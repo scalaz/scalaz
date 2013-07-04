@@ -1,0 +1,1264 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>Iteratee - scalaz.iteratee.Iteratee</title>
+          <meta name="description" content="Iteratee - scalaz.iteratee.Iteratee" />
+          <meta name="keywords" content="Iteratee scalaz.iteratee.Iteratee" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.iteratee.package$$Iteratee$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/object_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a>.<a href="package.html" class="extype" name="scalaz.iteratee">iteratee</a></p>
+        <h1>Iteratee</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Iteratee</span><span class="result"> extends <a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a> with <a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a> with <a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a> with <a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a> with <a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a> with <a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a> with <a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.1/iteratee/src/main/scala/scalaz/iteratee/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a>, <a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a>, <a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a>, <a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a>, <a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a>, <a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a>, <a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.iteratee.Iteratee"><span>Iteratee</span></li><li class="in" name="scalaz.iteratee.InputFunctions"><span>InputFunctions</span></li><li class="in" name="scalaz.iteratee.StepTFunctions"><span>StepTFunctions</span></li><li class="in" name="scalaz.iteratee.EnumerateeTFunctions"><span>EnumerateeTFunctions</span></li><li class="in" name="scalaz.iteratee.EnumeratorPFunctions"><span>EnumeratorPFunctions</span></li><li class="in" name="scalaz.iteratee.EnumeratorTFunctions"><span>EnumeratorTFunctions</span></li><li class="in" name="scalaz.iteratee.IterateeTFunctions"><span>IterateeTFunctions</span></li><li class="in" name="scalaz.iteratee.IterateeFunctions"><span>IterateeFunctions</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.Iteratee#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[E,A](s:scalaz.iteratee.package.Step[E,A]):scalaz.iteratee.package.Iteratee[E,A]"></a>
+      <a id="apply[E,A](Step[E,A]):Iteratee[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="params">(<span name="s">s: <a href="package.html#Step[E,A]=scalaz.iteratee.StepT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Step">Step</a>[<span class="extype" name="scalaz.iteratee.Iteratee.apply.E">E</span>, <span class="extype" name="scalaz.iteratee.Iteratee.apply.A">A</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.Iteratee.apply.E">E</span>, <span class="extype" name="scalaz.iteratee.Iteratee.apply.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#cogroupE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cogroupE[J,K,F[_]](implicitM:scalaz.Monad[F],implicitord:(J,K)=&gt;scalaz.Ordering):(scalaz.iteratee.EnumeratorP[J,F],scalaz.iteratee.EnumeratorP[K,F])=&gt;scalaz.iteratee.EnumeratorP[scalaz.Either3[J,(J,K),K],F]"></a>
+      <a id="cogroupE[J,K,F[_]](Monad[F],(J,K)⇒Ordering):(EnumeratorP[J,F],EnumeratorP[K,F])⇒EnumeratorP[Either3[J,(J,K),K],F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cogroupE</span><span class="tparams">[<span name="J">J</span>, <span name="K">K</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.F">F</span>]</span>, <span name="ord">ord: (<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.K">K</span>) ⇒ <a href="../Ordering.html" class="extype" name="scalaz.Ordering">Ordering</a></span>)</span><span class="result">: (<a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.F">F</span>], <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.K">K</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.F">F</span>]) ⇒ <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<a href="../Either3.html" class="extype" name="scalaz.Either3">Either3</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.J">J</span>, (<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.K">K</span>), <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.K">K</span>], <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.cogroupE.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#collect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="collect[O,I,F[_]](pf:PartialFunction[O,I])(implicitevidence$3:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[O,I,F]"></a>
+      <a id="collect[O,I,F[_]](PartialFunction[O,I])(Monad[F]):EnumerateeT[O,I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">collect</span><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="pf">pf: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.I">I</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.collect.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#collect" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="collect[A,F[_]](implicitmon:scalaz.Monoid[F[A]],implicitpt:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="collect[A,F[_]](Monoid[F[A]],Applicative[F]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">collect</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.A">A</span>]]</span>, <span name="pt">pt: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.collect.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Iteratee that collects all inputs with the given monoid.</p><div class="fullcomment"><div class="comment cmt"><p>Iteratee that collects all inputs with the given monoid.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#collectT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="collectT[E,F[_],A[_]](implicitM:scalaz.Monad[F],implicitmae:scalaz.Monoid[A[E]],implicitpointed:scalaz.Applicative[A]):scalaz.iteratee.IterateeT[E,F,A[E]]"></a>
+      <a id="collectT[E,F[_],A[_]](Monad[F],Monoid[A[E]],Applicative[A]):IterateeT[E,F,A[E]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">collectT</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.F">F</span>]</span>, <span name="mae">mae: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.A">A</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.E">E</span>]]</span>, <span name="pointed">pointed: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.A">A</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.A">A</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.collectT.E">E</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#consume" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="consume[E,F[_],A[_]](implicitevidence$4:scalaz.Monad[F],implicitevidence$5:scalaz.PlusEmpty[A],implicitevidence$6:scalaz.Applicative[A]):scalaz.iteratee.IterateeT[E,F,A[E]]"></a>
+      <a id="consume[E,F[_],A[_]](Monad[F],PlusEmpty[A],Applicative[A]):IterateeT[E,F,A[E]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">consume</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.F">F</span>]</span>, <span name="arg1">arg1: <a href="../PlusEmpty.html" class="extype" name="scalaz.PlusEmpty">PlusEmpty</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.A">A</span>]</span>, <span name="arg2">arg2: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.A">A</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.A">A</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.consume.E">E</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that consumes all of the input into something that is PlusEmpty and Applicative.</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that consumes all of the input into something that is PlusEmpty and Applicative.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#cont" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cont[E,F[_],A](c:scalaz.iteratee.Input[E]=&gt;scalaz.iteratee.IterateeT[E,F,A])(implicitevidence$2:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,A]"></a>
+      <a id="cont[E,F[_],A]((Input[E])⇒IterateeT[E,F,A])(Applicative[F]):IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cont</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="c">c: (<a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.E">E</span>]) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.cont.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#cross" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cross[E1,E2,F[_]](e2:scalaz.iteratee.EnumeratorT[E2,F])(implicitevidence$8:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[E1,(E1,E2),F]"></a>
+      <a id="cross[E1,E2,F[_]](EnumeratorT[E2,F])(Monad[F]):EnumerateeT[E1,(E1,E2),F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cross</span><span class="tparams">[<span name="E1">E1</span>, <span name="E2">E2</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="e2">e2: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.E2">E2</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.F">F</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.E1">E1</span>, (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.E1">E1</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.E2">E2</span>), <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.cross.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#done" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="done[E,F[_],A](d:=&gt;A,r:=&gt;scalaz.iteratee.Input[E])(implicitevidence$3:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,A]"></a>
+      <a id="done[E,F[_],A](⇒A,⇒Input[E])(Applicative[F]):IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">done</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="d">d: ⇒ <span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.A">A</span></span>, <span name="r">r: ⇒ <a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.E">E</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.done.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#doneOr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="doneOr[O,I,F[_],A](f:(scalaz.iteratee.Input[I]=&gt;scalaz.iteratee.IterateeT[I,F,A])=&gt;scalaz.iteratee.IterateeT[O,F,scalaz.iteratee.StepT[I,F,A]])(implicitevidence$9:scalaz.Applicative[F]):scalaz.iteratee.StepT[I,F,A]=&gt;scalaz.iteratee.IterateeT[O,F,scalaz.iteratee.StepT[I,F,A]]"></a>
+      <a id="doneOr[O,I,F[_],A](((Input[I])⇒IterateeT[I,F,A])⇒IterateeT[O,F,StepT[I,F,A]])(Applicative[F]):(StepT[I,F,A])⇒IterateeT[O,F,StepT[I,F,A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">doneOr</span><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="f">f: ((<a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.I">I</span>]) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.A">A</span>]) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.A">A</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>]</span>)</span><span class="result">: (<a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.A">A</span>]) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.doneOr.A">A</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#drop" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="drop[E,F[_]](n:Int)(implicitevidence$11:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Unit]"></a>
+      <a id="drop[E,F[_]](Int)(Applicative[F]):IterateeT[E,F,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">drop</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.drop.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.drop.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.drop.F">F</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that skips the first n elements of the input *</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that skips the first n elements of the input *</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#dropUntil" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dropUntil[E,F[_]](p:E=&gt;Boolean)(implicitevidence$13:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Unit]"></a>
+      <a id="dropUntil[E,F[_]]((E)⇒Boolean)(Applicative[F]):IterateeT[E,F,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dropUntil</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropUntil.E">E</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropUntil.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropUntil.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropUntil.F">F</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that skips elements until the predicate evaluates to true.</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that skips elements until the predicate evaluates to true.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#dropWhile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dropWhile[E,F[_]](p:E=&gt;Boolean)(implicitevidence$12:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Unit]"></a>
+      <a id="dropWhile[E,F[_]]((E)⇒Boolean)(Applicative[F]):IterateeT[E,F,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dropWhile</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropWhile.E">E</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropWhile.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropWhile.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.dropWhile.F">F</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that skips elements while the predicate evaluates to true.</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that skips elements while the predicate evaluates to true.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.InputFunctions#elInput" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="elInput[E](e:=&gt;E):scalaz.iteratee.Input[E]"></a>
+      <a id="elInput[E](⇒E):Input[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">elInput</span><span class="tparams">[<span name="E">E</span>]</span><span class="params">(<span name="e">e: ⇒ <span class="extype" name="scalaz.iteratee.InputFunctions.elInput.E">E</span></span>)</span><span class="result">: <a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.InputFunctions.elInput.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#empty" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="empty[E,F[_]]:scalaz.iteratee.EnumeratorP[E,F]"></a>
+      <a id="empty[E,F[_]]:EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">empty</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result">: <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.empty.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.empty.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#empty" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="empty[E,F[_]](implicitevidence$3:scalaz.Applicative[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="empty[E,F[_]](Applicative[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">empty</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.empty.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.empty.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.empty.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.InputFunctions#emptyInput" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="emptyInput[E]:scalaz.iteratee.Input[E]"></a>
+      <a id="emptyInput[E]:Input[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">emptyInput</span><span class="tparams">[<span name="E">E</span>]</span><span class="result">: <a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.InputFunctions.emptyInput.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumArray" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumArray[E,F[_]](a:Array[E],min:Int,max:Option[Int])(implicitevidence$9:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumArray[E,F[_]](Array[E],Int,Option[Int])(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumArray</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumArray.E">E</span>]</span>, <span name="min">min: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">0</span></span>, <span name="max">max: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Int">Int</span>] = <span class="symbol">None</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumArray.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumArray.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumArray.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+</p><div class="fullcomment"><div class="comment cmt"><p>An enumerator that yields the elements of the specified array from index min (inclusive) to max (exclusive)
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumEofT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumEofT[E,F[_]](implicitevidence$4:scalaz.Applicative[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumEofT[E,F[_]](Applicative[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumEofT</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumEofT.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumEofT.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumEofT.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An EnumeratorT that is at EOF
+</p><div class="fullcomment"><div class="comment cmt"><p>An EnumeratorT that is at EOF
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumIterator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumIterator[E,F[_]](x:=&gt;Iterator[E])(implicitMO:scalaz.MonadPartialOrder[F,scalaz.effect.IO]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumIterator[E,F[_]](⇒Iterator[E])(MonadPartialOrder[F,IO]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumIterator</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="x">x: ⇒ <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumIterator.E">E</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="MO">MO: <a href="../MonadPartialOrder.html" class="extype" name="scalaz.MonadPartialOrder">MonadPartialOrder</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumIterator.F">F</span>, <a href="../effect/IO.html" class="extype" name="scalaz.effect.IO">IO</a>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumIterator.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumIterator.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumList" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumList[E,F[_]](xs:List[E])(implicitevidence$8:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumList[E,F[_]](List[E])(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumList</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="xs">xs: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumList.E">E</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumList.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumList.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumList.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumOne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumOne[E,F[_]](e:E)(implicitevidence$6:scalaz.Applicative[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumOne[E,F[_]](E)(Applicative[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumOne</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumOne.E">E</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumOne.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumOne.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumOne.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#enumPStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumPStream[E,F[_]](xs:Stream[E])(implicitevidence$2:scalaz.Monad[F]):scalaz.iteratee.EnumeratorP[E,F]"></a>
+      <a id="enumPStream[E,F[_]](Stream[E])(Monad[F]):EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumPStream</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="xs">xs: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.enumPStream.E">E</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.enumPStream.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.enumPStream.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.enumPStream.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumReader" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumReader[F[_]](r:=&gt;java.io.Reader)(implicitMO:scalaz.MonadPartialOrder[F,scalaz.effect.IO]):scalaz.iteratee.EnumeratorT[scalaz.effect.IoExceptionOr[Char],F]"></a>
+      <a id="enumReader[F[_]](⇒java.io.Reader)(MonadPartialOrder[F,IO]):EnumeratorT[IoExceptionOr[Char],F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumReader</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="r">r: ⇒ <span class="extype" name="java.io.Reader">java.io.Reader</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="MO">MO: <a href="../MonadPartialOrder.html" class="extype" name="scalaz.MonadPartialOrder">MonadPartialOrder</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumReader.F">F</span>, <a href="../effect/IO.html" class="extype" name="scalaz.effect.IO">IO</a>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<a href="../effect/IoExceptionOr.html" class="extype" name="scalaz.effect.IoExceptionOr">IoExceptionOr</a>[<span class="extype" name="scala.Char">Char</span>], <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumReader.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumStream[E,F[_]](xs:Stream[E])(implicitevidence$7:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="enumStream[E,F[_]](Stream[E])(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumStream</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="xs">xs: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumStream.E">E</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumStream.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumStream.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumStream.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#enumerate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="enumerate[E](as:Stream[E]):scalaz.iteratee.Enumerator[E]"></a>
+      <a id="enumerate[E](Stream[E]):Enumerator[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">enumerate</span><span class="tparams">[<span name="E">E</span>]</span><span class="params">(<span name="as">as: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumerate.E">E</span>]</span>)</span><span class="result">: <a href="package.html#Enumerator[E]=scalaz.iteratee.EnumeratorT[E,scalaz.Id.Id]" class="extmbr" name="scalaz.iteratee.Enumerator">Enumerator</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.enumerate.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.InputFunctions#eofInput" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eofInput[E]:scalaz.iteratee.Input[E]"></a>
+      <a id="eofInput[E]:Input[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eofInput</span><span class="tparams">[<span name="E">E</span>]</span><span class="result">: <a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.InputFunctions.eofInput.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="filter[E,F[_]](p:E=&gt;Boolean)(implicitevidence$4:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[E,E,F]"></a>
+      <a id="filter[E,F[_]]((E)⇒Boolean)(Monad[F]):EnumerateeT[E,E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filter</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.filter.E">E</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.filter.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.filter.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.filter.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.filter.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#flatMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flatMap[O,I,F[_]](f:O=&gt;scalaz.iteratee.EnumeratorT[I,F])(implicitevidence$2:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[O,I,F]"></a>
+      <a id="flatMap[O,I,F[_]]((O)⇒EnumeratorT[I,F])(Monad[F]):EnumerateeT[O,I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flatMap</span><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.O">O</span>) ⇒ <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.F">F</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.flatMap.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#fold" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fold[E,F[_],A](init:A)(f:(A,E)=&gt;A)(implicitevidence$14:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,A]"></a>
+      <a id="fold[E,F[_],A](A)((A,E)⇒A)(Applicative[F]):IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fold</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="init">init: <span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.A">A</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.E">E</span>) ⇒ <span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.fold.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#foldM" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="foldM[E,F[_],A](init:A)(f:(A,E)=&gt;F[A])(implicitm:scalaz.Monad[F]):scalaz.iteratee.IterateeT[E,F,A]"></a>
+      <a id="foldM[E,F[_],A](A)((A,E)⇒F[A])(Monad[F]):IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldM</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="init">init: <span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.A">A</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.E">E</span>) ⇒ <span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.foldM.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#group" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="group[E,F[_],G[_]](n:Int)(implicitF:scalaz.Applicative[F],implicitFE:scalaz.Monoid[F[E]],implicitG:scalaz.Monad[G]):scalaz.iteratee.EnumerateeT[E,F[E],G]"></a>
+      <a id="group[E,F[_],G[_]](Int)(Applicative[F],Monoid[F[E]],Monad[G]):EnumerateeT[E,F[E],G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">group</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.F">F</span>]</span>, <span name="FE">FE: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.E">E</span>]]</span>, <span name="G">G: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.G">G</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.E">E</span>], <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.group.G">G</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#groupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="groupBy[A,F[_]](pred:(A,A)=&gt;Boolean)(implicitmon:scalaz.Monoid[F[A]],implicitpr:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="groupBy[A,F[_]]((A,A)⇒Boolean)(Monoid[F[A]],Applicative[F]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">groupBy</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="pred">pred: (<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.A">A</span>]]</span>, <span name="pr">pr: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.groupBy.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Produces chunked output split by the given predicate.</p><div class="fullcomment"><div class="comment cmt"><p>Produces chunked output split by the given predicate.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#head" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="head[E,F[_]](implicitevidence$7:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Option[E]]"></a>
+      <a id="head[E,F[_]](Applicative[F]):IterateeT[E,F,Option[E]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">head</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.head.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.head.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.head.F">F</span>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.head.E">E</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that consumes the head of the input *</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that consumes the head of the input *</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#headDoneOr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="headDoneOr[E,F[_],B](b:=&gt;B,f:E=&gt;scalaz.iteratee.IterateeT[E,F,B])(implicitevidence$8:scalaz.Monad[F]):scalaz.iteratee.IterateeT[E,F,B]"></a>
+      <a id="headDoneOr[E,F[_],B](⇒B,(E)⇒IterateeT[E,F,B])(Monad[F]):IterateeT[E,F,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">headDoneOr</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="b">b: ⇒ <span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.B">B</span></span>, <span name="f">f: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.E">E</span>) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.headDoneOr.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#isEof" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isEof[E,F[_]](implicitevidence$16:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Boolean]"></a>
+      <a id="isEof[E,F[_]](Applicative[F]):IterateeT[E,F,Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isEof</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.isEof.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.isEof.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.isEof.F">F</span>, <span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that checks if the input is EOF.</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that checks if the input is EOF.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#iterate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="iterate[E,F[_]](f:E=&gt;E,e:E)(implicitevidence$11:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="iterate[E,F[_]]((E)⇒E,E)(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">iterate</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.E">E</span>) ⇒ <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.E">E</span></span>, <span name="e">e: <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.E">E</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.iterate.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#iteratee" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="iteratee[E,A](s:scalaz.iteratee.Step[E,A]):scalaz.iteratee.Iteratee[E,A]"></a>
+      <a id="iteratee[E,A](Step[E,A]):Iteratee[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">iteratee</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="params">(<span name="s">s: <a href="package.html#Step[E,A]=scalaz.iteratee.StepT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Step">Step</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.iteratee.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.iteratee.A">A</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.iteratee.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.iteratee.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#iterateeT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="iterateeT[E,F[_],A](s:F[scalaz.iteratee.StepT[E,F,A]]):scalaz.iteratee.IterateeT[E,F,A]"></a>
+      <a id="iterateeT[E,F[_],A](F[StepT[E,F,A]]):IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">iterateeT</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="s">s: <span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.F">F</span>[<a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.A">A</span>]]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.iterateeT.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#joinE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="joinE[J,K,F[_]](implicitM:scalaz.Monad[F],implicitord:(J,K)=&gt;scalaz.Ordering):(scalaz.iteratee.EnumeratorP[J,F],scalaz.iteratee.EnumeratorP[K,F])=&gt;scalaz.iteratee.EnumeratorP[(J,K),F]"></a>
+      <a id="joinE[J,K,F[_]](Monad[F],(J,K)⇒Ordering):(EnumeratorP[J,F],EnumeratorP[K,F])⇒EnumeratorP[(J,K),F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">joinE</span><span class="tparams">[<span name="J">J</span>, <span name="K">K</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.F">F</span>]</span>, <span name="ord">ord: (<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.K">K</span>) ⇒ <a href="../Ordering.html" class="extype" name="scalaz.Ordering">Ordering</a></span>)</span><span class="result">: (<a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.F">F</span>], <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.K">K</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.F">F</span>]) ⇒ <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[(<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.K">K</span>), <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.joinE.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#length" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="length[E,F[_]](implicitevidence$15:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Int]"></a>
+      <a id="length[E,F[_]](Applicative[F]):IterateeT[E,F,Int]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">length</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.length.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.length.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.length.F">F</span>, <span class="extype" name="scala.Int">Int</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that counts and consumes the elements of the input
+</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that counts and consumes the elements of the input
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#liftE2" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="liftE2[J,K,I,F[_]](e2t:scalaz.iteratee.ForallM[[β[_]]scalaz.iteratee.Enumeratee2T[J,K,I,β]]):(scalaz.iteratee.EnumeratorP[J,F],scalaz.iteratee.EnumeratorP[K,F])=&gt;scalaz.iteratee.EnumeratorP[I,F]"></a>
+      <a id="liftE2[J,K,I,F[_]](ForallM[[β[_]]Enumeratee2T[J,K,I,β]]):(EnumeratorP[J,F],EnumeratorP[K,F])⇒EnumeratorP[I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">liftE2</span><span class="tparams">[<span name="J">J</span>, <span name="K">K</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="e2t">e2t: <a href="ForallM.html" class="extype" name="scalaz.iteratee.ForallM">ForallM</a>[[β[_]]<a href="Enumeratee2T.html" class="extype" name="scalaz.iteratee.Enumeratee2T">Enumeratee2T</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.K">K</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.&lt;refinement&gt;.λ.β">β</span>]]</span>)</span><span class="result">: (<a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.J">J</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.F">F</span>], <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.K">K</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.F">F</span>]) ⇒ <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.liftE2.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#map" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="map[O,I,F[_]](f:O=&gt;I)(implicitevidence$1:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[O,I,F]"></a>
+      <a id="map[O,I,F[_]]((O)⇒I)(Monad[F]):EnumerateeT[O,I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.O">O</span>) ⇒ <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.I">I</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.O">O</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.I">I</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.map.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Applies a function to each input element and feeds the resulting outputs to the inner iteratee.</p><div class="fullcomment"><div class="comment cmt"><p>Applies a function to each input element and feeds the resulting outputs to the inner iteratee.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#mergeAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="mergeAll[E,F[_]](enumerators:scalaz.iteratee.EnumeratorP[E,F]*)(implicitevidence$8:scalaz.Order[E],implicitevidence$9:scalaz.Monad[F]):scalaz.iteratee.EnumeratorP[E,F]"></a>
+      <a id="mergeAll[E,F[_]](EnumeratorP[E,F]*)(Order[E],Monad[F]):EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mergeAll</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="enumerators">enumerators: <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.F">F</span>]*</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.E">E</span>]</span>, <span name="arg1">arg1: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeAll.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#mergeE" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="mergeE[E,F[_]](implicitevidence$5:scalaz.Order[E],implicitevidence$6:scalaz.Monad[F]):(scalaz.iteratee.EnumeratorP[E,F],scalaz.iteratee.EnumeratorP[E,F])=&gt;scalaz.iteratee.EnumeratorP[E,F]"></a>
+      <a id="mergeE[E,F[_]](Order[E],Monad[F]):(EnumeratorP[E,F],EnumeratorP[E,F])⇒EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mergeE</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.E">E</span>]</span>, <span name="arg1">arg1: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.F">F</span>]</span>)</span><span class="result">: (<a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.F">F</span>], <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.F">F</span>]) ⇒ <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.mergeE.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#peek" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="peek[E,F[_]](implicitevidence$9:scalaz.Applicative[F]):scalaz.iteratee.IterateeT[E,F,Option[E]]"></a>
+      <a id="peek[E,F[_]](Applicative[F]):IterateeT[E,F,Option[E]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">peek</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peek.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peek.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peek.F">F</span>, <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peek.E">E</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that returns the first element of the input *</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that returns the first element of the input *</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#peekDoneOr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="peekDoneOr[E,F[_],B](b:=&gt;B,f:E=&gt;scalaz.iteratee.IterateeT[E,F,B])(implicitevidence$10:scalaz.Monad[F]):scalaz.iteratee.IterateeT[E,F,B]"></a>
+      <a id="peekDoneOr[E,F[_],B](⇒B,(E)⇒IterateeT[E,F,B])(Monad[F]):IterateeT[E,F,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">peekDoneOr</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="b">b: ⇒ <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.B">B</span></span>, <span name="f">f: (<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.E">E</span>) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.peekDoneOr.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions#perform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perform[E,F[_],B](f:F[B]):scalaz.iteratee.EnumeratorP[E,F]"></a>
+      <a id="perform[E,F[_],B](F[B]):EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perform</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.perform.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.perform.B">B</span>]</span>)</span><span class="result">: <a href="EnumeratorP.html" class="extype" name="scalaz.iteratee.EnumeratorP">EnumeratorP</a>[<span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.perform.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorPFunctions.perform.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#perform" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perform[E,F[_],B](f:F[B])(implicitevidence$5:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="perform[E,F[_],B](F[B])(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perform</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.perform.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.perform.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.perform.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.perform.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.perform.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An enumerator that forces the evaluation of an effect in the F monad when it is consumed.</p><div class="fullcomment"><div class="comment cmt"><p>An enumerator that forces the evaluation of an effect in the F monad when it is consumed.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#putStrTo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="putStrTo[E](os:java.io.OutputStream)(implicits:scalaz.Show[E]):scalaz.iteratee.IterateeT[E,scalaz.effect.IO,Unit]"></a>
+      <a id="putStrTo[E](OutputStream)(Show[E]):IterateeT[E,IO,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putStrTo</span><span class="tparams">[<span name="E">E</span>]</span><span class="params">(<span name="os">os: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="s">s: <a href="../Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.putStrTo.E">E</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.putStrTo.E">E</span>, <a href="../effect/IO.html" class="extype" name="scalaz.effect.IO">IO</a>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iteratee that writes input to the output stream as it comes in.</p><div class="fullcomment"><div class="comment cmt"><p>An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions#repeat" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="repeat[E,F[_]](e:E)(implicitevidence$10:scalaz.Monad[F]):scalaz.iteratee.EnumeratorT[E,F]"></a>
+      <a id="repeat[E,F[_]](E)(Monad[F]):EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">repeat</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.repeat.E">E</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.repeat.F">F</span>]</span>)</span><span class="result">: <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.repeat.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumeratorTFunctions.repeat.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#repeatBuild" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="repeatBuild[E,A,F[_]](iter:scalaz.iteratee.Iteratee[E,A])(implicitmon:scalaz.Monoid[F[A]],implicitF:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[E,F[A]]"></a>
+      <a id="repeatBuild[E,A,F[_]](Iteratee[E,A])(Monoid[F[A]],Applicative[F]):Iteratee[E,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">repeatBuild</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="iter">iter: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.A">A</span>]]</span>, <span name="F">F: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.repeatBuild.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Repeats the given iteratee by appending with the given monoid.</p><div class="fullcomment"><div class="comment cmt"><p>Repeats the given iteratee by appending with the given monoid.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#reversed" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reversed[A,F[_]](implicitr:scalaz.Reducer[A,F[A]]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="reversed[A,F[_]](Reducer[A,F[A]]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reversed</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="r">r: <a href="../Reducer.html" class="extype" name="scalaz.Reducer">Reducer</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.A">A</span>]]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.reversed.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Iteratee that collects all inputs in reverse with the given reducer.</p><div class="fullcomment"><div class="comment cmt"><p>Iteratee that collects all inputs in reverse with the given reducer.</p><p>This iteratee is useful for F[_] with efficient cons, i.e. List.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.StepTFunctions#scont" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="scont[E,F[_],A](c:scalaz.iteratee.Input[E]=&gt;scalaz.iteratee.IterateeT[E,F,A]):scalaz.iteratee.StepT[E,F,A]"></a>
+      <a id="scont[E,F[_],A]((Input[E])⇒IterateeT[E,F,A]):StepT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">scont</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="c">c: (<a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.StepTFunctions.scont.E">E</span>]) ⇒ <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.StepTFunctions.scont.E">E</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.scont.F">F</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.scont.A">A</span>]</span>)</span><span class="result">: <a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.StepTFunctions.scont.E">E</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.scont.F">F</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.scont.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.StepTFunctions#sdone" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sdone[E,F[_],A](d:=&gt;A,r:=&gt;scalaz.iteratee.Input[E]):scalaz.iteratee.StepT[E,F,A]"></a>
+      <a id="sdone[E,F[_],A](⇒A,⇒Input[E]):StepT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sdone</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="d">d: ⇒ <span class="extype" name="scalaz.iteratee.StepTFunctions.sdone.A">A</span></span>, <span name="r">r: ⇒ <a href="Input.html" class="extype" name="scalaz.iteratee.Input">Input</a>[<span class="extype" name="scalaz.iteratee.StepTFunctions.sdone.E">E</span>]</span>)</span><span class="result">: <a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.StepTFunctions.sdone.E">E</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.sdone.F">F</span>, <span class="extype" name="scalaz.iteratee.StepTFunctions.sdone.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#splitOn" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="splitOn[E,F[_],G[_]](p:E=&gt;Boolean)(implicitF:scalaz.Applicative[F],implicitFE:scalaz.Monoid[F[E]],implicitG:scalaz.Monad[G]):scalaz.iteratee.EnumerateeT[E,F[E],G]"></a>
+      <a id="splitOn[E,F[_],G[_]]((E)⇒Boolean)(Applicative[F],Monoid[F[E]],Monad[G]):EnumerateeT[E,F[E],G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">splitOn</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.E">E</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.F">F</span>]</span>, <span name="FE">FE: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.E">E</span>]]</span>, <span name="G">G: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.G">G</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.F">F</span>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.E">E</span>], <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.splitOn.G">G</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeTFunctions#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sum[E,F[_]](implicitevidence$17:scalaz.Monoid[E],implicitevidence$18:scalaz.Monad[F]):scalaz.iteratee.IterateeT[E,F,E]"></a>
+      <a id="sum[E,F[_]](Monoid[E],Monad[F]):IterateeT[E,F,E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.sum.E">E</span>]</span>, <span name="arg1">arg1: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.sum.F">F</span>]</span>)</span><span class="result">: <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.IterateeTFunctions.sum.E">E</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.sum.F">F</span>, <span class="extype" name="scalaz.iteratee.IterateeTFunctions.sum.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#take" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="take[A,F[_]](n:Int)(implicitmon:scalaz.Monoid[F[A]],implicitpt:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="take[A,F[_]](Int)(Monoid[F[A]],Applicative[F]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">take</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.take.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.take.A">A</span>]]</span>, <span name="pt">pt: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.take.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.take.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.take.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.take.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Iteratee that collects the first n inputs.</p><div class="fullcomment"><div class="comment cmt"><p>Iteratee that collects the first n inputs.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#takeUntil" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="takeUntil[A,F[_]](p:A=&gt;Boolean)(implicitmon:scalaz.Monoid[F[A]],implicitpt:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="takeUntil[A,F[_]]((A)⇒Boolean)(Monoid[F[A]],Applicative[F]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">takeUntil</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.A">A</span>]]</span>, <span name="pt">pt: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeUntil.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Iteratee that collects inputs with the given monoid until the input element passes a test.</p><div class="fullcomment"><div class="comment cmt"><p>Iteratee that collects inputs with the given monoid until the input element passes a test.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.iteratee.IterateeFunctions#takeWhile" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="takeWhile[A,F[_]](p:A=&gt;Boolean)(implicitmon:scalaz.Monoid[F[A]],implicitpt:scalaz.Applicative[F]):scalaz.iteratee.Iteratee[A,F[A]]"></a>
+      <a id="takeWhile[A,F[_]]((A)⇒Boolean)(Monoid[F[A]],Applicative[F]):Iteratee[A,F[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">takeWhile</span><span class="tparams">[<span name="A">A</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="mon">mon: <a href="../Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.A">A</span>]]</span>, <span name="pt">pt: <a href="../Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.F">F</span>]</span>)</span><span class="result">: <a href="package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">Iteratee</a>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.A">A</span>, <span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.F">F</span>[<span class="extype" name="scalaz.iteratee.IterateeFunctions.takeWhile.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Iteratee that collects inputs with the given monoid until the input element fails a test.</p><div class="fullcomment"><div class="comment cmt"><p>Iteratee that collects inputs with the given monoid until the input element fails a test.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#uniq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="uniq[E,F[_]](implicitevidence$5:scalaz.Order[E],implicitevidence$6:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[E,E,F]"></a>
+      <a id="uniq[E,F[_]](Order[E],Monad[F]):EnumerateeT[E,E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">uniq</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.uniq.E">E</span>]</span>, <span name="arg1">arg1: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.uniq.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.uniq.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.uniq.E">E</span>, <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.uniq.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Uniqueness filter.</p><div class="fullcomment"><div class="comment cmt"><p>Uniqueness filter. Assumes that the input enumerator is already sorted.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions#zipWithIndex" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="zipWithIndex[E,F[_]](implicitevidence$7:scalaz.Monad[F]):scalaz.iteratee.EnumerateeT[E,(E,Long),F]"></a>
+      <a id="zipWithIndex[E,F[_]](Monad[F]):EnumerateeT[E,(E,Long),F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">zipWithIndex</span><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.zipWithIndex.F">F</span>]</span>)</span><span class="result">: <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.zipWithIndex.E">E</span>, (<span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.zipWithIndex.E">E</span>, <span class="extype" name="scala.Long">Long</span>), <span class="extype" name="scalaz.iteratee.EnumerateeTFunctions.zipWithIndex.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Zips with the count of elements that have been encountered.</p><div class="fullcomment"><div class="comment cmt"><p>Zips with the count of elements that have been encountered.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.iteratee.InputFunctions">
+              <h3>Inherited from <a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.StepTFunctions">
+              <h3>Inherited from <a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.EnumerateeTFunctions">
+              <h3>Inherited from <a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.EnumeratorPFunctions">
+              <h3>Inherited from <a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.EnumeratorTFunctions">
+              <h3>Inherited from <a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.IterateeTFunctions">
+              <h3>Inherited from <a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a></h3>
+            </div><div class="parent" name="scalaz.iteratee.IterateeFunctions">
+              <h3>Inherited from <a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>

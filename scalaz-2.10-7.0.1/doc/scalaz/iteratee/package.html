@@ -1,0 +1,577 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>iteratee - scalaz.iteratee</title>
+          <meta name="description" content="iteratee - scalaz.iteratee" />
+          <meta name="keywords" content="iteratee scalaz.iteratee" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.iteratee.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1>iteratee</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">iteratee</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.1/iteratee/src/main/scala/scalaz/iteratee/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.iteratee"><span>iteratee</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.iteratee.&gt;@&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&gt;@&gt;[E,A]=scalaz.iteratee.package.Iteratee[E,A]"></a>
+      <a id="&gt;@&gt;[E,A]:&gt;@&gt;[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $greater$at$greater" class="name">&gt;@&gt;</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="result"> = <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.&gt;@&gt;.E">E</span>, <a href="../Id$.html#Id[+X]=X" class="extmbr" name="scalaz.Id.Id">Id.Id</a>, <span class="extype" name="scalaz.iteratee.&gt;@&gt;.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Enumeratee" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Enumeratee[O,I]=scalaz.iteratee.EnumerateeT[O,I,scalaz.Id.Id]"></a>
+      <a id="Enumeratee[O,I]:Enumeratee[O,I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Enumeratee</span><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>]</span><span class="result"> = <a href="EnumerateeT.html" class="extype" name="scalaz.iteratee.EnumerateeT">EnumerateeT</a>[<span class="extype" name="scalaz.iteratee.Enumeratee.O">O</span>, <span class="extype" name="scalaz.iteratee.Enumeratee.I">I</span>, <a href="../Id$.html#Id[+X]=X" class="extmbr" name="scalaz.Id.Id">Id.Id</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Enumeratee2T" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Enumeratee2T[J,K,I,F[_]]extendsAnyRef"></a>
+      <a id="Enumeratee2T[J,K,I,F[_]]:Enumeratee2T[J,K,I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Enumeratee2T.html"><span class="name">Enumeratee2T</span></a><span class="tparams">[<span name="J">J</span>, <span name="K">K</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Enumeratee2TFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Enumeratee2TFunctionsextendsAnyRef"></a>
+      <a id="Enumeratee2TFunctions:Enumeratee2TFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Enumeratee2TFunctions.html"><span class="name">Enumeratee2TFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumerateeT" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumerateeT[O,I,F[_]]extendsAnyRef"></a>
+      <a id="EnumerateeT[O,I,F[_]]:EnumerateeT[O,I,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumerateeT.html"><span class="name">EnumerateeT</span></a><span class="tparams">[<span name="O">O</span>, <span name="I">I</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumerateeTFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumerateeTFunctionsextendsAnyRef"></a>
+      <a id="EnumerateeTFunctions:EnumerateeTFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumerateeTFunctions.html"><span class="name">EnumerateeTFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Enumerator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Enumerator[E]=scalaz.iteratee.EnumeratorT[E,scalaz.Id.Id]"></a>
+      <a id="Enumerator[E]:Enumerator[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Enumerator</span><span class="tparams">[<span name="E">E</span>]</span><span class="result"> = <a href="EnumeratorT.html" class="extype" name="scalaz.iteratee.EnumeratorT">EnumeratorT</a>[<span class="extype" name="scalaz.iteratee.Enumerator.E">E</span>, <a href="../Id$.html#Id[+X]=X" class="extmbr" name="scalaz.Id.Id">Id.Id</a>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorP" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorP[E,F[_]]extendsAnyRef"></a>
+      <a id="EnumeratorP[E,F[_]]:EnumeratorP[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorP.html"><span class="name">EnumeratorP</span></a><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorPFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorPFunctionsextendsAnyRef"></a>
+      <a id="EnumeratorPFunctions:EnumeratorPFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorPFunctions.html"><span class="name">EnumeratorPFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorPInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorPInstancesextendsAnyRef"></a>
+      <a id="EnumeratorPInstances:EnumeratorPInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorPInstances.html"><span class="name">EnumeratorPInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorT" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorT[E,F[_]]extendsAnyRef"></a>
+      <a id="EnumeratorT[E,F[_]]:EnumeratorT[E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorT.html"><span class="name">EnumeratorT</span></a><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorTFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorTFunctionsextendsAnyRef"></a>
+      <a id="EnumeratorTFunctions:EnumeratorTFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorTFunctions.html"><span class="name">EnumeratorTFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorTInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorTInstancesextendsEnumeratorTInstances0"></a>
+      <a id="EnumeratorTInstances:EnumeratorTInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorTInstances.html"><span class="name">EnumeratorTInstances</span></a><span class="result"> extends <a href="EnumeratorTInstances0.html" class="extype" name="scalaz.iteratee.EnumeratorTInstances0">EnumeratorTInstances0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorTInstances0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorTInstances0extendsAnyRef"></a>
+      <a id="EnumeratorTInstances0:EnumeratorTInstances0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorTInstances0.html"><span class="name">EnumeratorTInstances0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.ForallM" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ForallM[P[_[_]]]extendsAnyRef"></a>
+      <a id="ForallM[P[_[_]]]:ForallM[P]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ForallM.html"><span class="name">ForallM</span></a><span class="tparams">[<span name="P">P<span class="tparams">[<span name="_">_<span class="tparams">[<span name="_">_</span>]</span></span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Input" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Input[E]extendsAnyRef"></a>
+      <a id="Input[E]:Input[E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Input.html"><span class="name">Input</span></a><span class="tparams">[<span name="E">E</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">The input to an iteratee.</p>
+    </li><li name="scalaz.iteratee.InputFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="InputFunctionsextendsAnyRef"></a>
+      <a id="InputFunctions:InputFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="InputFunctions.html"><span class="name">InputFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.InputInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="InputInstancesextendsAnyRef"></a>
+      <a id="InputInstances:InputInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="InputInstances.html"><span class="name">InputInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Iteratee" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]"></a>
+      <a id="Iteratee[E,A]:Iteratee[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Iteratee</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="result"> = <a href="IterateeT.html" class="extype" name="scalaz.iteratee.IterateeT">IterateeT</a>[<span class="extype" name="scalaz.iteratee.Iteratee.E">E</span>, <a href="../Id$.html#Id[+X]=X" class="extmbr" name="scalaz.Id.Id">Id.Id</a>, <span class="extype" name="scalaz.iteratee.Iteratee.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.IterateeFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IterateeFunctionsextendsAnyRef"></a>
+      <a id="IterateeFunctions:IterateeFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeFunctions.html"><span class="name">IterateeFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.IterateeT" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IterateeT[E,F[_],A]extendsAnyRef"></a>
+      <a id="IterateeT[E,F[_],A]:IterateeT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeT.html"><span class="name">IterateeT</span></a><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A data sink.</p>
+    </li><li name="scalaz.iteratee.IterateeTFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IterateeTFunctionsextendsAnyRef"></a>
+      <a id="IterateeTFunctions:IterateeTFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeTFunctions.html"><span class="name">IterateeTFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.IterateeTInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IterateeTInstancesextendsIterateeTInstances0"></a>
+      <a id="IterateeTInstances:IterateeTInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeTInstances.html"><span class="name">IterateeTInstances</span></a><span class="result"> extends <a href="IterateeTInstances0.html" class="extype" name="scalaz.iteratee.IterateeTInstances0">IterateeTInstances0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.IterateeTInstances0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IterateeTInstances0extendsAnyRef"></a>
+      <a id="IterateeTInstances0:IterateeTInstances0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeTInstances0.html"><span class="name">IterateeTInstances0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Step" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Step[E,A]=scalaz.iteratee.StepT[E,scalaz.Id.Id,A]"></a>
+      <a id="Step[E,A]:Step[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Step</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="result"> = <a href="StepT.html" class="extype" name="scalaz.iteratee.StepT">StepT</a>[<span class="extype" name="scalaz.iteratee.Step.E">E</span>, <a href="../Id$.html#Id[+X]=X" class="extmbr" name="scalaz.Id.Id">Id.Id</a>, <span class="extype" name="scalaz.iteratee.Step.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.StepT" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StepT[E,F[_],A]extendsAnyRef"></a>
+      <a id="StepT[E,F[_],A]:StepT[E,F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StepT.html"><span class="name">StepT</span></a><span class="tparams">[<span name="E">E</span>, <span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">The current state of an Iteratee, one of:</p>
+    </li><li name="scalaz.iteratee.StepTFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StepTFunctionsextendsAnyRef"></a>
+      <a id="StepTFunctions:StepTFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StepTFunctions.html"><span class="name">StepTFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalaz.iteratee.Enumeratee2T" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Enumeratee2T"></a>
+      <a id="Enumeratee2T:Enumeratee2T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Enumeratee2T$.html"><span class="name">Enumeratee2T</span></a><span class="result"> extends <a href="Enumeratee2TFunctions.html" class="extype" name="scalaz.iteratee.Enumeratee2TFunctions">Enumeratee2TFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumerateeT" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EnumerateeT"></a>
+      <a id="EnumerateeT:EnumerateeT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumerateeT$.html"><span class="name">EnumerateeT</span></a><span class="result"> extends <a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorP" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorP"></a>
+      <a id="EnumeratorP:EnumeratorP"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorP$.html"><span class="name">EnumeratorP</span></a><span class="result"> extends <a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a> with <a href="EnumeratorPInstances.html" class="extype" name="scalaz.iteratee.EnumeratorPInstances">EnumeratorPInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.EnumeratorT" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EnumeratorT"></a>
+      <a id="EnumeratorT:EnumeratorT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EnumeratorT$.html"><span class="name">EnumeratorT</span></a><span class="result"> extends <a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a> with <a href="EnumeratorTInstances.html" class="extype" name="scalaz.iteratee.EnumeratorTInstances">EnumeratorTInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Input" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Input"></a>
+      <a id="Input:Input"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Input$.html"><span class="name">Input</span></a><span class="result"> extends <a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a> with <a href="InputInstances.html" class="extype" name="scalaz.iteratee.InputInstances">InputInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.Iteratee" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Iteratee"></a>
+      <a id="Iteratee:Iteratee"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="package$$Iteratee$.html"><span class="name">Iteratee</span></a><span class="result"> extends <a href="IterateeFunctions.html" class="extype" name="scalaz.iteratee.IterateeFunctions">IterateeFunctions</a> with <a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a> with <a href="EnumeratorTFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorTFunctions">EnumeratorTFunctions</a> with <a href="EnumeratorPFunctions.html" class="extype" name="scalaz.iteratee.EnumeratorPFunctions">EnumeratorPFunctions</a> with <a href="EnumerateeTFunctions.html" class="extype" name="scalaz.iteratee.EnumerateeTFunctions">EnumerateeTFunctions</a> with <a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a> with <a href="InputFunctions.html" class="extype" name="scalaz.iteratee.InputFunctions">InputFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.IterateeT" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IterateeT"></a>
+      <a id="IterateeT:IterateeT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IterateeT$.html"><span class="name">IterateeT</span></a><span class="result"> extends <a href="IterateeTFunctions.html" class="extype" name="scalaz.iteratee.IterateeTFunctions">IterateeTFunctions</a> with <a href="IterateeTInstances.html" class="extype" name="scalaz.iteratee.IterateeTInstances">IterateeTInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.iteratee.StepT" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StepT"></a>
+      <a id="StepT:StepT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StepT$.html"><span class="name">StepT</span></a><span class="result"> extends <a href="StepTFunctions.html" class="extype" name="scalaz.iteratee.StepTFunctions">StepTFunctions</a> with <a href="EnumeratorTInstances.html" class="extype" name="scalaz.iteratee.EnumeratorTInstances">EnumeratorTInstances</a></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>

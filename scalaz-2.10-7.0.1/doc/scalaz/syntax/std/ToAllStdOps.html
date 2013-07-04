@@ -1,0 +1,735 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>ToAllStdOps - scalaz.syntax.std.ToAllStdOps</title>
+          <meta name="description" content="ToAllStdOps - scalaz.syntax.std.ToAllStdOps" />
+          <meta name="keywords" content="ToAllStdOps scalaz.syntax.std.ToAllStdOps" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'scalaz.syntax.std.ToAllStdOps';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../../lib/trait_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="scalaz">scalaz</a>.<a href="../package.html" class="extype" name="scalaz.syntax">syntax</a>.<a href="package.html" class="extype" name="scalaz.syntax.std">std</a></p>
+        <h1>ToAllStdOps</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToAllStdOps</span><span class="result"> extends <a href="ToBooleanOps.html" class="extype" name="scalaz.syntax.std.ToBooleanOps">ToBooleanOps</a> with <a href="ToOptionOps.html" class="extype" name="scalaz.syntax.std.ToOptionOps">ToOptionOps</a> with <a href="ToOptionIdOps.html" class="extype" name="scalaz.syntax.std.ToOptionIdOps">ToOptionIdOps</a> with <a href="ToListOps.html" class="extype" name="scalaz.syntax.std.ToListOps">ToListOps</a> with <a href="ToStreamOps.html" class="extype" name="scalaz.syntax.std.ToStreamOps">ToStreamOps</a> with <a href="ToVectorOps.html" class="extype" name="scalaz.syntax.std.ToVectorOps">ToVectorOps</a> with <a href="ToFunction2Ops.html" class="extype" name="scalaz.syntax.std.ToFunction2Ops">ToFunction2Ops</a> with <a href="ToFunction1Ops.html" class="extype" name="scalaz.syntax.std.ToFunction1Ops">ToFunction1Ops</a> with <a href="ToStringOps.html" class="extype" name="scalaz.syntax.std.ToStringOps">ToStringOps</a> with <a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a> with <a href="ToMapOps.html" class="extype" name="scalaz.syntax.std.ToMapOps">ToMapOps</a> with <a href="ToEitherOps.html" class="extype" name="scalaz.syntax.std.ToEitherOps">ToEitherOps</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.1/core/src/main/scala/scalaz/syntax/std/ToAllStdOps.scala" target="_blank">ToAllStdOps.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="ToEitherOps.html" class="extype" name="scalaz.syntax.std.ToEitherOps">ToEitherOps</a>, <a href="ToMapOps.html" class="extype" name="scalaz.syntax.std.ToMapOps">ToMapOps</a>, <a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a>, <a href="ToStringOps.html" class="extype" name="scalaz.syntax.std.ToStringOps">ToStringOps</a>, <a href="ToFunction1Ops.html" class="extype" name="scalaz.syntax.std.ToFunction1Ops">ToFunction1Ops</a>, <a href="ToFunction2Ops.html" class="extype" name="scalaz.syntax.std.ToFunction2Ops">ToFunction2Ops</a>, <a href="ToVectorOps.html" class="extype" name="scalaz.syntax.std.ToVectorOps">ToVectorOps</a>, <a href="ToStreamOps.html" class="extype" name="scalaz.syntax.std.ToStreamOps">ToStreamOps</a>, <a href="ToListOps.html" class="extype" name="scalaz.syntax.std.ToListOps">ToListOps</a>, <a href="ToOptionIdOps.html" class="extype" name="scalaz.syntax.std.ToOptionIdOps">ToOptionIdOps</a>, <a href="ToOptionOps.html" class="extype" name="scalaz.syntax.std.ToOptionOps">ToOptionOps</a>, <a href="ToBooleanOps.html" class="extype" name="scalaz.syntax.std.ToBooleanOps">ToBooleanOps</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+          <span class="toggle">Known Subclasses</span>
+          <div class="subClasses hiddenContent"><a href="../../Scalaz$.html" class="extype" name="scalaz.Scalaz">Scalaz</a>, <a href="package$$all$.html" class="extype" name="scalaz.syntax.std.all">all</a></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.syntax.std.ToAllStdOps"><span>ToAllStdOps</span></li><li class="in" name="scalaz.syntax.std.ToEitherOps"><span>ToEitherOps</span></li><li class="in" name="scalaz.syntax.std.ToMapOps"><span>ToMapOps</span></li><li class="in" name="scalaz.syntax.std.ToTupleOps"><span>ToTupleOps</span></li><li class="in" name="scalaz.syntax.std.ToStringOps"><span>ToStringOps</span></li><li class="in" name="scalaz.syntax.std.ToFunction1Ops"><span>ToFunction1Ops</span></li><li class="in" name="scalaz.syntax.std.ToFunction2Ops"><span>ToFunction2Ops</span></li><li class="in" name="scalaz.syntax.std.ToVectorOps"><span>ToVectorOps</span></li><li class="in" name="scalaz.syntax.std.ToStreamOps"><span>ToStreamOps</span></li><li class="in" name="scalaz.syntax.std.ToListOps"><span>ToListOps</span></li><li class="in" name="scalaz.syntax.std.ToOptionIdOps"><span>ToOptionIdOps</span></li><li class="in" name="scalaz.syntax.std.ToOptionOps"><span>ToOptionOps</span></li><li class="in" name="scalaz.syntax.std.ToBooleanOps"><span>ToBooleanOps</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToBooleanOps#ToBooleanOpsFromBoolean" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToBooleanOpsFromBoolean(a:Boolean):scalaz.syntax.std.BooleanOps"></a>
+      <a id="ToBooleanOpsFromBoolean(Boolean):BooleanOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToBooleanOpsFromBoolean</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <a href="BooleanOps.html" class="extype" name="scalaz.syntax.std.BooleanOps">BooleanOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToBooleanOps.html" class="extype" name="scalaz.syntax.std.ToBooleanOps">ToBooleanOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToEitherOps#ToEitherOpsFromEither" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToEitherOpsFromEither[A,B](e:Either[A,B]):scalaz.syntax.std.EitherOps[A,B]"></a>
+      <a id="ToEitherOpsFromEither[A,B](Either[A,B]):EitherOps[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToEitherOpsFromEither</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="scalaz.syntax.std.ToEitherOps.ToEitherOpsFromEither.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToEitherOps.ToEitherOpsFromEither.B">B</span>]</span>)</span><span class="result">: <a href="EitherOps.html" class="extype" name="scalaz.syntax.std.EitherOps">EitherOps</a>[<span class="extype" name="scalaz.syntax.std.ToEitherOps.ToEitherOpsFromEither.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToEitherOps.ToEitherOpsFromEither.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToEitherOps.html" class="extype" name="scalaz.syntax.std.ToEitherOps">ToEitherOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToFunction1Ops#ToFunction1OpsFromBoolean" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFunction1OpsFromBoolean[A,B](f:A=&gt;B):scalaz.syntax.std.Function1Ops[A,B]"></a>
+      <a id="ToFunction1OpsFromBoolean[A,B]((A)⇒B):Function1Ops[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFunction1OpsFromBoolean</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.syntax.std.ToFunction1Ops.ToFunction1OpsFromBoolean.A">A</span>) ⇒ <span class="extype" name="scalaz.syntax.std.ToFunction1Ops.ToFunction1OpsFromBoolean.B">B</span></span>)</span><span class="result">: <a href="Function1Ops.html" class="extype" name="scalaz.syntax.std.Function1Ops">Function1Ops</a>[<span class="extype" name="scalaz.syntax.std.ToFunction1Ops.ToFunction1OpsFromBoolean.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToFunction1Ops.ToFunction1OpsFromBoolean.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunction1Ops.html" class="extype" name="scalaz.syntax.std.ToFunction1Ops">ToFunction1Ops</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToFunction2Ops#ToFunction2Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFunction2Ops[T1,T2,R](f:(T1,T2)=&gt;R):scalaz.syntax.std.Function2Ops[T1,T2,R]{valself:(T1,T2)=&gt;R}"></a>
+      <a id="ToFunction2Ops[T1,T2,R]((T1,T2)⇒R):Function2Ops[T1,T2,R]{valself:(T1,T2)=&gt;R}"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFunction2Ops</span><span class="tparams">[<span name="T1">T1</span>, <span name="T2">T2</span>, <span name="R">R</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.T1">T1</span>, <span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.T2">T2</span>) ⇒ <span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.R">R</span></span>)</span><span class="result">: <a href="Function2Ops.html" class="extype" name="scalaz.syntax.std.Function2Ops">Function2Ops</a>[<span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.T1">T1</span>, <span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.T2">T2</span>, <span class="extype" name="scalaz.syntax.std.ToFunction2Ops.ToFunction2Ops.R">R</span>] { val self: (T1, T2) =&gt; R }</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunction2Ops.html" class="extype" name="scalaz.syntax.std.ToFunction2Ops">ToFunction2Ops</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToListOps#ToListOpsFromList" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToListOpsFromList[A](a:List[A]):scalaz.syntax.std.ListOps[A]"></a>
+      <a id="ToListOpsFromList[A](List[A]):ListOps[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToListOpsFromList</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.syntax.std.ToListOps.ToListOpsFromList.A">A</span>]</span>)</span><span class="result">: <a href="ListOps.html" class="extype" name="scalaz.syntax.std.ListOps">ListOps</a>[<span class="extype" name="scalaz.syntax.std.ToListOps.ToListOpsFromList.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToListOps.html" class="extype" name="scalaz.syntax.std.ToListOps">ToListOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToMapOps#ToMapOpsFromMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToMapOpsFromMap[K,V](m:Map[K,V]):scalaz.syntax.std.MapOps[K,V]"></a>
+      <a id="ToMapOpsFromMap[K,V](Map[K,V]):MapOps[K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToMapOpsFromMap</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="m">m: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.syntax.std.ToMapOps.ToMapOpsFromMap.K">K</span>, <span class="extype" name="scalaz.syntax.std.ToMapOps.ToMapOpsFromMap.V">V</span>]</span>)</span><span class="result">: <a href="MapOps.html" class="extype" name="scalaz.syntax.std.MapOps">MapOps</a>[<span class="extype" name="scalaz.syntax.std.ToMapOps.ToMapOpsFromMap.K">K</span>, <span class="extype" name="scalaz.syntax.std.ToMapOps.ToMapOpsFromMap.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToMapOps.html" class="extype" name="scalaz.syntax.std.ToMapOps">ToMapOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToOptionIdOps#ToOptionIdOps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToOptionIdOps[A](a:A):scalaz.syntax.std.OptionIdOps[A]"></a>
+      <a id="ToOptionIdOps[A](A):OptionIdOps[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToOptionIdOps</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.syntax.std.ToOptionIdOps.ToOptionIdOps.A">A</span></span>)</span><span class="result">: <a href="OptionIdOps.html" class="extype" name="scalaz.syntax.std.OptionIdOps">OptionIdOps</a>[<span class="extype" name="scalaz.syntax.std.ToOptionIdOps.ToOptionIdOps.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToOptionIdOps.html" class="extype" name="scalaz.syntax.std.ToOptionIdOps">ToOptionIdOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToOptionOps#ToOptionOpsFromOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToOptionOpsFromOption[A](a:Option[A]):scalaz.syntax.std.OptionOps[A]"></a>
+      <a id="ToOptionOpsFromOption[A](Option[A]):OptionOps[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToOptionOpsFromOption</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.syntax.std.ToOptionOps.ToOptionOpsFromOption.A">A</span>]</span>)</span><span class="result">: <a href="OptionOps.html" class="extype" name="scalaz.syntax.std.OptionOps">OptionOps</a>[<span class="extype" name="scalaz.syntax.std.ToOptionOps.ToOptionOpsFromOption.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToOptionOps.html" class="extype" name="scalaz.syntax.std.ToOptionOps">ToOptionOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToStreamOps#ToStreamOpsFromStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToStreamOpsFromStream[A](a:Stream[A]):scalaz.syntax.std.StreamOps[A]"></a>
+      <a id="ToStreamOpsFromStream[A](Stream[A]):StreamOps[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToStreamOpsFromStream</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.syntax.std.ToStreamOps.ToStreamOpsFromStream.A">A</span>]</span>)</span><span class="result">: <a href="StreamOps.html" class="extype" name="scalaz.syntax.std.StreamOps">StreamOps</a>[<span class="extype" name="scalaz.syntax.std.ToStreamOps.ToStreamOpsFromStream.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToStreamOps.html" class="extype" name="scalaz.syntax.std.ToStreamOps">ToStreamOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToStringOps#ToStringOpsFromString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToStringOpsFromString(a:String):scalaz.syntax.std.StringOps"></a>
+      <a id="ToStringOpsFromString(String):StringOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToStringOpsFromString</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="StringOps.html" class="extype" name="scalaz.syntax.std.StringOps">StringOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToStringOps.html" class="extype" name="scalaz.syntax.std.ToStringOps">ToStringOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple10Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple10Ops[A,B,C,D,E,F,G,H,I,J](t:(A,B,C,D,E,F,G,H,I,J)):scalaz.syntax.std.Tuple10Ops[A,B,C,D,E,F,G,H,I,J]"></a>
+      <a id="ToTuple10Ops[A,B,C,D,E,F,G,H,I,J]((A,B,C,D,E,F,G,H,I,J)):Tuple10Ops[A,B,C,D,E,F,G,H,I,J]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple10Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.J">J</span>)</span>)</span><span class="result">: <a href="Tuple10Ops.html" class="extype" name="scalaz.syntax.std.Tuple10Ops">Tuple10Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple10Ops.J">J</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple11Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple11Ops[A,B,C,D,E,F,G,H,I,J,K](t:(A,B,C,D,E,F,G,H,I,J,K)):scalaz.syntax.std.Tuple11Ops[A,B,C,D,E,F,G,H,I,J,K]"></a>
+      <a id="ToTuple11Ops[A,B,C,D,E,F,G,H,I,J,K]((A,B,C,D,E,F,G,H,I,J,K)):Tuple11Ops[A,B,C,D,E,F,G,H,I,J,K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple11Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.J">J</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.K">K</span>)</span>)</span><span class="result">: <a href="Tuple11Ops.html" class="extype" name="scalaz.syntax.std.Tuple11Ops">Tuple11Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.J">J</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple11Ops.K">K</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple12Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple12Ops[A,B,C,D,E,F,G,H,I,J,K,L](t:(A,B,C,D,E,F,G,H,I,J,K,L)):scalaz.syntax.std.Tuple12Ops[A,B,C,D,E,F,G,H,I,J,K,L]"></a>
+      <a id="ToTuple12Ops[A,B,C,D,E,F,G,H,I,J,K,L]((A,B,C,D,E,F,G,H,I,J,K,L)):Tuple12Ops[A,B,C,D,E,F,G,H,I,J,K,L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple12Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>, <span name="J">J</span>, <span name="K">K</span>, <span name="L">L</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.J">J</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.K">K</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.L">L</span>)</span>)</span><span class="result">: <a href="Tuple12Ops.html" class="extype" name="scalaz.syntax.std.Tuple12Ops">Tuple12Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.I">I</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.J">J</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.K">K</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple12Ops.L">L</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple2Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple2Ops[A,B](t:(A,B)):scalaz.syntax.std.Tuple2Ops[A,B]"></a>
+      <a id="ToTuple2Ops[A,B]((A,B)):Tuple2Ops[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple2Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple2Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple2Ops.B">B</span>)</span>)</span><span class="result">: <a href="Tuple2Ops.html" class="extype" name="scalaz.syntax.std.Tuple2Ops">Tuple2Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple2Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple2Ops.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple3Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple3Ops[A,B,C](t:(A,B,C)):scalaz.syntax.std.Tuple3Ops[A,B,C]"></a>
+      <a id="ToTuple3Ops[A,B,C]((A,B,C)):Tuple3Ops[A,B,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple3Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.C">C</span>)</span>)</span><span class="result">: <a href="Tuple3Ops.html" class="extype" name="scalaz.syntax.std.Tuple3Ops">Tuple3Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple3Ops.C">C</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple4Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple4Ops[A,B,C,D](t:(A,B,C,D)):scalaz.syntax.std.Tuple4Ops[A,B,C,D]"></a>
+      <a id="ToTuple4Ops[A,B,C,D]((A,B,C,D)):Tuple4Ops[A,B,C,D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple4Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.D">D</span>)</span>)</span><span class="result">: <a href="Tuple4Ops.html" class="extype" name="scalaz.syntax.std.Tuple4Ops">Tuple4Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple4Ops.D">D</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple5Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple5Ops[A,B,C,D,E](t:(A,B,C,D,E)):scalaz.syntax.std.Tuple5Ops[A,B,C,D,E]"></a>
+      <a id="ToTuple5Ops[A,B,C,D,E]((A,B,C,D,E)):Tuple5Ops[A,B,C,D,E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple5Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.E">E</span>)</span>)</span><span class="result">: <a href="Tuple5Ops.html" class="extype" name="scalaz.syntax.std.Tuple5Ops">Tuple5Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple5Ops.E">E</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple6Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple6Ops[A,B,C,D,E,F](t:(A,B,C,D,E,F)):scalaz.syntax.std.Tuple6Ops[A,B,C,D,E,F]"></a>
+      <a id="ToTuple6Ops[A,B,C,D,E,F]((A,B,C,D,E,F)):Tuple6Ops[A,B,C,D,E,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple6Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.F">F</span>)</span>)</span><span class="result">: <a href="Tuple6Ops.html" class="extype" name="scalaz.syntax.std.Tuple6Ops">Tuple6Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple6Ops.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple7Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple7Ops[A,B,C,D,E,F,G](t:(A,B,C,D,E,F,G)):scalaz.syntax.std.Tuple7Ops[A,B,C,D,E,F,G]"></a>
+      <a id="ToTuple7Ops[A,B,C,D,E,F,G]((A,B,C,D,E,F,G)):Tuple7Ops[A,B,C,D,E,F,G]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple7Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.G">G</span>)</span>)</span><span class="result">: <a href="Tuple7Ops.html" class="extype" name="scalaz.syntax.std.Tuple7Ops">Tuple7Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple7Ops.G">G</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple8Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple8Ops[A,B,C,D,E,F,G,H](t:(A,B,C,D,E,F,G,H)):scalaz.syntax.std.Tuple8Ops[A,B,C,D,E,F,G,H]"></a>
+      <a id="ToTuple8Ops[A,B,C,D,E,F,G,H]((A,B,C,D,E,F,G,H)):Tuple8Ops[A,B,C,D,E,F,G,H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple8Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.H">H</span>)</span>)</span><span class="result">: <a href="Tuple8Ops.html" class="extype" name="scalaz.syntax.std.Tuple8Ops">Tuple8Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple8Ops.H">H</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToTupleOps#ToTuple9Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTuple9Ops[A,B,C,D,E,F,G,H,I](t:(A,B,C,D,E,F,G,H,I)):scalaz.syntax.std.Tuple9Ops[A,B,C,D,E,F,G,H,I]"></a>
+      <a id="ToTuple9Ops[A,B,C,D,E,F,G,H,I]((A,B,C,D,E,F,G,H,I)):Tuple9Ops[A,B,C,D,E,F,G,H,I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTuple9Ops</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="F">F</span>, <span name="G">G</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="params">(<span name="t">t: (<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.I">I</span>)</span>)</span><span class="result">: <a href="Tuple9Ops.html" class="extype" name="scalaz.syntax.std.Tuple9Ops">Tuple9Ops</a>[<span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.A">A</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.B">B</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.C">C</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.D">D</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.E">E</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.F">F</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.G">G</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.H">H</span>, <span class="extype" name="scalaz.syntax.std.ToTupleOps.ToTuple9Ops.I">I</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.std.ToVectorOps#ToVectorOpsFromVector" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToVectorOpsFromVector[A](a:Vector[A]):scalaz.syntax.std.IndexedSeqOps[Vector,A]"></a>
+      <a id="ToVectorOpsFromVector[A](Vector[A]):IndexedSeqOps[Vector,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToVectorOpsFromVector</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Vector">Vector</span>[<span class="extype" name="scalaz.syntax.std.ToVectorOps.ToVectorOpsFromVector.A">A</span>]</span>)</span><span class="result">: <a href="IndexedSeqOps.html" class="extype" name="scalaz.syntax.std.IndexedSeqOps">IndexedSeqOps</a>[<span class="extype" name="scala.Vector">Vector</span>, <span class="extype" name="scalaz.syntax.std.ToVectorOps.ToVectorOpsFromVector.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToVectorOps.html" class="extype" name="scalaz.syntax.std.ToVectorOps">ToVectorOps</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.syntax.std.ToEitherOps">
+              <h3>Inherited from <a href="ToEitherOps.html" class="extype" name="scalaz.syntax.std.ToEitherOps">ToEitherOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToMapOps">
+              <h3>Inherited from <a href="ToMapOps.html" class="extype" name="scalaz.syntax.std.ToMapOps">ToMapOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToTupleOps">
+              <h3>Inherited from <a href="ToTupleOps.html" class="extype" name="scalaz.syntax.std.ToTupleOps">ToTupleOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToStringOps">
+              <h3>Inherited from <a href="ToStringOps.html" class="extype" name="scalaz.syntax.std.ToStringOps">ToStringOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToFunction1Ops">
+              <h3>Inherited from <a href="ToFunction1Ops.html" class="extype" name="scalaz.syntax.std.ToFunction1Ops">ToFunction1Ops</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToFunction2Ops">
+              <h3>Inherited from <a href="ToFunction2Ops.html" class="extype" name="scalaz.syntax.std.ToFunction2Ops">ToFunction2Ops</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToVectorOps">
+              <h3>Inherited from <a href="ToVectorOps.html" class="extype" name="scalaz.syntax.std.ToVectorOps">ToVectorOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToStreamOps">
+              <h3>Inherited from <a href="ToStreamOps.html" class="extype" name="scalaz.syntax.std.ToStreamOps">ToStreamOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToListOps">
+              <h3>Inherited from <a href="ToListOps.html" class="extype" name="scalaz.syntax.std.ToListOps">ToListOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToOptionIdOps">
+              <h3>Inherited from <a href="ToOptionIdOps.html" class="extype" name="scalaz.syntax.std.ToOptionIdOps">ToOptionIdOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToOptionOps">
+              <h3>Inherited from <a href="ToOptionOps.html" class="extype" name="scalaz.syntax.std.ToOptionOps">ToOptionOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.std.ToBooleanOps">
+              <h3>Inherited from <a href="ToBooleanOps.html" class="extype" name="scalaz.syntax.std.ToBooleanOps">ToBooleanOps</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../../lib/template.js"></script>
+    </body>
+      </html>

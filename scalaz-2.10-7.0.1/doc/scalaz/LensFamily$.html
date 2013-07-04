@@ -1,0 +1,1421 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>LensFamily - scalaz.LensFamily</title>
+          <meta name="description" content="LensFamily - scalaz.LensFamily" />
+          <meta name="keywords" content="LensFamily scalaz.LensFamily" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.LensFamily$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a href="LensFamily.html" title="Go to companion"><img src="../lib/object_to_trait_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="LensFamily.html" title="Go to companion">LensFamily</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LensFamily</span><span class="result"> extends <a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a> with <a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.1/core/src/main/scala/scalaz/Lens.scala" target="_blank">Lens.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a>, <a href="LensInstances0.html" class="extype" name="scalaz.LensInstances0">LensInstances0</a>, <a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a>, <a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.LensFamily"><span>LensFamily</span></li><li class="in" name="scalaz.LensInstances"><span>LensInstances</span></li><li class="in" name="scalaz.LensInstances0"><span>LensInstances0</span></li><li class="in" name="scalaz.LensFunctions"><span>LensFunctions</span></li><li class="in" name="scalaz.LensFamilyFunctions"><span>LensFamilyFunctions</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.LensInstances.ArrayLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ArrayLens[S,A]=LensInstances.this.ArrayLensFamily[S,S,A]"></a>
+      <a id="ArrayLens[S,A]:ArrayLens[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ArrayLens</span><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> = <a href="#ArrayLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.ArrayLensFamily">ArrayLensFamily</a>[<span class="extype" name="scalaz.LensInstances.ArrayLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.ArrayLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.ArrayLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.ArrayLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ArrayLensFamily[S1,S2,A]extendsProductwithSerializable"></a>
+      <a id="ArrayLensFamily[S1,S2,A]:ArrayLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$ArrayLensFamily.html"><span class="name">ArrayLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.ArrayLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.ArrayLensFamily.S2">S2</span>, <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scalaz.LensInstances.ArrayLensFamily.A">A</span>], <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scalaz.LensInstances.ArrayLensFamily.A">A</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Provide an imperative-seeming API for arrays viewed through a lens</p>
+    </li><li name="scalaz.LensInstances.FractionalLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FractionalLens[S,F]=LensInstances.this.FractionalLensFamily[S,S,F]"></a>
+      <a id="FractionalLens[S,F]:FractionalLens[S,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FractionalLens</span><span class="tparams">[<span name="S">S</span>, <span name="F">F</span>]</span><span class="result"> = <a href="#FractionalLensFamily[S1,S2,F]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.FractionalLensFamily">FractionalLensFamily</a>[<span class="extype" name="scalaz.LensInstances.FractionalLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.FractionalLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.FractionalLens.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.FractionalLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FractionalLensFamily[S1,S2,F]extendsProductwithSerializable"></a>
+      <a id="FractionalLensFamily[S1,S2,F]:FractionalLensFamily[S1,S2,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$FractionalLensFamily.html"><span class="name">FractionalLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="F">F</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.FractionalLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.FractionalLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.FractionalLensFamily.F">F</span>, <span class="extype" name="scalaz.LensInstances.FractionalLensFamily.F">F</span>]</span>, <span name="frac">frac: <span class="extype" name="scala.Fractional">Fractional</span>[<span class="extype" name="scalaz.LensInstances.FractionalLensFamily.F">F</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+    </li><li name="scalaz.LensInstances.IntegralLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegralLens[S,I]=LensInstances.this.IntegralLensFamily[S,S,I]"></a>
+      <a id="IntegralLens[S,I]:IntegralLens[S,I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">IntegralLens</span><span class="tparams">[<span name="S">S</span>, <span name="I">I</span>]</span><span class="result"> = <a href="#IntegralLensFamily[S1,S2,I]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.IntegralLensFamily">IntegralLensFamily</a>[<span class="extype" name="scalaz.LensInstances.IntegralLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.IntegralLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.IntegralLens.I">I</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.IntegralLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IntegralLensFamily[S1,S2,I]extendsProductwithSerializable"></a>
+      <a id="IntegralLensFamily[S1,S2,I]:IntegralLensFamily[S1,S2,I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$IntegralLensFamily.html"><span class="name">IntegralLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="I">I</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.IntegralLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.IntegralLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.IntegralLensFamily.I">I</span>, <span class="extype" name="scalaz.LensInstances.IntegralLensFamily.I">I</span>]</span>, <span name="ig">ig: <span class="extype" name="scala.Integral">Integral</span>[<span class="extype" name="scalaz.LensInstances.IntegralLensFamily.I">I</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+    </li><li name="scalaz.LensInstances.MapLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MapLens[S,K,V]=LensInstances.this.MapLensFamily[S,S,K,V]"></a>
+      <a id="MapLens[S,K,V]:MapLens[S,K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MapLens</span><span class="tparams">[<span name="S">S</span>, <span name="K">K</span>, <span name="V">V</span>]</span><span class="result"> = <a href="#MapLensFamily[-S1,+S2,K,V]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.MapLensFamily">MapLensFamily</a>[<span class="extype" name="scalaz.LensInstances.MapLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.MapLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.MapLens.K">K</span>, <span class="extype" name="scalaz.LensInstances.MapLens.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.MapLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MapLensFamily[-S1,+S2,K,V]extendsProductwithSerializable"></a>
+      <a id="MapLensFamily[-S1,+S2,K,V]:MapLensFamily[S1,S2,K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$MapLensFamily.html"><span class="name">MapLensFamily</span></a><span class="tparams">[<span name="S1">-S1</span>, <span name="S2">+S2</span>, <span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.MapLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.MapLensFamily.S2">S2</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.LensInstances.MapLensFamily.K">K</span>, <span class="extype" name="scalaz.LensInstances.MapLensFamily.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.LensInstances.MapLensFamily.K">K</span>, <span class="extype" name="scalaz.LensInstances.MapLensFamily.V">V</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A lens that views an immutable Map type can provide a mutable.</p>
+    </li><li name="scalaz.LensInstances.NumericLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NumericLens[S,N]=LensInstances.this.NumericLensFamily[S,S,N]"></a>
+      <a id="NumericLens[S,N]:NumericLens[S,N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NumericLens</span><span class="tparams">[<span name="S">S</span>, <span name="N">N</span>]</span><span class="result"> = <a href="#NumericLensFamily[S1,S2,N]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.NumericLensFamily">NumericLensFamily</a>[<span class="extype" name="scalaz.LensInstances.NumericLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.NumericLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.NumericLens.N">N</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.NumericLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NumericLensFamily[S1,S2,N]extendsProductwithSerializable"></a>
+      <a id="NumericLensFamily[S1,S2,N]:NumericLensFamily[S1,S2,N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$NumericLensFamily.html"><span class="name">NumericLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="N">N</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.NumericLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.NumericLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.NumericLensFamily.N">N</span>, <span class="extype" name="scalaz.LensInstances.NumericLensFamily.N">N</span>]</span>, <span name="num">num: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalaz.LensInstances.NumericLensFamily.N">N</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Allow the illusion of imperative updates to numbers viewed through a lens</p>
+    </li><li name="scalaz.LensInstances.QueueLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QueueLens[S,A]=LensInstances.this.QueueLensFamily[S,S,A]"></a>
+      <a id="QueueLens[S,A]:QueueLens[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QueueLens</span><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> = <a href="#QueueLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.QueueLensFamily">QueueLensFamily</a>[<span class="extype" name="scalaz.LensInstances.QueueLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.QueueLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.QueueLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.QueueLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueueLensFamily[S1,S2,A]extendsProductwithSerializable"></a>
+      <a id="QueueLensFamily[S1,S2,A]:QueueLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$QueueLensFamily.html"><span class="name">QueueLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.QueueLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.QueueLensFamily.S2">S2</span>, <span class="extype" name="scala.collection.immutable.Queue">Queue</span>[<span class="extype" name="scalaz.LensInstances.QueueLensFamily.A">A</span>], <span class="extype" name="scala.collection.immutable.Queue">Queue</span>[<span class="extype" name="scalaz.LensInstances.QueueLensFamily.A">A</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Provide an imperative-seeming API for queues viewed through a lens</p>
+    </li><li name="scalaz.LensInstances.SeqLikeLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SeqLikeLens[S,A,Repr&lt;:scala.collection.SeqLike[A,Repr]]=LensInstances.this.SeqLikeLensFamily[S,S,A,Repr]"></a>
+      <a id="SeqLikeLens[S,A,Repr&lt;:SeqLike[A,Repr]]:SeqLikeLens[S,A,Repr]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SeqLikeLens</span><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.SeqLike">SeqLike</span>[<span class="extype" name="scalaz.LensInstances.SeqLikeLens.A">A</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLens.Repr">Repr</span>]</span>]</span><span class="result"> = <a href="#SeqLikeLensFamily[S1,S2,A,Repr&lt;:scala.collection.SeqLike[A,Repr]]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.SeqLikeLensFamily">SeqLikeLensFamily</a>[<span class="extype" name="scalaz.LensInstances.SeqLikeLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLens.A">A</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLens.Repr">Repr</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.SeqLikeLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SeqLikeLensFamily[S1,S2,A,Repr&lt;:scala.collection.SeqLike[A,Repr]]extendsProductwithSerializable"></a>
+      <a id="SeqLikeLensFamily[S1,S2,A,Repr&lt;:SeqLike[A,Repr]]:SeqLikeLensFamily[S1,S2,A,Repr]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$SeqLikeLensFamily.html"><span class="name">SeqLikeLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.SeqLike">SeqLike</span>[<span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.Repr">Repr</span>]</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.Repr">Repr</span>, <span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily.Repr">Repr</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Provide the appearance of a mutable-like API for sorting sequences through a lens</p>
+    </li><li name="scalaz.LensInstances.SetLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SetLens[S,K]=LensInstances.this.SetLensFamily[S,S,K]"></a>
+      <a id="SetLens[S,K]:SetLens[S,K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SetLens</span><span class="tparams">[<span name="S">S</span>, <span name="K">K</span>]</span><span class="result"> = <a href="#SetLensFamily[-S1,+S2,K]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.SetLensFamily">SetLensFamily</a>[<span class="extype" name="scalaz.LensInstances.SetLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.SetLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.SetLens.K">K</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.SetLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SetLensFamily[-S1,+S2,K]extendsProductwithSerializable"></a>
+      <a id="SetLensFamily[-S1,+S2,K]:SetLensFamily[S1,S2,K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$SetLensFamily.html"><span class="name">SetLensFamily</span></a><span class="tparams">[<span name="S1">-S1</span>, <span name="S2">+S2</span>, <span name="K">K</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.SetLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.SetLensFamily.S2">S2</span>, <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scalaz.LensInstances.SetLensFamily.K">K</span>], <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scalaz.LensInstances.SetLensFamily.K">K</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.StackLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StackLens[S,A]=LensInstances.this.StackLensFamily[S,S,A]"></a>
+      <a id="StackLens[S,A]:StackLens[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">StackLens</span><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> = <a href="#StackLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.StackLensFamily">StackLensFamily</a>[<span class="extype" name="scalaz.LensInstances.StackLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.StackLens.S">S</span>, <span class="extype" name="scalaz.LensInstances.StackLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances.StackLensFamily" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StackLensFamily[S1,S2,A]extendsProductwithSerializable"></a>
+      <a id="StackLensFamily[S1,S2,A]:StackLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="LensInstances$StackLensFamily.html"><span class="name">StackLensFamily</span></a><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.StackLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.StackLensFamily.S2">S2</span>, <span class="extype" name="scala.collection.immutable.Stack">Stack</span>[<span class="extype" name="scalaz.LensInstances.StackLensFamily.A">A</span>], <span class="extype" name="scala.collection.immutable.Stack">Stack</span>[<span class="extype" name="scalaz.LensInstances.StackLensFamily.A">A</span>]]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Provide an imperative-seeming API for stacks viewed through a lens</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.LensInstances#ArrayLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ArrayLens:LensInstances.this.ArrayLensFamily.type"></a>
+      <a id="ArrayLens:ArrayLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ArrayLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.ArrayLensFamily">ArrayLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#FractionalLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="FractionalLens:LensInstances.this.FractionalLensFamily.type"></a>
+      <a id="FractionalLens:FractionalLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FractionalLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.FractionalLensFamily">FractionalLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#IntegralLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="IntegralLens:LensInstances.this.IntegralLensFamily.type"></a>
+      <a id="IntegralLens:IntegralLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">IntegralLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.IntegralLensFamily">IntegralLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#LensFamilyState" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LensFamilyState[A,B](lens:scalaz.LensFamily[A,_,B,_]):scalaz.State[A,B]"></a>
+      <a id="LensFamilyState[A,B](LensFamily[A,_,B,_]):State[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LensFamilyState</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.LensFamilyState.A">A</span>, _, <span class="extype" name="scalaz.LensInstances.LensFamilyState.B">B</span>, _]</span>)</span><span class="result">: <a href="package.html#State[S,+A]=scalaz.package.StateT[scalaz.Id.Id,S,A]" class="extmbr" name="scalaz.State">State</a>[<span class="extype" name="scalaz.LensInstances.LensFamilyState.A">A</span>, <span class="extype" name="scalaz.LensInstances.LensFamilyState.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Lenses may be used implicitly as State monadic actions that get the viewed portion of the state</p><div class="fullcomment"><div class="comment cmt"><p>Lenses may be used implicitly as State monadic actions that get the viewed portion of the state</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#LensFamilyUnzip" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LensFamilyUnzip[S,R]:scalaz.Unzip[[α]scalaz.LensFamily[S,R,α,α]]"></a>
+      <a id="LensFamilyUnzip[S,R]:Unzip[[α]LensFamily[S,R,α,α]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LensFamilyUnzip</span><span class="tparams">[<span name="S">S</span>, <span name="R">R</span>]</span><span class="result">: <a href="Unzip.html" class="extype" name="scalaz.Unzip">Unzip</a>[[α]<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.LensFamilyUnzip.S">S</span>, <span class="extype" name="scalaz.LensInstances.LensFamilyUnzip.R">R</span>, <span class="extype" name="scalaz.LensInstances.&lt;refinement&gt;.λ.α">α</span>, <span class="extype" name="scalaz.LensInstances.&lt;refinement&gt;.λ.α">α</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#MapLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MapLens:LensInstances.this.MapLensFamily.type"></a>
+      <a id="MapLens:MapLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MapLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.MapLensFamily">MapLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#NumericLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="NumericLens:LensInstances.this.NumericLensFamily.type"></a>
+      <a id="NumericLens:NumericLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NumericLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.NumericLensFamily">NumericLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#QueueLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QueueLens:LensInstances.this.QueueLensFamily.type"></a>
+      <a id="QueueLens:QueueLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">QueueLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.QueueLensFamily">QueueLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#SeqLikeLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SeqLikeLens:LensInstances.this.SeqLikeLensFamily.type"></a>
+      <a id="SeqLikeLens:SeqLikeLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SeqLikeLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.SeqLikeLensFamily">SeqLikeLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#SetLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SetLens:LensInstances.this.SetLensFamily.type"></a>
+      <a id="SetLens:SetLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SetLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.SetLensFamily">SetLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#StackLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StackLens:LensInstances.this.StackLensFamily.type"></a>
+      <a id="StackLens:StackLensFamily.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">StackLens</span><span class="result">: <span class="extype" name="scalaz.LensInstances.StackLensFamily">StackLensFamily</span>.type</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensFamily#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[A1,A2,B1,B2](r:A1=&gt;scalaz.IndexedStore[B1,B2,A2]):scalaz.LensFamily[A1,A2,B1,B2]"></a>
+      <a id="apply[A1,A2,B1,B2]((A1)⇒IndexedStore[B1,B2,A2]):LensFamily[A1,A2,B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="params">(<span name="r">r: (<span class="extype" name="scalaz.LensFamily.apply.A1">A1</span>) ⇒ <a href="package.html#IndexedStore[+I,-A,+B]=scalaz.IndexedStoreT[scalaz.Id.Id,I,A,B]" class="extmbr" name="scalaz.IndexedStore">IndexedStore</a>[<span class="extype" name="scalaz.LensFamily.apply.B1">B1</span>, <span class="extype" name="scalaz.LensFamily.apply.B2">B2</span>, <span class="extype" name="scalaz.LensFamily.apply.A2">A2</span>]</span>)</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensFamily.apply.A1">A1</span>, <span class="extype" name="scalaz.LensFamily.apply.A2">A2</span>, <span class="extype" name="scalaz.LensFamily.apply.B1">B1</span>, <span class="extype" name="scalaz.LensFamily.apply.B2">B2</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LensFunctions#applyLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="applyLens[A,B](k:B=&gt;A)(implicite:scalaz.Equal[A]):scalaz.@&gt;[scalaz.Store[A,B],B]"></a>
+      <a id="applyLens[A,B]((B)⇒A)(Equal[A]):@&gt;[Store[A,B],B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">applyLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="k">k: (<span class="extype" name="scalaz.LensFunctions.applyLens.B">B</span>) ⇒ <span class="extype" name="scalaz.LensFunctions.applyLens.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="e">e: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.LensFunctions.applyLens.A">A</span>]</span>)</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="package.html#Store[A,+B]=scalaz.package.StoreT[scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.Store">Store</a>[<span class="extype" name="scalaz.LensFunctions.applyLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.applyLens.B">B</span>], <span class="extype" name="scalaz.LensFunctions.applyLens.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#arrayLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="arrayLensFamily[S1,S2,A](lens:scalaz.LensFamily[S1,S2,Array[A],Array[A]]):LensInstances.this.ArrayLensFamily[S1,S2,A]"></a>
+      <a id="arrayLensFamily[S1,S2,A](LensFamily[S1,S2,Array[A],Array[A]]):ArrayLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">arrayLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.arrayLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.arrayLensFamily.S2">S2</span>, <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scalaz.LensInstances.arrayLensFamily.A">A</span>], <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scalaz.LensInstances.arrayLensFamily.A">A</span>]]</span>)</span><span class="result">: <a href="#ArrayLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.ArrayLensFamily">ArrayLensFamily</a>[<span class="extype" name="scalaz.LensInstances.arrayLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.arrayLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.arrayLensFamily.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.LensFunctions#codiagLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="codiagLens[A]:scalaz.Lens[scalaz.\/[A,A],A]"></a>
+      <a id="codiagLens[A]:Lens[\/[A,A],A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">codiagLens</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFunctions.codiagLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.codiagLens.A">A</span>], <span class="extype" name="scalaz.LensFunctions.codiagLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A lens that discards the choice of right or left from disjunction</p><div class="fullcomment"><div class="comment cmt"><p>A lens that discards the choice of right or left from disjunction</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#codiagLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="codiagLensFamily[A1,A2]:scalaz.LensFamily[scalaz.\/[A1,A1],scalaz.\/[A2,A2],A1,A2]"></a>
+      <a id="codiagLensFamily[A1,A2]:LensFamily[\/[A1,A1],\/[A2,A2],A1,A2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">codiagLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A1">A1</span>], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A2">A2</span>], <span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.codiagLensFamily.A2">A2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A lens family that discards the choice of right or left from disjunction</p><div class="fullcomment"><div class="comment cmt"><p>A lens family that discards the choice of right or left from disjunction</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#distributeLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="distributeLens[A,B,C]:scalaz.@&gt;[(A,scalaz.\/[B,C]),scalaz.\/[(A,B),(A,C)]]"></a>
+      <a id="distributeLens[A,B,C]:@&gt;[(A,\/[B,C]),\/[(A,B),(A,C)]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">distributeLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[(<span class="extype" name="scalaz.LensFunctions.distributeLens.A">A</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFunctions.distributeLens.B">B</span>, <span class="extype" name="scalaz.LensFunctions.distributeLens.C">C</span>]), <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFunctions.distributeLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.distributeLens.B">B</span>), (<span class="extype" name="scalaz.LensFunctions.distributeLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.distributeLens.C">C</span>)]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#distributeLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="distributeLensFamily[A1,A2,B1,B2,C1,C2]:scalaz.LensFamily[(A1,scalaz.\/[B1,C1]),(A2,scalaz.\/[B2,C2]),scalaz.\/[(A1,B1),(A1,C1)],scalaz.\/[(A2,B2),(A2,C2)]]"></a>
+      <a id="distributeLensFamily[A1,A2,B1,B2,C1,C2]:LensFamily[(A1,\/[B1,C1]),(A2,\/[B2,C2]),\/[(A1,B1),(A1,C1)],\/[(A2,B2),(A2,C2)]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">distributeLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>, <span name="C1">C1</span>, <span name="C2">C2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A1">A1</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.C1">C1</span>]), (<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A2">A2</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.B2">B2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.C2">C2</span>]), <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.B1">B1</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.C1">C1</span>)], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.B2">B2</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.distributeLensFamily.C2">C2</span>)]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LensFunctions#factorLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="factorLens[A,B,C]:scalaz.@&gt;[scalaz.\/[(A,B),(A,C)],(A,scalaz.\/[B,C])]"></a>
+      <a id="factorLens[A,B,C]:@&gt;[\/[(A,B),(A,C)],(A,\/[B,C])]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">factorLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFunctions.factorLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.factorLens.B">B</span>), (<span class="extype" name="scalaz.LensFunctions.factorLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.factorLens.C">C</span>)], (<span class="extype" name="scalaz.LensFunctions.factorLens.A">A</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFunctions.factorLens.B">B</span>, <span class="extype" name="scalaz.LensFunctions.factorLens.C">C</span>])]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#factorLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="factorLensFamily[A1,A2,B1,B2,C1,C2]:scalaz.LensFamily[scalaz.\/[(A1,B1),(A1,C1)],scalaz.\/[(A2,B2),(A2,C2)],(A1,scalaz.\/[B1,C1]),(A2,scalaz.\/[B2,C2])]"></a>
+      <a id="factorLensFamily[A1,A2,B1,B2,C1,C2]:LensFamily[\/[(A1,B1),(A1,C1)],\/[(A2,B2),(A2,C2)],(A1,\/[B1,C1]),(A2,\/[B2,C2])]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">factorLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>, <span name="C1">C1</span>, <span name="C2">C2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.B1">B1</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.C1">C1</span>)], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.B2">B2</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.C2">C2</span>)], (<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A1">A1</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.C1">C1</span>]), (<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.A2">A2</span>, <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.B2">B2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.factorLensFamily.C2">C2</span>])]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.LensFunctions#firstLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="firstLens[A,B]:scalaz.@&gt;[(A,B),A]"></a>
+      <a id="firstLens[A,B]:@&gt;[(A,B),A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">firstLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[(<span class="extype" name="scalaz.LensFunctions.firstLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.firstLens.B">B</span>), <span class="extype" name="scalaz.LensFunctions.firstLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Access the first field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Access the first field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#firstLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="firstLensFamily[A1,A2,B]:scalaz.LensFamily[(A1,B),(A2,B),A1,A2]"></a>
+      <a id="firstLensFamily[A1,A2,B]:LensFamily[(A1,B),(A2,B),A1,A2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">firstLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B">B</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.B">B</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.B">B</span>), <span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.firstLensFamily.A2">A2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Polymorphically access the first field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Polymorphically access the first field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#fractionalLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fractionalLensFamily[S1,S2,F](lens:scalaz.LensFamily[S1,S2,F,F])(implicitevidence$3:Fractional[F]):LensInstances.this.FractionalLensFamily[S1,S2,F]"></a>
+      <a id="fractionalLensFamily[S1,S2,F](LensFamily[S1,S2,F,F])(Fractional[F]):FractionalLensFamily[S1,S2,F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fractionalLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="F">F</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.fractionalLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.fractionalLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.fractionalLensFamily.F">F</span>, <span class="extype" name="scalaz.LensInstances.fractionalLensFamily.F">F</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Fractional">Fractional</span>[<span class="extype" name="scalaz.LensInstances.fractionalLensFamily.F">F</span>]</span>)</span><span class="result">: <a href="#FractionalLensFamily[S1,S2,F]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.FractionalLensFamily">FractionalLensFamily</a>[<span class="extype" name="scalaz.LensInstances.fractionalLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.fractionalLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.fractionalLensFamily.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LensInstances#integralLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="integralLensFamily[S1,S2,I](lens:scalaz.LensFamily[S1,S2,I,I])(implicitevidence$4:Integral[I]):LensInstances.this.IntegralLensFamily[S1,S2,I]"></a>
+      <a id="integralLensFamily[S1,S2,I](LensFamily[S1,S2,I,I])(Integral[I]):IntegralLensFamily[S1,S2,I]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">integralLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="I">I</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.integralLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.integralLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.integralLensFamily.I">I</span>, <span class="extype" name="scalaz.LensInstances.integralLensFamily.I">I</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Integral">Integral</span>[<span class="extype" name="scalaz.LensInstances.integralLensFamily.I">I</span>]</span>)</span><span class="result">: <a href="#IntegralLensFamily[S1,S2,I]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.IntegralLensFamily">IntegralLensFamily</a>[<span class="extype" name="scalaz.LensInstances.integralLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.integralLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.integralLensFamily.I">I</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lazyFirstLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lazyFirstLens[A,B]:scalaz.@&gt;[scalaz.LazyTuple2[A,B],A]"></a>
+      <a id="lazyFirstLens[A,B]:@&gt;[LazyTuple2[A,B],A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lazyFirstLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFunctions.lazyFirstLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lazyFirstLens.B">B</span>], <span class="extype" name="scalaz.LensFunctions.lazyFirstLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Access the first field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Access the first field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lazyFirstLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lazyFirstLensFamily[A1,A2,B]:scalaz.LensFamily[scalaz.LazyTuple2[A1,B],scalaz.LazyTuple2[A2,B],A1,A2]"></a>
+      <a id="lazyFirstLensFamily[A1,A2,B]:LensFamily[LazyTuple2[A1,B],LazyTuple2[A2,B],A1,A2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lazyFirstLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B">B</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.B">B</span>], <a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.B">B</span>], <span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazyFirstLensFamily.A2">A2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Polymorphically access the first field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Polymorphically access the first field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lazySecondLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lazySecondLens[A,B]:scalaz.@&gt;[scalaz.LazyTuple2[A,B],B]"></a>
+      <a id="lazySecondLens[A,B]:@&gt;[LazyTuple2[A,B],B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lazySecondLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFunctions.lazySecondLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lazySecondLens.B">B</span>], <span class="extype" name="scalaz.LensFunctions.lazySecondLens.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Access the second field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Access the second field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lazySecondLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lazySecondLensFamily[A,B1,B2]:scalaz.LensFamily[scalaz.LazyTuple2[A,B1],scalaz.LazyTuple2[A,B2],B1,B2]"></a>
+      <a id="lazySecondLensFamily[A,B1,B2]:LensFamily[LazyTuple2[A,B1],LazyTuple2[A,B2],B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lazySecondLensFamily</span><span class="tparams">[<span name="A">A</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.A">A</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.B1">B1</span>], <a href="LazyTuple2.html" class="extype" name="scalaz.LazyTuple2">LazyTuple2</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.A">A</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.B2">B2</span>], <span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lazySecondLensFamily.B2">B2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Polymorphically access the second field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Polymorphically access the second field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lens[A,B](r:A=&gt;scalaz.Store[B,A]):scalaz.Lens[A,B]"></a>
+      <a id="lens[A,B]((A)⇒Store[B,A]):Lens[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="r">r: (<span class="extype" name="scalaz.LensFunctions.lens.A">A</span>) ⇒ <a href="package.html#Store[A,+B]=scalaz.package.StoreT[scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.Store">Store</a>[<span class="extype" name="scalaz.LensFunctions.lens.B">B</span>, <span class="extype" name="scalaz.LensFunctions.lens.A">A</span>]</span>)</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<span class="extype" name="scalaz.LensFunctions.lens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lens.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#lensCategory" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensCategory:scalaz.LensCategory"></a>
+      <a id="lensCategory:LensCategory"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensCategory</span><span class="result">: <span class="extype" name="scalaz.LensCategory">LensCategory</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensFamily[A1,A2,B1,B2](r:A1=&gt;scalaz.IndexedStore[B1,B2,A2]):scalaz.LensFamily[A1,A2,B1,B2]"></a>
+      <a id="lensFamily[A1,A2,B1,B2]((A1)⇒IndexedStore[B1,B2,A2]):LensFamily[A1,A2,B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="params">(<span name="r">r: (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.A1">A1</span>) ⇒ <a href="package.html#IndexedStore[+I,-A,+B]=scalaz.IndexedStoreT[scalaz.Id.Id,I,A,B]" class="extmbr" name="scalaz.IndexedStore">IndexedStore</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.B2">B2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.A2">A2</span>]</span>)</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamily.B2">B2</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lensFamilyId" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensFamilyId[A1,A2]:scalaz.LensFamily[A1,A2,A1,A2]"></a>
+      <a id="lensFamilyId[A1,A2]:LensFamily[A1,A2,A1,A2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensFamilyId</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyId.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyId.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyId.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyId.A2">A2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The identity lens family for a given pair of objects</p><div class="fullcomment"><div class="comment cmt"><p>The identity lens family for a given pair of objects</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lensFamilyg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensFamilyg[A1,A2,B1,B2](set:A1=&gt;(B2=&gt;A2),get:A1=&gt;B1):scalaz.LensFamily[A1,A2,B1,B2]"></a>
+      <a id="lensFamilyg[A1,A2,B1,B2]((A1)⇒(B2)⇒A2,(A1)⇒B1):LensFamily[A1,A2,B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensFamilyg</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="params">(<span name="set">set: (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.A1">A1</span>) ⇒ (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.B2">B2</span>) ⇒ <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.A2">A2</span></span>, <span name="get">get: (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.A1">A1</span>) ⇒ <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.B1">B1</span></span>)</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyg.B2">B2</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#lensFamilyu" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensFamilyu[A1,A2,B1,B2](set:(A1,B2)=&gt;A2,get:A1=&gt;B1):scalaz.LensFamily[A1,A2,B1,B2]"></a>
+      <a id="lensFamilyu[A1,A2,B1,B2]((A1,B2)⇒A2,(A1)⇒B1):LensFamily[A1,A2,B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensFamilyu</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="params">(<span name="set">set: (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.B2">B2</span>) ⇒ <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.A2">A2</span></span>, <span name="get">get: (<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.A1">A1</span>) ⇒ <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.B1">B1</span></span>)</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.lensFamilyu.B2">B2</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lensId" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensId[A]:scalaz.Lens[A,A]"></a>
+      <a id="lensId[A]:Lens[A,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensId</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<span class="extype" name="scalaz.LensFunctions.lensId.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lensId.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The identity lens for a given object</p><div class="fullcomment"><div class="comment cmt"><p>The identity lens for a given object</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lensg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensg[A,B](set:A=&gt;(B=&gt;A),get:A=&gt;B):scalaz.Lens[A,B]"></a>
+      <a id="lensg[A,B]((A)⇒(B)⇒A,(A)⇒B):Lens[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensg</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="set">set: (<span class="extype" name="scalaz.LensFunctions.lensg.A">A</span>) ⇒ (<span class="extype" name="scalaz.LensFunctions.lensg.B">B</span>) ⇒ <span class="extype" name="scalaz.LensFunctions.lensg.A">A</span></span>, <span name="get">get: (<span class="extype" name="scalaz.LensFunctions.lensg.A">A</span>) ⇒ <span class="extype" name="scalaz.LensFunctions.lensg.B">B</span></span>)</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<span class="extype" name="scalaz.LensFunctions.lensg.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lensg.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#lensu" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lensu[A,B](set:(A,B)=&gt;A,get:A=&gt;B):scalaz.Lens[A,B]"></a>
+      <a id="lensu[A,B]((A,B)⇒A,(A)⇒B):Lens[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lensu</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="set">set: (<span class="extype" name="scalaz.LensFunctions.lensu.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lensu.B">B</span>) ⇒ <span class="extype" name="scalaz.LensFunctions.lensu.A">A</span></span>, <span name="get">get: (<span class="extype" name="scalaz.LensFunctions.lensu.A">A</span>) ⇒ <span class="extype" name="scalaz.LensFunctions.lensu.B">B</span></span>)</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<span class="extype" name="scalaz.LensFunctions.lensu.A">A</span>, <span class="extype" name="scalaz.LensFunctions.lensu.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#mapLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="mapLensFamily[S1,S2,K,V](lens:scalaz.LensFamily[S1,S2,Map[K,V],Map[K,V]]):LensInstances.this.MapLensFamily[S1,S2,K,V]"></a>
+      <a id="mapLensFamily[S1,S2,K,V](LensFamily[S1,S2,Map[K,V],Map[K,V]]):MapLensFamily[S1,S2,K,V]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mapLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.mapLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.S2">S2</span>, <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.LensInstances.mapLensFamily.K">K</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.V">V</span>], <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.LensInstances.mapLensFamily.K">K</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.V">V</span>]]</span>)</span><span class="result">: <a href="#MapLensFamily[-S1,+S2,K,V]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.MapLensFamily">MapLensFamily</a>[<span class="extype" name="scalaz.LensInstances.mapLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.K">K</span>, <span class="extype" name="scalaz.LensInstances.mapLensFamily.V">V</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#mapVLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="mapVLens[K,V](k:K):scalaz.@&gt;[Map[K,V],Option[V]]"></a>
+      <a id="mapVLens[K,V](K):@&gt;[Map[K,V],Option[V]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mapVLens</span><span class="tparams">[<span name="K">K</span>, <span name="V">V</span>]</span><span class="params">(<span name="k">k: <span class="extype" name="scalaz.LensFunctions.mapVLens.K">K</span></span>)</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scalaz.LensFunctions.mapVLens.K">K</span>, <span class="extype" name="scalaz.LensFunctions.mapVLens.V">V</span>], <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.LensFunctions.mapVLens.V">V</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Access the value at a particular key of a Map *</p><div class="fullcomment"><div class="comment cmt"><p>Access the value at a particular key of a Map *</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.LensFunctions#nelHeadLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nelHeadLens[A]:scalaz.@&gt;[scalaz.NonEmptyList[A],A]"></a>
+      <a id="nelHeadLens[A]:@&gt;[NonEmptyList[A],A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nelHeadLens</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="NonEmptyList.html" class="extype" name="scalaz.NonEmptyList">NonEmptyList</a>[<span class="extype" name="scalaz.LensFunctions.nelHeadLens.A">A</span>], <span class="extype" name="scalaz.LensFunctions.nelHeadLens.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#nelTailLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nelTailLens[A]:scalaz.@&gt;[scalaz.NonEmptyList[A],List[A]]"></a>
+      <a id="nelTailLens[A]:@&gt;[NonEmptyList[A],List[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nelTailLens</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="NonEmptyList.html" class="extype" name="scalaz.NonEmptyList">NonEmptyList</a>[<span class="extype" name="scalaz.LensFunctions.nelTailLens.A">A</span>], <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.LensFunctions.nelTailLens.A">A</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.LensInstances#numericLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="numericLensFamily[S1,S2,N](lens:scalaz.LensFamily[S1,S2,N,N])(implicitevidence$2:Numeric[N]):LensInstances.this.NumericLensFamily[S1,S2,N]"></a>
+      <a id="numericLensFamily[S1,S2,N](LensFamily[S1,S2,N,N])(Numeric[N]):NumericLensFamily[S1,S2,N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">numericLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="N">N</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.numericLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.numericLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.numericLensFamily.N">N</span>, <span class="extype" name="scalaz.LensInstances.numericLensFamily.N">N</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="scalaz.LensInstances.numericLensFamily.N">N</span>]</span>)</span><span class="result">: <a href="#NumericLensFamily[S1,S2,N]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.NumericLensFamily">NumericLensFamily</a>[<span class="extype" name="scalaz.LensInstances.numericLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.numericLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.numericLensFamily.N">N</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#predicateLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predicateLens[A]:scalaz.@&gt;[scalaz.Store[A,Boolean],scalaz.\/[A,A]]"></a>
+      <a id="predicateLens[A]:@&gt;[Store[A,Boolean],\/[A,A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predicateLens</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[<a href="package.html#Store[A,+B]=scalaz.package.StoreT[scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.Store">Store</a>[<span class="extype" name="scalaz.LensFunctions.predicateLens.A">A</span>, <span class="extype" name="scala.Boolean">Boolean</span>], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFunctions.predicateLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.predicateLens.A">A</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#predicateLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="predicateLensFamily[A1,A2]:scalaz.LensFamily[scalaz.Store[A1,Boolean],scalaz.Store[A2,Boolean],scalaz.\/[A1,A1],scalaz.\/[A2,A2]]"></a>
+      <a id="predicateLensFamily[A1,A2]:LensFamily[Store[A1,Boolean],Store[A2,Boolean],\/[A1,A1],\/[A2,A2]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">predicateLensFamily</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<a href="package.html#Store[A,+B]=scalaz.package.StoreT[scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.Store">Store</a>[<span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A1">A1</span>, <span class="extype" name="scala.Boolean">Boolean</span>], <a href="package.html#Store[A,+B]=scalaz.package.StoreT[scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.Store">Store</a>[<span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A2">A2</span>, <span class="extype" name="scala.Boolean">Boolean</span>], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A1">A1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A1">A1</span>], <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A2">A2</span>, <span class="extype" name="scalaz.LensFamilyFunctions.predicateLensFamily.A2">A2</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#queueLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="queueLensFamily[S1,S2,A](lens:scalaz.LensFamily[S1,S2,scala.collection.immutable.Queue[A],scala.collection.immutable.Queue[A]]):LensInstances.this.QueueLensFamily[S1,S2,A]"></a>
+      <a id="queueLensFamily[S1,S2,A](LensFamily[S1,S2,Queue[A],Queue[A]]):QueueLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">queueLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.queueLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.queueLensFamily.S2">S2</span>, <span class="extype" name="scala.collection.immutable.Queue">Queue</span>[<span class="extype" name="scalaz.LensInstances.queueLensFamily.A">A</span>], <span class="extype" name="scala.collection.immutable.Queue">Queue</span>[<span class="extype" name="scalaz.LensInstances.queueLensFamily.A">A</span>]]</span>)</span><span class="result">: <a href="#QueueLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.QueueLensFamily">QueueLensFamily</a>[<span class="extype" name="scalaz.LensInstances.queueLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.queueLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.queueLensFamily.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensFunctions#secondLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="secondLens[A,B]:scalaz.@&gt;[(A,B),B]"></a>
+      <a id="secondLens[A,B]:@&gt;[(A,B),B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">secondLens</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result">: <a href="package.html#@&gt;[A,B]=scalaz.package.Lens[A,B]" class="extmbr" name="scalaz.@&gt;">@&gt;</a>[(<span class="extype" name="scalaz.LensFunctions.secondLens.A">A</span>, <span class="extype" name="scalaz.LensFunctions.secondLens.B">B</span>), <span class="extype" name="scalaz.LensFunctions.secondLens.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Access the second field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Access the second field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensFamilyFunctions#secondLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="secondLensFamily[A,B1,B2]:scalaz.LensFamily[(A,B1),(A,B2),B1,B2]"></a>
+      <a id="secondLensFamily[A,B1,B2]:LensFamily[(A,B1),(A,B2),B1,B2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">secondLensFamily</span><span class="tparams">[<span name="A">A</span>, <span name="B1">B1</span>, <span name="B2">B2</span>]</span><span class="result">: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[(<span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.A">A</span>, <span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.B1">B1</span>), (<span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.A">A</span>, <span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.B2">B2</span>), <span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.B1">B1</span>, <span class="extype" name="scalaz.LensFamilyFunctions.secondLensFamily.B2">B2</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Polymorphically access the second field of a tuple</p><div class="fullcomment"><div class="comment cmt"><p>Polymorphically access the second field of a tuple</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#seqLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="seqLensFamily[S1,S2,A](lens:scalaz.LensFamily[S1,S2,scala.collection.immutable.Seq[A],scala.collection.immutable.Seq[A]]):LensInstances.this.SeqLikeLensFamily[S1,S2,A,scala.collection.immutable.Seq[A]]"></a>
+      <a id="seqLensFamily[S1,S2,A](LensFamily[S1,S2,Seq[A],Seq[A]]):SeqLikeLensFamily[S1,S2,A,Seq[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">seqLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.seqLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.seqLensFamily.S2">S2</span>, <span class="extype" name="scala.collection.immutable.Seq">Seq</span>[<span class="extype" name="scalaz.LensInstances.seqLensFamily.A">A</span>], <span class="extype" name="scala.collection.immutable.Seq">Seq</span>[<span class="extype" name="scalaz.LensInstances.seqLensFamily.A">A</span>]]</span>)</span><span class="result">: <a href="#SeqLikeLensFamily[S1,S2,A,Repr&lt;:scala.collection.SeqLike[A,Repr]]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.SeqLikeLensFamily">SeqLikeLensFamily</a>[<span class="extype" name="scalaz.LensInstances.seqLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.seqLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.seqLensFamily.A">A</span>, <span class="extype" name="scala.collection.immutable.Seq">Seq</span>[<span class="extype" name="scalaz.LensInstances.seqLensFamily.A">A</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances0#seqLikeLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="seqLikeLensFamily[S1,S2,A,Repr&lt;:scala.collection.SeqLike[A,Repr]](lens:scalaz.LensFamily[S1,S2,Repr,Repr]):LensInstances0.this.SeqLikeLensFamily[S1,S2,A,Repr]"></a>
+      <a id="seqLikeLensFamily[S1,S2,A,Repr&lt;:SeqLike[A,Repr]](LensFamily[S1,S2,Repr,Repr]):SeqLikeLensFamily[S1,S2,A,Repr]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">seqLikeLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="Repr">Repr &lt;: <span class="extype" name="scala.collection.SeqLike">SeqLike</span>[<span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.Repr">Repr</span>]</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.Repr">Repr</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.Repr">Repr</span>]</span>)</span><span class="result">: <a href="#SeqLikeLensFamily[S1,S2,A,Repr&lt;:scala.collection.SeqLike[A,Repr]]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.SeqLikeLensFamily">SeqLikeLensFamily</a>[<span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances0.seqLikeLensFamily.Repr">Repr</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances0.html" class="extype" name="scalaz.LensInstances0">LensInstances0</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#setLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setLensFamily[S1,S2,K](lens:scalaz.LensFamily[S1,S2,Set[K],Set[K]]):LensInstances.this.SetLensFamily[S1,S2,K]"></a>
+      <a id="setLensFamily[S1,S2,K](LensFamily[S1,S2,Set[K],Set[K]]):SetLensFamily[S1,S2,K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="K">K</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.setLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.setLensFamily.S2">S2</span>, <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scalaz.LensInstances.setLensFamily.K">K</span>], <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scalaz.LensInstances.setLensFamily.K">K</span>]]</span>)</span><span class="result">: <a href="#SetLensFamily[-S1,+S2,K]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.SetLensFamily">SetLensFamily</a>[<span class="extype" name="scalaz.LensInstances.setLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.setLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.setLensFamily.K">K</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A lens that views a Set can provide the appearance of in place mutation</p><div class="fullcomment"><div class="comment cmt"><p>A lens that views a Set can provide the appearance of in place mutation</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#stackLensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stackLensFamily[S1,S2,A](lens:scalaz.LensFamily[S1,S2,scala.collection.immutable.Stack[A],scala.collection.immutable.Stack[A]]):LensInstances.this.StackLensFamily[S1,S2,A]"></a>
+      <a id="stackLensFamily[S1,S2,A](LensFamily[S1,S2,Stack[A],Stack[A]]):StackLensFamily[S1,S2,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stackLensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.stackLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.stackLensFamily.S2">S2</span>, <span class="extype" name="scala.collection.immutable.Stack">Stack</span>[<span class="extype" name="scalaz.LensInstances.stackLensFamily.A">A</span>], <span class="extype" name="scala.collection.immutable.Stack">Stack</span>[<span class="extype" name="scalaz.LensInstances.stackLensFamily.A">A</span>]]</span>)</span><span class="result">: <a href="#StackLensFamily[S1,S2,A]extendsProductwithSerializable" class="extmbr" name="scalaz.LensInstances.StackLensFamily">StackLensFamily</a>[<span class="extype" name="scalaz.LensInstances.stackLensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.stackLensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.stackLensFamily.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LensFunctions#trivialLens" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="trivialLens[A]:scalaz.Lens[A,Unit]"></a>
+      <a id="trivialLens[A]:Lens[A,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">trivialLens</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">Lens</a>[<span class="extype" name="scalaz.LensFunctions.trivialLens.A">A</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">The trivial lens that can retrieve Unit from anything</p><div class="fullcomment"><div class="comment cmt"><p>The trivial lens that can retrieve Unit from anything</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple2LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple2LensFamily[S1,S2,A,B](lens:scalaz.LensFamily[S1,S2,(A,B),(A,B)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B])"></a>
+      <a id="tuple2LensFamily[S1,S2,A,B](LensFamily[S1,S2,(A,B),(A,B)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple2LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple2LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.B">B</span>), (<span class="extype" name="scalaz.LensInstances.tuple2LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.B">B</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple2LensFamily.B">B</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple3LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple3LensFamily[S1,S2,A,B,C](lens:scalaz.LensFamily[S1,S2,(A,B,C),(A,B,C)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B],scalaz.LensFamily[S1,S2,C,C])"></a>
+      <a id="tuple3LensFamily[S1,S2,A,B,C](LensFamily[S1,S2,(A,B,C),(A,B,C)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B],LensFamily[S1,S2,C,C])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple3LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.C">C</span>), (<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.C">C</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.B">B</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple3LensFamily.C">C</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple4LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple4LensFamily[S1,S2,A,B,C,D](lens:scalaz.LensFamily[S1,S2,(A,B,C,D),(A,B,C,D)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B],scalaz.LensFamily[S1,S2,C,C],scalaz.LensFamily[S1,S2,D,D])"></a>
+      <a id="tuple4LensFamily[S1,S2,A,B,C,D](LensFamily[S1,S2,(A,B,C,D),(A,B,C,D)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B],LensFamily[S1,S2,C,C],LensFamily[S1,S2,D,D])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple4LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.D">D</span>), (<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.D">D</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.B">B</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.C">C</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple4LensFamily.D">D</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple5LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple5LensFamily[S1,S2,A,B,C,D,E](lens:scalaz.LensFamily[S1,S2,(A,B,C,D,E),(A,B,C,D,E)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B],scalaz.LensFamily[S1,S2,C,C],scalaz.LensFamily[S1,S2,D,D],scalaz.LensFamily[S1,S2,E,E])"></a>
+      <a id="tuple5LensFamily[S1,S2,A,B,C,D,E](LensFamily[S1,S2,(A,B,C,D,E),(A,B,C,D,E)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B],LensFamily[S1,S2,C,C],LensFamily[S1,S2,D,D],LensFamily[S1,S2,E,E])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple5LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.E">E</span>), (<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.E">E</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.B">B</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.C">C</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.D">D</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple5LensFamily.E">E</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple6LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple6LensFamily[S1,S2,A,B,C,D,E,H](lens:scalaz.LensFamily[S1,S2,(A,B,C,D,E,H),(A,B,C,D,E,H)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B],scalaz.LensFamily[S1,S2,C,C],scalaz.LensFamily[S1,S2,D,D],scalaz.LensFamily[S1,S2,E,E],scalaz.LensFamily[S1,S2,H,H])"></a>
+      <a id="tuple6LensFamily[S1,S2,A,B,C,D,E,H](LensFamily[S1,S2,(A,B,C,D,E,H),(A,B,C,D,E,H)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B],LensFamily[S1,S2,C,C],LensFamily[S1,S2,D,D],LensFamily[S1,S2,E,E],LensFamily[S1,S2,H,H])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple6LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="H">H</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.H">H</span>), (<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.H">H</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.B">B</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.C">C</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.D">D</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.E">E</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.H">H</span>, <span class="extype" name="scalaz.LensInstances.tuple6LensFamily.H">H</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scalaz.LensInstances#tuple7LensFamily" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tuple7LensFamily[S1,S2,A,B,C,D,E,H,I](lens:scalaz.LensFamily[S1,S2,(A,B,C,D,E,H,I),(A,B,C,D,E,H,I)]):(scalaz.LensFamily[S1,S2,A,A],scalaz.LensFamily[S1,S2,B,B],scalaz.LensFamily[S1,S2,C,C],scalaz.LensFamily[S1,S2,D,D],scalaz.LensFamily[S1,S2,E,E],scalaz.LensFamily[S1,S2,H,H],scalaz.LensFamily[S1,S2,I,I])"></a>
+      <a id="tuple7LensFamily[S1,S2,A,B,C,D,E,H,I](LensFamily[S1,S2,(A,B,C,D,E,H,I),(A,B,C,D,E,H,I)]):(LensFamily[S1,S2,A,A],LensFamily[S1,S2,B,B],LensFamily[S1,S2,C,C],LensFamily[S1,S2,D,D],LensFamily[S1,S2,E,E],LensFamily[S1,S2,H,H],LensFamily[S1,S2,I,I])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tuple7LensFamily</span><span class="tparams">[<span name="S1">S1</span>, <span name="S2">S2</span>, <span name="A">A</span>, <span name="B">B</span>, <span name="C">C</span>, <span name="D">D</span>, <span name="E">E</span>, <span name="H">H</span>, <span name="I">I</span>]</span><span class="params">(<span name="lens">lens: <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, (<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.H">H</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.I">I</span>), (<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.H">H</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.I">I</span>)]</span>)</span><span class="result">: (<a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.A">A</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.A">A</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.B">B</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.B">B</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.C">C</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.C">C</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.D">D</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.D">D</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.E">E</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.E">E</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.H">H</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.H">H</span>], <a href="LensFamily.html" class="extype" name="scalaz.LensFamily">LensFamily</a>[<span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S1">S1</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.S2">S2</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.I">I</span>, <span class="extype" name="scalaz.LensInstances.tuple7LensFamily.I">I</span>])</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.LensInstances">
+              <h3>Inherited from <a href="LensInstances.html" class="extype" name="scalaz.LensInstances">LensInstances</a></h3>
+            </div><div class="parent" name="scalaz.LensInstances0">
+              <h3>Inherited from <a href="LensInstances0.html" class="extype" name="scalaz.LensInstances0">LensInstances0</a></h3>
+            </div><div class="parent" name="scalaz.LensFunctions">
+              <h3>Inherited from <a href="LensFunctions.html" class="extype" name="scalaz.LensFunctions">LensFunctions</a></h3>
+            </div><div class="parent" name="scalaz.LensFamilyFunctions">
+              <h3>Inherited from <a href="LensFamilyFunctions.html" class="extype" name="scalaz.LensFamilyFunctions">LensFamilyFunctions</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

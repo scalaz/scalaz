@@ -1,0 +1,627 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>traverse1 - scalaz.syntax.Syntaxes.traverse1</title>
+          <meta name="description" content="traverse1 - scalaz.syntax.Syntaxes.traverse1" />
+          <meta name="keywords" content="traverse1 scalaz.syntax.Syntaxes.traverse1" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.syntax.Syntaxes$traverse1$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/object_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a>.<a href="package.html" class="extype" name="scalaz.syntax">syntax</a>.<a href="Syntaxes.html" class="extype" name="scalaz.syntax.Syntaxes">Syntaxes</a></p>
+        <h1>traverse1</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traverse1</span><span class="result"> extends <a href="ToTraverse1Ops.html" class="extype" name="scalaz.syntax.ToTraverse1Ops">ToTraverse1Ops</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.1/core/src/main/scala/scalaz/syntax/Syntax.scala" target="_blank">Syntax.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="ToTraverse1Ops.html" class="extype" name="scalaz.syntax.ToTraverse1Ops">ToTraverse1Ops</a>, <a href="ToFoldable1Ops.html" class="extype" name="scalaz.syntax.ToFoldable1Ops">ToFoldable1Ops</a>, <a href="ToFoldable1Ops0.html" class="extype" name="scalaz.syntax.ToFoldable1Ops0">ToFoldable1Ops0</a>, <a href="ToTraverseOps.html" class="extype" name="scalaz.syntax.ToTraverseOps">ToTraverseOps</a>, <a href="ToFoldableOps.html" class="extype" name="scalaz.syntax.ToFoldableOps">ToFoldableOps</a>, <a href="ToFoldableOps0.html" class="extype" name="scalaz.syntax.ToFoldableOps0">ToFoldableOps0</a>, <a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a>, <a href="ToFunctorOps0.html" class="extype" name="scalaz.syntax.ToFunctorOps0">ToFunctorOps0</a>, <a href="ToTraverseOps0.html" class="extype" name="scalaz.syntax.ToTraverseOps0">ToTraverseOps0</a>, <a href="ToTraverse1Ops0.html" class="extype" name="scalaz.syntax.ToTraverse1Ops0">ToTraverse1Ops0</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.syntax.Syntaxes.traverse1"><span>traverse1</span></li><li class="in" name="scalaz.syntax.ToTraverse1Ops"><span>ToTraverse1Ops</span></li><li class="in" name="scalaz.syntax.ToFoldable1Ops"><span>ToFoldable1Ops</span></li><li class="in" name="scalaz.syntax.ToFoldable1Ops0"><span>ToFoldable1Ops0</span></li><li class="in" name="scalaz.syntax.ToTraverseOps"><span>ToTraverseOps</span></li><li class="in" name="scalaz.syntax.ToFoldableOps"><span>ToFoldableOps</span></li><li class="in" name="scalaz.syntax.ToFoldableOps0"><span>ToFoldableOps0</span></li><li class="in" name="scalaz.syntax.ToFunctorOps"><span>ToFunctorOps</span></li><li class="in" name="scalaz.syntax.ToFunctorOps0"><span>ToFunctorOps0</span></li><li class="in" name="scalaz.syntax.ToTraverseOps0"><span>ToTraverseOps0</span></li><li class="in" name="scalaz.syntax.ToTraverse1Ops0"><span>ToTraverse1Ops0</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.syntax.ToFunctorOps.FunctorIdV" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="FunctorIdV[A]extendsOps[A]"></a>
+      <a id="FunctorIdV[A]:FunctorIdV[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToFunctorOps$FunctorIdV.html"><span class="name">FunctorIdV</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.ToFunctorOps.FunctorIdV.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFunctorOps.LiftV" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="LiftV[F[_],A,B]extendsOps[A=&gt;B]"></a>
+      <a id="LiftV[F[_],A,B]:LiftV[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToFunctorOps$LiftV.html"><span class="name">LiftV</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends <a href="Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[(<span class="extype" name="scalaz.syntax.ToFunctorOps.LiftV.A">A</span>) ⇒ <span class="extype" name="scalaz.syntax.ToFunctorOps.LiftV.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.syntax.ToFoldable1Ops#ToFoldable1Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFoldable1Ops[F[_],A](v:F[A])(implicitF0:scalaz.Foldable1[F]):scalaz.syntax.Foldable1Ops[F,A]"></a>
+      <a id="ToFoldable1Ops[F[_],A](F[A])(Foldable1[F]):Foldable1Ops[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFoldable1Ops</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFoldable1Ops.ToFoldable1Ops.F">F</span>[<span class="extype" name="scalaz.syntax.ToFoldable1Ops.ToFoldable1Ops.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Foldable1.html" class="extype" name="scalaz.Foldable1">Foldable1</a>[<span class="extype" name="scalaz.syntax.ToFoldable1Ops.ToFoldable1Ops.F">F</span>]</span>)</span><span class="result">: <a href="Foldable1Ops.html" class="extype" name="scalaz.syntax.Foldable1Ops">Foldable1Ops</a>[<span class="extype" name="scalaz.syntax.ToFoldable1Ops.ToFoldable1Ops.F">F</span>, <span class="extype" name="scalaz.syntax.ToFoldable1Ops.ToFoldable1Ops.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFoldable1Ops.html" class="extype" name="scalaz.syntax.ToFoldable1Ops">ToFoldable1Ops</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFoldable1Ops0#ToFoldable1OpsUnapply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFoldable1OpsUnapply[FA](v:FA)(implicitF0:scalaz.Unapply[scalaz.Foldable1,FA]):scalaz.syntax.Foldable1Ops[F0.M,F0.A]"></a>
+      <a id="ToFoldable1OpsUnapply[FA](FA)(Unapply[Foldable1,FA]):Foldable1Ops[M,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFoldable1OpsUnapply</span><span class="tparams">[<span name="FA">FA</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFoldable1Ops0.ToFoldable1OpsUnapply.FA">FA</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Unapply.html" class="extype" name="scalaz.Unapply">Unapply</a>[<a href="../Foldable1.html" class="extype" name="scalaz.Foldable1">Foldable1</a>, <span class="extype" name="scalaz.syntax.ToFoldable1Ops0.ToFoldable1OpsUnapply.FA">FA</span>]</span>)</span><span class="result">: <a href="Foldable1Ops.html" class="extype" name="scalaz.syntax.Foldable1Ops">Foldable1Ops</a>[<a href="../Unapply.html#M[_]" class="extmbr" name="scalaz.Unapply.M">M</a>, <a href="../Unapply.html#A" class="extmbr" name="scalaz.Unapply.A">A</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFoldable1Ops0.html" class="extype" name="scalaz.syntax.ToFoldable1Ops0">ToFoldable1Ops0</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFoldableOps#ToFoldableOps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFoldableOps[F[_],A](v:F[A])(implicitF0:scalaz.Foldable[F]):scalaz.syntax.FoldableOps[F,A]"></a>
+      <a id="ToFoldableOps[F[_],A](F[A])(Foldable[F]):FoldableOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFoldableOps</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFoldableOps.ToFoldableOps.F">F</span>[<span class="extype" name="scalaz.syntax.ToFoldableOps.ToFoldableOps.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[<span class="extype" name="scalaz.syntax.ToFoldableOps.ToFoldableOps.F">F</span>]</span>)</span><span class="result">: <a href="FoldableOps.html" class="extype" name="scalaz.syntax.FoldableOps">FoldableOps</a>[<span class="extype" name="scalaz.syntax.ToFoldableOps.ToFoldableOps.F">F</span>, <span class="extype" name="scalaz.syntax.ToFoldableOps.ToFoldableOps.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFoldableOps.html" class="extype" name="scalaz.syntax.ToFoldableOps">ToFoldableOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFoldableOps0#ToFoldableOpsUnapply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFoldableOpsUnapply[FA](v:FA)(implicitF0:scalaz.Unapply[scalaz.Foldable,FA]):scalaz.syntax.FoldableOps[F0.M,F0.A]"></a>
+      <a id="ToFoldableOpsUnapply[FA](FA)(Unapply[Foldable,FA]):FoldableOps[M,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFoldableOpsUnapply</span><span class="tparams">[<span name="FA">FA</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFoldableOps0.ToFoldableOpsUnapply.FA">FA</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Unapply.html" class="extype" name="scalaz.Unapply">Unapply</a>[<a href="../Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>, <span class="extype" name="scalaz.syntax.ToFoldableOps0.ToFoldableOpsUnapply.FA">FA</span>]</span>)</span><span class="result">: <a href="FoldableOps.html" class="extype" name="scalaz.syntax.FoldableOps">FoldableOps</a>[<a href="../Unapply.html#M[_]" class="extmbr" name="scalaz.Unapply.M">M</a>, <a href="../Unapply.html#A" class="extmbr" name="scalaz.Unapply.A">A</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFoldableOps0.html" class="extype" name="scalaz.syntax.ToFoldableOps0">ToFoldableOps0</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFunctorOps#ToFunctorIdV" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFunctorIdV[A](v:A):ToFunctorOps.this.FunctorIdV[A]"></a>
+      <a id="ToFunctorIdV[A](A):FunctorIdV[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFunctorIdV</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorIdV.A">A</span></span>)</span><span class="result">: <a href="#FunctorIdV[A]extendsOps[A]" class="extmbr" name="scalaz.syntax.ToFunctorOps.FunctorIdV">FunctorIdV</a>[<span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorIdV.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFunctorOps#ToFunctorOps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFunctorOps[F[_],A](v:F[A])(implicitF0:scalaz.Functor[F]):scalaz.syntax.FunctorOps[F,A]"></a>
+      <a id="ToFunctorOps[F[_],A](F[A])(Functor[F]):FunctorOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFunctorOps</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorOps.F">F</span>[<span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorOps.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorOps.F">F</span>]</span>)</span><span class="result">: <a href="FunctorOps.html" class="extype" name="scalaz.syntax.FunctorOps">FunctorOps</a>[<span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorOps.F">F</span>, <span class="extype" name="scalaz.syntax.ToFunctorOps.ToFunctorOps.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFunctorOps0#ToFunctorOpsUnapply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToFunctorOpsUnapply[FA](v:FA)(implicitF0:scalaz.Unapply[scalaz.Functor,FA]):scalaz.syntax.FunctorOps[F0.M,F0.A]"></a>
+      <a id="ToFunctorOpsUnapply[FA](FA)(Unapply[Functor,FA]):FunctorOps[M,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToFunctorOpsUnapply</span><span class="tparams">[<span name="FA">FA</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToFunctorOps0.ToFunctorOpsUnapply.FA">FA</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Unapply.html" class="extype" name="scalaz.Unapply">Unapply</a>[<a href="../Functor.html" class="extype" name="scalaz.Functor">Functor</a>, <span class="extype" name="scalaz.syntax.ToFunctorOps0.ToFunctorOpsUnapply.FA">FA</span>]</span>)</span><span class="result">: <a href="FunctorOps.html" class="extype" name="scalaz.syntax.FunctorOps">FunctorOps</a>[<a href="../Unapply.html#M[_]" class="extmbr" name="scalaz.Unapply.M">M</a>, <a href="../Unapply.html#A" class="extmbr" name="scalaz.Unapply.A">A</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps0.html" class="extype" name="scalaz.syntax.ToFunctorOps0">ToFunctorOps0</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToFunctorOps#ToLiftV" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToLiftV[F[_],A,B](v:A=&gt;B):ToFunctorOps.this.LiftV[F,A,B]"></a>
+      <a id="ToLiftV[F[_],A,B]((A)⇒B):LiftV[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToLiftV</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="v">v: (<span class="extype" name="scalaz.syntax.ToFunctorOps.ToLiftV.A">A</span>) ⇒ <span class="extype" name="scalaz.syntax.ToFunctorOps.ToLiftV.B">B</span></span>)</span><span class="result">: <a href="#LiftV[F[_],A,B]extendsOps[A=&gt;B]" class="extmbr" name="scalaz.syntax.ToFunctorOps.LiftV">LiftV</a>[<span class="extype" name="scalaz.syntax.ToFunctorOps.ToLiftV.F">F</span>, <span class="extype" name="scalaz.syntax.ToFunctorOps.ToLiftV.A">A</span>, <span class="extype" name="scalaz.syntax.ToFunctorOps.ToLiftV.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToTraverse1Ops#ToTraverse1Ops" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTraverse1Ops[F[_],A](v:F[A])(implicitF0:scalaz.Traverse1[F]):scalaz.syntax.Traverse1Ops[F,A]"></a>
+      <a id="ToTraverse1Ops[F[_],A](F[A])(Traverse1[F]):Traverse1Ops[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTraverse1Ops</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToTraverse1Ops.ToTraverse1Ops.F">F</span>[<span class="extype" name="scalaz.syntax.ToTraverse1Ops.ToTraverse1Ops.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Traverse1.html" class="extype" name="scalaz.Traverse1">Traverse1</a>[<span class="extype" name="scalaz.syntax.ToTraverse1Ops.ToTraverse1Ops.F">F</span>]</span>)</span><span class="result">: <a href="Traverse1Ops.html" class="extype" name="scalaz.syntax.Traverse1Ops">Traverse1Ops</a>[<span class="extype" name="scalaz.syntax.ToTraverse1Ops.ToTraverse1Ops.F">F</span>, <span class="extype" name="scalaz.syntax.ToTraverse1Ops.ToTraverse1Ops.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTraverse1Ops.html" class="extype" name="scalaz.syntax.ToTraverse1Ops">ToTraverse1Ops</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToTraverse1Ops0#ToTraverse1OpsUnapply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTraverse1OpsUnapply[FA](v:FA)(implicitF0:scalaz.Unapply[scalaz.Traverse1,FA]):scalaz.syntax.Traverse1Ops[F0.M,F0.A]"></a>
+      <a id="ToTraverse1OpsUnapply[FA](FA)(Unapply[Traverse1,FA]):Traverse1Ops[M,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTraverse1OpsUnapply</span><span class="tparams">[<span name="FA">FA</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToTraverse1Ops0.ToTraverse1OpsUnapply.FA">FA</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Unapply.html" class="extype" name="scalaz.Unapply">Unapply</a>[<a href="../Traverse1.html" class="extype" name="scalaz.Traverse1">Traverse1</a>, <span class="extype" name="scalaz.syntax.ToTraverse1Ops0.ToTraverse1OpsUnapply.FA">FA</span>]</span>)</span><span class="result">: <a href="Traverse1Ops.html" class="extype" name="scalaz.syntax.Traverse1Ops">Traverse1Ops</a>[<a href="../Unapply.html#M[_]" class="extmbr" name="scalaz.Unapply.M">M</a>, <a href="../Unapply.html#A" class="extmbr" name="scalaz.Unapply.A">A</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTraverse1Ops0.html" class="extype" name="scalaz.syntax.ToTraverse1Ops0">ToTraverse1Ops0</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToTraverseOps#ToTraverseOps" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTraverseOps[F[_],A](v:F[A])(implicitF0:scalaz.Traverse[F]):scalaz.syntax.TraverseOps[F,A]"></a>
+      <a id="ToTraverseOps[F[_],A](F[A])(Traverse[F]):TraverseOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTraverseOps</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToTraverseOps.ToTraverseOps.F">F</span>[<span class="extype" name="scalaz.syntax.ToTraverseOps.ToTraverseOps.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[<span class="extype" name="scalaz.syntax.ToTraverseOps.ToTraverseOps.F">F</span>]</span>)</span><span class="result">: <a href="TraverseOps.html" class="extype" name="scalaz.syntax.TraverseOps">TraverseOps</a>[<span class="extype" name="scalaz.syntax.ToTraverseOps.ToTraverseOps.F">F</span>, <span class="extype" name="scalaz.syntax.ToTraverseOps.ToTraverseOps.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTraverseOps.html" class="extype" name="scalaz.syntax.ToTraverseOps">ToTraverseOps</a></dd></dl></div>
+    </li><li name="scalaz.syntax.ToTraverseOps0#ToTraverseOpsUnapply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ToTraverseOpsUnapply[FA](v:FA)(implicitF0:scalaz.Unapply[scalaz.Traverse,FA]):scalaz.syntax.TraverseOps[F0.M,F0.A]"></a>
+      <a id="ToTraverseOpsUnapply[FA](FA)(Unapply[Traverse,FA]):TraverseOps[M,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ToTraverseOpsUnapply</span><span class="tparams">[<span name="FA">FA</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="scalaz.syntax.ToTraverseOps0.ToTraverseOpsUnapply.FA">FA</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="../Unapply.html" class="extype" name="scalaz.Unapply">Unapply</a>[<a href="../Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>, <span class="extype" name="scalaz.syntax.ToTraverseOps0.ToTraverseOpsUnapply.FA">FA</span>]</span>)</span><span class="result">: <a href="TraverseOps.html" class="extype" name="scalaz.syntax.TraverseOps">TraverseOps</a>[<a href="../Unapply.html#M[_]" class="extmbr" name="scalaz.Unapply.M">M</a>, <a href="../Unapply.html#A" class="extmbr" name="scalaz.Unapply.A">A</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ToTraverseOps0.html" class="extype" name="scalaz.syntax.ToTraverseOps0">ToTraverseOps0</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.syntax.ToTraverse1Ops">
+              <h3>Inherited from <a href="ToTraverse1Ops.html" class="extype" name="scalaz.syntax.ToTraverse1Ops">ToTraverse1Ops</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFoldable1Ops">
+              <h3>Inherited from <a href="ToFoldable1Ops.html" class="extype" name="scalaz.syntax.ToFoldable1Ops">ToFoldable1Ops</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFoldable1Ops0">
+              <h3>Inherited from <a href="ToFoldable1Ops0.html" class="extype" name="scalaz.syntax.ToFoldable1Ops0">ToFoldable1Ops0</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToTraverseOps">
+              <h3>Inherited from <a href="ToTraverseOps.html" class="extype" name="scalaz.syntax.ToTraverseOps">ToTraverseOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFoldableOps">
+              <h3>Inherited from <a href="ToFoldableOps.html" class="extype" name="scalaz.syntax.ToFoldableOps">ToFoldableOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFoldableOps0">
+              <h3>Inherited from <a href="ToFoldableOps0.html" class="extype" name="scalaz.syntax.ToFoldableOps0">ToFoldableOps0</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFunctorOps">
+              <h3>Inherited from <a href="ToFunctorOps.html" class="extype" name="scalaz.syntax.ToFunctorOps">ToFunctorOps</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToFunctorOps0">
+              <h3>Inherited from <a href="ToFunctorOps0.html" class="extype" name="scalaz.syntax.ToFunctorOps0">ToFunctorOps0</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToTraverseOps0">
+              <h3>Inherited from <a href="ToTraverseOps0.html" class="extype" name="scalaz.syntax.ToTraverseOps0">ToTraverseOps0</a></h3>
+            </div><div class="parent" name="scalaz.syntax.ToTraverse1Ops0">
+              <h3>Inherited from <a href="ToTraverse1Ops0.html" class="extype" name="scalaz.syntax.ToTraverse1Ops0">ToTraverse1Ops0</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>
