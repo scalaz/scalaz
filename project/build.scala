@@ -169,7 +169,10 @@ object build extends Build {
         "scalaz.LensFamily.<:=",
         "scalaz.Validation.excepting",
         "scalaz.NonEmptyList.init",
-        "scalaz.NonEmptyList.last"
+        "scalaz.NonEmptyList.last",
+        "scalaz.NonEmptyList.sortBy",
+        "scalaz.NonEmptyList.sortWith",
+        "scalaz.NonEmptyList.sorted"
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
