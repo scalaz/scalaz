@@ -419,8 +419,8 @@ class DataMapTest extends Spec {
 
   import scalaz.scalacheck.ScalaCheckBinding._
 
-  implicit def mapArb[A: Order, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[A ==>> B] =
-    Functor[Arbitrary].map(A)(as => fromList(as))
+  implicit def mapArb[A, B](implicit o: Order[A], a: Arbitrary[List[(A, B)]]): Arbitrary[A ==>> B] =
+    Functor[Arbitrary].map(a)(as => fromList(as))
 
   checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
