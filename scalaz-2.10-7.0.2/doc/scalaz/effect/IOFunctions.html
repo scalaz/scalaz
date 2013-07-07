@@ -1,0 +1,659 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>IOFunctions - scalaz.effect.IOFunctions</title>
+          <meta name="description" content="IOFunctions - scalaz.effect.IOFunctions" />
+          <meta name="keywords" content="IOFunctions scalaz.effect.IOFunctions" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.effect.IOFunctions';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../lib/trait_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a>.<a href="package.html" class="extype" name="scalaz.effect">effect</a></p>
+        <h1>IOFunctions</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">IOFunctions</span><span class="result"> extends <a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.2/effect/src/main/scala/scalaz/effect/IO.scala" target="_blank">IO.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+          <span class="toggle">Known Subclasses</span>
+          <div class="subClasses hiddenContent"><a href="IO$.html" class="extype" name="scalaz.effect.IO">IO</a></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.effect.IOFunctions"><span>IOFunctions</span></li><li class="in" name="scalaz.effect.IOStd"><span>IOStd</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.effect.IOFunctions.RunInBase" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RunInBase[M[_],Base[_]]=scalaz.Forall[[B]M[B]=&gt;Base[M[B]]]"></a>
+      <a id="RunInBase[M[_],Base[_]]:RunInBase[M,Base]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RunInBase</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="Base">Base<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> = <a href="../Forall.html" class="extype" name="scalaz.Forall">Forall</a>[[B](<span class="extype" name="scalaz.effect.IOFunctions.RunInBase.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.&lt;refinement&gt;.λ.B">B</span>]) ⇒ <span class="extype" name="scalaz.effect.IOFunctions.RunInBase.Base">Base</span>[<span class="extype" name="scalaz.effect.IOFunctions.RunInBase.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.&lt;refinement&gt;.λ.B">B</span>]]]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#IOToST" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IOToST[A](io:scalaz.effect.IO[A]):scalaz.effect.ST[scalaz.effect.IvoryTower,A]"></a>
+      <a id="IOToST[A](IO[A]):ST[IvoryTower,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">IOToST</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="io">io: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scalaz.effect.IOFunctions.IOToST.A">A</span>]</span>)</span><span class="result">: <a href="ST.html" class="extype" name="scalaz.effect.ST">ST</a>[<a href="IvoryTower.html" class="extype" name="scalaz.effect.IvoryTower">IvoryTower</a>, <span class="extype" name="scalaz.effect.IOFunctions.IOToST.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An IO action is an ST action.</p>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#controlIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="controlIO[M[_],A](f:IOFunctions.this.RunInBase[M,scalaz.effect.IO]=&gt;scalaz.effect.IO[M[A]])(implicitM:scalaz.effect.MonadControlIO[M]):M[A]"></a>
+      <a id="controlIO[M[_],A]((RunInBase[M,IO])⇒IO[M[A]])(MonadControlIO[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">controlIO</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="f">f: (<a href="#RunInBase[M[_],Base[_]]=scalaz.Forall[[B]M[B]=&gt;Base[M[B]]]" class="extmbr" name="scalaz.effect.IOFunctions.RunInBase">RunInBase</a>[<span class="extype" name="scalaz.effect.IOFunctions.controlIO.M">M</span>, <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>]) ⇒ <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scalaz.effect.IOFunctions.controlIO.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.controlIO.A">A</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="MonadControlIO.html" class="extype" name="scalaz.effect.MonadControlIO">MonadControlIO</a>[<span class="extype" name="scalaz.effect.IOFunctions.controlIO.M">M</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.effect.IOFunctions.controlIO.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.controlIO.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#getChar" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getChar:scalaz.effect.IO[Char]"></a>
+      <a id="getChar:IO[Char]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getChar</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Char">Char</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Reads a character from standard input.</p><div class="fullcomment"><div class="comment cmt"><p>Reads a character from standard input.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#idLiftControl" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="idLiftControl[M[_],A](f:IOFunctions.this.RunInBase[M,M]=&gt;M[A])(implicitm:scalaz.Monad[M]):M[A]"></a>
+      <a id="idLiftControl[M[_],A]((RunInBase[M,M])⇒M[A])(Monad[M]):M[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">idLiftControl</span><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="f">f: (<a href="#RunInBase[M[_],Base[_]]=scalaz.Forall[[B]M[B]=&gt;Base[M[B]]]" class="extmbr" name="scalaz.effect.IOFunctions.RunInBase">RunInBase</a>[<span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.M">M</span>, <span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.M">M</span>]) ⇒ <span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.M">M</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.M">M</span>[<span class="extype" name="scalaz.effect.IOFunctions.idLiftControl.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOFunctions#io" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="io[A](f:scalaz.effect.Tower[scalaz.effect.IvoryTower]=&gt;scalaz.Free.Trampoline[(scalaz.effect.Tower[scalaz.effect.IvoryTower],A)]):scalaz.effect.IO[A]"></a>
+      <a id="io[A]((Tower[IvoryTower])⇒Free.Trampoline[(Tower[IvoryTower],A)]):IO[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">io</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.effect.Tower">Tower</span>[<a href="IvoryTower.html" class="extype" name="scalaz.effect.IvoryTower">IvoryTower</a>]) ⇒ <a href="../Free$.html#Trampoline[+A]=scalaz.Free[Function0,A]" class="extmbr" name="scalaz.Free.Trampoline">Free.Trampoline</a>[(<span class="extype" name="scalaz.effect.Tower">Tower</span>[<a href="IvoryTower.html" class="extype" name="scalaz.effect.IvoryTower">IvoryTower</a>], <span class="extype" name="scalaz.effect.IOFunctions.io.A">A</span>)]</span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scalaz.effect.IOFunctions.io.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Construct an IO action from a world-transition function.</p>
+    </li><li name="scalaz.effect.IOFunctions#ioUnit" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ioUnit:scalaz.effect.IO[Unit]"></a>
+      <a id="ioUnit:IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ioUnit</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An IO action that does nothing.</p>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#newIORef" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="newIORef[A](a:=&gt;A):scalaz.effect.IO[scalaz.effect.IORef[A]]"></a>
+      <a id="newIORef[A](⇒A):IO[IORef[A]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">newIORef</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.effect.IOFunctions.newIORef.A">A</span></span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<a href="IORef.html" class="extype" name="scalaz.effect.IORef">IORef</a>[<span class="extype" name="scalaz.effect.IOFunctions.newIORef.A">A</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#onExit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onExit[S,P[+_]](finalizer:scalaz.effect.IO[Unit])(implicitevidence$1:scalaz.effect.MonadIO[P]):scalaz.effect.RegionT[S,P,scalaz.effect.FinalizerHandle[[α]scalaz.effect.RegionT[S,P,α]]]"></a>
+      <a id="onExit[S,P[+_]](IO[Unit])(MonadIO[P]):RegionT[S,P,FinalizerHandle[[α]RegionT[S,P,α]]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onExit</span><span class="tparams">[<span name="S">S</span>, <span name="P">P<span class="tparams">[<span name="_">+_</span>]</span></span>]</span><span class="params">(<span name="finalizer">finalizer: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="MonadIO.html" class="extype" name="scalaz.effect.MonadIO">MonadIO</a>[<span class="extype" name="scalaz.effect.IOFunctions.onExit.P">P</span>]</span>)</span><span class="result">: <a href="RegionT.html" class="extype" name="scalaz.effect.RegionT">RegionT</a>[<span class="extype" name="scalaz.effect.IOFunctions.onExit.S">S</span>, <span class="extype" name="scalaz.effect.IOFunctions.onExit.P">P</span>, <a href="FinalizerHandle.html" class="extype" name="scalaz.effect.FinalizerHandle">FinalizerHandle</a>[[α]<a href="RegionT.html" class="extype" name="scalaz.effect.RegionT">RegionT</a>[<span class="extype" name="scalaz.effect.IOFunctions.onExit.S">S</span>, <span class="extype" name="scalaz.effect.IOFunctions.onExit.P">P</span>, <span class="extype" name="scalaz.effect.IOFunctions.&lt;refinement&gt;.λ.α">α</span>]]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Register a finalizer in the current region.</p><div class="fullcomment"><div class="comment cmt"><p>Register a finalizer in the current region. When the region terminates,
+all registered finalizers will be performed if they're not duplicated to a parent region.
+</p></div></div>
+    </li><li name="scalaz.effect.IOStd#put" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="put[A](a:A)(implicitS:scalaz.Show[A]):scalaz.effect.IO[Unit]"></a>
+      <a id="put[A](A)(Show[A]):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">put</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.effect.IOStd.put.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="S">S: <a href="../Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.effect.IOStd.put.A">A</span>]</span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#putChar" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="putChar(c:Char):scalaz.effect.IO[Unit]"></a>
+      <a id="putChar(Char):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putChar</span><span class="params">(<span name="c">c: <span class="extype" name="scala.Char">Char</span></span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Writes a character to standard output.</p><div class="fullcomment"><div class="comment cmt"><p>Writes a character to standard output.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#putLn" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="putLn[A](a:A)(implicitS:scalaz.Show[A]):scalaz.effect.IO[Unit]"></a>
+      <a id="putLn[A](A)(Show[A]):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putLn</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.effect.IOStd.putLn.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="S">S: <a href="../Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.effect.IOStd.putLn.A">A</span>]</span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#putStr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="putStr(s:String):scalaz.effect.IO[Unit]"></a>
+      <a id="putStr(String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putStr</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Writes a string to standard output.</p><div class="fullcomment"><div class="comment cmt"><p>Writes a string to standard output.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#putStrLn" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="putStrLn(s:String):scalaz.effect.IO[Unit]"></a>
+      <a id="putStrLn(String):IO[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">putStrLn</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Writes a string to standard output, followed by a newline.</p><div class="fullcomment"><div class="comment cmt"><p>Writes a string to standard output, followed by a newline.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOStd#readLn" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="readLn:scalaz.effect.IO[String]"></a>
+      <a id="readLn:IO[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">readLn</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Reads a line of standard input.</p><div class="fullcomment"><div class="comment cmt"><p>Reads a line of standard input.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#runRegionT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="runRegionT[P[+_],A](r:scalaz.Forall[[S]scalaz.effect.RegionT[S,P,A]])(implicitevidence$2:scalaz.effect.MonadControlIO[P]):P[A]"></a>
+      <a id="runRegionT[P[+_],A](Forall[[S]RegionT[S,P,A]])(MonadControlIO[P]):P[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">runRegionT</span><span class="tparams">[<span name="P">P<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="r">r: <a href="../Forall.html" class="extype" name="scalaz.Forall">Forall</a>[[S]<a href="RegionT.html" class="extype" name="scalaz.effect.RegionT">RegionT</a>[<span class="extype" name="scalaz.effect.IOFunctions.&lt;refinement&gt;.λ.S">S</span>, <span class="extype" name="scalaz.effect.IOFunctions.runRegionT.P">P</span>, <span class="extype" name="scalaz.effect.IOFunctions.runRegionT.A">A</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="MonadControlIO.html" class="extype" name="scalaz.effect.MonadControlIO">MonadControlIO</a>[<span class="extype" name="scalaz.effect.IOFunctions.runRegionT.P">P</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.effect.IOFunctions.runRegionT.P">P</span>[<span class="extype" name="scalaz.effect.IOFunctions.runRegionT.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Execute a region inside its parent region P.</p><div class="fullcomment"><div class="comment cmt"><p>Execute a region inside its parent region P. All resources which have been opened in the given
+region and which haven't been duplicated using &quot;dup&quot;, will be closed on exit from this function
+whether by normal termination or by raising an exception.
+Also all resources which have been duplicated to this region from a child region are closed
+on exit if they haven't been duplicated themselves.
+The Forall quantifier prevents resources from being returned by this function.
+</p></div></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.effect.IOFunctions#throwIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="throwIO[A](e:Throwable):scalaz.effect.IO[A]"></a>
+      <a id="throwIO[A](Throwable):IO[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">throwIO</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <a href="IO.html" class="extype" name="scalaz.effect.IO">IO</a>[<span class="extype" name="scalaz.effect.IOFunctions.throwIO.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Throw the given error in the IO monad.</p>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.effect.IOStd">
+              <h3>Inherited from <a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>

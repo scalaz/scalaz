@@ -1,0 +1,956 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>EitherT - scalaz.EitherT</title>
+          <meta name="description" content="EitherT - scalaz.EitherT" />
+          <meta name="keywords" content="EitherT scalaz.EitherT" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.EitherT';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="EitherT$.html" title="Go to companion"><img src="../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="EitherT$.html" title="Go to companion">EitherT</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">EitherT</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">+A</span>, <span name="B">+B</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Represents a computation of type <code>F[A \/ B]</code>.</p><p>Example:</p><pre><span class="kw">val</span> x: <span class="std">Option</span>[<span class="std">String</span> \/ <span class="std">Int</span>] = <span class="std">Some</span>(\/-(<span class="num">1</span>))
+EitherT(x).map(<span class="num">1</span>+).run <span class="cmt">// Some(\/-(2))</span></pre></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.2/core/src/main/scala/scalaz/EitherT.scala" target="_blank">EitherT.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.EitherT"><span>EitherT</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.EitherT.Switching_\/" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Switching_\/[X]extendsAnyRef"></a>
+      <a id="Switching_\/[X]:Switching_\/[X]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EitherT$Switching_$bslash$div.html"><span title="gt4s: Switching_$bslash$div" class="name">Switching_\/</span></a><span class="tparams">[<span name="X">X</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="scalaz.EitherT#run" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="run:F[scalaz.\/[A,B]]"></a>
+      <a id="run:F[\/[A,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">run</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.A">A</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#+++" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+++[AA&gt;:A,BB&gt;:B](x:=&gt;scalaz.EitherT[F,AA,BB])(implicitM1:scalaz.Semigroup[BB],implicitM2:scalaz.Semigroup[AA],implicitF:scalaz.Apply[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="+++[AA&gt;:A,BB&gt;:B](⇒EitherT[F,AA,BB])(Semigroup[BB],Semigroup[AA],Apply[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus$plus$plus" class="name">+++</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.+++.AA">AA</span>, <span class="extype" name="scalaz.EitherT.+++.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M1">M1: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.EitherT.+++.BB">BB</span>]</span>, <span name="M2">M2: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.EitherT.+++.AA">AA</span>]</span>, <span name="F">F: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.+++.AA">AA</span>, <span class="extype" name="scalaz.EitherT.+++.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sums up values inside disjunction, if both are left or right.</p><div class="fullcomment"><div class="comment cmt"><p>Sums up values inside disjunction, if both are left or right. Returns first left otherwise.</p><pre>\/-(v1) +++ \/-(v2) ￢ﾆﾒ \/-(v1 + v2)
+\/-(v1) +++ -\/(v2) ￢ﾆﾒ -\/(v2)
+-\/(v1) +++ \/-(v2) ￢ﾆﾒ -\/(v1)
+-\/(v1) +++ -\/(v2) ￢ﾆﾒ -\/(v1 + v2)</pre></div></div>
+    </li><li name="scalaz.EitherT#:?&gt;&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id=":?&gt;&gt;[X](right:=&gt;X):EitherT.this.Switching_\/[X]"></a>
+      <a id=":?&gt;&gt;[X](⇒X):Switching_\/[X]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $colon$qmark$greater$greater" class="name">:?&gt;&gt;</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="right">right: ⇒ <span class="extype" name="scalaz.EitherT.:?&gt;&gt;.X">X</span></span>)</span><span class="result">: <a href="EitherT$Switching_$bslash$div.html" class="extype" name="scalaz.EitherT.Switching_\/">Switching_\/</a>[<span class="extype" name="scalaz.EitherT.:?&gt;&gt;.X">X</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If this disjunction is right, return the given X value, otherwise, return the X value given to the return value.</p>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#===" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="===[AA&gt;:A,BB&gt;:B](x:scalaz.EitherT[F,AA,BB])(implicitEA:scalaz.Equal[AA],implicitEB:scalaz.Equal[BB],implicitF:scalaz.Apply[F]):F[Boolean]"></a>
+      <a id="===[AA&gt;:A,BB&gt;:B](EitherT[F,AA,BB])(Equal[AA],Equal[BB],Apply[F]):F[Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq$eq" class="name">===</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.===.AA">AA</span>, <span class="extype" name="scalaz.EitherT.===.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="EA">EA: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.EitherT.===.AA">AA</span>]</span>, <span name="EB">EB: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.EitherT.===.BB">BB</span>]</span>, <span name="F">F: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Compare two disjunction values for equality.</p>
+    </li><li name="scalaz.EitherT#app" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="app[AA&gt;:A,C](f:=&gt;scalaz.EitherT[F,AA,B=&gt;C])(implicitF:scalaz.Apply[F]):scalaz.EitherT[F,AA,C]"></a>
+      <a id="app[AA&gt;:A,C](⇒EitherT[F,AA,(B)⇒C])(Apply[F]):EitherT[F,AA,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">app</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: ⇒ <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.app.AA">AA</span>, (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.app.C">C</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.app.AA">AA</span>, <span class="extype" name="scalaz.EitherT.app.C">C</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Apply a function in the environment of the right of this
+disjunction.</p><div class="fullcomment"><div class="comment cmt"><p>Apply a function in the environment of the right of this
+disjunction.  Because it runs my <code>F</code> even when <code>f</code>'s <code>\/</code> fails,
+it is not consistent with <code>ap</code>.
+</p></div></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#bimap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bimap[C,D](f:A=&gt;C,g:B=&gt;D)(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,C,D]"></a>
+      <a id="bimap[C,D]((A)⇒C,(B)⇒D)(Functor[F]):EitherT[F,C,D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bimap</span><span class="tparams">[<span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.A">A</span>) ⇒ <span class="extype" name="scalaz.EitherT.bimap.C">C</span></span>, <span name="g">g: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.bimap.D">D</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.bimap.C">C</span>, <span class="extype" name="scalaz.EitherT.bimap.D">D</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Binary functor map on this disjunction.</p>
+    </li><li name="scalaz.EitherT#bitraverse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bitraverse[G[_],C,D](f:A=&gt;G[C],g:B=&gt;G[D])(implicitF:scalaz.Traverse[F],implicitG:scalaz.Applicative[G]):G[scalaz.EitherT[F,C,D]]"></a>
+      <a id="bitraverse[G[_],C,D]((A)⇒G[C],(B)⇒G[D])(Traverse[F],Applicative[G]):G[EitherT[F,C,D]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bitraverse</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.A">A</span>) ⇒ <span class="extype" name="scalaz.EitherT.bitraverse.G">G</span>[<span class="extype" name="scalaz.EitherT.bitraverse.C">C</span>]</span>, <span name="g">g: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.bitraverse.G">G</span>[<span class="extype" name="scalaz.EitherT.bitraverse.D">D</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>, <span name="G">G: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.EitherT.bitraverse.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.bitraverse.G">G</span>[<a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.bitraverse.C">C</span>, <span class="extype" name="scalaz.EitherT.bitraverse.D">D</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Binary functor traverse on this disjunction.</p>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.EitherT#compare" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="compare[AA&gt;:A,BB&gt;:B](x:scalaz.EitherT[F,AA,BB])(implicitEA:scalaz.Order[AA],implicitEB:scalaz.Order[BB],implicitF:scalaz.Apply[F]):F[scalaz.Ordering]"></a>
+      <a id="compare[AA&gt;:A,BB&gt;:B](EitherT[F,AA,BB])(Order[AA],Order[BB],Apply[F]):F[Ordering]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">compare</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.compare.AA">AA</span>, <span class="extype" name="scalaz.EitherT.compare.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="EA">EA: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.EitherT.compare.AA">AA</span>]</span>, <span name="EB">EB: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.EitherT.compare.BB">BB</span>]</span>, <span name="F">F: <a href="Apply.html" class="extype" name="scalaz.Apply">Apply</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<a href="Ordering.html" class="extype" name="scalaz.Ordering">Ordering</a>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Compare two disjunction values for ordering.</p>
+    </li><li name="scalaz.EitherT#cozip" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="cozip(implicitZ:scalaz.Cozip[F]):scalaz.\/[F[A],F[B]]"></a>
+      <a id="cozip(Cozip[F]):\/[F[A],F[B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cozip</span><span class="params">(<span class="implicit">implicit </span><span name="Z">Z: <a href="Cozip.html" class="extype" name="scalaz.Cozip">Cozip</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.A">A</span>], <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Cozip this disjunction on its functor.</p>
+    </li><li name="scalaz.EitherT#ensure" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ensure[AA&gt;:A](onLeft:=&gt;AA)(f:B=&gt;Boolean)(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,B]"></a>
+      <a id="ensure[AA&gt;:A](⇒AA)((B)⇒Boolean)(Functor[F]):EitherT[F,AA,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ensure</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>]</span><span class="params">(<span name="onLeft">onLeft: ⇒ <span class="extype" name="scalaz.EitherT.ensure.AA">AA</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.ensure.AA">AA</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value.</p>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#exists" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="exists(f:B=&gt;Boolean)(implicitF:scalaz.Functor[F]):F[Boolean]"></a>
+      <a id="exists((B)⇒Boolean)(Functor[F]):F[Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">exists</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this disjunction is a right value satisfying the given predicate.</p>
+    </li><li name="scalaz.EitherT#filter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="filter[AA&gt;:A](p:B=&gt;Boolean)(implicitM:scalaz.Monoid[AA],implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,B]"></a>
+      <a id="filter[AA&gt;:A]((B)⇒Boolean)(Monoid[AA],Functor[F]):EitherT[F,AA,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filter</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.EitherT.filter.AA">AA</span>]</span>, <span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.filter.AA">AA</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Filter on the right of this disjunction.</p>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.EitherT#flatMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="flatMap[AA&gt;:A,C](f:B=&gt;scalaz.EitherT[F,AA,C])(implicitF:scalaz.Monad[F]):scalaz.EitherT[F,AA,C]"></a>
+      <a id="flatMap[AA&gt;:A,C]((B)⇒EitherT[F,AA,C])(Monad[F]):EitherT[F,AA,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flatMap</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.flatMap.AA">AA</span>, <span class="extype" name="scalaz.EitherT.flatMap.C">C</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.flatMap.AA">AA</span>, <span class="extype" name="scalaz.EitherT.flatMap.C">C</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Bind through the right of this disjunction.</p>
+    </li><li name="scalaz.EitherT#fold" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fold[X](l:A=&gt;X,r:B=&gt;X)(implicitF:scalaz.Functor[F]):F[X]"></a>
+      <a id="fold[X]((A)⇒X,(B)⇒X)(Functor[F]):F[X]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fold</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="l">l: (<span class="extype" name="scalaz.EitherT.A">A</span>) ⇒ <span class="extype" name="scalaz.EitherT.fold.X">X</span></span>, <span name="r">r: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.fold.X">X</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.fold.X">X</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.EitherT#foldRight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foldRight[Z](z:=&gt;Z)(f:(B,=&gt;Z)=&gt;Z)(implicitF:scalaz.Foldable[F]):Z"></a>
+      <a id="foldRight[Z](⇒Z)((B,⇒Z)⇒Z)(Foldable[F]):Z"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldRight</span><span class="tparams">[<span name="Z">Z</span>]</span><span class="params">(<span name="z">z: ⇒ <span class="extype" name="scalaz.EitherT.foldRight.Z">Z</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>, ⇒ <span class="extype" name="scalaz.EitherT.foldRight.Z">Z</span>) ⇒ <span class="extype" name="scalaz.EitherT.foldRight.Z">Z</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.foldRight.Z">Z</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Fold on the right of this disjunction.</p>
+    </li><li name="scalaz.EitherT#forall" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="forall(f:B=&gt;Boolean)(implicitF:scalaz.Functor[F]):F[Boolean]"></a>
+      <a id="forall((B)⇒Boolean)(Functor[F]):F[Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">forall</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this disjunction is a left value or the right value satisfies the given predicate.</p>
+    </li><li name="scalaz.EitherT#foreach" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foreach(f:B=&gt;Unit)(implicitF:scalaz.Each[F]):Unit"></a>
+      <a id="foreach((B)⇒Unit)(Each[F]):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foreach</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Each.html" class="extype" name="scalaz.Each">Each</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the side-effect on the right of this disjunction.</p>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#getOrElse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOrElse[BB&gt;:B](default:=&gt;BB)(implicitF:scalaz.Functor[F]):F[BB]"></a>
+      <a id="getOrElse[BB&gt;:B](⇒BB)(Functor[F]):F[BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOrElse</span><span class="tparams">[<span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="default">default: ⇒ <span class="extype" name="scalaz.EitherT.getOrElse.BB">BB</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.getOrElse.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the right value of this disjunction or the given default if left.</p><div class="fullcomment"><div class="comment cmt"><p>Return the right value of this disjunction or the given default if left. Alias for <code>|</code></p></div></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#isLeft" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isLeft(implicitF:scalaz.Functor[F]):F[Boolean]"></a>
+      <a id="isLeft(Functor[F]):F[Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isLeft</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this disjunction is left.</p>
+    </li><li name="scalaz.EitherT#isRight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isRight(implicitF:scalaz.Functor[F]):F[Boolean]"></a>
+      <a id="isRight(Functor[F]):F[Boolean]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isRight</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Boolean">Boolean</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this disjunction is right.</p>
+    </li><li name="scalaz.EitherT#leftMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="leftMap[C](f:A=&gt;C)(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,C,B]"></a>
+      <a id="leftMap[C]((A)⇒C)(Functor[F]):EitherT[F,C,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leftMap</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.A">A</span>) ⇒ <span class="extype" name="scalaz.EitherT.leftMap.C">C</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.leftMap.C">C</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on the left value.</p>
+    </li><li name="scalaz.EitherT#map" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="map[C](f:B=&gt;C)(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,A,C]"></a>
+      <a id="map[C]((B)⇒C)(Functor[F]):EitherT[F,A,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.map.C">C</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.A">A</span>, <span class="extype" name="scalaz.EitherT.map.C">C</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Map on the right of this disjunction.</p>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.EitherT#orElse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="orElse[AA&gt;:A,BB&gt;:B](x:=&gt;scalaz.EitherT[F,AA,BB])(implicitF:scalaz.Bind[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="orElse[AA&gt;:A,BB&gt;:B](⇒EitherT[F,AA,BB])(Bind[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">orElse</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.orElse.AA">AA</span>, <span class="extype" name="scalaz.EitherT.orElse.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.orElse.AA">AA</span>, <span class="extype" name="scalaz.EitherT.orElse.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return this if it is a right, otherwise, return the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Return this if it is a right, otherwise, return the given value. Alias for <code>|||</code></p></div></div>
+    </li><li name="scalaz.EitherT#show" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="show[AA&gt;:A,BB&gt;:B](implicitSA:scalaz.Show[AA],implicitSB:scalaz.Show[BB],implicitF:scalaz.Functor[F]):F[scalaz.Cord]"></a>
+      <a id="show[AA&gt;:A,BB&gt;:B](Show[AA],Show[BB],Functor[F]):F[Cord]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">show</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="SA">SA: <a href="Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.EitherT.show.AA">AA</span>]</span>, <span name="SB">SB: <a href="Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.EitherT.show.BB">BB</span>]</span>, <span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<a href="Cord.html" class="extype" name="scalaz.Cord">Cord</a>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Show for a disjunction value.</p>
+    </li><li name="scalaz.EitherT#swap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="swap(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,B,A]"></a>
+      <a id="swap(Functor[F]):EitherT[F,B,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">swap</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.B">B</span>, <span class="extype" name="scalaz.EitherT.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Flip the left/right values in this disjunction.</p><div class="fullcomment"><div class="comment cmt"><p>Flip the left/right values in this disjunction. Alias for <code>swap</code></p></div></div>
+    </li><li name="scalaz.EitherT#swapped" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="swapped[AA,BB](k:scalaz.\/[B,A]=&gt;scalaz.\/[BB,AA])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="swapped[AA,BB]((\/[B,A])⇒\/[BB,AA])(Functor[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">swapped</span><span class="tparams">[<span name="AA">AA</span>, <span name="BB">BB</span>]</span><span class="params">(<span name="k">k: (<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.B">B</span>, <span class="extype" name="scalaz.EitherT.A">A</span>]) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.swapped.BB">BB</span>, <span class="extype" name="scalaz.EitherT.swapped.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.swapped.AA">AA</span>, <span class="extype" name="scalaz.EitherT.swapped.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on this swapped value.</p><div class="fullcomment"><div class="comment cmt"><p>Run the given function on this swapped value. Alias for <code>~</code></p></div></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.EitherT#toEither" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toEither(implicitF:scalaz.Functor[F]):F[Either[A,B]]"></a>
+      <a id="toEither(Functor[F]):F[Either[A,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toEither</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Either">Either</span>[<span class="extype" name="scalaz.EitherT.A">A</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert to a core <code>scala.Either</code> at your own peril.</p>
+    </li><li name="scalaz.EitherT#toList" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toList(implicitF:scalaz.Functor[F]):F[List[B]]"></a>
+      <a id="toList(Functor[F]):F[List[B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toList</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty list or list with one element on the right of this disjunction.</p>
+    </li><li name="scalaz.EitherT#toOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toOption(implicitF:scalaz.Functor[F]):scalaz.OptionT[F,B]"></a>
+      <a id="toOption(Functor[F]):OptionT[F,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toOption</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="OptionT.html" class="extype" name="scalaz.OptionT">OptionT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty option or option with one element on the right of this disjunction.</p><div class="fullcomment"><div class="comment cmt"><p>Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet.</p></div></div>
+    </li><li name="scalaz.EitherT#toStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toStream(implicitF:scalaz.Functor[F]):F[Stream[B]]"></a>
+      <a id="toStream(Functor[F]):F[Stream[B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toStream</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty stream or stream with one element on the right of this disjunction.</p>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#traverse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="traverse[G[_],AA&gt;:A,C](f:B=&gt;G[C])(implicitF:scalaz.Traverse[F],implicitG:scalaz.Applicative[G]):G[scalaz.EitherT[F,AA,C]]"></a>
+      <a id="traverse[G[_],AA&gt;:A,C]((B)⇒G[C])(Traverse[F],Applicative[G]):G[EitherT[F,AA,C]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traverse</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scalaz.EitherT.traverse.G">G</span>[<span class="extype" name="scalaz.EitherT.traverse.C">C</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>, <span name="G">G: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.EitherT.traverse.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.traverse.G">G</span>[<a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.traverse.AA">AA</span>, <span class="extype" name="scalaz.EitherT.traverse.C">C</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Traverse on the right of this disjunction.</p>
+    </li><li name="scalaz.EitherT#unary_~" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unary_~(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,B,A]"></a>
+      <a id="unary_~(Functor[F]):EitherT[F,B,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: unary_$tilde" class="name">unary_~</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.B">B</span>, <span class="extype" name="scalaz.EitherT.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Flip the left/right values in this disjunction.</p><div class="fullcomment"><div class="comment cmt"><p>Flip the left/right values in this disjunction. Alias for <code>unary_~</code></p></div></div>
+    </li><li name="scalaz.EitherT#validation" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validation(implicitF:scalaz.Functor[F]):F[scalaz.Validation[A,B]]"></a>
+      <a id="validation(Functor[F]):F[Validation[A,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validation</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.EitherT.A">A</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert to a validation.</p>
+    </li><li name="scalaz.EitherT#validationed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="validationed[AA,BB](k:scalaz.Validation[A,B]=&gt;scalaz.Validation[AA,BB])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="validationed[AA,BB]((Validation[A,B])⇒Validation[AA,BB])(Functor[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">validationed</span><span class="tparams">[<span name="AA">AA</span>, <span name="BB">BB</span>]</span><span class="params">(<span name="k">k: (<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.EitherT.A">A</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]) ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.EitherT.validationed.AA">AA</span>, <span class="extype" name="scalaz.EitherT.validationed.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.validationed.AA">AA</span>, <span class="extype" name="scalaz.EitherT.validationed.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run a validation function and back to disjunction again.</p>
+    </li><li name="scalaz.EitherT#valueOr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="valueOr[BB&gt;:B](x:A=&gt;BB)(implicitF:scalaz.Functor[F]):F[BB]"></a>
+      <a id="valueOr[BB&gt;:B]((A)⇒BB)(Functor[F]):F[BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">valueOr</span><span class="tparams">[<span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: (<span class="extype" name="scalaz.EitherT.A">A</span>) ⇒ <span class="extype" name="scalaz.EitherT.valueOr.BB">BB</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.valueOr.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the right value of this disjunction or run the given function on the left.</p>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.EitherT#withFilter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="withFilter[AA&gt;:A](p:B=&gt;Boolean)(implicitM:scalaz.Monoid[AA],implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,B]"></a>
+      <a id="withFilter[AA&gt;:A]((B)⇒Boolean)(Monoid[AA],Functor[F]):EitherT[F,AA,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withFilter</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.EitherT.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.EitherT.withFilter.AA">AA</span>]</span>, <span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.withFilter.AA">AA</span>, <span class="extype" name="scalaz.EitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Alias for <code>filter</code>.</p>
+    </li><li name="scalaz.EitherT#|" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="|[BB&gt;:B](default:=&gt;BB)(implicitF:scalaz.Functor[F]):F[BB]"></a>
+      <a id="|[BB&gt;:B](⇒BB)(Functor[F]):F[BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bar" class="name">|</span><span class="tparams">[<span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="default">default: ⇒ <span class="extype" name="scalaz.EitherT.|.BB">BB</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherT.F">F</span>[<span class="extype" name="scalaz.EitherT.|.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the right value of this disjunction or the given default if left.</p><div class="fullcomment"><div class="comment cmt"><p>Return the right value of this disjunction or the given default if left. Alias for <code>getOrElse</code></p></div></div>
+    </li><li name="scalaz.EitherT#|||" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="|||[AA&gt;:A,BB&gt;:B](x:=&gt;scalaz.EitherT[F,AA,BB])(implicitF:scalaz.Bind[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="|||[AA&gt;:A,BB&gt;:B](⇒EitherT[F,AA,BB])(Bind[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bar$bar$bar" class="name">|||</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.EitherT.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.EitherT.B">B</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.|||.AA">AA</span>, <span class="extype" name="scalaz.EitherT.|||.BB">BB</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.|||.AA">AA</span>, <span class="extype" name="scalaz.EitherT.|||.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return this if it is a right, otherwise, return the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Return this if it is a right, otherwise, return the given value. Alias for <code>orElse</code></p></div></div>
+    </li><li name="scalaz.EitherT#~" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="~[AA,BB](k:scalaz.\/[B,A]=&gt;scalaz.\/[BB,AA])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,AA,BB]"></a>
+      <a id="~[AA,BB]((\/[B,A])⇒\/[BB,AA])(Functor[F]):EitherT[F,AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $tilde" class="name">~</span><span class="tparams">[<span name="AA">AA</span>, <span name="BB">BB</span>]</span><span class="params">(<span name="k">k: (<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.B">B</span>, <span class="extype" name="scalaz.EitherT.A">A</span>]) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.~.BB">BB</span>, <span class="extype" name="scalaz.EitherT.~.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.F">F</span>, <span class="extype" name="scalaz.EitherT.~.AA">AA</span>, <span class="extype" name="scalaz.EitherT.~.BB">BB</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on this swapped value.</p><div class="fullcomment"><div class="comment cmt"><p>Run the given function on this swapped value. Alias for <code>swapped</code></p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

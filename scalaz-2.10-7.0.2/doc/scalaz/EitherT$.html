@@ -1,0 +1,638 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>EitherT - scalaz.EitherT</title>
+          <meta name="description" content="EitherT - scalaz.EitherT" />
+          <meta name="keywords" content="EitherT scalaz.EitherT" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.EitherT$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a href="EitherT.html" title="Go to companion"><img src="../lib/object_to_trait_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="EitherT.html" title="Go to companion">EitherT</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">EitherT</span><span class="result"> extends <a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a> with <a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.2/core/src/main/scala/scalaz/EitherT.scala" target="_blank">EitherT.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a>, <a href="EitherTInstances0.html" class="extype" name="scalaz.EitherTInstances0">EitherTInstances0</a>, <a href="EitherTInstances1.html" class="extype" name="scalaz.EitherTInstances1">EitherTInstances1</a>, <a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.EitherT"><span>EitherT</span></li><li class="in" name="scalaz.EitherTInstances"><span>EitherTInstances</span></li><li class="in" name="scalaz.EitherTInstances0"><span>EitherTInstances0</span></li><li class="in" name="scalaz.EitherTInstances1"><span>EitherTInstances1</span></li><li class="in" name="scalaz.EitherTFunctions"><span>EitherTFunctions</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="apply[F[+_],A,B](a:F[scalaz.\/[A,B]]):scalaz.EitherT[F,A,B]"></a>
+      <a id="apply[F[+_],A,B](F[\/[A,B]]):EitherT[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.EitherT.apply.F">F</span>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherT.apply.A">A</span>, <span class="extype" name="scalaz.EitherT.apply.B">B</span>]]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.apply.F">F</span>, <span class="extype" name="scalaz.EitherT.apply.A">A</span>, <span class="extype" name="scalaz.EitherT.apply.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Construct a disjunction value.</p>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.EitherTFunctions#eitherT" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherT[F[+_],A,B](a:F[scalaz.\/[A,B]]):scalaz.EitherT[F,A,B]"></a>
+      <a id="eitherT[F[+_],A,B](F[\/[A,B]]):EitherT[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherT</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.EitherTFunctions.eitherT.F">F</span>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherTFunctions.eitherT.A">A</span>, <span class="extype" name="scalaz.EitherTFunctions.eitherT.B">B</span>]]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherTFunctions.eitherT.F">F</span>, <span class="extype" name="scalaz.EitherTFunctions.eitherT.A">A</span>, <span class="extype" name="scalaz.EitherTFunctions.eitherT.B">B</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances0#eitherTBifunctor" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTBifunctor[F[+_]](implicitF0:scalaz.Functor[F]):scalaz.EitherTBifunctor[F]"></a>
+      <a id="eitherTBifunctor[F[+_]](Functor[F]):EitherTBifunctor[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTBifunctor</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherTInstances0.eitherTBifunctor.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTBifunctor">EitherTBifunctor</span>[<span class="extype" name="scalaz.EitherTInstances0.eitherTBifunctor.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances0.html" class="extype" name="scalaz.EitherTInstances0">EitherTInstances0</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances#eitherTBitraverse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTBitraverse[F[+_]](implicitF0:scalaz.Traverse[F]):scalaz.EitherTBitraverse[F]"></a>
+      <a id="eitherTBitraverse[F[+_]](Traverse[F]):EitherTBitraverse[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTBitraverse</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[<span class="extype" name="scalaz.EitherTInstances.eitherTBitraverse.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTBitraverse">EitherTBitraverse</span>[<span class="extype" name="scalaz.EitherTInstances.eitherTBitraverse.F">F</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances#eitherTEqual" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTEqual[F[+_],A,B](implicitF0:scalaz.Equal[F[scalaz.\/[A,B]]]):scalaz.Equal[scalaz.EitherT[F,A,B]]"></a>
+      <a id="eitherTEqual[F[+_],A,B](Equal[F[\/[A,B]]]):Equal[EitherT[F,A,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTEqual</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.EitherTInstances.eitherTEqual.F">F</span>[<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.EitherTInstances.eitherTEqual.A">A</span>, <span class="extype" name="scalaz.EitherTInstances.eitherTEqual.B">B</span>]]]</span>)</span><span class="result">: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherTInstances.eitherTEqual.F">F</span>, <span class="extype" name="scalaz.EitherTInstances.eitherTEqual.A">A</span>, <span class="extype" name="scalaz.EitherTInstances.eitherTEqual.B">B</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances0#eitherTFoldable" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTFoldable[F[+_],L](implicitF0:scalaz.Foldable[F]):scalaz.EitherTFoldable[F,L]"></a>
+      <a id="eitherTFoldable[F[+_],L](Foldable[F]):EitherTFoldable[F,L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTFoldable</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="L">L</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Foldable.html" class="extype" name="scalaz.Foldable">Foldable</a>[<span class="extype" name="scalaz.EitherTInstances0.eitherTFoldable.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTFoldable">EitherTFoldable</span>[<span class="extype" name="scalaz.EitherTInstances0.eitherTFoldable.F">F</span>, <span class="extype" name="scalaz.EitherTInstances0.eitherTFoldable.L">L</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances0.html" class="extype" name="scalaz.EitherTInstances0">EitherTInstances0</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances1#eitherTFunctor" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTFunctor[F[+_],L](implicitF0:scalaz.Functor[F]):scalaz.EitherTFunctor[F,L]"></a>
+      <a id="eitherTFunctor[F[+_],L](Functor[F]):EitherTFunctor[F,L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTFunctor</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="L">L</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherTInstances1.eitherTFunctor.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTFunctor">EitherTFunctor</span>[<span class="extype" name="scalaz.EitherTInstances1.eitherTFunctor.F">F</span>, <span class="extype" name="scalaz.EitherTInstances1.eitherTFunctor.L">L</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances1.html" class="extype" name="scalaz.EitherTInstances1">EitherTInstances1</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances#eitherTHoist" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTHoist[A]:scalaz.Hoist[[α[+_],β]scalaz.EitherT[α,A,β]]"></a>
+      <a id="eitherTHoist[A]:Hoist[[α[+_],β]EitherT[α,A,β]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTHoist</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="Hoist.html" class="extype" name="scalaz.Hoist">Hoist</a>[[α[+_], β]<a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherTInstances.&lt;refinement&gt;.λ.α">α</span>, <span class="extype" name="scalaz.EitherTInstances.eitherTHoist.A">A</span>, <span class="extype" name="scalaz.EitherTInstances.&lt;refinement&gt;.λ.β">β</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances0#eitherTMonad" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTMonad[F[+_],L](implicitF0:scalaz.Monad[F]):scalaz.EitherTMonad[F,L]"></a>
+      <a id="eitherTMonad[F[+_],L](Monad[F]):EitherTMonad[F,L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTMonad</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="L">L</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.EitherTInstances0.eitherTMonad.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTMonad">EitherTMonad</span>[<span class="extype" name="scalaz.EitherTInstances0.eitherTMonad.F">F</span>, <span class="extype" name="scalaz.EitherTInstances0.eitherTMonad.L">L</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances0.html" class="extype" name="scalaz.EitherTInstances0">EitherTInstances0</a></dd></dl></div>
+    </li><li name="scalaz.EitherTInstances#eitherTTraverse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eitherTTraverse[F[+_],L](implicitF0:scalaz.Traverse[F]):scalaz.EitherTTraverse[F,L]"></a>
+      <a id="eitherTTraverse[F[+_],L](Traverse[F]):EitherTTraverse[F,L]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eitherTTraverse</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="L">L</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F0">F0: <a href="Traverse.html" class="extype" name="scalaz.Traverse">Traverse</a>[<span class="extype" name="scalaz.EitherTInstances.eitherTTraverse.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTTraverse">EitherTTraverse</span>[<span class="extype" name="scalaz.EitherTInstances.eitherTTraverse.F">F</span>, <span class="extype" name="scalaz.EitherTInstances.eitherTTraverse.L">L</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.EitherT#fromEither" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fromEither[F[+_],A,B](e:F[Either[A,B]])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,A,B]"></a>
+      <a id="fromEither[F[+_],A,B](F[Either[A,B]])(Functor[F]):EitherT[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromEither</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scalaz.EitherT.fromEither.F">F</span>[<span class="extype" name="scala.Either">Either</span>[<span class="extype" name="scalaz.EitherT.fromEither.A">A</span>, <span class="extype" name="scalaz.EitherT.fromEither.B">B</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.fromEither.F">F</span>]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.fromEither.F">F</span>, <span class="extype" name="scalaz.EitherT.fromEither.A">A</span>, <span class="extype" name="scalaz.EitherT.fromEither.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Construct a disjunction value from a standard <code>scala.Either</code>.</p>
+    </li><li name="scalaz.EitherT#fromTryCatch" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fromTryCatch[F[+_],A](a:=&gt;F[A])(implicitF:scalaz.Applicative[F]):scalaz.EitherT[F,Throwable,A]"></a>
+      <a id="fromTryCatch[F[+_],A](⇒F[A])(Applicative[F]):EitherT[F,Throwable,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromTryCatch</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.EitherT.fromTryCatch.F">F</span>[<span class="extype" name="scalaz.EitherT.fromTryCatch.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.EitherT.fromTryCatch.F">F</span>]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.fromTryCatch.F">F</span>, <span class="extype" name="scala.Throwable">Throwable</span>, <span class="extype" name="scalaz.EitherT.fromTryCatch.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Evaluate the given value, which might throw an exception.</p>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.EitherT#left" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="left[F[+_],A,B](a:F[A])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,A,B]"></a>
+      <a id="left[F[+_],A,B](F[A])(Functor[F]):EitherT[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">left</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.EitherT.left.F">F</span>[<span class="extype" name="scalaz.EitherT.left.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.left.F">F</span>]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.left.F">F</span>, <span class="extype" name="scalaz.EitherT.left.A">A</span>, <span class="extype" name="scalaz.EitherT.left.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Construct a left disjunction value.</p>
+    </li><li name="scalaz.EitherTFunctions#monadListen" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monadListen[F[+_,+_],W,A](implicitML0:scalaz.MonadListen[F,W]):scalaz.EitherTMonadListen[F,W,A]"></a>
+      <a id="monadListen[F[+_,+_],W,A](MonadListen[F,W]):EitherTMonadListen[F,W,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">monadListen</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>, <span name="_">+_</span>]</span></span>, <span name="W">W</span>, <span name="A">A</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ML0">ML0: <a href="MonadListen.html" class="extype" name="scalaz.MonadListen">MonadListen</a>[<span class="extype" name="scalaz.EitherTFunctions.monadListen.F">F</span>, <span class="extype" name="scalaz.EitherTFunctions.monadListen.W">W</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTMonadListen">EitherTMonadListen</span>[<span class="extype" name="scalaz.EitherTFunctions.monadListen.F">F</span>, <span class="extype" name="scalaz.EitherTFunctions.monadListen.W">W</span>, <span class="extype" name="scalaz.EitherTFunctions.monadListen.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a></dd></dl></div>
+    </li><li name="scalaz.EitherTFunctions#monadTell" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monadTell[F[+_,+_],W,A](implicitMT0:scalaz.MonadTell[F,W]):scalaz.EitherTMonadTell[F,W,A]"></a>
+      <a id="monadTell[F[+_,+_],W,A](MonadTell[F,W]):EitherTMonadTell[F,W,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">monadTell</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>, <span name="_">+_</span>]</span></span>, <span name="W">W</span>, <span name="A">A</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="MT0">MT0: <a href="MonadTell.html" class="extype" name="scalaz.MonadTell">MonadTell</a>[<span class="extype" name="scalaz.EitherTFunctions.monadTell.F">F</span>, <span class="extype" name="scalaz.EitherTFunctions.monadTell.W">W</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.EitherTMonadTell">EitherTMonadTell</span>[<span class="extype" name="scalaz.EitherTFunctions.monadTell.F">F</span>, <span class="extype" name="scalaz.EitherTFunctions.monadTell.W">W</span>, <span class="extype" name="scalaz.EitherTFunctions.monadTell.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.EitherT#right" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="right[F[+_],A,B](b:F[B])(implicitF:scalaz.Functor[F]):scalaz.EitherT[F,A,B]"></a>
+      <a id="right[F[+_],A,B](F[B])(Functor[F]):EitherT[F,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">right</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="b">b: <span class="extype" name="scalaz.EitherT.right.F">F</span>[<span class="extype" name="scalaz.EitherT.right.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.EitherT.right.F">F</span>]</span>)</span><span class="result">: <a href="EitherT.html" class="extype" name="scalaz.EitherT">EitherT</a>[<span class="extype" name="scalaz.EitherT.right.F">F</span>, <span class="extype" name="scalaz.EitherT.right.A">A</span>, <span class="extype" name="scalaz.EitherT.right.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Construct a right disjunction value.</p>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.EitherTInstances">
+              <h3>Inherited from <a href="EitherTInstances.html" class="extype" name="scalaz.EitherTInstances">EitherTInstances</a></h3>
+            </div><div class="parent" name="scalaz.EitherTInstances0">
+              <h3>Inherited from <a href="EitherTInstances0.html" class="extype" name="scalaz.EitherTInstances0">EitherTInstances0</a></h3>
+            </div><div class="parent" name="scalaz.EitherTInstances1">
+              <h3>Inherited from <a href="EitherTInstances1.html" class="extype" name="scalaz.EitherTInstances1">EitherTInstances1</a></h3>
+            </div><div class="parent" name="scalaz.EitherTFunctions">
+              <h3>Inherited from <a href="EitherTFunctions.html" class="extype" name="scalaz.EitherTFunctions">EitherTFunctions</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

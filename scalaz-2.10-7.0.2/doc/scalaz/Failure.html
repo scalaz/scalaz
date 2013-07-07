@@ -1,0 +1,1015 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>Failure - scalaz.Failure</title>
+          <meta name="description" content="Failure - scalaz.Failure" />
+          <meta name="keywords" content="Failure scalaz.Failure" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.Failure';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../lib/class_big.png" />
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1>Failure</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Failure</span><span class="tparams">[<span name="E">E</span>, <span name="A">A</span>]</span><span class="params">(<span name="e">e: <span class="extype" name="scalaz.Failure.E">E</span></span>)</span><span class="result"> extends <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.0.2/core/src/main/scala/scalaz/Validation.scala" target="_blank">Validation.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.Failure"><span>Failure</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scalaz.Validation"><span>Validation</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalaz.Failure#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(e:E):scalaz.Failure[E,A]"></a>
+      <a id="&lt;init&gt;:Failure[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Failure</span><span class="params">(<span name="e">e: <span class="extype" name="scalaz.Failure.E">E</span></span>)</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.Validation.SwitchingValidation" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="SwitchingValidation[X]extendsAnyRef"></a>
+      <a id="SwitchingValidation[X]:SwitchingValidation[X]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Validation$SwitchingValidation.html"><span class="name">SwitchingValidation</span></a><span class="tparams">[<span name="X">X</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.Validation#+++" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+++[EE&gt;:E,AA&gt;:A](x:=&gt;scalaz.Validation[EE,AA])(implicitM1:scalaz.Semigroup[AA],implicitM2:scalaz.Semigroup[EE]):scalaz.Validation[EE,AA]"></a>
+      <a id="+++[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA])(Semigroup[AA],Semigroup[EE]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus$plus$plus" class="name">+++</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.+++.EE">EE</span>, <span class="extype" name="scalaz.Validation.+++.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M1">M1: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.+++.AA">AA</span>]</span>, <span name="M2">M2: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.+++.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.+++.EE">EE</span>, <span class="extype" name="scalaz.Validation.+++.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Sums up values inside validation, if both are success or failure.</p><div class="fullcomment"><div class="comment cmt"><p>Sums up values inside validation, if both are success or failure. Returns first failure otherwise.</p><pre>success(v1) +++ success(v2) ￢ﾆﾒ success(v1 + v2)
+success(v1) +++ failure(v2) ￢ﾆﾒ failure(v2)
+failure(v1) +++ success(v2) ￢ﾆﾒ failure(v1)
+failure(v1) +++ failure(v2) ￢ﾆﾒ failure(v1 + v2)</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#+|+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+|+[EE&gt;:E,AA&gt;:A](x:scalaz.Validation[EE,AA])(implicites:scalaz.Semigroup[EE],implicitas:scalaz.Semigroup[AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="+|+[EE&gt;:E,AA&gt;:A](Validation[EE,AA])(Semigroup[EE],Semigroup[AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus$bar$plus" class="name">+|+</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.+|+.EE">EE</span>, <span class="extype" name="scalaz.Validation.+|+.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="es">es: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.+|+.EE">EE</span>]</span>, <span name="as">as: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.+|+.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.+|+.EE">EE</span>, <span class="extype" name="scalaz.Validation.+|+.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If <code>this</code> and <code>that</code> are both success, or both a failure, combine them with the provided <code>Semigroup</code> for each.</p><div class="fullcomment"><div class="comment cmt"><p>If <code>this</code> and <code>that</code> are both success, or both a failure, combine them with the provided <code>Semigroup</code> for each. Otherwise, return the success. Alias for <code>append</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#:?&gt;&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id=":?&gt;&gt;[X](success:=&gt;X):Validation.this.SwitchingValidation[X]"></a>
+      <a id=":?&gt;&gt;[X](⇒X):SwitchingValidation[X]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $colon$qmark$greater$greater" class="name">:?&gt;&gt;</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="success">success: ⇒ <span class="extype" name="scalaz.Validation.:?&gt;&gt;.X">X</span></span>)</span><span class="result">: <a href="#SwitchingValidation[X]extendsAnyRef" class="extmbr" name="scalaz.Validation.SwitchingValidation">SwitchingValidation</a>[<span class="extype" name="scalaz.Validation.:?&gt;&gt;.X">X</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If this validation is success, return the given X value, otherwise, return the X value given to the return value.</p><div class="fullcomment"><div class="comment cmt"><p>If this validation is success, return the given X value, otherwise, return the X value given to the return value.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.Validation#===" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="===[EE&gt;:E,AA&gt;:A](x:=&gt;scalaz.Validation[EE,AA])(implicitEE:scalaz.Equal[EE],implicitEA:scalaz.Equal[AA]):Boolean"></a>
+      <a id="===[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA])(Equal[EE],Equal[AA]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq$eq" class="name">===</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.===.EE">EE</span>, <span class="extype" name="scalaz.Validation.===.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="EE">EE: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.Validation.===.EE">EE</span>]</span>, <span name="EA">EA: <a href="Equal.html" class="extype" name="scalaz.Equal">Equal</a>[<span class="extype" name="scalaz.Validation.===.AA">AA</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Compare two validations values for equality.</p><div class="fullcomment"><div class="comment cmt"><p>Compare two validations values for equality.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#@\/" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="@\/[EE,AA](k:scalaz.\/[E,A]=&gt;scalaz.\/[EE,AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="@\/[EE,AA]((\/[E,A])⇒\/[EE,AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $at$bslash$div" class="name">@\/</span><span class="tparams">[<span name="EE">EE</span>, <span name="AA">AA</span>]</span><span class="params">(<span name="k">k: (<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>]) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Validation.@\/.EE">EE</span>, <span class="extype" name="scalaz.Validation.@\/.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.@\/.EE">EE</span>, <span class="extype" name="scalaz.Validation.@\/.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run a disjunction function and back to validation again.</p><div class="fullcomment"><div class="comment cmt"><p>Run a disjunction function and back to validation again. Alias for <code>disjunctioned</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#ap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ap[EE&gt;:E,B](x:=&gt;scalaz.Validation[EE,A=&gt;B])(implicitE:scalaz.Semigroup[EE]):scalaz.Validation[EE,B]"></a>
+      <a id="ap[EE&gt;:E,B](⇒Validation[EE,(A)⇒B])(Semigroup[EE]):Validation[EE,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ap</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.ap.EE">EE</span>, (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.ap.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="E">E: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.ap.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.ap.EE">EE</span>, <span class="extype" name="scalaz.Validation.ap.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Apply a function in the environment of the success of this validation, accumulating errors.</p><div class="fullcomment"><div class="comment cmt"><p>Apply a function in the environment of the success of this validation, accumulating errors.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#append" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="append[EE&gt;:E,AA&gt;:A](that:scalaz.Validation[EE,AA])(implicites:scalaz.Semigroup[EE],implicitas:scalaz.Semigroup[AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="append[EE&gt;:E,AA&gt;:A](Validation[EE,AA])(Semigroup[EE],Semigroup[AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">append</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="that">that: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.append.EE">EE</span>, <span class="extype" name="scalaz.Validation.append.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="es">es: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.append.EE">EE</span>]</span>, <span name="as">as: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.append.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.append.EE">EE</span>, <span class="extype" name="scalaz.Validation.append.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If <code>this</code> and <code>that</code> are both success, or both a failure, combine them with the provided <code>Semigroup</code> for each.</p><div class="fullcomment"><div class="comment cmt"><p>If <code>this</code> and <code>that</code> are both success, or both a failure, combine them with the provided <code>Semigroup</code> for each. Otherwise, return the success. Alias for <code>+|+</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.Validation#bimap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="bimap[C,D](f:E=&gt;C,g:A=&gt;D):scalaz.Validation[C,D]"></a>
+      <a id="bimap[C,D]((E)⇒C,(A)⇒D):Validation[C,D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bimap</span><span class="tparams">[<span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.E">E</span>) ⇒ <span class="extype" name="scalaz.Validation.bimap.C">C</span></span>, <span name="g">g: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.bimap.D">D</span></span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.bimap.C">C</span>, <span class="extype" name="scalaz.Validation.bimap.D">D</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Binary functor map on this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Binary functor map on this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#bitraverse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="bitraverse[G[+_],C,D](f:E=&gt;G[C],g:A=&gt;G[D])(implicitevidence$1:scalaz.Functor[G]):G[scalaz.Validation[C,D]]"></a>
+      <a id="bitraverse[G[+_],C,D]((E)⇒G[C],(A)⇒G[D])(Functor[G]):G[Validation[C,D]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bitraverse</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.E">E</span>) ⇒ <span class="extype" name="scalaz.Validation.bitraverse.G">G</span>[<span class="extype" name="scalaz.Validation.bitraverse.C">C</span>]</span>, <span name="g">g: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.bitraverse.G">G</span>[<span class="extype" name="scalaz.Validation.bitraverse.D">D</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.Validation.bitraverse.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.bitraverse.G">G</span>[<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.bitraverse.C">C</span>, <span class="extype" name="scalaz.Validation.bitraverse.D">D</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Binary functor traverse on this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Binary functor traverse on this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.Validation#compare" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="compare[EE&gt;:E,AA&gt;:A](x:=&gt;scalaz.Validation[EE,AA])(implicitEE:scalaz.Order[EE],implicitEA:scalaz.Order[AA]):scalaz.Ordering"></a>
+      <a id="compare[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA])(Order[EE],Order[AA]):Ordering"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">compare</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.compare.EE">EE</span>, <span class="extype" name="scalaz.Validation.compare.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="EE">EE: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.Validation.compare.EE">EE</span>]</span>, <span name="EA">EA: <a href="Order.html" class="extype" name="scalaz.Order">Order</a>[<span class="extype" name="scalaz.Validation.compare.AA">AA</span>]</span>)</span><span class="result">: <a href="Ordering.html" class="extype" name="scalaz.Ordering">Ordering</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Compare two validations values for ordering.</p><div class="fullcomment"><div class="comment cmt"><p>Compare two validations values for ordering.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#disjunction" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="disjunction:scalaz.\/[E,A]"></a>
+      <a id="disjunction:\/[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">disjunction</span><span class="result">: <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert to a disjunction.</p><div class="fullcomment"><div class="comment cmt"><p>Convert to a disjunction.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#disjunctioned" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="disjunctioned[EE,AA](k:scalaz.\/[E,A]=&gt;scalaz.\/[EE,AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="disjunctioned[EE,AA]((\/[E,A])⇒\/[EE,AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">disjunctioned</span><span class="tparams">[<span name="EE">EE</span>, <span name="AA">AA</span>]</span><span class="params">(<span name="k">k: (<a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>]) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Validation.disjunctioned.EE">EE</span>, <span class="extype" name="scalaz.Validation.disjunctioned.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.disjunctioned.EE">EE</span>, <span class="extype" name="scalaz.Validation.disjunctioned.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run a disjunction function and back to validation again.</p><div class="fullcomment"><div class="comment cmt"><p>Run a disjunction function and back to validation again. Alias for <code>@\/</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Failure#e" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e:E"></a>
+      <a id="e:E"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e</span><span class="result">: <span class="extype" name="scalaz.Failure.E">E</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.Validation#ensure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ensure[EE&gt;:E](onFailure:=&gt;EE)(f:A=&gt;Boolean):scalaz.Validation[EE,A]"></a>
+      <a id="ensure[EE&gt;:E](⇒EE)((A)⇒Boolean):Validation[EE,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ensure</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>]</span><span class="params">(<span name="onFailure">onFailure: ⇒ <span class="extype" name="scalaz.Validation.ensure.EE">EE</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.ensure.EE">EE</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Ensures that the success value of this validation satisfies the given predicate, or fails with the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Ensures that the success value of this validation satisfies the given predicate, or fails with the given value.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.Validation#excepting" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="excepting[EE&gt;:E](pf:PartialFunction[A,EE]):scalaz.Validation[EE,A]"></a>
+      <a id="excepting[EE&gt;:E](PartialFunction[A,EE]):Validation[EE,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">excepting</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>]</span><span class="params">(<span name="pf">pf: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scalaz.Failure.A">A</span>, <span class="extype" name="scalaz.Validation.excepting.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.excepting.EE">EE</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return a Validation formed by the application of a partial function across the
+success of this value:</p><div class="fullcomment"><div class="comment cmt"><p>Return a Validation formed by the application of a partial function across the
+success of this value:</p><pre>strings map (_.parseInt excepting { <span class="kw">case</span> i <span class="kw">if</span> i &lt; <span class="num">0</span> <span class="kw">=&gt;</span> <span class="kw">new</span> Exception(s<span class="lit">"Int must be positive: $i"</span>) })</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#exists" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="exists(f:A=&gt;Boolean):Boolean"></a>
+      <a id="exists((A)⇒Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">exists</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this validation is a success value satisfying the given predicate.</p><div class="fullcomment"><div class="comment cmt"><p>Return <code>true</code> if this validation is a success value satisfying the given predicate.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#filter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="filter[EE&gt;:E](p:A=&gt;Boolean)(implicitM:scalaz.Monoid[EE]):scalaz.Validation[EE,A]"></a>
+      <a id="filter[EE&gt;:E]((A)⇒Boolean)(Monoid[EE]):Validation[EE,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">filter</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>]</span><span class="params">(<span name="p">p: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.Validation.filter.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.filter.EE">EE</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Filter on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Filter on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.Validation#findSuccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="findSuccess[EE&gt;:E,AA&gt;:A](that:=&gt;scalaz.Validation[EE,AA])(implicites:scalaz.Semigroup[EE]):scalaz.Validation[EE,AA]"></a>
+      <a id="findSuccess[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA])(Semigroup[EE]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">findSuccess</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="that">that: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.findSuccess.EE">EE</span>, <span class="extype" name="scalaz.Validation.findSuccess.AA">AA</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="es">es: <a href="Semigroup.html" class="extype" name="scalaz.Semigroup">Semigroup</a>[<span class="extype" name="scalaz.Validation.findSuccess.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.findSuccess.EE">EE</span>, <span class="extype" name="scalaz.Validation.findSuccess.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">If <code>this</code> is a success, return it; otherwise, if <code>that</code> is a success, return it; otherwise, combine the failures with the specified semigroup.</p><div class="fullcomment"><div class="comment cmt"><p>If <code>this</code> is a success, return it; otherwise, if <code>that</code> is a success, return it; otherwise, combine the failures with the specified semigroup.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#flatMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="flatMap[EE&gt;:E,B](f:A=&gt;scalaz.Validation[EE,B]):scalaz.Validation[EE,B]"></a>
+      <a id="flatMap[EE&gt;:E,B]((A)⇒Validation[EE,B]):Validation[EE,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flatMap</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.flatMap.EE">EE</span>, <span class="extype" name="scalaz.Validation.flatMap.B">B</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.flatMap.EE">EE</span>, <span class="extype" name="scalaz.Validation.flatMap.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Bind through the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Bind through the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#fold" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fold[X](fail:E=&gt;X,succ:A=&gt;X):X"></a>
+      <a id="fold[X]((E)⇒X,(A)⇒X):X"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fold</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="fail">fail: (<span class="extype" name="scalaz.Failure.E">E</span>) ⇒ <span class="extype" name="scalaz.Validation.fold.X">X</span></span>, <span name="succ">succ: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.fold.X">X</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.fold.X">X</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Catamorphism.</p><div class="fullcomment"><div class="comment cmt"><p>Catamorphism. Run the first given function if failure, otherwise, the second given function.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#foldRight" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="foldRight[B](z:=&gt;B)(f:(A,=&gt;B)=&gt;B):B"></a>
+      <a id="foldRight[B](⇒B)((A,⇒B)⇒B):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldRight</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="z">z: ⇒ <span class="extype" name="scalaz.Validation.foldRight.B">B</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>, ⇒ <span class="extype" name="scalaz.Validation.foldRight.B">B</span>) ⇒ <span class="extype" name="scalaz.Validation.foldRight.B">B</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.foldRight.B">B</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Fold on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Fold on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#forall" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="forall(f:A=&gt;Boolean):Boolean"></a>
+      <a id="forall((A)⇒Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">forall</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this validation is a failure value or the success value satisfies the given predicate.</p><div class="fullcomment"><div class="comment cmt"><p>Return <code>true</code> if this validation is a failure value or the success value satisfies the given predicate.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#foreach" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="foreach[U](f:A=&gt;U):Unit"></a>
+      <a id="foreach[U]((A)⇒U):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foreach</span><span class="tparams">[<span name="U">U</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.foreach.U">U</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the side-effect on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Run the side-effect on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.Validation#getOrElse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getOrElse[AA&gt;:A](x:=&gt;AA):AA"></a>
+      <a id="getOrElse[AA&gt;:A](⇒AA):AA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOrElse</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <span class="extype" name="scalaz.Validation.getOrElse.AA">AA</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.getOrElse.AA">AA</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the success value of this validation or the given default if failure.</p><div class="fullcomment"><div class="comment cmt"><p>Return the success value of this validation or the given default if failure. Alias for <code>|</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#isFailure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isFailure:Boolean"></a>
+      <a id="isFailure:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isFailure</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this validation is failure.</p><div class="fullcomment"><div class="comment cmt"><p>Return <code>true</code> if this validation is failure.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.Validation#isSuccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isSuccess:Boolean"></a>
+      <a id="isSuccess:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isSuccess</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return <code>true</code> if this validation is success.</p><div class="fullcomment"><div class="comment cmt"><p>Return <code>true</code> if this validation is success.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#leftMap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="leftMap[C](f:E=&gt;C):scalaz.Validation[C,A]"></a>
+      <a id="leftMap[C]((E)⇒C):Validation[C,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leftMap</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.E">E</span>) ⇒ <span class="extype" name="scalaz.Validation.leftMap.C">C</span></span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.leftMap.C">C</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on the left value.</p><div class="fullcomment"><div class="comment cmt"><p>Run the given function on the left value.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#loopFailure" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="loopFailure[EE&gt;:E,AA&gt;:A,X](success:AA=&gt;X,failure:EE=&gt;scalaz.\/[X,scalaz.Validation[EE,AA]]):X"></a>
+      <a id="loopFailure[EE&gt;:E,AA&gt;:A,X]((AA)⇒X,(EE)⇒\/[X,Validation[EE,AA]]):X"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">loopFailure</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>, <span name="X">X</span>]</span><span class="params">(<span name="success">success: (<span class="extype" name="scalaz.Validation.loopFailure.AA">AA</span>) ⇒ <span class="extype" name="scalaz.Validation.loopFailure.X">X</span></span>, <span name="failure">failure: (<span class="extype" name="scalaz.Validation.loopFailure.EE">EE</span>) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Validation.loopFailure.X">X</span>, <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.loopFailure.EE">EE</span>, <span class="extype" name="scalaz.Validation.loopFailure.AA">AA</span>]]</span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.loopFailure.X">X</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Spin in tail-position on the failure value of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Spin in tail-position on the failure value of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#loopSuccess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="loopSuccess[EE&gt;:E,AA&gt;:A,X](success:AA=&gt;scalaz.\/[X,scalaz.Validation[EE,AA]],failure:EE=&gt;X):X"></a>
+      <a id="loopSuccess[EE&gt;:E,AA&gt;:A,X]((AA)⇒\/[X,Validation[EE,AA]],(EE)⇒X):X"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">loopSuccess</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>, <span name="X">X</span>]</span><span class="params">(<span name="success">success: (<span class="extype" name="scalaz.Validation.loopSuccess.AA">AA</span>) ⇒ <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.Validation.loopSuccess.X">X</span>, <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.loopSuccess.EE">EE</span>, <span class="extype" name="scalaz.Validation.loopSuccess.AA">AA</span>]]</span>, <span name="failure">failure: (<span class="extype" name="scalaz.Validation.loopSuccess.EE">EE</span>) ⇒ <span class="extype" name="scalaz.Validation.loopSuccess.X">X</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.loopSuccess.X">X</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Spin in tail-position on the success value of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Spin in tail-position on the success value of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#map" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="map[B](f:A=&gt;B):scalaz.Validation[E,B]"></a>
+      <a id="map[B]((A)⇒B):Validation[E,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.map.B">B</span></span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Validation.map.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Map on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Map on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.Validation#orElse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="orElse[EE&gt;:E,AA&gt;:A](x:=&gt;scalaz.Validation[EE,AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="orElse[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">orElse</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.orElse.EE">EE</span>, <span class="extype" name="scalaz.Validation.orElse.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.orElse.EE">EE</span>, <span class="extype" name="scalaz.Validation.orElse.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return this if it is a success, otherwise, return the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Return this if it is a success, otherwise, return the given value. Alias for <code>|||</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#show" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="show[EE&gt;:E,AA&gt;:A](implicitSE:scalaz.Show[EE],implicitSA:scalaz.Show[AA]):scalaz.Cord"></a>
+      <a id="show[EE&gt;:E,AA&gt;:A](Show[EE],Show[AA]):Cord"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">show</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="SE">SE: <a href="Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.Validation.show.EE">EE</span>]</span>, <span name="SA">SA: <a href="Show.html" class="extype" name="scalaz.Show">Show</a>[<span class="extype" name="scalaz.Validation.show.AA">AA</span>]</span>)</span><span class="result">: <a href="Cord.html" class="extype" name="scalaz.Cord">Cord</a></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Show for a validation value.</p><div class="fullcomment"><div class="comment cmt"><p>Show for a validation value.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#swap" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="swap:scalaz.Validation[A,E]"></a>
+      <a id="swap:Validation[A,E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">swap</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.A">A</span>, <span class="extype" name="scalaz.Failure.E">E</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Flip the failure/success values in this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Flip the failure/success values in this validation. Alias for <code>unary_~</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#swapped" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="swapped[EE,AA](k:scalaz.Validation[A,E]=&gt;scalaz.Validation[AA,EE]):scalaz.Validation[EE,AA]"></a>
+      <a id="swapped[EE,AA]((Validation[A,E])⇒Validation[AA,EE]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">swapped</span><span class="tparams">[<span name="EE">EE</span>, <span name="AA">AA</span>]</span><span class="params">(<span name="k">k: (<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.A">A</span>, <span class="extype" name="scalaz.Failure.E">E</span>]) ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.swapped.AA">AA</span>, <span class="extype" name="scalaz.Validation.swapped.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.swapped.EE">EE</span>, <span class="extype" name="scalaz.Validation.swapped.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on this swapped value.</p><div class="fullcomment"><div class="comment cmt"><p>Run the given function on this swapped value. Alias for <code>~</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.Validation#toEither" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toEither:Either[E,A]"></a>
+      <a id="toEither:Either[E,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toEither</span><span class="result">: <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert to a core <code>scala.Either</code> at your own peril.</p><div class="fullcomment"><div class="comment cmt"><p>Convert to a core <code>scala.Either</code> at your own peril.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#toList" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toList:List[A]"></a>
+      <a id="toList:List[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toList</span><span class="result">: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty list or list with one element on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Return an empty list or list with one element on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#toOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toOption:Option[A]"></a>
+      <a id="toOption:Option[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toOption</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty option or option with one element on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Return an empty option or option with one element on the success of this validation. Useful to sweep errors under the carpet.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#toStream" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toStream:Stream[A]"></a>
+      <a id="toStream:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toStream</span><span class="result">: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.Failure.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return an empty stream or stream with one element on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Return an empty stream or stream with one element on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#toValidationNel" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toValidationNel[EE&gt;:E,AA&gt;:A]:scalaz.ValidationNel[EE,AA]"></a>
+      <a id="toValidationNel[EE&gt;:E,AA&gt;:A]:ValidationNel[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toValidationNel</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="result">: <a href="package.html#ValidationNel[+E,+X]=scalaz.Validation[scalaz.NonEmptyList[E],X]" class="extmbr" name="scalaz.ValidationNel">ValidationNel</a>[<span class="extype" name="scalaz.Validation.toValidationNel.EE">EE</span>, <span class="extype" name="scalaz.Validation.toValidationNel.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Wraps the failure value in a <a href="NonEmptyList.html" class="extype" name="scalaz.NonEmptyList">scalaz.NonEmptyList</a></p><div class="fullcomment"><div class="comment cmt"><p>Wraps the failure value in a <a href="NonEmptyList.html" class="extype" name="scalaz.NonEmptyList">scalaz.NonEmptyList</a></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#traverse" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="traverse[G[+_],B](f:A=&gt;G[B])(implicitevidence$2:scalaz.Applicative[G]):G[scalaz.Validation[E,B]]"></a>
+      <a id="traverse[G[+_],B]((A)⇒G[B])(Applicative[G]):G[Validation[E,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traverse</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">+_</span>]</span></span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.Failure.A">A</span>) ⇒ <span class="extype" name="scalaz.Validation.traverse.G">G</span>[<span class="extype" name="scalaz.Validation.traverse.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.Validation.traverse.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.traverse.G">G</span>[<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Validation.traverse.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Traverse on the success of this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Traverse on the success of this validation.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#unary_~" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unary_~:scalaz.Validation[A,E]"></a>
+      <a id="unary_~:Validation[A,E]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: unary_$tilde" class="name">unary_~</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.A">A</span>, <span class="extype" name="scalaz.Failure.E">E</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Flip the failure/success values in this validation.</p><div class="fullcomment"><div class="comment cmt"><p>Flip the failure/success values in this validation. Alias for <code>swap</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#valueOr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="valueOr[AA&gt;:A](x:E=&gt;AA):AA"></a>
+      <a id="valueOr[AA&gt;:A]((E)⇒AA):AA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">valueOr</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: (<span class="extype" name="scalaz.Failure.E">E</span>) ⇒ <span class="extype" name="scalaz.Validation.valueOr.AA">AA</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.valueOr.AA">AA</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the success value of this validation or run the given function on the failure.</p><div class="fullcomment"><div class="comment cmt"><p>Return the success value of this validation or run the given function on the failure.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.Validation#|" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="|[AA&gt;:A](x:=&gt;AA):AA"></a>
+      <a id="|[AA&gt;:A](⇒AA):AA"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bar" class="name">|</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <span class="extype" name="scalaz.Validation.|.AA">AA</span></span>)</span><span class="result">: <span class="extype" name="scalaz.Validation.|.AA">AA</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return the success value of this validation or the given default if failure.</p><div class="fullcomment"><div class="comment cmt"><p>Return the success value of this validation or the given default if failure. Alias for <code>getOrElse</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#|||" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="|||[EE&gt;:E,AA&gt;:A](x:=&gt;scalaz.Validation[EE,AA]):scalaz.Validation[EE,AA]"></a>
+      <a id="|||[EE&gt;:E,AA&gt;:A](⇒Validation[EE,AA]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bar$bar$bar" class="name">|||</span><span class="tparams">[<span name="EE">EE &gt;: <span class="extype" name="scalaz.Failure.E">E</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.Failure.A">A</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.|||.EE">EE</span>, <span class="extype" name="scalaz.Validation.|||.AA">AA</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.|||.EE">EE</span>, <span class="extype" name="scalaz.Validation.|||.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Return this if it is a success, otherwise, return the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Return this if it is a success, otherwise, return the given value. Alias for <code>orElse</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li><li name="scalaz.Validation#~" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="~[EE,AA](k:scalaz.Validation[A,E]=&gt;scalaz.Validation[AA,EE]):scalaz.Validation[EE,AA]"></a>
+      <a id="~[EE,AA]((Validation[A,E])⇒Validation[AA,EE]):Validation[EE,AA]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $tilde" class="name">~</span><span class="tparams">[<span name="EE">EE</span>, <span name="AA">AA</span>]</span><span class="params">(<span name="k">k: (<a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.A">A</span>, <span class="extype" name="scalaz.Failure.E">E</span>]) ⇒ <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.~.AA">AA</span>, <span class="extype" name="scalaz.Validation.~.EE">EE</span>]</span>)</span><span class="result">: <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Validation.~.EE">EE</span>, <span class="extype" name="scalaz.Validation.~.AA">AA</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on this swapped value.</p><div class="fullcomment"><div class="comment cmt"><p>Run the given function on this swapped value. Alias for <code>swapped</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="scalaz.Validation">
+              <h3>Inherited from <a href="Validation.html" class="extype" name="scalaz.Validation">Validation</a>[<span class="extype" name="scalaz.Failure.E">E</span>, <span class="extype" name="scalaz.Failure.A">A</span>]</h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>
