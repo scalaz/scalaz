@@ -8,13 +8,20 @@ import std.AllInstances._
 import OneAnd.oneAndNelIso
 
 class OneAndTest extends Spec {
+  type OneAndOption[A] = OneAnd[Option, A]
   type OneAndList[A] = OneAnd[List, A]
   type OneAndNel[A] = OneAnd[NonEmptyList, A]
 
   checkAll("OneAnd", equal.laws[OneAnd[List, Int]])
   checkAll("OneAnd", order.laws[OneAnd[List, Int]])
+  checkAll("OneAnd List", monad.laws[OneAndList])
+  checkAll("OneAnd Option", monad.laws[OneAndOption])
+  checkAll("OneAnd Nel", plus.laws[OneAndNel])
   checkAll("OneAnd List", traverse.laws[OneAndList])
   checkAll("OneAnd Nel", traverse.laws[OneAndNel])
+  checkAll("OneAnd List", semigroup.laws[OneAnd[List, Int]])
+  checkAll("OneAnd Nel", semigroup.laws[OneAnd[NonEmptyList, Int]])
+  checkAll("OneAnd Option", semigroup.laws[OneAnd[Option, Int]])
 
   "oneAndNelIso is iso" ! prop {(nel: NonEmptyList[Int]) =>
     oneAndNelIso.from(oneAndNelIso.to(nel)) must be_===(nel)
@@ -65,10 +72,17 @@ class OneAndTest extends Spec {
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Applicative: Plus, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
+    def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
+    def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: Applicative: Plus, A] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
     def foldable[F[_]: Foldable, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
     def foldable1[F[_]: Foldable1, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse[F[_]: Traverse, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse1[F[_]: Traverse1, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def each[F[_]: Each, A] = Each[({type λ[α] = OneAnd[F, α]})#λ]
+    def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }
