@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.generic.CanBuildFrom
+
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -111,6 +113,8 @@ trait Foldable[F[_]]  { self =>
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
+  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
+    foldLeft(fa, c())(_ += _).result
 
   /** Whether all `A`s in `fa` yield true from `p`. */
   def all[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, true)(p(_) && _)

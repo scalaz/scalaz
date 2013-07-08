@@ -1,6 +1,8 @@
 package scalaz
 package syntax
 
+import collection.generic.CanBuildFrom
+
 /** Wraps a value `self` and provides methods related to `Foldable` */
 trait FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
@@ -29,6 +31,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   final def toIndexedSeq: IndexedSeq[A] = F.toIndexedSeq(self)
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
+  final def to[G[_]](implicit c: CanBuildFrom[Nothing, A, G[A]]) = F.to[A, G](self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
   final def ∀(p: A => Boolean): Boolean = F.all(self)(p)
   final def allM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.allM(self)(p)
