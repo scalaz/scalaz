@@ -6,6 +6,11 @@ import syntax.foldable._
 import org.specs2.matcher._
 
 class FoldableTest extends Spec with OptionMatchers {
+  "to" ! prop {
+    (xs: List[Int]) =>
+      val v: Vector[Int] = Foldable[List].to[Int, Vector](xs)
+      v.toList must_== xs
+  }
   "maximum" ! prop {
     (xs: List[Int]) =>
       if (xs.isEmpty)
