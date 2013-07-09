@@ -154,7 +154,7 @@ object Task {
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
-    new Task(Future(Try(a))(pool).start)
+    new Task(Future(Try(a))(pool))
 
   /** 
    * Returns a `Future` that produces the same result as the given `Future`, 
