@@ -1,11 +1,15 @@
 package scalaz.concurrent
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean}
 
 import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
+import scalaz.syntax.either._
 import scalaz.std.list._
+
+import collection.JavaConversions._
+
 
 /* 
  * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
@@ -126,13 +130,78 @@ object Task {
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
   }
 
+  /**
+   * Combines all tasks to be run in parallel, order non-deterministic.  
+   * On last completed task will collect and return list of completed futures.
+   * If any task fails with exception it terminates early propagating exception of that task to result task. 
+   * However on the early exit all the tasks that were run are completing their job and may therefore use resources.
+   * When desired, combinator may try to cancel any not yet run tasks by setting cancelOnEarlyExit to true, 
+   * meaning that only the not scheduled tasks will not get run. 
+   * Unlike the Task's [[scalaz.Nondeterminism.gatherUnordered]] it won't run the tasks, but rather combines them in non-blocking way to be later run 
+   */
+  def gatherUnordered[A](tasks: Seq[Task[A]], cancelOnEarlyExit: Boolean = false): Task[List[A]] = {
+    // Unfortunately we cannot reuse the future's combinator 
+    // due to early terminating requirement on task
+    // when task fails.  This also makes implementation a bit trickier
+
+    tasks match {
+      case Seq() => Task.now(List())
+      case Seq(t) => t.map(List(_))
+      case _ => Task.async { cb =>
+        val interrupt = new AtomicBoolean(false)
+        val results = new ConcurrentLinkedQueue[A]
+        val togo = new AtomicInteger(tasks.size)
+      
+        tasks.foreach { t =>
+
+          val handle: (Throwable \/ A) => Unit = {
+            case \/-(success) =>
+              results.add(success)
+              //only last completed f will hit the 0 here. 
+              if (togo.decrementAndGet() == 0) {
+                cb(results.toList.right)
+              } 
+
+            case -\/(failure) =>
+              // togo is decremented straight to 0 to prevent any future callbacks of async. 
+              // however, as other tasks may failed, the one here must prevent 
+              // to call the callback in that case. Standard cmpAndSet construct is used to make
+              // sure we wouldn't race
+              def shouldCallBack:Boolean =  {
+                val current = togo.get
+                if (current > 0) {
+                  if (togo.compareAndSet(current,0)) true else  shouldCallBack
+                } else {
+                  false
+                }
+              }
+            
+              if(shouldCallBack) {
+                cb(failure.left)
+                if(cancelOnEarlyExit) interrupt.set(true) //cancel any computation not running yet
+              }
+            
+          }
+
+          t.runAsyncInterruptibly(handle, interrupt)
+
+        }
+        
+      }
+        
+    }
+
+
+  }
+
+
   /** A `Task` which fails with the given `Throwable`. */
   def fail(e: Throwable): Task[Nothing] = new Task(Future.now(-\/(e)))
 
   /** Convert a strict value to a `Task`. Also see `delay`. */
   def now[A](a: A): Task[A] = new Task(Future.now(\/-(a)))
 
-  /** 
+  /**
    * Promote a non-strict value to a `Task`, catching exceptions in 
    * the process. Note that since `Task` is unmemoized, this will 
    * recompute `a` each time it is sequenced into a larger computation. 
@@ -141,22 +210,22 @@ object Task {
    */
   def delay[A](a: => A): Task[A] = suspend(now(a))
 
-  /** 
+  /**
    * Produce `f` in the main trampolining loop, `Future.step`, using a fresh
    * call stack. The standard trampolining primitive, useful for avoiding
    * stack overflows. 
    */
   def suspend[A](a: => Task[A]): Task[A] = new Task(Future.suspend(
-    Try(a.get) match { 
+    Try(a.get) match {
       case -\/(e) => Future.now(-\/(e))
       case \/-(f) => f
-  }))
+    }))
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
-  def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
+  def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Try(a))(pool))
 
-  /** 
+  /**
    * Returns a `Future` that produces the same result as the given `Future`, 
    * but forks its evaluation off into a separate (logical) thread, using
    * the given `ExecutorService`. Note that this forking is only described
@@ -165,7 +234,7 @@ object Task {
   def fork[A](a: => Task[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
     apply(a).join
 
-  /** 
+  /**
    * Create a `Future` from an asynchronous computation, which takes the form
    * of a function with which we can register a callback. This can be used
    * to translate from a callback-based API to a straightforward monadic
@@ -173,7 +242,7 @@ object Task {
    * exceptions. 
    */
   def async[A](register: ((Throwable \/ A) => Unit) => Unit): Task[A] =
-   new Task(Future.async(register))
+    new Task(Future.async(register))
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
