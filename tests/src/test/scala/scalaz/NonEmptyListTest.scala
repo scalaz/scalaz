@@ -33,4 +33,9 @@ class NonEmptyListTest extends Spec {
   "NonEmptyList.init size is correct" ! prop { xs:NonEmptyList[Int] =>
     xs.init.size must be_===(xs.tail.size)
   }
+  "NonEmptyList.foldRight1 large list" in {
+    import NonEmptyList._
+    import syntax.foldable1._
+    nel(0, List.fill(10000000)(1)).foldRight1(_ + _) must_== 10000000
+  }
 }
