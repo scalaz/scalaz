@@ -26,7 +26,10 @@ class NonEmptyListTest extends Spec {
     val F = Foldable1[NonEmptyList]
     rnge.list.reduceRight(_++_) must be_===(F.foldr1(rnge)(a => b => a ++ b))
   }
-
+  "foldRight1 is reduceRight" ! prop { xs: NonEmptyList[List[Int]] =>
+    val F = Foldable1[NonEmptyList]
+    xs.list.reduceRight(_ ++ _) must_== F.foldRight1(xs)(_ ++ _)
+  }
   "NonEmptyList.last is correct" ! prop { xs:NonEmptyList[Int] =>
     xs.reverse.head must be_===(xs.last)
   }
