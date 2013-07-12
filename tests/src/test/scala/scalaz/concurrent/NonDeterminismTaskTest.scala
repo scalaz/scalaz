@@ -3,6 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.Executors
 import scalaz.{-\/, Spec}
 import java.util.concurrent.atomic.AtomicInteger
+import org.specs2.matcher.MustMatchers._
 
 /**
  *
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * Time: 2:58 PM
  * (c) 2011-2013 Spinoco Czech Republic, a.s.
  */
-object NondeterminismTaskTest extends Spec{
+object NonDeterminismTaskTest extends Spec{
 
   "Future Nondeterminism" should {
     import scalaz.concurrent.Task._
@@ -58,7 +59,7 @@ object NondeterminismTaskTest extends Spec{
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3)))(es3)
       
-      t.attemptRun match {
+      t.attemptRun must beLike {
         case -\/(e) => e must_== ex 
       }
       
@@ -84,7 +85,7 @@ object NondeterminismTaskTest extends Spec{
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), cancelOnEarlyExit = true))(es3)
 
-      t.attemptRun match {
+      t.attemptRun must beLike {
         case -\/(e) => e must_== ex 
       }
       

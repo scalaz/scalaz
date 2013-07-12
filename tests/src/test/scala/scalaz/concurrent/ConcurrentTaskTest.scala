@@ -6,6 +6,7 @@ import java.util.concurrent.{TimeoutException, ThreadFactory, Executors}
 import scala.collection.immutable.Queue
 import scala.concurrent.SyncVar
 import org.specs2.execute.{Success, Result}
+import org.specs2.matcher.MustMatchers._ 
 
 /**
  *
@@ -73,8 +74,8 @@ object ConcurrentTaskTest extends Spec {
       
       val t =  fork { Thread.sleep(3000); now(1) }(es)
       
-       t.attemptRunFor(100) match {
-         case -\/(ex:TimeoutException)  => //ok
+       t.attemptRunFor(100) must beLike {
+         case -\/(ex:TimeoutException)  => ok
        } 
    
       es.shutdown()
@@ -87,8 +88,8 @@ object ConcurrentTaskTest extends Spec {
       
       val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
 
-      t.attemptRunFor(100) match {
-        case -\/(ex:TimeoutException)  => //ok
+      t.attemptRunFor(100) must beLike {
+        case -\/(ex:TimeoutException)  => ok
       }
 
       Thread.sleep(1500)

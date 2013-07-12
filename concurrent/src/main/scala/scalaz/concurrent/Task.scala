@@ -99,13 +99,13 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * If supplied timeout is exceeded the Task wil terminate early 
    * and throws the TimeoutException with all remianing work to be terminated early. 
    */
-  def runFor(timeout: Long) = attemptRunFor(timeout) match {
+  def runFor(timeout: Long) : A = attemptRunFor(timeout) match {
     case -\/(e) => throw e
     case \/-(a) => a
   }
 
   /** Like `runFor`, but returns exceptions as values. */
-  def attemptRunFor(timeout: Long) = {
+  def attemptRunFor(timeout: Long) : Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
     val interrupt = new AtomicBoolean(false)
     runAsyncInterruptibly(sync.put(_), interrupt)
@@ -147,11 +147,10 @@ object Task {
       new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) => 
         a.map((_, residuals.map(new Task(_))))
       })
-    override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
-      new Task (F.map(F.gatherUnordered(fs.map(_ get)))(eithers => 
-        Traverse[List].sequenceU(eithers) 
-      ))
-    }
+    override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = 
+      Task.gatherUnordered(fs)
+    
+    
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
   }
@@ -163,9 +162,9 @@ object Task {
    * However on the early exit all the tasks that were run are completing their job and may therefore use resources.
    * When desired, combinator may try to cancel any not yet run tasks by setting cancelOnEarlyExit to true, 
    * meaning that only the not scheduled tasks will not get run. 
-   * Unlike the Task's [[scalaz.Nondeterminism.gatherUnordered]] it won't run the tasks, but rather combines them in non-blocking way to be later run 
+   * Unlike the Task's [[scalaz.Nondeterminism.gatherUnordered]] allows to decide whether to cancel running tasks on early exit (one of the tasks failed) 
    */
-  def gatherUnordered[A](tasks: Seq[Task[A]], cancelOnEarlyExit: Boolean = false): Task[List[A]] = {
+  def gatherUnordered[A](tasks: Seq[Task[A]], cancelOnEarlyExit: Boolean = true): Task[List[A]] = {
     // Unfortunately we cannot reuse the future's combinator 
     // due to early terminating requirement on task
     // when task fails.  This also makes implementation a bit trickier

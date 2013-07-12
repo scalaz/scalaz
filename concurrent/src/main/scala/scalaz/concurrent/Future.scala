@@ -230,38 +230,29 @@ object Future {
     }
 
    /** 
-    * Runs given futures non-deterministically for later collection of their results 
-    * Be careful, because the futures are run, this implementation blocks the thread.
-    * If you want rather just to combine them, use [[scalaz.concurrent.Future.gatherUnordered]]
+    * Combines  given futures non-deterministically for later collection of their results 
     */
-    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
-      Async { cb => cb(Future.gatherUnordered(fs).run) }
-  }
-
-  /**
-   * Combines all futures to be run in parallel, order non-deterministic.  
-   * On last completed future will collect and return list of completed futures.
-   * Unlike the Future's [[scalaz.Nondeterminism.gatherUnordered]] it won't run the futures, but rather combines them in non-blocking way to be later run 
-   */
-   def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] = fs match {
+    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] = fs match {
      case Seq() => Future.now(List())
      case Seq(f) => f.map(List(_))
      case other =>  async { cb =>
-        val results = new ConcurrentLinkedQueue[A]
-        val c = new AtomicInteger(fs.size)
-        
-        fs.foreach {  f =>
-          f.runAsync {  a =>
-            results.add(a)
-            //only last completed f will hit the 0 here.
-            if (c.decrementAndGet() == 0) {
-              cb(results.toList)
-            }
-          }
-        }
-      }
-    }
-   
+       val results = new ConcurrentLinkedQueue[A]
+       val c = new AtomicInteger(fs.size)
+
+       fs.foreach {  f =>
+         f.runAsync {  a =>
+           results.add(a)
+           //only last completed f will hit the 0 here.
+           if (c.decrementAndGet() == 0) {
+             cb(results.toList)
+           }
+         }
+       }
+     }
+   }
+    
+  }
+
 
   /** Convert a strict value to a `Future`. */
   def now[A](a: A): Future[A] = Now(a)
