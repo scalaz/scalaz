@@ -130,9 +130,9 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
-      override def foldRight1[A](fa: NonEmptyList[A])(f: (A, => A) => A): A = fa.tail match {
-        case Nil => fa.head
-        case h :: t => f(fa.head, foldRight1(NonEmptyList.nel(h, t))(f))
+      override def foldRight1[A](fa: NonEmptyList[A])(f: (A, => A) => A): A = {
+        val reversed = fa.reverse
+        reversed.tail.foldLeft(reversed.head)((x, y) => f(y, x))
       }
 
       override def foldLeft1[A](fa: NonEmptyList[A])(f: (A, A) => A): A = fa.tail match {
