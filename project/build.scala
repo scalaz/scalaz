@@ -43,7 +43,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.1",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
+    crossScalaVersions := Seq("2.9.3", "2.10.1"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -253,7 +253,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0",
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.1",
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -267,7 +267,7 @@ object build extends Build {
       publishArtifact := false,
       libraryDependencies <++= (scalaVersion) { sv => Seq(
         "org.specs2" %% "specs2" % Dependencies.specs2(sv) % "test",
-        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
+        "org.scalacheck" %% "scalacheck" % "1.10.1" % "test"
       ) }
     )
   )
