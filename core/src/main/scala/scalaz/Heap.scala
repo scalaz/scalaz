@@ -387,10 +387,10 @@ trait HeapFunctions {
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
 
   /**Heap sort */
-  def sort[F[_] : Traverse, A: Order](xs: F[A]): List[A] = fromData(xs).toList
+  def sort[F[_] : Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
 
   /**Heap sort */
-  def sortWith[F[_] : Traverse, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
+  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
 
   /**A heap with one element. */
   def singleton[A: Order](a: A): Heap[A] = singletonWith[A](Order[A].lessThanOrEqual, a)
