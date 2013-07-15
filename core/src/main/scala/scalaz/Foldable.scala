@@ -86,10 +86,11 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
-  def length[A](fa: F[A]): Int = {
-    import scalaz.std.anyVal._
-    foldMap(fa)(_ => 1)
-  }
+  /** Deforested alias for `toStream(fa).size`. */
+  def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+
+  /** Alias for `count`. */
+  def length[A](fa: F[A]): Int = count(fa)
 
   /**
    * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
@@ -126,8 +127,6 @@ trait Foldable[F[_]]  { self =>
   /** `any` with monadic traversal. */
   def anyM[G[_], A](fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
-  /** Deforested alias for `toStream(fa).size`. */
-  def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   import Ordering.{GT, LT}
   import std.option.{some, none}
