@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Show` */
-trait ShowOps[F] extends Ops[F] {
+sealed abstract class ShowOps[F] extends Ops[F] {
   implicit def F: Show[F]
   ////
   final def show: Cord = F.show(self)

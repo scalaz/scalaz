@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Foldable` */
-trait FoldableOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
   ////
   import collection.generic.CanBuildFrom

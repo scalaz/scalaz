@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Profunctor` */
-trait ProfunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class ProfunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Profunctor[F]
   ////
 

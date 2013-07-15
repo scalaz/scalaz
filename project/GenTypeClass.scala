@@ -245,7 +245,7 @@ object %s {
         """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F] extends Ops[F] {
+sealed abstract class %sOps[F] extends Ops[F] {
   implicit def F: %s[F]
   ////
 
@@ -293,7 +293,7 @@ trait %sSyntax[F] %s {
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
   implicit def F: %s[F]
   ////
 
@@ -347,7 +347,7 @@ trait %sSyntax[F[_]] %s {
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: %s[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Category` */
-trait CategoryOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class CategoryOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Category[F]
   ////
 

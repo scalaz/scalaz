@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `PlusEmpty` */
-trait PlusEmptyOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class PlusEmptyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: PlusEmpty[F]
   ////
 

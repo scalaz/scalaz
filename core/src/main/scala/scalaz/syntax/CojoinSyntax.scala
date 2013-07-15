@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Cojoin` */
-trait CojoinOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class CojoinOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Cojoin[F]
   ////
   final def cojoin: F[F[A]] = F.cojoin(self)

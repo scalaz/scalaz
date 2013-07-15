@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Each` */
-trait EachOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class EachOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Each[F]
   ////
   @deprecated("Each/foreach is deprecated", "7.1")

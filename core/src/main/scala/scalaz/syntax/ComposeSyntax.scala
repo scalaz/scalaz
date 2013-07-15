@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Compose` */
-trait ComposeOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class ComposeOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Compose[F]
   ////
   final def <<<[C](x: F[C, A]): F[C, B] =

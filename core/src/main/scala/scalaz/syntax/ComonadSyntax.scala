@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Comonad` */
-trait ComonadOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class ComonadOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Comonad[F]
   ////
   def copoint: A = F.copoint(self)

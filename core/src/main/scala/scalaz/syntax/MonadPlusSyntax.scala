@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadPlus[F]
   ////
   import Liskov._
