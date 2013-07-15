@@ -1,0 +1,734 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>LazyEither - scalaz.LazyEither</title>
+          <meta name="description" content="LazyEither - scalaz.LazyEither" />
+          <meta name="keywords" content="LazyEither scalaz.LazyEither" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.LazyEither';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="LazyEither$.html" title="Go to companion"><img src="../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="LazyEither$.html" title="Go to companion">LazyEither</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LazyEither</span><span class="tparams">[<span name="A">+A</span>, <span name="B">+B</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p><span class="extype" name="scala.Either">scala.Either</span>, but with a value by name.</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.1.0-M1/core/src/main/scala/scalaz/LazyEither.scala" target="_blank">LazyEither.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.LazyEither"><span>LazyEither</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#?" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="?[X](left:=&gt;X,right:=&gt;X):X"></a>
+      <a id="?[X](⇒X,⇒X):X"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $qmark" class="name">?</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="left">left: ⇒ <span class="extype" name="scalaz.LazyEither.?.X">X</span></span>, <span name="right">right: ⇒ <span class="extype" name="scalaz.LazyEither.?.X">X</span></span>)</span><span class="result">: <span class="extype" name="scalaz.LazyEither.?.X">X</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Catamorphism of the constructor chosen.</p>
+    </li><li name="scalaz.LazyEither#ap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ap[AA&gt;:A,C](f:=&gt;scalaz.LazyEither[AA,B=&gt;C]):scalaz.LazyEither[AA,C]"></a>
+      <a id="ap[AA&gt;:A,C](⇒LazyEither[AA,(B)⇒C]):LazyEither[AA,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ap</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.LazyEither.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: ⇒ <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.ap.AA">AA</span>, (<span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scalaz.LazyEither.ap.C">C</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.ap.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.ap.C">C</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#bimap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bimap[C,D](f:(=&gt;A)=&gt;C,g:(=&gt;B)=&gt;D):scalaz.LazyEither[C,D]"></a>
+      <a id="bimap[C,D]((⇒A)⇒C,(⇒B)⇒D):LazyEither[C,D]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bimap</span><span class="tparams">[<span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.A">A</span>) ⇒ <span class="extype" name="scalaz.LazyEither.bimap.C">C</span></span>, <span name="g">g: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scalaz.LazyEither.bimap.D">D</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.bimap.C">C</span>, <span class="extype" name="scalaz.LazyEither.bimap.D">D</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.LazyEither#disjunction" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="disjunction:scalaz.\/[A,B]"></a>
+      <a id="disjunction:\/[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">disjunction</span><span class="result">: <a href="$bslash$div.html" class="extype" name="scalaz.\/">\/</a>[<span class="extype" name="scalaz.LazyEither.A">A</span>, <span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#exists" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="exists(f:(=&gt;B)=&gt;Boolean):Boolean"></a>
+      <a id="exists((⇒B)⇒Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">exists</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.LazyEither#flatMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="flatMap[AA&gt;:A,C](f:(=&gt;B)=&gt;scalaz.LazyEither[AA,C]):scalaz.LazyEither[AA,C]"></a>
+      <a id="flatMap[AA&gt;:A,C]((⇒B)⇒LazyEither[AA,C]):LazyEither[AA,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">flatMap</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.LazyEither.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.flatMap.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.flatMap.C">C</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.flatMap.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.flatMap.C">C</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#fold" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="fold[X](left:(=&gt;A)=&gt;X,right:(=&gt;B)=&gt;X):X"></a>
+      <a id="fold[X]((⇒A)⇒X,(⇒B)⇒X):X"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fold</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="left">left: (⇒ <span class="extype" name="scalaz.LazyEither.A">A</span>) ⇒ <span class="extype" name="scalaz.LazyEither.fold.X">X</span></span>, <span name="right">right: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scalaz.LazyEither.fold.X">X</span></span>)</span><span class="result">: <span class="extype" name="scalaz.LazyEither.fold.X">X</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#foldRight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foldRight[Z](z:=&gt;Z)(f:(B,=&gt;Z)=&gt;Z):Z"></a>
+      <a id="foldRight[Z](⇒Z)((B,⇒Z)⇒Z):Z"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldRight</span><span class="tparams">[<span name="Z">Z</span>]</span><span class="params">(<span name="z">z: ⇒ <span class="extype" name="scalaz.LazyEither.foldRight.Z">Z</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.LazyEither.B">B</span>, ⇒ <span class="extype" name="scalaz.LazyEither.foldRight.Z">Z</span>) ⇒ <span class="extype" name="scalaz.LazyEither.foldRight.Z">Z</span></span>)</span><span class="result">: <span class="extype" name="scalaz.LazyEither.foldRight.Z">Z</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#forall" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="forall(f:(=&gt;B)=&gt;Boolean):Boolean"></a>
+      <a id="forall((⇒B)⇒Boolean):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">forall</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#foreach" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foreach(f:(=&gt;B)=&gt;Unit):Unit"></a>
+      <a id="foreach((⇒B)⇒Unit):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foreach</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#getOrElse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getOrElse[BB&gt;:B](default:=&gt;BB):BB"></a>
+      <a id="getOrElse[BB&gt;:B](⇒BB):BB"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getOrElse</span><span class="tparams">[<span name="BB">BB &gt;: <span class="extype" name="scalaz.LazyEither.B">B</span></span>]</span><span class="params">(<span name="default">default: ⇒ <span class="extype" name="scalaz.LazyEither.getOrElse.BB">BB</span></span>)</span><span class="result">: <span class="extype" name="scalaz.LazyEither.getOrElse.BB">BB</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#isLeft" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isLeft:Boolean"></a>
+      <a id="isLeft:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isLeft</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#isRight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isRight:Boolean"></a>
+      <a id="isRight:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isRight</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#left" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="left:scalaz.LazyEither.LeftProjection[A,B]{vale:scalaz.LazyEither[A,B]}"></a>
+      <a id="left:LeftProjection[A,B]{vale:scalaz.LazyEither[A,B]}"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">left</span><span class="result">: <a href="LazyEither$$LeftProjection.html" class="extype" name="scalaz.LazyEither.LeftProjection">LeftProjection</a>[<span class="extype" name="scalaz.LazyEither.A">A</span>, <span class="extype" name="scalaz.LazyEither.B">B</span>] { val e: scalaz.LazyEither[A,B] }</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#leftMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="leftMap[C](f:(=&gt;A)=&gt;C):scalaz.LazyEither[C,B]"></a>
+      <a id="leftMap[C]((⇒A)⇒C):LazyEither[C,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leftMap</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.A">A</span>) ⇒ <span class="extype" name="scalaz.LazyEither.leftMap.C">C</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.leftMap.C">C</span>, <span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Run the given function on the left value.</p>
+    </li><li name="scalaz.LazyEither#map" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="map[C](f:(=&gt;B)=&gt;C):scalaz.LazyEither[A,C]"></a>
+      <a id="map[C]((⇒B)⇒C):LazyEither[A,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (⇒ <span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scalaz.LazyEither.map.C">C</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.A">A</span>, <span class="extype" name="scalaz.LazyEither.map.C">C</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.LazyEither#orElse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="orElse[AA&gt;:A,BB&gt;:B](x:=&gt;scalaz.LazyEither[AA,BB]):scalaz.LazyEither[AA,BB]"></a>
+      <a id="orElse[AA&gt;:A,BB&gt;:B](⇒LazyEither[AA,BB]):LazyEither[AA,BB]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">orElse</span><span class="tparams">[<span name="AA">AA &gt;: <span class="extype" name="scalaz.LazyEither.A">A</span></span>, <span name="BB">BB &gt;: <span class="extype" name="scalaz.LazyEither.B">B</span></span>]</span><span class="params">(<span name="x">x: ⇒ <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.orElse.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.orElse.BB">BB</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.orElse.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.orElse.BB">BB</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#swap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="swap:scalaz.LazyEither[B,A]"></a>
+      <a id="swap:LazyEither[B,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">swap</span><span class="result">: <a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.B">B</span>, <span class="extype" name="scalaz.LazyEither.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.LazyEither#toEither" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toEither:Either[A,B]"></a>
+      <a id="toEither:Either[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toEither</span><span class="result">: <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="scalaz.LazyEither.A">A</span>, <span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#toLazyOption" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toLazyOption:scalaz.LazyOption[B]"></a>
+      <a id="toLazyOption:LazyOption[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toLazyOption</span><span class="result">: <a href="LazyOption.html" class="extype" name="scalaz.LazyOption">LazyOption</a>[<span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#toList" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toList:List[B]"></a>
+      <a id="toList:List[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toList</span><span class="result">: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#toOption" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toOption:Option[B]"></a>
+      <a id="toOption:Option[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toOption</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.LazyEither#toStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toStream:Stream[B]"></a>
+      <a id="toStream:Stream[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toStream</span><span class="result">: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.LazyEither.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.LazyEither#traverse" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="traverse[G[_],AA&gt;:A,C](f:B=&gt;G[C])(implicitevidence$1:scalaz.Applicative[G]):G[scalaz.LazyEither[AA,C]]"></a>
+      <a id="traverse[G[_],AA&gt;:A,C]((B)⇒G[C])(Applicative[G]):G[LazyEither[AA,C]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traverse</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="AA">AA &gt;: <span class="extype" name="scalaz.LazyEither.A">A</span></span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.LazyEither.B">B</span>) ⇒ <span class="extype" name="scalaz.LazyEither.traverse.G">G</span>[<span class="extype" name="scalaz.LazyEither.traverse.C">C</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.LazyEither.traverse.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.LazyEither.traverse.G">G</span>[<a href="" class="extype" name="scalaz.LazyEither">LazyEither</a>[<span class="extype" name="scalaz.LazyEither.traverse.AA">AA</span>, <span class="extype" name="scalaz.LazyEither.traverse.C">C</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

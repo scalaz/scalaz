@@ -1,0 +1,542 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>effect - scalaz.syntax.effect</title>
+          <meta name="description" content="effect - scalaz.syntax.effect" />
+          <meta name="keywords" content="effect scalaz.syntax.effect" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'scalaz.syntax.effect.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="scalaz">scalaz</a>.<a href="../package.html" class="extype" name="scalaz.syntax">syntax</a></p>
+        <h1>effect</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">effect</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Implicits to provide a convenient syntax to work with type classes
+and functions.</p><p>Non-trivial code should *not* be defined in this package; instead delegate.
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.1.0-M1/effect/src/main/scala/scalaz/syntax/effect/package.scala" target="_blank">package.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.syntax.effect"><span>effect</span></li><li class="in" name="scalaz.syntax.effect.EffectSyntaxes"><span>EffectSyntaxes</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.syntax.effect.EffectSyntaxes" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EffectSyntaxesextendsAnyRef"></a>
+      <a id="EffectSyntaxes:EffectSyntaxes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntaxes.html"><span class="name">EffectSyntaxes</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.IdOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IdOps[A]extendsOps[A]"></a>
+      <a id="IdOps[A]:IdOps[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IdOps.html"><span class="name">IdOps</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.IdOps.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.LiftControlIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftControlIOOps[F[_],A]extendsOps[F[A]]"></a>
+      <a id="LiftControlIOOps[F[_],A]:LiftControlIOOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftControlIOOps.html"><span class="name">LiftControlIOOps</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.LiftControlIOOps.F">F</span>[<span class="extype" name="scalaz.syntax.effect.LiftControlIOOps.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>LiftControlIO</code></p>
+    </li><li name="scalaz.syntax.effect.LiftControlIOSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftControlIOSyntax[F[_]]extendsAnyRef"></a>
+      <a id="LiftControlIOSyntax[F[_]]:LiftControlIOSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftControlIOSyntax.html"><span class="name">LiftControlIOSyntax</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.LiftIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftIOOps[F[_],A]extendsOps[F[A]]"></a>
+      <a id="LiftIOOps[F[_],A]:LiftIOOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftIOOps.html"><span class="name">LiftIOOps</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.LiftIOOps.F">F</span>[<span class="extype" name="scalaz.syntax.effect.LiftIOOps.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>LiftIO</code></p>
+    </li><li name="scalaz.syntax.effect.LiftIOSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftIOSyntax[F[_]]extendsAnyRef"></a>
+      <a id="LiftIOSyntax[F[_]]:LiftIOSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftIOSyntax.html"><span class="name">LiftIOSyntax</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.MonadCatchIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadCatchIOOps[F[_],A]extendsOps[F[A]]"></a>
+      <a id="MonadCatchIOOps[F[_],A]:MonadCatchIOOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadCatchIOOps.html"><span class="name">MonadCatchIOOps</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.MonadCatchIOOps.F">F</span>[<span class="extype" name="scalaz.syntax.effect.MonadCatchIOOps.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>MonadCatchIO</code></p>
+    </li><li name="scalaz.syntax.effect.MonadCatchIOSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadCatchIOSyntax[F[_]]extendsAnyRef"></a>
+      <a id="MonadCatchIOSyntax[F[_]]:MonadCatchIOSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadCatchIOSyntax.html"><span class="name">MonadCatchIOSyntax</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.MonadControlIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadControlIOOps[F[_],A]extendsOps[F[A]]"></a>
+      <a id="MonadControlIOOps[F[_],A]:MonadControlIOOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadControlIOOps.html"><span class="name">MonadControlIOOps</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.MonadControlIOOps.F">F</span>[<span class="extype" name="scalaz.syntax.effect.MonadControlIOOps.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>MonadControlIO</code></p>
+    </li><li name="scalaz.syntax.effect.MonadControlIOSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadControlIOSyntax[F[_]]extendsLiftControlIOSyntax[F]withMonadSyntax[F]"></a>
+      <a id="MonadControlIOSyntax[F[_]]:MonadControlIOSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadControlIOSyntax.html"><span class="name">MonadControlIOSyntax</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="LiftControlIOSyntax.html" class="extype" name="scalaz.syntax.effect.LiftControlIOSyntax">LiftControlIOSyntax</a>[<span class="extype" name="scalaz.syntax.effect.MonadControlIOSyntax.F">F</span>] with <a href="../MonadSyntax.html" class="extype" name="scalaz.syntax.MonadSyntax">MonadSyntax</a>[<span class="extype" name="scalaz.syntax.effect.MonadControlIOSyntax.F">F</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.MonadIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadIOOps[F[_],A]extendsOps[F[A]]"></a>
+      <a id="MonadIOOps[F[_],A]:MonadIOOps[F,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadIOOps.html"><span class="name">MonadIOOps</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.MonadIOOps.F">F</span>[<span class="extype" name="scalaz.syntax.effect.MonadIOOps.A">A</span>]]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>MonadIO</code></p>
+    </li><li name="scalaz.syntax.effect.MonadIOSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadIOSyntax[F[_]]extendsLiftIOSyntax[F]withMonadSyntax[F]"></a>
+      <a id="MonadIOSyntax[F[_]]:MonadIOSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadIOSyntax.html"><span class="name">MonadIOSyntax</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="LiftIOSyntax.html" class="extype" name="scalaz.syntax.effect.LiftIOSyntax">LiftIOSyntax</a>[<span class="extype" name="scalaz.syntax.effect.MonadIOSyntax.F">F</span>] with <a href="../MonadSyntax.html" class="extype" name="scalaz.syntax.MonadSyntax">MonadSyntax</a>[<span class="extype" name="scalaz.syntax.effect.MonadIOSyntax.F">F</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ResourceOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ResourceOps[F]extendsOps[F]"></a>
+      <a id="ResourceOps[F]:ResourceOps[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ResourceOps.html"><span class="name">ResourceOps</span></a><span class="tparams">[<span name="F">F</span>]</span><span class="result"> extends <a href="../Ops.html" class="extype" name="scalaz.syntax.Ops">Ops</a>[<span class="extype" name="scalaz.syntax.effect.ResourceOps.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt">Wraps a value <code>self</code> and provides methods related to <code>Resource</code></p>
+    </li><li name="scalaz.syntax.effect.ResourceSyntax" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ResourceSyntax[F]extendsAnyRef"></a>
+      <a id="ResourceSyntax[F]:ResourceSyntax[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ResourceSyntax.html"><span class="name">ResourceSyntax</span></a><span class="tparams">[<span name="F">F</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToAllEffectTypeClassOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToAllEffectTypeClassOpsextendsToIdOpswithToResourceOpswithToMonadCatchIOOps"></a>
+      <a id="ToAllEffectTypeClassOps:ToAllEffectTypeClassOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToAllEffectTypeClassOps.html"><span class="name">ToAllEffectTypeClassOps</span></a><span class="result"> extends <a href="ToIdOps.html" class="extype" name="scalaz.syntax.effect.ToIdOps">ToIdOps</a> with <a href="ToResourceOps.html" class="extype" name="scalaz.syntax.effect.ToResourceOps">ToResourceOps</a> with <a href="ToMonadCatchIOOps.html" class="extype" name="scalaz.syntax.effect.ToMonadCatchIOOps">ToMonadCatchIOOps</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToIdOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToIdOpsextendsAnyRef"></a>
+      <a id="ToIdOps:ToIdOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToIdOps.html"><span class="name">ToIdOps</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToLiftControlIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToLiftControlIOOpsextendsToLiftControlIOOps0"></a>
+      <a id="ToLiftControlIOOps:ToLiftControlIOOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToLiftControlIOOps.html"><span class="name">ToLiftControlIOOps</span></a><span class="result"> extends <a href="ToLiftControlIOOps0.html" class="extype" name="scalaz.syntax.effect.ToLiftControlIOOps0">ToLiftControlIOOps0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToLiftControlIOOps0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToLiftControlIOOps0extendsAnyRef"></a>
+      <a id="ToLiftControlIOOps0:ToLiftControlIOOps0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToLiftControlIOOps0.html"><span class="name">ToLiftControlIOOps0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToLiftIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToLiftIOOpsextendsToLiftIOOps0"></a>
+      <a id="ToLiftIOOps:ToLiftIOOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToLiftIOOps.html"><span class="name">ToLiftIOOps</span></a><span class="result"> extends <a href="ToLiftIOOps0.html" class="extype" name="scalaz.syntax.effect.ToLiftIOOps0">ToLiftIOOps0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToLiftIOOps0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToLiftIOOps0extendsAnyRef"></a>
+      <a id="ToLiftIOOps0:ToLiftIOOps0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToLiftIOOps0.html"><span class="name">ToLiftIOOps0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadCatchIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadCatchIOOpsextendsToMonadCatchIOOps0"></a>
+      <a id="ToMonadCatchIOOps:ToMonadCatchIOOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadCatchIOOps.html"><span class="name">ToMonadCatchIOOps</span></a><span class="result"> extends <a href="ToMonadCatchIOOps0.html" class="extype" name="scalaz.syntax.effect.ToMonadCatchIOOps0">ToMonadCatchIOOps0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadCatchIOOps0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadCatchIOOps0extendsAnyRef"></a>
+      <a id="ToMonadCatchIOOps0:ToMonadCatchIOOps0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadCatchIOOps0.html"><span class="name">ToMonadCatchIOOps0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadControlIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadControlIOOpsextendsToMonadControlIOOps0withToLiftControlIOOpswithToMonadOps"></a>
+      <a id="ToMonadControlIOOps:ToMonadControlIOOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadControlIOOps.html"><span class="name">ToMonadControlIOOps</span></a><span class="result"> extends <a href="ToMonadControlIOOps0.html" class="extype" name="scalaz.syntax.effect.ToMonadControlIOOps0">ToMonadControlIOOps0</a> with <a href="ToLiftControlIOOps.html" class="extype" name="scalaz.syntax.effect.ToLiftControlIOOps">ToLiftControlIOOps</a> with <a href="../ToMonadOps.html" class="extype" name="scalaz.syntax.ToMonadOps">ToMonadOps</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadControlIOOps0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadControlIOOps0extendsAnyRef"></a>
+      <a id="ToMonadControlIOOps0:ToMonadControlIOOps0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadControlIOOps0.html"><span class="name">ToMonadControlIOOps0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadIOOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadIOOpsextendsToMonadIOOps0withToLiftIOOpswithToMonadOps"></a>
+      <a id="ToMonadIOOps:ToMonadIOOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadIOOps.html"><span class="name">ToMonadIOOps</span></a><span class="result"> extends <a href="ToMonadIOOps0.html" class="extype" name="scalaz.syntax.effect.ToMonadIOOps0">ToMonadIOOps0</a> with <a href="ToLiftIOOps.html" class="extype" name="scalaz.syntax.effect.ToLiftIOOps">ToLiftIOOps</a> with <a href="../ToMonadOps.html" class="extype" name="scalaz.syntax.ToMonadOps">ToMonadOps</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToMonadIOOps0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToMonadIOOps0extendsAnyRef"></a>
+      <a id="ToMonadIOOps0:ToMonadIOOps0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToMonadIOOps0.html"><span class="name">ToMonadIOOps0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.syntax.effect.ToResourceOps" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ToResourceOpsextendsAnyRef"></a>
+      <a id="ToResourceOps:ToResourceOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ToResourceOps.html"><span class="name">ToResourceOps</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalaz.syntax.effect.EffectSyntax" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EffectSyntax"></a>
+      <a id="EffectSyntax:EffectSyntax"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntax$.html"><span class="name">EffectSyntax</span></a><span class="result"> extends <a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></span>
+      </span>
+      </h4>
+      <p class="comment cmt">The members of this object are also offered in the package object <a href="" class="extype" name="scalaz.syntax.effect">scalaz.syntax.effect</a></p>
+    </li><li name="scalaz.syntax.effect.EffectSyntaxes.all" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="all"></a>
+      <a id="all:all"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntaxes$all$.html"><span class="name">all</span></a><span class="result"> extends <a href="ToAllEffectTypeClassOps.html" class="extype" name="scalaz.syntax.effect.ToAllEffectTypeClassOps">ToAllEffectTypeClassOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></dd></dl></div>
+    </li><li name="scalaz.syntax.effect.EffectSyntaxes.id" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="id"></a>
+      <a id="id:id"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntaxes$id$.html"><span class="name">id</span></a><span class="result"> extends <a href="ToIdOps.html" class="extype" name="scalaz.syntax.effect.ToIdOps">ToIdOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></dd></dl></div>
+    </li><li name="scalaz.syntax.effect.EffectSyntaxes.monadCatchIO" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="monadCatchIO"></a>
+      <a id="monadCatchIO:monadCatchIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntaxes$monadCatchIO$.html"><span class="name">monadCatchIO</span></a><span class="result"> extends <a href="ToMonadCatchIOOps.html" class="extype" name="scalaz.syntax.effect.ToMonadCatchIOOps">ToMonadCatchIOOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></dd></dl></div>
+    </li><li name="scalaz.syntax.effect.EffectSyntaxes.resource" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="resource"></a>
+      <a id="resource:resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EffectSyntaxes$resource$.html"><span class="name">resource</span></a><span class="result"> extends <a href="ToResourceOps.html" class="extype" name="scalaz.syntax.effect.ToResourceOps">ToResourceOps</a></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.syntax.effect.EffectSyntaxes">
+              <h3>Inherited from <a href="EffectSyntaxes.html" class="extype" name="scalaz.syntax.effect.EffectSyntaxes">EffectSyntaxes</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../../lib/template.js"></script>
+    </body>
+      </html>

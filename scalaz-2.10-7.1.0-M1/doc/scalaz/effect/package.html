@@ -1,0 +1,1018 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>effect - scalaz.effect</title>
+          <meta name="description" content="effect - scalaz.effect" />
+          <meta name="keywords" content="effect scalaz.effect" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.effect.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1>effect</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">effect</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.effect.Dup" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Dup[H[_[_]]]extendsAnyRef"></a>
+      <a id="Dup[H[_[_]]]:Dup[H]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Dup.html"><span class="name">Dup</span></a><span class="tparams">[<span name="H">H<span class="tparams">[<span name="_">_<span class="tparams">[<span name="_">_</span>]</span></span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Duplicate a handle in the parent region.</p>
+    </li><li name="scalaz.effect.DupFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DupFunctionsextendsAnyRef"></a>
+      <a id="DupFunctions:DupFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="DupFunctions.html"><span class="name">DupFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.DupInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DupInstancesextendsAnyRef"></a>
+      <a id="DupInstances:DupInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="DupInstances.html"><span class="name">DupInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.Effects" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EffectsextendsToAllEffectTypeClassOpswithAllEffectInstances"></a>
+      <a id="Effects:Effects"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Effects.html"><span class="name">Effects</span></a><span class="result"> extends <a href="../syntax/effect/ToAllEffectTypeClassOps.html" class="extype" name="scalaz.syntax.effect.ToAllEffectTypeClassOps">ToAllEffectTypeClassOps</a> with <a href="../std/effect/AllEffectInstances.html" class="extype" name="scalaz.std.effect.AllEffectInstances">AllEffectInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.FinalizerHandle" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FinalizerHandle[R[_]]extendsAnyRef"></a>
+      <a id="FinalizerHandle[R[_]]:FinalizerHandle[R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FinalizerHandle.html"><span class="name">FinalizerHandle</span></a><span class="tparams">[<span name="R">R<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A handle to a finalizer that allows you to duplicate it to a parent region using &quot;dup&quot;.</p>
+    </li><li name="scalaz.effect.FinalizerHandleFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="FinalizerHandleFunctionsextendsAnyRef"></a>
+      <a id="FinalizerHandleFunctions:FinalizerHandleFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="FinalizerHandleFunctions.html"><span class="name">FinalizerHandleFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IO[A]extendsAnyRef"></a>
+      <a id="IO[A]:IO[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IO.html"><span class="name">IO</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IOFunctionsextendsIOStd"></a>
+      <a id="IOFunctions:IOFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IOFunctions.html"><span class="name">IOFunctions</span></a><span class="result"> extends <a href="IOStd.html" class="extype" name="scalaz.effect.IOStd">IOStd</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IOInstancesextendsIOInstances0"></a>
+      <a id="IOInstances:IOInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IOInstances.html"><span class="name">IOInstances</span></a><span class="result"> extends <a href="IOInstances0.html" class="extype" name="scalaz.effect.IOInstances0">IOInstances0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOInstances0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IOInstances0extendsIOInstances1"></a>
+      <a id="IOInstances0:IOInstances0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IOInstances0.html"><span class="name">IOInstances0</span></a><span class="result"> extends <a href="IOInstances1.html" class="extype" name="scalaz.effect.IOInstances1">IOInstances1</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOInstances1" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IOInstances1extendsAnyRef"></a>
+      <a id="IOInstances1:IOInstances1"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IOInstances1.html"><span class="name">IOInstances1</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IORef" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IORef[A]extendsAnyRef"></a>
+      <a id="IORef[A]:IORef[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IORef.html"><span class="name">IORef</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A mutable reference in the IO monad.</p>
+    </li><li name="scalaz.effect.IORefs" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IORefsextendsAnyRef"></a>
+      <a id="IORefs:IORefs"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IORefs.html"><span class="name">IORefs</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IOStd" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IOStdextendsAnyRef"></a>
+      <a id="IOStd:IOStd"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IOStd.html"><span class="name">IOStd</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">IO Actions for writing to standard output and and reading from standard input</p>
+    </li><li name="scalaz.effect.IoExceptionOr" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IoExceptionOr[A]extendsAnyRef"></a>
+      <a id="IoExceptionOr[A]:IoExceptionOr[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IoExceptionOr.html"><span class="name">IoExceptionOr</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IoExceptionOrFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IoExceptionOrFunctionsextendsAnyRef"></a>
+      <a id="IoExceptionOrFunctions:IoExceptionOrFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IoExceptionOrFunctions.html"><span class="name">IoExceptionOrFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IvoryTower" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IvoryTowerextendsAnyRef"></a>
+      <a id="IvoryTower:IvoryTower"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IvoryTower.html"><span class="name">IvoryTower</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IvoryTowers" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="IvoryTowersextendsAnyRef"></a>
+      <a id="IvoryTowers:IvoryTowers"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="IvoryTowers.html"><span class="name">IvoryTowers</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.KleisliCatchIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="KleisliCatchIO[M[_],R]extendsMonadCatchIO[[α]scalaz.Kleisli[M,R,α]]withKleisliLiftIO[M,R]withKleisliMonadReader[M,R]"></a>
+      <a id="KleisliCatchIO[M[_],R]:KleisliCatchIO[M,R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="KleisliCatchIO.html"><span class="name">KleisliCatchIO</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="R">R</span>]</span><span class="result"> extends <a href="MonadCatchIO.html" class="extype" name="scalaz.effect.MonadCatchIO">MonadCatchIO</a>[[α]<a href="../Kleisli.html" class="extype" name="scalaz.Kleisli">Kleisli</a>[<span class="extype" name="scalaz.effect.KleisliCatchIO.M">M</span>, <span class="extype" name="scalaz.effect.KleisliCatchIO.R">R</span>, <span class="extype" name="scalaz.effect.&lt;refinement&gt;.λ.α">α</span>]] with <a href="KleisliLiftIO.html" class="extype" name="scalaz.effect.KleisliLiftIO">KleisliLiftIO</a>[<span class="extype" name="scalaz.effect.KleisliCatchIO.M">M</span>, <span class="extype" name="scalaz.effect.KleisliCatchIO.R">R</span>] with <span class="extype" name="scalaz.KleisliMonadReader">KleisliMonadReader</span>[<span class="extype" name="scalaz.effect.KleisliCatchIO.M">M</span>, <span class="extype" name="scalaz.effect.KleisliCatchIO.R">R</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.KleisliEffectInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="KleisliEffectInstancesextendsKleisliEffectInstances0"></a>
+      <a id="KleisliEffectInstances:KleisliEffectInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="KleisliEffectInstances.html"><span class="name">KleisliEffectInstances</span></a><span class="result"> extends <a href="KleisliEffectInstances0.html" class="extype" name="scalaz.effect.KleisliEffectInstances0">KleisliEffectInstances0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.KleisliEffectInstances0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="KleisliEffectInstances0extendsKleisliEffectInstances1"></a>
+      <a id="KleisliEffectInstances0:KleisliEffectInstances0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="KleisliEffectInstances0.html"><span class="name">KleisliEffectInstances0</span></a><span class="result"> extends <a href="KleisliEffectInstances1.html" class="extype" name="scalaz.effect.KleisliEffectInstances1">KleisliEffectInstances1</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.KleisliEffectInstances1" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="KleisliEffectInstances1extendsKleisliInstances"></a>
+      <a id="KleisliEffectInstances1:KleisliEffectInstances1"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="KleisliEffectInstances1.html"><span class="name">KleisliEffectInstances1</span></a><span class="result"> extends <a href="../KleisliInstances.html" class="extype" name="scalaz.KleisliInstances">KleisliInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.KleisliLiftIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="KleisliLiftIO[M[_],R]extendsLiftIO[[α]scalaz.Kleisli[M,R,α]]"></a>
+      <a id="KleisliLiftIO[M[_],R]:KleisliLiftIO[M,R]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="KleisliLiftIO.html"><span class="name">KleisliLiftIO</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="R">R</span>]</span><span class="result"> extends <a href="LiftIO.html" class="extype" name="scalaz.effect.LiftIO">LiftIO</a>[[α]<a href="../Kleisli.html" class="extype" name="scalaz.Kleisli">Kleisli</a>[<span class="extype" name="scalaz.effect.KleisliLiftIO.M">M</span>, <span class="extype" name="scalaz.effect.KleisliLiftIO.R">R</span>, <span class="extype" name="scalaz.effect.&lt;refinement&gt;.λ.α">α</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.LiftControlIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftControlIO[F[_]]extendsAnyRef"></a>
+      <a id="LiftControlIO[F[_]]:LiftControlIO[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftControlIO.html"><span class="name">LiftControlIO</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt"></p>
+    </li><li name="scalaz.effect.LiftIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftIO[F[_]]extendsAnyRef"></a>
+      <a id="LiftIO[F[_]]:LiftIO[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftIO.html"><span class="name">LiftIO</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt"></p>
+    </li><li name="scalaz.effect.MonadCatchIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadCatchIO[M[_]]extendsMonadIO[M]"></a>
+      <a id="MonadCatchIO[M[_]]:MonadCatchIO[M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadCatchIO.html"><span class="name">MonadCatchIO</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="MonadIO.html" class="extype" name="scalaz.effect.MonadIO">MonadIO</a>[<span class="extype" name="scalaz.effect.MonadCatchIO.M">M</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.MonadCatchIOFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadCatchIOFunctionsextendsAnyRef"></a>
+      <a id="MonadCatchIOFunctions:MonadCatchIOFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadCatchIOFunctions.html"><span class="name">MonadCatchIOFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.MonadControlIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadControlIO[F[_]]extendsLiftControlIO[F]withMonad[F]"></a>
+      <a id="MonadControlIO[F[_]]:MonadControlIO[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadControlIO.html"><span class="name">MonadControlIO</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="LiftControlIO.html" class="extype" name="scalaz.effect.LiftControlIO">LiftControlIO</a>[<span class="extype" name="scalaz.effect.MonadControlIO.F">F</span>] with <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.effect.MonadControlIO.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt"></p>
+    </li><li name="scalaz.effect.MonadIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MonadIO[F[_]]extendsLiftIO[F]withMonad[F]"></a>
+      <a id="MonadIO[F[_]]:MonadIO[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadIO.html"><span class="name">MonadIO</span></a><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="LiftIO.html" class="extype" name="scalaz.effect.LiftIO">LiftIO</a>[<span class="extype" name="scalaz.effect.MonadIO.F">F</span>] with <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<span class="extype" name="scalaz.effect.MonadIO.F">F</span>]</span>
+      </span>
+      </h4>
+      <p class="comment cmt"></p>
+    </li><li name="scalaz.effect.RefCountedFinalizer" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RefCountedFinalizerextendsAnyRef"></a>
+      <a id="RefCountedFinalizer:RefCountedFinalizer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RefCountedFinalizer.html"><span class="name">RefCountedFinalizer</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RefCountedFinalizers" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RefCountedFinalizersextendsAnyRef"></a>
+      <a id="RefCountedFinalizers:RefCountedFinalizers"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RefCountedFinalizers.html"><span class="name">RefCountedFinalizers</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionT" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionT[S,P[_],A]extendsAnyRef"></a>
+      <a id="RegionT[S,P[_],A]:RegionT[S,P,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionT.html"><span class="name">RegionT</span></a><span class="tparams">[<span name="S">S</span>, <span name="P">P<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A monad transformer in which scarce resources can be opened.</p>
+    </li><li name="scalaz.effect.RegionTFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionTFunctionsextendsAnyRef"></a>
+      <a id="RegionTFunctions:RegionTFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionTFunctions.html"><span class="name">RegionTFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionTInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionTInstancesextendsRegionTInstances1"></a>
+      <a id="RegionTInstances:RegionTInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionTInstances.html"><span class="name">RegionTInstances</span></a><span class="result"> extends <a href="RegionTInstances1.html" class="extype" name="scalaz.effect.RegionTInstances1">RegionTInstances1</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionTInstances1" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionTInstances1extendsAnyRef"></a>
+      <a id="RegionTInstances1:RegionTInstances1"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionTInstances1.html"><span class="name">RegionTInstances1</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionTLiftIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionTLiftIO[S,M[_]]extendsLiftIO[[α]scalaz.effect.RegionT[S,M,α]]"></a>
+      <a id="RegionTLiftIO[S,M[_]]:RegionTLiftIO[S,M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionTLiftIO.html"><span class="name">RegionTLiftIO</span></a><span class="tparams">[<span name="S">S</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="LiftIO.html" class="extype" name="scalaz.effect.LiftIO">LiftIO</a>[[α]<a href="RegionT.html" class="extype" name="scalaz.effect.RegionT">RegionT</a>[<span class="extype" name="scalaz.effect.RegionTLiftIO.S">S</span>, <span class="extype" name="scalaz.effect.RegionTLiftIO.M">M</span>, <span class="extype" name="scalaz.effect.&lt;refinement&gt;.λ.α">α</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionTMonad" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="RegionTMonad[S,M[_]]extendsMonad[[α]scalaz.effect.RegionT[S,M,α]]"></a>
+      <a id="RegionTMonad[S,M[_]]:RegionTMonad[S,M]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionTMonad.html"><span class="name">RegionTMonad</span></a><span class="tparams">[<span name="S">S</span>, <span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result"> extends <a href="../Monad.html" class="extype" name="scalaz.Monad">Monad</a>[[α]<a href="RegionT.html" class="extype" name="scalaz.effect.RegionT">RegionT</a>[<span class="extype" name="scalaz.effect.RegionTMonad.S">S</span>, <span class="extype" name="scalaz.effect.RegionTMonad.M">M</span>, <span class="extype" name="scalaz.effect.&lt;refinement&gt;.λ.α">α</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.Resource" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Resource[F]extendsAnyRef"></a>
+      <a id="Resource[F]:Resource[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Resource.html"><span class="name">Resource</span></a><span class="tparams">[<span name="F">F</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt"></p>
+    </li><li name="scalaz.effect.ST" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ST[S,A]extendsAnyRef"></a>
+      <a id="ST[S,A]:ST[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ST.html"><span class="name">ST</span></a><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Purely functional mutable state threads.</p>
+    </li><li name="scalaz.effect.STArray" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STArray[S,A]extendsAnyRef"></a>
+      <a id="STArray[S,A]:STArray[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STArray.html"><span class="name">STArray</span></a><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Mutable array in state thread S containing values of type A.</p>
+    </li><li name="scalaz.effect.STArrayFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STArrayFunctionsextendsAnyRef"></a>
+      <a id="STArrayFunctions:STArrayFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STArrayFunctions.html"><span class="name">STArrayFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STFunctionsextendsAnyRef"></a>
+      <a id="STFunctions:STFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STFunctions.html"><span class="name">STFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STInstance0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STInstance0extendsAnyRef"></a>
+      <a id="STInstance0:STInstance0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STInstance0.html"><span class="name">STInstance0</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STInstancesextendsSTInstance0"></a>
+      <a id="STInstances:STInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STInstances.html"><span class="name">STInstances</span></a><span class="result"> extends <a href="STInstance0.html" class="extype" name="scalaz.effect.STInstance0">STInstance0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STRef" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STRef[S,A]extendsAnyRef"></a>
+      <a id="STRef[S,A]:STRef[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STRef.html"><span class="name">STRef</span></a><span class="tparams">[<span name="S">S</span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Mutable variable in state thread S containing a value of type A.</p>
+    </li><li name="scalaz.effect.STRefFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STRefFunctionsextendsAnyRef"></a>
+      <a id="STRefFunctions:STRefFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STRefFunctions.html"><span class="name">STRefFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STRefInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="STRefInstancesextendsAnyRef"></a>
+      <a id="STRefInstances:STRefInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="STRefInstances.html"><span class="name">STRefInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.SafeApp" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SafeAppextendsAnyRef"></a>
+      <a id="SafeApp:SafeApp"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SafeApp.html"><span class="name">SafeApp</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">A safe alternative to the <code>App</code> trait in the Scala standard library.</p>
+    </li><li name="scalaz.effect.StateTEffectInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StateTEffectInstancesextendsStateTEffectInstances0"></a>
+      <a id="StateTEffectInstances:StateTEffectInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StateTEffectInstances.html"><span class="name">StateTEffectInstances</span></a><span class="result"> extends <a href="StateTEffectInstances0.html" class="extype" name="scalaz.effect.StateTEffectInstances0">StateTEffectInstances0</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.StateTEffectInstances0" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StateTEffectInstances0extendsStateTInstances"></a>
+      <a id="StateTEffectInstances0:StateTEffectInstances0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StateTEffectInstances0.html"><span class="name">StateTEffectInstances0</span></a><span class="result"> extends <a href="../StateTInstances.html" class="extype" name="scalaz.StateTInstances">StateTInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.StateTLiftIO" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StateTLiftIO[M[_],S]extendsLiftIO[[α]scalaz.IndexedStateT[M,S,S,α]]"></a>
+      <a id="StateTLiftIO[M[_],S]:StateTLiftIO[M,S]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StateTLiftIO.html"><span class="name">StateTLiftIO</span></a><span class="tparams">[<span name="M">M<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="S">S</span>]</span><span class="result"> extends <a href="LiftIO.html" class="extype" name="scalaz.effect.LiftIO">LiftIO</a>[[α]<a href="../IndexedStateT.html" class="extype" name="scalaz.IndexedStateT">IndexedStateT</a>[<span class="extype" name="scalaz.effect.StateTLiftIO.M">M</span>, <span class="extype" name="scalaz.effect.StateTLiftIO.S">S</span>, <span class="extype" name="scalaz.effect.StateTLiftIO.S">S</span>, <span class="extype" name="scalaz.effect.&lt;refinement&gt;.λ.α">α</span>]]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalaz.effect.Dup" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Dup"></a>
+      <a id="Dup:Dup"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Dup$.html"><span class="name">Dup</span></a><span class="result"> extends <a href="DupFunctions.html" class="extype" name="scalaz.effect.DupFunctions">DupFunctions</a> with <a href="DupInstances.html" class="extype" name="scalaz.effect.DupInstances">DupInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.Effect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Effect"></a>
+      <a id="Effect:Effect"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Effect$.html"><span class="name">Effect</span></a><span class="result"> extends <a href="Effects.html" class="extype" name="scalaz.effect.Effects">Effects</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.FinalizerHandle" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="FinalizerHandle"></a>
+      <a id="FinalizerHandle:FinalizerHandle"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="FinalizerHandle$.html"><span class="name">FinalizerHandle</span></a><span class="result"> extends <a href="FinalizerHandleFunctions.html" class="extype" name="scalaz.effect.FinalizerHandleFunctions">FinalizerHandleFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IO"></a>
+      <a id="IO:IO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IO$.html"><span class="name">IO</span></a><span class="result"> extends <a href="IOFunctions.html" class="extype" name="scalaz.effect.IOFunctions">IOFunctions</a> with <a href="IOInstances.html" class="extype" name="scalaz.effect.IOInstances">IOInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IORef" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IORef"></a>
+      <a id="IORef:IORef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IORef$.html"><span class="name">IORef</span></a><span class="result"> extends <a href="IORefs.html" class="extype" name="scalaz.effect.IORefs">IORefs</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IoExceptionOr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IoExceptionOr"></a>
+      <a id="IoExceptionOr:IoExceptionOr"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IoExceptionOr$.html"><span class="name">IoExceptionOr</span></a><span class="result"> extends <a href="IoExceptionOrFunctions.html" class="extype" name="scalaz.effect.IoExceptionOrFunctions">IoExceptionOrFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.IvoryTower" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="IvoryTower"></a>
+      <a id="IvoryTower:IvoryTower"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="IvoryTower$.html"><span class="name">IvoryTower</span></a><span class="result"> extends <a href="IvoryTowers.html" class="extype" name="scalaz.effect.IvoryTowers">IvoryTowers</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.LiftControlIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LiftControlIO"></a>
+      <a id="LiftControlIO:LiftControlIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftControlIO$.html"><span class="name">LiftControlIO</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.LiftIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LiftIO"></a>
+      <a id="LiftIO:LiftIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="LiftIO$.html"><span class="name">LiftIO</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.MonadCatchIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MonadCatchIO"></a>
+      <a id="MonadCatchIO:MonadCatchIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadCatchIO$.html"><span class="name">MonadCatchIO</span></a><span class="result"> extends <a href="MonadCatchIOFunctions.html" class="extype" name="scalaz.effect.MonadCatchIOFunctions">MonadCatchIOFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.MonadControlIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MonadControlIO"></a>
+      <a id="MonadControlIO:MonadControlIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadControlIO$.html"><span class="name">MonadControlIO</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.MonadIO" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MonadIO"></a>
+      <a id="MonadIO:MonadIO"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MonadIO$.html"><span class="name">MonadIO</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RefCountedFinalizer" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RefCountedFinalizer"></a>
+      <a id="RefCountedFinalizer:RefCountedFinalizer"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RefCountedFinalizer$.html"><span class="name">RefCountedFinalizer</span></a><span class="result"> extends <a href="RefCountedFinalizers.html" class="extype" name="scalaz.effect.RefCountedFinalizers">RefCountedFinalizers</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.RegionT" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RegionT"></a>
+      <a id="RegionT:RegionT"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="RegionT$.html"><span class="name">RegionT</span></a><span class="result"> extends <a href="RegionTFunctions.html" class="extype" name="scalaz.effect.RegionTFunctions">RegionTFunctions</a> with <a href="RegionTInstances.html" class="extype" name="scalaz.effect.RegionTInstances">RegionTInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.Resource" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Resource"></a>
+      <a id="Resource:Resource"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Resource$.html"><span class="name">Resource</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.ST" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ST"></a>
+      <a id="ST:ST"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ST$.html"><span class="name">ST</span></a><span class="result"> extends <a href="STFunctions.html" class="extype" name="scalaz.effect.STFunctions">STFunctions</a> with <a href="STInstances.html" class="extype" name="scalaz.effect.STInstances">STInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STArray" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="STArray"></a>
+      <a id="STArray:STArray"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="STArray$.html"><span class="name">STArray</span></a><span class="result"> extends <a href="STArrayFunctions.html" class="extype" name="scalaz.effect.STArrayFunctions">STArrayFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.STRef" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="STRef"></a>
+      <a id="STRef:STRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="STRef$.html"><span class="name">STRef</span></a><span class="result"> extends <a href="STRefFunctions.html" class="extype" name="scalaz.effect.STRefFunctions">STRefFunctions</a> with <a href="STRefInstances.html" class="extype" name="scalaz.effect.STRefInstances">STRefInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.kleisliEffect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="kleisliEffect"></a>
+      <a id="kleisliEffect:kleisliEffect"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="kleisliEffect$.html"><span class="name">kleisliEffect</span></a><span class="result"> extends <a href="KleisliEffectInstances.html" class="extype" name="scalaz.effect.KleisliEffectInstances">KleisliEffectInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.effect.stateTEffect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stateTEffect"></a>
+      <a id="stateTEffect:stateTEffect"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="stateTEffect$.html"><span class="name">stateTEffect</span></a><span class="result"> extends <a href="StateTEffectInstances.html" class="extype" name="scalaz.effect.StateTEffectInstances">StateTEffectInstances</a></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>

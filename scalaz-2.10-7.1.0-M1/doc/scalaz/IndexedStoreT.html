@@ -1,0 +1,712 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>IndexedStoreT - scalaz.IndexedStoreT</title>
+          <meta name="description" content="IndexedStoreT - scalaz.IndexedStoreT" />
+          <meta name="keywords" content="IndexedStoreT scalaz.IndexedStoreT" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.IndexedStoreT';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="IndexedStoreT$.html" title="Go to companion"><img src="../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="IndexedStoreT$.html" title="Go to companion">IndexedStoreT</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">IndexedStoreT</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="I">+I</span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.1.0-M1/core/src/main/scala/scalaz/StoreT.scala" target="_blank">StoreT.scala</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="package.html#Lens[A,B]=scalaz.LensFamily[A,A,B,B]" class="extmbr" name="scalaz.Lens">scalaz.Lens</a>
+</p></span></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.IndexedStoreT"><span>IndexedStoreT</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="scalaz.IndexedStoreT#run" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="run:(F[A=&gt;B],I)"></a>
+      <a id="run:(F[(A)⇒B],I)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">run</span><span class="result">: (<span class="extype" name="scalaz.IndexedStoreT.F">F</span>[(<span class="extype" name="scalaz.IndexedStoreT.A">A</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.B">B</span>], <span class="extype" name="scalaz.IndexedStoreT.I">I</span>)</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#***" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="***[J,C,D](that:scalaz.IndexedStoreT[F,J,C,D])(implicitM:scalaz.Bind[F]):scalaz.IndexedStoreT[F,(I,J),(A,C),(B,D)]"></a>
+      <a id="***[J,C,D](IndexedStoreT[F,J,C,D])(Bind[F]):IndexedStoreT[F,(I,J),(A,C),(B,D)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $times$times$times" class="name">***</span><span class="tparams">[<span name="J">J</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.***.J">J</span>, <span class="extype" name="scalaz.IndexedStoreT.***.C">C</span>, <span class="extype" name="scalaz.IndexedStoreT.***.D">D</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.***.J">J</span>), (<span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.***.C">C</span>), (<span class="extype" name="scalaz.IndexedStoreT.B">B</span>, <span class="extype" name="scalaz.IndexedStoreT.***.D">D</span>)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">alias for <code>product</code></p>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#bimap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bimap[X,Y](f:I=&gt;X)(g:B=&gt;Y)(implicitF:scalaz.Functor[F]):scalaz.IndexedStoreT[F,X,A,Y]"></a>
+      <a id="bimap[X,Y]((I)⇒X)((B)⇒Y)(Functor[F]):IndexedStoreT[F,X,A,Y]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bimap</span><span class="tparams">[<span name="X">X</span>, <span name="Y">Y</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.bimap.X">X</span></span>)</span><span class="params">(<span name="g">g: (<span class="extype" name="scalaz.IndexedStoreT.B">B</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.bimap.Y">Y</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.bimap.X">X</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.bimap.Y">Y</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#bmap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="bmap[X,Z&gt;:I&lt;:A](b:scalaz.BijectionT.Bijection[Z,X])(implicitF:scalaz.Functor[F]):scalaz.StoreT[F,X,B]"></a>
+      <a id="bmap[X,Z&lt;:A&gt;:I](BijectionT.Bijection[Z,X])(Functor[F]):StoreT[F,X,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">bmap</span><span class="tparams">[<span name="X">X</span>, <span name="Z">Z &gt;: <span class="extype" name="scalaz.IndexedStoreT.I">I</span> &lt;: <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>]</span><span class="params">(<span name="b">b: <a href="BijectionT$.html#Bijection[A,B]=scalaz.BijectionT[scalaz.Id.Id,scalaz.Id.Id,A,B]" class="extmbr" name="scalaz.BijectionT.Bijection">BijectionT.Bijection</a>[<span class="extype" name="scalaz.IndexedStoreT.bmap.Z">Z</span>, <span class="extype" name="scalaz.IndexedStoreT.bmap.X">X</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="package.html#StoreT[F[_],A,B]=scalaz.IndexedStoreT[F,A,A,B]" class="extmbr" name="scalaz.StoreT">StoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.bmap.X">X</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#cobind" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="cobind[K,C](f:scalaz.IndexedStoreT[F,K,A,B]=&gt;C)(implicitF:scalaz.Cobind[F]):scalaz.IndexedStoreT[F,I,K,C]"></a>
+      <a id="cobind[K,C]((IndexedStoreT[F,K,A,B])⇒C)(Cobind[F]):IndexedStoreT[F,I,K,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cobind</span><span class="tparams">[<span name="K">K</span>, <span name="C">C</span>]</span><span class="params">(<span name="f">f: (<a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.cobind.K">K</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]) ⇒ <span class="extype" name="scalaz.IndexedStoreT.cobind.C">C</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Cobind.html" class="extype" name="scalaz.Cobind">Cobind</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.cobind.K">K</span>, <span class="extype" name="scalaz.IndexedStoreT.cobind.C">C</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#contramap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="contramap[X](g:X=&gt;A)(implicitF:scalaz.Functor[F]):scalaz.IndexedStoreT[F,I,X,B]"></a>
+      <a id="contramap[X]((X)⇒A)(Functor[F]):IndexedStoreT[F,I,X,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">contramap</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="g">g: (<span class="extype" name="scalaz.IndexedStoreT.contramap.X">X</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.contramap.X">X</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#copoint" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="copoint(implicitF:scalaz.Comonad[F],implicitev:&lt;:&lt;[I,A]):B"></a>
+      <a id="copoint(Comonad[F],&lt;:&lt;[I,A]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">copoint</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>, <span name="ev">ev: <span class="extype" name="scala.Predef.&lt;:&lt;">&lt;:&lt;</span>[<span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#duplicate" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="duplicate[J](implicitF:scalaz.Comonad[F]):scalaz.IndexedStoreT[F,I,J,scalaz.IndexedStoreT[F,J,A,B]]"></a>
+      <a id="duplicate[J](Comonad[F]):IndexedStoreT[F,I,J,IndexedStoreT[F,J,A,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">duplicate</span><span class="tparams">[<span name="J">J</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.duplicate.J">J</span>, <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.duplicate.J">J</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#experiment" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="experiment[G[_]](f:I=&gt;G[A])(implicitF:scalaz.Comonad[F],implicitG:scalaz.Functor[G]):G[B]"></a>
+      <a id="experiment[G[_]]((I)⇒G[A])(Comonad[F],Functor[G]):G[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">experiment</span><span class="tparams">[<span name="G">G<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.experiment.G">G</span>[<span class="extype" name="scalaz.IndexedStoreT.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>, <span name="G">G: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.experiment.G">G</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.experiment.G">G</span>[<span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#imap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="imap[X](f:I=&gt;X):scalaz.IndexedStoreT[F,X,A,B]"></a>
+      <a id="imap[X]((I)⇒X):IndexedStoreT[F,X,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">imap</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.imap.X">X</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.imap.X">X</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#leftMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="leftMap[X](f:I=&gt;X):scalaz.IndexedStoreT[F,X,A,B]"></a>
+      <a id="leftMap[X]((I)⇒X):IndexedStoreT[F,X,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leftMap</span><span class="tparams">[<span name="X">X</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.leftMap.X">X</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.leftMap.X">X</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#map" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="map[C](f:B=&gt;C)(implicitftr:scalaz.Functor[F]):scalaz.IndexedStoreT[F,I,A,C]"></a>
+      <a id="map[C]((B)⇒C)(Functor[F]):IndexedStoreT[F,I,A,C]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="C">C</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.B">B</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.map.C">C</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ftr">ftr: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.map.C">C</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#peek" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="peek(a:A)(implicitF:scalaz.Comonad[F]):B"></a>
+      <a id="peek(A)(Comonad[F]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">peek</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#peeks" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="peeks(f:I=&gt;A)(implicitF:scalaz.Comonad[F]):B"></a>
+      <a id="peeks((I)⇒A)(Comonad[F]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">peeks</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Comonad.html" class="extype" name="scalaz.Comonad">Comonad</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#pos" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="pos:I"></a>
+      <a id="pos:I"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pos</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.I">I</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#product" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="product[J,C,D](that:scalaz.IndexedStoreT[F,J,C,D])(implicitM:scalaz.Bind[F]):scalaz.IndexedStoreT[F,(I,J),(A,C),(B,D)]"></a>
+      <a id="product[J,C,D](IndexedStoreT[F,J,C,D])(Bind[F]):IndexedStoreT[F,(I,J),(A,C),(B,D)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">product</span><span class="tparams">[<span name="J">J</span>, <span name="C">C</span>, <span name="D">D</span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.product.J">J</span>, <span class="extype" name="scalaz.IndexedStoreT.product.C">C</span>, <span class="extype" name="scalaz.IndexedStoreT.product.D">D</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="M">M: <a href="Bind.html" class="extype" name="scalaz.Bind">Bind</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>, <span class="extype" name="scalaz.IndexedStoreT.product.J">J</span>), (<span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.product.C">C</span>), (<span class="extype" name="scalaz.IndexedStoreT.B">B</span>, <span class="extype" name="scalaz.IndexedStoreT.product.D">D</span>)]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Two disjoint lenses can be paired</p>
+    </li><li name="scalaz.IndexedStoreT#put" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="put(a:A)(implicitF:scalaz.Functor[F]):F[B]"></a>
+      <a id="put(A)(Functor[F]):F[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">put</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.F">F</span>[<span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#puts" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="puts(f:I=&gt;A)(implicitF:scalaz.Functor[F]):F[B]"></a>
+      <a id="puts((I)⇒A)(Functor[F]):F[B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">puts</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.F">F</span>[<span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#seek" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="seek[J](j:J):scalaz.IndexedStoreT[F,J,A,B]"></a>
+      <a id="seek[J](J):IndexedStoreT[F,J,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">seek</span><span class="tparams">[<span name="J">J</span>]</span><span class="params">(<span name="j">j: <span class="extype" name="scalaz.IndexedStoreT.seek.J">J</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.seek.J">J</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#seeks" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="seeks[J](f:I=&gt;J):scalaz.IndexedStoreT[F,J,A,B]"></a>
+      <a id="seeks[J]((I)⇒J):IndexedStoreT[F,J,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">seeks</span><span class="tparams">[<span name="J">J</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.seeks.J">J</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.seeks.J">J</span>, <span class="extype" name="scalaz.IndexedStoreT.A">A</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.IndexedStoreT#set" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="set:F[A=&gt;B]"></a>
+      <a id="set:F[(A)⇒B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">set</span><span class="result">: <span class="extype" name="scalaz.IndexedStoreT.F">F</span>[(<span class="extype" name="scalaz.IndexedStoreT.A">A</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.IndexedStoreT#xmap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="xmap[X1,X2](f:I=&gt;X1)(g:X2=&gt;A)(implicitF:scalaz.Functor[F]):scalaz.IndexedStoreT[F,X1,X2,B]"></a>
+      <a id="xmap[X1,X2]((I)⇒X1)((X2)⇒A)(Functor[F]):IndexedStoreT[F,X1,X2,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">xmap</span><span class="tparams">[<span name="X1">X1</span>, <span name="X2">X2</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.IndexedStoreT.I">I</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.xmap.X1">X1</span></span>)</span><span class="params">(<span name="g">g: (<span class="extype" name="scalaz.IndexedStoreT.xmap.X2">X2</span>) ⇒ <span class="extype" name="scalaz.IndexedStoreT.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="F">F: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.IndexedStoreT">IndexedStoreT</a>[<span class="extype" name="scalaz.IndexedStoreT.F">F</span>, <span class="extype" name="scalaz.IndexedStoreT.xmap.X1">X1</span>, <span class="extype" name="scalaz.IndexedStoreT.xmap.X2">X2</span>, <span class="extype" name="scalaz.IndexedStoreT.B">B</span>]</span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

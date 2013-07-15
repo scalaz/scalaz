@@ -1,0 +1,924 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>FingerTree - scalaz.FingerTree</title>
+          <meta name="description" content="FingerTree - scalaz.FingerTree" />
+          <meta name="keywords" content="FingerTree scalaz.FingerTree" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.FingerTree';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="FingerTree$.html" title="Go to companion"><img src="../lib/class_to_object_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="FingerTree$.html" title="Go to companion">FingerTree</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FingerTree</span><span class="tparams">[<span name="V">V</span>, <span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Finger trees with leaves of type A and Nodes that are annotated with type V.</p><p>Finger Trees provide a base for implementations of various collection types,
+as described in &quot;Finger trees: a simple general-purpose data structure&quot;, by
+Ralf Hinze and Ross Paterson.
+A gentle introduction is presented in the blog post &quot;Monoids and Finger Trees&quot; by Heinrich Apfelmus.</p><p>This is done by choosing a a suitable type to annotate the nodes. For example,
+a binary tree can be implemented by annotating each node with the size of its subtree,
+while a priority queue can be implemented by labelling the nodes by the minimum priority of its children.</p><p>The operations on FingerTree enforce the constraint measured (in the form of a Reducer instance).</p><p>Finger Trees have excellent (amortized) asymptotic performance:</p><ul><li>Access to the first and last elements is <code>O(1)</code></li><li>Appending/prepending a single value is <code>O(1)</code></li><li>Concatenating two trees is <code>(O lg min(l1, l2))</code> where <code>l1</code> and <code>l2</code> are their sizes</li><li>Random access to an element at <code>n</code> is <code>O(lg min(n, l - n))</code>, where <code>l</code> is the size of the tree.</li><li>Constructing a tree with n copies of a value is O(lg n).
+</li></ul></div><dl class="paramcmts block"><dt class="tparam">V</dt><dd class="cmt"><p>The type of the annotations of the nodes (the <b>measure</b>)</p></dd><dt class="tparam">A</dt><dd class="cmt"><p>The type of the elements stored at the leaves
+</p></dd></dl><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.1.0-M1/core/src/main/scala/scalaz/FingerTree.scala" target="_blank">FingerTree.scala</a></dd><dt>See also</dt><dd><span class="cmt"><p><a href="http://apfelmus.nfshost.com/articles/monoid-fingertree.html" target="_blank">http://apfelmus.nfshost.com/articles/monoid-fingertree.html</a>
+</p></span><span class="cmt"><p><a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf" target="_blank">Finger trees: a simple general-purpose data structure</a></p></span></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.FingerTree"><span>FingerTree</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="scalaz.FingerTree#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;()(implicitmeasurer:scalaz.Reducer[A,V]):scalaz.FingerTree[V,A]"></a>
+      <a id="&lt;init&gt;:FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">FingerTree</span><span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="measurer">measurer: <a href="Reducer.html" class="extype" name="scalaz.Reducer">Reducer</a>[<span class="extype" name="scalaz.FingerTree.A">A</span>, <span class="extype" name="scalaz.FingerTree.V">V</span>]</span>)</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt"></p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="scalaz.FingerTree#fold" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="fold[B](empty:V=&gt;B,single:(V,A)=&gt;B,deep:(V,scalaz.Finger[V,A],=&gt;scalaz.FingerTree[V,scalaz.Node[V,A]],scalaz.Finger[V,A])=&gt;B):B"></a>
+      <a id="fold[B]((V)⇒B,(V,A)⇒B,(V,Finger[V,A],⇒FingerTree[V,Node[V,A]],Finger[V,A])⇒B):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fold</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="empty">empty: (<span class="extype" name="scalaz.FingerTree.V">V</span>) ⇒ <span class="extype" name="scalaz.FingerTree.fold.B">B</span></span>, <span name="single">single: (<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scalaz.FingerTree.fold.B">B</span></span>, <span name="deep">deep: (<span class="extype" name="scalaz.FingerTree.V">V</span>, <a href="Finger.html" class="extype" name="scalaz.Finger">Finger</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>], ⇒ <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <a href="Node.html" class="extype" name="scalaz.Node">Node</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]], <a href="Finger.html" class="extype" name="scalaz.Finger">Finger</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]) ⇒ <span class="extype" name="scalaz.FingerTree.fold.B">B</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.fold.B">B</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Fold over the structure of the tree.</p><div class="fullcomment"><div class="comment cmt"><p>Fold over the structure of the tree. The given functions correspond to the three possible variations of the finger tree.
+</p></div><dl class="paramcmts block"><dt class="param">empty</dt><dd class="cmt"><p>if the tree is empty, convert the measure to a <code>B</code></p></dd><dt class="param">single</dt><dd class="cmt"><p>if the tree contains a single element, convert the measure and this element to a <code>B</code></p></dd><dt class="param">deep</dt><dd class="cmt"><p>otherwise, convert the measure, the two fingers, and the sub tree to a <code>B</code>.
+</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.FingerTree#+:" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="+:(a:=&gt;A):scalaz.FingerTree[V,A]"></a>
+      <a id="+:(⇒A):FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $plus$colon" class="name">+:</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Prepends an element to the left of the tree.</p><div class="fullcomment"><div class="comment cmt"><p>Prepends an element to the left of the tree. O(1).</p></div></div>
+    </li><li name="scalaz.FingerTree#:+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id=":+(a:=&gt;A):scalaz.FingerTree[V,A]"></a>
+      <a id=":+(⇒A):FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $colon$plus" class="name">:+</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Appends an element to the right of the tree.</p><div class="fullcomment"><div class="comment cmt"><p>Appends an element to the right of the tree. O(1).</p></div></div>
+    </li><li name="scalaz.FingerTree#:-|" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id=":-|(a:=&gt;A):scalaz.FingerTree[V,A]"></a>
+      <a id=":-|(⇒A):FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $colon$minus$bar" class="name">:-|</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Replace the last element of the tree with the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Replace the last element of the tree with the given value. O(1)</p></div></div>
+    </li><li name="scalaz.FingerTree#&lt;++&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;++&gt;(right:scalaz.FingerTree[V,A]):scalaz.FingerTree[V,A]"></a>
+      <a id="&lt;++&gt;(FingerTree[V,A]):FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $less$plus$plus$greater" class="name">&lt;++&gt;</span><span class="params">(<span name="right">right: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Appends the given finger tree to the right of this tree.</p>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.FingerTree#add1" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="add1(n:A,right:=&gt;FingerTree.this.ATree):FingerTree.this.ATree"></a>
+      <a id="add1(A,⇒ATree):ATree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">add1</span><span class="params">(<span name="n">n: <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="right">right: ⇒ <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#add2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="add2(n1:=&gt;A,n2:=&gt;A,right:=&gt;FingerTree.this.ATree):FingerTree.this.ATree"></a>
+      <a id="add2(⇒A,⇒A,⇒ATree):ATree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">add2</span><span class="params">(<span name="n1">n1: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n2">n2: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="right">right: ⇒ <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#add3" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="add3(n1:=&gt;A,n2:=&gt;A,n3:=&gt;A,right:=&gt;FingerTree.this.ATree):FingerTree.this.ATree"></a>
+      <a id="add3(⇒A,⇒A,⇒A,⇒ATree):ATree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">add3</span><span class="params">(<span name="n1">n1: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n2">n2: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n3">n3: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="right">right: ⇒ <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#add4" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="add4(n1:=&gt;A,n2:=&gt;A,n3:=&gt;A,n4:=&gt;A,right:=&gt;FingerTree.this.ATree):FingerTree.this.ATree"></a>
+      <a id="add4(⇒A,⇒A,⇒A,⇒A,⇒ATree):ATree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">add4</span><span class="params">(<span name="n1">n1: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n2">n2: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n3">n3: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="n4">n4: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="right">right: ⇒ <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.ATree">ATree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#addDigits0" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addDigits0(m1:=&gt;FingerTree.this.NodeTree,dig1:=&gt;FingerTree.this.AFinger,dig2:=&gt;FingerTree.this.AFinger,m2:=&gt;FingerTree.this.NodeTree):FingerTree.this.NodeTree"></a>
+      <a id="addDigits0(⇒NodeTree,⇒AFinger,⇒AFinger,⇒NodeTree):NodeTree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addDigits0</span><span class="params">(<span name="m1">m1: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>, <span name="dig1">dig1: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="dig2">dig2: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="m2">m2: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#addDigits1" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addDigits1(m1:=&gt;FingerTree.this.NodeTree,d1:=&gt;FingerTree.this.AFinger,x:=&gt;A,d2:=&gt;FingerTree.this.AFinger,m2:=&gt;FingerTree.this.NodeTree):FingerTree.this.NodeTree"></a>
+      <a id="addDigits1(⇒NodeTree,⇒AFinger,⇒A,⇒AFinger,⇒NodeTree):NodeTree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addDigits1</span><span class="params">(<span name="m1">m1: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>, <span name="d1">d1: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="x">x: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="d2">d2: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="m2">m2: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#addDigits2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addDigits2(m1:=&gt;FingerTree.this.NodeTree,d1:=&gt;FingerTree.this.AFinger,x:=&gt;A,y:=&gt;A,d2:=&gt;FingerTree.this.AFinger,m2:=&gt;FingerTree.this.NodeTree):FingerTree.this.NodeTree"></a>
+      <a id="addDigits2(⇒NodeTree,⇒AFinger,⇒A,⇒A,⇒AFinger,⇒NodeTree):NodeTree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addDigits2</span><span class="params">(<span name="m1">m1: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>, <span name="d1">d1: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="x">x: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="y">y: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="d2">d2: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="m2">m2: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#addDigits3" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addDigits3(m1:=&gt;FingerTree.this.NodeTree,d1:=&gt;FingerTree.this.AFinger,x:=&gt;A,y:=&gt;A,z:=&gt;A,d2:=&gt;FingerTree.this.AFinger,m2:=&gt;FingerTree.this.NodeTree):FingerTree.this.NodeTree"></a>
+      <a id="addDigits3(⇒NodeTree,⇒AFinger,⇒A,⇒A,⇒A,⇒AFinger,⇒NodeTree):NodeTree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addDigits3</span><span class="params">(<span name="m1">m1: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>, <span name="d1">d1: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="x">x: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="y">y: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="z">z: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="d2">d2: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="m2">m2: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#addDigits4" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addDigits4(m1:=&gt;FingerTree.this.NodeTree,d1:=&gt;FingerTree.this.AFinger,x:=&gt;A,y:=&gt;A,z:=&gt;A,w:=&gt;A,d2:=&gt;FingerTree.this.AFinger,m2:=&gt;FingerTree.this.NodeTree):FingerTree.this.NodeTree"></a>
+      <a id="addDigits4(⇒NodeTree,⇒AFinger,⇒A,⇒A,⇒A,⇒A,⇒AFinger,⇒NodeTree):NodeTree"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addDigits4</span><span class="params">(<span name="m1">m1: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>, <span name="d1">d1: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="x">x: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="y">y: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="z">z: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="w">w: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>, <span name="d2">d2: ⇒ <span class="extype" name="scalaz.FingerTree.AFinger">AFinger</span></span>, <span name="m2">m2: ⇒ <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.NodeTree">NodeTree</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.FingerTree#foldLeft" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foldLeft[B](b:B)(f:(B,A)=&gt;B):B"></a>
+      <a id="foldLeft[B](B)((B,A)⇒B):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldLeft</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="b">b: <span class="extype" name="scalaz.FingerTree.foldLeft.B">B</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.foldLeft.B">B</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scalaz.FingerTree.foldLeft.B">B</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.foldLeft.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#foldMap" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foldMap[B](f:A=&gt;B)(implicits:scalaz.Monoid[B]):B"></a>
+      <a id="foldMap[B]((A)⇒B)(Monoid[B]):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldMap</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scalaz.FingerTree.foldMap.B">B</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="s">s: <a href="Monoid.html" class="extype" name="scalaz.Monoid">Monoid</a>[<span class="extype" name="scalaz.FingerTree.foldMap.B">B</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.foldMap.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#foldRight" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foldRight[B](z:=&gt;B)(f:(A,=&gt;B)=&gt;B):B"></a>
+      <a id="foldRight[B](⇒B)((A,⇒B)⇒B):B"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foldRight</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="z">z: ⇒ <span class="extype" name="scalaz.FingerTree.foldRight.B">B</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.A">A</span>, ⇒ <span class="extype" name="scalaz.FingerTree.foldRight.B">B</span>) ⇒ <span class="extype" name="scalaz.FingerTree.foldRight.B">B</span></span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.foldRight.B">B</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#foreach" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="foreach(f:A=&gt;Unit):Unit"></a>
+      <a id="foreach((A)⇒Unit):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foreach</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Execute the provided side effect for each element in the tree.</p>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.FingerTree#head" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="head:A"></a>
+      <a id="head:A"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">head</span><span class="result">: <span class="extype" name="scalaz.FingerTree.A">A</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Selects the first element in the tree.</p><div class="fullcomment"><div class="comment cmt"><p>Selects the first element in the tree.
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt">if<p>the tree is empty
+</p></span></dd></dl></div>
+    </li><li name="scalaz.FingerTree#init" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="init:scalaz.FingerTree[V,A]"></a>
+      <a id="init:FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">init</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Selects a subtree containing all elements except the last
+</p><div class="fullcomment"><div class="comment cmt"><p>Selects a subtree containing all elements except the last
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt">if<p>the tree is empty
+</p></span></dd></dl></div>
+    </li><li name="scalaz.FingerTree#isEmpty" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="isEmpty:Boolean"></a>
+      <a id="isEmpty:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isEmpty</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.FingerTree#iterator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="iterator:Iterator[A]"></a>
+      <a id="iterator:Iterator[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">iterator</span><span class="result">: <span class="extype" name="scala.collection.Iterator">Iterator</span>[<span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iterator that visits each element in the tree.</p>
+    </li><li name="scalaz.FingerTree#last" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="last:A"></a>
+      <a id="last:A"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">last</span><span class="result">: <span class="extype" name="scalaz.FingerTree.A">A</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Selects the last element in the tree.</p><div class="fullcomment"><div class="comment cmt"><p>Selects the last element in the tree.
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt">if<p>the tree is empty
+</p></span></dd></dl></div>
+    </li><li name="scalaz.FingerTree#map" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="map[B,V2](f:A=&gt;B)(implicitm:scalaz.Reducer[B,V2]):scalaz.FingerTree[V2,B]"></a>
+      <a id="map[B,V2]((A)⇒B)(Reducer[B,V2]):FingerTree[V2,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="B">B</span>, <span name="V2">V2</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scalaz.FingerTree.map.B">B</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="m">m: <a href="Reducer.html" class="extype" name="scalaz.Reducer">Reducer</a>[<span class="extype" name="scalaz.FingerTree.map.B">B</span>, <span class="extype" name="scalaz.FingerTree.map.V2">V2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.map.V2">V2</span>, <span class="extype" name="scalaz.FingerTree.map.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Maps the given function across the tree, annotating nodes in the resulting tree according to the provided <code>Reducer</code>.</p>
+    </li><li name="scalaz.FingerTree#measure" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="measure:V"></a>
+      <a id="measure:V"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">measure</span><span class="result">: <span class="extype" name="scalaz.FingerTree.V">V</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.FingerTree#reverseIterator" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="reverseIterator:Iterator[A]"></a>
+      <a id="reverseIterator:Iterator[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reverseIterator</span><span class="result">: <span class="extype" name="scala.collection.Iterator">Iterator</span>[<span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">An iterator that visits each element in the tree in reverse order.</p>
+    </li><li name="scalaz.FingerTree#split" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="split(pred:V=&gt;Boolean):(scalaz.FingerTree[V,A],scalaz.FingerTree[V,A])"></a>
+      <a id="split((V)⇒Boolean):(FingerTree[V,A],FingerTree[V,A])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">split</span><span class="params">(<span name="pred">pred: (<span class="extype" name="scalaz.FingerTree.V">V</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: (<a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>], <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>])</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Splits this tree into a pair of subtrees at the point where the given predicate, based on the measure,
+changes from <code>true</code> to <code>false</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Splits this tree into a pair of subtrees at the point where the given predicate, based on the measure,
+changes from <code>true</code> to <code>false</code>. O(log(min(i,n-i)))
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p><code>(as, bs)</code> <code>as</code>: the subtree containing elements before the point where <code>pred</code> first holds
+                   <code>fs</code> the subtree containing element at and after the point where <code>pred</code> first holds. Empty if <code>pred</code> never holds.
+</p></dd></dl></div>
+    </li><li name="scalaz.FingerTree#split1" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="split1(pred:V=&gt;Boolean):(scalaz.FingerTree[V,A],A,scalaz.FingerTree[V,A])"></a>
+      <a id="split1((V)⇒Boolean):(FingerTree[V,A],A,FingerTree[V,A])"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">split1</span><span class="params">(<span name="pred">pred: (<span class="extype" name="scalaz.FingerTree.V">V</span>) ⇒ <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: (<a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>], <span class="extype" name="scalaz.FingerTree.A">A</span>, <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>])</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like <code>split</code>, but returns the element where <code>pred</code> first holds separately
+</p><div class="fullcomment"><div class="comment cmt"><p>Like <code>split</code>, but returns the element where <code>pred</code> first holds separately
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt">if<p>the tree is empty.
+</p></span></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.FingerTree#tail" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="tail:scalaz.FingerTree[V,A]"></a>
+      <a id="tail:FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">tail</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Selects a subtree containing all elements except the first
+</p><div class="fullcomment"><div class="comment cmt"><p>Selects a subtree containing all elements except the first
+</p></div><dl class="attributes block"> <dt>Exceptions thrown</dt><dd><span class="cmt">if<p>the tree is empty
+</p></span></dd></dl></div>
+    </li><li name="scalaz.FingerTree#toList" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toList:List[A]"></a>
+      <a id="toList:List[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toList</span><span class="result">: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert the leaves of the tree to a <code>scala.List</code></p>
+    </li><li name="scalaz.FingerTree#toStream" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toStream:Stream[A]"></a>
+      <a id="toStream:Stream[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toStream</span><span class="result">: <span class="extype" name="scala.Stream">Stream</span>[<span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert the leaves of the tree to a <code>scala.Stream</code></p>
+    </li><li name="scalaz.FingerTree#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Convert the tree to a <code>String</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Convert the tree to a <code>String</code>. Unsafe: this uses <code>Any#toString</code> for types <code>V</code> and <code>A</code></p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="scalaz.FingerTree">FingerTree</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.FingerTree#traverseTree" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="traverseTree[F[_],V2,B](f:A=&gt;F[B])(implicitms:scalaz.Reducer[B,V2],implicitF:scalaz.Applicative[F]):F[scalaz.FingerTree[V2,B]]"></a>
+      <a id="traverseTree[F[_],V2,B]((A)⇒F[B])(Reducer[B,V2],Applicative[F]):F[FingerTree[V2,B]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traverseTree</span><span class="tparams">[<span name="F">F<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="V2">V2</span>, <span name="B">B</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="scalaz.FingerTree.A">A</span>) ⇒ <span class="extype" name="scalaz.FingerTree.traverseTree.F">F</span>[<span class="extype" name="scalaz.FingerTree.traverseTree.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ms">ms: <a href="Reducer.html" class="extype" name="scalaz.Reducer">Reducer</a>[<span class="extype" name="scalaz.FingerTree.traverseTree.B">B</span>, <span class="extype" name="scalaz.FingerTree.traverseTree.V2">V2</span>]</span>, <span name="F">F: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.FingerTree.traverseTree.F">F</span>]</span>)</span><span class="result">: <span class="extype" name="scalaz.FingerTree.traverseTree.F">F</span>[<a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.traverseTree.V2">V2</span>, <span class="extype" name="scalaz.FingerTree.traverseTree.B">B</span>]]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Like traverse, but with a more constraint type: we need the additional measure to construct the new tree.</p>
+    </li><li name="scalaz.FingerTree#viewl" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="viewl:scalaz.ViewL[[α]scalaz.FingerTree[V,α],A]"></a>
+      <a id="viewl:ViewL[[α]FingerTree[V,α],A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">viewl</span><span class="result">: <a href="ViewL.html" class="extype" name="scalaz.ViewL">ViewL</a>[[α]<a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.&lt;refinement&gt;.λ.α">α</span>], <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.FingerTree#viewr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="viewr:scalaz.ViewR[[α]scalaz.FingerTree[V,α],A]"></a>
+      <a id="viewr:ViewR[[α]FingerTree[V,α],A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">viewr</span><span class="result">: <a href="ViewR.html" class="extype" name="scalaz.ViewR">ViewR</a>[[α]<a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.&lt;refinement&gt;.λ.α">α</span>], <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.FingerTree#|-:" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="|-:(a:=&gt;A):scalaz.FingerTree[V,A]"></a>
+      <a id="|-:(⇒A):FingerTree[V,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bar$minus$colon" class="name">|-:</span><span class="params">(<span name="a">a: ⇒ <span class="extype" name="scalaz.FingerTree.A">A</span></span>)</span><span class="result">: <a href="" class="extype" name="scalaz.FingerTree">FingerTree</a>[<span class="extype" name="scalaz.FingerTree.V">V</span>, <span class="extype" name="scalaz.FingerTree.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Replace the first element of the tree with the given value.</p><div class="fullcomment"><div class="comment cmt"><p>Replace the first element of the tree with the given value. O(1)</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>

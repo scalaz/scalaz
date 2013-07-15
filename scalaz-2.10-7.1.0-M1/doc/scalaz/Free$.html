@@ -1,0 +1,645 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>Free - scalaz.Free</title>
+          <meta name="description" content="Free - scalaz.Free" />
+          <meta name="keywords" content="Free scalaz.Free" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'scalaz.Free$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a href="Free.html" title="Go to companion"><img src="../lib/object_to_class_big.png" /></a>
+        <p id="owner"><a href="package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1><a href="Free.html" title="Go to companion">Free</a></h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Free</span><span class="result"> extends <a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a> with <a href="FreeInstances.html" class="extype" name="scalaz.FreeInstances">FreeInstances</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/scalaz/scalaz/tree/v7.1.0-M1/core/src/main/scala/scalaz/Free.scala" target="_blank">Free.scala</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="FreeInstances.html" class="extype" name="scalaz.FreeInstances">FreeInstances</a>, <a href="SourceInstances.html" class="extype" name="scalaz.SourceInstances">SourceInstances</a>, <a href="SinkInstances.html" class="extype" name="scalaz.SinkInstances">SinkInstances</a>, <a href="TrampolineInstances.html" class="extype" name="scalaz.TrampolineInstances">TrampolineInstances</a>, <a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="scalaz.Free"><span>Free</span></li><li class="in" name="scalaz.FreeInstances"><span>FreeInstances</span></li><li class="in" name="scalaz.SourceInstances"><span>SourceInstances</span></li><li class="in" name="scalaz.SinkInstances"><span>SinkInstances</span></li><li class="in" name="scalaz.TrampolineInstances"><span>TrampolineInstances</span></li><li class="in" name="scalaz.FreeFunctions"><span>FreeFunctions</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.Free.Gosub" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Gosub[S[_],A,B]extendsFree[S,B]withProductwithSerializable"></a>
+      <a id="Gosub[S[_],A,B]:Gosub[S,A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Free$$Gosub.html"><span class="name">Gosub</span></a><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>, <span name="B">B</span>]</span><span class="params">(<span name="a">a: () ⇒ <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Gosub.S">S</span>, <span class="extype" name="scalaz.Free.Gosub.A">A</span>]</span>, <span name="f">f: (<span class="extype" name="scalaz.Free.Gosub.A">A</span>) ⇒ <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Gosub.S">S</span>, <span class="extype" name="scalaz.Free.Gosub.B">B</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$3">evidence$3: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.Free.Gosub.S">S</span>]</span>)</span><span class="result"> extends <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Gosub.S">S</span>, <span class="extype" name="scalaz.Free.Gosub.B">B</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Call a subroutine and continue with the given function.</p>
+    </li><li name="scalaz.Free.Return" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Return[S[_],A]extendsFree[S,A]withProductwithSerializable"></a>
+      <a id="Return[S[_],A]:Return[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Free$$Return.html"><span class="name">Return</span></a><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.Free.Return.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$1">evidence$1: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.Free.Return.S">S</span>]</span>)</span><span class="result"> extends <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Return.S">S</span>, <span class="extype" name="scalaz.Free.Return.A">A</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Return from the computation with the given value.</p>
+    </li><li name="scalaz.Free.Sink" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Sink[A,B]=scalaz.Free[[x](=&gt;A)=&gt;x,B]"></a>
+      <a id="Sink[A,B]:Sink[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Sink</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> = <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[[x](⇒ <span class="extype" name="scalaz.Free.Sink.A">A</span>) ⇒ <span class="extype" name="scalaz.Free.&lt;refinement&gt;.f.x">x</span>, <span class="extype" name="scalaz.Free.Sink.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A computation that accepts values of type <code>A</code>, eventually resulting in a value of type <code>B</code>.</p><div class="fullcomment"><div class="comment cmt"><p>A computation that accepts values of type <code>A</code>, eventually resulting in a value of type <code>B</code>.
+Note the similarity to an <a href="iteratee/package.html#Iteratee[E,A]=scalaz.iteratee.IterateeT[E,scalaz.Id.Id,A]" class="extmbr" name="scalaz.iteratee.Iteratee">scalaz.iteratee.Iteratee</a>.
+</p></div></div>
+    </li><li name="scalaz.Free.Source" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Source[A,B]=scalaz.Free[[x](A,x),B]"></a>
+      <a id="Source[A,B]:Source[A,B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Source</span><span class="tparams">[<span name="A">A</span>, <span name="B">B</span>]</span><span class="result"> = <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[[x](<span class="extype" name="scalaz.Free.Source.A">A</span>, <span class="extype" name="scalaz.Free.&lt;refinement&gt;.f.x">x</span>), <span class="extype" name="scalaz.Free.Source.B">B</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A computation that produces values of type <code>A</code>, eventually resulting in a value of type <code>B</code>.</p>
+    </li><li name="scalaz.Free.Suspend" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Suspend[S[_],A]extendsFree[S,A]withProductwithSerializable"></a>
+      <a id="Suspend[S[_],A]:Suspend[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Free$$Suspend.html"><span class="name">Suspend</span></a><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.Free.Suspend.S">S</span>[<a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Suspend.S">S</span>, <span class="extype" name="scalaz.Free.Suspend.A">A</span>]]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="evidence$2">evidence$2: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.Free.Suspend.S">S</span>]</span>)</span><span class="result"> extends <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.Free.Suspend.S">S</span>, <span class="extype" name="scalaz.Free.Suspend.A">A</span>] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Suspend the computation with the given suspension.</p>
+    </li><li name="scalaz.Free.Trampoline" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Trampoline[A]=scalaz.Free[Function0,A]"></a>
+      <a id="Trampoline[A]:Trampoline[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Trampoline</span><span class="tparams">[<span name="A">A</span>]</span><span class="result"> = <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scala.Function0">Function0</span>, <span class="extype" name="scalaz.Free.Trampoline.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A computation that can be stepped through, suspended, and paused</p>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:AnyRef):Boolean"></a>
+      <a id="!=(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:AnyRef):Boolean"></a>
+      <a id="==(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#await" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="await[A]:scalaz.Free.Sink[A,A]"></a>
+      <a id="await[A]:Sink[A,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">await</span><span class="tparams">[<span name="A">A</span>]</span><span class="result">: <a href="#Sink[A,B]=scalaz.Free[[x](=&gt;A)=&gt;x,B]" class="extmbr" name="scalaz.Free.Sink">Sink</a>[<span class="extype" name="scalaz.FreeFunctions.await.A">A</span>, <span class="extype" name="scalaz.FreeFunctions.await.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A sink that waits for a single value and returns it.</p><div class="fullcomment"><div class="comment cmt"><p>A sink that waits for a single value and returns it.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scalaz.FreeInstances#freeMonad" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="freeMonad[S[_]](implicitevidence$6:scalaz.Functor[S]):scalaz.Monad[[x]scalaz.Free[S,x]]"></a>
+      <a id="freeMonad[S[_]](Functor[S]):Monad[[x]Free[S,x]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">freeMonad</span><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="Functor.html" class="extype" name="scalaz.Functor">Functor</a>[<span class="extype" name="scalaz.FreeInstances.freeMonad.S">S</span>]</span>)</span><span class="result">: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[[x]<a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.FreeInstances.freeMonad.S">S</span>, <span class="extype" name="scalaz.FreeInstances.&lt;refinement&gt;.f.x">x</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeInstances.html" class="extype" name="scalaz.FreeInstances">FreeInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#pause" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="pause:scalaz.Free.Trampoline[Unit]"></a>
+      <a id="pause:Trampoline[Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pause</span><span class="result">: <a href="#Trampoline[A]=scalaz.Free[Function0,A]" class="extmbr" name="scalaz.Free.Trampoline">Trampoline</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A trampoline step that doesn't do anything.</p><div class="fullcomment"><div class="comment cmt"><p>A trampoline step that doesn't do anything.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#produce" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="produce[A](a:A):scalaz.Free.Source[A,Unit]"></a>
+      <a id="produce[A](A):Source[A,Unit]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">produce</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="scalaz.FreeFunctions.produce.A">A</span></span>)</span><span class="result">: <a href="#Source[A,B]=scalaz.Free[[x](A,x),B]" class="extmbr" name="scalaz.Free.Source">Source</a>[<span class="extype" name="scalaz.FreeFunctions.produce.A">A</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">A source that produces the given value.</p><div class="fullcomment"><div class="comment cmt"><p>A source that produces the given value.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#reset" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="reset[A](r:scalaz.Free.Trampoline[A]):scalaz.Free.Trampoline[A]"></a>
+      <a id="reset[A](Trampoline[A]):Trampoline[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">reset</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="r">r: <a href="#Trampoline[A]=scalaz.Free[Function0,A]" class="extmbr" name="scalaz.Free.Trampoline">Trampoline</a>[<span class="extype" name="scalaz.FreeFunctions.reset.A">A</span>]</span>)</span><span class="result">: <a href="#Trampoline[A]=scalaz.Free[Function0,A]" class="extmbr" name="scalaz.Free.Trampoline">Trampoline</a>[<span class="extype" name="scalaz.FreeFunctions.reset.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Collapse a trampoline to a single step.</p><div class="fullcomment"><div class="comment cmt"><p>Collapse a trampoline to a single step.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#return_" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="return_[S[_],A](value:=&gt;A)(implicitS:scalaz.Applicative[S]):scalaz.Free[S,A]"></a>
+      <a id="return_[S[_],A](⇒A)(Applicative[S]):Free[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">return_</span><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="value">value: ⇒ <span class="extype" name="scalaz.FreeFunctions.return_.A">A</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="S">S: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.FreeFunctions.return_.S">S</span>]</span>)</span><span class="result">: <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.FreeFunctions.return_.S">S</span>, <span class="extype" name="scalaz.FreeFunctions.return_.A">A</span>]</span>
+      </span>
+      </h4>
+      <p class="shortcomment cmt">Suspend the given computation in a single step.</p><div class="fullcomment"><div class="comment cmt"><p>Suspend the given computation in a single step.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scalaz.SinkInstances#sinkMonad" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sinkMonad[S]:scalaz.Monad[[x]scalaz.Free[[x](=&gt;S)=&gt;x,x]]"></a>
+      <a id="sinkMonad[S]:Monad[[x]Free[[x](⇒S)⇒x,x]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sinkMonad</span><span class="tparams">[<span name="S">S</span>]</span><span class="result">: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[[x]<a href="Free.html" class="extype" name="scalaz.Free">Free</a>[[x](⇒ <span class="extype" name="scalaz.SinkInstances.sinkMonad.S">S</span>) ⇒ <span class="extype" name="scalaz.Free.&lt;refinement&gt;.f.x">x</span>, <span class="extype" name="scalaz.SinkInstances.&lt;refinement&gt;.f.x">x</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SinkInstances.html" class="extype" name="scalaz.SinkInstances">SinkInstances</a></dd></dl></div>
+    </li><li name="scalaz.SourceInstances#sourceMonad" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sourceMonad[S]:scalaz.Monad[[x]scalaz.Free[[x](S,x),x]]"></a>
+      <a id="sourceMonad[S]:Monad[[x]Free[[x](S,x),x]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sourceMonad</span><span class="tparams">[<span name="S">S</span>]</span><span class="result">: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[[x]<a href="Free.html" class="extype" name="scalaz.Free">Free</a>[[x](<span class="extype" name="scalaz.SourceInstances.sourceMonad.S">S</span>, <span class="extype" name="scalaz.Free.&lt;refinement&gt;.f.x">x</span>), <span class="extype" name="scalaz.SourceInstances.&lt;refinement&gt;.f.x">x</span>]]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SourceInstances.html" class="extype" name="scalaz.SourceInstances">SourceInstances</a></dd></dl></div>
+    </li><li name="scalaz.FreeFunctions#suspend" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="suspend[S[_],A](value:=&gt;scalaz.Free[S,A])(implicitS:scalaz.Applicative[S]):scalaz.Free[S,A]"></a>
+      <a id="suspend[S[_],A](⇒Free[S,A])(Applicative[S]):Free[S,A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">suspend</span><span class="tparams">[<span name="S">S<span class="tparams">[<span name="_">_</span>]</span></span>, <span name="A">A</span>]</span><span class="params">(<span name="value">value: ⇒ <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.FreeFunctions.suspend.S">S</span>, <span class="extype" name="scalaz.FreeFunctions.suspend.A">A</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="S">S: <a href="Applicative.html" class="extype" name="scalaz.Applicative">Applicative</a>[<span class="extype" name="scalaz.FreeFunctions.suspend.S">S</span>]</span>)</span><span class="result">: <a href="Free.html" class="extype" name="scalaz.Free">Free</a>[<span class="extype" name="scalaz.FreeFunctions.suspend.S">S</span>, <span class="extype" name="scalaz.FreeFunctions.suspend.A">A</span>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scalaz.TrampolineInstances#trampolineMonad" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="trampolineMonad:scalaz.Monad[scalaz.Free.Trampoline]"></a>
+      <a id="trampolineMonad:Monad[Trampoline]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">trampolineMonad</span><span class="result">: <a href="Monad.html" class="extype" name="scalaz.Monad">Monad</a>[<a href="#Trampoline[A]=scalaz.Free[Function0,A]" class="extmbr" name="scalaz.Free.Trampoline">Trampoline</a>]</span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="TrampolineInstances.html" class="extype" name="scalaz.TrampolineInstances">TrampolineInstances</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scalaz.FreeInstances">
+              <h3>Inherited from <a href="FreeInstances.html" class="extype" name="scalaz.FreeInstances">FreeInstances</a></h3>
+            </div><div class="parent" name="scalaz.SourceInstances">
+              <h3>Inherited from <a href="SourceInstances.html" class="extype" name="scalaz.SourceInstances">SourceInstances</a></h3>
+            </div><div class="parent" name="scalaz.SinkInstances">
+              <h3>Inherited from <a href="SinkInstances.html" class="extype" name="scalaz.SinkInstances">SinkInstances</a></h3>
+            </div><div class="parent" name="scalaz.TrampolineInstances">
+              <h3>Inherited from <a href="TrampolineInstances.html" class="extype" name="scalaz.TrampolineInstances">TrampolineInstances</a></h3>
+            </div><div class="parent" name="scalaz.FreeFunctions">
+              <h3>Inherited from <a href="FreeFunctions.html" class="extype" name="scalaz.FreeFunctions">FreeFunctions</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../lib/template.js"></script>
+    </body>
+      </html>
