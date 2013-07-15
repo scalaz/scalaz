@@ -1,7 +1,5 @@
 package scalaz
 
-import collection.generic.CanBuildFrom
-
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -10,6 +8,8 @@ import collection.generic.CanBuildFrom
 ////
 trait Foldable[F[_]]  { self =>
   ////
+  import collection.generic.CanBuildFrom
+
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
   /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
