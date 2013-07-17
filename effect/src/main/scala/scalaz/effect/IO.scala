@@ -138,7 +138,7 @@ object IO extends IOFunctions with IOInstances {
 
 trait IOInstances1 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
-      Monoid.liftSemigroup[IO, A](IO.ioMonad, A)
+      Semigroup.liftSemigroup[IO, A](IO.ioMonad, A)
 
   implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
 
