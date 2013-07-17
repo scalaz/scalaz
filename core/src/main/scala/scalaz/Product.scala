@@ -1,5 +1,7 @@
 package scalaz
 
+import std.option.{cata, some, none}
+
 private[scalaz] trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Functor[F]
 
@@ -61,6 +63,40 @@ private[scalaz] trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α]
 
   override def foldLeft[A, B](fa: (F[A], G[A]), z: B)(f: (B, A) => B): B =
     F.foldLeft(fa._1, z)((b, a) => G.foldLeft(fa._2, f(b, a))((b, a) => f(b, a)))
+}
+
+private[scalaz] trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+  implicit def F: Foldable1[G]
+
+  override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
+    cata(G.foldRight(fa._2, none[A]){(a, oa) =>
+      oa map (f(a, _)) orElse some(a)
+    })(F.foldRight(fa._1, _)(f), F.foldRight1(fa._1)(f))
+
+  override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
+    val resume = F.foldMap1(fa._1)(f)
+    cata(G.foldMap(fa._2)(some))(S.append(resume, _), resume)
+  }
+
+  override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
+    G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
+}
+
+private[scalaz] trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+  implicit def G: Foldable1[G]
+
+  override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
+    F.foldRight(fa._1, G.foldRight1(fa._2)(f))(f)
+
+  override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
+    def resume = G.foldMap1(fa._2)(f)
+    cata(F.foldMap(fa._1)(some))(S.append(_, resume), resume)
+  }
+
+  override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
+    cata(F.foldLeft(fa._1, none[A]){(oa, a) =>
+      oa map (f(_, a) orElse some(a)
+    })(G.foldLeft(fa._2, _)(f), G.foldLeft1(fa._2)(f))
 }
 
 private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
