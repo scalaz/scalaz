@@ -66,7 +66,7 @@ private[scalaz] trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α]
 }
 
 private[scalaz] trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
-  implicit def F: Foldable1[G]
+  implicit def F: Foldable1[F]
 
   override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
     cata(G.foldRight(fa._2, none[A]){(a, oa) =>
