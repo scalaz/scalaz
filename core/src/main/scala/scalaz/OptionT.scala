@@ -64,6 +64,10 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
       case x@Some(_) => F.point(x)
     })
 
+  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
+
+  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
+
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
 
