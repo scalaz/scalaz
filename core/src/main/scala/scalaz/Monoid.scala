@@ -91,29 +91,17 @@ object Monoid {
     def append(f1: A, f2: => A): A = f(f1,f2)
   }
 
-  @deprecated("use ApplySemigroup", "7.1")
+  @deprecated("use Semigroup.applySemigroup", "7.1")
   trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Applicative[F]
     implicit def M: Semigroup[M]
     def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
   }
 
-  trait ApplySemigroup[F[_], M] extends Semigroup[F[M]] {
-    implicit def F: Apply[F]
-    implicit def M: Semigroup[M]
-    def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
-  }
-
-  trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with ApplySemigroup[F, M] {
+  private[scalaz] trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
     implicit def M: Monoid[M]
     val zero = F.point(M.zero)
-  }
-
-  /**A semigroup for sequencing Apply effects. */
-  def liftSemigroup[F[_], M](implicit F0: Apply[F], M0: Semigroup[M]): Semigroup[F[M]] = new ApplySemigroup[F, M] {
-    implicit def F: Apply[F] = F0
-    implicit def M: Semigroup[M] = M0
   }
 
   /**A monoid for sequencing Applicative effects. */
