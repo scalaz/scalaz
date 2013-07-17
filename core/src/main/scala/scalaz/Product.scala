@@ -123,6 +123,28 @@ private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α]
     Applicative[X].apply2(F.traverse(a._1)(f), G.traverse(a._2)(f))((a, b) => (a, b))
 }
 
+private[scalaz] trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1L[F, G] with ProductTraverse[F, G] {
+  implicit def F: Traverse1[F]
+
+  def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
+    def resume = F.traverse1(a._1)(f)
+    X0.applyApplicative.traverse(a._2)(a => -\/(f(a)))(G)
+      .fold(X0.apply(resume, _)(Tuple2.apply),
+            pr => X0.map(resume)((_, pr)))
+  }
+}
+
+private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1R[F, G] with ProductTraverse[F, G] {
+  implicit def G: Traverse1[G]
+
+  def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
+    def resume = G.traverse1(a._2)(f)
+    X0.applyApplicative.traverse(a._1)(a => -\/(f(a)))(F)
+      .fold(X0.apply(_, resume)(Tuple2.apply),
+            pr => X0.map(resume)((pr, _)))
+  }
+}
+
 private[scalaz] trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1[F, G] with ProductTraverse[F, G] {
   implicit def F: Traverse1[F]
 
