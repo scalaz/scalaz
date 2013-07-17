@@ -1,6 +1,5 @@
 package scalaz
 
-<<<<<<< HEAD
 import std.AllInstances._
 import syntax.foldable1._
 import scalaz.scalacheck.ScalazArbitrary._
@@ -39,13 +38,13 @@ class Foldable1Test extends Spec {
 
   "product foldRight1 equivalence" ! prop {
     (l: NonEmptyList[List[Int]], l2: NonEmptyList[List[Int]]) =>
-      (L.product(L).foldRight1((l, l2))(_ append _)
+      (L.product(L).foldRight1((l, l2))(_ ++ _)
        must be_===((l.list ++ l2.list).flatten))
   }
 
   "product foldLeft1 equivalence" ! prop {
     (l: NonEmptyList[List[Int]], l2: NonEmptyList[List[Int]]) =>
-      (L.product(L).foldLeft1((l, l2))((xs, x) => x append xs)
+      (L.product(L).foldLeft1((l, l2))((xs, x) => x ++ xs)
        must be_===((l.list ++ l2.list).reverse.flatten))
   }
 }
