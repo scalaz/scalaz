@@ -98,6 +98,18 @@ object Semigroup {
 
   @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
 
+  private[scalaz] trait ApplySemigroup[F[_], M] extends Semigroup[F[M]] {
+    implicit def F: Apply[F]
+    implicit def M: Semigroup[M]
+    def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
+  }
+
+  /**A semigroup for sequencing Apply effects. */
+  def liftSemigroup[F[_], M](implicit F0: Apply[F], M0: Semigroup[M]): Semigroup[F[M]] = new ApplySemigroup[F, M] {
+    implicit def F: Apply[F] = F0
+    implicit def M: Semigroup[M] = M0
+  }
+
   /** `point(a) append (point(a) append (point(a)...` */
   def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), repeat[F, A](a))
