@@ -69,13 +69,13 @@ private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[�
   implicit def G: Foldable1[G]
 
   override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
-    F.foldRight1(fa._1)((a, b) => G.foldRight1(fa._2)((a, b) => f(a, b)))
+    F.foldRight(fa._1, G.foldRight1(fa._2)(f))(f)
 
   override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B =
     S.append(F.foldMap1(fa._1)(f), G.foldMap1(fa._2)(f))
 
   override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
-    F.foldLeft1(fa._1)((b, a) => G.foldLeft1(fa._2)((b, a) => f(b, a)))
+    G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
 }
 
 private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] with ProductFoldable[F, G] {
