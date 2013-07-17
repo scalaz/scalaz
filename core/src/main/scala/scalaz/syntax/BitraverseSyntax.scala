@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bitraverse` */
-trait BitraverseOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class BitraverseOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Bitraverse[F]
   ////
   final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit ap: Applicative[G]): G[F[C, D]] =

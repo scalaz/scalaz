@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Index` */
-trait IndexOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class IndexOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Index[F]
   ////
   @deprecated("Index#index is deprecated, use Foldable#index instead", "7.1")

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Choice` */
-trait ChoiceOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class ChoiceOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Choice[F]
   ////
   final def |||[C](x: => F[C, B]): F[A \/ C, B] =

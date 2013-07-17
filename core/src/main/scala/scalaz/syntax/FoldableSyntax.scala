@@ -1,12 +1,12 @@
 package scalaz
 package syntax
 
-import collection.generic.CanBuildFrom
-
 /** Wraps a value `self` and provides methods related to `Foldable` */
-trait FoldableOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
   ////
+  import collection.generic.CanBuildFrom
+
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
   final def foldRight[B](z: => B)(f: (A, => B) => B): B = F.foldRight(self, z)(f)

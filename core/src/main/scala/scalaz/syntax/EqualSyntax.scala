@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Equal` */
-trait EqualOps[F] extends Ops[F] {
+sealed abstract class EqualOps[F] extends Ops[F] {
   implicit def F: Equal[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `IsEmpty` */
-trait IsEmptyOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class IsEmptyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: IsEmpty[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bifunctor` */
-trait BifunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class BifunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Bifunctor[F]
   ////
   import Liskov.<~<

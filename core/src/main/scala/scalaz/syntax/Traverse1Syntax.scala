@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse1` */
-trait Traverse1Ops[F[_],A] extends Ops[F[A]] {
+sealed abstract class Traverse1Ops[F[_],A] extends Ops[F[A]] {
   implicit def F: Traverse1[F]
   ////
 

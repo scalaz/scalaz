@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Arrow` */
-trait ArrowOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class ArrowOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Arrow[F]
   ////
   final def first[C]: F[(A, C), (B, C)] =

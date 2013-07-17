@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Length` */
-trait LengthOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class LengthOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Length[F]
   ////
   @deprecated("Length#length is deprecated, use Foldable#length instead", "7.1")

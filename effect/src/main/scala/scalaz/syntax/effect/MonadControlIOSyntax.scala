@@ -5,7 +5,7 @@ package effect
 import scalaz.effect.MonadControlIO
 
 /** Wraps a value `self` and provides methods related to `MonadControlIO` */
-trait MonadControlIOOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class MonadControlIOOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadControlIO[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Monoid` */
-trait MonoidOps[F] extends Ops[F] {
+sealed abstract class MonoidOps[F] extends Ops[F] {
   implicit def F: Monoid[F]
   ////
   final def multiply(n: Int): F = F.multiply(self, n)
