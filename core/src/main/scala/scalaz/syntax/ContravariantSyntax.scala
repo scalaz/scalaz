@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Contravariant` */
-trait ContravariantOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class ContravariantOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Contravariant[F]
   ////
   final def contramap[B](f: B => A): F[B] = F.contramap(self)(f)

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Apply` */
-trait ApplyOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class ApplyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Apply[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bind` */
-trait BindOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class BindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Bind[F]
   ////
   import Liskov.<~<

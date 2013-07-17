@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Split` */
-trait SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Split[F]
   ////
   final def -*-[C, D](k: F[C, D]): F[(A, C), (B, D)] =

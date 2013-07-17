@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Functor` */
-trait FunctorOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Functor[F]
   ////
   import Leibniz.===
