@@ -101,10 +101,9 @@ private[scalaz] sealed trait OneAndTraverse[F[_]]
   def F: Traverse[F]
 
   def traverse1Impl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Apply[G]) =
-    (F.traverseImpl[({type λ[α] = G[α] \/ α})#λ, A, B
-                   ](fa.tail)(a => -\/(f(a)))(G.applyApplicative)
-       fold (ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply),
-             tl => G.map(f(fa.head))(OneAnd(_, tl))))
+    G.applyApplicative.traverse(fa.tail)(a => -\/(f(a)))(F)
+     .fold(ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply),
+           tl => G.map(f(fa.head))(OneAnd(_, tl)))
 
   override def traverseImpl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
