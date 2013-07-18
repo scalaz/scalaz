@@ -1,11 +1,12 @@
 package scalaz.concurrent
 
-import scalaz.{ Spec}
+import scalaz.{-\/, Spec}
 import scalaz.concurrent.Task._
-import java.util.concurrent.{ThreadFactory, Executors}
+import java.util.concurrent.{TimeoutException, ThreadFactory, Executors}
 import scala.collection.immutable.Queue
 import scala.concurrent.SyncVar
 import org.specs2.execute.{Success, Result}
+import org.specs2.matcher.MustMatchers._ 
 
 /**
  *
@@ -62,8 +63,40 @@ object ConcurrentTaskTest extends Spec {
       //the rest of tasks must be run off the forked thread
       runned.filter(_._2 == forked).map(_._1) must_== List(3,4,5,6,7,8)
       
+      es.shutdown()
       
+    }
+    
+    
+    "correctly exit when timeout is exceeded on runFor" in {
+
+      val es = Executors.newFixedThreadPool(1)
       
+      val t =  fork { Thread.sleep(3000); now(1) }(es)
+      
+       t.attemptRunFor(100) must beLike {
+         case -\/(ex:TimeoutException)  => ok
+       } 
+   
+      es.shutdown()
+    }
+    
+    "correctly cancels scheduling of all tasks once first task hit timeout" in {
+      val es = Executors.newFixedThreadPool(1)
+
+      @volatile var bool = false
+      
+      val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
+
+      t.attemptRunFor(100) must beLike {
+        case -\/(ex:TimeoutException)  => ok
+      }
+
+      Thread.sleep(1500)
+
+      bool must_== false
+
+      es.shutdown()
     }
 
   }

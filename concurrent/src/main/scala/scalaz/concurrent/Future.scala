@@ -1,7 +1,7 @@
 package scalaz.concurrent
 
 import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService}
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
 
@@ -10,7 +10,7 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
 
-/**
+/** 
  * `Future` is a trampolined computation producing an `A` that may 
  * include asynchronous steps. Like `Trampoline`, arbitrary 
  * monadic expressions involving `map` and `flatMap` are guaranteed
@@ -229,20 +229,30 @@ object Future {
       }
     }
 
-    // Optimized implementation has all Futures dump to a shared queue, then
-    // waits for all to finish
-    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
-      Async { cb => 
-        val latch = new CountDownLatch(fs.length)
-        val results = new ConcurrentLinkedQueue[A] 
-        fs.foreach(_ runAsync { a => 
-          results.add(a)
-          latch.countDown
-        })
-        latch.await
-        cb(results.toList).run
-      }
+   /** 
+    * Combines  given futures non-deterministically for later collection of their results 
+    */
+    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] = fs match {
+     case Seq() => Future.now(List())
+     case Seq(f) => f.map(List(_))
+     case other =>  async { cb =>
+       val results = new ConcurrentLinkedQueue[A]
+       val c = new AtomicInteger(fs.size)
+
+       fs.foreach {  f =>
+         f.runAsync {  a =>
+           results.add(a)
+           //only last completed f will hit the 0 here.
+           if (c.decrementAndGet() == 0) {
+             cb(results.toList)
+           }
+         }
+       }
+     }
+   }
+    
   }
+
 
   /** Convert a strict value to a `Future`. */
   def now[A](a: A): Future[A] = Now(a)
