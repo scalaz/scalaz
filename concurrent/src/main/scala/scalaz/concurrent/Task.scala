@@ -108,6 +108,30 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def runAsync(f: (Throwable \/ A) => Unit): Unit =
     get.runAsync(f)
+
+  /**
+   * Run this `Task` and block until its result is available, or until
+   * `timeoutInMillis` milliseconds have elapsed, at which point a `TimeoutException`
+   * will be thrown and the `Future` will attempt to be canceled.
+   */
+  def runFor(timeoutInMillis: Long): A = get.runFor(timeoutInMillis) match {
+    case -\/(e) => throw e
+    case \/-(a) => a
+  }
+
+  /** 
+   * Like `runFor`, but returns exceptions as values. Both `TimeoutException`
+   * and other exceptions will be folded into the same `Throwable`.
+   */
+  def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = 
+    get.attemptRunFor(timeoutInMillis).join
+
+  /** 
+   * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
+   * and attempts to cancel the running computation.
+   */
+  def timed(timeoutInMillis: Long): Task[A] =
+    new Task(get.timed(timeoutInMillis).map(_.join))
 }
 
 object Task {

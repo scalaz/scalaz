@@ -131,6 +131,38 @@ class TaskTest extends Spec {
       t1v.get must_== 0
       t3v.get must_== 0
     }
+
+
+    "correctly exit when timeout is exceeded on runFor" in {
+
+      val es = Executors.newFixedThreadPool(1)
+      
+      val t =  fork { Thread.sleep(3000); now(1) }(es)
+      
+       t.attemptRunFor(100) match {
+         case -\/(ex:TimeoutException)  => //ok
+       } 
+   
+      es.shutdown()
+    }
+    
+    "correctly cancels scheduling of all tasks once first task hit timeout" in {
+      val es = Executors.newFixedThreadPool(1)
+
+      @volatile var bool = false
+      
+      val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
+
+      t.attemptRunFor(100) match {
+        case -\/(ex:TimeoutException)  => //ok
+      }
+
+      Thread.sleep(1500)
+
+      bool must_== false
+
+      es.shutdown()
+    }
   }
 }
 

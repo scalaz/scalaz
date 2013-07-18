@@ -161,6 +161,34 @@ trait Future[+A] {
       result.get
     }
   }
+
+  /**
+   * Run this `Future` and block until its result is available, or until
+   * `timeoutInMillis` milliseconds have elapsed, at which point a `TimeoutException`
+   * will be thrown and the `Future` will attempt to be canceled.
+   */
+  def runFor(timeoutInMillis: Long): A = attemptRunFor(timeoutInMillis) match {
+    case -\/(e) => throw e
+    case \/-(a) => a
+  }
+
+  /** Like `runFor`, but returns exceptions as values. */
+  def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = {
+    val sync = new SyncVar[Throwable \/ A]
+    val interrupt = new AtomicBoolean(false)
+    runAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
+    sync.get(timeoutInMillis).getOrElse { 
+      interrupt.set(true)
+      -\/(new TimeoutException())
+    }
+  }
+
+  /** 
+   * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
+   * and attempts to cancel the running computation.
+   */
+  def timed(timeoutInMillis: Long): Future[Throwable \/ A] =
+    delay { attemptRunFor(timeoutInMillis) }
 }
 
 object Future {
