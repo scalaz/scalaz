@@ -1,8 +1,14 @@
 package scalaz
 package concurrent
 
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
 import org.scalacheck.Prop._
+
+import java.util.concurrent.{Executors, TimeoutException}
+import java.util.concurrent.atomic._
+
 
 class TaskTest extends Spec {
    
@@ -47,4 +53,84 @@ class TaskTest extends Spec {
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
   }
 
+  "Nondeterminism[Task]" should {
+    import scalaz.concurrent.Task._
+    val es = Executors.newFixedThreadPool(1)
+
+
+    "correctly process gatherUnordered for >1 tasks in non-blocking way" in {
+      val t1 = fork(now(1))(es)
+      val t2 = delay(7).flatMap(_=>fork(now(2))(es))
+      val t3 = fork(now(3))(es)
+      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3)))(es)
+
+      t.run.toSet must_== Set(1,2,3)
+    }
+
+
+    "correctly process gatherUnordered for 1 task in non-blocking way" in {
+      val t1 = fork(now(1))(es)
+
+      val t = fork(Task.gatherUnordered(Seq(t1)))(es)
+
+      t.run.toSet must_== Set(1)
+    }
+
+    "correctly process gatherUnordered for empty seq of tasks in non-blocking way" in {
+      val t = fork(Task.gatherUnordered(Seq()))(es)
+
+      t.run.toSet must_== Set()
+    }
+
+    "early terminate once any of the tasks failed" in {
+      import Thread._
+      val ex = new RuntimeException("expected")
+      
+      val t1v = new AtomicInteger(0)
+      val t3v = new AtomicInteger(0)
+
+      val es3 = Executors.newFixedThreadPool(3)
+      
+      // NB: Task can only be interrupted in between steps (before the `map`)
+      val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
+      val t2 = fork { now(throw ex) }
+      val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
+
+      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+      
+      t.attemptRun match {
+        case -\/(e) => e must_== ex 
+      }
+      
+      t1v.get must_== 0
+      t3v.get must_== 0
+    }
+
+    "early terminate once any of the tasks failed, and cancels execution" in {
+      import Thread._
+      val ex = new RuntimeException("expected")
+
+      val t1v = new AtomicInteger(0)
+      val t3v = new AtomicInteger(0)
+
+      implicit val es3 = Executors.newFixedThreadPool(3)
+
+      // NB: Task can only be interrupted in between steps (before the `map`)
+      val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
+      val t2 = fork { sleep(100); now(throw ex) }
+      val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
+
+      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+
+      t.attemptRun match {
+        case -\/(e) => e must_== ex 
+      }
+      
+      sleep(3000)
+
+      t1v.get must_== 0
+      t3v.get must_== 0
+    }
+  }
 }
+

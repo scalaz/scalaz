@@ -1,11 +1,15 @@
 package scalaz.concurrent
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
+import scalaz.Free.Trampoline
+import scalaz.Trampoline
+
+import collection.JavaConversions._
 
 /* 
  * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
@@ -173,10 +177,64 @@ object Task {
    * exceptions. 
    */
   def async[A](register: ((Throwable \/ A) => Unit) => Unit): Task[A] =
-   new Task(Future.async(register))
+    new Task(Future.async(register))
+
+  /** 
+   * Like `Nondeterminism[Task].gatherUnordered`, but if `exceptionCancels` is true, 
+   * exceptions in any task try to immediately cancel all other running tasks. If
+   * `exceptionCancels` is false, in the event of an error, all tasks are run to completion 
+   * before the error is returned. 
+   */
+  def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] = 
+    if (!exceptionCancels) taskInstance.gatherUnordered(tasks)
+    else tasks match {
+      // Unfortunately we cannot reuse the future's combinator 
+      // due to early terminating requirement on task
+      // when task fails.  This also makes implementation a bit trickier
+      case Seq() => Task.now(List())
+      case Seq(t) => t.map(List(_))
+      case _ => new Task(Future.Async { cb =>
+        val interrupt = new AtomicBoolean(false)
+        val results = new ConcurrentLinkedQueue[A]
+        val togo = new AtomicInteger(tasks.size)
+      
+        tasks.foreach { t =>
+          val handle: (Throwable \/ A) => Trampoline[Unit] = {
+            case \/-(success) =>
+              results.add(success)
+              // only last completed f will hit the 0 here. 
+              if (togo.decrementAndGet() == 0)
+                cb(\/-(results.toList))
+              else
+                Trampoline.done(())
+            case e@(-\/(failure)) =>
+              // Only allow the first failure to invoke the callback, so we 
+              // race to set `togo` to 0 here. 
+              // If we win, invoke the callback with our error, otherwise, noop 
+              @annotation.tailrec
+              def firstFailure: Boolean = {
+                val current = togo.get
+                if (current > 0) {
+                  if (togo.compareAndSet(current,0)) true 
+                  else firstFailure
+                } 
+                else false
+              }
+            
+              if (firstFailure) // invoke `cb`, then cancel any computation not running yet
+                // food for thought - might be safe to set the interrupt first 
+                // but, this may also kill `cb(e)`
+                // could have separate AtomicBooleans for each task
+                cb(e) *> Trampoline.delay { interrupt.set(true); () }
+              else
+                Trampoline.done(())
+          }
+          t.get.listenInterruptibly(handle, interrupt)
+        }
+      })
+    }
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
     try \/-(a) catch { case e: Exception => -\/(e) }
-
 }

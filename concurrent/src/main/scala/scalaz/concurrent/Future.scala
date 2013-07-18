@@ -1,7 +1,7 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService}
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
+import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService, TimeoutException}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
 
@@ -9,8 +9,11 @@ import scalaz.Nondeterminism
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
+import scalaz.{\/, -\/, \/-}
 
-/**
+import scala.concurrent.SyncVar
+
+/** 
  * `Future` is a trampolined computation producing an `A` that may 
  * include asynchronous steps. Like `Trampoline`, arbitrary 
  * monadic expressions involving `map` and `flatMap` are guaranteed
@@ -70,7 +73,7 @@ trait Future[+A] {
    */
   def listen(cb: A => Trampoline[Unit]): Unit = 
     this.step match {
-      case Now(a) => cb(a) 
+      case Now(a) => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) => 
         onFinish(x => Trampoline.delay(g(x)) map (_ listen cb))
@@ -84,8 +87,11 @@ trait Future[+A] {
    */
   def listenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit = 
     this.stepInterruptibly(cancel) match {
-      case Now(a) if !cancel.get => cb(a) 
-      case Async(onFinish) if !cancel.get => onFinish(cb)
+      case Now(a) if !cancel.get => cb(a).run 
+      case Async(onFinish) if !cancel.get => 
+        onFinish(a => 
+          if (!cancel.get) cb(a)
+          else Trampoline.done(()))
       case BindAsync(onFinish, g) if !cancel.get => 
         onFinish(x => 
           if (!cancel.get) Trampoline.delay(g(x)) map (_ listenInterruptibly (cb, cancel))
@@ -175,73 +181,77 @@ object Future {
     def point[A](a: => A): Future[A] = now(a)
 
     def chooseAny[A](h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
-      // The details of this implementation are a bit tricky, but general
-      // idea is to run all `fs` in parallel, with each decrementing
-      // a central CountDownLatch; we then return a Future that awaits on 
-      // this latch, then returns whichever result became available first
-      // 
-      // To account for the fact that the losing computations are still 
-      // running, we construct special 'residual' Futures for the losers,
-      // that will first return from the already running computation, 
-      // then revert back to running the original Future
+      Async { cb => 
+        // The details of this implementation are a bit tricky, but the general
+        // idea is to run all futures in parallel, returning whichever result
+        // becomes available first.
 
-      Async { (cb: Tuple2[A,Seq[Future[A]]] => Trampoline[Unit]) => 
-        @volatile var result: Option[(A, Int)] = None
-        val latch = new CountDownLatch(1)
-        val fs = h +: t
-        // we keep a separate latch and atomic reference for purposes of 
-        // computing a residual Future should each Future lose
-        val fs2: IndexedSeq[(Future[A], CountDownLatch, AtomicReference[A])] = 
-          fs.toIndexedSeq.map { 
-            (f: Future[A]) => (f, new CountDownLatch(1), new AtomicReference[A])
-          }
-        fs2.zipWithIndex.foreach { case ((f,flatch,ref), ind) => f.runAsync { a =>
-          ref.set(a)
-          // actually ok if two threads clobber each other here
-          if (!result.isDefined) result = Some((a, ind))
-          flatch.countDown 
-          latch.countDown
-        }}
-        latch.await // wait for any one of the threads to finish
-        val Some((a, ind)) = result // extract the winner
-        // for all the losing futures, we compute a 'residual', which includes the
-        // 'rest' of the current, partially completed computation, followed by a 
-        // repetition of the original computation
-        val residuals = fs2.zipWithIndex collect { case ((f, latch, ref), i) if i != ind => 
+        // To account for the fact that the losing computations are still 
+        // running, we construct special 'residual' Futures for the losers
+        // that will first return from the already running computation, 
+        // then revert back to running the original Future.
+        val won = new AtomicBoolean(false) // threads race to set this
+        
+        val fs = (h +: t).view.zipWithIndex.map { case (f, ind) => 
           val used = new AtomicBoolean(false)
-          Async { (cb: A => Trampoline[Unit]) => 
-            if (used.get) f.listen(cb) 
-            else {
-              // A bit of trickiness here, since two threads may listen to this
-              // Async simultaneously, and we only want one to receive the value
-              // inside `ref`. To ensure this, we race to set the `used` flag.
-              // Whichever one wins gets the value inside `ref`, the other just
-              // delegates to `f`.
-              latch.await
-              if (used.compareAndSet(false, true)) 
-                cb(ref.get).run
-              else
-                f.listen(cb)
-            }
+          val ref = new AtomicReference[A]
+          val listener = new AtomicReference[A => Trampoline[Unit]](null)
+          val residual = Async { (cb: A => Trampoline[Unit]) => 
+             if (used.compareAndSet(false, true)) { // get residual value from already running Future
+               if (listener.compareAndSet(null, cb)) {} // we've successfully registered ourself with running task
+               else cb(ref.get).run // the running task has completed, use its result
+             }
+             else // residual value used up, revert to original Future 
+               f.listen(cb)
+          }
+          (ind, f, residual, listener, ref)
+        }.toIndexedSeq
+
+        fs.foreach { case (ind, f, residual, listener, ref) => 
+          f.listen { a =>
+            ref.set(a)
+            val notifyWinner = 
+              // If we're the first to finish, invoke `cb`, passing residuals
+              if (won.compareAndSet(false, true))
+                cb((a, fs.collect { case (i,_,rf,_,_) if i != ind => rf }))
+              else {
+                Trampoline.done(()) // noop; another thread will have already invoked `cb` w/ our residual
+              }
+            val notifyListener = 
+              if (listener.compareAndSet(null, finishedCallback.asInstanceOf[A => Trampoline[Unit]]))
+                // noop; no listeners yet, any added after this will use result stored in `ref`
+                Trampoline.done(()) 
+              else // there is a registered listener, invoke it with the result
+                listener.get.apply(a)
+            notifyWinner *> notifyListener
           }
         }
-        cb((a, residuals)).run
       }
     }
 
-    // Optimized implementation has all Futures dump to a shared queue, then
-    // waits for all to finish
-    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
-      Async { cb => 
-        val latch = new CountDownLatch(fs.length)
-        val results = new ConcurrentLinkedQueue[A] 
-        fs.foreach(_ runAsync { a => 
-          results.add(a)
-          latch.countDown
-        })
-        latch.await
-        cb(results.toList).run
+    private val finishedCallback: String => Trampoline[Unit] = 
+      s => sys.error("impossible, since there can only be one runner of chooseAny")
+
+    // implementation runs all threads, dumping to a shared queue
+    // last thread to finish invokes the callback with the results
+    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] = fs match {
+      case Seq() => Future.now(List())
+      case Seq(f) => f.map(List(_))
+      case other => Async { cb =>
+        val results = new ConcurrentLinkedQueue[A]
+        val c = new AtomicInteger(fs.size)
+
+        fs.foreach { f =>
+          f.listen { a =>
+            results.add(a)
+            // only last completed f will hit the 0 here.
+            if (c.decrementAndGet() == 0)
+              cb(results.toList)
+            else Trampoline.done(())
+          }
+        }
       }
+    }
   }
 
   /** Convert a strict value to a `Future`. */
@@ -286,4 +296,7 @@ object Future {
     pool.submit { new Callable[Unit] { def call = cb(a).run }}
   }
 
+  /** Calls `Nondeterminism[Future].gatherUnordered`. */
+  def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
+    futureInstance.gatherUnordered(fs)
 }
