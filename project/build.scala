@@ -175,6 +175,13 @@ object build extends Build {
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
       },
+      libraryDependencies <++= scalaVersion{ v =>
+        if((v startsWith "2.9") || (v startsWith "2.10")) Seq()
+        else Seq(
+          "org.scala-lang" % "scala-parser-combinators" % v,
+          "org.scala-lang" % "scala-xml" % v
+        )
+      },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
