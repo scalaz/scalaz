@@ -13,8 +13,8 @@ import Isomorphism.<=>
  *
  * Also known as an exponential functor.
  *
- * @see http://hackage.haskell.org/packages/archive/invariant/latest/doc/html/Data-Functor-Invariant.html
- * @see http://comonad.com/reader/2008/rotten-bananas/
+ * @see [[http://hackage.haskell.org/packages/archive/invariant/latest/doc/html/Data-Functor-Invariant.html]]
+ * @see [[http://comonad.com/reader/2008/rotten-bananas/]]
  *
  * @see [[scalaz.InvariantFunctor.InvariantFunctorLaw]]
  */
