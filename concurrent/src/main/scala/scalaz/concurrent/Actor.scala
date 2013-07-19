@@ -10,7 +10,7 @@ import annotation.tailrec
  * this is controlled by the provided `strategy`.
  *
  * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
- * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
+ * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
  *
  * @see scalaz.concurrent.Promise
  *
