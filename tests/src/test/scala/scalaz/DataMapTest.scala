@@ -320,6 +320,13 @@ class DataMapTest extends Spec {
       m.partition(_ < "x") === (fromList(List(3 -> "b", 5 -> "a")), empty[Int, String])
       m.partition(_ > "x") === (empty[Int, String], fromList(List(3 -> "b", 5 -> "a")))
     }
+
+    "partitionWithKey" in {
+      m.partitionWithKey((k, _) => k > 3) === (singleton(5, "a"), singleton(3, "b"))
+
+      m.partitionWithKey((k, _) => k < 7) === (fromList(List(3 -> "b", 5 -> "a")), empty[Int, String])
+      m.partitionWithKey((k, _) => k > 7) === (empty[Int, String], fromList(List(3 -> "b", 5 -> "a")))
+    }
   }
 
   "==>> map" should {

@@ -685,9 +685,9 @@ sealed abstract trait ==>>[A, B] {
         val (r1, r2) = r partitionWithKey p
 
         if (p(kx, x))
-          (r1.join(kx, x, l1), r2 merge l2)
+          (l1.join(kx, x, r1), l2 merge r2)
         else
-          (r1 merge l1, r2.join(kx, x, l2))
+          (l1 merge r1, l2.join(kx, x, r2))
     }
 
   //def mapMaybe
@@ -822,7 +822,7 @@ sealed abstract trait ==>>[A, B] {
         else Bin(kx, x, l, r)
     }
 
-  private def insertMin(kx: A, x: B): A ==>> B =
+  private def insertMax(kx: A, x: B): A ==>> B =
     this match {
       case Tip() =>
         singleton(kx, x)
@@ -830,7 +830,7 @@ sealed abstract trait ==>>[A, B] {
         balance(ky, y, l, r.insertMax(kx, x))
     }
 
-  private def insertMax(kx: A, x: B): A ==>> B =
+  private def insertMin(kx: A, x: B): A ==>> B =
     this match {
       case Tip() =>
         singleton(kx, x)
