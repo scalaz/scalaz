@@ -7,7 +7,7 @@ import scala.math
 import scala.collection.mutable.ListBuffer
 
 /**
- * Implementation of a Discrete Interval Encoding Tree (http://web.engr.oregonstate.edu/~erwig/diet/) that
+ * Implementation of a Discrete Interval Encoding Tree [[http://web.engr.oregonstate.edu/~erwig/diet/]] that
  * is actually implemented using a Vector and is balanced at all times as a result.
  */
 sealed trait Diev[A] {
