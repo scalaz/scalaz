@@ -2,7 +2,7 @@ package scalaz
 
 import Id._
 
-sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
+sealed trait BijectionT[F[_], G[_], A, B] { self =>
   def to(a: A): F[B]
   def from(b: B): G[A]
 
@@ -62,7 +62,7 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
 object BijectionT extends BijectionTFunctions with BijectionTInstances
 
 trait BijectionTFunctions {
-  def bijection[F[+_], G[+_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
+  def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B] {
       def to(a: A) = t(a)
       def from(b: B) = f(b)
@@ -76,10 +76,10 @@ trait BijectionTFunctions {
   type Bijection[A, B] =
   BijectionT[Id, Id, A, B]
 
-  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
+  def liftBijection[F[_], G[_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
-  def bijectionId[F[+_], G[+_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
+  def bijectionId[F[_], G[_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
     liftBijection(x => x, x => x)
 
   def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =
@@ -125,7 +125,7 @@ trait BijectionTFunctions {
 
 
 trait BijectionTInstances0 {
-  implicit def bijectionTSplit[F[+_], G[+_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+  implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
     new BijectionTSplit[F, G] {
       implicit def F = F0
       implicit def G = G0
@@ -133,14 +133,14 @@ trait BijectionTInstances0 {
 }
 
 trait BijectionTInstances extends BijectionTInstances0 {
-  implicit def bijectionTCategory[F[+_], G[+_]](implicit F0: Monad[F], G0: Monad[G]): Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+  implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
     new BijectionTCategory[F, G] {
       implicit def F = F0
       implicit def G = G0
     }
 }
 
-private[scalaz] trait BijectionTSplit[F[+_], G[+_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
+private[scalaz] trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
   implicit def F: Bind[F]
   implicit def G: Bind[G]
 
@@ -153,7 +153,7 @@ private[scalaz] trait BijectionTSplit[F[+_], G[+_]] extends Split[({type λ[α, 
     )
 }
 
-private[scalaz] trait BijectionTCategory[F[+_], G[+_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
+private[scalaz] trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 
