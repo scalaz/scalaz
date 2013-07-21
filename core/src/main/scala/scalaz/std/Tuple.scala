@@ -63,14 +63,14 @@ trait TupleInstances0 {
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
   implicit def tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
-    def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+    override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
   /** Product functor and comonad */
   implicit def tuple2Instance[A1]: Traverse[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
-    def cojoin[A](a: (A1, A)) = (a._1, a)
+    override def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
   }
