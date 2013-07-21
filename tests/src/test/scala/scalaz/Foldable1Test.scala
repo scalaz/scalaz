@@ -33,4 +33,18 @@ class Foldable1Test extends Spec {
       val f: Int => String = _.toString
       (xs minimumBy1 f) must be_===((xs.list zip (xs.list map f)).minBy(_._2)._1)
   }
+
+  private val L = Foldable1[NonEmptyList]
+
+  "product foldRight1 equivalence" ! prop {
+    (l: NonEmptyList[List[Int]], l2: NonEmptyList[List[Int]]) =>
+      (L.product(L).foldRight1((l, l2))(_ ++ _)
+       must be_===((l.list ++ l2.list).flatten))
+  }
+
+  "product foldLeft1 equivalence" ! prop {
+    (l: NonEmptyList[List[Int]], l2: NonEmptyList[List[Int]]) =>
+      (L.product(L).foldLeft1((l, l2))((xs, x) => x ++ xs)
+       must be_===((l.list ++ l2.list).reverse.flatten))
+  }
 }
