@@ -143,16 +143,8 @@ private[scalaz] sealed trait OneOrComonad[F[_]]
     fa.copoint
 }
 
-private[scalaz] sealed trait OneOrApply[F[_]]
-    extends OneOrFunctor[F] with Apply[({type λ[α] = OneOr[F, α]})#λ] {
-  implicit def F: Apply[F]
-
-  override def ap[A,B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
-    fa ap f
-}
-
 private[scalaz] sealed trait OneOrApplicative[F[_]]
-    extends OneOrApply[F] with Applicative[({type λ[α] = OneOr[F, α]})#λ] {
+    extends OneOrFunctor[F] with Applicative[({type λ[α] = OneOr[F, α]})#λ] {
   implicit def F: Apply[F]
 
   override def ap[A,B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
@@ -296,41 +288,34 @@ trait OneOrInstances1 extends OneOrInstances2 {
 }
 
 trait OneOrInstances2 extends OneOrInstances3 {
-  implicit def OneOrApply[F[_]: Apply]: Apply[({type λ[α] = OneOr[F, α]})#λ] =
-    new OneOrApply[F] {
-      def F = implicitly
-    }
-}
-
-trait OneOrInstances3 extends OneOrInstances4 {
   implicit def OneOrApplicative[F[_]: Apply]: Applicative[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrApplicative[F] {
       def F = implicitly
     }
 }
 
-trait OneOrInstances4 extends OneOrInstances5 {
+trait OneOrInstances3 extends OneOrInstances4 {
   implicit def OneOrFoldable[F[_]: Foldable]: Foldable[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable[F] {
       def F = implicitly
     }
 }
 
-trait OneOrInstances5 extends OneOrInstances6 {
+trait OneOrInstances4 extends OneOrInstances5 {
   implicit def OneOrFoldable1[F[_]: Foldable1]: Foldable1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
 }
 
-trait OneOrInstances6 extends OneOrInstances7 {
+trait OneOrInstances5 extends OneOrInstances6 {
   implicit def OneOrTraverse[F[_]: Traverse]: Traverse[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
 }
 
-trait OneOrInstances7 {
+trait OneOrInstances6 {
   implicit def OneOrTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse1[F] {
       def F = implicitly
