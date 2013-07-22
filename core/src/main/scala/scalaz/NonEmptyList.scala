@@ -10,15 +10,9 @@ sealed trait NonEmptyList[+A] {
 
   def <::[AA >: A](b: AA): NonEmptyList[AA] = nel(b, head :: tail)
 
-  import collection.mutable.ListBuffer
-
-  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = {
-    val b = new ListBuffer[AA]
-    b ++= bs
-    b += head
-    b ++= tail
-    val bb = b.toList
-    nel(bb.head, bb.tail)
+  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = bs match {
+    case Nil => this
+    case b :: bs => nel(b, bs ::: list)
   }
 
   def :::>[AA >: A](bs: List[AA]): NonEmptyList[AA] = nel(head, tail ::: bs)
@@ -27,6 +21,8 @@ sealed trait NonEmptyList[+A] {
   def append[AA >: A](f2: NonEmptyList[AA]): NonEmptyList[AA] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
+
+  import collection.mutable.ListBuffer
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val b = new ListBuffer[B]
