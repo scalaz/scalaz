@@ -95,7 +95,7 @@ private[scalaz] trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[
 
   override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
     cata(F.foldLeft(fa._1, none[A]){(oa, a) =>
-      oa map (f(_, a) orElse some(a)
+      oa map (f(_, a)) orElse some(a)
     })(G.foldLeft(fa._2, _)(f), G.foldLeft1(fa._2)(f))
 }
 
