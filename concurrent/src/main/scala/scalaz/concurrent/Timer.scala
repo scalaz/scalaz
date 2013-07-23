@@ -51,7 +51,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   private[this] def expireFutures(futures: SortedMap[Long, List[() => Unit]]) {
     futures.foreach(vector => vector._2.foreach(call => call()))
   }
-  
+
   def stop(expireImmediately: Boolean = false) {
     withWrite{
       continueRunning = false
@@ -81,7 +81,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   }
 
   private[this] def alignTimeResolution(time: Long): Long = time / timeoutTickMs * timeoutTickMs
-  
+
   def valueWait[T](value: T, waitMs: Long): Future[T] = {
     withRead{
       if (continueRunning) {
