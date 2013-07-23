@@ -135,10 +135,11 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     new Task(get.timed(timeoutInMillis).map(_.join))
 
   /**
-   * Retries this task if it fails. The number of 
+   * Retries this task if it fails, once for each element in `delays`,
+   * each retry delayed by the corresponding duration.
+   * A retriable failure is one for which the predicate `p` returns `true`.
    */
   def retry(delays: Seq[Duration],
-            k: (Throwable \/ A) => Unit,
             p: (Throwable => Boolean) = {
               case (e: Exception) => true
               case _ => false
