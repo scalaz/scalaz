@@ -120,6 +120,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     case \/-(a) => a
   }
 
+  def runFor(timeout: Duration): A = runFor(timeout.toMillis)
+
   /**
    * Like `runFor`, but returns exceptions as values. Both `TimeoutException`
    * and other exceptions will be folded into the same `Throwable`.
@@ -127,12 +129,16 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def attemptRunFor(timeoutInMillis: Long): Throwable \/ A =
     get.attemptRunFor(timeoutInMillis).join
 
+  def attemptRunFor(timeout: Duration): Throwable \/ A = attemptRunFor(timeout.toMillis)
+
   /**
    * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    */
   def timed(timeoutInMillis: Long): Task[A] =
     new Task(get.timed(timeoutInMillis).map(_.join))
+
+  def timed(timeout: Duration): Task[A] = timed(timeout.toMillis)
 
   /**
    * Retries this task if it fails, once for each element in `delays`,

@@ -109,3 +109,6 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   }
 }
 
+object Timer {
+  lazy val default = Timer()
+}

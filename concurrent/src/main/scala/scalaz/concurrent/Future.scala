@@ -173,6 +173,8 @@ trait Future[+A] {
     case \/-(a) => a
   }
 
+  def runFor(timeout: Duration): A = runFor(timeout.toMillis)
+
   /** Like `runFor`, but returns exceptions as values. */
   def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -184,6 +186,8 @@ trait Future[+A] {
     }
   }
 
+  def attemptRunFor(timeout: Duration): Throwable \/ A = attemptRunFor(timeout.toMillis)
+
   /**
    * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
@@ -191,11 +195,16 @@ trait Future[+A] {
   def timed(timeoutInMillis: Long): Future[Throwable \/ A] =
     delay { attemptRunFor(timeoutInMillis) }
 
+  def timed(timeout: Duration): Future[Throwable \/ A] = timed(timeout.toMillis)
+
   /**
    * Returns a `Future` that delays the execution of this `Future` by the duration `t`.
    */
   def after(t: Duration): Future[A] =
-    Timer().valueWait((), t.toMillis).flatMap(_ => this)
+    after(t.toMillis)
+
+  def after(t: Long): Future[A] =
+    Timer.default.valueWait((), t).flatMap(_ => this)
 }
 
 object Future {
