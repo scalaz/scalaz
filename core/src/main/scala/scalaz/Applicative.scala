@@ -76,6 +76,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     def point[A](a: => A) = F.point(a)
     def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
       F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
+    override def flip = self
   }
 
   trait ApplicativeLaw extends FunctorLaw {

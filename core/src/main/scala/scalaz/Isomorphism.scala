@@ -33,9 +33,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[A, B]
     def from: Arr[B, A]
-    def flip = new Iso[Arr, B, A] {
+    def flip: Iso[Arr, B, A] = new Iso[Arr, B, A] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
@@ -44,9 +45,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
-    def flip = new Iso2[Arr, G, F] {
+    def flip: Iso2[Arr, G, F] = new Iso2[Arr, G, F] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
@@ -55,9 +57,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
-    def flip = new Iso3[Arr, G, F] {
+    def flip: Iso3[Arr, G, F] = new Iso3[Arr, G, F] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
