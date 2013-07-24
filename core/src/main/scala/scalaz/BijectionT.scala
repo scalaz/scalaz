@@ -13,6 +13,8 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
     def to(a: B): G[A] = self.from(a)
 
     def from(b: A): F[B] = self.to(b)
+
+    override def flip = self
   }
 
   def toK: Kleisli[F, A, B] =

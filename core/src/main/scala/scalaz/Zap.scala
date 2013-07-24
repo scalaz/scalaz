@@ -9,6 +9,7 @@ trait Zap[F[_], G[_]] { self =>
   def flip: Zap[G, F] = new Zap[G, F] {
     def zapWith[A, B, C](ga: G[A], fb: F[B])(f: (A, B) => C): C =
       self.zapWith(fb, ga)((b, a) => f(a, b))
+    override def flip = self
   }
 }
 
