@@ -198,10 +198,6 @@ object ScalazProperties {
     def cobindRightIdentity[F[_], A, B](implicit F: Comonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
       forAll(F.comonadLaw.cobindRightIdentity[A, B] _)
 
-    def cobindAssociative[F[_], A, B, C, D](implicit F: Comonad[F], D: Equal[D], fa: Arbitrary[F[A]],
-                                            f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
-      forAll(F.comonadLaw.cobindAssociative[A, B, C, D] _)
-
     def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
       include(cobind.laws[F])
