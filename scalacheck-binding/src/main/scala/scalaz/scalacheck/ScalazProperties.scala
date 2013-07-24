@@ -330,7 +330,7 @@ object ScalazProperties {
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
       forAll(C.composeLaw.associative[A, B, C, D] _)
 
-    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("category") {
+    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("compose") {
       property("associative") = associative[=>:, Int, Int, Int, Int]
       include(semigroup.laws[Int =>: Int](C.semigroup[Int], implicitly, implicitly))
     }
