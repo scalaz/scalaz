@@ -26,7 +26,6 @@ class OneOrTest extends Spec {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneOr[F, α]})#λ]
     def apply[F[_]: Apply, A] = Apply[({type λ[α] = OneOr[F, α]})#λ]
     def applicative[F[_]: Apply, A] = Applicative[({type λ[α] = OneOr[F, α]})#λ]
-    def cojoin[F[_]: Cojoin, A] = Cojoin[({type λ[α] = OneOr[F, α]})#λ]
     def cobind[F[_]: Cobind, A] = Cobind[({type λ[α] = OneOr[F, α]})#λ]
     def comonad[F[_]: Comonad, A] = Comonad[({type λ[α] = OneOr[F, α]})#λ]
     def foldable[F[_]: Foldable, A] = Foldable[({type λ[α] = OneOr[F, α]})#λ]

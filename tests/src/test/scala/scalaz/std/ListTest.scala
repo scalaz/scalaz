@@ -11,7 +11,7 @@ class ListTest extends Spec {
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
   checkAll(isEmpty.laws[List])
-  checkAll(cojoin.laws[List])
+  checkAll(cobind.laws[List])
   checkAll(order.laws[List[Int]])
 
   import std.list.listSyntax._

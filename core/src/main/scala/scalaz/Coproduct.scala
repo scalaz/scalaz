@@ -19,7 +19,7 @@ sealed trait Coproduct[F[_], G[_], A] {
       run.bimap(a => F.cobind(a)(x => f(leftc(x))), a => G.cobind(a)(x => f(rightc(x))))
     )
 
-  def duplicate(implicit F: Cojoin[F], G: Cojoin[G]): Coproduct[F, G, Coproduct[F, G, A]] =
+  def duplicate(implicit F: Cobind[F], G: Cobind[G]): Coproduct[F, G, Coproduct[F, G, A]] =
     Coproduct(run.bimap(
       x => F.extend(x)(a => leftc(a))
     , x => G.extend(x)(a => rightc(a)))
@@ -98,11 +98,6 @@ trait CoproductInstances0 extends CoproductInstances {
     implicit def G: Cobind[G] = G0
   }
 
-  implicit def coproductCojoin[F[_], G[_]](implicit F0: Cojoin[F], G0: Cojoin[G]): Cojoin[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductCojoin[F, G] {
-    implicit def F: Cojoin[F] = F0
-    implicit def G: Cojoin[G] = G0
-  }
-
   implicit def coproductTraverse[F[_], G[_]](implicit F0: Traverse[F], G0: Traverse[G]): Traverse[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductTraverse[F, G] {
     implicit def F: Traverse[F] = F0
     implicit def G: Traverse[G] = G0
@@ -163,18 +158,6 @@ private[scalaz] trait CoproductCobind[F[_], G[_]] extends Cobind[({type λ[α]=C
 
   override def cobind[A, B](a: Coproduct[F, G, A])(f: Coproduct[F, G, A] => B) =
     a cobind f
-
-}
-
-private[scalaz] trait CoproductCojoin[F[_], G[_]] extends Cojoin[({type λ[α]=Coproduct[F, G, α]})#λ] {
-  implicit def F: Cojoin[F]
-  implicit def G: Cojoin[G]
-
-  override def map[A, B](a: Coproduct[F, G, A])(f: A => B) =
-    a map f
-
-  override def cojoin[A](a: Coproduct[F, G, A]) =
-    a.duplicate
 
 }
 

@@ -49,7 +49,8 @@ trait Syntaxes {
 
   object monad extends ToMonadOps
 
-  object cojoin extends ToCojoinOps
+  @deprecated("cojoin has been merged into cobind", "7.1")
+  object cojoin extends ToCobindOps
 
   object comonad extends ToComonadOps
 
@@ -144,7 +145,7 @@ trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
-  with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
+  with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps

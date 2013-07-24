@@ -165,7 +165,7 @@ private[scalaz] trait StoreTCobind[F[_], A0] extends Cobind[({type λ[α]=StoreT
 
 private[scalaz] trait StoreTComonad[F[_], A0] extends Comonad[({type λ[α]=StoreT[F, A0, α]})#λ] with StoreTCobind[F, A0] {
   implicit def F: Comonad[F]
-  def cojoin[A](a: StoreT[F, A0, A]) = a.duplicate
+  override def cojoin[A](a: StoreT[F, A0, A]) = a.duplicate
   def copoint[A](p: StoreT[F, A0, A]) = p.copoint
 
 }
