@@ -11,7 +11,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] with Cojoin[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     // TODO remove after removal of Index
@@ -78,7 +78,7 @@ trait ListInstances extends ListInstances0 {
         case _::t => f(fa) :: cobind(t)(f)
       }
 
-    def cojoin[A](a: List[A]) =
+    override def cojoin[A](a: List[A]) =
       a match {
         case Nil => Nil
         case _::t => a :: cojoin(t)

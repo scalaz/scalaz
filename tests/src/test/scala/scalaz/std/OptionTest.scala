@@ -19,7 +19,7 @@ class OptionTest extends Spec {
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", isEmpty.laws[Option])
-  checkAll("Option", cojoin.laws[Option])
+  checkAll("Option", cobind.laws[Option])
   
   checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
