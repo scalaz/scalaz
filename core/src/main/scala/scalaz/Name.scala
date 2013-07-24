@@ -11,7 +11,7 @@ sealed abstract class Need[+A] extends Name[A]
 /** Call by value */
 final case class Value[+A](value: A) extends Need[A]
 
-object Name { 
+object Name {
   def apply[A](a: => A) = new Name[A] {
     def value = a
   }
@@ -35,9 +35,9 @@ object Name {
 }
 
 object Need {
-  def apply[A](a: => A) = {
-    lazy val value0: A = a
+  def apply[A](a: => A): Need[A] = {
     new Need[A] {
+      private[this] lazy val value0: A = a
       def value = value0
     }
   }
