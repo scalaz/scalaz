@@ -142,23 +142,36 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
   /**
    * Retries this task if it fails, once for each element in `delays`,
+   * each retry delayed by the corresponding duration, accumulating
+   * errors into a list.
+   * A retriable failure is one for which the predicate `p` returns `true`.
+   */
+  def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
+    retryInternal(delays, p, true)
+
+  /**
+   * Retries this task if it fails, once for each element in `delays`,
    * each retry delayed by the corresponding duration.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retry(delays: Seq[Duration],
-            p: (Throwable => Boolean) = {
-              case (e: Exception) => true
-              case _ => false
-            }): Task[A] = {
-      def help(ds: Seq[Duration]): Future[Throwable \/ A] = ds match {
-        case Seq() => get
-        case Seq(t, ts @_*) => get flatMap {
-          case -\/(e) if p(e) =>
-            help(ts) after t
-          case x => Future.now(x)
+  def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
+    retryInternal(delays, p, false).map(_._1)
+
+  private def retryInternal(delays: Seq[Duration],
+                            p: (Throwable => Boolean),
+                            accumulateErrors: Boolean): Task[(A, List[Throwable])] = {
+      def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, List[Throwable])] = {
+        def acc = if (accumulateErrors) es.toList else Nil
+          ds match {
+            case Seq() => get map (_. map(_ -> acc))
+            case Seq(t, ts @_*) => get flatMap {
+              case -\/(e) if p(e) =>
+                help(ts, e #:: es) after t
+              case x => Future.now(x.map(_ -> acc))
+            }
         }
       }
-      Task.async { help(delays).runAsync }
+      Task.async { help(delays, Stream()).runAsync }
     }
 }
 
