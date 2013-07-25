@@ -128,6 +128,9 @@ private[scalaz] trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[
       .fold(X0.apply2(resume, _)(Tuple2.apply),
             pr => X0.map(resume)((_, pr)))
   }
+
+  override def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1R[F, G] with ProductTraverse[F, G] {
@@ -139,6 +142,9 @@ private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[
       .fold(X0.apply2(_, resume)(Tuple2.apply),
             pr => X0.map(resume)((pr, _)))
   }
+
+  override def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private[scalaz] trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1[F, G] with ProductTraverse[F, G] {
