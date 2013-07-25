@@ -36,7 +36,7 @@ trait Foldable[F[_]]  { self =>
   }
 
   /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */
-  def product0(implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+  def product0[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
     new ProductFoldable1R[F, G] {
       def F = self
       def G = G0
