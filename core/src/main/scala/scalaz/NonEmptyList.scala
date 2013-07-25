@@ -170,7 +170,7 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
-    Contravariant[Show].contramap(Show[List[A]])(_.list)
+    Contravariant[Show].contramap(std.list.listShow[A])(_.list)
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], List[A]](_.list)(std.list.listOrder[A])
