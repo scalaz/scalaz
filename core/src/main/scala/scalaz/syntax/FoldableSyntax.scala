@@ -6,6 +6,7 @@ sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
   ////
   import collection.generic.CanBuildFrom
+  import collection.immutable.IndexedSeq
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
