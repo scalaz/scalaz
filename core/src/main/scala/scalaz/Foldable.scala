@@ -9,6 +9,7 @@ package scalaz
 trait Foldable[F[_]]  { self =>
   ////
   import collection.generic.CanBuildFrom
+  import collection.immutable.IndexedSeq
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
