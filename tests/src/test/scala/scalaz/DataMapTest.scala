@@ -361,6 +361,32 @@ class DataMapTest extends Spec {
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ => 1, _ + _) must be_===(singleton(1, "cdab"))
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ => 3, _ + _) must be_===(singleton(3, "cdab"))
     }
+
+    "mapOption" in {
+      val f = (x: String) => if (x == "a") Some("new a") else None
+      fromList(List(5 -> "a", 3 -> "b")).mapOption(f) must be_===(singleton(5, "new a"))
+    }
+
+    "mapOptionWithKey" in {
+      val f = (k: Int, _: String) => if (k < 5) Some("key : " + k.toString) else None
+      fromList(List(5 -> "a", 3 -> "b")).mapOptionWithKey(f) must be_===(singleton(3, "key : 3"))
+    }
+
+    "mapEither" in {
+      val f = (a: String) => if (a < "c") \/.left(a) else \/.right(a)
+      val lst = fromList(List(5 -> "a", 3 -> "b", 1 -> "x", 7 -> "z"))
+
+      lst.mapEither(f) must be_===((fromList(List(3 -> "b", 5 -> "a")), fromList(List(1 -> "x", 7 -> "z"))))
+      lst.mapEither((a: String) => \/.right(a)) must be_===((empty[Int, String], lst))
+    }
+
+    "mapEitherWithKey" in {
+      val f = (k: Int, a: String) => if (k < 5) \/.left(k * 2) else \/.right(a + a)
+      val lst = fromList(List(5 -> "a", 3 -> "b", 1 -> "x", 7 -> "z"))
+
+      lst.mapEitherWithKey(f) must be_===(fromList(List(1 -> 2, 3 -> 6)), fromList(List(5 -> "aa", 7 -> "zz")))
+      lst.mapEitherWithKey((_: Int, a: String) => \/.right(a)) must be_===(empty[Int, String], lst)
+    }
   }
 
   "==>> fold" should {

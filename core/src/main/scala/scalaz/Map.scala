@@ -690,10 +690,40 @@ sealed abstract trait ==>>[A, B] {
           (l1 merge r1, l2.join(kx, x, r2))
     }
 
-  //def mapMaybe
-  //def mapMaybeWithKey
-  //def mapEither
-  //def mapEitherWithKey
+  def mapOption[C](f: B => Option[C])(implicit o: Order[A]): A ==>> C =
+    mapOptionWithKey((_, x) => f(x))
+
+  def mapOptionWithKey[C](f: (A, B) => Option[C])(implicit o: Order[A]): A ==>> C =
+    this match {
+      case Tip() =>
+        Tip()
+      case Bin(kx, x, l, r) =>
+        f(kx, x) match {
+          case Some(y) =>
+            l.mapOptionWithKey(f).join(kx, y, r.mapOptionWithKey(f))
+          case None =>
+            l.mapOptionWithKey(f).merge(r.mapOptionWithKey(f))
+        }
+    }
+
+  def mapEither[C, D](f: B => C \/ D)(implicit o: Order[A]): (A ==>> C, A ==>> D) =
+    mapEitherWithKey((_, x) => f(x))
+
+  def mapEitherWithKey[C, D](f: (A, B) => C \/ D)(implicit o: Order[A]): (A ==>> C, A ==>> D) =
+    this match {
+      case Tip() =>
+        (Tip(), Tip())
+      case Bin(kx, x, l, r) =>
+        val (l1, l2) = l.mapEitherWithKey(f)
+        val (r1, r2) = r.mapEitherWithKey(f)
+
+        f(kx, x) match {
+          case -\/(y) =>
+            (l1.join(kx, y, r1), l2 merge r2)
+          case \/-(z) =>
+            (l1 merge r1, l2.join(kx, z, r2))
+        }
+    }
 
   // Split
   def split(k: A)(implicit o: Order[A]): (A ==>> B, A ==>> B) =
