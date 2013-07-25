@@ -79,6 +79,14 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def sequence1_[M[_], A, B](fa: F[M[A]])(implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
     traverse1_(fa)(x => x)
 
+  /**The product of Foldable1 `F` and Foldable `G`, `[x](F[x], G[x]])`, is a Foldable1 */
+  def product0[G[_]](implicit G0: Foldable[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+    new ProductFoldable1L[F, G] {
+      def F = self
+      def G = G0
+    }
+
+
   ////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
