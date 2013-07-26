@@ -163,14 +163,8 @@ trait LazyEitherInstances {
         }
       )
 
-   def getOrElse[A](fa: LazyEither[E,A])(default: => A): A =
-     fa.getOrElse(default)
-
-   def isDefined[A](fa: LazyEither[E,A]): Boolean =
-     fa.isRight
-
-   def toOption[A](fa: LazyEither[E,A]): Option[A] =
-     fa.toOption
+   def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
+     fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
   }
 
   implicit def lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {

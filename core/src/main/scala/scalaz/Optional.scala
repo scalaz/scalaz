@@ -11,19 +11,24 @@ package scalaz
 trait Optional[F[_]]  { self =>
   ////
 
-  /** Returns the value within the context if defined or else the value of `default`. */
-  def getOrElse[A](fa: F[A])(default: => A): A
-
-  /** Returns `true` if a value is defined within the context. */
-  def isDefined[A](fa: F[A]): Boolean
+  /** If `fa` has an `a`, return it; otherwise it must be universally
+    * quantified.
+    */
+  def pextract[B, A](fa: F[A]): F[B] \/ A
 
   // derived functions
 
+  /** Returns the value within the context if defined or else the value of `default`. */
+  def getOrElse[A](fa: F[A])(default: => A): A = pextract(fa) | default
+
+  /** Returns `true` if a value is defined within the context. */
+  def isDefined[A](fa: F[A]): Boolean = pextract(fa).isRight
+
   /** Returns `true` if a value is defined within the context. This is an alias for `isDefined`. */
-  def nonEmpty[A](fa: F[A]): Boolean = isDefined(fa)
+  final def nonEmpty[A](fa: F[A]): Boolean = isDefined(fa)
 
   /** Returns `true` if no value is defined within the context. */
-  def isEmpty[A](fa: F[A]): Boolean = ! isDefined(fa)
+  final def isEmpty[A](fa: F[A]): Boolean = ! isDefined(fa)
 
   /** Returns given context if it is defined or else the value of the `alternative`. */
   def orElse[A](fa: F[A])(alternative: => F[A]): F[A] =
@@ -36,7 +41,7 @@ trait Optional[F[_]]  { self =>
   // conversions
 
   /** Returns this context converted to the `Option` context. */
-  def toOption[A](fa: F[A]): Option[A]
+  def toOption[A](fa: F[A]): Option[A] = pextract(fa).toOption
 
   ////
   val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }

@@ -364,14 +364,10 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
     def plus[A](a: L \/ A, b: => L \/ A) =
       a orElse b
 
-    def getOrElse[A](fa: L \/ A)(default: => A): A =
-      fa.getOrElse(default)
-
-    def isDefined[A](fa: L \/ A): Boolean =
-      fa.isRight
-
-    def toOption[A](fa: L \/ A): Option[A] =
-      fa.toOption
+    def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
+      case l@ -\/(_) => -\/(l)
+      case r@ \/-(_) => r
+    }
   }
 
 }

@@ -6,6 +6,11 @@ trait OptionalOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Optional[F]
   ////
 
+  /** If the value has an `a`, return it; otherwise it must be
+    * universally quantified.
+    */
+  final def pextract[B]: F[B] \/ A = F.pextract(self)
+
   /** Returns the value within the context if defined or else the value of `default`. */
   def getOrElse(default: => A): A = F.getOrElse(self)(default)
 
