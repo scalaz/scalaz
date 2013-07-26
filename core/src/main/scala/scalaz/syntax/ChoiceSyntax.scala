@@ -10,7 +10,7 @@ sealed abstract class ChoiceOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToChoiceOps0 {
+sealed trait ToChoiceOps0 {
     implicit def ToChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Choice, FA]) =
       new ChoiceOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Choice[F0.M] = F0.TC }
   
