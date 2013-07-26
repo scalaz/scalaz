@@ -4,8 +4,7 @@ package scalaz
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
 sealed abstract class \/[+A, +B] extends Product with Serializable {
-  sealed abstract class SwitchingDisjunction[X] {
-    def r: X
+  final class SwitchingDisjunction[X](r: => X) {
     def <<?:(left: => X): X =
       \/.this match {
         case -\/(_) => left
@@ -15,9 +14,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
-    new SwitchingDisjunction[X] {
-      def r = right
-    }
+    new SwitchingDisjunction[X](right)
 
   /** Return `true` if this disjunction is left. */
   def isLeft: Boolean =
