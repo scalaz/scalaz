@@ -270,8 +270,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
 
 }
-case class -\/[+A](a: A) extends (A \/ Nothing)
-case class \/-[+B](b: B) extends (Nothing \/ B)
+final case class -\/[+A](a: A) extends (A \/ Nothing)
+final case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
