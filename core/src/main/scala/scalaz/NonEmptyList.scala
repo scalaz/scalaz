@@ -1,10 +1,7 @@
 package scalaz
 
 /** A singly-linked list that is guaranteed to be non-empty. */
-sealed trait NonEmptyList[+A] {
-  val head: A
-  val tail: List[A]
-
+final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
   import NonEmptyList._
   import Zipper._
 
@@ -177,10 +174,8 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
 }
 
 trait NonEmptyListFunctions {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t.toList
-  }
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] =
+    new NonEmptyList(h, t)
 
   def nels[A](h: A, t: A*): NonEmptyList[A] =
     nel(h, t.toList)

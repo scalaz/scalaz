@@ -9,9 +9,7 @@ package scalaz
  * EitherT(x).map(1+).run // Some(\/-(2))
  * }}}
  * */
-sealed trait EitherT[F[_], A, B] {
-  val run: F[A \/ B]
-
+final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   import OptionT._
 
   sealed trait Switching_\/[X] {
@@ -196,10 +194,6 @@ sealed trait EitherT[F[_], A, B] {
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
-  /** Construct a disjunction value. */
-  def apply[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] =
-    eitherT[F, A, B](a)
-
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left(_)))
@@ -254,9 +248,7 @@ trait EitherTInstances extends EitherTInstances0 {
 }
 
 trait EitherTFunctions {
-  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = new EitherT[F, A, B] {
-    val run = a
-  }
+  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
 
   def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
     def MT = MT0
