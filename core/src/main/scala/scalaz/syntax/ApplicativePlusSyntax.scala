@@ -9,7 +9,7 @@ sealed abstract class ApplicativePlusOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToApplicativePlusOps0 {
+sealed trait ToApplicativePlusOps0 {
   implicit def ToApplicativePlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[ApplicativePlus, FA]) =
     new ApplicativePlusOps[F0.M,F0.A] { def self = F0(v); implicit def F: ApplicativePlus[F0.M] = F0.TC }
 

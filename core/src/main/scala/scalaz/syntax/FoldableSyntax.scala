@@ -60,7 +60,7 @@ sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToFoldableOps0 {
+sealed trait ToFoldableOps0 {
   implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
     new FoldableOps[F0.M,F0.A] { def self = F0(v); implicit def F: Foldable[F0.M] = F0.TC }
 

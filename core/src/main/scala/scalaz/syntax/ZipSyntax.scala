@@ -13,7 +13,7 @@ sealed abstract class ZipOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToZipOps0 {
+sealed trait ToZipOps0 {
   implicit def ToZipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]) =
     new ZipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Zip[F0.M] = F0.TC }
 

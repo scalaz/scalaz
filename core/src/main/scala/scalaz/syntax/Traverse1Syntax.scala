@@ -19,7 +19,7 @@ sealed abstract class Traverse1Ops[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToTraverse1Ops0 {
+sealed trait ToTraverse1Ops0 {
   implicit def ToTraverse1OpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse1, FA]) =
     new Traverse1Ops[F0.M,F0.A] { def self = F0(v); implicit def F: Traverse1[F0.M] = F0.TC }
 

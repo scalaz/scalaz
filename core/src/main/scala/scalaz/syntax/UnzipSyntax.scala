@@ -8,7 +8,7 @@ sealed abstract class UnzipOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToUnzipOps0 {
+sealed trait ToUnzipOps0 {
   implicit def ToUnzipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Unzip, FA]) =
     new UnzipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Unzip[F0.M] = F0.TC }
 

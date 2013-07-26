@@ -21,7 +21,7 @@ sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToMonadPlusOps0 {
+sealed trait ToMonadPlusOps0 {
   implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
     new MonadPlusOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadPlus[F0.M] = F0.TC }
 

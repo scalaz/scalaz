@@ -10,7 +10,7 @@ sealed abstract class LengthOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToLengthOps0 {
+sealed trait ToLengthOps0 {
   implicit def ToLengthOpsUnapply[FA](v: FA)(implicit F0: Unapply[Length, FA]) =
     new LengthOps[F0.M,F0.A] { def self = F0(v); implicit def F: Length[F0.M] = F0.TC }
 

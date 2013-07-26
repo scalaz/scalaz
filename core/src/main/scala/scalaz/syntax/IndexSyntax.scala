@@ -12,7 +12,7 @@ sealed abstract class IndexOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToIndexOps0 {
+sealed trait ToIndexOps0 {
   implicit def ToIndexOpsUnapply[FA](v: FA)(implicit F0: Unapply[Index, FA]) =
     new IndexOps[F0.M,F0.A] { def self = F0(v); implicit def F: Index[F0.M] = F0.TC }
 
