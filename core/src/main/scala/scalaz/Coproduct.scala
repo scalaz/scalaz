@@ -66,7 +66,7 @@ trait CoproductFunctions {
     Coproduct(\/.right(x))
 }
 
-trait CoproductInstances {
+sealed trait CoproductInstances {
   type TupleCoglorified[F[_], G[_], A] =
   Coproduct[F, G, A]
 
@@ -98,7 +98,7 @@ sealed trait CoproductInstances0 extends CoproductInstances {
   }
 }
 
-sealed trait CoproductInstances1 extends CoproductInstances0 {
+trait CoproductInstances1 extends CoproductInstances0 {
   implicit def coproductComonad[F[_], G[_]](implicit F0: Comonad[F], G0: Comonad[G]): Comonad[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductComonad[F, G] {
     implicit def F: Comonad[F] = F0
     implicit def G: Comonad[G] = G0
