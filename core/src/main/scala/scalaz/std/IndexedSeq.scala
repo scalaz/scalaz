@@ -22,7 +22,7 @@ trait IndexedSeqSubIndexedSeq extends IndexedSeqSub {
 }
 
 sealed trait IndexedSeqInstances0 {
-  implicit def indexedSeqEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, IndexedSeq[A]] {
+  implicit def indexedSeqEqual[A](implicit A0: Equal[A]): Equal[IndexedSeq[A]] = new IndexedSeqEqual[A, IndexedSeq[A]] {
     implicit def A = A0
   }
 }

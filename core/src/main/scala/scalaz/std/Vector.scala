@@ -9,7 +9,7 @@ trait IndexedSeqSubVector extends IndexedSeqSub {
 }
 
 sealed trait VectorInstances0 {
-  implicit def vectorEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, Vector[A]] {
+  implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new IndexedSeqEqual[A, Vector[A]] {
     implicit def A = A0
   }
 }
