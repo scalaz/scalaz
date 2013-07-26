@@ -109,7 +109,7 @@ trait NullArgumentFunctions {
     apply(c apply _)
 }
 
-trait NullArgumentInstances0 {
+sealed trait NullArgumentInstances0 {
 
   implicit def nullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
     new NullArgumentSemigroup[A, B] {

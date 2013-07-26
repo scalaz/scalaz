@@ -93,17 +93,17 @@ object IndexedStateT extends StateTFunctions with StateTInstances {
 // Prioritized Implicits for type class instances
 //
 
-trait IndexedStateTInstances2 {
+sealed trait IndexedStateTInstances2 {
   implicit def indexedStateTContravariant[S2, A0, F[_]]: Contravariant[({type f[a] = IndexedStateT[F, a, S2, A0]})#f] = new IndexedStateTContravariant[S2, A0, F] {}
 }
 
-trait IndexedStateTInstances1 extends IndexedStateTInstances2 {
+sealed trait IndexedStateTInstances1 extends IndexedStateTInstances2 {
   implicit def indexedStateTFunctorLeft[S1, A0, F[_]](implicit F0: Functor[F]): Functor[({type f[a] = IndexedStateT[F, S1, a, A0]})#f] = new IndexedStateTFunctorLeft[S1, A0, F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait IndexedStateTInstances0 extends IndexedStateTInstances1 {
+sealed trait IndexedStateTInstances0 extends IndexedStateTInstances1 {
   implicit def indexedStateTBifunctor[S1, F[_]](implicit F0: Functor[F]): Bifunctor[({type f[a, b] = IndexedStateT[F, S1, a, b]})#f] = new IndexedStateTBifunctor[S1, F] {
     implicit def F: Functor[F] = F0
   }
@@ -115,13 +115,13 @@ trait IndexedStateTInstances extends IndexedStateTInstances0 {
   }
 }
 
-trait StateTInstances1 extends IndexedStateTInstances {
+sealed trait StateTInstances1 extends IndexedStateTInstances {
   implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] = new StateTMonadState[S, F] {
     implicit def F: Monad[F] = F0
   }
 }
 
-trait StateTInstances0 extends StateTInstances1 {
+sealed trait StateTInstances0 extends StateTInstances1 {
   implicit def StateMonadTrans[S]: Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTHoist[S] {}
 }
 

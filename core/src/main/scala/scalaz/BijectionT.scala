@@ -126,7 +126,7 @@ trait BijectionTFunctions {
 }
 
 
-trait BijectionTInstances0 {
+sealed trait BijectionTInstances0 {
   implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
     new BijectionTSplit[F, G] {
       implicit def F = F0

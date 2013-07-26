@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait FunctionInstances1 {
+sealed trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
     implicit def R = R0
   }
@@ -10,7 +10,7 @@ trait FunctionInstances1 {
   }
 }
 
-trait FunctionInstances0 extends FunctionInstances1 {
+sealed trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
     implicit def R = R0
   }

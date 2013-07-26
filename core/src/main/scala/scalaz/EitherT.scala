@@ -220,13 +220,13 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   }
 }
 
-trait EitherTInstances1 {
+sealed trait EitherTInstances1 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
     implicit def F = F0
   }
 }
 
-trait EitherTInstances0 extends EitherTInstances1 {
+sealed trait EitherTInstances0 extends EitherTInstances1 {
   implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
     implicit def F = F0
   }

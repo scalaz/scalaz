@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait OptionInstances0 {
+sealed trait OptionInstances0 {
   implicit def optionEqual[A](implicit A0: Equal[A]) = new OptionEqual[A] {
     implicit def A = A0
   }

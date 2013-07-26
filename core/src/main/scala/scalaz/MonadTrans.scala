@@ -52,7 +52,7 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
     }
 }
 
-trait MonadPartialOrderFunctions1 {
+sealed trait MonadPartialOrderFunctions1 {
   implicit def transitive[G[_], F[_], E[_]](implicit e1: MonadPartialOrder[G, F], e2: MonadPartialOrder[F, E]): MonadPartialOrder[G, E] = 
      e2 compose e1
 }

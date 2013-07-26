@@ -42,7 +42,7 @@ trait EndomorphicInstances extends EndomorphicInstances0 {
     endomorphicMonoid[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
 }
 
-trait EndomorphicInstances0 {
+sealed trait EndomorphicInstances0 {
 
   implicit def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
     new EndomorphicSemigroup[=>:, A] {

@@ -305,7 +305,7 @@ trait DisjunctionInstances extends DisjunctionInstances0 {
   A \/ B
 }
 
-trait DisjunctionInstances0 extends DisjunctionInstances1 {
+sealed trait DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
@@ -321,7 +321,7 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
     }
 }
 
-trait DisjunctionInstances1 extends DisjunctionInstances2 {
+sealed trait DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
@@ -338,7 +338,7 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
     }
 }
 
-trait DisjunctionInstances2 extends DisjunctionInstances3 {
+sealed trait DisjunctionInstances2 extends DisjunctionInstances3 {
   implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
@@ -367,7 +367,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 
 }
 
-trait DisjunctionInstances3 {
+sealed trait DisjunctionInstances3 {
   implicit def DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)

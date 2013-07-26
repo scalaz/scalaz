@@ -81,7 +81,7 @@ trait LazyTupleFunctions {
   }
 }
 
-trait LazyTuple2Instances0 {
+sealed trait LazyTuple2Instances0 {
   implicit def lazyTuple2Instance[A1, A2] = new Bitraverse[LazyTuple2] {
     override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(f: A => C, g: B => D): LazyTuple2[C, D] = LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] = {
@@ -119,7 +119,7 @@ trait LazyTuple2Instances extends LazyTuple2Instances0 {
   }
 }
 
-trait LazyTuple3Instances0 {
+sealed trait LazyTuple3Instances0 {
   implicit def lazyTuple3Semigroup[A1, A2, A3](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3]) = new LazyTuple3Semigroup[A1, A2, A3] {
     implicit def _1 = A1
     implicit def _2 = A2
@@ -160,7 +160,7 @@ trait LazyTuple3Instances extends LazyTuple3Instances0 {
   }
 }
 
-trait LazyTuple4Instances0 {
+sealed trait LazyTuple4Instances0 {
   implicit def lazyTuple4Semigroup[A1, A2, A3, A4](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3], A4: Semigroup[A4]) = new LazyTuple4Semigroup[A1, A2, A3, A4] {
     implicit def _1 = A1
     implicit def _2 = A2

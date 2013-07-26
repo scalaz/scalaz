@@ -389,7 +389,7 @@ trait LensFunctions extends LensFamilyFunctions {
     }
 }
 
-trait LensInstances0 { this: LensInstances =>
+sealed trait LensInstances0 { this: LensInstances =>
   import scala.collection.SeqLike
 
   implicit def seqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](lens: LensFamily[S1, S2, Repr, Repr]) =
