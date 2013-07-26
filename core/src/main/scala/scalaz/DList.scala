@@ -14,9 +14,9 @@ import std.function._
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
  */
-trait DList[A] {
+final class DList[A](f: (List[A]) => Trampoline[List[A]]) {
   import DList._
-  def apply(xs: => List[A]): Trampoline[List[A]]
+  def apply(xs: => List[A]): Trampoline[List[A]] = f(xs)
 
   /** Convert to a normal list. */
   def toList: List[A] = apply(List()).run
@@ -83,9 +83,7 @@ trait DListInstances {
 
 trait DListFunctions {
   def mkDList[A](f: (List[A]) => Trampoline[List[A]]): DList[A] =
-    new DList[A] {
-      def apply(xs: => List[A]) = f(xs)
-    }
+    new DList[A](f)
   def DL[A](f: (=> List[A]) => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
   def fromList[A](as: => List[A]): DList[A] =
     DL(bs => as ++ bs)
