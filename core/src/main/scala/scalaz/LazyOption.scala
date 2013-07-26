@@ -1,7 +1,7 @@
 package scalaz
 
 /** [[scala.Option]], but with a value by name. */
-sealed trait LazyOption[+A] {
+sealed abstract class LazyOption[+A] extends Product with Serializable {
 
   import LazyOption._
   import LazyEither._
@@ -98,7 +98,7 @@ sealed trait LazyOption[+A] {
 
 }
 
-private case class LazySome[A](a: () => A) extends LazyOption[A]
+private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private case object LazyNone extends LazyOption[Nothing]
 
