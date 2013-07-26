@@ -105,7 +105,7 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
     list.hashCode
 }
 
-object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
+object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
@@ -113,11 +113,11 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
     Some((v.head, v.tail))
 }
 
-sealed trait NonEmptyListInstances0 {
+sealed abstract class NonEmptyListInstances0 {
   implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
 }
 
-trait NonEmptyListInstances extends NonEmptyListInstances0 {
+sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =

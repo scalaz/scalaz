@@ -84,7 +84,7 @@ final class InsertionMap[K, V] private[scalaz](
     "InsertionMap(" + (toList mkString ", ") + ")"
 }
 
-object InsertionMap extends InsertionMapFunctions with InsertionMapInstances
+object InsertionMap extends InsertionMapInstances with InsertionMapFunctions
 
 trait InsertionMapFunctions {
   private[scalaz] def build[K, V](a: Map[K, (V, Long)], n: Long): InsertionMap[K, V] =
@@ -109,7 +109,7 @@ trait InsertionMapFunctions {
 
 }
 
-trait InsertionMapInstances {
+sealed abstract class InsertionMapInstances {
   import Scalaz._
 
   implicit def insertionTraverse[K]: Traverse[({type λ[α]=InsertionMap[K, α]})#λ] =

@@ -347,9 +347,9 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   }
 }
 
-object Zipper extends ZipperFunctions with ZipperInstances
+object Zipper extends ZipperInstances with ZipperFunctions
 
-trait ZipperInstances {
+sealed abstract class ZipperInstances {
   import Zipper._
 
   implicit def zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with Comonad[Zipper] {

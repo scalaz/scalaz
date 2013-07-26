@@ -15,14 +15,14 @@ sealed trait Endo[A] {
   final def andThen(other: Endo[A]): Endo[A] = other compose this
 }
 
-object Endo extends EndoFunctions with EndoInstances {
+object Endo extends EndoInstances with EndoFunctions {
   /** Wrap a function. */
   def apply[A](f: A => A): Endo[A] = new Endo[A] {
     val run = f
   }
 }
 
-trait EndoInstances {
+sealed abstract class EndoInstances {
 
   /** Endo forms a monoid where `zero` is the identity endomorphism
     * and `append` composes the underlying functions. */

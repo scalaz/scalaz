@@ -104,7 +104,7 @@ sealed abstract class Tree[A] {
   }
 }
 
-object Tree extends TreeFunctions with TreeInstances {
+object Tree extends TreeInstances with TreeFunctions {
   /** Construct a tree node with no children. */
   def apply[A](root: => A): Tree[A] = leaf(root)
 
@@ -115,7 +115,7 @@ object Tree extends TreeFunctions with TreeInstances {
 
 }
 
-trait TreeInstances {
+sealed abstract class TreeInstances {
   implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa cobind f

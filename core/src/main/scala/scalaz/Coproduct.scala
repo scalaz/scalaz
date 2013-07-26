@@ -56,7 +56,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
 
 }
 
-object Coproduct extends CoproductFunctions with CoproductInstances0
+object Coproduct extends CoproductInstances0 with CoproductFunctions
 
 trait CoproductFunctions {
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =
@@ -66,7 +66,7 @@ trait CoproductFunctions {
     Coproduct(\/.right(x))
 }
 
-sealed trait CoproductInstances {
+sealed abstract class CoproductInstances {
   type TupleCoglorified[F[_], G[_], A] =
   Coproduct[F, G, A]
 
@@ -86,7 +86,7 @@ sealed trait CoproductInstances {
   }
 }
 
-sealed trait CoproductInstances0 extends CoproductInstances {
+sealed abstract class CoproductInstances0 extends CoproductInstances {
   implicit def coproductCobind[F[_], G[_]](implicit F0: Cobind[F], G0: Cobind[G]): Cobind[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductCobind[F, G] {
     implicit def F: Cobind[F] = F0
     implicit def G: Cobind[G] = G0
@@ -98,7 +98,7 @@ sealed trait CoproductInstances0 extends CoproductInstances {
   }
 }
 
-trait CoproductInstances1 extends CoproductInstances0 {
+sealed abstract class CoproductInstances1 extends CoproductInstances0 {
   implicit def coproductComonad[F[_], G[_]](implicit F0: Comonad[F], G0: Comonad[G]): Comonad[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductComonad[F, G] {
     implicit def F: Comonad[F] = F0
     implicit def G: Comonad[G] = G0

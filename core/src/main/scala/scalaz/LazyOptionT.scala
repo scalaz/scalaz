@@ -60,32 +60,32 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
 
 }
 
-object LazyOptionT extends LazyOptionTFunctions with LazyOptionTInstances
+object LazyOptionT extends LazyOptionTInstances with LazyOptionTFunctions
 
 //
 // Prioritized Implicits for type class instances
 //
 
-sealed trait LazyOptionTInstances2 {
+sealed abstract class LazyOptionTInstances2 {
   implicit def lazyOptionTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-sealed trait LazyOptionTInstances1 extends LazyOptionTInstances2 {
+sealed abstract class LazyOptionTInstances1 extends LazyOptionTInstances2 {
   implicit def lazyOptionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
-sealed trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
+sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }
   implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] = Equal.equalBy((_: LazyOptionT[F, A]).run)
 }
 
-trait LazyOptionTInstances extends LazyOptionTInstances0 {
+sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
   implicit def lazyOptionTMonadTrans: Hoist[LazyOptionT] = new LazyOptionTHoist {}
 
   implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTMonad[F] {

@@ -92,7 +92,7 @@ sealed abstract class EphemeralStream[A] {
 
 }
 
-object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInstances {
+object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
   def apply[A]: EphemeralStream[A] =
     emptyEphemeralStream
 
@@ -102,7 +102,7 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
       else None)
 }
 
-trait EphemeralStreamInstances {
+sealed abstract class EphemeralStreamInstances {
   // TODO more instances
   implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b

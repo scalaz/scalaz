@@ -79,7 +79,7 @@ sealed trait IndexedStoreT[F[_], +I, A, B] {
     (F.map(run._1)(f), run._2)
 }
 
-object IndexedStoreT extends StoreTFunctions with StoreTInstances {
+object IndexedStoreT extends StoreTInstances with StoreTFunctions {
   def apply[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] =
     indexedStoreT(r)
 }
@@ -102,40 +102,40 @@ trait StoreTFunctions extends IndexedStoreTFunctions {
   def store[A, B](a: A)(f: A => B): Store[A, B] =
     storeT[Id, A, B](f -> a)
 }
-sealed trait IndexedStoreTInstances2 {
+sealed abstract class IndexedStoreTInstances2 {
   implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]) = new IndexedStoreTContravariant[F, I, B] {
     implicit def F: Functor[F] = F0
   }
 }
-sealed trait IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
+sealed abstract class IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
   implicit def indexedStoreTFunctorLeft[F[_], A, B] = new IndexedStoreTFunctorLeft[F, A, B] {}
 }
-sealed trait IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
+sealed abstract class IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
   implicit def indexedStoreTBifunctor[F[_], A](implicit F0: Functor[F]) = new IndexedStoreTBifunctor[F, A] {
     implicit def F: Functor[F] = F0
   }
 }
-trait IndexedStoreTInstances extends IndexedStoreTInstances0 {
+sealed abstract class IndexedStoreTInstances extends IndexedStoreTInstances0 {
   implicit def indexedStoreTFunctorRight[F[_], I, A](implicit F0: Functor[F]) = new IndexedStoreTFunctorRight[F, I, A] {
     implicit def F: Functor[F] = F0
   }
 }
-sealed trait StoreTInstances2 extends IndexedStoreTInstances {
+sealed abstract class StoreTInstances2 extends IndexedStoreTInstances {
   implicit def storeTCobind[F[_], A](implicit F0: Cobind[F]) = new StoreTCobind[F, A] {
     implicit def F: Cobind[F] = F0
   }
 }
-sealed trait StoreTInstances1 extends StoreTInstances2 {
+sealed abstract class StoreTInstances1 extends StoreTInstances2 {
   implicit def storeTComonad[F[_], A](implicit F0: Comonad[F]) = new StoreTComonad[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
-sealed trait StoreTInstances0 extends StoreTInstances1 {
+sealed abstract class StoreTInstances0 extends StoreTInstances1 {
   implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]) = new StoreTComonadStore[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
-trait StoreTInstances extends StoreTInstances0 {
+abstract class StoreTInstances extends StoreTInstances0 {
   implicit def storeTCohoist[S]: Cohoist[({type f[g[_], a] = StoreT[g, S, a]})#f] = new StoreTCohoist[S] {}
 }
 

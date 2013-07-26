@@ -60,11 +60,11 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
     foldr(DList[B]())((x, y) => f(x) ++ y)
 }
 
-object DList extends DListFunctions with DListInstances {
+object DList extends DListInstances with DListFunctions {
   def apply[A](xs: A*) = fromList(xs.toList)
 }
 
-trait DListInstances {
+sealed abstract class DListInstances {
   implicit def dlistMonoid[A]: Monoid[DList[A]] = new Monoid[DList[A]] {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b

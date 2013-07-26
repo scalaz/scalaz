@@ -18,7 +18,7 @@ sealed abstract class Liskov[-A, +B] {
   final def compose[C](that: Liskov[C, A]): Liskov[C, B] = Liskov.trans(this, that)
 }
 
-trait LiskovInstances {
+sealed abstract class LiskovInstances {
   import Liskov._
 
   /**Subtyping forms a category */

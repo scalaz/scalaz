@@ -40,7 +40,7 @@ sealed trait STRef[S, A] {
   } yield ()
 }
 
-object STRef extends STRefFunctions with STRefInstances {
+object STRef extends STRefInstances with STRefFunctions {
 
   def apply[S]: (Id ~> ({type λ[α] = STRef[S, α]})#λ) =
     stRef[S]
@@ -55,7 +55,7 @@ trait STRefFunctions {
   }
 }
 
-trait STRefInstances {
+sealed abstract class STRefInstances {
   
   /**Equality for STRefs is reference equality */
   implicit def STRefEqual[S, A]: Equal[STRef[S, A]] =
@@ -132,7 +132,7 @@ sealed trait ST[S, A] {
     })
 }
 
-object ST extends STFunctions with STInstances {
+object ST extends STInstances with STFunctions {
   def apply[S, A](a: => A): ST[S, A] =
     returnST(a)
 }
@@ -186,12 +186,12 @@ trait STFunctions {
   }
 }
 
-trait STInstance0 {
+sealed abstract class STInstance0 {
   implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
       Semigroup.liftSemigroup[({type λ[α] = ST[S, α]})#λ, A](ST.stMonad[S], A)
 }
 
-trait STInstances extends STInstance0 {
+sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
     Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
 

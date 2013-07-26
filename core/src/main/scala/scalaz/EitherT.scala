@@ -193,7 +193,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     EitherT(F.map(run)(_ validationed k))
 }
 
-object EitherT extends EitherTFunctions with EitherTInstances {
+object EitherT extends EitherTInstances with EitherTFunctions {
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left(_)))
@@ -214,13 +214,13 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   }
 }
 
-sealed trait EitherTInstances1 {
+sealed abstract class EitherTInstances1 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
     implicit def F = F0
   }
 }
 
-sealed trait EitherTInstances0 extends EitherTInstances1 {
+sealed abstract class EitherTInstances0 extends EitherTInstances1 {
   implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
     implicit def F = F0
   }
@@ -233,7 +233,7 @@ sealed trait EitherTInstances0 extends EitherTInstances1 {
   }
 }
 
-trait EitherTInstances extends EitherTInstances0 {
+sealed abstract class EitherTInstances extends EitherTInstances0 {
   implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBitraverse[F] {
     implicit def F = F0
   }

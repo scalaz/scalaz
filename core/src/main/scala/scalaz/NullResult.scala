@@ -108,7 +108,7 @@ sealed trait NullResult[A, B] {
     OptionT(F.map(a)(apply(_)))
 }
 
-object NullResult extends NullResultFunctions with NullResultInstances
+object NullResult extends NullResultInstances with NullResultFunctions
 
 trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
@@ -144,7 +144,7 @@ trait NullResultFunctions {
   }
 }
 
-sealed trait NullResultInstances0 {
+sealed abstract class NullResultInstances0 {
 
   implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
@@ -153,7 +153,7 @@ sealed trait NullResultInstances0 {
 
 }
 
-trait NullResultInstances extends NullResultInstances0 {
+sealed abstract class NullResultInstances extends NullResultInstances0 {
 
   implicit def nullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
     new NullResultMonoid[A, B] {
