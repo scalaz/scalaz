@@ -2,7 +2,7 @@ package scalaz
 
 import Id._
 
-sealed trait BijectionT[F[_], G[_], A, B] { self =>
+sealed abstract class BijectionT[F[_], G[_], A, B] { self =>
   def to(a: A): F[B]
   def from(b: B): G[A]
 
