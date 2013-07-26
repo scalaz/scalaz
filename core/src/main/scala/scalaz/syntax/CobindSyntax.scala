@@ -12,7 +12,7 @@ sealed abstract class CobindOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToCobindOps0 {
+sealed trait ToCobindOps0 {
   implicit def ToCobindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cobind, FA]) =
     new CobindOps[F0.M,F0.A] { def self = F0(v); implicit def F: Cobind[F0.M] = F0.TC }
 

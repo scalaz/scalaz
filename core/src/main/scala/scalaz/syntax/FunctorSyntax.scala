@@ -23,7 +23,7 @@ sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToFunctorOps0 {
+sealed trait ToFunctorOps0 {
   implicit def ToFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
     new FunctorOps[F0.M,F0.A] { def self = F0(v); implicit def F: Functor[F0.M] = F0.TC }
 

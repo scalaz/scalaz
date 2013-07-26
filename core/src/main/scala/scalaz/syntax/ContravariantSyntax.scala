@@ -10,7 +10,7 @@ sealed abstract class ContravariantOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToContravariantOps0 {
+sealed trait ToContravariantOps0 {
   implicit def ToContravariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[Contravariant, FA]) =
     new ContravariantOps[F0.M,F0.A] { def self = F0(v); implicit def F: Contravariant[F0.M] = F0.TC }
 

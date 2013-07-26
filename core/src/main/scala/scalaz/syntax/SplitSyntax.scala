@@ -10,7 +10,7 @@ sealed abstract class SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToSplitOps0 {
+sealed trait ToSplitOps0 {
     implicit def ToSplitOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Split, FA]) =
       new SplitOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Split[F0.M] = F0.TC }
   

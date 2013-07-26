@@ -68,7 +68,7 @@ sealed abstract class TraverseOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToTraverseOps0 {
+sealed trait ToTraverseOps0 {
   implicit def ToTraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse, FA]) =
     new TraverseOps[F0.M,F0.A] { def self = F0(v); implicit def F: Traverse[F0.M] = F0.TC }
 

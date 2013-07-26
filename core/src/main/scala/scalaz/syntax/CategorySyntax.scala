@@ -9,7 +9,7 @@ sealed abstract class CategoryOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToCategoryOps0 {
+sealed trait ToCategoryOps0 {
     implicit def ToCategoryOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
       new CategoryOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Category[F0.M] = F0.TC }
   

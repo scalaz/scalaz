@@ -23,7 +23,7 @@ sealed abstract class ArrowOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToArrowOps0 {
+sealed trait ToArrowOps0 {
     implicit def ToArrowOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
       new ArrowOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Arrow[F0.M] = F0.TC }
   

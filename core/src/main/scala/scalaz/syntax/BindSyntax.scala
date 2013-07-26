@@ -27,7 +27,7 @@ sealed abstract class BindOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToBindOps0 {
+sealed trait ToBindOps0 {
   implicit def ToBindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
     new BindOps[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
 

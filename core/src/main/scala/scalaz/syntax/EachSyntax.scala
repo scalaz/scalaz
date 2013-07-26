@@ -10,7 +10,7 @@ sealed abstract class EachOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToEachOps0 {
+sealed trait ToEachOps0 {
   implicit def ToEachOpsUnapply[FA](v: FA)(implicit F0: Unapply[Each, FA]) =
     new EachOps[F0.M,F0.A] { def self = F0(v); implicit def F: Each[F0.M] = F0.TC }
 

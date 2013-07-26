@@ -15,7 +15,7 @@ trait InvariantFunctorOps[F[_], A] extends Ops[F[A]] {
   ////
 }
 
-trait ToInvariantFunctorOps0 {
+sealed trait ToInvariantFunctorOps0 {
   implicit def ToInvariantFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[InvariantFunctor, FA]) =
     new InvariantFunctorOps[F0.M, F0.A] {
       def self = F0(v)
