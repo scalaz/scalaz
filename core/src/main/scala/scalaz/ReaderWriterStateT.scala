@@ -1,7 +1,7 @@
 package scalaz
 
 /** A monad transformer stack yielding `(R, S1) => F[(W, A, S2)]`. */
-sealed trait IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
+sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   self =>
   def run(r: R, s: S1): F[(W, A, S2)]
 
