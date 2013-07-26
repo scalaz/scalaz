@@ -16,7 +16,7 @@ sealed trait Endomorphic[=>:[_, _], A] {
 
 }
 
-object Endomorphic extends EndomorphicFunctions with EndomorphicInstances {
+object Endomorphic extends EndomorphicInstances with EndomorphicFunctions {
 
   def apply[=>:[_, _], A](ga: A =>: A) = new Endomorphic[=>:, A] {
     val run = ga
@@ -30,7 +30,7 @@ trait EndomorphicFunctions {
     Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A](Kleisli(f))
 }
 
-trait EndomorphicInstances extends EndomorphicInstances0 {
+sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
 
   implicit def endomorphicMonoid[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
     new Monoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
@@ -42,7 +42,7 @@ trait EndomorphicInstances extends EndomorphicInstances0 {
     endomorphicMonoid[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
 }
 
-sealed trait EndomorphicInstances0 {
+sealed abstract class EndomorphicInstances0 {
 
   implicit def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
     new EndomorphicSemigroup[=>:, A] {

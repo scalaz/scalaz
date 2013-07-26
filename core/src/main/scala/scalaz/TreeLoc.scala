@@ -191,12 +191,12 @@ sealed trait TreeLoc[A] {
     }
 }
 
-object TreeLoc extends TreeLocFunctions with TreeLocInstances {
+object TreeLoc extends TreeLocInstances with TreeLocFunctions {
   def apply[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
     loc(t, l, r, p)
 }
 
-trait TreeLocInstances {
+sealed abstract class TreeLocInstances {
   // TODO more instances
   implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] {
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel

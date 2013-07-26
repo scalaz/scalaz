@@ -102,9 +102,9 @@ private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private case object LazyNone extends LazyOption[Nothing]
 
-object LazyOption extends LazyOptionFunctions with LazyOptionInstances
+object LazyOption extends LazyOptionInstances with LazyOptionFunctions
 
-trait LazyOptionInstances {
+sealed abstract class LazyOptionInstances {
   import LazyOption._
 
   implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Cobind[LazyOption] {

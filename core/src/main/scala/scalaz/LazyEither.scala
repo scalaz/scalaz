@@ -93,7 +93,7 @@ private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
 
 private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
-object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
+object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
   sealed trait LeftProjection[+A, +B] {
     def e: LazyEither[A, B]
@@ -137,7 +137,7 @@ object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 }
 
 // TODO more instances
-trait LazyEitherInstances {
+sealed abstract class LazyEitherInstances {
   implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
       fa traverse f

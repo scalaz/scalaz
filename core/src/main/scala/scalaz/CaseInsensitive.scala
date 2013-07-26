@@ -23,7 +23,7 @@ object CaseInsensitive extends CaseInsensitiveInstances {
   }
 }
 
-trait CaseInsensitiveInstances {
+sealed abstract class CaseInsensitiveInstances {
   implicit def CaseInsensitiveMonoid[A: FoldCase : Monoid]: Monoid[CaseInsensitive[A]] =
     new Monoid[CaseInsensitive[A]] {
       def zero = CaseInsensitive.mk(Monoid[A].zero, Monoid[A].zero)
@@ -54,7 +54,7 @@ trait FoldCase[A] {
 
 object FoldCase extends FoldCaseInstances
 
-trait FoldCaseInstances {
+sealed abstract class FoldCaseInstances {
   implicit def StringFoldCase: FoldCase[String] = new FoldCase[String] {
     def foldCase(s: String) = s.toLowerCase
   }

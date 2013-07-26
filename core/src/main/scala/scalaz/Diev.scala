@@ -214,7 +214,7 @@ trait DievFunctions extends DievImplementation {
 object Diev extends DievInstances with DievFunctions {
 }
 
-trait DievInstances extends DievImplementation {
+sealed abstract class DievInstances extends DievImplementation {
   implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
 
   @deprecated("Each/foreach and Length/length are deprecated", "7.1")

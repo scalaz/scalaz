@@ -55,7 +55,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def >=>[C](that: BijectionT[F, G, B, C])(implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
 
 }
-object BijectionT extends BijectionTFunctions with BijectionTInstances
+object BijectionT extends BijectionTInstances with BijectionTFunctions
 
 trait BijectionTFunctions {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
@@ -117,7 +117,7 @@ trait BijectionTFunctions {
 }
 
 
-sealed trait BijectionTInstances0 {
+sealed abstract class BijectionTInstances0 {
   implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
     new BijectionTSplit[F, G] {
       implicit def F = F0
@@ -125,7 +125,7 @@ sealed trait BijectionTInstances0 {
     }
 }
 
-trait BijectionTInstances extends BijectionTInstances0 {
+sealed abstract class BijectionTInstances extends BijectionTInstances0 {
   implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
     new BijectionTCategory[F, G] {
       implicit def F = F0

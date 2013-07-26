@@ -67,7 +67,7 @@ object UnitReducer {
   }
 }
 
-object Reducer extends ReducerFunctions with ReducerInstances {
+object Reducer extends ReducerInstances with ReducerFunctions {
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
     */
@@ -75,7 +75,7 @@ object Reducer extends ReducerFunctions with ReducerInstances {
     reducer(u, cs, sc)
 }
 
-trait ReducerInstances {
+sealed abstract class ReducerInstances {
   import Reducer._
 
   /** Collect `C`s into a list, in order. */

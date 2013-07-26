@@ -7,9 +7,9 @@ sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
   def apply(z: K => V): K => V
 }
 
-object Memo extends MemoFunctions with MemoInstances
+object Memo extends MemoInstances with MemoFunctions
 
-trait MemoInstances {
+sealed abstract class MemoInstances {
 }
 
 /** @define immuMapNote As this memo uses a single var, it's

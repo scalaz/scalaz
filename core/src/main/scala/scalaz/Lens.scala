@@ -216,7 +216,7 @@ sealed trait LensFamily[A1, A2, B1, B2] {
 
 }
 
-object LensFamily extends LensFunctions with LensInstances {
+object LensFamily extends LensInstances with LensFunctions {
   def apply[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] =
     lensFamily(r)
 }
@@ -389,7 +389,7 @@ trait LensFunctions extends LensFamilyFunctions {
     }
 }
 
-sealed trait LensInstances0 { this: LensInstances =>
+sealed abstract class LensInstances0 { this: LensInstances =>
   import scala.collection.SeqLike
 
   implicit def seqLikeLensFamily[S1, S2, A, Repr <: SeqLike[A, Repr]](lens: LensFamily[S1, S2, Repr, Repr]) =
@@ -397,7 +397,7 @@ sealed trait LensInstances0 { this: LensInstances =>
 
 }
 
-trait LensInstances extends LensInstances0 {
+abstract class LensInstances extends LensInstances0 {
   import LensFamily._
   import BijectionT._
   import collection.SeqLike

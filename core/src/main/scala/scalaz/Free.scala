@@ -7,7 +7,7 @@ import std.tuple._
 
 // TODO report compiler bug when this appears just above FreeInstances:
 //      "java.lang.Error: typeConstructor inapplicable for <none>"
-object Free extends FreeFunctions with FreeInstances {
+object Free extends FreeInstances with FreeFunctions {
 
   /** Return from the computation with the given value. */
   case class Return[S[_]: Functor, A](a: A) extends Free[S, A]
@@ -183,7 +183,7 @@ object Trampoline extends TrampolineInstances {
     Free.Suspend[Function0, A](() => a)
 }
 
-trait TrampolineInstances {
+sealed abstract class TrampolineInstances {
   implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
     override def point[A](a: => A) = return_[Function0, A](a)
     def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
@@ -192,7 +192,7 @@ trait TrampolineInstances {
 
 object Sink extends SinkInstances
 
-trait SinkInstances {
+sealed trait SinkInstances {
   implicit def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] =
     new Monad[({type f[x] = Sink[S, x]})#f] {
       def point[A](a: => A) =
@@ -204,7 +204,7 @@ trait SinkInstances {
 
 object Source extends SourceInstances
 
-trait SourceInstances {
+sealed trait SourceInstances {
   implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] =
     new Monad[({type f[x] = Source[S, x]})#f] {
       override def point[A](a: => A) = Return[({type f[x] = (S, x)})#f, A](a)
@@ -214,7 +214,7 @@ trait SourceInstances {
 
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
-trait FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
+sealed abstract class FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)

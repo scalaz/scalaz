@@ -234,7 +234,7 @@ trait OneOrFunctions {
   type OneOrNothing[A] = OneOr[Nothing, A]
 }
 
-trait OneOrInstances extends OneOrInstances0 {
+sealed abstract class OneOrInstances extends OneOrInstances0 {
   implicit def OneOrFunctor[F[_]: Functor]: Functor[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFunctor[F] {
       def F = implicitly
@@ -253,7 +253,7 @@ trait OneOrInstances extends OneOrInstances0 {
     }
 }
 
-sealed trait OneOrInstances0 extends OneOrInstances1 {
+sealed abstract class OneOrInstances0 extends OneOrInstances1 {
   implicit def OneOrCobind[F[_]: Cobind]: Cobind[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrCobind[F] {
       def F = implicitly
@@ -266,7 +266,7 @@ sealed trait OneOrInstances0 extends OneOrInstances1 {
     }
 }
 
-sealed trait OneOrInstances1 extends OneOrInstances2 {
+sealed abstract class OneOrInstances1 extends OneOrInstances2 {
   implicit def OneOrComonad[F[_]: Comonad]: Comonad[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrComonad[F] {
       def F = implicitly
@@ -274,35 +274,35 @@ sealed trait OneOrInstances1 extends OneOrInstances2 {
 
 }
 
-sealed trait OneOrInstances2 extends OneOrInstances3 {
+sealed abstract class OneOrInstances2 extends OneOrInstances3 {
   implicit def OneOrApplicative[F[_]: Apply]: Applicative[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrApplicative[F] {
       def F = implicitly
     }
 }
 
-sealed trait OneOrInstances3 extends OneOrInstances4 {
+sealed abstract class OneOrInstances3 extends OneOrInstances4 {
   implicit def OneOrFoldable[F[_]: Foldable]: Foldable[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable[F] {
       def F = implicitly
     }
 }
 
-sealed trait OneOrInstances4 extends OneOrInstances5 {
+sealed abstract class OneOrInstances4 extends OneOrInstances5 {
   implicit def OneOrFoldable1[F[_]: Foldable1]: Foldable1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
 }
 
-sealed trait OneOrInstances5 extends OneOrInstances6 {
+sealed abstract class OneOrInstances5 extends OneOrInstances6 {
   implicit def OneOrTraverse[F[_]: Traverse]: Traverse[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
 }
 
-sealed trait OneOrInstances6 {
+sealed abstract class OneOrInstances6 {
   implicit def OneOrTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse1[F] {
       def F = implicitly

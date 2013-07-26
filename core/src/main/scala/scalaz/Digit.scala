@@ -9,7 +9,7 @@ sealed trait Digit {
   def toChar: Char = (toLong + 48).toChar
 }
 
-object Digit extends DigitFunctions with DigitInstances {
+object Digit extends DigitInstances with DigitFunctions {
 
   case object _0 extends Digit {
     override val toInt = 0
@@ -109,7 +109,7 @@ trait DigitFunctions {
     traverseDigits(chars) getOrElse d
 }
 
-trait DigitInstances {
+sealed abstract class DigitInstances {
   implicit def digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] = new Enum[Digit] with Show[Digit] with Monoid[Digit] {
 
     import std.anyVal._

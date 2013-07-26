@@ -31,19 +31,19 @@ trait Cokleisli[F[_], A, B] { self =>
     compose(c)
 }
 
-object Cokleisli extends CokleisliFunctions with CokleisliInstances {
+object Cokleisli extends CokleisliInstances with CokleisliFunctions {
   def apply[F[_], A, B](f: F[A] => B): Cokleisli[F, A, B] = new Cokleisli[F, A, B] {
     def run(fa: F[A]): B = f(fa)
   }
 }
 
-sealed trait CokleisliInstances0 {
+sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]) = new CokleisliCompose[F] {
     override implicit def F = F0
   }
 }
 
-trait CokleisliInstances extends CokleisliInstances0 {
+sealed abstract class CokleisliInstances extends CokleisliInstances0 {
   implicit def cokleisliMonad[F[_], R] = new CokleisliMonad[F, R] {}
   
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]) = new CokleisliArrow[F] {

@@ -31,7 +31,7 @@ object Leibniz extends LeibnizInstances with LeibnizFunctions{
   type ===[A,B] = Leibniz[⊥, ⊤, A, B]
 }
 
-trait LeibnizInstances {
+sealed abstract class LeibnizInstances {
   import Leibniz._
 
   implicit def leibniz: Category[===] = new Category[===] {

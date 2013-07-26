@@ -42,7 +42,7 @@ sealed trait IndexedContsT[W[_], M[_], R, O, A] {
   }
 }
 
-object IndexedContsT extends IndexedContsTFunctions with IndexedContsTInstances {
+object IndexedContsT extends IndexedContsTInstances with IndexedContsTFunctions {
   def apply[W[_], M[_], R, O, A](f: W[A => M[O]] => M[R]): IndexedContsT[W, M, R, O, A] = new IndexedContsT[W, M, R, O, A] {
     def run(wamo: W[A => M[O]]): M[R] = f(wamo)
   }
@@ -85,13 +85,13 @@ trait IndexedContsTFunctions {
     }
 }
 
-sealed trait IndexedContsTInstances0 {
+sealed abstract class IndexedContsTInstances0 {
   implicit def IndexedContsTFunctorRight[W[_], M[_], R, O](implicit W0: Functor[W]): Functor[({type f[a]=IndexedContsT[W, M, R, O, a]})#f] = new IndexedContsTFunctorRight[W, M, R, O] {
     implicit val W: Functor[W] = W0
   }
 }
 
-trait IndexedContsTInstances extends IndexedContsTInstances0 {
+abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
   implicit def IndexedContsTFunctorLeft[W[_], M[_], O, A](implicit M0: Functor[M]): Functor[({type f[r]=IndexedContsT[W, M, r, O, A]})#f] = new IndexedContsTFunctorLeft[W, M, O, A] {
     implicit val M: Functor[M] = M0
   }

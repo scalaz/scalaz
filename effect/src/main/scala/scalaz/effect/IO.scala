@@ -131,12 +131,12 @@ sealed trait IO[A] {
     bracket(resource.close)(f)
 }
 
-object IO extends IOFunctions with IOInstances {
+object IO extends IOInstances with IOFunctions {
   def apply[A](a: => A): IO[A] =
     io(rw => return_(rw -> a))
 }
 
-trait IOInstances1 {
+sealed abstract class IOInstances1 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
       Semigroup.liftSemigroup[IO, A](IO.ioMonad, A)
 
@@ -145,14 +145,14 @@ trait IOInstances1 {
   implicit val ioMonad: Monad[IO] = new IOMonad {}
 }
 
-trait IOInstances0 extends IOInstances1 {
+sealed abstract class IOInstances0 extends IOInstances1 {
   implicit def IOMonoid[A](implicit A: Monoid[A]): Monoid[IO[A]] =
     Monoid.liftMonoid[IO, A](ioMonad, A)
 
   implicit val ioMonadIO: MonadIO[IO] = new MonadIO[IO] with IOLiftIO with IOMonad
 }
 
-trait IOInstances extends IOInstances0 {
+sealed abstract class IOInstances extends IOInstances0 {
   implicit val ioMonadCatchIO: MonadCatchIO[IO] = new IOMonadCatchIO with IOLiftIO with IOMonad
 }
 
