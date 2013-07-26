@@ -1,7 +1,7 @@
 package scalaz
 
 /** An algebraic data type representing the characters 'a' to 'z' */
-sealed trait Alpha {
+sealed abstract class Alpha extends Product with Serializable {
   val toChar: Char
 
   def toUpperChar: Char = toChar.toUpper

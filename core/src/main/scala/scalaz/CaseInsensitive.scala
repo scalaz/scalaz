@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait CaseInsensitive[A] {
+sealed abstract class CaseInsensitive[A] {
   val original: A
   def foldedCase: A
 

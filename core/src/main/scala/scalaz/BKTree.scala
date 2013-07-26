@@ -22,7 +22,7 @@ import annotation.tailrec
  * This implementation is a port of Haskell's [[http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html Data.Set.BKTree]]
  */
 @deprecated("This class depends on `MetricSpace` which is deprecated, too.", "7.0.1")
-sealed trait BKTree[A] {
+sealed abstract class BKTree[A] extends Product with Serializable {
   def isEmpty: Boolean =
     this match {
       case BKTreeEmpty()       => true

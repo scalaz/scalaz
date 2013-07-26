@@ -2,20 +2,14 @@ package scalaz
 
 import Id._
 
-sealed trait BijectionT[F[_], G[_], A, B] { self =>
-  def to(a: A): F[B]
-  def from(b: B): G[A]
+final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: B => G[A]) { self =>
+  def to(a: A): F[B] = _to(a)
+  def from(b: B): G[A] = _from(b)
 
   import BijectionT._
   import std.AllInstances._
 
-  def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A] {
-    def to(a: B): G[A] = self.from(a)
-
-    def from(b: A): F[B] = self.to(b)
-
-    override def flip = self
-  }
+  def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A](_from, _to)
 
   def toK: Kleisli[F, A, B] =
     Kleisli(to(_))
@@ -65,10 +59,7 @@ object BijectionT extends BijectionTFunctions with BijectionTInstances
 
 trait BijectionTFunctions {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
-    new BijectionT[F, G, A, B] {
-      def to(a: A) = t(a)
-      def from(b: B) = f(b)
-    }
+    new BijectionT[F, G, A, B](t, f)
 
   import std.AllInstances._
 
