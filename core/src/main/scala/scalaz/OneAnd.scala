@@ -117,14 +117,14 @@ private[scalaz] sealed trait OneAndTraverse1[F[_]]
     G.apply2(f(fa.head), F.traverse1Impl(fa.tail)(f)(G))(OneAnd.apply)
 }
 
-trait OneAndInstances5 {
+sealed trait OneAndInstances5 {
   implicit def oneAndFunctor[F[_]: Functor]: Functor[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndFunctor[F] {
       def F = implicitly
     }
 }
 
-trait OneAndInstances4 extends OneAndInstances5 {
+sealed trait OneAndInstances4 extends OneAndInstances5 {
   implicit def oneAndApply[F[_]: Applicative: Plus]: Apply[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndApply[F] {
       def F = implicitly
@@ -132,7 +132,7 @@ trait OneAndInstances4 extends OneAndInstances5 {
     }
 }
 
-trait OneAndInstances3 extends OneAndInstances4 {
+sealed trait OneAndInstances3 extends OneAndInstances4 {
   implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndApplicative[F] {
       def F = implicitly
@@ -140,7 +140,7 @@ trait OneAndInstances3 extends OneAndInstances4 {
     }
 }
 
-trait OneAndInstances2 extends OneAndInstances3 {
+sealed trait OneAndInstances2 extends OneAndInstances3 {
   implicit def oneAndBind[F[_]: Monad: Plus]: Bind[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndBind[F] {
       def F = implicitly
@@ -148,7 +148,7 @@ trait OneAndInstances2 extends OneAndInstances3 {
     }
 }
 
-trait OneAndInstances1 extends OneAndInstances2 {
+sealed trait OneAndInstances1 extends OneAndInstances2 {
   implicit def oneAndMonad[F[_]: MonadPlus]: Monad[({type λ[α] = OneAnd[F, α]})#λ] =
     new OneAndMonad[F] {
       def F = implicitly
@@ -171,7 +171,7 @@ sealed trait OneAndEqual[F[_], A] extends Equal[OneAnd[F, A]] {
   override def equalIsNatural = OA.equalIsNatural && OFA.equalIsNatural
 }
 
-trait OneAndInstances0 extends OneAndInstances1 {
+sealed trait OneAndInstances0 extends OneAndInstances1 {
   /** If you have `Foldable1[F]`, `foldMap1` and `foldRight1` are
     * nonstrict and significantly more efficient.
     */

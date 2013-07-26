@@ -71,19 +71,19 @@ object LazyOptionT extends LazyOptionTFunctions with LazyOptionTInstances {
 // Prioritized Implicits for type class instances
 //
 
-trait LazyOptionTInstances2 {
+sealed trait LazyOptionTInstances2 {
   implicit def lazyOptionTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait LazyOptionTInstances1 extends LazyOptionTInstances2 {
+sealed trait LazyOptionTInstances1 extends LazyOptionTInstances2 {
   implicit def lazyOptionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
-trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
+sealed trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }

@@ -85,7 +85,7 @@ trait IndexedContsTFunctions {
     }
 }
 
-trait IndexedContsTInstances0 {
+sealed trait IndexedContsTInstances0 {
   implicit def IndexedContsTFunctorRight[W[_], M[_], R, O](implicit W0: Functor[W]): Functor[({type f[a]=IndexedContsT[W, M, R, O, a]})#f] = new IndexedContsTFunctorRight[W, M, R, O] {
     implicit val W: Functor[W] = W0
   }

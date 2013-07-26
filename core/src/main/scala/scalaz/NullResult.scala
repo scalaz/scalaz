@@ -144,7 +144,7 @@ trait NullResultFunctions {
   }
 }
 
-trait NullResultInstances0 {
+sealed trait NullResultInstances0 {
 
   implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {

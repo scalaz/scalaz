@@ -146,7 +146,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait StreamTInstances0 {
+sealed trait StreamTInstances0 {
   implicit def StreamTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = StreamT[F, α]})#λ] = new StreamTFunctor[F] {
     implicit def F: Functor[F] = F0
   }

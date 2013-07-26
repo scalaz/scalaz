@@ -37,7 +37,7 @@ object Cokleisli extends CokleisliFunctions with CokleisliInstances {
   }
 }
 
-trait CokleisliInstances0 {
+sealed trait CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]) = new CokleisliCompose[F] {
     override implicit def F = F0
   }

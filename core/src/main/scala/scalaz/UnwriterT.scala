@@ -92,19 +92,19 @@ object UnwriterT extends UnwriterTFunctions with UnwriterTInstances {
     unwriterT(v)
 }
 
-trait UnwriterTInstances2 {
+sealed trait UnwriterTInstances2 {
   implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]) = new UnwriterTFunctor[F, W] {
     implicit def F = F0
   }
 }
 
-trait UnwriterTInstances1 extends UnwriterTInstances2 {
+sealed trait UnwriterTInstances1 extends UnwriterTInstances2 {
   implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]) = new UnwriterTApply[F, W] {
     implicit def F = F0
   }
 }
 
-trait UnwriterTInstances0 extends UnwriterTInstances1 {
+sealed trait UnwriterTInstances0 extends UnwriterTInstances1 {
   implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]) = new UnwriterTBifunctor[F] {
     implicit def F = F0
   }

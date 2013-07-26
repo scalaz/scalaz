@@ -144,7 +144,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
 }
 
-trait LazyEitherTInstances1 {
+sealed trait LazyEitherTInstances1 {
   implicit def lazyEitherTFunctor[F[_], L](implicit F0: Functor[F]) = new LazyEitherTFunctor[F, L] {
     implicit def F = F0
   }
@@ -154,7 +154,7 @@ trait LazyEitherTInstances1 {
   }
 }
 
-trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
+sealed trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
   implicit def lazyEitherTBifunctor[F[_]](implicit F0: Functor[F]) = new LazyEitherTBifunctor[F] {
     implicit def F = F0
   }

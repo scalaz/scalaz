@@ -1,6 +1,6 @@
 package scalaz
 
-trait IsomorphismsLow1 {
+sealed trait IsomorphismsLow1 {
   self: Isomorphisms =>
 
   /**Set isomorphism is commutative */
@@ -10,7 +10,7 @@ trait IsomorphismsLow1 {
   implicit def isoNaturalCommutative[F[_], G[_]](implicit i: F <~> G): G <~> F = i.flip
 }
 
-trait IsomorphismsLow0 extends IsomorphismsLow1 {
+sealed trait IsomorphismsLow0 extends IsomorphismsLow1 {
   self: Isomorphisms =>
 
   /**Set isomorphism is reflexive */

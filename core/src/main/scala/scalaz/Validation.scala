@@ -372,7 +372,7 @@ trait ValidationInstances extends ValidationInstances0 {
   Validation[E, A]
 }
 
-trait ValidationInstances0 extends ValidationInstances1 {
+sealed trait ValidationInstances0 extends ValidationInstances1 {
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
     def order(f1: Validation[E, A], f2: Validation[E, A]) =
@@ -388,7 +388,7 @@ trait ValidationInstances0 extends ValidationInstances1 {
     }
 }
 
-trait ValidationInstances1 extends ValidationInstances2 {
+sealed trait ValidationInstances1 extends ValidationInstances2 {
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
       new Equal[Validation[E, A]] {
         def equal(a1: Validation[E, A], a2: Validation[E, A]) =
@@ -405,7 +405,7 @@ trait ValidationInstances1 extends ValidationInstances2 {
     }
 }
 
-trait ValidationInstances2 extends ValidationInstances3 {
+sealed trait ValidationInstances2 extends ValidationInstances3 {
   implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
 
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
@@ -431,7 +431,7 @@ trait ValidationInstances2 extends ValidationInstances3 {
   }
 }
 
-trait ValidationInstances3 {
+sealed trait ValidationInstances3 {
   implicit def ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])
                                   (f: A => C, g: B => D) = fab bimap (f, g)

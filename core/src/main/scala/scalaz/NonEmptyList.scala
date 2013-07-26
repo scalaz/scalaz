@@ -116,7 +116,7 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
     Some((v.head, v.tail))
 }
 
-trait NonEmptyListInstances0 {
+sealed trait NonEmptyListInstances0 {
   implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
 }
 
