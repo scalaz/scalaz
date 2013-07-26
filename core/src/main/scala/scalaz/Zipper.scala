@@ -10,10 +10,6 @@ import annotation.tailrec
  * Based on the pointedlist library by Jeff Wheeler.
  */
 final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
-  val focus: A
-  val lefts: Stream[A]
-  val rights: Stream[A]
-
   private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
     if (s1.isEmpty) s2
     else s1.head #:: mergeStreams(s2, s1.tail)
