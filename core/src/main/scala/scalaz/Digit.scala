@@ -1,12 +1,12 @@
 package scalaz
 
 /**An algebraic data type representing the digits 0 - 9 */
-sealed trait Digit {
+sealed abstract class Digit extends Product with Serializable {
   val toInt: Int
 
-  def toLong: Long = toInt.toLong
+  final def toLong: Long = toInt.toLong
 
-  def toChar: Char = (toLong + 48).toChar
+  final def toChar: Char = (toLong + 48).toChar
 }
 
 object Digit extends DigitInstances with DigitFunctions {

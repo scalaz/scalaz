@@ -16,7 +16,7 @@ package scalaz
  * @tparam B1 The initial type of the optional field
  * @tparam B2 The final type of the optional field
  */
-sealed trait PLensFamily[A1, A2, B1, B2] {
+sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def run(a: A1): Option[IndexedStore[B1, B2, A2]]
 
   def apply(a: A1): Option[IndexedStore[B1, B2, A2]] =
