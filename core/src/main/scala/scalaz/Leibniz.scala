@@ -17,7 +17,7 @@ import Id._
  *
  * The more refined types are useful if you need to be able to substitute into restricted contexts.
  */
-trait Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
   def subst[F[_ >: L <: H]](p: F[A]): F[B]
   def compose[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, C, A]): Leibniz[L2, H2, C, B] =
     Leibniz.trans[L2, H2, C, A, B](this, that)
