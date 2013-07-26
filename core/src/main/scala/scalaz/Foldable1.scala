@@ -46,6 +46,9 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def sequence1_[M[_], A, B](fa: F[M[A]])(implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
     traverse1_(fa)(x => x)
 
+  /** always return `false` */
+  final override def empty[A](fa: F[A]): Boolean = false
+
   ////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
