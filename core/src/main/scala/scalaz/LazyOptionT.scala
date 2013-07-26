@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait LazyOptionT[F[_], A] {
-  def run: F[LazyOption[A]]
-
+final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
   import LazyOption._
   import LazyOptionT._
   import LazyEitherT._
@@ -62,10 +60,7 @@ sealed trait LazyOptionT[F[_], A] {
 
 }
 
-object LazyOptionT extends LazyOptionTFunctions with LazyOptionTInstances {
-  def apply[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
-    lazyOptionT(r)
-}
+object LazyOptionT extends LazyOptionTFunctions with LazyOptionTInstances
 
 //
 // Prioritized Implicits for type class instances
@@ -100,9 +95,8 @@ trait LazyOptionTInstances extends LazyOptionTInstances0 {
 }
 
 trait LazyOptionTFunctions {
-  def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] = new LazyOptionT[F, A] {
-    val run = r
-  }
+  def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
+    LazyOptionT(r)
 
   import LazyOption._
 

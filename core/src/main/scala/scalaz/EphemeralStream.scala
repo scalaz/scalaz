@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
   * things, but without the space leak problem frequently encountered
   * using that type.
   */
-sealed trait EphemeralStream[A] {
+sealed abstract class EphemeralStream[A] {
 
   import EphemeralStream._
 

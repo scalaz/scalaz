@@ -6,7 +6,7 @@ import std.string.stringInstance
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
  */
-sealed trait Tree[A] {
+sealed abstract class Tree[A] {
 
   import Tree._
 
