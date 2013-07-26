@@ -298,7 +298,7 @@ sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
 %s
 }
 
