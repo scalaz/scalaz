@@ -6,7 +6,7 @@ package scalaz
  * `A <: B` holds whenever `A` could be used in any negative context that expects a `B`.
  * (e.g. if you could pass an `A` into any function that expects a `B`.)
  */
-trait Liskov[-A, +B] {
+sealed abstract class Liskov[-A, +B] {
   def apply(a: A): B = Liskov.witness(this)(a)
 
   def subst[F[-_]](p: F[B]): F[A]
