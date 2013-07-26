@@ -3,8 +3,8 @@ package scalaz
 /**
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
-sealed trait \/[+A, +B] {
-  sealed trait SwitchingDisjunction[X] {
+sealed abstract class \/[+A, +B] extends Product with Serializable {
+  sealed abstract class SwitchingDisjunction[X] {
     def r: X
     def <<?:(left: => X): X =
       \/.this match {
