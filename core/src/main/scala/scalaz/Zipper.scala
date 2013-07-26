@@ -9,13 +9,10 @@ import annotation.tailrec
  * <p/>
  * Based on the pointedlist library by Jeff Wheeler.
  */
-sealed trait Zipper[+A] {
+final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   val focus: A
   val lefts: Stream[A]
   val rights: Stream[A]
-
-  def copy[AA >: A](lefts: Stream[AA] = this.lefts, focus: AA = this.focus, rights: Stream[AA] = this.rights): Zipper[AA] =
-    Zipper(lefts, focus, rights)
 
   private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
     if (s1.isEmpty) s2
@@ -354,10 +351,7 @@ sealed trait Zipper[+A] {
   }
 }
 
-object Zipper extends ZipperFunctions with ZipperInstances {
-  def apply[A](lefts: Stream[A], focus: A, rights: Stream[A]): Zipper[A] =
-    zipper(lefts, focus, rights)
-}
+object Zipper extends ZipperFunctions with ZipperInstances
 
 trait ZipperInstances {
   import Zipper._
@@ -401,9 +395,6 @@ trait ZipperInstances {
 }
 
 trait ZipperFunctions {
-  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] = new Zipper[A] {
-    val focus = a
-    val lefts = ls
-    val rights = rs
-  }
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
+    Zipper(ls, a, rs)
 }
