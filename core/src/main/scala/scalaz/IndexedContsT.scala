@@ -1,7 +1,7 @@
 package scalaz
 
-sealed abstract class IndexedContsT[W[_], M[_], R, O, A] {
-  def run(wamo: W[A => M[O]]): M[R]
+final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R]) {
+  def run(wamo: W[A => M[O]]): M[R] = _run(wamo)
 
   def apply(wamo: W[A => M[O]]): M[R] = run(wamo)
 
@@ -43,9 +43,7 @@ sealed abstract class IndexedContsT[W[_], M[_], R, O, A] {
 }
 
 object IndexedContsT extends IndexedContsTInstances with IndexedContsTFunctions {
-  def apply[W[_], M[_], R, O, A](f: W[A => M[O]] => M[R]): IndexedContsT[W, M, R, O, A] = new IndexedContsT[W, M, R, O, A] {
-    def run(wamo: W[A => M[O]]): M[R] = f(wamo)
-  }
+  def apply[W[_], M[_], R, O, A](f: W[A => M[O]] => M[R]): IndexedContsT[W, M, R, O, A] = new IndexedContsT[W, M, R, O, A](f)
 }
 
 trait IndexedContsTFunctions {
