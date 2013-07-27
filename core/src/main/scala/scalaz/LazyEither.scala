@@ -1,7 +1,7 @@
 package scalaz
 
 /** [[scala.Either]], but with a value by name. */
-sealed trait LazyEither[+A, +B] {
+sealed abstract class LazyEither[+A, +B] {
 
   import LazyOption._
   import LazyEither._

@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait IndexedContsT[W[_], M[_], R, O, A] {
+sealed abstract class IndexedContsT[W[_], M[_], R, O, A] {
   def run(wamo: W[A => M[O]]): M[R]
 
   def apply(wamo: W[A => M[O]]): M[R] = run(wamo)
