@@ -18,6 +18,7 @@ sealed case class ListT[M[_], A](underlying: M[List[A]]){
 
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(underlying)(_.isEmpty)
 
+  @deprecated("Head is deprecated. Use ListT#headOption instead", "7.1")
   def head(implicit M: Functor[M]) : M[A] = M.map(underlying)(_.head)
 
   def headOption(implicit M: Functor[M]) : M[Option[A]] = M.map(underlying)(_.headOption)
