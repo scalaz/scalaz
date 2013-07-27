@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Enum` */
-sealed abstract class EnumOps[F] extends Ops[F] {
-  implicit def F: Enum[F]
+final class EnumOps[F] private[syntax](val self: F)(implicit val F: Enum[F]) extends Ops[F] {
   ////
   final def succ: F =
     F succ self
@@ -46,7 +45,7 @@ sealed abstract class EnumOps[F] extends Ops[F] {
 
 trait ToEnumOps extends ToOrderOps {
   implicit def ToEnumOps[F](v: F)(implicit F0: Enum[F]) =
-    new EnumOps[F] { def self = v; implicit def F: Enum[F] = F0 }
+    new EnumOps[F](v)
 
   ////
 
@@ -54,7 +53,7 @@ trait ToEnumOps extends ToOrderOps {
 }
 
 trait EnumSyntax[F] extends OrderSyntax[F] {
-  implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F] { def self = v; implicit def F: Enum[F] = EnumSyntax.this.F }
+  implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F](v)(EnumSyntax.this.F)
   
   def F: Enum[F]
   ////

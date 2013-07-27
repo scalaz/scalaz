@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Monoid` */
-sealed abstract class MonoidOps[F] extends Ops[F] {
-  implicit def F: Monoid[F]
+final class MonoidOps[F] private[syntax](val self: F)(implicit val F: Monoid[F]) extends Ops[F] {
   ////
   final def multiply(n: Int): F = F.multiply(self, n)
 
@@ -19,7 +18,7 @@ sealed abstract class MonoidOps[F] extends Ops[F] {
 
 trait ToMonoidOps extends ToSemigroupOps {
   implicit def ToMonoidOps[F](v: F)(implicit F0: Monoid[F]) =
-    new MonoidOps[F] { def self = v; implicit def F: Monoid[F] = F0 }
+    new MonoidOps[F](v)
 
   ////
 
@@ -29,7 +28,7 @@ trait ToMonoidOps extends ToSemigroupOps {
 }
 
 trait MonoidSyntax[F] extends SemigroupSyntax[F] {
-  implicit def ToMonoidOps(v: F): MonoidOps[F] = new MonoidOps[F] { def self = v; implicit def F: Monoid[F] = MonoidSyntax.this.F }
+  implicit def ToMonoidOps(v: F): MonoidOps[F] = new MonoidOps[F](v)(MonoidSyntax.this.F)
   
   def F: Monoid[F]
   ////
