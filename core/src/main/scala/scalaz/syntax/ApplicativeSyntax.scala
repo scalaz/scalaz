@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Applicative` */
-sealed abstract class ApplicativeOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Applicative[F]
+final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Applicative[F]) extends Ops[F[A]] {
   ////
   final def unlessM(cond: Boolean): F[Unit] = scalaz.std.boolean.unlessM(cond)(self)
   final def whenM(cond: Boolean): F[Unit] = scalaz.std.boolean.whenM(cond)(self)
@@ -17,13 +16,13 @@ sealed abstract class ApplicativeOps[F[_],A] extends Ops[F[A]] {
 
 sealed trait ToApplicativeOps0 {
   implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
-    new ApplicativeOps[F0.M,F0.A] { def self = F0(v); implicit def F: Applicative[F0.M] = F0.TC }
+    new ApplicativeOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
   implicit def ToApplicativeOps[F[_],A](v: F[A])(implicit F0: Applicative[F]) =
-    new ApplicativeOps[F,A] { def self = v; implicit def F: Applicative[F] = F0 }
+    new ApplicativeOps[F,A](v)
 
   ////
   implicit def ApplicativeIdV[A](v: => A) = new ApplicativeIdV[A] {
@@ -38,7 +37,7 @@ trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
 }
 
 trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
-  implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A] { def self = v; implicit def F: Applicative[F] = ApplicativeSyntax.this.F }
+  implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A](v)(ApplicativeSyntax.this.F)
 
   def F: Applicative[F]
   ////

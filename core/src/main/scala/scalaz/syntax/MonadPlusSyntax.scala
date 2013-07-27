@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: MonadPlus[F]
+final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadPlus[F]) extends Ops[F[A]] {
   ////
   import Liskov._
 
@@ -23,13 +22,13 @@ sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
 
 sealed trait ToMonadPlusOps0 {
   implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
-    new MonadPlusOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadPlus[F0.M] = F0.TC }
+    new MonadPlusOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToMonadPlusOps extends ToMonadPlusOps0 with ToMonadOps with ToApplicativePlusOps {
   implicit def ToMonadPlusOps[F[_],A](v: F[A])(implicit F0: MonadPlus[F]) =
-    new MonadPlusOps[F,A] { def self = v; implicit def F: MonadPlus[F] = F0 }
+    new MonadPlusOps[F,A](v)
 
   ////
 
@@ -37,7 +36,7 @@ trait ToMonadPlusOps extends ToMonadPlusOps0 with ToMonadOps with ToApplicativeP
 }
 
 trait MonadPlusSyntax[F[_]] extends MonadSyntax[F] with ApplicativePlusSyntax[F] {
-  implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] = new MonadPlusOps[F,A] { def self = v; implicit def F: MonadPlus[F] = MonadPlusSyntax.this.F }
+  implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] = new MonadPlusOps[F,A](v)(MonadPlusSyntax.this.F)
 
   def F: MonadPlus[F]
   ////

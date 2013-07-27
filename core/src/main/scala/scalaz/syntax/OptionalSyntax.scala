@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Optional` */
-sealed abstract class OptionalOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Optional[F]
+final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Optional[F]) extends Ops[F[A]] {
   ////
 
   /** If the value has an `a`, return it; otherwise it must be
@@ -43,13 +42,13 @@ sealed abstract class OptionalOps[F[_],A] extends Ops[F[A]] {
 
 sealed trait ToOptionalOps0 {
   implicit def ToOptionalOpsUnapply[FA](v: FA)(implicit F0: Unapply[Optional, FA]) =
-    new OptionalOps[F0.M,F0.A] { def self = F0(v); implicit def F: Optional[F0.M] = F0.TC }
+    new OptionalOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToOptionalOps extends ToOptionalOps0 {
   implicit def ToOptionalOps[F[_],A](v: F[A])(implicit F0: Optional[F]) =
-    new OptionalOps[F,A] { def self = v; implicit def F: Optional[F] = F0 }
+    new OptionalOps[F,A](v)
 
   ////
 
@@ -57,7 +56,7 @@ trait ToOptionalOps extends ToOptionalOps0 {
 }
 
 trait OptionalSyntax[F[_]]  {
-  implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] = new OptionalOps[F,A] { def self = v; implicit def F: Optional[F] = OptionalSyntax.this.F }
+  implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] = new OptionalOps[F,A](v)(OptionalSyntax.this.F)
 
   def F: Optional[F]
   ////

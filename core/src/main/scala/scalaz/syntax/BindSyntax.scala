@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bind` */
-sealed abstract class BindOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Bind[F]
+final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind[F]) extends Ops[F[A]] {
   ////
   import Liskov.<~<
 
@@ -29,13 +28,13 @@ sealed abstract class BindOps[F[_],A] extends Ops[F[A]] {
 
 sealed trait ToBindOps0 {
   implicit def ToBindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Bind, FA]) =
-    new BindOps[F0.M,F0.A] { def self = F0(v); implicit def F: Bind[F0.M] = F0.TC }
+    new BindOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToBindOps extends ToBindOps0 with ToApplyOps {
   implicit def ToBindOps[F[_],A](v: F[A])(implicit F0: Bind[F]) =
-    new BindOps[F,A] { def self = v; implicit def F: Bind[F] = F0 }
+    new BindOps[F,A](v)
 
   ////
 
@@ -43,7 +42,7 @@ trait ToBindOps extends ToBindOps0 with ToApplyOps {
 }
 
 trait BindSyntax[F[_]] extends ApplySyntax[F] {
-  implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A] { def self = v; implicit def F: Bind[F] = BindSyntax.this.F }
+  implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A](v)(BindSyntax.this.F)
 
   def F: Bind[F]
   ////
