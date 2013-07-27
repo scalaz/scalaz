@@ -1,11 +1,11 @@
 package scalaz
 
 /** Endomorphisms.  They have special properties among functions, so
-  * are captured in this newtype. */
-sealed trait Endo[A] {
-  /** The captured function. */
-  def run: A => A
-
+  * are captured in this newtype.
+  *
+  * @param run The captured function.
+  */
+final case class Endo[A](run: A => A) {
   final def apply(a: A): A = run(a)
 
   /** Do `other`, than call myself with its result. */
@@ -15,12 +15,7 @@ sealed trait Endo[A] {
   final def andThen(other: Endo[A]): Endo[A] = other compose this
 }
 
-object Endo extends EndoInstances with EndoFunctions {
-  /** Wrap a function. */
-  def apply[A](f: A => A): Endo[A] = new Endo[A] {
-    val run = f
-  }
-}
+object Endo extends EndoInstances with EndoFunctions
 
 sealed abstract class EndoInstances {
 
@@ -44,9 +39,7 @@ sealed abstract class EndoInstances {
 
 trait EndoFunctions {
   /** Alias for `Endo.apply`. */
-  final def endo[A](f: A => A): Endo[A] = new Endo[A] {
-    val run = f
-  }
+  final def endo[A](f: A => A): Endo[A] = Endo(f)
 
   /** Always yield `a`. */
   final def constantEndo[A](a: => A): Endo[A] = endo[A](_ => a)

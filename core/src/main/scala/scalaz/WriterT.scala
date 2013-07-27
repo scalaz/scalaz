@@ -2,9 +2,7 @@ package scalaz
 
 import Id._
 
-sealed trait WriterT[F[_], W, A] { self =>
-  val run: F[(W, A)]
-
+final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   import WriterT._
 
   def off: UnwriterT[F, W, A] =
@@ -101,10 +99,7 @@ sealed trait WriterT[F[_], W, A] { self =>
   def colocal[X](f: W => X)(implicit F: Functor[F]): WriterT[F, X, A] = mapWritten(f)
 }
 
-object WriterT extends WriterTInstances with WriterTFunctions {
-  def apply[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] =
-    writerT(v)
-}
+object WriterT extends WriterTInstances with WriterTFunctions
 
 sealed abstract class WriterTInstances12 {
   implicit def writerFunctor[W]: WriterTFunctor[Id, W] = new WriterTFunctor[Id, W] {
@@ -226,10 +221,7 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
 }
 
 trait WriterTFunctions {
-  def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = new WriterT[F, W, A] {
-    val run = v
-  }
-
+  def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = WriterT(v)
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)

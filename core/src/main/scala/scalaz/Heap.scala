@@ -13,7 +13,7 @@ import std.tuple._
  *
  * Based on the heaps Haskell library by Edward Kmett
  */
-sealed trait Heap[A] {
+sealed abstract class Heap[A] {
 
   import Heap._
   import Heap.impl._
