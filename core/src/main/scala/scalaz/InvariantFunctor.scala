@@ -1,8 +1,6 @@
 package scalaz
 
-import BijectionT.Bijection
-import Isomorphism.<=>
-
+////
 /**
  * Unary type constructor that supports an `xmap` operation that converts an `F[A]` to an `F[B]` given
  * two functions, `A => B` and `B => A`.
@@ -19,8 +17,11 @@ import Isomorphism.<=>
  * @see [[scalaz.InvariantFunctor.InvariantFunctorLaw]]
  */
 ////
-trait InvariantFunctor[F[_]] {
+trait InvariantFunctor[F[_]]  { self =>
   ////
+
+  import BijectionT.Bijection
+  import Isomorphism.<=>
 
   /** Converts `ma` to a value of type `F[B]` using the provided functions `f` and `g`. */
   def xmap[A, B](ma: F[A], f: A => B, g: B => A): F[B]
@@ -42,7 +43,6 @@ trait InvariantFunctor[F[_]] {
 
   def invariantFunctorLaw = new InvariantFunctorLaw {}
   ////
-
   val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }
 }
 
