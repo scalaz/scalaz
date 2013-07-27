@@ -4,7 +4,7 @@ package effect
 
 import scalaz.effect.IO
 
-trait IdOps[A] extends Ops[A] {
+sealed abstract class IdOps[A] extends Ops[A] {
 
   final def put(implicit S: Show[A]): IO[Unit] =
     IO.put(self)
