@@ -1,6 +1,8 @@
 package scalaz
 
-final case class NullArgument[A, B](apply: Option[A] => B) {
+final class NullArgument[A, B] private(_apply: Option[A] => B) {
+  def apply(a: Option[A]): B = _apply(a)
+
   import NullArgument._
 
   def map[C](f: B => C): A ?=> C =
@@ -82,25 +84,28 @@ final case class NullArgument[A, B](apply: Option[A] => B) {
 
 }
 
-object NullArgument extends NullArgumentInstances with NullArgumentFunctions
+object NullArgument extends NullArgumentInstances with NullArgumentFunctions {
+  def apply[A, B](f: Option[A] => B): A ?=> B =
+    new (A ?=> B)(f)
+}
 
 trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
 
   def always[A, B](b: => B): A ?=> B =
-    apply(_ => b)
+    NullArgument(_ => b)
 
   def zero[A, B](implicit M: Monoid[B]): A ?=> B =
     always(M.zero)
 
   def pair[A, B](f: A => B, b: => B): A ?=> B =
-    apply((_: Option[A]) match {
+    NullArgument((_: Option[A]) match {
       case None => b
       case Some(a) => f(a)
     })
 
   def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
-    apply(c apply _)
+    NullArgument(c apply _)
 }
 
 sealed abstract class NullArgumentInstances0 {
