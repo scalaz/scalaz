@@ -117,26 +117,26 @@ trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
-    apply(k apply _)
+    NullResult(k apply _)
 
   def lift[A, B](f: A => B): A =>? B =
-    apply(a => Some(f(a)))
+    NullResult(a => Some(f(a)))
 
   def always[A, B](b: => B): A =>? B =
     lift(_ => b)
 
   def never[A, B]: A =>? B =
-    apply(_ => None)
+    NullResult(_ => None)
 
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
 
   object list {
     def head[A]: List[A] =>? A =
-      apply(_.headOption)
+      NullResult(_.headOption)
 
     def tail[A]: List[A] =>? List[A] =
-      apply {
+      NullResult {
         case Nil => None
         case _::t => Some(t)
       }
