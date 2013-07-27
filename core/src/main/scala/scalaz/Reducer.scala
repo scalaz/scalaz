@@ -15,7 +15,7 @@ import scalaz.Tags.{Conjunction}
  *
  * Based on a Haskell library by Edward Kmett
  */
-sealed trait Reducer[C, M] {
+sealed abstract class Reducer[C, M] {
   implicit def monoid: Monoid[M]
 
   def unit(c: C): M
