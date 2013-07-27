@@ -78,6 +78,7 @@ object TypeClass {
     enum,
     plusEmpty,
     isEmpty,
+    invariantFunctor,
     functor,
     contravariant,
     apply,
