@@ -5,9 +5,7 @@ import Id._
 /**
  * Represents a function `A => M[B]`.
  */
-sealed trait Kleisli[M[_], A, B] { self =>
-  def run(a: A): M[B]
-
+final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   import Kleisli._
 
   /** alias for `andThen` */
@@ -31,7 +29,7 @@ sealed trait Kleisli[M[_], A, B] { self =>
   def traverse[F[_]](f: F[A])(implicit M: Applicative[M], F: Traverse[F]): M[F[B]] =
     F.traverse(f)(Kleisli.this(_))
 
-  def =<<(a: M[A])(implicit m: Bind[M]): M[B] = m.bind(a)(run _)
+  def =<<(a: M[A])(implicit m: Bind[M]): M[B] = m.bind(a)(run)
 
   def map[C](f: B => C)(implicit M: Functor[M]): Kleisli[M, A, C] =
     kleisli(a => M.map(run(a))(f))
@@ -45,14 +43,12 @@ sealed trait Kleisli[M[_], A, B] { self =>
   def flatMap[C](f: B => Kleisli[M, A, C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli((r: A) => M.bind[B, C](run(r))(((b: B) => f(b).run(r))))
 
-  def lift[L[_]: Applicative]: Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] = new Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] {
-    def run(a: A) = Applicative[L].point(self(a))
-  }
+  def lift[L[_]: Applicative]: Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] =
+    kleisli[({type λ[α]=L[M[α]]})#λ, A, B](a => Applicative[L].point(self(a)))
 
   import Liskov._
-  def unlift[N[_], FF[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[α] = N[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] = new Kleisli[FF, A, B] {
-    def run(a: A) = Comonad[N].copoint(ev(self) run a)
-  }
+  def unlift[N[_], FF[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[α] = N[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] =
+    kleisli[FF, A, B]{a => Comonad[N].copoint(ev(self) run a)}
 
   def unliftId[N[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[α] = N[α]})#λ, A, B]): Reader[A, B] =
     unlift[N, Id]
@@ -158,12 +154,10 @@ abstract class KleisliInstances extends KleisliInstances0 {
 
 trait KleisliFunctions {
   /**Construct a Kleisli from a Function1 */
-  def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = new Kleisli[M, A, B] {
-    def run(a: A) = f(a)
-  }
+  def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = Kleisli(f)
 
   /**Implicitly unwrap the Function1 represented by the Kleisli */
-  implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = (a: A) => k.run(a)
+  implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = k.run
 
   /**Pure Kleisli arrow */
   def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
@@ -171,9 +165,7 @@ trait KleisliFunctions {
   def local[M[_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = fa local f
 }
 
-object Kleisli extends KleisliInstances with KleisliFunctions {
-  def apply[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = kleisli(f)
-}
+object Kleisli extends KleisliInstances with KleisliFunctions
 
 //
 // Implementation traits for type class instances
