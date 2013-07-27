@@ -4,9 +4,7 @@ package scalaz
   *
   * Endomorphic[Function1, A] is equivalent to Endo[A]
   */
-sealed trait Endomorphic[=>:[_, _], A] {
-
-  def run: A =>: A
+final case class Endomorphic[=>:[_, _], A](run: A =>: A) {
 
   final def compose(that: Endomorphic[=>:, A])(implicit F: Compose[=>:]): Endomorphic[=>:, A] =
     Endomorphic[=>:, A](F.compose(run, that.run))
@@ -16,12 +14,7 @@ sealed trait Endomorphic[=>:[_, _], A] {
 
 }
 
-object Endomorphic extends EndomorphicInstances with EndomorphicFunctions {
-
-  def apply[=>:[_, _], A](ga: A =>: A) = new Endomorphic[=>:, A] {
-    val run = ga
-  }
-}
+object Endomorphic extends EndomorphicInstances with EndomorphicFunctions
 
 trait EndomorphicFunctions {
 

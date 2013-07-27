@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait NullArgument[A, B] {
-  def apply(a: Option[A]): B
-
+final case class NullArgument[A, B](apply: Option[A] => B) {
   import NullArgument._
 
   def map[C](f: B => C): A ?=> C =
@@ -88,10 +86,6 @@ object NullArgument extends NullArgumentInstances with NullArgumentFunctions
 
 trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
-  def apply[A, B](f: Option[A] => B): A ?=> B =
-    new (A ?=> B) {
-      def apply(a: Option[A]) = f(a)
-    }
 
   def always[A, B](b: => B): A ?=> B =
     apply(_ => b)

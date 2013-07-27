@@ -5,7 +5,7 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-sealed trait IndexedStoreT[F[_], +I, A, B] {
+sealed abstract class IndexedStoreT[F[_], +I, A, B] {
   def run: (F[A => B], I)
 
   import StoreT._
