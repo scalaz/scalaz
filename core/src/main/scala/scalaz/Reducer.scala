@@ -50,7 +50,7 @@ sealed abstract class Reducer[C, M] {
     }
   }
 }
-sealed trait UnitReducer[C, M] extends Reducer[C, M] {
+sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
   def unit(c: C): M
 
