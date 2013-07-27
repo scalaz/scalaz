@@ -1,7 +1,7 @@
 package scalaz
 
-sealed trait NullResult[A, B] {
-  def apply(a: A): Option[B]
+final class NullResult[A, B] private(_apply: A => Option[B]) {
+  def apply(a: A): Option[B] = _apply(a)
 
   import NullResult._
   import NullArgument._
@@ -108,14 +108,13 @@ sealed trait NullResult[A, B] {
     OptionT(F.map(a)(apply(_)))
 }
 
-object NullResult extends NullResultInstances with NullResultFunctions
+object NullResult extends NullResultInstances with NullResultFunctions {
+  def apply[A, B](f: A => Option[B]): A =>? B =
+    new (A =>? B)(f)
+}
 
 trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
-  def apply[A, B](f: A => Option[B]): A =>? B =
-    new (A =>? B) {
-      def apply(a: A) = f(a)
-    }
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
     apply(k apply _)
