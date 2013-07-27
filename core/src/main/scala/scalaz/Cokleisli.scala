@@ -1,22 +1,15 @@
 package scalaz
 
-trait Cokleisli[F[_], A, B] { self =>
-  def run(fa: F[A]): B
-
+final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
   def apply(fa: F[A]): B =
     run(fa)
 
-  def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C,  B] = new Cokleisli[F, C, B] {
-    def run(fc: F[C]): B = self.run(f(fc))
-  }
+  def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C,  B] = Cokleisli(run compose f)
 
-  def map[C](f: B => C): Cokleisli[F, A, C] = new Cokleisli[F, A, C] {
-    def run(fa: F[A]) = f(self.run(fa))
-  }
+  def map[C](f: B => C): Cokleisli[F, A, C] = Cokleisli(f compose run)
 
-  def flatMap[C](f: B => Cokleisli[F, A, C]): Cokleisli[F, A, C] = new Cokleisli[F, A, C] {
-    def run(fa: F[A]) = f(self.run(fa)).run(fa)
-  }
+  def flatMap[C](f: B => Cokleisli[F, A, C]): Cokleisli[F, A, C] =
+    Cokleisli(fa => f(self.run(fa)).run(fa))
 
   def <<=(a: F[A])(implicit F: Functor[F], FC: Cobind[F]): F[B] =
     F.map(FC.cojoin(a))(run)
@@ -31,11 +24,7 @@ trait Cokleisli[F[_], A, B] { self =>
     compose(c)
 }
 
-object Cokleisli extends CokleisliInstances with CokleisliFunctions {
-  def apply[F[_], A, B](f: F[A] => B): Cokleisli[F, A, B] = new Cokleisli[F, A, B] {
-    def run(fa: F[A]): B = f(fa)
-  }
-}
+object Cokleisli extends CokleisliInstances with CokleisliFunctions
 
 sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]) = new CokleisliCompose[F] {
