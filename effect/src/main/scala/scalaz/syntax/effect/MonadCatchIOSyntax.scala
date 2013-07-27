@@ -5,7 +5,7 @@ package effect
 import scalaz.effect.MonadCatchIO
 
 /** Wraps a value `self` and provides methods related to `MonadCatchIO` */
-trait MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadCatchIO[F]
   ////
   def except(handler: Throwable ⇒ F[A]): F[A] = F.except(self)(handler)
@@ -20,7 +20,7 @@ trait MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToMonadCatchIOOps0 {
+sealed trait ToMonadCatchIOOps0 {
   implicit def ToMonadCatchIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadCatchIO, FA]) =
     new MonadCatchIOOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadCatchIO[F0.M] = F0.TC }
 
