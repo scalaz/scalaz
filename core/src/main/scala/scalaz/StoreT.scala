@@ -5,9 +5,7 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-sealed abstract class IndexedStoreT[F[_], +I, A, B] {
-  def run: (F[A => B], I)
-
+final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   import StoreT._
   import BijectionT._
 
@@ -79,16 +77,11 @@ sealed abstract class IndexedStoreT[F[_], +I, A, B] {
     (F.map(run._1)(f), run._2)
 }
 
-object IndexedStoreT extends StoreTInstances with StoreTFunctions {
-  def apply[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] =
-    indexedStoreT(r)
-}
+object IndexedStoreT extends StoreTInstances with StoreTFunctions
 
 trait IndexedStoreTFunctions {
 
-  def indexedStoreT[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] = new IndexedStoreT[F, I, A, B] {
-    val run = r
-  }
+  def indexedStoreT[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] = IndexedStoreT(r)
 
   def indexedStore[I, A, B](i: I)(f: A => B): IndexedStore[I, A, B] =
     indexedStoreT[Id, I, A, B](f -> i)
