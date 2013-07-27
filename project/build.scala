@@ -170,6 +170,7 @@ object build extends Build {
         "scalaz.Validation.excepting",
         "scalaz.NonEmptyList.init",
         "scalaz.NonEmptyList.last",
+        "scalaz.NonEmptyList.foreach",
         "scalaz.NonEmptyList.sortBy",
         "scalaz.NonEmptyList.sortWith",
         "scalaz.NonEmptyList.sorted"
