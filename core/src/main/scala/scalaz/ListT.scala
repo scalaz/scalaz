@@ -4,7 +4,7 @@ package scalaz
  * ListT monad transformer.
  */
 
-sealed case class ListT[M[_], A](underlying: M[List[A]]){
+final case class ListT[M[_], A](underlying: M[List[A]]){
   def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
     M.map(underlying){list =>
       list match {
