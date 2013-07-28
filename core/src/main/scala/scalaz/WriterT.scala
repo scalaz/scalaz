@@ -160,7 +160,7 @@ trait WriterTInstance5 extends WriterTInstances6 {
 }
 
 trait WriterTInstances4 extends WriterTInstance5 {
-  implicit def writerBifunctor = new WriterTBifunctor[Id] {
+  implicit val writerBifunctor = new WriterTBifunctor[Id] {
     implicit def F = idInstance
   }
   implicit def writerFoldable[W] = new WriterTFoldable[Id, W] {

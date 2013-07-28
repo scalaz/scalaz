@@ -55,7 +55,7 @@ trait FoldCase[A] {
 object FoldCase extends FoldCaseInstances
 
 trait FoldCaseInstances {
-  implicit def StringFoldCase: FoldCase[String] = new FoldCase[String] {
+  implicit val StringFoldCase: FoldCase[String] = new FoldCase[String] {
     def foldCase(s: String) = s.toLowerCase
   }
 }

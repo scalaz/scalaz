@@ -368,7 +368,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 trait DisjunctionInstances3 {
-  implicit def DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 

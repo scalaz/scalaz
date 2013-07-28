@@ -90,7 +90,7 @@ trait ListTInstances extends ListTInstances1 {
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
   implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
-  implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
+  implicit val listTHoist: Hoist[ListT] = new ListTHoist {}
 }
 
 object ListT extends ListTInstances {
