@@ -80,7 +80,7 @@
  *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
  *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
-package object scalaz {
+package object scalaz extends TypeAlias {
   import Id._
 
   implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] = Id.id

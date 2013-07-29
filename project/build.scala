@@ -90,6 +90,12 @@ object build extends Build {
     typeClassTree <<= typeClasses map {
       tcs => tcs.map(_.doc).mkString("\n")
     },
+    unmanagedSourceDirectories in Compile <+= (scalaVersion, sourceDirectory in Compile){ (v, dir) =>
+      if(v.startsWith("2.9"))
+        dir / "scala29"
+      else
+        dir / "scala210"
+    },
 
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
       val index = out / "index.html"
@@ -363,8 +369,7 @@ object build extends Build {
       }
 
       val pimp = """|
-          |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
-          |  val value = self
+          |final class Tuple%dOps[%s](val value: Tuple%d[%s]) extends Super {
           |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
           |  def mapElements[%s](%s): (%s) = (%s)
@@ -373,8 +378,8 @@ object build extends Build {
         mapallTParams, mapallParams, mapallTParams, mapallApply
       )
 
-      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new { val self = t } with Tuple%dOps[%s]
-          |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
+      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new Tuple%dOps(t)
+          |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity)
       (pimp, conv)
     }
 

@@ -2,12 +2,10 @@ package scalaz
 package syntax
 package std
 
-import scalaz.syntax.Ops
-import scalaz.{Monad, Tree, Zipper}
 import scalaz.std.{stream => s}
 
 
-trait StreamOps[A] extends Ops[Stream[A]] {
+final class StreamOps[A](val self: Stream[A]) extends Super {
   final def merge(other: Stream[A]): Stream[A] = s.merge(self, other)
   final def toZipper: Option[Zipper[A]] = s.toZipper(self)
   final def zipperEnd: Option[Zipper[A]] = s.zipperEnd(self)
@@ -20,7 +18,5 @@ trait StreamOps[A] extends Ops[Stream[A]] {
 }
 
 trait ToStreamOps {
-  implicit def ToStreamOpsFromStream[A](a: Stream[A]): StreamOps[A] = new StreamOps[A] {
-    val self = a
-  }
+  implicit def ToStreamOpsFromStream[A](a: Stream[A]): StreamOps[A] = new StreamOps(a)
 }

@@ -1,10 +1,11 @@
-package scalaz.syntax
+package scalaz
+package syntax
 package std
 
-trait OptionIdOps[A] extends Ops[A] {
+final class OptionIdOps[A](val self: A) extends Super {
   def some: Option[A] = Some(self)
 }
 
 trait ToOptionIdOps {
-  implicit def ToOptionIdOps[A](a: A) = new OptionIdOps[A] { def self = a }
+  implicit def ToOptionIdOps[A](a: A) = new OptionIdOps(a)
 }

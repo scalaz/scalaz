@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-trait Function1Ops[T, R] extends Ops[T => R] {
+final class Function1Ops[T, R](val self: T => R) extends Super {
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 
@@ -61,7 +61,5 @@ trait Function1Ops[T, R] extends Ops[T => R] {
 }
 
 trait ToFunction1Ops {
-  implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] = new Function1Ops[A, B] {
-    val self = f
-  }
+  implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] = new Function1Ops(f)
 }

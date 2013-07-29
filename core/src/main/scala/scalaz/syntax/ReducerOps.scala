@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-trait ReducerOps[A] extends Ops[A] {
+final class ReducerOps[A](val self: A) extends Super {
   /** Convert the value into a monoid */
   def unit[M](implicit r: Reducer[A,M]): M = r.unit(self)
 
@@ -13,5 +13,5 @@ trait ReducerOps[A] extends Ops[A] {
 }
 
 trait ToReducerOps {
-  implicit def ToReducerOps[A](a: A) = new ReducerOps[A]{ def self = a }
+  implicit def ToReducerOps[A](a: A) = new ReducerOps(a)
 }

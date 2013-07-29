@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-trait ValidationOps[A] extends Ops[A] {
+final class ValidationOps[A](val self: A) extends Super {
   def success[X]: Validation[X, A] = Validation.success[X, A](self)
 
   def successNel[X]: ValidationNel[X, A] = success
@@ -16,5 +16,5 @@ trait ValidationOps[A] extends Ops[A] {
 }
 
 trait ToValidationOps {
-  implicit def ToValidationOps[A](a: A) = new ValidationOps[A]{ def self = a }
+  implicit def ToValidationOps[A](a: A) = new ValidationOps(a)
 }

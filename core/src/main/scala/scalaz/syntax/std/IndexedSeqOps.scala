@@ -4,9 +4,10 @@ package std
 
 import collection.immutable.IndexedSeq
 
-trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
+trait IndexedSeqOps0[IS[+_], A] extends Super0 {
+  def self: IS[A]
 
-  protected def v: scalaz.std.IndexedSeqSubFunctions {
+  protected[this] def v: scalaz.std.IndexedSeqSubFunctions {
     type IxSq[+X] = IS[X]
   }
 
@@ -54,9 +55,10 @@ trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
   final def adjacentPairs: IS[(A, A)] = v.adjacentPairs(self)
 }
 
+final class IndexedSeqOps[A](override val self: IndexedSeq[A]) extends Super with IndexedSeqOps0[IndexedSeq, A] {
+  protected[this] def v = scalaz.std.indexedSeq
+}
+
 trait ToIndexedSeqOps {
-  implicit def ToIndexedSeqOpsFromIndexedSeq[A](a: IndexedSeq[A]): IndexedSeqOps[IndexedSeq, A] = new IndexedSeqOps[IndexedSeq, A] {
-    protected def v = scalaz.std.indexedSeq
-    val self = a
-  }
+  implicit def ToIndexedSeqOpsFromIndexedSeq[A](a: IndexedSeq[A]): IndexedSeqOps[A] = new IndexedSeqOps(a)
 }

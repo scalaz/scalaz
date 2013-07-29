@@ -4,7 +4,7 @@ package effect
 
 import scalaz.effect.IO
 
-trait IdOps[A] extends Ops[A] {
+final class IdOps[A](val self: A) extends Super {
 
   final def put(implicit S: Show[A]): IO[Unit] =
     IO.put(self)
@@ -19,7 +19,5 @@ trait IdOps[A] extends Ops[A] {
 }
 
 trait ToIdOps {
-  implicit def ToEffectIdOps[A](a: A): IdOps[A] = new IdOps[A] {
-    def self: A = a
-  }
+  implicit def ToEffectIdOps[A](a: A): IdOps[A] = new IdOps(a)
 }

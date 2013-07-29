@@ -1,9 +1,9 @@
-package scalaz.syntax
+package scalaz
+package syntax
 
 import annotation.tailrec
-import scalaz.{Applicative, Monoid, NonEmptyList, \/}
 
-trait IdOps[A] extends Ops[A] {
+final class IdOps[A](val self: A) extends Super {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
     if (self == null) d else self
@@ -76,7 +76,5 @@ trait IdOps[A] extends Ops[A] {
 }
 
 trait ToIdOps {
-  implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps[A] {
-    def self: A = a
-  }
+  implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps(a)
 }

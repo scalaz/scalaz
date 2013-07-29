@@ -5,7 +5,7 @@ package std
 import scalaz.std.{list => l}
 
 
-trait ListOps[A] extends Ops[List[A]] {
+final class ListOps[A](val self: List[A]) extends Super {
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
   final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
@@ -54,7 +54,5 @@ trait ListOps[A] extends Ops[List[A]] {
 }
 
 trait ToListOps {
-  implicit def ToListOpsFromList[A](a: List[A]): ListOps[A] = new ListOps[A] {
-    val self = a
-  }
+  implicit def ToListOpsFromList[A](a: List[A]): ListOps[A] = new ListOps[A](a)
 }
