@@ -1,9 +1,7 @@
 package scalaz
 
 /** `F` on the left, and `G` on the right, of [[scalaz.\/]]. */
-sealed trait Coproduct[F[_], G[_], A] {
-  /** The underlying [[scalaz.\/]]. */
-  val run: F[A] \/ G[A]
+final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
 
   import Coproduct._
 
@@ -57,12 +55,7 @@ sealed trait Coproduct[F[_], G[_], A] {
 
 }
 
-object Coproduct extends CoproductFunctions with CoproductInstances0 {
-  def apply[F[_], G[_], A](x: F[A] \/ G[A]): Coproduct[F, G, A] =
-    new Coproduct[F, G, A] {
-      val run = x
-    }
-}
+object Coproduct extends CoproductFunctions with CoproductInstances0
 
 trait CoproductFunctions {
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =

@@ -8,8 +8,7 @@ import Id._
  * It implements flatMap+map and drops the write value. There is no `Monoid` or `Semigroup` required. There is no `point` operation.
  * You can switch between `WriterT` and `UnwriterT` with `unary_+` and `unary_-`.
  */
-sealed trait UnwriterT[F[_], U, A] { self =>
-  val run: F[(U, A)]
+final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
 
   import UnwriterT._
 
@@ -87,10 +86,7 @@ sealed trait UnwriterT[F[_], U, A] { self =>
   def colocal[X](f: U => X)(implicit F: Functor[F]): UnwriterT[F, X, A] = mapUnwritten(f)
 }
 
-object UnwriterT extends UnwriterTFunctions with UnwriterTInstances {
-  def apply[F[_], W, A](v: F[(W, A)]): UnwriterT[F, W, A] =
-    unwriterT(v)
-}
+object UnwriterT extends UnwriterTFunctions with UnwriterTInstances
 
 trait UnwriterTInstances2 {
   implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]) = new UnwriterTFunctor[F, W] {
@@ -141,9 +137,7 @@ trait UnwriterTInstances extends UnwriterTInstances0 {
 }
 
 trait UnwriterTFunctions {
-  def unwriterT[F[_], W, A](v: F[(W, A)]): UnwriterT[F, W, A] = new UnwriterT[F, W, A] {
-    val run = v
-  }
+  def unwriterT[F[_], W, A](v: F[(W, A)]): UnwriterT[F, W, A] = new UnwriterT[F, W, A](v)
 
 
   def unwriter[W, A](v: (W, A)): Unwriter[W, A] =
