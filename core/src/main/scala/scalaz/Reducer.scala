@@ -75,8 +75,7 @@ object Reducer extends ReducerInstances with ReducerFunctions {
     reducer(u, cs, sc)
 }
 
-sealed abstract class ReducerInstances {
-  import Reducer._
+sealed abstract class ReducerInstances { self: ReducerFunctions =>
 
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
