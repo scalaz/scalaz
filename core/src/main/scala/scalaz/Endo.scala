@@ -30,7 +30,7 @@ trait EndoInstances {
     def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
     def zero = Endo.idEndo
   }
-  implicit def endoInstances: Zip[Endo] with Unzip[Endo] = new Zip[Endo] with Unzip[Endo] {
+  implicit val endoInstances: Zip[Endo] with Unzip[Endo] = new Zip[Endo] with Unzip[Endo] {
     def zip[A, B](a: => Endo[A], b: => Endo[B]) =
       Endo {
         case (x, y) => (a(x), b(y))
@@ -61,7 +61,7 @@ trait EndoFunctions {
     def from: (A => A) => Endo[A] = endo
   }
 
-  implicit def IsoFunctorEndo = new IsoFunctorTemplate[Endo, ({type λ[α]=(α => α)})#λ] {
+  implicit val IsoFunctorEndo = new IsoFunctorTemplate[Endo, ({type λ[α]=(α => α)})#λ] {
     def to[A](fa: Endo[A]): A => A = fa.run
     def from[A](ga: A => A): Endo[A] = endo(ga)
   }

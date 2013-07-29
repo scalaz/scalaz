@@ -404,7 +404,7 @@ trait LensInstances extends LensInstances0 {
   import collection.immutable.Stack
   import collection.immutable.Queue
 
-  implicit def lensCategory: LensCategory = new LensCategory {
+  implicit val lensCategory: LensCategory = new LensCategory {
   }
 
   /** Lenses may be used implicitly as State monadic actions that get the viewed portion of the state */

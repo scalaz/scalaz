@@ -160,7 +160,7 @@ trait NullResultInstances extends NullResultInstances0 {
       implicit val M = M0
     }
 
-  implicit def nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
+  implicit val nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
     def id[A] =
       NullResult.lift(identity)
     override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =

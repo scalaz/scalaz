@@ -9,7 +9,7 @@ trait CallableInstances {
     def order(f1: Callable[A], f2: Callable[A]) = Order[A].order(f1.call, f2.call)
   }
 
-  implicit def callableMonad: Monad[Callable] = new Monad[Callable] {
+  implicit val callableMonad: Monad[Callable] = new Monad[Callable] {
     override def map[A, B](fa: Callable[A])(f: A => B) = new Callable[B] {
       def call() = f(fa.call)
     }
