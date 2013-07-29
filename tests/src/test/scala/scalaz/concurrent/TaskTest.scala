@@ -9,8 +9,9 @@ import org.scalacheck.Prop._
 import java.util.concurrent.{Executors, TimeoutException}
 import java.util.concurrent.atomic._
 
+import org.specs2.matcher.AnyMatchers
 
-class TaskTest extends Spec {
+class TaskTest extends Spec with AnyMatchers {
    
   val N = 10000
   val correct = (0 to N).sum
@@ -98,7 +99,7 @@ class TaskTest extends Spec {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
       
-      t.attemptRun match {
+      t.attemptRun must beLike {
         case -\/(e) => e must_== ex 
       }
       
@@ -122,7 +123,7 @@ class TaskTest extends Spec {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun match {
+      t.attemptRun must beLike {
         case -\/(e) => e must_== ex 
       }
       
@@ -139,8 +140,8 @@ class TaskTest extends Spec {
       
       val t =  fork { Thread.sleep(3000); now(1) }(es)
       
-       t.attemptRunFor(100) match {
-         case -\/(ex:TimeoutException)  => //ok
+       t.attemptRunFor(100) must beLike {
+         case -\/(ex:TimeoutException) => ok
        } 
    
       es.shutdown()
@@ -153,8 +154,8 @@ class TaskTest extends Spec {
       
       val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
 
-      t.attemptRunFor(100) match {
-        case -\/(ex:TimeoutException)  => //ok
+      t.attemptRunFor(100) must beLike {
+        case -\/(ex:TimeoutException) => ok
       }
 
       Thread.sleep(1500)
