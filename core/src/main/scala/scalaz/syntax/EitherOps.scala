@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-trait EitherOps[A] extends Ops[A] {
+final class EitherOps[A](val self: A) extends Super {
   final def left[B]: (A \/ B) =
     \/.left(self)
 
@@ -10,5 +10,5 @@ trait EitherOps[A] extends Ops[A] {
 }
 
 trait ToEitherOps {
-  implicit def ToEitherOps[A](a: A) = new EitherOps[A]{ def self = a }
+  implicit def ToEitherOps[A](a: A) = new EitherOps(a)
 }

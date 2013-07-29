@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{ map => dict }
 
-trait MapOps[K, A] extends Ops[Map[K, A]] {
+final class MapOps[K, A](val self: Map[K, A]) extends Super {
   final def alter(k: K)(f: (Option[A] => Option [A])): Map[K, A] = dict.alter(self, k)(f)
   final def intersectWithKey[B, C](m: Map[K, B])(f: (K, A, B) => C): Map[K, C] = dict.intersectWithKey(self, m)(f)
   final def intersectWith[B, C](m: Map[K, B])(f: (A, B) => C): Map[K, C] = dict.intersectWith(self, m)(f)
@@ -15,6 +15,6 @@ trait MapOps[K, A] extends Ops[Map[K, A]] {
 }
 
 trait ToMapOps {
-  implicit def ToMapOpsFromMap[K, V](m: Map[K, V]): MapOps[K, V] = new MapOps[K, V] { val self = m }
+  implicit def ToMapOpsFromMap[K, V](m: Map[K, V]): MapOps[K, V] = new MapOps(m)
 }
 
