@@ -94,7 +94,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
+  implicit val optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
     def point[A](a: => A): FirstOption[A] = Tag(Some(a))
     override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
@@ -111,7 +111,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
+  implicit val optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
     def point[A](a: => A): LastOption[A] = Tag(Some(a))
     override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)

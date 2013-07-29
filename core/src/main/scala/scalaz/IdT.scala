@@ -55,7 +55,7 @@ trait IdTInstances0 extends IdTInstances1 {
 }
 
 trait IdTInstances extends IdTInstances0 {
-  implicit def idTHoist: Hoist[IdT] = IdTHoist
+  implicit val idTHoist: Hoist[IdT] = IdTHoist
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = IdT[F, α]})#λ] = new IdTTraverse[F] {
     implicit def F: Traverse[F] = F0
