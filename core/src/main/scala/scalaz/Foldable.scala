@@ -87,10 +87,10 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
-  /** Deforested alias for `toStream(fa).size`. */
+  /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
 
-  /** Alias for `count`. */
+  /** Deforested alias for `toStream(fa).size`. */
   def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   /**
