@@ -21,7 +21,7 @@ final case class ListT[M[_], A](underlying: M[List[A]]){
   @deprecated("Head is deprecated. Use ListT#headOption instead", "7.1")
   def head(implicit M: Functor[M]) : M[A] = M.map(underlying)(_.head)
 
-  def headOption(implicit M: Functor[M]) : M[Option[A]] = M.map(underlying)(_.headOption)
+  def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(underlying)(_.headOption))
   
   def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
