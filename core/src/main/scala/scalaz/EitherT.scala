@@ -10,6 +10,7 @@ package scalaz
  * }}}
  * */
 final case class EitherT[F[_], A, B](run: F[A \/ B]) {
+
   import OptionT._
 
   sealed trait Switching_\/[X] {
@@ -194,6 +195,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances with EitherTFunctions {
+
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left(_)))

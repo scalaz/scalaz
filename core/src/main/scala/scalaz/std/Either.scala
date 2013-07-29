@@ -56,7 +56,7 @@ sealed trait EitherInstances0 {
 }
 
 trait EitherInstances extends EitherInstances0 {
-  implicit def eitherInstance = new Bitraverse[Either] {
+  implicit val eitherInstance = new Bitraverse[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
                                   (f: A => C, g: B => D) = fab match {
       case Left(a)  => Left(f(a))
@@ -118,19 +118,19 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** LeftProjection is isomorphic to Validation  */
-  implicit def LeftProjectionIso2 = new IsoBifunctorTemplate[LeftProjection, Either] {
+  implicit val LeftProjectionIso2 = new IsoBifunctorTemplate[LeftProjection, Either] {
     def to[A, B](fa: LeftProjection[A, B]) = fa.e
     def from[A, B](ga: Either[A, B]) = ga.left
   }
 
   /** LeftProjection is isomorphic to Validation  */
-  implicit def FirstLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ First})#λ, Either] {
+  implicit val FirstLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ First) = fa.e
     def from[A, B](ga: Either[A, B]) = First(ga.left)
   }
 
   /** LeftProjection is isomorphic to Validation  */
-  implicit def LastLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ Last})#λ, Either] {
+  implicit val LastLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ Last) = fa.e
     def from[A, B](ga: Either[A, B]) = Last(ga.left)
   }
@@ -154,34 +154,34 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** RightProjection is isomorphic to Validation  */
-  implicit def RightProjectionIso2 = new IsoBifunctorTemplate[RightProjection, Either] {
+  implicit val RightProjectionIso2 = new IsoBifunctorTemplate[RightProjection, Either] {
     def to[A, B](fa: RightProjection[A, B]) = fa.e
     def from[A, B](ga: Either[A, B]) = ga.right
   }
 
   /** RightProjection is isomorphic to Validation  */
-  implicit def FirstRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ First})#λ, Either] {
+  implicit val FirstRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ First) = fa.e
     def from[A, B](ga: Either[A, B]) = First(ga.right)
   }
 
   /** RightProjection is isomorphic to Validation  */
-  implicit def LastRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ Last})#λ, Either] {
+  implicit val LastRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ Last) = fa.e
     def from[A, B](ga: Either[A, B]) = Last(ga.right)
   }
 
-  implicit def eitherLeftInstance = new IsomorphismBifunctor[LeftProjection, Either] {
+  implicit val eitherLeftInstance = new IsomorphismBifunctor[LeftProjection, Either] {
     def iso = LeftProjectionIso2
     implicit def G: Bifunctor[Either] = eitherInstance
   }
 
-  implicit def eitherFirstLeftInstance = new IsomorphismBifunctor[({type f[a, b]=LeftProjection[a,b] @@ First})#f, Either] {
+  implicit val eitherFirstLeftInstance = new IsomorphismBifunctor[({type f[a, b]=LeftProjection[a,b] @@ First})#f, Either] {
     def iso = FirstLeftProjectionIso2
     implicit def G: Bifunctor[Either] = eitherInstance
   }
 
-  implicit def eitherRightInstance = new IsomorphismBifunctor[RightProjection, Either] {
+  implicit val eitherRightInstance = new IsomorphismBifunctor[RightProjection, Either] {
     def iso = RightProjectionIso2
     implicit def G: Bifunctor[Either] = eitherInstance
   }

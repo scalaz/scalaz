@@ -164,7 +164,7 @@ sealed abstract class LazyEitherInstances {
       )
   }
 
-  implicit def lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
+  implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
 

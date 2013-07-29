@@ -4,6 +4,7 @@ package scalaz
   *
   * @param run The underlying [[scalaz.\/]]. */
 final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
+
   import Coproduct._
 
   def map[B](f: A => B)(implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =

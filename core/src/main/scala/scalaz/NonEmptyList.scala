@@ -19,6 +19,11 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
+  def foreach(f: A => Unit): Unit = {
+    f(head)
+    tail foreach f
+  }
+
   import collection.mutable.ListBuffer
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {

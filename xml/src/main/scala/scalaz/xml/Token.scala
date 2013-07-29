@@ -66,7 +66,7 @@ trait Tokens {
 
   import std.AllInstances._
 
-  implicit def TokenShow: Show[Token] = new Show[Token] {
+  implicit val TokenShow: Show[Token] = new Show[Token] {
     override def shows(t: Token) =
       t.fold(
         start = l => q => a => e =>

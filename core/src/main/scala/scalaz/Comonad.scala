@@ -13,7 +13,7 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
   // derived functions
 
   /** alias for `copoint` */
-  def copure[A](p: F[A]): A = copoint(p)
+  final def copure[A](p: F[A]): A = copoint(p)
 
   trait ComonadLaws extends CobindLaws {
     def cobindLeftIdentity[A](fa: F[A])(implicit F: Equal[F[A]]): Boolean =

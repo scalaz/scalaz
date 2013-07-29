@@ -347,7 +347,7 @@ object Heap extends HeapInstances with HeapFunctions {
 }
 
 sealed abstract class HeapInstances {
-  implicit def heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
+  implicit val heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
     def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
   }
 

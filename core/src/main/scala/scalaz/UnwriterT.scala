@@ -9,6 +9,7 @@ import Id._
  * You can switch between `WriterT` and `UnwriterT` with `unary_+` and `unary_-`.
  */
 final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
+
   import UnwriterT._
 
   def on: WriterT[F, U, A] =

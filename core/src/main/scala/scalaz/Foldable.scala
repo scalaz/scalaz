@@ -36,6 +36,13 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
+  /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */
+  def product0[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+    new ProductFoldable1R[F, G] {
+      def F = self
+      def G = G0
+    }
+
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
     import Dual._, Endo._, syntax.std.all._
@@ -87,11 +94,11 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
-  /** Deforested alias for `toStream(fa).size`. */
-  def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+  /** Alias for `length`. */
+  final def count[A](fa: F[A]): Int = length(fa)
 
-  /** Alias for `count`. */
-  def length[A](fa: F[A]): Int = count(fa)
+  /** Deforested alias for `toStream(fa).size`. */
+  def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   /**
    * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range

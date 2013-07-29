@@ -3,6 +3,7 @@ package scalaz
 import Id._
 
 final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
+
   import WriterT._
 
   def off: UnwriterT[F, W, A] =
@@ -155,7 +156,7 @@ sealed trait WriterTInstance5 extends WriterTInstances6 {
 }
 
 sealed abstract class WriterTInstances4 extends WriterTInstance5 {
-  implicit def writerBifunctor = new WriterTBifunctor[Id] {
+  implicit val writerBifunctor = new WriterTBifunctor[Id] {
     implicit def F = idInstance
   }
   implicit def writerFoldable[W] = new WriterTFoldable[Id, W] {

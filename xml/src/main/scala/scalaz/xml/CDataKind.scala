@@ -39,10 +39,10 @@ trait CDataKinds {
   val cdataRaw: CDataKind =
     CDataRaw
 
-  implicit def CDataKindEqual: Equal[CDataKind] =
+  implicit val CDataKindEqual: Equal[CDataKind] =
     Equal.equalA
 
-  implicit def CDataKindShow: Show[CDataKind] =
+  implicit val CDataKindShow: Show[CDataKind] =
     Show.showFromToString
 
 }

@@ -22,7 +22,7 @@ sealed abstract class LiskovInstances {
   import Liskov._
 
   /**Subtyping forms a category */
-  implicit def liskov: Category[<~<] = new Category[<~<] {
+  implicit val liskov: Category[<~<] = new Category[<~<] {
     def id[A]: (A <~< A) = refl[A]
 
     def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)

@@ -566,7 +566,7 @@ abstract class PLensInstances {
 
   import PLensFamily._
 
-  implicit def plensCategory: PLensCategory = new PLensCategory {
+  implicit val plensCategory: PLensCategory = new PLensCategory {
   }
 
   /** Partial Lenses may be used implicitly as State monadic actions that get the potentially viewed portion of the state */

@@ -62,7 +62,7 @@ sealed trait TupleInstances0 {
     implicit def _8 = A8
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit def tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+  implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
@@ -295,7 +295,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     implicit def _8 = A8
   }
 
-  implicit def tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
+  implicit val tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
   implicit def tuple2Cozip[A1]: Cozip[({type f[x] = (A1, x)})#f] = new Tuple2Cozip[A1] {}
   implicit def tuple3Cozip[A1, A2]: Cozip[({type f[x] = (A1, A2, x)})#f] = new Tuple3Cozip[A1, A2] {}
   implicit def tuple4Cozip[A1, A2, A3]: Cozip[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Cozip[A1, A2, A3] {}
