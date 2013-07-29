@@ -82,6 +82,13 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /** always return `false` */
   final override def empty[A](fa: F[A]): Boolean = false
 
+  /**The product of Foldable1 `F` and Foldable `G`, `[x](F[x], G[x]])`, is a Foldable1 */
+  def product0[G[_]](implicit G0: Foldable[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+    new ProductFoldable1L[F, G] {
+      def F = self
+      def G = G0
+    }
+
   ////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
