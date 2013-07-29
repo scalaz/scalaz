@@ -21,6 +21,9 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.Plugin._
 
+import sbtunidoc.Plugin._
+import sbtunidoc.Plugin.UnidocKeys._
+
 object build extends Build {
   type Sett = Def.Setting[_]
 
@@ -163,9 +166,9 @@ object build extends Build {
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
-    settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
+    settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
-      Unidoc.unidocExclude += "typelevel",
+      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
       publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
