@@ -94,11 +94,11 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
-  /** Deforested alias for `toStream(fa).size`. */
-  def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+  /** Alias for `length`. */
+  final def count[A](fa: F[A]): Int = length(fa)
 
-  /** Alias for `count`. */
-  def length[A](fa: F[A]): Int = count(fa)
+  /** Deforested alias for `toStream(fa).size`. */
+  def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   /**
    * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
