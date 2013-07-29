@@ -103,7 +103,7 @@ trait OptionTInstances0 extends OptionTInstances1 {
 }
 
 trait OptionTInstances extends OptionTInstances0 {
-  implicit def optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
+  implicit val optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
   implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = OptionT[F, α]})#λ] = new OptionTTraverse[F] {
     implicit def F: Traverse[F] = F0

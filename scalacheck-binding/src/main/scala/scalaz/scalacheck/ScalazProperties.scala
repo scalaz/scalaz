@@ -180,12 +180,12 @@ object ScalazProperties {
     }
   }
 
-  object cojoin {
-    def cobindAssociative[F[_], A, B, C, D](implicit F: Cojoin[F], D: Equal[D], fa: Arbitrary[F[A]],
+  object cobind {
+    def cobindAssociative[F[_], A, B, C, D](implicit F: Cobind[F], D: Equal[D], fa: Arbitrary[F[A]],
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
-      forAll(F.cojoinLaw.cobindAssociative[A, B, C, D] _)
+      forAll(F.cobindLaw.cobindAssociative[A, B, C, D] _)
 
-    def laws[F[_]](implicit a: Cojoin[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("cojoin") {
+    def laws[F[_]](implicit a: Cobind[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("cobind") {
       include(functor.laws[F])
       property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
     }
@@ -198,13 +198,9 @@ object ScalazProperties {
     def cobindRightIdentity[F[_], A, B](implicit F: Comonad[F], F0: Equal[B], fa: Arbitrary[F[A]], f: Arbitrary[F[A] => B]) =
       forAll(F.comonadLaw.cobindRightIdentity[A, B] _)
 
-    def cobindAssociative[F[_], A, B, C, D](implicit F: Comonad[F], D: Equal[D], fa: Arbitrary[F[A]],
-                                            f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
-      forAll(F.comonadLaw.cobindAssociative[A, B, C, D] _)
-
     def laws[F[_]](implicit a: Comonad[F], am: Arbitrary[F[Int]],
                    af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]) = new Properties("comonad") {
-      include(cojoin.laws[F])
+      include(cobind.laws[F])
       property("cobind left identity") = cobindLeftIdentity[F, Int]
       property("cobind right identity") = cobindRightIdentity[F, Int, Int]
     }
@@ -334,7 +330,7 @@ object ScalazProperties {
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
       forAll(C.composeLaw.associative[A, B, C, D] _)
 
-    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("category") {
+    def laws[=>:[_, _]](implicit C: Category[=>:], AB: Arbitrary[Int =>: Int], E: Equal[Int =>: Int]) = new Properties("compose") {
       property("associative") = associative[=>:, Int, Int, Int, Int]
       include(semigroup.laws[Int =>: Int](C.semigroup[Int], implicitly, implicitly))
     }

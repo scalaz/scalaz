@@ -165,7 +165,7 @@ trait StreamTInstances extends StreamTInstances0 {
   }
   implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
   implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
-  implicit def StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
+  implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
 }
 
 object StreamT extends StreamTInstances {

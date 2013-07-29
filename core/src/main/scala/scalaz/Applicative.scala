@@ -22,7 +22,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   def point[A](a: => A): F[A]
 
   // alias for point
-  def pure[A](a: => A): F[A] = point(a)
+  final def pure[A](a: => A): F[A] = point(a)
 
   // derived functions
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
@@ -76,6 +76,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     def point[A](a: => A) = F.point(a)
     def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
       F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
+    override def flip = self
   }
 
   trait ApplicativeLaw extends FunctorLaw {

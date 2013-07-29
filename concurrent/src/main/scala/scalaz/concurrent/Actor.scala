@@ -84,7 +84,7 @@ private class Node[A](var a: A = null.asInstanceOf[A]) extends AtomicReference[N
 object Actor extends ActorFunctions with ActorInstances
 
 trait ActorInstances {
-  implicit def actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
+  implicit val actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
     def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
   }
 }

@@ -38,9 +38,8 @@ object TypeClass {
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
-  lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
@@ -88,7 +87,6 @@ object TypeClass {
     cozip,
     bind,
     monad,
-    cojoin,
     cobind,
     comonad,
     plus,
@@ -126,26 +124,40 @@ object Kind {
   case object *^*->* extends Kind
 }
 
+sealed trait FileStatus
+
+object FileStatus{
+  case object NoChange extends FileStatus
+  case object Updated  extends FileStatus
+  case object Created  extends FileStatus
+}
+
 object GenTypeClass {
   val useDependentMethodTypes = true
 
   case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
-    def createOrUpdate(scalaSource: File, log: Logger): sbt.File = {
+    def createOrUpdate(scalaSource: File, log: Logger): (FileStatus, sbt.File) = {
       val f = file(scalaSource)
-      val updatedSource = if (f.exists()) {
+      val (status, updatedSource) = if (f.exists()) {
         val old = IO.read(f)
-        log.info("Updating %s".format(f))
-        updateSource(old)
+        val updated = updateSource(old)
+        if(updated == old){
+          log.debug("No changed %s".format(f))
+          (FileStatus.NoChange, updated)
+        }else{
+          log.info("Updating %s".format(f))
+          (FileStatus.Updated, updated)
+        }
       } else {
         log.info("Creating %s".format(f))
-        source
+        (FileStatus.Created, source)
       }
       log.debug("Contents: %s".format(updatedSource))
       IO.delete(f)
       IO.write(f, updatedSource)
-      f
+      (status, f)
     }
 
     def updateSource(oldSource: String): String = {

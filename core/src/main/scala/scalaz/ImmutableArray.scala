@@ -1,6 +1,7 @@
 package scalaz
 
 import reflect.ClassManifest
+import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
 import collection.IndexedSeqOptimized

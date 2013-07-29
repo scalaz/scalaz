@@ -8,7 +8,7 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Cojoin[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -56,7 +56,7 @@ trait OptionInstances extends OptionInstances0 {
     def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
       fa map (a => f(Some(a)))
 
-    def cojoin[A](a: Option[A]) =
+    override def cojoin[A](a: Option[A]) =
       a map (Some(_))
 
   }
@@ -94,7 +94,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
+  implicit val optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
     def point[A](a: => A): FirstOption[A] = Tag(Some(a))
     override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
@@ -111,7 +111,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
+  implicit val optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
     def point[A](a: => A): LastOption[A] = Tag(Some(a))
     override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)

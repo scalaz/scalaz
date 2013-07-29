@@ -5,8 +5,10 @@ package syntax
 sealed abstract class CobindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Cobind[F]
   ////
-  def cobind[B](f: F[A] => B) = F.cobind(self)(f)
-  def coflatMap[B](f: F[A] => B) = F.cobind(self)(f)
+  final def cojoin: F[F[A]] = F.cojoin(self)
+  final def coflatten: F[F[A]] = F.cojoin(self)
+  final def cobind[B](f: F[A] => B) = F.cobind(self)(f)
+  final def coflatMap[B](f: F[A] => B) = F.cobind(self)(f)
   ////
 }
 

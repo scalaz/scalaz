@@ -4,7 +4,7 @@ package scalaz
  * ListT monad transformer.
  */
 
-sealed case class ListT[M[_], A](underlying: M[List[A]]){
+final case class ListT[M[_], A](underlying: M[List[A]]){
   def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
     M.map(underlying){list =>
       list match {
@@ -18,9 +18,10 @@ sealed case class ListT[M[_], A](underlying: M[List[A]]){
 
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(underlying)(_.isEmpty)
 
+  @deprecated("Head is deprecated. Use ListT#headOption instead", "7.1")
   def head(implicit M: Functor[M]) : M[A] = M.map(underlying)(_.head)
 
-  def headOption(implicit M: Functor[M]) : M[Option[A]] = M.map(underlying)(_.headOption)
+  def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(underlying)(_.headOption))
   
   def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
@@ -89,7 +90,7 @@ trait ListTInstances extends ListTInstances1 {
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
   implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
-  implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
+  implicit val listTHoist: Hoist[ListT] = new ListTHoist {}
 }
 
 object ListT extends ListTInstances {

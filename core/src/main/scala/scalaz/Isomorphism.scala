@@ -33,9 +33,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[A, B]
     def from: Arr[B, A]
-    def flip = new Iso[Arr, B, A] {
+    def flip: Iso[Arr, B, A] = new Iso[Arr, B, A] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
@@ -44,9 +45,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
-    def flip = new Iso2[Arr, G, F] {
+    def flip: Iso2[Arr, G, F] = new Iso2[Arr, G, F] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
@@ -55,9 +57,10 @@ trait Isomorphisms extends IsomorphismsLow0{
     self =>
     def to: Arr[F, G]
     def from: Arr[G, F]
-    def flip = new Iso3[Arr, G, F] {
+    def flip: Iso3[Arr, G, F] = new Iso3[Arr, G, F] {
       val to = self.from
       val from = self.to
+      override def flip = self
     }
   }
 
@@ -212,18 +215,20 @@ trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[
   implicit def G: Monad[G]
 }
 
-trait IsomorphismCojoin[F[_], G[_]] extends Cojoin[F] with IsomorphismFunctor[F, G] {
-  implicit def G: Cojoin[G] with Functor[G]
+trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G] {
+  implicit def G: Cobind[G]
 
   def iso: F <~> G
 
-  def cojoin[A](a: F[A]): F[F[A]] = iso.from(G.map(G.cojoin(iso.to(a)))(iso.from.apply))
+  def cobind[A, B](fa: F[A])(f: F[A] => B): F[B] = iso.from(G.cobind(iso.to(fa))(f.compose(iso.from.apply)))
+
+  override def cojoin[A](a: F[A]): F[F[A]] = iso.from(G.map(G.cojoin(iso.to(a)))(iso.from.apply))
 }
 
-trait IsomorphismComonad[F[_], G[_]] extends Comonad[F] with IsomorphismCojoin[F, G] {
-  implicit def G: Comonad[G] with Functor[G]
-  def copoint[A](p: F[A]): A = G.copoint(iso.to(p))
+trait IsomorphismComonad[F[_], G[_]] extends Comonad[F] with IsomorphismCobind[F, G] {
+  implicit def G: Comonad[G]
 
+  def copoint[A](p: F[A]): A = G.copoint(iso.to(p))
 }
 
 trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {

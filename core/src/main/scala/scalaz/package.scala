@@ -38,9 +38,8 @@
  *  - [[scalaz.Cozip]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
- *  - [[scalaz.Cojoin]] extends [[scalaz.Functor]]
  *  - [[scalaz.Cobind]] extends [[scalaz.Functor]]
- *  - [[scalaz.Comonad]] extends [[scalaz.Cojoin]] with [[scalaz.Cobind]]
+ *  - [[scalaz.Comonad]] extends [[scalaz.Cobind]]
  *  - [[scalaz.ApplicativePlus]] extends [[scalaz.Applicative]] with [[scalaz.PlusEmpty]]
  *  - [[scalaz.MonadPlus]] extends [[scalaz.Monad]] with [[scalaz.ApplicativePlus]]
  *  - [[scalaz.Foldable]]
@@ -84,7 +83,7 @@
 package object scalaz {
   import Id._
 
-  implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] = Id.id
+  implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] = Id.id
 
   type Tagged[T] = {type Tag = T}
 
@@ -270,4 +269,10 @@ package object scalaz {
   object Cont extends IndexedContsTFunctions with IndexedContsTInstances {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
+
+  @deprecated("Cojoin has been merged into Cobind", "7.1")
+  type Cojoin[F[_]] = Cobind[F]
+
+  @deprecated("Cojoin has been merged into Cobind", "7.1")
+  val Cojoin = Cobind
 }

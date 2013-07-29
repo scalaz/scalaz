@@ -5,7 +5,7 @@ trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
     implicit def R = R0
   }
-  implicit def function1Cojoin[A, R](implicit A0: Semigroup[A]): Cojoin[({type λ[α]=(A => α)})#λ] with Cobind[({type λ[α]=(A => α)})#λ] = new Function1Cojoin[A, R] {
+  implicit def function1Cobind[A, R](implicit A0: Semigroup[A]): Cobind[({type λ[α]=(A => α)})#λ] = new Function1Cobind[A, R] {
     implicit def M = A0
   }
 }
@@ -28,7 +28,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def cobind[A, B](fa: Function0[A])(f: Function0[A] => B) =
       () => f(fa)
 
-    def cojoin[A](a: Function0[A]): Function0[Function0[A]] =
+    override def cojoin[A](a: Function0[A]): Function0[Function0[A]] =
       () => a
 
     def bind[A, B](fa: () => A)(f: (A) => () => B) = () => f(fa())()
@@ -157,14 +157,14 @@ trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R]
   def zero = a => R.zero
 }
 
-private[scalaz] trait Function1Cojoin[M, R] extends Cojoin[({type λ[α]=(M => α)})#λ] with Cobind[({type λ[α]=(M => α)})#λ] {
+private[scalaz] trait Function1Cobind[M, R] extends Cobind[({type λ[α]=(M => α)})#λ] {
   implicit def M: Semigroup[M]
-  def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m2))
+  override def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m2))
   def cobind[A, B](fa: M => A)(f: (M => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
   override def map[A, B](fa: M => A)(f: A => B) = fa andThen f
 }
 
-private[scalaz] trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] with Function1Cojoin[M, R]{
+private[scalaz] trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] with Function1Cobind[M, R]{
   implicit def M: Monoid[M]
   def copoint[A](p: M => A) = p(M.zero)
 }

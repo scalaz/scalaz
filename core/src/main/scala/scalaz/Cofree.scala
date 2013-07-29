@@ -82,7 +82,7 @@ trait CofreeInstances {
 private[scalaz] trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
   def copoint[A](p: Cofree[S, A]) = p.head
 
-  def cojoin[A](a: Cofree[S, A]) = a.duplicate
+  override def cojoin[A](a: Cofree[S, A]) = a.duplicate
 
   def map[A, B](fa: Cofree[S, A])(f: A => B) = fa map f
 

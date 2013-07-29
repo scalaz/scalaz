@@ -10,15 +10,9 @@ sealed trait NonEmptyList[+A] {
 
   def <::[AA >: A](b: AA): NonEmptyList[AA] = nel(b, head :: tail)
 
-  import collection.mutable.ListBuffer
-
-  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = {
-    val b = new ListBuffer[AA]
-    b ++= bs
-    b += head
-    b ++= tail
-    val bb = b.toList
-    nel(bb.head, bb.tail)
+  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = bs match {
+    case Nil => this
+    case b :: bs => nel(b, bs ::: list)
   }
 
   def :::>[AA >: A](bs: List[AA]): NonEmptyList[AA] = nel(head, tail ::: bs)
@@ -27,6 +21,13 @@ sealed trait NonEmptyList[+A] {
   def append[AA >: A](f2: NonEmptyList[AA]): NonEmptyList[AA] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
+
+  def foreach(f: A => Unit): Unit = {
+    f(head)
+    tail foreach f
+  }
+
+  import collection.mutable.ListBuffer
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val b = new ListBuffer[B]
@@ -126,7 +127,7 @@ trait NonEmptyListInstances0 {
 
 trait NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
-    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Cobind.FromCojoin[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -155,8 +156,10 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
 
       def copoint[A](p: NonEmptyList[A]): A = p.head
+	
+      def cobind[A, B](fa: NonEmptyList[A])(f: NonEmptyList[A] => B): NonEmptyList[B] = map(cojoin(fa))(f)
 
-      def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
+      override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
 
       def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
 
@@ -171,10 +174,8 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
     def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
   }
 
-  implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] = new Show[NonEmptyList[A]] {
-    import std.list._
-    override def show(fa: NonEmptyList[A]) = Show[List[A]].show(fa.list)
-  }
+  implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
+    Contravariant[Show].contramap(std.list.listShow[A])(_.list)
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], List[A]](_.list)(std.list.listOrder[A])

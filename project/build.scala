@@ -76,6 +76,10 @@ object build extends Build {
             typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
         }
     },
+    checkGenTypeClasses <<= genTypeClasses.map{ classes =>
+      if(classes.exists(_._1 != FileStatus.NoChange))
+        sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
+    },
     typeClasses := Seq(),
     genToSyntax <<= typeClasses map {
       (tcs: Seq[TypeClass]) =>
@@ -305,7 +309,7 @@ object build extends Build {
     }
   }
 
-  lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
+  lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 
@@ -314,6 +318,8 @@ object build extends Build {
   lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+
+  lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
 
   def generateTupleW(outputDir: File) = {
     val arities = 2 to 12
@@ -372,7 +378,7 @@ object build extends Build {
       (pimp, conv)
     }
 
-    val source = "package scalaz\npackage syntax\npackage std\n\n" +
+    val source = "package scalaz\npackage syntax\npackage std\n\nimport collection.immutable.IndexedSeq\n\n" +
       tuples.map(_._1).mkString("\n") +
       "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +

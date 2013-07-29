@@ -91,7 +91,7 @@ trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
 }
 
 trait LazyOptionTInstances extends LazyOptionTInstances0 {
-  implicit def lazyOptionTMonadTrans: Hoist[LazyOptionT] = new LazyOptionTHoist {}
+  implicit val lazyOptionTMonadTrans: Hoist[LazyOptionT] = new LazyOptionTHoist {}
 
   implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTMonad[F] {
     implicit def F: Monad[F] = F0

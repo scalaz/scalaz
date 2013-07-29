@@ -22,7 +22,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         }
     })
 
-  def cojoin(implicit F: Cojoin[F]): OneOr[F, OneOr[F, A]] =
+  def cojoin(implicit F: Cobind[F]): OneOr[F, OneOr[F, A]] =
     OneOr(run match {
       case \/-(_) =>
         \/-(this)
@@ -116,14 +116,6 @@ private[scalaz] sealed trait OneOrFunctor[F[_]]
     fa map f
 }
 
-private[scalaz] sealed trait OneOrCojoin[F[_]]
-    extends OneOrFunctor[F] with Cojoin[({type λ[α] = OneOr[F, α]})#λ] {
-  implicit def F: Cojoin[F]
-
-  override def cojoin[A](fa: OneOr[F, A]) =
-    fa.cojoin
-}
-
 private[scalaz] sealed trait OneOrCobind[F[_]]
     extends OneOrFunctor[F] with Cobind[({type λ[α] = OneOr[F, α]})#λ] {
   implicit def F: Cobind[F]
@@ -133,7 +125,7 @@ private[scalaz] sealed trait OneOrCobind[F[_]]
 }
 
 private[scalaz] sealed trait OneOrComonad[F[_]]
-    extends OneOrCojoin[F] with OneOrCobind[F] with Comonad[({type λ[α] = OneOr[F, α]})#λ] {
+    extends OneOrCobind[F] with Comonad[({type λ[α] = OneOr[F, α]})#λ] {
   implicit def F: Comonad[F]
 
   override def cobind[A, B](fa: OneOr[F, A])(f: OneOr[F, A] => B): OneOr[F, B] =
@@ -262,11 +254,6 @@ trait OneOrInstances extends OneOrInstances0 {
 }
 
 trait OneOrInstances0 extends OneOrInstances1 {
-  implicit def OneOrCojoin[F[_]: Cojoin]: Cojoin[({type λ[α] = OneOr[F, α]})#λ] =
-    new OneOrCojoin[F] {
-      def F = implicitly
-    }
-
   implicit def OneOrCobind[F[_]: Cobind]: Cobind[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrCobind[F] {
       def F = implicitly
