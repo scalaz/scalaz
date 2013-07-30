@@ -46,8 +46,8 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.1",
-    crossScalaVersions := Seq("2.9.3", "2.10.1"),
+    scalaVersion := "2.10.2",
+    crossScalaVersions := Seq("2.9.3", "2.10.2"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
