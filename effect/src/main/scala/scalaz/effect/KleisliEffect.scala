@@ -3,13 +3,13 @@ package effect
 
 object kleisliEffect extends KleisliEffectInstances  
 
-trait KleisliEffectInstances1 extends KleisliInstances {
+sealed abstract class KleisliEffectInstances1 extends KleisliInstances {
   implicit def kleisliLiftIO[M[_], R](implicit M0: LiftIO[M]): LiftIO[({type λ[α] = Kleisli[M, R, α]})#λ] = new KleisliLiftIO[M, R] {
     implicit def L = M0
   }
 }
 
-trait KleisliEffectInstances0 extends KleisliEffectInstances1 {
+sealed abstract class KleisliEffectInstances0 extends KleisliEffectInstances1 {
   implicit def KleisliMonadIO[R, M[_]](implicit M0: MonadIO[M]): MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] =
     new MonadIO[({type λ[α] = Kleisli[M, R, α]})#λ] with KleisliLiftIO[M, R] with KleisliMonadReader[M, R] {
       implicit def L = M0
@@ -17,7 +17,7 @@ trait KleisliEffectInstances0 extends KleisliEffectInstances1 {
     }
 }
 
-trait KleisliEffectInstances extends KleisliEffectInstances0 {
+sealed abstract class KleisliEffectInstances extends KleisliEffectInstances0 {
   implicit def KleisliMonadCatchIO[M[_], R](implicit M0: MonadCatchIO[M]): MonadCatchIO[({type λ[α] = Kleisli[M, R, α]})#λ] =
     new KleisliCatchIO[M, R] {
       implicit def L = M0

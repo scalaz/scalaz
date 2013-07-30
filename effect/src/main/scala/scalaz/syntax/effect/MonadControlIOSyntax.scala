@@ -5,22 +5,21 @@ package effect
 import scalaz.effect.MonadControlIO
 
 /** Wraps a value `self` and provides methods related to `MonadControlIO` */
-sealed abstract class MonadControlIOOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: MonadControlIO[F]
+final class MonadControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadControlIO[F]) extends Ops[F[A]] {
   ////
 
   ////
 }
 
-trait ToMonadControlIOOps0 {
+sealed trait ToMonadControlIOOps0 {
   implicit def ToMonadControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]) =
-    new MonadControlIOOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadControlIO[F0.M] = F0.TC }
+    new MonadControlIOOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToMonadControlIOOps extends ToMonadControlIOOps0 with ToLiftControlIOOps with ToMonadOps {
   implicit def ToMonadControlIOOps[F[_],A](v: F[A])(implicit F0: MonadControlIO[F]) =
-    new MonadControlIOOps[F,A] { def self = v; implicit def F: MonadControlIO[F] = F0 }
+    new MonadControlIOOps[F,A](v)
 
   ////
 
@@ -28,7 +27,7 @@ trait ToMonadControlIOOps extends ToMonadControlIOOps0 with ToLiftControlIOOps w
 }
 
 trait MonadControlIOSyntax[F[_]] extends LiftControlIOSyntax[F] with MonadSyntax[F] {
-  implicit def ToMonadControlIOOps[A](v: F[A]): MonadControlIOOps[F, A] = new MonadControlIOOps[F,A] { def self = v; implicit def F: MonadControlIO[F] = MonadControlIOSyntax.this.F }
+  implicit def ToMonadControlIOOps[A](v: F[A]): MonadControlIOOps[F, A] = new MonadControlIOOps[F,A](v)(MonadControlIOSyntax.this.F)
 
   def F: MonadControlIO[F]
   ////

@@ -1,13 +1,13 @@
 package scalaz
 
 /** An algebraic data type representing the characters 'a' to 'z' */
-sealed trait Alpha {
+sealed abstract class Alpha extends Product with Serializable {
   val toChar: Char
 
   def toUpperChar: Char = toChar.toUpper
 }
 
-object Alpha extends AlphaFunctions with AlphaInstances {
+object Alpha extends AlphaInstances with AlphaFunctions {
 
   case object A extends Alpha {
     val toChar = 'a'
@@ -114,7 +114,7 @@ object Alpha extends AlphaFunctions with AlphaInstances {
   }
 }
 
-trait AlphaInstances {
+sealed abstract class AlphaInstances {
   // TODO
 }
 

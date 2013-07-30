@@ -75,19 +75,19 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 // Prioritized Implicits for type class instances
 //
 
-trait OptionTInstances3 {
+sealed abstract class OptionTInstances3 {
   implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait OptionTInstances2 extends OptionTInstances3 {
+sealed abstract class OptionTInstances2 extends OptionTInstances3 {
   implicit def optionTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
-trait OptionTInstances1 extends OptionTInstances2 {
+sealed abstract class OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
   }
@@ -96,13 +96,13 @@ trait OptionTInstances1 extends OptionTInstances2 {
   }
 }
 
-trait OptionTInstances0 extends OptionTInstances1 {
+sealed abstract class OptionTInstances0 extends OptionTInstances1 {
   implicit def optionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = OptionT[F, α]})#λ] = new OptionTMonadPlus[F] {
     implicit def F: Monad[F] = F0
   }
 }
 
-trait OptionTInstances extends OptionTInstances0 {
+sealed abstract class OptionTInstances extends OptionTInstances0 {
   implicit val optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
   implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = OptionT[F, α]})#λ] = new OptionTTraverse[F] {
@@ -126,7 +126,7 @@ trait OptionTFunctions {
   }
 }
 
-object OptionT extends OptionTFunctions with OptionTInstances
+object OptionT extends OptionTInstances with OptionTFunctions
 
 //
 // Implementation traits for type class instances

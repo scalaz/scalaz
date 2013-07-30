@@ -78,6 +78,7 @@ object TypeClass {
     enum,
     plusEmpty,
     isEmpty,
+    invariantFunctor,
     functor,
     contravariant,
     apply,
@@ -257,8 +258,7 @@ object %s {
         """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F] extends Ops[F] {
-  implicit def F: %s[F]
+final class %sOps[F] private[syntax](val self: F)(implicit val F: %s[F]) extends Ops[F] {
   ////
 
   ////
@@ -266,7 +266,7 @@ sealed abstract class %sOps[F] extends Ops[F] {
 
 trait To%sOps %s {
   implicit def To%sOps[F](v: F)(implicit F0: %s[F]) =
-    new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
+    new %sOps[F](v)
 
   ////
 
@@ -274,7 +274,7 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F] %s {
-  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F](v)(%sSyntax.this.F)
   
   def F: %s[F]
   ////
@@ -284,35 +284,34 @@ trait %sSyntax[F] %s {
 """.format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
 
       // implicits in ToXxxSyntax
-      typeClassName, typeClassName, typeClassName, typeClassName,
+      typeClassName, typeClassName, typeClassName,
       
       // trait MonadSyntax[F] extends ... { ... } 
       typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
+      typeClassName, typeClassName, typeClassName, typeClassName,
       
       typeClassName
     )
     case Kind.*->* =>
       val ToVUnapply =
 """  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
-    new %sOps[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
-""".format(Seq.fill(4)(typeClassName): _*)
+    new %sOps[F0.M,F0.A](F0(v))(F0.TC)
+""".format(Seq.fill(3)(typeClassName): _*)
       val ToVMA =
 """  implicit def To%sOps[F[_],A](v: F[A])(implicit F0: %s[F]) =
-    new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
-""".format(Seq.fill(4)(typeClassName) :_*)
+    new %sOps[F,A](v)
+""".format(Seq.fill(3)(typeClassName) :_*)
 
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: %s[F]
+final class %sOps[F[_],A] private[syntax](val self: F[A])(implicit val F: %s[F]) extends Ops[F[A]] {
   ////
 
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
 %s
 }
 
@@ -324,7 +323,7 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F[_]] %s {
-  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A](v)(%sSyntax.this.F)
 
   def F: %s[F]
   ////
@@ -339,7 +338,7 @@ trait %sSyntax[F[_]] %s {
           ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
+          typeClassName, typeClassName, typeClassName, typeClassName, 
           
           typeClassName
         )
@@ -347,26 +346,25 @@ trait %sSyntax[F[_]] %s {
 
         val ToVUnapply =
   """  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply2[%s, FA]) =
-      new %sOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
-  """.format(Seq.fill(4)(typeClassName): _*)
+      new %sOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  """.format(Seq.fill(3)(typeClassName): _*)
        val ToVFAB =
   """
   implicit def To%sOps[F[_, _],A, B](v: F[A, B])(implicit F0: %s[F]) =
-      new %sOps[F,A, B] { def self = v; implicit def F: %s[F] = F0 }
-  """.format(Seq.fill(4)(typeClassName) :_*)
+      new %sOps[F,A, B](v)
+  """.format(Seq.fill(3)(typeClassName) :_*)
 
 
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
-  implicit def F: %s[F]
+final class %sOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: %s[F]) extends Ops[F[A, B]] {
   ////
 
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
   %s
 }
 
@@ -379,7 +377,7 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F[_, _]] %s {
-  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+  implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B](v)(%sSyntax.this.F)
 
   def F: %s[F]
   ////
@@ -392,7 +390,7 @@ trait %sSyntax[F[_, _]] %s {
           typeClassName, extendsToSyntaxListText,
           ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
+          typeClassName, typeClassName, typeClassName, typeClassName, 
           
           typeClassName
         )

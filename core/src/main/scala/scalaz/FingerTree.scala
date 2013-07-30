@@ -804,7 +804,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 }
 
-trait FingerTreeInstances {
+sealed abstract class FingerTreeInstances {
   import FingerTree._
 
   implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[({type λ[α]=ViewL[S, α]})#λ] = new Functor[({type λ[α]=ViewL[S, α]})#λ] {

@@ -16,7 +16,7 @@ package scalaz
  * @tparam B1 The initial type of the optional field
  * @tparam B2 The final type of the optional field
  */
-sealed trait PLensFamily[A1, A2, B1, B2] {
+sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def run(a: A1): Option[IndexedStore[B1, B2, A2]]
 
   def apply(a: A1): Option[IndexedStore[B1, B2, A2]] =
@@ -202,7 +202,7 @@ sealed trait PLensFamily[A1, A2, B1, B2] {
 
 }
 
-object PLensFamily extends PLensFunctions with PLensInstances {
+object PLensFamily extends PLensInstances with PLensFunctions {
 
   def apply[A1, A2, B1, B2](r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
     plensFamily(r)
@@ -302,7 +302,7 @@ trait PLensFamilyFunctions extends PLensInstances {
     ~LensFamily.distributeLensFamily
 }
 
-trait PLensFunctions extends PLensFamilyFunctions with PLensInstances {
+trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   import BijectionT._
 
   def plens[A, B](r: A => Option[Store[B, A]]): PLens[A, B] = new PLens[A, B] {
@@ -562,7 +562,7 @@ trait PLensFunctions extends PLensFamilyFunctions with PLensInstances {
     }
 }
 
-trait PLensInstances {
+abstract class PLensInstances {
 
   import PLensFamily._
 

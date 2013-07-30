@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Apply` */
-sealed abstract class ApplyOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Apply[F]
+final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Apply[F]) extends Ops[F[A]] {
   ////
 
   final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
@@ -35,15 +34,15 @@ sealed abstract class ApplyOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToApplyOps0 {
+sealed trait ToApplyOps0 {
   implicit def ToApplyOpsUnapply[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
-    new ApplyOps[F0.M,F0.A] { def self = F0(v); implicit def F: Apply[F0.M] = F0.TC }
+    new ApplyOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
   implicit def ToApplyOps[F[_],A](v: F[A])(implicit F0: Apply[F]) =
-    new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
+    new ApplyOps[F,A](v)
 
   ////
 
@@ -79,7 +78,7 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
 }
 
 trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = ApplySyntax.this.F }
+  implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A](v)(ApplySyntax.this.F)
 
   def F: Apply[F]
   ////

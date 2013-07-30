@@ -5,9 +5,7 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-sealed trait IndexedStoreT[F[_], +I, A, B] {
-  def run: (F[A => B], I)
-
+final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   import StoreT._
   import BijectionT._
 
@@ -79,16 +77,11 @@ sealed trait IndexedStoreT[F[_], +I, A, B] {
     (F.map(run._1)(f), run._2)
 }
 
-object IndexedStoreT extends StoreTFunctions with StoreTInstances {
-  def apply[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] =
-    indexedStoreT(r)
-}
+object IndexedStoreT extends StoreTInstances with StoreTFunctions
 
 trait IndexedStoreTFunctions {
 
-  def indexedStoreT[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] = new IndexedStoreT[F, I, A, B] {
-    val run = r
-  }
+  def indexedStoreT[F[_], I, A, B](r: (F[A => B], I)): IndexedStoreT[F, I, A, B] = IndexedStoreT(r)
 
   def indexedStore[I, A, B](i: I)(f: A => B): IndexedStore[I, A, B] =
     indexedStoreT[Id, I, A, B](f -> i)
@@ -102,40 +95,40 @@ trait StoreTFunctions extends IndexedStoreTFunctions {
   def store[A, B](a: A)(f: A => B): Store[A, B] =
     storeT[Id, A, B](f -> a)
 }
-trait IndexedStoreTInstances2 {
+sealed abstract class IndexedStoreTInstances2 {
   implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]) = new IndexedStoreTContravariant[F, I, B] {
     implicit def F: Functor[F] = F0
   }
 }
-trait IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
+sealed abstract class IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
   implicit def indexedStoreTFunctorLeft[F[_], A, B] = new IndexedStoreTFunctorLeft[F, A, B] {}
 }
-trait IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
+sealed abstract class IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
   implicit def indexedStoreTBifunctor[F[_], A](implicit F0: Functor[F]) = new IndexedStoreTBifunctor[F, A] {
     implicit def F: Functor[F] = F0
   }
 }
-trait IndexedStoreTInstances extends IndexedStoreTInstances0 {
+sealed abstract class IndexedStoreTInstances extends IndexedStoreTInstances0 {
   implicit def indexedStoreTFunctorRight[F[_], I, A](implicit F0: Functor[F]) = new IndexedStoreTFunctorRight[F, I, A] {
     implicit def F: Functor[F] = F0
   }
 }
-trait StoreTInstances2 extends IndexedStoreTInstances {
+sealed abstract class StoreTInstances2 extends IndexedStoreTInstances {
   implicit def storeTCobind[F[_], A](implicit F0: Cobind[F]) = new StoreTCobind[F, A] {
     implicit def F: Cobind[F] = F0
   }
 }
-trait StoreTInstances1 extends StoreTInstances2 {
+sealed abstract class StoreTInstances1 extends StoreTInstances2 {
   implicit def storeTComonad[F[_], A](implicit F0: Comonad[F]) = new StoreTComonad[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
-trait StoreTInstances0 extends StoreTInstances1 {
+sealed abstract class StoreTInstances0 extends StoreTInstances1 {
   implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]) = new StoreTComonadStore[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
-trait StoreTInstances extends StoreTInstances0 {
+abstract class StoreTInstances extends StoreTInstances0 {
   implicit def storeTCohoist[S]: Cohoist[({type f[g[_], a] = StoreT[g, S, a]})#f] = new StoreTCohoist[S] {}
 }
 

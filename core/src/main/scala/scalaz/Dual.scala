@@ -4,13 +4,13 @@ object Dual extends DualInstances {
   def apply[A](a: A): (A @@ Tags.Dual) = Tag(a)
 }
 
-trait DualInstances0 {
+sealed abstract class DualInstances0 {
   implicit def dualSemigroup[F](implicit F0: Semigroup[F]) = new DualSemigroup[F] {
     implicit def F = F0
   }
 }
 
-trait DualInstances extends DualInstances0 {
+sealed abstract class DualInstances extends DualInstances0 {
   implicit def dualMonoid[F](implicit F0: Monoid[F]) = new DualMonoid[F] {
     implicit def F = F0
   }

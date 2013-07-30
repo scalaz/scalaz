@@ -1,10 +1,7 @@
 package scalaz
 
 /** A singly-linked list that is guaranteed to be non-empty. */
-sealed trait NonEmptyList[+A] {
-  val head: A
-  val tail: List[A]
-
+final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
   import NonEmptyList._
   import Zipper._
 
@@ -113,7 +110,7 @@ sealed trait NonEmptyList[+A] {
     list.hashCode
 }
 
-object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
+object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
@@ -121,11 +118,11 @@ object NonEmptyList extends NonEmptyListFunctions with NonEmptyListInstances {
     Some((v.head, v.tail))
 }
 
-trait NonEmptyListInstances0 {
+sealed abstract class NonEmptyListInstances0 {
   implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
 }
 
-trait NonEmptyListInstances extends NonEmptyListInstances0 {
+sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
@@ -182,10 +179,8 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
 }
 
 trait NonEmptyListFunctions {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] = new NonEmptyList[A] {
-    val head = h
-    val tail = t.toList
-  }
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] =
+    new NonEmptyList(h, t)
 
   def nels[A](h: A, t: A*): NonEmptyList[A] =
     nel(h, t.toList)

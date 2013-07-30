@@ -134,7 +134,7 @@ package object scalaz {
   type State[S, A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
-  object StateT extends StateTFunctions with StateTInstances {
+  object StateT extends StateTInstances with StateTFunctions {
     def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
       def apply(s: S) = f(s)
     }
@@ -155,7 +155,7 @@ package object scalaz {
   type Store[A, B] = StoreT[Id, A, B]
   // flipped
   type |-->[A, B] = Store[B, A]
-  object StoreT extends StoreTFunctions with StoreTInstances {
+  object StoreT extends StoreTInstances with StoreTFunctions {
     def apply[F[_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
       storeT(r)
   }
@@ -168,15 +168,15 @@ package object scalaz {
 
 
   type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
-  object ReaderWriterStateT extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+  object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[F[_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
   }
   type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
-  object IndexedReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+  object IndexedReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) => f(r, s) }
   }
   type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[Id, R, W, S, A]
-  object ReaderWriterState extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+  object ReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
   }
   type IRWST[F[_], -R, W, -S1, S2, A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
@@ -214,7 +214,7 @@ package object scalaz {
   type Lens[A, B] = LensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
-  object Lens extends LensFunctions with LensInstances {
+  object Lens extends LensInstances with LensFunctions {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
   }
@@ -228,7 +228,7 @@ package object scalaz {
   type PLens[A, B] = PLensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
-  object PLens extends PLensFunctions with PLensInstances {
+  object PLens extends PLensInstances with PLensFunctions {
     def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
   }
@@ -242,31 +242,31 @@ package object scalaz {
   type PState[S, A] = PStateT[Id, S, A]
 
   type IndexedConts[W[_], R, O, A] = IndexedContsT[W, Id, R, O, A]
-  object IndexedConts extends IndexedContsTFunctions with IndexedContsTInstances {
+  object IndexedConts extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] = IndexedContsT[W, Id, R, O, A](f)
   }
   type IndexedContT[M[_], R, O, A] = IndexedContsT[Id, M, R, O, A]
-  object IndexedContT extends IndexedContsTFunctions with IndexedContsTInstances {
+  object IndexedContT extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[M, R, O, A] = IndexedContsT[Id, M, R, O, A](f)
   }
   type IndexedCont[R, O, A] = IndexedContT[Id, R, O, A]
-  object IndexedCont extends IndexedContsTFunctions with IndexedContsTInstances {
+  object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[W[_], R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, Id, R, O, A](f)
   }
   type ContsT[W[_], M[_], R, A] = IndexedContsT[W, M, R, R, A]
-  object ContsT extends IndexedContsTFunctions with IndexedContsTInstances {
+  object ContsT extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[W[_], M[_], R, A](f: W[A => M[R]] => M[R]): ContsT[W, M, R, A] = IndexedContsT[W, M, R, R, A](f)
   }
   type Conts[W[_], R, A] = ContsT[W, Id, R, A]
-  object Conts extends IndexedContsTFunctions with IndexedContsTInstances {
+  object Conts extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[W[_], R, A](f: W[A => R] => R): Conts[W, R, A] = IndexedContsT[W, Id, R, R, A](f)
   }
   type ContT[M[_], R, A] = ContsT[Id, M, R, A]
-  object ContT extends IndexedContsTFunctions with IndexedContsTInstances {
+  object ContT extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[M[_], R, A](f: (A => M[R]) => M[R]): ContT[M, R, A] = IndexedContsT[Id, M, R, R, A](f)
   }
   type Cont[R, A] = ContT[Id, R, A]
-  object Cont extends IndexedContsTFunctions with IndexedContsTInstances {
+  object Cont extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
 

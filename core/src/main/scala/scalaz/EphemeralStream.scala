@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference
   * things, but without the space leak problem frequently encountered
   * using that type.
   */
-sealed trait EphemeralStream[A] {
+sealed abstract class EphemeralStream[A] {
 
   import EphemeralStream._
 
@@ -92,7 +92,7 @@ sealed trait EphemeralStream[A] {
 
 }
 
-object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInstances {
+object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
   def apply[A]: EphemeralStream[A] =
     emptyEphemeralStream
 
@@ -102,7 +102,7 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
       else None)
 }
 
-trait EphemeralStreamInstances {
+sealed abstract class EphemeralStreamInstances {
   // TODO more instances
   implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b

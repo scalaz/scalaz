@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse` */
-sealed abstract class TraverseOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Traverse[F]
+final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Traverse[F]) extends Ops[F[A]] {
   ////
 
   import Leibniz.===
@@ -68,15 +67,15 @@ sealed abstract class TraverseOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToTraverseOps0 {
+sealed trait ToTraverseOps0 {
   implicit def ToTraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse, FA]) =
-    new TraverseOps[F0.M,F0.A] { def self = F0(v); implicit def F: Traverse[F0.M] = F0.TC }
+    new TraverseOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
   implicit def ToTraverseOps[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
-    new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = F0 }
+    new TraverseOps[F,A](v)
 
   ////
 
@@ -84,7 +83,7 @@ trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps 
 }
 
 trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
-  implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A] { def self = v; implicit def F: Traverse[F] = TraverseSyntax.this.F }
+  implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A](v)(TraverseSyntax.this.F)
 
   def F: Traverse[F]
   ////

@@ -8,8 +8,8 @@ trait IndexedSeqSubVector extends IndexedSeqSub {
   protected final def empty[A] = Vector()
 }
 
-trait VectorInstances0 {
-  implicit def vectorEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, Vector[A]] {
+sealed trait VectorInstances0 {
+  implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new IndexedSeqEqual[A, Vector[A]] {
     implicit def A = A0
   }
 }

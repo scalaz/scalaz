@@ -3,9 +3,8 @@ package scalaz
 /**
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
-sealed trait \/[+A, +B] {
-  sealed trait SwitchingDisjunction[X] {
-    def r: X
+sealed abstract class \/[+A, +B] extends Product with Serializable {
+  final class SwitchingDisjunction[X](r: => X) {
     def <<?:(left: => X): X =
       \/.this match {
         case -\/(_) => left
@@ -15,9 +14,7 @@ sealed trait \/[+A, +B] {
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
-    new SwitchingDisjunction[X] {
-      def r = right
-    }
+    new SwitchingDisjunction[X](right)
 
   /** Return `true` if this disjunction is left. */
   def isLeft: Boolean =
@@ -270,8 +267,8 @@ sealed trait \/[+A, +B] {
 
 
 }
-case class -\/[+A](a: A) extends (A \/ Nothing)
-case class \/-[+B](b: B) extends (Nothing \/ B)
+final case class -\/[+A](a: A) extends (A \/ Nothing)
+final case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
@@ -299,13 +296,13 @@ object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
 }
 
-trait DisjunctionInstances extends DisjunctionInstances0 {
+sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
   /** Turns out that Either is just a glorified tuple; who knew? */
   type GlorifiedTuple[+A, +B] =
   A \/ B
 }
 
-trait DisjunctionInstances0 extends DisjunctionInstances1 {
+sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
@@ -321,7 +318,7 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
     }
 }
 
-trait DisjunctionInstances1 extends DisjunctionInstances2 {
+sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
@@ -338,7 +335,7 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
     }
 }
 
-trait DisjunctionInstances2 extends DisjunctionInstances3 {
+sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
   implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
@@ -367,7 +364,7 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 
 }
 
-trait DisjunctionInstances3 {
+sealed abstract class DisjunctionInstances3 {
   implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)

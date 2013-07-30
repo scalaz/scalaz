@@ -13,7 +13,7 @@ trait Zap[F[_], G[_]] { self =>
   }
 }
 
-trait ZapInstances {
+sealed abstract class ZapInstances {
 
   /** The identity functor annihilates itself. */
   implicit val identityZap: Zap[Id, Id] = new Zap[Id, Id] {

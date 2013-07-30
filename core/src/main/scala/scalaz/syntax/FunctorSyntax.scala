@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Functor` */
-sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Functor[F]
+final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) extends Ops[F[A]] {
   ////
   import Leibniz.===
 
@@ -23,15 +22,15 @@ sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToFunctorOps0 {
+sealed trait ToFunctorOps0 {
   implicit def ToFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
-    new FunctorOps[F0.M,F0.A] { def self = F0(v); implicit def F: Functor[F0.M] = F0.TC }
+    new FunctorOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToFunctorOps extends ToFunctorOps0 with ToInvariantFunctorOps {
   implicit def ToFunctorOps[F[_],A](v: F[A])(implicit F0: Functor[F]) =
-    new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = F0 }
+    new FunctorOps[F,A](v)
 
   ////
 
@@ -52,7 +51,7 @@ trait ToFunctorOps extends ToFunctorOps0 with ToInvariantFunctorOps {
 }
 
 trait FunctorSyntax[F[_]] extends InvariantFunctorSyntax[F] {
-  implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A] { def self = v; implicit def F: Functor[F] = FunctorSyntax.this.F }
+  implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A](v)(FunctorSyntax.this.F)
 
   def F: Functor[F]
   ////

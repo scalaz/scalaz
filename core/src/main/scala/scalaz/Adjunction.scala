@@ -79,7 +79,7 @@ trait AdjunctionFunctions {
   def apply[F[_], G[_]](implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A
 }
 
-trait AdjunctionInstances {
+sealed abstract class AdjunctionInstances {
   import Adjunction.-|
 
   implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](implicit A1: F -| G, A2: P -| Q): ({type λ[α] = P[F[α]]})#λ -| ({type λ[α] = G[Q[α]]})#λ =
