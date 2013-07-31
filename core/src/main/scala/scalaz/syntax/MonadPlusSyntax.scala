@@ -13,6 +13,9 @@ sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
   def withFilter(f: A => Boolean) =
     filter(f)
 
+  final def uniteU[T, B](implicit T: Unapply[Foldable, A]): F[T.A] =
+    F.uniteU(self)(T)
+
   def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
     val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
     F.unite[T, B](ftb)
