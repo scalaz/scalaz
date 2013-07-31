@@ -4,7 +4,6 @@ import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
 
-
 class MapTest extends Spec {
   "Map functions" should {
     "satisfy monoid laws" ! monoid.laws[Map[Int, String]]
