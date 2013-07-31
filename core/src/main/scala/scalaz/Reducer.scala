@@ -15,7 +15,7 @@ import scalaz.Tags.{Conjunction}
  *
  * Based on a Haskell library by Edward Kmett
  */
-sealed trait Reducer[C, M] {
+sealed abstract class Reducer[C, M] {
   implicit def monoid: Monoid[M]
 
   def unit(c: C): M
@@ -50,7 +50,7 @@ sealed trait Reducer[C, M] {
     }
   }
 }
-sealed trait UnitReducer[C, M] extends Reducer[C, M] {
+sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
   def unit(c: C): M
 
@@ -67,7 +67,7 @@ object UnitReducer {
   }
 }
 
-object Reducer extends ReducerFunctions with ReducerInstances {
+object Reducer extends ReducerInstances with ReducerFunctions {
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
     */
@@ -75,8 +75,7 @@ object Reducer extends ReducerFunctions with ReducerInstances {
     reducer(u, cs, sc)
 }
 
-trait ReducerInstances {
-  import Reducer._
+sealed abstract class ReducerInstances { self: ReducerFunctions =>
 
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {

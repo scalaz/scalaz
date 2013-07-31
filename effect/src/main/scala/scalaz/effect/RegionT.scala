@@ -20,13 +20,13 @@ sealed trait RegionT[S, P[_], A] {
     value.run(r)
 }
 
-object RegionT extends RegionTFunctions with RegionTInstances {
+object RegionT extends RegionTInstances with RegionTFunctions {
   def apply[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
     val value = k
   }
 }
 
-trait RegionTInstances1 {
+sealed abstract class RegionTInstances1 {
   implicit def RegionTLiftIO[S, M[_]](implicit M: LiftIO[M]): LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] = new RegionTLiftIO[S, M] {
     implicit def L = M
   }
@@ -36,7 +36,7 @@ trait RegionTInstances1 {
   }
 }
 
-trait RegionTInstances extends RegionTInstances1 {
+sealed abstract class RegionTInstances extends RegionTInstances1 {
 }
 
 trait RegionTFunctions {

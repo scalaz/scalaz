@@ -1,8 +1,6 @@
 package scalaz
 
-sealed trait LazyEitherT[F[_], A, B] {
-  def run: F[LazyEither[A, B]]
-
+final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   import LazyEither._
   import LazyEitherT._
   import OptionT._
@@ -92,10 +90,7 @@ sealed trait LazyEitherT[F[_], A, B] {
   }
 }
 
-object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
-  def apply[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] =
-    lazyEitherT(a)
-
+object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
   sealed trait LeftProjectionT[F[_], A, B] {
     def lazyEitherT: LazyEitherT[F, A, B]
 
@@ -144,7 +139,7 @@ object LazyEitherT extends LazyEitherTFunctions with LazyEitherTInstances {
 
 }
 
-trait LazyEitherTInstances1 {
+sealed abstract class LazyEitherTInstances1 {
   implicit def lazyEitherTFunctor[F[_], L](implicit F0: Functor[F]) = new LazyEitherTFunctor[F, L] {
     implicit def F = F0
   }
@@ -154,7 +149,7 @@ trait LazyEitherTInstances1 {
   }
 }
 
-trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
+sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
   implicit def lazyEitherTBifunctor[F[_]](implicit F0: Functor[F]) = new LazyEitherTBifunctor[F] {
     implicit def F = F0
   }
@@ -180,7 +175,7 @@ trait LazyEitherTInstances0 extends LazyEitherTInstances1 {
 }
 
 // TODO more instances
-trait LazyEitherTInstances extends LazyEitherTInstances0 {
+sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTBitraverse[F[_]](implicit F0: Traverse[F]) = new LazyEitherTBitraverse[F] {
     implicit def F = F0
   }
@@ -200,9 +195,7 @@ trait LazyEitherTInstances extends LazyEitherTInstances0 {
 }
 
 trait LazyEitherTFunctions {
-  def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] = new LazyEitherT[F, A, B] {
-    val run = a
-  }
+  def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] = LazyEitherT(a)
 
   import LazyEither._
 

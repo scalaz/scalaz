@@ -20,7 +20,7 @@ sealed abstract class BitraverseOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToBitraverseOps0 {
+sealed trait ToBitraverseOps0 {
     implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bitraverse, FA]) =
       new BitraverseOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bitraverse[F0.M] = F0.TC }
   

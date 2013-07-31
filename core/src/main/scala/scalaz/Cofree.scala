@@ -64,7 +64,7 @@ case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S
     zapWith(fs)((a, f) => f(a))
 }
 
-object Cofree extends CofreeFunctions with CofreeInstances
+object Cofree extends CofreeInstances with CofreeFunctions
 
 
 trait CofreeFunctions {
@@ -75,7 +75,7 @@ trait CofreeFunctions {
 
 }
 
-trait CofreeInstances {
+sealed abstract class CofreeInstances {
   implicit def cofreeComonad[S[_]]: Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {}
 }
 

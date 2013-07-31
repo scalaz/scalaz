@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait TupleInstances0 {
+sealed trait TupleInstances0 {
   implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
@@ -135,7 +135,7 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
 }
-trait TupleInstances1 extends TupleInstances0 {
+sealed trait TupleInstances1 extends TupleInstances0 {
 
   implicit def tuple1Show[A1](implicit A1: Show[A1]) = new Tuple1Show[A1] {
     implicit def _1 = A1

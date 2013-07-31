@@ -66,7 +66,7 @@ final case class ListT[M[_], A](underlying: M[List[A]]){
 // Prioritized Implicits for type class instances
 //
 
-trait ListTInstances2 {
+sealed abstract class ListTInstances2 {
   implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = ListT[F, α]})#λ] = new ListTFunctor[F]{
     implicit def F: Functor[F] = F0
   }
@@ -76,14 +76,14 @@ trait ListTInstances2 {
   }
 }
 
-trait ListTInstances1 extends ListTInstances2 {
+sealed abstract class ListTInstances1 extends ListTInstances2 {
 
   implicit def listTMonoid[F[_], A](implicit F0: Monad[F]): Monoid[ListT[F, A]] = new ListTMonoid[F, A] {
     implicit def F: Monad[F] = F0
   }
 }
 
-trait ListTInstances extends ListTInstances1 {
+sealed abstract class ListTInstances extends ListTInstances1 {
   implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[({type λ[α] = ListT[F, α]})#λ] = new ListTMonadPlus[F] {
     implicit def F: Monad[F] = F0
   }

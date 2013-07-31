@@ -22,7 +22,7 @@ import annotation.tailrec
  * This implementation is a port of Haskell's [[http://hackage.haskell.org/packages/archive/bktrees/0.2.1/doc/html/src/Data-Set-BKTree.html Data.Set.BKTree]]
  */
 @deprecated("This class depends on `MetricSpace` which is deprecated, too.", "7.0.1")
-sealed trait BKTree[A] {
+sealed abstract class BKTree[A] extends Product with Serializable {
   def isEmpty: Boolean =
     this match {
       case BKTreeEmpty()       => true
@@ -177,7 +177,7 @@ private case class BKTreeNode[A](value: A, sz: Int, children: IntMap[BKTree[A]])
 
 private case class BKTreeEmpty[A]() extends BKTree[A]
 
-object BKTree extends BKTreeFunctions with BKTreeInstances {
+object BKTree extends BKTreeInstances with BKTreeFunctions {
   def apply[A: MetricSpace](as: A*): BKTree[A] = as.foldLeft(emptyBKTree[A])((b, a) => b + a)
 }
 
@@ -185,7 +185,7 @@ trait BKTreeFunctions {
   def emptyBKTree[A]: BKTree[A] = BKTreeEmpty()
 }
 
-trait BKTreeInstances {
+sealed abstract class BKTreeInstances {
   implicit def bKTreeInstance: Functor[BKTree] with Length[BKTree] = new Functor[BKTree] with Length[BKTree] {
     def map[A, B](fa: BKTree[A])(f: A => B): BKTree[B] = fa map f
     def length[A](fa: BKTree[A]): Int = fa.size

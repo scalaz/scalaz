@@ -10,7 +10,7 @@ sealed abstract class ComonadOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToComonadOps0 {
+sealed trait ToComonadOps0 {
   implicit def ToComonadOpsUnapply[FA](v: FA)(implicit F0: Unapply[Comonad, FA]) =
     new ComonadOps[F0.M,F0.A] { def self = F0(v); implicit def F: Comonad[F0.M] = F0.TC }
 

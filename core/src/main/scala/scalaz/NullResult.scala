@@ -1,7 +1,7 @@
 package scalaz
 
-sealed trait NullResult[A, B] {
-  def apply(a: A): Option[B]
+final class NullResult[A, B] private(_apply: A => Option[B]) {
+  def apply(a: A): Option[B] = _apply(a)
 
   import NullResult._
   import NullArgument._
@@ -108,43 +108,42 @@ sealed trait NullResult[A, B] {
     OptionT(F.map(a)(apply(_)))
 }
 
-object NullResult extends NullResultFunctions with NullResultInstances
+object NullResult extends NullResultInstances with NullResultFunctions {
+  def apply[A, B](f: A => Option[B]): A =>? B =
+    new (A =>? B)(f)
+}
 
 trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
-  def apply[A, B](f: A => Option[B]): A =>? B =
-    new (A =>? B) {
-      def apply(a: A) = f(a)
-    }
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
-    apply(k apply _)
+    NullResult(k apply _)
 
   def lift[A, B](f: A => B): A =>? B =
-    apply(a => Some(f(a)))
+    NullResult(a => Some(f(a)))
 
   def always[A, B](b: => B): A =>? B =
     lift(_ => b)
 
   def never[A, B]: A =>? B =
-    apply(_ => None)
+    NullResult(_ => None)
 
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
 
   object list {
     def head[A]: List[A] =>? A =
-      apply(_.headOption)
+      NullResult(_.headOption)
 
     def tail[A]: List[A] =>? List[A] =
-      apply {
+      NullResult {
         case Nil => None
         case _::t => Some(t)
       }
   }
 }
 
-trait NullResultInstances0 {
+sealed abstract class NullResultInstances0 {
 
   implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
@@ -153,7 +152,7 @@ trait NullResultInstances0 {
 
 }
 
-trait NullResultInstances extends NullResultInstances0 {
+sealed abstract class NullResultInstances extends NullResultInstances0 {
 
   implicit def nullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
     new NullResultMonoid[A, B] {

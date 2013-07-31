@@ -21,8 +21,8 @@ trait IndexedSeqSubIndexedSeq extends IndexedSeqSub {
   protected final def empty[A] = IndexedSeq()
 }
 
-trait IndexedSeqInstances0 {
-  implicit def indexedSeqEqual[A](implicit A0: Equal[A]) = new IndexedSeqEqual[A, IndexedSeq[A]] {
+sealed trait IndexedSeqInstances0 {
+  implicit def indexedSeqEqual[A](implicit A0: Equal[A]): Equal[IndexedSeq[A]] = new IndexedSeqEqual[A, IndexedSeq[A]] {
     implicit def A = A0
   }
 }

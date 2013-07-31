@@ -9,7 +9,7 @@ sealed abstract class CatchableOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToCatchableOps0 {
+sealed trait ToCatchableOps0 {
   implicit def ToCatchableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Catchable, FA]) =
     new CatchableOps[F0.M,F0.A] { def self = F0(v); implicit def F: Catchable[F0.M] = F0.TC }
 

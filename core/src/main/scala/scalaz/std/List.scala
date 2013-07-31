@@ -4,7 +4,7 @@ package std
 import scalaz.Id._
 import annotation.tailrec
 
-trait ListInstances0 {
+sealed trait ListInstances0 {
   implicit def listEqual[A](implicit A0: Equal[A]) = new ListEqual[A] {
     implicit def A = A0
   }

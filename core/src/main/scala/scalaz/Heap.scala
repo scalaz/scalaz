@@ -13,7 +13,7 @@ import std.tuple._
  *
  * Based on the heaps Haskell library by Edward Kmett
  */
-sealed trait Heap[A] {
+sealed abstract class Heap[A] {
 
   import Heap._
   import Heap.impl._
@@ -196,7 +196,7 @@ sealed trait Heap[A] {
 
 case class Ranked[A](rank: Int, value: A)
 
-object Heap extends HeapFunctions with HeapInstances {
+object Heap extends HeapInstances with HeapFunctions {
   def apply[A](sz: Int, leq: (A, A) => Boolean, t: Tree[Ranked[A]]): Heap[A] = new Heap[A] {
     def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B) =
       nonempty(sz, leq, t)
@@ -346,7 +346,7 @@ object Heap extends HeapFunctions with HeapInstances {
   }
 }
 
-trait HeapInstances {
+sealed abstract class HeapInstances {
   implicit val heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
     def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
   }

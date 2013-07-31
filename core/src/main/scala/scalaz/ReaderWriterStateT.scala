@@ -1,7 +1,7 @@
 package scalaz
 
 /** A monad transformer stack yielding `(R, S1) => F[(W, A, S2)]`. */
-sealed trait IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
+sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   self =>
   def run(r: R, s: S1): F[(W, A, S2)]
 
@@ -30,7 +30,7 @@ sealed trait IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   }
 }
 
-object IndexedReaderWriterStateT extends ReaderWriterStateTFunctions with ReaderWriterStateTInstances {
+object IndexedReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
   def apply[F[_], R, W, S1, S2, A](f: (R, S1) => F[(W, A, S2)]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] = new IndexedReaderWriterStateT[F, R, W, S1, S2, A] {
     def run(r: R, s: S1): F[(W, A, S2)] = f(r, s)
   }
@@ -40,14 +40,14 @@ trait ReaderWriterStateTFunctions {
 
 }
 
-trait IndexedReaderWriterStateTInstances {
+sealed abstract class IndexedReaderWriterStateTInstances {
   implicit def irwstFunctor[F[_], R, W, S1, S2](implicit F0: Functor[F]): Functor[({type λ[α] = IndexedReaderWriterStateT[F, R, W, S1, S2, α]})#λ] =
     new IndexedReaderWriterStateTFunctor[F, R, W, S1, S2] {
       implicit def F = F0
     }
 }
 
-trait ReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances {
+abstract class ReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances {
   implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]):
   MonadReader[({type λ[r, α]=ReaderWriterStateT[F, r, W, S, α]})#λ, R] with MonadState[({type f[s, α] = ReaderWriterStateT[F, R, W, s, α]})#f, S] with MonadListen[({type f[w, α] = ReaderWriterStateT[F, R, w, S, α]})#f, W] =
     new ReaderWriterStateTMonad[F, R, W, S] {

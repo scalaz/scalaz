@@ -9,7 +9,6 @@ import Id._
  * You can switch between `WriterT` and `UnwriterT` with `unary_+` and `unary_-`.
  */
 final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
-
   import UnwriterT._
 
   def on: WriterT[F, U, A] =
@@ -86,21 +85,21 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   def colocal[X](f: U => X)(implicit F: Functor[F]): UnwriterT[F, X, A] = mapUnwritten(f)
 }
 
-object UnwriterT extends UnwriterTFunctions with UnwriterTInstances
+object UnwriterT extends UnwriterTInstances with UnwriterTFunctions
 
-trait UnwriterTInstances2 {
+sealed abstract class UnwriterTInstances2 {
   implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]) = new UnwriterTFunctor[F, W] {
     implicit def F = F0
   }
 }
 
-trait UnwriterTInstances1 extends UnwriterTInstances2 {
+sealed abstract class UnwriterTInstances1 extends UnwriterTInstances2 {
   implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]) = new UnwriterTApply[F, W] {
     implicit def F = F0
   }
 }
 
-trait UnwriterTInstances0 extends UnwriterTInstances1 {
+sealed abstract class UnwriterTInstances0 extends UnwriterTInstances1 {
   implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]) = new UnwriterTBifunctor[F] {
     implicit def F = F0
   }
@@ -113,7 +112,7 @@ trait UnwriterTInstances0 extends UnwriterTInstances1 {
   implicit def unwriterTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: UnwriterT[F, W, A]).run)
 }
 
-trait UnwriterTInstances extends UnwriterTInstances0 {
+sealed abstract class UnwriterTInstances extends UnwriterTInstances0 {
   implicit def unwriterTBitraverse[F[_]](implicit F0: Traverse[F]) = new UnwriterTBitraverse[F] {
     implicit def F = F0
   }
@@ -137,7 +136,7 @@ trait UnwriterTInstances extends UnwriterTInstances0 {
 }
 
 trait UnwriterTFunctions {
-  def unwriterT[F[_], W, A](v: F[(W, A)]): UnwriterT[F, W, A] = new UnwriterT[F, W, A](v)
+  def unwriterT[F[_], W, A](v: F[(W, A)]): UnwriterT[F, W, A] = UnwriterT(v)
 
 
   def unwriter[W, A](v: (W, A)): Unwriter[W, A] =

@@ -8,9 +8,9 @@ trait Dup[H[_[_]]] {
       RegionT[CS, ({type λ[α] = RegionT[PS, PP, α]})#λ, H[({type λ[β] = RegionT[PS, PP, β]})#λ]]
 }
 
-object Dup extends DupFunctions with DupInstances
+object Dup extends DupInstances with DupFunctions
 
-trait DupInstances {
+sealed abstract class DupInstances {
   import Dup._
 
   implicit val FinalizerHandleDup: Dup[FinalizerHandle] = new Dup[FinalizerHandle] {

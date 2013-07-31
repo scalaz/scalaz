@@ -1,15 +1,15 @@
 package scalaz
 
 /**An algebraic data type representing the digits 0 - 9 */
-sealed trait Digit {
+sealed abstract class Digit extends Product with Serializable {
   val toInt: Int
 
-  def toLong: Long = toInt.toLong
+  final def toLong: Long = toInt.toLong
 
-  def toChar: Char = (toLong + 48).toChar
+  final def toChar: Char = (toLong + 48).toChar
 }
 
-object Digit extends DigitFunctions with DigitInstances {
+object Digit extends DigitInstances with DigitFunctions {
 
   case object _0 extends Digit {
     override val toInt = 0
@@ -109,7 +109,7 @@ trait DigitFunctions {
     traverseDigits(chars) getOrElse d
 }
 
-trait DigitInstances {
+sealed abstract class DigitInstances {
   implicit val digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] = new Enum[Digit] with Show[Digit] with Monoid[Digit] {
 
     import std.anyVal._

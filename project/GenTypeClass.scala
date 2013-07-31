@@ -80,6 +80,7 @@ object TypeClass {
     plusEmpty,
     isEmpty,
     optional,
+    invariantFunctor,
     functor,
     contravariant,
     apply,
@@ -314,7 +315,7 @@ sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
 %s
 }
 
@@ -368,7 +369,7 @@ sealed abstract class %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
   %s
 }
 

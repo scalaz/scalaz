@@ -81,7 +81,7 @@ trait LazyTupleFunctions {
   }
 }
 
-trait LazyTuple2Instances0 {
+sealed abstract class LazyTuple2Instances0 {
   implicit def lazyTuple2Instance[A1, A2] = new Bitraverse[LazyTuple2] {
     override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(f: A => C, g: B => D): LazyTuple2[C, D] = LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] = {
@@ -97,7 +97,7 @@ trait LazyTuple2Instances0 {
   implicit def lazyTuple2Functor[A1]: Functor[({type f[x] = LazyTuple2[A1, x]})#f] = new LazyTuple2Functor[A1] {}
 }
 
-trait LazyTuple2Instances extends LazyTuple2Instances0 {
+sealed abstract class LazyTuple2Instances extends LazyTuple2Instances0 {
 
   implicit def lazyTuple2Show[A1, A2](implicit A1: Show[A1], A2: Show[A2]) = new LazyTuple2Show[A1, A2] {
     implicit def _1 = A1
@@ -119,7 +119,7 @@ trait LazyTuple2Instances extends LazyTuple2Instances0 {
   }
 }
 
-trait LazyTuple3Instances0 {
+sealed abstract class LazyTuple3Instances0 {
   implicit def lazyTuple3Semigroup[A1, A2, A3](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3]) = new LazyTuple3Semigroup[A1, A2, A3] {
     implicit def _1 = A1
     implicit def _2 = A2
@@ -134,7 +134,7 @@ trait LazyTuple3Instances0 {
     implicit def _3 = A3
   }
 }
-trait LazyTuple3Instances extends LazyTuple3Instances0 {
+sealed abstract class LazyTuple3Instances extends LazyTuple3Instances0 {
 
   implicit def lazyTuple3Show[A1, A2, A3](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]) = new LazyTuple3Show[A1, A2, A3] {
     implicit def _1 = A1
@@ -160,7 +160,7 @@ trait LazyTuple3Instances extends LazyTuple3Instances0 {
   }
 }
 
-trait LazyTuple4Instances0 {
+sealed abstract class LazyTuple4Instances0 {
   implicit def lazyTuple4Semigroup[A1, A2, A3, A4](implicit A1: Semigroup[A1], A2: Semigroup[A2], A3: Semigroup[A3], A4: Semigroup[A4]) = new LazyTuple4Semigroup[A1, A2, A3, A4] {
     implicit def _1 = A1
     implicit def _2 = A2
@@ -177,7 +177,7 @@ trait LazyTuple4Instances0 {
     implicit def _4 = A4
   }
 }
-trait LazyTuple4Instances extends LazyTuple4Instances0 {
+sealed abstract class LazyTuple4Instances extends LazyTuple4Instances0 {
 
   implicit def lazyTuple4Show[A1, A2, A3, A4](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4]) = new LazyTuple4Show[A1, A2, A3, A4] {
     implicit def _1 = A1

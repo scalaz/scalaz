@@ -19,7 +19,7 @@ trait KleisliFAOps[F[_], A] extends Ops[F[A]] {
   def liftReaderT[R]: ReaderT[F, R, A] = liftKleisli
 }
 
-trait ToKleisliOps0 {
+sealed trait ToKleisliOps0 {
   implicit def ToKleisliOpsUnapply[FA](v: FA)(implicit F0: Unapply[Monad, FA]) =
     new KleisliFAOps[F0.M, F0.A] { def self = F0(v) }
 }
