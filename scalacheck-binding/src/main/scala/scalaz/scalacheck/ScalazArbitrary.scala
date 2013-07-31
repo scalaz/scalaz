@@ -17,6 +17,13 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
+    Arbitrary(Gen.oneOf(
+      arbitrary[A].map2(arbitrary[B])(\&/.Both(_, _)),
+      arbitrary[A].map(\&/.This(_)),
+      arbitrary[B].map(\&/.That(_))
+    ))
+
   implicit def EphemeralStreamArbitrary[A : Arbitrary] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
