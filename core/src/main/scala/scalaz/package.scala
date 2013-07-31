@@ -26,6 +26,7 @@
  *  - [[scalaz.Plus]]
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
  *  - [[scalaz.IsEmpty]] extends [[scalaz.PlusEmpty]]
+ *  - [[scalaz.Optional]]
  *  - [[scalaz.Each]]
  *  - [[scalaz.Index]]
  *  - [[scalaz.InvariantFunctor]]
