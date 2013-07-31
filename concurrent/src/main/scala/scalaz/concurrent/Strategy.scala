@@ -79,11 +79,14 @@ trait StrategysLow {
    * A simple strategy that spawns a new thread for every evaluation.
    */
   implicit val Naive: Strategy = new Strategy {
-
-    import scala.concurrent.ops.future
-
-    def apply[A](a: => A) = future {
-      a
+    def apply[A](a: => A) = {
+      import java.util.concurrent.Callable
+      val thread = java.util.concurrent.Executors.newSingleThreadExecutor
+      val fut = thread.submit(new Callable[A] {
+        def call = a
+      })
+      thread.shutdown()
+      () => fut.get
     }
   }
 
