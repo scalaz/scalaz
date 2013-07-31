@@ -37,25 +37,20 @@ object GenerateTupleW {
         n => n.alpha2
       }
       val mapallParams = mapMkString {
-        n => "%s: (%s => %s) = identity[%s] _".format(n.element, n.alpha, n.alpha2, n.alpha)
+        n => s"${n.element}: (${n.alpha} => ${n.alpha2}) = identity[${n.alpha}] _"
       }
       val mapallApply = mapMkString {
-        n => "%s(value.%s)".format(n.element, n.element)
+        n => s"${n.element}(value.${n.element})"
       }
 
-      val pimp = """|
-          |trait Tuple%dOps[%s] extends Ops[Tuple%d[%s]] {
-          |  val value = self
-          |  def fold[Z](f: => (%s) => Z): Z = {import value._; f(%s)}
-          |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple%d[%s]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(%s)}
-          |  def mapElements[%s](%s): (%s) = (%s)
-          |}""".stripMargin.format(arity, tparams, arity, tparams, tparams, params, arity,
-        ztparams, params,
-        mapallTParams, mapallParams, mapallTParams, mapallApply
-      )
+      val pimp = s"""|
+          |final class Tuple${arity}Ops[${tparams}](value: (${tparams})) {
+          |  def fold[Z](f: => (${tparams}) => Z): Z = {import value._; f(${params})}
+          |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple${arity}[${ztparams}]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(${params})}
+          |  def mapElements[${mapallTParams}](${mapallParams}): (${mapallTParams}) = (${mapallApply})
+          |}""".stripMargin
 
-      val conv = """implicit def ToTuple%dOps[%s](t: (%s)): Tuple%dOps[%s] = new { val self = t } with Tuple%dOps[%s]
-          |""".stripMargin.format(arity, tparams, tparams, arity, tparams, arity, tparams)
+      val conv = s"""implicit def ToTuple${arity}Ops[${tparams}](t: (${tparams})): Tuple${arity}Ops[${tparams}] = new Tuple${arity}Ops(t)\n"""
       (pimp, conv)
     }
 
