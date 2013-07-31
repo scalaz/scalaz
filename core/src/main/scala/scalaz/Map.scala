@@ -11,7 +11,7 @@ import std.option._
 import syntax.equal._
 import syntax.std.option._
 
-sealed abstract trait ==>>[A, B] {
+sealed abstract class ==>>[A, B] {
   import ==>>._
 
   val size: Int
@@ -869,7 +869,7 @@ sealed abstract trait ==>>[A, B] {
     }
 }
 
-object ==>> extends MapFunctions with MapInstances {
+object ==>> extends MapInstances with MapFunctions {
   private[scalaz] final case class Tip[A, B]() extends ==>>[A, B] {
     val size = 0
   }
@@ -879,7 +879,7 @@ object ==>> extends MapFunctions with MapInstances {
   }
 }
 
-trait MapInstances {
+sealed abstract class MapInstances {
   import ==>>._
 
   import std.list._
