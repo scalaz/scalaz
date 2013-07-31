@@ -19,7 +19,7 @@ Type class extension is encoded with inheritance. For example, `Monoid` extends 
 
 ### Hierarchy
 
-The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `gen-type-classes`
+The type class hierarchy is configured in the build (`GenTypeClass`). The SBT command `genTypeClasses`
 will recreate all type classes, preserving chunks of code delimited by pairs of `////` comments.
 
 Do not add code, comments, or imports outside of these delimiters.
@@ -57,12 +57,12 @@ autocompletion, and avoids unneeded indirection in cases when abstraction is not
 
 Define type class instances in the same files as the data structure. Type class instance is described in more detail separately.
 
-    sealed abstract trait MyDataStructure[A] {
+    sealed abstract class MyDataStructure[A] {
        final def map[B](f: A => B): F[B] = ...
        final def flatMap[B](f: A => F[B]): F[B] = ...
     }
 
-    object MyDataStructure extends MyDataStructureFunctions with MyDataStructureInstances {
+    object MyDataStructure extends MyDataStructureInstances with MyDataStructureFunctions {
        // Define type aliases in the companion directly; avoids fights with the compiler later.
        type MDS[A] = MyDataStructure[A]
 
@@ -71,7 +71,7 @@ Define type class instances in the same files as the data structure. Type class 
     }
 
     // described separately.
-    trait MyDataStructureInstances {
+    sealed abstract class MyDataStructureInstances {
        import MyDataStructure._
        type MDS[X] = MyDataStructure
 
@@ -94,7 +94,7 @@ Define type class instances in the same files as the data structure. Type class 
 
 ### General
 
-Type class instances are packaged in a trait `ClassifiedTypeInstances`.
+Type class instances are packaged in a class `ClassifiedTypeInstances`.
 
 The implicit members within the `Instances` class should be named:
 
@@ -112,7 +112,7 @@ of the type class.
 `scala.math.BigInt` => `scalaz.std.math.bigInt`
 `java.math.BigInteger` => `scalaz.std.java.math.bigInteger`
 
-In the file `ClassifiedType.scala`, define the trait `ClassifiedTypeInstances`, and mix it into a) an object `classifiedType`,
+In the file `ClassifiedType.scala`, define the class `ClassifiedTypeInstances`, and mix it into a) an object `classifiedType`,
 and b) `scalaz.std.AllInstances`.
 
 In some cases, a group of related type class instances may be defined in a single file, such as for `AnyVals` or `TupleN`.
@@ -136,7 +136,7 @@ without ambiguity (both of these functions could provide that).
 
 Here's how to organize the type class instances and implicits for `Tuple2`. See the comments inline.
 
-    trait TupleInstances0 {
+    sealed abstract class TupleInstances0 {
       // defined in a supertype of TupleInstances as a tie-breaker in case of ambiguity.
       // pass the type class instances into the type class implementation trait as members.
       // We need to choose different names for the parameters and the members to avoid shadowing.
@@ -148,7 +148,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
       }
     }
 
-    trait TupleInstances extends TupleInstances0 {
+    sealed abstract class TupleInstances extends TupleInstances0 {
       // In a subtype of tuple2Monoid. The order doesn't matter, but by convention we follow the subtyping
       // relationship of the type classes.
       implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] = new Tuple2Monoid[A1, A2] {
@@ -198,7 +198,7 @@ The methods of a type class that should be copied to the corresponding `TypeClas
 
 For example:
 
-    trait FunctorOps[F[_],A] extends Ops[F[A]] {
+    sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
       implicit def F: Functor[F]
 
       final def map[B](f: A => B): F[B] = F.map(self)(f)
