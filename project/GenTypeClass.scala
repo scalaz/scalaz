@@ -45,6 +45,7 @@ object TypeClass {
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
+  lazy val optional = TypeClass("Optional", *->*)
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
@@ -78,6 +79,7 @@ object TypeClass {
     enum,
     plusEmpty,
     isEmpty,
+    optional,
     functor,
     contravariant,
     apply,
