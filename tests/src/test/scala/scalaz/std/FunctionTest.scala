@@ -28,7 +28,7 @@ class FunctionTest extends Spec {
   implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
   implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
 
-  checkAll("Function0", monoid.laws[Int => Int])
+  checkAll("Function1", monoid.laws[Int => Int])
 
   checkAll("Function0", monad.laws[Function0])
   checkAll("Function1", monad.laws[({type λ[α] = (B) => α})#λ])
