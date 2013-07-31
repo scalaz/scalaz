@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Optional` */
-trait OptionalOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class OptionalOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Optional[F]
   ////
 
