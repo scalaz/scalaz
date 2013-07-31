@@ -1,6 +1,6 @@
 package scalaz
 
-sealed trait \&/[A, B] {
+sealed abstract class \&/[A, B] extends Product with Serializable {
   import \&/._
 
   def isThis: Boolean =
@@ -217,10 +217,10 @@ sealed trait \&/[A, B] {
 
 }
 
-object \&/ extends TheseFunctions {
-  case class This[A, B](aa: A) extends (A \&/ B)
-  case class That[A, B](bb: B) extends (A \&/ B)
-  case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
+object \&/ extends TheseInstances with TheseFunctions {
+  final case class This[A, B](aa: A) extends (A \&/ B)
+  final case class That[A, B](bb: B) extends (A \&/ B)
+  final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
 }
 
 trait TheseFunctions {
@@ -292,15 +292,15 @@ trait TheseFunctions {
     (concatThis(x), concatThat(x))
 }
 
-trait TheseInstances extends TheseInstances0 {
+sealed abstract class TheseInstances extends TheseInstances0 {
   type These[A, B] =
   A \&/ B
 }
 
-trait TheseInstances0 extends TheseInstances1 {
-  // Traverse, Bitraverse
-  implicit def TheseMonad[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] =
-    new Monad[({type l[a] = L \&/ a})#l] {
+sealed abstract class TheseInstances0 extends TheseInstances1 {
+
+  implicit def TheseInstance0[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] with Zip[({type l[a] = L \&/ a})#l] =
+    new Monad[({type l[a] = L \&/ a})#l] with Zip[({type l[a] = L \&/ a})#l] {
       override def map[A, B](x: L \&/ A)(f: A => B) =
         x map f
 
@@ -309,18 +309,9 @@ trait TheseInstances0 extends TheseInstances1 {
 
       def point[A](a: => A) =
         \&/.That(a)
-    }
 
-  implicit def TheseZip[L: Semigroup]: Zip[({type l[a] = L \&/ a})#l] =
-    new Zip[({type l[a] = L \&/ a})#l] {
       def zip[A, B](a: => L \&/ A, b: => L \&/ B) =
         a zip b
-    }
-
-  implicit def TheseTraverse[L]: Traverse[({type l[a] = L \&/ a})#l] =
-    new Traverse[({type l[a] = L \&/ a})#l] {
-      def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
-        fa traverse f
     }
 
   implicit val TheseBitraverse: Bitraverse[\&/] =
@@ -340,49 +331,21 @@ trait TheseInstances0 extends TheseInstances1 {
 
 }
 
-trait TheseInstances1 extends TheseInstances2 {
-  implicit def TheseBind[L: Semigroup]: Bind[({type l[a] = L \&/ a})#l] =
-    new Bind[({type l[a] = L \&/ a})#l] {
-      def map[A, B](x: L \&/ A)(f: A => B) =
-        x map f
+sealed abstract class TheseInstances1 {
 
-      def bind[A, B](fa: L \&/ A)(f: A => L \&/ B) =
-        fa flatMap f
-    }
+  implicit def TheseInstance1[L]: Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] =
+    new Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] {
+      def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
+        fa traverse f
 
-  implicit def TheseFoldable[L]: Foldable[({type l[a] = L \&/ a})#l] =
-    new Foldable[({type l[a] = L \&/ a})#l] {
-      def foldMap[A, B](fa: L \&/ A)(f: A => B)(implicit F: Monoid[B]) =
+      override def foldMap[A, B](fa: L \&/ A)(f: A => B)(implicit F: Monoid[B]) =
         fa foldMap f
 
-      def foldRight[A, B](fa: L \&/ A, z: => B)(f: (A, => B) => B) =
+      override def foldRight[A, B](fa: L \&/ A, z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)(f)
-    }
 
-  implicit val TheseBifoldable: Bifoldable[\&/] =
-    new Bifoldable[\&/] {
-      def bimap[A, B, C, D](fab: A \&/ B)(f: A => C, g: B => D) =
-        fab.bimap(f, g)
-
-      def bifoldMap[A, B, M](fa: A \&/ B)(f: A => M)(g: B => M)(implicit F: Monoid[M]) =
-        fa.bifoldMap(f)(g)
-
-      def bifoldRight[A, B, C](fa: A \&/ B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
-        fa.bifoldRight(z)(f)(g)
-    }
-}
-
-trait TheseInstances2 {
-  implicit def TheseFunctor[L]: Functor[({type l[a] = L \&/ a})#l] =
-    new Functor[({type l[a] = L \&/ a})#l] {
-      def map[A, B](x: L \&/ A)(f: A => B) =
-        x map f
-    }
-
-  implicit val TheseBifunctor: Bifunctor[\&/] =
-    new Bifunctor[\&/] {
-      def bimap[A, B, C, D](fab: A \&/ B)(f: A => C, g: B => D) =
-        fab.bimap(f, g)
+      def cobind[A, B](fa: L \&/ A)(f: (L \&/ A) => B): L \&/ B =
+        \&/.That(f(fa))
     }
 
   implicit def TheseEqual[A, B](implicit EA: Equal[A], EB: Equal[B]): Equal[A \&/ B] =
