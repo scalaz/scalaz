@@ -41,7 +41,7 @@ sealed abstract class OptionalOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToOptionalOps0 {
+sealed trait ToOptionalOps0 {
   implicit def ToOptionalOpsUnapply[FA](v: FA)(implicit F0: Unapply[Optional, FA]) =
     new OptionalOps[F0.M,F0.A] { def self = F0(v); implicit def F: Optional[F0.M] = F0.TC }
 
