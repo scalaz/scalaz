@@ -549,12 +549,14 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   import util.parsing.json._
 
+  @deprecated("scalaJSONObjectPLens will be removed", "7.1.0")
   def scalaJSONObjectPLens: JSONType @?> Map[String, Any] =
     plens {
       case JSONObject(m) => Some(Store(JSONObject(_), m))
       case _             => None
     }
 
+  @deprecated("scalaJSONArrayPLens will be removed", "7.1.0")
   def scalaJSONArrayPLens: JSONType @?> List[Any] =
     plens {
       case JSONArray(a) => Some(Store(JSONArray(_), a))
