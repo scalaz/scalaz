@@ -20,6 +20,10 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   def unite[T[_], A](value: F[T[A]])(implicit T: Foldable[T]): F[A] =
     bind(value)((ta) => T.foldMap(ta)(a => point(a))(monoid[A]))
 
+  /** A version of `unite` that infers the type constructor `T`. */
+  final def uniteU[T, A](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =
+    unite(T.leibniz.subst(value))(T.TC)
+
   trait MonadPlusLaw extends EmptyLaw with MonadLaw {
     /** `empty[A]` is a polymorphic value over `A`. */
     def emptyMap[A](f1: A => A)(implicit FA: Equal[F[A]]): Boolean =
