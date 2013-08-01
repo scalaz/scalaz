@@ -323,6 +323,24 @@ object ScalazProperties {
       }
   }
 
+  object foldable1 {
+    type Pair[A] = (A, A)
+
+    def leftFold1Bias[F[_], A](implicit F: Foldable1[F], fa: Arbitrary[F[Free.Return[Pair, A]]], up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]) =
+      forAll(F.foldable1Law.leftFold1Bias[A] _)
+
+    def rightFold1Bias[F[_], A](implicit F: Foldable1[F], fa: Arbitrary[F[Free.Return[Pair, A]]], up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]) =
+      forAll(F.foldable1Law.rightFold1Bias[A] _)
+
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], afrpa: Arbitrary[F[Free.Return[Pair, Int]]],
+                   F: Foldable1[F], EA: Equal[Int], up: F[Free.Return[Pair, Int]] => F[Free[Pair, Int]]) =
+      new Properties("foldable1") {
+        include(foldable.laws[F])
+        property("left fold accumulates on left") = leftFold1Bias[F, Int]
+        property("right fold accumulates on right") = rightFold1Bias[F, Int]
+      }
+  }
+
   object traverse1 {
     def identityTraverse1[F[_], X, Y](implicit f: Traverse1[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
       forAll(f.traverse1Law.identityTraverse1[X, Y] _)
@@ -341,7 +359,15 @@ object ScalazProperties {
 
     def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse1[F], EF: Equal[F[Int]]) =
       new Properties("traverse1") {
+        import ScalaCheckBinding.ArbitraryMonad
+        private[this] implicit def frpi: Arbitrary[F[Free.Return[foldable1.Pair, Int]]] =
+          Functor[Arbitrary].map(fa)(F.map(_)(Free.Return[foldable1.Pair, Int](_)(Functor[Id].product[Id])))
+        private[this] implicit def upfrpi(xs: F[Free.Return[foldable1.Pair, Int]]
+                                        ): F[Free[foldable1.Pair, Int]] =
+          F.map(xs)(conforms)
+
         include(traverse.laws[F])
+        include(foldable1.laws[F])
         property("identity traverse1") = identityTraverse1[F, Int, Int]
 
         import std.list._, std.option._, std.stream._, std.anyVal._

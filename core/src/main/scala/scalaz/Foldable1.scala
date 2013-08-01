@@ -89,6 +89,38 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
       def G = G0
     }
 
+  trait Foldable1Law extends FoldableLaw {
+    import scalaz.Id._
+    type Pair[A] = (A, A)
+    private[this] implicit def pfunc: Functor[Pair] = // probably not val-safe
+      Functor[Id].product[Id]
+
+    /** In a left-fold, the accumulator is always on the left. */
+    def leftFold1Bias[A](fa: F[Free.Return[Pair, A]]
+                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
+      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
+        fpa.resume.leftMap{case (a, b) => (a, b.resume)} match {
+          case -\/((l, \/-(r))) => rec(l)
+          case -\/(_) => false
+          case \/-(_) => true
+        }
+      rec(foldLeft1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
+    }
+
+    /** In a right-fold, the accumulator is always on the right. */
+    def rightFold1Bias[A](fa: F[Free.Return[Pair, A]]
+                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
+      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
+        fpa.resume.leftMap{case (a, b) => (a.resume, b)} match {
+          case -\/((\/-(l), r)) => rec(r)
+          case -\/(_) => false
+          case \/-(_) => true
+        }
+      rec(foldRight1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
+    }
+  }
+  def foldable1Law = new Foldable1Law {}
+
   ////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
