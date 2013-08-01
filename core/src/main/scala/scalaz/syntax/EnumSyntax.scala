@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Enum` */
-trait EnumOps[F] extends Ops[F] {
+sealed abstract class EnumOps[F] extends Ops[F] {
   implicit def F: Enum[F]
   ////
   final def succ: F =

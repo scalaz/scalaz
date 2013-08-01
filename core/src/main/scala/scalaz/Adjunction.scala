@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /**
  * An adjunction formed by two functors `F` and `G` such that `F` is left-adjoint to `G`.
  * The composite functor GF is a monad and the composite functor FG is a comonad.
@@ -51,7 +49,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
     def copoint[A](a: F[G[A]]) = counit(a)
     def cobind[A,B](a: F[G[A]])(f: F[G[A]] => B): F[G[B]] = F.map(a)(leftAdjunct(_)(f))
     def map[A,B](a: F[G[A]])(f: A => B) = cobind(a)(x => f(counit(x)))
-    def cojoin[A](a: F[G[A]]) = cobind(a)(x => x)
+    override def cojoin[A](a: F[G[A]]) = cobind(a)(x => x)
   }
 
   import Adjunction.-|
@@ -81,13 +79,15 @@ trait AdjunctionFunctions {
   def apply[F[_], G[_]](implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A
 }
 
-trait AdjunctionInstances {
+sealed abstract class AdjunctionInstances {
   import Adjunction.-|
 
   implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](implicit A1: F -| G, A2: P -| Q): ({type λ[α] = P[F[α]]})#λ -| ({type λ[α] = G[Q[α]]})#λ =
     A1 compose A2
 
-  import std.AllInstances._
+  import Id._
+  import std.tuple._
+  import std.function._
 
   implicit def curryUncurryAdjunction[S]: ({type λ[α] = (S, α)})#λ -| ({type λ[α] = S => α})#λ =
     new Adjunction[({type λ[α] = (S, α)})#λ, ({type λ[α] = S => α})#λ] {

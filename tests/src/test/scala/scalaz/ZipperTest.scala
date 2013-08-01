@@ -4,8 +4,6 @@ import Scalaz._
 import NonEmptyList._
 import Zipper._
 import syntax.equal._
-import org.scalacheck._
-import org.scalacheck.Prop._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 

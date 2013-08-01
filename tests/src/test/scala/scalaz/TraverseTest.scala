@@ -1,6 +1,5 @@
 package scalaz
 
-import scalacheck.ScalazProperties
 
 class TraverseTest extends Spec {
 
@@ -76,6 +75,11 @@ class TraverseTest extends Spec {
         _ <- State.put(a)
       } yield IO(a - s))
       state.eval(0).unsafePerformIO().take(3) must be_===(Stream(0, 1, 1))
+    }
+
+    "traverse with monadic join" in {
+      val s: Writer[String, List[Int]] = List(1, 2, 3).traverseM[({ type λ[α] = Writer[String, α] })#λ, Int](x => Writer(x.toString, List(x, x * 2)))
+      s.run must be_===(("123", List(1, 2, 2, 4, 3, 6)))
     }
   }
 

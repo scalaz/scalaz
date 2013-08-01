@@ -5,7 +5,7 @@ package effect
 import scalaz.effect.Resource
 
 /** Wraps a value `self` and provides methods related to `Resource` */
-trait ResourceOps[F] extends Ops[F] {
+sealed abstract class ResourceOps[F] extends Ops[F] {
   implicit def F: Resource[F]
   ////
 

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Order` */
-trait OrderOps[F] extends Ops[F] {
+sealed abstract class OrderOps[F] extends Ops[F] {
   implicit def F: Order[F]
   ////
   final def <(other: F): Boolean = F.lessThan(self, other)

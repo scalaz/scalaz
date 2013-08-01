@@ -10,13 +10,13 @@ sealed abstract class Ordering(val toInt: Int, val name: String) {
   def complement: Ordering
 }
 
-object Ordering extends OrderingFunctions with OrderingInstances {
+object Ordering extends OrderingInstances with OrderingFunctions {
   case object LT extends Ordering(-1, "LT") { def complement = GT }
   case object EQ extends Ordering(0,  "EQ") { def complement = EQ }
   case object GT extends Ordering(1,  "GT") { def complement = LT }
 }
 
-trait OrderingInstances {
+sealed abstract class OrderingInstances {
 
   import Ordering._
 

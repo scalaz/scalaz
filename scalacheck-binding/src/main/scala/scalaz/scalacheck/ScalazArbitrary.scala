@@ -2,8 +2,7 @@ package scalaz
 package scalacheck
 
 import java.math.BigInteger
-import org.scalacheck.{Pretty, Gen, Arbitrary}
-import java.io._
+import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
 
 /**
@@ -16,10 +15,17 @@ object ScalazArbitrary {
   import Gen._
   import ScalaCheckBinding._
 
-  // todo report and/or work around compilation error: "scalaz is not an enclosing class"
-  // implicit def ShowPretty[A: Show](a: A): Pretty = Pretty { _ => a.show }
-
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
+
+  implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
+    Arbitrary(Gen.oneOf(
+      arbitrary[A].map2(arbitrary[B])(\&/.Both(_, _)),
+      arbitrary[A].map(\&/.This(_)),
+      arbitrary[B].map(\&/.That(_))
+    ))
+
+  implicit def EphemeralStreamArbitrary[A : Arbitrary] =
+    Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arbArray[A])(ImmutableArray.fromArray[A](_))
@@ -28,42 +34,49 @@ object ScalazArbitrary {
   implicit def NameArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Name[A]] = Functor[Arbitrary].map(fa)(a => Name(a))
   implicit def NeedArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Need[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
 
-  implicit def UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
+  implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
-  implicit def AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
+  implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
 
-  implicit def BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
+  implicit val BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
 
-  implicit def arbBigInt: Arbitrary[BigInt] = Apply[Arbitrary].apply2[Int, Int, BigInt](arb[Int], arb[Int])(_ + _)
+  implicit val arbBigInt: Arbitrary[BigInt] = Apply[Arbitrary].apply2[Int, Int, BigInt](arb[Int], arb[Int])(_ + _)
 
-  implicit def arbBigInteger: Arbitrary[BigInteger] = Functor[Arbitrary].map(arb[BigInt])(_.bigInteger)
+  implicit val arbBigInteger: Arbitrary[BigInteger] = Functor[Arbitrary].map(arb[BigInt])(_.bigInteger)
 
-  implicit def BigIntegerMultiplicationArbitrary: Arbitrary[BigInteger @@ Multiplication] =
+  implicit val BigIntegerMultiplicationArbitrary: Arbitrary[BigInteger @@ Multiplication] =
     Tag.subst[BigInteger, Arbitrary, Multiplication](arb[BigInteger])
 
-  implicit def BigIntMultiplicationArbitrary: Arbitrary[BigInt @@ Multiplication] = Tag.subst(arb[BigInt])
+  implicit val BigIntMultiplicationArbitrary: Arbitrary[BigInt @@ Multiplication] = Tag.subst(arb[BigInt])
 
-  implicit def ByteMultiplicationArbitrary: Arbitrary[Byte @@ Multiplication] = Tag.subst(arb[Byte])
+  implicit val ByteMultiplicationArbitrary: Arbitrary[Byte @@ Multiplication] = Tag.subst(arb[Byte])
 
-  implicit def CharMultiplicationArbitrary: Arbitrary[Char @@ Multiplication] = Tag.subst(arb[Char])
+  implicit val CharMultiplicationArbitrary: Arbitrary[Char @@ Multiplication] = Tag.subst(arb[Char])
 
-  implicit def ShortMultiplicationArbitrary: Arbitrary[Short @@ Multiplication] = Tag.subst(arb[Short])
+  implicit val ShortMultiplicationArbitrary: Arbitrary[Short @@ Multiplication] = Tag.subst(arb[Short])
 
-  implicit def IntMultiplicationArbitrary: Arbitrary[Int @@ Multiplication] = Tag.subst(arb[Int])
+  implicit val IntMultiplicationArbitrary: Arbitrary[Int @@ Multiplication] = Tag.subst(arb[Int])
 
-  implicit def LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] = Tag.subst(arb[Long])
+  implicit val LongMultiplicationArbitrary: Arbitrary[Long @@ Multiplication] = Tag.subst(arb[Long])
 
-  implicit def FloatMultiplicationArbitrary: Arbitrary[Float @@ Multiplication] = Tag.subst(arb[Float])
+  implicit val FloatMultiplicationArbitrary: Arbitrary[Float @@ Multiplication] = Tag.subst(arb[Float])
 
-  implicit def DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
+  implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
-  implicit def DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
+  implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
 
+  implicit def OneAndArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]
+                                        ): Arbitrary[OneAnd[F, A]] =
+    Apply[Arbitrary].apply2(arb[A], arb[F[A]])(OneAnd.apply)
+
+  implicit def OneOrArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]): Arbitrary[OneOr[F, A]] =
+    Functor[Arbitrary].map(arb[F[A] \/ A])(OneOr(_))
+
   import scalaz.Ordering._
-  implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
+  implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
   implicit def TreeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tree[A]] = Arbitrary {
   import scalaz.Tree._
@@ -83,7 +96,6 @@ object ScalazArbitrary {
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
     Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
 
-  import Validation._
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => \/.left(a)
@@ -155,7 +167,6 @@ object ScalazArbitrary {
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Promise
-  import scalaz.concurrent.Promise._
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
@@ -216,12 +227,10 @@ object ScalazArbitrary {
     Applicative[Arbitrary].apply4(A, B, C, D)(LazyTuple4(_, _, _, _))
 
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
   implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
   }
 

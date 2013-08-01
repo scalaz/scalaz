@@ -1,10 +1,11 @@
 package scalaz
 package std
 
-import annotation.tailrec
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+    override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
+    def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
@@ -14,8 +15,8 @@ trait StreamInstances {
     }
 
     def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f
-    def length[A](fa: Stream[A]) = fa.length
-    def index[A](fa: Stream[A], i: Int) = {
+    override def length[A](fa: Stream[A]) = fa.length
+    override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
       val it = fa.iterator
@@ -27,6 +28,8 @@ trait StreamInstances {
 
       k
     }
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: Stream[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
@@ -34,6 +37,8 @@ trait StreamInstances {
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
+
+    override def toStream[A](fa: Stream[A]) = fa
 
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
@@ -52,7 +57,8 @@ trait StreamInstances {
    *
    * Example:
    * {{{
-   * streamZipApplicative(Stream(1, 2), Stream(3, 4))(_ * _) // Stream(3, 8)
+   * import scalaz.Tags.Zip
+   * streamZipApplicative.apply2(Zip(Stream(1, 2)), Zip(Stream(3, 4)))(_ * _) // Stream(3, 8)
    * }}}
    */
   implicit val streamZipApplicative: Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] = new Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {

@@ -4,17 +4,19 @@ package std
 import scalaz.Id._
 import annotation.tailrec
 
-trait ListInstances0 {
+sealed trait ListInstances0 {
   implicit def listEqual[A](implicit A0: Equal[A]) = new ListEqual[A] {
     implicit def A = A0
   }
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] with Cojoin[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
-    def length[A](fa: List[A]) = fa.length
+    override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: List[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
+    override def length[A](fa: List[A]) = fa.length
     def point[A](a: => A) = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()
@@ -66,6 +68,8 @@ trait ListInstances extends ListInstances0 {
       r
     }
 
+    override def toList[A](fa: List[A]) = fa
+
     def isEmpty[A](fa: List[A]) = fa.isEmpty
 
     def cobind[A, B](fa: List[A])(f: List[A] => B) =
@@ -74,7 +78,7 @@ trait ListInstances extends ListInstances0 {
         case _::t => f(fa) :: cobind(t)(f)
       }
 
-    def cojoin[A](a: List[A]) =
+    override def cojoin[A](a: List[A]) =
       a match {
         case Nil => Nil
         case _::t => a :: cojoin(t)
@@ -97,20 +101,6 @@ trait ListInstances extends ListInstances0 {
 }
 
 trait ListFunctions {
-  /** Return all non-empty tails. */
-  final def coflatten[A](as: List[A]): List[List[A]] =
-    as match {
-      case Nil => Nil
-      case _ :: t => as :: coflatten(t)
-    }
-
-  /** Map on all non-empty tails. */
-  final def coflatMap[A, B](as: List[A], f: List[A] => B): List[B] =
-    as match {
-      case Nil => Nil
-      case _ :: t => f(as) :: coflatMap(t, f)
-    }
-
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
   final def intersperse[A](as: List[A], a: A): List[A] = {
     @tailrec

@@ -5,6 +5,7 @@ package scalaz
  * Random access through an integer index.
  */
 ////
+@deprecated("Index is deprecated, use Foldable#index instead", "7.1")
 trait Index[F[_]]  { self =>
   ////
   /**
@@ -24,6 +25,7 @@ trait Index[F[_]]  { self =>
   val indexSyntax = new scalaz.syntax.IndexSyntax[F] { def F = Index.this }
 }
 
+@deprecated("Index is deprecated, use Foldable#index instead", "7.1")
 object Index {
   @inline def apply[F[_]](implicit F: Index[F]): Index[F] = F
 

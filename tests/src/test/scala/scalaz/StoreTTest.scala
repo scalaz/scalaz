@@ -16,13 +16,13 @@ class StoreTTest extends Spec {
 
   object instances {
     type A = Int
-    def functor[F[+_] : Functor] = Functor[({type λ[+α] = StoreT[F, A, α]})#λ]
-    def cobind[F[+_] : Cobind] = Cobind[({type λ[+α] = StoreT[F, A, α]})#λ]
-    def comonad[F[+_] : Comonad] = Comonad[({type λ[+α] = StoreT[F, A, α]})#λ]
+    def functor[F[_] : Functor] = Functor[({type λ[α] = StoreT[F, A, α]})#λ]
+    def cobind[F[_] : Cobind] = Cobind[({type λ[α] = StoreT[F, A, α]})#λ]
+    def comonad[F[_] : Comonad] = Comonad[({type λ[α] = StoreT[F, A, α]})#λ]
 
     // checking absence of ambiguity
-    def functor[F[+_] : Comonad] = Functor[({type λ[+α] = StoreT[F, A, α]})#λ]
-    def cobind[F[+_] : Comonad] = Cobind[({type λ[+α] = StoreT[F, A, α]})#λ]
+    def functor[F[_] : Comonad] = Functor[({type λ[α] = StoreT[F, A, α]})#λ]
+    def cobind[F[_] : Comonad] = Cobind[({type λ[α] = StoreT[F, A, α]})#λ]
   }
 
 }

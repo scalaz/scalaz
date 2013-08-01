@@ -12,6 +12,15 @@ class MonoidTest extends Spec {
     incTimesThree(0) must be_===(3)
   }
 
+  "endo kleisli multiply" in {
+    import syntax.monoid._
+
+    val k = Kleisli { i: Int => if (i % 2 == 0) Some(i * 2) else None }
+
+    val kTimes3 = k.endo.multiply(3)
+    kTimes3.run(2) must be_=== (Some(16))
+  }
+
   "unfold" in {
     val ss = std.stream.unfold(1) {
       case x if x < 10 => Some((x.toString, x * 2))

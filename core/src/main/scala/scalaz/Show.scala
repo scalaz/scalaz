@@ -38,7 +38,7 @@ object Show {
     override def shows(a: A): String = f(a)
   }
 
-  implicit def showContravariant: Contravariant[Show] = new Contravariant[Show] {
+  implicit val showContravariant: Contravariant[Show] = new Contravariant[Show] {
     def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
       override def show(b: B): Cord = r.show(f(b))
     }

@@ -2,18 +2,14 @@ package scalaz
 
 import Id._
 
-sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
-  def to(a: A): F[B]
-  def from(b: B): G[A]
+final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: B => G[A]) { self =>
+  def to(a: A): F[B] = _to(a)
+  def from(b: B): G[A] = _from(b)
 
   import BijectionT._
   import std.AllInstances._
 
-  def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A] {
-    def to(a: B): G[A] = self.from(a)
-
-    def from(b: A): F[B] = self.to(b)
-  }
+  def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A](_from, _to)
 
   def toK: Kleisli[F, A, B] =
     Kleisli(to(_))
@@ -59,14 +55,11 @@ sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def >=>[C](that: BijectionT[F, G, B, C])(implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
 
 }
-object BijectionT extends BijectionTFunctions with BijectionTInstances
+object BijectionT extends BijectionTInstances with BijectionTFunctions
 
 trait BijectionTFunctions {
-  def bijection[F[+_], G[+_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
-    new BijectionT[F, G, A, B] {
-      def to(a: A) = t(a)
-      def from(b: B) = f(b)
-    }
+  def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
+    new BijectionT[F, G, A, B](t, f)
 
   import std.AllInstances._
 
@@ -76,10 +69,10 @@ trait BijectionTFunctions {
   type Bijection[A, B] =
   BijectionT[Id, Id, A, B]
 
-  def liftBijection[F[+_], G[+_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
+  def liftBijection[F[_], G[_], A, B](t: A => B, f: B => A)(implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, B] =
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
-  def bijectionId[F[+_], G[+_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
+  def bijectionId[F[_], G[_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
     liftBijection(x => x, x => x)
 
   def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =
@@ -123,18 +116,40 @@ trait BijectionTFunctions {
 
 }
 
-trait BijectionTInstances {
-  implicit def bijectionTCategory[F[+_], G[+_]](implicit F0: Monad[F], G0: Monad[G]) = new BijectionTCategory[F, G] {
-    implicit def F: Monad[F] = F0
-    implicit def G: Monad[G] = G0
-  }
+
+sealed abstract class BijectionTInstances0 {
+  implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+    new BijectionTSplit[F, G] {
+      implicit def F = F0
+      implicit def G = G0
+    }
 }
 
-private[scalaz] trait BijectionTCategory[F[+_], G[+_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
-  implicit def F: Monad[F]
-  implicit def G: Monad[G]
+sealed abstract class BijectionTInstances extends BijectionTInstances0 {
+  implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+    new BijectionTCategory[F, G] {
+      implicit def F = F0
+      implicit def G = G0
+    }
+}
+
+private[scalaz] trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
+  implicit def F: Bind[F]
+  implicit def G: Bind[G]
 
   def compose[A, B, C](bc: BijectionT[F, G, B, C], ab: BijectionT[F, G, A, B]): BijectionT[F, G, A, C] = ab >=> bc
 
+  def split[A, B, C, D](ab: BijectionT[F, G, A, B], cd: BijectionT[F, G, C, D]): BijectionT[F, G, (A, C), (B, D)] =
+    BijectionT.bijection(
+      { case (a, c) => F.tuple2(ab.to(a), cd.to(c)) },
+      { case (b, d) => G.tuple2(ab.from(b), cd.from(d)) }
+    )
+}
+
+private[scalaz] trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
+  implicit def F: Monad[F]
+  implicit def G: Monad[G]
+
   def id[A] = BijectionT.bijectionId
 }
+

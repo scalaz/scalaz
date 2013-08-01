@@ -21,7 +21,7 @@ abstract class Representable[F[_], X](implicit val F: Functor[F]) {
   def representableLaw = new RepresentableLaw {}
 }
 
-trait RepresentableInstances {
+sealed abstract class RepresentableInstances {
   import scalaz.std.function._
 
   /** The identity representable. */

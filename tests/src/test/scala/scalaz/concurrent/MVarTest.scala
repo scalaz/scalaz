@@ -5,7 +5,6 @@ import scalaz.Spec
 
 import scalaz.concurrent.MVar.newEmptyMVar
 import scalaz.effect.IO
-import scalaz.effect.IO.putStrLn
 
 class MVarTest extends Spec {
 

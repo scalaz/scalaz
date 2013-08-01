@@ -1,15 +1,15 @@
 package scalaz
 
 /**An algebraic data type representing the digits 0 - 9 */
-sealed trait Digit {
+sealed abstract class Digit extends Product with Serializable {
   val toInt: Int
 
-  def toLong: Long = toInt.toLong
+  final def toLong: Long = toInt.toLong
 
-  def toChar: Char = (toLong + 48).toChar
+  final def toChar: Char = (toLong + 48).toChar
 }
 
-object Digit extends DigitFunctions with DigitInstances {
+object Digit extends DigitInstances with DigitFunctions {
 
   case object _0 extends Digit {
     override val toInt = 0
@@ -88,7 +88,7 @@ trait DigitFunctions {
   def longDigits[F[_]](digits: F[Digit])(implicit F: Foldable[F]): Long =
     F.foldLeft(digits, 0L)((n, a) => n * 10L + (a: Digit))
 
-  def digits[F[+_]](cs: F[Char])(implicit F: Functor[F]): OptionT[F, Digit] =
+  def digits[F[_]](cs: F[Char])(implicit F: Functor[F]): OptionT[F, Digit] =
     OptionT(F.map(cs)(digitFromChar))
 
   def digitsOr[F[_]](chars: F[Char], d: => Digit)(implicit F: Functor[F]): F[Digit] =
@@ -100,17 +100,17 @@ trait DigitFunctions {
       case Some(d) => F.point(d)
     })
 
-  def traverseDigits[F[+_]](chars: F[Char])(implicit F: Traverse[F]): Option[F[Digit]] = {
+  def traverseDigits[F[_]](chars: F[Char])(implicit F: Traverse[F]): Option[F[Digit]] = {
     import std.option._
     F.sequence(digits(chars).run)
   }
 
-  def traverseDigitsOr[F[+_]](chars: F[Char], d: => F[Digit])(implicit F: Traverse[F]): F[Digit] =
+  def traverseDigitsOr[F[_]](chars: F[Char], d: => F[Digit])(implicit F: Traverse[F]): F[Digit] =
     traverseDigits(chars) getOrElse d
 }
 
-trait DigitInstances {
-  implicit def digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] = new Enum[Digit] with Show[Digit] with Monoid[Digit] {
+sealed abstract class DigitInstances {
+  implicit val digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] = new Enum[Digit] with Show[Digit] with Monoid[Digit] {
 
     import std.anyVal._
 

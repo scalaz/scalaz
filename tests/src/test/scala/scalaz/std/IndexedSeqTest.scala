@@ -7,7 +7,6 @@ import org.scalacheck.Arbitrary
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import syntax.std._
 
@@ -23,7 +22,7 @@ class IndexedSeqTest extends Spec {
   checkAll(isEmpty.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
-  import syntax.index._
+  import syntax.foldable._
 
   private def evenp(x: Int): Boolean = x % 2 == 0
 

@@ -6,7 +6,7 @@ package scalaz
  * `A <: B` holds whenever `A` could be used in any negative context that expects a `B`.
  * (e.g. if you could pass an `A` into any function that expects a `B`.)
  */
-trait Liskov[-A, +B] {
+sealed abstract class Liskov[-A, +B] {
   def apply(a: A): B = Liskov.witness(this)(a)
 
   def subst[F[-_]](p: F[B]): F[A]
@@ -18,11 +18,11 @@ trait Liskov[-A, +B] {
   final def compose[C](that: Liskov[C, A]): Liskov[C, B] = Liskov.trans(this, that)
 }
 
-trait LiskovInstances {
+sealed abstract class LiskovInstances {
   import Liskov._
 
   /**Subtyping forms a category */
-  implicit def liskov: Category[<~<] = new Category[<~<] {
+  implicit val liskov: Category[<~<] = new Category[<~<] {
     def id[A]: (A <~< A) = refl[A]
 
     def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
@@ -219,9 +219,8 @@ trait LiskovFunctions {
     def subst[F[-_]](p: F[B]): F[A] = p.asInstanceOf[F[A]]
   }
 
-  import Injectivity._
 
-  def unco[F[+_] : Injective, Z, A](
+  def unco[F[_] : Injective, Z, A](
     a: F[A] <~< F[Z]
   ): (A <~< Z) = force[A, Z]
 

@@ -21,7 +21,6 @@ trait Foralls {
         p((arg: P[A]) => throw new Control(arg))
       } catch {
         case Control(arg) => arg
-        case e => throw e
       }
     }
   }

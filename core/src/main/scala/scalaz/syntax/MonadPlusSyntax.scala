@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
-trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadPlus[F]
   ////
   import Liskov._
@@ -13,6 +13,9 @@ trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
   def withFilter(f: A => Boolean) =
     filter(f)
 
+  final def uniteU[T, B](implicit T: Unapply[Foldable, A]): F[T.A] =
+    F.uniteU(self)(T)
+
   def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
     val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
     F.unite[T, B](ftb)
@@ -21,7 +24,7 @@ trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToMonadPlusOps0 {
+sealed trait ToMonadPlusOps0 {
   implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadPlus, FA]) =
     new MonadPlusOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadPlus[F0.M] = F0.TC }
 

@@ -2,8 +2,6 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
 class PartialFunctionTest extends Spec {
   private type PF[-A, +B] = PartialFunction[A, B]

@@ -2,10 +2,10 @@ package scalaz
 package syntax
 
 trait Syntaxes {
+
   //
   // Type classes over * -> *
   //
-
 
   object semigroup extends ToSemigroupOps
 
@@ -13,6 +13,7 @@ trait Syntaxes {
 
   object equal extends ToEqualOps
 
+  @deprecated("length is deprecated, use foldable instead", "7.1")
   object length extends ToLengthOps
 
   object show extends ToShowOps
@@ -21,18 +22,22 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
-  @deprecated("MetricSpace is deprecated", "7.0.1")
+  @deprecated("metricSpace is deprecated", "7.0.1")
   object metricSpace extends ToMetricSpaceOps
 
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
 
+  @deprecated("each is deprecated", "7.1")
   object each extends ToEachOps
 
+  @deprecated("index is deprecated", "7.1")
   object index extends ToIndexOps
 
   object functor extends ToFunctorOps
+
+  object invariantFunctor extends ToInvariantFunctorOps
 
   object contravariant extends ToContravariantOps
 
@@ -44,7 +49,8 @@ trait Syntaxes {
 
   object monad extends ToMonadOps
 
-  object cojoin extends ToCojoinOps
+  @deprecated("cojoin has been merged into cobind", "7.1")
+  object cojoin extends ToCobindOps
 
   object comonad extends ToComonadOps
 
@@ -56,6 +62,10 @@ trait Syntaxes {
 
   object monadPlus extends ToMonadPlusOps
 
+  object foldable extends ToFoldableOps
+
+  object foldable1 extends ToFoldable1Ops
+
   object traverse extends ToTraverseOps
 
   object traverse1 extends ToTraverse1Ops
@@ -63,6 +73,8 @@ trait Syntaxes {
   object zip extends ToZipOps
 
   object unzip extends ToUnzipOps
+
+  object optional extends ToOptionalOps
 
   //
   // Type classes over * * -> *
@@ -87,6 +99,7 @@ trait Syntaxes {
   object monadTell extends ToMonadTellOps
 
   object monadListen extends ToMonadListenOps
+
   //
   // Data
   //
@@ -101,13 +114,13 @@ trait Syntaxes {
 
   object state extends ToStateOps
 
-  object foldable extends ToFoldableOps
-
-  object foldable1 extends ToFoldable1Ops
-
   object validation extends ToValidationOps
 
   object kleisli extends ToKleisliOps
+
+  object either extends ToEitherOps
+
+  object nel extends ToNelOps
 
   //
   // Mixed
@@ -117,16 +130,26 @@ trait Syntaxes {
 
 }
 
-trait ToDataOps extends ToIdOps with ToTreeOps with ToWriterOps with ToValidationOps with ToReducerOps with ToKleisliOps
+trait ToDataOps
+  extends ToIdOps
+  with ToTreeOps
+  with ToReducerOps
+  with ToWriterOps
+  with ToStateOps
+  with ToValidationOps
+  with ToKleisliOps
+  // TODO those are not yet included because of ambiguities when importing all syntax
+  // can be included again when the @deprecated methods are being removed
+  // with ToEitherOps
+  // with ToNelOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
-  with ToApplicativeOps with ToBindOps with ToMonadOps with ToCojoinOps with ToComonadOps
+  with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps
-  with ToFoldable1Ops with ToTraverse1Ops
-
+  with ToFoldable1Ops with ToTraverse1Ops with ToOptionalOps

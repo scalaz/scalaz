@@ -5,14 +5,14 @@ package effect
 import scalaz.effect.LiftIO
 
 /** Wraps a value `self` and provides methods related to `LiftIO` */
-trait LiftIOOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class LiftIOOps[F[_],A] extends Ops[F[A]] {
   implicit def F: LiftIO[F]
   ////
   
   ////
 }
 
-trait ToLiftIOOps0 {
+sealed trait ToLiftIOOps0 {
   implicit def ToLiftIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[LiftIO, FA]) =
     new LiftIOOps[F0.M,F0.A] { def self = F0(v); implicit def F: LiftIO[F0.M] = F0.TC }
 

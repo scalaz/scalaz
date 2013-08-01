@@ -15,7 +15,7 @@ import scalaz.Tags.{Conjunction}
  *
  * Based on a Haskell library by Edward Kmett
  */
-sealed trait Reducer[C, M] {
+sealed abstract class Reducer[C, M] {
   implicit def monoid: Monoid[M]
 
   def unit(c: C): M
@@ -50,7 +50,7 @@ sealed trait Reducer[C, M] {
     }
   }
 }
-sealed trait UnitReducer[C, M] extends Reducer[C, M] {
+sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
   def unit(c: C): M
 
@@ -67,7 +67,7 @@ object UnitReducer {
   }
 }
 
-object Reducer extends ReducerFunctions with ReducerInstances {
+object Reducer extends ReducerInstances with ReducerFunctions {
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
     */
@@ -75,8 +75,7 @@ object Reducer extends ReducerFunctions with ReducerInstances {
     reducer(u, cs, sc)
 }
 
-trait ReducerInstances {
-  import Reducer._
+sealed abstract class ReducerInstances { self: ReducerFunctions =>
 
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
@@ -103,7 +102,7 @@ trait ReducerInstances {
   }
 
   /** The "or" monoid. */
-  implicit def AnyReducer: Reducer[Boolean, Boolean] = {
+  implicit val AnyReducer: Reducer[Boolean, Boolean] = {
     implicit val B = std.anyVal.booleanInstance.disjunction
     unitReducer(x => x)
   }
@@ -111,7 +110,7 @@ trait ReducerInstances {
   import std.anyVal._
 
   /** The "and" monoid. */
-  implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
+  implicit val AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))
 
   /** Accumulate endomorphisms. */
   implicit def EndoReducer[A]: Reducer[A => A, Endo[A]] = unitReducer(Endo(_))
@@ -120,18 +119,18 @@ trait ReducerInstances {
 
   import Tags.{Multiplication, First, Last}
 
-  implicit def IntProductReducer: Reducer[Int, Int @@ Multiplication] = unitReducer(i => Tag[Int, Multiplication](i))
+  implicit val IntProductReducer: Reducer[Int, Int @@ Multiplication] = unitReducer(i => Tag[Int, Multiplication](i))
 
-  implicit def CharProductReducer: Reducer[Char, Char @@ Multiplication] = unitReducer(c => Tag[Char, Multiplication](c))
+  implicit val CharProductReducer: Reducer[Char, Char @@ Multiplication] = unitReducer(c => Tag[Char, Multiplication](c))
 
-  implicit def ByteProductReducer: Reducer[Byte, Byte @@ Multiplication] = unitReducer(b => Tag[Byte, Multiplication](b))
+  implicit val ByteProductReducer: Reducer[Byte, Byte @@ Multiplication] = unitReducer(b => Tag[Byte, Multiplication](b))
 
-  implicit def LongProductReducer: Reducer[Long, Long @@ Multiplication] = unitReducer(l => Tag[Long, Multiplication](l))
+  implicit val LongProductReducer: Reducer[Long, Long @@ Multiplication] = unitReducer(l => Tag[Long, Multiplication](l))
 
-  implicit def ShortProductReducer: Reducer[Short, Short @@ Multiplication] = unitReducer(s => Tag[Short, Multiplication](s))
+  implicit val ShortProductReducer: Reducer[Short, Short @@ Multiplication] = unitReducer(s => Tag[Short, Multiplication](s))
 
 
-  implicit def BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] = {
+  implicit val BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] = {
     import std.math.bigInt._
     unitReducer(b => Tag[BigInt, Multiplication](b))
   }

@@ -9,7 +9,7 @@ trait MonadListenOps[F[_, _], W, A] extends Ops[F[W, A]] {
   final def listen: F[W, (A, W)] = ML.listen[A](self)
 }
 
-trait ToMonadListenOps0 {
+sealed trait ToMonadListenOps0 {
   implicit def ToMonadListenOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadListen, FA]) =
     new MonadListenOps[F0.M, F0.A, F0.B]{ def self = F0(v); implicit def ML = F0.TC }
 }

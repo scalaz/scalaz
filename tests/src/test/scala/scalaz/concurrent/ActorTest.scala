@@ -2,7 +2,6 @@ package scalaz
 package concurrent
 
 import scalaz.Spec
-import org.specs2.execute.{Failure, Result, Success}
 import collection.mutable
 import java.util.concurrent._
 import ConcurrentTest._

@@ -4,7 +4,6 @@ package concurrent
 
 import scalaz._
 import effect._
-import IO._
 import concurrent._
 import Chan._
 import std.anyVal._

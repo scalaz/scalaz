@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Semigroup` */
-trait SemigroupOps[F] extends Ops[F] {
+sealed abstract class SemigroupOps[F] extends Ops[F] {
   implicit def F: Semigroup[F]
   ////
   final def |+|(other: => F): F = F.append(self, other)

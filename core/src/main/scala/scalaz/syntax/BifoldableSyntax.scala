@@ -2,14 +2,14 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Bifoldable` */
-trait BifoldableOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class BifoldableOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Bifoldable[F]
   ////
 
   ////
 }
 
-trait ToBifoldableOps0 {
+sealed trait ToBifoldableOps0 {
     implicit def ToBifoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bifoldable, FA]) =
       new BifoldableOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Bifoldable[F0.M] = F0.TC }
   

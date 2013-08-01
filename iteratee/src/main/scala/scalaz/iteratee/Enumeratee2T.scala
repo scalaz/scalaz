@@ -1,7 +1,6 @@
 package scalaz
 package iteratee
 
-import effect._
 import Iteratee._
 import Ordering.{EQ, GT, LT}
 

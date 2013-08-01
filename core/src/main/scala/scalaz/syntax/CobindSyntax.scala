@@ -2,14 +2,17 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Cobind` */
-trait CobindOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class CobindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Cobind[F]
   ////
-  def cobind[B](f: F[A] => B) = F.cobind(self)(f)
+  final def cojoin: F[F[A]] = F.cojoin(self)
+  final def coflatten: F[F[A]] = F.cojoin(self)
+  final def cobind[B](f: F[A] => B) = F.cobind(self)(f)
+  final def coflatMap[B](f: F[A] => B) = F.cobind(self)(f)
   ////
 }
 
-trait ToCobindOps0 {
+sealed trait ToCobindOps0 {
   implicit def ToCobindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cobind, FA]) =
     new CobindOps[F0.M,F0.A] { def self = F0(v); implicit def F: Cobind[F0.M] = F0.TC }
 

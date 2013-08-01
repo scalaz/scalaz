@@ -1,7 +1,7 @@
 package scalaz
 
-sealed trait NullResult[A, B] {
-  def apply(a: A): Option[B]
+final class NullResult[A, B] private(_apply: A => Option[B]) {
+  def apply(a: A): Option[B] = _apply(a)
 
   import NullResult._
   import NullArgument._
@@ -104,98 +104,94 @@ sealed trait NullResult[A, B] {
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
     T.traverse(a)(apply(_))
 
-  def on[F[+_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
+  def on[F[_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
     OptionT(F.map(a)(apply(_)))
 }
 
-object NullResult extends NullResultFunctions with NullResultInstances
+object NullResult extends NullResultInstances with NullResultFunctions {
+  def apply[A, B](f: A => Option[B]): A =>? B =
+    new (A =>? B)(f)
+}
 
 trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
-  def apply[A, B](f: A => Option[B]): A =>? B =
-    new (A =>? B) {
-      def apply(a: A) = f(a)
-    }
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
-    apply(k apply _)
+    NullResult(k apply _)
 
   def lift[A, B](f: A => B): A =>? B =
-    apply(a => Some(f(a)))
+    NullResult(a => Some(f(a)))
 
   def always[A, B](b: => B): A =>? B =
     lift(_ => b)
 
   def never[A, B]: A =>? B =
-    apply(_ => None)
+    NullResult(_ => None)
 
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
 
   object list {
     def head[A]: List[A] =>? A =
-      apply(_.headOption)
+      NullResult(_.headOption)
 
     def tail[A]: List[A] =>? List[A] =
-      apply {
+      NullResult {
         case Nil => None
         case _::t => Some(t)
       }
   }
 }
 
-trait NullResultInstances {
-  implicit def NullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
+sealed abstract class NullResultInstances0 {
+
+  implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
       implicit val M = M0
     }
 
-  implicit def NullResultFunctor[X]: Functor[({type λ[α] = NullResult[X, α]})#λ] =
-    new NullResultFunctor[X] {
-    }
-
-  implicit def NullResultCompose: Compose[NullResult] =
-    new NullResultCompose {
-    }
-
-  implicit def NullResultProfunctor: Profunctor[NullResult] =
-    new NullResultProfunctor {
-    }
 }
 
-trait NullResultInstances0 extends NullResultInstances {
-  implicit def NullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
+sealed abstract class NullResultInstances extends NullResultInstances0 {
+
+  implicit def nullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
     new NullResultMonoid[A, B] {
       implicit val M = M0
     }
 
-  implicit def NullResultApply[X]: Apply[({type λ[α] = NullResult[X, α]})#λ] =
-    new NullResultApply[X] {
-    }
+  implicit val nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
+    def id[A] =
+      NullResult.lift(identity)
+    override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
+      f compose g
+    override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
+      f *** g
+    override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
+      r contramap f
+    override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
+      r map f
+    override def arr[A, B](f: A => B) =
+      NullResult.lift(f)
+    override def first[A, B, C](r: NullResult[A, B]) =
+      r.first
+  }
 
-  implicit def NullResultCategory: Category[NullResult] =
-    new NullResultCategory {
-    }
-}
+  implicit def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = new Monad[({type λ[α] = NullResult[X, α]})#λ] {
+    override def map[A, B](a: NullResult[X, A])(f: A => B) =
+      a map f
+    override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
+      a ap f
+    override def point[A](a: => A): NullResult[X, A] =
+      NullResult.always(a)
+    override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
+      a flatMap f
+  }
 
-trait NullResultInstances1 extends NullResultInstances0 {
-  implicit def NullResultApplicative[X]: Applicative[({type λ[α] = NullResult[X, α]})#λ] =
-    new NullResultApplicative[X] {
-    }
+  implicit def nullResultContravariant[X]: Contravariant[({type λ[α] = NullResult[α, X]})#λ] = new Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
+    override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
+      a contramap f
+  }
 
-  implicit def NullResultSplit: Split[NullResult] =
-    new NullResultSplit {
-    }
-}
-
-trait NullResultInstances2 extends NullResultInstances1 {
-  implicit def NullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] =
-    new NullResultMonad[X] {
-    }
-
-  implicit def NullResultArrow: Arrow[NullResult] =
-    new NullResultArrow {
-    }
 }
 
 private[scalaz] trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
@@ -210,63 +206,6 @@ private[scalaz] trait NullResultMonoid[A, B] extends Monoid[NullResult[A, B]] wi
 
   override def zero =
     NullResult.zero
-
 }
 
-private[scalaz] trait NullResultFunctor[X] extends Functor[({type λ[α] = NullResult[X, α]})#λ] {
-  override def map[A, B](a: NullResult[X, A])(f: A => B) =
-    a map f
-}
-
-private[scalaz] trait NullResultContravariant[X] extends Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
-  override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
-    a contramap f
-}
-
-private[scalaz] trait NullResultApply[X] extends Apply[({type λ[α] = NullResult[X, α]})#λ] with NullResultFunctor[X] {
-  override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
-    a ap f
-}
-
-private[scalaz] trait NullResultApplicative[X] extends Applicative[({type λ[α] = NullResult[X, α]})#λ] with NullResultApply[X] {
-  override def map[A, B](a: NullResult[X, A])(f: A => B) =
-    a map f
-  override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
-    a ap f
-  override def point[A](a: => A): NullResult[X, A] =
-    NullResult.always(a)
-}
-
-private[scalaz] trait NullResultMonad[X] extends Monad[({type λ[α] = NullResult[X, α]})#λ] with NullResultApplicative[X] {
-  override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
-    a flatMap f
-}
-
-private[scalaz] trait NullResultCompose extends Compose[NullResult] {
-  override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
-    f compose g
-}
-
-private[scalaz] trait NullResultCategory extends Category[NullResult] with NullResultCompose {
-  def id[A] =
-    NullResult.lift(identity)
-}
-
-private[scalaz] trait NullResultSplit extends Split[NullResult] with NullResultCompose {
-  override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
-    f *** g
-}
-
-private[scalaz] trait NullResultProfunctor extends Profunctor[NullResult] {
-  override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
-    r contramap f
-  override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
-    r map f
-}
-
-private[scalaz] trait NullResultArrow extends Arrow[NullResult] with NullResultSplit with NullResultProfunctor with NullResultCategory {
-  override def arr[A, B](f: A => B) =
-    NullResult.lift(f)
-  override def first[A, B, C](r: NullResult[A, B]) =
-    r.first
-}
+// vim: expandtab:ts=2:sw=2

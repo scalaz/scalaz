@@ -2,14 +2,14 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Cozip` */
-trait CozipOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class CozipOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Cozip[F]
   ////
 
   ////
 }
 
-trait ToCozipOps0 {
+sealed trait ToCozipOps0 {
   implicit def ToCozipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cozip, FA]) =
     new CozipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Cozip[F0.M] = F0.TC }
 

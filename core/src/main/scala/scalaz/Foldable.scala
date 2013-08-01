@@ -8,6 +8,9 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
+  import collection.generic.CanBuildFrom
+  import collection.immutable.IndexedSeq
+
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
   /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
@@ -32,6 +35,13 @@ trait Foldable[F[_]]  { self =>
 
     implicit def G = G0
   }
+
+  /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */
+  def product0[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+    new ProductFoldable1R[F, G] {
+      def F = self
+      def G = G0
+    }
 
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
@@ -59,7 +69,7 @@ trait Foldable[F[_]]  { self =>
     traverse_[({type λ[α]=State[S, α]})#λ, A, B](fa)(f)
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
-  def sequence_[M[_], A, B](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
+  def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
 
   /** `sequence_` specialized to `State` **/
@@ -84,12 +94,36 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
+  /** Alias for `length`. */
+  final def count[A](fa: F[A]): Int = length(fa)
+
+  /** Deforested alias for `toStream(fa).size`. */
+  def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+
+  /**
+   * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
+   */
+  def index[A](fa: F[A], i: Int): Option[A] =
+    foldLeft[A, (Int, Option[A])](fa, (0, None)) {
+      case ((idx, elem), curr) =>
+        (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
+    }._2
+
+  /**
+   * @return the element at index `i`, or `default` if the given index falls outside of the range
+   */
+  def indexOr[A](fa: F[A], default: => A, i: Int): A =
+    index(fa, i) getOrElse default
+
   /** Unbiased sum of monoidal values. */
-  def foldMapIdentity[A,B](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
+  @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
+  def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
+  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
+    foldLeft(fa, c())(_ += _).result
 
   /** Whether all `A`s in `fa` yield true from `p`. */
   def all[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, true)(p(_) && _)
@@ -101,8 +135,6 @@ trait Foldable[F[_]]  { self =>
   /** `any` with monadic traversal. */
   def anyM[G[_], A](fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
-  /** Deforested alias for `toStream(fa).size`. */
-  def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   import Ordering.{GT, LT}
   import std.option.{some, none}

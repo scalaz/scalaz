@@ -17,7 +17,7 @@ import Id._
  *
  * The more refined types are useful if you need to be able to substitute into restricted contexts.
  */
-trait Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
   def subst[F[_ >: L <: H]](p: F[A]): F[B]
   def compose[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, C, A]): Leibniz[L2, H2, C, B] =
     Leibniz.trans[L2, H2, C, A, B](this, that)
@@ -31,10 +31,10 @@ object Leibniz extends LeibnizInstances with LeibnizFunctions{
   type ===[A,B] = Leibniz[⊥, ⊤, A, B]
 }
 
-trait LeibnizInstances {
+sealed abstract class LeibnizInstances {
   import Leibniz._
 
-  implicit def leibniz: Category[===] = new Category[===] {
+  implicit val leibniz: Category[===] = new Category[===] {
     def id[A]: (A === A) = refl[A]
 
     def compose[A, B, C](bc: B === C, ab: A === B) = bc compose ab
@@ -144,7 +144,6 @@ trait LeibnizFunctions {
     def subst[F[_ >: L <: H]](fa: F[A]): F[B] = fa.asInstanceOf[F[B]]
   }
 
-  import Injectivity._
 
   /**
    * Emir Pasalic's PhD thesis mentions that it is unknown whether or not `((A,B) === (C,D)) => (A === C)` is inhabited.

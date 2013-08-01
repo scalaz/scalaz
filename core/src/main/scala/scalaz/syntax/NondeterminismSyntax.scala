@@ -2,14 +2,14 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Nondeterminism` */
-trait NondeterminismOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class NondeterminismOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Nondeterminism[F]
   ////
 
   ////
 }
 
-trait ToNondeterminismOps0 {
+sealed trait ToNondeterminismOps0 {
   implicit def ToNondeterminismOpsUnapply[FA](v: FA)(implicit F0: Unapply[Nondeterminism, FA]) =
     new NondeterminismOps[F0.M,F0.A] { def self = F0(v); implicit def F: Nondeterminism[F0.M] = F0.TC }
 

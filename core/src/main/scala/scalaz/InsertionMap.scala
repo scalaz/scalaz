@@ -1,9 +1,9 @@
 package scalaz
 
 /** Returns a list in order of key insertion. */
-sealed trait InsertionMap[K, V] {
-  private[scalaz] val assoc: Map[K, (V, Long)]
-  private[scalaz] val next: Long
+final class InsertionMap[K, V] private[scalaz](
+  private[scalaz] val assoc: Map[K, (V, Long)],
+  private[scalaz] val next: Long) {
 
   def apply(k: K): Option[V] =
     get(k)
@@ -84,14 +84,11 @@ sealed trait InsertionMap[K, V] {
     "InsertionMap(" + (toList mkString ", ") + ")"
 }
 
-object InsertionMap extends InsertionMapFunctions with InsertionMapInstances
+object InsertionMap extends InsertionMapInstances with InsertionMapFunctions
 
 trait InsertionMapFunctions {
   private[scalaz] def build[K, V](a: Map[K, (V, Long)], n: Long): InsertionMap[K, V] =
-    new InsertionMap[K, V] {
-      val assoc = a
-      val next = n
-    }
+    new InsertionMap[K, V](a, n)
 
   def empty[K, V]: InsertionMap[K, V] =
     build(Map.empty, 0L)
@@ -112,7 +109,7 @@ trait InsertionMapFunctions {
 
 }
 
-trait InsertionMapInstances {
+sealed abstract class InsertionMapInstances {
   import Scalaz._
 
   implicit def insertionTraverse[K]: Traverse[({type λ[α]=InsertionMap[K, α]})#λ] =

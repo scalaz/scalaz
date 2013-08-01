@@ -2,7 +2,6 @@ package scalaz
 
 import std.AllInstances._
 import Dual._
-import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class OrderTest extends Spec {

@@ -24,10 +24,8 @@ object TypeClass {
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
-  lazy val length = TypeClass("Length", *->*)
-  lazy val each = TypeClass("Each", *->*)
-  lazy val index = TypeClass("Index", *->*)
-  lazy val functor = TypeClass("Functor", *->*)
+  lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
+  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)
@@ -39,15 +37,15 @@ object TypeClass {
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
-  lazy val contravariant = TypeClass("Contravariant", *->*)
-  lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
+  lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
-  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
+  lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
   lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
+  lazy val optional = TypeClass("Optional", *->*)
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
@@ -60,9 +58,9 @@ object TypeClass {
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
-  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(category))
+  lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(compose))
   lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
-  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor))
+  lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -76,15 +74,13 @@ object TypeClass {
   def core: List[TypeClass] = List(semigroup,
     monoid,
     equal,
-    length,
     show,
     order,
     enum,
-    metricSpace,
     plusEmpty,
     isEmpty,
-    each,
-    index,
+    optional,
+    invariantFunctor,
     functor,
     contravariant,
     apply,
@@ -94,7 +90,6 @@ object TypeClass {
     cozip,
     bind,
     monad,
-    cojoin,
     cobind,
     comonad,
     plus,
@@ -132,26 +127,40 @@ object Kind {
   case object *^*->* extends Kind
 }
 
+sealed trait FileStatus
+
+object FileStatus{
+  case object NoChange extends FileStatus
+  case object Updated  extends FileStatus
+  case object Created  extends FileStatus
+}
+
 object GenTypeClass {
   val useDependentMethodTypes = true
 
   case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
-    def createOrUpdate(scalaSource: File, log: Logger): sbt.File = {
+    def createOrUpdate(scalaSource: File, log: Logger): (FileStatus, sbt.File) = {
       val f = file(scalaSource)
-      val updatedSource = if (f.exists()) {
+      val (status, updatedSource) = if (f.exists()) {
         val old = IO.read(f)
-        log.info("Updating %s".format(f))
-        updateSource(old)
+        val updated = updateSource(old)
+        if(updated == old){
+          log.debug("No changed %s".format(f))
+          (FileStatus.NoChange, updated)
+        }else{
+          log.info("Updating %s".format(f))
+          (FileStatus.Updated, updated)
+        }
       } else {
         log.info("Creating %s".format(f))
-        source
+        (FileStatus.Created, source)
       }
       log.debug("Contents: %s".format(updatedSource))
       IO.delete(f)
       IO.write(f, updatedSource)
-      f
+      (status, f)
     }
 
     def updateSource(oldSource: String): String = {
@@ -251,7 +260,7 @@ object %s {
         """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F] extends Ops[F] {
+sealed abstract class %sOps[F] extends Ops[F] {
   implicit def F: %s[F]
   ////
 
@@ -299,14 +308,14 @@ trait %sSyntax[F] %s {
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
   implicit def F: %s[F]
   ////
 
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
 %s
 }
 
@@ -353,14 +362,14 @@ trait %sSyntax[F[_]] %s {
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-trait %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class %sOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: %s[F]
   ////
 
   ////
 }
 
-trait To%sOps0 {
+sealed trait To%sOps0 {
   %s
 }
 

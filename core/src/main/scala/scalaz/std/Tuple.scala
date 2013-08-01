@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait TupleInstances0 {
+sealed trait TupleInstances0 {
   implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
@@ -62,15 +62,15 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
   /** `Tuple1[A]` is isomorphic to `Id[X]` */
-  implicit def tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
-    def cojoin[A](a: Tuple1[A]) = Tuple1(a)
+  implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
+    override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
   /** Product functor and comonad */
   implicit def tuple2Instance[A1]: Traverse[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
-    def cojoin[A](a: (A1, A)) = (a._1, a)
+    override def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
   }
@@ -135,7 +135,7 @@ trait TupleInstances0 {
     implicit def _8 = A8
   }
 }
-trait TupleInstances1 extends TupleInstances0 {
+sealed trait TupleInstances1 extends TupleInstances0 {
 
   implicit def tuple1Show[A1](implicit A1: Show[A1]) = new Tuple1Show[A1] {
     implicit def _1 = A1
@@ -295,7 +295,7 @@ trait TupleInstances1 extends TupleInstances0 {
     implicit def _8 = A8
   }
 
-  implicit def tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
+  implicit val tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
   implicit def tuple2Cozip[A1]: Cozip[({type f[x] = (A1, x)})#f] = new Tuple2Cozip[A1] {}
   implicit def tuple3Cozip[A1, A2]: Cozip[({type f[x] = (A1, A2, x)})#f] = new Tuple3Cozip[A1, A2] {}
   implicit def tuple4Cozip[A1, A2, A3]: Cozip[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Cozip[A1, A2, A3] {}
@@ -688,7 +688,6 @@ private[scalaz] trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] extends Show[(A
 
 private[scalaz] trait Tuple1Order[A1] extends Order[Tuple1[A1]] with Tuple1Equal[A1] {
   implicit def _1 : Order[A1]
-  import Ordering.EQ
   def order(f1: Tuple1[A1], f2: Tuple1[A1]) = _1.order(f1._1, f2._1)
 }
 private[scalaz] trait Tuple2Order[A1, A2] extends Order[(A1, A2)] with Tuple2Equal[A1, A2] {

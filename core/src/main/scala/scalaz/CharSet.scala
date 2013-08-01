@@ -1,15 +1,11 @@
 package scalaz
 
 /** Newtype for strings representing character sets. */
-sealed trait CharSet {
-  val value: String
-}
+final case class CharSet private(value: String)
 
 object CharSet extends CharSetFunctions {
 
-  def charset(v: String): CharSet = new CharSet {
-    val value = v
-  }
+  def charset(v: String): CharSet = CharSet(v)
 
   val USASCII = charset("US-ASCII")
 

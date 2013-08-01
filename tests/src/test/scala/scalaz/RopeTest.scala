@@ -1,15 +1,11 @@
 package scalaz
 
 import scalacheck.ScalazArbitrary._
-import reflect.ClassManifest
 import syntax.equal._
 import std.string._
 import std.anyVal._
 import std.stream._
-import org.specs2.control.LazyParameter
-import collection.GenTraversable
-import collection.immutable.Traversable
-import org.specs2.matcher.{Parameters, ExceptionMatchers, TraversableMatchers, ContainInOrderMatcher, ContainMatcher}
+import org.specs2.matcher.{Parameters, ExceptionMatchers, TraversableMatchers}
 
 class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
 

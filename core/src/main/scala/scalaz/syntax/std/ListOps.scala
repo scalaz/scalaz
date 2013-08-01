@@ -6,10 +6,6 @@ import scalaz.std.{list => l}
 
 
 trait ListOps[A] extends Ops[List[A]] {
-  final def coflatten: List[List[A]] = l.coflatten(self)
-
-  final def coflatten[B](f: List[A] => B): List[B] = l.coflatMap(self, f)
-
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
   final def toNel: Option[NonEmptyList[A]] = l.toNel(self)

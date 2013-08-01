@@ -13,13 +13,16 @@ package scalaz
  * @see [[scalaz.Functor.FunctorLaw]]
  */
 ////
-trait Functor[F[_]]  { self =>
+trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   ////
 
   /** Lift `f` into `F` and apply to `F[A]`. */
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
   // derived functions
+
+  def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
+    map(fa)(f)
 
   /** Alias for `map`. */
   def apply[A, B](fa: F[A])(f: A => B): F[B] = map(fa)(f)
@@ -61,6 +64,15 @@ trait Functor[F[_]]  { self =>
     implicit def G = G0
   }
 
+  /** The composition of Functor F and Contravariant G, `[x]F[G[x]]`,
+    * is contravariant.
+    */
+  def icompose[G[_]](implicit G0: Contravariant[G]): Contravariant[({type λ[α] = F[G[α]]})#λ] =
+    new Contravariant[({type λ[α] = F[G[α]]})#λ] {
+      def contramap[A, B](fa: F[G[A]])(f: B => A) =
+        self.map(fa)(ga => G0.contramap(ga)(f))
+    }
+
   /**The product of Functors `F` and `G`, `[x](F[x], G[x]])`, is a Functor */
   def product[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = (F[α], G[α])})#λ] = new ProductFunctor[F, G] {
     implicit def F = self
@@ -68,7 +80,7 @@ trait Functor[F[_]]  { self =>
     implicit def G = G0
   }
 
-  trait FunctorLaw {
+  trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
     def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
 

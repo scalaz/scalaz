@@ -13,13 +13,15 @@ trait IdInstances {
   // TODO Review!
   type Identity[+X] = Need[X]
 
-  val id: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
-    new Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
+  val id: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+    new Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
 
-      def cojoin[A](a: Id[A]): A = a
+      def cobind[A, B](a: A)(f: A => B): B = f(a)
+
+      override def cojoin[A](a: Id[A]): A = a
 
       def copoint[A](p: Id[A]): A = p
 

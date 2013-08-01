@@ -1,5 +1,7 @@
 package scalaz
 
+import std.option.cata
+
 private[scalaz] trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Functor[F]
 
@@ -54,13 +56,43 @@ private[scalaz] trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α]
   implicit def G: Foldable[G]
 
   override def foldRight[A, B](fa: (F[A], G[A]), z: => B)(f: (A, => B) => B): B =
-    F.foldRight(fa._1, z)((a, b) => G.foldRight(fa._2, f(a, b))((a, b) => f(a, b)))
+    F.foldRight(fa._1, G.foldRight(fa._2, z)(f))(f)
 
   override def foldMap[A,B](fa: (F[A], G[A]))(f: A => B)(implicit M: Monoid[B]): B =
     M.append(F.foldMap(fa._1)(f), G.foldMap(fa._2)(f))
 
   override def foldLeft[A, B](fa: (F[A], G[A]), z: B)(f: (B, A) => B): B =
-    F.foldLeft(fa._1, z)((b, a) => G.foldLeft(fa._2, f(b, a))((b, a) => f(b, a)))
+    G.foldLeft(fa._2, F.foldLeft(fa._1, z)(f))(f)
+}
+
+private[scalaz] trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+  implicit def F: Foldable1[F]
+
+  override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
+    cata(G.foldRight1Opt(fa._2)(f))(F.foldRight(fa._1, _)(f), F.foldRight1(fa._1)(f))
+
+  override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
+    val resume = F.foldMap1(fa._1)(f)
+    cata(G.foldMap1Opt(fa._2)(f))(S.append(resume, _), resume)
+  }
+
+  override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
+    G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
+}
+
+private[scalaz] trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+  implicit def G: Foldable1[G]
+
+  override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
+    F.foldRight(fa._1, G.foldRight1(fa._2)(f))(f)
+
+  override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
+    def resume = G.foldMap1(fa._2)(f)
+    cata(F.foldMap1Opt(fa._1)(f))(S.append(_, resume), resume)
+  }
+
+  override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
+    cata(F.foldLeft1Opt(fa._1)(f))(G.foldLeft(fa._2, _)(f), G.foldLeft1(fa._2)(f))
 }
 
 private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
@@ -69,13 +101,13 @@ private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[�
   implicit def G: Foldable1[G]
 
   override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
-    F.foldRight1(fa._1)((a, b) => G.foldRight1(fa._2)((a, b) => f(a, b)))
+    F.foldRight(fa._1, G.foldRight1(fa._2)(f))(f)
 
   override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B =
     S.append(F.foldMap1(fa._1)(f), G.foldMap1(fa._2)(f))
 
   override def foldLeft1[A](fa: (F[A], G[A]))(f: (A, A) => A): A =
-    F.foldLeft1(fa._1)((b, a) => G.foldLeft1(fa._2)((b, a) => f(b, a)))
+    G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
 }
 
 private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] with ProductFoldable[F, G] {
@@ -85,6 +117,34 @@ private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α]
 
   def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
     Applicative[X].apply2(F.traverse(a._1)(f), G.traverse(a._2)(f))((a, b) => (a, b))
+}
+
+private[scalaz] trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1L[F, G] with ProductTraverse[F, G] {
+  implicit def F: Traverse1[F]
+
+  def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
+    def resume = F.traverse1(a._1)(f)
+    X0.applyApplicative.traverse(a._2)(a => -\/(f(a)))(G)
+      .fold(X0.apply2(resume, _)(Tuple2.apply),
+            pr => X0.map(resume)((_, pr)))
+  }
+
+  override def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
+    super[ProductTraverse].traverseImpl(a)(f)
+}
+
+private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1R[F, G] with ProductTraverse[F, G] {
+  implicit def G: Traverse1[G]
+
+  def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
+    def resume = G.traverse1(a._2)(f)
+    X0.applyApplicative.traverse(a._1)(a => -\/(f(a)))(F)
+      .fold(X0.apply2(_, resume)(Tuple2.apply),
+            pr => X0.map(resume)((pr, _)))
+  }
+
+  override def traverseImpl[X[_]:Applicative, A, B](a: (F[A], G[A]))(f: A => X[B]): X[(F[B], G[B])] =
+    super[ProductTraverse].traverseImpl(a)(f)
 }
 
 private[scalaz] trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1[F, G] with ProductTraverse[F, G] {

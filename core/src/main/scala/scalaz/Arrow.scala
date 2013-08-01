@@ -33,7 +33,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
     }
 
   /** Alias for `compose`. */
-  def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
+  final def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
     compose(fbc, fab)
 
   /** Flipped `<<<`. */
@@ -50,7 +50,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
   }
 
   /** Alias for `split`. */
-  def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
+  final def splitA[A, B, C, D](fab: (A =>: B), fcd: (C =>: D)): ((A, C) =>: (B, D)) =
     split(fab, fcd)
 
   /** Run `fab` and `fcd` alongside each other.  Sometimes `***`. */
@@ -63,7 +63,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
 
   /** Run `fab` and `fac` on the same `A`.  Sometimes `&&&`. */
   def combine[A, B, C](fab: (A =>: B), fac: (A =>: C)): (A =>: (B, C)) =
-      >>>(arr((a: A) => (a, a)), splitA(fab, fac))
+    >>>(arr((a: A) => (a, a)), splitA(fab, fac))
 
   /** Contramap on `A`. */
   def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B) =

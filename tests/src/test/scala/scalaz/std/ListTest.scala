@@ -3,9 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
-import syntax.std._
 
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
@@ -13,12 +11,11 @@ class ListTest extends Spec {
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
   checkAll(isEmpty.laws[List])
+  checkAll(cobind.laws[List])
   checkAll(order.laws[List[Int]])
 
   import std.list.listSyntax._
   import syntax.foldable._
-  import syntax.monad._
-  import syntax.index._
 
   "intercalate empty list is flatten" ! check((a: List[List[Int]]) => a.intercalate(List[Int]()) must be_===(a.flatten))
 
@@ -60,6 +57,13 @@ class ListTest extends Spec {
 
   "filterM" ! prop {
     (xs: List[Int]) => xs.filterM[Id](_ % 2 == 0) == xs.filter(_ % 2 == 0)
+  }
+
+  "groupByWhen splits a list at each point where `p(as(n), as(n+1))` yields false" ! prop {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      forall(a.groupWhen(p)) { group: List[Int] =>
+        forall(0 until group.size - 1) { i: Int => p(group(i), group(i+1)) ==== true }
+      }
   }
 
   "takeWhileM example" in {

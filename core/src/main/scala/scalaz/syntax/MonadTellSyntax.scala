@@ -10,7 +10,7 @@ trait MonadTellOps[F[_, _], W, A] extends Ops[F[W, A]] {
      MT.bind(self)(a => MT.map(MT.tell(f(a)))(_ => a))
 }
 
-trait ToMonadTellOps0 {
+sealed trait ToMonadTellOps0 {
   implicit def ToMonadTellOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadTell, FA]) = 
     new MonadTellOps[F0.M, F0.A, F0.B]{ def self = F0(v); implicit def MT = F0.TC }
 }

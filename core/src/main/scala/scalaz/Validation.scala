@@ -1,6 +1,5 @@
 package scalaz
 
-import Id._
 
 /**
  * Represents either:
@@ -32,7 +31,6 @@ import Id._
  */
 sealed trait Validation[+E, +A] {
 
-  import Validation._
 
   sealed trait SwitchingValidation[X] {
     def s: X
@@ -151,8 +149,8 @@ sealed trait Validation[+E, +A] {
   /** Filter on the success of this validation. */
   def filter[EE >: E](p: A => Boolean)(implicit M: Monoid[EE]): Validation[EE, A] =
     this match {
-      case Failure(a) => Failure(a)
-      case Success(e) => if(p(e)) Success(e) else Failure(M.zero)
+      case Failure(_) => this
+      case Success(e) => if(p(e)) this else Failure(M.zero)
     }
 
   /** Return `true` if this validation is a success value satisfying the given predicate. */
@@ -234,10 +232,10 @@ sealed trait Validation[+E, +A] {
     this match {
       case Failure(a1) => x match {
         case Failure(a2) => Failure(M2.append(a1, a2))
-        case Success(b2) => Failure(a1)
+        case Success(b2) => this
       }
       case Success(b1) => x match {
-        case Failure(a2) => Failure(a2)
+        case Failure(_) => x
         case Success(b2) => Success(M1.append(b1, b2))
       }
     }
@@ -342,7 +340,7 @@ sealed trait Validation[+E, +A] {
 final case class Success[E, A](a: A) extends Validation[E, A]
 final case class Failure[E, A](e: E) extends Validation[E, A]
 
-object Validation extends ValidationFunctions with ValidationInstances {
+object Validation extends ValidationInstances with ValidationFunctions {
 
   /** Spin in tail-position on the success value of the given validation. */
   @annotation.tailrec
@@ -369,12 +367,12 @@ object Validation extends ValidationFunctions with ValidationInstances {
 }
 
 
-trait ValidationInstances extends ValidationInstances0 {
+sealed abstract class ValidationInstances extends ValidationInstances0 {
   type \?/[+E, +A] =
   Validation[E, A]
 }
 
-trait ValidationInstances0 extends ValidationInstances1 {
+sealed abstract class ValidationInstances0 extends ValidationInstances1 {
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
     def order(f1: Validation[E, A], f2: Validation[E, A]) =
@@ -390,7 +388,7 @@ trait ValidationInstances0 extends ValidationInstances1 {
     }
 }
 
-trait ValidationInstances1 extends ValidationInstances2 {
+sealed abstract class ValidationInstances1 extends ValidationInstances2 {
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
       new Equal[Validation[E, A]] {
         def equal(a1: Validation[E, A], a2: Validation[E, A]) =
@@ -407,8 +405,8 @@ trait ValidationInstances1 extends ValidationInstances2 {
     }
 }
 
-trait ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] {
+sealed abstract class ValidationInstances2 extends ValidationInstances3 {
+  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] {
 
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f
@@ -430,11 +428,14 @@ trait ValidationInstances2 extends ValidationInstances3 {
 
     def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
       a orElse b
+
+    def pextract[B, A](fa: Validation[L,A]): Validation[L,B] \/ A =
+      fa.fold(l => -\/(Failure(l)), \/.right)
   }
 }
 
-trait ValidationInstances3 {
-  implicit def ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
+sealed abstract class ValidationInstances3 {
+  implicit val ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
@@ -466,7 +467,7 @@ trait ValidationFunctions {
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
-    case e => failure(e)
+    case e: Throwable => failure(e)
   }
 
   /** Construct a `Validation` from an `Either`. */

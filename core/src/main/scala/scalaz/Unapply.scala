@@ -18,7 +18,7 @@ import Leibniz.{===, refl}
  *   G.traverse(self)(f)
  *
  * // Indirect lookup of the Applicative instance
- * // Requires -Ydep-method-types or Scala trunk circa Oct 2011
+ * // Requires the -Ydep-method-types flag to scalac with scala 2.9.x (not required with 2.10)
  * def traverseI[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
  *   G.TC.traverse(self)(a => G(f(a)))
  * }
@@ -72,7 +72,7 @@ trait Unapply[TC[_[_]], MA] {
   @inline final def apply(ma: MA): M[A] = leibniz.subst[Id](ma)
 }
 
-trait Unapply_4 {
+sealed trait Unapply_4 {
   // /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
   implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[({type λ[α] = A0})#λ]): Unapply[TC, A0] {
     type M[X] = A0
@@ -85,7 +85,7 @@ trait Unapply_4 {
   }
 }
 
-trait Unapply_3 extends Unapply_4 {
+sealed trait Unapply_3 extends Unapply_4 {
   /**Unpack a value of type `M0[F[_], A0, A0, B0]` into types `[a]M0[F, a, a, B0]` and `A0`, given an instance of `TC` */
   implicit def unapplyMFABC1and2[TC[_[_]], F[_], M0[F[_], _, _, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, α, B0]})#λ]): Unapply[TC, M0[F, A0, A0, B0]] {
     type M[X] = M0[F, X, X, B0]
@@ -109,7 +109,7 @@ trait Unapply_3 extends Unapply_4 {
   }
 }
 
-trait Unapply_2 extends Unapply_3 {
+sealed trait Unapply_2 extends Unapply_3 {
   // Things get tricky with type State[S, A] = StateT[Id, S, A], both unapplyMAB2 and unapplyMFAB2 are applicable
   // Without characterizing this fully, I'm using the standard implicit prioritization to avoid this.
 
@@ -136,7 +136,7 @@ trait Unapply_2 extends Unapply_3 {
   }
 }
 
-trait Unapply_1 extends Unapply_2 {
+sealed trait Unapply_1 extends Unapply_2 {
   /**Unpack a value of type `M0[A0, B0, C0, D0, E0, F0, G0]` into types `[g]M0[A0, B0, C0, D0, E0, F0, g]` and `G0`, given an instance of `TC` */
   implicit def unapplyMABCDEFG7[TC[_[_]], M0[_, _, _, _, _, _, _], A0, B0, C0, D0, E0, F0, G0](implicit TC0: TC[({type λ[α] = M0[A0, B0, C0, D0, E0, F0, α]})#λ]): Unapply[TC, M0[A0, B0, C0, D0, E0, F0, G0]] {
     type M[X] = M0[A0, B0, C0, D0, E0, F0, X]
@@ -193,7 +193,7 @@ trait Unapply_1 extends Unapply_2 {
   }
 }
 
-trait Unapply_0 extends Unapply_1 {
+sealed trait Unapply_0 extends Unapply_1 {
   /** Unpack a value of type `M0[F0, A0]` where `F0: * -> *` into
     * types `[a]M0[F0, a]` and `A`, given an instance of `TC`
     */
@@ -266,7 +266,7 @@ trait Unapply2[TC[_[_, _]], MAB] {
   @inline final def apply(ma: MAB): M[A, B] = leibniz.subst[Id](ma)
 }
 
-trait Unapply2_0 {
+sealed trait Unapply2_0 {
   /**Unpack a value of type `M0[F[_], A0, B0]` into types `[a, b]=M0[F, a, b]`, `A0`, and 'B9', given an instance of `TC` */
   implicit def unapplyMFAB[TC[_[_, _]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[({type λ[α, β] = M0[F, α, β]})#λ]): Unapply2[TC, M0[F, A0, B0]] {
     type M[X, Y] = M0[F, X, Y]
@@ -307,12 +307,12 @@ trait Unapply21[TC[_[_, _], _], MAB]{
 }
 
 object Unapply21 {
-  implicit def unapply210MFABC[TC[_[_, _], _], F[+_,+_], M0[_[+_], _, _], A0, B0, C](implicit TC0: TC[({type f[a, b] = M0[({type m[+x] = F[a, x]})#m, C, b]})#f, A0]): Unapply21[TC, M0[({type f[+x] = F[A0, x]})#f, C, B0]]{
-    type M[X, Y] = M0[({type f[+a] = F[X, a]})#f, C, Y]
+  implicit def unapply210MFABC[TC[_[_, _], _], F[_,_], M0[_[_], _, _], A0, B0, C](implicit TC0: TC[({type f[a, b] = M0[({type m[x] = F[a, x]})#m, C, b]})#f, A0]): Unapply21[TC, M0[({type f[x] = F[A0, x]})#f, C, B0]]{
+    type M[X, Y] = M0[({type f[a] = F[X, a]})#f, C, Y]
     type A = A0
     type B = B0
-  } = new Unapply21[TC, M0[({type f[+x] = F[A0, x]})#f, C, B0]]{
-    type M[X, Y] = M0[({type f[+a] = F[X, a]})#f, C, Y]
+  } = new Unapply21[TC, M0[({type f[x] = F[A0, x]})#f, C, B0]]{
+    type M[X, Y] = M0[({type f[a] = F[X, a]})#f, C, Y]
     type A = A0
     type B = B0
 
@@ -358,156 +358,3 @@ object UnapplyProduct {
     def _2(mb: MB0) = iso.from(U2(mb))
   }
 }
-
-/** Unapply a covariant type constructor, maintaining the covariance */
-trait UnapplyCo[TC[_[_]], MA] {
-
-  /** The type constructor */
-  type M[+_]
-
-  /** The type that `M` was applied to */
-  type A
-
-  /** The instance of the type class */
-  def TC: TC[M]
-
-  /** Evidence that MA =:= M[A] */
-  def leibniz: MA === M[A]
-
-  /** Compatibility. */
-  @inline final def apply(ma: MA): M[A] = leibniz.subst[Id](ma)
-}
-
-trait UnapplyCo_3 {
-  /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
-  implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[({type λ[α] = A0})#λ]): UnapplyCo[TC, A0] {
-    type M[+X] = A0
-    type A = A0
-  } = new UnapplyCo[TC, A0] {
-    type M[+X] = A0
-    type A = A0
-    def TC = TC0
-    def leibniz = refl
-  }
-}
-
-trait UnapplyCo_2 extends UnapplyCo_3 {
-  /**Unpack a value of type `M0[F[+_], A0, B0]` into types `[a]M0[F, a, B0]` and `A0`, given an instance of `TC` */
-  implicit def unapplyMFAB1[TC[_[_]], F[+_], M0[F[+_], +_, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[F, α, B0]})#λ]): UnapplyCo[TC, M0[F, A0, B0]] {
-    type M[+X] = M0[F, X, B0]
-    type A = A0
-  } = new UnapplyCo[TC, M0[F, A0, B0]] {
-    type M[+X] = M0[F, X, B0]
-    type A = A0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[F[+_], A0, B0]` into types `[b]M0[F, A0, b]` and `B0`, given an instance of `TC` */
-  implicit def unapplyMFAB2[TC[_[_]], F[+_], M0[F[+_], _, +_], A0, B0](implicit TC0: TC[({type λ[β] = M0[F, A0, β]})#λ]): UnapplyCo[TC, M0[F, A0, B0]] {
-    type M[+X] = M0[F, A0, X]
-    type A = B0
-  } = new UnapplyCo[TC, M0[F, A0, B0]] {
-    type M[+X] = M0[F, A0, X]
-    type A = B0
-    def TC = TC0
-    def leibniz = refl
-  }
-}
-
-trait UnapplyCo_1 extends UnapplyCo_2 {
-  /**Unpack a value of type `M0[A0, B0, C0, D0, E0, F0, G0]` into types `[g]M0[A0, B0, C0, D0, E0, F0, g]` and `G0`, given an instance of `TC` */
-  implicit def unapplyMABCDEFG7[TC[_[_]], M0[_, _, _, _, _, _, +_], A0, B0, C0, D0, E0, F0, G0](implicit TC0: TC[({type λ[α] = M0[A0, B0, C0, D0, E0, F0, α]})#λ]): UnapplyCo[TC, M0[A0, B0, C0, D0, E0, F0, G0]] {
-    type M[+X] = M0[A0, B0, C0, D0, E0, F0, X]
-    type A = G0
-  } = new UnapplyCo[TC, M0[A0, B0, C0, D0, E0, F0, G0]] {
-    type M[+X] = M0[A0, B0, C0, D0, E0, F0, X]
-    type A = G0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[A0, B0, C0, D0, E0, F0]` into types `[f]M0[A0, B0, C0, D0, E0, f]` and `F0`, given an instance of `TC` */
-  implicit def unapplyMABCDEF6[TC[_[_]], M0[_, _, _, _, _, +_], A0, B0, C0, D0, E0, F0](implicit TC0: TC[({type λ[α] = M0[A0, B0, C0, D0, E0, α]})#λ]): UnapplyCo[TC, M0[A0, B0, C0, D0, E0, F0]] {
-    type M[+X] = M0[A0, B0, C0, D0, E0, X]
-    type A = F0
-  } = new UnapplyCo[TC, M0[A0, B0, C0, D0, E0, F0]] {
-    type M[+X] = M0[A0, B0, C0, D0, E0, X]
-    type A = F0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[A0, B0, C0, D0, E0]` into types `[e]M0[A0, B0, C0, D0, e]` and `E0`, given an instance of `TC` */
-  implicit def unapplyMABCDE5[TC[_[_]], M0[_, _, _, _, +_], A0, B0, C0, D0, E0](implicit TC0: TC[({type λ[α] = M0[A0, B0, C0, D0, α]})#λ]): UnapplyCo[TC, M0[A0, B0, C0, D0, E0]] {
-    type M[+X] = M0[A0, B0, C0, D0, X]
-    type A = E0
-  } = new UnapplyCo[TC, M0[A0, B0, C0, D0, E0]] {
-    type M[+X] = M0[A0, B0, C0, D0, X]
-    type A = E0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[A0, B0, C0, D0]` into types `[d]M0[A0, B0, C0, d]` and `D0`, given an instance of `TC` */
-  implicit def unapplyMABCD4[TC[_[_]], M0[_, _, _, +_], A0, B0, C0, D0](implicit TC0: TC[({type λ[α] = M0[A0, B0, C0, α]})#λ]): UnapplyCo[TC, M0[A0, B0, C0, D0]] {
-    type M[+X] = M0[A0, B0, C0, X]
-    type A = D0
-  } = new UnapplyCo[TC, M0[A0, B0, C0, D0]] {
-    type M[+X] = M0[A0, B0, C0, X]
-    type A = D0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[A0, B0, C0]` into types `[c]M0[A0, B0, c]` and `C0`, given an instance of `TC` */
-  implicit def unapplyMABC3[TC[_[_]], M0[_, _, +_], A0, B0, C0](implicit TC0: TC[({type λ[α] = M0[A0, B0, α]})#λ]): UnapplyCo[TC, M0[A0, B0, C0]] {
-    type M[+X] = M0[A0, B0, X]
-    type A = C0
-  } = new UnapplyCo[TC, M0[A0, B0, C0]] {
-    type M[+X] = M0[A0, B0, X]
-    type A = C0
-    def TC = TC0
-    def leibniz = refl
-  }
-}
-
-trait UnapplyCo_0 extends UnapplyCo_1 {
-  /**Unpack a value of type `M0[A0, B0]` into types `[a]M0[a, B0]` and `A`, given an instance of `TC` */
-  implicit def unapplyMAB1[TC[_[_]], M0[+_, _], A0, B0](implicit TC0: TC[({type λ[α] = M0[α, B0]})#λ]): UnapplyCo[TC, M0[A0, B0]] {
-    type M[+X] = M0[X, B0]
-    type A = A0
-  } = new UnapplyCo[TC, M0[A0, B0]] {
-    type M[+X] = M0[X, B0]
-    type A = A0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  /**Unpack a value of type `M0[A0, B0]` into types `[b]M0[A0, b]` and `B`, given an instance of `TC` */
-  implicit def unapplyMAB2[TC[_[_]], M0[_, +_], A0, B0](implicit TC0: TC[({type λ[α] = M0[A0, α]})#λ]): UnapplyCo[TC, M0[A0, B0]] {
-    type M[+X] = M0[A0, X]
-    type A = B0
-  } = new UnapplyCo[TC, M0[A0, B0]] {
-    type M[+X] = M0[A0, X]
-    type A = B0
-    def TC = TC0
-    def leibniz = refl
-  }
-}
-
-object UnapplyCo extends UnapplyCo_0 {
-  /** Unpack a value of type `M0[A0]` into types `M0` and `A0`, given a instance of `TC` */
-  implicit def unapplyMA[TC[_[_]], M0[+_], A0](implicit TC0: TC[M0]): UnapplyCo[TC, M0[A0]] {
-    type M[+X] = M0[X]
-    type A = A0
-  } = new UnapplyCo[TC, M0[A0]] {
-    type M[+X] = M0[X]
-    type A = A0
-    def TC = TC0
-    def leibniz = refl
-  }
-
-  // TODO More!
-}
-

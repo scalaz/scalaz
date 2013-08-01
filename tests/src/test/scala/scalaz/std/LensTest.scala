@@ -6,7 +6,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.{Gen, Arbitrary}
 import Lens.{lens => _, _}
-import Id._
 
 class LensTest extends Spec {
 

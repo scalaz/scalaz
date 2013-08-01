@@ -3,7 +3,7 @@ package scalaz
 import org.specs2.matcher._
 import org.specs2.mutable.FragmentsBuilder
 import org.specs2.data.NoTuplesToSeq
-import org.specs2.specification.{Example, Fragments, BaseSpecification, SpecificationStructure}
+import org.specs2.specification.BaseSpecification
 import org.specs2.main.{ArgumentsShortcuts, ArgumentsArgs}
 import org.scalacheck.{Gen, Arbitrary, Prop, Properties}
 

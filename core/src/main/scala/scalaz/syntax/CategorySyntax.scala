@@ -2,14 +2,14 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Category` */
-trait CategoryOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class CategoryOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Category[F]
   ////
 
   ////
 }
 
-trait ToCategoryOps0 {
+sealed trait ToCategoryOps0 {
     implicit def ToCategoryOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
       new CategoryOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Category[F0.M] = F0.TC }
   

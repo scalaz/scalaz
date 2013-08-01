@@ -4,7 +4,6 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import Tags._
 import org.scalacheck.{Gen, Arbitrary}
 

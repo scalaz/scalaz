@@ -1,17 +1,17 @@
 package scalaz
 package concurrent
 
-import scalaz._
-import Scalaz._
 import scala.annotation.tailrec
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import scala.collection.immutable.SortedMap
+
+import java.util.concurrent.locks.ReentrantReadWriteLock
+
+import scalaz.syntax.either._
 
 trait Timeout
 object Timeout extends Timeout
 
 case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
-  import Timer._
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
   private[this] val futureNondeterminism = Nondeterminism[Future]
   private[this] val taskNondeterminism = Nondeterminism[Task]
@@ -51,7 +51,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   private[this] def expireFutures(futures: SortedMap[Long, List[() => Unit]]) {
     futures.foreach(vector => vector._2.foreach(call => call()))
   }
-  
+
   def stop(expireImmediately: Boolean = false) {
     withWrite{
       continueRunning = false
@@ -81,7 +81,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   }
 
   private[this] def alignTimeResolution(time: Long): Long = time / timeoutTickMs * timeoutTickMs
-  
+
   def valueWait[T](value: T, waitMs: Long): Future[T] = {
     withRead{
       if (continueRunning) {
@@ -109,3 +109,6 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   }
 }
 
+object Timer {
+  lazy val default = Timer()
+}

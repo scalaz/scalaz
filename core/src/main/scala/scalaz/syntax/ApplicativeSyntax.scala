@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Applicative` */
-trait ApplicativeOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class ApplicativeOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Applicative[F]
   ////
   final def unlessM(cond: Boolean): F[Unit] = scalaz.std.boolean.unlessM(cond)(self)
@@ -15,7 +15,7 @@ trait ApplicativeOps[F[_],A] extends Ops[F[A]] {
   ////
 }
 
-trait ToApplicativeOps0 {
+sealed trait ToApplicativeOps0 {
   implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
     new ApplicativeOps[F0.M,F0.A] { def self = F0(v); implicit def F: Applicative[F0.M] = F0.TC }
 

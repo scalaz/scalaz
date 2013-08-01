@@ -10,7 +10,7 @@ import annotation.tailrec
  * this is controlled by the provided `strategy`.
  *
  * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
- * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
+ * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
  *
  * @see scalaz.concurrent.Promise
  *
@@ -56,6 +56,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
     val t = tail.get
     val n = batchHandle(t, 1024)
     if (n ne t) {
+      n.a = null.asInstanceOf[A]
       tail.lazySet(n)
       schedule()
     } else {
@@ -78,12 +79,12 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
   }
 }
 
-private class Node[A](val a: A = null.asInstanceOf[A]) extends AtomicReference[Node[A]]
+private class Node[A](var a: A = null.asInstanceOf[A]) extends AtomicReference[Node[A]]
 
 object Actor extends ActorFunctions with ActorInstances
 
 trait ActorInstances {
-  implicit def actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
+  implicit val actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
     def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
   }
 }

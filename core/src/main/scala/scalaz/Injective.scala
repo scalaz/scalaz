@@ -1,5 +1,7 @@
 package scalaz
 
+import collection.immutable.IndexedSeq
+
 /** Given Injective[Foo]: If type Foo[A] = Foo[B] then A ~ B
   *
   * This represents an assertion that is used by other code that requires this condition.

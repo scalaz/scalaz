@@ -16,12 +16,16 @@ import sbtrelease.Utilities._
 
 import com.typesafe.sbt.pgp.PgpKeys._
 
-import com.typesafe.sbtosgi.OsgiPlugin._
+import com.typesafe.sbt.osgi.OsgiKeys
+import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.Plugin._
 
+import sbtunidoc.Plugin._
+import sbtunidoc.Plugin.UnidocKeys._
+
 object build extends Build {
-  type Sett = Project.Setting[_]
+  type Sett = Def.Setting[_]
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -42,8 +46,8 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.1",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
+    scalaVersion := "2.10.2",
+    crossScalaVersions := Seq("2.9.3", "2.10.2"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -75,6 +79,10 @@ object build extends Build {
             val typeClassSource0 = typeclassSource(tc)
             typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
         }
+    },
+    checkGenTypeClasses <<= genTypeClasses.map{ classes =>
+      if(classes.exists(_._1 != FileStatus.NoChange))
+        sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
     },
     typeClasses := Seq(),
     genToSyntax <<= typeClasses map {
@@ -158,9 +166,9 @@ object build extends Build {
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
-    settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
+    settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
-      Unidoc.unidocExclude += "typelevel",
+      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
       publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
@@ -174,6 +182,13 @@ object build extends Build {
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
+      },
+      libraryDependencies <++= scalaVersion{ v =>
+        if((v startsWith "2.9") || (v startsWith "2.10")) Seq()
+        else Seq(
+          "org.scala-lang" % "scala-parser-combinators" % v,
+          "org.scala-lang" % "scala-xml" % v
+        )
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -298,7 +313,7 @@ object build extends Build {
     }
   }
 
-  lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
+  lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 
@@ -307,6 +322,8 @@ object build extends Build {
   lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+
+  lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
 
   def generateTupleW(outputDir: File) = {
     val arities = 2 to 12
@@ -365,7 +382,7 @@ object build extends Build {
       (pimp, conv)
     }
 
-    val source = "package scalaz\npackage syntax\npackage std\n\n" +
+    val source = "package scalaz\npackage syntax\npackage std\n\nimport collection.immutable.IndexedSeq\n\n" +
       tuples.map(_._1).mkString("\n") +
       "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +

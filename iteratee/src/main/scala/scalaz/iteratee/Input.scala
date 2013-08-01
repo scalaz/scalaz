@@ -83,7 +83,7 @@ trait InputInstances {
   import Input._
 
   implicit val input = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {
-     def length[A](fa: Input[A]): Int = fa.fold(
+     override def length[A](fa: Input[A]): Int = fa.fold(
        empty = 0
        , el = _ => 1
        , eof = 0

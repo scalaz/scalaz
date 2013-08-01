@@ -1,25 +1,20 @@
 package scalaz
 
+import TreeLoc._
+
 /**
  * A rose-tree zipper. Represents a [[scalaz.Tree]] together with a position in that tree.
  * Provides navigation, persistent update, insertion, and deletes.
+ *
+ * @param tree The currently selected node.
+ * @param lefts The left siblings of the current node.
+ * @param rights The right siblings of the current node.
+ * @param parents The parent contexts of the current node.
  */
-sealed trait TreeLoc[A] {
+final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
+                            rights: TreeForest[A], parents: Parents[A]) {
 
-  import TreeLoc._
   import Tree._
-
-  /** The currently selected node. */
-  val tree: Tree[A]
-
-  /** The left siblings of the current node. */
-  val lefts: TreeForest[A]
-
-  /** The right siblings of the current node. */
-  val rights: TreeForest[A]
-
-  /** The parent contexts of the current node. */
-  val parents: Parents[A]
 
   /** Select the parent of the current node. */
   def parent: Option[TreeLoc[A]] = parents match {
@@ -76,7 +71,7 @@ sealed trait TreeLoc[A] {
 
   /**Select the first descendant node of the current node that satisfies the given predicate. */
   def find(p: TreeLoc[A] => Boolean): Option[TreeLoc[A]] =
-    Cojoin[TreeLoc].cojoin(this).tree.flatten.find(p)
+    Cobind[TreeLoc].cojoin(this).tree.flatten.find(p)
 
   /** Get the entire tree represented by this zipper. */
   def toTree: Tree[A] = root.tree
@@ -157,7 +152,6 @@ sealed trait TreeLoc[A] {
   }
 
   def cojoin: TreeLoc[TreeLoc[A]] = {
-    import std.stream.{streamInstance, streamMonoid}
 
     val lft = (_: TreeLoc[A]).left
     val rgt = (_: TreeLoc[A]).right
@@ -192,19 +186,18 @@ sealed trait TreeLoc[A] {
     }
 }
 
-object TreeLoc extends TreeLocFunctions with TreeLocInstances {
-  def apply[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
-    loc(t, l, r, p)
-}
+object TreeLoc extends TreeLocInstances with TreeLocFunctions
 
-trait TreeLocInstances {
+sealed abstract class TreeLocInstances {
   // TODO more instances
-  implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] with Cobind.FromCojoin[TreeLoc] {
+  implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] {
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
     def map[A, B](fa: TreeLoc[A])(f: A => B): TreeLoc[B] = fa map f
 
-    def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = a.cojoin
+    def cobind[A, B](fa: TreeLoc[A])(f: TreeLoc[A] => B): TreeLoc[B] = map(cojoin(fa))(f)
+
+    override def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = a.cojoin
   }
 
   implicit def treeLocEqual[A](implicit A: Equal[A]): Equal[TreeLoc[A]] = Equal[Tree[A]].contramap((_: TreeLoc[A]).toTree)
@@ -221,12 +214,7 @@ trait TreeLocFunctions {
   Stream[Parent[A]]
 
   def loc[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
-    new TreeLoc[A] {
-      val tree = t
-      val lefts = l
-      val rights = r
-      val parents = p
-    }
+    TreeLoc(t, l, r, p)
 
   def fromForest[A](ts: TreeForest[A]) = ts match {
     case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Split` */
-trait SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
+sealed abstract class SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
   implicit def F: Split[F]
   ////
   final def -*-[C, D](k: F[C, D]): F[(A, C), (B, D)] =
@@ -10,13 +10,13 @@ trait SplitOps[F[_, _],A, B] extends Ops[F[A, B]] {
   ////
 }
 
-trait ToSplitOps0 {
+sealed trait ToSplitOps0 {
     implicit def ToSplitOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Split, FA]) =
       new SplitOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Split[F0.M] = F0.TC }
   
 }
 
-trait ToSplitOps extends ToSplitOps0 with ToCategoryOps {
+trait ToSplitOps extends ToSplitOps0 with ToComposeOps {
   
   implicit def ToSplitOps[F[_, _],A, B](v: F[A, B])(implicit F0: Split[F]) =
       new SplitOps[F,A, B] { def self = v; implicit def F: Split[F] = F0 }

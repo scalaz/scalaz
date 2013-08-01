@@ -5,6 +5,10 @@ trait MonadTrans[F[_[_], _]] {
   /** A component of `Applicative.point` for the transformer stack. */
   def liftM[G[_] : Monad, A](a: G[A]): F[G, A]
 
+  /** A version of `liftM` that infers the type constructor `G`. */
+  final def liftMU[GA](a: GA)(implicit G: Unapply[Monad, GA]): F[G.M, G.A] =
+    liftM[G.M, G.A](G(a))(G.TC)
+
   /** The [[scalaz.Monad]] implied by this transformer. */
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = F[G, α]})#λ]
 }
@@ -48,7 +52,7 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
     }
 }
 
-trait MonadPartialOrderFunctions1 {
+sealed trait MonadPartialOrderFunctions1 {
   implicit def transitive[G[_], F[_], E[_]](implicit e1: MonadPartialOrder[G, F], e2: MonadPartialOrder[F, E]): MonadPartialOrder[G, E] = 
      e2 compose e1
 }

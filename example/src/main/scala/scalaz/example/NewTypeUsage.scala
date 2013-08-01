@@ -16,8 +16,8 @@ object NewTypeUsage extends App {
   val bools = List(true, false)
 
   val boolDisjunctions: List[Boolean @@ Disjunction] = Tag.subst(bools)
-  assert(listInstance.foldMapIdentity(boolDisjunctions))
+  assert(listInstance.fold(boolDisjunctions))
   
   val boolConjunctions: List[Boolean @@ Conjunction] = Tag.subst(bools)
-  assert(!listInstance.foldMapIdentity(boolConjunctions))
+  assert(!listInstance.fold(boolConjunctions))
 }

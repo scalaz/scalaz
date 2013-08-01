@@ -2,12 +2,15 @@ package scalaz
 
 import std.AllInstances._
 import syntax.foldable._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
 import org.specs2.matcher._
 
 class FoldableTest extends Spec with OptionMatchers {
+  "to" ! prop {
+    (xs: List[Int]) =>
+      val v: Vector[Int] = Foldable[List].to[Int, Vector](xs)
+      v.toList must_== xs
+  }
   "maximum" ! prop {
     (xs: List[Int]) =>
       if (xs.isEmpty)
@@ -106,4 +109,16 @@ class FoldableTest extends Spec with OptionMatchers {
 
   }
 
+  private val L = Foldable[List]
+
+  "product foldRight equivalence" ! prop {
+    (l: List[Int], l2: List[Int]) =>
+      L.product(L).foldRight((l, l2), List.empty[Int])(_ :: _) must be_===(l ++ l2)
+  }
+
+  "product foldLeft equivalence" ! prop {
+    (l: List[Int], l2: List[Int]) =>
+      (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
+       must be_===((l ++ l2).reverse))
+  }
 }

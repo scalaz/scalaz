@@ -2,7 +2,6 @@ package scalaz
 
 import scalacheck.ScalazArbitrary._
 import scalacheck.ScalazProperties._
-import std.AllInstances._
 
 class InsertionMapTest extends Spec {
   checkAll(equal.laws[InsertionMap[Int, String]])

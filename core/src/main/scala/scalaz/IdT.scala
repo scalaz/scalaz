@@ -18,7 +18,6 @@ final case class IdT[F[_], A](run: F[A]) {
   }
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] = {
-    import std.option._
     G.map(F.traverse(run)(f))(IdT(_))
   }
 
@@ -27,19 +26,19 @@ final case class IdT[F[_], A](run: F[A]) {
   )
 }
 
-trait IdTInstances3 {
+sealed abstract class IdTInstances3 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = IdT[F, α]})#λ] = new IdTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
 }
 
-trait IdTInstances2 extends IdTInstances3 {
+sealed abstract class IdTInstances2 extends IdTInstances3 {
   implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[({type λ[α] = IdT[F, α]})#λ] = new IdTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
-trait IdTInstances1 extends IdTInstances2 {
+sealed abstract class IdTInstances1 extends IdTInstances2 {
   implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = IdT[F, α]})#λ] = new IdTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }
@@ -49,14 +48,14 @@ trait IdTInstances1 extends IdTInstances2 {
   }
 }
 
-trait IdTInstances0 extends IdTInstances1 {
+sealed abstract class IdTInstances0 extends IdTInstances1 {
   implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IdT[F, α]})#λ] = new IdTMonad[F] {
     implicit def F: Monad[F] = F0
   }
 }
 
-trait IdTInstances extends IdTInstances0 {
-  implicit def idTHoist: Hoist[IdT] = IdTHoist
+sealed abstract class IdTInstances extends IdTInstances0 {
+  implicit val idTHoist: Hoist[IdT] = IdTHoist
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = IdT[F, α]})#λ] = new IdTTraverse[F] {
     implicit def F: Traverse[F] = F0
@@ -66,7 +65,7 @@ trait IdTInstances extends IdTInstances0 {
 trait IdTFunctions {
 }
 
-object IdT extends IdTFunctions with IdTInstances 
+object IdT extends IdTInstances with IdTFunctions 
 
 //
 // Implementation traits for type class instances

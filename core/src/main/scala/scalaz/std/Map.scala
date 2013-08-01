@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait MapInstances0 {
+sealed trait MapInstances0 {
   private[std] trait MapEqual[K, V] extends Equal[Map[K, V]] {
     implicit def OK: Order[K]
     implicit def OV: Equal[V]

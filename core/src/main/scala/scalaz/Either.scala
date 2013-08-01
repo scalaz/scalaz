@@ -3,9 +3,8 @@ package scalaz
 /**
  * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
  */
-sealed trait \/[+A, +B] {
-  sealed trait SwitchingDisjunction[X] {
-    def r: X
+sealed abstract class \/[+A, +B] extends Product with Serializable {
+  final class SwitchingDisjunction[X](r: => X) {
     def <<?:(left: => X): X =
       \/.this match {
         case -\/(_) => left
@@ -15,9 +14,7 @@ sealed trait \/[+A, +B] {
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
-    new SwitchingDisjunction[X] {
-      def r = right
-    }
+    new SwitchingDisjunction[X](right)
 
   /** Return `true` if this disjunction is left. */
   def isLeft: Boolean =
@@ -92,7 +89,7 @@ sealed trait \/[+A, +B] {
   /** Traverse on the right of this disjunction. */
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
     this match {
-      case -\/(a) => Applicative[F].point(-\/(a))
+      case a @ -\/(_) => Applicative[F].point(a)
       case \/-(b) => Functor[F].map(g(b))(\/-(_))
     }
 
@@ -107,7 +104,7 @@ sealed trait \/[+A, +B] {
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
     this match {
-      case -\/(a) => -\/(a)
+      case a @ -\/(_) => a
       case \/-(b) => g(b)
     }
 
@@ -121,8 +118,8 @@ sealed trait \/[+A, +B] {
   /** Filter on the right of this disjunction. */
   def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA]): (AA \/ B) =
     this match {
-      case -\/(a) => -\/(a)
-      case \/-(b) => if(p(b)) \/-(b) else -\/(M.zero)
+      case -\/(_) => this
+      case \/-(b) => if(p(b)) this else -\/(M.zero)
     }
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
@@ -206,10 +203,10 @@ sealed trait \/[+A, +B] {
     this match {
       case -\/(a1) => x match {
         case -\/(a2) => -\/(M2.append(a1, a2))
-        case \/-(b2) => -\/(a1)
+        case \/-(_) => this
       }
       case \/-(b1) => x match {
-        case -\/(a2) => -\/(a2)
+        case -\/(_) => x
         case \/-(b2) => \/-(M1.append(b1, b2))
       }
     }
@@ -270,8 +267,8 @@ sealed trait \/[+A, +B] {
 
 
 }
-case class -\/[+A](a: A) extends (A \/ Nothing)
-case class \/-[+B](b: B) extends (Nothing \/ B)
+final case class -\/[+A](a: A) extends (A \/ Nothing)
+final case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
@@ -299,13 +296,13 @@ object \/ extends DisjunctionInstances with DisjunctionFunctions {
 
 }
 
-trait DisjunctionInstances extends DisjunctionInstances0 {
+sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
   /** Turns out that Either is just a glorified tuple; who knew? */
   type GlorifiedTuple[+A, +B] =
   A \/ B
 }
 
-trait DisjunctionInstances0 extends DisjunctionInstances1 {
+sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
@@ -321,7 +318,7 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
     }
 }
 
-trait DisjunctionInstances1 extends DisjunctionInstances2 {
+sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
@@ -338,8 +335,8 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
     }
 }
 
-trait DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] {
+sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
+  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] {
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
@@ -354,21 +351,26 @@ trait DisjunctionInstances2 extends DisjunctionInstances3 {
 
     def cozip[A, B](x: L \/ (A \/ B)) =
       x match {
-        case -\/(l) => -\/(-\/(l))
+        case l @ -\/(_) => -\/(l)
         case \/-(e) => e match {
           case -\/(a) => -\/(\/-(a))
-          case \/-(b) => \/-(\/-(b))
+          case b @ \/-(_) => \/-(b)
         }
       }
 
     def plus[A](a: L \/ A, b: => L \/ A) =
       a orElse b
+
+    def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
+      case l@ -\/(_) => -\/(l)
+      case r@ \/-(_) => r
+    }
   }
 
 }
 
-trait DisjunctionInstances3 {
-  implicit def DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+sealed abstract class DisjunctionInstances3 {
+  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
@@ -395,6 +397,6 @@ trait DisjunctionFunctions {
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     right(a)
   } catch {
-    case e => left(e)
+    case e: Throwable => left(e)
   }
 }

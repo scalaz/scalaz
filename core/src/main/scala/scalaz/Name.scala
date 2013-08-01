@@ -11,20 +11,21 @@ sealed abstract class Need[+A] extends Name[A]
 /** Call by value */
 final case class Value[+A](value: A) extends Need[A]
 
-object Name { 
+object Name {
   def apply[A](a: => A) = new Name[A] {
     def value = a
   }
   def unapply[A](v: Name[A]): Option[A] = Some(v.value)
 
-  implicit val name = new Monad[Name] with Comonad[Name] with Cobind.FromCojoin[Name] with Distributive[Name] {
+  implicit val name = new Monad[Name] with Comonad[Name] with Distributive[Name] {
     def point[A](a: => A) = Name(a)
 
     override def map[A, B](fa: Name[A])(f: A => B) = Name(f(fa.value))
     override def ap[A, B](fa: => Name[A])(f: => Name[A => B]) =
       Name(f.value apply fa.value)
     def bind[A,B](v: Name[A])(f: A => Name[B]): Name[B] = Name(f(v.value).value)
-    def cojoin[A](a: Name[A]): Name[Name[A]] = Name(a)
+    def cobind[A, B](fa: Name[A])(f: Name[A] => B): Name[B] = Name(f(fa))
+    override def cojoin[A](a: Name[A]): Name[Name[A]] = Name(a)
     def copoint[A](p: Name[A]): A = p.value
     def distributeImpl[G[_], A, B](fa: G[A])(f: A => Name[B])(implicit G: Functor[G]) =
       Name(G.map(fa)(a => f(a).value))
@@ -35,21 +36,22 @@ object Name {
 }
 
 object Need {
-  def apply[A](a: => A) = {
-    lazy val value0: A = a
+  def apply[A](a: => A): Need[A] = {
     new Need[A] {
+      private[this] lazy val value0: A = a
       def value = value0
     }
   }
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
-  implicit val need = new Monad[Need] with Comonad[Need] with Cobind.FromCojoin[Need] with Distributive[Need] {
+  implicit val need = new Monad[Need] with Comonad[Need] with Distributive[Need] {
     def point[A](a: => A) = Need(a)
     override def map[A, B](fa: Need[A])(f: A => B) = Need(f(fa.value))
     override def ap[A, B](fa: => Need[A])(f: => Need[A => B]) =
       Need(f.value apply fa.value)
     def bind[A, B](v: Need[A])(f: A => Need[B]): Need[B] = Need(f(v.value).value)
-    def cojoin[A](a: Need[A]): Need[Need[A]] = Need(a)
+    def cobind[A, B](fa: Need[A])(f: Need[A] => B): Need[B] = Need(f(fa))
+    override def cojoin[A](a: Need[A]): Need[Need[A]] = Need(a)
     def copoint[A](p: Need[A]): A = p.value
     def distributeImpl[G[_], A, B](fa: G[A])(f: A => Need[B])(implicit G: Functor[G]) =
       Need(G.map(fa)(a => f(a).value))
@@ -60,10 +62,11 @@ object Need {
 }
 
 object Value {
-  implicit val value = new Monad[Value] with Comonad[Value] with Cobind.FromCojoin[Value] with Distributive[Value] {
+  implicit val value = new Monad[Value] with Comonad[Value] with Distributive[Value] {
     def point[A](a: => A) = Value(a)
     def bind[A, B](v: Value[A])(f: A => Value[B]): Value[B] = f(v.value)
-    def cojoin[A](a: Value[A]): Value[Value[A]] = Value(a)
+    def cobind[A, B](fa: Value[A])(f: Value[A] => B): Value[B] = Value(f(fa))
+    override def cojoin[A](a: Value[A]): Value[Value[A]] = Value(a)
     def copoint[A](p: Value[A]): A = p.value
     def distributeImpl[G[_], A, B](fa: G[A])(f: A => Value[B])(implicit G: Functor[G]) =
       Value(G.map(fa)(a => f(a).value))

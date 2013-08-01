@@ -3,12 +3,9 @@ package typelevel
 
 import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
-import org.scalacheck.Arbitrary
 
 class CompositionTest extends Spec {
 
-  import syntax.typelevel.all._
 
   checkAll("Identity composition", applicative.laws[TCNil#Composed])
   checkAll("Identity composition", traverse.laws[TCNil#Composed])

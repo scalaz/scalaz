@@ -2,13 +2,13 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Unzip` */
-trait UnzipOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class UnzipOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Unzip[F]
   ////
   ////
 }
 
-trait ToUnzipOps0 {
+sealed trait ToUnzipOps0 {
   implicit def ToUnzipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Unzip, FA]) =
     new UnzipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Unzip[F0.M] = F0.TC }
 

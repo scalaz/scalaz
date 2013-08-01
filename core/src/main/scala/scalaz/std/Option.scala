@@ -1,18 +1,20 @@
 package scalaz
 package std
 
-trait OptionInstances0 {
+sealed trait OptionInstances0 {
   implicit def optionEqual[A](implicit A0: Equal[A]) = new OptionEqual[A] {
     implicit def A = A0
   }
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Cojoin[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
-    def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
+    override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
+    // TODO remove after removal of Index
+    override def indexOr[A](fa: Option[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
+    override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
     override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
       case Some(f) => fa match {
         case Some(x) => Some(f(x))
@@ -49,14 +51,16 @@ trait OptionInstances extends OptionInstances0 {
         case Some((a, b)) => (Some(a), Some(b))
       }
 
-    def isEmpty[A](opt: Option[A]) = opt.isEmpty
-
     def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
       fa map (a => f(Some(a)))
 
-    def cojoin[A](a: Option[A]) =
+    override def cojoin[A](a: Option[A]) =
       a map (Some(_))
 
+    def pextract[B, A](fa: Option[A]): Option[B] \/ A =
+      fa map \/.right getOrElse -\/(None)
+    override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
+    override def toOption[A](fa: Option[A]): Option[A] = fa
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
@@ -92,7 +96,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
+  implicit val optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
     def point[A](a: => A): FirstOption[A] = Tag(Some(a))
     override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
@@ -109,7 +113,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
+  implicit val optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
     def point[A](a: => A): LastOption[A] = Tag(Some(a))
     override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)
@@ -166,12 +170,6 @@ trait OptionFunctions {
 
   /**Alias for `cata` */
   final def fold[A, X](oa: Option[A])(some: A => X, none: => X): X = cata(oa)(some, none)
-
-  final def coflatten[A](oa: Option[A]): Option[Option[A]] =
-    oa map (Some(_))
-
-  final def coflatMap[A, B](oa: Option[A], f: Option[A] => B): Option[B] =
-    oa map (a => f(Some(a)))
 
   final def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] = oa match {
     case Some(a) => Success(a)
