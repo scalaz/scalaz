@@ -981,7 +981,7 @@ object FingerTree extends FingerTreeInstances with FingerTreeFunctions
  *
  * The measure is the count of the preceding elements, provided by `UnitReducer((e: Int) => 1)`.
  */
-sealed trait IndSeq[A] extends Ops[FingerTree[Int, A]] {
+final class IndSeq[A](val self: FingerTree[Int, A]) {
 
   import std.anyVal._
   import IndSeq.indSeq
@@ -1013,9 +1013,7 @@ sealed trait IndSeq[A] extends Ops[FingerTree[Int, A]] {
 }
 
 object IndSeq {
-  private def indSeq[A](v: FingerTree[Int, A]) = new IndSeq[A] {
-    val self = v
-  }
+  private def indSeq[A](v: FingerTree[Int, A]): IndSeq[A] = new IndSeq(v)
 
   import std.anyVal._
 
@@ -1034,7 +1032,7 @@ object IndSeq {
  * operation favours the first argument. Accordingly, the measuer of a node is the
  * item with the highest priority contained recursively below that node.
  */
-sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
+sealed abstract class OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
   import std.function._
   import syntax.order._
   import std.option._

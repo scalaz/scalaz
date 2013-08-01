@@ -146,13 +146,13 @@ object function extends FunctionFunctions with FunctionInstances
 // Type class implementation traits
 //
 
-trait Function1Semigroup[A, R] extends Semigroup[A => R] {
+private[scalaz] trait Function1Semigroup[A, R] extends Semigroup[A => R] {
   implicit def R: Semigroup[R]
 
   def append(f1: A => R, f2: => A => R) = a => R.append(f1(a), f2(a))
 }
 
-trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
+private[scalaz] trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
   implicit def R: Monoid[R]
   def zero = a => R.zero
 }
