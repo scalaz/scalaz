@@ -237,6 +237,7 @@ object ScalazProperties {
         property("purity.stream") = purity[F, Stream, Int]
 
         property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+        // TODO naturality, parallelFusion
       }
   }
 
@@ -375,6 +376,7 @@ object ScalazProperties {
         import std.list._, std.option._, std.stream._, std.anyVal._
 
         property("sequential fusion (1)") = sequentialFusion1[F, Option, List, Int, Int, Int]
+        // TODO naturality1, parallelFusion1
       }
   }
 
