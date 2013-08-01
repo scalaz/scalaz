@@ -309,6 +309,20 @@ object ScalazProperties {
     }
   }
 
+  object foldable {
+    def leftFMConsistent[F[_], A](implicit F: Foldable[F], afa: Arbitrary[F[A]], ea: Equal[A]) =
+      forAll(F.foldableLaw.leftFMConsistent[A] _)
+
+    def rightFMConsistent[F[_], A](implicit F: Foldable[F], afa: Arbitrary[F[A]], ea: Equal[A]) =
+      forAll(F.foldableLaw.rightFMConsistent[A] _)
+
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F], EA: Equal[Int]) =
+      new Properties("foldable") {
+        property("consistent left fold") = leftFMConsistent[F, Int]
+        property("consistent right fold") = rightFMConsistent[F, Int]
+      }
+  }
+
   object traverse1 {
     def identityTraverse1[F[_], X, Y](implicit f: Traverse1[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
       forAll(f.traverse1Law.identityTraverse1[X, Y] _)
