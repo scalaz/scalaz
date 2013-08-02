@@ -173,8 +173,8 @@ trait XSources {
             case (_, ']') :: (_, ']') :: (_, '>') :: ds =>
               Return((Nil, ds))
             case (_, d) :: ds =>
-              cdata(ds) map {
-                case (xs, ys) => (d::xs, ys)
+              Suspend(() => cdata(ds)) map {
+                case (xs, ys) => (d :: xs, ys)
               }
             case Nil =>
               Return((Nil, Nil))
