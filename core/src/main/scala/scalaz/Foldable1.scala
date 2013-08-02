@@ -92,7 +92,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   trait Foldable1Law extends FoldableLaw {
     import scalaz.Id._
     type Pair[A] = (A, A)
-    private[this] implicit def pfunc: Functor[Pair] = // probably not val-safe
+    private[this] implicit lazy val pfunc: Functor[Pair] = // probably not eager-val-safe
       Functor[Id].product[Id]
 
     /** In a left-fold, the accumulator is always on the left. */
