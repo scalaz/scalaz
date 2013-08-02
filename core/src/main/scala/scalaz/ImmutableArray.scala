@@ -12,7 +12,7 @@ import syntax.Ops
  *
  * @tparam A type of the elements of the array
  */
-trait ImmutableArray[+A] {
+sealed abstract class ImmutableArray[+A] {
   protected[this] def elemManifest: ClassManifest[A]
 
   def apply(index: Int): A

@@ -12,9 +12,7 @@ package scalaz
 final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   import OptionT._
 
-  sealed trait Switching_\/[X] {
-    def r: X
-
+  final class Switching_\/[X](r: => X) {
     def <<?:(left: => X)(implicit F: Functor[F]): F[X] =
       F.map(EitherT.this.run){
         case -\/(_) => left
@@ -24,9 +22,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](right: => X): Switching_\/[X] =
-    new Switching_\/[X] {
-      def r = right
-    }
+    new Switching_\/(right)
 
   def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
     F.map(run)(_.fold(l, r))

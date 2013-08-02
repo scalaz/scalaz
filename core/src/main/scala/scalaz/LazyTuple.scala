@@ -1,14 +1,14 @@
 package scalaz
 
 /** [[scala.Tuple2]], but with values by name. */
-sealed trait LazyTuple2[A, B] {
+sealed abstract class LazyTuple2[A, B] {
   def _1: A
 
   def _2: B
 }
 
 /** [[scala.Tuple3]], but with values by name. */
-sealed trait LazyTuple3[A, B, C] {
+sealed abstract class LazyTuple3[A, B, C] {
   def _1: A
 
   def _2: B
@@ -17,7 +17,7 @@ sealed trait LazyTuple3[A, B, C] {
 }
 
 /** [[scala.Tuple4]], but with values by name. */
-sealed trait LazyTuple4[A, B, C, D] {
+sealed abstract class LazyTuple4[A, B, C, D] {
   def _1: A
 
   def _2: B
