@@ -29,11 +29,9 @@ package scalaz
  * @tparam E The type of the `Failure`
  * @tparam A The type of the `Success`
  */
-sealed trait Validation[+E, +A] {
+sealed abstract class Validation[+E, +A] extends Product with Serializable {
 
-
-  sealed trait SwitchingValidation[X] {
-    def s: X
+  final class SwitchingValidation[X](s: => X){
     def <<?:(fail: => X): X =
       Validation.this match {
         case Failure(_) => fail
@@ -43,9 +41,7 @@ sealed trait Validation[+E, +A] {
 
   /** If this validation is success, return the given X value, otherwise, return the X value given to the return value. */
   def :?>>[X](success: => X): SwitchingValidation[X] =
-    new SwitchingValidation[X] {
-      def s = success
-    }
+    new SwitchingValidation[X](success)
 
   /** Return `true` if this validation is success. */
   def isSuccess: Boolean = this match {
@@ -337,8 +333,8 @@ sealed trait Validation[+E, +A] {
 
 }
 
-final case class Success[E, A](a: A) extends Validation[E, A]
-final case class Failure[E, A](e: E) extends Validation[E, A]
+final case class Success[A](a: A) extends Validation[Nothing, A]
+final case class Failure[E](e: E) extends Validation[E, Nothing]
 
 object Validation extends ValidationInstances with ValidationFunctions {
 

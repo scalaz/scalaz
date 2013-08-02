@@ -83,9 +83,8 @@ sealed abstract class LazyEither[+A, +B] {
   def ap[AA >: A, C](f: => LazyEither[AA, B => C]): LazyEither[AA, C] =
     f flatMap (k => map(k apply _))
 
-  def left = new LeftProjection[A, B]() {
-    val e = LazyEither.this
-  }
+  def left: LeftProjection[A, B] =
+    new LeftProjection[A, B](this)
 
 }
 
@@ -95,9 +94,7 @@ private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
 object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
-  sealed trait LeftProjection[+A, +B] {
-    def e: LazyEither[A, B]
-
+  final case class LeftProjection[+A, +B](e: LazyEither[A, B]) {
     import LazyOption._
 
     def getOrElse[AA >: A](default: => AA): AA =
@@ -188,7 +185,7 @@ trait LazyEitherFunctions {
    */
   def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
 
-  trait LazyLeftConstruct[B] {
+  sealed abstract class LazyLeftConstruct[B] {
     def apply[A](a: => A): LazyEither[A, B]
   }
 
@@ -196,7 +193,7 @@ trait LazyEitherFunctions {
     def apply[A](a: => A) = LazyLeft(() => a)
   }
 
-  trait LazyRightConstruct[A] {
+  sealed abstract class LazyRightConstruct[A] {
     def apply[B](b: => B): LazyEither[A, B]
   }
 

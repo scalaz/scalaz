@@ -1,7 +1,7 @@
 package scalaz
 
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
-case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S]) {
+final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S]) {
 
   /** Alias for `head`, for compatibility with Scalaz 6 */
   final def extract: A = head

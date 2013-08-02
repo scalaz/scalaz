@@ -12,7 +12,7 @@ import std.indexedSeq.indexedSeqMonoid
  * Very similar to `Rope[Char]`, but with better constant factors and a
  * simpler interface since it's specialized for `String`s.
  */
-sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
+final case class Cord(self: FingerTree[Int, String]) {
 
   import Cord.{stringToCord => _, _}
 
@@ -123,9 +123,7 @@ sealed trait Cord extends syntax.Ops[FingerTree[Int, String]] {
 }
 
 object Cord {
-  private def cord[A](v: FingerTree[Int, String]): Cord = new Cord {
-    val self = v
-  }
+  private def cord[A](v: FingerTree[Int, String]): Cord = new Cord(v)
 
   implicit def stringToCord(s: String): Cord = cord(FingerTree.single[Int, String](s))
 
