@@ -206,7 +206,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
         case \/-(_) => this
       }
       case \/-(b1) => x match {
-        case -\/(_) => x
+        case b2 @ -\/(_) => b2
         case \/-(b2) => \/-(M1.append(b1, b2))
       }
     }
