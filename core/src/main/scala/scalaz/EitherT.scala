@@ -211,30 +211,30 @@ object EitherT extends EitherTInstances with EitherTFunctions {
 }
 
 sealed abstract class EitherTInstances1 {
-  implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]) = new EitherTFunctor[F, L] {
+  implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTFunctor[F, L] {
     implicit def F = F0
   }
 }
 
 sealed abstract class EitherTInstances0 extends EitherTInstances1 {
-  implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]) = new EitherTBifunctor[F] {
+  implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBifunctor[F] {
     implicit def F = F0
   }
 
-  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]) = new EitherTMonad[F, L] {
+  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTMonad[F, L] {
     implicit def F = F0
   }
-  implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]) = new EitherTFoldable[F, L] {
+  implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTFoldable[F, L] {
     implicit def F = F0
   }
 }
 
 sealed abstract class EitherTInstances extends EitherTInstances0 {
-  implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]) = new EitherTBitraverse[F] {
+  implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBitraverse[F] {
     implicit def F = F0
   }
 
-  implicit def eitherTTraverse[F[_], L](implicit F0: Traverse[F]) = new EitherTTraverse[F, L] {
+  implicit def eitherTTraverse[F[_], L](implicit F0: Traverse[F]): Traverse[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTTraverse[F, L] {
     implicit def F = F0
   }
 
@@ -246,11 +246,11 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
 trait EitherTFunctions {
   def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
 
-  def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]) = new EitherTMonadTell[F, W, A]{
+  def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]): MonadTell[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] = new EitherTMonadTell[F, W, A]{
     def MT = MT0
   }
 
-  def monadListen[F[_, _], W, A](implicit ML0: MonadListen[F, W]) = new EitherTMonadListen[F, W, A]{
+  def monadListen[F[_, _], W, A](implicit ML0: MonadListen[F, W]): MonadListen[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] = new EitherTMonadListen[F, W, A]{
     def MT = ML0
   }
 }

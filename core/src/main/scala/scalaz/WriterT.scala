@@ -102,115 +102,112 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
 object WriterT extends WriterTInstances with WriterTFunctions
 
 sealed abstract class WriterTInstances12 {
-  implicit def writerFunctor[W]: WriterTFunctor[Id, W] = new WriterTFunctor[Id, W] {
+  implicit def writerFunctor[W]: Functor[({type λ[α]=Writer[W, α]})#λ] = new WriterTFunctor[Id, W] {
     implicit def F = idInstance
   }
 }
 sealed abstract class WriterTInstances11 extends WriterTInstances12 {
-  implicit def writerTFunctor[F[_], W](implicit F0: Functor[F]) = new WriterTFunctor[F, W] {
+  implicit def writerTFunctor[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFunctor[F, W] {
     implicit def F = F0
   }
 }
 
 sealed abstract class WriterTInstances10 extends WriterTInstances11 {
-  implicit def writerApply[W](implicit W0: Semigroup[W]) = new WriterTApply[Id, W] {
+  implicit def writerApply[W](implicit W0: Semigroup[W]): Apply[({type λ[α]=Writer[W, α]})#λ] = new WriterTApply[Id, W] {
     implicit def F = idInstance
     implicit def W = W0
   }
 }
 
 sealed abstract class WriterTInstances9 extends WriterTInstances10 {
-  implicit def writerTApply[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]) = new WriterTApply[F, W] {
+  implicit def writerTApply[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTApply[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
 }
 
 sealed abstract class WriterTInstances8 extends WriterTInstances9 {
-  implicit def writerApplicative[W](implicit W0: Monoid[W]) = new WriterTApplicative[Id, W] {
+  implicit def writerApplicative[W](implicit W0: Monoid[W]): Applicative[({type λ[α]=Writer[W, α]})#λ] = new WriterTApplicative[Id, W] {
     implicit def F = idInstance
     implicit def W = W0
   }
 }
 
 sealed abstract class WriterTInstances7 extends WriterTInstances8 {
-  implicit def writerTApplicative[F[_], W](implicit W0: Monoid[W], F0: Applicative[F]) = new WriterTApplicative[F, W] {
+  implicit def writerTApplicative[F[_], W](implicit W0: Monoid[W], F0: Applicative[F]): Applicative[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTApplicative[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
 }
 
 sealed abstract class WriterTInstances6 extends WriterTInstances7 {
-  implicit def writerMonad[W](implicit W0: Monoid[W]) = new WriterTMonad[Id, W] {
+  implicit def writerMonad[W](implicit W0: Monoid[W]): Monad[({type λ[α]=Writer[W, α]})#λ] = new WriterTMonad[Id, W] {
     implicit def F = idInstance
     implicit def W = W0
   }
 }
 
 sealed trait WriterTInstance5 extends WriterTInstances6 {
-  implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]) = new WriterTMonad[F, W] {
+  implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]): Monad[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTMonad[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
 }
 
 sealed abstract class WriterTInstances4 extends WriterTInstance5 {
-  implicit val writerBifunctor = new WriterTBifunctor[Id] {
+  implicit def writerFoldable[W]: Foldable[({type λ[α]=Writer[W, α]})#λ] = new WriterTFoldable[Id, W] {
     implicit def F = idInstance
   }
-  implicit def writerFoldable[W] = new WriterTFoldable[Id, W] {
-    implicit def F = idInstance
-  }
-  implicit def writerEqual[W, A](implicit E: Equal[(W, A)]) = E.contramap((_: Writer[W, A]).run)
+  implicit def writerEqual[W, A](implicit E: Equal[(W, A)]): Equal[Writer[W, A]] = E.contramap((_: Writer[W, A]).run)
 }
 
 sealed abstract class WriterTInstances3 extends WriterTInstances4 {
-  implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]) = new WriterTBifunctor[F] {
+  implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] = new WriterTBifunctor[F] {
     implicit def F = F0
   }
-  implicit def writerTFoldable[F[_], W](implicit F0: Foldable[F]) = new WriterTFoldable[F, W] {
+  implicit def writerTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFoldable[F, W] {
     implicit def F = F0
   }
-  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: WriterT[F, W, A]).run)
+  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
 }
 
 sealed abstract class WriterTInstances2 extends WriterTInstances3 {
-  implicit def writerComonad[W] = new WriterComonad[W] {
+  implicit def writerComonad[W]: Comonad[({type λ[α]=Writer[W, α]})#λ] = new WriterComonad[W] {
     implicit def F = implicitly
   }
 }
 
 sealed abstract class WriterTInstances1 extends WriterTInstances2 {
-  implicit def writerBitraverse: WriterTBitraverse[Id] = new WriterTBitraverse[Id] {
+  implicit val writerBitraverse: Bitraverse[Writer] = new WriterTBitraverse[Id] {
     implicit def F = idInstance
   }
-  implicit def writerTraverse[W]: WriterTTraverse[Id, W] = new WriterTTraverse[Id, W] {
+  implicit def writerTraverse[W]: Traverse[({type λ[α]=Writer[W, α]})#λ] = new WriterTTraverse[Id, W] {
     implicit def F = idInstance
   }
   @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def writerEach[W]: WriterTEach[Id, W] = new WriterTEach[Id, W] {
+  implicit def writerEach[W]: Each[({type λ[α]=Writer[W, α]})#λ] = new WriterTEach[Id, W] {
     implicit def F = idInstance
   }
 }
 
 sealed abstract class WriterTInstances0 extends WriterTInstances1 {
-  implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]) = new WriterTBitraverse[F] {
+  implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] = new WriterTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]) = new WriterTTraverse[F, W] {
+  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
     implicit def F = F0
   }
   @deprecated("Index is deprecated, use Foldable instead", "7.1")
-  implicit def writerTIndex[W] = new WriterTIndex[W] {
+  implicit def writerIndex[W]: Index[({type λ[α]=Writer[W, α]})#λ] = new WriterIndex[W] {
   }
   @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def writerEach[F[_], W](implicit F0: Each[F]) = new WriterTEach[F, W] {
+  implicit def writerTEach[F[_], W](implicit F0: Each[F]): Each[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTEach[F, W] {
     implicit def F = F0
   }
 }
 
 sealed abstract class WriterTInstances extends WriterTInstances0 {
-  implicit def writerTMonadListen[F[_], W](implicit F0: Monad[F], W0: Monoid[W]) = new WriterMonadListen[F, W] {
+  implicit def writerTMonadListen[F[_], W](implicit F0: Monad[F], W0: Monoid[W]): MonadListen[({type λ[α, β] = WriterT[F, α, β]})#λ, W] = new WriterTMonadListen[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
@@ -268,8 +265,8 @@ private[scalaz] trait WriterTEach[F[_], W] extends Each[({type λ[α]=WriterT[F,
 }
 
 // TODO does Index it make sense for F other than Id?
-private[scalaz] trait WriterTIndex[W] extends Index[({type λ[α]=WriterT[Id, W, α]})#λ] {
-  def index[A](fa: WriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.value) else None
+private[scalaz] trait WriterIndex[W] extends Index[({type λ[α]=Writer[W, α]})#λ] {
+  def index[A](fa: Writer[W, A], i: Int) = if(i == 0) Some(fa.value) else None
 }
 
 private[scalaz] trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] {
@@ -323,7 +320,7 @@ private[scalaz] trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[_], �
   implicit def apply[M[_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
 }
 
-private[scalaz] trait WriterMonadListen[F[_], W] extends MonadListen[({type λ[α, β] = WriterT[F, α, β]})#λ, W] with WriterTMonad[F, W] {
+private[scalaz] trait WriterTMonadListen[F[_], W] extends MonadListen[({type λ[α, β] = WriterT[F, α, β]})#λ, W] with WriterTMonad[F, W] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 
