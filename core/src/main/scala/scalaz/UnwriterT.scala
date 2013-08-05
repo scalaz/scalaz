@@ -88,48 +88,49 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
 object UnwriterT extends UnwriterTInstances with UnwriterTFunctions
 
 sealed abstract class UnwriterTInstances2 {
-  implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]) = new UnwriterTFunctor[F, W] {
+  implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTFunctor[F, W] {
     implicit def F = F0
   }
 }
 
 sealed abstract class UnwriterTInstances1 extends UnwriterTInstances2 {
-  implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]) = new UnwriterTApply[F, W] {
+  implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]): Apply[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTApply[F, W] {
     implicit def F = F0
   }
 }
 
 sealed abstract class UnwriterTInstances0 extends UnwriterTInstances1 {
-  implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]) = new UnwriterTBifunctor[F] {
+  implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=UnwriterT[F, α, β]})#λ] = new UnwriterTBifunctor[F] {
     implicit def F = F0
   }
-  implicit def unwriterTBind[F[_], W](implicit F0: Bind[F]) = new UnwriterTBind[F, W] {
+  implicit def unwriterTBind[F[_], W](implicit F0: Bind[F]): Bind[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTBind[F, W] {
     implicit def F = F0
   }
-  implicit def unwriterTFoldable[F[_], W](implicit F0: Foldable[F]) = new UnwriterTFoldable[F, W] {
+  implicit def unwriterTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTFoldable[F, W] {
     implicit def F = F0
   }
-  implicit def unwriterTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]) = E.contramap((_: UnwriterT[F, W, A]).run)
+  implicit def unwriterTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[UnwriterT[F, W, A]] =
+    E.contramap((_: UnwriterT[F, W, A]).run)
 }
 
 sealed abstract class UnwriterTInstances extends UnwriterTInstances0 {
-  implicit def unwriterTBitraverse[F[_]](implicit F0: Traverse[F]) = new UnwriterTBitraverse[F] {
+  implicit def unwriterTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=UnwriterT[F, α, β]})#λ] = new UnwriterTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def unwriterComonad[W] = new UnwriterComonad[W] {
+  implicit def unwriterComonad[W]: Comonad[({type λ[α]=Unwriter[W, α]})#λ] = new UnwriterComonad[W] {
     implicit def F = implicitly
   }
-  implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]) = new UnwriterTTraverse[F, W] {
+  implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTTraverse[F, W] {
     implicit def F = F0
   }
   @deprecated("Index is deprecated, use Foldable instead", "7.1")
-  implicit def unwriterTIndex[W] = new UnwriterTIndex[W] {
+  implicit def unwriterTIndex[W]: Index[({type λ[α]=Unwriter[W, α]})#λ] = new UnwriterTIndex[W] {
   }
   @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def unwriterTEach[F[_], W](implicit F0: Each[F]) = new UnwriterTEach[F, W] {
+  implicit def unwriterTEach[F[_], W](implicit F0: Each[F]): Each[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTEach[F, W] {
     implicit def F = F0
   }
-  implicit def unwriterEqual[W, A](implicit W: Equal[W], A: Equal[A]) = {
+  implicit def unwriterEqual[W, A](implicit W: Equal[W], A: Equal[A]): Equal[Unwriter[W, A]] = {
     import std.tuple._
     Equal[(W, A)].contramap((_: Unwriter[W, A]).run)
   }

@@ -96,35 +96,35 @@ trait StoreTFunctions extends IndexedStoreTFunctions {
     storeT[Id, A, B](f -> a)
 }
 sealed abstract class IndexedStoreTInstances2 {
-  implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]) = new IndexedStoreTContravariant[F, I, B] {
+  implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]): Contravariant[({type λ[-α]=IndexedStoreT[F, I, α, B]})#λ] = new IndexedStoreTContravariant[F, I, B] {
     implicit def F: Functor[F] = F0
   }
 }
 sealed abstract class IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
-  implicit def indexedStoreTFunctorLeft[F[_], A, B] = new IndexedStoreTFunctorLeft[F, A, B] {}
+  implicit def indexedStoreTFunctorLeft[F[_], A, B]: Functor[({type λ[α]=IndexedStoreT[F, α, A, B]})#λ] = new IndexedStoreTFunctorLeft[F, A, B] {}
 }
 sealed abstract class IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
-  implicit def indexedStoreTBifunctor[F[_], A](implicit F0: Functor[F]) = new IndexedStoreTBifunctor[F, A] {
+  implicit def indexedStoreTBifunctor[F[_], A](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=IndexedStoreT[F, α, A, β]})#λ] = new IndexedStoreTBifunctor[F, A] {
     implicit def F: Functor[F] = F0
   }
 }
 sealed abstract class IndexedStoreTInstances extends IndexedStoreTInstances0 {
-  implicit def indexedStoreTFunctorRight[F[_], I, A](implicit F0: Functor[F]) = new IndexedStoreTFunctorRight[F, I, A] {
+  implicit def indexedStoreTFunctorRight[F[_], I, A](implicit F0: Functor[F]): Functor[({type λ[α]=IndexedStoreT[F, I, A, α]})#λ] = new IndexedStoreTFunctorRight[F, I, A] {
     implicit def F: Functor[F] = F0
   }
 }
 sealed abstract class StoreTInstances2 extends IndexedStoreTInstances {
-  implicit def storeTCobind[F[_], A](implicit F0: Cobind[F]) = new StoreTCobind[F, A] {
+  implicit def storeTCobind[F[_], A](implicit F0: Cobind[F]): Cobind[({type λ[α]=StoreT[F, A, α]})#λ] = new StoreTCobind[F, A] {
     implicit def F: Cobind[F] = F0
   }
 }
 sealed abstract class StoreTInstances1 extends StoreTInstances2 {
-  implicit def storeTComonad[F[_], A](implicit F0: Comonad[F]) = new StoreTComonad[F, A] {
+  implicit def storeTComonad[F[_], A](implicit F0: Comonad[F]): Comonad[({type λ[α]=StoreT[F, A, α]})#λ] = new StoreTComonad[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }
 sealed abstract class StoreTInstances0 extends StoreTInstances1 {
-  implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]) = new StoreTComonadStore[F, A] {
+  implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]): ComonadStore[({type λ[σ, α]=StoreT[F, σ, α]})#λ, A] = new StoreTComonadStore[F, A] {
     implicit def F: Comonad[F] = F0
   }
 }

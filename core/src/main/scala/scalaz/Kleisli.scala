@@ -95,7 +95,7 @@ sealed abstract class KleisliInstances6 extends KleisliInstances7 {
   implicit def kleisliApplicative[F[_], R](implicit F0: Applicative[F]): Applicative[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliApplicative[F, R] {
     implicit def F: Applicative[F] = F0
   }
-  implicit def kleisliPlus[F[_], A](implicit F0: Plus[F]) = new KleisliPlus[F, A] {
+  implicit def kleisliPlus[F[_], A](implicit F0: Plus[F]): Plus[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlus[F, A] {
     implicit def F = F0
   }
 }
@@ -104,19 +104,19 @@ sealed abstract class KleisliInstances5 extends KleisliInstances6 {
   implicit def kleisliApplicativePlus[F[_], R](implicit F0: ApplicativePlus[F]): ApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] = new ApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliApplicative[F, R] with KleisliPlusEmpty[F, R] {
     implicit def F: ApplicativePlus[F] = F0
   }
-  implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]) = new KleisliSemigroup[F, A, B] {
+  implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]): Semigroup[Kleisli[F, A, B]] = new KleisliSemigroup[F, A, B] {
     implicit def FB = FB0
   }
 }
 
 sealed abstract class KleisliInstances4 extends KleisliInstances5 {
-  implicit def kleisliMonadPlus[F[_], A](implicit F0: MonadPlus[F]) = new KleisliMonadPlus[F, A] {
+  implicit def kleisliMonadPlus[F[_], A](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliMonadPlus[F, A] {
     implicit def F = F0
   }
 }
 
 sealed abstract class KleisliInstances3 extends KleisliInstances4 {
-  implicit def kleisliMonadReader[F[_], R](implicit F0: Monad[F]) = new KleisliMonadReader[F, R] {
+  implicit def kleisliMonadReader[F[_], R](implicit F0: Monad[F]): MonadReader[({type λ[α, β] = Kleisli[F, α, β]})#λ, R] = new KleisliMonadReader[F, R] {
     implicit def F: Monad[F] = F0
   }
 }
@@ -135,18 +135,18 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
 }
 
 abstract class KleisliInstances extends KleisliInstances0 {
-  implicit def kleisliArrow[F[_]](implicit F0: Monad[F]) = new KleisliArrow[F] {
+  implicit def kleisliArrow[F[_]](implicit F0: Monad[F]): Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliArrow[F] {
     implicit def F: Monad[F] = F0
   }
 
-  implicit def kleisliContravariant[F[_], A] = new KleisliContravariant[F, A] {}
+  implicit def kleisliContravariant[F[_], A]: Contravariant[({type λ[α] = Kleisli[F, α, A]})#λ] = new KleisliContravariant[F, A] {}
 
-  implicit def kleisliIdMonadReader[R] = kleisliMonadReader[Id, R]
+  implicit def kleisliIdMonadReader[R]: MonadReader[({type λ[α, β] = Kleisli[Id, α, β]})#λ, R] = kleisliMonadReader[Id, R]
 
-  implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]) = new KleisliMonoid[F, A, B] {
+  implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]): Monoid[Kleisli[F, A, B]] = new KleisliMonoid[F, A, B] {
     implicit def FB = FB0
   }
-  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]) = new KleisliPlusEmpty[F, A] {
+  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlusEmpty[F, A] {
     implicit def F = F0
   }
   implicit def kleisliMonadTrans[R]: Hoist[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] = new KleisliHoist[R] {}
