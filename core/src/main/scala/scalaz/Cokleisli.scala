@@ -27,15 +27,15 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
 object Cokleisli extends CokleisliInstances with CokleisliFunctions
 
 sealed abstract class CokleisliInstances0 {
-  implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]) = new CokleisliCompose[F] {
+  implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliCompose[F] {
     override implicit def F = F0
   }
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R] = new CokleisliMonad[F, R] {}
+  implicit def cokleisliMonad[F[_], R]: Monad[({type λ[α]=Cokleisli[F, R, α]})#λ] = new CokleisliMonad[F, R] {}
   
-  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]) = new CokleisliArrow[F] {
+  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliArrow[F] {
     override implicit def F = F0
   }
 }
