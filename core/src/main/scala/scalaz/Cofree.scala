@@ -79,7 +79,7 @@ sealed abstract class CofreeInstances {
   implicit def cofreeComonad[S[_]]: Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {}
 }
 
-private[scalaz] trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
+private trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
   def copoint[A](p: Cofree[S, A]) = p.head
 
   override def cojoin[A](a: Cofree[S, A]) = a.duplicate

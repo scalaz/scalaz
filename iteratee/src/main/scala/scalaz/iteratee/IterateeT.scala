@@ -345,7 +345,7 @@ trait IterateeTFunctions {
 // Type class implementation traits
 //
 
-private[scalaz] trait IterateeTMonad[E, F[_]] extends Monad[({type λ[α] = IterateeT[E, F, α]})#λ] {
+private trait IterateeTMonad[E, F[_]] extends Monad[({type λ[α] = IterateeT[E, F, α]})#λ] {
   implicit def F: Monad[F]
 
   def point[A](a: => A) = StepT.sdone(a, emptyInput).pointI
@@ -353,7 +353,7 @@ private[scalaz] trait IterateeTMonad[E, F[_]] extends Monad[({type λ[α] = Iter
   def bind[A, B](fa: IterateeT[E, F, A])(f: A => IterateeT[E, F, B]): IterateeT[E, F, B] = fa flatMap f
 }
 
-private[scalaz] trait IterateeTHoist[E] extends Hoist[({type λ[β[_], α] = IterateeT[E, β, α]})#λ] {
+private trait IterateeTHoist[E] extends Hoist[({type λ[β[_], α] = IterateeT[E, β, α]})#λ] {
   trait IterateeTF[F[_]] {
     type λ[α] = IterateeT[E, F, α]
   }
@@ -368,13 +368,13 @@ private[scalaz] trait IterateeTHoist[E] extends Hoist[({type λ[β[_], α] = Ite
   implicit def apply[G[_] : Monad]: Monad[IterateeTF[G]#λ] = IterateeT.IterateeTMonad[E, G]
 }
 
-private[scalaz] trait IterateeTMonadIO[E, F[_]] extends MonadIO[({type λ[α] = IterateeT[E, F, α]})#λ] with IterateeTMonad[E, F] {
+private trait IterateeTMonadIO[E, F[_]] extends MonadIO[({type λ[α] = IterateeT[E, F, α]})#λ] with IterateeTMonad[E, F] {
   implicit def F: MonadIO[F]
   
   def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ].liftM(F.liftIO(ioa))
 }
 
-private[scalaz] trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[({type λ0[α[_], β] = IterateeT[E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] {
+private trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[({type λ0[α[_], β] = IterateeT[E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] {
   implicit def T: MonadTrans[H]
 
   def liftM[G[_]: Monad, A](ga: G[A]): IterateeT[E, ({type λ[α] = H[G, α]})#λ, A] =
@@ -384,7 +384,7 @@ private[scalaz] trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[({t
     IterateeT.IterateeTMonad[E, ({type λ[α] = H[G, α]})#λ](T[G])
 }
 
-private[scalaz] trait IterateeTHoistT[E, H[_[_], _]] extends Hoist[({type λ0[α[_], β] = IterateeT[E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] with IterateeTMonadTransT[E, H] {
+private trait IterateeTHoistT[E, H[_[_], _]] extends Hoist[({type λ0[α[_], β] = IterateeT[E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] with IterateeTMonadTransT[E, H] {
   implicit def T: Hoist[H]
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type λ0[α0] = IterateeT[E, ({type λ1[α1] = H[M, α1]})#λ1, α0]})#λ0 ~> ({type λ0[α0] = IterateeT[E, ({type λ1[α1] = H[N, α1]})#λ1, α0]})#λ0) {

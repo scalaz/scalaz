@@ -133,7 +133,7 @@ sealed abstract class BijectionTInstances extends BijectionTInstances0 {
     }
 }
 
-private[scalaz] trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
+private trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
   implicit def F: Bind[F]
   implicit def G: Bind[G]
 
@@ -146,7 +146,7 @@ private[scalaz] trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β
     )
 }
 
-private[scalaz] trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
+private trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 

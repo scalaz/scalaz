@@ -235,25 +235,25 @@ object StreamT extends StreamTInstances {
 // Implementation traits for type class instances
 //
 
-private[scalaz] trait StreamTFunctor[F[_]] extends Functor[({type λ[α] = StreamT[F, α]})#λ] {
+private trait StreamTFunctor[F[_]] extends Functor[({type λ[α] = StreamT[F, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: StreamT[F, A])(f: A => B): StreamT[F, B] = fa map f
 }
 
-private[scalaz] trait StreamTSemigroup[F[_], A] extends Semigroup[StreamT[F, A]] {
+private trait StreamTSemigroup[F[_], A] extends Semigroup[StreamT[F, A]] {
   implicit def F: Functor[F]
 
   def append(f1: StreamT[F, A], f2: => StreamT[F, A]): StreamT[F, A] = f1 ++ f2
 }
 
-private[scalaz] trait StreamTMonoid[F[_], A] extends Monoid[StreamT[F, A]] with StreamTSemigroup[F, A] {
+private trait StreamTMonoid[F[_], A] extends Monoid[StreamT[F, A]] with StreamTSemigroup[F, A] {
   implicit def F: Applicative[F]
 
   def zero: StreamT[F, A] = StreamT.empty[F, A]
 }
 
-private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTFunctor[F] {
+private trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = StreamT[F, α]})#λ] with StreamTFunctor[F] {
   implicit def F: Applicative[F]
 
   def point[A](a: => A): StreamT[F, A] = a :: StreamT.empty[F, A]
@@ -265,7 +265,7 @@ private[scalaz] trait StreamTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = S
   def bind[A, B](fa: StreamT[F, A])(f: A => StreamT[F, B]): StreamT[F, B] = fa flatMap f
 }
 
-private[scalaz] trait StreamTHoist extends Hoist[StreamT] {
+private trait StreamTHoist extends Hoist[StreamT] {
   import StreamT._
   
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StreamT[G, α]})#λ] = StreamTMonadPlus[G]

@@ -103,23 +103,23 @@ object ListT extends ListTInstances {
 // Implementation traits for type class instances
 //
 
-private[scalaz] trait ListTFunctor[F[_]] extends Functor[({type λ[α] = ListT[F, α]})#λ] {
+private trait ListTFunctor[F[_]] extends Functor[({type λ[α] = ListT[F, α]})#λ] {
  implicit def F: Functor[F]
  override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa map f
 }
 
-private[scalaz] trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
+private trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
  implicit def F: Bind[F]
  def append(f1: ListT[F, A], f2: => ListT[F, A]): ListT[F, A] = f1 ++ f2
 }
 
-private[scalaz] trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
+private trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
   implicit def F: Monad[F]
 
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
-private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
+private trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = ListT[F, α]})#λ] with ListTFunctor[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
@@ -131,7 +131,7 @@ private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = Lis
   def plus[A](a: ListT[F, A], b: => ListT[F, A]): ListT[F, A] = a ++ b
 }
 
-private[scalaz] trait ListTHoist extends Hoist[ListT] {
+private trait ListTHoist extends Hoist[ListT] {
   import ListT._
   
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = ListT[G, α]})#λ] = listTMonadPlus[G]

@@ -11,10 +11,10 @@ trait Compose[=>:[_, _]]  { self =>
   /** Associative `=>:` binary operator. */
   def compose[A, B, C](f: B =>: C, g: A =>: B): (A =>: C)
 
-  private[scalaz] trait ComposePlus extends Plus[({type λ[α]=(α =>: α)})#λ] {
+  protected[this] trait ComposePlus extends Plus[({type λ[α]=(α =>: α)})#λ] {
     def plus[A](f1: (A =>: A), f2: => (A =>: A)) = self.compose(f1, f2)
   }
-  private[scalaz] trait ComposeSemigroup[A] extends Semigroup[A =>: A] {
+  protected[this] trait ComposeSemigroup[A] extends Semigroup[A =>: A] {
     def append(f1: (A =>: A), f2: => (A =>: A)) = self.compose(f1, f2)
   }
 

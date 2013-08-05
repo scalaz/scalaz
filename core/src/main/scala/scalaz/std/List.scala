@@ -4,8 +4,8 @@ package std
 import scalaz.Id._
 import annotation.tailrec
 
-sealed trait ListInstances0 {
-  implicit def listEqual[A](implicit A0: Equal[A]) = new ListEqual[A] {
+trait ListInstances0 {
+  implicit def listEqual[A](implicit A0: Equal[A]): Equal[List[A]] = new ListEqual[A] {
     implicit def A = A0
   }
 }
@@ -264,7 +264,7 @@ object list extends ListInstances with ListFunctions {
 }
 
 
-trait ListEqual[A] extends Equal[List[A]] {
+private trait ListEqual[A] extends Equal[List[A]] {
   implicit def A: Equal[A]
 
   override def equalIsNatural: Boolean = A.equalIsNatural
@@ -272,7 +272,7 @@ trait ListEqual[A] extends Equal[List[A]] {
   override def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
 }
 
-trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
+private trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
   implicit def A: Order[A]
 
   import Ordering._
