@@ -231,7 +231,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
         case Success(b2) => this
       }
       case Success(b1) => x match {
-        case Failure(_) => x
+        case b2 @ Failure(_) => b2
         case Success(b2) => Success(M1.append(b1, b2))
       }
     }
