@@ -9,7 +9,7 @@ a large number of data structures.
 [![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.0.x)](http://travis-ci.org/scalaz/scalaz)
 
 This is the branch for the 7.0.x release series. For general information about changes in version 7,
-consult the documentation in the `scalaz-seven` branch or our [wiki](https://github.com/scalaz/scalaz/wiki).
+consult the documentation in the [`scalaz-seven`](https://github.com/scalaz/scalaz/tree/scalaz-seven) branch or our [wiki](https://github.com/scalaz/scalaz/wiki).
 
 ## Quick Start
 
