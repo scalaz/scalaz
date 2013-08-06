@@ -21,6 +21,9 @@ sealed abstract class MonadPlusOps[F[_],A] extends Ops[F[A]] {
     F.unite[T, B](ftb)
   }
 
+  final def separate[G[_, _], B, C](implicit ev: A <~< G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
+    F.separate(Liskov.co(ev)(self))
+
   ////
 }
 
