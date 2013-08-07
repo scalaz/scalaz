@@ -231,7 +231,7 @@ object EnumeratorT extends EnumeratorTFunctions with EnumeratorTInstances
 // Type class implementation traits
 //
 
-private[scalaz] trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[EnumeratorT[E, F]] {
+private trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[EnumeratorT[E, F]] {
   implicit def F: Bind[F]
 
   def append(f1: EnumeratorT[E, F], f2: => EnumeratorT[E, F]) =
@@ -240,7 +240,7 @@ private[scalaz] trait EnumeratorTSemigroup[E, F[_]] extends Semigroup[Enumerator
     }
 }
 
-private[scalaz] trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F]] with EnumeratorTSemigroup[E, F] {
+private trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F]] with EnumeratorTSemigroup[E, F] {
   implicit def F: Monad[F]
 
   def zero = new EnumeratorT[E, F] {
@@ -248,12 +248,12 @@ private[scalaz] trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F
   }
 }
 
-private[scalaz] trait EnumeratorTFunctor[F[_]] extends Functor[({type λ[α]=EnumeratorT[α, F]})#λ] {
+private trait EnumeratorTFunctor[F[_]] extends Functor[({type λ[α]=EnumeratorT[α, F]})#λ] {
   implicit def M: Monad[F]
   abstract override def map[A, B](fa: EnumeratorT[A, F])(f: A => B): EnumeratorT[B, F] = fa.map(f)
 }
 
-private [scalaz] trait EnumeratorTMonad[F[_]] extends Monad[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTFunctor[F] {
+private trait EnumeratorTMonad[F[_]] extends Monad[({type λ[α]=EnumeratorT[α, F]})#λ] with EnumeratorTFunctor[F] {
   def bind[A, B](fa: EnumeratorT[A, F])(f: A => EnumeratorT[B, F]) = fa.flatMap(f)
   def point[E](e: => E) = EnumeratorT.enumOne[E, F](e)
 }

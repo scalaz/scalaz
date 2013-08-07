@@ -147,29 +147,29 @@ trait StateTFunctions extends IndexedStateTFunctions {
 // Implementation traits for type class instances
 //
 
-private[scalaz] trait IndexedStateTContravariant[S2, A0, F[_]] extends Contravariant[({type f[a] = IndexedStateT[F, a, S2, A0]})#f] {
+private trait IndexedStateTContravariant[S2, A0, F[_]] extends Contravariant[({type f[a] = IndexedStateT[F, a, S2, A0]})#f] {
   override def contramap[A, B](fa: IndexedStateT[F, A, S2, A0])(f: B => A): IndexedStateT[F, B, S2, A0] = fa.contramap(f)
 }
 
-private[scalaz] trait IndexedStateTBifunctor[S1, F[_]] extends Bifunctor[({type f[a, b] = IndexedStateT[F, S1, a, b]})#f] {
+private trait IndexedStateTBifunctor[S1, F[_]] extends Bifunctor[({type f[a, b] = IndexedStateT[F, S1, a, b]})#f] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: IndexedStateT[F, S1, A, B])(f: A => C, g: B => D): IndexedStateT[F, S1, C, D] = fab.bimap(f)(g)
 }
 
-private[scalaz] trait IndexedStateTFunctorLeft[S1, A0, F[_]] extends Functor[({type f[a] = IndexedStateT[F, S1, a, A0]})#f] {
+private trait IndexedStateTFunctorLeft[S1, A0, F[_]] extends Functor[({type f[a] = IndexedStateT[F, S1, a, A0]})#f] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: IndexedStateT[F, S1, A, A0])(f: A => B): IndexedStateT[F, S1, B, A0] = fa.imap(f)
 }
 
-private[scalaz] trait IndexedStateTFunctorRight[S1, S2, F[_]] extends Functor[({type f[a] = IndexedStateT[F, S1, S2, a]})#f] {
+private trait IndexedStateTFunctorRight[S1, S2, F[_]] extends Functor[({type f[a] = IndexedStateT[F, S1, S2, a]})#f] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: IndexedStateT[F, S1, S2, A])(f: A => B): IndexedStateT[F, S1, S2, B] = fa.map(f)
 }
 
-private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] {
+private trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a] = StateT[F, s, a]})#f, S] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: StateT[F, S, A])(f: A => StateT[F, S, B]): StateT[F, S, B] = fa.flatMap(f)
@@ -190,7 +190,7 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
   override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
 }
 
-private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] {
+private trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] {
 
   type StateTF[G[_], S] = {
     type f[x] = StateT[G, S, x]

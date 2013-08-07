@@ -71,43 +71,43 @@ object IdT extends IdTInstances with IdTFunctions
 // Implementation traits for type class instances
 //
 
-private[scalaz] trait IdTFunctor[F[_]] extends Functor[({type λ[α] = IdT[F, α]})#λ] {
+private trait IdTFunctor[F[_]] extends Functor[({type λ[α] = IdT[F, α]})#λ] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: IdT[F, A])(f: A => B) = fa map f
 }
 
-private[scalaz] trait IdTApply[F[_]] extends Apply[({type λ[α] = IdT[F, α]})#λ] with IdTFunctor[F] {
+private trait IdTApply[F[_]] extends Apply[({type λ[α] = IdT[F, α]})#λ] with IdTFunctor[F] {
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => IdT[F, A])(f: => IdT[F, A => B]): IdT[F, B] = fa ap f
 }
 
-private[scalaz] trait IdTApplicative[F[_]] extends Applicative[({type λ[α] = IdT[F, α]})#λ] with IdTApply[F] {
+private trait IdTApplicative[F[_]] extends Applicative[({type λ[α] = IdT[F, α]})#λ] with IdTApply[F] {
   implicit def F: Applicative[F]
 
   def point[A](a: => A) = new IdT[F, A](F.point(a))
 }
 
-private[scalaz] trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#λ] with IdTApplicative[F] {
+private trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#λ] with IdTApplicative[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
 }
 
-private[scalaz] trait IdTFoldable[F[_]] extends Foldable.FromFoldr[({type λ[α] = IdT[F, α]})#λ] {
+private trait IdTFoldable[F[_]] extends Foldable.FromFoldr[({type λ[α] = IdT[F, α]})#λ] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: IdT[F, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-private[scalaz] trait IdTTraverse[F[_]] extends Traverse[({type λ[α] = IdT[F, α]})#λ] with IdTFoldable[F] with IdTFunctor[F]{
+private trait IdTTraverse[F[_]] extends Traverse[({type λ[α] = IdT[F, α]})#λ] with IdTFoldable[F] with IdTFunctor[F]{
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_] : Applicative, A, B](fa: IdT[F, A])(f: A => G[B]): G[IdT[F, B]] = fa traverse f
 }
 
-private[scalaz] object IdTHoist extends Hoist[IdT] {
+private object IdTHoist extends Hoist[IdT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): IdT[G, A] = new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = IdT[M, x]})#f ~> ({type f[x] = IdT[N, x]})#f) {

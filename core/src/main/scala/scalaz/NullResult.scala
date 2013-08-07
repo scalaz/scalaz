@@ -194,14 +194,14 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
 
 }
 
-private[scalaz] trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
+private trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
   implicit val M: Semigroup[B]
 
   override def append(a1: NullResult[A, B], a2: => NullResult[A, B]) =
     a1 |+| a2
 }
 
-private[scalaz] trait NullResultMonoid[A, B] extends Monoid[NullResult[A, B]] with NullResultSemigroup[A, B] {
+private trait NullResultMonoid[A, B] extends Monoid[NullResult[A, B]] with NullResultSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

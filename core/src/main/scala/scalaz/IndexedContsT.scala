@@ -109,26 +109,26 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
   }
 }
 
-private[scalaz] sealed trait IndexedContsTFunctorLeft[W[_], M[_], O, A0] extends Functor[({type f[r]=IndexedContsT[W, M, r, O, A0]})#f] {
+private sealed trait IndexedContsTFunctorLeft[W[_], M[_], O, A0] extends Functor[({type f[r]=IndexedContsT[W, M, r, O, A0]})#f] {
   implicit val M: Functor[M]
 
   def map[A, B](fa: IndexedContsT[W, M, A, O, A0])(f: A => B): IndexedContsT[W, M, B, O, A0] = fa.imap(f)
 }
 
-private[scalaz] sealed trait IndexedContsTFunctorRight[W[_], M[_], R, O] extends Functor[({type f[a]=IndexedContsT[W, M, R, O, a]})#f] {
+private sealed trait IndexedContsTFunctorRight[W[_], M[_], R, O] extends Functor[({type f[a]=IndexedContsT[W, M, R, O, a]})#f] {
   implicit val W: Functor[W]
 
   override def map[A, B](fa: IndexedContsT[W, M, R, O, A])(f: A => B): IndexedContsT[W, M, R, O, B] = fa.map(f)
 }
 
-private[scalaz] sealed trait IndexedContsTContravariant[W[_], M[_], R, A0] extends Contravariant[({type f[o]=IndexedContsT[W, M, R, o, A0]})#f] {
+private sealed trait IndexedContsTContravariant[W[_], M[_], R, A0] extends Contravariant[({type f[o]=IndexedContsT[W, M, R, o, A0]})#f] {
   implicit val W: Functor[W]
   implicit val M: Functor[M]
 
   def contramap[A, B](fa: IndexedContsT[W, M, R, A, A0])(f: B => A): IndexedContsT[W, M, R, B, A0] = fa.contramap(f)
 }
 
-private[scalaz] sealed trait IndexedContsTBifunctor[W[_], M[_], O] extends Bifunctor[({type f[r, a]=IndexedContsT[W, M, r, O, a]})#f] {
+private sealed trait IndexedContsTBifunctor[W[_], M[_], O] extends Bifunctor[({type f[r, a]=IndexedContsT[W, M, r, O, a]})#f] {
   implicit val W: Functor[W]
   implicit val M: Functor[M]
 
@@ -143,7 +143,7 @@ private[scalaz] sealed trait IndexedContsTBifunctor[W[_], M[_], O] extends Bifun
   override def rightMap[A, B, D](fa: IndexedContsT[W, M, A, O, B])(f: B => D): IndexedContsT[W, M, A, O, D] = fa.map(f)
 }
 
-private[scalaz] sealed trait ContsTMonad[W[_], M[_], R] extends Monad[({type f[a]=ContsT[W, M, R, a]})#f] with IndexedContsTFunctorRight[W, M, R, R] {
+private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[({type f[a]=ContsT[W, M, R, a]})#f] with IndexedContsTFunctorRight[W, M, R, R] {
   implicit val W: Comonad[W]
 
   def point[A](a: => A): ContsT[W, M, R, A] = IndexedContsT.point(a)

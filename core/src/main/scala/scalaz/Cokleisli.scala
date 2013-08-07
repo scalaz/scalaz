@@ -42,20 +42,20 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 
 trait CokleisliFunctions
 
-private[scalaz] trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]})#λ] {
+private trait CokleisliMonad[F[_], R] extends Monad[({type λ[α] = Cokleisli[F, R, α]})#λ] {
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) = fa flatMap f
 }
 
-private[scalaz] trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
+private trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
   implicit def F: Cobind[F]
 
   override def compose[A, B, C](f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]) = f compose g
 }
 
 
-private[scalaz] trait CokleisliArrow[F[_]]
+private trait CokleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
   with CokleisliCompose[F] {
 

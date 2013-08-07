@@ -238,7 +238,7 @@ object indexedSeq extends IndexedSeqInstances with IndexedSeqSubFunctions with I
   object indexedSeqSyntax extends scalaz.syntax.std.ToIndexedSeqOps
 }
 
-trait IndexedSeqEqual[A, Coll <: IndexedSeq[A]] extends Equal[Coll] {
+private trait IndexedSeqEqual[A, Coll <: IndexedSeq[A]] extends Equal[Coll] {
   implicit def A: Equal[A]
 
   override def equalIsNatural: Boolean = A.equalIsNatural
@@ -246,7 +246,7 @@ trait IndexedSeqEqual[A, Coll <: IndexedSeq[A]] extends Equal[Coll] {
   override def equal(a1: Coll, a2: Coll) = (a1 corresponds a2)(Equal[A].equal)
 }
 
-trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] extends Order[Coll] with IndexedSeqEqual[A, Coll] {
+private trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A, Coll]] extends Order[Coll] with IndexedSeqEqual[A, Coll] {
   implicit def A: Order[A]
 
   import Ordering._
