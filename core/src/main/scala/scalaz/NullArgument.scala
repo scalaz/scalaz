@@ -153,14 +153,14 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
 
 }
 
-private[scalaz] trait NullArgumentSemigroup[A, B] extends Semigroup[NullArgument[A, B]] {
+private trait NullArgumentSemigroup[A, B] extends Semigroup[NullArgument[A, B]] {
   implicit val M: Semigroup[B]
 
   override def append(a1: NullArgument[A, B], a2: => NullArgument[A, B]) =
     a1 |+| a2
 }
 
-private[scalaz] trait NullArgumentMonoid[A, B] extends Monoid[NullArgument[A, B]] with NullArgumentSemigroup[A, B] {
+private trait NullArgumentMonoid[A, B] extends Monoid[NullArgument[A, B]] with NullArgumentSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

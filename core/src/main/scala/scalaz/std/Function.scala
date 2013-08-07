@@ -2,7 +2,7 @@ package scalaz
 package std
 
 sealed trait FunctionInstances1 {
-  implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]) = new Function1Semigroup[A, R] {
+  implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]): Semigroup[A => R] = new Function1Semigroup[A, R] {
     implicit def R = R0
   }
   implicit def function1Cobind[A, R](implicit A0: Semigroup[A]): Cobind[({type λ[α]=(A => α)})#λ] = new Function1Cobind[A, R] {
@@ -11,7 +11,7 @@ sealed trait FunctionInstances1 {
 }
 
 sealed trait FunctionInstances0 extends FunctionInstances1 {
-  implicit def function1Monoid[A, R](implicit R0: Monoid[R]) = new Function1Monoid[A, R] {
+  implicit def function1Monoid[A, R](implicit R0: Monoid[R]): Monoid[A => R] = new Function1Monoid[A, R] {
     implicit def R = R0
   }
   implicit def function1Comonad[A, R](implicit A0: Monoid[A]): Comonad[({type λ[α]=(A => α)})#λ] = new Function1Comonad[A, R] {
@@ -146,25 +146,25 @@ object function extends FunctionFunctions with FunctionInstances
 // Type class implementation traits
 //
 
-private[scalaz] trait Function1Semigroup[A, R] extends Semigroup[A => R] {
+private trait Function1Semigroup[A, R] extends Semigroup[A => R] {
   implicit def R: Semigroup[R]
 
   def append(f1: A => R, f2: => A => R) = a => R.append(f1(a), f2(a))
 }
 
-private[scalaz] trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
+private trait Function1Monoid[A, R] extends Monoid[A => R] with Function1Semigroup[A, R] {
   implicit def R: Monoid[R]
   def zero = a => R.zero
 }
 
-private[scalaz] trait Function1Cobind[M, R] extends Cobind[({type λ[α]=(M => α)})#λ] {
+private trait Function1Cobind[M, R] extends Cobind[({type λ[α]=(M => α)})#λ] {
   implicit def M: Semigroup[M]
   override def cojoin[A](a: M => A) = (m1: M) => (m2: M) => a(M.append(m1, m2))
   def cobind[A, B](fa: M => A)(f: (M => A) => B) = (m1: M) => f((m2: M) => fa(M.append(m1, m2)))
   override def map[A, B](fa: M => A)(f: A => B) = fa andThen f
 }
 
-private[scalaz] trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] with Function1Cobind[M, R]{
+private trait Function1Comonad[M, R] extends Comonad[({type λ[α]=(M => α)})#λ] with Function1Cobind[M, R]{
   implicit def M: Monoid[M]
   def copoint[A](p: M => A) = p(M.zero)
 }

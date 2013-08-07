@@ -2,7 +2,7 @@ package scalaz
 package std
 
 sealed trait OptionInstances0 {
-  implicit def optionEqual[A](implicit A0: Equal[A]) = new OptionEqual[A] {
+  implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
 }
@@ -225,7 +225,7 @@ object option extends OptionInstances with OptionFunctions {
 // Type class implementation traits
 //
 
-trait OptionEqual[A] extends Equal[Option[A]] {
+private trait OptionEqual[A] extends Equal[Option[A]] {
   implicit def A: Equal[A]
 
   override def equalIsNatural: Boolean = A.equalIsNatural
@@ -239,7 +239,7 @@ trait OptionEqual[A] extends Equal[Option[A]] {
 }
 
 
-trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
+private trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
   implicit def A: Order[A]
 
   import Ordering._

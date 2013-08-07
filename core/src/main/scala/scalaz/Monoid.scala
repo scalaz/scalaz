@@ -98,7 +98,7 @@ object Monoid {
     def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
   }
 
-  private[scalaz] trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
+  private trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
     implicit def M: Monoid[M]
     val zero = F.point(M.zero)

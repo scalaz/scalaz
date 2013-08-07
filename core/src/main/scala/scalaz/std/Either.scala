@@ -300,7 +300,7 @@ trait EitherInstances extends EitherInstances0 {
 object either extends EitherInstances
 
 
-private[scalaz] trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {
+private trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {
   implicit def A: Equal[A]
 
   def equal(a1: RightProjection[X, A], a2: RightProjection[X, A]) = (a1.toOption, a2.toOption) match {
@@ -311,7 +311,7 @@ private[scalaz] trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
+private trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
   implicit def A: Equal[A]
 
   def equal(a1: LeftProjection[A, X], a2: LeftProjection[A, X]) = (a1.toOption, a2.toOption) match {
@@ -322,7 +322,7 @@ private[scalaz] trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] 
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[X, A] @@ First] {
+private trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[X, A] @@ First] {
   implicit def A: Equal[A]
 
   def equal(a1: RightProjection[X, A] @@ First, a2: RightProjection[X, A] @@ First) = (a1.toOption, a2.toOption) match {
@@ -333,7 +333,7 @@ private[scalaz] trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ First] {
+private trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ First] {
   implicit def A: Equal[A]
 
   def equal(a1: LeftProjection[A, X] @@ First, a2: LeftProjection[A, X] @@ First) = (a1.toOption, a2.toOption) match {
@@ -345,7 +345,7 @@ private[scalaz] trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A,
 }
 
 
-private[scalaz] trait EitherLastRightEqual[X, A] extends Equal[RightProjection[X, A] @@ Last] {
+private trait EitherLastRightEqual[X, A] extends Equal[RightProjection[X, A] @@ Last] {
   implicit def A: Equal[A]
 
   def equal(a1: RightProjection[X, A] @@ Last, a2: RightProjection[X, A] @@ Last) = (a1.toOption, a2.toOption) match {
@@ -356,7 +356,7 @@ private[scalaz] trait EitherLastRightEqual[X, A] extends Equal[RightProjection[X
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ Last] {
+private trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ Last] {
   implicit def A: Equal[A]
 
   def equal(a1: LeftProjection[A, X] @@ Last, a2: LeftProjection[A, X] @@ Last) = (a1.toOption, a2.toOption) match {
@@ -367,7 +367,7 @@ private[scalaz] trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, 
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherEqual[A, B] extends Equal[Either[A, B]] {
+private trait EitherEqual[A, B] extends Equal[Either[A, B]] {
   implicit def A: Equal[A]
   implicit def B: Equal[B]
 
@@ -379,23 +379,23 @@ private[scalaz] trait EitherEqual[A, B] extends Equal[Either[A, B]] {
   override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
-private[scalaz] trait EitherFirstLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ First] {
+private trait EitherFirstLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ First] {
   def append(f1: LeftProjection[A, X] @@ First, f2: => LeftProjection[A, X] @@ First) = if (f1.e.isLeft) f1 else f2
 }
 
-private[scalaz] trait EitherFirstRightSemigroup[X, A] extends Semigroup[RightProjection[X, A] @@ First] {
+private trait EitherFirstRightSemigroup[X, A] extends Semigroup[RightProjection[X, A] @@ First] {
   def append(f1: RightProjection[X, A] @@ First, f2: => RightProjection[X, A] @@ First) = if (f1.e.isRight) f1 else f2
 }
 
-private[scalaz] trait EitherLastLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ Last] {
+private trait EitherLastLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ Last] {
   def append(f1: LeftProjection[A, X] @@ Last, f2: => LeftProjection[A, X] @@ Last) = if (f1.e.isLeft) f1 else f2
 }
 
-private[scalaz] trait EitherLastRightSemigroup[X, A] extends Semigroup[RightProjection[X, A] @@ Last] {
+private trait EitherLastRightSemigroup[X, A] extends Semigroup[RightProjection[X, A] @@ Last] {
   def append(f1: RightProjection[X, A] @@ Last, f2: => RightProjection[X, A] @@ Last) = if (f1.e.isRight) f1 else f2
 }
 
-private[scalaz] trait EitherLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X]] {
+private trait EitherLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X]] {
   implicit def A: Semigroup[A]
   implicit def X: Monoid[X]
 
@@ -407,7 +407,7 @@ private[scalaz] trait EitherLeftSemigroup[A, X] extends Semigroup[LeftProjection
   }
 }
 
-private[scalaz] trait EitherRightSemigroup[X, A] extends Semigroup[RightProjection[X, A]] {
+private trait EitherRightSemigroup[X, A] extends Semigroup[RightProjection[X, A]] {
   implicit def X: Monoid[X]
   implicit def A: Semigroup[A]
 
@@ -420,43 +420,43 @@ private[scalaz] trait EitherRightSemigroup[X, A] extends Semigroup[RightProjecti
 }
 
 
-private[scalaz] trait EitherFirstLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ First] with EitherFirstLeftSemigroup[A, X] {
+private trait EitherFirstLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ First] with EitherFirstLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero = First(Right(Monoid[X].zero).left)
 }
 
-private[scalaz] trait EitherLastLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ Last] with EitherLastLeftSemigroup[A, X] {
+private trait EitherLastLeftMonoid[A, X] extends Monoid[LeftProjection[A, X] @@ Last] with EitherLastLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero = Last(Right(Monoid[X].zero).left)
 }
 
-private[scalaz] trait EitherLeftMonoid[A, X] extends Monoid[LeftProjection[A, X]] with EitherLeftSemigroup[A, X] {
+private trait EitherLeftMonoid[A, X] extends Monoid[LeftProjection[A, X]] with EitherLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero: LeftProjection[A, X] = Right(Monoid[X].zero).left
 }
 
-private[scalaz] trait EitherFirstRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ First] with EitherFirstRightSemigroup[X, A] {
+private trait EitherFirstRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ First] with EitherFirstRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero = First(Left(Monoid[X].zero).right)
 }
 
-private[scalaz] trait EitherLastRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ Last] with EitherLastRightSemigroup[X, A] {
+private trait EitherLastRightMonoid[X, A] extends Monoid[RightProjection[X, A] @@ Last] with EitherLastRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero = Last(Left(Monoid[X].zero).right)
 }
 
-private[scalaz] trait EitherRightMonoid[X, A] extends Monoid[RightProjection[X, A]] with EitherRightSemigroup[X, A] {
+private trait EitherRightMonoid[X, A] extends Monoid[RightProjection[X, A]] with EitherRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero: RightProjection[X, A] = Left(Monoid[X].zero).right
 }
 
-private[scalaz] trait EitherOrder[A, B] extends Order[Either[A, B]] {
+private trait EitherOrder[A, B] extends Order[Either[A, B]] {
   implicit def A: Order[A]
   implicit def B: Order[B]
 
@@ -470,7 +470,7 @@ private[scalaz] trait EitherOrder[A, B] extends Order[Either[A, B]] {
   }
 }
 
-private[scalaz] trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] {
+private trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -483,7 +483,7 @@ private[scalaz] trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] 
   }
 }
 
-private[scalaz] trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]] {
+private trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -496,7 +496,7 @@ private[scalaz] trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]
   }
 }
 
-private[scalaz] trait EitherFirstLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ First] {
+private trait EitherFirstLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ First] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -509,7 +509,7 @@ private[scalaz] trait EitherFirstLeftOrder[A, X] extends Order[LeftProjection[A,
   }
 }
 
-private[scalaz] trait EitherFirstRightOrder[X, A] extends Order[RightProjection[X, A] @@ First] {
+private trait EitherFirstRightOrder[X, A] extends Order[RightProjection[X, A] @@ First] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -523,7 +523,7 @@ private[scalaz] trait EitherFirstRightOrder[X, A] extends Order[RightProjection[
 }
 
 
-private[scalaz] trait EitherLastLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ Last] {
+private trait EitherLastLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ Last] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -536,7 +536,7 @@ private[scalaz] trait EitherLastLeftOrder[A, X] extends Order[LeftProjection[A, 
   }
 }
 
-private[scalaz] trait EitherLastRightOrder[X, A] extends Order[RightProjection[X, A] @@ Last] {
+private trait EitherLastRightOrder[X, A] extends Order[RightProjection[X, A] @@ Last] {
   implicit def A: Order[A]
 
   import Ordering._

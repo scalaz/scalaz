@@ -22,7 +22,7 @@ trait Semigroup[F]  { self =>
   def append(f1: F, f2: => F): F
 
   // derived functions
-  private[scalaz] trait SemigroupCompose extends Compose[({type λ[α, β]=F})#λ] {
+  protected[this] trait SemigroupCompose extends Compose[({type λ[α, β]=F})#λ] {
     def compose[A, B, C](f: F, g: F) = append(f, g)
   }
 
@@ -33,7 +33,7 @@ trait Semigroup[F]  { self =>
     */
   final def compose: Compose[({type λ[α, β]=F})#λ] = new SemigroupCompose {}
 
-  private[scalaz] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
+  protected[this] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
     override def map[A, B](fa: F)(f: A => B) = fa
     def ap[A, B](fa: => F)(f: => F) = append(f, fa)
   }

@@ -2,7 +2,7 @@ package scalaz
 
 import std.option.cata
 
-private[scalaz] trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] = (F[α], G[α])})#λ] {
+private trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Functor[F]
 
   implicit def G: Functor[G]
@@ -10,7 +10,7 @@ private[scalaz] trait ProductFunctor[F[_], G[_]] extends Functor[({type λ[α] =
   override def map[A, B](fa: (F[A], G[A]))(f: A => B): (F[B], G[B]) = (F.map(fa._1)(f), G.map(fa._2)(f))
 }
 
-private[scalaz] trait ProductApply[F[_], G[_]] extends Apply[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
+private trait ProductApply[F[_], G[_]] extends Apply[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
   implicit def F: Apply[F]
 
   implicit def G: Apply[G]
@@ -19,7 +19,7 @@ private[scalaz] trait ProductApply[F[_], G[_]] extends Apply[({type λ[α] = (F[
     (F.ap(fa._1)(f._1), G.ap(fa._2)(f._2))
 }
 
-private[scalaz] trait ProductApplicative[F[_], G[_]] extends Applicative[({type λ[α] = (F[α], G[α])})#λ] with ProductApply[F, G] {
+private trait ProductApplicative[F[_], G[_]] extends Applicative[({type λ[α] = (F[α], G[α])})#λ] with ProductApply[F, G] {
   implicit def F: Applicative[F]
 
   implicit def G: Applicative[G]
@@ -27,7 +27,7 @@ private[scalaz] trait ProductApplicative[F[_], G[_]] extends Applicative[({type 
   def point[A](a: => A): (F[A], G[A]) = (F.point(a), G.point(a))
 }
 
-private[scalaz] trait ProductPlus[F[_], G[_]] extends Plus[({type λ[α] = (F[α], G[α])})#λ] {
+private trait ProductPlus[F[_], G[_]] extends Plus[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Plus[F]
 
   implicit def G: Plus[G]
@@ -36,7 +36,7 @@ private[scalaz] trait ProductPlus[F[_], G[_]] extends Plus[({type λ[α] = (F[α
     (F.plus(a._1, b._1), G.plus(a._2, b._2))
 }
 
-private[scalaz] trait ProductPlusEmpty[F[_], G[_]] extends PlusEmpty[({type λ[α] = (F[α], G[α])})#λ] with ProductPlus[F, G] {
+private trait ProductPlusEmpty[F[_], G[_]] extends PlusEmpty[({type λ[α] = (F[α], G[α])})#λ] with ProductPlus[F, G] {
   implicit def F: PlusEmpty[F]
 
   implicit def G: PlusEmpty[G]
@@ -44,13 +44,13 @@ private[scalaz] trait ProductPlusEmpty[F[_], G[_]] extends PlusEmpty[({type λ[�
   def empty[A]: (F[A], G[A]) = (F.empty[A], G.empty[A])
 }
 
-private[scalaz] trait ProductApplicativePlus[F[_], G[_]] extends ApplicativePlus[({type λ[α] = (F[α], G[α])})#λ] with ProductApplicative[F, G] with ProductPlusEmpty[F, G] {
+private trait ProductApplicativePlus[F[_], G[_]] extends ApplicativePlus[({type λ[α] = (F[α], G[α])})#λ] with ProductApplicative[F, G] with ProductPlusEmpty[F, G] {
   implicit def F: ApplicativePlus[F]
 
   implicit def G: ApplicativePlus[G]
 }
 
-private[scalaz] trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α] = (F[α], G[α])})#λ] {
+private trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Foldable[F]
 
   implicit def G: Foldable[G]
@@ -65,7 +65,7 @@ private[scalaz] trait ProductFoldable[F[_], G[_]] extends Foldable[({type λ[α]
     G.foldLeft(fa._2, F.foldLeft(fa._1, z)(f))(f)
 }
 
-private[scalaz] trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+private trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
   implicit def F: Foldable1[F]
 
   override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
@@ -80,7 +80,7 @@ private[scalaz] trait ProductFoldable1L[F[_], G[_]] extends Foldable1[({type λ[
     G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
 }
 
-private[scalaz] trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+private trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
   implicit def G: Foldable1[G]
 
   override def foldRight1[A](fa: (F[A], G[A]))(f: (A, => A) => A): A =
@@ -95,7 +95,7 @@ private[scalaz] trait ProductFoldable1R[F[_], G[_]] extends Foldable1[({type λ[
     cata(F.foldLeft1Opt(fa._1)(f))(G.foldLeft(fa._2, _)(f), G.foldLeft1(fa._2)(f))
 }
 
-private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
+private trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable[F, G] {
   implicit def F: Foldable1[F]
 
   implicit def G: Foldable1[G]
@@ -110,7 +110,7 @@ private[scalaz] trait ProductFoldable1[F[_], G[_]] extends Foldable1[({type λ[�
     G.foldLeft(fa._2, F.foldLeft1(fa._1)(f))(f)
 }
 
-private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] with ProductFoldable[F, G] {
+private trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] with ProductFoldable[F, G] {
   implicit def F: Traverse[F]
 
   implicit def G: Traverse[G]
@@ -119,7 +119,7 @@ private[scalaz] trait ProductTraverse[F[_], G[_]] extends Traverse[({type λ[α]
     Applicative[X].apply2(F.traverse(a._1)(f), G.traverse(a._2)(f))((a, b) => (a, b))
 }
 
-private[scalaz] trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1L[F, G] with ProductTraverse[F, G] {
+private trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1L[F, G] with ProductTraverse[F, G] {
   implicit def F: Traverse1[F]
 
   def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
@@ -133,7 +133,7 @@ private[scalaz] trait ProductTraverse1L[F[_], G[_]] extends Traverse1[({type λ[
     super[ProductTraverse].traverseImpl(a)(f)
 }
 
-private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1R[F, G] with ProductTraverse[F, G] {
+private trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1R[F, G] with ProductTraverse[F, G] {
   implicit def G: Traverse1[G]
 
   def traverse1Impl[X[_], A, B](a: (F[A], G[A]))(f: A => X[B])(implicit X0: Apply[X]): X[(F[B], G[B])] = {
@@ -147,7 +147,7 @@ private[scalaz] trait ProductTraverse1R[F[_], G[_]] extends Traverse1[({type λ[
     super[ProductTraverse].traverseImpl(a)(f)
 }
 
-private[scalaz] trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1[F, G] with ProductTraverse[F, G] {
+private trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = (F[α], G[α])})#λ] with ProductFoldable1[F, G] with ProductTraverse[F, G] {
   implicit def F: Traverse1[F]
 
   implicit def G: Traverse1[G]
@@ -159,7 +159,7 @@ private[scalaz] trait ProductTraverse1[F[_], G[_]] extends Traverse1[({type λ[�
     super[ProductTraverse].traverseImpl(a)(f)
 }
 
-private[scalaz] trait ProductDistributive[F[_], G[_]] extends Distributive[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
+private trait ProductDistributive[F[_], G[_]] extends Distributive[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
   implicit def F: Distributive[F]
 
   implicit def G: Distributive[G]
@@ -168,7 +168,7 @@ private[scalaz] trait ProductDistributive[F[_], G[_]] extends Distributive[({typ
     (F.distribute(a)(x => f(x)._1), G.distribute(a)(x => f(x)._2))
 }
 
-private[scalaz] trait ProductZip[F[_], G[_]] extends Zip[({type λ[α] = (F[α], G[α])})#λ] {
+private trait ProductZip[F[_], G[_]] extends Zip[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Zip[F]
 
   implicit def G: Zip[G]
@@ -177,7 +177,7 @@ private[scalaz] trait ProductZip[F[_], G[_]] extends Zip[({type λ[α] = (F[α],
     (F.zip(a._1, b._1), G.zip(a._2, b._2))
 }
 
-private[scalaz] trait ProductUnzip[F[_], G[_]] extends Unzip[({type λ[α] = (F[α], G[α])})#λ] {
+private trait ProductUnzip[F[_], G[_]] extends Unzip[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Unzip[F]
 
   implicit def G: Unzip[G]
@@ -189,7 +189,7 @@ private[scalaz] trait ProductUnzip[F[_], G[_]] extends Unzip[({type λ[α] = (F[
   }
 }
 
-private[scalaz] trait ProductBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
+private trait ProductBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
   implicit def F: Bifunctor[F]
 
   implicit def G: Bifunctor[G]
@@ -198,7 +198,7 @@ private[scalaz] trait ProductBifunctor[F[_, _], G[_, _]] extends Bifunctor[({typ
     (F.bimap(fab._1)(f, g), G.bimap(fab._2)(f, g))
 }
 
-private[scalaz] trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
+private trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
   implicit def F: Bifoldable[F]
 
   implicit def G: Bifoldable[G]
@@ -212,7 +212,7 @@ private[scalaz] trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({t
 
 }
 
-private[scalaz] trait ProductBitraverse[F[_, _], G[_, _]]
+private trait ProductBitraverse[F[_, _], G[_, _]]
   extends Bitraverse[({type λ[α, β]=(F[α, β], G[α, β])})#λ] with ProductBifunctor[F, G] with ProductBifoldable[F, G] {
 
   implicit def F: Bitraverse[F]

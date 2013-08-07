@@ -6,7 +6,7 @@ import scalaz.Ordering.orderingInstance
 
 final case class OneAnd[F[_], A](head: A, tail: F[A])
 
-private[scalaz] sealed trait OneAndFunctor[F[_]]
+private sealed trait OneAndFunctor[F[_]]
     extends Functor[({type λ[α] = OneAnd[F, α]})#λ] {
   def F: Functor[F]
 
@@ -14,7 +14,7 @@ private[scalaz] sealed trait OneAndFunctor[F[_]]
     OneAnd(f(fa.head), F.map(fa.tail)(f))
 }
 
-private[scalaz] sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = OneAnd[F, α]})#λ] with OneAndFunctor[F] {
+private sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = OneAnd[F, α]})#λ] with OneAndFunctor[F] {
   def F: Applicative[F]
   def G: Plus[F]
 
@@ -26,13 +26,13 @@ private[scalaz] sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = One
   }
 }
 
-private[scalaz] sealed trait OneAndApplicative[F[_]] extends Applicative[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
+private sealed trait OneAndApplicative[F[_]] extends Applicative[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
   def F: ApplicativePlus[F]
 
   def point[A](a: => A): OneAnd[F, A] = OneAnd(a, F.empty)
 }
 
-private[scalaz] sealed trait OneAndBind[F[_]] extends Bind[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
+private sealed trait OneAndBind[F[_]] extends Bind[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
   def F: Monad[F]
   def G: Plus[F]
 
@@ -48,7 +48,7 @@ private[scalaz] sealed trait OneAndBind[F[_]] extends Bind[({type λ[α] = OneAn
   )
 }
 
-private[scalaz] sealed trait OneAndPlus[F[_]] extends Plus[({type λ[α] = OneAnd[F, α]})#λ] {
+private sealed trait OneAndPlus[F[_]] extends Plus[({type λ[α] = OneAnd[F, α]})#λ] {
   def F: Applicative[F]
   def G: Plus[F]
 
@@ -56,12 +56,12 @@ private[scalaz] sealed trait OneAndPlus[F[_]] extends Plus[({type λ[α] = OneAn
     OneAnd(a.head, G.plus(G.plus(a.tail, F.point(b.head)), b.tail))
 }
 
-private[scalaz] sealed trait OneAndMonad[F[_]] extends Monad[({type λ[α] = OneAnd[F, α]})#λ] with OneAndBind[F] with OneAndApplicative[F] {
+private sealed trait OneAndMonad[F[_]] extends Monad[({type λ[α] = OneAnd[F, α]})#λ] with OneAndBind[F] with OneAndApplicative[F] {
   def F: MonadPlus[F]
   def G = F
 }
 
-private[scalaz] sealed trait OneAndFoldable[F[_]]
+private sealed trait OneAndFoldable[F[_]]
     extends Foldable1[({type λ[α] = OneAnd[F, α]})#λ] {
   def F: Foldable[F]
 
@@ -85,7 +85,7 @@ private[scalaz] sealed trait OneAndFoldable[F[_]]
     F.foldLeft(fa.tail, f(z, fa.head))(f)
 }
 
-private[scalaz] sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
+private sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
   def F: Foldable1[F]
 
   override def foldMap1[A, B](fa: OneAnd[F, A])(f: A => B)(implicit S: Semigroup[B]) =
@@ -95,7 +95,7 @@ private[scalaz] sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
     f(fa.head, F.foldRight1(fa.tail)(f))
 }
 
-private[scalaz] sealed trait OneAndTraverse[F[_]]
+private sealed trait OneAndTraverse[F[_]]
     extends Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     with OneAndFunctor[F] with OneAndFoldable[F] {
   def F: Traverse[F]
@@ -109,7 +109,7 @@ private[scalaz] sealed trait OneAndTraverse[F[_]]
     G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
 }
 
-private[scalaz] sealed trait OneAndTraverse1[F[_]]
+private sealed trait OneAndTraverse1[F[_]]
     extends OneAndTraverse[F] with OneAndFoldable1[F] {
   def F: Traverse1[F]
 
@@ -160,8 +160,7 @@ sealed abstract class OneAndInstances1 extends OneAndInstances2 {
     }
 }
 
-private[scalaz]
-sealed trait OneAndEqual[F[_], A] extends Equal[OneAnd[F, A]] {
+private sealed trait OneAndEqual[F[_], A] extends Equal[OneAnd[F, A]] {
   def OA: Equal[A]
   def OFA: Equal[F[A]]
 
