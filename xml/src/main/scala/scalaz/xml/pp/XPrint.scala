@@ -42,13 +42,14 @@ trait XPrints {
     d.verbatim.fold(
       text = esc_str(d.data)
     , verbatim = {
-        def escape(c: Str): Str =
+        @annotation.tailrec
+        def escape(c: Str, result: Vector[Char]): Str =
           c match {
-            case ']' :: ']' :: '>' :: t => "]]]]><![CDATA[>".toList ::: escape(t)
-            case h :: t => h :: escape(t)
-            case Nil => Nil
+            case ']' :: ']' :: '>' :: t => escape(t, result ++ "]]]]><![CDATA[>")
+            case h :: t => escape(t, result :+ h)
+            case Nil => result.toList
           }
-        "<![CDATA[".toList ::: escape(d.data) ::: "]]>".toList
+        "<![CDATA[".toList ::: escape(d.data, Vector.empty) ::: "]]>".toList
       }
     , raw = d.data
     )
