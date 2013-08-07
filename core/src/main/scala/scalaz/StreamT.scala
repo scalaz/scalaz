@@ -85,6 +85,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      )
   }
       
+  /** @since 7.0.1 */
   def mapM[B](f: A => M[B])(implicit m: Monad[M]): StreamT[M, B] = stepBind {
     _( yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) }
      , skip = s => m.point(Skip(s mapM f))

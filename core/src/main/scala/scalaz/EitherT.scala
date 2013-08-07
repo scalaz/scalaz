@@ -95,7 +95,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def filter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
     EitherT(F.map(run)(_.filter[A](p)))
 
-  /** Alias for `filter`. */
+  /** Alias for `filter`.
+   * @since 7.0.2
+   */
   def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
     filter(p)(M, F)
 

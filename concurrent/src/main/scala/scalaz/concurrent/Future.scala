@@ -348,7 +348,9 @@ object Future {
       }, delay.toMillis, TimeUnit.MILLISECONDS)
     }
 
-  /** Calls `Nondeterminism[Future].gatherUnordered`. */
+  /** Calls `Nondeterminism[Future].gatherUnordered`.
+   * @since 7.0.3
+   */
   def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
     futureInstance.gatherUnordered(fs)
 }
