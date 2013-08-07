@@ -328,6 +328,7 @@ sealed trait Validation[+E, +A] {
    * {{{
    *   strings map (_.parseInt excepting { case i if i < 0 => new Exception(s"Int must be positive: $i") })
    * }}}
+   * @since 7.0.2
    */
   def excepting[EE >: E](pf: PartialFunction[A, EE]): Validation[EE, A] = {
     import syntax.std.option._

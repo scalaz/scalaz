@@ -130,7 +130,9 @@ trait FunctionInstances extends FunctionInstances0 {
 }
 
 trait FunctionFunctions {
-  /** `f(f(f(...` for referentially transparent `f`. */
+  /** `f(f(f(...` for referentially transparent `f`.
+   * @since 7.0.1
+   */
   final def fix[A](f: (=> A) => A): A = {
     lazy val a: A = f(a)
     a

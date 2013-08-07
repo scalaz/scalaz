@@ -22,6 +22,7 @@ sealed trait NonEmptyList[+A] {
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
+  /** @since 7.0.3 */
   def foreach(f: A => Unit): Unit = {
     f(head)
     tail foreach f
@@ -65,8 +66,10 @@ sealed trait NonEmptyList[+A] {
     }
   }
 
+  /** @since 7.0.2 */
   def init: List[A] = if(tail.isEmpty) Nil else (head :: tail.init)
 
+  /** @since 7.0.2 */
   def last: A = if(tail.isEmpty) head else tail.last
 
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
@@ -78,14 +81,17 @@ sealed trait NonEmptyList[+A] {
     case x :: xs => nel(x, xs)
   }
 
+  /** @since 7.0.2 */
   def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
     case x :: xs => nel(x, xs)
   }
 
+  /** @since 7.0.2 */
   def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = (list.sortWith(lt): @unchecked) match {
     case x :: xs => nel(x, xs)
   }
 
+  /** @since 7.0.2 */
   def sorted[B >: A](implicit o: Order[B]): NonEmptyList[A] = (list.sorted(o.toScalaOrdering): @unchecked) match {
     case x :: xs => nel(x, xs)
   }

@@ -298,7 +298,9 @@ object Future {
     pool.submit { new Callable[Unit] { def call = cb(a).run }}
   }
 
-  /** Calls `Nondeterminism[Future].gatherUnordered`. */
+  /** Calls `Nondeterminism[Future].gatherUnordered`.
+   * @since 7.0.3
+   */
   def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
     futureInstance.gatherUnordered(fs)
 }

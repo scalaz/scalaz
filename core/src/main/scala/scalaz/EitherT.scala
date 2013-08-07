@@ -100,7 +100,9 @@ sealed trait EitherT[F[+_], +A, +B] {
   def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
     EitherT(F.map(run)(_.filter[AA](p)))
 
-  /** Alias for `filter`. */
+  /** Alias for `filter`.
+   * @since 7.0.2
+   */
   def withFilter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA], F: Functor[F]): EitherT[F, AA, B] =
     filter[AA](p)(M, F)
 

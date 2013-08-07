@@ -182,8 +182,9 @@ object Task {
   /** 
    * Like `Nondeterminism[Task].gatherUnordered`, but if `exceptionCancels` is true, 
    * exceptions in any task try to immediately cancel all other running tasks. If
-   * `exceptionCancels` is false, in the event of an error, all tasks are run to completion 
-   * before the error is returned. 
+   * `exceptionCancels` is false, in the event of an error, all tasks are run to completion
+   * before the error is returned.
+   * @since 7.0.3
    */
   def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] = 
     if (!exceptionCancels) taskInstance.gatherUnordered(tasks)
