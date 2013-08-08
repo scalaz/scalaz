@@ -94,6 +94,7 @@ sealed abstract class Free[S[_], A](implicit S: Functor[S]) {
     go2(this)
   }
 
+  /** @since 7.0.1 */
   final def runM[M[_]:Monad](f: S[Free[S, A]] => M[Free[S, A]]): M[A] = {
     def runM2(t: Free[S, A]): M[A] = t.resume match {
       case -\/(s) => Monad[M].bind(f(s))(runM2)
