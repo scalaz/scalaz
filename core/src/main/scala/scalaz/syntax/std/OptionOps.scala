@@ -5,12 +5,12 @@ package std
 import scalaz.std.{option => o}
 import scalaz.Tags.{Last, First}
 
-trait OptionOps[A] extends Ops[Option[A]] {
+final class OptionOps[A](self: Option[A]) {
   final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
   final def fold[X](some: A => X, none: => X): X = cata(some, none)
 
-  sealed trait Fold[X] {
-    def none(s: => X): X
+  final class Fold[X](s: A => X) {
+    def none(n: => X): X = cata(s, n)
   }
 
   /**
@@ -24,12 +24,13 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * o.some(_ * 2).none(0)
    * }}}
    */
-  final def some[X](s: A => X): Fold[X] = new Fold[X] {
-    def none(n: => X): X = cata(s, n)
-  }
+  final def some[X](s: A => X): Fold[X] = new Fold(s)
 
-  sealed trait Conditional[X] {
-    def |(n: => X): X
+  final class Conditional[X](s: => X) {
+    def |(n: => X): X = self match {
+      case None    => n
+      case Some(_) => s
+    }
   }
 
   /**
@@ -40,13 +41,7 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * option ? "defined" | "undefined"
    * }}}
    */
-  final def ?[X](s: => X): Conditional[X] = new Conditional[X] {
-    def |(n: => X): X = self match {
-      case None    => n
-      case Some(_) => s
-    }
-  }
-
+  final def ?[X](s: => X): Conditional[X] = new Conditional(s)
 
   /**
    * Executes the provided side effect if the Option if it is undefined.
@@ -100,7 +95,5 @@ trait OptionOps[A] extends Ops[Option[A]] {
 }
 
 trait ToOptionOps {
-  implicit def ToOptionOpsFromOption[A](a: Option[A]): OptionOps[A] = new OptionOps[A] {
-    val self = a
-  }
+  implicit def ToOptionOpsFromOption[A](a: Option[A]): OptionOps[A] = new OptionOps(a)
 }
