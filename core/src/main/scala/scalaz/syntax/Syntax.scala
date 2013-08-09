@@ -52,6 +52,8 @@ trait Syntaxes {
   @deprecated("cojoin has been merged into cobind", "7.1")
   object cojoin extends ToCobindOps
 
+  object cobind extends ToCobindOps
+
   object comonad extends ToComonadOps
 
   object cozip extends ToCozipOps
@@ -87,6 +89,8 @@ trait Syntaxes {
   object bitraverse extends ToBitraverseOps
 
   object compose extends ToComposeOps
+
+  object profunctor extends ToProfunctorOps
 
   object category extends ToCategoryOps
 
