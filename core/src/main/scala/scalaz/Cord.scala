@@ -107,7 +107,7 @@ final case class Cord(self: FingerTree[Int, String]) {
    * Modifies each character in this `Cord` by the given function.
    * Time complexity: O(N)
    */
-  def map[B](f: Char => Char): Cord = cord(self map (_ map f))
+  def map(f: Char => Char): Cord = cord(self map (_ map f))
 
   def toList: List[Char] = toIndexedSeq.toList
   def toStream: Stream[Char] = toIndexedSeq.toStream
@@ -119,7 +119,7 @@ final case class Cord(self: FingerTree[Int, String]) {
   }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
-  def flatMap[B](f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
+  def flatMap(f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
 }
 
 object Cord {
