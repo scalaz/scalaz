@@ -84,7 +84,9 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   def %=(f: B1 => B2): IndexedState[A1, A2, B2] =
     mods(f)
 
-  /** Modify the portion of the state viewed through the lens and return its old value. */
+  /** Modify the portion of the state viewed through the lens and return its old value.
+   * @since 7.0.2
+   */
   def modo(f: B1 => B2): IndexedState[A1, A2, B1] =
     IndexedState(a => {
       val c = run(a)
@@ -92,7 +94,9 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
       (c put f(o), o)
     })
 
-  /** Modify the portion of the state viewed through the lens and return its old value. */
+  /** Modify the portion of the state viewed through the lens and return its old value. alias for `modo`
+   * @since 7.0.2
+   */
   def <%=(f: B1 => B2): IndexedState[A1, A2, B1] =
     modo(f)
 
@@ -104,11 +108,15 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   def :=(b: => B2): IndexedState[A1, A2, B2] =
     assign(b)
 
-  /** Set the portion of the state viewed through the lens and return its old value. */
+  /** Set the portion of the state viewed through the lens and return its old value.
+   * @since 7.0.2
+   */
   def assigno(b: => B2): IndexedState[A1, A2, B1] =
     modo(_ => b)
 
-  /** Set the portion of the state viewed through the lens and return its old value. */
+  /** Set the portion of the state viewed through the lens and return its old value. alias for `assigno`
+   * @since 7.0.2
+   */
   def <:=(b: => B2): IndexedState[A1, A2, B1] =
     assigno(b)
 
