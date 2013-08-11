@@ -131,7 +131,7 @@ trait InputInstances {
      def equal(a1: Input[A], a2: Input[A]): Boolean = a1.fold(
        empty = a2.isEmpty
        , el = a => a2.exists(z => A.equal(a, z))
-       , eof = a2.isEmpty
+       , eof = a2.isEof
      )
    }
 
