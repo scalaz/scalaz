@@ -77,8 +77,10 @@ trait FunctionInstances extends FunctionInstances0 {
     def zip[A, B](a: => T => A, b: => T => B) =
       t => (a(t), b(t))
 
-    def unzip[A, B](a: T => (A, B)) =
-      (a(_)._1, a(_)._2)
+    def unzip[A, B](a: T => (A, B)) = {
+      lazy val result = Memo.immutableHashMapMemo((t: T) => a(t))
+      (result(_)._1, result(_)._2)
+    }
 
     def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => T => B): T => G[B] =
       t => Functor[G].map(fa)(a => f(a)(t))

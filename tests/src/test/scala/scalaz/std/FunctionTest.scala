@@ -63,6 +63,15 @@ class FunctionTest extends Spec {
     mappedCall() must be_===(number + 4)
   }
 
+  "Function1 unzip must only evaluate the function once" ! {
+    var sideEffect = 0
+    val f: Int => (Int, Int) = (i: Int) => ({ sideEffect += 1; i + 1}, i + 2)
+    val (unzipped1, unzipped2) = function1Covariant[Int].unzip(f)
+
+    (unzipped1(1), unzipped2(1)) must be_===((2, 3))
+    sideEffect must be_===(1)
+  }
+
   "fix" ! prop{(n: Int) =>
     fix[Int](_ => n) must be_===(n)
     (fix[Stream[Int]](ns => n #:: (2*n) #:: ns).take(4).toList
