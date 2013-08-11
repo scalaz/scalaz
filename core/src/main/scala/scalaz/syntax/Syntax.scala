@@ -108,7 +108,7 @@ trait Syntaxes {
   // Data
   //
 
-  object id extends ToIdOps
+  object id extends ToIdOpsDeprecated
 
   object tree extends ToTreeOps
 
@@ -142,10 +142,8 @@ trait ToDataOps
   with ToStateOps
   with ToValidationOps
   with ToKleisliOps
-  // TODO those are not yet included because of ambiguities when importing all syntax
-  // can be included again when the @deprecated methods are being removed
-  // with ToEitherOps
-  // with ToNelOps
+  with ToEitherOps
+  with ToNelOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
