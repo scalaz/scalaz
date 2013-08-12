@@ -21,6 +21,13 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
+    Arbitrary(Gen.oneOf(
+      arbitrary[A].map2(arbitrary[B])(\&/.Both(_, _)),
+      arbitrary[A].map(\&/.This(_)),
+      arbitrary[B].map(\&/.That(_))
+    ))
+
   implicit def arbList[T](implicit a: Arbitrary[T]): Arbitrary[List[T]] = Arbitrary(containerOf[List,T](arbitrary[T]))
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
