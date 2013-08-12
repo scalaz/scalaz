@@ -4,6 +4,7 @@ import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
 import scalaz.std.option.{optionMonoid, none, some}
 import scalaz.Ordering.orderingInstance
 
+/** @since 7.0.3 */
 final case class OneAnd[F[_], A](head: A, tail: F[A])
 
 private sealed trait OneAndFunctor[F[_]]

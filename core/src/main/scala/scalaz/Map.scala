@@ -11,6 +11,7 @@ import std.option._
 import syntax.equal._
 import syntax.std.option._
 
+/** @since 7.0.3 */
 sealed abstract class ==>>[A, B] {
   import ==>>._
 

@@ -1,5 +1,6 @@
 package scalaz
 
+/** @since 7.0.3 */
 sealed abstract class \&/[A, B] extends Product with Serializable {
   import \&/._
 
