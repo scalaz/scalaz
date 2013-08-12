@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+        <head>
+          <title>concurrent - scalaz.concurrent</title>
+          <meta name="description" content="concurrent - scalaz.concurrent" />
+          <meta name="keywords" content="concurrent scalaz.concurrent" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'scalaz.concurrent.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../lib/package_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="scalaz">scalaz</a></p>
+        <h1>concurrent</h1>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">concurrent</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="scalaz.concurrent.Actor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Actor[A]extendsProductwithSerializable"></a>
+      <a id="Actor[A]:Actor[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Actor.html"><span class="name">Actor</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="handler">handler: (<span class="extype" name="scalaz.concurrent.Actor.A">A</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>, <span name="onError">onError: (<span class="extype" name="scala.Throwable">Throwable</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span> = <span class="symbol">((x$1: Throwable) =&gt; throw x$1)</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="strategy">strategy: <a href="Strategy.html" class="extype" name="scalaz.concurrent.Strategy">Strategy</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Processes messages of type <code>A</code> sequentially.</p>
+    </li><li name="scalaz.concurrent.ActorFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ActorFunctionsextendsAnyRef"></a>
+      <a id="ActorFunctions:ActorFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ActorFunctions.html"><span class="name">ActorFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.ActorInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ActorInstancesextendsAnyRef"></a>
+      <a id="ActorInstances:ActorInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ActorInstances.html"><span class="name">ActorInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Atomic" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Atomic[A]extendsAnyRef"></a>
+      <a id="Atomic[A]:Atomic[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Atomic.html"><span class="name">Atomic</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Atomics" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="AtomicsextendsAnyRef"></a>
+      <a id="Atomics:Atomics"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Atomics.html"><span class="name">Atomics</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.BooleanLatch" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="BooleanLatchextendsAnyRef"></a>
+      <a id="BooleanLatch:BooleanLatch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="BooleanLatch.html"><span class="name">BooleanLatch</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Chan" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Chan[A]extendsAnyRef"></a>
+      <a id="Chan[A]:Chan[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Chan.html"><span class="name">Chan</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Concurrents" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ConcurrentsextendsActorFunctionswithPromiseFunctions"></a>
+      <a id="Concurrents:Concurrents"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Concurrents.html"><span class="name">Concurrents</span></a><span class="result"> extends <a href="ActorFunctions.html" class="extype" name="scalaz.concurrent.ActorFunctions">ActorFunctions</a> with <a href="PromiseFunctions.html" class="extype" name="scalaz.concurrent.PromiseFunctions">PromiseFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Future" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Future[+A]extendsAnyRef"></a>
+      <a id="Future[+A]:Future[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Future.html"><span class="name">Future</span></a><span class="tparams">[<span name="A">+A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt"><code>Future</code> is a trampolined computation producing an <code>A</code> that may
+include asynchronous steps.</p>
+    </li><li name="scalaz.concurrent.MVar" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MVar[A]extendsAnyRef"></a>
+      <a id="MVar[A]:MVar[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MVar.html"><span class="name">MVar</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.MVarFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MVarFunctionsextendsAnyRef"></a>
+      <a id="MVarFunctions:MVarFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MVarFunctions.html"><span class="name">MVarFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.PhasedLatch" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PhasedLatchextendsAnyRef"></a>
+      <a id="PhasedLatch:PhasedLatch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PhasedLatch.html"><span class="name">PhasedLatch</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.PhasedLatches" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PhasedLatchesextendsAnyRef"></a>
+      <a id="PhasedLatches:PhasedLatches"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PhasedLatches.html"><span class="name">PhasedLatches</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Promise" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Promise[A]extendsAnyRef"></a>
+      <a id="Promise[A]:Promise[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Promise.html"><span class="name">Promise</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.PromiseFunctions" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PromiseFunctionsextendsAnyRef"></a>
+      <a id="PromiseFunctions:PromiseFunctions"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PromiseFunctions.html"><span class="name">PromiseFunctions</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.PromiseInstances" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="PromiseInstancesextendsAnyRef"></a>
+      <a id="PromiseInstances:PromiseInstances"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="PromiseInstances.html"><span class="name">PromiseInstances</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Run" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="Run[F]extendsAnyRef"></a>
+      <a id="Run[F]:Run[F]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Run.html"><span class="name">Run</span></a><span class="tparams">[<span name="F">F</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Strategy" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StrategyextendsAnyRef"></a>
+      <a id="Strategy:Strategy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Strategy.html"><span class="name">Strategy</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      <p class="comment cmt">Evaluate an expression in some specific manner.</p>
+    </li><li name="scalaz.concurrent.Strategys" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StrategysextendsStrategysLow"></a>
+      <a id="Strategys:Strategys"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Strategys.html"><span class="name">Strategys</span></a><span class="result"> extends <a href="StrategysLow.html" class="extype" name="scalaz.concurrent.StrategysLow">StrategysLow</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.StrategysLow" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StrategysLowextendsAnyRef"></a>
+      <a id="StrategysLow:StrategysLow"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StrategysLow.html"><span class="name">StrategysLow</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Task" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Task[+A]extendsAnyRef"></a>
+      <a id="Task[+A]:Task[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Task.html"><span class="name">Task</span></a><span class="tparams">[<span name="A">+A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scalaz.concurrent.Actor" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Actor"></a>
+      <a id="Actor:Actor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Actor$.html"><span class="name">Actor</span></a><span class="result"> extends <a href="ActorFunctions.html" class="extype" name="scalaz.concurrent.ActorFunctions">ActorFunctions</a> with <a href="ActorInstances.html" class="extype" name="scalaz.concurrent.ActorInstances">ActorInstances</a> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Atomic" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Atomic"></a>
+      <a id="Atomic:Atomic"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Atomic$.html"><span class="name">Atomic</span></a><span class="result"> extends <a href="Atomics.html" class="extype" name="scalaz.concurrent.Atomics">Atomics</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.BooleanLatch" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BooleanLatch"></a>
+      <a id="BooleanLatch:BooleanLatch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="BooleanLatch$.html"><span class="name">BooleanLatch</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Chan" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Chan"></a>
+      <a id="Chan:Chan"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Chan$.html"><span class="name">Chan</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Concurrent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Concurrent"></a>
+      <a id="Concurrent:Concurrent"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Concurrent$.html"><span class="name">Concurrent</span></a><span class="result"> extends <a href="Concurrents.html" class="extype" name="scalaz.concurrent.Concurrents">Concurrents</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Future" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Future"></a>
+      <a id="Future:Future"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Future$.html"><span class="name">Future</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.MVar" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MVar"></a>
+      <a id="MVar:MVar"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MVar$.html"><span class="name">MVar</span></a><span class="result"> extends <a href="MVarFunctions.html" class="extype" name="scalaz.concurrent.MVarFunctions">MVarFunctions</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.PhasedLatch" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PhasedLatch"></a>
+      <a id="PhasedLatch:PhasedLatch"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="PhasedLatch$.html"><span class="name">PhasedLatch</span></a><span class="result"> extends <a href="PhasedLatches.html" class="extype" name="scalaz.concurrent.PhasedLatches">PhasedLatches</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Promise" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Promise"></a>
+      <a id="Promise:Promise"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Promise$.html"><span class="name">Promise</span></a><span class="result"> extends <a href="PromiseFunctions.html" class="extype" name="scalaz.concurrent.PromiseFunctions">PromiseFunctions</a> with <a href="PromiseInstances.html" class="extype" name="scalaz.concurrent.PromiseInstances">PromiseInstances</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Run" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Run"></a>
+      <a id="Run:Run"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Run$.html"><span class="name">Run</span></a>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Strategy" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Strategy"></a>
+      <a id="Strategy:Strategy"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Strategy$.html"><span class="name">Strategy</span></a><span class="result"> extends <a href="Strategys.html" class="extype" name="scalaz.concurrent.Strategys">Strategys</a></span>
+      </span>
+      </h4>
+      
+    </li><li name="scalaz.concurrent.Task" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Task"></a>
+      <a id="Task:Task"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Task$.html"><span class="name">Task</span></a>
+      </span>
+      </h4>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+      <script defer="defer" type="text/javascript" id="jquery-js" src="../../lib/jquery.js"></script><script defer="defer" type="text/javascript" id="jquery-ui-js" src="../../lib/jquery-ui.js"></script><script defer="defer" type="text/javascript" id="tools-tooltip-js" src="../../lib/tools.tooltip.js"></script><script defer="defer" type="text/javascript" id="template-js" src="../../lib/template.js"></script>
+    </body>
+      </html>
