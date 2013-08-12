@@ -1,5 +1,6 @@
 package scalaz
 
+/** @since 7.0.3 */
 final case class OneOr[F[_], A](run: F[A] \/ A) {
   def map[B](f: A => B)(implicit F: Functor[F]): OneOr[F, B] =
     OneOr(run.bimap(F.map(_)(f), f))

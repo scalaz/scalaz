@@ -21,6 +21,7 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  /** @since 7.0.3 */
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
       arbitrary[A].map2(arbitrary[B])(\&/.Both(_, _)),
@@ -71,10 +72,13 @@ object ScalazArbitrary {
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, List[A], NonEmptyList[A]](arb[A], arb[List[A]])(nel(_, _))
 
+
+  /** @since 7.0.3 */
   implicit def OneAndArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]
                                         ): Arbitrary[OneAnd[F, A]] =
     Apply[Arbitrary].apply2(arb[A], arb[F[A]])(OneAnd.apply)
 
+  /** @since 7.0.3 */
   implicit def OneOrArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]): Arbitrary[OneOr[F, A]] =
     Functor[Arbitrary].map(arb[F[A] \/ A])(OneOr(_))
 
