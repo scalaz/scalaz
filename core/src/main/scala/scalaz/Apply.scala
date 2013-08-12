@@ -139,5 +139,20 @@ object Apply {
 
   ////
 
+  /**
+   * Add a unit to any Apply to form an Applicative.
+   * Backported from 7.1.0 for `OneAnd`
+   */
+  private[scalaz] def applyApplicative[F[_]](implicit F: Apply[F]): Applicative[({type λ[α] = F[α] \/ α})#λ] =
+    new Applicative[({type λ[α] = F[α] \/ α})#λ] {
+      // transliterated from semigroupoids 3.0.2, thanks edwardk
+      def point[A](a: => A) = \/-(a)
+      def ap[A, B](a: => F[A] \/ A)(f: => F[A => B] \/ (A => B)) = (f, a) match {
+        case (\/-(f), \/-(a)) => \/-(f(a))
+        case (\/-(f), -\/(a)) => -\/(F.map(a)(f))
+        case (-\/(f), \/-(a)) => -\/(F.map(f)(_(a)))
+        case (-\/(f), -\/(a)) => -\/(F.ap(a)(f))
+      }
+    }
   ////
 }
