@@ -69,8 +69,10 @@ sealed abstract class EphemeralStream[A] {
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
 
-  def reverse: EphemeralStream[A] =
-    foldLeft(EphemeralStream.emptyEphemeralStream[A])(a => b => EphemeralStream.cons(b, a))
+  def reverse: EphemeralStream[A] = {
+    def lcons(xs: => List[A])(x: => A) = x :: xs
+    apply(foldLeft(Nil: List[A])(lcons _) : _*)
+  }
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
     if(isEmpty && b.isEmpty)
@@ -96,10 +98,16 @@ object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunc
   def apply[A]: EphemeralStream[A] =
     emptyEphemeralStream
 
-  def apply[A](as: A*): EphemeralStream[A] =
+  def apply[A](as: A*): EphemeralStream[A] = {
+    val as0 = as match{
+      case indexedSeq: collection.IndexedSeq[A] => indexedSeq
+      case other => other.toIndexedSeq
+    }
+    val size = as.size
     unfold(0)(b =>
-      if (b < as.size) Some((as(b), b + 1))
+      if (b < size) Some((as0(b), b + 1))
       else None)
+  }
 }
 
 sealed abstract class EphemeralStreamInstances {
