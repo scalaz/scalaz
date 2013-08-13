@@ -69,8 +69,10 @@ sealed abstract class EphemeralStream[A] {
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
 
-  def reverse: EphemeralStream[A] =
-    foldLeft(EphemeralStream.emptyEphemeralStream[A])(a => b => EphemeralStream.cons(b, a))
+  def reverse: EphemeralStream[A] = {
+    def lcons(xs: => List[A])(x: => A) = x :: xs
+    apply(foldLeft(Nil: List[A])(lcons _) : _*)
+  }
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
     if(isEmpty && b.isEmpty)
