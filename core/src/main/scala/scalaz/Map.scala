@@ -242,7 +242,7 @@ sealed abstract class ==>>[A, B] {
   def updateAt(i: Int, f: (A, B) => Option[B]): A ==>> B =
     this match {
       case Tip() =>
-        sys.error("")
+        sys.error("updateAt")
       case Bin(kx, x, l, r) =>
         implicitly[Order[Int]].order(i, l.size) match {
           case LT =>
@@ -404,7 +404,7 @@ sealed abstract class ==>>[A, B] {
         val (km, r2) = deleteFindMax(r)
         (km, balance(k, x, l, r2))
       case Tip() =>
-        (sys.error("nonedasda"), t)
+        sys.error("deleteFindMax")
     }
 
   private def deleteFindMin(t: A ==>> B): ((A, B), A ==>> B) =
@@ -415,7 +415,7 @@ sealed abstract class ==>>[A, B] {
         val (km, l2) = deleteFindMin(l)
         (km, balance(k, x, l2, r))
       case Tip() =>
-        (sys.error("asdsad"), t)
+        sys.error("deleteFindMin")
     }
 
   /* Mappings */
@@ -960,14 +960,14 @@ trait MapFunctions {
   final def fromListWithKey[A: Order, B](l: List[(A, B)])(f: (A, B, B) => B): A ==>> B =
     l.foldLeft(empty[A, B])((a, c) => a.insertWithKey((k, x, y) => f(k, x, y), c._1, c._2))
 
-  def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
+  final def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.union(c))
 
-  def unionsWith[A: Order, B](f: (B, B) => B)(xs: List[A ==>> B]): A ==>> B =
+  final def unionsWith[A: Order, B](f: (B, B) => B)(xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.unionWith(c)(f))
 
-  val ratio = 2
-  val delta = 4
+  private[scalaz] val ratio = 2
+  private[scalaz] val delta = 4
 
   private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
     if (l.size + r.size <= 1)
@@ -986,7 +986,8 @@ trait MapFunctions {
       case Bin(_, _, ly, ry) =>
         if (ly.size < ratio * ry.size) singleL(k, x, l, r)
         else doubleL(k, x, l, r)
-      case Tip() => sys.error("rotateL Tip")
+      case Tip() =>
+        sys.error("rotateL Tip")
     }
 
   private def singleL[A, B](k1: A, x1: B, t1: A ==>> B, r: A ==>> B): A ==>> B =
