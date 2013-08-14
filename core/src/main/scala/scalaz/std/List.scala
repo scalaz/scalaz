@@ -251,7 +251,8 @@ trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
 
   import Ordering._
 
-  def order(a1: List[A], a2: List[A]) =
+  @annotation.tailrec
+  final def order(a1: List[A], a2: List[A]) =
     (a1, a2) match {
       case (Nil, Nil)     => EQ
       case (Nil, _::_)    => LT
