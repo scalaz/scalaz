@@ -28,6 +28,8 @@
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
   </style>
+
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 </head>
 
 <body>
@@ -54,6 +56,12 @@
 <h2>Contact</h2>
 <p> (nkpart+scalaz@gmail.com)<br/>      </p>
 
+<h2><a href="#scaladoc">Scaladoc</a></h2>
+<div>
+  <ul id="scaladoc">
+    <li><a target='_blank' href='https://scalazproject.ci.cloudbees.com/job/nightly_2.10/ws/target/scala-2.10/unidoc/index.html#scalaz.package'>snapshot</a></li>
+  </ul>
+</div>
 
     <h2>Download</h2>
     <p>
@@ -74,4 +82,18 @@
 
   
 </body>
+<script>
+(function(){
+  var callback = function(data){
+    for(var i = 0; i < data.tree.length; i++){
+      var tree = data.tree[i]
+      if(tree.type === "tree"){
+        var path = tree.path
+        $("#scaladoc").append("<li><a target='_blank' href='" + path + "/doc/index.html#scalaz.package'>" + path + "</a></li>")
+      }
+    }
+  }
+  $.get("https://api.github.com/repos/scalaz/scalaz/git/trees/gh-pages", {}, callback)
+})()
+</script>
 </html>
