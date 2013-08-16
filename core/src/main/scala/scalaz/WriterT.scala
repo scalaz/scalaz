@@ -212,7 +212,7 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
     implicit def W = W0
   }
 
-  implicit def writerTMonadTrans[W](implicit W0: Monoid[W]): MonadTrans[({type λ[α[_], β] = WriterT[α, W, β]})#λ] = new WriterTMonadTrans[W] {
+  implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type λ[α[_], β] = WriterT[α, W, β]})#λ] = new WriterTHoist[W] {
     implicit def W = W0
   }
 }
@@ -311,13 +311,17 @@ private trait WriterComonad[W] extends Comonad[({type λ[α] = Writer[W, α]})#�
     Writer(fa.written, f(fa))
 }
 
-private trait WriterTMonadTrans[W] extends MonadTrans[({type λ[α[_], β] = WriterT[α, W, β]})#λ] {
+private trait WriterTHoist[W] extends Hoist[({type λ[α[_], β] = WriterT[α, W, β]})#λ] {
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): WriterT[M, W, B] =
     WriterT(M.map(mb)((W.zero, _)))
 
   implicit def W: Monoid[W]
 
   implicit def apply[M[_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
+
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type λ[α]=WriterT[M, W, α]})#λ ~> ({type λ[α]=WriterT[N, W, α]})#λ) {
+    def apply[A](fa: WriterT[M, W, A]) = WriterT(f(fa.run))
+  }
 }
 
 private trait WriterTMonadListen[F[_], W] extends MonadListen[({type λ[α, β] = WriterT[F, α, β]})#λ, W] with WriterTMonad[F, W] {
