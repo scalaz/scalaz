@@ -5,6 +5,8 @@ import scalacheck.ScalazProperties._
 
 class InsertionMapTest extends Spec {
   checkAll(equal.laws[InsertionMap[Int, String]])
+  checkAll(functor.laws[({type λ[α] = InsertionMap[Int, α]})#λ])
+  checkAll(traverse.laws[({type λ[α] = InsertionMap[Int, α]})#λ])
 
   "equality order independence" ! prop {
     (k1: Int, v1: String, k2: Int, v2: String, a: InsertionMap[Int, String]) =>
