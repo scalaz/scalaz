@@ -17,6 +17,7 @@ class FingerTreeTest extends Spec {
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
 
   checkAll(monoid.laws[SequenceTree[String]])
+  checkAll(equal.laws[SequenceTree[String]])
 
   val intStream = Stream.from(1)
 
