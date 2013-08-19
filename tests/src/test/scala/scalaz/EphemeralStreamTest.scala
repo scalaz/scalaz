@@ -18,4 +18,14 @@ class EphemeralStreamTest extends Spec {
     e.reverse.toList must be_===(e.toList.reverse)
     e.reverse.reverse must be_===(e)
   }
+
+  "foldLeft large stream" in {
+    val list = List.fill(10000000)(1)
+    val xs = EphemeralStream(list : _*)
+    Foldable[EphemeralStream].foldLeft(xs, 0)(_ + _) must be_===(list.sum)
+  }
+
+  "foldLeft" ! prop{ xs: List[List[Int]] =>
+    Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must be_===(xs.foldLeft(List[Int]())(_ ::: _))
+  }
 }
