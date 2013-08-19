@@ -38,7 +38,7 @@ import scala.concurrent.duration._
  * `Future` also differs from the scala 2.10 `Future` type in that it
  * does not necessarily represent a _running_ computation. Instead, we
  * reintroduce nondeterminism _explicitly_ using the functions of the
- * `scalaz.Nondeterminsm` interface. This simplifies our implementation
+ * `scalaz.Nondeterminism` interface. This simplifies our implementation
  * and makes code easier to reason about, since the order of effects
  * and the points of nondeterminism are made fully explicit and do not
  * depend on Scala's evaluation order.
