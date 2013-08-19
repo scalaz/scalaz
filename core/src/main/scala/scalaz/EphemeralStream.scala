@@ -119,7 +119,8 @@ trait EphemeralStreamInstances {
     def empty[A] = EphemeralStream()
     def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
     def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
-
+    override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
+      fa.foldLeft(z)(b => a => f(b, a))
     def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
       val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
