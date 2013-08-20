@@ -6,6 +6,8 @@ sealed abstract class IsEmptyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: IsEmpty[F]
   ////
 
+  def isEmpty: Boolean = F.isEmpty(self)
+
   ////
 }
 
