@@ -68,8 +68,8 @@ trait OptionOps[A] extends Ops[Option[A]] {
    * <p/>
    * For example:
    * {{{
-   * val o: Option = None
-   * val a: List[String] = ~o
+   * val o: Option[List[String]] = None
+   * val a: List[String] = ~o // List()
    * }}}
    */
   final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
