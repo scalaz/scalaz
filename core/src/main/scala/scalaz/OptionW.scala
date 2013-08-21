@@ -73,8 +73,8 @@ sealed trait OptionW[A] extends PimpedType[Option[A]] {
    * <p/>
    * For example:
    * <pre>
-   * val o: Option = None
-   * val a: List[String] = ~o
+   * val o: Option[List[String]] = None
+   * val a: List[String] = ~o // List()
    * </pre>
    */
   def unary_~(implicit z: Zero[A]): A = value getOrElse z.zero
