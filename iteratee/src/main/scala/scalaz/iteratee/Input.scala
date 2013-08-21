@@ -82,7 +82,7 @@ object Input extends InputFunctions with InputInstances {
 trait InputInstances {
   import Input._
 
-  implicit val input = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {
+  implicit val input: Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {
      override def length[A](fa: Input[A]): Int = fa.fold(
        empty = 0
        , el = _ => 1
@@ -109,7 +109,7 @@ trait InputInstances {
      def empty[A]: Input[A] = emptyInput
    }
 
-   implicit def inputMonoid[A](implicit A: Monoid[A]) = new Monoid[Input[A]] {
+   implicit def inputMonoid[A](implicit A: Monoid[A]): Monoid[Input[A]] = new Monoid[Input[A]] {
      def append(a1: Input[A], a2: => Input[A]): Input[A] = a1.fold(
        empty = a2.fold(
          empty = emptyInput
@@ -127,7 +127,7 @@ trait InputInstances {
      def zero: Input[A] = emptyInput
    }
 
-   implicit def inputEqual[A](implicit A: Equal[A]) = new Equal[Input[A]] {
+   implicit def inputEqual[A](implicit A: Equal[A]): Equal[Input[A]] = new Equal[Input[A]] {
      def equal(a1: Input[A], a2: Input[A]): Boolean = a1.fold(
        empty = a2.isEmpty
        , el = a => a2.exists(z => A.equal(a, z))
@@ -135,7 +135,7 @@ trait InputInstances {
      )
    }
 
-   implicit def inputShow[A](implicit A: Show[A]) = new Show[Input[A]] {
+   implicit def inputShow[A](implicit A: Show[A]): Show[Input[A]] = new Show[Input[A]] {
      override def shows(f: Input[A]) = f.fold(
        empty = "empty-input"
        , el = a => "el-input(" + A.shows(a) + ")"
