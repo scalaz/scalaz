@@ -304,3 +304,7 @@ type Id[A] = A
 ## Contributing
 
 [Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/doc/DeveloperGuide.md)
+
+## Credits
+
+Support for Scalaz development is provided by [Jetbrains](http://www.jetbrains.com/idea/).
