@@ -17,7 +17,7 @@ class TreeTest extends Spec {
         Equal[A].equal(a1.rootLabel, a2.rootLabel) && streamEqualApprox.equal(a1.subForest, a2.subForest)
     }
 
-    // TODO checkAll("Tree", traverse.laws[Tree])
+    // TODO checkAll("Tree", traverse1.laws[Tree])
     checkAll("Tree", applicative.laws[Tree])
     checkAll("Tree", comonad.laws[Tree])
   }

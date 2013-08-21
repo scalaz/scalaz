@@ -137,6 +137,9 @@ object ScalazArbitrary {
 
   implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
 
+  implicit def FreeReturnArbitrary[F[_], A](implicit F: Functor[F], a: Arbitrary[A]): Arbitrary[Free.Return[F, A]] =
+    Functor[Arbitrary].map(a)(Free.Return[F, A](_))
+
   import FingerTree._
 
   implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(

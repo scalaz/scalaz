@@ -8,4 +8,5 @@ class SetTest extends Spec {
   checkAll(order.laws[Set[Int]])
   checkAll(monoid.laws[Set[Int]])
   checkAll(isEmpty.laws[Set])
+  checkAll(foldable.laws[Set])
 }
