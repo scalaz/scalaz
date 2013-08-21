@@ -347,4 +347,13 @@ object ScalazArbitrary {
   implicit val hCursorArbitrary: Arbitrary[HCursor] =
     ^(arb[History], arb[Option[Cursor]])(HCursor.hcursor)
 
+  implicit def iterateeInputArbitrary[A: Arbitrary]: Arbitrary[scalaz.iteratee.Input[A]] = {
+    import scalaz.iteratee.Input._
+    Arbitrary(Gen.oneOf(
+      emptyInput[A],
+      eofInput[A],
+      arbitrary[A].map(e => elInput(e))
+    ))
+  }
+
 }
