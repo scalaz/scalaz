@@ -112,7 +112,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
 object Task {
   
-  implicit val taskInstance = new Nondeterminism[Task] with Catchable[Task] { 
+  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] = new Nondeterminism[Task] with Catchable[Task] { 
     val F = Nondeterminism[Future]
     def point[A](a: => A) = new Task(Future.now(Try(a))) 
     def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] = 
