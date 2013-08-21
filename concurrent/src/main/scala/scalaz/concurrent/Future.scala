@@ -218,7 +218,7 @@ object Future {
   // NB: considered implementing Traverse and Comonad, but these would have
   // to run the Future; leaving out for now
 
-  implicit val futureInstance = new Nondeterminism[Future] {
+  implicit val futureInstance: Nondeterminism[Future] = new Nondeterminism[Future] {
     def bind[A,B](fa: Future[A])(f: A => Future[B]): Future[B] =
       fa flatMap f
     def point[A](a: => A): Future[A] = now(a)
