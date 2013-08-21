@@ -27,4 +27,28 @@ class StateTTest extends Spec {
     // checking absence of ambiguity
     def functor[S, F[_] : Monad] = Functor[({type λ[α] = StateT[F, S, α]})#λ]
   }
+
+  "monadState.state" in {
+    instances.monadState[Boolean].state(42).run(true) must be_===((true, 42))
+  }
+
+  "monadState.constantState" in {
+    instances.monadState[Boolean].constantState(42, false).run(true) must be_===((false, 42))
+  }
+
+  "monadState.get" in {
+    instances.monadState[Boolean].get.run(true) must be_===((true, true))
+  }
+
+  "monadState.gets" in {
+    instances.monadState[Int].gets { _ + 1 }.run(10) must be_===((10, 11))
+  }
+
+  "monadState.put" in {
+    instances.monadState[Int].put(20).run(10) must be_===((20, ()))
+  }
+
+  "monadState.modify" in {
+    instances.monadState[Int].modify { _ + 1 }.run(10) must be_===((11, ()))
+  }
 }
