@@ -4,13 +4,10 @@ package std
 
 import collection.immutable.IndexedSeq
 
-trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
-
-  protected def v: scalaz.std.IndexedSeqSubFunctions {
-    type IxSq[+X] = IS[X]
-  }
+final class IndexedSeqOps[IS[+_], A](self: IS[A], v: scalaz.std.IndexedSeqSubFunctions{type IxSq[+X]=IS[X]}) {
 
   final def intersperse(a: A): IS[A] = v.intersperse(self, a)
+
   final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
 
   final def toZipper: Option[Zipper[A]] = v.toZipper(self)
@@ -55,8 +52,5 @@ trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
 }
 
 trait ToIndexedSeqOps {
-  implicit def ToIndexedSeqOpsFromIndexedSeq[A](a: IndexedSeq[A]): IndexedSeqOps[IndexedSeq, A] = new IndexedSeqOps[IndexedSeq, A] {
-    protected def v = scalaz.std.indexedSeq
-    val self = a
-  }
+  implicit def ToIndexedSeqOpsFromIndexedSeq[A](a: IndexedSeq[A]): IndexedSeqOps[IndexedSeq, A] = new IndexedSeqOps[IndexedSeq, A](a, scalaz.std.indexedSeq)
 }
