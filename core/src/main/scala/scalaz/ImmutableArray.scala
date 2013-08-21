@@ -30,6 +30,7 @@ sealed abstract class ImmutableArray[+A] {
 
 
 trait ImmutableArrayFunctions {
+  import ImmutableArray._
 
   def make[A](x: AnyRef): ImmutableArray[A] = {
     val y = x match {
@@ -93,8 +94,10 @@ trait ImmutableArrayFunctions {
 
       def apply: Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
     }
+}
 
-  abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
+object ImmutableArray extends ImmutableArrayFunctions {
+  sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
     // override def stringPrefix = "ImmutableArray"
     // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemManifest)
@@ -104,7 +107,7 @@ trait ImmutableArrayFunctions {
     def length = arr.length
     def toArray[B >: A : ClassManifest] = arr.clone.asInstanceOf[Array[B]]
     def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) { arr.copyToArray(xs, start, len) }
-    
+
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
@@ -115,7 +118,6 @@ trait ImmutableArrayFunctions {
       fromArray(newArr)
     }
   }
-
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
     protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
   }
@@ -174,7 +176,7 @@ trait ImmutableArrayFunctions {
 
     def ++[B >: Char](other: ImmutableArray[B]) =
       other match {
-        case other: ImmutableArrayFunctions#StringArray => new StringArray(str + other.str)
+        case other: StringArray => new StringArray(str + other.str)
         case _ => {
           val newArr = new Array[Char](length + other.length)
           this.copyToArray(newArr, 0, length)
@@ -183,9 +185,6 @@ trait ImmutableArrayFunctions {
         }
       }
   }
-}
-
-object ImmutableArray extends ImmutableArrayFunctions {
 
   implicit def wrapArray[A](immArray: ImmutableArray[A]): WrappedImmutableArray[A] = {
     import ImmutableArray.{WrappedImmutableArray => IAO}
