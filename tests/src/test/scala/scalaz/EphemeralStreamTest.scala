@@ -10,6 +10,7 @@ class EphemeralStreamTest extends Spec {
   checkAll(equal.laws[EphemeralStream[Int]])
   checkAll(monadPlus.laws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])
+  checkAll(zip.laws[EphemeralStream])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)

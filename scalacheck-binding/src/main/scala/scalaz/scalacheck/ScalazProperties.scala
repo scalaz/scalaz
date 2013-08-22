@@ -380,6 +380,16 @@ object ScalazProperties {
       }
   }
 
+  object zip {
+    def zipPreservation[F[_], X](implicit F: Zip[F], FF: Functor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
+      forAll(F.zipLaw.zipPreservation[X] _)
+
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Zip[F], FF: Functor[F], EF: Equal[F[Int]]) =
+      new Properties("zip") {
+        property("preserves structure") = zipPreservation[F, Int]
+      }
+  }
+
   object contravariant {
     def identity[F[_], X](implicit F: Contravariant[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.contravariantLaw.identity[X] _)

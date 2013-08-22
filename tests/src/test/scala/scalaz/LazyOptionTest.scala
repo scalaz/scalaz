@@ -9,4 +9,5 @@ class LazyOptionTest extends Spec {
   checkAll(monadPlus.laws[LazyOption])
   checkAll(cobind.laws[LazyOption])
   checkAll(traverse.laws[LazyOption])
+  checkAll(zip.laws[LazyOption])
 }
