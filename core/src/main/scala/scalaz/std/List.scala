@@ -36,7 +36,7 @@ trait ListInstances extends ListInstances0 {
       //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
 
       // foldRight(l, F.point(List[B]())) {
-      //   (a, fbs) => F.map2(f(a), fbs)(_ :: _)
+      //   (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
       // }
 
       DList.fromList(l).foldr(F.point(List[B]())) {

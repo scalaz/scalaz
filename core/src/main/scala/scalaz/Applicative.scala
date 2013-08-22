@@ -7,7 +7,7 @@ package scalaz
  * Whereas a [[scalaz.Functor]] allows application of a pure function to a value in a context, an Applicative
  * also allows application of a function in a context to a value in a context (`ap`).
  *
- * It follows that a pure function can be applied to arguments in a context. (See `map2`, `map3`, ... )
+ * It follows that a pure function can be applied to arguments in a context. (See `apply2`, `apply3`, ... )
  *
  * Applicative instances come in a few flavours:
  *  - All [[scalaz.Monad]]s are also `Applicative`
