@@ -145,15 +145,8 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
         })
     }
 
-  def bifoldMap[M](f: A => M)(g: B => M)(implicit M: Monoid[M]): M =
-    a match {
-      case None => M.zero
-      case Some(aa) =>
-        b match {
-          case None => M.zero
-          case Some(bb) => M.append(f(aa), g(bb))
-        }
-    }
+  def bifoldMap[M](f: A => M)(g: B => M)(implicit M: Semigroup[M]): M =
+    fold(f, g, (a, b) => M.append(f(a), g(b)))
 
   def exists(p: B => Boolean): Boolean =
     b exists p

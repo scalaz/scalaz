@@ -21,7 +21,7 @@ class MonadPlusTest extends Spec {
 
     List(1 -> "a", 2 -> "b").separate must be_===(List(1, 2) -> List("a", "b"))
 
-    Vector[Int \&/ String](This(1), Both(3, "a"), That("b")).separate must be_===(Vector(3) -> Vector("a"))
+    Vector[Int \&/ String](This(1), Both(3, "a"), That("b")).separate must be_===(Vector(1, 3) -> Vector("a", "b"))
 
     Stream(Success(1), Failure("a"), Success(2)).separate must be_===(Stream("a") -> Stream(1, 2))
   }
