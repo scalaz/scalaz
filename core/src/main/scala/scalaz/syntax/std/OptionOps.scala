@@ -7,6 +7,7 @@ import scalaz.Tags.{Last, First}
 
 final class OptionOps[A](self: Option[A]) {
   final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
+  @deprecated("use `option.cata` or `option.some(f).none(default)`", "7.1.0")
   final def fold[X](some: A => X, none: => X): X = cata(some, none)
 
   final class Fold[X](s: A => X) {
