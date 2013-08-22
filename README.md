@@ -308,3 +308,5 @@ type Id[A] = A
 ## Credits
 
 Support for Scalaz development is provided by [Jetbrains](http://www.jetbrains.com/idea/).
+
+Thanks to Mark Harrah and the sbt contributors for providing [our build tool](http://www.scala-sbt.org).
