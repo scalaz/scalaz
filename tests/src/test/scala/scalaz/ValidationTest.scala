@@ -54,7 +54,7 @@ class ValidationTest extends Spec {
     }
   }
 
-  "map2" should {
+  "apply2" should {
     "accumulate failures in order" in {
       import syntax.show._
       val fail1 = Failure("1").toValidationNel
