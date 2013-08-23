@@ -115,9 +115,8 @@ trait Foldable[F[_]]  { self =>
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
   /** Insert an `A` between every A, yielding the sum. */
   def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
-    (foldRight(fa, none[A]) {
-      case (l, None) => some(l)
-      case (l, Some(r)) => some(A.append(l, A.append(a, r)))
+    (foldRight(fa, none[A]) {case (l, oa) =>
+      some(A.append(l, oa map (A.append(a, _)) getOrElse A.zero))
     }).getOrElse(A.zero)
 
   /**
