@@ -75,7 +75,7 @@ sealed abstract class EphemeralStream[A] {
   }
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
-    if(isEmpty && b.isEmpty)
+    if(isEmpty || b.isEmpty)
       emptyEphemeralStream
     else
       cons((head(), b.head()), tail() zip b.tail())

@@ -28,4 +28,12 @@ class EphemeralStreamTest extends Spec {
   "foldLeft" ! prop{ xs: List[List[Int]] =>
     Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must be_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
+
+  "zip has right length" ! prop {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
+    (xs zip ys).length must be_===(xs.length min ys.length)
+  }
+
+  "interleave has right length" ! prop {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
+    (xs interleave ys).length must be_===(xs.length + ys.length)
+  }
 }
