@@ -1,6 +1,6 @@
 package scalaz
 
-class DataMapTest extends Spec {
+class MapTest extends Spec {
   import org.scalacheck.{Arbitrary, Gen}
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazProperties._
