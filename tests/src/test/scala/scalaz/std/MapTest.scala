@@ -2,6 +2,7 @@ package scalaz
 package std
 
 import std.AllInstances._
+import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import scala.math.{Ordering => SOrdering}
 
@@ -10,6 +11,20 @@ class MapTest extends Spec {
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
+  checkAll(equal.laws[Map[Int,String]])
+
+  "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
+
+  class NotNatural(val id: Int)
+  implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =
+    Arbitrary(arbitrary[Int] map (new NotNatural(_)))
+
+  implicit def NotNaturalOrder: Order[NotNatural] =
+    Order.orderBy[NotNatural, Int](_.id)
+
+  implicit def NotNaturalEqual: Equal[NotNatural] = new Equal[NotNatural] {
+    def equal(a1: NotNatural, a2: NotNatural): Boolean = a1.id == a2.id
+  }
 
   "map ordering" ! prop {
     val O = implicitly[Order[Map[String,Int]]]
