@@ -52,7 +52,7 @@ import scala.concurrent.duration._
  * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
-trait Future[+A] {
+sealed abstract class Future[+A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
