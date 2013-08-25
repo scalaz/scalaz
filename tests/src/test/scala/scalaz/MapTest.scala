@@ -13,9 +13,9 @@ class MapTest extends Spec {
     "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
   }
 
-  case class NotNatural(id: Int)
+  class NotNatural(val id: Int)
   implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =
-    Arbitrary(arbitrary[Int] map (NotNatural.apply))
+    Arbitrary(arbitrary[Int] map (new NotNatural(_)))
 
   implicit def NotNaturalOrder: Order[NotNatural] =
     Order.orderBy[NotNatural, Int](_.id)
