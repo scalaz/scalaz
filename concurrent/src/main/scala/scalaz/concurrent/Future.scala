@@ -73,7 +73,7 @@ sealed abstract class Future[+A] {
    * Also see `runAsync`.
    */
   def listen(cb: A => Trampoline[Unit]): Unit =
-    this.step match {
+    (this.step: @unchecked) match {
       case Now(a) => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) =>
