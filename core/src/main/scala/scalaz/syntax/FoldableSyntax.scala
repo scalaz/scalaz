@@ -7,6 +7,7 @@ sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   ////
   import collection.generic.CanBuildFrom
   import collection.immutable.IndexedSeq
+  import Leibniz.===
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
@@ -56,6 +57,7 @@ sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
   final def intercalate(a: A)(implicit A: Monoid[A]): A = F.intercalate(self, a)
   final def traverse_[M[_]:Applicative](f: A => M[Unit]): M[Unit] = F.traverse_(self)(f)
   final def traverseS_[S, B](f: A => State[S, B]): State[S, Unit] = F.traverseS_(self)(f)
+  final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(G)
 
   ////
 }
