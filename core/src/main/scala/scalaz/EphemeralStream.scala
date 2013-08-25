@@ -98,10 +98,16 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
   def apply[A]: EphemeralStream[A] =
     emptyEphemeralStream
 
-  def apply[A](as: A*): EphemeralStream[A] =
+  def apply[A](as: A*): EphemeralStream[A] = {
+    val as0 = as match{
+      case indexedSeq: collection.IndexedSeq[A] => indexedSeq
+      case other => other.toIndexedSeq
+    }
+    val size = as.size
     unfold(0)(b =>
-      if (b < as.size) Some((as(b), b + 1))
+      if (b < size) Some((as0(b), b + 1))
       else None)
+  }
 }
 
 trait EphemeralStreamInstances {
