@@ -20,7 +20,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
     new EnumeratorP[B, F] {
       def apply[G[_]](implicit MO: MonadPartialOrder[G, F]) = {
         import MO._
-        self[G].map(f)
+        self[G].map[B](f)
       }
     }
 
@@ -28,7 +28,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
     new EnumeratorP[B, F] {
       def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[B, G] = {
         import MO._
-        self[G].flatMap(e => f(e).apply[G])
+        self[G].flatMap[B](e => f(e).apply[G])
       }
     }
 
@@ -36,7 +36,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
     new EnumeratorP[B, F] {
       def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[B, G] = {
         import MO._
-        self[G].collect(pf)
+        self[G].collect[B](pf)
       }
     }
 
@@ -60,7 +60,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
     new EnumeratorP[(E, B), F] {
       def apply[G[_]](implicit MO: G |>=| F) = {
         import MO._
-        self[G].cross(other[G])
+        self[G].cross[B](other[G])
       }
     }
 
@@ -68,7 +68,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
     new EnumeratorP[(E, B), F] {
       def apply[G[_]](implicit MO: G |>=| F) = {
         import MO._
-        self[G].cross(other[G])
+        self[G].cross[B](other[G])
       }
     }
 
