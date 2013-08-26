@@ -173,6 +173,8 @@ object build extends Build {
       import com.typesafe.tools.mima.core.ProblemFilters._
       Seq(
         "scalaz.EitherT.withFilter",
+        "scalaz.EphemeralStream.take",
+        "scalaz.EphemeralStream.takeWhile",
         "scalaz.LensFamily.modo",
         "scalaz.LensFamily.<%=",
         "scalaz.LensFamily.assigno",
