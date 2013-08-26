@@ -36,4 +36,22 @@ class EphemeralStreamTest extends Spec {
   "interleave has right length" ! prop {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
     (xs interleave ys).length must be_===(xs.length + ys.length)
   }
+
+  "take" ! prop { (xs: Stream[Int], n: Int) =>
+    EphemeralStream.fromStream(xs).take(n) must be_===(EphemeralStream.fromStream(xs.take(n)))
+  }
+
+  "take from infinite stream" in {
+    val n = util.Random.nextInt(1000)
+    EphemeralStream.iterate(0)(_ + 1).take(n) must be_===(EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).take(n)))
+  }
+
+  "takeWhile" ! prop { (xs: Stream[Int], n: Int) =>
+    EphemeralStream.fromStream(xs).takeWhile(_ < n) must be_===(EphemeralStream.fromStream(xs.takeWhile(_ < n)))
+  }
+
+  "takeWhile from infinite stream" in {
+    val n = util.Random.nextInt(1000)
+    EphemeralStream.iterate(0)(_ + 1).takeWhile(_ < n) must be_===(EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).takeWhile(_ < n)))
+  }
 }
