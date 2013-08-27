@@ -34,6 +34,13 @@ trait Apply[F[_]] extends Functor[F] { self =>
   /** Flipped variant of `ap`. */
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
 
+  /** [[scalaz.Zip]] derived from `tuple2`. */
+  def zip: Zip[F] =
+    new Zip[F] {
+      def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
+        apply2(a, b)((x, y) => (x, y))
+    }
+
   def ap2[A,B,C](fa: => F[A], fb: => F[B])(f: F[(A,B) => C]): F[C] =
     ap(fb)(ap(fa)(map(f)(_.curried)))
   def ap3[A,B,C,D](fa: => F[A], fb: => F[B], fc: => F[C])(f: F[(A,B,C) => D]): F[D] =
