@@ -175,7 +175,8 @@ sealed abstract class Future[+A] {
 
   def runFor(timeout: Duration): A = runFor(timeout.toMillis)
 
-  /** Like `runFor`, but returns exceptions as values. */
+  /** Like `runFor`, but returns `TimeoutException` as left value. 
+    * Will not report any other exceptions that may be raised during computation of `A`*/
   def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
     val interrupt = new AtomicBoolean(false)
@@ -191,11 +192,31 @@ sealed abstract class Future[+A] {
   /**
    * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
+   * This implementation will not block the future's execution thread
    */
-  def timed(timeoutInMillis: Long): Future[Throwable \/ A] =
-    delay { attemptRunFor(timeoutInMillis) }
+  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
+    //instead of run this though chooseAny, it is run through simple primitive, 
+    //as we are never interested in results of timeout callback, and this is more resource savvy
+    async[Throwable \/ A] { cb =>
+      val cancel = new AtomicBoolean(false)
+      val done = new AtomicBoolean(false)
+      scheduler.schedule(new Runnable {
+        def run() { 
+          if (done.compareAndSet(false,true)) {
+            cancel.set(true)
+            cb(-\/(new TimeoutException()))
+          } 
+        }
+      }
+      , timeoutInMillis, TimeUnit.MILLISECONDS)
+      
+      runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
+    }
+    
+    
 
-  def timed(timeout: Duration): Future[Throwable \/ A] = timed(timeout.toMillis)
+  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
+      Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = timed(timeout.toMillis)
 
   /**
    * Returns a `Future` that delays the execution of this `Future` by the duration `t`.
@@ -341,7 +362,7 @@ object Future {
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
-      Executors.newScheduledThreadPool(1)): Future[A] =
+      Strategy.DefaultTimeoutScheduler): Future[A] =
     Async { cb =>
       pool.schedule(new Callable[Unit] {
         def call = cb(a).run

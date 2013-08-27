@@ -1,7 +1,7 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.{ExecutorService, ThreadFactory, Executors}
+import java.util.concurrent.{ScheduledExecutorService, ExecutorService, ThreadFactory, Executors}
 
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
@@ -32,6 +32,11 @@ trait Strategys extends StrategysLow {
       }
     })
   }
+
+  /**
+   * Default scheduler used for scheduling the tasks like timeout. 
+   */
+  val DefaultTimeoutScheduler: ScheduledExecutorService =  Executors.newScheduledThreadPool(1)
 
   /**
    * A strategy that executes its arguments on `DefaultExecutorService`

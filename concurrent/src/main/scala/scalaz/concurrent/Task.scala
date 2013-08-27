@@ -1,6 +1,6 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService, Executors}
+import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
@@ -135,10 +135,11 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    */
-  def timed(timeoutInMillis: Long): Task[A] =
+  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
     new Task(get.timed(timeoutInMillis).map(_.join))
 
-  def timed(timeout: Duration): Task[A] = timed(timeout.toMillis)
+  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
+  Strategy.DefaultTimeoutScheduler): Task[A] = timed(timeout.toMillis)
 
   /**
    * Retries this task if it fails, once for each element in `delays`,
