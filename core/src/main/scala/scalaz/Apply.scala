@@ -35,6 +35,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
 
   /** [[scalaz.Zip]] derived from `tuple2`. */
+  @deprecated("Apply#zip produces unlawful instances", "7.1.0")
   def zip: Zip[F] =
     new Zip[F] {
       def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =

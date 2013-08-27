@@ -46,6 +46,18 @@ trait Zip[F[_]]  { self =>
         F.map(fa)(f)
     }
 
+  trait ZipLaw {
+    /** Zipping preserves structure. */
+    def zipPreservation[A](fa: F[A])(implicit FA: Equal[F[A]], F: Functor[F]): Boolean = {
+      val fab = zip(fa, fa)
+      FA.equal(F.map(fab)(_._1), fa) && FA.equal(F.map(fab)(_._2), fa)
+    }
+
+    def zipSymmetric[A, B](fa: F[A], fb: F[B])(implicit FA: Equal[F[A]], F: Functor[F]) =
+      FA.equal(F.map(zip(fa, fb))(_._1), F.map(zip(fb, fa))(_._2))
+  }
+  def zipLaw = new ZipLaw {}
+
   ////
   val zipSyntax = new scalaz.syntax.ZipSyntax[F] { def F = Zip.this }
 }

@@ -19,6 +19,7 @@ class IndexedSeqTest extends Spec {
   checkAll(monoid.laws[IndexedSeq[Int]])
   checkAll(monadPlus.strongLaws[IndexedSeq])
   checkAll(traverse.laws[IndexedSeq])
+  checkAll(zip.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._

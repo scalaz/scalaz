@@ -19,6 +19,8 @@ class OneAndTest extends Spec {
   checkAll("OneAnd Nel", plus.laws[OneAndNel])
   checkAll("OneAnd List", traverse1.laws[OneAndList])
   checkAll("OneAnd Nel", traverse1.laws[OneAndNel])
+  checkAll("OneAnd List", zip.laws[OneAndList])
+  checkAll("OneAnd Nel", zip.laws[OneAndNel])
   checkAll("OneAnd List", semigroup.laws[OneAnd[List, Int]])
   checkAll("OneAnd Nel", semigroup.laws[OneAnd[NonEmptyList, Int]])
   checkAll("OneAnd Option", semigroup.laws[OneAnd[Option, Int]])
