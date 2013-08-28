@@ -45,6 +45,8 @@ class FunctionTest extends Spec {
 
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
 
+  checkAll("Function1", zip.laws[({type λ[α]=(Int => α)})#λ])
+
   // Likely could be made to cover all the FunctionN types.
   "Function0 map eagerness" ! prop{(number: Int) =>
     var modifiableNumber: Int = number
