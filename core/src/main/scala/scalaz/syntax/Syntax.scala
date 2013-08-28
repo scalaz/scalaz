@@ -126,6 +126,8 @@ trait Syntaxes {
 
   object nel extends ToNelOps
 
+  object these extends ToTheseOps
+
   //
   // Mixed
   //
@@ -144,6 +146,7 @@ trait ToDataOps
   with ToKleisliOps
   with ToEitherOps
   with ToNelOps
+  with ToTheseOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
