@@ -35,20 +35,20 @@ sealed abstract class Finger[V, A] {
    *
    * @throws if the finger is `Four`.
    */
-  def +:(a: => A): Finger[V, A]
+  def +:(a: A): Finger[V, A]
 
   /**
    * Prepends the given element to the left
    *
    * @throws if the finger is `Four`.
    */
-  def :+(a: => A): Finger[V, A]
+  def :+(a: A): Finger[V, A]
 
   /** Replaces the first element of this finger with `a` */
-  def |-:(a: => A): Finger[V, A]
+  def |-:(a: A): Finger[V, A]
 
   /** Replaces the last element of this finger with `a` */
-  def :-|(a: => A): Finger[V, A]
+  def :-|(a: A): Finger[V, A]
 
   def lhead: A
 
@@ -81,13 +81,13 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1)
 
-  def +:(a: => A) = Two(a cons v, a, a1)
+  def +:(a: A) = Two(a cons v, a, a1)
 
-  def :+(a: => A) = Two(v snoc a, a1, a)
+  def :+(a: A) = Two(v snoc a, a1, a)
 
-  def |-:(a: => A) = one(a)
+  def |-:(a: A) = one(a)
 
-  def :-|(a: => A) = one(a)
+  def :-|(a: A) = one(a)
 
   def lhead = a1
 
@@ -118,13 +118,13 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2)
 
-  def +:(a: => A) = Three(a cons v, a, a1, a2)
+  def +:(a: A) = Three(a cons v, a, a1, a2)
 
-  def :+(a: => A) = Three(v snoc a, a1, a2, a)
+  def :+(a: A) = Three(v snoc a, a1, a2, a)
 
-  def |-:(a: => A) = two(a, a2)
+  def |-:(a: A) = two(a, a2)
 
-  def :-|(a: => A) = two(a1, a)
+  def :-|(a: A) = two(a1, a)
 
   def lhead = a1
 
@@ -165,13 +165,13 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
 case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3)
 
-  def +:(a: => A) = Four(a cons v, a, a1, a2, a3)
+  def +:(a: A) = Four(a cons v, a, a1, a2, a3)
 
-  def :+(a: => A) = Four(v snoc a, a1, a2, a3, a)
+  def :+(a: A) = Four(v snoc a, a1, a2, a3, a)
 
-  def |-:(a: => A) = three(a, a2, a3)
+  def |-:(a: A) = three(a, a2, a3)
 
-  def :-|(a: => A) = three(a1, a2, a)
+  def :-|(a: A) = three(a1, a2, a)
 
   def lhead = a1
 
@@ -218,13 +218,13 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3) |+| f(a4)
 
-  def +:(a: => A) = sys.error("Digit overflow")
+  def +:(a: A) = sys.error("Digit overflow")
 
-  def :+(a: => A) = sys.error("Digit overflow")
+  def :+(a: A) = sys.error("Digit overflow")
 
-  def |-:(a: => A) = four(a, a2, a3, a4)
+  def |-:(a: A) = four(a, a2, a3, a4)
 
-  def :-|(a: => A) = four(a1, a2, a3, a)
+  def :-|(a: A) = four(a1, a2, a3, a)
 
   def lhead = a1
 
@@ -389,52 +389,59 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   /** Prepends an element to the left of the tree. O(1). */
   def +:(a: => A): FingerTree[V, A] = {
     implicit val nm = nodeMeasure[A, V]
-    fold(v => single(a cons v, a), (v, b) => deep(a cons v, one(a), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
+    lazy val az = a
+    fold(v => single(az cons v, az), (v, b) => deep(az cons v, one(az), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
       val mz = m
       pr match {
-        case Four(vf, b, c, d, e) => deep(a cons v, two(a, b), node3(c, d, e) +: mz, sf)
-        case _ => deep(a cons v, a +: pr, mz, sf)
+        case Four(vf, b, c, d, e) => deep(az cons v, two(az, b), node3(c, d, e) +: mz, sf)
+        case _ => deep(az cons v, az +: pr, mz, sf)
       }})
   }
 
   /** Appends an element to the right of the tree. O(1). */
   def :+(a: => A): FingerTree[V, A] = {
     implicit val nm = nodeMeasure[A, V]
-    fold(v => single(v snoc a, a), (v, b) => deep(v snoc a, one(b), empty[V, Node[V, A]], one(a)), (v, pr, m, sf) => {
+    lazy val az = a
+    fold(v => single(v snoc az, az), (v, b) => deep(v snoc az, one(b), empty[V, Node[V, A]], one(az)), (v, pr, m, sf) => {
       val mz = m
       sf match {
-        case Four(vf, b, c, d, e) => deep(v snoc a, pr, (mz :+ node3(b, c, d)), two(e, a))
-        case _ => deep(v snoc a, pr, mz, sf :+ a)
+        case Four(vf, b, c, d, e) => deep(v snoc az, pr, (mz :+ node3(b, c, d)), two(e, az))
+        case _ => deep(v snoc az, pr, mz, sf :+ az)
       }})
   }
 
   /** Replace the first element of the tree with the given value. O(1) */
   def |-:(a: => A): FingerTree[V, A] = {
+    lazy val az = a
     fold(
       v => sys.error("Replacing first element of an empty FingerTree"),
-      (v, b) => single(a),
-      (v, pr, m, sf) => deep(a |-: pr, m, sf))
+      (v, b) => single(az),
+      (v, pr, m, sf) => deep(az |-: pr, m, sf))
   }
 
   /** Replace the last element of the tree with the given value. O(1) */
   def :-|(a: => A): FingerTree[V, A] = {
+    lazy val az = a
     fold(
       v => sys.error("Replacing last element of an empty FingerTree"),
-      (v, b) => single(a),
-      (v, pr, m, sf) => deep(pr, m, sf :-| a))
+      (v, b) => single(az),
+      (v, pr, m, sf) => deep(pr, m, sf :-| az))
   }
 
   /** Appends the given finger tree to the right of this tree. */
-  def <++>(right: FingerTree[V, A]): FingerTree[V, A] = fold(
-      v => right,
-      (v, x) => x +: right,
+  def <++>(right: => FingerTree[V, A]): FingerTree[V, A] = {
+    lazy val rightz = right
+    fold(
+      v => rightz,
+      (v, x) => x +: rightz,
       (v1, pr1, m1, sf1) =>
-        right.fold(
+        rightz.fold(
           v => this,
           (v, x) => this :+ x,
           (v2, pr2, m2, sf2) => deep(v1 |+| v2, pr1, addDigits0(m1, sf1, pr2, m2), sf2)
         )
     )
+  }
 
   private type ATree = FingerTree[V, A]
   private type AFinger = Finger[V, A]
@@ -442,57 +449,78 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   private implicit def sg: Monoid[V] = measurer.monoid
 
-  def add1(n: A, right: => ATree): ATree = fold(
-    v => n +: right,
-    (v, x) => x +: n +: right,
-    (v1, pr1, m1, sf1) =>
-      right.fold(
-        v => this :+ n,
-        (v, x) => this :+ n :+ x,
-        (v2, pr2, m2, sf2) =>
-          deep((v1 snoc n) |+| v2, pr1, addDigits1(m1, sf1, n, pr2, m2), sf2)
-      )
-  )
+  def add1(n: A, right: => ATree): ATree = {
+    lazy val rightz = right
+    fold(
+      v => n +: rightz,
+      (v, x) => x +: n +: rightz,
+      (v1, pr1, m1, sf1) =>
+        rightz.fold(
+          v => this :+ n,
+          (v, x) => this :+ n :+ x,
+          (v2, pr2, m2, sf2) =>
+            deep((v1 snoc n) |+| v2, pr1, addDigits1(m1, sf1, n, pr2, m2), sf2)
+        )
+    )
+  }
 
-  def add2(n1: => A, n2: => A, right: => ATree): ATree = fold(
-    v => n1 +: n2 +: right,
-    (v, x) => x +: n1 +: n2 +: right,
-    (v1, pr1, m1, sf1) =>
-      right.fold(
-        v => this :+ n1 :+ n2,
-        (v, x) => this :+ n1 :+ n2 :+ x,
-        (v2, pr2, m2, sf2) =>
-          deep((v1 snoc n1 snoc n2) |+| v2, pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
-      )
-  )
+  def add2(n1t: => A, n2t: => A, right: => ATree): ATree = {
+    lazy val rightz = right
+    lazy val n1 = n1t
+    lazy val n2 = n2t
+    fold(
+      v => n1 +: n2 +: rightz,
+      (v, x) => x +: n1 +: n2 +: rightz,
+      (v1, pr1, m1, sf1) =>
+        rightz.fold(
+          v => this :+ n1 :+ n2,
+          (v, x) => this :+ n1 :+ n2 :+ x,
+          (v2, pr2, m2, sf2) =>
+            deep((v1 snoc n1 snoc n2) |+| v2, pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
+        )
+    )
+  }
 
-  def add3(n1: => A, n2: => A, n3: => A, right: => ATree): ATree = fold(
-    v => n1 +: n2 +: n3 +: right,
-    (v, x) => x +: n1 +: n2 +: n3 +: right,
-    (v1, pr1, m1, sf1) =>
-      right.fold(
-         v => this :+ n1 :+ n2 :+ n3,
-         (v, x) => this :+ n1 :+ n2 :+ n3 :+ x,
-         (v2, pr2, m2, sf2) =>
-           deep((v1 snoc n1 snoc n2 snoc n3) |+| v2,
-             pr1, addDigits3(m1, sf1, n1, n2, n3, pr2, m2), sf2)
-      )
-  )
+  def add3(n1t: => A, n2t: => A, n3t: => A, right: => ATree): ATree = {
+    lazy val rightz = right
+    lazy val n1 = n1t
+    lazy val n2 = n2t
+    lazy val n3 = n3t
+    fold(
+      v => n1 +: n2 +: n3 +: rightz,
+      (v, x) => x +: n1 +: n2 +: n3 +: rightz,
+      (v1, pr1, m1, sf1) =>
+        rightz.fold(
+           v => this :+ n1 :+ n2 :+ n3,
+           (v, x) => this :+ n1 :+ n2 :+ n3 :+ x,
+           (v2, pr2, m2, sf2) =>
+             deep((v1 snoc n1 snoc n2 snoc n3) |+| v2,
+               pr1, addDigits3(m1, sf1, n1, n2, n3, pr2, m2), sf2)
+        )
+    )
+  }
 
-  def add4(n1: => A, n2: => A, n3: => A, n4: => A, right: => ATree): ATree = fold(
-    v => n1 +: n2 +: n3 +: n4 +: right,
-    (v, x) => x +: n1 +: n2 +: n3 +: n4 +: right,
-    (v1, pr1, m1, sf1) =>
-      right.fold(
-        v => this :+ n1 :+ n2 :+ n3 :+ n4,
-        (v, x) => this :+ n1 :+ n2 :+ n3 :+ n4 :+ x,
-        (v2, pr2, m2, sf2) =>
-          deep((v1 snoc n1 snoc n2 snoc n3 snoc n4) |+| v2,
-            pr1, addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2), sf2)
-      )
-  )
+  def add4(n1t: => A, n2t: => A, n3t: => A, n4t: => A, right: => ATree): ATree = {
+    lazy val rightz = right
+    lazy val n1 = n1t
+    lazy val n2 = n2t
+    lazy val n3 = n3t
+    lazy val n4 = n4t
+    fold(
+      v => n1 +: n2 +: n3 +: n4 +: rightz,
+      (v, x) => x +: n1 +: n2 +: n3 +: n4 +: rightz,
+      (v1, pr1, m1, sf1) =>
+        rightz.fold(
+          v => this :+ n1 :+ n2 :+ n3 :+ n4,
+          (v, x) => this :+ n1 :+ n2 :+ n3 :+ n4 :+ x,
+          (v2, pr2, m2, sf2) =>
+            deep((v1 snoc n1 snoc n2 snoc n3 snoc n4) |+| v2,
+              pr1, addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2), sf2)
+        )
+    )
+  }
 
-  def addDigits0(m1: => NodeTree, dig1: => AFinger, dig2: => AFinger, m2: => NodeTree): NodeTree = dig1 match {
+  def addDigits0(m1: NodeTree, dig1: AFinger, dig2: AFinger, m2: => NodeTree): NodeTree = dig1 match {
     case One(_, a) => dig2 match {
       case One(_, b) => m1.add1(node2(a, b), m2)
       case Two(_, b,c) => m1.add1(node3(a,b,c), m2)
@@ -519,111 +547,133 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     }
   }
 
-  def addDigits1(m1: => NodeTree, d1: => AFinger, x: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
-    case One(_, a) => d2 match {
-      case One(_, b) => m1.add1(node3(a,x,b), m2)
-      case Two(_, b,c) => m1.add2(node2(a,x), node2(b,c), m2)
-      case Three(_, b,c,d) => m1.add2(node3(a,x,b), node2(c,d), m2)
-      case Four(_, b,c,d,e) => m1.add2(node3(a,x,b), node3(c,d,e), m2)
-    }
-    case Two(_, a,b) => d2 match {
-      case One(_, c) => m1.add2(node2(a,b), node2(x,c), m2)
-      case Two(_, c,d) => m1.add2(node3(a,b,x), node2(c,d), m2)
-      case Three(_, c,d,e) => m1.add2(node3(a,b,x), node3(c,d,e), m2)
-      case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node2(c,d), node2(e,f), m2)
-    }
-    case Three(_, a,b,c) => d2 match {
-      case One(_, d) => m1.add2(node3(a,b,c), node2(x,d), m2)
-      case Two(_, d,e) => m1.add2(node3(a,b,c), node3(x,d,e), m2)
-      case Three(_, d,e,f) => m1.add3(node3(a,b,c), node2(x,d), node2(e,f), m2)
-      case Four(_, d,e,f,g) => m1.add3(node3(a,b,c), node3(x,d,e), node2(f,g), m2)
-    }
-    case Four(_, a,b,c,d) => d2 match {
-      case One(_, e) => m1.add2(node3(a,b,c), node3(d,x,e), m2)
-      case Two(_, e,f) => m1.add3(node3(a,b,c), node2(d,x), node2(e,f), m2)
-      case Three(_, e,f,g) => m1.add3(node3(a,b,c), node3(d,x,e), node2(f,g), m2)
-      case Four(_, e,f,g,h) => m1.add3(node3(a,b,c), node3(d,x,e), node3(f,g,h), m2)
-    }
-  }
-
-  def addDigits2(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
-    case One(_, a) => d2 match {
-      case One(_, b) => m1.add2(node2(a,x), node2(y,b), m2)
-      case Two(_, b,c) => m1.add2(node3(a,x,y), node2(b,c), m2)
-      case Three(_, b,c,d) => m1.add2(node3(a,x,y), node3(b,c,d), m2)
-      case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node2(b,c), node2(d,e), m2)
-    }
-    case Two(_, a,b) => d2 match {
-      case One(_, c) => m1.add2(node3(a,b,x), node2(y,c), m2)
-      case Two(_, c,d) => m1.add2(node3(a,b,x), node3(y,c,d), m2)
-      case Three(_, c,d,e) => m1.add3(node3(a,b,x), node2(y,c), node2(d,e), m2)
-      case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node3(y,c,d), node2(e,f), m2)
-    }
-    case Three(_, a,b,c) => d2 match {
-      case One(_, d) => m1.add2(node3(a,b,c), node3(x,y,d), m2)
-      case Two(_, d,e) => m1.add3(node3(a,b,c), node2(x,y), node2(d,e), m2)
-      case Three(_, d,e,f) => m1.add3(node3(a,b,c), node3(x,y,d), node2(e,f), m2)
-      case Four(_, d,e,f,g) => m1.add3(node3(a,b,c), node3(x,y,d), node3(e,f,g), m2)
-    }
-    case Four(_, a,b,c,d) => d2 match {
-      case One(_, e) => m1.add3(node3(a,b,c), node2(d,x), node2(y,e), m2)
-      case Two(_, e,f) => m1.add3(node3(a,b,c), node3(d,x,y), node2(e,f), m2)
-      case Three(_, e,f,g) => m1.add3(node3(a,b,c), node3(d,x,y), node3(e,f,g), m2)
-      case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node2(e,f), node2(g,h), m2)
+  def addDigits1(m1: NodeTree, d1: AFinger, xt: => A, d2: AFinger, m2t: => NodeTree): NodeTree = {
+    lazy val x = xt
+    lazy val m2 = m2t
+    d1 match {
+      case One(_, a) => d2 match {
+        case One(_, b) => m1.add1(node3(a,x,b), m2)
+        case Two(_, b,c) => m1.add2(node2(a,x), node2(b,c), m2)
+        case Three(_, b,c,d) => m1.add2(node3(a,x,b), node2(c,d), m2)
+        case Four(_, b,c,d,e) => m1.add2(node3(a,x,b), node3(c,d,e), m2)
+      }
+      case Two(_, a,b) => d2 match {
+        case One(_, c) => m1.add2(node2(a,b), node2(x,c), m2)
+        case Two(_, c,d) => m1.add2(node3(a,b,x), node2(c,d), m2)
+        case Three(_, c,d,e) => m1.add2(node3(a,b,x), node3(c,d,e), m2)
+        case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node2(c,d), node2(e,f), m2)
+      }
+      case Three(_, a,b,c) => d2 match {
+        case One(_, d) => m1.add2(node3(a,b,c), node2(x,d), m2)
+        case Two(_, d,e) => m1.add2(node3(a,b,c), node3(x,d,e), m2)
+        case Three(_, d,e,f) => m1.add3(node3(a,b,c), node2(x,d), node2(e,f), m2)
+        case Four(_, d,e,f,g) => m1.add3(node3(a,b,c), node3(x,d,e), node2(f,g), m2)
+      }
+      case Four(_, a,b,c,d) => d2 match {
+        case One(_, e) => m1.add2(node3(a,b,c), node3(d,x,e), m2)
+        case Two(_, e,f) => m1.add3(node3(a,b,c), node2(d,x), node2(e,f), m2)
+        case Three(_, e,f,g) => m1.add3(node3(a,b,c), node3(d,x,e), node2(f,g), m2)
+        case Four(_, e,f,g,h) => m1.add3(node3(a,b,c), node3(d,x,e), node3(f,g,h), m2)
+      }
     }
   }
 
-  def addDigits3(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, z: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
-    case One(_, a) => d2 match {
-      case One(_, b) => m1.add2(node3(a,x,y), node2(z,b), m2)
-      case Two(_, b,c) => m1.add2(node3(a,x,y), node3(z,b,c), m2)
-      case Three(_, b,c,d) => m1.add3(node3(a,x,y), node2(z,b), node2(c,d), m2)
-      case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node3(z,b,c), node2(d,e), m2)
-    }
-    case Two(_, a,b) => d2 match {
-      case One(_, c) => m1.add2(node3(a,b,x), node3(y,z,c), m2)
-      case Two(_, c,d) => m1.add3(node3(a,b,x), node2(y,z), node2(c,d), m2)
-      case Three(_, c,d,e) => m1.add3(node3(a,b,x), node3(y,z,c), node2(d,e), m2)
-      case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node3(y,z,c), node3(d,e,f),m2)
-    }
-    case Three(_, a,b,c) => d2 match {
-      case One(_, d) => m1.add3(node3(a,b,c), node2(x,y), node2(z,d), m2)
-      case Two(_, d,e) => m1.add3(node3(a,b,c), node3(x,y,z), node2(d,e), m2)
-      case Three(_, d,e,f) => m1.add3(node3(a,b,c), node3(x,y,z), node3(d,e,f), m2)
-      case Four(_, d,e,f,g) => m1.add4(node3(a,b,c), node3(x,y,z), node2(d,e), node2(f,g), m2)
-    }
-    case Four(_, a,b,c,d) => d2 match {
-      case One(_, e) => m1.add3(node3(a,b,c), node3(d,x,y), node2(z,e), m2)
-      case Two(_, e,f) => m1.add3(node3(a,b,c), node3(d,x,y), node3(z,e,f), m2)
-      case Three(_, e,f,g) => m1.add4(node3(a,b,c), node3(d,x,y), node2(z,e),node2(f,g), m2)
-      case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,e,f), node2(g,h), m2)
+  def addDigits2(m1: NodeTree, d1: AFinger, xt: => A, yt: => A, d2: AFinger, m2t: => NodeTree): NodeTree = {
+    lazy val x = xt
+    lazy val y = yt
+    lazy val m2 = m2t
+    d1 match {
+      case One(_, a) => d2 match {
+        case One(_, b) => m1.add2(node2(a,x), node2(y,b), m2)
+        case Two(_, b,c) => m1.add2(node3(a,x,y), node2(b,c), m2)
+        case Three(_, b,c,d) => m1.add2(node3(a,x,y), node3(b,c,d), m2)
+        case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node2(b,c), node2(d,e), m2)
+      }
+      case Two(_, a,b) => d2 match {
+        case One(_, c) => m1.add2(node3(a,b,x), node2(y,c), m2)
+        case Two(_, c,d) => m1.add2(node3(a,b,x), node3(y,c,d), m2)
+        case Three(_, c,d,e) => m1.add3(node3(a,b,x), node2(y,c), node2(d,e), m2)
+        case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node3(y,c,d), node2(e,f), m2)
+      }
+      case Three(_, a,b,c) => d2 match {
+        case One(_, d) => m1.add2(node3(a,b,c), node3(x,y,d), m2)
+        case Two(_, d,e) => m1.add3(node3(a,b,c), node2(x,y), node2(d,e), m2)
+        case Three(_, d,e,f) => m1.add3(node3(a,b,c), node3(x,y,d), node2(e,f), m2)
+        case Four(_, d,e,f,g) => m1.add3(node3(a,b,c), node3(x,y,d), node3(e,f,g), m2)
+      }
+      case Four(_, a,b,c,d) => d2 match {
+        case One(_, e) => m1.add3(node3(a,b,c), node2(d,x), node2(y,e), m2)
+        case Two(_, e,f) => m1.add3(node3(a,b,c), node3(d,x,y), node2(e,f), m2)
+        case Three(_, e,f,g) => m1.add3(node3(a,b,c), node3(d,x,y), node3(e,f,g), m2)
+        case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node2(e,f), node2(g,h), m2)
+      }
     }
   }
 
-  def addDigits4(m1: => NodeTree, d1: => AFinger, x: => A, y: => A, z: => A, w: => A, d2: => AFinger, m2: => NodeTree): NodeTree = d1 match {
-    case One(_, a) => d2 match {
-      case One(_, b) => m1.add2(node3(a,x,y), node3(z,w,b), m2)
-      case Two(_, b,c) => m1.add3(node3(a,x,y), node2(z,w), node2(b,c), m2)
-      case Three(_, b,c,d) => m1.add3(node3(a,x,y), node3(z,w,b), node2(c,d), m2)
-      case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node3(z,w,b), node3(c,d,e), m2)
+  def addDigits3(m1: NodeTree, d1: AFinger, xt: => A, yt: => A, zt: => A, d2: AFinger, m2t: => NodeTree): NodeTree = {
+    lazy val x = xt
+    lazy val y = yt
+    lazy val z = zt
+    lazy val m2 = m2t
+    d1 match {
+      case One(_, a) => d2 match {
+        case One(_, b) => m1.add2(node3(a,x,y), node2(z,b), m2)
+        case Two(_, b,c) => m1.add2(node3(a,x,y), node3(z,b,c), m2)
+        case Three(_, b,c,d) => m1.add3(node3(a,x,y), node2(z,b), node2(c,d), m2)
+        case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node3(z,b,c), node2(d,e), m2)
+      }
+      case Two(_, a,b) => d2 match {
+        case One(_, c) => m1.add2(node3(a,b,x), node3(y,z,c), m2)
+        case Two(_, c,d) => m1.add3(node3(a,b,x), node2(y,z), node2(c,d), m2)
+        case Three(_, c,d,e) => m1.add3(node3(a,b,x), node3(y,z,c), node2(d,e), m2)
+        case Four(_, c,d,e,f) => m1.add3(node3(a,b,x), node3(y,z,c), node3(d,e,f),m2)
+      }
+      case Three(_, a,b,c) => d2 match {
+        case One(_, d) => m1.add3(node3(a,b,c), node2(x,y), node2(z,d), m2)
+        case Two(_, d,e) => m1.add3(node3(a,b,c), node3(x,y,z), node2(d,e), m2)
+        case Three(_, d,e,f) => m1.add3(node3(a,b,c), node3(x,y,z), node3(d,e,f), m2)
+        case Four(_, d,e,f,g) => m1.add4(node3(a,b,c), node3(x,y,z), node2(d,e), node2(f,g), m2)
+      }
+      case Four(_, a,b,c,d) => d2 match {
+        case One(_, e) => m1.add3(node3(a,b,c), node3(d,x,y), node2(z,e), m2)
+        case Two(_, e,f) => m1.add3(node3(a,b,c), node3(d,x,y), node3(z,e,f), m2)
+        case Three(_, e,f,g) => m1.add4(node3(a,b,c), node3(d,x,y), node2(z,e),node2(f,g), m2)
+        case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,e,f), node2(g,h), m2)
+      }
     }
-    case Two(_, a,b) => d2 match {
-      case One(_, c) => m1.add3(node3(a,b,x), node2(y,z), node2(w,c), m2)
-      case Two(_, c,d) => m1.add3(node3(a,b,x), node3(y,z,w), node2(c,d), m2)
-      case Three(_, c,d,e) => m1.add3(node3(a,b,x), node3(y,z,w), node3(c,d,e), m2)
-      case Four(_, c,d,e,f) => m1.add4(node3(a,b,x), node3(y,z,w), node2(c,d), node2(e,f),m2)
-    }
-    case Three(_, a,b,c) => d2 match {
-      case One(_, d) => m1.add3(node3(a,b,c), node3(x,y,z), node2(w,d), m2)
-      case Two(_, d,e) => m1.add3(node3(a,b,c), node3(x,y,z), node3(w,d,e), m2)
-      case Three(_, d,e,f) => m1.add4(node3(a,b,c), node3(x,y,z), node2(w,d),node2(e,f), m2)
-      case Four(_, d,e,f,g) => m1.add4(node3(a,b,c), node3(x,y,z), node3(w,d,e), node2(f,g), m2)
-    }
-    case Four(_, a,b,c,d) => d2 match {
-      case One(_, e) => m1.add3(node3(a,b,c), node3(d,x,y), node3(z,w,e), m2)
-      case Two(_, e,f) => m1.add4(node3(a,b,c), node3(d,x,y), node2(z,w), node2(e,f), m2)
-      case Three(_, e,f,g) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,w,e),node2(f,g), m2)
-      case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,w,e), node3(f,g,h), m2)
+  }
+
+  def addDigits4(m1: NodeTree, d1: AFinger, xt: => A, yt: => A, zt: => A, wt: => A, d2: AFinger, m2t: => NodeTree): NodeTree = {
+      lazy val x = xt
+      lazy val y = yt
+      lazy val z = zt
+      lazy val w = wt
+      lazy val m2 = m2t
+      d1 match {
+      case One(_, a) => d2 match {
+        case One(_, b) => m1.add2(node3(a,x,y), node3(z,w,b), m2)
+        case Two(_, b,c) => m1.add3(node3(a,x,y), node2(z,w), node2(b,c), m2)
+        case Three(_, b,c,d) => m1.add3(node3(a,x,y), node3(z,w,b), node2(c,d), m2)
+        case Four(_, b,c,d,e) => m1.add3(node3(a,x,y), node3(z,w,b), node3(c,d,e), m2)
+      }
+      case Two(_, a,b) => d2 match {
+        case One(_, c) => m1.add3(node3(a,b,x), node2(y,z), node2(w,c), m2)
+        case Two(_, c,d) => m1.add3(node3(a,b,x), node3(y,z,w), node2(c,d), m2)
+        case Three(_, c,d,e) => m1.add3(node3(a,b,x), node3(y,z,w), node3(c,d,e), m2)
+        case Four(_, c,d,e,f) => m1.add4(node3(a,b,x), node3(y,z,w), node2(c,d), node2(e,f),m2)
+      }
+      case Three(_, a,b,c) => d2 match {
+        case One(_, d) => m1.add3(node3(a,b,c), node3(x,y,z), node2(w,d), m2)
+        case Two(_, d,e) => m1.add3(node3(a,b,c), node3(x,y,z), node3(w,d,e), m2)
+        case Three(_, d,e,f) => m1.add4(node3(a,b,c), node3(x,y,z), node2(w,d),node2(e,f), m2)
+        case Four(_, d,e,f,g) => m1.add4(node3(a,b,c), node3(x,y,z), node3(w,d,e), node2(f,g), m2)
+      }
+      case Four(_, a,b,c,d) => d2 match {
+        case One(_, e) => m1.add3(node3(a,b,c), node3(d,x,y), node3(z,w,e), m2)
+        case Two(_, e,f) => m1.add4(node3(a,b,c), node3(d,x,y), node2(z,w), node2(e,f), m2)
+        case Three(_, e,f,g) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,w,e),node2(f,g), m2)
+        case Four(_, e,f,g,h) => m1.add4(node3(a,b,c), node3(d,x,y), node3(z,w,e), node3(f,g,h), m2)
+      }
     }
   }
 
@@ -905,22 +955,23 @@ trait FingerTreeFunctions {
     def fold[B](b: => B, f: (=> A, => S[A]) => B) = f(a, sa)
   }
 
-  def one[V, A](a: => A)(implicit measure: Reducer[A, V]) =
+  def one[V, A](a: A)(implicit measure: Reducer[A, V]) = {
     One(a.unit[V], a)
+  }
 
-  def two[V, A](a1: => A, a2: => A)(implicit measure: Reducer[A, V]) =
+  def two[V, A](a1: A, a2: A)(implicit measure: Reducer[A, V]) =
     Two(a1.unit[V] snoc a2, a1, a2)
 
-  def three[V, A](a1: => A, a2: => A, a3: => A)(implicit measure: Reducer[A, V]) =
+  def three[V, A](a1: A, a2: A, a3: A)(implicit measure: Reducer[A, V]) =
     Three(a1.unit[V] snoc a2 snoc a3, a1, a2, a3)
 
-  def four[V, A](a1: => A, a2: => A, a3: => A, a4: => A)(implicit measure: Reducer[A, V]) =
+  def four[V, A](a1: A, a2: A, a3: A, a4: A)(implicit measure: Reducer[A, V]) =
     Four(a1.unit[V] snoc a2 snoc a3 snoc a4, a1, a2, a3, a4)
 
-  def node2[V, A](a: => A, b: => A)(implicit measure: Reducer[A, V]) =
+  def node2[V, A](a: A, b: A)(implicit measure: Reducer[A, V]) =
     Node2[V, A](a.unit[V] snoc b, a, b)
 
-  def node3[V, A](a: => A, b: => A, c: => A)(implicit measure: Reducer[A, V]) =
+  def node3[V, A](a: A, b: A, c: A)(implicit measure: Reducer[A, V]) =
     Node3[V, A](a.unit[V] snoc b snoc c, a, b, c)
 
   def mappendVal[V, A](v: V, t: FingerTree[V, A])(implicit measure: Reducer[A, V]) = {
@@ -931,7 +982,7 @@ trait FingerTreeFunctions {
     def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = b(ms.monoid.zero)
   }
 
-  def single[V, A](a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(a.unit[V], a)
+  def single[V, A](a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(a.unit[V], a)
 
   def single[V, A](v: V, a: => A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = new FingerTree[V, A] {
     def fold[B](b: V => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
