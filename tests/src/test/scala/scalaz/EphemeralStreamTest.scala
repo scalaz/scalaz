@@ -30,6 +30,11 @@ class EphemeralStreamTest extends Spec {
     Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must be_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
 
+  "unzip zip" ! prop { xs: EphemeralStream[(Int, Int)] =>
+    val (firsts, seconds) = xs.unzip
+    (firsts zip seconds) must be_===(xs)
+  }
+
   "zip has right length" ! prop {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
     (xs zip ys).length must be_===(xs.length min ys.length)
   }
