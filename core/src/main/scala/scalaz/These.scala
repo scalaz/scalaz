@@ -118,6 +118,9 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
     }
 
   def zip[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
+    &&&(t)
+
+  def &&&[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
     for {
       b <- this
       c <- t
