@@ -92,6 +92,20 @@ sealed abstract class EphemeralStream[A] {
     else
       cons(head(), cons(q.head(), tail() interleave q.tail()))
 
+  def take(n: Int): EphemeralStream[A] =
+    unfold((n, this)){ case (len, xs) =>
+      if(len > 0 && !xs.isEmpty)
+        Some((xs.head(), (len - 1, xs.tail())))
+      else
+        None
+    }
+
+  def takeWhile(p: A => Boolean): EphemeralStream[A] =
+    if(!isEmpty){
+      val h = head()
+      if(p(h)) cons(h, tail().takeWhile(p))
+      else emptyEphemeralStream
+    }else this
 }
 
 object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
