@@ -233,11 +233,11 @@ trait TheseFunctions {
     def loop(aa: List[A], bb: List[B], accum: List[A \&/ B]): List[A \&/ B] = {
       aa match {
         case Nil =>
-          accum.reverse ::: bb.map(That[A, B](_))
+          accum reverse_::: bb.map(That[A, B](_))
         case h::t =>
           bb match {
             case Nil =>
-              accum.reverse ::: aa.map(This[A, B](_))
+              accum reverse_::: aa.map(This[A, B](_))
             case hh::tt =>
               loop(t, tt, Both(h, hh) :: accum)
           }
