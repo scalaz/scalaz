@@ -321,7 +321,7 @@ sealed trait Cursor {
     unconsOption(parents) {
       case ((pls, v, prs), ps) =>
         cursor(
-          current = Content.elem(v.fromTag(lefts.reverse ::: rights))
+          current = Content.elem(v.fromTag(lefts reverse_::: rights))
         , lefts = pls
         , rights = prs
         , parents = ps
