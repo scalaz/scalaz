@@ -117,6 +117,8 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
         }
     }
 
+  @deprecated("'These' forms no lawful Zip instances; use &&& instead",
+              "7.1.0")
   def zip[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
     &&&(t)
 
