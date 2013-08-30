@@ -7,4 +7,4 @@ jdk:
   - oraclejdk7
   - openjdk6
 
-script: sbt ++$TRAVIS_SCALA_VERSION ";test;mima-report-binary-issues"
+script: sbt ++$TRAVIS_SCALA_VERSION ';mima-report-binary-issues;set scalazMimaBasis in ThisBuild := "7.0.1";mima-report-binary-issues;set scalazMimaBasis in ThisBuild := "7.0.2";mima-report-binary-issues;set scalazMimaBasis in ThisBuild := "7.0.3";mima-report-binary-issues'
