@@ -240,6 +240,14 @@ class MapTest extends Spec {
       (ab \\ b) must be_===(ab)
     }
 
+    "produce right keyset" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a \\ b).keySet must_== (a.keySet diff b.keySet)
+    }
+
+    "be an inverse" ! prop {(a: Int ==>> Int) =>
+      (a \\ a) must be_===(==>>.empty[Int, Int])
+    }
+
     "syntax" in {
       val r = fromList(List(5 -> "a", 3 -> "b")) \\ fromList(List(5 -> "A", 7 -> "C"))
       r must_== singleton[Int, String](3, "b")
