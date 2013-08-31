@@ -921,16 +921,51 @@ sealed abstract class MapInstances {
         fa.toAscList.foldRight(z)((tuple, a) => f(tuple._2, a))
     }
 
-  implicit def mapTraversable[S: Order] = new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
-    def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
+  implicit def mapTraversable[S: Order]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
+    new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
+      override def map[A, B](fa: S ==>> A)(f: A => B) =
+        fa map f
+
+      override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]) =
+        fa match {
+          case Tip() =>
+            F.zero
+          case Bin(k, x, l, r) =>
+            F.append(foldMap(l)(f), F.append(f(x), foldMap(r)(f)))
+        }
+
+      override def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B) =
+        fa.foldrWithKey(z)((_, b, acc) => f(b, acc))
+
+      override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
+        fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
+
+      def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
+        fa match {
+          case Tip() =>
+            G.point(Tip())
+          case Bin(kx, x, l, r) =>
+            G.apply3(traverseImpl(l)(f), f(x), traverseImpl(r)(f)){
+              (l2, x2, r2) => Bin(kx, x2, l2, r2)
+            }
+        }
+    }
+
+  implicit val mapBifoldable: Bifoldable[==>>] = new Bifoldable[==>>] {
+    def bifoldMap[A,B,M](fa: A ==>> B)(f: A => M)(g: B => M)(implicit F: Monoid[M]): M =
       fa match {
         case Tip() =>
-          G.point(Tip())
-        case m @ Bin(kx, x, l, r) =>
-          m.toList.foldLeft(G.point(==>>.empty[S, B]))({
-            case (acc, (k, v)) => G.apply2(acc, f(v))(_.insert(k, _))
-          })
+          F.zero
+        case Bin(k, x, l, r) =>
+          F.append(bifoldMap(l)(f)(g),
+                   F.append(f(k), F.append(g(x), bifoldMap(r)(f)(g))))
       }
+
+    def bifoldRight[A,B,C](fa: A ==>> B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+      fa.foldrWithKey(z)((a, b, c) => f(a, g(b, c)))
+
+    override def bifoldLeft[A,B,C](fa: A ==>> B, z: C)(f: (C, A) => C)(g: (C, B) => C): C =
+      fa.foldlWithKey(z)((c, a, b) => g(f(c, a), b))
   }
 }
 
