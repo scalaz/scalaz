@@ -175,6 +175,11 @@ class MapTest extends Spec {
       empty.insert(2,3).insert(3,4) must be_===(fromList(List(2 -> 3, 3 -> 4)))
     }
 
+    "be order-insensitive" ! prop {(am: Map[Int, Int]) =>
+      val al = am.toList
+      fromList(al.reverse) must be_===(fromList(al))
+    }
+
     "create a valid map from empty list" in {
       fromList(List.empty[(Int, Int)]) must be_===(empty[Int, Int])
     }
@@ -189,7 +194,11 @@ class MapTest extends Spec {
       fromList(List((5, "a"), (3, "b"))) union fromList(List((5, "A"), (7, "C"))) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
     }
 
-    "union idempotently" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+    "commute" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a unionWith b)(_ + _) must be_===((b unionWith a)(_ + _))
+    }
+
+    "be idempotent" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
       val ab = a union b
       ab union a must be_===(ab)
       ab union b must be_===(ab)
@@ -226,6 +235,11 @@ class MapTest extends Spec {
       r must_== singleton[Int, String](3, "b")
     }
 
+    "be idempotent" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      val ab = a \\ b
+      (ab \\ b) must be_===(ab)
+    }
+
     "syntax" in {
       val r = fromList(List(5 -> "a", 3 -> "b")) \\ fromList(List(5 -> "A", 7 -> "C"))
       r must_== singleton[Int, String](3, "b")
@@ -250,6 +264,10 @@ class MapTest extends Spec {
 
     "intersect soundly" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
       structurallySound(a intersection b)
+    }
+
+    "commute" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
     }
 
     "intersectionWith" in {
