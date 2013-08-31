@@ -899,15 +899,16 @@ sealed abstract class MapInstances {
       Show[List[(A, B)]].show(as.toAscList)
   }
 
-  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = new Equal[A ==>> B] {
-    def equal(a1: A ==>> B, a2: A ==>> B) =
-      a1.size === a2.size && a1.toAscList === a2.toAscList
-  }
+  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = 
+    new MapEqual[A, B] {def A = implicitly; def B = implicitly}
 
-  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = new Order[A ==>> B] {
-    def order(o1: A ==>> B, o2: A ==>> B) =
-      Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
-  }
+  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = 
+    new Order[A ==>> B] with MapEqual[A, B] {
+      def A = implicitly
+      def B = implicitly
+      def order(o1: A ==>> B, o2: A ==>> B) =
+        Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
+    }
 
   implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
     Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
@@ -963,6 +964,16 @@ sealed abstract class MapInstances {
     override def bifoldLeft[A,B,C](fa: A ==>> B, z: C)(f: (C, A) => C)(g: (C, B) => C): C =
       fa.foldlWithKey(z)((c, a, b) => g(f(c, a), b))
   }
+}
+
+private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
+  import std.list._
+  import std.tuple._
+
+  implicit def A: Equal[A]
+  implicit def B: Equal[B]
+  final override def equal(a1: A ==>> B, a2: A ==>> B) =
+    a1.size === a2.size && a1.toAscList === a2.toAscList
 }
 
 trait MapFunctions {
