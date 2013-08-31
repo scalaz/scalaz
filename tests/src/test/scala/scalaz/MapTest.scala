@@ -455,10 +455,8 @@ class MapTest extends Spec {
   implicit def mapArb[A, B](implicit o: Order[A], a: Arbitrary[List[(A, B)]]): Arbitrary[A ==>> B] =
     Functor[Arbitrary].map(a)(as => fromList(as))
 
-  checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
 
   type IntMap[A] = Int ==>> A
-  checkAll(functor.laws[IntMap])
   checkAll(traverse.laws[IntMap])
 }
