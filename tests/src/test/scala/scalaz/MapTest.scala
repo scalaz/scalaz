@@ -2,6 +2,7 @@ package scalaz
 
 class MapTest extends Spec {
   import org.scalacheck.{Arbitrary, Gen}
+  import scalaz.scalacheck.ScalaCheckBinding._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
@@ -9,11 +10,17 @@ class MapTest extends Spec {
   import std.list._
   import std.string._
   import std.option._
+  import std.tuple._
   import syntax.equal._
   import syntax.show._
   import syntax.std.option._
 
   import ==>>._
+
+  def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
+    val al = m.toAscList
+    al must be_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
 
   "==>> fromList" should {
     "succeed" in {
@@ -127,6 +134,9 @@ class MapTest extends Spec {
     "not remove from an empty map" in {
       empty.delete(5) must be_===(empty[Int, Int])
     }
+    "be sound" ! prop {(m: Int ==>> Int, i: Int) =>
+      structurallySound(m delete i)
+    }
   }
 
   "==>> insertion" should {
@@ -134,6 +144,10 @@ class MapTest extends Spec {
       fromList(List(5 -> "a", 3 -> "b")).insert(5, "x") === fromList(List(3 -> "b", 5 -> "x")) // Replacement
       fromList(List((5,"a"), (3,"b"))).insert(7,"x") must be_===(fromList(List((3,"b"), (5,"a"), (7,"x")))) // Addition of new key
       empty.insert(5, "x") must be_===(singleton(5, "x"))
+    }
+
+    "insert sound" ! prop {(m: Int ==>> Int, a: Int, b: Int) =>
+      structurallySound(m insert (a, b))
     }
 
     "insertWith" in {
@@ -150,6 +164,10 @@ class MapTest extends Spec {
       fromList(List(5 -> "a", 3 -> "b")).insertWithKey(f, 7, "xxx") must be_===(fromList(List(3 -> "b", 5 -> "a", 7 -> "xxx")))
       empty.insertWithKey(f, 5, "xxx") must be_===(singleton(5, "xxx"))
     }
+
+    "insertWithKey sound" ! prop {(m: Int ==>> Int, a: Int, b: Int) =>
+      structurallySound(m insertWithKey ((_, _, b) => b, a, b))
+    }
   }
 
   "==>> from a list" should {
@@ -163,8 +181,18 @@ class MapTest extends Spec {
   }
 
   "==>> union operations" should {
+    "be sound" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      structurallySound(a union b)
+    }
+
     "union" in {
       fromList(List((5, "a"), (3, "b"))) union fromList(List((5, "A"), (7, "C"))) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
+    }
+
+    "union idempotently" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      val ab = a union b
+      ab union a must be_===(ab)
+      ab union b must be_===(ab)
     }
 
     "unions" in {
@@ -218,6 +246,10 @@ class MapTest extends Spec {
     "intersection" in {
       val r = fromList(List(5 -> "a", 3 -> "b")) intersection fromList(List(5 -> "A", 7 -> "C"))
       r must_== singleton(5, "a")
+    }
+
+    "intersect soundly" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      structurallySound(a intersection b)
     }
 
     "intersectionWith" in {
@@ -449,8 +481,6 @@ class MapTest extends Spec {
       //-- > valid (fromAscList [(5,"a"), (3,"b")]) == False
     }
   }*/
-
-  import scalaz.scalacheck.ScalaCheckBinding._
 
   checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
