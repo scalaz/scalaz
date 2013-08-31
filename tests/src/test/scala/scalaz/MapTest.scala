@@ -456,6 +456,18 @@ class MapTest extends Spec {
     Functor[Arbitrary].map(a)(as => fromList(as))
 
   checkAll(order.laws[Int ==>> Int])
+  checkAll(monoid.laws[Int ==>> Int])
+
+  {
+    implicit def equMapConj[A: Equal, B: Equal]: Equal[(A ==>> B) @@ Tags.Conjunction] =
+      Tag.subst(implicitly)
+
+    implicit def arbMapConj[A, B](implicit o: Order[A], a: Arbitrary[List[(A, B)]]
+                                ): Arbitrary[(A ==>> B) @@ Tags.Conjunction] =
+      Tag.subst(implicitly)
+
+    checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
+  }
 
   type IntMap[A] = Int ==>> A
   checkAll(traverse.laws[IntMap])

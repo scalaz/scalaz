@@ -909,6 +909,14 @@ sealed abstract class MapInstances {
       Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
   }
 
+  implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
+    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+
+  implicit def mapIntersection[A, B](implicit A: Order[A], B: Semigroup[B]
+                                   ): Semigroup[(A ==>> B) @@ Tags.Conjunction] =
+    Tag.subst(Semigroup.instance((l, r) =>
+      (l intersectionWith r)(B.append(_, _))))
+
   implicit def mapCovariant[S]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
     new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
