@@ -531,6 +531,7 @@ class DataMapTest extends SpecLite {
 
   checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
+  checkAll(monoid.laws[Int ==>> Int])
 
   type IntMap[A] = Int ==>> A
   checkAll(functor.laws[IntMap])

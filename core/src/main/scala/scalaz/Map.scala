@@ -921,6 +921,9 @@ sealed abstract class MapInstances {
         fa.toAscList.foldRight(z)((tuple, a) => f(tuple._2, a))
     }
 
+  implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
+    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+
   implicit def mapTraversable[S: Order]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
     new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
