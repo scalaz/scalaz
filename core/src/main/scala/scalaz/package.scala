@@ -271,6 +271,9 @@ package object scalaz {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
 
+  /** [[scalaz.:<:]][F, G] */
+  type :≺:[F[_], G[_]] = F :<: G
+
   @deprecated("Cojoin has been merged into Cobind", "7.1")
   type Cojoin[F[_]] = Cobind[F]
 
