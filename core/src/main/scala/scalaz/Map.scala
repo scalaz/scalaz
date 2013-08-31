@@ -894,10 +894,8 @@ sealed abstract class MapInstances {
   import std.list._
   import std.tuple._
 
-  implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] = new Show[A ==>> B] {
-    override def show(as: A ==>> B) =
-      Show[List[(A, B)]].show(as.toAscList)
-  }
+  implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
+    Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
 
   implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = 
     new MapEqual[A, B] {def A = implicitly; def B = implicitly}
