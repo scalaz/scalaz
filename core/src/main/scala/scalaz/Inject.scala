@@ -27,8 +27,8 @@ sealed trait InjectInstances {
       def prj[A](ga: ({type λ[α] = Coproduct[F, G, α]})#λ[A]) = ga.run.fold(some(_), _ => none)
     }
 
-  implicit def rightInjectInstance[F[_]: Functor, G[_]: Functor, H[_]: Functor]
-    (implicit I: F :<: G) =
+  implicit def rightInjectInstance[F[_], G[_], H[_]]
+    (implicit F: Functor[F], G: Functor[G], H: Functor[H], I: F :<: G) =
       new (F :<: ({type λ[α] = Coproduct[H, G, α]})#λ) {
         def inj[A](fa: F[A]) = Coproduct.rightc(I.inj(fa))
         def prj[A](ga: ({type λ[α] = Coproduct[H, G, α]})#λ[A]) = ga.run.fold(_ => none, I.prj(_))
@@ -36,11 +36,11 @@ sealed trait InjectInstances {
 }
 
 sealed trait InjectFunctions {
-  def inject[F[_]: Functor, G[_]: Functor, A](ga: G[Free[F, A]])(implicit I: G :<: F): Free[F, A] =
-    Suspend[F, A](I.inj(ga))
+  def inject[F[_], G[_], A](ga: G[Free[F, A]])
+    (implicit F: Functor[F], G: Functor[G], I: G :<: F): Free[F, A] = Suspend[F, A](I.inj(ga))
 
-  def match_[F[_]: Functor, G[_]: Functor, A](fa: Free[F, A])(implicit I: G :<: F): Option[G[Free[F, A]]] =
-    fa.resume.fold(I.prj(_), _ => none)
+  def match_[F[_], G[_], A](fa: Free[F, A])
+    (implicit F: Functor[F], G: Functor[G], I: G :<: F): Option[G[Free[F, A]]] = fa.resume.fold(I.prj(_), _ => none)
 }
 
 object :<: extends InjectInstances with InjectFunctions
