@@ -55,4 +55,9 @@ class StreamTest extends Spec {
     (rnge.foldRight(List[Int]())(_++_)
       must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
+
+  "fold large Stream" in {
+    val size = 100000
+    Foldable[Stream].fold(Stream.continually(".").take(size)) must be_===(Iterator.continually(".").take(size).mkString)
+  }
 }
