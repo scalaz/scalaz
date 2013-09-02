@@ -188,6 +188,9 @@ object ScalazArbitrary {
   implicit def KleisliArbitrary[M[+_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
     Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
 
+  implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
+    Functor[Arbitrary].map(a)(Coproduct(_))
+
   implicit def writerTArb[F[+_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
     Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
 
