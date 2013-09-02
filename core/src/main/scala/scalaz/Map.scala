@@ -523,8 +523,8 @@ sealed abstract class ==>>[A, B] {
         (l filterGt cmpLo).join(kx, x, r filterLt cmpHi)
       case (Bin(kx, x, l, r), t2) =>
         val cmpkx = (k: A) =>  o.order(kx, k)
-        val a = l.hedgeUnionL(cmpLo, cmpHi, t2.trim(cmpLo, cmpkx))
-        val b = r.hedgeUnionL(cmpLo, cmpHi, t2.trim(cmpkx, cmpHi))
+        val a = l.hedgeUnionL(cmpLo, cmpkx, t2.trim(cmpLo, cmpkx))
+        val b = r.hedgeUnionL(cmpkx, cmpHi, t2.trim(cmpkx, cmpHi))
         a.join(kx, x, b)
     }
 
