@@ -117,7 +117,12 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
         }
     }
 
+  @deprecated("'These' forms no lawful Zip instances; use &&& instead",
+              "7.1.0")
   def zip[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
+    &&&(t)
+
+  def &&&[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
     for {
       b <- this
       c <- t
@@ -297,8 +302,8 @@ sealed abstract class TheseInstances extends TheseInstances0 {
 
 sealed abstract class TheseInstances0 extends TheseInstances1 {
 
-  implicit def TheseInstance0[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] with Zip[({type l[a] = L \&/ a})#l] =
-    new Monad[({type l[a] = L \&/ a})#l] with Zip[({type l[a] = L \&/ a})#l] {
+  implicit def TheseInstance0[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] =
+    new Monad[({type l[a] = L \&/ a})#l] {
       override def map[A, B](x: L \&/ A)(f: A => B) =
         x map f
 
@@ -307,9 +312,6 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
       def point[A](a: => A) =
         \&/.That(a)
-
-      def zip[A, B](a: => L \&/ A, b: => L \&/ B) =
-        a zip b
     }
 
   implicit val TheseBitraverse: Bitraverse[\&/] =
