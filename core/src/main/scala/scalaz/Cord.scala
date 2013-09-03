@@ -120,6 +120,12 @@ final case class Cord(self: FingerTree[Int, String]) {
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
   def flatMap(f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
+
+  /** Returns whether this `Cord` will expand to an empty string. */
+  def isEmpty: Boolean = !nonEmpty
+
+  /** Returns whether this `Cord` will expand to a non-empty string. */
+  def nonEmpty: Boolean = self.iterator.exists(_.nonEmpty)
 }
 
 object Cord {
