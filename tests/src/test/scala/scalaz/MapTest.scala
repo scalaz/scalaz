@@ -240,6 +240,14 @@ class MapTest extends Spec {
       (ab \\ b) must be_===(ab)
     }
 
+    "be idempotent (in one case)" in {
+      val a = Bin(-1768028150,1831400640,Bin(-2147483648,2147483647,Tip(),Tip()),
+                  Bin(-541865171,1,Tip(),Bin(1085869916,1066820187,Tip(),Tip())))
+      val b = Bin(0,1979991171,Tip(),Tip())
+      val ab = a \\ b
+      (ab \\ b) must be_===(ab)
+    }
+
     "produce right keyset" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
       (a \\ b).keySet must_== (a.keySet diff b.keySet)
     }
