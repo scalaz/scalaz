@@ -400,6 +400,12 @@ class MapTest extends Spec {
       m.partition(_ > "x") === (empty[Int, String], fromList(List(3 -> "b", 5 -> "a")))
     }
 
+    "be sound" ! prop {(m: Int ==>> Int, p: Int => Boolean) =>
+      val (ma, mb) = m partition p
+      structurallySound(ma)
+      structurallySound(mb)
+    }
+
     "partitionWithKey" in {
       m.partitionWithKey((k, _) => k > 3) === (singleton(5, "a"), singleton(3, "b"))
 
