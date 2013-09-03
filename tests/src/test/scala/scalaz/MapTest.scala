@@ -282,6 +282,10 @@ class MapTest extends Spec {
       structurallySound(a intersection b)
     }
 
+    "form an identity" ! prop {a: Int ==>> Int =>
+      a intersection a must be_===(a)
+    }
+
     "commute" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
       (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
     }
