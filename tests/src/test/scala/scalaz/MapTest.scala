@@ -286,6 +286,15 @@ class MapTest extends Spec {
       (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
     }
 
+    "commute (in one case)" in {
+      val a = Bin(1951314151,1,Bin(-1,1271148582,Tip(),Tip()),
+                  Bin(2147483647,-1423766788,Tip(),Tip()))
+      val b = Bin(-12693552,-2147483648,
+                  Bin(-1587083834,-729342404,Tip(),Tip()),
+                  Bin(-1,0,Tip(),Tip()))
+      (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
+    }
+
     "intersectionWith" in {
       val f = (a: String, b: String) => a + b
       val r = fromList(List(5 -> "a", 3 -> "b")).intersectionWith(fromList(List(5 -> "A", 7 -> "C")))(f)
