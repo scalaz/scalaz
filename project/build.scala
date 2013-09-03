@@ -177,7 +177,6 @@ object build extends Build {
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
-    scalazMimaBasis in ThisBuild := "7.0.0",
     previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis) { (o, n, sbv, bas) => Some(o % (n + "_" + sbv) % bas) }
   )
 
