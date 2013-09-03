@@ -21,20 +21,36 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))
 
   /**Right-associative fold of a structure. */
-  def foldRight1[A](fa: F[A])(f: (A, => A) => A): A
+  def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B
 
   // derived functions
   override def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B =
     foldMap1(fa)(f)
 
+  /**Right-associative fold of a structure. */
+  def foldRight1[A](fa: F[A])(f: (A, => A) => A): A =
+    foldMapRight1(fa)(conforms)(f)
+
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
+    foldMapRight1(fa)(f(_, z))(f)
+
   /**Left-associative fold of a structure. */
-  def foldLeft1[A](fa: F[A])(f: (A, A) => A): A = {
+  def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = {
     import std.option._
-    foldLeft(fa, none[A]) {
-      case (None, r) => some(r)
+    foldLeft(fa, none[B]) {
+      case (None, r) => some(z(r))
       case (Some(l), r) => some(f(l, r))
-    }.getOrElse(sys.error("foldLeft1"))
+    }.getOrElse(sys.error("foldMapLeft1"))
   }
+
+  /**Left-associative fold of a structure. */
+  def foldLeft1[A](fa: F[A])(f: (A, A) => A): A =
+    foldMapLeft1(fa)(conforms)(f)
+
+  // XXX Would make a ⊥ with default foldMapLeft1; you can use it if
+  // you also overrode foldMapLeft1
+  // override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B =
+  //   foldMapLeft1(fa)(f(z, _))(f)
 
   /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
