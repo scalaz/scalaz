@@ -1,7 +1,7 @@
 package scalaz
 
 import syntax.all._
-import :<:._, Free.Return
+import Inject._, Free.Return
 
 class InjectTest extends Spec {
   import std.AllInstances._
@@ -103,5 +103,15 @@ class InjectTest extends Spec {
       distr(test1[T](Seq("a")) >> test2[T](Seq("b")) >> test3[T](Seq("c")))
 
     (res == Some(Return[T, Int](3))) must be_===(true)
+  }
+
+  "apply in left" in {
+    val fa = Test1(Seq("a"), Return[Test1Algebra, Int](_))
+    (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must be_===(true)
+  }
+
+  "apply in right" in {
+    val fa = Test2(Seq("a"), Return[Test2Algebra, Int](_))
+    (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must be_===(true)
   }
 }

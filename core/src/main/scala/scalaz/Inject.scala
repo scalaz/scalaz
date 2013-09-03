@@ -9,38 +9,39 @@ import Free.Suspend
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
  */
-sealed abstract class :<:[F[_]: Functor, G[_]: Functor] {
+sealed abstract class Inject[F[_], G[_]] {
   def inj[A](fa: F[A]): G[A]
   def prj[A](ga: G[A]): Option[F[A]]
 }
 
 sealed trait InjectInstances {
-  implicit def reflexiveInjectInstance[F[_]: Functor] =
-    new (F :<: F) {
+  implicit def reflexiveInjectInstance[F[_]] =
+    new Inject[F, F] {
       def inj[A](fa: F[A]) = fa
       def prj[A](ga: F[A]) = some(ga)
     }
 
-  implicit def leftInjectInstance[F[_]: Functor, G[_]: Functor] =
-    new (F :<: ({type λ[α] = Coproduct[F, G, α]})#λ) {
+  implicit def leftInjectInstance[F[_], G[_]] =
+    new Inject[F, ({type λ[α] = Coproduct[F, G, α]})#λ] {
       def inj[A](fa: F[A]) = Coproduct.leftc(fa)
       def prj[A](ga: ({type λ[α] = Coproduct[F, G, α]})#λ[A]) = ga.run.fold(some(_), _ => none)
     }
 
-  implicit def rightInjectInstance[F[_], G[_], H[_]]
-    (implicit F: Functor[F], G: Functor[G], H: Functor[H], I: F :<: G) =
-      new (F :<: ({type λ[α] = Coproduct[H, G, α]})#λ) {
+  implicit def rightInjectInstance[F[_], G[_], H[_]](implicit I: Inject[F, G]) =
+      new Inject[F, ({type λ[α] = Coproduct[H, G, α]})#λ] {
         def inj[A](fa: F[A]) = Coproduct.rightc(I.inj(fa))
         def prj[A](ga: ({type λ[α] = Coproduct[H, G, α]})#λ[A]) = ga.run.fold(_ => none, I.prj(_))
       }
 }
 
 sealed trait InjectFunctions {
-  def inject[F[_], G[_], A](ga: G[Free[F, A]])
-    (implicit F: Functor[F], G: Functor[G], I: G :<: F): Free[F, A] = Suspend[F, A](I.inj(ga))
+  def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit F: Functor[F], I: Inject[G, F]): Free[F, A] =
+    Suspend[F, A](I.inj(ga))
 
-  def match_[F[_], G[_], A](fa: Free[F, A])
-    (implicit F: Functor[F], G: Functor[G], I: G :<: F): Option[G[Free[F, A]]] = fa.resume.fold(I.prj(_), _ => none)
+  def match_[F[_], G[_], A](fa: Free[F, A])(implicit I: Inject[G, F]): Option[G[Free[F, A]]] =
+    fa.resume.fold(I.prj(_), _ => none)
 }
 
-object :<: extends InjectInstances with InjectFunctions
+object Inject extends InjectInstances with InjectFunctions {
+  @inline def apply[F[_], G[_]](implicit I: Inject[F, G]): Inject[F, G] = I
+}
