@@ -177,7 +177,7 @@ object build extends Build {
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
-    previousArtifact <<= (organization, name, scalaBinaryVersion) { (o, n, sbv) => Some(o % (n + "_" + sbv) % "7.0.0") }
+    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis) { (o, n, sbv, bas) => Some(o % (n + "_" + sbv) % bas) }
   )
 
   lazy val scalaz = Project(
@@ -336,6 +336,9 @@ object build extends Build {
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
+
+  lazy val scalazMimaBasis =
+    SettingKey[String]("scalaz-mima-basis", "Version of scalaz against which to run MIMA.")
 
   lazy val genTypeClasses = TaskKey[Seq[File]]("gen-type-classes")
 
