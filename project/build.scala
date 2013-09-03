@@ -172,6 +172,8 @@ object build extends Build {
       import com.typesafe.tools.mima.core._
       import com.typesafe.tools.mima.core.ProblemFilters._
       Seq(
+        "scalaz.Cord.isEmpty",
+        "scalaz.Cord.nonEmpty",
         "scalaz.EitherT.withFilter",
         "scalaz.EphemeralStream.take",
         "scalaz.EphemeralStream.takeWhile",
