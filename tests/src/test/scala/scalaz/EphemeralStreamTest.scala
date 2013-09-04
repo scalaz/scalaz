@@ -60,4 +60,14 @@ class EphemeralStreamTest extends Spec {
     val n = util.Random.nextInt(1000)
     EphemeralStream.iterate(0)(_ + 1).takeWhile(_ < n) must be_===(EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).takeWhile(_ < n)))
   }
+
+  "index" ! prop {(xs: EphemeralStream[Int], i: Int) =>
+    Foldable[EphemeralStream].index(xs, i) must be_===(xs.toList.lift.apply(i))
+  }
+
+  "index infinite stream" in {
+    val i = util.Random.nextInt(1000)
+    val xs = Stream from 0
+    Foldable[EphemeralStream].index(EphemeralStream.fromStream(xs), i) must be_===(xs.lift.apply(i))
+  }
 }
