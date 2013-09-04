@@ -54,11 +54,11 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
-  override def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] = Some(foldRight1(fa)(f))
+  override def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Option[B] = Some(foldMapRight1(fa)(z)(f))
   override def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = Some(foldr1(fa)(f))
   /** Curried `foldLeft1`. */
   final def foldl1[A](fa: F[A])(f: A => A => A): A = foldLeft1(fa)((b, a) => f(b)(a))
-  override def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] = Some(foldLeft1(fa)(f))
+  override def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] = Some(foldMapLeft1(fa)(z)(f))
   override def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
