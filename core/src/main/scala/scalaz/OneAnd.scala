@@ -69,12 +69,12 @@ private sealed trait OneAndFoldable[F[_]]
   override def foldMap1[A, B: Semigroup](fa: OneAnd[F, A])(f: A => B) =
     foldMap(fa)(a => some(f(a))) getOrElse f(fa.head)
 
-  override def foldRight1[A](fa: OneAnd[F, A])(f: (A, => A) => A) =
-    (F.foldRight(fa.tail, none[A])((a, oa) => oa map (f(a, _)) orElse some(a))
-       map (f(fa.head, _)) getOrElse fa.head)
+  override def foldMapRight1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (A, => B) => B) =
+    (F.foldRight(fa.tail, none[B])((a, ob) => ob map (f(a, _)) orElse some(z(a)))
+       map (f(fa.head, _)) getOrElse z(fa.head))
 
-  override def foldLeft1[A](fa: OneAnd[F, A])(f: (A, A) => A) =
-    F.foldLeft(fa.tail, fa.head)(f)
+  override def foldMapLeft1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (B, A) => B) =
+    F.foldLeft(fa.tail, z(fa.head))(f)
 
   override def foldMap[A, B](fa: OneAnd[F, A])(f: A => B)(implicit M: Monoid[B]) =
     M.append(f(fa.head), F.foldMap(fa.tail)(f))
@@ -92,8 +92,8 @@ private sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
   override def foldMap1[A, B](fa: OneAnd[F, A])(f: A => B)(implicit S: Semigroup[B]) =
     S.append(f(fa.head), F.foldMap1(fa.tail)(f))
 
-  override def foldRight1[A](fa: OneAnd[F, A])(f: (A, => A) => A) =
-    f(fa.head, F.foldRight1(fa.tail)(f))
+  override def foldMapRight1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (A, => B) => B) =
+    f(fa.head, F.foldMapRight1(fa.tail)(z)(f))
 }
 
 private sealed trait OneAndTraverse[F[_]]

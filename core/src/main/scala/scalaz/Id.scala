@@ -37,7 +37,7 @@ trait IdInstances {
 
       override def foldRight[A, B](fa: Id[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
 
-      override def foldRight1[A](fa: Id[A])(f: (A, => A) => A): A = fa
+      override def foldMapRight1[A, B](fa: Id[A])(z: A => B)(f: (A, => B) => B): B = z(fa)
 
       // Overrides for efficiency.
 

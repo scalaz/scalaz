@@ -124,11 +124,11 @@ sealed abstract class TreeInstances {
     def bind[A, B](fa: Tree[A])(f: A => Tree[B]): Tree[B] = fa flatMap f
     def traverse1Impl[G[_]: Apply, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] = fa traverse1 f
     override def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-    override def foldRight1[A](fa: Tree[A])(f: (A, => A) => A): A = fa.subForest.foldRight(fa.rootLabel)((t, a) => treeInstance.foldRight(t, a)(f))
+    override def foldMapRight1[A, B](fa: Tree[A])(z: A => B)(f: (A, => B) => B): B = fa.subForest.foldRight(z(fa.rootLabel))((t, b) => treeInstance.foldRight(t, b)(f))
     override def foldLeft[A, B](fa: Tree[A], z: B)(f: (B, A) => B): B =
       fa.flatten.foldLeft(z)(f)
-    override def foldLeft1[A](fa: Tree[A])(f: (A, A) => A): A = fa.flatten match {
-      case h #:: t => t.foldLeft(h)(f)
+    override def foldMapLeft1[A, B](fa: Tree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
+      case h #:: t => t.foldLeft(z(h))(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
   }
