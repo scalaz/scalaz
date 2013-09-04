@@ -142,7 +142,19 @@ sealed abstract class EphemeralStreamInstances {
         x => ys => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
       }
     }
-
+    override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
+      if(i < 0)
+        None
+      else{
+        var n = i
+        var these = fa
+        while (!these.isEmpty && n > 0){
+          n -= 1
+          these = these.tail()
+        }
+        these.headOption
+      }
+    }
   }
 
   import std.list._
