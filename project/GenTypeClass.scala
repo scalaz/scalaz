@@ -352,6 +352,11 @@ trait %sSyntax[F[_]] %s {
   s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[${typeClassName}, FA]) =
       new ${typeClassName}Ops[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: ${typeClassName}[F0.M] = F0.TC }
   """
+        val ToVKleisli =
+  s"""
+  implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new ${typeClassName}Ops[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: ${typeClassName}[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+"""
        val ToVFAB =
   s"""
   implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: ${typeClassName}[F]) =
@@ -376,6 +381,7 @@ sealed trait To${typeClassName}Ops0 {
 trait To${typeClassName}Ops ${extendsToSyntaxListText} {
   $ToVFAB
 
+  $ToVKleisli
   ////
 
   ////
