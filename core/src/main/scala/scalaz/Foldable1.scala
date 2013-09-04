@@ -106,34 +106,17 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     }
 
   trait Foldable1Law extends FoldableLaw {
-    import scalaz.Id._
-    type Pair[A] = (A, A)
-    private[this] implicit lazy val pfunc: Functor[Pair] = // probably not eager-val-safe
-      Functor[Id].product[Id]
+    import std.vector._
 
-    /** In a left-fold, the accumulator is always on the left. */
-    def leftFold1Bias[A](fa: F[Free.Return[Pair, A]]
-                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
-      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
-        fpa.resume.leftMap{case (a, b) => (a, b.resume)} match {
-          case -\/((l, \/-(r))) => rec(l)
-          case -\/(_) => false
-          case \/-(_) => true
-        }
-      rec(foldLeft1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
-    }
+    /** Left fold is consistent with foldMap1. */
+    def leftFM1Consistent[A: Equal](fa: F[A]): Boolean =
+      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
+                             foldMapLeft1(fa)(Vector(_))(_ :+ _))
 
-    /** In a right-fold, the accumulator is always on the right. */
-    def rightFold1Bias[A](fa: F[Free.Return[Pair, A]]
-                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
-      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
-        fpa.resume.leftMap{case (a, b) => (a.resume, b)} match {
-          case -\/((\/-(l), r)) => rec(r)
-          case -\/(_) => false
-          case \/-(_) => true
-        }
-      rec(foldRight1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
-    }
+    /** Right fold is consistent with foldMap1. */
+    def rightFM1Consistent[A: Equal](fa: F[A]): Boolean =
+      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
+                             foldMapRight1(fa)(Vector(_))(_ +: _))
   }
   def foldable1Law = new Foldable1Law {}
 
