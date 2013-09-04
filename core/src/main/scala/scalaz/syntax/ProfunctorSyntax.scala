@@ -33,6 +33,10 @@ trait ToProfunctorOps extends ToProfunctorOps0 {
       new ProfunctorOps[F,A, B] { def self = v; implicit def F: Profunctor[F] = F0 }
   
 
+  
+  implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Profunctor[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new ProfunctorOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Profunctor[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
 
   ////
