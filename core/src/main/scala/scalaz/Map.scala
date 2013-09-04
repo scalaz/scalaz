@@ -773,7 +773,7 @@ sealed abstract class ==>>[A, B] {
             (lt, z, gt.join(kx, x, r))
           case GT =>
             val (lt, z, gt) = r splitLookupWithKey k
-            (l.join(kx, x, l), z, gt)
+            (l.join(kx, x, lt), z, gt)
           case EQ =>
             (l, some((kx, x)), r)
         }
@@ -822,7 +822,7 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         f(kx) match {
           case LT =>
-            r.join(kx, x, l.filterGt(f))
+            l.filterGt(f).join(kx, x, r)
           case GT =>
             r filterGt f
           case EQ =>
@@ -853,7 +853,7 @@ sealed abstract class ==>>[A, B] {
         l.insertMax(kx, x)
       case (l @ Bin(ky, y, ly, ry), r @ Bin(kz, z, lz, rz)) =>
         if (delta * l.size <= r.size) balance(kz, z, l.join(kx, x, lz), rz)
-        else if (delta * r.size <= l.size) balance(ky, y, ly, r.join(kx, x, ry))
+        else if (delta * r.size <= l.size) balance(ky, y, ly, ry.join(kx, x, r))
         else Bin(kx, x, l, r)
     }
 
