@@ -2,21 +2,20 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Unzip` */
-sealed abstract class UnzipOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Unzip[F]
+final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unzip[F]) extends Ops[F[A]] {
   ////
   ////
 }
 
 sealed trait ToUnzipOps0 {
   implicit def ToUnzipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Unzip, FA]) =
-    new UnzipOps[F0.M,F0.A] { def self = F0(v); implicit def F: Unzip[F0.M] = F0.TC }
+    new UnzipOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToUnzipOps extends ToUnzipOps0 {
   implicit def ToUnzipOps[F[_],A](v: F[A])(implicit F0: Unzip[F]) =
-    new UnzipOps[F,A] { def self = v; implicit def F: Unzip[F] = F0 }
+    new UnzipOps[F,A](v)
 
   ////
   implicit def ToUnzipPairOps[F[_],A,B](v: F[(A, B)])(implicit F0: Unzip[F]) =
@@ -38,7 +37,7 @@ trait ToUnzipOps extends ToUnzipOps0 {
 }
 
 trait UnzipSyntax[F[_]]  {
-  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A] { def self = v; implicit def F: Unzip[F] = UnzipSyntax.this.F }
+  implicit def ToUnzipOps[A](v: F[A]): UnzipOps[F, A] = new UnzipOps[F,A](v)(UnzipSyntax.this.F)
 
   def F: Unzip[F]
   ////
