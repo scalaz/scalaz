@@ -79,6 +79,10 @@ object ScalazArbitrary {
   implicit def OneOrArbitrary[F[_], A](implicit A: Arbitrary[A], FA: Arbitrary[F[A]]): Arbitrary[OneOr[F, A]] =
     Functor[Arbitrary].map(arb[F[A] \/ A])(OneOr(_))
 
+  /** @since 7.1.0 */
+  implicit def Arbitrary_==>>[A, B](implicit o: Order[A], A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[A ==>> B] =
+    Functor[Arbitrary].map(arb[List[(A, B)]])(as => ==>>.fromList(as))
+
   import scalaz.Ordering._
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
