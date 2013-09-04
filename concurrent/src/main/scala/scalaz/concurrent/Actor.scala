@@ -5,14 +5,20 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
 import annotation.tailrec
 
 /**
- * Processes messages of type `A` sequentially. Messages are submitted to
+ * Processes messages of type `A`, one at a time. Messages are submitted to
  * the actor with the method `!`. Processing is typically performed asynchronously,
  * this is controlled by the provided `strategy`.
+ *
+ * Memory consistency guarantee: when each message is processed by the `handler`, any memory that it
+ * mutates is guaranteed to be visible by the `handler` when it processes the next message, even if
+ * the `strategy` runs the invocations of `handler` on separate threads. This is achieved because
+ * the `Actor` reads a volatile memory location before entering its event loop, and writes to the same
+ * location before suspending.
  *
  * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
  * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
  *
- * @see scalaz.concurrent.Promise
+ * @see scalaz.concurrent.Promise for a use case.
  *
  * @param handler  The message handler
  * @param onError  Exception handler, called if the message handler throws any `Throwable`.
