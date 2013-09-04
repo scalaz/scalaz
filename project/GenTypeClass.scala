@@ -257,95 +257,74 @@ object %s {
 
     val syntaxSource = kind match {
       case Kind.* =>
-        """%s
+        s"""$syntaxPackString
 
-/** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F] extends Ops[F] {
-  implicit def F: %s[F]
+/** Wraps a value `self` and provides methods related to `${typeClassName}` */
+sealed abstract class ${typeClassName}Ops[F] extends Ops[F] {
+  implicit def F: ${typeClassName}[F]
   ////
 
   ////
 }
 
-trait To%sOps %s {
-  implicit def To%sOps[F](v: F)(implicit F0: %s[F]) =
-    new %sOps[F] { def self = v; implicit def F: %s[F] = F0 }
+trait To${typeClassName}Ops $extendsToSyntaxListText {
+  implicit def To${typeClassName}Ops[F](v: F)(implicit F0: ${typeClassName}[F]) =
+    new ${typeClassName}Ops[F] { def self = v; implicit def F: ${typeClassName}[F] = F0 }
 
   ////
 
   ////
 }
 
-trait %sSyntax[F] %s {
-  implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
+  implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F] { def self = v; implicit def F: ${typeClassName}[F] = ${typeClassName}Syntax.this.F }
   
-  def F: %s[F]
+  def F: ${typeClassName}[F]
   ////
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName, typeClassName, typeClassName, extendsToSyntaxListText,
-
-      // implicits in ToXxxSyntax
-      typeClassName, typeClassName, typeClassName, typeClassName,
-      
-      // trait MonadSyntax[F] extends ... { ... } 
-      typeClassName, extendsListText("Syntax", cti = "F"),
-      typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
-      
-      typeClassName
-    )
+"""
     case Kind.*->* =>
       val ToVUnapply =
-"""  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
-    new %sOps[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
-""".format(Seq.fill(4)(typeClassName): _*)
+s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[${typeClassName}, FA]) =
+    new ${typeClassName}Ops[F0.M,F0.A] { def self = F0(v); implicit def F: ${typeClassName}[F0.M] = F0.TC }
+"""
       val ToVMA =
-"""  implicit def To%sOps[F[_],A](v: F[A])(implicit F0: %s[F]) =
-    new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
-""".format(Seq.fill(4)(typeClassName) :_*)
+s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeClassName}[F]) =
+    new ${typeClassName}Ops[F,A] { def self = v; implicit def F: ${typeClassName}[F] = F0 }
+"""
 
-    """%s
+    s"""$syntaxPackString
 
-/** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: %s[F]
+/** Wraps a value `self` and provides methods related to `${typeClassName}` */
+sealed abstract class ${typeClassName}Ops[F[_],A] extends Ops[F[A]] {
+  implicit def F: ${typeClassName}[F]
   ////
 
   ////
 }
 
-sealed trait To%sOps0 {
-%s
+sealed trait To${typeClassName}Ops0 {
+$ToVUnapply
 }
 
-trait To%sOps %s {
-%s
-  ////
-
-  ////
-}
-
-trait %sSyntax[F[_]] %s {
-  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
-
-  def F: %s[F]
+trait To${typeClassName}Ops $extendsToSyntaxListText {
+$ToVMA
   ////
 
   ////
 }
-""".format(syntaxPackString, typeClassName, typeClassName,
-      typeClassName,
-      typeClassName, ToVUnapply,
-      typeClassName, extendsToSyntaxListText,
 
-          ToVMA,
+trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
+  implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A] { def self = v; implicit def F: ${typeClassName}[F] = ${typeClassName}Syntax.this.F }
 
-          typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
-          
-          typeClassName
-        )
+  def F: ${typeClassName}[F]
+  ////
+
+  ////
+}
+"""
       case Kind.*^*->* =>
 
         val ToVUnapply =
