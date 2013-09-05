@@ -224,35 +224,32 @@ object GenTypeClass {
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
-    val syntaxMember = "val %sSyntax = new %s.%sSyntax[%s] { def F = %s.this }".format(Util.initLower(typeClassName), syntaxPackString1, typeClassName, classifiedTypeIdent, typeClassName)
+    val syntaxMember = s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
 
-    val mainSource = """%s
+    val mainSource = s"""${tc.packageString0}
 
 ////
 /**
  *
  */
 ////
-trait %s[%s] %s { self =>
+trait $typeClassName[$classifiedType] $extendsLikeList { self =>
   ////
 
   // derived functions
 
   ////
-  %s
+  $syntaxMember
 }
 
-object %s {
-  @inline def apply[%s](implicit F: %s[F]): %s[F] = F
+object $typeClassName {
+  @inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F
 
   ////
 
   ////
 }
-""".format(tc.packageString0, typeClassName, classifiedType, extendsLikeList, syntaxMember,
-      typeClassName,
-      classifiedTypeF, typeClassName, typeClassName, typeClassName, classifiedTypeIdent, classifiedTypeIdent
-      )
+"""
     val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {
