@@ -257,8 +257,7 @@ object $typeClassName {
         s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
-sealed abstract class ${typeClassName}Ops[F] extends Ops[F] {
-  implicit def F: ${typeClassName}[F]
+final class ${typeClassName}Ops[F] private[syntax](val self: F)(implicit val F: ${typeClassName}[F]) extends Ops[F] {
   ////
 
   ////
@@ -266,7 +265,7 @@ sealed abstract class ${typeClassName}Ops[F] extends Ops[F] {
 
 trait To${typeClassName}Ops $extendsToSyntaxListText {
   implicit def To${typeClassName}Ops[F](v: F)(implicit F0: ${typeClassName}[F]) =
-    new ${typeClassName}Ops[F] { def self = v; implicit def F: ${typeClassName}[F] = F0 }
+    new ${typeClassName}Ops[F](v)
 
   ////
 
@@ -274,7 +273,7 @@ trait To${typeClassName}Ops $extendsToSyntaxListText {
 }
 
 trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
-  implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F] { def self = v; implicit def F: ${typeClassName}[F] = ${typeClassName}Syntax.this.F }
+  implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F](v)(${typeClassName}Syntax.this.F)
   
   def F: ${typeClassName}[F]
   ////
@@ -285,18 +284,17 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
     case Kind.*->* =>
       val ToVUnapply =
 s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[${typeClassName}, FA]) =
-    new ${typeClassName}Ops[F0.M,F0.A] { def self = F0(v); implicit def F: ${typeClassName}[F0.M] = F0.TC }
+    new ${typeClassName}Ops[F0.M,F0.A](F0(v))(F0.TC)
 """
       val ToVMA =
 s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeClassName}[F]) =
-    new ${typeClassName}Ops[F,A] { def self = v; implicit def F: ${typeClassName}[F] = F0 }
+    new ${typeClassName}Ops[F,A](v)
 """
 
     s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
-sealed abstract class ${typeClassName}Ops[F[_],A] extends Ops[F[A]] {
-  implicit def F: ${typeClassName}[F]
+final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: ${typeClassName}[F]) extends Ops[F[A]] {
   ////
 
   ////
@@ -314,7 +312,7 @@ $ToVMA
 }
 
 trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
-  implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A] { def self = v; implicit def F: ${typeClassName}[F] = ${typeClassName}Syntax.this.F }
+  implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
   ////
@@ -326,20 +324,19 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
 
         val ToVUnapply =
   s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[${typeClassName}, FA]) =
-      new ${typeClassName}Ops[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: ${typeClassName}[F0.M] = F0.TC }
+      new ${typeClassName}Ops[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   """
        val ToVFAB =
   s"""
   implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: ${typeClassName}[F]) =
-      new ${typeClassName}Ops[F,A, B] { def self = v; implicit def F: ${typeClassName}[F] = F0 }
+      new ${typeClassName}Ops[F,A, B](v)
   """
 
 
     s"""$syntaxPackString
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
-sealed abstract class ${typeClassName}Ops[F[_, _],A, B] extends Ops[F[A, B]] {
-  implicit def F: ${typeClassName}[F]
+final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: ${typeClassName}[F]) extends Ops[F[A, B]] {
   ////
 
   ////
@@ -358,7 +355,7 @@ trait To${typeClassName}Ops ${extendsToSyntaxListText} {
 }
 
 trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
-  implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B] { def self = v; implicit def F: ${typeClassName}[F] = ${typeClassName}Syntax.this.F }
+  implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
   ////

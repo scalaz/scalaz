@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Semigroup` */
-sealed abstract class SemigroupOps[F] extends Ops[F] {
-  implicit def F: Semigroup[F]
+final class SemigroupOps[F] private[syntax](val self: F)(implicit val F: Semigroup[F]) extends Ops[F] {
   ////
   final def |+|(other: => F): F = F.append(self, other)
   final def mappend(other: => F): F = F.append(self, other)
@@ -13,14 +12,14 @@ sealed abstract class SemigroupOps[F] extends Ops[F] {
 
 trait ToSemigroupOps  {
   implicit def ToSemigroupOps[F](v: F)(implicit F0: Semigroup[F]) =
-    new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = F0 }
+    new SemigroupOps[F](v)
 
   ////
   ////
 }
 
 trait SemigroupSyntax[F]  {
-  implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F] { def self = v; implicit def F: Semigroup[F] = SemigroupSyntax.this.F }
+  implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F](v)(SemigroupSyntax.this.F)
   
   def F: Semigroup[F]
   ////
