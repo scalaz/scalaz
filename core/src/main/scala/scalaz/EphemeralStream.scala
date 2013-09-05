@@ -61,6 +61,14 @@ sealed abstract class EphemeralStream[A] {
     foldLeft(0)(addOne _)
   }
 
+  def tails: EphemeralStream[EphemeralStream[A]] =
+    if (isEmpty) emptyEphemeralStream
+    else cons(this, tail().tails)
+
+  def inits: EphemeralStream[EphemeralStream[A]] =
+    if (isEmpty) EphemeralStream(emptyEphemeralStream)
+    else EphemeralStream[A]() ##:: tail().inits.map(head() ##:: _)
+
   def findM[M[_]: Monad](p: A => M[Boolean]): M[Option[A]] =
     if(isEmpty)
       Monad[M].point(None)
@@ -122,11 +130,31 @@ object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunc
       if (b < size) Some((as0(b), b + 1))
       else None)
   }
+
+  class ConsWrap[A](e: => EphemeralStream[A]) {
+    def ##::(h: A): EphemeralStream[A] = cons(h, e)
+  }
+
+  implicit def consWrapper[A](e: => EphemeralStream[A]): ConsWrap[A] =
+    new ConsWrap[A](e)
+
+  object ##:: {
+    def unapply[A](xs: EphemeralStream[A]): Option[(A, EphemeralStream[A])] =
+      if (xs.isEmpty) None
+      else Some((xs.head(), xs.tail()))
+  }
 }
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] {
+    import EphemeralStream._
+    override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
+      case _ ##:: tl  => if (tl.isEmpty) EphemeralStream(a)
+                         else a ##:: cojoin(tl)
+      case _ => emptyEphemeralStream
+    }
+    def cobind[A, B](fa: EphemeralStream[A])(f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
     def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
