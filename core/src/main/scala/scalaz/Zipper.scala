@@ -230,7 +230,14 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
    */
   def findBy[AA >: A](f: Zipper[AA] => Option[Zipper[AA]])(p: AA => Boolean): Option[Zipper[AA]] = {
-    f(this) flatMap (x => if (p(x.focus)) Some(x) else x.findBy(f)(p))
+    @tailrec
+    def go(zopt: Option[Zipper[AA]]): Option[Zipper[AA]] = {
+      zopt match {
+        case Some(z) => if (p(z.focus)) Some(z) else go(f(z))
+        case None    => None
+      }
+    }
+    go(f(this))
   }
 
   /**
