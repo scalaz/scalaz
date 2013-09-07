@@ -129,8 +129,8 @@ sealed abstract class InsertionMapInstances {
         fa map f
     }
 
-  implicit def insertionMapEqual[K, V]: Equal[InsertionMap[K, V]] =
-    Equal.equalA
+  implicit def insertionMapEqual[K: Order, V: Equal]: Equal[InsertionMap[K, V]] =
+    Equal.equalBy(_.toMap)
 
   import Cord._
 
