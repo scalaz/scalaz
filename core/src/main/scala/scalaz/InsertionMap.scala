@@ -129,12 +129,6 @@ sealed abstract class InsertionMapInstances {
         fa map f
     }
 
-  implicit def insertionMap[K]: Functor[({type λ[α]=InsertionMap[K, α]})#λ] =
-    new Functor[({type λ[α]=InsertionMap[K, α]})#λ] {
-      def map[A, B](a: InsertionMap[K, A])(f: A => B) =
-        a map f
-    }
-
   implicit def insertionMapEqual[K, V]: Equal[InsertionMap[K, V]] =
     Equal.equalA
 
