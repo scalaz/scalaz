@@ -32,6 +32,10 @@ trait ToBitraverseOps extends ToBitraverseOps0 with ToBifunctorOps with ToBifold
       new BitraverseOps[F,A, B] { def self = v; implicit def F: Bitraverse[F] = F0 }
   
 
+  
+  implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bitraverse[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new BitraverseOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Bitraverse[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
 
   ////

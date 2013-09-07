@@ -21,6 +21,10 @@ trait ToBifoldableOps extends ToBifoldableOps0 {
       new BifoldableOps[F,A, B] { def self = v; implicit def F: Bifoldable[F] = F0 }
   
 
+  
+  implicit def ToBifoldableVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bifoldable[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new BifoldableOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Bifoldable[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
 
   ////
