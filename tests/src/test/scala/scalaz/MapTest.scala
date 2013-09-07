@@ -542,9 +542,9 @@ class MapTest extends Spec {
     implicit def equMapConj[A: Equal, B: Equal]: Equal[(A ==>> B) @@ Tags.Conjunction] =
       Tag.subst(implicitly)
 
-    implicit def arbMapConj[A, B](implicit o: Order[A], a: Arbitrary[List[(A, B)]]
+    implicit def arbMapConj[A, B](implicit a: Arbitrary[A ==>> B]
                                 ): Arbitrary[(A ==>> B) @@ Tags.Conjunction] =
-      Tag.subst(implicitly)
+      Tag.subst(a)
 
     checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
   }
