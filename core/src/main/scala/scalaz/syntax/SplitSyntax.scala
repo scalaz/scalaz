@@ -22,6 +22,10 @@ trait ToSplitOps extends ToSplitOps0 with ToComposeOps {
       new SplitOps[F,A, B] { def self = v; implicit def F: Split[F] = F0 }
   
 
+  
+  implicit def ToSplitVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Split[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new SplitOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Split[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
   implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Split[({type λ[α, β]=F[G, α, β]})#λ]) =
         new SplitOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Split[({type λ[α, β]=F[G, α, β]})#λ] = F0 }

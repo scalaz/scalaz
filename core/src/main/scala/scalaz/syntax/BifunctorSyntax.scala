@@ -29,6 +29,10 @@ trait ToBifunctorOps extends ToBifunctorOps0 {
       new BifunctorOps[F,A, B] { def self = v; implicit def F: Bifunctor[F] = F0 }
   
 
+  
+  implicit def ToBifunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bifunctor[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new BifunctorOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Bifunctor[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
 
   ////

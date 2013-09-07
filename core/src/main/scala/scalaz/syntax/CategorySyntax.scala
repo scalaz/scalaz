@@ -21,10 +21,11 @@ trait ToCategoryOps extends ToCategoryOps0 with ToComposeOps {
       new CategoryOps[F,A, B] { def self = v; implicit def F: Category[F] = F0 }
   
 
-  ////
+  
   implicit def ToCategoryVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Category[({type λ[α, β]=F[G, α, β]})#λ]) =
-      new CategoryOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Category[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+        new CategoryOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Category[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
 
+  ////
   ////
 }
 

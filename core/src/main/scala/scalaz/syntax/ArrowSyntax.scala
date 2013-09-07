@@ -35,6 +35,10 @@ trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps with T
       new ArrowOps[F,A, B] { def self = v; implicit def F: Arrow[F] = F0 }
   
 
+  
+  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Arrow[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new ArrowOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Arrow[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
 
   ////

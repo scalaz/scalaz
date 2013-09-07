@@ -22,6 +22,10 @@ trait ToChoiceOps extends ToChoiceOps0 with ToCategoryOps {
       new ChoiceOps[F,A, B] { def self = v; implicit def F: Choice[F] = F0 }
   
 
+  
+  implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Choice[({type λ[α, β]=F[G, α, β]})#λ]) =
+        new ChoiceOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Choice[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+
   ////
   implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Choice[({type λ[α, β]=F[G, α, β]})#λ]) =
         new ChoiceOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Choice[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
