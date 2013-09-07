@@ -119,6 +119,14 @@ sealed abstract class InsertionMapInstances {
           case (acc, (k, v)) => F.apply2(acc, f(v))(_ ^+^ (k, _))
         })
       }
+      override def foldLeft[A, B](fa: InsertionMap[K, A], z: B)(f: (B, A) => B) =
+        fa.toList.foldLeft(z){case (b, (_, a)) => f(b, a) }
+      override def foldRight[A, B](fa: InsertionMap[K, A], z: => B)(f: (A, => B) => B) =
+        Foldable[List].foldRight(fa.toList, z){case ((_, a), b) => f(a, b)}
+      override def foldMap[A, B: Monoid](fa: InsertionMap[K, A])(f: A => B) =
+        fa.toList.foldMap{case (_, a) => f(a)}
+      override def map[A, B](fa: InsertionMap[K, A])(f: A => B) =
+        fa map f
     }
 
   implicit def insertionMap[K]: Functor[({type λ[α]=InsertionMap[K, α]})#λ] =
