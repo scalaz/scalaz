@@ -77,4 +77,21 @@ class InsertionMapTest extends Spec {
     }
   }
 
+  "no stack overflow" in {
+    import syntax.foldable._
+    val list = (1 to 100000).map{i => i -> i}.toList
+    val values = list.map(_._2)
+    val map = InsertionMap(list: _*)
+
+    "foldLeft" in {
+      map.foldLeft(List[Int]())((a, b) => b :: a) must be_===(values.foldLeft(List[Int]())((a, b) => b :: a))
+    }
+    "foldRight" in {
+      map.foldRight(List[Int]())(_ :: _) must be_===(Foldable[List].foldRight(values, List[Int]())(_ :: _))
+    }
+    "foldMap" in {
+      map.foldMap(identity) must be_===(values.foldMap(identity))
+    }
+  }
+
 }
