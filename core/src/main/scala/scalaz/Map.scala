@@ -921,7 +921,7 @@ sealed abstract class MapInstances {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
-      override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]) =
+      override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]): B =
         fa match {
           case Tip() =>
             F.zero
