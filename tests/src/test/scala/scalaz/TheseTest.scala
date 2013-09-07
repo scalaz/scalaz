@@ -32,7 +32,6 @@ class TheseTest extends Spec {
     def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
     def applicative[L: Semigroup] = Applicative[({type λ[α] = L \&/ α})#λ]
     def monad[L: Semigroup] = Monad[({type λ[α] = L \&/ α})#λ]
-    def zip[L: Semigroup] = Zip[({type λ[α] = L \&/ α})#λ]
     def cobind[L] = Cobind[({type λ[α] = L \&/ α})#λ]
     def foldable[L] = Foldable[({type λ[α] = L \&/ α})#λ]
     def traverse[L] = Traverse[({type λ[α] = L \&/ α})#λ]

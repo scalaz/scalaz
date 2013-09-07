@@ -92,7 +92,17 @@ trait ListInstances extends ListInstances0 {
   }
 
   implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    override def show(as: List[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show):_*) :+ "]"
+    override def show(as: List[A]) = {
+      def commaSep(rest: List[A], acc: Cord): Cord =
+        rest match {
+          case Nil => acc
+          case x::xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
+        }
+      "[" +: (as match {
+        case Nil => Cord()
+        case x::xs => commaSep(xs, Show[A].show(x))
+      }) :+ "]"
+    }
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
@@ -203,12 +213,12 @@ trait ListFunctions {
       }
     }
   }
-  
-  /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */   
+
+  /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
   final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
     val b = f(a)
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
-  } mapValues (_.reverse) 
+  } mapValues (_.reverse)
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =

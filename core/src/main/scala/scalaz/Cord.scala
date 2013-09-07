@@ -113,8 +113,11 @@ final case class Cord(self: FingerTree[Int, String]) {
   def toStream: Stream[Char] = toIndexedSeq.toStream
   def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq)
   override def toString: String = {
+    import syntax.foldable._
+    import Free._
     val sb = new StringBuilder(self.measure)
-    self foreach (sb ++= _)
+    val t = self.traverse_[Trampoline](x => Trampoline.delay(sb ++= x))
+    t.run
     sb.toString
   }
 
@@ -136,7 +139,7 @@ object Cord {
   implicit val sizer: Reducer[String, Int] = UnitReducer((a: String) => a.length)
 
   def mkCord(sep: Cord, as: Cord*): Cord =
-    if (as.length > 0)
+    if (!as.isEmpty)
       as.tail.foldLeft(as.head)(_ ++ sep ++ _)
     else
       Cord()
