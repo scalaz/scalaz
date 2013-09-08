@@ -21,28 +21,44 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))
 
   /**Right-associative fold of a structure. */
-  def foldRight1[A](fa: F[A])(f: (A, => A) => A): A
+  def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B
 
   // derived functions
   override def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B =
     foldMap1(fa)(f)
 
+  /**Right-associative fold of a structure. */
+  def foldRight1[A](fa: F[A])(f: (A, => A) => A): A =
+    foldMapRight1(fa)(conforms)(f)
+
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
+    foldMapRight1(fa)(f(_, z))(f)
+
   /**Left-associative fold of a structure. */
-  def foldLeft1[A](fa: F[A])(f: (A, A) => A): A = {
+  def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = {
     import std.option._
-    foldLeft(fa, none[A]) {
-      case (None, r) => some(r)
+    foldLeft(fa, none[B]) {
+      case (None, r) => some(z(r))
       case (Some(l), r) => some(f(l, r))
-    }.getOrElse(sys.error("foldLeft1"))
+    }.getOrElse(sys.error("foldMapLeft1"))
   }
+
+  /**Left-associative fold of a structure. */
+  def foldLeft1[A](fa: F[A])(f: (A, A) => A): A =
+    foldMapLeft1(fa)(conforms)(f)
+
+  // XXX Would make a ⊥ with default foldMapLeft1; you can use it if
+  // you also overrode foldMapLeft1
+  // override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B =
+  //   foldMapLeft1(fa)(f(z, _))(f)
 
   /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
-  override def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] = Some(foldRight1(fa)(f))
+  override def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Option[B] = Some(foldMapRight1(fa)(z)(f))
   override def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = Some(foldr1(fa)(f))
   /** Curried `foldLeft1`. */
   final def foldl1[A](fa: F[A])(f: A => A => A): A = foldLeft1(fa)((b, a) => f(b)(a))
-  override def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] = Some(foldLeft1(fa)(f))
+  override def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] = Some(foldMapLeft1(fa)(z)(f))
   override def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
@@ -90,34 +106,17 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     }
 
   trait Foldable1Law extends FoldableLaw {
-    import scalaz.Id._
-    type Pair[A] = (A, A)
-    private[this] implicit lazy val pfunc: Functor[Pair] = // probably not eager-val-safe
-      Functor[Id].product[Id]
+    import std.vector._
 
-    /** In a left-fold, the accumulator is always on the left. */
-    def leftFold1Bias[A](fa: F[Free.Return[Pair, A]]
-                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
-      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
-        fpa.resume.leftMap{case (a, b) => (a, b.resume)} match {
-          case -\/((l, \/-(r))) => rec(l)
-          case -\/(_) => false
-          case \/-(_) => true
-        }
-      rec(foldLeft1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
-    }
+    /** Left fold is consistent with foldMap1. */
+    def leftFM1Consistent[A: Equal](fa: F[A]): Boolean =
+      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
+                             foldMapLeft1(fa)(Vector(_))(_ :+ _))
 
-    /** In a right-fold, the accumulator is always on the right. */
-    def rightFold1Bias[A](fa: F[Free.Return[Pair, A]]
-                       )(implicit up: F[Free.Return[Pair, A]] => F[Free[Pair, A]]): Boolean = {
-      @annotation.tailrec def rec(fpa: Free[Pair, A]): Boolean =
-        fpa.resume.leftMap{case (a, b) => (a.resume, b)} match {
-          case -\/((\/-(l), r)) => rec(r)
-          case -\/(_) => false
-          case \/-(_) => true
-        }
-      rec(foldRight1(up(fa))((l, r) => Free.Suspend[Pair, A]((l, r))))
-    }
+    /** Right fold is consistent with foldMap1. */
+    def rightFM1Consistent[A: Equal](fa: F[A]): Boolean =
+      Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
+                             foldMapRight1(fa)(Vector(_))(_ +: _))
   }
   def foldable1Law = new Foldable1Law {}
 
