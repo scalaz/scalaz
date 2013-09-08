@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Profunctor` */
-sealed abstract class ProfunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
-  implicit def F: Profunctor[F]
+final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Profunctor[F]) extends Ops[F[A, B]] {
   ////
 
   final def ^>>[C](f: C => A): F[C, B] =
@@ -23,19 +22,19 @@ sealed abstract class ProfunctorOps[F[_, _],A, B] extends Ops[F[A, B]] {
 
 sealed trait ToProfunctorOps0 {
     implicit def ToProfunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Profunctor, FA]) =
-      new ProfunctorOps[F0.M,F0.A,F0.B] { def self = F0(v); implicit def F: Profunctor[F0.M] = F0.TC }
+      new ProfunctorOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
 }
 
 trait ToProfunctorOps extends ToProfunctorOps0 {
   
   implicit def ToProfunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Profunctor[F]) =
-      new ProfunctorOps[F,A, B] { def self = v; implicit def F: Profunctor[F] = F0 }
+      new ProfunctorOps[F,A, B](v)
   
 
   
   implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Profunctor[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ProfunctorOps[({type λ[α, β]=F[G, α, β]})#λ, A, B] { def self = v; implicit def F: Profunctor[({type λ[α, β]=F[G, α, β]})#λ] = F0 }
+        new ProfunctorOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
 
   ////
 
@@ -43,7 +42,7 @@ trait ToProfunctorOps extends ToProfunctorOps0 {
 }
 
 trait ProfunctorSyntax[F[_, _]]  {
-  implicit def ToProfunctorOps[A, B](v: F[A, B]): ProfunctorOps[F, A, B] = new ProfunctorOps[F, A, B] { def self = v; implicit def F: Profunctor[F] = ProfunctorSyntax.this.F }
+  implicit def ToProfunctorOps[A, B](v: F[A, B]): ProfunctorOps[F, A, B] = new ProfunctorOps[F, A, B](v)(ProfunctorSyntax.this.F)
 
   def F: Profunctor[F]
   ////
