@@ -43,6 +43,15 @@ object build extends Build {
     enableCrossBuild = true
   )
 
+  lazy val setMimaVersion: ReleaseStep = { st: State =>
+    val extracted = Project.extract(st)
+
+    val (releaseV, _) = st.get(versions).getOrElse(sys.error("impossible"))
+    // TODO switch to `versionFile` key when updating sbt-release
+    IO.write(new File("version.sbt"), "\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
+  }
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
@@ -111,6 +120,7 @@ object build extends Build {
       tagRelease,
       publishSignedArtifacts,
       setNextVersion,
+      setMimaVersion,
       commitNextVersion,
       pushChanges
     ),
