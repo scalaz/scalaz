@@ -156,6 +156,15 @@ trait KleisliFunctions {
   /**Construct a Kleisli from a Function1 */
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = Kleisli(f)
 
+  /** A version of `kleisli` that infers the type constructor `M`, when `M` is `Bind`
+   * @example
+   * {{{
+   * Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
+   * }}}
+   */
+  def kleisliU[A, MB](f: A => MB)(implicit MB: Unapply[Bind, MB]): Kleisli[MB.M, A, MB.A] =
+    Kleisli(a => MB(f(a)))
+
   /**Implicitly unwrap the Function1 represented by the Kleisli */
   implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = k.run
 
