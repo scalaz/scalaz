@@ -53,6 +53,12 @@ object UnapplyInference extends App {
     k >>> k
   }
 
+  def kleisliU() {
+    import scalaz._
+    val k: Kleisli[({type λ[α] = NumberFormatException \/ α})#λ, String, Int] =
+      Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
+  }
+
   def functorSyntaxChaining() {
     import scalaz._
     import syntax.functor._
