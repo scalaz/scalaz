@@ -34,7 +34,7 @@ sealed trait InjectInstances {
       }
 }
 
-sealed trait InjectFunctions {
+trait InjectFunctions {
   def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit F: Functor[F], I: Inject[G, F]): Free[F, A] =
     Suspend[F, A](I.inj(ga))
 
