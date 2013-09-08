@@ -186,8 +186,8 @@ object build extends Build {
       libraryDependencies <++= scalaVersion{ v =>
         if((v startsWith "2.9") || (v startsWith "2.10")) Seq()
         else Seq(
-          "org.scala-lang" % "scala-parser-combinators" % v,
-          "org.scala-lang" % "scala-xml" % v
+          "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0-RC2",
+          "org.scala-lang.modules" %% "scala-xml" % "1.0-RC4"
         )
       },
       sourceGenerators in Compile <+= buildInfo,
