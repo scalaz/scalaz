@@ -30,6 +30,19 @@ class CordTest extends Spec {
     x.tail.tail.tail.toString must_== ""
   }
 
+  "isEmpty() must indicate string is empty" ! prop { (a:Cord, b:Cord) =>
+    a.isEmpty == a.toString.isEmpty &&
+    b.isEmpty == b.toString.isEmpty &&
+    (a ++ b).isEmpty == (a.toString.isEmpty && b.toString.isEmpty)
+  }
+
+  "nonEmpty() must indicate string is non-empty" ! prop { (a:Cord, b:Cord) =>
+    val c = a ++ b
+    a.nonEmpty == !a.toString.isEmpty &&
+    b.nonEmpty == !b.toString.isEmpty &&
+    (a ++ b).nonEmpty == (!a.toString.isEmpty || !b.toString.isEmpty)
+  }
+
   implicit def ArbitraryCord: Arbitrary[Cord] = Functor[Arbitrary].map(implicitly[Arbitrary[String]])(Cord.stringToCord)
 
   checkAll(monoid.laws[Cord])
