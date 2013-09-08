@@ -5,6 +5,8 @@ package syntax
 sealed abstract class Foldable1Ops[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable1[F]
   ////
+  final def foldMapRight1[B](z: A => B)(f: (A, => B) => B): B = F.foldMapRight1(self)(z)(f)
+  final def foldMapLeft1[B](z: A => B)(f: (B, A) => B): B = F.foldMapLeft1(self)(z)(f)
   final def foldRight1(f: (A, => A) => A): A = F.foldRight1(self)(f)
   final def foldLeft1(f: (A, A) => A): A = F.foldLeft1(self)(f)
   final def foldr1(f: A => (=> A) => A): A = F.foldr1(self)(f)

@@ -74,20 +74,20 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
         F.foldMap1(a)(f)
     }
 
-  def foldRight1(f: (A, => A) => A)(implicit F: Foldable1[F]): A =
+  def foldMapRight1[B](z: A => B)(f: (A, => B) => B)(implicit F: Foldable1[F]): B =
     run match {
       case \/-(a) =>
-        a
+        z(a)
       case -\/(a) =>
-        F.foldRight1(a)(f)
+        F.foldMapRight1(a)(z)(f)
     }
 
-  def foldLeft1(f: (A, A) => A)(implicit F: Foldable1[F]): A =
+  def foldMapLeft1[B](z: A => B)(f: (B, A) => B)(implicit F: Foldable1[F]): B =
     run match {
       case \/-(a) =>
-        a
+        z(a)
       case -\/(a) =>
-        F.foldLeft1(a)(f)
+        F.foldMapLeft1(a)(z)(f)
     }
 
   def traverse[G[_], B](f: A => G[B])(implicit T: Traverse[F], F: Applicative[G]): G[OneOr[F, B]] =
@@ -170,11 +170,11 @@ private sealed trait OneOrFoldable1[F[_]]
   override def foldMap1[A, B](fa: OneOr[F, A])(f: A => B)(implicit M: Semigroup[B]) =
     fa.foldMap1(f)
 
-  override def foldRight1[A](fa: OneOr[F, A])(f: (A, => A) => A) =
-    fa.foldRight1(f)
+  override def foldMapRight1[A, B](fa: OneOr[F, A])(z: A => B)(f: (A, => B) => B) =
+    fa.foldMapRight1(z)(f)
 
-  override def foldLeft1[A](fa: OneOr[F, A])(f: (A, A) => A) =
-    fa.foldLeft1(f)
+  override def foldMapLeft1[A, B](fa: OneOr[F, A])(z: A => B)(f: (B, A) => B) =
+    fa.foldMapLeft1(z)(f)
 }
 
 private sealed trait OneOrTraverse[F[_]]

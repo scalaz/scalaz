@@ -134,15 +134,13 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
-      override def foldRight1[A](fa: NonEmptyList[A])(f: (A, => A) => A): A = {
+      override def foldMapRight1[A, B](fa: NonEmptyList[A])(z: A => B)(f: (A, => B) => B): B = {
         val reversed = fa.reverse
-        reversed.tail.foldLeft(reversed.head)((x, y) => f(y, x))
+        reversed.tail.foldLeft(z(reversed.head))((x, y) => f(y, x))
       }
 
-      override def foldLeft1[A](fa: NonEmptyList[A])(f: (A, A) => A): A = fa.tail match {
-        case Nil => fa.head
-        case h :: t => foldLeft1(NonEmptyList.nel(f(fa.head, h), t))(f)
-      }
+      override def foldMapLeft1[A, B](fa: NonEmptyList[A])(z: A => B)(f: (B, A) => B): B =
+        fa.tail.foldLeft(z(fa.head))(f)
 
       override def foldMap1[A, B](fa: NonEmptyList[A])(f: A => B)(implicit F: Semigroup[B]): B = {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
