@@ -894,52 +894,84 @@ sealed abstract class MapInstances {
   import std.list._
   import std.tuple._
 
-  implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] = new Show[A ==>> B] {
-    override def show(as: A ==>> B) =
-      Show[List[(A, B)]].show(as.toAscList)
-  }
+  implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
+    Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
 
-  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = new Equal[A ==>> B] {
-    def equal(a1: A ==>> B, a2: A ==>> B) =
-      a1.size === a2.size && a1.toAscList === a2.toAscList
-  }
+  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = 
+    new MapEqual[A, B] {def A = implicitly; def B = implicitly}
 
-  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = new Order[A ==>> B] {
-    def order(o1: A ==>> B, o2: A ==>> B) =
-      Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
-  }
-
-  implicit def mapFunctor[S]: Functor[({type λ[α] = ==>>[S, α]})#λ] =
-    new Functor[({type λ[α] = ==>>[S, α]})#λ] {
-      def map[A, B](fa: S ==>> A)(f: A => B) =
-        fa map f
+  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = 
+    new Order[A ==>> B] with MapEqual[A, B] {
+      def A = implicitly
+      def B = implicitly
+      def order(o1: A ==>> B, o2: A ==>> B) =
+        Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
     }
 
-  implicit def mapFoldable[S]: Foldable[({type λ[α] = ==>>[S, α]})#λ] =
-    new Foldable[({type λ[α] = ==>>[S, α]})#λ] {
-      def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]) =
+  implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
+    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+
+  implicit def mapIntersection[A, B](implicit A: Order[A], B: Semigroup[B]
+                                   ): Semigroup[(A ==>> B) @@ Tags.Conjunction] =
+    Tag.subst(Semigroup.instance((l, r) =>
+      (l intersectionWith r)(B.append(_, _))))
+
+  implicit def mapCovariant[S]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
+    new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
+      override def map[A, B](fa: S ==>> A)(f: A => B) =
+        fa map f
+
+      override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]): B =
         fa match {
           case Tip() =>
             F.zero
           case Bin(k, x, l, r) =>
-            F.append(F.append(foldMap(l)(f), f(x)), foldMap(r)(f))
+            F.append(foldMap(l)(f), F.append(f(x), foldMap(r)(f)))
         }
 
-      def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B) =
-        fa.toAscList.foldRight(z)((tuple, a) => f(tuple._2, a))
+      override def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B) =
+        fa.foldrWithKey(z)((_, b, acc) => f(b, acc))
+
+      override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
+        fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
+
+      def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
+        fa match {
+          case Tip() =>
+            G.point(Tip())
+          case Bin(kx, x, l, r) =>
+            G.apply3(traverseImpl(l)(f), f(x), traverseImpl(r)(f)){
+              (l2, x2, r2) => Bin(kx, x2, l2, r2)
+            }
+        }
     }
 
-  implicit def mapTraversable[S: Order] = new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
-    def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
+  implicit val mapBifoldable: Bifoldable[==>>] = new Bifoldable[==>>] {
+    def bifoldMap[A,B,M](fa: A ==>> B)(f: A => M)(g: B => M)(implicit F: Monoid[M]): M =
       fa match {
         case Tip() =>
-          G.point(Tip())
-        case m @ Bin(kx, x, l, r) =>
-          m.toList.foldLeft(G.point(==>>.empty[S, B]))({
-            case (acc, (k, v)) => G.apply2(acc, f(v))(_.insert(k, _))
-          })
+          F.zero
+        case Bin(k, x, l, r) =>
+          F.append(bifoldMap(l)(f)(g),
+                   F.append(f(k), F.append(g(x), bifoldMap(r)(f)(g))))
       }
+
+    def bifoldRight[A,B,C](fa: A ==>> B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+      fa.foldrWithKey(z)((a, b, c) => f(a, g(b, c)))
+
+    override def bifoldLeft[A,B,C](fa: A ==>> B, z: C)(f: (C, A) => C)(g: (C, B) => C): C =
+      fa.foldlWithKey(z)((c, a, b) => g(f(c, a), b))
   }
+}
+
+private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
+  import std.list._
+  import std.tuple._
+
+  implicit def A: Equal[A]
+  implicit def B: Equal[B]
+  final override def equal(a1: A ==>> B, a2: A ==>> B) =
+    a1.size === a2.size && a1.toAscList === a2.toAscList
 }
 
 trait MapFunctions {

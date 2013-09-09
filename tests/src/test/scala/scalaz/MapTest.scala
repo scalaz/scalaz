@@ -528,10 +528,20 @@ class MapTest extends Spec {
     }
   }*/
 
-  checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
+  checkAll(monoid.laws[Int ==>> Int])
+
+  {
+    implicit def equMapConj[A: Equal, B: Equal]: Equal[(A ==>> B) @@ Tags.Conjunction] =
+      Tag.subst(implicitly)
+
+    implicit def arbMapConj[A, B](implicit a: Arbitrary[A ==>> B]
+                                ): Arbitrary[(A ==>> B) @@ Tags.Conjunction] =
+      Tag.subst(a)
+
+    checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
+  }
 
   type IntMap[A] = Int ==>> A
-  checkAll(functor.laws[IntMap])
   checkAll(traverse.laws[IntMap])
 }
