@@ -148,7 +148,7 @@ trait EnumeratorPFunctions {
   }
 }
 
-trait EnumeratorPInstances {
+sealed abstract class EnumeratorPInstances {
   implicit def enumeratorPMonoid[E, F[_]]: Monoid[EnumeratorP[E, F]] = new Monoid[EnumeratorP[E, F]] {
     def zero = EnumeratorP.empty[E, F]
     def append(f1: EnumeratorP[E, F], f2: => EnumeratorP[E, F]) =
@@ -161,6 +161,6 @@ trait EnumeratorPInstances {
   }
 }
 
-object EnumeratorP extends EnumeratorPFunctions with EnumeratorPInstances
+object EnumeratorP extends EnumeratorPInstances with EnumeratorPFunctions
 
 // vim: set ts=4 sw=4 et:
