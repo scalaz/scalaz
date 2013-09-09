@@ -74,7 +74,7 @@ sealed trait Promise[A] {
   override def toString = "<promise>"
 }
 
-object Promise extends PromiseFunctions with PromiseInstances {
+object Promise extends PromiseInstances with PromiseFunctions {
   private case class Waiting[A](ok: A => Unit, err: Throwable => Unit)
 
   def apply[A](a: => A)(implicit s: Strategy): Promise[A] =
@@ -172,7 +172,7 @@ object Promise extends PromiseFunctions with PromiseInstances {
 
 }
 
-trait PromiseInstances {
+sealed abstract class PromiseInstances {
 
   import Promise._
 

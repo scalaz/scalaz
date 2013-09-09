@@ -14,7 +14,7 @@ sealed abstract class Inject[F[_], G[_]] {
   def prj[A](ga: G[A]): Option[F[A]]
 }
 
-sealed trait InjectInstances {
+sealed abstract class InjectInstances {
   implicit def reflexiveInjectInstance[F[_]] =
     new Inject[F, F] {
       def inj[A](fa: F[A]) = fa

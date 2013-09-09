@@ -87,9 +87,9 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw
 
 private class Node[A](var a: A = null.asInstanceOf[A]) extends AtomicReference[Node[A]]
 
-object Actor extends ActorFunctions with ActorInstances
+object Actor extends ActorInstances with ActorFunctions
 
-trait ActorInstances {
+sealed abstract class ActorInstances {
   implicit val actorContravariant: Contravariant[Actor] = new Contravariant[Actor] {
     def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
   }

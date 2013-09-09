@@ -147,7 +147,7 @@ sealed abstract class WriterTInstances6 extends WriterTInstances7 {
   }
 }
 
-sealed trait WriterTInstance5 extends WriterTInstances6 {
+sealed abstract class WriterTInstance5 extends WriterTInstances6 {
   implicit def writerTMonad[F[_], W](implicit W0: Monoid[W], F0: Monad[F]): Monad[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTMonad[F, W] {
     implicit def F = F0
     implicit def W = W0

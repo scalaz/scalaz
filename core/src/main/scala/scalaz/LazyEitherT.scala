@@ -85,15 +85,11 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
     LazyEitherT[F, A, C](F.apply2(f.run, run)((ff: LazyEither[A, B => C], aa: LazyEither[A, B]) => LazyEither.lazyEitherInstance[A].ap(aa)(ff)))
   }
 
-  def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B]() {
-    val lazyEitherT = LazyEitherT.this
-  }
+  def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B](LazyEitherT.this)
 }
 
 object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
-  sealed trait LeftProjectionT[F[_], A, B] {
-    def lazyEitherT: LazyEitherT[F, A, B]
-
+  final class LeftProjectionT[F[_], A, B](val lazyEitherT: LazyEitherT[F, A, B]) {
     import OptionT._
     import LazyOptionT._
 
