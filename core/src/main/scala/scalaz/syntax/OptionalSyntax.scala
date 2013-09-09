@@ -25,14 +25,12 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   /** Returns `true` if no value is defined within the context. */
   def isEmpty: Boolean = F.isEmpty(self)
 
-  sealed trait Conditional[X] {
-    def |(none: => X): X
+  final class Conditional[X](some: => X) {
+    def |(none: => X): X = F.?(self)(some,none)
   }
 
   /** Returns `some` if this context is defined, otherwise `none`. */
-  def ?[X](some: => X): Conditional[X] = new Conditional[X] {
-    def |(none: => X): X = F.?(self)(some,none)
-  }
+  def ?[X](some: => X): Conditional[X] = new Conditional[X](some)
 
   /** Returns this context converted to the `Option` context. */
   def toOption: Option[A] = F.toOption(self)

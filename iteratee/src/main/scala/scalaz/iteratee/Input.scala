@@ -48,7 +48,7 @@ sealed trait Input[E] {
   abstract override def toString = fold("Empty", el => el.toString, "EOF")
 }
 
-object Input extends InputFunctions with InputInstances {
+object Input extends InputInstances with InputFunctions {
   def apply[E](e: => E): Input[E] =
     elInput(e)
 
@@ -79,7 +79,7 @@ object Input extends InputFunctions with InputInstances {
 
 }
 
-trait InputInstances {
+sealed abstract class InputInstances {
   import Input._
 
   implicit val input: Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {

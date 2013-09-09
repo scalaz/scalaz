@@ -172,12 +172,12 @@ sealed trait IterateeT[E, F[_], A] {
   }
 }
 
-object IterateeT extends IterateeTFunctions with IterateeTInstances {
+object IterateeT extends IterateeTInstances with IterateeTFunctions {
   def apply[E, F[_], A](s: F[StepT[E, F, A]]): IterateeT[E, F, A] =
     iterateeT(s)
 }
 
-trait IterateeTInstances0 {
+sealed abstract class IterateeTInstances0 {
   implicit def IterateeTMonad[E, F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = IterateeT[E, F, α]})#λ] = new IterateeTMonad[E, F] {
     implicit def F = F0
   }
@@ -189,7 +189,7 @@ trait IterateeTInstances0 {
   }
 }
 
-trait IterateeTInstances extends IterateeTInstances0 {
+sealed abstract class IterateeTInstances extends IterateeTInstances0 {
   implicit def IterateeTMonadTrans[E]: Hoist[({type λ[α[_], β] = IterateeT[E, α, β]})#λ] = new IterateeTHoist[E] { }
 
   implicit def IterateeTHoistT[E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[({type λ0[α[_], β] = IterateeT[E, ({type λ1[x] = H[α, x]})#λ1, β]})#λ0] = new IterateeTHoistT[E, H] {
