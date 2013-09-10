@@ -27,10 +27,13 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
 
   def length: Int = self.measure
 
-  def apply(i: Int): A = {
+  def get(i: Int): Option[A] = {
     val (right, left) = self.split(_ > i)
-    left.viewl.headOption.getOrElse(sys.error("Index " + i + " > " + self.measure))(i - right.measure)
+    left.viewl.headOption.flatMap(_.lift(i - right.measure))
   }
+
+  @deprecated("Rope#apply is deprecated, use Rope#get instead", "7.1")
+  def apply(i: Int): A = get(i).getOrElse(sys.error("index out of range"))
 
   /**Concatenates two Ropes. `(O lg min(r1, r2))` where `r1` and `r2` are their sizes. */
   def ++(xs: Rope[A]): Rope[A] = Rope(self <++> xs.self)
