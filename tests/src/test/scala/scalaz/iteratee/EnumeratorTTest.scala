@@ -70,12 +70,11 @@ class EnumeratorTTest extends Spec {
     (consume[Int, Id, List] &= enum).run must be_===(List(1, 2, 3))
   }
 
-  // TODO retronym Get this working again under Scala 2.10.0-M6+
-  // "allow for nesting of monads" in {
-  //   type OIO[α] = OptionT[IO, α]
-  //   val enum = enumIterator[Int, OIO](List(1, 2, 3).iterator)
-  //   (consume[Int, OIO, List] &= enum.map(_ * 2)).run.run.unsafePerformIO() must be_===(Some(List(2, 4, 6)))
-  // }
+  "allow for nesting of monads" in {
+    type OIO[α] = OptionT[IO, α]
+    val enum = enumIterator[Int, OIO](List(1, 2, 3).iterator)
+    (consume[Int, OIO, List] &= enum.map(_ * 2)).run.run.unsafePerformIO() must be_===(Some(List(2, 4, 6)))
+  }
 
   "drain" in {
     val enum = enumStream[Int, Id](Stream(1, 2, 3))
