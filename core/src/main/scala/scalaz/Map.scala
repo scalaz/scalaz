@@ -1002,8 +1002,8 @@ trait MapFunctions {
   final def unionsWith[A: Order, B](f: (B, B) => B)(xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.unionWith(c)(f))
 
-  private[scalaz] val ratio = 2
-  private[scalaz] val delta = 4
+  private[scalaz] final val ratio = 2
+  private[scalaz] final val delta = 4
 
   private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
     if (l.size + r.size <= 1)
