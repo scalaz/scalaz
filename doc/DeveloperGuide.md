@@ -198,8 +198,7 @@ The methods of a type class that should be copied to the corresponding `TypeClas
 
 For example:
 
-    sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
-      implicit def F: Functor[F]
+    final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) extends Ops[F[A]] {
 
       final def map[B](f: A => B): F[B] = F.map(self)(f)
 
