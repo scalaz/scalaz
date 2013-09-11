@@ -165,7 +165,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
     //
     // Type class implementation traits
     //
-    private[scalaz] trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
+    private trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
       implicit def A1 : Semigroup[A1]  // Requirements about the type
       implicit def A2 : Semigroup[A2]
 
@@ -182,7 +182,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
     // In some cases, you need to add `override` to the methods in these traits to allow this
     // ordering of the extends list. For example, see `OptionTFunctor#map`
     //
-    private[scalaz] trait Tuple2Monoid[A1, A2] extends Monoid[(A1, A2)] with Tuple2Semigroup[A1, A2] {
+    private trait Tuple2Monoid[A1, A2] extends Monoid[(A1, A2)] with Tuple2Semigroup[A1, A2] {
       implicit def A1 : Monoid[A1] // refining the implicit requirement
       implicit def A2 : Monoid[A2]
 
