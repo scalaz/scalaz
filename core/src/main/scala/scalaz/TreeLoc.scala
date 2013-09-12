@@ -200,7 +200,15 @@ sealed abstract class TreeLocInstances {
     override def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = a.cojoin
   }
 
-  implicit def treeLocEqual[A](implicit A: Equal[A]): Equal[TreeLoc[A]] = Equal[Tree[A]].contramap((_: TreeLoc[A]).toTree)
+  import std.stream._, std.tuple._
+
+  implicit def treeLocEqual[A](implicit A: Equal[A]): Equal[TreeLoc[A]] =
+    Equal.equal{ (a, b) =>
+      Equal[Tree[A]].equal(a.tree, b.tree) &&
+      Equal[TreeForest[A]].equal(a.lefts, b.lefts) &&
+      Equal[TreeForest[A]].equal(a.rights, b.rights) &&
+      Equal[Parents[A]].equal(a.parents, b.parents)
+    }
 }
 
 trait TreeLocFunctions {
