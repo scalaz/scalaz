@@ -124,13 +124,6 @@ trait AnyValInstances {
     override def max = Some(Byte.MaxValue)
 
     override def equalIsNatural: Boolean = true
-
-    object multiplication extends Monoid[Byte] {
-      def append(f1: Byte, f2: => Byte) = (f1 * f2).toByte
-
-      def zero: Byte = 1
-    }
-
   }
 
   import Tags.{Multiplication}
@@ -175,13 +168,6 @@ trait AnyValInstances {
     override def max = Some(Char.MaxValue)
 
     override def equalIsNatural: Boolean = true
-
-    object multiplication extends Monoid[Char] {
-      def append(f1: Char, f2: => Char) = (f1 * f2).toChar
-
-      def zero: Char = 1
-    }
-
   }
 
   implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
@@ -223,13 +209,6 @@ trait AnyValInstances {
     override def max = Some(Short.MaxValue)
 
     override def equalIsNatural: Boolean = true
-
-    object multiplication extends Monoid[Short] {
-      def append(f1: Short, f2: => Short) = (f1 * f2).toShort
-
-      def zero: Short = 1
-    }
-
   }
 
   implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
@@ -269,12 +248,6 @@ trait AnyValInstances {
     override def max = Some(Int.MaxValue)
 
     override def equalIsNatural: Boolean = true
-
-    object multiplication extends Monoid[Int] {
-      def append(f1: Int, f2: => Int) = f1 * f2
-
-      def zero: Int = 1
-    }
   }
 
   /** Warning: the triangle inequality will not hold if `b - a` overflows. */
@@ -320,13 +293,6 @@ trait AnyValInstances {
     override def max = Some(Long.MaxValue)
 
     override def equalIsNatural: Boolean = true
-
-    object multiplication extends Monoid[Long] {
-      def append(f1: Long, f2: => Long) = f1 * f2
-
-      def zero: Long = 1
-    }
-
   }
 
   implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
