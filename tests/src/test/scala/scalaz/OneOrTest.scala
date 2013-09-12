@@ -13,7 +13,7 @@ class OneOrTest extends Spec {
   checkAll("OneOr", order.laws[OneOr[List, Int]])
   checkAll("OneOr List", traverse.laws[OneOrList])
   checkAll("OneOr List", applicative.laws[OneOrList])
-  checkAll("OneOr Nel", traverse.laws[OneOrNel])
+  checkAll("OneOr Nel", traverse1.laws[OneOrNel])
   checkAll("OneOr Nel", comonad.laws[OneOrNel])
 
   "inequality exists" ! prop {(a: OneOrList[Int]) =>
