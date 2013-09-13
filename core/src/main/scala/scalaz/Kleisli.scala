@@ -135,7 +135,7 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
 }
 
 abstract class KleisliInstances extends KleisliInstances0 {
-  implicit def kleisliArrow[F[_]](implicit F0: Monad[F]): Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliArrow[F] {
+  implicit def kleisliArrow[F[_]](implicit F0: Monad[F]): Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ] with Choice[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliArrow[F] {
     implicit def F: Monad[F] = F0
   }
 

@@ -45,6 +45,7 @@ class KleisliTest extends Spec {
 
     def category[F[_]: Monad, A] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def arrow[F[_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def choice[F[_]: Monad, A] = Choice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
