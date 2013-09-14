@@ -146,7 +146,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   def deleteOthers: Zipper[A] = zipper(Stream.Empty, focus, Stream.Empty)
 
   def foldLeft[B](b: B)(f: (B, A) => B): B =
-    lefts.foldRight((focus #:: rights).foldLeft(b)((b, a) => f(b, a)))((a, b) => f(b, a))
+    Stream.cons(focus, rights).foldLeft(lefts.foldRight(b)((a, b) => f(b, a)))(f)
 
   def foldRight[B](b: => B)(f: (A, => B) => B): B =
     lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a, b)))((a, b) => f(b, a))
