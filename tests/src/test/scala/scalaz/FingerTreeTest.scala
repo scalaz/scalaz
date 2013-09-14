@@ -15,9 +15,13 @@ import WriterT._
 class FingerTreeTest extends Spec {
   type SequenceTree[A] = FingerTree[Int, A]
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
+  import FingerTree._
 
   checkAll(monoid.laws[SequenceTree[String]])
   checkAll(equal.laws[SequenceTree[String]])
+  checkAll("FingerTree", foldable.laws[SequenceTree])
+  checkAll("Finger", foldable.laws[({type l[a]=Finger[Int, a]})#l])
+  checkAll("Node", foldable.laws[({type l[a]=Node[Int, a]})#l])
 
   val intStream = Stream.from(1)
 
