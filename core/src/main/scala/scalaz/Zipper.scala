@@ -372,6 +372,8 @@ sealed abstract class ZipperInstances {
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
+    override def foldMap[A, B](fa: Zipper[A])(f: A => B)(implicit F: Monoid[B]) =
+      fa.foldLeft(F.zero)((b, a) => F.append(b, f(a)))
     def point[A](a: => A): Zipper[A] =
       zipper(Stream.continually(a), a, Stream.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
