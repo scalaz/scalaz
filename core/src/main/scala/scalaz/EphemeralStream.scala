@@ -156,6 +156,10 @@ trait EphemeralStreamInstances {
     def empty[A] = EphemeralStream()
     def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
     def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
+    override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
+      if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
+    override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
+      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(b => a => f(b, a))
     def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
