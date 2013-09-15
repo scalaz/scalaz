@@ -1,6 +1,6 @@
 package scalaz
 
-trait Codensity[F[_], A] { self =>
+abstract class Codensity[F[_], A] { self =>
   def apply[B](f: A => F[B]): F[B]
   def improve(implicit F: Applicative[F]): F[A] =
     apply(a => F.point(a))
