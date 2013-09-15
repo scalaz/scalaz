@@ -14,12 +14,52 @@ abstract class Codensity[F[_], A] { self =>
     flatMap(x => Codensity.pureCodensity(k(x)))
 }
 
-object Codensity {
+object Codensity extends CodensityInstances {
   def rep[F[_], A](f: F[A])(implicit F: Monad[F]): Codensity[F, A] =
     new Codensity[F, A] {
       def apply[B](k: A => F[B]) = F.bind(f)(k)
     }
+
   def pureCodensity[F[_], A](a: => A): Codensity[F, A] = new Codensity[F, A] {
     def apply[B](f: A => F[B]): F[B] = f(a)
   }
+
+  /** Supposing we have the guarantees of consistency between
+    * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
+    * [[scalaz.MonadPlus]] laws should hold.
+    */
+  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F])
+      : MonadPlus[({type λ[α] = Codensity[F, α]})#λ] =
+    new CodensityMonad[F] with MonadPlus[({type λ[α] = Codensity[F, α]})#λ] {
+      def empty[A] = new Codensity[F, A] {
+        def apply[B](f: A => F[B]) = F.empty[B]
+      }
+
+      def plus[A](a: Codensity[F, A], b: => Codensity[F, A]) =
+        new Codensity[F, A] {
+          def apply[B](f: A => F[B]) = F.plus(a(f), b(f))
+        }
+    }
+
+  implicit val codensityTrans: MonadTrans[Codensity] =
+    new MonadTrans[Codensity] {
+      def liftM[G[_]: Monad, A](a: G[A]) = Codensity.rep(a)
+      def apply[G[_]: Monad] = codensityMonad[G]
+    }
+}
+
+sealed abstract class CodensityInstances {
+  implicit def codensityMonad[F[_]]: Monad[({type λ[α] = Codensity[F, α]})#λ] =
+    new CodensityMonad[F]
+}
+
+private[scalaz] sealed class CodensityMonad[F[_]]
+  extends Monad[({type λ[α] = Codensity[F, α]})#λ] {
+  final def point[A](a: => A) = Codensity.pureCodensity(a)
+
+  override final def map[A, B](fa: Codensity[F, A])(f: A => B) =
+    fa map f
+
+  final def bind[A, B](fa: Codensity[F, A])(k: A => Codensity[F, B]) =
+    fa flatMap k
 }
