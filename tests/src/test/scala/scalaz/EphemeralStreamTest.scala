@@ -71,4 +71,26 @@ class EphemeralStreamTest extends Spec {
     val xs = Stream from 0
     Foldable[EphemeralStream].index(EphemeralStream.fromStream(xs), i) must be_===(xs.lift.apply(i))
   }
+
+  "inits" ! prop { xs: EphemeralStream[Int] =>
+    import syntax.std.list._
+    xs.inits.map(_.toList).toList must be_===(xs.toList.initz)
+  }
+
+  "tails" ! prop { xs: EphemeralStream[Int] =>
+    import syntax.std.list._
+    xs.tails.map(_.toList).toList must be_===(xs.toList.tailz)
+  }
+
+  "inits infinite stream" in {
+    EphemeralStream.iterate(0)(_ + 1).inits
+    ok
+  }
+
+  "tails infinite stream" in {
+    val n = util.Random.nextInt(1000)
+    EphemeralStream.iterate(0)(_ + 1).tails.map(_.take(n).toStream).take(n) must be_===(
+      EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).tails.map(_ take n).toStream.take(n))
+    )
+  }
 }
