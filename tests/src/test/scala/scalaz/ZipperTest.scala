@@ -482,6 +482,8 @@ class ZipperTest extends Spec with ExceptionMatchers {
   }
 
   checkAll("Zipper", equal.laws[Zipper[Int]])
+  checkAll("Zipper", traverse.laws[Zipper])
+  checkAll("Zipper", comonad.laws[Zipper])
 
   {
     implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
@@ -493,15 +495,7 @@ class ZipperTest extends Spec with ExceptionMatchers {
           streamEqualApprox.equal(a1.rights, a2.rights)
     }
 
-    "Zipper.traverse" in {
-      skipped("stack overflow in sequential fusion")
-      //checkAll("Zipper", traverse.laws[Zipper])
-      // dummy
-      false
-    }
-
     checkAll("Zipper", applicative.laws[Zipper])
-    checkAll("Zipper", comonad.laws[Zipper])
   }
 }
 
