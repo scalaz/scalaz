@@ -62,7 +62,7 @@ sealed abstract class EphemeralStream[A] {
   }
 
   def tails: EphemeralStream[EphemeralStream[A]] =
-    if (isEmpty) emptyEphemeralStream
+    if (isEmpty) EphemeralStream(emptyEphemeralStream)
     else cons(this, tail().tails)
 
   def inits: EphemeralStream[EphemeralStream[A]] =
