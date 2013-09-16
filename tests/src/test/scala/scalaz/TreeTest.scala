@@ -18,6 +18,7 @@ class TreeTest extends Spec {
     }
 
     // TODO checkAll("Tree", traverse1.laws[Tree])
+    checkAll("Tree", foldable1.laws[Tree])
     checkAll("Tree", applicative.laws[Tree])
     checkAll("Tree", comonad.laws[Tree])
   }
