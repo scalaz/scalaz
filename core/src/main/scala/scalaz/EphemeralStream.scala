@@ -67,7 +67,7 @@ sealed abstract class EphemeralStream[A] {
 
   def inits: EphemeralStream[EphemeralStream[A]] =
     if (isEmpty) EphemeralStream(emptyEphemeralStream)
-    else EphemeralStream[A]() ##:: tail().inits.map(head() ##:: _)
+    else cons(emptyEphemeralStream, tail().inits.map(cons(head(), _)))
 
   def findM[M[_]: Monad](p: A => M[Boolean]): M[Option[A]] =
     if(isEmpty)
@@ -151,7 +151,7 @@ sealed abstract class EphemeralStreamInstances {
     import EphemeralStream._
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
       case _ ##:: tl  => if (tl.isEmpty) EphemeralStream(a)
-                         else a ##:: cojoin(tl)
+                         else cons(a, cojoin(tl))
       case _ => emptyEphemeralStream
     }
     def cobind[A, B](fa: EphemeralStream[A])(f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
