@@ -55,4 +55,12 @@ class StreamTest extends Spec {
     (rnge.foldRight(List[Int]())(_++_)
       must be_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
+
+  "no stack overflow infinite stream foldMap" in {
+    Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must be_===(false)
+  }
+
+  "no stack overflow infinite stream foldRight" in {
+    Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must be_===(true)
+  }
 }
