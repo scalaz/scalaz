@@ -16,7 +16,7 @@ object Tag {
   /** @see `Tag.of` */
   final class TagOf[T] {
     /** Like `Tag.apply`, but specify only the `T`. */
-    def on[A](a: A): A @@ T = Tag.apply(a)
+    def apply[A](a: A): A @@ T = Tag.apply(a)
 
     /** Like `Tag.subst`, but specify only the `T`. */
     def subst[F[_], A](fa: F[A]): F[A @@ T] = Tag.subst(fa)
