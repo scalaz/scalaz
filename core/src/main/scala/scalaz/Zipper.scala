@@ -10,16 +10,6 @@ import annotation.tailrec
  * Based on the pointedlist library by Jeff Wheeler.
  */
 final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
-  private def mergeStreams[T](s1: Stream[T], s2: Stream[T]): Stream[T] =
-    if (s1.isEmpty) s2
-    else s1.head #:: mergeStreams(s2, s1.tail)
-
-  private def unfoldStream[T, B](x: T, f: T => Option[(B, T)]): Stream[B] =
-    f(x) match {
-      case None         => Stream()
-      case Some((b, a)) => b #:: unfoldStream(a, f)
-    }
-
   import Zipper._
 
   def map[B](f: A => B): Zipper[B] =
@@ -216,7 +206,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     if (p(focus)) Some(this)
     else {
       val c = this.positions
-      mergeStreams(c.lefts, c.rights).find((x => p(x.focus)))
+      std.stream.merge(c.lefts, c.rights).find((x => p(x.focus)))
     }
 
   /**
@@ -256,8 +246,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * A zipper of all positions of the zipper, with focus on the current position.
    */
   def positions: Zipper[Zipper[A]] = {
-    val left = unfoldStream[Zipper[A], Zipper[A]](this, (p: Zipper[A]) => p.previous.map(x => (x, x)))
-    val right = unfoldStream[Zipper[A], Zipper[A]](this, (p: Zipper[A]) => p.next.map(x => (x, x)))
+    val left = std.stream.unfold(this)(_.previous.map(x => (x, x)))
+    val right = std.stream.unfold(this)(_.next.map(x => (x, x)))
 
     zipper(left, this, right)
   }
