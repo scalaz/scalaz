@@ -63,4 +63,16 @@ class StreamTest extends Spec {
   "no stack overflow infinite stream foldRight" in {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must be_===(true)
   }
+
+  "zipL" in {
+    val size = 100
+    val infinite = Stream.from(1)
+    val finite = Stream.range(0, size)
+    val F = Traverse[Stream]
+    F.zipL(infinite, infinite)
+    F.zipL(finite, infinite).length must be_===(size)
+    F.zipL(finite, infinite) must be_===((finite zip infinite).map{x => (x._1, Option(x._2))})
+    F.zipL(infinite, finite).take(1000).length must be_===(1000)
+    F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must be_===(size)
+  }
 }
