@@ -14,13 +14,16 @@ object Tag {
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
 
   /** @see `Tag.of` */
-  final class TagOf[T] {
+  final class TagOf[T] extends (Id.Id ~> ({type λ[α] = α @@ T})#λ) {
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
 
     /** Like `Tag.subst`, but specify only the `T`. */
     def subst[F[_], A](fa: F[A]): F[A @@ T] = Tag.subst(fa)
 
+    /** Tag `fa`'s return type.  Allows inference of `A` to "flow through" from
+      * the enclosing context.
+      */
     def onF[A, B](fa: A => B): A => (B @@ T) =
       subst[({type λ[α] = A => α})#λ, B](fa)
 
