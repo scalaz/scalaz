@@ -93,4 +93,14 @@ class EphemeralStreamTest extends Spec {
       EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).tails.map(_ take n).toStream.take(n))
     )
   }
+
+  "no stack overflow infinite stream foldMap" in {
+    val infiniteStream = EphemeralStream.iterate(false)(identity)
+    Foldable[EphemeralStream].foldMap(infiniteStream)(identity)(booleanInstance.conjunction) must be_===(false)
+  }
+
+  "no stack overflow infinite stream foldRight" in {
+    val infiniteStream = EphemeralStream.iterate(true)(identity)
+    Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must be_===(true)
+  }
 }
