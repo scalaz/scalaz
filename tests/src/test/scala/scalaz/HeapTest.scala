@@ -7,6 +7,7 @@ import scalaz.std.AllInstances._
 class HeapTest extends Spec {
   checkAll(equal.laws[Heap[Int]])
   checkAll(monoid.laws[Heap[Int]])
+  checkAll(foldable.laws[Heap])
 
   def pred(i: Int) = i % 2 == 0
 
