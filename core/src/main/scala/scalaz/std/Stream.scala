@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -50,6 +50,15 @@ trait StreamInstances {
     def point[A](a: => A) = scala.Stream(a)
     def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
     def unzip[A, B](a: Stream[(A, B)]) = a.unzip
+
+    def alignWith[A, B, C](f: A \&/ B => C) =
+      (a, b) =>
+        if(b.isEmpty)
+          a.map(x => f(\&/.This(x)))
+        else if(a.isEmpty)
+          b.map(x => f(\&/.That(x)))
+        else
+          f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
   }
 
   import Tags.Zip

@@ -10,4 +10,5 @@ class LazyOptionTest extends Spec {
   checkAll(cobind.laws[LazyOption])
   checkAll(traverse.laws[LazyOption])
   checkAll(zip.laws[LazyOption])
+  checkAll(align.laws[LazyOption])
 }

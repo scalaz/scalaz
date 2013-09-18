@@ -11,7 +11,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Cobind[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     // TODO remove after removal of Index
@@ -25,7 +25,14 @@ trait ListInstances extends ListInstances0 {
 
     def zip[A, B](a: => List[A], b: => List[B]) = a zip b
     def unzip[A, B](a: List[(A, B)]) = a.unzip
-
+    def alignWith[A, B, C](f: A \&/ B => C) = {
+      case (as, Nil) =>
+        as.map(a => f(\&/.This(a)))
+      case (Nil, bs) =>
+        bs.map(b => f(\&/.That(b)))
+      case (a::as, b::bs) =>
+        f(\&/.Both(a, b)) :: alignWith(f)(as, bs)
+    }
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       // implementation with `foldRight` leads to SOE in:
       //

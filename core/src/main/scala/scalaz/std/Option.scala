@@ -8,7 +8,7 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -50,6 +50,17 @@ trait OptionInstances extends OptionInstances0 {
         case None => (None, None)
         case Some((a, b)) => (Some(a), Some(b))
       }
+
+    def alignWith[A, B, C](f: A \&/ B => C) = {
+      case (None, None) =>
+        None
+      case (Some(a), None) =>
+        Some(f(\&/.This(a)))
+      case (None, Some(b)) =>
+        Some(f(\&/.That(b)))
+      case (Some(a), Some(b)) =>
+        Some(f(\&/.Both(a, b)))
+    }
 
     def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
       fa map (a => f(Some(a)))

@@ -92,6 +92,14 @@ sealed abstract class EphemeralStream[A] {
     foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
       (cons(q._1, r._1), cons(q._2, r._2)))
 
+  def alignWith[B, C](f: A \&/ B => C)(b: EphemeralStream[B]): EphemeralStream[C] =
+    if(b.isEmpty)
+      map(x => f(\&/.This(x)))
+    else if(isEmpty)
+      b.map(x => f(\&/.That(x)))
+    else
+      cons(f(\&/.Both(head(), b.head())), tail().alignWith(f)(b.tail()))
+
   def interleave(q: EphemeralStream[A]): EphemeralStream[A] =
     if(isEmpty)
       q
@@ -147,7 +155,7 @@ object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunc
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] {
     import EphemeralStream._
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
       case _ ##:: tl  => if (tl.isEmpty) EphemeralStream(a)
@@ -161,6 +169,9 @@ sealed abstract class EphemeralStreamInstances {
     def empty[A] = EphemeralStream()
     def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
     def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
+    def alignWith[A, B, C](f: A \&/ B => C) =
+      (a, b) =>
+        a.alignWith(f)(b)
     override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
       if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =

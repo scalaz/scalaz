@@ -27,6 +27,15 @@ private sealed trait OneAndApply[F[_]] extends Apply[({type λ[α] = OneAnd[F, �
   }
 }
 
+private sealed trait OneAndAlign[F[_]] extends Align[({type λ[α] = OneAnd[F, α]})#λ] with OneAndFunctor[F] {
+  def F: Align[F]
+
+  override def alignWith[A, B, C](f: A \&/ B => C) = {
+    case (OneAnd(ha, ta), OneAnd(hb, tb)) =>
+      OneAnd(f(\&/.Both(ha, hb)), F.alignWith(f)(ta, tb))
+  }
+}
+
 private sealed trait OneAndApplicative[F[_]] extends Applicative[({type λ[α] = OneAnd[F, α]})#λ] with OneAndApply[F] {
   def F: ApplicativePlus[F]
 
@@ -130,6 +139,10 @@ sealed abstract class OneAndInstances4 extends OneAndInstances5 {
     new OneAndApply[F] {
       def F = implicitly
       def G = implicitly
+    }
+  implicit def oneAndAlign[F[_]: Align]: Align[({type λ[α] = OneAnd[F, α]})#λ] =
+    new OneAndAlign[F] {
+      def F = implicitly
     }
 }
 

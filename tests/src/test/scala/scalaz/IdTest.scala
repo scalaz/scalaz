@@ -8,5 +8,6 @@ class IdTest extends Spec {
   checkAll(monad.laws[Id])
   checkAll(traverse.laws[Id])
   checkAll(zip.laws[Id])
+  checkAll(align.laws[Id])
   checkAll(comonad.laws[Id])
 }

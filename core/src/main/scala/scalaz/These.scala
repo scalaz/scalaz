@@ -39,6 +39,34 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
       case Both(_, b) => Some(b)
     }
 
+  def onlyThis: Option[A] =
+    this match {
+      case This(a) => Some(a)
+      case That(_) => None
+      case Both(_, _) => None
+    }
+
+  def onlyThat: Option[B] =
+    this match {
+      case This(_) => None
+      case That(b) => Some(b)
+      case Both(_, _) => None
+    }
+
+  def onlyBoth: Option[(A, B)] =
+    this match {
+      case This(_) => None
+      case That(_) => None
+      case Both(a, b) => Some(a, b)
+    }
+
+  def pad: (Option[A], Option[B]) =
+    this match {
+      case This(a) => (Some(a), None)
+      case That(b) => (None, Some(b))
+      case Both(a, b) => (Some(a), Some(b))
+    }
+
   def fold[X](s: A => X, t: B => X, q: (A, B) => X): X =
     this match {
       case This(a) => s(a)
@@ -293,6 +321,16 @@ trait TheseFunctions {
 
   def unalign[F[_], A, B](x: F[A \&/ B])(implicit M: MonadPlus[F]): (F[A], F[B]) =
     (concatThis(x), concatThat(x))
+
+  def merge[A](t: A \&/ A)(implicit S: Semigroup[A]): A =
+    t match {
+      case This(a) =>
+        a
+      case That(a) =>
+        a
+      case Both(a1, a2) =>
+        S.append(a1, a2)
+    }
 }
 
 sealed abstract class TheseInstances extends TheseInstances0 {
