@@ -18,7 +18,7 @@ class OrderTest extends Spec {
       val F = Foldable1[NonEmptyList]
       import Tags._
       import syntax.foldable1._
-      (xs map MinVal).suml1 must be_===(F minimum1 xs)
+      (MinVal.subst(xs)).suml1 must be_===(F minimum1 xs)
   }
 
   "semigroups max" ! prop {
@@ -26,6 +26,6 @@ class OrderTest extends Spec {
       val F = Foldable1[NonEmptyList]
       import Tags._
       import syntax.foldable1._
-      (xs map MaxVal).suml1 must be_===(F maximum1 xs)
+      (MaxVal.subst(xs)).suml1 must be_===(F maximum1 xs)
   }
 }
