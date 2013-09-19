@@ -315,7 +315,7 @@ private trait EitherEqual[A, B] extends Equal[Either[A, B]] {
     case (Right(b1), Right(b2))                    => B.equal(b1, b2)
     case (Right(_), Left(_)) | (Left(_), Right(_)) => false
   }
-  override val equalIsNatural: Boolean = A.equalIsNatural
+  override val equalIsNatural: Boolean = A.equalIsNatural && B.equalIsNatural
 }
 
 private trait EitherFirstLeftSemigroup[A, X] extends Semigroup[LeftProjection[A, X] @@ First] {
