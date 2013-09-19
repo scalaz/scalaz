@@ -99,73 +99,73 @@ trait EitherInstances extends EitherInstances0 {
       }
   }
 
-  /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
   implicit def LeftProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α] = LeftProjection[E, α]})#λ, ({type λ[α] = Either[E, α]})#λ] {
     def to[A](fa: LeftProjection[E, A]) = fa.e
     def from[A](ga: Either[E, A]) = ga.left
   }
 
-  /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
   implicit def FirstLeftProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α] = LeftProjection[E, α] @@ First})#λ, ({type λ[α] = Either[E, α]})#λ] {
     def to[A](fa: LeftProjection[E, A] @@ First) = fa.e
     def from[A](ga: Either[E, A]) = First(ga.left)
   }
 
-  /** LeftProjection is isomorphic to Validation, when the type parameter `E` is partially applied. */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
   implicit def LastLeftProjectionEIso2[E] = new IsoFunctorTemplate[({type λ[α] = LeftProjection[E, α] @@ Last})#λ, ({type λ[α] = Either[E, α]})#λ] {
     def to[A](fa: LeftProjection[E, A] @@ Last) = fa.e
     def from[A](ga: Either[E, A]) = Last(ga.left)
   }
 
-  /** LeftProjection is isomorphic to Validation  */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
   implicit def LeftProjectionIso2 = new IsoBifunctorTemplate[LeftProjection, Either] {
     def to[A, B](fa: LeftProjection[A, B]) = fa.e
     def from[A, B](ga: Either[A, B]) = ga.left
   }
 
-  /** LeftProjection is isomorphic to Validation  */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
   implicit def FirstLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ First) = fa.e
     def from[A, B](ga: Either[A, B]) = First(ga.left)
   }
 
-  /** LeftProjection is isomorphic to Validation  */
+  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
   implicit def LastLeftProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=LeftProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: LeftProjection[A, B] @@ Last) = fa.e
     def from[A, B](ga: Either[A, B]) = Last(ga.left)
   }
 
-  /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
   implicit def RightProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α] = RightProjection[α, A]})#λ, ({type λ[α] = Either[α, A]})#λ] {
     def to[E](fa: RightProjection[E, A]) = fa.e
     def from[E](ga: Either[E, A]) = ga.right
   }
 
-  /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
   implicit def FirstRightProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α] = RightProjection[α, A] @@ First})#λ, ({type λ[α] = Either[α, A]})#λ] {
     def to[E](fa: RightProjection[E, A] @@ First) = fa.e
     def from[E](ga: Either[E, A]) = First(ga.right)
   }
 
-  /** RightProjection is isomorphic to Validation, when the type parameter `A` is partially applied. */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
   implicit def LastRightProjectionAIso2[A] = new IsoFunctorTemplate[({type λ[α] = RightProjection[α, A] @@ Last})#λ, ({type λ[α] = Either[α, A]})#λ] {
     def to[E](fa: RightProjection[E, A] @@ Last) = fa.e
     def from[E](ga: Either[E, A]) = Last(ga.right)
   }
 
-  /** RightProjection is isomorphic to Validation  */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
   implicit def RightProjectionIso2 = new IsoBifunctorTemplate[RightProjection, Either] {
     def to[A, B](fa: RightProjection[A, B]) = fa.e
     def from[A, B](ga: Either[A, B]) = ga.right
   }
 
-  /** RightProjection is isomorphic to Validation  */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
   implicit def FirstRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ First})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ First) = fa.e
     def from[A, B](ga: Either[A, B]) = First(ga.right)
   }
 
-  /** RightProjection is isomorphic to Validation  */
+  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
   implicit def LastRightProjectionIso2 = new IsoBifunctorTemplate[({type λ[α, β]=RightProjection[α, β] @@ Last})#λ, Either] {
     def to[A, B](fa: RightProjection[A, B] @@ Last) = fa.e
     def from[A, B](ga: Either[A, B]) = Last(ga.right)
