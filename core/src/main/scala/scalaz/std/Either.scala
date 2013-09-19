@@ -292,7 +292,6 @@ private trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {
     case (None, None)       => true
     case _                  => false
   }
-  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
@@ -303,7 +302,6 @@ private trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
     case (None, None)       => true
     case _                  => false
   }
-  override val equalIsNatural: Boolean = A.equalIsNatural
 }
 
 private trait EitherEqual[A, B] extends Equal[Either[A, B]] {
