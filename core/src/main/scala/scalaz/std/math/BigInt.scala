@@ -18,12 +18,6 @@ trait BigInts {
     override def predn(a: Int, b: BigInt) = b - a
     override def min = None
     override def max = None
-
-    object multiplication extends Monoid[BigInt] {
-      def append(f1: BigInt, f2: => BigInt): BigInt = f1 * f2
-
-      def zero: BigInt = 1
-    }
   }
 
   import Tags.Multiplication
