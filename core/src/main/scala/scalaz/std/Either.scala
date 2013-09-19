@@ -19,21 +19,13 @@ sealed trait EitherInstances0 {
     implicit def A = A0
   }
 
-  implicit def eitherFirstRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ First] = new EitherFirstRightEqual[X, A] {
-    implicit def A = A0
-  }
+  implicit def eitherFirstRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ First] = First.subst(Equal[RightProjection[X, A]])
 
-  implicit def eitherLastRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ Last] = new EitherLastRightEqual[X, A] {
-    implicit def A = A0
-  }
+  implicit def eitherLastRightEqual[X, A](implicit A0: Equal[A]): Equal[RightProjection[X, A] @@ Last] = Last.subst(Equal[RightProjection[X, A]])
 
-  implicit def eitherFirstLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ First] = new EitherFirstLeftEqual[A, X] {
-    implicit def A = A0
-  }
+  implicit def eitherFirstLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ First] = First.subst(Equal[LeftProjection[A, X]])
 
-  implicit def eitherLastLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ Last] = new EitherLastLeftEqual[A, X] {
-    implicit def A = A0
-  }
+  implicit def eitherLastLeftEqual[A, X](implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ Last] = Last.subst(Equal[LeftProjection[A, X]])
 
   implicit def eitherFirstLeftSemigroup[A: Semigroup, X]: Semigroup[LeftProjection[A, X] @@ First] = new EitherFirstLeftSemigroup[A, X] {}
 
@@ -254,21 +246,13 @@ trait EitherInstances extends EitherInstances0 {
     implicit def A = OrderA
   }
 
-  implicit def eitherFirstLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ First] = new EitherFirstLeftOrder[A, X] {
-    implicit def A = OrderA
-  }
+  implicit def eitherFirstLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ First] = First.subst(Order[LeftProjection[A, X]])
 
-  implicit def eitherFirstRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ First] = new EitherFirstRightOrder[X, A] {
-    implicit def A = OrderA
-  }
+  implicit def eitherFirstRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ First] = First.subst(Order[RightProjection[X, A]])
 
-  implicit def eitherLastLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ Last] = new EitherLastLeftOrder[A, X] {
-    implicit def A = OrderA
-  }
+  implicit def eitherLastLeftOrder[A, X](implicit OrderA: Order[A]): Order[LeftProjection[A, X] @@ Last] = Last.subst(Order[LeftProjection[A, X]])
 
-  implicit def eitherLastRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ Last] = new EitherLastRightOrder[X, A] {
-    implicit def A = OrderA
-  }
+  implicit def eitherLastRightOrder[X, A](implicit OrderA: Order[A]): Order[RightProjection[X, A] @@ Last] = Last.subst(Order[RightProjection[X, A]])
 
   implicit def eitherFirstLeftMonoid[A, X](implicit MonoidX: Monoid[X]): Monoid[LeftProjection[A, X] @@ First] = new EitherFirstLeftMonoid[A, X] {
     implicit def X = MonoidX
@@ -315,51 +299,6 @@ private trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
   implicit def A: Equal[A]
 
   def equal(a1: LeftProjection[A, X], a2: LeftProjection[A, X]) = (a1.toOption, a2.toOption) match {
-    case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None)       => true
-    case _                  => false
-  }
-  override val equalIsNatural: Boolean = A.equalIsNatural
-}
-
-private trait EitherFirstRightEqual[X, A] extends Equal[RightProjection[X, A] @@ First] {
-  implicit def A: Equal[A]
-
-  def equal(a1: RightProjection[X, A] @@ First, a2: RightProjection[X, A] @@ First) = (a1.toOption, a2.toOption) match {
-    case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None)       => true
-    case _                  => false
-  }
-  override val equalIsNatural: Boolean = A.equalIsNatural
-}
-
-private trait EitherFirstLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ First] {
-  implicit def A: Equal[A]
-
-  def equal(a1: LeftProjection[A, X] @@ First, a2: LeftProjection[A, X] @@ First) = (a1.toOption, a2.toOption) match {
-    case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None)       => true
-    case _                  => false
-  }
-  override val equalIsNatural: Boolean = A.equalIsNatural
-}
-
-
-private trait EitherLastRightEqual[X, A] extends Equal[RightProjection[X, A] @@ Last] {
-  implicit def A: Equal[A]
-
-  def equal(a1: RightProjection[X, A] @@ Last, a2: RightProjection[X, A] @@ Last) = (a1.toOption, a2.toOption) match {
-    case (Some(x), Some(y)) => A.equal(x, y)
-    case (None, None)       => true
-    case _                  => false
-  }
-  override val equalIsNatural: Boolean = A.equalIsNatural
-}
-
-private trait EitherLastLeftEqual[A, X] extends Equal[LeftProjection[A, X] @@ Last] {
-  implicit def A: Equal[A]
-
-  def equal(a1: LeftProjection[A, X] @@ Last, a2: LeftProjection[A, X] @@ Last) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
     case (None, None)       => true
     case _                  => false
@@ -496,55 +435,3 @@ private trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]] {
   }
 }
 
-private trait EitherFirstLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ First] {
-  implicit def A: Order[A]
-
-  import Ordering._
-
-  def order(f1: LeftProjection[A, X] @@ First, f2: LeftProjection[A, X] @@ First) = (f1.toOption, f2.toOption) match {
-    case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_))    => LT
-    case (Some(_), None)    => GT
-    case (None, None)       => EQ
-  }
-}
-
-private trait EitherFirstRightOrder[X, A] extends Order[RightProjection[X, A] @@ First] {
-  implicit def A: Order[A]
-
-  import Ordering._
-
-  def order(f1: RightProjection[X, A] @@ First, f2: RightProjection[X, A] @@ First) = (f1.toOption, f2.toOption) match {
-    case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_))    => LT
-    case (Some(_), None)    => GT
-    case (None, None)       => EQ
-  }
-}
-
-
-private trait EitherLastLeftOrder[A, X] extends Order[LeftProjection[A, X] @@ Last] {
-  implicit def A: Order[A]
-
-  import Ordering._
-
-  def order(f1: LeftProjection[A, X] @@ Last, f2: LeftProjection[A, X] @@ Last) = (f1.toOption, f2.toOption) match {
-    case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_))    => LT
-    case (Some(_), None)    => GT
-    case (None, None)       => EQ
-  }
-}
-
-private trait EitherLastRightOrder[X, A] extends Order[RightProjection[X, A] @@ Last] {
-  implicit def A: Order[A]
-
-  import Ordering._
-
-  def order(f1: RightProjection[X, A] @@ Last, f2: RightProjection[X, A] @@ Last) = (f1.toOption, f2.toOption) match {
-    case (Some(x), Some(y)) => A.order(x, y)
-    case (None, Some(_))    => LT
-    case (Some(_), None)    => GT
-    case (None, None)       => EQ
-  }
-}
