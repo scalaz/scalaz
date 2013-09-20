@@ -170,7 +170,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def alignWith[A, B, C](f: A \&/ B => C) = (a, b) => {
         import std.list._
-        NonEmptyList.apply(f(\&/.Both(a.head, b.head)), Align[List].alignWith(f)(a.tail, b.tail): _*)
+        NonEmptyList.nel(f(\&/.Both(a.head, b.head)), Align[List].alignWith(f)(a.tail, b.tail))
       }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size

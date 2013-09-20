@@ -26,12 +26,16 @@ trait ListInstances extends ListInstances0 {
     def zip[A, B](a: => List[A], b: => List[B]) = a zip b
     def unzip[A, B](a: List[(A, B)]) = a.unzip
     def alignWith[A, B, C](f: A \&/ B => C) = {
-      case (as, Nil) =>
-        as.map(a => f(\&/.This(a)))
-      case (Nil, bs) =>
-        bs.map(b => f(\&/.That(b)))
-      case (a::as, b::bs) =>
-        f(\&/.Both(a, b)) :: alignWith(f)(as, bs)
+      @annotation.tailrec
+      def loop(aa: List[A], bb: List[B], accum: List[C]): List[C] = (aa, bb) match {
+        case (Nil, _) =>
+          accum reverse_::: bb.map(b => f(\&/.That(b)))
+        case (_, Nil) =>
+          accum reverse_::: aa.map(a => f(\&/.This(a)))
+        case (ah :: at, bh :: bt) =>
+          loop(at, bt, f(\&/.Both(ah, bh)) :: accum)
+      }
+      (a, b) => loop(a, b, Nil)
     }
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       // implementation with `foldRight` leads to SOE in:

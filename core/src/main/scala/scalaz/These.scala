@@ -253,33 +253,15 @@ object \&/ extends TheseInstances with TheseFunctions {
 trait TheseFunctions {
   import \&/._
 
+  @deprecated("use Align typeclass", "7.1")
   def alignStream[A, B](a: EphemeralStream[A], b: EphemeralStream[B]): EphemeralStream[A \&/ B] =
-    if(a.isEmpty)
-      b.map(That(_))
-    else if(b.isEmpty)
-      a.map(This(_))
-    else
-      EphemeralStream.cons(Both(a.head(), b.head()), alignStream(a.tail(), b.tail()))
-
-  def alignList[A, B](a: List[A], b: List[B]): List[A \&/ B] = {
-    @annotation.tailrec
-    def loop(aa: List[A], bb: List[B], accum: List[A \&/ B]): List[A \&/ B] = {
-      aa match {
-        case Nil =>
-          accum reverse_::: bb.map(That[A, B](_))
-        case h::t =>
-          bb match {
-            case Nil =>
-              accum reverse_::: aa.map(This[A, B](_))
-            case hh::tt =>
-              loop(t, tt, Both(h, hh) :: accum)
-          }
-      }
-    }
-    loop(a, b, Nil)
-  }
+    Align[EphemeralStream].align(a, b)
 
   import scalaz.std.list._
+
+  @deprecated("use Align typeclass", "7.1")
+  def alignList[A, B](a: List[A], b: List[B]): List[A \&/ B] =
+    Align[List].align(a, b)
 
   def concatThisList[A, B](x: List[A \&/ B]): List[A] =
     concatThis[List, A, B](x)
