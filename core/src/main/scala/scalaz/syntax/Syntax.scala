@@ -159,4 +159,4 @@ trait ToTypeClassOps
   with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps
-  with ToFoldable1Ops with ToTraverse1Ops with ToOptionalOps
+  with ToFoldable1Ops with ToTraverse1Ops with ToOptionalOps with ToAlignOps
