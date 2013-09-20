@@ -1,15 +1,7 @@
 package scalaz
 package syntax
 
-trait AlignSyntax[F[_]] extends FunctorSyntax[F] {
-  implicit def ToAlignOps[A](v: F[A]): AlignOps[F, A] = new AlignOps[F,A](v)(AlignSyntax.this.F)
-
-  def F: Align[F]
-  ////
-
-  ////
-}
-
+/** Wraps a value `self` and provides methods related to `Align` */
 final class AlignOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Align[F]) extends Ops[F[A]] {
   ////
   def align[B](b: F[B]): F[A \&/ B] = F.align(self, b)
@@ -32,8 +24,6 @@ sealed trait ToAlignOps0 {
 
 }
 
-
-
 trait ToAlignOps extends ToAlignOps0 with ToFunctorOps {
   implicit def ToAlignOps[F[_],A](v: F[A])(implicit F0: Align[F]) =
     new AlignOps[F,A](v)
@@ -43,4 +33,11 @@ trait ToAlignOps extends ToAlignOps0 with ToFunctorOps {
   ////
 }
 
+trait AlignSyntax[F[_]] extends FunctorSyntax[F] {
+  implicit def ToAlignOps[A](v: F[A]): AlignOps[F, A] = new AlignOps[F,A](v)(AlignSyntax.this.F)
 
+  def F: Align[F]
+  ////
+
+  ////
+}

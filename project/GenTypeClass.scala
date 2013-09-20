@@ -1,4 +1,3 @@
-import java.lang.String
 import sbt._
 
 case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq()) {
@@ -28,6 +27,7 @@ object TypeClass {
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
+  lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
@@ -85,6 +85,7 @@ object TypeClass {
     contravariant,
     apply,
     applicative,
+    align,
     zip,
     unzip,
     cozip,

@@ -1,8 +1,15 @@
 package scalaz
 
-import \&/._
+////
+/**
+ *
+ */
+////
+trait Align[F[_]] extends Functor[F] { self =>
+  ////
 
-trait Align[F[_]] extends Functor[F] {
+  import \&/._
+
   def alignWith[A, B, C](f: A \&/ B => C): (F[A], F[B]) => F[C]
 
   def align[A, B](a: F[A], b: F[B]): F[A \&/ B] =
