@@ -21,6 +21,7 @@ class OptionTest extends Spec {
   checkAll("Option", zip.laws[Option])
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
+  checkAll("Option", align.laws[Option])
   
   checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
