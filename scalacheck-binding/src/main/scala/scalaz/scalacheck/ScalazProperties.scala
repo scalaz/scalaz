@@ -126,6 +126,16 @@ object ScalazProperties {
     }
   }
 
+  object align {
+    def collapse[F[_], A](implicit F: Align[F], E: Equal[F[A \&/ A]], A: Arbitrary[F[A]]): Prop =
+      forAll(F.alignLaw.collapse[A] _)
+    def laws[F[_]](implicit F: Align[F], af: Arbitrary[F[Int]],
+                   e: Equal[F[Int]], ef: Equal[F[Int \&/ Int]]) = new Properties("align") {
+      include(functor.laws[F])
+      property("collapse") = collapse[F, Int]
+    }
+  }
+
   object applicative {
     def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(f.applicativeLaw.identityAp[X] _)

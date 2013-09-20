@@ -41,6 +41,8 @@ trait Syntaxes {
 
   object contravariant extends ToContravariantOps
 
+  object align extends ToAlignOps
+
   object apply extends ToApplyOps
 
   object applicative extends ToApplicativeOps

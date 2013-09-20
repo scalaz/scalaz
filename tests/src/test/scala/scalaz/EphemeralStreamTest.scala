@@ -11,6 +11,7 @@ class EphemeralStreamTest extends Spec {
   checkAll(monadPlus.laws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])
   checkAll(zip.laws[EphemeralStream])
+  checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =

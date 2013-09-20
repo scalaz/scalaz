@@ -12,6 +12,7 @@ class StreamTest extends Spec {
   checkAll(cobind.laws[Stream])
   checkAll(isEmpty.laws[Stream])
   checkAll(zip.laws[Stream])
+  checkAll(align.laws[Stream])
 
   import std.stream.streamSyntax._
   import syntax.foldable._
