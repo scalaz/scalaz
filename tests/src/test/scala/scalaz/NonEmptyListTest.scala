@@ -41,4 +41,9 @@ class NonEmptyListTest extends Spec {
     import syntax.foldable1._
     nel(0, List.fill(10000000)(1)).foldRight1(_ + _) must_== 10000000
   }
+  "no stack overflow large list traverse" in {
+    import syntax.traverse._
+    val largeNel = NonEmptyList.nel(0, (1 to 100000).toList)
+    (largeNel map Option.apply).sequence must be_===(Option(largeNel))
+  }
 }
