@@ -51,7 +51,7 @@ trait StreamInstances {
     def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
     def unzip[A, B](a: Stream[(A, B)]) = a.unzip
 
-    def alignWith[A, B, C](f: A \&/ B => C) =
+    def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
       (a, b) =>
         if(b.isEmpty)
           a.map(x => f(\&/.This(x)))
