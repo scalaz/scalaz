@@ -23,12 +23,6 @@ trait BigIntegerInstances {
       case x if x == 0 => Ordering.EQ
       case x if x > 0   => Ordering.GT
     }
-
-    object multiplication extends Monoid[BigInteger] {
-      def append(f1: BigInteger, f2: => BigInteger) = f1 multiply f2
-
-      def zero: BigInteger = BigInteger.ONE
-    }
   }
 
   import Tags.Multiplication

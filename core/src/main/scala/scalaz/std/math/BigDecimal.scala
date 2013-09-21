@@ -18,13 +18,6 @@ trait BigDecimalInstances {
     override def predn(a: Int, b: BigDecimal) = b - a
     override def min = None
     override def max = None
-
-
-    object multiplication extends Monoid[BigDecimal] {
-      def append(f1: BigDecimal, f2: => BigDecimal): BigDecimal = f1 * f2
-
-      def zero: BigDecimal = 1
-    }
   }
 
   import Tags.Multiplication
