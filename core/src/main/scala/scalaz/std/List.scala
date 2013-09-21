@@ -77,7 +77,17 @@ trait ListInstances extends ListInstances0 {
   }
 
   implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    override def show(as: List[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show):_*) :+ "]"
+    override def show(as: List[A]) = {
+      def commaSep(rest: List[A], acc: Cord): Cord =
+        rest match {
+          case Nil => acc
+          case x::xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
+        }
+      "[" +: (as match {
+        case Nil => Cord()
+        case x::xs => commaSep(xs, Show[A].show(x))
+      }) :+ "]"
+    }
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
