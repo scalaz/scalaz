@@ -153,7 +153,7 @@ sealed trait Zipper[+A] {
   def deleteOthers: Zipper[A] = zipper(Stream.Empty, focus, Stream.Empty)
 
   def foldLeft[B](b: B)(f: (B, A) => B): B =
-    lefts.foldRight((focus #:: rights).foldLeft(b)((b, a) => f(b, a)))((a, b) => f(b, a))
+    Stream.cons(focus, rights).foldLeft(lefts.foldRight(b)((a, b) => f(b, a)))(f)
 
   def foldRight[B](b: => B)(f: (A, => B) => B): B =
     lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a, b)))((a, b) => f(b, a))
@@ -373,6 +373,8 @@ trait ZipperInstances {
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
+    override def foldMap[A, B](fa: Zipper[A])(f: A => B)(implicit F: Monoid[B]) =
+      fa.foldLeft(F.zero)((b, a) => F.append(b, f(a)))
     def point[A](a: => A): Zipper[A] =
       zipper(Stream.continually(a), a, Stream.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
