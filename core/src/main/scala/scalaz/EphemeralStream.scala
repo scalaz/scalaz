@@ -92,6 +92,7 @@ sealed trait EphemeralStream[A] {
     else
       cons(head(), cons(q.head(), tail() interleave q.tail()))
 
+  /** @since 7.0.4 */
   def take(n: Int): EphemeralStream[A] =
     unfold((n, this)){ case (len, xs) =>
       if(len > 0 && !xs.isEmpty)
@@ -100,6 +101,7 @@ sealed trait EphemeralStream[A] {
         None
     }
 
+  /** @since 7.0.4 */
   def takeWhile(p: A => Boolean): EphemeralStream[A] =
     if(!isEmpty){
       val h = head()
