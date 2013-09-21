@@ -235,19 +235,23 @@ trait TheseFunctions {
     else
       EphemeralStream.cons(Both(a.head(), b.head()), alignStream(a.tail(), b.tail()))
 
-  def alignList[A, B](a: List[A], b: List[B]): List[A \&/ B] =
-    a match {
-      case Nil =>
-        b.map(That[A, B](_))
-      case h::t =>
-        b match {
-          case Nil =>
-            a.map(This[A, B](_))
-          case hh::tt =>
-            Both(h, hh) :: alignList(t, tt)
-        }
-
+  def alignList[A, B](a: List[A], b: List[B]): List[A \&/ B] = {
+    @annotation.tailrec
+    def loop(aa: List[A], bb: List[B], accum: List[A \&/ B]): List[A \&/ B] = {
+      aa match {
+        case Nil =>
+          accum.reverse ::: bb.map(That[A, B](_))
+        case h::t =>
+          bb match {
+            case Nil =>
+              accum.reverse ::: aa.map(This[A, B](_))
+            case hh::tt =>
+              loop(t, tt, Both(h, hh) :: accum)
+          }
+      }
     }
+    loop(a, b, Nil)
+  }
 
   import scalaz.std.list._
 
