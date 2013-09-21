@@ -61,6 +61,14 @@ sealed trait EphemeralStream[A] {
     foldLeft(0)(addOne _)
   }
 
+  def tails: EphemeralStream[EphemeralStream[A]] =
+    if (isEmpty) EphemeralStream(emptyEphemeralStream)
+    else cons(this, tail().tails)
+
+  def inits: EphemeralStream[EphemeralStream[A]] =
+    if (isEmpty) EphemeralStream(emptyEphemeralStream)
+    else cons(emptyEphemeralStream, tail().inits.map(cons(head(), _)))
+
   def findM[M[_]: Monad](p: A => M[Boolean]): M[Option[A]] =
     if(isEmpty)
       Monad[M].point(None)
@@ -123,6 +131,19 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
     unfold(0)(b =>
       if (b < size) Some((as0(b), b + 1))
       else None)
+  }
+
+  class ConsWrap[A](e: => EphemeralStream[A]) {
+    def ##::(h: A): EphemeralStream[A] = cons(h, e)
+  }
+
+  implicit def consWrapper[A](e: => EphemeralStream[A]): ConsWrap[A] =
+    new ConsWrap[A](e)
+
+  object ##:: {
+    def unapply[A](xs: EphemeralStream[A]): Option[(A, EphemeralStream[A])] =
+      if (xs.isEmpty) None
+      else Some((xs.head(), xs.tail()))
   }
 }
 
