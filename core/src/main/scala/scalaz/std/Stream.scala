@@ -30,6 +30,9 @@ trait StreamInstances {
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
+    override def foldMap[A, B](fa: Stream[A])(f: A => B)(implicit M: Monoid[B]) =
+      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+
     override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
