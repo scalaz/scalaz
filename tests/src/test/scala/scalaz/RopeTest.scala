@@ -6,6 +6,7 @@ import syntax.equal._
 import std.string._
 import std.anyVal._
 import std.stream._
+import std.option._
 import org.specs2.control.LazyParameter
 import collection.GenTraversable
 import collection.immutable.Traversable
@@ -111,6 +112,13 @@ class RopeTest extends Spec with ExceptionMatchers with TraversableMatchers {
 
   "replacing first element works correctly" ! prop {(tree: Rope[Int], x: Int) =>
     !tree.isEmpty ==> ((x +: tree.tail).toStream must be_===(x +: tree.toStream.tail))
+  }
+
+  "get" ! prop { (tree: Rope[Int], i: Int) =>
+    if(0 <= i && i < tree.length)
+      tree.get(i) must be_===(Some(tree.self.toList.flatten.apply(i)))
+    else
+      tree.get(i) must be_===(None)
   }
 
 }
