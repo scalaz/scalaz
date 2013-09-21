@@ -34,6 +34,7 @@
  *  - [[scalaz.Contravariant]] extends [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]]
+ *  - [[scalaz.Align]] extends [[scalaz.Functor]]
  *  - [[scalaz.Zip]]
  *  - [[scalaz.Unzip]]
  *  - [[scalaz.Cozip]]
