@@ -124,7 +124,9 @@ trait TreeInstances {
     def bind[A, B](fa: Tree[A])(f: A => Tree[B]): Tree[B] = fa flatMap f
     def traverse1Impl[G[_]: Apply, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] = fa traverse1 f
     override def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-    override def foldRight1[A](fa: Tree[A])(f: (A, => A) => A): A = fa.subForest.foldRight(fa.rootLabel)((t, a) => treeInstance.foldRight(t, a)(f))
+    override def foldRight1[A](fa: Tree[A])(f: (A, => A) => A): A = (fa.flatten.reverse: @unchecked) match {
+      case h #:: t => t.foldLeft(h)((a1, a2) => f(a1, a2))
+    }
     override def foldLeft[A, B](fa: Tree[A], z: B)(f: (B, A) => B): B =
       fa.flatten.foldLeft(z)(f)
     override def foldLeft1[A](fa: Tree[A])(f: (A, A) => A): A = fa.flatten match {
