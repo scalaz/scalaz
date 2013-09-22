@@ -92,7 +92,7 @@ object ScalazArbitrary {
       case 0 => arbitrary[A] map (leaf(_))
       case _ => {
         val nextSize = n.abs / 2
-        Apply[Gen].apply2(arbitrary[A], resize(n, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
+        Apply[Gen].apply2(arbitrary[A], resize(nextSize, containerOf[Stream, Tree[A]](Arbitrary(tree(nextSize)).arbitrary)))(node(_, _))
       }
     }
     Gen.sized(tree _)
