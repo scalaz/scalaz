@@ -25,7 +25,7 @@ sealed abstract class ImmutableArray[+A] {
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  def ++[B >: A](other: ImmutableArray[B]): ImmutableArray[A]
+  def ++[B >: A: ClassManifest](other: ImmutableArray[B]): ImmutableArray[B]
 }
 
 
@@ -111,10 +111,10 @@ object ImmutableArray extends ImmutableArrayFunctions {
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
-    override def ++[B >: A](other: ImmutableArray[B]) = {
-      val newArr = elemManifest.newArray(length + other.length)
+    override def ++[B >: A: ClassManifest](other: ImmutableArray[B]) = {
+      val newArr = new Array(length + other.length)
       this.copyToArray(newArr, 0, length)
-      other.copyToArray(newArr.asInstanceOf[Array[B]], length, other.length)
+      other.copyToArray(newArr, length, other.length)
       fromArray(newArr)
     }
   }
@@ -174,13 +174,13 @@ object ImmutableArray extends ImmutableArrayFunctions {
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
-    def ++[B >: Char](other: ImmutableArray[B]) =
+    def ++[B >: Char: ClassManifest](other: ImmutableArray[B]) =
       other match {
         case other: StringArray => new StringArray(str + other.str)
         case _ => {
-          val newArr = new Array[Char](length + other.length)
+          val newArr = new Array[B](length + other.length)
           this.copyToArray(newArr, 0, length)
-          other.copyToArray(newArr.asInstanceOf[Array[B]], length, other.length)
+          other.copyToArray(newArr, length, other.length)
           fromArray(newArr)
         }
       }
