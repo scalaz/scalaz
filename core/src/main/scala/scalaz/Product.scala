@@ -168,6 +168,16 @@ private trait ProductDistributive[F[_], G[_]] extends Distributive[({type λ[α]
     (F.distribute(a)(x => f(x)._1), G.distribute(a)(x => f(x)._2))
 }
 
+private trait ProductAlign[F[_], G[_]] extends Align[({type λ[α] = (F[α], G[α])})#λ] with ProductFunctor[F, G] {
+  implicit def F: Align[F]
+
+  implicit def G: Align[G]
+
+  def alignWith[A, B, C](f: (A \&/ B) => C): ((F[A], G[A]), (F[B], G[B])) => (F[C], G[C]) = {
+    case ((fa, ga), (fb, gb)) => (F.alignWith(f)(fa, fb), G.alignWith(f)(ga, gb))
+  }
+}
+
 private trait ProductZip[F[_], G[_]] extends Zip[({type λ[α] = (F[α], G[α])})#λ] {
   implicit def F: Zip[F]
 

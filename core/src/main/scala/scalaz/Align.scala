@@ -12,6 +12,12 @@ trait Align[F[_]] extends Functor[F] { self =>
 
   def alignWith[A, B, C](f: A \&/ B => C): (F[A], F[B]) => F[C]
 
+  def product[G[_]](implicit G0: Align[G]): Align[({type λ[α] = (F[α], G[α])})#λ] = new ProductAlign[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def align[A, B](a: F[A], b: F[B]): F[A \&/ B] =
     alignWith[A, B, A \&/ B](identity)(a, b)
 
