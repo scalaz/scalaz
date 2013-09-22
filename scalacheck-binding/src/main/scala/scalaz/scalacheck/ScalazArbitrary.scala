@@ -101,8 +101,16 @@ object ScalazArbitrary {
   implicit def IterableArbitrary[A] (implicit a: Arbitrary[A]): Arbitrary[Iterable[A]] =
       Apply[Arbitrary].apply2[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
 
+  // TODO
+  // could not use type alias `TreeLoc.Parents` and `TreeLoc.TreeForest`.
+  // regression https://issues.scala-lang.org/browse/SI-6854 ?
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
-    Functor[Arbitrary].map(arb[Tree[A]])((t: Tree[A]) => t.loc)
+    Apply[Arbitrary].apply4(
+      arb[Tree[A]],
+      arb[Stream[Tree[A]]],
+      arb[Stream[Tree[A]]],
+      arb[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]
+    )(TreeLoc.loc)
 
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {

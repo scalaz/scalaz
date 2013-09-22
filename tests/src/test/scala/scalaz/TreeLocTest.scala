@@ -15,7 +15,6 @@ class TreeLocTest extends Spec {
       def equal(a1: Tree[A], a2: Tree[A]) =
         Equal[A].equal(a1.rootLabel, a2.rootLabel) && streamEqualApprox.equal(a1.subForest, a2.subForest)
     }
-    implicit def treeLocEqual[A: Equal]: Equal[TreeLoc[A]] = treeEqual[A].contramap((_: TreeLoc[A]).toTree)
 
     // TODO checkAll("TreeLoc", traverse.laws[TreeLoc])
     // TODO checkAll("TreeLoc", applicative.laws[TreeLoc])
