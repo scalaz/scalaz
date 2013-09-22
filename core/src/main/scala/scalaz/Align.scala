@@ -28,22 +28,22 @@ trait Align[F[_]] extends Functor[F] { self =>
     alignWith[A, A, A](t => \&/.merge(t))(a1, a2)
 
   def alignSwap[A, B](a: F[A], b: F[B]): F[B \&/ A] =
-    map(align(a, b))(_.swap)
+    alignWith[A, B, B \&/ A](_.swap)(a, b)
 
   def alignA[A, B](a: F[A], b: F[B]): F[Option[A]] =
-    map(align(a, b))(_.a)
+    alignWith[A, B, Option[A]](_.a)(a, b)
 
   def alignB[A, B](a: F[A], b: F[B]): F[Option[B]] =
-   map(align(a, b))(_.b)
+    alignWith[A, B, Option[B]](_.b)(a, b)
 
   def alignThis[A, B](a: F[A], b: F[B]): F[Option[A]] =
-    map(align(a, b))(_.onlyThis)
+    alignWith[A, B, Option[A]](_.onlyThis)(a, b)
 
   def alignThat[A, B](a: F[A], b: F[B]): F[Option[B]] =
-    map(align(a, b))(_.onlyThat)
+    alignWith[A, B, Option[B]](_.onlyThat)(a, b)
 
   def alignBoth[A, B](a: F[A], b: F[B]): F[Option[(A, B)]] =
-    map(align(a, b))(_.onlyBoth)
+    alignWith[A, B, Option[(A, B)]](_.onlyBoth)(a, b)
 
   trait AlignLaw extends FunctorLaw {
     def collapse[A](a: F[A])(implicit E: Equal[F[A \&/ A]]): Boolean =
