@@ -9,6 +9,12 @@ class TreeTest extends Spec {
 
   checkAll("Tree", equal.laws[Tree[Int]])
 
+  "satisfy foldable1 law" ! prop { xs: Tree[Int] =>
+    val F = Foldable1[Tree]
+    F.foldMap1(xs)(Vector(_)) must be_===(F.foldRight1(xs.map(Vector(_)))((a, b) => b ++ a))
+    F.foldMap1(xs)(Vector(_)) must be_===(F.foldLeft1(xs.map(Vector(_)))(_ ++ _))
+  }
+
   {
     implicit def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {
       import std.stream.streamEqual
