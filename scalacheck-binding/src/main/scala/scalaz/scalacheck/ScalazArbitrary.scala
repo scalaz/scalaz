@@ -101,9 +101,8 @@ object ScalazArbitrary {
   implicit def IterableArbitrary[A] (implicit a: Arbitrary[A]): Arbitrary[Iterable[A]] =
       Apply[Arbitrary].apply2[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
 
-  // TODO
   // could not use type alias `TreeLoc.Parents` and `TreeLoc.TreeForest`.
-  // regression https://issues.scala-lang.org/browse/SI-6854 ?
+  // https://github.com/scalaz/scalaz/pull/527#discussion_r6315123
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
     Apply[Arbitrary].apply4(
       arb[Tree[A]],
