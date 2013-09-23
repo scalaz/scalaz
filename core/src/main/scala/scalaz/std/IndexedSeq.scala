@@ -40,7 +40,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] with Align[IxSq] {
     def each[A](fa: IxSq[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: IxSq[A], i: Int) = fa.lift.apply(i)
     // TODO remove after removal of Index
@@ -83,6 +83,16 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
       r
     }
 
+    def alignWith[A, B, C](f: A \&/ B => C): (IxSq[A], IxSq[B]) => IxSq[C] = { (as, bs) =>
+      val sizeA = as.size
+      val sizeB = bs.size
+      (as, bs).zipped.map((a, b) => f(\&/.Both(a, b))) ++ {
+        if(sizeA > sizeB)
+          as.drop(sizeB).map(a => f(\&/.This(a)))
+        else
+          bs.drop(sizeA).map(b => f(\&/.That(b)))
+      }
+    }
   }
 
   implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
