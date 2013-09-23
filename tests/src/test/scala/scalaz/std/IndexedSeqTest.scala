@@ -21,6 +21,7 @@ class IndexedSeqTest extends Spec {
   checkAll(traverse.laws[IndexedSeq])
   checkAll(zip.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
+  checkAll(align.laws[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
   import syntax.foldable._
