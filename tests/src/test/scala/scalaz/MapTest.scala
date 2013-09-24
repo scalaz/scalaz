@@ -546,4 +546,5 @@ class MapTest extends Spec {
 
   type IntMap[A] = Int ==>> A
   checkAll(traverse.laws[IntMap])
+  checkAll(bifoldable.laws[==>>])
 }
