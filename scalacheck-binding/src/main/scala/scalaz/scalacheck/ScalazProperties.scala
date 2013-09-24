@@ -251,6 +251,16 @@ object ScalazProperties {
       }
   }
 
+  object bifoldable {
+    def laws[F[_, _]](implicit fa: Arbitrary[F[Int, Int]], F: Bifoldable[F]) =
+      new Properties("bifoldable") {
+        private implicit val left = F.leftFoldable[Int]
+        private implicit val right = F.rightFoldable[Int]
+        include(foldable.laws[({type λ[α]=F[α, Int]})#λ])
+        include(foldable.laws[({type λ[α]=F[Int, α]})#λ])
+      }
+  }
+
   object bitraverse {
     def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
       new Properties("bitraverse") {
