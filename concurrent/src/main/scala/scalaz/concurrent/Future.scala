@@ -192,7 +192,7 @@ trait Future[+A] {
 
 object Future {
 
-  private[scalaz] val timeoutScheduler = Executors.newScheduledThreadPool(1)
+  private[scalaz] lazy val timeoutScheduler = Executors.newScheduledThreadPool(Runtime.getRuntime.availableProcessors() min 2)
 
   case class Now[+A](a: A) extends Future[A]
   case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
