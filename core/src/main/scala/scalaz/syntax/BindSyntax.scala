@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Bind` */
 final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind[F]) extends Ops[F[A]] {
   ////
-  import Liskov.<~<
+  import Liskov.<~<, Leibniz.===
 
   def flatMap[B](f: A => F[B]) = F.bind(self)(f)
 
@@ -18,8 +18,8 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
 
   def >>[B](b: => F[B]): F[B] = F.bind(self)(_ => b)
 
-  def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A <~< Boolean): F[B] = {
-    val value: F[Boolean] = Liskov.co[F, A, Boolean](ev)(self)
+  def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A === Boolean): F[B] = {
+    val value: F[Boolean] = ev.subst(self)
     F.ifM(value, ifTrue, ifFalse)
   }
 

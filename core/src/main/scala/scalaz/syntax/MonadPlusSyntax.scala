@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `MonadPlus` */
 final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadPlus[F]) extends Ops[F[A]] {
   ////
-  import Liskov._
+  import Liskov._, Leibniz.===
 
   def filter(f: A => Boolean) =
     F.filter(self)(f)
@@ -15,13 +15,13 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def uniteU[T, B](implicit T: Unapply[Foldable, A]): F[T.A] =
     F.uniteU(self)(T)
 
-  def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
-    val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
+  def unite[T[_], B](implicit ev: A === T[B], T: Foldable[T]): F[B] = {
+    val ftb: F[T[B]] = ev.subst(self)
     F.unite[T, B](ftb)
   }
 
-  final def separate[G[_, _], B, C](implicit ev: A <~< G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
-    F.separate(Liskov.co(ev)(self))
+  final def separate[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
+    F.separate(ev.subst(self))
 
   ////
 }
