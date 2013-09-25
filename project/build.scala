@@ -189,7 +189,8 @@ object build extends Build {
         "scalaz.NonEmptyList.foreach",
         "scalaz.NonEmptyList.sortBy",
         "scalaz.NonEmptyList.sortWith",
-        "scalaz.NonEmptyList.sorted"
+        "scalaz.NonEmptyList.sorted",
+        "scalaz.concurrent.Future.timed"
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](

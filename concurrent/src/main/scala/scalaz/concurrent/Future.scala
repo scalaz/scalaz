@@ -1,6 +1,6 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Executors, ExecutorService, TimeoutException}
+import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Executors, ExecutorService, TimeoutException, TimeUnit}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
 
 import collection.JavaConversions._
@@ -163,9 +163,36 @@ trait Future[+A] {
       result.get
     }
   }
+
+  /**
+   * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
+   * and attempts to cancel the running computation.
+   * This implementation will not block the future's execution thread
+   */
+  def timed(timeoutInMillis: Long): Future[Throwable \/ A] =  
+    //instead of run this though chooseAny, it is run through simple primitive, 
+    //as we are never interested in results of timeout callback, and this is more resource savvy
+    async[Throwable \/ A] { cb =>
+      val cancel = new AtomicBoolean(false)
+      val done = new AtomicBoolean(false)
+      timeoutScheduler.schedule(new Runnable {
+        def run() { 
+          if (done.compareAndSet(false,true)) {
+            cancel.set(true)
+            cb(-\/(new TimeoutException()))
+          } 
+        }
+      }
+      , timeoutInMillis, TimeUnit.MILLISECONDS)
+      
+      runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
+    }
+
 }
 
 object Future {
+
+  private[scalaz] lazy val timeoutScheduler = Executors.newScheduledThreadPool(Runtime.getRuntime.availableProcessors() min 2)
 
   case class Now[+A](a: A) extends Future[A]
   case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
