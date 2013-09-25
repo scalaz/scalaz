@@ -28,7 +28,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   }
 
   /** A version of `unite` that infers the type constructor `T`. */
-  final def uniteU[T, A](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =
+  final def uniteU[T](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =
     unite(T.leibniz.subst(value))(T.TC)
 
   trait MonadPlusLaw extends EmptyLaw with MonadLaw {
