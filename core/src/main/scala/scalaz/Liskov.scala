@@ -55,27 +55,32 @@ trait LiskovFunctions {
 
   /**Subtyping is reflexive */
   implicit def refl[A]: (A <~< A) = new (A <~< A) {
-    def subst[F[_]](p: F[A]): F[A] = p
+    def subst[F[-_]](p: F[A]): F[A] = p
   }
 
   /**Subtyping is transitive */
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
     g.subst[({type λ[-α]= α <~< C})#λ](f)
 
+  @deprecated("inv is unsound on <~<; use Leibniz.=== or Liskov.co instead",
+              "7.1.0")
   def inv[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
     a.subst[({type λ[-α] = T[α] <~< T[A2]})#λ](refl)
 
-  /**We can lift subtyping into any invariant or covariant type constructor */
-  def co[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
+  /**We can lift subtyping into any covariant type constructor */
+  def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
     a.subst[({type λ[-α]= T[α] <~< T[A2]})#λ](refl)
 
-  def co2[T[_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
+  def co2[T[+_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
     a.subst[({type λ[-α]= T[α, B] <~< T[Z, B]})#λ](refl)
 
-  def co3[T[_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
+  def co2_2[T[_, +_], Z, A, B](a: B <~< Z): T[A, B] <~< T[A, Z] =
+    a.subst[({type λ[-α]= T[A, α] <~< T[A, Z]})#λ](refl)
+
+  def co3[T[+_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
     a.subst[({type λ[-α]= T[α, B, C] <~< T[Z, B, C]})#λ](refl)
 
-  def co4[T[_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
+  def co4[T[+_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
     a.subst[({type λ[-α]=T[α, B, C, D] <~< T[Z, B, C, D]})#λ](refl)
 
   /**lift2(a,b) = co1_2(a) compose co2_2(b) */
