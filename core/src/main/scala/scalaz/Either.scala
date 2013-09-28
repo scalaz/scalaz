@@ -84,7 +84,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
-    bimap(identity, g)
+    this match {
+      case \/-(a)     => \/-(g(a))
+      case b @ -\/(_) => b
+    }
 
   /** Traverse on the right of this disjunction. */
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
