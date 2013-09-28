@@ -95,7 +95,10 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
 
   /** Run the given function on the left value. */
   def leftMap[C](f: E => C): Validation[C, A] =
-    bimap(f, identity)
+    this match {
+      case a @ Success(_) => a
+      case Failure(e) => Failure(f(e))
+    }
 
   /** Binary functor traverse on this validation. */
   def bitraverse[G[_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
