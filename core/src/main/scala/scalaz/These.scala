@@ -169,13 +169,10 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
     }
 
   def bifoldRight[Z](z: => Z)(f: (A, => Z) => Z)(g: (B, => Z) => Z): Z =
-    a match {
-      case None => z
-      case Some(aa) =>
-        f(aa, b match {
-          case None => z
-          case Some(bb) => g(bb, z)
-        })
+    this match{
+      case This(a)    => f(a, z)
+      case That(b)    => g(b, z)
+      case Both(a, b) => f(a, g(b, z))
     }
 
   def bifoldMap[M](f: A => M)(g: B => M)(implicit M: Semigroup[M]): M =
