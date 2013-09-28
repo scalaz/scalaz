@@ -16,16 +16,19 @@ import sbtrelease.Utilities._
 
 import com.typesafe.sbt.pgp.PgpKeys._
 
-import com.typesafe.sbtosgi.OsgiPlugin._
+import com.typesafe.sbt.osgi.OsgiKeys
+import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.Plugin._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 import com.typesafe.tools.mima.plugin.MimaKeys.binaryIssueFilters
+import sbtunidoc.Plugin._
+import sbtunidoc.Plugin.UnidocKeys._
 
 object build extends Build {
-  type Sett = Project.Setting[_]
+  type Sett = Def.Setting[_]
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -200,10 +203,10 @@ object build extends Build {
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
-    settings = standardSettings ++ Unidoc.settings ++ Seq[Sett](
-      // <https://github.com/scalaz/scalaz/issues/261>
-      Unidoc.unidocExclude += "typelevel",
+    settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       previousArtifact := None,
+      // <https://github.com/scalaz/scalaz/issues/261>
+      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
       publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
