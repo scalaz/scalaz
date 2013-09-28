@@ -108,6 +108,14 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def runAsync(f: (Throwable \/ A) => Unit): Unit =
     get.runAsync(f)
+
+  /**
+   * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
+   * and attempts to cancel the running computation.
+   */
+  def timed(timeoutInMillis: Long): Task[A] =
+    new Task(get.timed(timeoutInMillis).map(_.join))
+
 }
 
 object Task {

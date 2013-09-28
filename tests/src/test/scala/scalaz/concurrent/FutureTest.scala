@@ -75,6 +75,28 @@ class FutureTest extends Spec {
     }
   }
   
+  
+  "Timed Future " should {
+
+    "not block future's execution thread" in {
+      val es = Executors.newFixedThreadPool(1)
+
+      val start  = System.currentTimeMillis()
+      val t1 = Future.fork({Thread.sleep(500); Future.now(1)})(es).timed(10000) 
+      val t2 = Future.fork({Thread.sleep(500); Future.now(2)})(es).timed(100)
+
+      val result:Seq[Throwable \/ Int] =
+        Future.fork(Future.gatherUnordered(Seq(t1,t2))).run
+      val duration = System.currentTimeMillis() - start
+
+      (result.head.isLeft must_== true) and
+      (result.last.isRight must_== true) and
+        ((duration-5000 <= 0) must_== true)
+
+    }
+    
+  }
+  
 
   /*
    * This is a little deadlock factory based on the code in #308.
