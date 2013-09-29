@@ -31,7 +31,7 @@ trait Bifoldable[F[_, _]]  { self =>
     implicit def G = G0
   }
 
-  /**The product of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
+  /**The product of Bifoldables `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifoldable */
   def product[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBifoldable[F, G] {
     implicit def F = self
 

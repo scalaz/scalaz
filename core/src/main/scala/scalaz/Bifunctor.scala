@@ -18,7 +18,7 @@ trait Bifunctor[F[_, _]]  { self =>
     implicit def G = G0
   }
 
-  /**The product of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
+  /**The product of Bifunctors `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifunctor */
   def product[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBifunctor[F, G] {
     implicit def F = self
 
