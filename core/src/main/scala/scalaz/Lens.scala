@@ -357,6 +357,10 @@ trait LensFunctions extends LensFamilyFunctions {
       case None => m - k
       case Some(v) => m.updated(k, v)
     }: Option[V] => Map[K, V]), _ get k)
+    
+  /** Specify whether a value is in a Set */
+  def setMembershipLens[A](a: A): Set[A] @> Boolean =
+    lensg(s => b => if (b) s + a else s - a, _.contains(a))
 
   def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Store[A, B] @> B =
     lens(q => {
