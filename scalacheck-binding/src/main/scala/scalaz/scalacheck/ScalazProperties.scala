@@ -252,8 +252,16 @@ object ScalazProperties {
   }
 
   object bifoldable {
+    def leftFMConsistent[F[_, _], A, B](implicit F: Bifoldable[F], afa: Arbitrary[F[A, B]], ea: Equal[A], eb: Equal[B]) =
+      forAll(F.bifoldableLaw.leftFMConsistent[A, B] _)
+
+    def rightFMConsistent[F[_, _], A, B](implicit F: Bifoldable[F], afa: Arbitrary[F[A, B]], ea: Equal[A], eb: Equal[B]) =
+      forAll(F.bifoldableLaw.rightFMConsistent[A, B] _)
+
     def laws[F[_, _]](implicit fa: Arbitrary[F[Int, Int]], F: Bifoldable[F]) =
       new Properties("bifoldable") {
+        property("consistent left bifold") = leftFMConsistent[F, Int, Int]
+        property("consistent right bifold") = rightFMConsistent[F, Int, Int]
         private implicit val left = F.leftFoldable[Int]
         private implicit val right = F.rightFoldable[Int]
         include(foldable.laws[({type λ[α]=F[α, Int]})#λ])
@@ -264,6 +272,7 @@ object ScalazProperties {
   object bitraverse {
     def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
       new Properties("bitraverse") {
+        include(bifoldable.laws[F])
         private implicit val left = F.leftTraverse[Int]
         private implicit val right = F.rightTraverse[Int]
         include(traverse.laws[({type f[a]=F[a, Int]})#f])
