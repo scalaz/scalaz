@@ -7,6 +7,18 @@ final class MonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Mon
 
   def liftM[G[_[_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)
 
+  def whileM[G[_]](p: F[Boolean])(implicit G: MonadPlus[G]): F[G[A]] = F.whileM(p, self)
+
+  def whileM_(p: F[Boolean]): F[Unit] = F.whileM_(p, self)
+
+  def untilM[G[_]](p: => F[Boolean])(implicit G: MonadPlus[G]): F[G[A]] = F.untilM(self, p)
+
+  def untilM(p: => F[Boolean]): F[Unit] = F.untilM_(self, p)
+
+  def iterateWhile(p: A => Boolean): F[A] = F.iterateWhile(self)(p)
+
+  def iterateUntil(p: A => Boolean): F[A] = F.iterateUntil(self)(p)
+
   ////
 }
 
