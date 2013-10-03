@@ -20,6 +20,14 @@ class EnumeratorTTest extends Spec {
     }
   }
 
+  "Issue #553" in {
+    import std.list._
+    val xs = (1 to 10).map(List(_)).toList
+    val e = enumIterator(xs.iterator)
+    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must be_===(xs.flatten)
+    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must be_===(xs.flatten)
+  }
+
   "eof" in {
     val enum = enumEofT[Int, Id]
     (consume[Int, Id, List] &= enum).run must be_===(Nil)
