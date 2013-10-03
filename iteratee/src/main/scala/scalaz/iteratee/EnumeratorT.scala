@@ -141,15 +141,15 @@ trait EnumeratorTFunctions {
   def enumIterator[E, F[_]](x: => Iterator[E])(implicit MO: MonadPartialOrder[F, IO]) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
       import MO._
-      lazy val iter = x
-      def apply[A] = (s: StepT[E, F, A]) =>
-        s.mapCont(
-          k =>
-            if (iter.hasNext) {
-              val n = iter.next()
-              k(elInput(n)) >>== apply[A]
-            } else s.pointI
-        )
+      def apply[A] = (s: StepT[E, F, A]) => {
+        def go(xs: Iterator[E]): IterateeT[E, F, A] =
+          if(xs.isEmpty) s.pointI
+          else {
+            val next = xs.next
+            s.mapCont(_ apply (elInput(next)) >>== enumIterator(xs).apply[A])
+          }
+        go(x)
+      }
     }
 
   def enumIoSource[T, E, F[_]](get : () => IoExceptionOr[T], gotdata : IoExceptionOr[T] => Boolean, render : T => E)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[E], F] =
