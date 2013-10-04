@@ -18,12 +18,10 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
   /** Pass `C` through untouched. */
   def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
 
-  def covariantInstance[C]: Applicative[({type λ[α] = (C =>: α)})#λ] =
-    new Applicative[({type λ[α] = (C =>: α)})#λ] {
+  override def covariantInstance[C]: Applicative[({type λ[α] = (C =>: α)})#λ] =
+    new Applicative[({type λ[α] = (C =>: α)})#λ] with SndCovariant[C] {
       def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
-      override def map[A, B](fa: (C =>: A))(f: A => B): (C =>: B) =
-	<<<(arr(f), fa)
     }
 
   /** Alias for `compose`. */
