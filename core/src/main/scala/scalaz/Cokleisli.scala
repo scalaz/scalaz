@@ -11,16 +11,16 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
   def flatMap[C](f: B => Cokleisli[F, A, C]): Cokleisli[F, A, C] =
     Cokleisli(fa => f(self.run(fa)).run(fa))
 
-  def <<=(a: F[A])(implicit F: Functor[F], FC: Cobind[F]): F[B] =
-    F.map(FC.cojoin(a))(run)
+  def <<=(a: F[A])(implicit F: Cobind[F]): F[B] =
+    F.extend(a)(run)
 
-  def =>=[C](c: Cokleisli[F, B, C])(implicit F: Functor[F], FC: Cobind[F]): Cokleisli[F, A, C] =
+  def =>=[C](c: Cokleisli[F, B, C])(implicit F: Cobind[F]): Cokleisli[F, A, C] =
     Cokleisli(fa => c run (<<=(fa)))
 
-  def compose[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: Cobind[F]): Cokleisli[F, C, B] =
+  def compose[C](c: Cokleisli[F, C, A])(implicit F: Cobind[F]): Cokleisli[F, C, B] =
     c =>= this
 
-  def =<=[C](c: Cokleisli[F, C, A])(implicit F: Functor[F], FC: Cobind[F]): Cokleisli[F, C, B] =
+  def =<=[C](c: Cokleisli[F, C, A])(implicit F: Cobind[F]): Cokleisli[F, C, B] =
     compose(c)
 }
 
