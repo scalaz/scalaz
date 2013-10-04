@@ -13,6 +13,12 @@ trait Profunctor[=>:[_, _]]  { self =>
   /** Functor map on `B`. */
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C)
 
+  def contravariantInstance[C]: Contravariant[({type λ[α] = (α =>: C)})#λ] =
+    new Contravariant[({type λ[α] = (α =>: C)})#λ] {
+      def contramap[A, B](fa: A =>: C)(f: B => A): (B =>: C) =
+        mapfst(fa)(f)
+    }
+
   ////
   val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
 }

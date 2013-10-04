@@ -26,12 +26,6 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
 	<<<(arr(f), fa)
     }
 
-  def contravariantInstance[C]: Contravariant[({type λ[α] = (α =>: C)})#λ] =
-    new Contravariant[({type λ[α] = (α =>: C)})#λ] {
-      def contramap[A, B](fa: A =>: C)(f: B => A): (B =>: C) =
-        <<<(fa, arr(f))
-    }
-
   /** Alias for `compose`. */
   final def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
     compose(fbc, fab)
