@@ -132,6 +132,14 @@ sealed abstract class KleisliInstances1 extends KleisliInstances2 {
 }
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
+
+  implicit def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+    implicit def F = F0
+  }
+
+  implicit def kleisliCompose[F[_]](implicit F0: Bind[F]): Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliCompose[F] {
+    implicit def F = F0
+  }
 }
 
 abstract class KleisliInstances extends KleisliInstances0 {
@@ -243,14 +251,29 @@ private trait KleisliContravariant[F[_], X] extends Contravariant[({type λ[α] 
 //
 // (* *) -> *
 //
+private trait KleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+
+  implicit def F: Functor[F]
+
+  override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa local f
+
+  override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
+}
+
+private trait KleisliCompose[F[_]] extends Compose[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+
+  implicit def F: Bind[F]
+
+  def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
+}
 
 private trait KleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ]
-  with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+  with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ]
+  with KleisliCompose[F]
+  with KleisliProfunctor[F] {
 
   implicit def F: Monad[F]
-
-  def compose[A, B, C](bc: Kleisli[F, B, C], ab: Kleisli[F, A, B]): Kleisli[F, A, C] = ab >=> bc
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
 
