@@ -132,10 +132,9 @@ private[scalaz] trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({t
   override def bifoldMap[A,B,M](fa: (F[A, B], G[A, B]))(f: A => M)(g: B => M)(implicit M: Monoid[M]): M =
     M.append(F.bifoldMap(fa._1)(f)(g), G.bifoldMap(fa._2)(f)(g))
   override def bifoldRight[A,B,C](fa: (F[A, B], G[A, B]), z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
-    F.bifoldRight(fa._1, G.bifoldRight(fa._2, z)((a, b) => f(a, b))((b, c) => g(b, c)))((a, b) => f(a, b))((b, c) => g(b, c))
+    F.bifoldRight(fa._1, G.bifoldRight(fa._2, z)(f)(g))(f)(g)
   override def bifoldLeft[A,B,C](fa: (F[A, B], G[A, B]), z: C)(f: (C, A) => C)(g: (C, B) => C): C =
-    F.bifoldLeft(fa._1, G.bifoldLeft(fa._2, z)((b, a) => f(b, a))((c, b) => g(c, b)))((b, a) => f(b, a))((c, b) => g(c, b))
-
+    G.bifoldLeft( fa._2, F.bifoldLeft( fa._1, z)(f)(g))(f)(g)
 }
 
 private[scalaz] trait ProductBitraverse[F[_, _], G[_, _]]
