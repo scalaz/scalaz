@@ -1,28 +1,28 @@
 package scalaz
 
 class DataMapTest extends Spec {
-  import org.scalacheck.{Arbitrary, Gen}
-  import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._
   import std.list._
   import std.string._
   import std.option._
-  import syntax.equal._
-  import syntax.show._
+  import std.tuple._
   import syntax.std.option._
 
   import ==>>._
 
+  def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
+    val al = m.toAscList
+    al must be_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
+
   "==>> fromList" should {
     "succeed" in {
-      fromList(List.empty[(Int, String)]) === empty[Int, String]
-      fromList(List(5 -> "a", 3 -> "b")) === fromList(List(3 -> "b", 5 -> "a"))
-      fromList(List(5 ->"a", 3 -> "b", 5 -> "c")) === fromList(List(5 -> "c", 3 -> "b"))
-      fromList(List(5 -> "c", 3 -> "b", 5 -> "a")) === fromList(List(5 -> "a", 3 -> "b"))
-
-      Equal[Int ==>> String].equal(fromList(List(5 -> "a", 3 -> "b")), fromList(List(3 -> "b", 5 -> "a")))
+      fromList(List.empty[(Int, String)]) must be_===(empty[Int, String])
+      fromList(List(5 -> "a", 3 -> "b")) must be_===(fromList(List(3 -> "b", 5 -> "a")))
+      fromList(List(5 ->"a", 3 -> "b", 5 -> "c")) must be_===(fromList(List(5 -> "c", 3 -> "b")))
+      fromList(List(5 -> "c", 3 -> "b", 5 -> "a")) must be_===(fromList(List(5 -> "a", 3 -> "b")))
     }
   }
 
@@ -127,13 +127,20 @@ class DataMapTest extends Spec {
     "not remove from an empty map" in {
       empty.delete(5) must be_===(empty[Int, Int])
     }
+    "be sound" ! prop {(m: Int ==>> Int, i: Int) =>
+      structurallySound(m delete i)
+    }
   }
 
   "==>> insertion" should {
     "insert" in {
-      fromList(List(5 -> "a", 3 -> "b")).insert(5, "x") === fromList(List(3 -> "b", 5 -> "x")) // Replacement
+      fromList(List(5 -> "a", 3 -> "b")).insert(5, "x") must be_===(fromList(List(3 -> "b", 5 -> "x"))) // Replacement
       fromList(List((5,"a"), (3,"b"))).insert(7,"x") must be_===(fromList(List((3,"b"), (5,"a"), (7,"x")))) // Addition of new key
       empty.insert(5, "x") must be_===(singleton(5, "x"))
+    }
+
+    "insert sound" ! prop {(m: Int ==>> Int, a: Int, b: Int) =>
+      structurallySound(m insert (a, b))
     }
 
     "insertWith" in {
@@ -150,11 +157,20 @@ class DataMapTest extends Spec {
       fromList(List(5 -> "a", 3 -> "b")).insertWithKey(f, 7, "xxx") must be_===(fromList(List(3 -> "b", 5 -> "a", 7 -> "xxx")))
       empty.insertWithKey(f, 5, "xxx") must be_===(singleton(5, "xxx"))
     }
+
+    "insertWithKey sound" ! prop {(m: Int ==>> Int, a: Int, b: Int) =>
+      structurallySound(m insertWithKey ((_, _, b) => b, a, b))
+    }
   }
 
   "==>> from a list" should {
     "equivalence to insert on empty ==>>" in {
       empty.insert(2,3).insert(3,4) must be_===(fromList(List(2 -> 3, 3 -> 4)))
+    }
+
+    "be order-insensitive" ! prop {(am: Map[Int, Int]) =>
+      val al = am.toList
+      fromList(al.reverse) must be_===(fromList(al))
     }
 
     "create a valid map from empty list" in {
@@ -163,8 +179,22 @@ class DataMapTest extends Spec {
   }
 
   "==>> union operations" should {
+    "be sound" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      structurallySound(a union b)
+    }
+
     "union" in {
       fromList(List((5, "a"), (3, "b"))) union fromList(List((5, "A"), (7, "C"))) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
+    }
+
+    "commute" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a unionWith b)(_ + _) must be_===((b unionWith a)(_ + _))
+    }
+
+    "be idempotent" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      val ab = a union b
+      ab union a must be_===(ab)
+      ab union b must be_===(ab)
     }
 
     "unions" in {
@@ -198,6 +228,27 @@ class DataMapTest extends Spec {
       r must_== singleton[Int, String](3, "b")
     }
 
+    "be idempotent" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      val ab = a \\ b
+      (ab \\ b) must be_===(ab)
+    }
+
+    "be idempotent (in one case)" in {
+      val a = Bin(-1768028150,1831400640,Bin(-2147483648,2147483647,Tip(),Tip()),
+                  Bin(-541865171,1,Tip(),Bin(1085869916,1066820187,Tip(),Tip())))
+      val b = Bin(0,1979991171,Tip(),Tip())
+      val ab = a \\ b
+      (ab \\ b) must be_===(ab)
+    }
+
+    "produce right keyset" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a \\ b).keySet must_== (a.keySet diff b.keySet)
+    }
+
+    "be an inverse" ! prop {(a: Int ==>> Int) =>
+      (a \\ a) must be_===(==>>.empty[Int, Int])
+    }
+
     "syntax" in {
       val r = fromList(List(5 -> "a", 3 -> "b")) \\ fromList(List(5 -> "A", 7 -> "C"))
       r must_== singleton[Int, String](3, "b")
@@ -218,6 +269,27 @@ class DataMapTest extends Spec {
     "intersection" in {
       val r = fromList(List(5 -> "a", 3 -> "b")) intersection fromList(List(5 -> "A", 7 -> "C"))
       r must_== singleton(5, "a")
+    }
+
+    "intersect soundly" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      structurallySound(a intersection b)
+    }
+
+    "form an identity" ! prop {a: Int ==>> Int =>
+      a intersection a must be_===(a)
+    }
+
+    "commute" ! prop {(a: Int ==>> Int, b: Int ==>> Int) =>
+      (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
+    }
+
+    "commute (in one case)" in {
+      val a = Bin(1951314151,1,Bin(-1,1271148582,Tip(),Tip()),
+                  Bin(2147483647,-1423766788,Tip(),Tip()))
+      val b = Bin(-12693552,-2147483648,
+                  Bin(-1587083834,-729342404,Tip(),Tip()),
+                  Bin(-1,0,Tip(),Tip()))
+      (a intersectionWith b)(_ + _) must be_===((b intersectionWith a)(_ + _))
     }
 
     "intersectionWith" in {
@@ -316,16 +388,22 @@ class DataMapTest extends Spec {
     val m = fromList(List(5 -> "a", 3 -> "b"))
 
     "partition" in {
-      m.partition(_ > "a") === (singleton(3, "b"), singleton(5, "a"))
-      m.partition(_ < "x") === (fromList(List(3 -> "b", 5 -> "a")), empty[Int, String])
-      m.partition(_ > "x") === (empty[Int, String], fromList(List(3 -> "b", 5 -> "a")))
+      m.partition(_ > "a") must be_===((singleton(3, "b"), singleton(5, "a")))
+      m.partition(_ < "x") must be_===((fromList(List(3 -> "b", 5 -> "a")), empty[Int, String]))
+      m.partition(_ > "x") must be_===((empty[Int, String], fromList(List(3 -> "b", 5 -> "a"))))
+    }
+
+    "be sound" ! prop {(m: Int ==>> Int, p: Int => Boolean) =>
+      val (ma, mb) = m partition p
+      structurallySound(ma)
+      structurallySound(mb)
     }
 
     "partitionWithKey" in {
-      m.partitionWithKey((k, _) => k > 3) === (singleton(5, "a"), singleton(3, "b"))
+      m.partitionWithKey((k, _) => k > 3) must be_===((singleton(5, "a"), singleton(3, "b")))
 
-      m.partitionWithKey((k, _) => k < 7) === (fromList(List(3 -> "b", 5 -> "a")), empty[Int, String])
-      m.partitionWithKey((k, _) => k > 7) === (empty[Int, String], fromList(List(3 -> "b", 5 -> "a")))
+      m.partitionWithKey((k, _) => k < 7) must be_===((fromList(List(3 -> "b", 5 -> "a")), empty[Int, String]))
+      m.partitionWithKey((k, _) => k > 7) must be_===((empty[Int, String], fromList(List(3 -> "b", 5 -> "a"))))
     }
   }
 
@@ -449,8 +527,6 @@ class DataMapTest extends Spec {
       //-- > valid (fromAscList [(5,"a"), (3,"b")]) == False
     }
   }*/
-
-  import scalaz.scalacheck.ScalaCheckBinding._
 
   checkAll(equal.laws[Int ==>> Int])
   checkAll(order.laws[Int ==>> Int])
