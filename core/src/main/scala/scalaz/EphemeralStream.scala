@@ -148,6 +148,7 @@ object EphemeralStream extends EphemeralStreamFunctions with EphemeralStreamInst
 }
 
 trait EphemeralStreamInstances {
+  import EphemeralStream._
   // TODO more instances
   implicit val ephemeralStreamInstance = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Traverse[EphemeralStream] {
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
@@ -162,6 +163,15 @@ trait EphemeralStreamInstances {
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(b => a => f(b, a))
+    override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
+      if(fa.isEmpty) emptyEphemeralStream
+      else {
+        val bTail = if(fb.isEmpty) emptyEphemeralStream[B] else fb.tail()
+        cons(f(fa.head(), fb.headOption), zipWithL(fa.tail(), bTail)(f))
+      }
+    }
+    override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
+      zipWithL(fb, fa)((b, a) => f(a, b))
     def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
       val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
