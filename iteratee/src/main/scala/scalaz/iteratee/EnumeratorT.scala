@@ -145,8 +145,10 @@ trait EnumeratorTFunctions {
         def go(xs: Iterator[E]): IterateeT[E, F, A] =
           if(xs.isEmpty) s.pointI
           else {
-            val next = xs.next
-            s.mapCont(_ apply (elInput(next)) >>== enumIterator(xs).apply[A])
+            s mapCont { k => 
+              val next = xs.next
+              k(elInput(next)) >>== enumIterator[E, F](xs).apply[A] 
+            }
           }
         go(x)
       }
