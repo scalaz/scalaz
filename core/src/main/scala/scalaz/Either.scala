@@ -169,7 +169,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
   def getOrElse[BB >: B](x: => BB): BB =
-    toOption getOrElse x
+    this match {
+      case -\/(_) => x
+      case \/-(b) => b
+    }
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |[BB >: B](x: => BB): BB =
