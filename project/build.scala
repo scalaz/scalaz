@@ -51,7 +51,7 @@ object build extends Build {
 
     val (releaseV, _) = st.get(versions).getOrElse(sys.error("impossible"))
     // TODO switch to `versionFile` key when updating sbt-release
-    IO.write(new File("version.sbt"), "\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    IO.write(new File("version.sbt"), "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
