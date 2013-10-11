@@ -73,4 +73,44 @@ class KleisliTest extends Spec {
       def readerXApply = Apply[ReaderX]
     }
   }
+
+  object `FromKleisliLike inference` {
+    val k1: Kleisli[Option, Int, String] = Kleisli(i => Option("a"))
+    val k2: Kleisli[Option, String, Int] = Kleisli(s => Option(1))
+
+    object compose{
+      import syntax.compose._
+      k1 >>> k2
+    }
+
+    object choice{
+      import syntax.choice._
+      k1 ||| k1
+    }
+
+    object split{
+      import syntax.split._
+      k1 -*- k1
+    }
+
+    object profunctor{
+      import syntax.profunctor._
+      k1.mapsnd(x => x)
+    }
+
+    object arrow{
+      import syntax.arrow._
+      k1 *** k1
+    }
+
+    object all{
+      import syntax.all._
+
+      k1 >>> k2
+      k1 ||| k1
+      k1 -*- k1
+      k1.mapsnd(x => x)
+      k1 *** k1
+    }
+  }
 }
