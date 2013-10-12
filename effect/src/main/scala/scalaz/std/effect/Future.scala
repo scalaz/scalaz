@@ -10,4 +10,4 @@ trait FutureFunctions {
     IO(Future(a.unsafePerformIO))
 }
 
-object future extends FutureFunctions
+object scalaFuture extends FutureFunctions
