@@ -5,7 +5,7 @@ import scala.concurrent.{Await, CanAwait, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
 trait FutureInstances1 {
-  implicit def futureInstance(implicit ec: ExecutionContext): Monad[Future] with Cobind[Future] with Cojoin[Future] =
+  implicit def futureInstance(implicit ec: ExecutionContext): Monad[Future] with Cobind[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
