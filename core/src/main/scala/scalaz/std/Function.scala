@@ -17,6 +17,21 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Comonad[A, R](implicit A0: Monoid[A]): Comonad[({type λ[α]=(A => α)})#λ] = new Function1Comonad[A, R] {
     implicit def M = A0
   }
+  // See SI-7899
+  implicit def function1CovariantByName[T]: Monad[({type l[a] = ((=> T) => a)})#l] with Zip[({type l[a] = ((=> T) => a)})#l] with Unzip[({type l[a] = ((=> T) => a)})#l] with Distributive[({type l[a] = ((=> T) => a)})#l] = new Monad[({type l[a] = ((=> T) => a)})#l] with Zip[({type l[a] = ((=> T) => a)})#l] with Unzip[({type l[a] = ((=> T) => a)})#l] with Distributive[({type l[a] = ((=> T) => a)})#l] {
+    def point[A](a: => A) = _ => a
+
+    def bind[A, B](fa: (=> T) => A)(f: A => (=> T) => B) = (t: T) => f(fa(t))(t)
+
+    def zip[A, B](a: => (=> T) => A, b: => (=> T) => B) =
+      t => (a(t), b(t))
+
+    def unzip[A, B](a: (=> T) => (A, B)) =
+      (a(_)._1, a(_)._2)
+
+    def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => (=> T) => B): (=> T) => G[B] =
+      t => Functor[G].map(fa)(a => f(a)(t))
+  }
 }
 
 trait FunctionInstances extends FunctionInstances0 {
