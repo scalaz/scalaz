@@ -4,8 +4,9 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class TupleTest extends Spec {
+object TupleTest extends SpecLite {
 
   type A = Int
   type B = Int
@@ -52,14 +53,14 @@ class TupleTest extends Spec {
   "syntax" should {
     import std.tuple.tupleSyntax._
     "mapElements" in {
-       (1, 2).mapElements(_1 = 2 *) must be_===((2, 2))
+       (1, 2).mapElements(_1 = 2 *) must_===((2, 2))
     }
     "toIndexedSeq" in {
       val as: IndexedSeq[Int] = (1, 2).toIndexedSeq
-      as.toList must be_===(List(1, 2))
+      as.toList must_===(List(1, 2))
     }
     "fold" in {
-      (1, 2).fold(_ + _) must be_===(3)
+      (1, 2).fold(_ + _) must_===(3)
     }
   }
 

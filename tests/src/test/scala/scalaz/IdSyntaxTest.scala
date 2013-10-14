@@ -1,25 +1,26 @@
 package scalaz
 
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class IdSyntaxTest extends Spec {
+object IdSyntaxTest extends SpecLite {
   "smorgasbord" in {
     import syntax.id._
-    2 |> (_ * 3) must be_===(6)
+    2 |> (_ * 3) must_===(6)
 
-    1.squared must be_===((1, 1))
+    1.squared must_===((1, 1))
 
     "foo" matchOrZero {
       case "bar" => 1
-    } must be_===(0)
+    } must_===(0)
 
-    0.doWhile(_ + 1, _ < 3) must be_===(3)
+    0.doWhile(_ + 1, _ < 3) must_===(3)
 
-    0.doWhile(_ + 1, _ => false) must be_===(1)
+    0.doWhile(_ + 1, _ => false) must_===(1)
 
-    0.whileDo(_ + 1, _ < 3) must be_===(3)
+    0.whileDo(_ + 1, _ < 3) must_===(3)
 
-    0.whileDo(_ + 1, _ => false) must be_===(0)
+    0.whileDo(_ + 1, _ => false) must_===(0)
   }
 
 }

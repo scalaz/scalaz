@@ -8,8 +8,9 @@ import effect._
 import Either3._
 import MonadPartialOrder._
 import Id._
+import org.scalacheck.Prop.forAll
 
-class Enumeratee2TTest extends Spec {
+object Enumeratee2TTest extends SpecLite {
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
   implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]
@@ -26,7 +27,7 @@ class Enumeratee2TTest extends Spec {
     val outer = joinI[Int, Int, Id].apply(consume[(Int, Int), Id, List].value) &= enum
     val inner = outer.run &= enum2
 
-    inner.run.pointI.run must be_===(List((3, 3), (5, 5)))
+    inner.run.pointI.run must_===(List((3, 3), (5, 5)))
   }
 
   "cogroup" should {
@@ -66,7 +67,7 @@ class Enumeratee2TTest extends Spec {
     val outer = mergeI[Int, Id].apply(consume[Int, Id, List].value) &= enum
     val inner = outer.run &= enum2
     
-    inner.run.pointI.run must be_===(List(1, 2, 3, 3, 3, 4, 5, 5, 6))
+    inner.run.pointI.run must_===(List(1, 2, 3, 3, 3, 4, 5, 5, 6))
   }
 
   "cross the first element with all of the second iteratee's elements" in {
@@ -75,7 +76,7 @@ class Enumeratee2TTest extends Spec {
 
     val consumer = consume[(Int, Int), Id, List]
     val producer = enum1 cross enum2
-    (consumer &= producer).run must be_===(List(
+    (consumer &= producer).run must_===(List(
       (1, 2), (1, 3), (1, 4), (3, 2), (3, 3), (3, 4), (5, 2), (5, 3), (5, 4)
     ))
   }
@@ -97,7 +98,7 @@ class Enumeratee2TTest extends Spec {
 
     val consumer = consume[(Int, Int), Id, List]
     val producer = joinE[Int, Int, Id].apply(enum1p, enum2p).apply[Id]
-    (consumer &= producer).run must be_===(List(
+    (consumer &= producer).run must_===(List(
       (1, 1), (1, 1), (1, 1)
     ))
   }

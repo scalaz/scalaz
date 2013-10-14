@@ -4,7 +4,8 @@ package cursor
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class HistoryTest extends Spec {
+object HistoryTest extends SpecLite {
   checkAll(equal.laws[History])
 }

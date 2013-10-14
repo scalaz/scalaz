@@ -3,8 +3,9 @@ package effect
 
 import std.AllInstances._
 import ST._
+import org.scalacheck.Prop.forAll
 
-class STTest extends Spec {
+object STTest extends SpecLite {
   type ForallST[A] = Forall[({type λ[S] = ST[S, A]})#λ]
 
   "STRef" in {
@@ -16,7 +17,7 @@ class STTest extends Spec {
       x <- e1[S]
       r <- x.read
     } yield r
-    runST(new ForallST[Int] { def apply[S] = e2[S] }) must be_===(1)
+    runST(new ForallST[Int] { def apply[S] = e2[S] }) must_===(1)
   }
 
   "STArray" in {
@@ -25,7 +26,7 @@ class STTest extends Spec {
       _ <- arr.write(0, false)
       r <- arr.freeze
     } yield r
-    runST(new ForallST[ImmutableArray[Boolean]] { def apply[S] = e1[S] }).toList must be_===(
+    runST(new ForallST[ImmutableArray[Boolean]] { def apply[S] = e1[S] }).toList must_===(
       List(false, true, true))
   }
 }

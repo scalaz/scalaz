@@ -3,16 +3,15 @@ package scalaz
 import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
 
-class MapTest extends Spec {
-  "Map functions" should {
-    "satisfy monoid laws" ! monoid.laws[Map[Int, String]]
-    "satisfy order laws" ! order.laws[Map[Int, String]]
-    "satisfy traverse laws" ! traverse.laws[({type λ[α]=Map[Int, α]})#λ]
-    "satisfy equals laws" ! equal.laws[Map[Int, String]]
-    "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
-  }
+class MapTest extends SpecLite {
+  checkAll(order.laws[Map[Int, String]])
+  checkAll(monoid.laws[Map[Int, String]])
+  checkAll(traverse.laws[({type λ[α]=Map[Int, α]})#λ])
+  checkAll(equal.laws[Map[Int, String]])
+  checkAll(equal.laws[Map[NotNatural, String]])
 
   case class NotNatural(id: Int)
   implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =

@@ -4,9 +4,10 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary
 import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, indexedStateTArb => _, _}
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 import Id._
 
-class StateTTest extends Spec {
+object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]

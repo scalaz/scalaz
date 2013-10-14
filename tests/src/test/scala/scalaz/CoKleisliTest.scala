@@ -1,6 +1,7 @@
 package scalaz
+import org.scalacheck.Prop.forAll
 
-class CokleisliTest extends Spec {
+object CokleisliTest extends SpecLite {
 
   // TODO enforce laws.
 
@@ -10,7 +11,7 @@ class CokleisliTest extends Spec {
     val ck = Cokleisli((a: NonEmptyList[Int]) => a.size)
     val ck1 = ck compose ck
     val run: Int = ck1.run(NonEmptyList(0, 0))
-    run must be_===(2)
+    run must_===(2)
   }
 
   object instances {

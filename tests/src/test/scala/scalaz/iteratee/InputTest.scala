@@ -5,7 +5,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-class InputTest extends Spec {
+class InputTest extends SpecLite {
 
   checkAll(equal.laws[Input[Int]])
   checkAll(semigroup.laws[Input[Int]])

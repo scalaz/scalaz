@@ -7,8 +7,9 @@ import std.AllInstances._
 import org.scalacheck.Arbitrary
 import scalaz._
 import Id._
+import org.scalacheck.Prop.forAll
 
-class WriterTTest extends Spec {
+object WriterTTest extends SpecLite {
 
   type WriterTOpt[W, A] = WriterT[Option, W, A]
   type WriterTOptInt[A] = WriterTOpt[Int, A]

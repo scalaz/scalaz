@@ -1,8 +1,9 @@
 package scalaz
 
 import org.scalacheck.{Prop, Gen}
+import org.scalacheck.Prop.forAll
 
-class ApplicativeTest extends Spec {
+object ApplicativeTest extends SpecLite {
 
   // In c44c206461fe, the functions `replicateM`, `replicateM_`, `filterM`
   // and `partitionM` have been generalized from `Monad` to `Applicative`.
@@ -23,14 +24,14 @@ class ApplicativeTest extends Spec {
       case h :: t => Monad[F].bind(f(h))(b => Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
     }
 
-  "replicateM is the same" ! prop { (fa: Option[Int]) => Prop.forAll(Gen.choose(0, 100)) { n =>
-    fa.replicateM(n) must be_===(replicateM(n, fa))
+  "replicateM is the same" ! forAll { (fa: Option[Int]) => forAll(Gen.choose(0, 100)) { n =>
+    fa.replicateM(n) must_===(replicateM(n, fa))
   }}
 
-  "filterM is the same" ! prop { (l: List[Int]) =>
+  "filterM is the same" ! forAll { (l: List[Int]) =>
     // don't make `None` too likely
     def pred(n: Int) = if (n < 0 && n % 2 == 0) None else Some(n % 2 == 0)
-    l.filterM(pred) must be_===(filterM(l, pred))
+    l.filterM(pred) must_===(filterM(l, pred))
   }
 
 }

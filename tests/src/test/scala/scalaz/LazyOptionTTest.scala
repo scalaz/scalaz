@@ -3,8 +3,9 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class LazyOptionTTest extends Spec {
+object LazyOptionTTest extends SpecLite {
 
   type LazyOptionTList[A] = LazyOptionT[List, A]
 

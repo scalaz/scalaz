@@ -3,8 +3,9 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class LazyEitherTTest extends Spec {
+object LazyEitherTTest extends SpecLite {
 
   // TODO duplication with LazyEitherTest
   implicit def LazyEitherEqual[A: Equal, B: Equal]: Equal[LazyEither[A, B]] = new Equal[LazyEither[A, B]] {

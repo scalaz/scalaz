@@ -5,8 +5,9 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import \&/._
 import syntax.contravariant._
+import org.scalacheck.Prop.forAll
 
-class TheseTest extends Spec {
+object TheseTest extends SpecLite {
   type TheseInt[a] = Int \&/ a
 
   checkAll(monad.laws[TheseInt])
@@ -15,8 +16,8 @@ class TheseTest extends Spec {
   checkAll(bitraverse.laws[\&/])
 
   "align unalign" should {
-    "List" ! prop { (a: List[Int], b: List[Int]) =>
-      unalignList(alignList(a, b)) must be_=== ((a, b))
+    "List" ! forAll { (a: List[Int], b: List[Int]) =>
+      unalignList(alignList(a, b)) must_=== ((a, b))
     }
   }
 

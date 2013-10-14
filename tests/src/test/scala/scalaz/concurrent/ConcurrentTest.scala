@@ -1,12 +1,11 @@
 package scalaz
 package concurrent
 
-import scalaz.Spec
 import java.util.concurrent._
-import org.specs2.execute.{Success, Failure, Result}
+import org.scalacheck.Prop
+import org.scalacheck.Prop.forAll
 
-class ConcurrentTest extends Spec{
-  import ConcurrentTest._
+object ConcurrentTest extends SpecLite{
 
   "Current test tools" should {
     "succeed on exhaused CountDownLatch" in {
@@ -25,23 +24,21 @@ class ConcurrentTest extends Spec{
 
     "run test with timeout" in {
       (withTimeout(2000) {
-        Success()
-      }).isSuccess must_== true
+        true
+      })
     }
 
     "fail when timeout occurs" in {
       (withTimeout(100) {
         Thread.sleep(2000)
-        Success()
-      }).isSuccess must_== false
+        ()
+      }).mustThrowA[RuntimeException]
     }
   }
-}
 
-object ConcurrentTest {
-  def assertCountDown(latch: CountDownLatch, hint: String, timeout: Long = 1000) : Result = {
-    if (latch.await(timeout, TimeUnit.MILLISECONDS)) Success()
-    else Failure("Failed to count down within " + timeout + " millis: " + hint)
+  def assertCountDown(latch: CountDownLatch, hint: String, timeout: Long = 1000) : Prop = {
+    if (latch.await(timeout, TimeUnit.MILLISECONDS)) ()
+    else sys.error("Failed to count down within " + timeout + " millis: " + hint)
   }
 
   def fork(f: => Unit) {
@@ -52,14 +49,18 @@ object ConcurrentTest {
     }.start()
   }
 
-  def withTimeout(timeout: Long)(test: => Result): Result = {
-    val latch = new CountDownLatch(1)
-    @volatile var result: Result = null
-    fork {
-      result = test
-      latch.countDown
+  final class WithTimeout(timeout: Long) {
+    def apply[A](test: => A): A = {
+      val latch = new CountDownLatch(1)
+      @volatile var result: A = null.asInstanceOf[A]
+      fork {
+        result = test
+        latch.countDown
+      }
+      if (latch.await(timeout, TimeUnit.MILLISECONDS)) result
+      else sys.error("Timeout occured, possible deadlock.")
     }
-    if (latch.await(timeout, TimeUnit.MILLISECONDS)) result
-    else Failure("Timeout occured, possible deadlock.")
   }
+
+  def withTimeout(timeout: Long) = new WithTimeout(timeout)
 }

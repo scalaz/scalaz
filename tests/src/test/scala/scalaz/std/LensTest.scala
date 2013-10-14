@@ -4,11 +4,12 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.{Prop, Gen, Arbitrary}
 import Lens.{lens => _, _}
 import Id._
+import org.scalacheck.Prop.forAll
 
-class LensTest extends Spec {
+object LensTest extends SpecLite {
 
   {
     implicit def lensArb = Arbitrary(Gen.value(Lens.lensId[Int]))
@@ -27,14 +28,9 @@ class LensTest extends Spec {
   checkAll("Map.member", lens.laws(Lens.lensId[Map[Boolean, Int]].member(true)))
   checkAll("sum", lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
 
-  "NumericLens" ^
-    "+=" ! {
-      check((i: Int) => (Lens.lensId[Int] += i).run(1) must be_=== ((i + 1) -> (i + 1)))
-    }^
-    "-=" ! {
-      check((i: Int) => (Lens.lensId[Int] -= i).run(1) must be_=== ((1 - i) -> (1 - i)))
-    }^
-    "*=" ! {
-      check((i: Int) => (Lens.lensId[Int] *= i).run(2) must be_=== ((i * 2) -> (i * 2)))
-    }
+  "NumericLens" should {
+    "+=" ! forAll((i: Int) => (Lens.lensId[Int] += i).run(1) must_=== ((i + 1) -> (i + 1)))
+    "-=" ! forAll((i: Int) => (Lens.lensId[Int] -= i).run(1) must_=== ((1 - i) -> (1 - i)))
+    "*=" ! forAll((i: Int) => (Lens.lensId[Int] *= i).run(2) must_=== ((i * 2) -> (i * 2)))
+  }
 }
