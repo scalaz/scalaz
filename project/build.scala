@@ -44,6 +44,7 @@ object build extends Build {
   )
 
   val latestScala211PreRelease = "2.11.0-M5"
+  def scalaCheckVersion = "1.10.1"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -284,7 +285,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.10.0",
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -298,7 +299,7 @@ object build extends Build {
       publishArtifact := false,
       libraryDependencies <++= (scalaVersion) { sv => Seq(
         "org.specs2" %% "specs2" % Dependencies.specs2(sv) % "test",
-        "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
+        "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
       ) }
     )
   )
