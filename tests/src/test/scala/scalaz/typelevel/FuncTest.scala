@@ -5,20 +5,26 @@ class FuncTest extends Spec {
   import std.AllInstances._
   import scalaz.syntax.typelevel.hlist._
 
-  val f = AppFuncU { (x: Int) => List(x + 1) }
-  val g = AppFuncU { (x: Int) => List(x, 5) }
-
   "andThenA" in {
+    val f = AppFuncU { (x: Int) => List(x + 1) }
+    val g = AppFuncU { (x: Int) => List(x, 5) }
+
     val test = f @>>> g
     test.runA(1) must be_===(List(List(2, 5))) 
   }
 
   "composeA" in {
+    val f = AppFuncU { (x: Int) => List(x + 1) }
+    val g = AppFuncU { (x: Int) => List(x, 5) }
+
     val test = f <<<@ g
     test.runA(1) must be_===(List(List(2), List(6))) 
   }
 
   "productA" in {
+    val f = AppFuncU { (x: Int) => List(x + 1) }
+    val g = AppFuncU { (x: Int) => List(x, 5) }
+
     val test = f @&&& g
     val result = test.runA(1)
     result match {
@@ -29,6 +35,9 @@ class FuncTest extends Spec {
   }
 
   "consA" in {
+    val f = AppFuncU { (x: Int) => List(x + 1) }
+    val g = AppFuncU { (x: Int) => List(x, 5) }
+
     val test = f :: g :: AppFunc.HNil
     val result = test.runA(1)
     result match {
