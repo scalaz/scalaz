@@ -8,8 +8,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
+import org.scalacheck.Prop.forAll
 
-class BigIntegerTest extends Spec {
+object BigIntegerTest extends SpecLite {
   checkAll("BigInteger", enum.laws[BigInteger])
   checkAll("BigInteger @@ Multiplication", order.laws[BigInteger @@ Multiplication])
   checkAll("BigInteger", monoid.laws[BigInteger])

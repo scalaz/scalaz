@@ -5,36 +5,37 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Prop.forAll
 
 
-class BKTreeTest extends Spec {
+object BKTreeTest extends SpecLite {
   implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))
 
   "string distance" in {
     BKTree[String]("kitten").containsApproximate("sitting", 3)
   }
 
-  "empty" ! prop {
+  "empty" ! forAll {
     (a: String) => !BKTree[String]().contains(a)
   }
 
-  "singleton" ! prop {
+  "singleton" ! forAll {
     (a: String) => BKTree[String](a).contains(a)
   }
 
-  "contains" ! prop {
+  "contains" ! forAll {
     (a: String, as: Set[String]) => BKTree[String](as.toSeq: _*).contains(a) == as.contains(a)
   }
 
-  "values" ! prop {
+  "values" ! forAll {
     (as: Set[String]) => BKTree[String](as.toSeq: _*).values.toSet == as
   }
 
-  "+ and -" ! prop {
+  "+ and -" ! forAll {
     (a:String, as: Set[String]) => (BKTree[String](as.toSeq: _*) + a - a).values.toSet == as
   }
 
-  "isEmpty" ! prop {
+  "isEmpty" ! forAll {
     (as: Set[String]) => BKTree[String](as.toSeq: _*).isEmpty == as.isEmpty
   }
 

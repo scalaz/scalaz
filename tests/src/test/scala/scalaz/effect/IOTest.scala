@@ -3,8 +3,9 @@ package effect
 
 import syntax.foldable._
 import std.stream._
+import org.scalacheck.Prop.forAll
 
-class IOTest extends Spec {
+object IOTest extends SpecLite {
   "IO" should {
     // as reported in <https://groups.google.com/d/msg/scalaz/BIhItmdejeI/zZ-fSH7ZzfwJ>
     // fix in bb4ebd650

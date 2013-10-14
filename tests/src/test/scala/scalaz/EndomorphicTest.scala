@@ -1,6 +1,7 @@
 package scalaz
+import org.scalacheck.Prop.forAll
 
-class EndomorphicTest extends Spec {
+object EndomorphicTest extends SpecLite {
 
   object instances{
     def semigroup[F[_, _]: Compose, A] = Semigroup[Endomorphic[F, A]]

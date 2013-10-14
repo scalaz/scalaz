@@ -5,8 +5,9 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.list._
 import std.option._
+import org.scalacheck.Prop.forAll
 
-class CodensityTest extends Spec {
+object CodensityTest extends SpecLite {
   implicit def arbCodensity[F[_], A](implicit A: Arbitrary[F[A]], M: Monad[F])
       : Arbitrary[Codensity[F, A]] =
     Functor[Arbitrary].map(A)(Codensity.rep(_))

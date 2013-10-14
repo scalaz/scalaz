@@ -3,9 +3,10 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.{Prop, Gen, Arbitrary}
+import org.scalacheck.Prop.forAll
 
-class KleisliTest extends Spec {
+object KleisliTest extends SpecLite {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
@@ -25,9 +26,9 @@ class KleisliTest extends Spec {
     }
   }
   
-  "mapK" ! prop {
+  "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) => 
-      Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must be_===(f(a).toList.map(_.toString))
+      Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])

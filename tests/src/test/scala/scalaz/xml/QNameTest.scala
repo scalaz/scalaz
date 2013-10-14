@@ -5,8 +5,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import QName._
+import org.scalacheck.Prop.forAll
 
-class QNameTest extends Spec {
+object QNameTest extends SpecLite {
   checkAll(order.laws[QName])
   checkAll(lens.laws(nameQNameL))
   checkAll(lens.laws(uriQNameL))

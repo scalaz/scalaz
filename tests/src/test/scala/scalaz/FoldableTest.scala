@@ -2,60 +2,59 @@ package scalaz
 
 import std.AllInstances._
 import syntax.foldable._
+import org.scalacheck.Prop.forAll
 
-import org.specs2.matcher._
-
-class FoldableTest extends Spec with OptionMatchers {
-  "to" ! prop {
+object FoldableTest extends SpecLite {
+  "to" ! forAll {
     (xs: List[Int]) =>
       val v: Vector[Int] = Foldable[List].to[Int, Vector](xs)
       v.toList must_== xs
   }
-  "maximum" ! prop {
+  "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
-        (xs.maximum) must beNone
+        (xs.maximum) must_==(None)
       else
-        (xs.maximum) must beSome(xs.max)
+        (xs.maximum) must_== Some((xs.max))
   }
-  "maximumOf" ! prop {
+  "maximumOf" ! forAll {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs maximumOf f) must beNone
+        (xs maximumOf f) must_==(None)
       else
-        (xs maximumOf f) must beSome((xs.iterator map f).max)
+        (xs maximumOf f) must_==(Some((xs.iterator map f).max))
   }
-  "maximumBy" ! prop {
+  "maximumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs maximumBy f) must beNone
+        (xs maximumBy f) must_== None
       else
-        (xs maximumBy f) must beSome((xs zip (xs map f)).maxBy(_._2)._1)
+        (xs maximumBy f) must_== Some((xs zip (xs map f)).maxBy(_._2)._1)
   }
-  "minimum" ! prop {
+  "minimum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
-        (xs.minimum) must beNone
+        (xs.minimum) must_== None
       else
-        (xs.minimum) must beSome(xs.min)
+        (xs.minimum) must_== Some(xs.min)
   }
-  "minimumOf" ! prop {
+  "minimumOf" ! forAll {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs minimumOf f) must beNone
+        (xs minimumOf f) must_== None
       else
-        (xs minimumOf f) must beSome((xs.iterator map f).min)
+        (xs minimumOf f) must_== Some((xs.iterator map f).min)
   }
-  "minimumBy" ! prop {
+  "minimumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs minimumBy f) must beNone
+        (xs minimumBy f) must_== None
       else
-        (xs minimumBy f) must beSome((xs zip (xs map f)).minBy(_._2)._1)
+        (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
   }
 
   "non-empty folding" should {
@@ -67,43 +66,43 @@ class FoldableTest extends Spec with OptionMatchers {
     import syntax.foldable1._
     import syntax.std.list._
 
-    "foldLeft1Opt" ! prop {
+    "foldLeft1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldLeft1Opt gt1) must beNone
-          case y :: ys => (xs foldLeft1Opt gt1) must beSome(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldLeft1Opt gt1) must_== None
+          case y :: ys => (xs foldLeft1Opt gt1) must_== Some(ys.foldLeft(y)(gt1))
         }
     }
 
-    "foldRight1Opt" ! prop {
+    "foldRight1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldRight1Opt gt2) must beNone
-          case _   => (xs foldRight1Opt gt2) must beSome(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldRight1Opt gt2) must_== None
+          case _   => (xs foldRight1Opt gt2) must_== Some(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
-    "foldl1Opt" ! prop {
+    "foldl1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldl1Opt gt1.curried) must beNone
-          case y :: ys => (xs foldl1Opt gt1.curried) must beSome(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldl1Opt gt1.curried) must_== None
+          case y :: ys => (xs foldl1Opt gt1.curried) must_== Some(ys.foldLeft(y)(gt1))
         }
     }
 
-    "foldr1Opt" ! prop {
+    "foldr1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldr1Opt gt2.curried) must beNone
-          case _   => (xs foldr1Opt gt2.curried) must beSome(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldr1Opt gt2.curried) must_== None
+          case _   => (xs foldr1Opt gt2.curried) must_== Some(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
-    "foldMap1Opt" ! prop {
+    "foldMap1Opt" ! forAll {
       (xs: List[String]) =>
         xs.toNel match {
-          case None      => (xs foldMap1Opt strlen) must beNone
-          case Some(nel) => (xs foldMap1Opt strlen) must beSome(nel.foldMap1(strlen))
+          case None      => (xs foldMap1Opt strlen) must_== None
+          case Some(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
         }
     }
 
@@ -111,14 +110,14 @@ class FoldableTest extends Spec with OptionMatchers {
 
   private val L = Foldable[List]
 
-  "product foldRight equivalence" ! prop {
+  "product foldRight equivalence" ! forAll {
     (l: List[Int], l2: List[Int]) =>
-      L.product(L).foldRight((l, l2), List.empty[Int])(_ :: _) must be_===(l ++ l2)
+      L.product(L).foldRight((l, l2), List.empty[Int])(_ :: _) must_===(l ++ l2)
   }
 
-  "product foldLeft equivalence" ! prop {
+  "product foldLeft equivalence" ! forAll {
     (l: List[Int], l2: List[Int]) =>
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
-       must be_===((l ++ l2).reverse))
+       must_===((l ++ l2).reverse))
   }
 }

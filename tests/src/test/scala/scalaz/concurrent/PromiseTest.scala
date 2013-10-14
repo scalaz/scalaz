@@ -6,17 +6,18 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop._
 import ConcurrentTest._
+import org.scalacheck.Prop.forAll
 
-class PromiseTest extends Spec {
+object PromiseTest extends SpecLite {
   implicit def promiseEqual[A: Equal] = Equal[A].contramap((_: Promise[A]).get)
 
   checkAll(monad.laws[Promise])
   checkAll(traverse.laws[Promise])
   checkAll(comonad.laws[Promise])
 
-  check(throws(Promise({throw new Error("x"); 1}).flatMap(_ => Promise(2)).get, classOf[Error]))
-  check(throws(Promise(0).filter(_ != 0).get, classOf[Promise.BrokenException]))
-  check(forAll((x: Int) => Promise(x).filter(_ => true).get === x))
+  "throw" ! (throws(Promise({throw new Error("x"); 1}).flatMap(_ => Promise(2)).get, classOf[Error]))
+  "filter broken" ! (throws(Promise(0).filter(_ != 0).get, classOf[Promise.BrokenException]))
+  "filter" ! (forAll((x: Int) => Promise(x).filter(_ => true).get must_=== x))
 
   class OhNo extends RuntimeException("OhNo!")
 

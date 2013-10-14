@@ -4,8 +4,9 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, indexedStateTArb => _, _}
 import std.AllInstances._
 import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Prop.forAll
 
-class ReaderWriterStateTTest extends Spec {
+object ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
   implicit val RWSOptIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int]](
     Gen.value(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),

@@ -3,8 +3,9 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class StoreTTest extends Spec {
+object StoreTTest extends SpecLite {
 
   implicit def storeTuple1IntEqual = new Equal[StoreT[Tuple1, Int, Int]] {
     def equal(a1: StoreT[Tuple1, Int, Int], a2: StoreT[Tuple1, Int, Int]) = (a1.run, a2.run) match {

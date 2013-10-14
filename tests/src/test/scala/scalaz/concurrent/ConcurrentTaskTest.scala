@@ -1,11 +1,10 @@
 package scalaz.concurrent
 
-import scalaz.{ Spec}
+import scalaz.SpecLite
 import scalaz.concurrent.Task._
 import java.util.concurrent.{ThreadFactory, Executors}
 import scala.collection.immutable.Queue
 import scala.concurrent.SyncVar
-import org.specs2.execute.{Success, Result}
 
 /**
  *
@@ -14,7 +13,7 @@ import org.specs2.execute.{Success, Result}
  * Time: 6:53 PM
  * (c) 2011-2013 Spinoco Czech Republic, a.s.
  */
-object ConcurrentTaskTest extends Spec {
+object ConcurrentTaskTest extends SpecLite {
 
   "Task" should {
 
@@ -31,7 +30,7 @@ object ConcurrentTaskTest extends Spec {
         def newThread(p1: Runnable) = new Thread(p1, forked)
       })
 
-      val sync = new SyncVar[Result]
+      val sync = new SyncVar[Boolean]
 
       (for {
         _ <- now(enqueue(1))
@@ -44,11 +43,11 @@ object ConcurrentTaskTest extends Spec {
 
       } yield ()).runAsync(_ => {
         enqueue(8)
-        sync.set(Success())
+        sync.set(true)
       })
       enqueue(9)
 
-      sync.get(5000).isDefined must_== true
+      sync.get(5000) must_== Some(true)
 
       val runned = q.toList
       
@@ -57,15 +56,11 @@ object ConcurrentTaskTest extends Spec {
       runned(1) must_== (2,current)
       
       //the after async must not be the last ever
-      runned.last._1 must_!=(9)
+      (runned.last._1 != 9) must_==(true)
       
       //the rest of tasks must be run off the forked thread
       runned.filter(_._2 == forked).map(_._1) must_== List(3,4,5,6,7,8)
-      
-      
-      
+
     }
-
   }
-
 }
