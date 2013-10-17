@@ -10,3 +10,7 @@ tags
 *#
 .DS_Store
 .history
+.cache
+.classpath
+.project
+.settings
