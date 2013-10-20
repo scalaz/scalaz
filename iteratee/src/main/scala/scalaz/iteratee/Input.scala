@@ -82,7 +82,7 @@ object Input extends InputInstances with InputFunctions {
 sealed abstract class InputInstances {
   import Input._
 
-  implicit val input: Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] = new Traverse[Input] with MonadPlus[Input] with Each[Input] with Length[Input] {
+  implicit val input: Traverse[Input] with Monad[Input] with Plus[Input] with Each[Input] with Length[Input] = new Traverse[Input] with Monad[Input] with Plus[Input] with Each[Input] with Length[Input] {
      override def length[A](fa: Input[A]): Int = fa.fold(
        empty = 0
        , el = _ => 1
@@ -106,10 +106,9 @@ sealed abstract class InputInstances {
        , eof = b
      )
      def bind[A, B](fa: Input[A])(f: A => Input[B]): Input[B] = fa flatMap (a => f(a))
-     def empty[A]: Input[A] = emptyInput
    }
 
-   implicit def inputMonoid[A](implicit A: Monoid[A]): Monoid[Input[A]] = new Monoid[Input[A]] {
+   implicit def inputSemigroup[A](implicit A: Semigroup[A]): Semigroup[Input[A]] = new Semigroup[Input[A]] {
      def append(a1: Input[A], a2: => Input[A]): Input[A] = a1.fold(
        empty = a2.fold(
          empty = emptyInput
@@ -123,8 +122,6 @@ sealed abstract class InputInstances {
        )
        , eof = eofInput
      )
-
-     def zero: Input[A] = emptyInput
    }
 
    implicit def inputEqual[A](implicit A: Equal[A]): Equal[Input[A]] = new Equal[Input[A]] {
