@@ -55,12 +55,18 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
+  val latestScala211PreRelease = "2.11.0-M5"
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
-    resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+
+    scalaBinaryVersion in update := (
+      if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
+    ),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
@@ -212,6 +218,17 @@ object build extends Build {
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
+  // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
+  val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
+    "scala-parser-combinators" -> {
+      case _ => "1.0.0-RC3"
+    }
+    ,
+    "scala-xml"                -> {
+      case _ => "1.0.0-RC5"
+    }
+  )
+
   lazy val core = Project(
     id = "core",
     base = file("core"),
@@ -220,6 +237,14 @@ object build extends Build {
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
+      },
+      libraryDependencies ++= {
+        val version = ScalaVersion(scalaVersion.value)
+        if (version.isModularised)
+          coreModuleDependencies211 map {
+            case (a, v) => "org.scala-lang.modules" %% a % v(version) intransitive()
+          }
+        else Nil
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
