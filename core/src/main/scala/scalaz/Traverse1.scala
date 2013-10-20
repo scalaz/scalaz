@@ -19,7 +19,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
     traverse1Impl(fa)(f)
 
   override def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B =
-    foldLeft1(traverse1Impl[Id, A, B](fa)(a => f(a)))(F.append(_, _))
+    foldLeft1(traverse1Impl[Id, A, B](fa)(f))(F.append(_, _))
 
   def traverse1[G[_], A, B](fa: F[A])(f: A => G[B])(implicit a: Apply[G]): G[F[B]] =
     traverse1Impl(fa)(f)
