@@ -199,7 +199,9 @@ object build extends Build {
         "scalaz.NonEmptyList.sortBy",
         "scalaz.NonEmptyList.sortWith",
         "scalaz.NonEmptyList.sorted",
-        "scalaz.concurrent.Future.timed"
+        "scalaz.concurrent.Future.timed",
+        "scalaz.syntax.typelevel.HLists.::",
+        "scalaz.syntax.typelevel.HLists.scalaz$syntax$typelevel$HLists$_setter_$::_="
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](

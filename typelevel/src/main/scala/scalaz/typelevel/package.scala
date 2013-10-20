@@ -55,7 +55,7 @@ package object typelevel {
   // mismatch if used in a pattern match.
   val KNil: _KNil.type = _KNil
 
-  def :^: = GenericCons
+  val :^: = GenericCons
 
   /** The empty [[scalaz.typelevel.Formatter]]. */
   def FNil[R : Monoid] =
