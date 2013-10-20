@@ -30,6 +30,10 @@ object Free extends FreeFunctions with FreeInstances {
     */
   type Sink[A, +B] = Free[({type f[+x] = (=> A) => x})#f, B]
 
+  // Note: this has been backported from the 7.1.x branch. It is private here because it can't be
+  // added to scalaz.std.function without breaking binary compatibility, and only affected
+  // this piece of code inside of scalaz.
+
   // See SI-7899. Scala 2.11 will no longer infer by-name types for type parameter `T` (which was unsound.)
   // Scala doesn't support abstraction over by-name-ness.
   // In Scala 2.11.0-M5 and below, a few places in `Free.scala` inferred the implicit
