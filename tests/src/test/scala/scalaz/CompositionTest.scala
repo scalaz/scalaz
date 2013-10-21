@@ -16,4 +16,7 @@ class CompositionTest extends Spec {
 
   implicit val eitherTuple2 = Bitraverse[Either].compose[Tuple2]
   checkAll(bitraverse.laws[({type λ[α, β]=Either[(α, β), (α, β)]})#λ])
+
+  implicit val listEitherBitraverse = Traverse[List].bicompose[Either]
+  checkAll(bitraverse.laws[({type λ[α, β] = List[Either[α, β]]})#λ])
 }
