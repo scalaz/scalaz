@@ -245,7 +245,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     excepting({ case a if !f(a) => onFailure})
 
   /** Compare two validations values for equality. */
-  def ===[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
+  def ===[EE >: E, AA >: A](x: Validation[EE, AA])(implicit EE: Equal[EE], EA: Equal[AA]): Boolean =
     this match {
       case Failure(e1) => x match {
         case Failure(e2) => Equal[EE].equal(e1, e2)
@@ -258,7 +258,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     }
 
   /** Compare two validations values for ordering. */
-  def compare[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit EE: Order[EE], EA: Order[AA]): Ordering =
+  def compare[EE >: E, AA >: A](x: Validation[EE, AA])(implicit EE: Order[EE], EA: Order[AA]): Ordering =
     this match {
       case Failure(e1) => x match {
         case Failure(e2) => Order[EE].apply(e1, e2)
