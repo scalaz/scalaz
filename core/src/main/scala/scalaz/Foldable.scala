@@ -207,12 +207,12 @@ trait Foldable[F[_]]  { self =>
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
-  def splitWith[A](fa: F[A])(p: A => Boolean): List[List[A]] =
-    foldRight(fa, (List[List[A]](), None : Option[Boolean]))((a, b) => {
+  def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
+    foldRight(fa, (List[NonEmptyList[A]](), None : Option[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
-        case (_, None) => List(List(a))
-        case (x, Some(q)) => if (pa == q) (a :: x.head) :: x.tail else List(a) :: x
+        case (_, None) => List(NonEmptyList(a))
+        case (x, Some(q)) => if (pa == q) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
       }, Some(pa))
     })._1
 
@@ -220,14 +220,14 @@ trait Foldable[F[_]]  { self =>
   /**
    * Selects groups of elements that satisfy p and discards others.
    */
-  def selectSplit[A](fa: F[A])(p: A => Boolean): List[List[A]] =
-    foldRight(fa, (List[List[A]](), false))((a, xb) => xb match {
+  def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
+    foldRight(fa, (List[NonEmptyList[A]](), false))((a, xb) => xb match {
       case (x, b) => {
         val pa = p(a)
         (if (pa)
           if (b)
-            (a :: x.head) :: x.tail else
-            List(a) :: x
+            (a <:: x.head) :: x.tail else
+            NonEmptyList(a) :: x
         else x, pa)
       }
     })._1
