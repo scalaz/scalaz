@@ -3,8 +3,9 @@ package typelevel
 
 import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import org.scalacheck.Prop.forAll
 
-class CompositionTest extends Spec {
+object CompositionTest extends SpecLite {
 
 
   checkAll("Identity composition", applicative.laws[TCNil#Composed])

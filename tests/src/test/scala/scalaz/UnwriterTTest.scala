@@ -5,8 +5,9 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.Arbitrary
+import org.scalacheck.Prop.forAll
 
-class UnwriterTTest extends Spec {
+object UnwriterTTest extends SpecLite {
 
   type UnwriterTOpt[W, A] = UnwriterT[Option, W, A]
   type UnwriterTOptInt[A] = UnwriterTOpt[Int, A]

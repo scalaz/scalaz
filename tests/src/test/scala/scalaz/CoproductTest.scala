@@ -3,8 +3,9 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class CoproductTest extends Spec {
+object CoproductTest extends SpecLite {
 
   checkAll(comonad.laws[({type λ[α]=Coproduct[NonEmptyList, Tree, α]})#λ])
   checkAll(traverse.laws[({type λ[α]=Coproduct[Option, List, α]})#λ])

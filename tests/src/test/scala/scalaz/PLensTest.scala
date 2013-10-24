@@ -1,13 +1,14 @@
 package scalaz
 
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class PLensTest extends Spec {
+object PLensTest extends SpecLite {
   import PLens._
 
   "list head" in {
-    listHeadPLens[Int].get(List(1, 2)) must be_===(Some(1))
-    listHeadPLens[Int].get(Nil) must be_===(None)
+    listHeadPLens[Int].get(List(1, 2)) must_===(Some(1))
+    listHeadPLens[Int].get(Nil) must_===(None)
   }
 
   object instances {

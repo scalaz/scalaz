@@ -2,8 +2,9 @@ package scalaz
 
 import syntax.all._
 import Inject._, Free.Return
+import org.scalacheck.Prop.forAll
 
-class InjectTest extends Spec {
+object InjectTest extends SpecLite {
   import std.AllInstances._
   import Test1Algebra._, Test2Algebra._, Test3Algebra._
 
@@ -83,7 +84,7 @@ class InjectTest extends Spec {
         c <- test3[T](Seq("c1", "c2"))
       } yield (a, b, c)
 
-    run(res) must be_===((3, 1, 2))
+    run(res) must_===((3, 1, 2))
   }
 
   "prj" in {
@@ -102,16 +103,16 @@ class InjectTest extends Spec {
     val res =
       distr(test1[T](Seq("a")) >> test2[T](Seq("b")) >> test3[T](Seq("c")))
 
-    (res == Some(Return[T, Int](3))) must be_===(true)
+    (res == Some(Return[T, Int](3))) must_===(true)
   }
 
   "apply in left" in {
     val fa = Test1(Seq("a"), Return[Test1Algebra, Int](_))
-    (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must be_===(true)
+    (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must_===(true)
   }
 
   "apply in right" in {
     val fa = Test2(Seq("a"), Return[Test2Algebra, Int](_))
-    (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must be_===(true)
+    (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must_===(true)
   }
 }

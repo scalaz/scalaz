@@ -1,8 +1,9 @@
 package scalaz
 package std.java
+import org.scalacheck.Prop.forAll
 
 
-class EnumTest extends Spec {
+object EnumTest extends SpecLite {
 
   import syntax.equal._
   import std.java.enum._

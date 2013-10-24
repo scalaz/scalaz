@@ -1,7 +1,8 @@
 package scalaz
+import org.scalacheck.Prop.forAll
 
 
-class IdTTest extends Spec {
+object IdTTest extends SpecLite {
 
   object instances {
     def functor[F[_] : Functor] = Functor[({type λ[α] = IdT[F, α]})#λ]

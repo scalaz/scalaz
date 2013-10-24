@@ -2,7 +2,8 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class DigitTest extends Spec {
+object DigitTest extends SpecLite {
   checkAll(order.laws[Digit])
 }

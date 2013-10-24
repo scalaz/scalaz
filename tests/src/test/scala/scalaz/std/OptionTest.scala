@@ -6,8 +6,9 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
 import org.scalacheck.Prop._
+import org.scalacheck.Prop.forAll
 
-class OptionTest extends Spec {
+object OptionTest extends SpecLite {
 
   checkAll("Option", order.laws[Option[Int]])
   checkAll("Option @@ First", order.laws[Option[Int] @@ First])
@@ -30,8 +31,7 @@ class OptionTest extends Spec {
   checkAll("Option @@ Min", monad.laws[MinOption])
   checkAll("Option @@ Max", monad.laws[MaxOption])
 
-  "None is less than anything else" in {
-    check { forAll { x: Option[Int] => Order[Option[Int]].greaterThanOrEqual(x, None) }}}
+  "None is less than anything else" ! forAll { (x: Option[Int]) => Order[Option[Int]].greaterThanOrEqual(x, None) }
 
   object instances {
     def equal[A: Equal] = Equal[Option[A]]

@@ -16,7 +16,7 @@ import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class FutureTest extends Spec {
+class FutureTest extends SpecLite {
 
   val duration: Duration = 1.seconds
 

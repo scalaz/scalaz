@@ -1,6 +1,7 @@
 package scalaz
+import org.scalacheck.Prop.forAll
 
-class LiskovTest extends Spec {
+object LiskovTest extends SpecLite {
 
   trait Co1[+ _]
 
@@ -18,7 +19,7 @@ class LiskovTest extends Spec {
 
   "apply" in {
     implicitly[String <:< AnyRef].apply(""): AnyRef
-    ok
+    ()
   }
 
   "lift" in {
@@ -34,6 +35,5 @@ class LiskovTest extends Spec {
 
     foo[String, AnyRef]
 
-    ok
   }
 }

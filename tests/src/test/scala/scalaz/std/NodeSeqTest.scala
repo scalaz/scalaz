@@ -8,8 +8,9 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.{ Gen, Arbitrary }
 
 import scala.xml.{ Node, NodeSeq, XML }
+import org.scalacheck.Prop.forAll
 
-class NodeSeqTest extends Spec {
+object NodeSeqTest extends SpecLite {
   {
     def nonEmptyAlphaStr: Gen[String] = for(cs <- Gen.listOf1(Gen.alphaChar)) yield cs.mkString
 
