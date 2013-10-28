@@ -7,7 +7,7 @@ import scalaz.typelevel.{HList, HCons}
 trait HLists {
 
   type ::[H, T <: HList] = HCons[H, T]
-  def :: = HCons
+  val :: = HCons
 
 }
 

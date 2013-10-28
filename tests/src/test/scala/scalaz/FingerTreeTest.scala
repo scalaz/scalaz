@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.{extendedAny => _, _}
 import FingerTree._
 import scalacheck.ScalazArbitrary._
 import std.anyVal._
