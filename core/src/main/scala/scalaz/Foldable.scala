@@ -29,6 +29,13 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
+  /** The composition of Foldable `F` and Bifoldable `G`, `[x, y]F[G[x, y]]`, is a Bifoldable */
+  def bicompose[G[_, _]: Bifoldable]: Bifoldable[({type l[a, b] = F[G[a, b]]})#l] =
+    new CompositionFoldableBifoldable[F, G] {
+      def F = self
+      def G = implicitly
+    }
+
   /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
   def product[G[_]](implicit G0: Foldable[G]): Foldable[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable[F, G] {
     implicit def F = self

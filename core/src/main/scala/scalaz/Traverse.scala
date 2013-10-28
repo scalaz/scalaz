@@ -25,6 +25,13 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     implicit def G = G0
   }
 
+  /** The composition of Traverse `F` and Bitraverse `G`, `[x, y]F[G[x, y]]`, is a Bitraverse */
+  def bicompose[G[_, _]: Bitraverse]: Bitraverse[({type λ[α, β]= F[G[α, β]]})#λ] =
+    new CompositionTraverseBitraverse[F, G] {
+      def F = self
+      def G = implicitly
+    }
+
   /**The product of Traverses `F` and `G`, `[x](F[x], G[x]])`, is a Traverse */
   def product[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = (F[α], G[α])})#λ] = new ProductTraverse[F, G] {
     implicit def F = self

@@ -142,3 +142,36 @@ private trait CompositionBitraverse[F[_, _], G[_, _]]
 
 }
 
+private trait CompositionFunctorBifunctor[F[_], G[_, _]] extends Bifunctor[({type λ[α, β]=F[G[α, β]]})#λ] {
+  def F: Functor[F]
+
+  def G: Bifunctor[G]
+
+  override def bimap[A, B, C, D](fab: F[G[A, B]])(f: A => C, g: B => D) =
+    F.map(fab)(G.bimap(_)(f, g))
+}
+
+private trait CompositionFoldableBifoldable[F[_], G[_, _]] extends Bifoldable[({type λ[α, β]=F[G[α, β]]})#λ] {
+  def F: Foldable[F]
+
+  def G: Bifoldable[G]
+
+  override def bifoldMap[A, B, M: Monoid](fa: F[G[A, B]])(f: A => M)(g: B => M) =
+    F.foldMap(fa)(G.bifoldMap(_)(f)(g))
+  override def bifoldRight[A, B, C](fa: F[G[A, B]], z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
+    F.foldRight(fa, z)(G.bifoldRight(_, _)(f)(g))
+  override def bifoldLeft[A, B, C](fa: F[G[A, B]], z: C)(f: (C, A) => C)(g: (C, B) => C) =
+    F.foldLeft(fa, z)((c, gab) => G.bifoldLeft(gab, c)(f)(g))
+}
+
+private trait CompositionTraverseBitraverse[F[_], G[_, _]]
+  extends Bitraverse[({type λ[α, β]=F[G[α, β]]})#λ]
+  with CompositionFunctorBifunctor[F, G]
+  with CompositionFoldableBifoldable[F, G] {
+  def F: Traverse[F]
+
+  def G: Bitraverse[G]
+
+  override def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[G[A, B]])(f: A => H[C], g: B => H[D]) =
+    F.traverseImpl(fab)(G.bitraverseF(f, g))
+}
