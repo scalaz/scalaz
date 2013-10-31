@@ -32,11 +32,14 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def flatMap[B](f: A => Task[B]): Task[B] =
     new Task(get flatMap {
       case -\/(e) => Future.now(-\/(e))
-      case \/-(a) => f(a).get
+      case \/-(a) => Task.Try(f(a)) match {
+        case e @ -\/(_) => Future.now(e)
+        case \/-(task) => task.get
+      }
     })
 
   def map[B](f: A => B): Task[B] =
-    new Task(get map { _ map f })
+    new Task(get map { _ flatMap {a => Task.Try(f(a))} })
 
   /** 'Catches' exceptions in the given task and returns them as values. */
   def attempt: Task[Throwable \/ A] =
