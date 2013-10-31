@@ -47,9 +47,39 @@ class TaskTest extends Spec {
     -\/(FailWhale)
   }
 
-  "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) => 
-    val t1 = Task { Thread.sleep(10); throw FailWhale; 42 } 
-    val t2 = Task { 43 } 
+  "catches exceptions in a mapped function" ! check {
+    Task { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in a mapped function, created by delay" ! check {
+    Task.delay { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in a mapped function, created with now" ! check {
+    Task.now { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in a flatMapped function" ! check {
+    Task { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in a flatMapped function, created with delay" ! check {
+    Task.delay { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in a flatMapped function, created with now" ! check {
+    Task.now { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    -\/(FailWhale)
+  }
+
+  "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) =>
+    val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
+    val t2 = Task { 43 }
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
   }
 
