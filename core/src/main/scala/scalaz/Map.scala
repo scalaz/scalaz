@@ -386,7 +386,7 @@ sealed abstract class ==>>[A, B] {
     (l, r) match {
       case (Tip(), r) => r
       case (l, Tip()) => l
-      case _ => if (l.size > r.size) {
+      case (l @ Bin(_, _, _, _), r @ Bin(_, _, _, _)) => if (l.size > r.size) {
         val ((km, m), l2) = deleteFindMax(l)
         balance(km, m, l2, r)
       }
@@ -396,26 +396,22 @@ sealed abstract class ==>>[A, B] {
       }
     }
 
-  private def deleteFindMax(t: A ==>> B): ((A, B), A ==>> B) =
+  private def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, l, Tip()) =>
         ((k,x), l)
-      case Bin(k, x, l, r) =>
+      case Bin(k, x, l, r @ Bin(_, _, _, _)) =>
         val (km, r2) = deleteFindMax(r)
         (km, balance(k, x, l, r2))
-      case Tip() =>
-        sys.error("deleteFindMax")
     }
 
-  private def deleteFindMin(t: A ==>> B): ((A, B), A ==>> B) =
+  private def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, Tip(), r) =>
         ((k, x), r)
-      case Bin(k, x, l, r) =>
+      case Bin(k, x, l @ Bin(_, _, _, _), r) =>
         val (km, l2) = deleteFindMin(l)
         (km, balance(k, x, l2, r))
-      case Tip() =>
-        sys.error("deleteFindMin")
     }
 
   /* Mappings */
@@ -1019,22 +1015,20 @@ trait MapFunctions {
   // Left rotations
   private def rotateL[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
     r match {
-      case Bin(_, _, ly, ry) =>
+      case r @ Bin(_, _, ly, ry) =>
         if (ly.size < ratio * ry.size) singleL(k, x, l, r)
         else doubleL(k, x, l, r)
       case Tip() =>
         sys.error("rotateL Tip")
     }
 
-  private def singleL[A, B](k1: A, x1: B, t1: A ==>> B, r: A ==>> B): A ==>> B =
+  private def singleL[A, B](k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
     r match {
       case Bin(k2, x2, t2, t3) =>
         Bin(k2, x2, Bin(k1, x1, t1, t2), t3)
-      case Tip() =>
-        sys.error("singleL Tip")
     }
 
-  private def doubleL[A, B](k1: A, x1: B, t1: A ==>> B, r: A ==>> B): A ==>> B =
+  private def doubleL[A, B](k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
     r match {
       case Bin(k2, x2, Bin(k3, x3, t2, t3), t4) =>
         Bin(k3, x3, Bin(k1, x1, t1, t2), Bin(k2, x2, t3, t4))
@@ -1045,22 +1039,20 @@ trait MapFunctions {
   // Right rotations
   private def rotateR[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
     l match {
-      case Bin(_, _, ly, ry) =>
+      case l @ Bin(_, _, ly, ry) =>
         if (ry.size < ratio * ly.size) singleR(k, x, l, r)
         else doubleR(k, x, l, r)
       case Tip() =>
         sys.error("rotateR Tip")
     }
 
-  private def singleR[A, B](k1: A, x1: B, l: A ==>> B, t3: A ==>> B): A ==>> B =
+  private def singleR[A, B](k1: A, x1: B, l: Bin[A, B], t3: A ==>> B): A ==>> B =
     l match {
       case Bin(k2, x2, t1, t2) =>
         Bin(k2, x2, t1, Bin(k1, x1, t2, t3))
-      case Tip() =>
-        sys.error("singleR Tip")
     }
 
-  private def doubleR[A, B](k1: A, x1: B, l: A ==>> B, t4: A ==>> B): A ==>> B =
+  private def doubleR[A, B](k1: A, x1: B, l: Bin[A, B], t4: A ==>> B): A ==>> B =
     l match {
       case Bin(k2, x2, t1, Bin(k3, x3, t2, t3)) =>
         Bin(k3, x3, Bin(k2, x2, t1, t2), Bin(k1, x1, t3, t4))

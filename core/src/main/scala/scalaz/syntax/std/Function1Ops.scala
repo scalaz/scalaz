@@ -2,6 +2,8 @@ package scalaz
 package syntax
 package std
 
+import Leibniz.===
+
 final class Function1Ops[T, R](self: T => R) {
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
@@ -19,8 +21,8 @@ final class Function1Ops[T, R](self: T => R) {
 
   def byName: (=> T) => R = t => self(t)
 
-  def endo(implicit ev: R =:= T): Endo[T] =
-    Endo.endo(t => ev(self(t)))
+  def endo(implicit ev: R === T): Endo[T] =
+    Endo.endo(ev.subst[({type λ[α] = T => α})#λ](self))
 
   def comparing(implicit o: Order[R]): (T, T) => Ordering =
     (t1, t2) => o.order(self(t1), self(t2))

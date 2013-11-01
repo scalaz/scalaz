@@ -2,7 +2,7 @@ package scalaz
 package scalacheck
 
 /**
- * Type class instances for types from <a href="https://github.com/rickynils/scalacheck">Scalacheck</a>
+ * Type class instances for types from [[https://github.com/rickynils/scalacheck Scalacheck]]
  */
 object ScalaCheckBinding {
   import org.scalacheck.{Gen, Arbitrary}

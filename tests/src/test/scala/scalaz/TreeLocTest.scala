@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 
 class TreeLocTest extends Spec {
 
-  checkAll("TreeLoc", equal.laws[Tree[Int]])
+  checkAll("TreeLoc", equal.laws[TreeLoc[Int]])
 
   {
     def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {

@@ -73,7 +73,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Run the given function on the left value. */
   def leftMap[C](f: A => C): (C \/ B) =
-    bimap(f, identity)
+    this match {
+      case -\/(a) => -\/(f(a))
+      case b @ \/-(_) => b
+    }
 
   /** Binary functor traverse on this disjunction. */
   def bitraverse[F[_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
@@ -84,7 +87,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
-    bimap(identity, g)
+    this match {
+      case \/-(a)     => \/-(g(a))
+      case b @ -\/(_) => b
+    }
 
   /** Traverse on the right of this disjunction. */
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
@@ -166,7 +172,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
   def getOrElse[BB >: B](x: => BB): BB =
-    toOption getOrElse x
+    this match {
+      case -\/(_) => x
+      case \/-(b) => b
+    }
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |[BB >: B](x: => BB): BB =

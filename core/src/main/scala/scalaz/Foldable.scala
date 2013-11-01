@@ -29,6 +29,13 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
+  /** The composition of Foldable `F` and Bifoldable `G`, `[x, y]F[G[x, y]]`, is a Bifoldable */
+  def bicompose[G[_, _]: Bifoldable]: Bifoldable[({type l[a, b] = F[G[a, b]]})#l] =
+    new CompositionFoldableBifoldable[F, G] {
+      def F = self
+      def G = implicitly
+    }
+
   /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
   def product[G[_]](implicit G0: Foldable[G]): Foldable[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable[F, G] {
     implicit def F = self
@@ -63,6 +70,10 @@ trait Foldable[F[_]]  { self =>
   /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */  
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
+
+  /** A version of `traverse_` that infers the type constructor `M`. */
+  final def traverseU_[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[Unit] =
+    traverse_[G.M, A, G.A](fa)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(G.TC)
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
@@ -203,12 +214,12 @@ trait Foldable[F[_]]  { self =>
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
-  def splitWith[A](fa: F[A])(p: A => Boolean): List[List[A]] =
-    foldRight(fa, (List[List[A]](), None : Option[Boolean]))((a, b) => {
+  def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
+    foldRight(fa, (List[NonEmptyList[A]](), None : Option[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
-        case (_, None) => List(List(a))
-        case (x, Some(q)) => if (pa == q) (a :: x.head) :: x.tail else List(a) :: x
+        case (_, None) => List(NonEmptyList(a))
+        case (x, Some(q)) => if (pa == q) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
       }, Some(pa))
     })._1
 
@@ -216,14 +227,14 @@ trait Foldable[F[_]]  { self =>
   /**
    * Selects groups of elements that satisfy p and discards others.
    */
-  def selectSplit[A](fa: F[A])(p: A => Boolean): List[List[A]] =
-    foldRight(fa, (List[List[A]](), false))((a, xb) => xb match {
+  def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
+    foldRight(fa, (List[NonEmptyList[A]](), false))((a, xb) => xb match {
       case (x, b) => {
         val pa = p(a)
         (if (pa)
           if (b)
-            (a :: x.head) :: x.tail else
-            List(a) :: x
+            (a <:: x.head) :: x.tail else
+            NonEmptyList(a) :: x
         else x, pa)
       }
     })._1

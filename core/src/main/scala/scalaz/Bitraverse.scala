@@ -22,7 +22,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     implicit def G = G0
   }
 
-  /**The product of Bitraverses `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bitraverse */
+  /**The product of Bitraverses `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bitraverse */
   def product[G[_, _]](implicit G0: Bitraverse[G]): Bitraverse[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBitraverse[F, G] {
     implicit def F = self
 

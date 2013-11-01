@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.{extendedAny => _, _}
 import scalacheck.ScalazArbitrary._
 import scalacheck.ScalazProperties._
 import std.anyVal._

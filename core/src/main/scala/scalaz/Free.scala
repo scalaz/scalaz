@@ -2,7 +2,8 @@ package scalaz
 
 import annotation.tailrec
 import Free._
-import std.function._
+// See explanation in comments on function1CovariantByName
+import std.function.{function1Covariant => _, function1CovariantByName, _}
 import std.tuple._
 
 // TODO report compiler bug when this appears just above FreeInstances:

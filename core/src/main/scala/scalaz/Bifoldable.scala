@@ -8,7 +8,7 @@ package scalaz
 trait Bifoldable[F[_, _]]  { self =>
   ////
 
-  /** Accumulate `A`s and `B`s in some unspecified order. */
+  /** Accumulate `A`s and `B`s */
   def bifoldMap[A,B,M](fa: F[A, B])(f: A => M)(g: B => M)(implicit F: Monoid[M]): M
 
   /** Accumulate to `C` starting at the "right".  `f` and `g` may be
@@ -31,7 +31,7 @@ trait Bifoldable[F[_, _]]  { self =>
     implicit def G = G0
   }
 
-  /**The product of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
+  /**The product of Bifoldables `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifoldable */
   def product[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBifoldable[F, G] {
     implicit def F = self
 
@@ -69,6 +69,20 @@ trait Bifoldable[F[_, _]]  { self =>
     def foldRight[A, B](fa: F[X, A], z: => B)(f: (A, => B) => B): B =
       bifoldRight(fa, z)((_, b) => b)(f)
   }
+
+  trait BifoldableLaw {
+    import std.vector._
+
+    def leftFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
+      Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
+                                  bifoldLeft(fa, Vector.empty[B \/ A])(_ :+ \/-(_))(_ :+ -\/(_)))
+
+    def rightFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
+      Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
+                                  bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
+  }
+
+  def bifoldableLaw = new BifoldableLaw {}
 
   ////
   val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }

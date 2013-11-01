@@ -1,7 +1,7 @@
 package scalaz
 
 /** @since 7.0.3 */
-sealed abstract class \&/[A, B] extends Product with Serializable {
+sealed abstract class \&/[+A, +B] extends Product with Serializable {
   import \&/._
 
   def isThis: Boolean =
@@ -115,7 +115,7 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
   def map[D](g: B => D): (A \&/ D) =
     bimap(identity, g)
 
-  def traverse[F[_]: Applicative, D](g: B => F[D]): F[A \&/ D] =
+  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
     this match {
       case This(a) =>
         Applicative[F].point(This(a))
@@ -128,7 +128,7 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
   def foreach(g: B => Unit): Unit =
     bimap(_ => (), g)
 
-  def flatMap[D](g: B => (A \&/ D))(implicit M: Semigroup[A]): (A \&/ D) =
+  def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
     this match {
       case This(a) =>
         This(a)
@@ -147,10 +147,10 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
 
   @deprecated("'These' forms no lawful Zip instances; use &&& instead",
               "7.1.0")
-  def zip[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
+  def zip[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
     &&&(t)
 
-  def &&&[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
+  def &&&[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
     for {
       b <- this
       c <- t
@@ -169,13 +169,10 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
     }
 
   def bifoldRight[Z](z: => Z)(f: (A, => Z) => Z)(g: (B, => Z) => Z): Z =
-    a match {
-      case None => z
-      case Some(aa) =>
-        f(aa, b match {
-          case None => z
-          case Some(bb) => g(bb, z)
-        })
+    this match{
+      case This(a)    => f(a, z)
+      case That(b)    => g(b, z)
+      case Both(a, b) => f(a, g(b, z))
     }
 
   def bifoldMap[M](f: A => M)(g: B => M)(implicit M: Semigroup[M]): M =
@@ -190,13 +187,13 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
   def toList: List[B] =
     b.toList
 
-  def getOrElse(bb: => B): B =
+  def getOrElse[BB >: B](bb: => BB): BB =
     b getOrElse bb
 
-  def |(bb: => B): B =
+  def |[BB >: B](bb: => BB): BB =
     getOrElse(bb)
 
-  def valueOr(x: A => B)(implicit M: Semigroup[B]): B =
+  def valueOr[BB >: B](x: A => BB)(implicit M: Semigroup[BB]): BB =
     this match {
       case This(a) =>
         x(a)
@@ -206,7 +203,7 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
         M.append(x(a), b)
     }
 
-  def ===(x: A \&/ B)(implicit EA: Equal[A], EB: Equal[B]): Boolean =
+  def ===[AA >: A, BB >: B](x: AA \&/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
     this match {
       case This(a) =>
         x match {
@@ -231,7 +228,7 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
         }
     }
 
-  def show(implicit SA: Show[A], SB: Show[B]): Cord =
+  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
     this match {
       case This(a) =>
         "This(" +: SA.show(a) :+ ")"
@@ -245,9 +242,15 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
 }
 
 object \&/ extends TheseInstances with TheseFunctions {
-  final case class This[A, B](aa: A) extends (A \&/ B)
-  final case class That[A, B](bb: B) extends (A \&/ B)
+  final case class This[A](aa: A) extends (A \&/ Nothing)
+  final case class That[B](bb: B) extends (Nothing \&/ B)
   final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
+
+  def apply[A, B](a: A, b: B): These[A, B] =
+    Both(a, b)
+
+  def unapply[A, B](t: Both[A, B]): Some[(A, B)] =
+    Some((t.aa, t.bb))
 }
 
 trait TheseFunctions {

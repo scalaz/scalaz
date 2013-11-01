@@ -17,6 +17,26 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   implicit def function1Comonad[A, R](implicit A0: Monoid[A]): Comonad[({type λ[α]=(A => α)})#λ] = new Function1Comonad[A, R] {
     implicit def M = A0
   }
+  // See SI-7899. Scala 2.11 will no longer infer by-name types for type parameter `T` (which was unsound.)
+  // Scala doesn't support abstraction over by-name-ness.
+  // In Scala 2.11.0-M5 and below, a few places in `Free.scala` inferred the implicit
+  // `function1Covariant[=> Any]`. In 2.11.0-M6 and above, they would infer this value.
+  // Those places have been change to explicitly use this instance so that we don't see different
+  // behaviour based on Scala version.
+  implicit def function1CovariantByName[T]: Monad[({type l[a] = ((=> T) => a)})#l] with Zip[({type l[a] = ((=> T) => a)})#l] with Unzip[({type l[a] = ((=> T) => a)})#l] with Distributive[({type l[a] = ((=> T) => a)})#l] = new Monad[({type l[a] = ((=> T) => a)})#l] with Zip[({type l[a] = ((=> T) => a)})#l] with Unzip[({type l[a] = ((=> T) => a)})#l] with Distributive[({type l[a] = ((=> T) => a)})#l] {
+    def point[A](a: => A): (=> T) => A = _ => a
+
+    def bind[A, B](fa: (=> T) => A)(f: A => (=> T) => B): (=> T) => B = (t) => f(fa(t))(t)
+
+    def zip[A, B](a: => (=> T) => A, b: => (=> T) => B): (=> T) => (A, B) =
+      t => (a(t), b(t))
+
+    def unzip[A, B](a: (=> T) => (A, B)): ((=> T) => A, (=> T) => B) =
+      (a(_)._1, a(_)._2)
+
+    def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => (=> T) => B): (=> T) => G[B] =
+      t => Functor[G].map(fa)(a => f(a)(t))
+  }
 }
 
 trait FunctionInstances extends FunctionInstances0 {

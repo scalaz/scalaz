@@ -220,7 +220,7 @@ object Rope {
   type FingerTreeIntPlus[A] = FingerTree[Int, A]
 
   implicit def wrapRope[A : ClassManifest](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
-  implicit def unwrapRope[A : ClassManifest](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.self
+  implicit def unwrapRope[A](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.self
   implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
 
