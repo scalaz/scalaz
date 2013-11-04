@@ -197,7 +197,10 @@ sealed trait Validation[+E, +A] {
 
   /** Return the success value of this validation or the given default if failure. Alias for `|` */
   def getOrElse[AA >: A](x: => AA): AA =
-    toOption getOrElse x
+    this match {
+      case Failure(_) => x
+      case Success(a) => a
+    }
 
   /** Return the success value of this validation or the given default if failure. Alias for `getOrElse` */
   def |[AA >: A](x: => AA): AA =
