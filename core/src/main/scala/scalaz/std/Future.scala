@@ -32,11 +32,8 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Monad[Future
   override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
 
   // override for actual parallel execution
-  override def ap[A, B](_fa: => Future[A])(_fab: => Future[A => B]) = {
-    val fa = _fa
-    val fab = _fab
-    for { a <- fa; ab <- fab } yield ab(a)
-  }
+  override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
+    fa zip fab map { case (a, fa) => fa(a) }
 }
 
 object scalaFuture extends FutureInstances
