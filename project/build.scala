@@ -322,7 +322,7 @@ object build extends Build {
   }
 
   lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
+    Seq("build.publish.user", "build.publish.password") map sys.props.get match {
       case Seq(Some(user), Some(pass)) =>
         Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
       case _                           =>
