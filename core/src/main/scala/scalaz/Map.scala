@@ -11,6 +11,8 @@ import std.option._
 import syntax.equal._
 import syntax.std.option._
 
+import annotation.tailrec
+
 /** @since 7.0.3 */
 sealed abstract class ==>>[A, B] {
   import ==>>._
@@ -150,7 +152,8 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def lookup(k: A)(implicit n: Order[A]): Option[B] =
+  @tailrec
+  final def lookup(k: A)(implicit n: Order[A]): Option[B] =
     this match {
       case Tip() =>
         none
@@ -165,7 +168,8 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def lookupAssoc(k: A)(implicit n: Order[A]): Option[(A, B)] =
+  @tailrec
+  final def lookupAssoc(k: A)(implicit n: Order[A]): Option[(A, B)] =
     this match {
       case Tip() =>
         none
@@ -205,6 +209,7 @@ sealed abstract class ==>>[A, B] {
     !member(k)
 
   def lookupIndex(k: A)(implicit o: Order[A]): Option[Int] = {
+    @tailrec
     def go(n: Int, m: A ==>> B): Option[Int] =
       m match {
         case Tip() =>
@@ -223,7 +228,8 @@ sealed abstract class ==>>[A, B] {
     go(0, this)
   }
 
-  def elemAt(i: Int): Option[(A, B)] =
+  @tailrec
+  final def elemAt(i: Int): Option[(A, B)] =
     this match {
       case Tip() =>
         none
@@ -260,7 +266,8 @@ sealed abstract class ==>>[A, B] {
   def deleteAt(i: Int) =
     updateAt(i, (A, B) => None)
 
-  def findMin: Option[(A, B)] =
+  @tailrec
+  final def findMin: Option[(A, B)] =
     this match {
       case Bin(kx, x, Tip(), _) =>
         (kx, x).some
@@ -270,7 +277,8 @@ sealed abstract class ==>>[A, B] {
         none
     }
 
-  def findMax: Option[(A, B)] =
+  @tailrec
+  final def findMax: Option[(A, B)] =
     this match {
       case Bin(kx, x, _, Tip()) =>
         (kx, x).some
@@ -776,7 +784,8 @@ sealed abstract class ==>>[A, B] {
     }
 
   // Utility functions
-  def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
+  @tailrec
+  final def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
     this match {
       case Tip() =>
         empty
@@ -790,7 +799,8 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Option[(A,B)], A ==>> B) =
+  @tailrec
+  final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Option[(A, B)], A ==>> B) =
     this match {
       case Tip() =>
         (none, empty)
