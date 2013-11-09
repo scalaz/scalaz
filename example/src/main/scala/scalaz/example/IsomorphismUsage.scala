@@ -2,6 +2,7 @@ package scalaz.example
 
 import scalaz._, Isomorphism._
 import std.list._
+import std.anyVal._
 import syntax.monoid._
 import syntax.monad._
 import syntax.equal._

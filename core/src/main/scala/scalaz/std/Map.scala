@@ -117,6 +117,7 @@ trait MapSubInstances extends MapSubInstances0 {
     def order(x: XMap[K, V], y: XMap[K, V]): Ordering = {
       import collection.immutable.IndexedSeq
       import indexedSeq._
+      import anyVal._
       import tuple._
       implicit val ok = Order[K].toScalaOrdering
       Semigroup[Ordering]

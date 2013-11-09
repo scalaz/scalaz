@@ -4,6 +4,7 @@ import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.list._
+import std.anyVal._
 import std.option._
 
 class CodensityTest extends Spec {

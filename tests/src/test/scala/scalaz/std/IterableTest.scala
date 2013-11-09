@@ -5,8 +5,8 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 class IterableTest extends Spec {
-
   import std.iterable._
+  import std.anyVal._
 
   checkAll(order.laws[Iterable[Boolean]].withProp("benchmark", order.scalaOrdering[Iterable[Boolean]]))
 }

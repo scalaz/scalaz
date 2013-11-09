@@ -260,6 +260,7 @@ private trait IndexedSeqSubOrder[A, Coll <: IndexedSeq[A] with IndexedSeqLike[A,
   implicit def A: Order[A]
 
   import Ordering._
+  import scalaz.std.anyVal._
 
   def order(a1: Coll, a2: Coll): Ordering = {
     val a1s = a1.length

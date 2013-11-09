@@ -74,7 +74,7 @@ object Order {
     def contramap[A, B](r: Order[A])(f: B => A): Order[B] = r.contramap(f)
   }
 
-  implicit def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
+  def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
     def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
   }
 

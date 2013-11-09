@@ -3,6 +3,7 @@ package scalaz.example
 object STUsage extends App {
   import scalaz._
   import std.list._
+  import std.string._
   import std.anyVal._
   import syntax.equal._
   import effect._
