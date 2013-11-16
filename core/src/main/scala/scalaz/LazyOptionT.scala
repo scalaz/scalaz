@@ -77,13 +77,17 @@ trait LazyOptionTInstances2 {
 }
 
 trait LazyOptionTInstances1 extends LazyOptionTInstances2 {
-  implicit def lazyOptionTApply[F[+_]](implicit F0: Apply[F]): Apply[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApply[F] {
+  @deprecated("Monad[F] will be required, and this instance removed, in 7.1",
+              "7.0.5")
+  def lazyOptionTApply[F[+_]](implicit F0: Apply[F]): Apply[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
 
 trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
-  implicit def lazyOptionTApplicative[F[+_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApplicative[F] {
+  @deprecated("Monad[F] will be required, and this instance removed, in 7.1",
+              "7.0.5")
+  def lazyOptionTApplicative[F[+_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }
   implicit def lazyOptionEqual[F[+_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] = Equal.equalBy((_: LazyOptionT[F, A]).run)
@@ -137,6 +141,10 @@ private[scalaz] trait LazyOptionTApplicative[F[+_]] extends Applicative[({type �
 
 private[scalaz] trait LazyOptionTMonad[F[+_]] extends Monad[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTApplicative[F] {
   implicit def F: Monad[F]
+
+  override def ap[A, B](fa: => LazyOptionT[F, A])(f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
+    LazyOptionT(F.bind(f.run)(_ fold (ff => F.map(fa.run)(_ map ((ff:A=>B)(_))),
+                                      F.point(LazyOption.lazyNone))))
 
   def bind[A, B](fa: LazyOptionT[F, A])(f: A => LazyOptionT[F, B]): LazyOptionT[F, B] = fa flatMap (a => f(a))
 }

@@ -36,7 +36,16 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
     G.map(F.traverse(run)(o => Traverse[Option].traverse(o)(f)))(OptionT(_))
   }
 
+  /** @see `app` */
+  @deprecated("Monad[F] will be required, and this fixed, in 7.1; use a different `Apply` combinator in 7.0.x",
+              "7.0.5")
   def ap[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
+    app(f)
+
+  /** Apply a function in the environment of both options, containing
+    * both `F`s.  It is not compatible with `Monad#bind`.
+    */
+  def app[B](f: => OptionT[F, A => B])(implicit F: Apply[F]): OptionT[F, B] =
     OptionT(F.apply2(f.run, run) {
       case (ff, aa) => optionInstance.ap(aa)(ff)
     })
@@ -83,7 +92,9 @@ trait OptionTInstances3 {
 }
 
 trait OptionTInstances2 extends OptionTInstances3 {
-  implicit def optionTApply[F[+_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
+  @deprecated("Monad[F] will be required, and this instance removed, in 7.1",
+              "7.0.5")
+  def optionTApply[F[+_]](implicit F0: Apply[F]): Apply[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApply[F] {
     implicit def F: Apply[F] = F0
   }
 }
@@ -92,7 +103,9 @@ trait OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTFoldable[F[+_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = OptionT[F, α]})#λ] = new OptionTFoldable[F] {
     implicit def F: Foldable[F] = F0
   }
-  implicit def optionTApplicative[F[+_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApplicative[F] {
+  @deprecated("Monad[F] will be required, and this instance removed, in 7.1",
+              "7.0.5")
+  def optionTApplicative[F[+_]](implicit F0: Applicative[F]): Applicative[({type λ[α] = OptionT[F, α]})#λ] = new OptionTApplicative[F] {
     implicit def F: Applicative[F] = F0
   }
 }
@@ -142,7 +155,7 @@ private[scalaz] trait OptionTFunctor[F[+_]] extends Functor[({type λ[α] = Opti
 private[scalaz] trait OptionTApply[F[+_]] extends Apply[({type λ[α] = OptionT[F, α]})#λ] with OptionTFunctor[F] {
   implicit def F: Apply[F]
 
-  override def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
+  override def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa app f
 }
 
 private[scalaz] trait OptionTApplicative[F[+_]] extends Applicative[({type λ[α] = OptionT[F, α]})#λ] with OptionTApply[F] {
@@ -153,6 +166,12 @@ private[scalaz] trait OptionTApplicative[F[+_]] extends Applicative[({type λ[α
 
 private[scalaz] trait OptionTMonad[F[+_]] extends Monad[({type λ[α] = OptionT[F, α]})#λ] with OptionTApplicative[F] {
   implicit def F: Monad[F]
+
+  override def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] =
+    OptionT(F.bind(f.run){
+              case None => F.point(None)
+              case Some(ff) => F.map(fa.run)(_ map ff)
+            })
 
   def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
 
