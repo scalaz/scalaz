@@ -5,8 +5,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
+import org.scalacheck.Prop.forAll
 
-class EitherTest extends Spec {
+object EitherTest extends SpecLite {
   checkAll("Either", order.laws[Either[Int, Int]])
   checkAll("Either.LeftProjection", order.laws[Either.LeftProjection[Int, Int]])
   checkAll("Either.LeftProjection @@ First", order.laws[Either.LeftProjection[Int, Int] @@ First])

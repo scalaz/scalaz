@@ -8,10 +8,9 @@ import org.scalacheck.Prop._
 
 import java.util.concurrent.{Executors, TimeoutException}
 import java.util.concurrent.atomic._
+import org.scalacheck.Prop.forAll
 
-import org.specs2.matcher.AnyMatchers
-
-class TaskTest extends Spec with AnyMatchers {
+object TaskTest extends SpecLite {
 
   val N = 10000
   val correct = (0 to N).sum
@@ -31,11 +30,11 @@ class TaskTest extends Spec with AnyMatchers {
     combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).run == correct }
   }
 
-  "traverse-based map == sequential map" ! prop { (xs: List[Int]) =>
+  "traverse-based map == sequential map" ! forAll { (xs: List[Int]) =>
     xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).run
   }
 
-  "gather-based map == sequential map" ! prop { (xs: List[Int]) =>
+  "gather-based map == sequential map" ! forAll { (xs: List[Int]) =>
     xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).run
   }
 
@@ -43,42 +42,42 @@ class TaskTest extends Spec with AnyMatchers {
     override def fillInStackTrace = this
   }
 
-  "catches exceptions" ! check {
+  "catches exceptions" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a mapped function" ! check {
+  "catches exceptions in a mapped function" ! {
     Task { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a mapped function, created by delay" ! check {
+  "catches exceptions in a mapped function, created by delay" ! {
     Task.delay { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a mapped function, created with now" ! check {
+  "catches exceptions in a mapped function, created with now" ! {
     Task.now { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a flatMapped function" ! check {
+  "catches exceptions in a flatMapped function" ! {
     Task { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a flatMapped function, created with delay" ! check {
+  "catches exceptions in a flatMapped function, created with delay" ! {
     Task.delay { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in a flatMapped function, created with now" ! check {
+  "catches exceptions in a flatMapped function, created with now" ! {
     Task.now { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
     -\/(FailWhale)
   }
 
-  "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) =>
+  "catches exceptions in parallel execution" ! forAll { (x: Int, y: Int) =>
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
     val t2 = Task { 43 }
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
@@ -129,8 +128,8 @@ class TaskTest extends Spec with AnyMatchers {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun must beLike {
-        case -\/(e) => e must_== ex
+      t.attemptRun mustMatch {
+        case -\/(e) => e must_== ex; true
       }
 
       t1v.get must_== 0
@@ -153,8 +152,8 @@ class TaskTest extends Spec with AnyMatchers {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun must beLike {
-        case -\/(e) => e must_== ex
+      t.attemptRun mustMatch {
+        case -\/(e) => e must_== ex; true
       }
 
       sleep(3000)
@@ -170,8 +169,8 @@ class TaskTest extends Spec with AnyMatchers {
 
       val t =  fork { Thread.sleep(3000); now(1) }(es)
 
-       t.attemptRunFor(100) must beLike {
-         case -\/(ex:TimeoutException) => ok
+       t.attemptRunFor(100) mustMatch {
+         case -\/(ex:TimeoutException) => true
        }
 
       es.shutdown()
@@ -184,8 +183,8 @@ class TaskTest extends Spec with AnyMatchers {
 
       val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
 
-      t.attemptRunFor(100) must beLike {
-        case -\/(ex:TimeoutException) => ok
+      t.attemptRunFor(100) mustMatch {
+        case -\/(ex:TimeoutException) => true
       }
 
       Thread.sleep(1500)
@@ -196,7 +195,7 @@ class TaskTest extends Spec with AnyMatchers {
     }
   }
 
-  "retries a retriable task n times" ! prop { xs: List[Byte] =>
+  "retries a retriable task n times" ! forAll { xs: List[Byte] =>
     import scala.concurrent.duration._
     var x = 0
     Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.run

@@ -3,8 +3,9 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class OptionTTest extends Spec {
+object OptionTTest extends SpecLite {
 
   type OptionTList[A] = OptionT[List, A]
   type OptionTOption[A] = OptionT[Option, A]

@@ -3,8 +3,10 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import org.scalacheck.Prop
+import org.scalacheck.Prop.forAll
 
-class StreamTest extends Spec {
+object StreamTest extends SpecLite {
   checkAll(equal.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
@@ -17,20 +19,20 @@ class StreamTest extends Spec {
   import std.stream.streamSyntax._
   import syntax.foldable._
 
-  "intercalate empty stream is flatten" ! check((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must be_===(a.flatten))
+  "intercalate empty stream is flatten" ! forAll((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must_===(a.flatten))
 
-  "intersperse then remove odd items is identity" ! prop {
+  "intersperse then remove odd items is identity" ! forAll {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
-      a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must be_===(a)
+      a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must_===(a)
   }
 
-  "intercalate is same as intersperse(s).flatten" ! check  {
+  "intercalate is same as intersperse(s).flatten" ! forAll {
     (a: Stream[Stream[Int]], b: Stream[Int]) =>
-      a.intercalate(b) must be_===(a.intersperse(b).flatten)
+      a.intercalate(b) must_===(a.intersperse(b).flatten)
   }
 
-  "intersperse vs benchmark" ! check  {
+  "intersperse vs benchmark" ! forAll {
     def intersperse[A](as: Stream[A], a: A): Stream[A] = {
       def loop(rest: Stream[A]): Stream[A] = rest match {
         case Stream.Empty => Stream.empty
@@ -41,28 +43,28 @@ class StreamTest extends Spec {
         case h #:: t      => h #:: loop(t)
       }
     }
-    (a: Stream[Int], b: Int) => (a.intersperse(b) must be_===(intersperse(a, b)))
+    (a: Stream[Int], b: Int) => (a.intersperse(b) must_===(intersperse(a, b)))
   }
 
 
-  "foldl is foldLeft" ! prop {(rnge: Stream[List[Int]]) =>
+  "foldl is foldLeft" ! forAll {(rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldLeft(List[Int]())(_++_)
-      must be_===(F.foldLeft(rnge, List[Int]())(_++_)))
+      must_===(F.foldLeft(rnge, List[Int]())(_++_)))
   }
 
-  "foldr is foldRight" ! prop {(rnge: Stream[List[Int]]) =>
+  "foldr is foldRight" ! forAll {(rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldRight(List[Int]())(_++_)
-      must be_===(F.foldRight(rnge, List[Int]())(_++_)))
+      must_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 
   "no stack overflow infinite stream foldMap" in {
-    Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must be_===(false)
+    Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(false)
   }
 
   "no stack overflow infinite stream foldRight" in {
-    Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must be_===(true)
+    Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===(true)
   }
 
   "zipL" in {
@@ -71,9 +73,9 @@ class StreamTest extends Spec {
     val finite = Stream.range(0, size)
     val F = Traverse[Stream]
     F.zipL(infinite, infinite)
-    F.zipL(finite, infinite).length must be_===(size)
-    F.zipL(finite, infinite) must be_===((finite zip infinite).map{x => (x._1, Option(x._2))})
-    F.zipL(infinite, finite).take(1000).length must be_===(1000)
-    F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must be_===(size)
+    F.zipL(finite, infinite).length must_===(size)
+    F.zipL(finite, infinite) must_===((finite zip infinite).map{x => (x._1, Option(x._2))})
+    F.zipL(infinite, finite).take(1000).length must_===(1000)
+    F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_===(size)
   }
 }

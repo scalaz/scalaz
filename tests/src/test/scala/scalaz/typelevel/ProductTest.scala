@@ -5,8 +5,9 @@ import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Prop.forAll
 
-class ProductTest extends Spec {
+object ProductTest extends SpecLite {
 
   import syntax.typelevel.all._
 

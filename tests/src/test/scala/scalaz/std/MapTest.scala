@@ -2,16 +2,17 @@ package scalaz
 package std
 
 import std.AllInstances._
-import org.scalacheck.Arbitrary, Arbitrary.arbitrary
+import org.scalacheck.{Prop, Arbitrary}, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import scala.collection.immutable.{Map => SMap, MapLike}
 import scala.math.{Ordering => SOrdering}
+import org.scalacheck.Prop.forAll
 
 abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], BKC[_]]
   (dict: MapSubInstances with MapSubFunctions{
      type XMap[A, B] = Map[A, B]
      type BuildKeyConstraint[A] = BKC[A]
-   })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String]) extends Spec {
+   })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String]) extends SpecLite {
   import dict._
 
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
@@ -38,7 +39,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
     def equal(a1: NotNatural, a2: NotNatural): Boolean = a1.id == a2.id
   }
 
-  "map ordering" ! prop {
+  "map ordering" ! forAll {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {
@@ -58,5 +59,5 @@ private object DIContravariant extends Contravariant[({type λ[α] = DummyImplic
   def contramap[A, B](fa: DummyImplicit)(f: B => A) = fa
 }
 
-class MapTest extends XMapTest[SMap, ({type λ[α] = DummyImplicit})#λ
+object MapTest extends XMapTest[SMap, ({type λ[α] = DummyImplicit})#λ
     ](std.map)(DIContravariant, implicitly, implicitly)

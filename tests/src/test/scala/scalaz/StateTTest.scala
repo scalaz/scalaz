@@ -3,8 +3,9 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class StateTTest extends Spec {
+object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
@@ -29,26 +30,26 @@ class StateTTest extends Spec {
   }
 
   "monadState.state" in {
-    instances.monadState[Boolean].state(42).run(true) must be_===((true, 42))
+    instances.monadState[Boolean].state(42).run(true) must_===((true, 42))
   }
 
   "monadState.constantState" in {
-    instances.monadState[Boolean].constantState(42, false).run(true) must be_===((false, 42))
+    instances.monadState[Boolean].constantState(42, false).run(true) must_===((false, 42))
   }
 
   "monadState.get" in {
-    instances.monadState[Boolean].get.run(true) must be_===((true, true))
+    instances.monadState[Boolean].get.run(true) must_===((true, true))
   }
 
   "monadState.gets" in {
-    instances.monadState[Int].gets { _ + 1 }.run(10) must be_===((10, 11))
+    instances.monadState[Int].gets { _ + 1 }.run(10) must_===((10, 11))
   }
 
   "monadState.put" in {
-    instances.monadState[Int].put(20).run(10) must be_===((20, ()))
+    instances.monadState[Int].put(20).run(10) must_===((20, ()))
   }
 
   "monadState.modify" in {
-    instances.monadState[Int].modify { _ + 1 }.run(10) must be_===((11, ()))
+    instances.monadState[Int].modify { _ + 1 }.run(10) must_===((11, ()))
   }
 }

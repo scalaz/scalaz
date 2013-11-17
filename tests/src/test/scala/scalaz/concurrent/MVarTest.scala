@@ -1,12 +1,12 @@
 package scalaz
 package concurrent
 
-import scalaz.Spec
 
 import scalaz.concurrent.MVar.newEmptyMVar
 import scalaz.effect.IO
+import org.scalacheck.Prop.forAll
 
-class MVarTest extends Spec {
+object MVarTest extends SpecLite {
 
   def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] =
     IO { s(f.unsafePerformIO); () }

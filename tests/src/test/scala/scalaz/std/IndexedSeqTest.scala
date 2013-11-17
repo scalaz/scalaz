@@ -9,8 +9,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
 import syntax.std._
+import org.scalacheck.Prop.forAll
 
-class IndexedSeqTest extends Spec {
+object IndexedSeqTest extends SpecLite {
   implicit def indexedSeqArb[A: Arbitrary] =
     Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toIndexedSeq))
 
@@ -28,76 +29,76 @@ class IndexedSeqTest extends Spec {
 
   private def evenp(x: Int): Boolean = x % 2 == 0
 
-  "filterM" ! prop {
+  "filterM" ! forAll {
     (xs: IndexedSeq[Int]) => xs.filterM[Id](evenp) == xs.filter(_ % 2 == 0)
   }
 
-  "initz" ! prop {
+  "initz" ! forAll {
     (xs: IndexedSeq[Int]) =>
-      initz(xs) must be_===(xs.inits.toIndexedSeq.reverse)
+      initz(xs) must_===(xs.inits.toIndexedSeq.reverse)
   }
 
-  "tailz" ! prop {
-    (xs: IndexedSeq[Int]) => tailz(xs) must be_===(xs.tails.toIndexedSeq)
+  "tailz" ! forAll {
+    (xs: IndexedSeq[Int]) => tailz(xs) must_===(xs.tails.toIndexedSeq)
   }
 
-  "spanM" ! prop {
+  "spanM" ! forAll {
     (xs: IndexedSeq[Int]) =>
       (xs.spanM[Id](evenp)
-       must be_===(xs.takeWhile(evenp) -> xs.dropWhile(evenp)))
+       must_===(xs.takeWhile(evenp) -> xs.dropWhile(evenp)))
   }
 
-  "takeWhileM" ! prop {
+  "takeWhileM" ! forAll {
     (xs: IndexedSeq[Int]) =>
-      takeWhileM[Int, Id](xs)(evenp) must be_===(xs takeWhile evenp)
+      takeWhileM[Int, Id](xs)(evenp) must_===(xs takeWhile evenp)
   }
 
-  "groupWhen" ! prop {
+  "groupWhen" ! forAll {
     (xs: IndexedSeq[Int]) =>
       (xs.groupWhen(_ < _)
-       must be_===(list.groupWhen(xs.toList)(_ < _)
+       must_===(list.groupWhen(xs.toList)(_ < _)
                    .map(_.toIndexedSeq).toIndexedSeq))
   }
 
-  "partitionM" ! prop {
+  "partitionM" ! forAll {
     (xs: IndexedSeq[Int]) =>
       val (evens, odds) = xs.partitionM[Id](evenp)
-      (evens.toSet & odds.toSet) must be_===(Set[Int]())
+      (evens.toSet & odds.toSet) must_===(Set[Int]())
       (evens.filter(evenp) ++
-       odds.filter(i => !evenp(i))).toSet must be_===(xs.toSet)
+       odds.filter(i => !evenp(i))).toSet must_===(xs.toSet)
   }
 
-  "findM" ! prop {
+  "findM" ! forAll {
     (xs: IndexedSeq[Int]) =>
       val i = xs indexWhere evenp
       type W[A] = Writer[IndexedSeq[Int], A]
       val wxs = findM[Int, W](xs)(x =>
         WriterT.writer(IndexedSeq(x) -> evenp(x)))
-      (wxs.written, wxs.value) must be_==={
+      (wxs.written, wxs.value) must_==={
         if (i < 0) (xs, None)
         else (xs take (i+1), Some(xs(i)))
       }
   }
 
-  "mapAccumLeft" ! prop {
+  "mapAccumLeft" ! forAll {
     (xs: IndexedSeq[Int]) =>
       mapAccumLeft(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
-        (c :+ a, a)) must be_===(xs, xs)
+        (c :+ a, a)) must_===(xs, xs)
   }
 
-  "mapAccumRight" ! prop {
+  "mapAccumRight" ! forAll {
     (xs: IndexedSeq[Int]) =>
       mapAccumRight(xs)(IndexedSeq[Int](), (c: IndexedSeq[Int], a) =>
-        (c :+ a, a)) must be_===(xs.reverse, xs)
+        (c :+ a, a)) must_===(xs.reverse, xs)
   }
 
   "Issue #266" in {
     import syntax.std.list._
-    List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
-    List(1, 2, 4).toIndexedSeq.groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must be_===(2)
+    List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must_===(2)
+    List(1, 2, 4).toIndexedSeq.groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must_===(2)
   }
 
-  "index" ! prop { (xs: IndexedSeq[Int], n: Int) =>
-    (xs index n) must be_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
+  "index" ! forAll { (xs: IndexedSeq[Int], n: Int) =>
+    (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 }

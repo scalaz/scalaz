@@ -1,40 +1,41 @@
 package scalaz
+import org.scalacheck.Prop.forAll
 
 
-class BooleanTest extends Spec {
+object BooleanTest extends SpecLite {
   "boolean functions" in {
 
     import scalaz.std.{boolean => b}
 
-    "and" ! prop { (p:Boolean, q:Boolean) =>
+    "and" ! forAll { (p:Boolean, q:Boolean) =>
       b.conjunction(p, q) == (p && q)
     }
 
-    "or" ! prop { (p:Boolean, q:Boolean) =>
+    "or" ! forAll { (p:Boolean, q:Boolean) =>
       b.disjunction(p, q) == (p || q)
     }
 
-    "nand" ! prop { (p:Boolean, q:Boolean) =>
+    "nand" ! forAll { (p:Boolean, q:Boolean) =>
       b.nand(p, q) == !(p && q)
     }
 
-    "nor" ! prop { (p:Boolean, q:Boolean) =>
+    "nor" ! forAll { (p:Boolean, q:Boolean) =>
       b.nor(p, q) == !(p || q)
     }
 
-    "conditional" ! prop { (p:Boolean, q:Boolean) =>
+    "conditional" ! forAll { (p:Boolean, q:Boolean) =>
       b.conditional(p, q)  == (!p || q)
     }
 
-    "inverse conditional" ! prop { (p:Boolean, q:Boolean) =>
+    "inverse conditional" ! forAll { (p:Boolean, q:Boolean) =>
       b.inverseConditional(p, q)  == (p || !q)
     }
 
-    "negate conditional" ! prop { (p:Boolean, q:Boolean) =>
+    "negate conditional" ! forAll { (p:Boolean, q:Boolean) =>
       b.negConditional(p, q)  == (p && !q)
     }
 
-    "negate inverse conditional" ! prop { (p:Boolean, q:Boolean) =>
+    "negate inverse conditional" ! forAll { (p:Boolean, q:Boolean) =>
       b.negInverseConditional(p, q) == (!p && q)
     }
   }

@@ -3,8 +3,9 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
+import org.scalacheck.Prop.forAll
 
-class StringTest extends Spec {
+object StringTest extends SpecLite {
   checkAll(monoid.laws[String])
   checkAll(isEmpty.laws[({type λ[α] = String})#λ])
 
@@ -14,8 +15,8 @@ class StringTest extends Spec {
     import string.parseBoolean
     implicit val s = Show.showFromToString[IllegalArgumentException]
     implicit val e = Equal.equalA[IllegalArgumentException]
-    parseBoolean("true") must be_===(Validation.success(true))
-    parseBoolean("false") must be_===(Validation.success(false))
-    parseBoolean("1").isSuccess must be_===(false)
+    parseBoolean("true") must_===(Validation.success(true))
+    parseBoolean("false") must_===(Validation.success(false))
+    parseBoolean("1").isSuccess must_===(false)
   }
 }

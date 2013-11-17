@@ -4,8 +4,9 @@ import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import Cord._
+import org.scalacheck.Prop.forAll
 
-class CordTest extends Spec {
+object CordTest extends SpecLite {
   "split() must result in two cords whose summary length is equal to the length of original cord " in {
     val x = Cord("Once upon a midnight dreary")
     for (i <- 0 until x.length) {
@@ -30,13 +31,13 @@ class CordTest extends Spec {
     x.tail.tail.tail.toString must_== ""
   }
 
-  "isEmpty() must indicate string is empty" ! prop { (a:Cord, b:Cord) =>
+  "isEmpty() must indicate string is empty" ! forAll { (a:Cord, b:Cord) =>
     a.isEmpty == a.toString.isEmpty &&
     b.isEmpty == b.toString.isEmpty &&
     (a ++ b).isEmpty == (a.toString.isEmpty && b.toString.isEmpty)
   }
 
-  "nonEmpty() must indicate string is non-empty" ! prop { (a:Cord, b:Cord) =>
+  "nonEmpty() must indicate string is non-empty" ! forAll { (a:Cord, b:Cord) =>
     val c = a ++ b
     a.nonEmpty == !a.toString.isEmpty &&
     b.nonEmpty == !b.toString.isEmpty &&

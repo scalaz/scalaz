@@ -73,7 +73,7 @@ object build extends Build {
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += Tests.Argument("sequential"),
+    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1"),
 
     (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
 
@@ -297,20 +297,9 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      libraryDependencies <++= (scalaVersion) { sv => Seq(
-        "org.specs2" %% "specs2" % Dependencies.specs2(sv) % "test",
-        "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
-      ) }
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
     )
   )
-
-  object Dependencies {
-    def specs2(scalaVersion: String) =
-      if (scalaVersion startsWith "2.9")
-        "1.12.4.1"
-      else
-        "1.12.3"
-  }
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>
