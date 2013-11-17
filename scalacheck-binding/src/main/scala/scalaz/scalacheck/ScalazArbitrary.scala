@@ -20,7 +20,7 @@ object ScalazArbitrary {
   /** @since 7.0.3 */
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
-      arbitrary[A].map2(arbitrary[B])(\&/.Both(_, _)),
+      ^(arbitrary[A], arbitrary[B])(\&/.Both(_, _)),
       arbitrary[A].map(\&/.This(_)),
       arbitrary[B].map(\&/.That(_))
     ))
@@ -29,7 +29,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
-    Functor[Arbitrary].map(arbArray[A])(ImmutableArray.fromArray[A](_))
+    Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
   implicit def ValueArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Value[A]] = Functor[Arbitrary].map(fa)(a => Value(a))
   implicit def NameArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Name[A]] = Functor[Arbitrary].map(fa)(a => Name(a))
@@ -152,14 +152,14 @@ object ScalazArbitrary {
 
   implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
     arbitrary[A].map(one(_): Finger[V, A]),
-    arbitrary[A].map2(arbitrary[A])(two(_, _): Finger[V, A]),
-    arbitrary[A].map3(arbitrary[A], arbitrary[A])(three(_, _, _): Finger[V, A]),
-    arbitrary[A].map4(arbitrary[A], arbitrary[A], arbitrary[A])(four(_, _, _, _): Finger[V, A])
+    ^(arbitrary[A], arbitrary[A])(two(_, _): Finger[V, A]),
+    ^^(arbitrary[A], arbitrary[A], arbitrary[A])(three(_, _, _): Finger[V, A]),
+    ^^^(arbitrary[A], arbitrary[A], arbitrary[A], arbitrary[A])(four(_, _, _, _): Finger[V, A])
   ))
 
   implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
-    arbitrary[A].map2(arbitrary[A])((a, b) => node2[V, A](a, b)),
-    arbitrary[A].map3(arbitrary[A], arbitrary[A])((a, b, c) => node3[V, A](a, b, c))
+    ^(arbitrary[A], arbitrary[A])(node2[V, A](_, _)),
+    ^^(arbitrary[A], arbitrary[A], arbitrary[A])(node3[V, A](_, _, _))
   ))
 
   implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
@@ -168,7 +168,10 @@ object ScalazArbitrary {
       case 1 => arbitrary[A].map(single[V, A](_))
       case n => {
         val nextSize = n.abs / 2
-        arbitrary[Finger[V, A]].map3(fingerTree[Node[V, A]](nextSize), arbitrary[Finger[V, A]])(deep[V, A](_, _, _))
+        ^^(FingerArbitrary[V, A].arbitrary,
+          fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A], implicitly),
+          FingerArbitrary[V, A].arbitrary
+        )(deep[V, A](_, _, _))
       }
     }
     Gen.sized(fingerTree[A] _)
@@ -351,7 +354,7 @@ object ScalazArbitrary {
       arbitrary[Int].map(n => nthChildOp(n)),
       ^(arbitrary[Cursor => Cursor], arbitrary[OpDescription])(succeedingOp),
       ^(arbitrary[Cursor => Option[Cursor]], arbitrary[OpDescription])(genericOp),
-      failedComposeOp, leftOp, rightOp, firstChildOp, lastChildOp, remove, removeLeftOp, removeRightOp, parentOp, rootOp, nextDepthFirstOp
+      oneOf(failedComposeOp, leftOp, rightOp, firstChildOp, lastChildOp, remove, removeLeftOp, removeRightOp, parentOp, rootOp, nextDepthFirstOp)
     ))
   }
 
@@ -364,8 +367,8 @@ object ScalazArbitrary {
   implicit def iterateeInputArbitrary[A: Arbitrary]: Arbitrary[scalaz.iteratee.Input[A]] = {
     import scalaz.iteratee.Input._
     Arbitrary(Gen.oneOf(
-      emptyInput[A],
-      eofInput[A],
+      Gen.const(emptyInput[A]),
+      Gen.const(eofInput[A]),
       arbitrary[A].map(e => elInput(e))
     ))
   }
