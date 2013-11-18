@@ -880,7 +880,19 @@ object ==>> extends MapInstances with MapFunctions {
   }
 }
 
-sealed abstract class MapInstances {
+sealed abstract class MapInstances0 {
+
+  implicit def mapBind[S: Order]: Bind[({type λ[α] = ==>>[S, α]})#λ] =
+    new Bind[({type λ[α] = ==>>[S, α]})#λ] {
+      override def map[A, B](fa: S ==>> A)(f: A => B) =
+        fa map f
+
+      def bind[A, B](fa: S ==>> A)(f: A => (S ==>> B)) =
+        fa.mapOptionWithKey((k, v) => f(v).lookup(k))
+    }
+}
+
+sealed abstract class MapInstances extends MapInstances0 {
   import ==>>._
 
   import std.list._
