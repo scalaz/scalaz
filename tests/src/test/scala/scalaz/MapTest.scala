@@ -547,5 +547,14 @@ object MapTest extends SpecLite {
 
   type IntMap[A] = Int ==>> A
   checkAll(traverse.laws[IntMap])
+  checkAll(bind.laws[IntMap])
   checkAll(bifoldable.laws[==>>])
+
+  object instances {
+    def bind[A: Order] = Bind[({type λ[α] = A ==>> α})#λ]
+    def traverse[A] = Traverse[({type λ[α] = A ==>> α})#λ]
+
+    // checking absence of ambiguity
+    def functor[A: Order] = Functor[({type λ[α] = A ==>> α})#λ]
+  }
 }

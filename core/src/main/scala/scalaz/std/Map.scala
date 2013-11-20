@@ -78,10 +78,11 @@ trait MapSubInstances extends MapSubInstances0 {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] = new Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] with MapFoldable[K] {
+  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] with Bind[({type F[V] = XMap[K,V]})#F] = new Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] with Bind[({type F[V] = XMap[K,V]})#F] with MapFoldable[K] {
     def empty[V] = fromSeq[K, V]()
     def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
     def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
+    def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
 
     def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
       G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
