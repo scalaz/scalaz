@@ -3,6 +3,8 @@ package scalaz
 ////
 /**
  * [[scalaz.Applicative]] without `point`.
+ *
+ * @see [[scalaz.Apply.ApplyLaw]]
  */
 ////
 trait Apply[F[_]] extends Functor[F] { self =>
@@ -131,6 +133,14 @@ trait Apply[F[_]] extends Functor[F] { self =>
         case (-\/(f), -\/(a)) => -\/(self.ap(a)(f))
       }
     }
+
+  trait ApplyLaw extends FunctorLaw {
+    /** Lifted functions can be fused. */
+    def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]) =
+      FC.equal(ap(ap(fa)(fab))(fbc),
+               ap(fa)(ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc compose ab))))
+  }
+  def applyLaw = new ApplyLaw {}
 
   ////
   val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }

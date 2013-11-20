@@ -79,14 +79,10 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     override def flip = self
   }
 
-  trait ApplicativeLaw extends FunctorLaw {
+  trait ApplicativeLaw extends ApplyLaw {
     /** `point(identity)` is a no-op. */
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(ap(fa)(point((a: A) => a)), fa)
-
-    /** Lifted functions can be fused. */
-    def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]) =
-      FC.equal(ap(ap(fa)(fab))(fbc), ap(fa)(ap(fab)(ap(fbc)(point((bc: B => C) => (ab: A => B) => bc compose ab)))))
 
     /** `point` distributes over function applications. */
     def homomorphism[A, B](ab: A => B, a: A)(implicit FB: Equal[F[B]]): Boolean =

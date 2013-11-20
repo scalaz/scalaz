@@ -136,12 +136,20 @@ object ScalazProperties {
     }
   }
 
+  object apply {self =>
+    def composition[F[_], X, Y, Z](implicit ap: Apply[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
+                                   av: Arbitrary[F[X => Y]], e: Equal[F[Z]]) = forAll(ap.applyLaw.composition[X, Y, Z] _)
+
+    def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
+                   aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("apply") {
+      include(functor.laws[F])
+      property("composition") = self.composition[F, Int, Int, Int]
+    }
+  }
+
   object applicative {
     def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(f.applicativeLaw.identityAp[X] _)
-
-    def composition[F[_], X, Y, Z](implicit ap: Applicative[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
-                                   av: Arbitrary[F[X => Y]], e: Equal[F[Z]]) = forAll(ap.applicativeLaw.composition[X, Y, Z] _)
 
     def homomorphism[F[_], X, Y](implicit ap: Applicative[F], ax: Arbitrary[X], af: Arbitrary[X => Y], e: Equal[F[Y]]) =
       forAll(ap.applicativeLaw.homomorphism[X, Y] _)
@@ -154,9 +162,8 @@ object ScalazProperties {
 
     def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("applicative") {
-      include(functor.laws[F])
+      include(ScalazProperties.apply.laws[F])
       property("identity") = applicative.identity[F, Int]
-      property("composition") = applicative.composition[F, Int, Int, Int]
       property("homomorphism") = applicative.homomorphism[F, Int, Int]
       property("interchange") = applicative.interchange[F, Int, Int]
       property("map consistent with ap") = applicative.mapApConsistency[F, Int, Int]
