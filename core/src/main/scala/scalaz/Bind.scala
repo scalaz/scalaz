@@ -5,6 +5,8 @@ package scalaz
  * An [[scalaz.Apply]] functor, where a lifted function can introduce
  * new values _and_ new functor context to be incorporated into the
  * lift context.  The essential new operation of [[scalaz.Monad]]s.
+ *
+ * @see [[scalaz.Bind.BindLaw]]
  */
 ////
 trait Bind[F[_]] extends Apply[F] { self =>
@@ -28,6 +30,21 @@ trait Bind[F[_]] extends Apply[F] { self =>
    */
   def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] =
     bind(value)(x => if (x) ifTrue else ifFalse)
+
+  trait BindLaw extends ApplyLaw {
+    /**
+     * As with semigroups, monadic effects only change when their
+     * order is changed, not when the order in which they're
+     * combined changes.
+     */
+    def associativeBind[A, B, C](fa: F[A], f: A => F[B], g: B => F[C])(implicit FC: Equal[F[C]]): Boolean =
+      FC.equal(bind(bind(fa)(f))(g), bind(fa)((a: A) => bind(f(a))(g)))
+
+    /** `ap` is consistent with `bind`. */
+    def apLikeDerived[A, B](fa: F[A], f: F[A => B])(implicit FB: Equal[F[B]]): Boolean =
+      FB.equal(ap(fa)(f), bind(f)(f => map(fa)(f)))
+  }
+  def bindLaw = new BindLaw {}
 
   ////
   val bindSyntax = new scalaz.syntax.BindSyntax[F] { def F = Bind.this }

@@ -66,21 +66,11 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def iterateUntil[A](f: F[A])(p: A => Boolean): F[A] =
     bind(f)(y => if (p(y)) point(y) else iterateUntil(f)(p))
 
-  trait MonadLaw extends ApplicativeLaw {
+  trait MonadLaw extends ApplicativeLaw with BindLaw {
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(bind(a)(point(_: A)), a)
     /** Lifted `f` applied to pure `a` is just `f(a)`. */
     def leftIdentity[A, B](a: A, f: A => F[B])(implicit FB: Equal[F[B]]): Boolean = FB.equal(bind(point(a))(f), f(a))
-    /**
-     * As with semigroups, monadic effects only change when their
-     * order is changed, not when the order in which they're
-     * combined changes.
-     */
-    def associativeBind[A, B, C](fa: F[A], f: A => F[B], g: B => F[C])(implicit FC: Equal[F[C]]): Boolean =
-      FC.equal(bind(bind(fa)(f))(g), bind(fa)((a: A) => bind(f(a))(g)))
-    /** `ap` is consistent with `bind`. */
-    def apLikeDerived[A, B](fa: F[A], f: F[A => B])(implicit FB: Equal[F[B]]): Boolean =
-      FB.equal(ap(fa)(f), bind(f)(f => map(fa)(f)))
   }
   def monadLaw = new MonadLaw {}
   ////
