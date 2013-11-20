@@ -44,7 +44,7 @@ object build extends Build {
   )
 
   val latestScala211PreRelease = "2.11.0-M5"
-  def scalaCheckVersion = "1.10.1"
+  def scalaCheckVersion = "1.11.0"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
