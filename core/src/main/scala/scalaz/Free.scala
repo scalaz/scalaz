@@ -133,12 +133,27 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   }
 
   /**
+   * Catamorphism for `Free`.
+   * Runs to completion, mapping the suspension with the given transformation at each step and
+   * accumulating into the monad `M`.
    * @since 7.0.5
    */
   final def foldMap[M[_]:Monad, AA >: A](f: S ~> M): M[AA] =
     this.resume match {
       case -\/(s) => Monad[M].bind(f(s))(_.foldMap(f))
       case \/-(r) => Monad[M].pure(r)
+    }
+
+  import Id._
+
+  /**
+   * Folds this free recursion to the right using the given natural transformations.
+   * @since 7.0.5
+   */
+  final def foldRight[G[_], AA >: A](z: Id ~> G)(f: ({type λ[α] = S[G[α]]})#λ ~> G): G[AA] =
+    this.resume match {
+      case -\/(s) => f(S.map(s: S[Free[S, AA]])(_.foldRight(z)(f)))
+      case \/-(r) => z(r: AA)
     }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
