@@ -1,5 +1,6 @@
 language: scala
 scala:
+  - 2.11.0-M7
   - 2.10.2
   - 2.9.3
 jdk:
