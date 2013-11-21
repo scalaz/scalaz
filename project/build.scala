@@ -43,8 +43,8 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  val latestScala211PreRelease = "2.11.0-M5"
-  def scalaCheckVersion = "1.11.0"
+  val latestScala211PreRelease = "2.11.0-M7"
+  def scalaCheckVersion = "1.11.1"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -182,11 +182,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0-RC3"
+      case _ => "1.0.0-RC5"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0-RC5"
+      case _ => "1.0.0-RC7"
     }
   )
 
