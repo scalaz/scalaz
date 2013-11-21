@@ -95,7 +95,10 @@ sealed abstract class Free[S[_], A](implicit S: Functor[S]) {
     go2(this)
   }
 
-  /** @since 7.0.1 */
+  /**
+   * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
+   * @since 7.0.1
+   */
   final def runM[M[_]:Monad](f: S[Free[S, A]] => M[Free[S, A]]): M[A] = {
     def runM2(t: Free[S, A]): M[A] = t.resume match {
       case -\/(s) => Monad[M].bind(f(s))(runM2)
@@ -103,6 +106,12 @@ sealed abstract class Free[S[_], A](implicit S: Functor[S]) {
     }
     runM2(this)
   }
+
+  final def foldMap[M[_]:Monad](f: S ~> M): M[A] =
+    this.resume match {
+      case -\/(s) => Monad[M].bind(f(s))(_.foldMap(f))
+      case \/-(r) => Monad[M].pure(r)
+    }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
   final def foldRun[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A])): (B, A) = {
