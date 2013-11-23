@@ -3,52 +3,55 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop
+import org.scalacheck.Prop.forAll
 
-class ListTTest extends Spec {
+object ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
 
-  "fromList / toList" ! prop {
+  "fromList / toList" ! forAll {
     (ass: List[List[Int]]) =>
-      ListT.fromList(ass).toList must be_===(ass)
+      ListT.fromList(ass).toList must_===(ass)
   }
 
-  "filter all" ! prop {
+  "filter all" ! forAll {
     (ass: ListT[List, Int]) =>
-      ass.filter(_ => true) must be_===(ass)
+      ass.filter(_ => true) must_===(ass)
   }
 
-  "filter none" ! prop {
+  "filter none" ! forAll {
     (ass: ListT[List, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
       isEmpty.toList.forall(identity)
   }
   
-  "drop" ! prop {
+  "drop" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
-      ListT.fromList(ass).drop(x).toList must be_===(ass.map(_.drop(x)))
+      ListT.fromList(ass).drop(x).toList must_===(ass.map(_.drop(x)))
   }
   
-  "take" ! prop {
+  "take" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
-      ListT.fromList(ass).take(x).toList must be_===(ass.map(_.take(x)))
+      ListT.fromList(ass).take(x).toList must_===(ass.map(_.take(x)))
   }
 
-  "map" ! prop {
+  "map" ! forAll {
     (ass: List[List[Int]]) =>
-      ListT.fromList(ass).map(_ * 2).toList must be_===(ass.map(_.map(_ * 2)))
+      ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
   }
 
-  "flatMap" ! prop {
+  "flatMap" ! forAll {
     (ass: List[List[Int]]) =>
-      ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList must
-      be_===(ass.map(_.flatMap(number => List(number.toFloat))))
+      (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
+      must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
   }
 
   // Exists to ensure that fromList and map don't stack overflow.
   "large map" ! {
     val list = (0 to 400).toList.map(_ => (0 to 400).toList)
-    ListT.fromList(list).map(_ * 2).toList must be_===(list.map(_.map(_ * 2)))
+    ListT.fromList(list).map(_ * 2).toList must_===(list.map(_.map(_ * 2)))
+    ()
   }
 
   checkAll(equal.laws[ListTOpt[Int]])

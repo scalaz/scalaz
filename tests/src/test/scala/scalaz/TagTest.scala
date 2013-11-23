@@ -5,19 +5,20 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
 import Tags.{Multiplication => Mult}
+import org.scalacheck.Prop.forAll
 
-class TagTest extends Spec {
+object TagTest extends SpecLite {
   "of.subst" should {
-    "substitute" ! prop {xs: List[Int] =>
-      (Foldable[List].fold(Tag.of[Mult].subst(xs))
-         must be_===(xs.foldLeft(1)(_ * _)))
+    "substitute" ! forAll {xs: List[Int] =>
+      ((Foldable[List].fold(Tag.of[Mult].subst(xs)): Int)
+         must_===(xs.foldLeft(1)(_ * _)))
     }
   }
 
   "of.onF" should {
-    "substitute" ! prop {xs: List[List[Unit]] =>
-      (Foldable[List].foldMap(xs)(Tag.of[Mult].onF(_.length))
-         must be_===(xs.foldLeft(1)((n, l) => n * l.length)))
+    "substitute" ! forAll {xs: List[List[Unit]] =>
+      ((Foldable[List].foldMap(xs)(Tag.of[Mult].onF(_.length)): Int)
+         must_===(xs.foldLeft(1)((n, l) => n * l.length)))
     }
   }
 

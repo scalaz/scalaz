@@ -1,11 +1,9 @@
 package scalaz
 
-import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Prop.forAll
 
-class DigitTest extends Spec {
+object DigitTest extends SpecLite {
   checkAll(order.laws[Digit])
 }

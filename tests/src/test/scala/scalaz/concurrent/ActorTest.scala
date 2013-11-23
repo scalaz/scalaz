@@ -1,13 +1,12 @@
 package scalaz
 package concurrent
 
-import scalaz.Spec
-import org.specs2.execute.{Failure, Result, Success}
 import collection.mutable
 import java.util.concurrent._
 import ConcurrentTest._
+import org.scalacheck.Prop.forAll
 
-class ActorTest extends Spec {
+object ActorTest extends SpecLite {
   val NumOfMessages = 1000
   val NumOfThreads = 4
   val NumOfMessagesPerThread = NumOfMessages / NumOfThreads

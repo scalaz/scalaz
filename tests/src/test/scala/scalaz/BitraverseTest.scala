@@ -4,8 +4,9 @@ import scalaz.std.AllInstances.{tuple2Instance => _, _}
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class BitraverseTest extends Spec {
+object BitraverseTest extends SpecLite {
 
   implicit val LE = Bitraverse[\/].leftTraverse[Int]
   implicit val RE = Bitraverse[\/].rightTraverse[Int]
@@ -24,11 +25,11 @@ class BitraverseTest extends Spec {
   "left/right bias" in {
     import scalaz.syntax.id._
 
-    Bitraverse[\/].rightTraverse.traverse(42.left[Int])(x => Vector(x + 3)) must be_===(Vector(-\/(42)))
-    Bitraverse[\/].leftTraverse.traverse(42.left[Int])(x => Vector(x + 3))  must be_===(Vector(-\/(45)))
+    Bitraverse[\/].rightTraverse.traverse(42.left[Int])(x => Vector(x + 3)) must_===(Vector(-\/(42)))
+    Bitraverse[\/].leftTraverse.traverse(42.left[Int])(x => Vector(x + 3))  must_===(Vector(-\/(45)))
 
-    Bifoldable[\/].leftFoldable.foldMap(42.left[Int])(identity)  must be_===(42)
-    Bifoldable[\/].rightFoldable.foldMap(42.left[Int])(identity) must be_===(0)
+    Bifoldable[\/].leftFoldable.foldMap(42.left[Int])(identity)  must_===(42)
+    Bifoldable[\/].rightFoldable.foldMap(42.left[Int])(identity) must_===(0)
   }
 
 }

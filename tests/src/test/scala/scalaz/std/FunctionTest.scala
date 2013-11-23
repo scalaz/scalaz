@@ -5,8 +5,9 @@ import std.AllInstances._
 import std.function.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class FunctionTest extends Spec {
+object FunctionTest extends SpecLite {
   type A = Int
   type B = Int
   type C = Int
@@ -46,27 +47,27 @@ class FunctionTest extends Spec {
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
 
   // Likely could be made to cover all the FunctionN types.
-  "Function0 map eagerness" ! prop{(number: Int) =>
+  "Function0 map eagerness" ! forAll{(number: Int) =>
     var modifiableNumber: Int = number
     val methodCall: () => Int = () => modifiableNumber
     val mappedCall: () => Int = Monad[Function0].map(methodCall)(_ + 3)
     modifiableNumber += 1
-    mappedCall() must be_===(number + 4)
+    mappedCall() must_===(number + 4)
   }
 
   // Likely could be made to cover all the FunctionN types.
-  "Function0 bind eagerness" ! prop{(number: Int) =>
+  "Function0 bind eagerness" ! forAll{(number: Int) =>
     var modifiableNumber: Int = number
     val methodCall: () => Int = () => modifiableNumber
     val mappedCall = Monad[Function0].bind(methodCall)((value: Int) => () => value + 3)
     modifiableNumber += 1
-    mappedCall() must be_===(number + 4)
+    mappedCall() must_===(number + 4)
   }
 
-  "fix" ! prop{(n: Int) =>
-    fix[Int](_ => n) must be_===(n)
+  "fix" ! forAll{(n: Int) =>
+    fix[Int](_ => n) must_===(n)
     (fix[Stream[Int]](ns => n #:: (2*n) #:: ns).take(4).toList
-      must be_===(List(n, 2*n, n, 2*n)))
+      must_===(List(n, 2*n, n, 2*n)))
   }
 
   object instances {

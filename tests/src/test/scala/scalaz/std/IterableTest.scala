@@ -4,8 +4,9 @@ package std
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class IterableTest extends Spec {
+object IterableTest extends SpecLite {
 
   import std.iterable._
 

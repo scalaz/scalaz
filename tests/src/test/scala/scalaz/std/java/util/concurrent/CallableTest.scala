@@ -8,8 +8,9 @@ import _root_.java.util.concurrent.Callable
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class CallableTest extends Spec {
+object CallableTest extends SpecLite {
   checkAll("Callable", order.laws[Callable[Int]])
   checkAll("Callable", monad.laws[Callable])
 }

@@ -1,7 +1,8 @@
 package scalaz
 package typelevel
+import org.scalacheck.Prop.forAll
 
-class FuncTest extends Spec {
+object FuncTest extends SpecLite {
   import std.AllInstances._
   import scalaz.syntax.typelevel.hlist._
 
@@ -10,12 +11,12 @@ class FuncTest extends Spec {
 
   "andThenA" in {
     val test = f @>>> g
-    test.runA(1) must be_===(List(List(2, 5))) 
+    test.runA(1) must_===(List(List(2, 5)))
   }
 
   "composeA" in {
     val test = f <<<@ g
-    test.runA(1) must be_===(List(List(2), List(6))) 
+    test.runA(1) must_===(List(List(2), List(6)))
   }
 
   "productA" in {
@@ -23,8 +24,8 @@ class FuncTest extends Spec {
     val result = test.runA(1)
     result match {
       case x :: y :: HNil =>
-        { (x: List[Int]) must be_===(List(2)) } and
-        { (y: List[Int]) must be_===(List(1, 5)) }
+        { (x: List[Int]) must_===(List(2)) } and
+        { (y: List[Int]) must_===(List(1, 5)) }
     }
   }
 
@@ -33,8 +34,8 @@ class FuncTest extends Spec {
     val result = test.runA(1)
     result match {
       case x :: y :: HNil =>
-        { (x: List[Int]) must be_===(List(2)) } and
-        { (y: List[Int]) must be_===(List(1, 5)) }
+        { (x: List[Int]) must_===(List(2)) } and
+        { (y: List[Int]) must_===(List(1, 5)) }
     }
   }
 
@@ -44,9 +45,9 @@ class FuncTest extends Spec {
     val result = test.runA(1)
     result match {
       case Some(x: Int) :: Some(y: Int) :: Some(z: Int) :: HNil =>
-        { x must be_===(2) } and
-        { y must be_===(3) } and
-        { z must be_===(4) }   
+        { x must_===(2) } and
+        { y must_===(3) } and
+        { z must_===(4) }
     }
   }
 
@@ -58,9 +59,9 @@ class FuncTest extends Spec {
       case Some(List(x0: Int, x1: Int)) ::
            Some(List(y0: Int, y1: Int)) ::
            Some(List(z0: Int, z1: Int)) :: HNil =>
-        { List(x0, x1) must be_===(List(2, 3)) } and
-        { List(y0, y1) must be_===(List(3, 4)) } and
-        { List(z0, z1) must be_===(List(4, 5)) } 
+        { List(x0, x1) must_===(List(2, 3)) } and
+        { List(y0, y1) must_===(List(3, 4)) } and
+        { List(z0, z1) must_===(List(4, 5)) }
     }
   }
 }

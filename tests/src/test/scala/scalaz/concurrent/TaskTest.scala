@@ -8,10 +8,10 @@ import org.scalacheck.Prop._
 
 import java.util.concurrent.{Executors, TimeoutException}
 import java.util.concurrent.atomic._
+import org.scalacheck.Prop.forAll
 
+object TaskTest extends SpecLite {
 
-class TaskTest extends Spec {
-   
   val N = 10000
   val correct = (0 to N).sum
   val LM = Monad[List]; import LM.monadSyntax._; 
@@ -30,11 +30,11 @@ class TaskTest extends Spec {
     combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).run == correct }
   }
 
-  "traverse-based map == sequential map" ! prop { (xs: List[Int]) => 
-    xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).run 
+  "traverse-based map == sequential map" ! forAll { (xs: List[Int]) =>
+    xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).run
   }
 
-  "gather-based map == sequential map" ! prop { (xs: List[Int]) => 
+  "gather-based map == sequential map" ! forAll { (xs: List[Int]) =>
     xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).run
   }
 
@@ -77,7 +77,7 @@ class TaskTest extends Spec {
     -\/(FailWhale)
   }
 
-  "catches exceptions in parallel execution" ! prop { (x: Int, y: Int) =>
+  "catches exceptions in parallel execution" ! forAll { (x: Int, y: Int) =>
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
     val t2 = Task { 43 }
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
@@ -152,8 +152,8 @@ class TaskTest extends Spec {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun match {
-        case -\/(e) => e must_== ex 
+      t.attemptRun mustMatch {
+        case -\/(e) => e must_== ex; true
       }
       
       sleep(3000)

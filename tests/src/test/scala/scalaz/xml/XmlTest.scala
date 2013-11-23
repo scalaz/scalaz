@@ -7,8 +7,9 @@ import syntax.foldable._
 import scalaz.xml.Xml._
 import scalaz.xml.pp.Config
 import scala.util.Random
+import org.scalacheck.Prop.forAll
 
-class XmlTest extends Spec {
+object XmlTest extends SpecLite {
 
   // https://github.com/scalaz/scalaz/issues/456
   "parse large CDATA" in {
@@ -16,7 +17,7 @@ class XmlTest extends Spec {
       <cdata>{new scala.xml.PCData( Random.alphanumeric.take(1000000).mkString )}</cdata>
     }.toString
 
-    data.parseXml.foldMap(_.sxprints(Config.config())) must be_===(data)
+    data.parseXml.foldMap(_.sxprints(Config.config())) must_===(data)
   }
 
 }

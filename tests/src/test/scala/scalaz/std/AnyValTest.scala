@@ -7,8 +7,9 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import Tags._
 import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Prop.forAll
 
-class AnyValTest extends Spec {
+object AnyValTest extends SpecLite {
 
   checkAll("Unit", order.laws[Unit])
   checkAll("Boolean", order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))

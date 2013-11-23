@@ -3,7 +3,8 @@ package xml
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Prop.forAll
 
-class ContentTest extends Spec {
+object ContentTest extends SpecLite {
   checkAll(equal.laws[Content])
 }

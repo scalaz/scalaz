@@ -4,15 +4,16 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tree._
+import org.scalacheck.Prop.forAll
 
-class TreeTest extends Spec {
+object TreeTest extends SpecLite {
 
   checkAll("Tree", equal.laws[Tree[Int]])
 
-  "satisfy foldable1 law" ! prop { xs: Tree[Int] =>
+  "satisfy foldable1 law" ! forAll { xs: Tree[Int] =>
     val F = Foldable1[Tree]
-    F.foldMap1(xs)(Vector(_)) must be_===(F.foldRight1(xs.map(Vector(_)))((a, b) => b ++ a))
-    F.foldMap1(xs)(Vector(_)) must be_===(F.foldLeft1(xs.map(Vector(_)))(_ ++ _))
+    F.foldMap1(xs)(Vector(_)) must_===(F.foldRight1(xs.map(Vector(_)))((a, b) => b ++ a))
+    F.foldMap1(xs)(Vector(_)) must_===(F.foldLeft1(xs.map(Vector(_)))(_ ++ _))
   }
 
   {
@@ -28,7 +29,7 @@ class TreeTest extends Spec {
     checkAll("Tree", comonad.laws[Tree])
   }
 
-  "A tree must can be rendered as an ASCII string" >> {
+  "A tree must can be rendered as an ASCII string" ! {
       node(1, Stream(node(2, Stream(leaf(3))), leaf(4))).drawTree must_== Seq(
       "1",
       "|",

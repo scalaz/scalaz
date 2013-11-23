@@ -3,94 +3,93 @@ package scalaz
 import Scalaz._
 import NonEmptyList._
 import Zipper._
-import syntax.equal._
 import org.scalacheck._
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-class ZipperTest extends Spec {
+class ZipperTest extends SpecLite {
 
-  "Zipper From Stream" ! prop { (xs: Stream[Int]) =>
+  "Zipper From Stream" ! forAll { (xs: Stream[Int]) =>
     (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs
   }
 
   "Zipper Move Then To Stream" in {
     val n = nels(1, 2, 3, 4)
-    n.toZipper.move(2).map(_.toStream).exists(_ must be_===(n.stream))
+    n.toZipper.move(2).map(_.toStream).exists(_ == n.stream)
   }
 
-  "Next Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "Next Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.next)
         yield zn.lefts.length == z.lefts.length + 1 && zn.rights.length == z.rights.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "Previous Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "Previous Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.previous)
         yield zn.lefts.length == z.lefts.length - 1 && zn.rights.length == z.rights.length + 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteRight Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "DeleteRight Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRight)
         yield zn.rights.length == z.rights.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteRightC Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "DeleteRightC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRightC)
         yield zn.rights.length == z.rights.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteRight Affects Lengths and Moves Left if at end" ! prop { (xs: Stream[Int]) =>
+  "DeleteRight Affects Lengths and Moves Left if at end" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteRight)
         yield zn.lefts.length == z.lefts.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteLeft Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "DeleteLeft Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteLeft)
         yield zn.lefts.length == z.lefts.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteLeftC Affects Lengths" ! prop { (xs: Stream[Int]) =>
+  "DeleteLeftC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteLeftC)
         yield zn.lefts.length == z.lefts.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteLeft Affects Lengths and Moves Right if at start" ! prop { (xs: Stream[Int]) =>
+  "DeleteLeft Affects Lengths and Moves Right if at start" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteLeft)
         yield zn.rights.length == z.rights.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteRightC Affects Lengths and Cycles to Start if at end" ! prop { (xs: Stream[Int]) =>
+  "DeleteRightC Affects Lengths and Cycles to Start if at end" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteRightC)
         yield zn.rights.length == z.lefts.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "DeleteLeftC Affects Lengths and Cycles to end if at start" ! prop { (xs: Stream[Int]) =>
+  "DeleteLeftC Affects Lengths and Cycles to end if at start" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteLeftC)
         yield zn.lefts.length == z.rights.length - 1
     ) getOrElse (xs.length < 2)
   }
 
-  "Move" ! prop { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
+  "Move" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
     (
       zipper(xs, f, ys).move(n) map { (z: Zipper[Int]) =>
         z.lefts.length == xs.length + n &&
@@ -100,16 +99,16 @@ class ZipperTest extends Spec {
     ) getOrElse (xs.length < (-n) || ys.length < n)
   }
 
-  "Find" ! prop { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
+  "Find" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
     zipper(xs, f, ys).findZ(p) map { z => p(z.focus) } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
   }
 
-  "Update Modifies Zipper Correctly" ! prop { (xs: Stream[Int], ys: Stream[Int], f: Int, u: Int) =>
+  "Update Modifies Zipper Correctly" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, u: Int) =>
     Equal[Zipper[Int]].equal(zipper(xs, f, ys).update(u), zipper(xs, u, ys))
   }
 
-  "Start" ! prop { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
+  "Start" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
     val zo = zipper(xs, f, ys)
     val z = zo.start
     z.lefts.length === 0 &&
@@ -118,7 +117,7 @@ class ZipperTest extends Spec {
       (z.move(xs.length).map(Equal[Zipper[Int]].equal(_, zo)).getOrElse(z.length == 0): Boolean)
   }
 
-  "End" ! prop { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
+  "End" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
     val zo = zipper(xs, f, ys)
     val z = zo.end
     z.lefts.length === z.length - 1 &&

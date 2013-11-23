@@ -4,11 +4,11 @@ package concurrent
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.specs2.execute.{Failure, Result}
 import java.util.concurrent._
 import ConcurrentTest._
+import org.scalacheck.Prop.forAll
 
-class FutureTest extends Spec {
+object FutureTest extends SpecLite {
   implicit def FutureEqual[A: Equal] =
     Equal[A].contramap((_: Future[A]).run)
 
@@ -32,14 +32,14 @@ class FutureTest extends Spec {
       "when constructed from Future.fork" in prop{(n: Int) =>
         Future.fork(Future.now(n)).run must_== n
       }
-      "when constructed from Future.suspend" in prop{(n: Int) =>
+      "when constructed from Future.suspend" ! prop{(n: Int) =>
         Future.suspend(Future.now(n)).run must_== n
       }
-      "when constructed from Future.async" in prop{(n: Int) =>
+      "when constructed from Future.async" ! prop{(n: Int) =>
         def callback(call: Int => Unit): Unit = call(n)
         Future.async(callback).run must_== n
       }
-      "when constructed from Future.apply" in prop{(n: Int) =>
+      "when constructed from Future.apply" ! prop{(n: Int) =>
         Future.apply(n).run must_== n
       }
     }

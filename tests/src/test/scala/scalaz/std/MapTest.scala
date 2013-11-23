@@ -2,16 +2,18 @@ package scalaz
 package std
 
 import std.AllInstances._
+import org.scalacheck.{Prop, Arbitrary}, Arbitrary.arbitrary
+import Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scala.math.{Ordering => SOrdering}
 
-class MapTest extends Spec {
+class MapTest extends SpecLite {
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
 
-  "map ordering" ! prop {
+  "map ordering" ! forAll {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {

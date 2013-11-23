@@ -1,14 +1,17 @@
 package scalaz
 
-import org.scalacheck.Prop.{exists, propBoolean}
+import org.scalacheck.Prop._
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import org.scalacheck.Prop.forAll
 
-class OneOrTest extends Spec {
+object OneOrTest extends SpecLite {
   import OneOr._
-
+  property("myprop") = forAll { l: List[Int] =>
+    l.reverse.reverse == l
+  }
   checkAll("OneOr", equal.laws[OneOr[List, Int]])
   checkAll("OneOr", order.laws[OneOr[List, Int]])
   checkAll("OneOr List", traverse.laws[OneOrList])
@@ -16,11 +19,11 @@ class OneOrTest extends Spec {
   checkAll("OneOr Nel", traverse.laws[OneOrNel])
   checkAll("OneOr Nel", comonad.laws[OneOrNel])
 
-  "inequality exists" ! prop {(a: OneOrList[Int]) =>
-    exists {(b: OneOrList[Int]) =>
-      propBoolean(!Equal[OneOrList[Int]].equal(a, b))
-    }
-  }
+//  "inequality exists" ! forAll {(a: OneOrList[Int]) =>
+//    exists {(b: OneOrList[Int]) =>
+//      propBoolean(!Equal[OneOrList[Int]].equal(a, b))
+//    }
+//  }
 
   object instances {
     def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneOr[F, α]})#λ]

@@ -6,8 +6,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Cursor._
+import org.scalacheck.Prop.forAll
 
-class CursorTest extends Spec {
+object CursorTest extends SpecLite {
   checkAll(equal.laws[Cursor])
   checkAll(lens.laws(currentCursorL))
   checkAll(lens.laws(leftsCursorL))
