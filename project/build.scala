@@ -179,7 +179,7 @@ object build extends Build {
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
-  val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
+  val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
       case _ => "1.0.1"
     }
@@ -199,10 +199,9 @@ object build extends Build {
         dir => Seq(GenerateTupleW(dir))
       },
       libraryDependencies ++= {
-        val version = ScalaVersion(scalaVersion.value)
-        if (version.isModularised)
+        if (scalaVersion.value.startsWith("2.11"))
           coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(version) intransitive()
+            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
           }
         else Nil
       },
