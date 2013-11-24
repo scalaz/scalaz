@@ -87,12 +87,12 @@ object TaskTest extends SpecLite {
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
   }
 
-  "handles exceptions" ! {
+  "handles exceptions in handle" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => 84 }.attemptRun ==
       \/-(84)
   }
 
-  "leaves unhandled exceptions alone" ! {
+  "leaves unhandled exceptions alone in handle" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case SadTrombone => 84 }.attemptRun ==
       -\/(FailWhale)
   }
@@ -101,6 +101,23 @@ object TaskTest extends SpecLite {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => throw SadTrombone }.attemptRun ==
       -\/(SadTrombone)
   }
+
+  "handles exceptions in handleWith" ! {
+    val foo =
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(84) }.attemptRun ==
+      \/-(84)
+  }
+
+  "leaves unhandled exceptions alone in handleWith" ! {
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case SadTrombone => Task.delay(84) }.attemptRun ==
+      -\/(FailWhale)
+  }
+
+  "catches exceptions thrown in handleWith" ! {
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.attemptRun ==
+      -\/(SadTrombone)
+  }
+
 
   "Nondeterminism[Task]" should {
     import scalaz.concurrent.Task._
