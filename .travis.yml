@@ -1,6 +1,6 @@
 language: scala
 scala:
-  - 2.11.0-M6
+  - 2.11.0-M7
   - 2.10.1
   - 2.9.2
   - 2.9.3
@@ -9,6 +9,4 @@ jdk:
   - openjdk6
 
 script:
-  - SBT_COMMANDS=";test;mima-report-binary-issues"
-  - if [[ $TRAVIS_SCALA_VERSION == "2.11.0-M6" ]]; then SBT_COMMANDS=";example/compile;iterv/compile;scalacheck-binding/compile"; fi
-  - sbt ++$TRAVIS_SCALA_VERSION "$SBT_COMMANDS"
+  - sbt ++$TRAVIS_SCALA_VERSION test mima-report-binary-issues
