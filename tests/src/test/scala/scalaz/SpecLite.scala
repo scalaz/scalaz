@@ -1,7 +1,7 @@
 package scalaz
 
 import org.scalacheck._
-import org.scalacheck.Prop.{Result, Params}
+import org.scalacheck.Prop.Result
 
 abstract class SpecLite extends Properties("") {
   def updateName: Unit = {
@@ -39,9 +39,8 @@ abstract class SpecLite extends Properties("") {
       context = s; try a finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
-    def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = new Prop {
-      def apply(prms: Params): Result = ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
-    }
+    def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
+      property(context + ":" + s) = Prop(prms => ev(a).apply(prms)) // TODO sort out the laziness / implicit conversions properly
   }
 
   implicit def enrichString(s: String) = new StringOps(s)

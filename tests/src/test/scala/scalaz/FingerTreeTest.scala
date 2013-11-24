@@ -1,7 +1,7 @@
 package scalaz
 
-import org.scalacheck.Prop.{extendedAny => _, _}
 import FingerTree._
+import org.scalacheck.Prop.forAll
 import scalacheck.ScalazArbitrary._
 import std.anyVal._
 import std.stream._
@@ -95,7 +95,7 @@ object FingerTreeTest extends SpecLite {
   }
 
   "OrdSeq is ordered" ! forAll { xs: List[Int] => OrdSeq(xs:_*).toList == xs.sorted }
-  
+
   "IndSeq" should {
     import org.scalacheck._
     import Gen._
