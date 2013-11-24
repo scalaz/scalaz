@@ -55,14 +55,13 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val latestScala211PreRelease = "2.11.0-M6"
-  def scalaCheckVersion = "1.10.1"
+  val latestScala211PreRelease = "2.11.0-M7"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", latestScala211PreRelease),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
 
     scalaBinaryVersion in update := (
@@ -206,7 +205,12 @@ object build extends Build {
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
-    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis) { (o, n, sbv, bas) => Some(o % (n + "_" + sbv) % bas) }
+    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis) { (o, n, sbv, bas) =>
+      if (sbv startsWith "2.11")
+        None // TODO previous artifacts do not exist for 2.11
+      else
+        Some(o % (n + "_" + sbv) % bas)
+    }
   )
 
   lazy val scalaz = Project(
@@ -224,11 +228,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0-RC3"
+      case _ => "1.0.0-RC5"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0-RC5"
+      case _ => "1.0.0-RC7"
     }
   )
 
@@ -339,7 +343,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % Dependencies.scalacheck(scalaVersion.value),
       conflictWarning in Global ~= { _.copy(failOnConflict = false) }, // workaround for 2.11
       osgiExport("scalaz.scalacheck")
     )
@@ -349,13 +353,20 @@ object build extends Build {
     id = "tests",
     base = file("tests"),
     dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
+    settings = standardSettings ++ Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      previousArtifact := None,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
+      previousArtifact := None
     )
   )
+
+  object Dependencies {
+    def scalacheck(sv: String) =
+      if (sv startsWith "2.11")
+        "1.11.1"
+      else
+        "1.10.1"
+  }
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>

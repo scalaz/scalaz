@@ -5,7 +5,7 @@ import std.AllInstances._
 import Iteratee._
 import effect._
 
-import org.scalacheck.{Pretty, Gen, Arbitrary}
+import org.scalacheck.{Gen, Arbitrary}
 import Arbitrary._
 import Gen._
 import syntax.functor._
