@@ -42,6 +42,10 @@ object TaskTest extends SpecLite {
     override def fillInStackTrace = this
   }
 
+  case object SadTrombone extends RuntimeException {
+    override def fillInStackTrace = this
+  }
+
   "catches exceptions" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun ==
     -\/(FailWhale)
@@ -81,6 +85,21 @@ object TaskTest extends SpecLite {
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
     val t2 = Task { 43 }
     Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
+  }
+
+  "handles exceptions" ! {
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => 84 }.attemptRun ==
+      \/-(84)
+  }
+
+  "leaves unhandled exceptions alone" ! {
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case SadTrombone => 84 }.attemptRun ==
+      -\/(FailWhale)
+  }
+
+  "catches exceptions thrown in handle" ! {
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => throw SadTrombone }.attemptRun ==
+      -\/(SadTrombone)
   }
 
   "Nondeterminism[Task]" should {
