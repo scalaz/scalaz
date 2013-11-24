@@ -205,11 +205,13 @@ object build extends Build {
       ) map exclude[MissingMethodProblem]
     }
   ) ++ Seq[Sett](
-    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis) { (o, n, sbv, bas) =>
-      if (sbv startsWith "2.11")
-        None // TODO previous artifacts do not exist for 2.11
-      else
-        Some(o % (n + "_" + sbv) % bas)
+    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
+      basOpt match {
+        case Some(bas) if !(sbv startsWith "2.11") =>
+          Some(o % (n + "_" + sbv) % bas)
+        case _ =>
+          None
+      }
     }
   )
 
