@@ -50,7 +50,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.2",
-    crossScalaVersions := Seq("2.9.3", "2.10.2"),
+    crossScalaVersions := Seq("2.9.3", "2.10.2", latestScala211PreRelease),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalaBinaryVersion in update := (
       if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
