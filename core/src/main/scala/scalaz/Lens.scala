@@ -156,9 +156,10 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def ->>-[C, X1 <: A1, X2 >: A2](f: => IndexedState[X1, X2, C]): IndexedState[X1, X2, C] =
     flatMap(_ => f)
 
+  import annotation.unchecked._
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
-  def liftsNT: ({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n =
-    new (({type m[+x] = IndexedState[B1,B2,x]})#m ~> ({type n[+x] = IndexedState[A1,A2,x]})#n) {
+  def liftsNT: ({type m[x] = IndexedState[B1 @uncheckedVariance,B2 @uncheckedVariance,x]})#m ~> ({type n[x] = IndexedState[A1 @uncheckedVariance,A2 @uncheckedVariance,x]})#n =
+    new (({type m[x] = IndexedState[B1 @uncheckedVariance,B2 @uncheckedVariance,x]})#m ~> ({type n[x] = IndexedState[A1 @uncheckedVariance,A2 @uncheckedVariance,x]})#n) {
       def apply[C](s : IndexedState[B1,B2,C]): IndexedState[A1,A2,C] = IndexedState[A1,A2,C](a => modp(s(_), a))
     }
 
