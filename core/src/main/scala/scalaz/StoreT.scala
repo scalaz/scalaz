@@ -96,7 +96,7 @@ trait StoreTFunctions extends IndexedStoreTFunctions {
     storeT[Id, A, B](f -> a)
 }
 sealed abstract class IndexedStoreTInstances2 {
-  implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]): Contravariant[({type λ[-α]=IndexedStoreT[F, I, α, B]})#λ] = new IndexedStoreTContravariant[F, I, B] {
+  implicit def indexedStoreTContravariant[F[_], I, B](implicit F0: Functor[F]): Contravariant[({type λ[α]=IndexedStoreT[F, I, α, B]})#λ] = new IndexedStoreTContravariant[F, I, B] {
     implicit def F: Functor[F] = F0
   }
 }
@@ -141,7 +141,7 @@ private trait IndexedStoreTFunctorRight[F[_], I0, A0] extends Functor[({type λ[
   override def map[A, B](fa: IndexedStoreT[F, I0, A0, A])(f: A => B): IndexedStoreT[F, I0, A0, B] = fa map f
 }
 
-private trait IndexedStoreTContravariant[F[_], I0, B0] extends Contravariant[({type λ[-α]=IndexedStoreT[F, I0, α, B0]})#λ] {
+private trait IndexedStoreTContravariant[F[_], I0, B0] extends Contravariant[({type λ[α]=IndexedStoreT[F, I0, α, B0]})#λ] {
   implicit def F: Functor[F]
   override def contramap[A, B](fa: IndexedStoreT[F, I0, A, B0])(f: B => A): IndexedStoreT[F, I0, B, B0] = fa contramap f
 }

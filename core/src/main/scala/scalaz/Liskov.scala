@@ -1,5 +1,7 @@
 package scalaz
 
+import annotation.unchecked._
+
 /**
  * Liskov substitutability: A better `<:<`
  *
@@ -65,7 +67,7 @@ trait LiskovFunctions {
   @deprecated("inv is unsound on <~<; use Leibniz.=== or Liskov.co instead",
               "7.1.0")
   def inv[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
-    a.subst[({type λ[-α] = T[α] <~< T[A2]})#λ](refl)
+    a.subst[({type λ[-α] = T[α @uncheckedVariance] <~< T[A2]})#λ](refl)
 
   /**We can lift subtyping into any covariant type constructor */
   def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =

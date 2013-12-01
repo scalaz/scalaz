@@ -194,7 +194,7 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
   implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] = new WriterTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[+α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
+  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
     implicit def F = F0
   }
   @deprecated("Index is deprecated, use Foldable instead", "7.1")
