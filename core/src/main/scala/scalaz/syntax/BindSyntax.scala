@@ -5,6 +5,7 @@ package syntax
 trait BindOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Bind[F]
   ////
+  import annotation.unchecked._
   import Liskov.<~<
 
   def flatMap[B](f: A => F[B]) = F.bind(self)(f)
@@ -20,7 +21,7 @@ trait BindOps[F[_],A] extends Ops[F[A]] {
   def >>[B](b: => F[B]): F[B] = F.bind(self)(_ => b)
 
   def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A <~< Boolean): F[B] = {
-    val value: F[Boolean] = Liskov.co[F, A, Boolean](ev)(self)
+    val value: F[Boolean] = Liskov.co[({type λ[+α] = F[α @uncheckedVariance]})#λ, A, Boolean](ev)(self)
     F.ifM(value, ifTrue, ifFalse)
   }
 

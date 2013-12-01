@@ -70,17 +70,17 @@ trait LiskovFunctions {
     a.subst[({type λ[-α] = T[α @uncheckedVariance] <~< T[A2]})#λ](refl)
 
   /**We can lift subtyping into any invariant or covariant type constructor */
-  def co[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
-    a.subst[({type λ[-α]= T[α @uncheckedVariance] <~< T[A2]})#λ](refl)
+  def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
+    a.subst[({type λ[-α]= T[α] <~< T[A2]})#λ](refl)
 
-  def co2[T[_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
-    a.subst[({type λ[-α]= T[α @uncheckedVariance, B] <~< T[Z, B]})#λ](refl)
+  def co2[T[+_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
+    a.subst[({type λ[-α]= T[α, B] <~< T[Z, B]})#λ](refl)
 
-  def co3[T[_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
-    a.subst[({type λ[-α]= T[α @uncheckedVariance, B, C] <~< T[Z, B, C]})#λ](refl)
+  def co3[T[+_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
+    a.subst[({type λ[-α]= T[α, B, C] <~< T[Z, B, C]})#λ](refl)
 
-  def co4[T[_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
-    a.subst[({type λ[-α]=T[α @uncheckedVariance, B, C, D] <~< T[Z, B, C, D]})#λ](refl)
+  def co4[T[+_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
+    a.subst[({type λ[-α]=T[α, B, C, D] <~< T[Z, B, C, D]})#λ](refl)
 
   /**lift2(a,b) = co1_2(a) compose co2_2(b) */
   def lift2[T[+_, +_], A, A2, B, B2](
