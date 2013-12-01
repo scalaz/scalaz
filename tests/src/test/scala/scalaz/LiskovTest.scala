@@ -5,15 +5,11 @@ object LiskovTest extends SpecLite {
 
   trait Co1[+ _]
 
-  trait In1[_]
-
   trait Contra1[- _]
 
   trait Co1_2[+A, B]
 
-  trait Co2_2[A, B]
-
-  trait In2[A, B]
+  trait Co2_2[A, +B]
 
   trait Contra1_2[-A, B]
 
@@ -29,12 +25,10 @@ object LiskovTest extends SpecLite {
   "lift" in {
     def foo[A, B](implicit ev: A <~< B) {
       Liskov.co[Co1, A, B](ev)
-      Liskov.co[In1, A, B](ev)
       Liskov.contra[Contra1, A, B](ev)
 
       Liskov.co2[Co1_2, B, A, Unit](ev)
-      Liskov.co2[Co2_2, B, A, Unit](ev)
-      Liskov.co2[In2, B, A, Unit](ev)
+      Liskov.co2[({type λ[+α, β] = Co2_2[β, α]})#λ, B, A, Unit](ev)
       Liskov.contra1_2[Contra1_2, B, A, Unit](ev)
       Liskov.contra2_2[Contra2_2, B, Unit, A](ev)
     }

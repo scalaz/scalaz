@@ -5,6 +5,7 @@ package syntax
 trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadPlus[F]
   ////
+  import annotation.unchecked._
   import Liskov._
 
   def filter(f: A => Boolean) =
@@ -14,7 +15,7 @@ trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
     filter(f)
 
   def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
-    val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
+    val ftb: F[T[B]] = Liskov.co[({type λ[+α] = F[α @uncheckedVariance]})#λ, A, T[B]](ev)(self)
     F.unite[T, B](ftb)
   }
 
