@@ -206,27 +206,23 @@ trait ListFunctions {
     go(as, Nil)
   }
 
+  private[this] def mapAccum[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
+    as.foldLeft((c, Nil: List[B])){ case ((c, bs), a) =>
+      val (c0, b) = f(c, a)
+      (c0, b :: bs)
+    }
+
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
-    case Nil    => (c, Nil)
-    case h :: t => {
-      val (i, j) = f(c, h)
-      val (k, l) = mapAccumLeft(t)(i, f)
-      (k, j :: l)
-    }
+  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = {
+    val (c0, list) = mapAccum(as)(c, f)
+    (c0, list.reverse)
   }
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
-  final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
-    case Nil    => (c, Nil)
-    case h :: t => {
-      val (i, j) = mapAccumRight(t)(c, f)
-      val (k, l) = f(i, h)
-      (k, l :: j)
-    }
-  }
+  final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
+    mapAccum(as.reverse)(c, f)
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {
