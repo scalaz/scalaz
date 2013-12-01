@@ -374,7 +374,6 @@ trait HeapFunctions {
     def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
   }
 
-  import Tree._
   import Heap.impl._
 
   def fromData[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =

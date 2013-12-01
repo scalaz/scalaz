@@ -411,7 +411,7 @@ object ScalazProperties {
         include(foldable1.laws[F])
         property("identity traverse1") = identityTraverse1[F, Int, Int]
 
-        import std.list._, std.option._, std.stream._, std.anyVal._
+        import std.list._, std.option._
 
         property("sequential fusion (1)") = sequentialFusion1[F, Option, List, Int, Int, Int]
         // TODO naturality1, parallelFusion1

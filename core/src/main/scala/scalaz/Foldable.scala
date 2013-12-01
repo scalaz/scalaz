@@ -15,7 +15,7 @@ trait Foldable[F[_]]  { self =>
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
   /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
   def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
-    import syntax.std.option._, std.option._
+    import std.option._
     foldMap(fa)(x => some(f(x)))
   }
 
