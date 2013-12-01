@@ -57,7 +57,7 @@ trait LiskovFunctions {
 
   /**Subtyping is reflexive */
   implicit def refl[A]: (A <~< A) = new (A <~< A) {
-    def subst[F[_]](p: F[A]): F[A] = p
+    def subst[F[-_]](p: F[A]): F[A] = p
   }
 
   /**Subtyping is transitive */
