@@ -253,7 +253,7 @@ package object scalaz {
   }
   type IndexedCont[R, O, A] = IndexedContT[Id, R, O, A]
   object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, Id, R, O, A](f)
+    def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, Id, R, O, A](f)
   }
   type ContsT[W[_], M[_], R, A] = IndexedContsT[W, M, R, R, A]
   object ContsT extends IndexedContsTInstances with IndexedContsTFunctions {
