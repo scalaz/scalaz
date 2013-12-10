@@ -17,13 +17,13 @@ object DListTest extends SpecLite {
 
     // Defined when appropriate?
     val nonempty = d.uncons(false, (_, _) => true)
-    d.headOption.isDefined == nonempty
-    d.tailOption.isDefined == nonempty
+    d.headOption.isDefined must_=== nonempty
+    d.tailOption.isDefined must_=== nonempty
 
     // If defined, are values correct?
     val d0 = n +: d
-    d0.headOption === Some(n)
-    d0.tailOption === Some(d)
+    check(d0.headOption === Some(n)) // no Show instance, can't use must_===
+    check(d0.tailOption === Some(d))
     
   }
 
