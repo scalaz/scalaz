@@ -39,11 +39,11 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
     }).run
 
   /** Get the first element of the list. */
-  @deprecated("unsafe; use headOption", "2.11.0")
+  @deprecated("unsafe; use headOption", "7.1.0")
   def head: A = uncons(sys.error("DList.head: empty list"), (x, _) => x)
 
   /** Get the tail of the list. */
-  @deprecated("unsafe; use tailOption", "2.11.0")
+  @deprecated("unsafe; use tailOption", "7.1.0")
   def tail: DList[A] = uncons(sys.error("DList.tail: empty list"), (_, y) => y)
 
   /** Get the first element of the list, if any. */
