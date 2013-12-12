@@ -421,4 +421,10 @@ trait DisjunctionFunctions {
   } catch {
     case e: Throwable => left(e)
   }
+  
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit ex: ClassManifest[E]): E \/ T = try {
+    \/-(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
 }
