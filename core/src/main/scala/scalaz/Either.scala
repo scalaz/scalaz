@@ -306,6 +306,11 @@ object \/ extends DisjunctionInstances with DisjunctionFunctions {
       case \/-(b) => right(b)
     }
 
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit ex: ClassManifest[E]): E \/ T = try {
+    \/-(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
 }
 
 trait DisjunctionInstances extends DisjunctionInstances0 {
