@@ -416,6 +416,7 @@ trait DisjunctionFunctions {
     e fold (left, right)
 
   /** Evaluate the given value, which might throw an exception. */
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     right(a)
   } catch {

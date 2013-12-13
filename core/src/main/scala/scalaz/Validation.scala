@@ -485,6 +485,7 @@ trait ValidationFunctions {
     Failure(_)
 
   /** Evaluate the given value, which might throw an exception. */
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
