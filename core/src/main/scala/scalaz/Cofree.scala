@@ -73,6 +73,10 @@ trait CofreeFunctions {
   def unfoldC[F[_], A](a: A)(f: A => F[A])(implicit F: Functor[F]): Cofree[F, A] =
     Cofree(a, F.map(f(a))(unfoldC(_)(f)))
 
+  def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F]): Cofree[F, A] = {
+    val (a, fb) = f(b)
+    Cofree(a, F.map(fb)(unfold(_)(f)))
+  }
 }
 
 sealed abstract class CofreeInstances {
