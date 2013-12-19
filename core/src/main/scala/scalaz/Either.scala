@@ -349,6 +349,9 @@ trait DisjunctionInstances1 extends DisjunctionInstances2 {
 
 trait DisjunctionInstances2 extends DisjunctionInstances3 {
   implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] {
+    override def map[A, B](fa: L \/ A)(f: A => B) =
+      fa map f
+
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 
