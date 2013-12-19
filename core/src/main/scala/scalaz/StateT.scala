@@ -38,7 +38,7 @@ trait IndexedStateT[F[_], -S1, S2, A] { self =>
   })
 
   /** Map both the return value and final state using the given function. */
-  def mapK[G[_], B](f: F[(S2, A)] => G[(S2, B)]): IndexedStateT[G, S1, S2, B] =
+  def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)]): IndexedStateT[G, S1, S, B] =
     IndexedStateT { s => f(apply(s)) }
 
   import BijectionT._
