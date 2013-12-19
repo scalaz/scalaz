@@ -49,11 +49,7 @@ import Leibniz.{===, refl}
  *
  * Credits to Miles Sabin.
  */
-@implicitNotFound(
-"""Unable to unapply type `${MA}` into a type constructor of kind `M[_]` that is classified by the type class `${TC}`
-1) Check that the type class is defined by compiling `implicitly[${TC}[<type constructor>]]`.
-2) Review the implicits in object Unapply, which only cover common type 'shapes'
-(implicit not found: scalaz.Unapply[${TC}, ${MA}])""")
+@implicitNotFound("Implicit not found: scalaz.Unapply[${TC}, ${MA}]. Unable to unapply type `${MA}` into a type constructor of kind `M[_]` that is classified by the type class `${TC}`. Check that the type class is defined by compiling `implicitly[${TC}[type constructor]]` and review the implicits in object Unapply, which only cover common type 'shapes.'")
 trait Unapply[TC[_[_]], MA] {
 
   /** The type constructor */
