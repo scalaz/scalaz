@@ -449,6 +449,9 @@ trait ValidationInstances3 {
   }
 
   implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+    override def map[A, B](fa: Validation[L, A])(f: A => B) =
+      fa map f
+
     def point[A](a: => A) =
       Success(a)
 
