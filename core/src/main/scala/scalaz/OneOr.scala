@@ -140,6 +140,9 @@ private sealed trait OneOrApplicative[F[_]]
     extends OneOrFunctor[F] with Applicative[({type λ[α] = OneOr[F, α]})#λ] {
   implicit def F: Apply[F]
 
+  override final def map[A, B](fa: OneOr[F, A])(f: A => B): OneOr[F, B] =
+    fa map f
+
   override def ap[A,B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
     fa ap f
 
@@ -182,6 +185,9 @@ private sealed trait OneOrTraverse[F[_]]
 
   implicit def F: Traverse[F]
 
+  override final def map[A, B](fa: OneOr[F, A])(f: A => B): OneOr[F, B] =
+    fa map f
+
   override def traverseImpl[G[_]: Applicative,A,B](fa: OneOr[F, A])(f: A => G[B]) =
     fa traverse f
 
@@ -194,6 +200,9 @@ private sealed trait OneOrTraverse1[F[_]]
   extends OneOrFoldable1[F] with OneOrTraverse[F] with Traverse1[({type λ[α] = OneOr[F, α]})#λ] {
 
   implicit def F: Traverse1[F]
+
+  override final def foldMap1[A, B](fa: OneOr[F, A])(f: A => B)(implicit M: Semigroup[B]) =
+    fa foldMap1 f
 
   override def traverse1Impl[G[_]: Apply,A,B](fa: OneOr[F, A])(f: A => G[B]) =
     fa traverse1 f
