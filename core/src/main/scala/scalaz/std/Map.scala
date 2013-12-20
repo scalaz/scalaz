@@ -83,7 +83,7 @@ trait MapSubInstances extends MapSubInstances0 {
     def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
     def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
     def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
-
+    override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
     def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
       G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
   }
