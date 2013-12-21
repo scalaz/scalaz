@@ -238,6 +238,8 @@ object ScalazArbitrary {
 
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
+  implicit def ilistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(IList.fromList)
+
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
     Applicative[Arbitrary].apply2(A, B)(LazyTuple2(_, _))
 
