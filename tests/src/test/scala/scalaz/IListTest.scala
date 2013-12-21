@@ -74,6 +74,42 @@ object IListTest extends SpecLite {
   // Functionality borrowed from List is tested in terms of List. Is this ethical? 
   // Should they be collapsed into fewer cases?
 
+  "++" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
+    (ns ++ ms).toList must_=== ns.toList ++ ms.toList
+  }
+
+  "++:" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
+    (ns ++: ms).toList must_=== ns.toList ++: ms.toList
+  }
+
+  "+:" ! forAll { (n: Int, ns: IList[Int]) =>
+    (n +: ns).toList must_=== n +: ns.toList
+  }
+
+  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) => 
+    (s /: ns)(f) == (s /: ns.toList)(f)
+  }
+
+  ":+" ! forAll { (n: Int, ns: IList[Int]) =>
+    (ns :+ n).toList must_=== ns.toList :+ n
+  }
+
+  "::" ! forAll { (n: Int, ns: IList[Int]) =>
+    (n :: ns).toList must_=== n :: ns.toList
+  }
+
+  ":::" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
+    (ns ::: ms).toList must_=== ns.toList ::: ms.toList
+  }
+
+  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) => 
+    (ns :\ s)(f) == (ns.toList :\ s)(f)
+  }
+
+  "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
+    (ns concat ms).toList must_=== ns.toList ++ ms.toList
+  }
+
   "collect" ! forAll { (ns: IList[Int]) =>
     val pf: PartialFunction[Int, Int] = { case n if n % 2 == 0 => n + 1 }
     ns.collect(pf).toList must_=== ns.toList.collect(pf)

@@ -18,7 +18,7 @@ sealed abstract class IList[A] {
     concat(as)
 
   def ++:(as: IList[A]): IList[A] = 
-    concat(as)
+    as.concat(this)
 
   def +:(a: A): IList[A] = 
     ::(a)
