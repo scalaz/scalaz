@@ -446,7 +446,7 @@ trait IListInstances extends IListInstance0 {
 
   implicit val instances =
 
-    new Traverse[IList] with MonadPlus[IList] with Each[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] = 
         fa map f
@@ -462,9 +462,6 @@ trait IListInstances extends IListInstance0 {
 
       def empty[A]: IList[A] = 
         IList.empty[A]
-
-      def each[A](fa: IList[A])(f: A => Unit): Unit = 
-        fa.foldLeft(()) { (_, a) => f(a); () }
 
       def zip[A, B](a: => IList[A], b: => IList[B]): IList[(A, B)] = 
         a zip b
