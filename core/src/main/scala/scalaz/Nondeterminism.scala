@@ -109,15 +109,15 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   /**
    * Nondeterministically sequence `fs`, collecting the results using a `Monoid`.
    */
-  def aggregate[A,M](fs: Seq[F[A]])(m: Monoid[A]): F[A] =
-    map(gather(fs))(_.foldLeft(m.zero)((a,b) => m.append(a,b)))
+  def aggregate[A: Monoid](fs: Seq[F[A]]): F[A] =
+    map(gather(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a,b) => implicitly[Monoid[A]].append(a,b)))
 
   /**
    * Nondeterministically sequence `fs`, collecting the results using
    * a commutative `Monoid`.
    */
-  def aggregateCommutative[A,M](fs: Seq[F[A]])(m: Monoid[A]): F[A] =
-    map(gatherUnordered(fs))(_.foldLeft(m.zero)((a,b) => m.append(a,b)))
+  def aggregateCommutative[A: Monoid](fs: Seq[F[A]]): F[A] =
+    map(gatherUnordered(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a,b) => implicitly[Monoid[A]].append(a,b)))
 
   ////
   val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
