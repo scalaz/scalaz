@@ -46,7 +46,7 @@ sealed abstract class IList[A] {
     flatMap(a => IList.fromOption(pf.lift(a)))
 
   def collectFirst[B](pf: PartialFunction[A,B]): Option[B] = 
-    find(a => pf.lift(a).isDefined).map(pf)
+    find(pf.isDefinedAt).map(pf)
 
   def concat(as: IList[A]): IList[A] = 
     foldRight(as)(_ :: _)
@@ -122,7 +122,6 @@ sealed abstract class IList[A] {
     reverse.foldLeft(b)((b, a) => f(a, b))
 
   // no forall; use Foldable#all
-  // no foreach; use Each#each if you dare
 
   def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> IList[A] =
     foldLeft(==>>.empty[K, IList[A]]) { (m, a) => 
