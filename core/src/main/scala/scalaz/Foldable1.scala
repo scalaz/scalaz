@@ -67,7 +67,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** The greatest element of `fa`. */
   def maximum1[A: Order](fa: F[A]): A =
-    foldl1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
+    foldLeft1(fa)((x, y) => if (Order[A].order(x, y) == GT) x else y)
 
   /** The greatest value of `f(a)` for each element `a` of `fa`. */
   def maximumOf1[A, B: Order](fa: F[A])(f: A => B): B =
@@ -79,7 +79,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** The smallest element of `fa`. */
   def minimum1[A: Order](fa: F[A]): A =
-    foldl1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
+    foldLeft1(fa)((x, y) => if (Order[A].order(x, y) == LT) x else y)
 
   /** The smallest value of `f(a)` for each element `a` of `fa`. */
   def minimumOf1[A, B: Order](fa: F[A])(f: A => B): B =
