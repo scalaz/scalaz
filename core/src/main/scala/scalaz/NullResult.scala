@@ -51,12 +51,12 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
       case -\/(a) => apply(a) map (-\/(_))
-      case \/-(c) => Some(\/-(c))
+      case c @ \/-(_) => Some(c)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
-      case -\/(c) => Some(-\/(c))
+      case c @ -\/(_) => Some(c)
       case \/-(a) => apply(a) map (\/-(_))
     }
 
@@ -94,7 +94,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
     carry map (_._1)
 
   def kleisli: Kleisli[Option, A, B] =
-    Kleisli(apply(_))
+    Kleisli(_apply)
 
   import std.option._
 
@@ -102,10 +102,10 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
     StateT(carry apply _)
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
-    T.traverse(a)(apply(_))
+    T.traverse(a)(_apply)
 
   def on[F[_]](a: F[A])(implicit F: Functor[F]): OptionT[F, B] =
-    OptionT(F.map(a)(apply(_)))
+    OptionT(F.map(a)(_apply))
 }
 
 object NullResult extends NullResultInstances with NullResultFunctions {
@@ -117,7 +117,7 @@ trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =
-    NullResult(k apply _)
+    NullResult(k.run)
 
   def lift[A, B](f: A => B): A =>? B =
     NullResult(a => Some(f(a)))

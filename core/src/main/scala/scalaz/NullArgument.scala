@@ -39,20 +39,20 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     NullArgument {
       case None => -\/(apply(None))
       case Some(-\/(a)) => -\/(apply(Some(a)))
-      case Some(\/-(c)) => \/-(c)
+      case Some(c @ \/-(_)) => c
     }
 
   def right[C]: (C \/ A) ?=> (C \/ B) =
     NullArgument {
       case None => \/-(apply(None))
       case Some(\/-(a)) => \/-(apply(Some(a)))
-      case Some(-\/(c)) => -\/(c)
+      case Some(c @ -\/(_)) => c
     }
 
   def compose[C](f: C ?=> A): C ?=> B =
     NullArgument {
       case None => apply(None)
-      case Some(c) => apply(Some(f(Some(c))))
+      case c @ Some(_) => apply(Some(f(c)))
     }
 
   def andThen[C](g: B ?=> C): A ?=> C =
@@ -68,7 +68,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     Cokleisli(apply(_))
 
   def on[F[_]](o: OptionT[F, A])(implicit F: Functor[F]): F[B] =
-    F.map(o.run)(apply(_))
+    F.map(o.run)(_apply)
 
   def lower: A => B =
     a => apply(Some(a))
@@ -105,7 +105,7 @@ trait NullArgumentFunctions {
     })
 
   def cokleisli[A, B](c: Cokleisli[Option, A, B]): A ?=> B =
-    NullArgument(c apply _)
+    NullArgument(c.run)
 }
 
 sealed abstract class NullArgumentInstances0 {
