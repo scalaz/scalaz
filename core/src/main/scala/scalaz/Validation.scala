@@ -133,7 +133,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   }
 
   /** Bind through the success of this validation. */
-  @deprecated("flatMap does not accumulate errors, use `\\/` instead", "7.1")
+  @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` instead""", "7.1")
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
