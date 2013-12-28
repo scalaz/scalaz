@@ -2,7 +2,9 @@ package scalaz
 
 import scala.annotation.tailrec
 import scala.annotation.unchecked.uncheckedVariance
-import Scalaz._
+import std.option.{ cata, none, some }
+import std.stream.{ toZipper => sToZipper }
+import std.tuple.{ tuple2Bitraverse => BFT }
 import Liskov.{ <~<, refl }
 
 /**
@@ -98,7 +100,7 @@ sealed abstract class IList[A] {
     @tailrec def find0[A](as: IList[A])(f: A => Boolean): Option[A] =
       as match {
         case INil() => none
-        case ICons(a, as) => if (f(a)) a.some else find0[A](as)(f)
+        case ICons(a, as) => if (f(a)) some(a) else find0[A](as)(f)
       }
     find0(this)(f)
   }
@@ -137,7 +139,7 @@ sealed abstract class IList[A] {
     uncons(None, (h, _) => Some(h))
 
   def indexOf(a: A)(implicit ev: Equal[A]): Option[Int] = 
-    indexWhere(_ === a)
+    indexWhere(ev.equal(a, _))
    
   def indexOfSlice(slice: IList[A])(implicit ev: Equal[A]): Option[Int] = {
     @tailrec def indexOfSlice0(i: Int, as: IList[A]): Option[Int] =
@@ -195,11 +197,11 @@ sealed abstract class IList[A] {
 
   // private helper for mapAccumLeft/Right below
   private[this] def mapAccum[B, C](as: IList[A])(c: C, f: (C, A) => (C, B)): (C, IList[B]) =
-    as.foldLeft((c, IList.empty[B])) { case ((c, bs), a) => f(c, a).rightMap(_ :: bs) }
+    as.foldLeft((c, IList.empty[B])) { case ((c, bs), a) => BFT.rightMap(f(c, a))(_ :: bs) }
 
   /** All of the `B`s, in order, and the final `C` acquired by a stateful left fold over `as`. */
   def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, IList[B]) =
-    mapAccum(this)(c, f).rightMap(_.reverse)
+    BFT.rightMap(mapAccum(this)(c, f))(_.reverse)
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired by a stateful right fold over `as`. */
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, IList[B]) =
@@ -220,9 +222,9 @@ sealed abstract class IList[A] {
   }
 
   def partition(f: A => Boolean): (IList[A], IList[A]) =
-    foldLeft((IList.empty[A], IList.empty[A])) {
+    BFT.umap(foldLeft((IList.empty[A], IList.empty[A])) {
       case ((ts, fs), a) => if (f(a)) (a :: ts, fs) else (ts, a :: fs)
-    }.bimap(_.reverse, _.reverse)
+    })(_.reverse)
 
   def patch(from: Int, patch: IList[A], replaced: Int): IList[A] = {
     val (init, tail) = splitAt(from)
@@ -295,7 +297,7 @@ sealed abstract class IList[A] {
     @tailrec def startsWith0(a: IList[A], b: IList[A]): Boolean =
       (a, b) match {
         case (_, INil()) => true
-        case (ICons(ha, ta), ICons(hb, tb)) if ha === hb => startsWith0(ta, tb)
+        case (ICons(ha, ta), ICons(hb, tb)) if ev.equal(ha, hb) => startsWith0(ta, tb)
         case _ => false
       }
     startsWith0(this, as)
@@ -361,7 +363,7 @@ sealed abstract class IList[A] {
     foldRight(Vector[A]())(_ +: _)
 
   def toZipper: Option[Zipper[A]] =
-    toStream.toZipper
+    sToZipper(toStream)
 
   def uncons[B](n: => B, c: (A, IList[A]) => B): B =
     this match {
@@ -370,9 +372,9 @@ sealed abstract class IList[A] {
     }
 
   def unzip[B, C](implicit ev: A <~< (B, C)): (IList[B], IList[C]) =
-    widen[(B,C)].foldLeft((IList.empty[B], IList.empty[C])) { 
+    BFT.bimap(widen[(B,C)].foldLeft((IList.empty[B], IList.empty[C])) { 
       case ((as, bs), (a, b)) => (a :: as, b :: bs)
-    }.bimap(_.reverse, _.reverse)
+    })(_.reverse, _.reverse)
 
   /** Unlike stdlib's version, this is total and simply ignores indices that are out of range */
   def updated(index: Int, a: A): IList[A] = {
@@ -423,7 +425,7 @@ object IList extends IListFunctions with IListInstances {
     as.foldRight(empty[A])(ICons(_, _))
   
   def fromOption[A](a: Option[A]): IList[A] = 
-    a.cata(IList(_), IList.empty[A])
+    cata(a)(IList(_), IList.empty[A])
 
   def fill[A](n: Int)(a: A): IList[A] =
     INil().padTo(n, a)
@@ -528,7 +530,7 @@ private trait IListEqual[A] extends Equal[IList[A]] {
   @tailrec final override def equal(a: IList[A], b: IList[A]): Boolean =
     (a, b) match {
       case (INil(), INil()) => true
-      case (ICons(a, as), ICons(b, bs)) if a === b => equal(as, bs)
+      case (ICons(a, as), ICons(b, bs)) if A.equal(a, b) => equal(as, bs)
       case _ => false
     }
 
