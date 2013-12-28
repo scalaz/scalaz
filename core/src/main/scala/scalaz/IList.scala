@@ -12,7 +12,7 @@ import Liskov.{ <~<, refl }
  * here, either on the `IList` interface itself or via typeclass instances (which are the same as
  * those defined for stdlib `List`). All methods are total and stack-safe.
  */
-sealed abstract class IList[A] {
+sealed abstract class IList[A] extends Product with Serializable {
 
   // Operations, in alphabetic order
 
@@ -410,8 +410,8 @@ sealed abstract class IList[A] {
 
 // In order to get exhaustiveness checking and a sane unapply in both 2.9 and 2.10 it seems
 // that we need to use bare case classes. Sorry. Suggestions welcome.
-case class INil[A]() extends IList[A]
-case class ICons[A](head: A, tail: IList[A]) extends IList[A]
+final case class INil[A]() extends IList[A]
+final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListFunctions with IListInstances {
 
