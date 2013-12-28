@@ -303,7 +303,7 @@ type Id[A] = A
 
 ## Contributing
 
-[Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/doc/DeveloperGuide.md)
+[Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/CONTRIBUTING.md)
 
 ## Credits
 
