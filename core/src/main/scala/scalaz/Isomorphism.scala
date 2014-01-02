@@ -50,6 +50,14 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
       val from = self.to
       override def flip = self
     }
+
+    import Liskov._
+
+    def unlift[A](implicit FG: Arr[F, G] <~< (F ~> G), GF: Arr[G, F] <~< (G ~> F)): F[A] <=> G[A] =
+      new (F[A] <=> G[A]){
+        def from = GF(self.from)
+        def to   = FG(self.to)
+      }
   }
 
   /**Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */
@@ -61,6 +69,41 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
       val to = self.from
       val from = self.to
       override def flip = self
+    }
+
+    import Liskov._
+
+    def unlift[A, B](implicit
+      FG: Arr[F, G] <~< (F ~~> G),
+      GF: Arr[G, F] <~< (G ~~> F)
+    ): F[A, B] <=> G[A, B] =
+      new (F[A, B] <=> G[A, B]){
+        def from = GF(self.from).apply _
+        def to   = FG(self.to).apply _
+      }
+
+    def unlift1[A](implicit
+      FG: Arr[F, G] <~< (F ~~> G),
+      GF: Arr[G, F] <~< (G ~~> F)
+    ): ({type λ[α] = F[A, α]})#λ <~> ({type λ[α] = G[A, α]})#λ = {
+      type FA[α] = F[A, α]
+      type GA[α] = G[A, α]
+      new IsoFunctorTemplate[FA, GA]{
+        def from[X](ga: GA[X]) = GF(self.from)(ga)
+        def to[X](fa: FA[X]) = FG(self.to)(fa)
+      }
+    }
+
+    def unlift2[A](implicit
+      FG: Arr[F, G] <~< (F ~~> G),
+      GF: Arr[G, F] <~< (G ~~> F)
+    ): ({type λ[α] = F[α, A]})#λ <~> ({type λ[α] = G[α, A]})#λ = {
+      type FA[α] = F[α, A]
+      type GA[α] = G[α, A]
+      new IsoFunctorTemplate[FA, GA]{
+        def from[X](ga: GA[X]) = GF(self.from)(ga)
+        def to[X](fa: FA[X]) = FG(self.to)(fa)
+      }
     }
   }
 
