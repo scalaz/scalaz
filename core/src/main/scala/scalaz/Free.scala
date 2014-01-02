@@ -261,6 +261,10 @@ trait FreeFunctions {
   def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(value))
 
+  /** Suspends a value within a functor in a single step. */
+  def liftF[S[_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
+    Suspend(S.map(value)(Return[S, A]))
+
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
     return_(())
