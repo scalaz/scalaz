@@ -55,6 +55,9 @@ object Free extends FreeFunctions with FreeInstances {
       t => Functor[G].map(fa)(a => f(a)(t))
   }
 
+  /** Suspends a value within a functor in a single step. */
+  def liftF[S[+_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
+    Suspend(S.map(value)(Return[S, A]))
 }
 
 /** A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
