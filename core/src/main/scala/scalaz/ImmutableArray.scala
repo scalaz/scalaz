@@ -96,7 +96,40 @@ trait ImmutableArrayFunctions {
     }
 }
 
-object ImmutableArray extends ImmutableArrayFunctions {
+sealed abstract class ImmutableArrayInstances {
+
+  implicit def immutableArrayEqual[A](implicit A: Equal[A]): Equal[ImmutableArray[A]] =
+    Equal.equal{ (a, b) =>
+      (a.length == b.length) && (0 until a.length).forall(i => A.equal(a(i), b(i)))
+    }
+
+  implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[ImmutableArray] =
+    new Foldable[ImmutableArray] with Zip[ImmutableArray] {
+      override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
+        fa.foldLeft(z)(f)
+      def foldMap[A, B](fa: ImmutableArray[A])(f: A => B)(implicit F: Monoid[B]): B = {
+        var i = 0
+        var b = F.zero
+        while(i < fa.length){
+          b = F.append(b, f(fa(i)))
+          i += 1
+        }
+        b
+      }
+      def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
+        fa.foldRight(z)((a, b) => f(a, b))
+      def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) =
+        new ImmutableArray.ofRef((a.iterator zip b.iterator).toArray)
+      override def index[A](fa: ImmutableArray[A], i: Int) =
+        if(0 <= i && i < fa.length) Some(fa(i)) else None
+      override def length[A](fa: ImmutableArray[A]) =
+        fa.length
+      override def empty[A](fa: ImmutableArray[A]) =
+        fa.isEmpty
+    }
+}
+
+object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctions {
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
     // override def stringPrefix = "ImmutableArray"
