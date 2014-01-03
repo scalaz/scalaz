@@ -253,4 +253,20 @@ object Rope {
       def apply(from: Rope[_]): Builder[T, Rope[T]] = newBuilder[T]
       def apply(): Builder[T, Rope[T]] = newBuilder[T]
     }
+
+  implicit val ropeInstance: Foldable[Rope] with Plus[Rope] =
+    new Foldable[Rope] with Plus[Rope] {
+      override def foldLeft[A, B](fa: Rope[A], z: B)(f: (B, A) => B) =
+        Foldable[FingerTreeIntPlus].foldLeft(fa.self, z)((b, a) => Foldable[ImmutableArray].foldLeft(a, b)(f))
+      def foldMap[A, B: Monoid](fa: Rope[A])(f: A => B) =
+        Foldable[FingerTreeIntPlus].foldMap(fa.self)(Foldable[ImmutableArray].foldMap(_)(f))
+      def foldRight[A, B](fa: Rope[A], z: => B)(f: (A, => B) => B) =
+        Foldable[FingerTreeIntPlus].foldRight(fa.self, z)(Foldable[ImmutableArray].foldRight(_, _)(f))
+      def plus[A](a: Rope[A], b: => Rope[A]) =
+        a ++ b
+    }
+
+  import std.list._
+  implicit def ropeEqual[A: Equal]: Equal[Rope[A]] =
+    Equal.equalBy(_.self.toList.flatten)
 }
