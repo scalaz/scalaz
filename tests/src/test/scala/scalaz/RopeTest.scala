@@ -1,5 +1,6 @@
 package scalaz
 
+import scalaz.scalacheck.ScalazProperties._
 import scalacheck.ScalazArbitrary._
 import syntax.equal._
 import std.string._
@@ -12,8 +13,9 @@ object RopeTest extends SpecLite {
 
   import Rope._
 
-  //def beTheSameRopeSeq[A : ClassManifest] = containInOrder(_: Seq[A]) ^^ (wrapRope(_: Rope[A]))
-  import scala.Predef.{implicitly => ?}
+  checkAll(equal.laws[Rope[Int]])
+  checkAll(foldable.laws[Rope])
+  checkAll(plus.laws[Rope])
 
   // TODO get rid of code duplication
   def streamToRope[A : ClassManifest](stream: Stream[A]): Rope[A] = stream.foldLeft(Rope.empty[A]) {
