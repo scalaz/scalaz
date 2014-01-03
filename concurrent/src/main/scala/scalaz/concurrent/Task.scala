@@ -306,6 +306,6 @@ object Task {
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
-    try \/-(a) catch { case e: Exception => -\/(e) }
+    try \/-(a) catch { case e: Throwable => -\/(e) }
 }
 
