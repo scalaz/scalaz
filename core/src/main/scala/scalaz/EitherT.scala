@@ -92,13 +92,13 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
 
   /** Filter on the right of this disjunction. */
-  def filter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
-    EitherT(F.map(run)(_.filter[A](p)))
+  def filter(p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
+    MonadPlus[({type λ[α] = EitherT[F, A, α]})#λ].filter(this)(p)
 
   /** Alias for `filter`.
    * @since 7.0.2
    */
-  def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Functor[F]): EitherT[F, A, B] =
+  def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
     filter(p)(M, F)
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
@@ -212,9 +212,19 @@ object EitherT extends EitherTInstances with EitherTFunctions {
   }
 }
 
-sealed abstract class EitherTInstances1 {
+sealed abstract class EitherTInstances2 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTFunctor[F, L] {
     implicit def F = F0
+  }
+}
+
+sealed abstract class EitherTInstances1 extends EitherTInstances2 {
+  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTMonad[F, L] {
+    implicit def F = F0
+  }
+  implicit def eitherTPlus[F[_], L](implicit F0: Monad[F], L0: Semigroup[L]): Plus[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTPlus[F, L] {
+    implicit def F = F0
+    implicit def G = L0
   }
 }
 
@@ -222,9 +232,9 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
   implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBifunctor[F] {
     implicit def F = F0
   }
-
-  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTMonad[F, L] {
+  implicit def eitherTMonadPlus[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTMonadPlus[F, L] {
     implicit def F = F0
+    implicit def G = L0
   }
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTFoldable[F, L] {
     implicit def F = F0
@@ -270,6 +280,28 @@ private trait EitherTMonad[F[_], E] extends Monad[({type λ[α]=EitherT[F, E, α
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
 
   def bind[A, B](fa: EitherT[F, E, A])(f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
+}
+
+private trait EitherTPlus[F[_], E] extends Plus[({type λ[α]=EitherT[F, E, α]})#λ] {
+  def F: Monad[F]
+  def G: Semigroup[E]
+
+  def plus[A](a: EitherT[F, E, A], b: => EitherT[F, E, A]): EitherT[F, E, A] =
+    EitherT(F.bind(a.run){
+      case -\/(l) =>
+        F.map(b.run){
+          case -\/(ll)    => -\/(G.append(l, ll))
+          case r @ \/-(_) => r
+        }
+      case r =>
+        F.point(r)
+    })
+}
+
+private trait EitherTMonadPlus[F[_], E] extends MonadPlus[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTMonad[F, E] with EitherTPlus[F, E] {
+  def G: Monoid[E]
+
+  def empty[A]: EitherT[F, E, A] = EitherT(F.point(-\/(G.zero)))
 }
 
 private trait EitherTFoldable[F[_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
