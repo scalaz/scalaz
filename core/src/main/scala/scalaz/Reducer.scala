@@ -80,7 +80,7 @@ sealed abstract class ReducerInstances { self: ReducerFunctions =>
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
-    unitConsReducer(List(_), c => c :: _)
+    unitConsReducer(_ :: Nil, c => c :: _)
   }
 
   /** Collect `C`s into a stream, in order. */
@@ -96,9 +96,11 @@ sealed abstract class ReducerInstances { self: ReducerFunctions =>
   }
 
   /** Collect `C`s into a vector, in order. */
-  implicit def VectorReducer[C]: Reducer[C, Vector[C]] = {
-    import std.vector._
-    unitReducer(c => Vector(c))
+  implicit def VectorReducer[C]: Reducer[C, Vector[C]] = new Reducer[C, Vector[C]]{
+    val monoid: Monoid[Vector[C]] = std.vector.vectorMonoid[C]
+    def cons(c: C, m: Vector[C]) = c +: m
+    def snoc(m: Vector[C], c: C) = m :+ c
+    def unit(c: C) = Vector(c)
   }
 
   /** The "or" monoid. */
