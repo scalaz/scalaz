@@ -45,6 +45,9 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def rightTraverse[X]: Traverse[({type λ[α] = F[X, α]})#λ] =
     new RightTraverse[F, X] {val F = self}
 
+  /** Unify the traverse over both params. */
+  def uTraverse: Traverse[({type λ[α] = F[α, α]})#λ] = new UTraverse[F] {val F = self}
+
   class Bitraversal[G[_]](implicit G: Applicative[G]) {
     def run[A,B,C,D](fa: F[A,B])(f: A => G[C])(g: B => G[D]): G[F[C, D]] = bitraverseImpl[G,A,B,C,D](fa)(f, g)
   }

@@ -35,6 +35,9 @@ trait Bifunctor[F[_, _]]  { self =>
   def rightFunctor[X]: Functor[({type λ[α] = F[X, α]})#λ] =
     new RightFunctor[F, X] {val F = self}
 
+  /** Unify the functor over both params. */
+  def uFunctor: Functor[({type λ[α] = F[α, α]})#λ] = new UFunctor[F] {val F = self}
+
   def rightMap[A, B, D](fab: F[A, B])(g: B => D): F[A, D] =
     bimap(fab)(z => z, g)
 

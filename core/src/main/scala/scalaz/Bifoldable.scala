@@ -60,6 +60,9 @@ trait Bifoldable[F[_, _]]  { self =>
   def rightFoldable[X]: Foldable[({type λ[α] = F[X, α]})#λ] =
     new RightFoldable[F, X] {val F = self}
 
+  /** Unify the foldable over both params. */
+  def uFoldable: Foldable[({type λ[α] = F[α, α]})#λ] = new UFoldable[F] {val F = self}
+
   trait BifoldableLaw {
     import std.vector._
 
