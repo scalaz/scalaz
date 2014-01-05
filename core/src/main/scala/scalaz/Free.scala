@@ -50,11 +50,11 @@ sealed abstract class Free[S[_], A](implicit S: Functor[S]) {
 
   /** Evaluates a single layer of the free monad. */
   @tailrec final def resume: (S[Free[S, A]] \/ A) = this match {
-    case Return(a)  => \/.right(a)
-    case Suspend(t) => \/.left(t)
+    case Return(a)  => \/-(a)
+    case Suspend(t) => -\/(t)
     case a Gosub f  => a() match {
       case Return(a)  => f(a).resume
-      case Suspend(t) => \/.left(S.map(t)(((_: Free[S, Any]) flatMap f)))
+      case Suspend(t) => -\/(S.map(t)(((_: Free[S, Any]) flatMap f)))
       case b Gosub g  => b().flatMap((x: Any) => g(x) flatMap f).resume
     }
   }

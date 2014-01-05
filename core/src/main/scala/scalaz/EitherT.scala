@@ -194,11 +194,11 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 object EitherT extends EitherTInstances with EitherTFunctions {
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
-    apply(F.map(a)(\/.left(_)))
+    apply(F.map(a)(\/.left))
 
   /** Construct a right disjunction value. */
   def right[F[_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
-    apply(F.map(b)(\/.right(_)))
+    apply(F.map(b)(\/.right))
 
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =

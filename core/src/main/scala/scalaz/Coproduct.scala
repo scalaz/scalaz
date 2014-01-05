@@ -60,10 +60,10 @@ object Coproduct extends CoproductInstances with CoproductFunctions
 
 trait CoproductFunctions {
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =
-    Coproduct(\/.left(x))
+    Coproduct(-\/(x))
 
   def rightc[F[_], G[_], A](x: G[A]): Coproduct[F, G, A] =
-    Coproduct(\/.right(x))
+    Coproduct(\/-(x))
 
   final class CoproductLeft[G[_]] private[CoproductFunctions]{
     def apply[F[_], A](fa: F[A]): Coproduct[F, G, A] = Coproduct(-\/(fa))
