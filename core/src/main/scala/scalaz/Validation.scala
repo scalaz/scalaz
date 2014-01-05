@@ -381,6 +381,8 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
     def order(f1: Validation[E, A], f2: Validation[E, A]) =
       f1 compare f2
+    override def equal(f1: Validation[E, A], f2: Validation[E, A]) =
+      f1 === f2
   }
 
   implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
