@@ -24,7 +24,7 @@ final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Fun
 
   /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
   def scanr[B](g: (A, S[Cofree[S, B]]) => B): Cofree[S, B] = {
-    lazy val qs = S.map(tail)(_ scanr g)
+    val qs = S.map(tail)(_ scanr g)
     Cofree(g(head, qs), qs)
   }
 
