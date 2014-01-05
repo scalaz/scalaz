@@ -64,6 +64,24 @@ trait CoproductFunctions {
 
   def rightc[F[_], G[_], A](x: G[A]): Coproduct[F, G, A] =
     Coproduct(\/.right(x))
+
+  final class CoproductLeft[G[_]] private[CoproductFunctions]{
+    def apply[F[_], A](fa: F[A]): Coproduct[F, G, A] = Coproduct(-\/(fa))
+  }
+
+  final class CoproductRight[F[_]] private[CoproductFunctions]{
+    def apply[G[_], A](ga: G[A]): Coproduct[F, G, A] = Coproduct(\/-(ga))
+  }
+
+  /** Like `Coproduct.leftc`, but specify only the `G`
+   * @example {{{
+   * Coproduct.left[Option](List(1)) // Coproduct[List, Option, Int](-\/(List(1)))
+   * }}}
+   */
+  def left[G[_]]: CoproductLeft[G] = new CoproductLeft[G]
+
+  /** Like `Coproduct.rightc`, but specify only the `F` */
+  def right[F[_]]: CoproductRight[F] = new CoproductRight[F]
 }
 
 sealed abstract class CoproductInstances3 {
