@@ -319,6 +319,8 @@ trait DisjunctionInstances0 extends DisjunctionInstances1 {
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
         a1 compare a2
+      override def equal(a1: A \/ B, a2: A \/ B) =
+        a1 === a2
     }
 
   implicit def DisjunctionMonoid[A: Semigroup, B: Monoid]: Monoid[A \/ B] =
