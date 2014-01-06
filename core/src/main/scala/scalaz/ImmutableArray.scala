@@ -238,15 +238,14 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
 
   implicit def unwrapArray[A](immArrayOps: WrappedImmutableArray[A]): ImmutableArray[A] = immArrayOps.value
   
-  class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
+  abstract class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
           IndexedSeq[A] with IndexedSeqOptimized[A, WrappedImmutableArray[A]] {
     def apply(index: Int) = value(index)
     def length = value.length
 
     override def stringPrefix = "ImmutableArray"
 
-    protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]] =
-      sys.error("calling newBuilder directly on WrappedImmutableArray[A]; this should be overridden in all subclasses")
+    protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
 
     override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
