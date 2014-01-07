@@ -1,7 +1,7 @@
 package scalaz
 
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
-final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Functor[S]) {
+final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]]) {
 
   /** Alias for `head`, for compatibility with Scalaz 6 */
   final def extract: A = head
@@ -12,31 +12,31 @@ final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Fun
   /** Alias for `tail`, for compatibility with Scalaz 6 */
   final def out: S[Cofree[S, A]] = tail
 
-  final def map[B](f: A => B): Cofree[S, B] =
+  final def map[B](f: A => B)(implicit S: Functor[S]): Cofree[S, B] =
     applyCofree(f, _ map f)
 
   /** Alias for `extend` */
-  final def =>>[B](f: Cofree[S, A] => B): Cofree[S, B] = this extend f
+  final def =>>[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] = this extend f
 
   /** Redecorates this structure with a computation whose context is the entire structure under that value. */
-  final def extend[B](f: Cofree[S, A] => B): Cofree[S, B] =
+  final def extend[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] =
     applyTail(f(this), _ extend f)
 
   /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
-  def scanr[B](g: (A, S[Cofree[S, B]]) => B): Cofree[S, B] = {
+  def scanr[B](g: (A, S[Cofree[S, B]]) => B)(implicit S: Functor[S]): Cofree[S, B] = {
     val qs = S.map(tail)(_ scanr g)
     Cofree(g(head, qs), qs)
   }
 
   /** Redecorates the structure with values representing entire substructures. */
-  final def duplicate: Cofree[S, Cofree[S, A]] =
+  final def duplicate(implicit S: Functor[S]): Cofree[S, Cofree[S, A]] =
     applyTail(this, _.duplicate)
 
   /** Returns the components of this structure in a tuple. */
   final def toPair: (A, S[Cofree[S, A]]) = (head, tail)
 
   /** Changes the branching functor by the given natural transformation. */
-  final def mapBranching[T[_]:Functor](f: S ~> T): Cofree[T, A] =
+  final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Cofree[T, A] =
     Cofree(head, f(S.map(tail)(_ mapBranching f)))
 
   /** Modifies the first branching with the given natural transformation. */
@@ -44,23 +44,23 @@ final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]])(implicit S: Fun
     Cofree(head, f(tail))
 
   /** Injects a constant value into this structure. */
-  final def inject[B](b: B): Cofree[S, B] =
+  final def inject[B](b: B)(implicit S: Functor[S]): Cofree[S, B] =
     applyTail(b, _ inject b)
 
   /** Applies `f` to the head and `g` through the tail. */
-  final def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B]): Cofree[S, B] =
+  final def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] =
     Cofree(f(head), S.map(tail)(g))
 
   /** Replaces the head with `b` and applies `g` through the tail. */
-  final def applyTail[B](b: B, g: Cofree[S, A] => Cofree[S, B]): Cofree[S, B] =
+  final def applyTail[B](b: B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] =
     applyCofree(x => b, g)
 
   /** Applies a function `f` to a value in this comonad and a corresponding value in the dual monad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): C =
     Zap.comonadMonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a monad to the corresponding value in this comonad, annihilating both. */
-  final def zap[G[_], B](fs: Free[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Free[G, A => B])(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 }
 
@@ -71,7 +71,7 @@ trait CofreeFunctions {
 
   private[scalaz] final type CofreeZip[F[_], A] = Cofree[F, A] @@ Tags.Zip
 
-  private[scalaz] final def CofreeZip[F[_]: Functor, A](head: A, tail: F[Cofree[F, A]]): CofreeZip[F, A] =
+  private[scalaz] final def CofreeZip[F[_], A](head: A, tail: F[Cofree[F, A]]): CofreeZip[F, A] =
     Tags.Zip(Cofree(head, tail))
 
   /** Cofree corecursion. */
@@ -101,8 +101,10 @@ sealed abstract class CofreeInstances3 extends CofreeInstances4 {
       def F = implicitly
     }
 
-  implicit def cofreeZipFunctor[F[_]]: Functor[({type λ[α] = CofreeZip[F, α]})#λ] =
-    new CofreeZipFunctor[F]{}
+  implicit def cofreeZipFunctor[F[_]: Functor]: Functor[({type λ[α] = CofreeZip[F, α]})#λ] =
+    new CofreeZipFunctor[F]{
+      def F = implicitly
+    }
 }
 
 sealed abstract class CofreeInstances2 extends CofreeInstances3 {
@@ -154,10 +156,14 @@ sealed abstract class CofreeInstances0 extends CofreeInstances1 {
 }
 
 sealed abstract class CofreeInstances extends CofreeInstances0 {
-  implicit def cofreeComonad[S[_]]: Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {}
+  implicit def cofreeComonad[S[_]: Functor]: Comonad[({type f[x] = Cofree[S, x]})#f] = new CofreeComonad[S] {
+    def F = implicitly
+  }
 }
 
 private trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f] {
+  implicit def F: Functor[S]
+
   def copoint[A](p: Cofree[S, A]) = p.head
 
   override def cojoin[A](a: Cofree[S, A]) = a.duplicate
@@ -168,6 +174,8 @@ private trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f
 }
 
 private trait CofreeZipFunctor[F[_]] extends Functor[({type λ[α] = CofreeZip[F, α]})#λ]{
+  implicit def F: Functor[F]
+
   override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) = Tags.Zip(fa map f)
 }
 

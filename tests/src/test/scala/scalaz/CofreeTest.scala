@@ -103,7 +103,7 @@ object CofreeTest extends SpecLite {
   }
 
   object instances{
-    def comonad[F[_]] = Comonad[({type λ[α] = Cofree[F, α]})#λ]
+    def comonad[F[_]: Functor] = Comonad[({type λ[α] = Cofree[F, α]})#λ]
     def bind[F[_]: Plus: Functor] = Bind[({type λ[α] = Cofree[F, α]})#λ]
     def monad[F[_]: PlusEmpty: Functor] = Monad[({type λ[α] = Cofree[F, α]})#λ]
     def foldable1[F[_]: Foldable] = Foldable1[({type λ[α] = Cofree[F, α]})#λ]
@@ -116,7 +116,7 @@ object CofreeTest extends SpecLite {
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Cofree[F, α]})#λ]
 
     object zip{
-      def functor[F[_]] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
+      def functor[F[_]: Functor] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
       def apply[F[_]: Apply] = Apply[({type λ[α] = CofreeZip[F, α]})#λ]
       def applicative[F[_]: Applicative] = Applicative[({type λ[α] = CofreeZip[F, α]})#λ]
 
