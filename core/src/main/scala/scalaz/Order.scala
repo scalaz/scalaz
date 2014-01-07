@@ -55,7 +55,7 @@ trait Order[F] extends Equal[F] { self =>
     }
 
     def orderAndEqualConsistent(f1: F, f2: F): Boolean = {
-      conditional(equal(f1, f2), order(f1, f2) == Ordering.EQ)
+      equal(f1, f2) == (order(f1, f2) == Ordering.EQ)
     }
   }
 
