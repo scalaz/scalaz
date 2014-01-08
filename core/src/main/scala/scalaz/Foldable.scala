@@ -126,8 +126,8 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, (List[List[A]](), None : Option[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
-        case (_, None) => List(List(a))
-        case (x, Some(q)) => if (pa == q) (a :: x.head) :: x.tail else List(a) :: x
+        case (_, None) => (a :: Nil) :: Nil
+        case (x, Some(q)) => if (pa == q) (a :: x.head) :: x.tail else (a :: Nil) :: x
       }, Some(pa))
     })._1
 

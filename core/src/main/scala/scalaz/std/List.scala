@@ -15,9 +15,9 @@ trait ListInstances extends ListInstances0 {
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: List[A]) = fa.length
-    def point[A](a: => A) = scala.List(a)
+    def point[A](a: => A) = a :: Nil
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
-    def empty[A] = scala.List()
+    def empty[A] = Nil
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
@@ -156,7 +156,7 @@ trait ListFunctions {
   final def powerset[A](as: List[A]): List[List[A]] = {
     import list.listInstance
 
-    filterM(as)(_ => scala.List(true, false))
+    filterM(as)(_ => true :: false :: Nil)
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
@@ -226,13 +226,13 @@ trait ListFunctions {
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {
-    case Nil           => scala.List(Nil)
+    case Nil           => Nil :: Nil
     case xxs@(_ :: xs) => xxs :: tailz(xs)
   }
 
   /** `[Nil, as take 1, as take 2, ..., as]` */
   final def initz[A](as: List[A]): List[List[A]] = as match {
-    case Nil           => scala.List(Nil)
+    case Nil           => Nil :: Nil
     case xxs@(x :: xs) => Nil :: (initz(xs) map (x :: _))
   }
 

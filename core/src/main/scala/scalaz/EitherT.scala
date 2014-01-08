@@ -116,7 +116,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
-    F.map(run)(_.fold(_ => Nil, List(_)))
+    F.map(run)(_.fold(_ => Nil, _ :: Nil))
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =

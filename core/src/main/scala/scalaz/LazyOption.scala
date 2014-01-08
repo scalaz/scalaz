@@ -47,7 +47,7 @@ sealed trait LazyOption[+A] {
     fold(-\/(_), \/-(right))
 
   def toList: List[A] =
-    fold(List(_), Nil)
+    fold(_ :: Nil, Nil)
 
   def orElse[AA >: A](a: => LazyOption[AA]): LazyOption[AA] =
     fold(_ => this, a)
