@@ -1,11 +1,7 @@
 package scalaz
 package concurrent
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
-import org.scalacheck.Prop._
-
 import java.util.concurrent.{Executors, TimeoutException}
 import java.util.concurrent.atomic._
 import org.scalacheck.Prop.forAll
@@ -14,7 +10,7 @@ object TaskTest extends SpecLite {
 
   val N = 10000
   val correct = (0 to N).sum
-  val LM = Monad[List]; import LM.monadSyntax._;
+  val LM = Monad[List]; import LM.monadSyntax._
   val LT = Traverse[List]; import LT.traverseSyntax._
 
   // standard worst case scenario for trampolining -
@@ -24,7 +20,7 @@ object TaskTest extends SpecLite {
     (0 to N).map(cur(_)).foldLeft(seed(0))(Task.taskInstance.lift2(_ + _))
 
   val options = List[(=> Int) => Task[Int]](n => Task.now(n), Task.delay _ , Task.apply _)
-  val combinations = (options tuple options)
+  val combinations = options tuple options
 
   "left associated binds" ! check {
     combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).run == correct }
@@ -131,9 +127,9 @@ object TaskTest extends SpecLite {
       val es3 = Executors.newFixedThreadPool(3)
 
       // NB: Task can only be interrupted in between steps (before the `map`)
-      val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { now(throw ex) }
-      val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
+      val t1 = fork { sleep(1000); now(()) }(es3).map { _ => t1v.set(1) }
+      val t2 = fork { now(throw ex) }(es3)
+      val t3 = fork { sleep(1000); now(()) }(es3).map { _ => t3v.set(3) }
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
@@ -155,9 +151,9 @@ object TaskTest extends SpecLite {
       implicit val es3 = Executors.newFixedThreadPool(3)
 
       // NB: Task can only be interrupted in between steps (before the `map`)
-      val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { sleep(100); now(throw ex) }
-      val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
+      val t1 = fork { sleep(1000); now(()) }(es3).map { _ => t1v.set(1) }
+      val t2 = fork { sleep(100); now(throw ex) }(es3)
+      val t3 = fork { sleep(1000); now(()) }(es3).map { _ => t3v.set(3) }
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
@@ -211,4 +207,3 @@ object TaskTest extends SpecLite {
     x == (xs.length + 1)
   }
 }
-

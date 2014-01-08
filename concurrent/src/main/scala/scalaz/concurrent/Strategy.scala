@@ -56,8 +56,6 @@ trait StrategysLow {
     }
   }
 
-  import java.util.concurrent.ExecutorService
-
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
    */
@@ -70,6 +68,20 @@ trait StrategysLow {
         def call = a
       })
       () => fut.get
+    }
+  }
+
+  /**
+   * A strategy that running actors using an implicit ExecutorService.
+   */
+  def ActorExecutor(implicit s: ExecutorService) = new Strategy {
+    private val es = s
+
+    def apply[A](a: => A): () => A = {
+      es.execute(new Runnable() {
+        def run(): Unit = a
+      })
+      null
     }
   }
 
@@ -104,9 +116,9 @@ trait StrategysLow {
 
     def apply[A](a: => A) = {
       val worker = new SwingWorker[A, Unit] {
-        def doInBackground = a
+        def doInBackground() = a
       }
-      worker.execute
+      worker.execute()
       () => worker.get
     }
   }
