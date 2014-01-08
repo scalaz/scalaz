@@ -275,7 +275,7 @@ object either extends EitherInstances
 private trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {
   implicit def A: Equal[A]
 
-  def equal(a1: RightProjection[X, A], a2: RightProjection[X, A]) = (a1.toOption, a2.toOption) match {
+  final override def equal(a1: RightProjection[X, A], a2: RightProjection[X, A]) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
     case (None, None)       => true
     case _                  => false
@@ -285,7 +285,7 @@ private trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {
 private trait EitherLeftEqual[A, X] extends Equal[LeftProjection[A, X]] {
   implicit def A: Equal[A]
 
-  def equal(a1: LeftProjection[A, X], a2: LeftProjection[A, X]) = (a1.toOption, a2.toOption) match {
+  final override def equal(a1: LeftProjection[A, X], a2: LeftProjection[A, X]) = (a1.toOption, a2.toOption) match {
     case (Some(x), Some(y)) => A.equal(x, y)
     case (None, None)       => true
     case _                  => false
@@ -296,7 +296,7 @@ private trait EitherEqual[A, B] extends Equal[Either[A, B]] {
   implicit def A: Equal[A]
   implicit def B: Equal[B]
 
-  def equal(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
+  final override def equal(f1: Either[A, B], f2: Either[A, B]) = (f1, f2) match {
     case (Left(a1), Left(a2))                      => A.equal(a1, a2)
     case (Right(b1), Right(b2))                    => B.equal(b1, b2)
     case (Right(_), Left(_)) | (Left(_), Right(_)) => false
@@ -381,7 +381,7 @@ private trait EitherRightMonoid[X, A] extends Monoid[RightProjection[X, A]] with
   def zero: RightProjection[X, A] = Left(Monoid[X].zero).right
 }
 
-private trait EitherOrder[A, B] extends Order[Either[A, B]] {
+private trait EitherOrder[A, B] extends Order[Either[A, B]] with EitherEqual[A, B]{
   implicit def A: Order[A]
   implicit def B: Order[B]
 
@@ -395,7 +395,7 @@ private trait EitherOrder[A, B] extends Order[Either[A, B]] {
   }
 }
 
-private trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] {
+private trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] with EitherLeftEqual[A, X]{
   implicit def A: Order[A]
 
   import Ordering._
@@ -408,7 +408,7 @@ private trait EitherLeftOrder[A, X] extends Order[LeftProjection[A, X]] {
   }
 }
 
-private trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]] {
+private trait EitherRightOrder[X, A] extends Order[RightProjection[X, A]] with EitherRightEqual[X, A]{
   implicit def A: Order[A]
 
   import Ordering._
