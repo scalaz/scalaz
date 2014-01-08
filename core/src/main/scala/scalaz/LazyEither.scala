@@ -50,7 +50,7 @@ sealed abstract class LazyEither[+A, +B] {
     fold(_ => None, Some(_))
 
   def toList: List[B] =
-    fold(_ => Nil, List(_))
+    fold(_ => Nil, _ :: Nil)
 
   def toStream: Stream[B] =
     fold(_ => Stream(), Stream(_))
@@ -116,7 +116,7 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
       e.fold(Some(_), _ => None)
 
     def toList: List[A] =
-      e.fold(List(_), _ => Nil)
+      e.fold(_ :: Nil, _ => Nil)
 
     def toStream: Stream[A] =
       e.fold(Stream(_), _ => Stream())

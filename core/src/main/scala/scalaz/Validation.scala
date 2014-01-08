@@ -169,7 +169,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   def toList: List[A] =
     this match {
       case Failure(_) => Nil
-      case Success(a) => List(a)
+      case Success(a) => a :: Nil
     }
 
   /** Return an empty stream or stream with one element on the success of this validation. */

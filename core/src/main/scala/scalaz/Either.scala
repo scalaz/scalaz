@@ -148,7 +148,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def toList: List[B] =
     this match {
       case -\/(_) => Nil
-      case \/-(b) => List(b)
+      case \/-(b) => b :: Nil
     }
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
