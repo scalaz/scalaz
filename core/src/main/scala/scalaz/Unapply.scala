@@ -227,6 +227,12 @@ sealed trait Unapply_0 extends Unapply_1 {
 }
 
 object Unapply extends Unapply_0 {
+  /** Fetch a well-typed `Unapply` for the given typeclass and type. */
+  def apply[TC[_[_]], MA](implicit U: Unapply[TC, MA]): U.type {
+    type M[A] = U.M[A]
+    type A = U.A
+  } = U
+
   /** Unpack a value of type `M0[A0]` into types `M0` and `A0`, given a instance of `TC` */
   implicit def unapplyMA[TC[_[_]], M0[_], A0](implicit TC0: TC[M0]): Unapply[TC, M0[A0]] {
     type M[X] = M0[X]
@@ -278,6 +284,13 @@ sealed trait Unapply2_0 {
 }
 
 object Unapply2 extends Unapply2_0 {
+  /** Fetch a well-typed `Unapply2` for the given typeclass and type. */
+  def apply[TC[_[_, _]], MAB](implicit U: Unapply2[TC, MAB]): U.type {
+    type M[X, Y] = U.M[X, Y]
+    type A = U.A
+    type B = U.B
+  } = U
+
   /**Unpack a value of type `M0[A0, B0]` into types `M0`, `A`, and 'B', given an instance of `TC` */
   implicit def unapplyMAB[TC[_[_, _]], M0[_, _], A0, B0](implicit TC0: TC[M0]): Unapply2[TC, M0[A0, B0]] {
     type M[X, Y] = M0[X, Y]
@@ -303,6 +316,13 @@ trait Unapply21[TC[_[_, _], _], MAB]{
 }
 
 object Unapply21 {
+  /** Fetch a well-typed `Unapply21` for the given typeclass and type. */
+  def apply[TC[_[_, _], _], MAB](implicit U: Unapply21[TC, MAB]): U.type {
+    type M[X, Y] = U.M[X, Y]
+    type A = U.A
+    type B = U.B
+  } = U
+
   implicit def unapply210MFABC[TC[_[_, _], _], F[_,_], M0[_[_], _, _], A0, B0, C](implicit TC0: TC[({type f[a, b] = M0[({type m[x] = F[a, x]})#m, C, b]})#f, A0]): Unapply21[TC, M0[({type f[x] = F[A0, x]})#f, C, B0]]{
     type M[X, Y] = M0[({type f[a] = F[X, a]})#f, C, Y]
     type A = A0
