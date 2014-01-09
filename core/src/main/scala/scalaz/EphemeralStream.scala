@@ -17,6 +17,16 @@ sealed abstract class EphemeralStream[A] {
 
   def tail: () => EphemeralStream[A]
 
+  def headOption: Option[A] = {
+    if(isEmpty) None
+    else Some(head())
+  }
+
+  def tailOption: Option[EphemeralStream[A]] = {
+    if(isEmpty) None
+    else Some(tail())
+  }
+
   def toList: List[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
     foldLeft(Nil: List[A])(lcons _).reverse
