@@ -9,7 +9,7 @@ object UnapplyTest extends SpecLite {
   object unapply {
     val ue = Unapply[Monad, Int \/ String]
     def mequiv[A] = implicitly[ue.M[A] === (Int \/ A)]
-      implicitly[ue.A === String]
+    implicitly[ue.A === String]
 
     // needs only transient stable type
     Unapply[Monad, Int \/ String].TC : Monad[({type λ[α] = Int \/ α})#λ]
