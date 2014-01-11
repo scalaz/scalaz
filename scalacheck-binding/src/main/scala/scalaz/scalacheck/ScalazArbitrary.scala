@@ -177,6 +177,8 @@ object ScalazArbitrary {
     Gen.sized(fingerTree[A] _)
   }
 
+  implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
+
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
     Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
