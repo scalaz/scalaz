@@ -25,6 +25,11 @@ object FingerTreeTest extends SpecLite {
   checkAll("Finger", foldable.laws[({type l[a]=Finger[Int, a]})#l])
   checkAll("Node", foldable.laws[({type l[a]=Node[Int, a]})#l])
 
+  checkAll("IndSeq", equal.laws[IndSeq[Int]])
+  checkAll("IndSeq", monadPlus.laws[IndSeq])
+  checkAll("IndSeq", traverse.laws[IndSeq])
+  checkAll("IndSeq", isEmpty.laws[IndSeq])
+
   val intStream = Stream.from(1)
 
   def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty(SizeReducer[A])) {
