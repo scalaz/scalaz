@@ -195,8 +195,16 @@ trait ListFunctions {
   }
 
   /** `groupByM` specialized to [[scalaz.Id.Id]]. */
-  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
-    groupByM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] = {
+    @tailrec
+    def go(xs: List[A], acc: List[List[A]]): List[List[A]] = xs match {
+      case Nil    => acc.reverse
+      case h :: t =>
+        val (x, y) = t.span(p(h, _))
+        go(y, (h :: x) :: acc)
+    }
+    go(as, Nil)
+  }
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
