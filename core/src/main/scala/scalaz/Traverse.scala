@@ -40,7 +40,9 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traversal[G[_]:Applicative]: Traversal[G] =
     new Traversal[G]
   def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] =
-    new Traversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad)
+    new Traversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad){
+      override def run[A, B](fa: F[A])(f: A => State[S, B]) = traverseS(fa)(f)
+    }
 
   def traverse[G[_]:Applicative,A,B](fa: F[A])(f: A => G[B]): G[F[B]] =
     traversal[G].run(fa)(f)
@@ -52,7 +54,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** Traverse with `State`. */
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
-    traversalS[S].run(fa)(f)
+    traverseSTrampoline[S, Id.Id, A, B](fa)(f)
 
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (S, F[B]) =
     traverseS(fa)(f)(s)
@@ -83,7 +85,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** Traverse with `State`. */
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] =
-    traversalS[S].run(fga)(a => a)
+    traverseS(fga)(x => x)
 
   /** A version of `sequence` that infers the nested type constructor. */
   final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {

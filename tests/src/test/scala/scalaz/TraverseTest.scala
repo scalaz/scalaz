@@ -44,9 +44,21 @@ object TraverseTest extends SpecLite {
     }
 
     "state traverse does not blow stack" in {
-      var N = 10000
+      val N = 10000
       val s = List.range(0,N).traverseS(x => modify((x: Int) => x+1))
       s.exec(0) must_=== (N)
+    }
+
+    "sequenceS, traverseS, traversalS does not blow stack" in {
+      val N = 100000
+      val F = new Traverse[List]{
+        def traverseImpl[G[_]: Applicative, A, B](fa: List[A])(f: A => G[B]) =
+          Traverse[List].traverseImpl(fa)(f)
+      }
+      val s = List.fill(N)(modify((_: Int) + 1))
+      F.sequenceS(s).exec(0) must_=== N
+      F.traverseS(s)(x => x).exec(0) must_=== N
+      F.traversalS[Int].run(s)(x => x).exec(0) must_=== N
     }
   }
 
