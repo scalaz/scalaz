@@ -1,8 +1,7 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
-import annotation.tailrec
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Processes messages of type `A`, one at a time. Messages are submitted to
@@ -22,70 +21,53 @@ import annotation.tailrec
  *
  * @param handler  The message handler
  * @param onError  Exception handler, called if the message handler throws any `Throwable`.
+ * @param batch    Number of messages that handled in bulk, for tuning of trade off between fairness and efficiency
  * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`
  * @tparam A       The type of messages accepted by this actor.
  */
-final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = throw(_))
+final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor.rethrowError, batch: Int = 128)
                          (implicit val strategy: Strategy) {
-  self =>
+  private val head = new AtomicReference[Node[A]]
 
-  private val tail = new AtomicReference(new Node[A]())
-  private val suspended = new AtomicInteger(1)
-  private val head = new AtomicReference(tail.get)
-
-  val toEffect: Run[A] = Run[A](a => this ! a)
+  def toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
-  def !(a: A) {
+  def !(a: A): Unit = {
     val n = new Node(a)
-    head.getAndSet(n).lazySet(n)
-    trySchedule()
+    val h = head.getAndSet(n)
+    if (h ne null) h.lazySet(n)
+    else strategy(act(n))
   }
 
   /** Pass the message `a` to the mailbox of this actor */
-  def apply(a: A) {
-    this ! a
-  }
+  def apply(a: A): Unit = this ! a
 
-  def contramap[B](f: B => A): Actor[B] =
-    Actor[B]((b: B) => (this ! f(b)), onError)(strategy)
+  def contramap[B](f: B => A): Actor[B] = new Actor[B](b => this ! f(b), onError, batch)(strategy)
 
-  private def trySchedule() {
-    if (suspended.compareAndSet(1, 0)) schedule()
-  }
+  private def act(n: Node[A]): Unit = act(n, batch)
 
-  private def schedule() {
-    strategy(act())
-  }
-
-  private def act() {
-    val t = tail.get
-    val n = batchHandle(t, 1024)
-    if (n ne t) {
-      n.a = null.asInstanceOf[A]
-      tail.lazySet(n)
-      schedule()
-    } else {
-      suspended.set(1)
-      if (n.get ne null) trySchedule()
+  @annotation.tailrec
+  private def act(n: Node[A], i: Int): Unit = {
+    try handler(n.a) catch {
+      case ex: Throwable => onError(ex)
     }
+    val n2 = n.get
+    if ((n2 ne null) & i != 0) act(n2, i - 1)
+    else if (n2 ne null) strategy(act(n2))
+    else strategy(tryAct(n))
   }
 
-  @tailrec
-  private def batchHandle(t: Node[A], i: Int): Node[A] = {
-    val n = t.get
-    if (n ne null) {
-      try {
-        handler(n.a)
-      } catch {
-        case ex: Throwable => onError(ex)
-      }
-      if (i > 0) batchHandle(n, i - 1) else n
-    } else t
+  private def tryAct(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(next(n), batch)
+
+  @annotation.tailrec
+  private def next(n: Node[A]): Node[A] = {
+    val n2 = n.get
+    if (n2 ne null) n2
+    else next(n)
   }
 }
 
-private class Node[A](var a: A = null.asInstanceOf[A]) extends AtomicReference[Node[A]]
+private class Node[A](val a: A) extends AtomicReference[Node[A]]
 
 object Actor extends ActorInstances with ActorFunctions
 
@@ -96,8 +78,10 @@ sealed abstract class ActorInstances {
 }
 
 trait ActorFunctions {
-  def actor[A](e: A => Unit, err: Throwable => Unit = throw (_))(implicit s: Strategy): Actor[A] =
-    Actor[A](e, err)
+  val rethrowError: Throwable => Unit = throw _
+
+  def actor[A](handler: A => Unit, onError: Throwable => Unit = rethrowError, batch: Int = 128)
+              (implicit s: Strategy): Actor[A] = new Actor[A](handler, onError, batch)(s)
 
   implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
 }
