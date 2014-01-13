@@ -201,9 +201,14 @@ object build extends Build {
         "scalaz.NonEmptyList.sortWith",
         "scalaz.NonEmptyList.sorted",
         "scalaz.concurrent.Future.timed",
+        "scalaz.concurrent.Node.a_=",
         "scalaz.syntax.typelevel.HLists.::",
-        "scalaz.syntax.typelevel.HLists.scalaz$syntax$typelevel$HLists$_setter_$::_="
-      ) map exclude[MissingMethodProblem]
+        "scalaz.syntax.typelevel.HLists.scalaz$syntax$typelevel$HLists$_setter_$::_=",
+        "scalaz.concurrent.Actor.scalaz$concurrent$Actor$$act"
+      ).map(exclude[MissingMethodProblem]) ++
+      Seq(
+        "scalaz.concurrent.Node$"
+      ).map(exclude[MissingClassProblem])
     }
   ) ++ Seq[Sett](
     previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
