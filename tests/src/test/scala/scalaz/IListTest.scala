@@ -23,7 +23,7 @@ object IListTest extends SpecLite {
 
   // These tests hold for List, so they had better hold for IList
 
-  "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) => 
+  "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) =>
     a.intercalate(IList[Int]()) must_===(a.flatten)
   }
 
@@ -36,7 +36,7 @@ object IListTest extends SpecLite {
     a.intercalate(b) must_===(a.intersperse(b).flatten)
   }
 
-  "intersperse vs benchmark" ! forAll { (a: IList[Int], b: Int) => 
+  "intersperse vs benchmark" ! forAll { (a: IList[Int], b: Int) =>
     def intersperse[A](value: IList[A], a: A): IList[A] = value match {
       case INil() => INil()
       case ICons(x, INil()) => x :: INil()
@@ -46,13 +46,13 @@ object IListTest extends SpecLite {
   }
 
   "foldl is foldLeft" ! forAll {(rnge: IList[IList[Int]]) =>
-    val F = Foldable[IList]
-    rnge.foldLeft(IList[Int]())(_++_) must_=== F.foldLeft(rnge, IList[Int]())(_++_)
+    val F = Foldable[List]
+    rnge.foldLeft(IList[Int]())(_++_) must_=== F.foldLeft(rnge.toList, IList[Int]())(_++_)
   }
 
   "foldr is foldRight" ! forAll {(rnge: IList[IList[Int]]) =>
-    val F = Foldable[IList]
-    rnge.foldRight(IList[Int]())(_++_) must_=== F.foldRight(rnge, IList[Int]())(_++_)
+    val F = Foldable[List]
+    rnge.foldRight(IList[Int]())(_++_) must_=== F.foldRight(rnge.toList, IList[Int]())(_++_)
   }
 
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
@@ -68,10 +68,10 @@ object IListTest extends SpecLite {
   // And some other tests that List doesn't have
 
   "catamorphism" ! forAll { (ns: IList[Int]) =>
-    ns.foldRight(IList.empty[Int]())(ICons(_, _)) must_=== ns
+    ns.foldRight(IList.empty[Int])(ICons(_, _)) must_=== ns
   }
 
-  // Functionality borrowed from List is tested in terms of List. Is this ethical? 
+  // Functionality borrowed from List is tested in terms of List. Is this ethical?
   // Should they be collapsed into fewer cases?
 
   "++" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -86,7 +86,7 @@ object IListTest extends SpecLite {
     (n +: ns).toList must_=== n +: ns.toList
   }
 
-  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) => 
+  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
     (s /: ns)(f) == (s /: ns.toList)(f)
   }
 
@@ -102,7 +102,7 @@ object IListTest extends SpecLite {
     (ns ::: ms).toList must_=== ns.toList ::: ms.toList
   }
 
-  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) => 
+  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
     (ns :\ s)(f) == (ns.toList :\ s)(f)
   }
 
@@ -319,8 +319,8 @@ object IListTest extends SpecLite {
     ns.takeWhile(f).toList must_=== ns.toList.takeWhile(f)
   }
 
-  "toEphemeralStream" ! forAll { ns: List[Int] =>    
-    IList(ns: _*).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList 
+  "toEphemeralStream" ! forAll { ns: List[Int] =>
+    IList(ns: _*).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
   }
 
   "toList" ! forAll { ns: List[Int] =>
@@ -335,8 +335,8 @@ object IListTest extends SpecLite {
     IList(ns: _*).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
-  "toStream" ! forAll { ns: List[Int] =>    
-    IList(ns: _*).toStream must_=== ns.toStream  
+  "toStream" ! forAll { ns: List[Int] =>
+    IList(ns: _*).toStream must_=== ns.toStream
   }
 
   "toVector" ! forAll { ns: Vector[Int] =>
@@ -363,9 +363,9 @@ object IListTest extends SpecLite {
 
   // widen is tested by toMap and unzip
   // zip is tested by zip laws
-  
+
   "zipWithIndex" ! forAll { ns: IList[Int] =>
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
-  } 
+  }
 
 }
