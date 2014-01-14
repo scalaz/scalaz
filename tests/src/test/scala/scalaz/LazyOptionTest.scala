@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 object LazyOptionTest extends SpecLite {
   checkAll(equal.laws[LazyOption[Int]])
-  checkAll(monadPlus.laws[LazyOption])
+  checkAll(monadPlus.strongLaws[LazyOption])
   checkAll(cobind.laws[LazyOption])
   checkAll(traverse.laws[LazyOption])
   checkAll(zip.laws[LazyOption])

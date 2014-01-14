@@ -26,7 +26,7 @@ object FingerTreeTest extends SpecLite {
   checkAll("Node", foldable.laws[({type l[a]=Node[Int, a]})#l])
 
   checkAll("IndSeq", equal.laws[IndSeq[Int]])
-  checkAll("IndSeq", monadPlus.laws[IndSeq])
+  checkAll("IndSeq", monadPlus.strongLaws[IndSeq])
   checkAll("IndSeq", traverse.laws[IndSeq])
   checkAll("IndSeq", isEmpty.laws[IndSeq])
 
