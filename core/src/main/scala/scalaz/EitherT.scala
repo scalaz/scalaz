@@ -232,6 +232,9 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
   implicit def eitherTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBifunctor[F] {
     implicit def F = F0
   }
+  implicit def eitherTBifoldable[F[_]](implicit F0: Foldable[F]): Bifoldable[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBifoldable[F] {
+    implicit def F = F0
+  }
   implicit def eitherTMonadPlus[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTMonadPlus[F, L] {
     implicit def F = F0
     implicit def G = L0
@@ -322,7 +325,14 @@ private trait EitherTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=EitherT
   override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: A => C, g: B => D): EitherT[F, C, D] = fab.bimap(f, g)
 }
 
-private trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
+private trait EitherTBifoldable[F[_]] extends Bifoldable.FromBifoldMap[({type λ[α, β]=EitherT[F, α, β]})#λ] {
+  implicit def F: Foldable[F]
+
+  override final def bifoldMap[A, B, M: Monoid](fab: EitherT[F, A, B])(f: A => M)(g: B => M) =
+    F.foldMap(fab.run)(Bifoldable[\/].bifoldMap(_)(f)(g))
+}
+
+private trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] with EitherTBifoldable[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
