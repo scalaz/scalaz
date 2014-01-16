@@ -103,6 +103,13 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(minimumOf1(fa)(f))
   override def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(minimumBy1(fa)(f))
 
+  /** Insert an `A` between every A, yielding the sum. */
+  def intercalate1[A](fa: F[A], a: A)(implicit A: Semigroup[A]): A =
+    foldLeft1(fa)((x, y) => A.append(x, A.append(a, y)))
+
+  override def intercalate[A: Monoid](fa: F[A], a: A): A =
+    intercalate1(fa, a)
+
   def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())
 
