@@ -16,6 +16,13 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     implicit def G = G0
   }
 
+  /**The composition of Foldable1 `F` and `G`, `[x]F[G[x]]`, is a Foldable1 */
+  def compose[G[_]: Foldable1]: Foldable1[({type λ[α] = F[G[α]]})#λ] =
+    new CompositionFoldable1[F, G] {
+      def F = self
+      def G = implicitly
+    }
+
   /** Map each element of the structure to a [[scalaz.Semigroup]], and combine the results. */
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B
   override def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))

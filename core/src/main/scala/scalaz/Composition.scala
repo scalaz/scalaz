@@ -73,6 +73,30 @@ private trait CompositionTraverse[F[_], G[_]] extends Traverse[({type λ[α] = F
 
 }
 
+private trait CompositionFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = F[G[α]]})#λ] with CompositionFoldable[F, G] {
+  implicit def F: Foldable1[F]
+
+  implicit def G: Foldable1[G]
+
+  override final def foldMap1[A, B: Semigroup](fa: F[G[A]])(f: A => B) =
+    F.foldMap1(fa)(G.foldMap1(_)(f))
+
+  override final def foldMapRight1[A, B](fa: F[G[A]])(z: A => B)(f: (A, => B) => B) =
+    F.foldMapRight1(fa)(G.foldMapRight1(_)(z)(f))(G.foldRight(_, _)(f))
+
+  override final def foldMapLeft1[A, B](fa: F[G[A]])(z: A => B)(f: (B, A) => B) =
+    F.foldMapLeft1(fa)(G.foldMapLeft1(_)(z)(f))((b, ga) => G.foldLeft(ga, b)(f))
+}
+
+private trait CompositionTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = F[G[α]]})#λ] with CompositionFoldable1[F, G] {
+  implicit def F: Traverse1[F]
+
+  implicit def G: Traverse1[G]
+
+  def traverse1Impl[X[_]:Apply, A, B](a: F[G[A]])(f: A => X[B]) =
+    F.traverse1(a)(G.traverse1(_)(f))
+}
+
 private trait CompositionDistributive[F[_], G[_]] extends Distributive[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
   implicit def F: Distributive[F]
 
