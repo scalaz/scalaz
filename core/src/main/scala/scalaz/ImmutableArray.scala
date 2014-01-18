@@ -118,8 +118,11 @@ sealed abstract class ImmutableArrayInstances {
       }
       def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)((a, b) => f(a, b))
-      def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) =
-        new ImmutableArray.ofRef((a.iterator zip b.iterator).toArray)
+      def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) = {
+        val _a = a
+        if(_a.isEmpty) new ImmutableArray.ofRef(Array[(A, B)]())
+        else new ImmutableArray.ofRef((_a.iterator zip b.iterator).toArray)
+      }
       override def index[A](fa: ImmutableArray[A], i: Int) =
         if(0 <= i && i < fa.length) Some(fa(i)) else None
       override def length[A](fa: ImmutableArray[A]) =
@@ -237,7 +240,7 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
   }
 
   implicit def unwrapArray[A](immArrayOps: WrappedImmutableArray[A]): ImmutableArray[A] = immArrayOps.value
-  
+
   abstract class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
           IndexedSeq[A] with IndexedSeqOptimized[A, WrappedImmutableArray[A]] {
     def apply(index: Int) = value(index)

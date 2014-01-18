@@ -98,8 +98,10 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
 
   def size: Int = 1 + tail.size
 
-  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
-    nel((head, b.head), tail zip b.tail)
+  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] = {
+    val _b = b
+    nel((head, _b.head), tail zip _b.tail)
+  }
 
   def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
     val (a, b) = head: (X, Y)
@@ -160,7 +162,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
 
       def copoint[A](p: NonEmptyList[A]): A = p.head
-	
+
       def cobind[A, B](fa: NonEmptyList[A])(f: NonEmptyList[A] => B): NonEmptyList[B] = map(cojoin(fa))(f)
 
       override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails

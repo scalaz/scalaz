@@ -421,12 +421,13 @@ sealed abstract class IList[A] extends Product with Serializable {
   // many other zip variants; see Traverse#zip*
 
   def zip[B](b: => IList[B]): IList[(A, B)] = {
-    @tailrec def zaccum(a: => IList[A], b: => IList[B], accum: IList[(A,B)]): IList[(A, B)] =
+    @tailrec def zaccum(a: IList[A], b: IList[B], accum: IList[(A,B)]): IList[(A, B)] =
       (a, b) match {
         case (ICons(a, as), ICons(b, bs)) => zaccum(as, bs, (a, b) :: accum)
         case _ => accum
       }
-    zaccum(this, b, empty).reverse
+    if(this.isEmpty) empty
+    else zaccum(this, b, empty).reverse
   }
 
   // IList is invariant in behavior but covariant by nature, so we can safely widen to IList[B]

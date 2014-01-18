@@ -52,7 +52,11 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
     def isEmpty[A](a: IxSq[A]) = a.isEmpty
     override def map[A, B](v: IxSq[A])(f: A => B) = v map f
 
-    def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b
+    def zip[A, B](a: => IxSq[A], b: => IxSq[B]): IxSq[(A, B)] = {
+      val _a = a
+      if(_a.isEmpty) empty
+      else _a zip b
+    }
     def unzip[A, B](a: IxSq[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](v: IxSq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
