@@ -18,6 +18,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(bind.laws[({type F[V] = Map[Int,V]})#F])
+  checkAll(align.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
   checkAll(equal.laws[Map[Int,String]])
@@ -53,6 +54,25 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
         l == r
       }
     }
+  }
+
+  "align" ! forAll { (a: Map[Int, String], b: Map[Int, Long]) =>
+    import std.set._, \&/._
+    val F = Align[({type λ[α] = Map[Int, α]})#λ]
+    val x = F.align(a, b)
+    val keysA = a.keySet
+    val keysB = b.keySet
+
+    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    ==>>.fromList(x.toList) must_=== Align[({type λ[α] = Int ==>> α})#λ].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
+    x.keySet must_=== (keysA ++ keysB)
+
+    x.filter(_._2.isThis).keySet must_=== (keysA -- keysB)
+    x.filter(_._2.isThat).keySet must_=== (keysB -- keysA)
+    x.filter(_._2.isBoth).keySet must_=== (keysA & keysB)
+
+    x.filter(_._2.isThis) must_=== F.map(a.filter{case (k, _) => ! keysB(k)})(This(_))
+    x.filter(_._2.isThat) must_=== F.map(b.filter{case (k, _) => ! keysA(k)})(That(_))
   }
 }
 
