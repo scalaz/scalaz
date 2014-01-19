@@ -3,10 +3,9 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import Id._
-import org.scalacheck.Prop
+import org.scalacheck.{Arbitrary, Prop, Gen}
 import org.scalacheck.Prop.forAll
-import syntax.all._
+import syntax.bifunctor._, syntax.foldable._
 
 object IListTest extends SpecLite {
 
@@ -22,6 +21,18 @@ object IListTest extends SpecLite {
   checkAll(order.laws[IList[Int]])
 
   // These tests hold for List, so they had better hold for IList
+
+  implicit val intBooleanArb: Arbitrary[Int => Boolean] = {
+    val intGen = implicitly[Arbitrary[Int]].arbitrary
+    Arbitrary(Gen.oneOf(
+      Gen.const((_: Int) => true),
+      Gen.const((_: Int) => false),
+      Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
+      Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
+      intGen.map(n => (_: Int) > n),
+      intGen.map(n => (_: Int) < n)
+    ))
+  }
 
   "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) =>
     a.intercalate(IList[Int]()) must_===(a.flatten)
@@ -303,12 +314,12 @@ object IListTest extends SpecLite {
     ns.tailOption.map(_.toList) must_=== (try Some(ns.toList.tail) catch { case e: Exception => None })
   }
 
-  "take" ! forAll { (ns: IList[Int], n: Int) =>
-    ns.take(100).toList must_=== ns.toList.take(100)
+  "take" ! forAll { (ns: IList[Int], n: Byte) =>
+    ns.take(n).toList must_=== ns.toList.take(n)
   }
 
-  "takeRight" ! forAll { (ns: IList[Int], n: Int) =>
-    ns.takeRight(100).toList must_=== ns.toList.takeRight(100)
+  "takeRight" ! forAll { (ns: IList[Int], n: Byte) =>
+    ns.takeRight(n).toList must_=== ns.toList.takeRight(n)
   }
 
   "takeRightWhile" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
