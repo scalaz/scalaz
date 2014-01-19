@@ -48,8 +48,16 @@ sealed abstract class IList[A] extends Product with Serializable {
   final def <^>[B](f: OneAnd[IList, A] => B)(implicit B: Monoid[B]): B =
     uncons(B.zero, (h, t) => f(OneAnd(h, t)))
 
-  def collect[B](pf: PartialFunction[A,B]): IList[B] =
-    flatMap(a => IList.fromOption(pf.lift(a)))
+  def collect[B](pf: PartialFunction[A,B]): IList[B] = {
+    @tailrec def go(as: IList[A], acc: IList[B]): IList[B] =
+      as match {
+        case ICons(h, t) =>
+          if(pf isDefinedAt h) go(t, ICons(pf(h), acc))
+          else go(t, acc)
+        case INil() => acc
+      }
+    go(this, empty).reverse
+  }
 
   def collectFirst[B](pf: PartialFunction[A,B]): Option[B] =
     find(pf.isDefinedAt).map(pf)
@@ -336,10 +344,16 @@ sealed abstract class IList[A] extends Product with Serializable {
   }
 
   def takeRight(n: Int): IList[A] =
-    reverse.take(n).reverse
+    drop(length - n)
 
-  def takeRightWhile(f: A => Boolean): IList[A] =
-    reverse.takeWhile(f).reverse
+  def takeRightWhile(f: A => Boolean): IList[A] = {
+    @tailrec def go(as: IList[A], accum: IList[A]): IList[A] =
+      as match {
+        case ICons(h, t) if f(h) => go(t, h :: accum)
+        case _ => accum
+      }
+    go(this.reverse, empty)
+  }
 
   def takeWhile(f: A => Boolean): IList[A] = {
     @tailrec def takeWhile0(as: IList[A], accum: IList[A]): IList[A] =
