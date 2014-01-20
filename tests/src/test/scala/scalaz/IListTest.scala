@@ -66,6 +66,18 @@ object IListTest extends SpecLite {
     rnge.foldRight(IList[Int]())(_++_) must_=== F.foldRight(rnge.toList, IList[Int]())(_++_)
   }
 
+  "foldLeft1Opt" ! forAll { ns: IList[List[Int]] =>
+    ns.foldLeft1Opt(_ ::: _) must_=== ns.toList.reduceLeftOption(_ ::: _)
+  }
+
+  "foldRight1Opt" ! forAll { ns: IList[List[Int]] =>
+    ns.foldRight1Opt(_ ::: _) must_=== ns.toList.reduceRightOption(_ ::: _)
+  }
+
+  "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
+    ns.foldMap1Opt(conforms) must_=== ns.toList.reduceLeftOption(_ ::: _)
+  }
+
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
     val f = (_: Int) + 1
     xs.mapAccumLeft(IList[Int](), (c: IList[Int], a) => (c :+ a, f(a))) must_=== (xs, xs.map(f))
@@ -187,6 +199,10 @@ object IListTest extends SpecLite {
 
   "headOption" ! forAll { ns: IList[Int] =>
     ns.headOption must_=== ns.toList.headOption
+  }
+
+  "index" ! forAll { (ns: IList[Int], n: Int) =>
+    ns.index(n) must_=== ns.toList.lift(n)
   }
 
   "indexOf" ! forAll { (ns: IList[Int], n: Int) =>
