@@ -497,6 +497,9 @@ sealed abstract class IListInstances extends IListInstance0 {
       def isEmpty[A](fa: IList[A]): Boolean =
         fa.isEmpty
 
+      override def empty[A](fa: IList[A]) =
+        fa.isEmpty
+
       def cobind[A, B](fa: IList[A])(f: IList[A] => B) =
         fa.uncons(empty, (_, t) => f(fa) :: cobind(t)(f))
 
@@ -525,8 +528,32 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)((a, b) => f(a, b))
 
+      override def foldMapRight1Opt[A, B](fa: IList[A])(z: A => B)(f: (A, => B) => B) =
+        foldMapLeft1Opt(fa.reverse)(z)((b, a) => f(a, b))
+
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
         fa.foldLeft(M.zero)((b, a) => M.append(b, f(a)))
+
+      override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
+        fa match {
+          case ICons(h, t) => Some(t.foldLeft(f(h))((b, a) => M.append(b, f(a))))
+          case INil() => None
+        }
+
+      override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(f: (B, A) => B) =
+        fa match {
+          case ICons(h, t) => Some(t.foldLeft(z(h))(f))
+          case INil() => None
+        }
+
+      override def index[A](fa: IList[A], i: Int) = {
+        @tailrec def go(as: IList[A], n: Int): Option[A] = as match {
+          case ICons(h, t) => if(n == i) Some(h) else go(t, n + 1)
+          case INil() => None
+        }
+        if(i < 0) None
+        else go(fa, 0)
+      }
 
       override def reverse[A](fa: IList[A]) =
         fa.reverse
