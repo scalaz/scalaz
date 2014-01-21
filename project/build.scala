@@ -80,8 +80,9 @@ object build extends Build {
       Seq("-unchecked") ++ versionDepOpts
     },
 
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")) map { bd =>
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
+      val tagOrBranch = if(v endsWith "SNAPSHOT") "series/7.0.x" else ("v" + v)
+      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
