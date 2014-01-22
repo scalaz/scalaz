@@ -19,6 +19,7 @@ abstract class Yoneda[F[_], A] { yo =>
     def k(i: A) = i
   }
 
+  /** Allows us to map over `F` without looking inside of it */
   def map[B](f: A => B): Yoneda[F, B] = new Yoneda[F, B] {
     def apply[C](g: B => C) = yo(f andThen g)
   }
@@ -44,6 +45,7 @@ abstract class Coyoneda[F[_], A] { coyo =>
     def apply[B](f: A => B) = F.map(fi)(k _ andThen f)
   }
 
+  /** Allows us to map over `F` without looking inside of it */
   def map[B](f: A => B): Coyoneda[F, B] = new Coyoneda[F, B] {
     type I = coyo.I
     val fi = coyo.fi
