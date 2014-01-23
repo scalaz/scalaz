@@ -5,6 +5,7 @@ package scalaz
  * `Yoneda[F,A]` is isomorphic to `F[A]` for any functor `F`.
  * The homomorphism from `Yoneda[F,A]` to `F[A]` exists even when
  * we have forgotten that `F` is a functor.
+ * Can be seen as a partially applied `map` for the functor `F`.
  */
 abstract class Yoneda[F[_], A] { yo =>
   def apply[B](f: A => B): F[B]
@@ -19,8 +20,15 @@ abstract class Yoneda[F[_], A] { yo =>
     def k(i: A) = i
   }
 
+  /** Simple function composition. Allows map fusion without traversing an `F`. */
   def map[B](f: A => B): Yoneda[F, B] = new Yoneda[F, B] {
     def apply[C](g: B => C) = yo(f andThen g)
+  }
+
+  import Id._
+  /** `Yoneda[F, _]` is the right Kan extension of `F` along `Id` */
+  def toRan: Ran[Id, F, A] = new Ran[Id, F, A] {
+    def apply[B](f: A => B) = yo(f)
   }
 }
 
@@ -44,10 +52,20 @@ abstract class Coyoneda[F[_], A] { coyo =>
     def apply[B](f: A => B) = F.map(fi)(k _ andThen f)
   }
 
+  /** Simple function composition. Allows map fusion without touching the underlying `F`. */
   def map[B](f: A => B): Coyoneda[F, B] = new Coyoneda[F, B] {
     type I = coyo.I
     val fi = coyo.fi
     def k(i: I) = f(coyo k i)
+  }
+
+  import Id._
+
+  /** `Coyoneda[F,_]` is the left Kan extension of `F` along `Id` */
+  def toLan: Lan[Id, F, A] = new Lan[Id, F, A] {
+    type I = coyo.I
+    val v = fi
+    def f(i: I) = k(i)
   }
 }
 
