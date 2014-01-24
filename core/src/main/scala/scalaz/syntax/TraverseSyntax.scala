@@ -38,7 +38,7 @@ trait TraverseOps[F[_],A] extends Ops[F[A]] {
    * A version of `traverse` specialized for `State[S, G[B]]` that internally uses a `Trampoline`
    * to avoid stack-overflow.
    */
-  final def traverseSTrampoline[G[+_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
+  final def traverseSTrampoline[G[_]: Applicative, S, B](f: A => State[S, G[B]]): State[S, G[F[B]]] =
     F.traverseSTrampoline[S, G, A, B](self)(f)
 
   /**
