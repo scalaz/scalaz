@@ -274,14 +274,22 @@ sealed abstract class IList[A] extends Product with Serializable {
   def reverse_:::(as: IList[A]): IList[A] =
     as.foldLeft(this)((as, a) => a :: as)
 
+  private[this] def scan0[B](list: IList[A], z: B)(f: (B, A) => B): IList[B] = {
+    @tailrec def go(as: IList[A], acc: IList[B], b: B): IList[B] =
+      as match {
+        case INil() => acc
+        case ICons(h, t) =>
+          val b0 = f(b, h)
+          go(t, b0 :: acc, b0)
+      }
+    go(list, single(z), z)
+  }
+
   def scanLeft[B](z: B)(f: (B, A) => B): IList[B] =
-    reverse.scanRight(z)((a, b) => f(b, a)).reverse
+    scan0(this, z)(f).reverse
 
   def scanRight[B](z: B)(f: (A, B) => B): IList[B] =
-    foldRight((single(z), z)) { case (a, (bs, b)) =>
-      val b0 = f(a, b)
-      (b0 :: bs, b0)
-    }._1
+    scan0(reverse, z)((b, a) => f(a, b))
 
   def slice(from: Int, until: Int): IList[A] =
     drop(from).take((until max 0)- (from max 0))
