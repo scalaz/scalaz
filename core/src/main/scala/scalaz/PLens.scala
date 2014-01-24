@@ -16,7 +16,7 @@ package scalaz
  * @tparam B1 The initial type of the optional field
  * @tparam B2 The final type of the optional field
  */
-sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
+sealed trait PLensFamily[A1, A2, B1, B2] {
   def run(a: A1): Option[IndexedStore[B1, B2, A2]]
 
   def apply(a: A1): Option[IndexedStore[B1, B2, A2]] =
@@ -182,7 +182,7 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
   def >=>[C1, C2](that: PLensFamily[B1, B2, C1, C2]): PLensFamily[A1, A2, C1, C2] = andThen(that)
 
   /** Two partial lenses that view a value of the same type can be joined */
-  def sum[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamily[C1, C2, B1m, B2m]): PLensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
+  def sum[C1, C2](that: => PLensFamily[C1, C2, B1, B2]): PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
     plensFamily {
       case -\/(a) =>
         run(a) map (_ map (-\/(_)))
@@ -191,7 +191,7 @@ sealed trait PLensFamily[-A1, +A2, +B1, -B2] {
     }
 
   /** Alias for `sum` */
-  def |||[C1, C2, B1m >: B1, B2m <: B2](that: => PLensFamily[C1, C2, B1m, B2m]): PLensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] = sum(that)
+  def |||[C1, C2](that: => PLensFamily[C1, C2, B1, B2]): PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] = sum(that)
 
   /** Two disjoint partial lenses can be paired */
   def product[C1, C2, D1, D2](that: PLensFamily[C1, C2, D1, D2]): PLensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
