@@ -292,10 +292,14 @@ object IListTest extends SpecLite {
 
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>
     ss.scanLeft(0)(f).toList must_=== ss.toList.scanLeft(0)(f)
+    ss.scanLeft("z")(_ + _).toList must_=== ss.toList.scanLeft("z")(_ + _)
+    ss.scanLeft(IList.empty[String])(_ :+ _).toList must_=== ss.toList.scanLeft(IList.empty[String])(_ :+ _)
   }
 
   "scanRight" ! forAll { (ss: IList[String], f: (String, Int) => Int)  =>
     ss.scanRight(0)(f).toList must_=== ss.toList.scanRight(0)(f)
+    ss.scanRight("z")(_ + _).toList must_=== ss.toList.scanRight("z")(_ + _)
+    ss.scanRight(IList.empty[String])(_ +: _).toList must_=== ss.toList.scanRight(IList.empty[String])(_ +: _)
   }
 
   "slice" ! forAll { (ns: IList[Int], a: Int, b: Int) =>
