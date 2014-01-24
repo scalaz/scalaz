@@ -23,8 +23,8 @@ trait Strategys extends StrategysLow {
    * where N is equal to the number of available processors.
    */
   val DefaultExecutorService: ExecutorService = {
-    import Executors._
-    newFixedThreadPool(Runtime.getRuntime.availableProcessors, new ThreadFactory {
+    Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, new ThreadFactory {
+      val defaultThreadFactory = Executors.defaultThreadFactory()
       def newThread(r: Runnable) = {
         val t = defaultThreadFactory.newThread(r)
         t.setDaemon(true)
