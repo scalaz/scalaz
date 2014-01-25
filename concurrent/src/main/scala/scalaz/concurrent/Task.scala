@@ -8,6 +8,7 @@ import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
+import scalaz.\/._
 
 import collection.JavaConversions._
 
@@ -110,7 +111,37 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def runAsyncInterruptibly(f: (Throwable \/ A) => Unit, cancel: AtomicBoolean): Unit =
     get.runAsyncInterruptibly(f, cancel)
 
-  /** 
+  /**
+   * Similar to `runAsyncInterruptibly(f,cancel)` except instead of interrupting by setting cancel to true,
+   * It returns the function, that, when applied will interrupt the task.
+   *
+   * This allows "deterministic" completion of task computation
+   * even if it was interrupted.
+   * That means task will complete even when interrupted,
+   * but with `TaskInterrupted` exception.
+   *
+   * Note 1: When Interrupted, the `f` callback will run in thread that called the `Interrupting` function () => Unit
+   * Note 2: If task has handler like attempt, it won't get consulted for handling TaskInterrupted excpetion
+   * @param f
+   * @return
+   */
+  def runAsyncInterruptibly(f: (Throwable \/ A) => Unit) : () => Unit = {
+    val completed : AtomicBoolean = new AtomicBoolean(false)
+    val a = Actor[Option[Throwable \/ A]] ({
+      case Some(r) if ! completed.get =>
+        completed.set(true)
+        f(r)
+      case None if ! completed.get  =>
+        completed.set(true)
+        f(left(Task.TaskInterrupted))
+      case _ => () //already completed
+    })(Strategy.Sequential)
+
+    get.runAsyncInterruptibly(r => a ! Some(r), completed)
+    () => { a ! None }
+  }
+
+  /**
    * Run this computation to obtain either a result or an exception, then
    * invoke the given callback. Any pure, non-asynchronous computation at the 
    * head of this `Future` will be forced in the calling thread. At the first 
@@ -147,6 +178,11 @@ object Task {
     }
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
+  }
+
+  /** signals task was interrupted **/
+  case object TaskInterrupted extends InterruptedException {
+    override def fillInStackTrace = this
   }
 
   /** A `Task` which fails with the given `Throwable`. */
