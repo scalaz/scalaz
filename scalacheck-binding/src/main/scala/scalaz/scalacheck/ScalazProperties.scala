@@ -232,6 +232,11 @@ object ScalazProperties {
     }
   }
 
+  private def resizeProp(p: Prop, max: Int): Prop = new Prop{
+    def apply(params: Gen.Parameters) =
+      p(params.resize(params.size % (max + 1)))
+  }
+
   object traverse {
     def identityTraverse[F[_], X, Y](implicit f: Traverse[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
       forAll(f.traverseLaw.identityTraverse[X, Y] _)
@@ -262,7 +267,7 @@ object ScalazProperties {
         property("purity.option") = purity[F, Option, Int]
         property("purity.stream") = purity[F, Stream, Int]
 
-        property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+        property("sequential fusion") = resizeProp(sequentialFusion[F, Option, List, Int, Int, Int], 3)
         // TODO naturality, parallelFusion
       }
   }
@@ -413,7 +418,7 @@ object ScalazProperties {
 
         import std.list._, std.option._
 
-        property("sequential fusion (1)") = sequentialFusion1[F, Option, List, Int, Int, Int]
+        property("sequential fusion (1)") = resizeProp(sequentialFusion1[F, Option, List, Int, Int, Int], 3)
         // TODO naturality1, parallelFusion1
       }
   }
