@@ -896,13 +896,38 @@ object ==>> extends MapInstances with MapFunctions {
 
 sealed abstract class MapInstances0 {
 
-  implicit def mapBind[S: Order]: Bind[({type λ[α] = ==>>[S, α]})#λ] =
-    new Bind[({type λ[α] = ==>>[S, α]})#λ] {
+  implicit def scalazMapInstance[S: Order]: Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] =
+    new Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
       def bind[A, B](fa: S ==>> A)(f: A => (S ==>> B)) =
         fa.mapOptionWithKey((k, v) => f(v).lookup(k))
+
+      import \&/._, ==>>.Tip
+
+      override def align[A, B](a: S ==>> A, b: S ==>> B) =
+        (a, b) match {
+          case (Tip(), Tip()) => Tip()
+          case (a    , Tip()) => a.map(This(_))
+          case (Tip(), b    ) => b.map(That(_))
+          case (a    , b    ) =>
+            a.map(This(_): A \&/ B).unionWith(b.map(That(_): A \&/ B)){
+              case (This(aa), That(bb)) => Both(aa, bb)
+              case _ => sys.error("==>> align")
+            }
+         }
+
+      override def alignWith[A, B, C](f: A \&/ B => C) = {
+        case (Tip(), Tip()) => Tip()
+        case (a    , Tip()) => a.map(aa => f(This(aa)))
+        case (Tip(), b    ) => b.map(bb => f(That(bb)))
+        case (a    , b    ) =>
+          a.map(This(_): A \&/ B).unionWith(b.map(That(_): A \&/ B)){
+            case (This(aa), That(bb)) => Both(aa, bb)
+            case _ => sys.error("==>> alignWith")
+          }.map(f)
+        }
     }
 }
 
