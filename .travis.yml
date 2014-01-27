@@ -1,12 +1,7 @@
 language: scala
-scala:
-  - 2.11.0-M7
-  - 2.10.1
-  - 2.9.2
-  - 2.9.3
 jdk:
   - oraclejdk7
   - openjdk6
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test mima-report-binary-issues
+  - sbt test
