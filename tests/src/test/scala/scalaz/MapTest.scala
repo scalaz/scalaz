@@ -568,6 +568,7 @@ object MapTest extends SpecLite {
   checkAll(traverse.laws[IntMap])
   checkAll(bind.laws[IntMap])
   checkAll(align.laws[IntMap])
+  checkAll(zip.laws[IntMap])
   checkAll(bifoldable.laws[==>>])
 
   object instances {

@@ -896,8 +896,8 @@ object ==>> extends MapInstances with MapFunctions {
 
 sealed abstract class MapInstances0 {
 
-  implicit def scalazMapInstance[S: Order]: Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] =
-    new Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] {
+  implicit def scalazMapInstance[S: Order]: Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] with Zip[({type λ[α] = S ==>> α})#λ] =
+    new Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] with Zip[({type λ[α] = S ==>> α})#λ]{
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
@@ -928,6 +928,18 @@ sealed abstract class MapInstances0 {
             case _ => sys.error("==>> alignWith")
           }.map(f)
         }
+
+      def zip[A, B](a: => (S ==>> A), b: => (S ==>> B)) = {
+        val a0 = a
+        if(a0.isEmpty) ==>>.empty
+        else a0.intersectionWith(b)(Tuple2.apply)
+      }
+
+      override def zipWith[A, B, C](a: => (S ==>> A), b: => (S ==>> B))(f: (A, B) => C)(implicit F: Functor[({type λ[α] = S ==>> α})#λ]) = {
+        val a0 = a
+        if(a0.isEmpty) ==>>.empty
+        else a0.intersectionWith(b)(f)
+      }
     }
 }
 
@@ -940,10 +952,10 @@ sealed abstract class MapInstances extends MapInstances0 {
   implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
     Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
 
-  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = 
+  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] =
     new MapEqual[A, B] {def A = implicitly; def B = implicitly}
 
-  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = 
+  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] =
     new Order[A ==>> B] with MapEqual[A, B] {
       def A = implicitly
       def B = implicitly
