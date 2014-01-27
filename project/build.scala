@@ -55,13 +55,13 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val latestScala211PreRelease = "2.11.0-M7"
+  val latestScala211PreRelease = "2.11.0-M8"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", latestScala211PreRelease),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-SNAPSHOT"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
 
     scalaBinaryVersion in update := (
@@ -77,7 +77,7 @@ object build extends Build {
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
-      Seq("-unchecked") ++ versionDepOpts
+      Seq("-unchecked") ++ versionDepOpts ++ (if (sv startsWith "2.11") Seq("-Xsource:2.10") else Seq())
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -365,7 +365,7 @@ object build extends Build {
   object Dependencies {
     def scalacheck(sv: String) =
       if (sv startsWith "2.11")
-        "1.11.1"
+        "1.11.3"
       else
         "1.10.1"
   }
