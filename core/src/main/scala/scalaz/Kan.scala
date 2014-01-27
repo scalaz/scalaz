@@ -108,9 +108,8 @@ object Lan {
           val xp: Lan[G, H, A]
           val xfp: Lan[G, H, A => B]
         } = new Lan[G, H, B] {
-        // NB: Since the existential type has to be accessed, this applicative cannot be lazy
-        val xfp = xf
-        val xp = x
+        lazy val xfp = xf
+        lazy val xp = x
         type I = (xfp.I, xp.I)
         lazy val v = Applicative[H].apply2(xfp.v, xp.v)((_, _))
         def f(gi: G[I]) = xfp.f(Functor[G].map(gi)(_._1))(xp.f(Functor[G].map(gi)(_._2)))
