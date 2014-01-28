@@ -169,7 +169,7 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
   }
   implicit def lazyEitherTLeftProjectionFoldable[F[_], L](implicit F0: Foldable[F]) = new IsomorphismFoldable[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {
     implicit def G = lazyEitherTFoldable[F, L]
-    def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
+    def naturalTrans = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L].to
   }
 }
 

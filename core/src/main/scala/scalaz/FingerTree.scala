@@ -1080,10 +1080,8 @@ sealed abstract class IndSeqInstances {
   implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
     new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, ({type λ[α] = FingerTree[Int, α]})#λ]{
       def G = implicitly
-      val iso = new Isomorphism.IsoFunctorTemplate[IndSeq, ({type λ[α] = FingerTree[Int, α]})#λ] {
-        def from[A](a: FingerTree[Int, A]) =
-          new IndSeq(a)
-        def to[A](a: IndSeq[A]) =
+      override val naturalTrans = new (IndSeq ~> ({type λ[α] = FingerTree[Int, α]})#λ) {
+        def apply[A](a: IndSeq[A]) =
           a.self
       }
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
