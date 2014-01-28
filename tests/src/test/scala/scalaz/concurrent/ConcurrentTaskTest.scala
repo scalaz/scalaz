@@ -1,10 +1,11 @@
 package scalaz.concurrent
 
-import scalaz.SpecLite
+import scalaz.{\/, SpecLite}
 import scalaz.concurrent.Task._
 import java.util.concurrent.{ThreadFactory, Executors}
 import scala.collection.immutable.Queue
 import scala.concurrent.SyncVar
+import scalaz.\/._
 
 /**
  *
@@ -43,7 +44,7 @@ object ConcurrentTaskTest extends SpecLite {
 
       } yield ()).runAsync(_ => {
         enqueue(8)
-        sync.set(true)
+        sync.put(true)
       })
       enqueue(9)
 
@@ -62,5 +63,15 @@ object ConcurrentTaskTest extends SpecLite {
       runned.filter(_._2 == forked).map(_._1) must_== List(3,4,5,6,7,8)
 
     }
+
+    "complete even when interrupted" in {
+      val t = Task.fork(Task.delay(Thread.sleep(3000)))
+      val sync = new SyncVar[Throwable\/Unit]
+      val interrupt = t.runAsyncInterruptibly(sync.put)
+      Thread.sleep(1000)
+      interrupt()
+      sync.get(3000) == Some(left(Task.TaskInterrupted))
+    }
+
   }
 }
