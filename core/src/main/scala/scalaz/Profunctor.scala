@@ -17,6 +17,12 @@ trait Profunctor[=>:[_, _]]  { self =>
     override def map[A, B](fa: C =>: A)(f: A => B) = mapsnd(fa)(f)
   }
 
+  def invariantFunctor: InvariantFunctor[({type λ[α] = α =>: α})#λ] =
+    new InvariantFunctor[({type λ[α] = α =>: α})#λ] {
+      def xmap[A, B](ma: A =>: A, f: A => B, g: B => A) =
+        mapsnd(mapfst(ma)(g))(f)
+    }
+
   def covariantInstance[C]: Functor[({type λ[α] = C =>: α})#λ] =
     new SndCovariant[C]{}
 
@@ -63,7 +69,7 @@ object Profunctor {
       def map[A,B](m: UpStar[F,D,A])(f: A => B) = upStarProfunctor[F].mapsnd(m)(f)
     }
 
-  implicit def downStarFunctor[F[_]:Functor,D]: Functor[({type λ[α]=DownStar[F,D,α]})#λ] =
+  implicit def downStarFunctor[F[_],D]: Functor[({type λ[α]=DownStar[F,D,α]})#λ] =
     new Functor[({type λ[α]=DownStar[F,D,α]})#λ] {
       def map[A,B](f: DownStar[F,D,A])(k: A => B) = DownStar(k compose f)
     }

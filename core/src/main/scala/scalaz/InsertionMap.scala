@@ -110,7 +110,8 @@ trait InsertionMapFunctions {
 }
 
 sealed abstract class InsertionMapInstances {
-  import Scalaz._
+  import std.list._, std.map._, std.tuple._
+  import syntax.foldable._
 
   implicit def insertionTraverse[K]: Traverse[({type λ[α]=InsertionMap[K, α]})#λ] =
     new Traverse[({type λ[α]=InsertionMap[K, α]})#λ] {

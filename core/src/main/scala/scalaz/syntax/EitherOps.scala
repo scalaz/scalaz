@@ -3,10 +3,10 @@ package syntax
 
 final class EitherOps[A](self: A) {
   final def left[B]: (A \/ B) =
-    \/.left(self)
+    -\/(self)
 
   final def right[B]: (B \/ A) =
-    \/.right(self)
+    \/-(self)
 }
 
 trait ToEitherOps {

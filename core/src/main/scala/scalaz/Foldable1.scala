@@ -16,6 +16,13 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     implicit def G = G0
   }
 
+  /**The composition of Foldable1 `F` and `G`, `[x]F[G[x]]`, is a Foldable1 */
+  def compose[G[_]: Foldable1]: Foldable1[({type λ[α] = F[G[α]]})#λ] =
+    new CompositionFoldable1[F, G] {
+      def F = self
+      def G = implicitly
+    }
+
   /** Map each element of the structure to a [[scalaz.Semigroup]], and combine the results. */
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B
   override def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))
@@ -67,7 +74,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** The greatest element of `fa`. */
   def maximum1[A: Order](fa: F[A]): A =
-    foldl1(fa)(x => y => if (Order[A].order(x, y) == GT) x else y)
+    foldLeft1(fa)((x, y) => if (Order[A].order(x, y) == GT) x else y)
 
   /** The greatest value of `f(a)` for each element `a` of `fa`. */
   def maximumOf1[A, B: Order](fa: F[A])(f: A => B): B =
@@ -79,7 +86,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** The smallest element of `fa`. */
   def minimum1[A: Order](fa: F[A]): A =
-    foldl1(fa)(x => y => if (Order[A].order(x, y) == LT) x else y)
+    foldLeft1(fa)((x, y) => if (Order[A].order(x, y) == LT) x else y)
 
   /** The smallest value of `f(a)` for each element `a` of `fa`. */
   def minimumOf1[A, B: Order](fa: F[A])(f: A => B): B =
@@ -88,6 +95,20 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /** The element `a` of `fa` which yield the smallest value of `f(a)`. */
   def minimumBy1[A, B: Order](fa: F[A])(f: A => B): A =
     (minimumOf1(fa)(a => (a, f(a)))(Order.orderBy[(A, B), B](_._2)))._1
+
+  override def maximum[A: Order](fa: F[A]): Option[A] = Some(maximum1(fa))
+  override def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(maximumOf1(fa)(f))
+  override def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(maximumBy1(fa)(f))
+  override def minimum[A: Order](fa: F[A]): Option[A] = Some(minimum1(fa))
+  override def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(minimumOf1(fa)(f))
+  override def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(minimumBy1(fa)(f))
+
+  /** Insert an `A` between every A, yielding the sum. */
+  def intercalate1[A](fa: F[A], a: A)(implicit A: Semigroup[A]): A =
+    foldLeft1(fa)((x, y) => A.append(x, A.append(a, y)))
+
+  override def intercalate[A: Monoid](fa: F[A], a: A): A =
+    intercalate1(fa, a)
 
   def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())

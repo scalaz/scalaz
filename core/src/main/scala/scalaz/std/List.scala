@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import scalaz.Id._
 import annotation.tailrec
 
 trait ListInstances0 {
@@ -17,9 +16,9 @@ trait ListInstances extends ListInstances0 {
     // TODO remove after removal of Index
     override def indexOr[A](fa: List[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
     override def length[A](fa: List[A]) = fa.length
-    def point[A](a: => A) = scala.List(a)
+    def point[A](a: => A) = a :: Nil
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
-    def empty[A] = scala.List()
+    def empty[A] = Nil
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
@@ -185,7 +184,7 @@ trait ListFunctions {
   final def powerset[A](as: List[A]): List[List[A]] = {
     import list.listInstance
 
-    filterM(as)(_ => scala.List(true, false))
+    filterM(as)(_ => true :: false :: Nil)
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
@@ -232,40 +231,44 @@ trait ListFunctions {
   } mapValues (_.reverse)
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
-  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] =
-    groupWhenM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] = {
+    @tailrec
+    def go(xs: List[A], acc: List[List[A]]): List[List[A]] = xs match {
+      case Nil    => acc.reverse
+      case h :: t =>
+        val (x, y) = t.span(p(h, _))
+        go(y, (h :: x) :: acc)
+    }
+    go(as, Nil)
+  }
+
+  private[this] def mapAccum[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
+    as.foldLeft((c, Nil: List[B])){ case ((c, bs), a) =>
+      val (c0, b) = f(c, a)
+      (c0, b :: bs)
+    }
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
-    case Nil    => (c, Nil)
-    case h :: t => {
-      val (i, j) = f(c, h)
-      val (k, l) = mapAccumLeft(t)(i, f)
-      (k, j :: l)
-    }
+  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = {
+    val (c0, list) = mapAccum(as)(c, f)
+    (c0, list.reverse)
   }
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
-  final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = as match {
-    case Nil    => (c, Nil)
-    case h :: t => {
-      val (i, j) = mapAccumRight(t)(c, f)
-      val (k, l) = f(i, h)
-      (k, l :: j)
-    }
-  }
+  final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
+    mapAccum(as.reverse)(c, f)
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {
-    case Nil           => scala.List(Nil)
+    case Nil           => Nil :: Nil
     case xxs@(_ :: xs) => xxs :: tailz(xs)
   }
 
   /** `[Nil, as take 1, as take 2, ..., as]` */
   final def initz[A](as: List[A]): List[List[A]] = as match {
-    case Nil           => scala.List(Nil)
+    case Nil           => Nil :: Nil
     case xxs@(x :: xs) => Nil :: (initz(xs) map (x :: _))
   }
 

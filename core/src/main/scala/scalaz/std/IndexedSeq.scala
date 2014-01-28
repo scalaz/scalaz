@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import scalaz.Id._
 import annotation.tailrec
 import collection.immutable.IndexedSeq
 import collection.IndexedSeqLike
@@ -203,8 +202,18 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       }
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
-  final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] =
-    groupWhenM(as)((a1: A, a2: A) => p(a1, a2): Id[Boolean])
+  final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] = {
+    @tailrec
+    def go(xs: IxSq[A], acc: IxSq[IxSq[A]]): IxSq[IxSq[A]] = {
+      if(xs.isEmpty)
+        acc
+      else{
+        val (x, y) = xs.tail.span(p(xs.head, _))
+        go(y, acc :+ (xs.head +: x))
+      }
+    }
+    go(as, empty)
+  }
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */

@@ -6,12 +6,17 @@ abstract class Codensity[F[_], A] { self =>
     apply(a => F.point(a))
   def flatMap[B](k: A => Codensity[F, B]): Codensity[F, B] = {
     new Codensity[F, B] {
-      def apply[C](h: B => F[C]): F[C] = 
+      def apply[C](h: B => F[C]): F[C] =
         self.apply(a => k(a)(h))
     }
   }
   def map[B](k: A => B): Codensity[F, B] =
     flatMap(x => Codensity.pureCodensity(k(x)))
+
+  /** `Codensity[F,_]` is a right Kan extension of `F` along itself. */
+  def toRan: Ran[F, F, A] = new Ran[F, F, A] {
+    def apply[B](f: A => F[B]) = self(f)
+  }
 }
 
 object Codensity extends CodensityInstances {

@@ -545,9 +545,30 @@ object MapTest extends SpecLite {
     checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
   }
 
+  "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
+    import std.set._, \&/._
+    val F = Align[({type λ[α] = Int ==>> α})#λ]
+    val x = F.align(a, b)
+    val keysA = a.keySet
+    val keysB = b.keySet
+
+    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    x.keySet must_=== (keysA ++ keysB)
+
+    x.filter(_.isThis).keySet must_=== (keysA -- keysB)
+    x.filter(_.isThat).keySet must_=== (keysB -- keysA)
+    x.filter(_.isBoth).keySet must_=== (keysA & keysB)
+
+    x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB(k)).map(This(_))
+    x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA(k)).map(That(_))
+    x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB(k)).mapWithKey((k, v) => Both(v, b.lookup(k).get))
+  }
+
   type IntMap[A] = Int ==>> A
   checkAll(traverse.laws[IntMap])
   checkAll(bind.laws[IntMap])
+  checkAll(align.laws[IntMap])
+  checkAll(zip.laws[IntMap])
   checkAll(bifoldable.laws[==>>])
 
   object instances {

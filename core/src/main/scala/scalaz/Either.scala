@@ -148,7 +148,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def toList: List[B] =
     this match {
       case -\/(_) => Nil
-      case \/-(b) => List(b)
+      case \/-(b) => b :: Nil
     }
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
@@ -324,6 +324,8 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
         a1 compare a2
+      override def equal(a1: A \/ B, a2: A \/ B) =
+        a1 === a2
     }
 
   implicit def DisjunctionMonoid[A: Semigroup, B: Monoid]: Monoid[A \/ B] =
@@ -354,6 +356,9 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 
 sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
   implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] {
+    override def map[A, B](fa: L \/ A)(f: A => B) =
+      fa map f
+
     def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
       fa flatMap f
 

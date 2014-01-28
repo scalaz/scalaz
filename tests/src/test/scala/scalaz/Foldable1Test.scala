@@ -48,4 +48,9 @@ object Foldable1Test extends SpecLite {
       (L.product(L).foldLeft1((l, l2))((xs, x) => x ++ xs)
        must_===((l.list ++ l2.list).reverse.flatten))
   }
+
+  "intercalate1" ! forAll {
+    (l: NonEmptyList[List[Int]], x: List[Int]) =>
+      l.intercalate1(x) must_=== Foldable[List].intercalate(l.list, x)
+  }
 }

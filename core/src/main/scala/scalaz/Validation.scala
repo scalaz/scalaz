@@ -133,7 +133,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   }
 
   /** Bind through the success of this validation. */
-  @deprecated("flatMap does not accumulate errors, use `\\/` instead", "7.1")
+  @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` instead""", "7.1")
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
@@ -169,7 +169,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   def toList: List[A] =
     this match {
       case Failure(_) => Nil
-      case Success(a) => List(a)
+      case Success(a) => a :: Nil
     }
 
   /** Return an empty stream or stream with one element on the success of this validation. */
@@ -381,6 +381,8 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
     def order(f1: Validation[E, A], f2: Validation[E, A]) =
       f1 compare f2
+    override def equal(f1: Validation[E, A], f2: Validation[E, A]) =
+      f1 === f2
   }
 
   implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
@@ -449,6 +451,9 @@ sealed abstract class ValidationInstances3 {
   }
 
   implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+    override def map[A, B](fa: Validation[L, A])(f: A => B) =
+      fa map f
+
     def point[A](a: => A) =
       Success(a)
 

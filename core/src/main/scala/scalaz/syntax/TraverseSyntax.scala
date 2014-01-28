@@ -18,7 +18,7 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
     F.traverseU[A, GB](self)(f)(G)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
-  final def traverseM[G[_], B](f: A => G[F[B]])(implicit G: Applicative[G], FM: Monad[F]): G[F[B]] =
+  final def traverseM[G[_], B](f: A => G[F[B]])(implicit G: Applicative[G], FM: Bind[F]): G[F[B]] =
     F.traverseM[A, G, B](self)(f)(G, FM)
 
   /** Traverse with the identity function */

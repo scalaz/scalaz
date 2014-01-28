@@ -22,6 +22,10 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
 
   def =<=[C](c: Cokleisli[F, C, A])(implicit F: Cobind[F]): Cokleisli[F, C, B] =
     compose(c)
+
+  import Leibniz.===
+  def endo(implicit ev: B === A): Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A] =
+    Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A](ev.subst[({type λ[α] = Cokleisli[F, A, α]})#λ](this))
 }
 
 object Cokleisli extends CokleisliInstances with CokleisliFunctions
@@ -30,11 +34,14 @@ sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliCompose[F] {
     override implicit def F = F0
   }
+  implicit def cokleisliProfunctor[F[_]: Functor]: Profunctor[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliProfunctor[F] {
+    def F = implicitly
+  }
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
   implicit def cokleisliMonad[F[_], R]: Monad[({type λ[α]=Cokleisli[F, R, α]})#λ] = new CokleisliMonad[F, R] {}
-  
+
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliArrow[F] {
     override implicit def F = F0
   }
@@ -54,9 +61,19 @@ private trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleis
   override def compose[A, B, C](f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]) = f compose g
 }
 
+private trait CokleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
+  implicit def F: Functor[F]
+
+  override final def mapfst[A, B, C](fa: Cokleisli[F, A, B])(f: C => A) =
+    Cokleisli[F, C, B](fc => fa(F.map(fc)(f)))
+
+  override final def mapsnd[A, B, C](fa: Cokleisli[F, A, B])(f: B => C) =
+    fa map f
+}
 
 private trait CokleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+  with CokleisliProfunctor[F]
   with CokleisliCompose[F] {
 
   implicit def F: Comonad[F]

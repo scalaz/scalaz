@@ -50,7 +50,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.2",
-    crossScalaVersions := Seq("2.9.3", "2.10.2"),
+    crossScalaVersions := Seq("2.9.3", "2.10.2", latestScala211PreRelease),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalaBinaryVersion in update := (
       if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
@@ -67,8 +67,9 @@ object build extends Build {
       Seq("-unchecked") ++ versionDepOpts
     },
 
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")) map { bd =>
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
+    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
+      val tagOrBranch = if(v endsWith "SNAPSHOT") "scalaz-seven" else ("v" + v)
+      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.

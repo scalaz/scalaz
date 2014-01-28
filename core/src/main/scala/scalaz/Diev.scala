@@ -1,8 +1,8 @@
 package scalaz
 
 import scala.annotation.tailrec
-import Scalaz._
 import scala.collection.mutable.ListBuffer
+import syntax.enum._
 
 /**
  * Implementation of a Discrete Interval Encoding Tree [[http://web.engr.oregonstate.edu/~erwig/diet/]] that
@@ -55,6 +55,8 @@ object DievInterval {
 }
 
 trait DievImplementation {
+  import syntax.std.option._
+  import std.anyVal._
   import DievInterval._
   protected[this] case class DieVector[A](intervals: Vector[(A, A)] = Vector())(implicit EA: Enum[A]) extends Diev[A] {
     val liftedIntervals = intervals.lift
@@ -215,6 +217,8 @@ object Diev extends DievInstances with DievFunctions {
 }
 
 sealed abstract class DievInstances extends DievImplementation {
+  import std.tuple._, std.vector._
+
   implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
 
   @deprecated("Each/foreach and Length/length are deprecated", "7.1")

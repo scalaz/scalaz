@@ -47,7 +47,7 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
     fold(-\/(_), \/-(right))
 
   def toList: List[A] =
-    fold(List(_), Nil)
+    fold(_ :: Nil, Nil)
 
   def orElse[AA >: A](a: => LazyOption[AA]): LazyOption[AA] =
     fold(_ => this, a)
@@ -149,6 +149,18 @@ sealed abstract class LazyOptionInstances {
     import std.option._
     Equal.equalBy(_.toOption)
   }
+
+  implicit def lazyOptionMonoid[A: Semigroup]: Monoid[LazyOption[A]] =
+    new Monoid[LazyOption[A]] {
+      def zero = LazyNone
+
+      def append(a: LazyOption[A], b: => LazyOption[A]) = (a, b) match {
+        case (LazySome(a1), LazySome(b1))     => LazySome(() => Semigroup[A].append(a1(), b1()))
+        case (LazySome(_) , LazyNone)         => a
+        case (LazyNone    , b1 @ LazySome(_)) => b1
+        case (LazyNone    , LazyNone)         => LazyNone
+      }
+    }
 
   implicit def lazyOptionShow[A](implicit S: Show[A]): Show[LazyOption[A]] =
     Show.shows(_.fold(a ⇒ "LazySome(%s)".format(S.shows(a)), "LazyNone"))

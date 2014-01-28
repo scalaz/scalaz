@@ -12,20 +12,38 @@ object EitherTTest extends SpecLite {
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
 
   checkAll(equal.laws[EitherTListInt[Int]])
-  checkAll(monad.laws[EitherTListInt])
+  checkAll(monadPlus.laws[EitherTListInt])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
+
+  "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
+    val F = new Bitraverse[EitherTList]{
+      def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
+        EitherT.eitherTBitraverse[List].bitraverseImpl(fab)(f, g)
+    }
+
+    Bifoldable[EitherTList].bifoldMap(a)(_ :: Nil)(_ :: Nil) must_=== F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
+  }
 
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
     def monad[F[_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
+    def plus[F[_] : Monad, A: Semigroup] = Plus[({type λ[α] = EitherT[F, A, α]})#λ]
+    def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[({type λ[α] = EitherT[F, A, α]})#λ]
     def foldable[F[_] : Foldable, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
     def traverse[F[_] : Traverse, A] = Traverse[({type λ[α] = EitherT[F, A, α]})#λ]
+    def bifunctor[F[_] : Functor] = Bifunctor[({type λ[α, β] = EitherT[F, α, β]})#λ]
+    def bifoldable[F[_] : Foldable] = Bifoldable[({type λ[α, β] = EitherT[F, α, β]})#λ]
+    def bitraverse[F[_] : Traverse] = Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def apply[F[_] : Monad, A] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
+    def functor[F[_] : Monad, A: Monoid] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
+    def apply[F[_] : Monad, A: Monoid] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
+    def monad[F[_] : Monad, A: Monoid] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
+    def plus[F[_] : Monad, A: Monoid] = Plus[({type λ[α] = EitherT[F, A, α]})#λ]
     def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
+    def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = EitherT[F, α, β]})#λ]
+    def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = EitherT[F, α, β]})#λ]
   }
 
   // compilation test

@@ -113,8 +113,8 @@ object ScalazArbitrary {
 
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
-      case Left(a) => \/.left(a)
-      case Right(b) => \/.right(b)
+      case Left(a) => -\/(a)
+      case Right(b) => \/-(b)
     }
 
   implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =
@@ -177,6 +177,8 @@ object ScalazArbitrary {
     Gen.sized(fingerTree[A] _)
   }
 
+  implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
+
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
     Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
@@ -237,6 +239,8 @@ object ScalazArbitrary {
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
+
+  implicit def ilistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(IList.fromList)
 
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
     Applicative[Arbitrary].apply2(A, B)(LazyTuple2(_, _))

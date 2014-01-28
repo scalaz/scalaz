@@ -1,6 +1,7 @@
 package scalaz
 
 import TreeLoc._
+import annotation.tailrec
 
 /**
  * A rose-tree zipper. Represents a [[scalaz.Tree]] together with a position in that tree.
@@ -23,6 +24,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
   }
 
   /** Select the root node of the tree. */
+  @tailrec
   def root: TreeLoc[A] =
     parent match {
       case Some(z) => z.root
@@ -61,6 +63,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
   /** Select the first immediate child of the current node that satisfies the given predicate. */
   def findChild(p: Tree[A] => Boolean): Option[TreeLoc[A]] = {
+    @tailrec
     def split(acc: TreeForest[A], xs: TreeForest[A]): Option[(TreeForest[A], Tree[A], TreeForest[A])] =
       (acc, xs) match {
         case (acc, Stream.cons(x, xs)) => if (p(x)) Some((acc, x, xs)) else split(Stream.cons(x, acc), xs)
@@ -178,6 +181,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
   private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
     ls.foldLeft(t #:: rs)((a, b) => b #:: a)
 
+  @tailrec
   private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
     (acc, xs, n) match {
       case (acc, xs, 0)                 => Some((acc, xs))

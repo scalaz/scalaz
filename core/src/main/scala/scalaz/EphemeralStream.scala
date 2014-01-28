@@ -17,6 +17,16 @@ sealed abstract class EphemeralStream[A] {
 
   def tail: () => EphemeralStream[A]
 
+  def headOption: Option[A] = {
+    if(isEmpty) None
+    else Some(head())
+  }
+
+  def tailOption: Option[EphemeralStream[A]] = {
+    if(isEmpty) None
+    else Some(tail())
+  }
+
   def toList: List[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
     foldLeft(Nil: List[A])(lcons _).reverse
@@ -181,8 +191,9 @@ sealed abstract class EphemeralStreamInstances {
     override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
       if(fa.isEmpty) emptyEphemeralStream
       else {
-        val bTail = if(fb.isEmpty) emptyEphemeralStream[B] else fb.tail()
-        cons(f(fa.head(), fb.headOption), zipWithL(fa.tail(), bTail)(f))
+        val (bo, bTail) = if(fb.isEmpty) (None, emptyEphemeralStream[B])
+                          else (Some(fb.head()), fb.tail())
+        cons(f(fa.head(), bo), zipWithL(fa.tail(), bTail)(f))
       }
     }
     override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
@@ -204,7 +215,7 @@ sealed abstract class EphemeralStreamInstances {
           n -= 1
           these = these.tail()
         }
-        these.headOption
+        if (these.isEmpty) None else Some(these.head())
       }
     }
   }
@@ -252,7 +263,7 @@ trait EphemeralStreamFunctions {
     case h #:: t  => cons(h, fromStream(t))
   }
 
-  implicit def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
+  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
     def iterator = new Iterator[A] {
       var cur = e
 

@@ -1063,7 +1063,7 @@ final class IndSeq[A](val self: FingerTree[Int, A]) {
   def flatMap[B](f: A => IndSeq[B]): IndSeq[B] = indSeq(fingerTreeFoldable.foldLeft(self, empty[Int, B])((ys, x) => ys <++> f(x).self))
 }
 
-object IndSeq {
+object IndSeq extends IndSeqInstances {
   private def indSeq[A](v: FingerTree[Int, A]): IndSeq[A] = new IndSeq(v)
 
   import std.anyVal._
@@ -1072,6 +1072,45 @@ object IndSeq {
   def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
 }
 
+sealed abstract class IndSeqInstances {
+
+  implicit def indSeqEqual[A: Equal]: Equal[IndSeq[A]] =
+    Equal.equalBy(_.self)
+
+  implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
+    new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, ({type λ[α] = FingerTree[Int, α]})#λ]{
+      def G = implicitly
+      val iso = new Isomorphism.IsoFunctorTemplate[IndSeq, ({type λ[α] = FingerTree[Int, α]})#λ] {
+        def from[A](a: FingerTree[Int, A]) =
+          new IndSeq(a)
+        def to[A](a: IndSeq[A]) =
+          a.self
+      }
+      def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
+        import std.anyVal._
+        implicit val r = UnitReducer((_: B) => 1)
+        G.map(fa.self.traverseTree(f))(new IndSeq(_))
+      }
+      override def length[A](fa: IndSeq[A]) =
+        fa.length
+      override def index[A](fa: IndSeq[A], i: Int) =
+        if(0 <= i && i < fa.length) Some(fa(i)) else None
+      override def isEmpty[A](fa: IndSeq[A]) =
+        fa.self.isEmpty
+      override def empty[A](fa: IndSeq[A]) =
+        fa.self.isEmpty
+      def point[A](a: => A) =
+        IndSeq(a)
+      def bind[A, B](fa: IndSeq[A])(f: A => IndSeq[B]) =
+        fa flatMap f
+      override def map[A, B](fa: IndSeq[A])(f: A => B) =
+        fa map f
+      def plus[A](a: IndSeq[A], b: => IndSeq[A]) =
+        a ++ b
+      def empty[A] =
+        IndSeq.apply()
+    }
+}
 
 /** Ordered sequences, based on [[scalaz.FingerTree]]
  *

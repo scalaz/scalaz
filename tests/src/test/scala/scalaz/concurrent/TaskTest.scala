@@ -46,9 +46,18 @@ object TaskTest extends SpecLite {
     override def fillInStackTrace = this
   }
 
+  case object FailTurkey extends Error {
+    override def fillInStackTrace = this
+  }
+
   "catches exceptions" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun ==
     -\/(FailWhale)
+  }
+
+  "catches errors" ! {
+    Task { Thread.sleep(10); throw FailTurkey; 42 }.map(_ + 1).attemptRun ==
+    -\/(FailTurkey)
   }
 
   "catches exceptions in a mapped function" ! {

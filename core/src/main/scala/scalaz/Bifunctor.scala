@@ -26,16 +26,17 @@ trait Bifunctor[F[_, _]]  { self =>
   }
 
   /** Extract the Functor on the first param. */
-  def leftFunctor[X]: Functor[({type λ[α] = F[α, X]})#λ] = new Functor[({type λ[α] = F[α, X]})#λ] {
-    def map[A, C](fax: F[A, X])(f: A => C): F[C, X] = bimap(fax)(f, z => z)
-  }
+  def leftFunctor[X]: Functor[({type λ[α] = F[α, X]})#λ] =
+    new LeftFunctor[F, X] {val F = self}
 
   def leftMap[A, B, C](fab: F[A, B])(f: A => C): F[C, B] = bimap(fab)(f, z => z)
 
   /** Extract the Functor on the second param. */
-  def rightFunctor[X]: Functor[({type λ[α] = F[X, α]})#λ] = new Functor[({type λ[α] = F[X, α]})#λ] {
-    def map[B, D](fab: F[X, B])(g: B => D): F[X, D] = bimap(fab)(z => z, g)
-  }
+  def rightFunctor[X]: Functor[({type λ[α] = F[X, α]})#λ] =
+    new RightFunctor[F, X] {val F = self}
+
+  /** Unify the functor over both params. */
+  def uFunctor: Functor[({type λ[α] = F[α, α]})#λ] = new UFunctor[F] {val F = self}
 
   def rightMap[A, B, D](fab: F[A, B])(g: B => D): F[A, D] =
     bimap(fab)(z => z, g)

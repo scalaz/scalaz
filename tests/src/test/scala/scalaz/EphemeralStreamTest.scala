@@ -9,7 +9,7 @@ import org.scalacheck.Prop.forAll
 object EphemeralStreamTest extends SpecLite {
 
   checkAll(equal.laws[EphemeralStream[Int]])
-  checkAll(monadPlus.laws[EphemeralStream])
+  checkAll(monadPlus.strongLaws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])
   checkAll(zip.laws[EphemeralStream])
   checkAll(align.laws[EphemeralStream])
@@ -91,7 +91,9 @@ object EphemeralStreamTest extends SpecLite {
 
   "tails infinite stream" in {
     val n = util.Random.nextInt(1000)
-    EphemeralStream.iterate(0)(_ + 1).tails.map(_.take(n).toStream).take(n) must_===(
+    EphemeralStream.iterate(0)(_ + 1).tails
+      .map(t => Foldable[EphemeralStream].toStream(t.take(n)))
+      .take(n) must_===(
       EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).tails.map(_ take n).toStream.take(n))
     )
   }

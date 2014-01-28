@@ -97,4 +97,24 @@ object ListTest extends SpecLite {
   "index" ! forAll { (xs: List[Int], n: Int) =>
     (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
+
+  "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>
+    val f: (Int, Int) => Boolean = _ > _
+    xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
+  }
+
+  "mapAccumLeft" ! forAll {
+    (xs: List[Int]) =>
+      val f = (_: Int) + 1
+      xs.mapAccumLeft(List[Int](), (c: List[Int], a) =>
+        (c :+ a, f(a))) must_===(xs, xs.map(f))
+  }
+
+  "mapAccumRight" ! forAll {
+    (xs: List[Int]) =>
+      val f = (_: Int) + 1
+      xs.mapAccumRight(List[Int](), (c: List[Int], a) =>
+        (c :+ a, f(a))) must_===(xs.reverse, xs.map(f))
+  }
+
 }

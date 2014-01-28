@@ -7,11 +7,11 @@ final class IdOpsDeprecated[A](self: A) extends IdOps[A](self){
 
   @deprecated("use scalaz.syntax.either._", "7.1")
   def left[B]: (A \/ B) =
-    \/.left(self)
+    -\/(self)
 
   @deprecated("use scalaz.syntax.either._", "7.1")
   def right[B]: (B \/ A) =
-    \/.right(self)
+    \/-(self)
 
   @deprecated("use scalaz.syntax.nel._", "7.1")
   final def wrapNel: NonEmptyList[A] =

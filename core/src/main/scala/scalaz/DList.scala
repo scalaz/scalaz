@@ -39,10 +39,18 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
     }).run
 
   /** Get the first element of the list. */
+  @deprecated("unsafe; use headOption", "7.1.0")
   def head: A = uncons(sys.error("DList.head: empty list"), (x, _) => x)
 
   /** Get the tail of the list. */
+  @deprecated("unsafe; use tailOption", "7.1.0")
   def tail: DList[A] = uncons(sys.error("DList.tail: empty list"), (_, y) => y)
+
+  /** Get the first element of the list, if any. */
+  def headOption: Option[A] = uncons(None, (x, _) => Some(x))
+
+  /** Get the tail of the list, if any. */
+  def tailOption: Option[DList[A]] = uncons(None, (_, y) => Some(y))
 
   /** Fold over a difference list. */
   def foldr[B](z: => B)(f: (A, => B) => B): B = {

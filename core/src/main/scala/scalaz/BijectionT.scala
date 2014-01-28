@@ -7,7 +7,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def from(b: B): G[A] = _from(b)
 
   import BijectionT._
-  import std.AllInstances._
+  import std.tuple._
 
   def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A](_from, _to)
 
@@ -61,7 +61,7 @@ trait BijectionTFunctions {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B](t, f)
 
-  import std.AllInstances._
+  import std.list._, std.function._
 
   type <@>[A, B] =
   Bijection[A, B]

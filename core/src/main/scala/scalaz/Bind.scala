@@ -15,7 +15,10 @@ trait Bind[F[_]] extends Apply[F] { self =>
   /** Equivalent to `join(map(fa)(f))`. */
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
 
-  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = bind(f)(f => map(fa)(f))
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = {
+    lazy val fa0 = fa
+    bind(f)(map(fa0))
+  }
 
   /** Sequence the inner `F` of `FFA` after the outer `F`, forming a
    * single `F[A]`. */
@@ -28,8 +31,11 @@ trait Bind[F[_]] extends Apply[F] { self =>
    * a)`, this will only include context from the chosen of `ifTrue`
    * and `ifFalse`, not the other.
    */
-  def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] =
-    bind(value)(x => if (x) ifTrue else ifFalse)
+  def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] = {
+    lazy val t = ifTrue
+    lazy val f = ifFalse
+    bind(value)(if(_) t else f)
+  }
 
   trait BindLaw extends ApplyLaw {
     /**

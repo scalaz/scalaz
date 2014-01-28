@@ -77,18 +77,18 @@ object OneAndTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Functor] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
-    def apply[F[_]: Applicative: Plus, A] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
-    def applicative[F[_]: ApplicativePlus, A] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
-    def bind[F[_]: Monad: Plus, A] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
-    def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
-    def plus[F[_]: Applicative: Plus, A] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
-    def foldable[F[_]: Foldable, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
-    def foldable1[F[_]: Foldable1, A] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
-    def traverse[F[_]: Traverse, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
-    def traverse1[F[_]: Traverse1, A] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
-    def each[F[_]: Each, A] = Each[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Applicative: Plus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def applicative[F[_]: ApplicativePlus] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
+    def bind[F[_]: Monad: Plus] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
+    def monad[F[_]: MonadPlus] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: Applicative: Plus] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
+    def foldable[F[_]: Foldable] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
+    def foldable1[F[_]: Foldable1] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
+    def traverse[F[_]: Traverse] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
+    def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
+    def each[F[_]: Each] = Each[({type λ[α] = OneAnd[F, α]})#λ]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }

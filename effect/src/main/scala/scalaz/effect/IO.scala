@@ -85,7 +85,7 @@ sealed trait IO[A] {
    * exception was raised.
    */
   def catchLeft: IO[Throwable \/ A] =
-    map(\/.right[Throwable, A]) except (t => IO(\/.left(t)))
+    map(\/.right[Throwable, A]) except (t => IO(-\/(t)))
 
   /**Like "catchLeft" but takes a predicate to select which exceptions are caught. */
   def catchSomeLeft[B](p: Throwable => Option[B]): IO[B \/ A] =

@@ -91,7 +91,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
 
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))
-  def tuple3[A,B,C](fa: => F[A], fb: => F[B], fc: F[C]): F[(A,B,C)] =
+  def tuple3[A,B,C](fa: => F[A], fb: => F[B], fc: => F[C]): F[(A,B,C)] =
     apply3(fa, fb, fc)((_,_,_))
   def tuple4[A,B,C,D](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D]): F[(A,B,C,D)] =
     apply4(fa, fb, fc, fd)((_,_,_,_))

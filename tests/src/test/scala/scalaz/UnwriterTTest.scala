@@ -13,6 +13,7 @@ object UnwriterTTest extends SpecLite {
   type UnwriterTOptInt[A] = UnwriterTOpt[Int, A]
 
   checkAll(equal.laws[UnwriterTOptInt[Int]])
+  checkAll(bind.laws[UnwriterTOptInt])
   checkAll(traverse.laws[UnwriterTOptInt])
   checkAll(bitraverse.laws[UnwriterTOpt])
 

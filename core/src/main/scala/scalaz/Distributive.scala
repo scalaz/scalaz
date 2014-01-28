@@ -24,7 +24,7 @@ trait Distributive[F[_]] extends Functor[F] { self =>
   }
 
   class Distribution[G[_]](implicit G: Functor[G]) {
-    def run[X[_]:Functor,A,B](fa: X[A])(f: A => F[B]): F[X[B]] = distributeImpl(fa)(f)
+    def run[A,B](fa: G[A])(f: A => F[B]): F[G[B]] = distributeImpl(fa)(f)
   }
 
   def distribution[G[_]:Functor]: Distribution[G] =
