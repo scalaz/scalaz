@@ -44,6 +44,10 @@ trait Zip[F[_]]  { self =>
         zipWith(fa, f)((a, g) => g(a))
       def map[A, B](fa: F[A])(f: A => B) =
         F.map(fa)(f)
+      override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C) =
+        zipWith(fa, fb)(f)
+      override def tuple2[A, B](fa: => F[A], fb: => F[B]) =
+        self.zip(fa, fb)
     }
 
   trait ZipLaw {

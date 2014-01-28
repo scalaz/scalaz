@@ -58,7 +58,11 @@ trait StreamInstances {
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
     def isEmpty[A](s: Stream[A]) = s.isEmpty
     def point[A](a: => A) = scala.Stream(a)
-    def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
+    def zip[A, B](a: => Stream[A], b: => Stream[B]) = {
+      val _a = a
+      if(_a.isEmpty) Stream.Empty
+      else _a zip b
+    }
     def unzip[A, B](a: Stream[(A, B)]) = a.unzip
 
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
