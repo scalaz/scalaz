@@ -386,7 +386,7 @@ sealed abstract class ==>>[A, B] {
         l
       case (l @ Bin(kx, x, lx, rx), r @ Bin(ky, y, ly, ry)) =>
         if (delta * l.size <= r.size) balance(ky, y, l.merge(ly), ry)
-        else if (delta * r.size <= l.size) balance(kx, x, lx, r.merge(rx))
+        else if (delta * r.size <= l.size) balance(kx, x, lx, rx.merge(r))
         else glue(l, r)
     }
 
