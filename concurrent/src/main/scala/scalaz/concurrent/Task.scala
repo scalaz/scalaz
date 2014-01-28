@@ -62,11 +62,19 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
   /**
    * Calls `attempt` and handles some exceptions using the given partial
-   * function. Any nonmatching exceptions are reraised.
+   * function, calling Task.now on the result. Any nonmatching exceptions
+   * are reraised.
    */
   def handle[B>:A](f: PartialFunction[Throwable,B]): Task[B] =
+    handleWith(f andThen Task.now)
+
+  /**
+   * Calls `attempt` and handles some exceptions using the given partial
+   * function. Any nonmatching exceptions are reraised.
+   */
+  def handleWith[B>:A](f: PartialFunction[Throwable,Task[B]]): Task[B] =
     attempt flatMap {
-      case -\/(e) => f.lift(e) map (Task.now) getOrElse Task.fail(e)
+      case -\/(e) => f.lift(e) getOrElse Task.fail(e)
       case \/-(a) => Task.now(a)
     }
 
