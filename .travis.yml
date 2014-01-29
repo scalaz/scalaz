@@ -1,11 +1,10 @@
 language: scala
 scala:
-  - 2.11.0-M7
-  - 2.10.2
+  - 2.11.0-M8
+  - 2.10.3
   - 2.9.3
 jdk:
   - oraclejdk7
   - openjdk6
 
 script: sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test
-
