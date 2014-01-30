@@ -213,11 +213,15 @@ object Trampoline extends TrampolineInstances {
     Free.Suspend[Function0, A](() => a)
 }
 
-sealed abstract class TrampolineInstances {
-  implicit val trampolineMonad: Monad[Trampoline] = new Monad[Trampoline] {
-    override def point[A](a: => A) = return_[Function0, A](a)
-    def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
-  }
+sealed trait TrampolineInstances {
+  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] =
+    new Monad[Trampoline] with Comonad[Trampoline] {
+      override def point[A](a: => A) = return_[Function0, A](a)
+      def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
+      def copoint[A](fa: Trampoline[A]) = fa.run
+      def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
+      override def cojoin[A](fa: Trampoline[A]) = Return(fa)
+    }
 }
 
 object Sink extends SinkInstances
@@ -242,14 +246,54 @@ sealed trait SourceInstances {
     }
 }
 
+sealed abstract class FreeInstances3 {
+  implicit def freeFoldable[F[_]: Foldable: Functor]: Foldable[({type λ[α] = Free[F, α]})#λ] =
+    new FreeFoldable[F] {
+      def F = implicitly
+      def F0 = implicitly
+    }
+}
+
+sealed abstract class FreeInstances2 extends FreeInstances3 {
+  implicit def freeFoldable1[F[_]: Foldable1: Functor]: Foldable1[({type λ[α] = Free[F, α]})#λ] =
+    new FreeFoldable1[F] {
+      def F = implicitly
+      def F0 = implicitly
+    }
+}
+
+sealed abstract class FreeInstances1 extends FreeInstances2 {
+  implicit def freeTraverse[F[_]: Traverse]: Traverse[({type λ[α] = Free[F, α]})#λ] =
+    new FreeTraverse[F] {
+      def F = implicitly
+    }
+}
+
+sealed abstract class FreeInstances0 extends FreeInstances1 {
+  implicit def freeTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = Free[F, α]})#λ] =
+    new FreeTraverse1[F] {
+      def F = implicitly
+    }
+}
+
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
-sealed abstract class FreeInstances extends TrampolineInstances with SinkInstances with SourceInstances {
+sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
+    }
+
+  implicit def freeEqual[F[_], A](implicit A: Equal[A], N: Equal ~> ({type λ[α] = Equal[F[α]]})#λ, F: Functor[F]): Equal[Free[F, A]] =
+    Equal.equal{ (aa, bb) =>
+      (aa.resume, bb.resume) match {
+        case (\/-(a), \/-(b)) => A.equal(a, b)
+        case (-\/(a), -\/(b)) => N(freeEqual[F, A]).equal(a, b)
+        case (\/-(_), -\/(_)) => false
+        case (-\/(_), \/-(_)) => false
+      }
     }
 }
 
@@ -281,3 +325,71 @@ trait FreeFunctions {
     Suspend[({type f[x] = (=> A) => x})#f, A](a => Return[({type f[x] = (=> A) => x})#f, A](a))
 }
 
+private sealed trait FreeFoldable[F[_]] extends Foldable[({type λ[α] = Free[F, α]})#λ] {
+  def F: Foldable[F]
+  implicit def F0: Functor[F]
+
+  override final def foldMap[A, B: Monoid](fa: Free[F, A])(f: A => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldMap(s)(foldMap(_)(f))
+      case \/-(r) => f(r)
+    }
+
+  override final def foldLeft[A, B](fa: Free[F, A], z: B)(f: (B, A) => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldLeft(s, z)((b, a) => foldLeft(a, b)(f))
+      case \/-(r) => f(z, r)
+    }
+
+  override final def foldRight[A, B](fa: Free[F, A], z: => B)(f: (A, => B) => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldRight(s, z)(foldRight(_, _)(f))
+      case \/-(r) => f(r, z)
+    }
+}
+
+private sealed trait FreeFoldable1[F[_]] extends Foldable1[({type λ[α] = Free[F, α]})#λ] {
+  def F: Foldable1[F]
+  implicit def F0: Functor[F]
+
+  override final def foldMap1[A, B: Semigroup](fa: Free[F, A])(f: A => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldMap1(s)(foldMap1(_)(f))
+      case \/-(r) => f(r)
+    }
+
+  override final def foldMapRight1[A, B](fa: Free[F, A])(z: A => B)(f: (A, => B) => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldMapRight1(s)(foldMapRight1(_)(z)(f))(foldRight(_, _)(f))
+      case \/-(r) => z(r)
+    }
+
+  override final def foldMapLeft1[A, B](fa: Free[F, A])(z: A => B)(f: (B, A) => B): B =
+    fa.resume match {
+      case -\/(s) => F.foldMapLeft1(s)(foldMapLeft1(_)(z)(f))((b, a) => foldLeft(a, b)(f))
+      case \/-(r) => z(r)
+    }
+}
+
+private sealed trait FreeTraverse[F[_]] extends Traverse[({type λ[α] = Free[F, α]})#λ] with FreeFoldable[F]{
+  implicit def F: Traverse[F]
+  override final def F0 = F
+
+  override final def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
+
+  override final def traverseImpl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Applicative[G]): G[Free[F, B]] =
+    fa.resume match {
+      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(Suspend(_))
+      case \/-(r) => G.map(f(r))(Return(_))
+    }
+}
+
+private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[({type λ[α] = Free[F, α]})#λ] with FreeTraverse[F] with FreeFoldable1[F]{
+  implicit def F: Traverse1[F]
+
+  override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =
+    fa.resume match {
+      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(Suspend(_))
+      case \/-(r) => G.map(f(r))(Return(_))
+    }
+}
