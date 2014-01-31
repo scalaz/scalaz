@@ -6,7 +6,7 @@ trait Codensity[F[+_], +A] { self =>
     apply(a => F.point(a))
   def flatMap[B](k: A => Codensity[F, B]): Codensity[F, B] = {
     new Codensity[F, B] {
-      def apply[C](h: B => F[C]): F[C] = 
+      def apply[C](h: B => F[C]): F[C] =
         self.apply(a => k(a)(h))
     }
   }
