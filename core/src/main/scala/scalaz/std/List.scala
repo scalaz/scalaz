@@ -21,7 +21,11 @@ trait ListInstances extends ListInstances0 {
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
 
-    def zip[A, B](a: => List[A], b: => List[B]) = a zip b
+    def zip[A, B](a: => List[A], b: => List[B]) = {
+      val _a = a
+      if(_a.isEmpty) Nil
+      else _a zip b
+    }
     def unzip[A, B](a: List[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
