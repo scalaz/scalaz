@@ -64,7 +64,8 @@ object build extends Build {
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
-      Seq("-unchecked") ++ versionDepOpts
+      // no generic signatures, see SI-7932 and #571
+      Seq("-unchecked", "-Yno-generic-signatures") ++ versionDepOpts
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
