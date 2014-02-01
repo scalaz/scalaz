@@ -1,6 +1,8 @@
 package scalaz
 package effect
 
+import java.io.Closeable
+
 ////
 /**
  *
@@ -20,9 +22,32 @@ trait Resource[F]  { self =>
   val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
 }
 
-object Resource {
+object Resource extends ResourceFunctions with ResourceInstances {
   @inline def apply[F](implicit F: Resource[F]): Resource[F] = F
 
   ////
   ////
 }
+
+trait ResourceFunctions {
+
+  def resource[A](closeAction: A => IO[Unit]): Resource[A] =
+    new Resource[A] {
+      def close(a: A): IO[Unit] = closeAction(a)
+    }
+ 
+  def resourceFromCloseable[A <: Closeable]: Resource[A] =
+    resource(a => IO(a.close))
+
+}
+
+trait ResourceInstances {
+
+  implicit val contravariant: Contravariant[Resource] =
+    new Contravariant[Resource] {
+      def contramap[A, B](fa: Resource[A])(f: B => A): Resource[B] =
+        fa.contramap(f)
+    }
+
+}
+
