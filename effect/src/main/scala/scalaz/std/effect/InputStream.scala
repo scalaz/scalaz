@@ -5,10 +5,11 @@ import effect.{IO, Resource}
 
 import java.io.InputStream
 
+@deprecated("Use CloseableInstances", "7.1")
 trait InputStreamInstances {
-  implicit val inputStreamResource: Resource[InputStream] = new Resource[InputStream] {
-    def close(r: InputStream) = IO(r.close)
-  }
+  implicit val inputStreamResource: Resource[InputStream] = 
+    Resource.resourceFromCloseable
 }
 
+@deprecated("Use closeable", "7.1")
 object inputStream extends InputStreamInstances

@@ -5,10 +5,11 @@ import effect.{IO, Resource}
 
 import java.io.Writer
 
+@deprecated("Use CloseableInstances", "7.1")
 trait WriterInstances {
-  implicit val writerResource: Resource[Writer] = new Resource[Writer] {
-    def close(r: Writer) = IO(r.close)
-  }
+  implicit val writerResource: Resource[Writer] = 
+    Resource.resourceFromCloseable
 }
 
+@deprecated("Use closeable", "7.1")
 object writer extends WriterInstances
