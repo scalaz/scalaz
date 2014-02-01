@@ -13,8 +13,10 @@ sealed abstract class EphemeralStream[A] {
 
   def isEmpty: Boolean
 
+  @deprecated("unsafe; use headOption", "7.1")
   def head: () => A
 
+  @deprecated("unsafe; use tailOption", "7.1")
   def tail: () => EphemeralStream[A]
 
   def headOption: Option[A] = {
