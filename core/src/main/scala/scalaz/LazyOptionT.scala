@@ -25,7 +25,7 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
     F.map(run)(_.forall(f))
 
   def toOption(implicit F: Functor[F]): OptionT[F, A] =
-    OptionT.optionT(F.map(run)(_.toOption))
+    OptionT.traverseT(F.map(run)(_.toOption))
 
   def toLazyRight[X](left: => X)(implicit F: Functor[F]): LazyEitherT[F, X, A] =
     lazyEitherT(F.map(run)(_.toLazyRight(left)))

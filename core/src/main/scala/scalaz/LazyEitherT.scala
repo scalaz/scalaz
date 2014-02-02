@@ -39,7 +39,7 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
     lazyOptionT(F.map(run)(_.toLazyOption))
 
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
-    optionT(F.map(run)(_.toOption))
+    traverseT(F.map(run)(_.toOption))
 
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.toList)
@@ -114,7 +114,7 @@ object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
       lazyOptionT(F.map(lazyEitherT.run)(_.left.toLazyOption))
 
     def toOption(implicit F: Functor[F]): OptionT[F, A] =
-      optionT(F.map(lazyEitherT.run)(_.left.toOption))
+      traverseT(F.map(lazyEitherT.run)(_.left.toOption))
 
     def toList(implicit F: Functor[F]): F[List[A]] =
       F.map(lazyEitherT.run)(_.left.toList)
