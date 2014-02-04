@@ -132,14 +132,6 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
-  /** Bind through the success of this validation. */
-  @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` instead""", "7.1")
-  def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
-    this match {
-      case Success(a) => f(a)
-      case e @ Failure(_) => e
-    }
-
   /** Fold on the success of this validation. */
   def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
     case Success(a) => f(a, z)
@@ -368,6 +360,17 @@ object Validation extends ValidationInstances with ValidationFunctions {
       case Success(a) => success(a)
     }
 
+  @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` or `import scalaz.Validation.FlatMap._` instead""", "7.1")
+  @inline implicit def ValidationFlatMapDeprecated[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] = 
+    new ValidationFlatMap(d)
+
+  /** Import this if you wish to use `flatMap` without a deprecation
+    * warning.
+    */
+  object FlatMap {
+    @inline implicit def ValidationFlatMapRequested[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] =
+      new ValidationFlatMap(d)
+  }
 }
 
 
@@ -391,6 +394,15 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
         a1 +++ a2
       def zero =
         Success(Monoid[A].zero)
+    }
+}
+
+final class ValidationFlatMap[E, A] private[scalaz](self: Validation[E, A]) {
+  /** Bind through the success of this validation. */
+  def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
+    self match {
+      case Success(a) => f(a)
+      case e @ Failure(_) => e
     }
 }
 
