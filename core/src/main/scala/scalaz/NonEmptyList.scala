@@ -101,8 +101,10 @@ sealed trait NonEmptyList[+A] {
 
   def size: Int = 1 + tail.size
 
-  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] =
-    nel((head, b.head), tail zip b.tail)
+  def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] = {
+    val _b = b
+    nel((head, _b.head), tail zip _b.tail)
+  }
 
   def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
     val (a, b) = head: (X, Y)
