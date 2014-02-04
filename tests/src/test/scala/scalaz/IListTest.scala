@@ -175,6 +175,10 @@ object IListTest extends SpecLite {
     ns.endsWith(ms) must_=== ns.toList.endsWith(ms.toList)
   }
 
+  "fill" ! forAll { (a: Byte, b: Int) =>
+    IList.fill(a)(b).toList must_=== List.fill(a)(b)
+  }
+
   "filter" ! forAll { (ns: IList[Int], p: Int => Boolean) =>
     ns.filter(p).toList must_=== ns.toList.filter(p)
   }
