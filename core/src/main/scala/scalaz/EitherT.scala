@@ -119,7 +119,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
-    optionT[F](F.map(run)((_: (A \/ B)).toOption))
+    traverseT[F](F.map(run)((_: (A \/ B)).toOption))
 
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither(implicit F: Functor[F]): F[Either[A, B]] =
