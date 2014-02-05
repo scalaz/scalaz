@@ -303,7 +303,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def span(f: A => Boolean): (IList[A], IList[A]) = {
     @tailrec def span0(as: IList[A], accum: IList[A]): (IList[A], IList[A]) =
       as match {
-        case INil() => (accum.reverse, empty)
+        case INil() => (this, empty)
         case ICons(h, t) => if (f(h)) span0(t, h :: accum) else (accum.reverse, as)
       }
     span0(this, empty)
@@ -312,7 +312,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def splitAt(n: Int): (IList[A], IList[A]) = {
     @tailrec def splitAt0(n: Int, as: IList[A], accum: IList[A]): (IList[A], IList[A]) =
       if (n < 1) (accum.reverse, as) else as match {
-        case INil() => (accum.reverse, empty)
+        case INil() => (this, empty)
         case ICons(h, t) => splitAt0(n - 1, t, h :: accum)
       }
     splitAt0(n, this, empty)
@@ -367,9 +367,10 @@ sealed abstract class IList[A] extends Product with Serializable {
     @tailrec def takeWhile0(as: IList[A], accum: IList[A]): IList[A] =
       as match {
         case ICons(h, t) if f(h) => takeWhile0(t, h :: accum)
-        case _ => accum
+        case INil() => this
+        case _ => accum.reverse
       }
-    takeWhile0(this, empty).reverse
+    takeWhile0(this, empty)
   }
 
   def toEphemeralStream: EphemeralStream[A] =
