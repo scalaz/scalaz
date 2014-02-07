@@ -18,11 +18,18 @@ import Id._
  * The more refined types are useful if you need to be able to substitute into restricted contexts.
  */
 sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
+  def apply(a: A): B = subst[Id](a)
   def subst[F[_ >: L <: H]](p: F[A]): F[B]
   def compose[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, C, A]): Leibniz[L2, H2, C, B] =
     Leibniz.trans[L2, H2, C, A, B](this, that)
   def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, B, C]): Leibniz[L2, H2, A, C] =
     Leibniz.trans[L2, H2, A, B, C](that, this)
+
+  def onF[X](fa: X => A): X => B = subst[({type λ[α] = X => α})#λ](fa)
+  def onCov[FA](fa: FA)(implicit U: Unapply.AuxA[Functor, FA, A]): U.M[B] =
+    subst(U(fa))
+  def onContra[FA](fa: FA)(implicit U: Unapply.AuxA[Contravariant, FA, A]): U.M[B] =
+    subst(U(fa))
 }
 
 object Leibniz extends LeibnizInstances with LeibnizFunctions{

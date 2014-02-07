@@ -22,7 +22,7 @@ final class Function1Ops[T, R](self: T => R) {
   def byName: (=> T) => R = t => self(t)
 
   def endo(implicit ev: R === T): Endo[T] =
-    Endo.endo(ev.subst[({type λ[α] = T => α})#λ](self))
+    Endo.endo(ev.onF(self))
 
   def comparing(implicit o: Order[R]): (T, T) => Ordering =
     (t1, t2) => o.order(self(t1), self(t2))

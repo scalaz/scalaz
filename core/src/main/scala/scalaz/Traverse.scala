@@ -63,7 +63,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** A version of `traverse` that infers the type constructor `G`. */
   final def traverseU[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]]*/ =
-    G.TC.traverse(fa)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(this)
+    G.TC.traverse(fa)(G.leibniz.onF(f))(this)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
   final def traverseM[A, G[_], B](fa: F[A])(f: A => G[F[B]])(implicit G: Applicative[G], F: Bind[F]): G[F[B]] =
