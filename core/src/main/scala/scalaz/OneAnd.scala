@@ -235,21 +235,6 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
   implicit def oneAndSemigroup[F[_]: Applicative: Plus, A]: Semigroup[OneAnd[F, A]] =
     oneAndPlus[F].semigroup
 
-  @deprecated("Each is deprecated", "7.1")
-  implicit def oneAndEach[F[_]: Each]: Each[({type λ[α] = OneAnd[F, α]})#λ] =
-    new Each[({type λ[α] = OneAnd[F, α]})#λ] {
-      def each[A](fa: OneAnd[F, A])(f: A => Unit) = {
-        f(fa.head)
-        Each[F].each(fa.tail)(f)
-      }
-    }
-
-  @deprecated("Length is deprecated", "7.1")
-  implicit def oneAndLength[F[_]: Length, A]: Length[({type λ[α] = OneAnd[F, α]})#λ] =
-    new Length[({type λ[α] = OneAnd[F, α]})#λ] {
-      def length[A](fa: OneAnd[F, A]) = 1 + Length[F].length(fa.tail)
-    }
-
   implicit def oneAndZip[F[_]: Zip]: Zip[({type λ[α] = OneAnd[F, α]})#λ] =
     new Zip[({type λ[α] = OneAnd[F, α]})#λ] {
       def zip[A, B](a: => OneAnd[F, A], b: => OneAnd[F, B]) =

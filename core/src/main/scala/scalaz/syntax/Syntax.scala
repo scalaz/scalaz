@@ -13,9 +13,6 @@ trait Syntaxes {
 
   object equal extends ToEqualOps
 
-  @deprecated("length is deprecated, use foldable instead", "7.1")
-  object length extends ToLengthOps
-
   object show extends ToShowOps
 
   object order extends ToOrderOps
@@ -25,12 +22,6 @@ trait Syntaxes {
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
-
-  @deprecated("each is deprecated", "7.1")
-  object each extends ToEachOps
-
-  @deprecated("index is deprecated", "7.1")
-  object index extends ToIndexOps
 
   object functor extends ToFunctorOps
 
@@ -157,8 +148,8 @@ trait ToDataOps
   with ToMaybeOps
 
 trait ToTypeClassOps
-  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
-  with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
+  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
+  with ToOrderOps with ToEnumOps with ToPlusEmptyOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps

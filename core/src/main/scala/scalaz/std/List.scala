@@ -10,11 +10,8 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
-    def each[A](fa: List[A])(f: A => Unit) = fa foreach f
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
     override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
-    // TODO remove after removal of Index
-    override def indexOr[A](fa: List[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
     override def length[A](fa: List[A]) = fa.length
     def point[A](a: => A) = a :: Nil
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f

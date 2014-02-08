@@ -88,7 +88,6 @@ object OneAndTest extends SpecLite {
     def foldable1[F[_]: Foldable1] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse[F[_]: Traverse] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
-    def each[F[_]: Each] = Each[({type λ[α] = OneAnd[F, α]})#λ]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }

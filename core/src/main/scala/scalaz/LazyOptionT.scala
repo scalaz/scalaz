@@ -45,10 +45,6 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
   def map[B](f: (=> A) => B)(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_ map f))
 
-  @deprecated("Each/foreach is deprecated", "7.1")
-  def foreach(f: (=> A) => Unit)(implicit e: Each[F]): Unit =
-    e.each(run)(_ foreach f)
-
   def filter(f: (=> A) => Boolean)(implicit F: Functor[F]): LazyOptionT[F, A] =
     lazyOptionT(F.map(run)(_.filter(f)))
 

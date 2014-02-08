@@ -36,9 +36,6 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): UnwriterT[F, U, B] =
     unwriterT(F.map(run)(wa => (wa._1, f(wa._2))))
 
-  @deprecated("Each/foreach is deprecated", "7.1")
-  def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
-    E.each(run)(wa => f(wa._2))
 
   def ap[B](f: => UnwriterT[F, U, A => B])(implicit F: Apply[F]): UnwriterT[F, U, B] =
     unwriterT {
@@ -123,13 +120,6 @@ sealed abstract class UnwriterTInstances extends UnwriterTInstances0 {
   implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTTraverse[F, W] {
     implicit def F = F0
   }
-  @deprecated("Index is deprecated, use Foldable instead", "7.1")
-  implicit def unwriterTIndex[W]: Index[({type λ[α]=Unwriter[W, α]})#λ] = new UnwriterTIndex[W] {
-  }
-  @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def unwriterTEach[F[_], W](implicit F0: Each[F]): Each[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTEach[F, W] {
-    implicit def F = F0
-  }
   implicit def unwriterEqual[W, A](implicit W: Equal[W], A: Equal[A]): Equal[Unwriter[W, A]] = {
     import std.tuple._
     Equal[(W, A)].contramap((_: Unwriter[W, A]).run)
@@ -170,16 +160,6 @@ private trait UnwriterTApply[F[_], W] extends Apply[({type λ[α]=UnwriterT[F, W
   override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa ap f
 }
 
-private trait UnwriterTEach[F[_], W] extends Each[({type λ[α]=UnwriterT[F, W, α]})#λ] {
-  implicit def F: Each[F]
-
-  def each[A](fa: UnwriterT[F, W, A])(f: A => Unit) = fa foreach f
-}
-
-// TODO does Index it make sense for F other than Id?
-private trait UnwriterTIndex[W] extends Index[({type λ[α]=UnwriterT[Id, W, α]})#λ] {
-  def index[A](fa: UnwriterT[Id, W, A], i: Int) = if(i == 0) Some(fa.value) else None
-}
 
 private trait UnwriterTBind[F[_], W] extends Bind[({type λ[α]=UnwriterT[F, W, α]})#λ] with UnwriterTApply[F, W] {
   implicit def F: Bind[F]

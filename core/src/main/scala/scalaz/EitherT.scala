@@ -73,11 +73,6 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (A \/ α)})#λ].traverse(o)(f)))(EitherT(_))
 
-  /** Run the side-effect on the right of this disjunction. */
-  @deprecated("Each/foreach is deprecated", "7.1")
-  def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
-    F.each(run)(_ foreach f)
-
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
     * it is not consistent with `ap`.

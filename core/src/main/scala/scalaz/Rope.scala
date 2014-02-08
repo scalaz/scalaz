@@ -230,11 +230,6 @@ object Rope {
   implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
 
-  @deprecated("Length is deprecated", "7.1")
-  implicit def ropeLength: Length[Rope] = new Length[Rope] {
-    def length[A](a: Rope[A]) = a.self.measure
-  }
-
   val baseChunkLength = 16
 
   def apply[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)

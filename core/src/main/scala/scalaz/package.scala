@@ -17,7 +17,6 @@
  *  - [[scalaz.Semigroup]]
  *  - [[scalaz.Monoid]] extends [[scalaz.Semigroup]]
  *  - [[scalaz.Equal]]
- *  - [[scalaz.Length]]
  *  - [[scalaz.Show]]
  *  - [[scalaz.Order]] extends [[scalaz.Equal]]
  *  - [[scalaz.Enum]] extends [[scalaz.Order]]
@@ -26,8 +25,6 @@
  *  - [[scalaz.PlusEmpty]] extends [[scalaz.Plus]]
  *  - [[scalaz.IsEmpty]] extends [[scalaz.PlusEmpty]]
  *  - [[scalaz.Optional]]
- *  - [[scalaz.Each]]
- *  - [[scalaz.Index]]
  *  - [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Functor]] extends [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Contravariant]] extends [[scalaz.InvariantFunctor]]
@@ -83,9 +80,10 @@
  *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
+
   import Id._
 
-  implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] = Id.id
+  implicit val idInstance: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] = Id.id
 
   private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
 
