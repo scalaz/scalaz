@@ -4,6 +4,8 @@ import Ordering._
 import std.option._
 import syntax.std.option._
 
+// http://www.haskell.org/ghc/docs/latest/html/libraries/containers-0.5.0.0/src/Data-Set-Base.html#Set
+
 sealed abstract class ISet[A] {
   import ISet._
 
@@ -27,6 +29,7 @@ sealed abstract class ISet[A] {
         }
     }
 
+  /** Alias for member */
   def contains(x: A)(implicit o: Order[A]) =
     member(x)
 
@@ -47,7 +50,6 @@ sealed abstract class ISet[A] {
         none
       case Bin(y, l, r) =>
         if (o.lessThanOrEqual(x, y)) l.lookupLT(x) else withBest(x, y, r)
-
     }
   }
 
@@ -232,7 +234,7 @@ sealed abstract class ISet[A] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiff(None, None, t1, t2)
+        hedgeDiff(none, none, t1, t2)
     }
   }
 
@@ -370,33 +372,36 @@ sealed abstract class ISet[A] {
       case Tip() => Tip()
     }
 
-  import std.tuple._
-  def deleteFindMin: Option[(A, ISet[A])] =
+  // TODO: Can we make this total? or should this remain unsafe, preferring minView instead?
+  def deleteFindMin: (A, ISet[A]) =
     this match {
-      case Bin(x, Tip(), r) => (x, r).some
+      case Bin(x, Tip(), r) => (x, r)
       case Bin(x, l, r) =>
-        l.deleteFindMin.map(a => Functor[({ type X[Y] = Tuple2[A, Y] })#X].map(a)(b => balanceR(x, b, r)))
-      case Tip() => none
+        val (xm, l2) = l.deleteFindMin
+        (xm, balanceR(x, l2, r))
+      case Tip() => sys.error("deleteFindMin on empty ISet")
     }
 
-  def deleteFindMax: Option[(A, ISet[A])] =
+  // TODO: Can we make this total? or should this remain unsafe, preferring maxView instead?
+  def deleteFindMax: (A, ISet[A]) =
     this match {
-      case Bin(x, l, Tip()) => (x, l).some
+      case Bin(x, l, Tip()) => (x, l)
       case Bin(x, l, r) =>
-        r.deleteFindMax.map(a => Functor[({ type X[Y] = Tuple2[A, Y] })#X].map(a)(b => balanceL(x, b, r)))
-      case Tip() => none
+        val (xm, r2) = r.deleteFindMax
+        (xm, balanceL(x, l, r2))
+      case Tip() => sys.error("deleteFindMax on empty ISet")
     }
 
   def minView: Option[(A, ISet[A])] =
     this match {
       case Tip() => none
-      case x => x.deleteFindMin
+      case x => x.deleteFindMin.some
     }
 
   def maxView: Option[(A, ISet[A])] =
     this match {
       case Tip() => none
-      case x => x.deleteFindMax
+      case x => x.deleteFindMax.some
     }
 
   // -- * Conversion
@@ -415,14 +420,13 @@ sealed abstract class ISet[A] {
   def toDescList =
     foldLeft(List.empty[A])((a, b) => b :: a)
 
+  // -- * Debugging
+  // , showTree
+  // , showTreeWith
+  // , valid
 
-            // -- * Debugging
-            // , showTree
-            // , showTreeWith
-            // , valid
-
-            // -- Internals (for testing)
-            // , balanced
+  // -- Internals (for testing)
+  // , balanced
 
   private def glue[A](l: ISet[A], r: ISet[A]): ISet[A] =
     (l, r) match {
@@ -430,16 +434,18 @@ sealed abstract class ISet[A] {
       case (l, Tip()) => l
       case (_, _) =>
         if (l.size > r.size) {
-          l.deleteFindMax.map(b => balanceR(b._1, b._2, r)).get
+          val (m, l2) = l.deleteFindMax
+          balanceR(m, l2, r)
         } else {
-          r.deleteFindMin.map(b => balanceL(b._1, l, b._2)).get
+          val (m, r2) = r.deleteFindMin
+          balanceL(m, l, r2)
         }
     }
 
   private def join[A](x: A, l: ISet[A], r: ISet[A]): ISet[A] =
     (l, r) match {
       case (Tip(), r) => r.insertMin(x)
-      case (l, Tip()) => l.insertMin(x)
+      case (l, Tip()) => l.insertMax(x)
       case (Bin(y, ly, ry), Bin(z, lz, rz)) =>
         if (delta*l.size < r.size) balanceL(z, join(x, l, lz), rz)
         else if (delta*r.size < l.size) balanceR(y, ly, join(x, ry, r))
@@ -467,8 +473,8 @@ sealed abstract class ISet[A] {
       case (Tip(), r) => r
       case (l, Tip()) => l
       case (l@Bin(x, lx, rx), r@Bin(y, ly, ry)) =>
-        if (delta*l.size < r.size) balanceL(y, l.merge(ly), ry)
-        else if (delta*r.size < l.size) balanceR(x, lx, rx.merge(r))
+        if (delta*l.size < r.size) balanceL(y, l merge ly, ry)
+        else if (delta*r.size < l.size) balanceR(x, lx, rx merge r)
         else glue(l, r)
     }
 
@@ -595,42 +601,6 @@ trait ISetFunctions {
 
   final def fromAscList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
     fromDistinctAscList(xs.distinct)
-
-  final def fromDistinctAscList[A](xs: List[A])(implicit o: Order[A]): ISet[A] = {
-    //def createR
-    def create(c: A => A => A, n: Int, xs: List[A]): ISet[A] =
-      if (n == 0)
-        Tip()
-      else if (n == 5) {
-        xs match {
-          case x1 :: x2 :: x3 :: x4 :: x5 :: xx => Bin(x4, Bin(x2, singleton(x1), singleton(x3)), singleton(x5))
-          case _ => sys.error("error in create 5")
-        }
-      } else {
-        empty[A]
-      }
-
-    create(Function.const, xs.length, xs)
-  }
-
-
-//   fromDistinctAscList :: [a] -> ISet a
-//   fromDistinctAscList xs
-//   = create const (length xs) xs
-//   where
-//   -- 1) use continutations so that we use heap space instead of stack space.
-//   -- 2) special case for n==5 to create bushier trees.
-//     create c 0 xs' = c Tip xs'
-//     create c 5 xs' = case xs' of
-//       (x1:x2:x3:x4:x5:xx) -> c (bin x4 (bin x2 (singleton x1) (singleton x3)) (singleton x5)) xx
-//       _ -> error "fromDistinctAscList create 5"
-//     create c n xs' = seq nr $ create (createR nr c) nl xs'
-//         where nl = n `div` 2
-//               nr = n - nl - 1
-
-// createR n c l (x:ys) = create (createB l x c) n ys
-// createR _ _ _ []     = error "fromDistinctAscList createR []"
-// createB l x c r zs   = c (bin x l r) zs
 
   private[scalaz] val delta = 3
   private[scalaz] val ratio = 2
