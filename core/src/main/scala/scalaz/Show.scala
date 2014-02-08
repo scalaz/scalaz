@@ -11,8 +11,6 @@ trait Show[F]  { self =>
   def show(f: F): Cord = Cord(shows(f))
   def shows(f: F): String = show(f).toString
 
-  def xmlText(f: F): scala.xml.Text = scala.xml.Text(shows(f))
-
   // derived functions
   ////
   val showSyntax = new scalaz.syntax.ShowSyntax[F] { def F = Show.this }

@@ -54,16 +54,10 @@ object build extends Build {
     crossScalaVersions := Seq("2.10.4", "2.11.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions <++= (scalaVersion) map { sv =>
-      val versionDepOpts =
-        if (sv startsWith "2.9")
-          Seq("-Ydependent-method-types", "-deprecation")
-        else
-          // does not contain -deprecation (because of ClassManifest)
-          // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
-
+      // does not contain -deprecation (because of ClassManifest)
+      // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       // no generic signatures, see SI-7932 and #571
-      Seq("-unchecked", "-Yno-generic-signatures") ++ versionDepOpts
+      Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps", "-unchecked", "-Yno-generic-signatures")
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -180,17 +174,6 @@ object build extends Build {
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
-  // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
-  val coreModuleDependencies211 = List[(String, String => String)] (
-    "scala-parser-combinators" -> {
-      case _ => "1.0.2"
-    }
-    ,
-    "scala-xml"                -> {
-      case _ => "1.0.2"
-    }
-  )
-
   lazy val core = Project(
     id = "core",
     base = file("core"),
@@ -199,13 +182,6 @@ object build extends Build {
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
-      },
-      libraryDependencies ++= {
-        if (scalaVersion.value.startsWith("2.11"))
-          coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-          }
-        else Nil
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),

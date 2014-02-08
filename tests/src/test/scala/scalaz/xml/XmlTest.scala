@@ -13,9 +13,8 @@ object XmlTest extends SpecLite {
 
   // https://github.com/scalaz/scalaz/issues/456
   "parse large CDATA" in {
-    val data = {
-      <cdata>{new scala.xml.PCData( Random.alphanumeric.take(1000000).mkString )}</cdata>
-    }.toString
+    val data =
+      s"<cdata><![CDATA[${Random.alphanumeric.take(1000000).mkString}]]></cdata>"
 
     data.parseXml.foldMap(_.sxprints(Config.config())) must_===(data)
   }
