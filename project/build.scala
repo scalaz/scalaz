@@ -166,12 +166,10 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      // <https://github.com/scalaz/scalaz/issues/261>
-      unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, xml)
   )
 
   lazy val core = Project(
@@ -224,16 +222,6 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
-  lazy val typelevel = Project(
-    id = "typelevel",
-    base = file("typelevel"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-typelevel",
-      osgiExport("scalaz.typelevel", "scalaz.syntax.typelevel")
-    ),
-    dependencies = Seq(core)
-  )
-
   lazy val xml = Project(
     id = "xml",
     base = file("xml"),
@@ -248,7 +236,7 @@ object build extends Build {
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
+    dependencies = Seq(core, iteratee, concurrent, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       publishArtifact := false
@@ -258,7 +246,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
+    dependencies = Seq(core, concurrent, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
@@ -269,7 +257,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
