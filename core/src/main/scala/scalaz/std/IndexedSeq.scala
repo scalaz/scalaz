@@ -189,10 +189,6 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
-  @deprecated("use groupWhenM", "7.1")
-  final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
-    groupWhenM(as)(p)
-
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupWhenM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
     if (as.isEmpty)

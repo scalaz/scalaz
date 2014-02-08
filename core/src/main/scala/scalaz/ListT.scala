@@ -21,9 +21,6 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(run)(_.isEmpty)
 
-  @deprecated("Head is deprecated. Use ListT#headOption instead", "7.1")
-  def head(implicit M: Functor[M]) : M[A] = M.map(run)(_.head)
-
   def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.headOption))
 
   def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(l => Maybe.fromOption(l.headOption)))

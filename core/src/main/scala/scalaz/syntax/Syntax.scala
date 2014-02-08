@@ -39,9 +39,6 @@ trait Syntaxes {
 
   object monad extends ToMonadOps
 
-  @deprecated("cojoin has been merged into cobind", "7.1")
-  object cojoin extends ToCobindOps
-
   object cobind extends ToCobindOps
 
   object comonad extends ToComonadOps
@@ -102,7 +99,7 @@ trait Syntaxes {
   // Data
   //
 
-  object id extends ToIdOpsDeprecated
+  object id extends ToIdOps
 
   object tree extends ToTreeOps
 

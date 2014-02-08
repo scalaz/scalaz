@@ -283,12 +283,6 @@ package object scalaz {
   /** [[scalaz.Inject]][F, G] */
   type :≺:[F[_], G[_]] = Inject[F, G]
 
-  @deprecated("Cojoin has been merged into Cobind", "7.1")
-  type Cojoin[F[_]] = Cobind[F]
-
-  @deprecated("Cojoin has been merged into Cobind", "7.1")
-  val Cojoin = Cobind
-
   type IMap[A, B] = ==>>[A, B]
   val IMap = ==>>
 

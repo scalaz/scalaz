@@ -34,8 +34,6 @@ final class ListOps[A](self: List[A]) {
 
   final def breakM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.breakM(self)(p)
 
-  @deprecated("use groupWhenM", "7.1")
-  final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = l.groupWhenM(self)(p)
   final def groupWhenM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = l.groupWhenM(self)(p)
   
   final def groupBy1[B](f: A => B): Map[B, NonEmptyList[A]] = l.groupBy1(self)(f)

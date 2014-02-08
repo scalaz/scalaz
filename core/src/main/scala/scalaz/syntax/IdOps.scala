@@ -3,21 +3,6 @@ package syntax
 
 import annotation.tailrec
 
-final class IdOpsDeprecated[A](self: A) extends IdOps[A](self){
-
-  @deprecated("use scalaz.syntax.either._", "7.1")
-  def left[B]: (A \/ B) =
-    -\/(self)
-
-  @deprecated("use scalaz.syntax.either._", "7.1")
-  def right[B]: (B \/ A) =
-    \/-(self)
-
-  @deprecated("use scalaz.syntax.nel._", "7.1")
-  final def wrapNel: NonEmptyList[A] =
-    NonEmptyList(self)
-}
-
 sealed class IdOps[A](self: A) {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
@@ -91,8 +76,4 @@ sealed class IdOps[A](self: A) {
 
 trait ToIdOps {
   implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps(a)
-}
-
-trait ToIdOpsDeprecated {
-  implicit def ToIdOpsDeprecated[A](a: A): IdOpsDeprecated[A] = new IdOpsDeprecated(a)
 }

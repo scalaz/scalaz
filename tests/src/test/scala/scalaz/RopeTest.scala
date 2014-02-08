@@ -3,6 +3,7 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalacheck.ScalazArbitrary._
 import syntax.equal._
+import syntax.std.boolean._
 import std.string._
 import std.anyVal._
 import std.stream._
@@ -28,14 +29,14 @@ object RopeTest extends SpecLite {
     Rope.empty[Int].length must_===(0)
   }
 
-  "a rope consturcted from a finger tree should have the same length" ! forAll {v: FingerTreeIntPlus[ImmutableArray[Int]] =>
+  "a rope constructed from a finger tree should have the same length" ! forAll {v: FingerTreeIntPlus[ImmutableArray[Int]] =>
     Rope.apply(v).length must_===(v.toList.flatten.length)
   }
 
   "indexing a rope created from a finger tree should be the same as indexing this tree" ! forAll {(v: FingerTreeIntPlus[ImmutableArray[Int]], i: Int) =>
     val flat = v.toList.flatten
-    if (i >= 0 && i < flat.length) Rope(v).apply(i) must_===(flat(i))
-    else Rope(v).apply(i).mustThrowA[RuntimeException]
+    val expected = (i >= 0 && i < flat.length) option flat(i)
+    Rope(v).get(i) must_===(expected)
   }
 
   "converting an array gives a rope of the same length" ! forAll {(array: Array[Int]) =>
@@ -43,8 +44,8 @@ object RopeTest extends SpecLite {
   }
 
   "indexing a rope converted from an array is the same as indexing this array" ! forAll {(array: Array[Int], i: Int) =>
-    if (i >= 0 && i < array.length) Rope.fromArray(array).apply(i) must_===(array(i))
-    else Rope.fromArray(array).apply(i).mustThrowA[RuntimeException]
+    val expected = (i >= 0 && i < array.length) option array(i)
+    Rope.fromArray(array).get(i) must_===(expected)
   }
 
   "converting an string gives a rope of the same length" ! forAll {(string: String) =>
@@ -52,8 +53,8 @@ object RopeTest extends SpecLite {
   }
 
   "indexing a rope converted from a string is the same as indexing this string" ! forAll {(string: String, i: Int) =>
-    if (i >= 0 && i < string.length) Rope.fromString(string).apply(i) must_===(string.charAt(i))
-    else Rope.fromString(string).apply(i).mustThrowA[RuntimeException]
+    val expected = (i >= 0 && i < string.length) option string.charAt(i)
+    Rope.fromString(string).get(i) must_===(expected)
   }
 
   "length of a rope is the same as its length as a stream" ! forAll {(rope: Rope[Int]) =>
@@ -61,8 +62,8 @@ object RopeTest extends SpecLite {
   }
 
   "indexing a rope is the same as converting it to a stream and indexing that" ! forAll {(rope: Rope[Int], i: Int) =>
-    if (i >= 0 && i < rope.length) rope(i) must_===(rope.toStream(i))
-    else rope(i).mustThrowA[RuntimeException]
+    val expected = (i >= 0 && i < rope.length) option rope.toStream(i)
+    rope.get(i) must_===(expected)
   }
 
   "building a rope from chunks and converting it back is the same as filtering out empty chunks" ! forAll {(chunks: List[ImmutableArray[Int]]) =>
@@ -93,7 +94,7 @@ object RopeTest extends SpecLite {
 
   "iterator should have the same elements as its rope" ! forAll { rope: Rope[Int] =>
     val elems = rope.iterator.toList
-    for (i <- 0 until rope.size) elems(i) must_===(rope(i))
+    for (i <- 0 until rope.size) elems(i) must_===(rope.get(i).get)
   }
 
   "reverse iterator should have the same length as its rope" ! forAll { rope: Rope[Int] =>
@@ -102,7 +103,7 @@ object RopeTest extends SpecLite {
 
   "reverse iterator should have the same elements as its rope in reverse order" ! forAll { rope: Rope[Int] =>
     val elems = rope.reverseIterator.toList.reverse
-    for (i <- 0 until rope.size) elems(i) must_===(rope(i))
+    for (i <- 0 until rope.size) elems(i) must_===(rope.get(i).get)
   }
 
   "concatenating ropes work correctly" ! forAll {(t1: Rope[Int], t2: Rope[Int]) =>

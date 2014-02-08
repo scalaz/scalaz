@@ -66,11 +66,6 @@ trait LiskovFunctions {
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
     g.subst[({type λ[-α]= α <~< C})#λ](f)
 
-  @deprecated("inv is unsound on <~<; use Leibniz.=== or Liskov.co instead",
-              "7.1.0")
-  def inv[T[_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
-    a.subst[({type λ[-α] = T[α @uncheckedVariance] <~< T[A2]})#λ](refl)
-
   /**We can lift subtyping into any covariant type constructor */
   def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
     a.subst[({type λ[-α]= T[α] <~< T[A2]})#λ](refl)

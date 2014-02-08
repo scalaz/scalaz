@@ -543,36 +543,6 @@ abstract class LensInstances extends LensInstances0 {
   implicit def seqLensFamily[S1, S2, A](lens: LensFamily[S1, S2, scala.collection.immutable.Seq[A], scala.collection.immutable.Seq[A]]) =
     seqLikeLensFamily[S1, S2, A, scala.collection.immutable.Seq[A]](lens)
 
-  @deprecated("will be removed, because `scala.collection.immutable.Stack` is deprecated in Scala", "7.1")
-  type StackLens[S, A] = StackLensFamily[S, S, A]
-  @deprecated("will be removed, because `scala.collection.immutable.Stack` is deprecated in Scala", "7.1")
-  val StackLens: StackLensFamily.type = StackLensFamily
-  /** Provide an imperative-seeming API for stacks viewed through a lens */
-  @deprecated("will be removed, because `scala.collection.immutable.Stack` is deprecated in Scala", "7.1")
-  case class StackLensFamily[S1, S2, A](lens: LensFamily[S1, S2, Stack[A], Stack[A]]) {
-    def push(elem1: A, elem2: A, elems: A*): IndexedState[S1, S2, Unit] =
-      lens %== (_ push elem1 push elem2 pushAll elems)
-
-    def push1(elem: A): IndexedState[S1, S2, Unit] =
-      lens %== (_ push elem)
-
-    def pop: IndexedState[S1, S2, Unit] =
-      lens %== (_.pop)
-
-    def pop2: IndexedState[S1, S2, A] =
-      lens %%= State[Stack[A], A](_.pop2.swap)
-
-    def top: State[S1, A] =
-      lens >- (_.top)
-
-    def length: State[S1, Int] =
-      lens >- (_.length)
-  }
-
-  @deprecated("will be removed, because `scala.collection.immutable.Stack` is deprecated in Scala", "7.1")
-  implicit def stackLensFamily[S1, S2, A](lens: LensFamily[S1, S2, Stack[A], Stack[A]]) =
-    StackLens[S1, S2, A](lens)
-
   type QueueLens[S, A] = QueueLensFamily[S, S, A]
   val QueueLens: QueueLensFamily.type = QueueLensFamily
   /** Provide an imperative-seeming API for queues viewed through a lens */

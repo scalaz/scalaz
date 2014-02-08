@@ -32,8 +32,6 @@ final class IndexedSeqOps[IS[+_], A](self: IS[A], v: scalaz.std.IndexedSeqSubFun
 
   final def breakM[M[_] : Monad](p: A => M[Boolean]): M[(IS[A], IS[A])] = v.breakM(self)(p)
 
-  @deprecated("use groupWhenM", "7.1")
-  final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[IS[IS[A]]] = v.groupWhenM(self)(p)
   final def groupWhenM[M[_] : Monad](p: (A, A) => M[Boolean]): M[IS[IS[A]]] = v.groupWhenM(self)(p)
 
   final def groupWhen(p: (A, A) => Boolean): IS[IS[A]] = v.groupWhen(self)(p)

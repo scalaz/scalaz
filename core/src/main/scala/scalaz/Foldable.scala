@@ -142,9 +142,6 @@ trait Foldable[F[_]]  { self =>
   def indexOr[A](fa: F[A], default: => A, i: Int): A =
     index(fa, i) getOrElse default
 
-  /** Unbiased sum of monoidal values. */
-  @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
-  def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
