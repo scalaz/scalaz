@@ -151,15 +151,24 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         if (b) Monad[M].map(as)((tt: IxSq[A]) => a +: tt)
         else Monad[M].point(empty)))
 
+  final def takeWhileMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
+    takeWhileM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
     * any `p`s after the first true.
     */
   final def takeUntilM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
+  final def takeUntilMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
+    takeUntilM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   final def filterM[A, M[_]](as: IxSq[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[IxSq[A]] =
     lazyFoldRight(as, F.point(empty[A]))((a, g) =>
       F.ap(g)(F.map(p(a))(b => t => if (b) a +: t else t)))
+
+  final def filterMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[IxSq[A]] =
+    filterM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
@@ -168,6 +177,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
     lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
         if (b) Monad[M].point(Some(a): Option[A]) else g))
+
+  final def findMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[Option[A]] =
+    findM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   final def powerset[A](as: IxSq[A]): IxSq[IxSq[A]] = {
     implicit val indexedSeqInstance = covariant
@@ -182,14 +194,23 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         case (x, y) => if (b) (a +: x, y) else (x, a +: y)
       })))
 
+  final def partitionMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
+    partitionM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     Monad[M].map(takeWhileM(as)(p))(ys => (ys, as drop (ys.length)))
 
+  final def spanMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
+    spanM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
+
+  final def breakMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
+    breakM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   @deprecated("use groupWhenM", "7.1")
   final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
@@ -204,6 +225,9 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
+
+  final def groupWhenMTrampoline[A, M[_]: Monad: Traverse](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
+    groupWhenM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF2(p)).run
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] = {

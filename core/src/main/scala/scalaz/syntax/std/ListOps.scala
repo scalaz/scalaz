@@ -18,24 +18,40 @@ final class ListOps[A](self: List[A]) {
 
   final def takeWhileM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.takeWhileM(self)(p)
 
+  final def takeWhileMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[List[A]] = l.takeWhileMTrampoline(self)(p)
+
   final def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.takeUntilM(self)(p)
+
+  final def takeUntilMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[List[A]] = l.takeUntilMTrampoline(self)(p)
 
   final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[List[A]] = l.filterM(self)(p)
 
+  final def filterMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[List[A]] = l.filterMTrampoline(self)(p)
+
   final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = l.findM(self)(p)
+
+  final def findMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[Option[A]] = l.findMTrampoline(self)(p)
 
   final def powerset: List[List[A]] = l.powerset(self)
 
   final def partitionM[M[_] : Applicative](p: A => M[Boolean]): M[(List[A], List[A])] = l.partitionM(self)(p)
 
+  final def partitionMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[(List[A], List[A])] = l.partitionMTrampoline(self)(p)
+
   final def spanM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.spanM(self)(p)
 
+  final def spanMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[(List[A], List[A])] = l.spanMTrampoline(self)(p)
+
   final def breakM[M[_] : Monad](p: A => M[Boolean]): M[(List[A], List[A])] = l.breakM(self)(p)
+
+  final def breakMTrampoline[M[_]: Monad: Traverse](p: A => M[Boolean]): M[(List[A], List[A])] = l.breakMTrampoline(self)(p)
 
   @deprecated("use groupWhenM", "7.1")
   final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupWhenM(self)(p)
   final def groupWhenM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupWhenM(self)(p)
-  
+
+  final def groupWhenMTrampoline[M[_]: Monad: Traverse](p: (A, A) => M[Boolean]): M[List[List[A]]] = l.groupWhenMTrampoline(self)(p)
+
   final def groupBy1[B](f: A => B): Map[B, NonEmptyList[A]] = l.groupBy1(self)(f)
 
   final def groupWhen(p: (A, A) => Boolean): List[List[A]] = l.groupWhen(self)(p)

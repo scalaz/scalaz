@@ -167,14 +167,23 @@ trait ListFunctions {
       if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt) else Monad[M].point(Nil))
   }
 
+  final def takeWhileMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    takeWhileM[A, ({type λ[α] = TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
     * any `p`s after the first true.
     */
   final def takeUntilM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     takeWhileM(as)((a: A) => Monad[M].map(p(a))((b) => !b))
 
+  final def takeUntilMTrampoline[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit M: Monad[M], T: Traverse[M]): M[List[A]] =
+    takeWhileMTrampoline(as)(a => M.map(p(a))(b => !b))
+
   final def filterM[A, M[_] : Applicative](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     Applicative[M].filterM(as)(p)
+
+  final def filterMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[List[A]] =
+    Monad[M].filterMTrampoline(as)(p)
 
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
@@ -184,6 +193,9 @@ trait ListFunctions {
     case h :: t => Monad[M].bind(p(h))(b =>
       if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
   }
+
+  final def findMTrampoline[A, M[_] : Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[Option[A]] =
+    findM[A,({type λ[α]=TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   final def powerset[A](as: List[A]): List[List[A]] = {
     import list.listInstance
@@ -200,6 +212,9 @@ trait ListFunctions {
       }))
   }
 
+  final def partitionMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
+    partitionM[A,({type λ[α]=TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
+
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
@@ -208,12 +223,17 @@ trait ListFunctions {
       Monad[M].bind(p(h))(b =>
         if (b) Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) => (h :: k._1, k._2))
         else Monad[M].point(Nil, as))
-
   }
+
+  final def spanMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
+    spanM[A,({type λ[α]=TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
+
+  final def breakMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] =
+    breakM[A,({type λ[α]=TrampolineT[M, α]})#λ](as)(TrampolineT.delayF(p)).run
 
   @deprecated("use groupWhenM", "7.1")
   final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = groupWhenM(as)(p)
@@ -227,6 +247,9 @@ trait ListFunctions {
       }
     }
   }
+
+  final def groupWhenMTrampoline[A, M[_]: Monad: Traverse](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] =
+    groupWhenM[A,({type λ[α]=TrampolineT[M, α]})#λ](as)(TrampolineT.delayF2(p)).run
 
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
   final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
