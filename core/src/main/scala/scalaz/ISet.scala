@@ -599,8 +599,8 @@ trait ISetFunctions {
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(ISet.empty[A])(_ union _)
 
-  final def fromAscList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
-    fromDistinctAscList(xs.distinct)
+  //final def fromAscList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
+  //  fromDistinctAscList(xs.distinct)
 
   private[scalaz] val delta = 3
   private[scalaz] val ratio = 2
