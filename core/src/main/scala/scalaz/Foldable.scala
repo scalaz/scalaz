@@ -73,7 +73,7 @@ trait Foldable[F[_]]  { self =>
 
   /** A version of `traverse_` that infers the type constructor `M`. */
   final def traverseU_[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[Unit] =
-    traverse_[G.M, A, G.A](fa)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))(G.TC)
+    traverse_[G.M, A, G.A](fa)(G.leibniz.onF(f))(G.TC)
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =

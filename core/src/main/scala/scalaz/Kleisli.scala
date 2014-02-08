@@ -176,7 +176,7 @@ trait KleisliFunctions {
    * }}}
    */
   def kleisliU[A, MB](f: A => MB)(implicit MB: Unapply[Bind, MB]): Kleisli[MB.M, A, MB.A] =
-    Kleisli(MB.leibniz.subst[({type λ[α] = A => α})#λ](f))
+    Kleisli(MB.leibniz.onF(f))
 
   /**Implicitly unwrap the Function1 represented by the Kleisli */
   implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = k.run

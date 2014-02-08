@@ -18,6 +18,8 @@ sealed abstract class Liskov[-A, +B] {
   final def andThen[C](that: Liskov[B, C]): Liskov[A, C] = Liskov.trans(that, this)
 
   final def compose[C](that: Liskov[C, A]): Liskov[C, B] = Liskov.trans(this, that)
+
+  def onF[X](fa: X => A): X => B = Liskov.co2_2[Function1, B, X, A](this)(fa)
 }
 
 sealed abstract class LiskovInstances {

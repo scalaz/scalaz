@@ -25,7 +25,7 @@ import Leibniz.{===, refl}
  *
  * // Deforested version of traverseI
  * def traverseI2[GB](f: A => GB)(implicit G: Unapply[Applicative, GB]): G.M[F[G.A]] /*G[F[B]*/ = {
- *   G.TC.traverse(self)(G.leibniz.subst[({type λ[α] = A => α})#λ](f))
+ *   G.TC.traverse(self)(G.leibniz.onF(f))
  * }
  *
  * // Old usage
@@ -65,7 +65,7 @@ trait Unapply[TC[_[_]], MA] {
   def leibniz: MA === M[A]
 
   /** Compatibility. */
-  @inline final def apply(ma: MA): M[A] = leibniz.subst[Id](ma)
+  @inline final def apply(ma: MA): M[A] = leibniz(ma)
 }
 
 sealed trait Unapply_4 {
@@ -227,6 +227,10 @@ sealed trait Unapply_0 extends Unapply_1 {
 }
 
 object Unapply extends Unapply_0 {
+  type AuxA[TC[_[_]], MA, A0] = Unapply[TC, MA] {
+    type A = A0
+  }
+
   /** Fetch a well-typed `Unapply` for the given typeclass and type. */
   def apply[TC[_[_]], MA](implicit U: Unapply[TC, MA]): U.type {
     type M[A] = U.M[A]
@@ -265,7 +269,7 @@ trait Unapply2[TC[_[_, _]], MAB] {
   def leibniz: MAB === M[A, B]
 
   /** Compatibility. */
-  @inline final def apply(ma: MAB): M[A, B] = leibniz.subst[Id](ma)
+  @inline final def apply(ma: MAB): M[A, B] = leibniz(ma)
 }
 
 sealed trait Unapply2_0 {
@@ -312,7 +316,7 @@ trait Unapply21[TC[_[_, _], _], MAB]{
   def TC: TC[M, A]
 
   def leibniz: MAB === M[A, B]
-  @inline final def apply(mabc: MAB): M[A, B] = leibniz.subst[Id](mabc)
+  @inline final def apply(mabc: MAB): M[A, B] = leibniz(mabc)
 }
 
 object Unapply21 {
