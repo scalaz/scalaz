@@ -238,7 +238,7 @@ object ScalazProperties {
 
   private def resizeProp(p: Prop, max: Int): Prop = new Prop{
     def apply(params: Gen.Parameters) =
-      p(params.resize(params.size % (max + 1)))
+      p(params.withSize(params.size % (max + 1)))
   }
 
   object traverse {

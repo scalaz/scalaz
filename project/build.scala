@@ -54,10 +54,16 @@ object build extends Build {
     crossScalaVersions := Seq("2.10.4", "2.11.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions <++= (scalaVersion) map { sv =>
-      // does not contain -deprecation (because of ClassManifest)
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       // no generic signatures, see SI-7932 and #571
-      Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps", "-unchecked", "-Yno-generic-signatures")
+      Seq(
+        "-deprecation",
+        "-encoding", "UTF-8",
+        "-feature",
+        "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+        "-unchecked",
+        "-Yno-generic-signatures"
+      )
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>

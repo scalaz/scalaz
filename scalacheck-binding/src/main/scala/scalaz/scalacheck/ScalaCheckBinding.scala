@@ -6,16 +6,16 @@ package scalacheck
  */
 object ScalaCheckBinding {
   import org.scalacheck.{Gen, Arbitrary, Shrink}
-  import Gen.{sized, value}
+  import Gen.{sized, const}
 
   implicit val ArbitraryMonad: Monad[Arbitrary] = new Monad[Arbitrary] {
     def bind[A, B](fa: Arbitrary[A])(f: A => Arbitrary[B]) = Arbitrary(fa.arbitrary.flatMap(f(_).arbitrary))
-    def point[A](a: => A) = Arbitrary(sized(_ => value(a)))
+    def point[A](a: => A) = Arbitrary(sized(_ => const(a)))
     override def map[A, B](fa: Arbitrary[A])(f: A => B) = Arbitrary(fa.arbitrary.map(f))
   }
 
   implicit val GenMonad: Monad[Gen] = new Monad[Gen] {
-    def point[A](a: => A) = sized(_ => value(a))
+    def point[A](a: => A) = sized(_ => const(a))
     def bind[A, B](fa: Gen[A])(f: A => Gen[B]) = fa flatMap f
     override def map[A, B](fa: Gen[A])(f: A => B) = fa map f
   }
