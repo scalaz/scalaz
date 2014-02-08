@@ -1,6 +1,6 @@
 package scalaz
 
-import reflect.ClassManifest
+import reflect.ClassTag
 import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
@@ -13,7 +13,7 @@ import syntax.Ops
  * @tparam A type of the elements of the array
  */
 sealed abstract class ImmutableArray[+A] {
-  protected[this] def elemManifest: ClassManifest[A]
+  protected[this] def elemTag: ClassTag[A]
 
   def apply(index: Int): A
 
@@ -21,11 +21,11 @@ sealed abstract class ImmutableArray[+A] {
 
   def isEmpty: Boolean = length == 0
 
-  def toArray[B >: A : ClassManifest]: Array[B]
+  def toArray[B >: A : ClassTag]: Array[B]
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  def ++[B >: A: ClassManifest](other: ImmutableArray[B]): ImmutableArray[B]
+  def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
 }
 
 
@@ -75,20 +75,20 @@ trait ImmutableArrayFunctions {
   /** Wrap the characters in `str` in an `ImmutableArray` */
   def fromString(str: String): ImmutableArray[Char] = new StringArray(str)
 
-  def newBuilder[A](implicit elemManifest: ClassManifest[A]): Builder[A, ImmutableArray[A]] =
-    ArrayBuilder.make[A]()(elemManifest).mapResult(make(_))
+  def newBuilder[A](implicit elemTag: ClassTag[A]): Builder[A, ImmutableArray[A]] =
+    ArrayBuilder.make[A]()(elemTag).mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
 
-  implicit def canBuildFrom[T](implicit m: ClassManifest[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
+  implicit def canBuildFrom[T](implicit m: ClassTag[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
     new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
       def apply(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] = newBuilder(m)
 
       def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
     }
 
-  implicit def canBuildFromChar(implicit m: ClassManifest[Char]): CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+  implicit def canBuildFromChar(implicit m: ClassTag[Char]): CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
     new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
       def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
 
@@ -136,18 +136,18 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
     // override def stringPrefix = "ImmutableArray"
-    // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemManifest)
+    // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemTag)
 
     def apply(idx: Int) = arr(idx)
 
     def length = arr.length
-    def toArray[B >: A : ClassManifest] = arr.clone.asInstanceOf[Array[B]]
+    def toArray[B >: A : ClassTag] = arr.clone.asInstanceOf[Array[B]]
     def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) { arr.copyToArray(xs, start, len) }
 
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
-    override def ++[B >: A: ClassManifest](other: ImmutableArray[B]) = {
+    override def ++[B >: A: ClassTag](other: ImmutableArray[B]) = {
       val newArr = new Array(length + other.length)
       this.copyToArray(newArr, 0, length)
       other.copyToArray(newArr, length, other.length)
@@ -155,62 +155,62 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
     }
   }
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
-    protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+    protected[this] lazy val elemTag = ClassTag[A](array.getClass.getComponentType)
   }
 
   final class ofByte(array: Array[Byte]) extends ImmutableArray1[Byte](array) {
-    protected[this] def elemManifest = ClassManifest.Byte
+    protected[this] def elemTag = ClassTag.Byte
   }
 
   final class ofShort(array: Array[Short]) extends ImmutableArray1[Short](array) {
-    protected[this] def elemManifest = ClassManifest.Short
+    protected[this] def elemTag = ClassTag.Short
   }
 
   final class ofChar(array: Array[Char]) extends ImmutableArray1[Char](array) {
-    protected[this] def elemManifest = ClassManifest.Char
+    protected[this] def elemTag = ClassTag.Char
 
     // def mkString = new String(arr)
-    // TODO why can elemManifest be protected, but arr can't?
+    // TODO why can elemTag be protected, but arr can't?
   }
 
   final class ofInt(array: Array[Int]) extends ImmutableArray1[Int](array) {
-    protected[this] def elemManifest = ClassManifest.Int
+    protected[this] def elemTag = ClassTag.Int
   }
 
   final class ofLong(array: Array[Long]) extends ImmutableArray1[Long](array) {
-    protected[this] def elemManifest = ClassManifest.Long
+    protected[this] def elemTag = ClassTag.Long
   }
 
   final class ofFloat(array: Array[Float]) extends ImmutableArray1[Float](array) {
-    protected[this] def elemManifest = ClassManifest.Float
+    protected[this] def elemTag = ClassTag.Float
   }
 
   final class ofDouble(array: Array[Double]) extends ImmutableArray1[Double](array) {
-    protected[this] def elemManifest = ClassManifest.Double
+    protected[this] def elemTag = ClassTag.Double
   }
 
   final class ofBoolean(array: Array[Boolean]) extends ImmutableArray1[Boolean](array) {
-    protected[this] def elemManifest = ClassManifest.Boolean
+    protected[this] def elemTag = ClassTag.Boolean
   }
 
   final class ofUnit(array: Array[Unit]) extends ImmutableArray1[Unit](array) {
-    protected[this] def elemManifest = ClassManifest.Unit
+    protected[this] def elemTag = ClassTag.Unit
   }
 
   final class StringArray(val str: String) extends ImmutableArray[Char] {
-    protected[this] def elemManifest = ClassManifest.Char
+    protected[this] def elemTag = ClassTag.Char
 
     // override protected[this] def newBuilder = (new StringBuilder).mapResult(new StringArray(_))
 
     def apply(idx: Int) = str(idx)
 
     def length = str.length
-    def toArray[B >: Char : ClassManifest] = str.toArray
+    def toArray[B >: Char : ClassTag] = str.toArray
     def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int) { str.copyToArray(xs, start, len) }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
-    def ++[B >: Char: ClassManifest](other: ImmutableArray[B]) =
+    def ++[B >: Char: ClassTag](other: ImmutableArray[B]) =
       other match {
         case other: StringArray => new StringArray(str + other.str)
         case _ => {
@@ -260,49 +260,49 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
     }
 
     abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
-      protected[this] def elemManifest: ClassManifest[A]
+      protected[this] def elemTag: ClassTag[A]
 
-      override protected[this] def arrayBuilder = ImmutableArray.newBuilder[A](elemManifest)
+      override protected[this] def arrayBuilder = ImmutableArray.newBuilder[A](elemTag)
     }
 
     final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
-      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+      protected[this] lazy val elemTag = ClassTag[A](array.getClass.getComponentType)
     }
 
     final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
-      protected[this] def elemManifest = ClassManifest.Byte
+      protected[this] def elemTag = ClassTag.Byte
     }
 
     final class ofShort(array: IA.ofShort) extends ofImmutableArray1[Short](array) {
-      protected[this] def elemManifest = ClassManifest.Short
+      protected[this] def elemTag = ClassTag.Short
     }
 
     final class ofChar(array: IA.ofChar) extends ofImmutableArray1[Char](array) {
-      protected[this] def elemManifest = ClassManifest.Char
+      protected[this] def elemTag = ClassTag.Char
     }
 
     final class ofInt(array: IA.ofInt) extends ofImmutableArray1[Int](array) {
-      protected[this] def elemManifest = ClassManifest.Int
+      protected[this] def elemTag = ClassTag.Int
     }
 
     final class ofLong(array: IA.ofLong) extends ofImmutableArray1[Long](array) {
-      protected[this] def elemManifest = ClassManifest.Long
+      protected[this] def elemTag = ClassTag.Long
     }
 
     final class ofFloat(array: IA.ofFloat) extends ofImmutableArray1[Float](array) {
-      protected[this] def elemManifest = ClassManifest.Float
+      protected[this] def elemTag = ClassTag.Float
     }
 
     final class ofDouble(array: IA.ofDouble) extends ofImmutableArray1[Double](array) {
-      protected[this] def elemManifest = ClassManifest.Double
+      protected[this] def elemTag = ClassTag.Double
     }
 
     final class ofBoolean(array: IA.ofBoolean) extends ofImmutableArray1[Boolean](array) {
-      protected[this] def elemManifest = ClassManifest.Boolean
+      protected[this] def elemTag = ClassTag.Boolean
     }
 
     final class ofUnit(array: IA.ofUnit) extends ofImmutableArray1[Unit](array) {
-      protected[this] def elemManifest = ClassManifest.Unit
+      protected[this] def elemTag = ClassTag.Unit
     }
   }
 

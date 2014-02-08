@@ -1,5 +1,7 @@
 package scalaz
 
+import reflect.ClassTag
+
 import org.scalacheck._
 import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
@@ -89,7 +91,7 @@ abstract class SpecLite extends Properties("") {
         fail(koMessage)
     }
 
-    def mustThrowA[T <: Throwable](implicit man: ClassManifest[T]): Unit = {
+    def mustThrowA[T <: Throwable](implicit man: ClassTag[T]): Unit = {
       val erasedClass = man.erasure
       try {
         actual

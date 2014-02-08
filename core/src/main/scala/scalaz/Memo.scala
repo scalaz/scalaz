@@ -1,5 +1,7 @@
 package scalaz
 
+import reflect.ClassTag
+
 /** A function memoization strategy.  See companion for various
   * instances employing various strategies.
   */
@@ -21,7 +23,7 @@ trait MemoFunctions {
 
   def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[K, V] = memo[K, V](z => z)
 
-  private class ArrayMemo[V >: Null : ClassManifest](n: Int) extends Memo[Int, V] {
+  private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       lazy val a = new Array[V](n)
       k => {
@@ -56,7 +58,7 @@ trait MemoFunctions {
   }
 
   /** Cache results in an `n`-long array. */
-  def arrayMemo[V >: Null : ClassManifest](n: Int): Memo[Int, V] = new ArrayMemo(n)
+  def arrayMemo[V >: Null : ClassTag](n: Int): Memo[Int, V] = new ArrayMemo(n)
 
   /** As with `arrayMemo`, but memoizing double results !=
     * `sentinel`.

@@ -4,6 +4,7 @@ package scalacheck
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
+import reflect.ClassTag
 
 /**
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
@@ -31,7 +32,7 @@ object ScalazArbitrary {
   implicit def EphemeralStreamArbitrary[A : Arbitrary] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
-  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
+  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassTag] =
     Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
   implicit def ValueArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Value[A]] = Functor[Arbitrary].map(fa)(a => Value(a))
@@ -196,7 +197,7 @@ object ScalazArbitrary {
 
   implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
 
-  implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
+  implicit def RopeArbitrary[A : Arbitrary : ClassTag]: Arbitrary[Rope[A]] =
     Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
   import java.util.concurrent.Callable

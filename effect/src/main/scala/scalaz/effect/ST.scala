@@ -1,6 +1,8 @@
 package scalaz
 package effect
 
+import reflect.ClassTag
+
 import IvoryTower._
 import STRef._
 import STArray._
@@ -66,7 +68,7 @@ sealed abstract class STRefInstances {
 sealed trait STArray[S, A] {
   def size: Int
   def z: A
-  implicit def manifest: Manifest[A]
+  implicit def tag: ClassTag[A]
 
   private lazy val value: Array[A] = Array.fill(size)(z)
 
@@ -101,14 +103,14 @@ sealed trait STArray[S, A] {
 }
 
 object STArray extends STArrayFunctions {
-  def apply[S, A](s: Int, a: A)(implicit m: Manifest[A]): STArray[S, A] = stArray(s, a)
+  def apply[S, A : ClassTag](s: Int, a: A): STArray[S, A] = stArray(s, a)
 }
 
 trait STArrayFunctions {
-  def stArray[S, A](s: Int, a: A)(implicit m: Manifest[A]): STArray[S, A] = new STArray[S, A] {
+  def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] = new STArray[S, A] {
     val size = s
     val z = a
-    implicit val manifest = m
+    implicit val tag = t
   }
 }
 
@@ -160,7 +162,7 @@ trait STFunctions {
   }
 
   /**Allocates a fresh mutable array. */
-  def newArr[S, A: Manifest](size: Int, z: A): ST[S, STArray[S, A]] =
+  def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
     returnST(stArray[S, A](size, z))
 
   /**Allows the result of a state transformer computation to be used lazily inside the computation. */
@@ -171,7 +173,7 @@ trait STFunctions {
   })
 
   /**Accumulates an integer-associated list into an immutable array. */
-  def accumArray[F[_], A, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Foldable[F], mf: Manifest[A]): ImmutableArray[A] = {
+  def accumArray[F[_], A : ClassTag, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Foldable[F]): ImmutableArray[A] = {
     import std.anyVal.unitInstance
     type STA[S] = ST[S, ImmutableArray[A]]
     runST(new Forall[STA] {

@@ -3,6 +3,7 @@ package scalaz
 import collection.IndexedSeqLike
 import collection.immutable.IndexedSeq
 import collection.generic.CanBuildFrom
+import reflect.ClassTag
 
 import syntax.Ops
 import scalaz.{ImmutableArray => IA}
@@ -21,7 +22,7 @@ import FingerTree._
   * @see [[http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf]]
   */
 @deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
-sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableArray[A]])
+sealed class Rope[A : ClassTag](val self: Rope.FingerTreeIntPlus[ImmutableArray[A]])
     extends Ops[Rope.FingerTreeIntPlus[ImmutableArray[A]]] {
   import Rope._
   implicit def sizer = UnitReducer((arr: ImmutableArray[A]) => arr.length)
@@ -109,7 +110,7 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
 }
     
 @deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
-sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
+sealed class WrappedRope[A : ClassTag](val self: Rope[A])
     extends Ops[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
   import Rope._
 
@@ -159,7 +160,7 @@ import collection.mutable.Builder
 import scalaz.{ImmutableArray => IA}
 
 @deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
-final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
+final class RopeBuilder[A : ClassTag] extends Builder[A, Rope[A]] {
   import Rope._
   private var startRope: Rope[A] = Rope.empty[A]
   private var tailBuilder: Builder[A, ImmutableArray[A]] = IA.newBuilder[A]
@@ -222,31 +223,31 @@ final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
 object Rope {
   type FingerTreeIntPlus[A] = FingerTree[Int, A]
 
-  implicit def wrapRope[A : ClassManifest](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
+  implicit def wrapRope[A : ClassTag](rope: Rope[A]): WrappedRope[A] = new WrappedRope(rope)
   implicit def unwrapRope[A](wrappedRope: WrappedRope[A]): Rope[A] = wrappedRope.self
   implicit def wrapRopeChar(rope: Rope[Char]): RopeCharW = new RopeCharW(rope)
   implicit def sizer[A]: Reducer[ImmutableArray[A], Int] = UnitReducer(_.length)
 
   val baseChunkLength = 16
 
-  def apply[A : ClassManifest](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)
+  def apply[A : ClassTag](v: FingerTreeIntPlus[ImmutableArray[A]]): Rope[A] = new Rope[A](v)
 
-  def empty[A : ClassManifest] = Rope(FingerTree.empty[Int, ImmutableArray[A]])
+  def empty[A : ClassTag] = Rope(FingerTree.empty[Int, ImmutableArray[A]])
 
-  def fromArray[A : ClassManifest](a: Array[A]): Rope[A] =
+  def fromArray[A : ClassTag](a: Array[A]): Rope[A] =
     if (a.isEmpty) empty[A] else Rope(single(IA.fromArray(a)))
 
   def fromString(str: String): Rope[Char] =
     if (str.isEmpty) empty[Char] else Rope(single(IA.fromString(str)))
 
-  def fromChunks[A : ClassManifest](chunks: Seq[ImmutableArray[A]]): Rope[A] =
+  def fromChunks[A : ClassTag](chunks: Seq[ImmutableArray[A]]): Rope[A] =
     Rope(chunks.foldLeft(FingerTree.empty[Int, ImmutableArray[A]])((tree, chunk) => if (!chunk.isEmpty) tree :+ chunk else tree))
 //      def apply[A](as: A*) = fromSeq(as)
 //      def fromSeq[A](as: Seq[A]) = Rope(as.foldLeft(empty[Int, A](Reducer(a => 1)))((x, y) => x :+ y))
 
-  def newBuilder[A : ClassManifest]: Builder[A, Rope[A]] = new RopeBuilder[A]
+  def newBuilder[A : ClassTag]: Builder[A, Rope[A]] = new RopeBuilder[A]
 
-  implicit def canBuildFrom[T : ClassManifest]: CanBuildFrom[Rope[_], T, Rope[T]] =
+  implicit def canBuildFrom[T : ClassTag]: CanBuildFrom[Rope[_], T, Rope[T]] =
     new CanBuildFrom[Rope[_], T, Rope[T]] {
       def apply(from: Rope[_]): Builder[T, Rope[T]] = newBuilder[T]
       def apply(): Builder[T, Rope[T]] = newBuilder[T]

@@ -1,5 +1,7 @@
 package scalaz
 
+import reflect.ClassTag
+
 import scalaz.scalacheck.ScalazProperties._
 import scalacheck.ScalazArbitrary._
 import syntax.equal._
@@ -19,7 +21,7 @@ object RopeTest extends SpecLite {
   checkAll(plus.laws[Rope])
 
   // TODO get rid of code duplication
-  def streamToRope[A : ClassManifest](stream: Stream[A]): Rope[A] = stream.foldLeft(Rope.empty[A]) {
+  def streamToRope[A : ClassTag](stream: Stream[A]): Rope[A] = stream.foldLeft(Rope.empty[A]) {
     case (t, x) => (t :+ x)
   }
 
