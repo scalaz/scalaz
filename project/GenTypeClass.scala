@@ -21,7 +21,6 @@ object TypeClass {
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
-  lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))

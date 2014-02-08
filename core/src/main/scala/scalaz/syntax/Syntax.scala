@@ -22,9 +22,6 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
-  @deprecated("metricSpace is deprecated", "7.0.1")
-  object metricSpace extends ToMetricSpaceOps
-
   object isEmpty extends ToIsEmptyOps
 
   object plusEmpty extends ToPlusEmptyOps
@@ -161,7 +158,7 @@ trait ToDataOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps
-  with ToOrderOps with ToEnumOps with ToMetricSpaceOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
+  with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToEachOps with ToIndexOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps
   with ToBifoldableOps with ToCozipOps
