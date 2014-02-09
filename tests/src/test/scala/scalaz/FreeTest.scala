@@ -16,41 +16,41 @@ object FreeTest extends SpecLite {
       (1, Functor[Arbitrary].map(F(freeArb[F, A]))(Suspend[F, A](_)).arbitrary)
     ))
 
-  private trait Template[F[_], G[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
+  trait Template[F[_], G[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
     override final def apply[A](a: G[A]) = lift(a)
 
     def lift[A: G]: G[F[A]]
   }
 
+  implicit val listArb = new Template[List, Arbitrary] {
+    def lift[A](implicit A: Arbitrary[A]) = Arbitrary(
+      Gen.choose(0, 2).flatMap(Gen.listOfN(_, A.arbitrary)) // avoid stack overflow
+    )
+  }
+
+  implicit val listEq = new Template[List, Equal] {
+    def lift[A: Equal] = implicitly
+  }
+
+  implicit val oneAndOptArb = new Template[OneAndOpt, Arbitrary] {
+    def lift[A: Arbitrary] = implicitly
+  }
+
+  implicit val oneAndOptEqual = new Template[OneAndOpt, Equal] {
+    def lift[A: Equal] = implicitly
+  }
+
+  type OneAndOpt[A] = OneAnd[Option, A]
+
   "List" should {
     type FreeList[A] = Free[List, A]
-
-    implicit val listArb = new Template[List, Arbitrary] {
-      def lift[A](implicit A: Arbitrary[A]) = Arbitrary(
-        Gen.choose(0, 2).flatMap(Gen.listOfN(_, A.arbitrary)) // avoid stack overflow
-      )
-    }
-
-    implicit val listEq = new Template[List, Equal] {
-      def lift[A: Equal] = implicitly
-    }
-
     checkAll(traverse.laws[FreeList])
     checkAll(monad.laws[FreeList])
     checkAll(equal.laws[FreeList[Int]])
   }
 
   "OneAnd[Option, A]" should {
-    type OneAndOpt[A] = OneAnd[Option, A]
     type FreeOneAndOpt[A] = Free[OneAndOpt, A]
-
-    implicit val oneAndOptArb = new Template[OneAndOpt, Arbitrary] {
-      def lift[A: Arbitrary] = implicitly
-    }
-
-    implicit val oneAndOptEqual = new Template[OneAndOpt, Equal] {
-      def lift[A: Equal] = implicitly
-    }
 
     checkAll(traverse1.laws[FreeOneAndOpt])
     checkAll(monad.laws[FreeOneAndOpt])

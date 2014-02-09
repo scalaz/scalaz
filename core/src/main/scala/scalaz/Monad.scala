@@ -66,6 +66,11 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def iterateUntil[A](f: F[A])(p: A => Boolean): F[A] =
     bind(f)(y => if (p(y)) point(y) else iterateUntil(f)(p))
 
+  def filterMTrampoline[A](l: List[A])(f: A => F[Boolean])(implicit T: Traverse[F]): F[List[A]] = {
+    implicit val F = this
+    TrampolineT.trampolineTMonad[F].filterM(l)(TrampolineT.delayF(f)).run
+  }
+
   trait MonadLaw extends ApplicativeLaw with BindLaw {
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(bind(a)(point(_: A)), a)

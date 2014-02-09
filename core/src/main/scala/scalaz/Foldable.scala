@@ -63,11 +63,17 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
-  
+
+  def foldRightMTrampoline[G[_]: Monad: Traverse, A, B](fa: F[A], z: => B)(f: (A, => B) => G[B]): G[B] =
+    foldRightM[({type λ[α] = TrampolineT[G, α]})#λ, A, B](fa, z)((a, b) => TrampolineT.delay(f(a, b))).run
+
+  def foldLeftMTrampoline[G[_]: Monad: Traverse, A, B](fa: F[A], z: B)(f: (B, A) => G[B]): G[B] =
+    foldLeftM[({type λ[α] = TrampolineT[G, α]})#λ, A, B](fa, z)(TrampolineT.delayF2(f)).run
+
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
-  /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */  
+  /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
 
@@ -106,7 +112,7 @@ trait Foldable[F[_]]  { self =>
   def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */
-  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
+  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] =
     foldRightM(fa, z)((a, b) => f(a)(b))
 
   /**Curried version of `foldLeftM` */
