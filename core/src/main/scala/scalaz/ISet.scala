@@ -328,7 +328,23 @@ sealed abstract class ISet[A] {
         }
     }
 
-  // -- * Map
+  /**
+    * For the `Functor` composition law to hold it is important that the `Order[B]` is substitutive for the `Order[A]` –
+    * that is, that the `Order[B]` should be __no stronger__, it should not distinguish two `B` instances that would
+    * be considered as equal `A` instances.
+    *
+    * '''Note:''' this is not able to implement `Functor` due to the `Order` constraint on the destination type,
+    * however it still is a functor in the mathematical sense.
+    *
+    * Documentation as copied from the Haskell source:
+    *  {{{
+    -- | /O(n*log n)/.
+    -- @'map' f s@ is the set obtained by applying @f@ to each element of @s@.
+    --
+    -- It's worth noting that the size of the result may be smaller if,
+    -- for some @(x,y)@, @x \/= y && f x == f y@
+    }}}
+    */
   def map[B: Order](f: A => B) =
     fromList(toList.map(f))
 
