@@ -93,6 +93,10 @@ object ISetTest extends SpecLite {
     a.map(f).toList must_=== a.toList.map(f).distinct.sorted
   }
 
+  "map" ! forAll {(a: List[Int => Boolean]) =>
+    ISet.fromList(a.map(_(2)).distinct.sorted) must_=== MSet.fromList(a).map(_(2))
+  }
+
   "filter" ! forAll {(s: ISet[Int], p: Int => Boolean) =>
     s.filter(p).toList must_=== s.toList.sorted.filter(p)
   }

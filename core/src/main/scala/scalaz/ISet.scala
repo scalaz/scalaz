@@ -328,26 +328,6 @@ sealed abstract class ISet[A] {
         }
     }
 
-  /**
-    * For the `Functor` composition law to hold it is important that the `Order[B]` is substitutive for the `Order[A]` –
-    * that is, that the `Order[B]` should be __no stronger__, it should not distinguish two `B` instances that would
-    * be considered as equal `A` instances.
-    *
-    * '''Note:''' this is not able to implement `Functor` due to the `Order` constraint on the destination type,
-    * however it still is a functor in the mathematical sense.
-    *
-    * Documentation as copied from the Haskell source:
-    *  {{{
-    -- | /O(n*log n)/.
-    -- @'map' f s@ is the set obtained by applying @f@ to each element of @s@.
-    --
-    -- It's worth noting that the size of the result may be smaller if,
-    -- for some @(x,y)@, @x \/= y && f x == f y@
-    }}}
-    */
-  def map[B: Order](f: A => B) =
-    fromList(toList.map(f))
-
   // -- * Folds
   final def foldRight[B](z: B)(f: (A, B) => B): B =
     this match {
@@ -558,8 +538,45 @@ object ISet extends ISetInstances with ISetFunctions {
   }
 }
 
+sealed abstract class MSet[A] {
+  import MSet._
+  val set: List[A] \/ ISet[A]
+  
+  def map[B](f: A => B): MSet[B] = set match {
+    case -\/(l) => fromList(l.map(f))
+    case \/-(s) => fromList(s.toList.map(f))
+  }
+}
+
+object MSet extends ISetInstances with MSetFunctions {
+  private[scalaz] case class MkSet[A](i: ISet[A]) extends MSet[A] {
+    val set = \/-(i)
+  }
+  
+  private[scalaz] case class MkLst[A](i: List[A]) extends MSet[A] {
+    val set = -\/(i)
+  }
+  
+}
+
+trait MSetFunctions {
+  import MSet._
+  import ISet._
+  final def fromSet[A](x: ISet[A]): MSet[A] =
+    MkSet(x)
+  
+  final def fromList[A](x: List[A]): MSet[A] =
+    MkLst(x)
+  
+  final def toSet[A: Order](x: MSet[A]): ISet[A] = x.set match {
+      case \/-(s) => s
+      case -\/(l) => ISet.fromList(l)
+    }
+}
+
 trait ISetInstances {
   import ISet._
+  import MSet._
   import std.list._
 
   implicit def setEqual[A: Equal]: Equal[ISet[A]] = new Equal[ISet[A]] {
@@ -578,7 +595,7 @@ trait ISetInstances {
     override def shows(f: ISet[A]) =
       f.toAscList.mkString("ISet(", ",", ")")
   }
-
+  
   implicit def setMonoid[A: Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
     def zero: ISet[A] =
       empty[A]
@@ -599,6 +616,9 @@ trait ISetInstances {
     def foldRight[A, B](fa: ISet[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)((a, b) => f(a, b))
   }
+  
+  implicit def iset2mset[A](s: ISet[A]): MSet[A] = fromSet[A](s)
+  implicit def mset2iset[A: Order](s: MSet[A]): ISet[A] = toSet[A](s)
 }
 
 trait ISetFunctions {

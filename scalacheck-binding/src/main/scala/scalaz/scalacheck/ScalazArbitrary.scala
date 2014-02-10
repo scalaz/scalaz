@@ -85,6 +85,9 @@ object ScalazArbitrary {
 
   implicit def Arbitrary_ISet[A](implicit o: Order[A], A: Arbitrary[A]): Arbitrary[ISet[A]] =
     Functor[Arbitrary].map(arb[List[A]])(as => ISet.fromList(as))
+      
+  implicit def Arbitrary_MSet[A](implicit A: Arbitrary[A]): Arbitrary[MSet[A]] =
+    Functor[Arbitrary].map(arb[List[A]])(as => MSet.fromList(as))
 
   import scalaz.Ordering._
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
