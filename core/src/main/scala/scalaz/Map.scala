@@ -454,7 +454,7 @@ sealed abstract class ==>>[A, B] {
   //def mapAccumRWithKey
 
   def mapKeys[C](f: A => C)(implicit o: Order[C]): C ==>> B =
-    fromList(toList.map(a => (f(a._1), a._2)))
+    foldlWithKey(empty[C, B])((xs, k, x) => xs.insert(f(k), x))
 
   def mapKeysWith[C](f: A => C, f2: (B, B) => B)(implicit o: Order[C]): C ==>> B =
     fromListWith[C, B](toList.map(x => (f(x._1), x._2)))(f2)
