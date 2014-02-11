@@ -438,6 +438,16 @@ object MapTest extends SpecLite {
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeys(_ => 3) must_===(singleton(3, "c"))
     }
 
+    "mapKeys sound" ! forAll { a: Int ==>> Int =>
+      val b = a.mapKeys(identity)
+      b must_=== a
+      structurallySound(b)
+      val f = (_: Int) % 10
+      val c = a.mapKeys(f)
+      c must_=== fromList(a.toList.map(x => (f(x._1), x._2)))
+      structurallySound(c)
+    }
+
     "mapWithKeys" in {
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ => 1, _ + _) must_===(singleton(1, "cdab"))
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeysWith(_ => 3, _ + _) must_===(singleton(3, "cdab"))
