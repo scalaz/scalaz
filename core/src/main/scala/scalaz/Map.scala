@@ -180,11 +180,11 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def values =
-    toList.map(x => x._2)
+  def values: List[B] =
+    foldrWithKey(List.empty[B])((_, x, xs) => x :: xs)
 
-  def keys =
-    toList.map(x => x._1)
+  def keys: List[A] =
+    foldrWithKey(List.empty[A])((x, _, xs) => x :: xs)
 
   def keySet =
     Set(keys: _*)
