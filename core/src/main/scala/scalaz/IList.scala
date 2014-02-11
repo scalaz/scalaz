@@ -344,11 +344,11 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def take(n: Int): IList[A] = {
     @tailrec def take0(n: Int, as: IList[A], accum: IList[A]): IList[A] =
-      if (n < 1) accum else as match {
-        case INil() => accum
+      if (n < 1) accum.reverse else as match {
         case ICons(h, t) => take0(n - 1, t, h :: accum)
+        case INil() => this
       }
-    take0(n, this, empty).reverse
+    take0(n, this, empty)
   }
 
   def takeRight(n: Int): IList[A] =
