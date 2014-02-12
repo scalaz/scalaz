@@ -1049,7 +1049,7 @@ trait MapFunctions {
     fromListWithKey(l)((_, x, y) => f(x, y))
 
   final def fromListWithKey[A: Order, B](l: List[(A, B)])(f: (A, B, B) => B): A ==>> B =
-    l.foldLeft(empty[A, B])((a, c) => a.insertWithKey((k, x, y) => f(k, x, y), c._1, c._2))
+    l.foldLeft(empty[A, B])((a, c) => a.insertWithKey(f, c._1, c._2))
 
   final def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.union(c))
