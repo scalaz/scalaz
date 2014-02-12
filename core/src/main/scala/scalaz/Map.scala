@@ -999,6 +999,9 @@ sealed abstract class MapInstances extends MapInstances0 {
               (l2, x2, r2) => Bin(kx, x2, l2, r2)
             }
         }
+
+      override def length[A](fa: S ==>> A) =
+        fa.size
     }
 
   implicit val mapBifoldable: Bifoldable[==>>] = new Bifoldable[==>>] {
