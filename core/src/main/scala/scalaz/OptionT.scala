@@ -55,6 +55,8 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def isEmpty(implicit F: Functor[F]): F[Boolean] = mapO(_.isEmpty)
 
+  def filter(f: A => Boolean)(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(self.run) { _ filter f })
+
   def fold[X](some: A => X, none: => X)(implicit F: Functor[F]): F[X] =
     mapO {
       case None => none
