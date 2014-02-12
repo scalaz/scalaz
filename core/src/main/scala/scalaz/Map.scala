@@ -378,7 +378,7 @@ sealed abstract class ==>>[A, B] {
         (r._1._2, r._2).some
     }
 
-  private def merge(other: A ==>> B): A ==>> B =
+  protected def merge(other: A ==>> B): A ==>> B =
     (this, other) match {
       case (Tip(), r) =>
         r
@@ -851,7 +851,7 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  private def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
+  protected def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (this, other) match {
       case (Tip(), r) =>
         r.insertMin(kx, x)
