@@ -560,18 +560,17 @@ object ISet extends ISetInstances with ISetFunctions {
 
 trait ISetInstances {
   import ISet._
-  import std.list._
 
-  implicit def setEqual[A: Equal]: Equal[ISet[A]] = new Equal[ISet[A]] {
-    import syntax.equal._
-
-    def equal(a1: ISet[A], a2: ISet[A]): Boolean =
-      (a1.size == a2.size) && (a1.toAscList === a2.toAscList)
+  implicit def setEqual[A: Equal]: Equal[ISet[A]] = new ISetEqual[A] {
+    def A = implicitly
   }
 
-  implicit def setOrder[A: Order]: Order[ISet[A]] = new Order[ISet[A]] {
+  implicit def setOrder[A: Order]: Order[ISet[A]] = new Order[ISet[A]] with ISetEqual[A] {
+    import std.list._
+    def A = implicitly
+
     def order(x: ISet[A], y: ISet[A]) =
-      implicitly[Order[List[A]]].order(x.toAscList, y.toAscList)
+      Order[List[A]].order(x.toAscList, y.toAscList)
   }
 
   implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
@@ -598,6 +597,21 @@ trait ISetInstances {
 
     def foldRight[A, B](fa: ISet[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)((a, b) => f(a, b))
+
+    override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
+      fa.foldLeft(z)(f)
+
+    override def length[A](fa: ISet[A]) =
+      fa.size
+
+    override def maximum[A: Order](fa: ISet[A]) =
+      fa.findMax
+
+    override def minimum[A: Order](fa: ISet[A]) =
+      fa.findMin
+
+    override def empty[A](fa: ISet[A]) =
+      fa.isEmpty
   }
 }
 
@@ -616,8 +630,8 @@ trait ISetFunctions {
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(ISet.empty[A])(_ union _)
 
-  private[scalaz] val delta = 3
-  private[scalaz] val ratio = 2
+  private[scalaz] final val delta = 3
+  private[scalaz] final val ratio = 2
 
   private[scalaz] def balanceL[A](x: A, l: ISet[A], r: ISet[A]): ISet[A] =
     r match {
@@ -682,4 +696,12 @@ trait ISetFunctions {
             } else Bin(x, l, r)
         }
     }
+}
+
+private sealed trait ISetEqual[A] extends Equal[ISet[A]] {
+  import std.list._
+  implicit def A: Equal[A]
+
+  override final def equal(a1: ISet[A], a2: ISet[A]) =
+    (a1.size == a2.size) && Equal[List[A]].equal(a1.toAscList, a2.toAscList)
 }
