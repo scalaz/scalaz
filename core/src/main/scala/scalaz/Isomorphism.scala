@@ -38,6 +38,9 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
       val from = self.to
       override def flip = self
     }
+
+    def %~(f: Arr[B, B])(implicit C: Compose[Arr]): Arr[A, A] =
+      C.compose(from, C.compose(f, to))
   }
 
   /**Isomorphism for arrows of kind (* -> *) -> (* -> *) -> * */
@@ -57,6 +60,11 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
       new (F[A] <=> G[A]){
         def from = GF(self.from)
         def to   = FG(self.to)
+      }
+
+    def %~(f: G ~> G)(implicit FG: Arr[F, G] <~< (F ~> G), GF: Arr[G, F] <~< (G ~> F)): F ~> F =
+      new (F ~> F) {
+        def apply[A](a: F[A]): F[A] = GF(self.from)(f(FG(self.to)(a)))
       }
   }
 
@@ -105,6 +113,11 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
         def to[X](fa: FA[X]) = FG(self.to)(fa)
       }
     }
+
+    def %~(f: G ~~> G)(implicit FG: Arr[F, G] <~< (F ~~> G), GF: Arr[G, F] <~< (G ~~> F)): F ~~> F =
+      new (F ~~> F) {
+        def apply[A, B](a: F[A, B]): F[A, B] = GF(self.from)(f(FG(self.to)(a)))
+      }
   }
 
   /**Set isomorphism */
