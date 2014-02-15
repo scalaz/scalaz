@@ -27,19 +27,72 @@ object ISetTest extends SpecLite {
     al must_===(al.sorted)(Order[A].toScalaOrdering)
   }
 
+  "split" ! forAll { (a: ISet[Int], i: Int) =>
+    val (b, c) = a.split(i)
+    structurallySound(b)
+    structurallySound(c)
+    Foldable[ISet].all(b)(_ < i) must_=== true
+    Foldable[ISet].all(c)(_ > i) must_=== true
+    if(a member i){
+      (b.size + c.size + 1) must_=== a.size
+      b.union(c).insert(i) must_=== a
+    }else{
+      (b union c) must_=== a
+    }
+  }
+
+  "splitMember" ! forAll { (a: ISet[Int], i: Int) =>
+    val (b, c, d) = a.splitMember(i)
+    structurallySound(b)
+    structurallySound(d)
+    c must_=== a.member(i)
+    Foldable[ISet].all(b)(_ < i) must_=== true
+    Foldable[ISet].all(d)(_ > i) must_=== true
+    if(c){
+      (b.size + d.size + 1) must_=== a.size
+      b.union(d).insert(i) must_=== a
+    }else{
+      (b union d) must_=== a
+    }
+  }
+
+  "lookupLT" ! forAll { (a: ISet[Int], i: Int) =>
+    a.lookupLT(i) match {
+      case Some(b) =>
+        (i > b) must_=== true
+        val (c, d) = a.split(i)
+        c.findMax must_=== Option(b)
+        Foldable[ISet].all(d)(_ > i) must_=== true
+        a.filter(x => b < x && x < i) must_=== ISet.empty
+      case None =>
+        a.split(i)._1 must_=== ISet.empty
+    }
+  }
+
   "member" ! forAll {(a: ISet[Int], i: Int) =>
     a.member(i) must_=== a.toList.contains(i)
   }
 
   "sound delete" ! forAll {(a: ISet[Int], i: Int) =>
-    structurallySound(a delete i)
+    val b = a.delete(i)
+    structurallySound(b)
+    if(a.member(i))
+      (a.size - b.size) must_=== 1
+    else
+      a must_=== b
   }
 
   "sound insert" ! forAll {(a: ISet[Int], i: Int) =>
-    structurallySound(a insert i)
+    val b = a.insert(i)
+    structurallySound(b)
+    if(a.member(i))
+      a must_=== b
+    else
+      (b.size - a.size) must_=== 1
   }
 
   "sound union" ! forAll {(a: ISet[Int], b: ISet[Int]) =>
+    (a union b) must_=== ISet.fromList(a.toList ++ b.toList)
     structurallySound(a union b)
   }
 
@@ -71,7 +124,10 @@ object ISetTest extends SpecLite {
   }
 
   "sound difference" ! forAll {(a: ISet[Int], b: ISet[Int]) =>
-    structurallySound(a difference b)
+    val c = a difference b
+    structurallySound(c)
+    Foldable[ISet].any(c)(b member _) must_=== false
+    Foldable[ISet].all(c)(a member _) must_=== true
   }
 
   "filter" ! forAll {(a: ISet[Int], p: Int => Boolean) =>
@@ -82,6 +138,8 @@ object ISetTest extends SpecLite {
     val (ma, mb) = a partition p
     structurallySound(ma)
     structurallySound(mb)
+    (ma.size + mb.size) must_=== a.size
+    (ma union mb) must_=== a
   }
 
   "partition" ! forAll {(a: ISet[Int], p: Int => Boolean) =>
@@ -123,6 +181,13 @@ object ISetTest extends SpecLite {
     val l = a.toList.sortWith(_ > _)
     val target = if (l.isEmpty) none else (l.head, fromList(l.tail)).some
     a.maxView must_=== target
+  }
+
+  "isSubsetOf" ! forAll { (a: ISet[Int], b: ISet[Int]) =>
+    val c = a isSubsetOf b
+    c must_=== (a.toList.toSet subsetOf b.toList.toSet)
+    c must_=== Foldable[ISet].all(a)(b member _)
+    (c && (b isSubsetOf a)) must_=== Equal[ISet[Int]].equal(a, b)
   }
 
 }
