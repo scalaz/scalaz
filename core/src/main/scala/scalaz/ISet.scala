@@ -147,9 +147,9 @@ sealed abstract class ISet[A] {
 
   private def isSubsetOfX(other: ISet[A])(implicit o: Order[A]): Boolean =
     (this, other) match {
-      case (_, Tip()) =>
-        true
       case (Tip(), _) =>
+        true
+      case (_, Tip()) =>
         false
       case (Bin(x, l, r), t) =>
         val (lt,found,gt) = t.splitMember(x)
