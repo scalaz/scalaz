@@ -13,6 +13,10 @@ trait Profunctor[=>:[_, _]]  { self =>
   /** Functor map on `B`. */
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C)
 
+  /** Functor map on `A` and `B`. */
+  def dimap[A, B, C, D](fab: (A =>: B))(f: C => A)(g: B => D): (C =>: D) =
+    mapsnd(mapfst(fab)(f))(g)
+
   protected[this] trait SndCovariant[C] extends Functor[({type λ[α] = C =>: α})#λ] {
     override def map[A, B](fa: C =>: A)(f: A => B) = mapsnd(fa)(f)
   }
