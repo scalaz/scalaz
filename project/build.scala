@@ -340,7 +340,12 @@ object build extends Build {
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       previousArtifact := None,
-      publishArtifact := false
+      publishArtifact := false,
+      sources in Compile := {
+        val fs = (sources in Compile).value
+        if (scalaVersion.value.contains("2.11.")) fs.filterNot(_.getName == "WordCount.scala") // See SI-8290
+        else fs
+      }
     )
   )
 
@@ -363,7 +368,12 @@ object build extends Build {
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      previousArtifact := None
+      previousArtifact := None,
+      sources in Test := {
+        val fs = (sources in Test).value
+        if (scalaVersion.value.contains("2.11.")) fs.filterNot(_.getName == "FuncTest.scala") // See SI-8290
+        else fs
+      }
     )
   )
 
