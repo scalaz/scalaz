@@ -416,9 +416,16 @@ trait DisjunctionFunctions {
     e fold (left, right)
 
   /** Evaluate the given value, which might throw an exception. */
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     right(a)
   } catch {
     case e: Throwable => left(e)
+  }
+  
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit ex: ClassManifest[E]): E \/ T = try {
+    \/-(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 }

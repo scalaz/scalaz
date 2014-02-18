@@ -205,11 +205,19 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
     case e: Throwable => left(F.point(e))
   }
+
+  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], ex: ClassManifest[B]): EitherT[F, B, A] =
+    try {
+      right(a)
+    } catch {
+      case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+    }
 }
 
 sealed abstract class EitherTInstances2 {

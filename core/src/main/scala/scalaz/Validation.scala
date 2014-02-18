@@ -485,10 +485,17 @@ trait ValidationFunctions {
     Failure(_)
 
   /** Evaluate the given value, which might throw an exception. */
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     success(a)
   } catch {
     case e: Throwable => failure(e)
+  }
+
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit ex: ClassManifest[E]): Validation[E, T] = try {
+    Success(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
   }
 
   /** Construct a `Validation` from an `Either`. */
