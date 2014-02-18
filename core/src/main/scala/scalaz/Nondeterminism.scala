@@ -78,17 +78,24 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def both[A,B](a: F[A], b: F[B]): F[(A,B)] = mapBoth(a,b)((_,_))
 
   /**
-   * Nondeterministically gather results from the given sequence of actions.
-   * The resulting list will be arbitrarily reordered, depending on the order
-   * results come back in a sequence of calls to `chooseAny`.
+   * Nondeterministically gather results from the given sequence of actions
+   * to a list. Same as calling `reduceUnordered` with the `List` `Monoid`.
    *
    * To preserve the order of the output list while allowing nondetermininstic
    * ordering of effects, use `gather`.
    */
   def gatherUnordered[A](fs: Seq[F[A]]): F[List[A]] =
-    if (fs.isEmpty) point(List())
+    reduceUnordered[A, List[A]](fs)
+
+  /**
+   * Nondeterministically gather results from the given sequence of actions.
+   * The result will be arbitrarily reordered, depending on the order
+   * results come back in a sequence of calls to `chooseAny`.
+   */
+  def reduceUnordered[A, M](fs: Seq[F[A]])(implicit R: Reducer[A, M]): F[M] =
+    if (fs.isEmpty) point(implicitly[Reducer[A, M]].zero)
     else bind(chooseAny(fs.head, fs.tail)) { case (a, residuals) =>
-      map(gatherUnordered(residuals))(a :: _)
+      map(reduceUnordered(residuals))(implicitly[Reducer[A, M]].cons(a, _))
     }
 
   /**
