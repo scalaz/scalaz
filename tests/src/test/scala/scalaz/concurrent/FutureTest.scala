@@ -48,30 +48,31 @@ object FutureTest extends SpecLite {
   "Nondeterminism[Future]" should {
     import scalaz.concurrent.Future._
     implicit val es = Executors.newFixedThreadPool(1)
+    val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
    
-    "correctly process gatherUnordered for >1 futures in non-blocking way" in {
+    "correctly process reduceUnordered for >1 futures in non-blocking way" in {
       val f1 = fork(now(1))(es)
       val f2 = delay(7).flatMap(_=>fork(now(2))(es))
       val f3 = fork(now(3))(es)
       
-      val f = fork(Future.gatherUnordered(Seq(f1,f2,f3)))(es)
+      val f = fork(Future.reduceUnordered(Seq(f1,f2,f3))(intSetReducer))(es)
       
-      f.run.toSet must_== Set(1,2,3)
+      f.run must_== Set(1,2,3)
     }
 
 
-    "correctly process gatherUnordered for 1 future in non-blocking way" in {
+    "correctly process reduceUnordered for 1 future in non-blocking way" in {
       val f1 = fork(now(1))(es) 
 
-      val f = fork(Future.gatherUnordered(Seq(f1)))(es)
+      val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
 
-      f.run.toSet must_== Set(1)
+      f.run must_== Set(1)
     }
 
-    "correctly process gatherUnordered for empty seq of futures in non-blocking way" in {
-      val f = fork(Future.gatherUnordered(Seq()))(es)
+    "correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
+      val f = fork(Future.reduceUnordered(Seq())(intSetReducer))(es)
 
-      f.run.toSet must_== Set()
+      f.run must_== Set()
     }
   }
   

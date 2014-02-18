@@ -131,30 +131,30 @@ object TaskTest extends SpecLite {
   "Nondeterminism[Task]" should {
     import scalaz.concurrent.Task._
     val es = Executors.newFixedThreadPool(1)
+    val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
-
-    "correctly process gatherUnordered for >1 tasks in non-blocking way" in {
+    "correctly process reduceUnordered for >1 tasks in non-blocking way" in {
       val t1 = fork(now(1))(es)
       val t2 = delay(7).flatMap(_=>fork(now(2))(es))
       val t3 = fork(now(3))(es)
-      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3)))(es)
+      val t = fork(Task.reduceUnordered(Seq(t1,t2,t3))(intSetReducer))(es)
 
-      t.run.toSet must_== Set(1,2,3)
+      t.run must_== Set(1,2,3)
     }
 
 
-    "correctly process gatherUnordered for 1 task in non-blocking way" in {
+    "correctly process reduceUnordered for 1 task in non-blocking way" in {
       val t1 = fork(now(1))(es)
 
-      val t = fork(Task.gatherUnordered(Seq(t1)))(es)
+      val t = fork(Task.reduceUnordered(Seq(t1))(intSetReducer))(es)
 
-      t.run.toSet must_== Set(1)
+      t.run must_== Set(1)
     }
 
-    "correctly process gatherUnordered for empty seq of tasks in non-blocking way" in {
-      val t = fork(Task.gatherUnordered(Seq()))(es)
+    "correctly process reduceUnordered for empty seq of tasks in non-blocking way" in {
+      val t = fork(Task.reduceUnordered(Seq())(intSetReducer))(es)
 
-      t.run.toSet must_== Set()
+      t.run must_== Set()
     }
 
     "early terminate once any of the tasks failed" in {
