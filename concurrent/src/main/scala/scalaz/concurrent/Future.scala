@@ -381,4 +381,7 @@ object Future {
    */
   def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
     futureInstance.gatherUnordered(fs)
+
+  def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+    futureInstance.reduceUnordered(fs)
 }
