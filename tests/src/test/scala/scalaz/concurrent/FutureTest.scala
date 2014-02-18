@@ -76,30 +76,6 @@ object FutureTest extends SpecLite {
     }
   }
   
-  
-  "Timed Future " should {
-
-    "not block future's execution thread" in {
-      val es = Executors.newFixedThreadPool(1)
-      import scala.concurrent.duration._
-
-      val start  = System.currentTimeMillis()
-      val t1 = Future.fork({Thread.sleep(500); Future.now(1)})(es).timed(10 second) 
-      val t2 = Future.fork({Thread.sleep(500); Future.now(2)})(es).timed(100 millis)
-
-      val result:Seq[Throwable \/ Int] =
-        Future.fork(Future.gatherUnordered(Seq(t1,t2))).run
-      val duration = System.currentTimeMillis() - start
-
-      (result.exists(_.isLeft) must_== true) and
-      (result.exists(_.isRight) must_== true) and
-        ((duration-5000 <= 0) must_== true)
-
-    }
-    
-  }
-  
-
   /*
    * This is a little deadlock factory based on the code in #308.
    *
