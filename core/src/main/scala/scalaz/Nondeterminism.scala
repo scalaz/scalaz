@@ -93,9 +93,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * results come back in a sequence of calls to `chooseAny`.
    */
   def reduceUnordered[A, M](fs: Seq[F[A]])(implicit R: Reducer[A, M]): F[M] =
-    if (fs.isEmpty) point(implicitly[Reducer[A, M]].zero)
+    if (fs.isEmpty) point(R.zero)
     else bind(chooseAny(fs.head, fs.tail)) { case (a, residuals) =>
-      map(reduceUnordered(residuals))(implicitly[Reducer[A, M]].cons(a, _))
+      map(reduceUnordered(residuals))(R.cons(a, _))
     }
 
   /**
