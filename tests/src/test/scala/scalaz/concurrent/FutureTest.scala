@@ -91,8 +91,8 @@ object FutureTest extends SpecLite {
         Future.fork(Future.gatherUnordered(Seq(t1,t2))).run
       val duration = System.currentTimeMillis() - start
 
-      (result.head.isLeft must_== true) and
-      (result.last.isRight must_== true) and
+      (result.exists(_.isLeft) must_== true) and
+      (result.exists(_.isRight) must_== true) and
         ((duration-5000 <= 0) must_== true)
 
     }
