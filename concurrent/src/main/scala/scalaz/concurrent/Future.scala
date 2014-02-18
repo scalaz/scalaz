@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReferenc
 
 import collection.JavaConversions._
 
-import scalaz.Nondeterminism
+import scalaz.{Nondeterminism, Reducer}
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
@@ -298,19 +298,26 @@ object Future {
 
     // implementation runs all threads, dumping to a shared queue
     // last thread to finish invokes the callback with the results
-    override def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] = fs match {
-      case Seq() => Future.now(List())
-      case Seq(f) => f.map(List(_))
+    override def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+      fs match {
+      case Seq() => Future.now(R.zero)
+      case Seq(f) => f.map(R.unit)
       case other => Async { cb =>
-        val results = new ConcurrentLinkedQueue[A]
+        val results = new ConcurrentLinkedQueue[M]
         val c = new AtomicInteger(fs.size)
 
         fs.foreach { f =>
           f.listen { a =>
-            results.add(a)
+            // Try to reduce number of values in the queue
+            val front = results.poll()
+            if (front == null)
+              results.add(R.unit(a))
+            else
+              results.add(R.cons(a, front))
+
             // only last completed f will hit the 0 here.
             if (c.decrementAndGet() == 0)
-              cb(results.toList)
+              cb(results.toList.foldLeft(R.zero)((a, b) => R.append(a, b)))
             else Trampoline.done(())
           }
         }
