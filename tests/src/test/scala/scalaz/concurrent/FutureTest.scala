@@ -76,6 +76,23 @@ object FutureTest extends SpecLite {
     }
   }
   
+  "Timed Future" should {
+    "not run futures sequentially" in {
+      val times = Stream.iterate(100)(_ + 100).take(10)
+
+      val start  = System.currentTimeMillis()
+      val result = Future.fork(Future.gatherUnordered(times.map { time =>
+        Future.fork {
+          Thread.sleep(time)
+          Future.now(time)
+        }
+      })).run
+      val duration = System.currentTimeMillis() - start
+
+      result.length must_== times.size and duration.toInt mustBe_< times.fold(0)(_ + _)
+    }
+  }
+
   /*
    * This is a little deadlock factory based on the code in #308.
    *
