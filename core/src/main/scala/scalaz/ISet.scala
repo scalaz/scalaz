@@ -561,7 +561,7 @@ object ISet extends ISetInstances with ISetFunctions {
   }
 }
 
-trait ISetInstances {
+sealed abstract class ISetInstances {
   import ISet._
 
   implicit def setEqual[A: Equal]: Equal[ISet[A]] = new ISetEqual[A] {
@@ -618,7 +618,7 @@ trait ISetInstances {
   }
 }
 
-trait ISetFunctions {
+sealed trait ISetFunctions {
   import ISet._
 
   final def empty[A]: ISet[A] =
