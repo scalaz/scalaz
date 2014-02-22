@@ -407,7 +407,7 @@ trait DisjunctionFunctions {
 
   /** Evaluate the given value, which might throw an exception. */
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
-    right(a)
+    \/-(a)
   } catch {
     case e => left(e)
   }

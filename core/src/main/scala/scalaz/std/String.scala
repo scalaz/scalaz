@@ -44,48 +44,47 @@ trait StringFunctions {
   def unsafeCharsNel(s:String) : NonEmptyList[Char] = charsNelErr(s, "cannot turn empty string into NonEmptyList")
 
   // Parsing functions.
-  import Validation.{success, failure}
 
   def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] = try {
-    success(s.toBoolean)
+    Success(s.toBoolean)
   } catch {
-    case e: IllegalArgumentException => failure(e)
+    case e: IllegalArgumentException => Failure(e)
   }
 
   def parseByte(s:String): Validation[NumberFormatException, Byte] = try {
-    success(s.toByte)
+    Success(s.toByte)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 
   def parseShort(s:String): Validation[NumberFormatException, Short] = try {
-    success(s.toShort)
+    Success(s.toShort)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 
   def parseInt(s:String): Validation[NumberFormatException, Int] = try {
-    success(s.toInt)
+    Success(s.toInt)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 
   def parseLong(s:String): Validation[NumberFormatException, Long] = try {
-    success(s.toLong)
+    Success(s.toLong)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 
   def parseFloat(s:String): Validation[NumberFormatException, Float] = try {
-    success(s.toFloat)
+    Success(s.toFloat)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 
   def parseDouble(s:String): Validation[NumberFormatException, Double] = try {
-    success(s.toDouble)
+    Success(s.toDouble)
   } catch {
-    case e: NumberFormatException => failure(e)
+    case e: NumberFormatException => Failure(e)
   }
 }
 
