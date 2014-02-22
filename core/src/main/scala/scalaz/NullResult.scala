@@ -10,7 +10,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
     NullResult(apply(_) map f)
 
   def contramap[C](f: C => A): C =>? B =
-    NullResult(c => apply(f(c)))
+    NullResult(f andThen _apply)
 
   def flatMap[C](f: B => A =>? C): A =>? C =
     NullResult(a => apply(a) flatMap(f(_)(a)))
@@ -64,7 +64,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
     NullResult(a => apply(a) orElse x(a))
 
   def compose[C](f: C =>? A): C =>? B =
-    NullResult(f(_) flatMap (apply(_)))
+    NullResult(f(_) flatMap _apply)
 
   def andThen[C](g: B =>? C): A =>? C =
     g compose this

@@ -6,7 +6,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
   import NullArgument._
 
   def map[C](f: B => C): A ?=> C =
-    NullArgument(a => f(apply(a)))
+    NullArgument(_apply andThen f)
 
   def contramap[C](f: C => A): C ?=> B =
     NullArgument(c => apply(c.map(f)))
@@ -65,7 +65,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     } yield S.append(b1, b2)
 
   def cokleisli: Cokleisli[Option, A, B] =
-    Cokleisli(apply(_))
+    Cokleisli(_apply)
 
   def on[F[_]](o: OptionT[F, A])(implicit F: Functor[F]): F[B] =
     F.map(o.run)(_apply)

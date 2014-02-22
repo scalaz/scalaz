@@ -9,7 +9,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   import Kleisli._
 
   /** alias for `andThen` */
-  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k(_)))
+  def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k.run))
 
   def andThen[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] = this >=> k
 
@@ -27,7 +27,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def composeK[C](k: C => M[A])(implicit b: Bind[M]): Kleisli[M, C, B] = this <==< k
 
   def traverse[F[_]](f: F[A])(implicit M: Applicative[M], F: Traverse[F]): M[F[B]] =
-    F.traverse(f)(Kleisli.this(_))
+    F.traverse(f)(run)
 
   def =<<(a: M[A])(implicit m: Bind[M]): M[B] = m.bind(a)(run)
 
