@@ -312,6 +312,10 @@ trait FreeFunctions {
   def liftF[S[_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
     Suspend(S.map(value)(Return[S, A]))
 
+  /** A version of `liftF` that infers the nested type constructor. */
+  def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
+    liftF(MA(value))(MA.TC)
+
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
     return_(())
