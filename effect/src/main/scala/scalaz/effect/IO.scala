@@ -35,7 +35,7 @@ sealed trait IO[A] {
   def unsafeZipWith[B, C](iob: IO[B], f: (A, B) => C): IO[C] = (for {
     a <- unsafeInterleaveIO()
     b <- iob.unsafeInterleaveIO()
-    c <- io(rw => a zipWith (b, (x: A, y: B) => (rw -> f(x, y))))
+    c <- io(rw => a.zipWith(b)((x, y) => (rw -> f(x, y))))
   } yield c)
 
   /**

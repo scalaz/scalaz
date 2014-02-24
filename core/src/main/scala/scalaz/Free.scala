@@ -148,11 +148,11 @@ sealed abstract class Free[S[_], A] {
     ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
-  def zipWith[B, C](tb: Free[S, B], f: (A, B) => C)(implicit S: Functor[S]): Free[S, C] = {
+  def zipWith[B, C](tb: Free[S, B])(f: (A, B) => C)(implicit S: Functor[S]): Free[S, C] = {
     (resume, tb.resume) match {
-      case (-\/(a), -\/(b))   => Suspend(S.map(a)(x => Suspend(S.map(b)(y => x zipWith(y, f)))))
-      case (-\/(a), \/-(b))  => Suspend(S.map(a)(x => x zipWith(Return(b), f)))
-      case (\/-(a), -\/(b))  => Suspend(S.map(b)(y => Return(a) zipWith(y, f)))
+      case (-\/(a), -\/(b)) => Suspend(S.map(a)(x => Suspend(S.map(b)(y => x.zipWith(y)(f)))))
+      case (-\/(a), \/-(b)) => Suspend(S.map(a)(x => x.zipWith(Return(b))(f)))
+      case (\/-(a), -\/(b)) => Suspend(S.map(b)(y => Return(a).zipWith(y)(f)))
       case (\/-(a), \/-(b)) => Return(f(a, b))
     }
   }
