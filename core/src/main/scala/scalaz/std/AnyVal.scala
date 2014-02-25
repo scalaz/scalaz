@@ -452,12 +452,12 @@ trait BooleanFunctions {
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
    */
-  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = if (cond) M.point(()) else M.void(f)
+  final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.unlessM(cond)(f)
 
   /**
    * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
    */
-  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = if (cond) M.void(f) else M.point(())
+  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.whenM(cond)(f)
 
   /**
    * @return `t` if `cond` is `true`, `f` otherwise

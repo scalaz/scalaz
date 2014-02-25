@@ -56,6 +56,16 @@ trait Applicative[F[_]] extends Apply[F] { self =>
       case h :: t => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
     }
 
+  /**
+   * Returns the given argument if `cond` is `false`, otherwise, unit lifted into F.
+   */
+  def unlessM[A](cond: Boolean)(f: => F[A]): F[Unit] = if (cond) point(()) else void(f)
+  
+  /**
+   * Returns the given argument if `cond` is `true`, otherwise, unit lifted into F.
+   */
+  def whenM[A](cond: Boolean)(f: => F[A]): F[Unit] = if (cond) void(f) else point(())
+  
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
     implicit def F = self
