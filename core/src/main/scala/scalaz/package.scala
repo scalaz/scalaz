@@ -124,6 +124,7 @@ package object scalaz {
 
   object Writer {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+    def apply[W, A](wa: (W, A)): WriterT[Id, W, A] = WriterT[Id, W,A](wa)
   }
 
   object Unwriter {
