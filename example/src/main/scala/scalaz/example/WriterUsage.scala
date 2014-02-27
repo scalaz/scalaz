@@ -6,8 +6,6 @@ object WriterUsage extends App {
   import std.list._
   import syntax.writer._
   import syntax.id._
-  
-  import syntax.each._      // for foreach
   import syntax.semigroup._ // for |+|
   import syntax.apply._     // for |@|
 
@@ -25,10 +23,10 @@ object WriterUsage extends App {
     } yield moveWatson                            
 
   // print log
-  drWatson.written.foreach(println)               
+  drWatson.written.map(println)               
                                                   
   // get value
-  drWatson.value.foreach(println)                 
+  drWatson.value.map(println)                 
 
   val sherlockHolmes =
     for {
@@ -39,33 +37,33 @@ object WriterUsage extends App {
 
   // map lets you map over the value side
   val mapValue: Logger[Option[Address]] = sherlockHolmes.map(x => x.address)
-  mapValue.value.foreach(println)                 
+  mapValue.value.map(println)                 
 
   // with mapWritten you can map over the written side.
-  val mapWritten: Logger[Person] = sherlockHolmes.mapWritten(_.map(entry => s"[LOG] $entry"))
-  mapWritten.written.foreach(println)   
+  val mapWritten: Logger[Person] = sherlockHolmes.mapWritten(_.map(entry => "[LOG] " + entry))
+  mapWritten.written.map(println)   
 
   // with mapValue you can map over both sides
   val mValue: Logger[Option[Address]] = sherlockHolmes.mapValue { case (log, p) => (log :+ "Extracting address", p.address) }
-  mValue.written.foreach(println)                 
+  mValue.written.map(println)                 
 
   // with :++> you can append to the log side of things
   val resultAppend: Logger[Person] = sherlockHolmes :++> List("Finished", "--- new Person ready ---")
-  resultAppend.written.foreach(println)           
+  resultAppend.written.map(println)           
 
   // with :++>> you can append using a function
-  val resultFappend: Logger[Person] = sherlockHolmes :++>> { x => List("Finished", s"--- new Person $x ready ---") }
-  resultFappend.written.foreach(println)
+  val resultFappend: Logger[Person] = sherlockHolmes :++>> { x => List("Finished", "--- new Person " + x + " ready ---") }
+  resultFappend.written.map(println)
 
   // <++: and <<++: work like :++>, :++>> only to prepend information
   val resultPrepend: Logger[Person] = sherlockHolmes.<++:(List("Starting to create a Person"))
-  resultPrepend.written.foreach(println)         
+  resultPrepend.written.map(println)         
 
   // reset your log to zero
   val logNoGood: Logger[Person] = sherlockHolmes.reset
-  logNoGood.written.foreach(println)
+  logNoGood.written.map(println)
 
   // Writer is an applicative, you can easily combine different results.
   val combined: Logger[List[Person]] = (sherlockHolmes |@| drWatson) { List(_) |+| List(_) }
-  combined.written.foreach(println) 
+  combined.written.map(println) 
 }
