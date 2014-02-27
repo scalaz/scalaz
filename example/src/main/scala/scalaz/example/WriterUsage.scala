@@ -42,7 +42,7 @@ object WriterUsage extends App {
   mapValue.value.foreach(println)                 
 
   // with mapWritten you can map over the written side.
-  val mapWritten: Logger[Person] = sherlockHolmes.mapWritten(_.map(entry => s"[LOG] $entry"))
+  val mapWritten: Logger[Person] = sherlockHolmes.mapWritten(_.map(entry => "[LOG] " + entry))
   mapWritten.written.foreach(println)   
 
   // with mapValue you can map over both sides
@@ -54,7 +54,7 @@ object WriterUsage extends App {
   resultAppend.written.foreach(println)           
 
   // with :++>> you can append using a function
-  val resultFappend: Logger[Person] = sherlockHolmes :++>> { x => List("Finished", s"--- new Person $x ready ---") }
+  val resultFappend: Logger[Person] = sherlockHolmes :++>> { x => List("Finished", "--- new Person " + x + " ready ---") }
   resultFappend.written.foreach(println)
 
   // <++: and <<++: work like :++>, :++>> only to prepend information
