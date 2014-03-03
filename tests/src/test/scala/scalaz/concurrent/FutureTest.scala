@@ -48,56 +48,50 @@ object FutureTest extends SpecLite {
   "Nondeterminism[Future]" should {
     import scalaz.concurrent.Future._
     implicit val es = Executors.newFixedThreadPool(1)
+    val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
    
-    "correctly process gatherUnordered for >1 futures in non-blocking way" in {
+    "correctly process reduceUnordered for >1 futures in non-blocking way" in {
       val f1 = fork(now(1))(es)
       val f2 = delay(7).flatMap(_=>fork(now(2))(es))
       val f3 = fork(now(3))(es)
       
-      val f = fork(Future.gatherUnordered(Seq(f1,f2,f3)))(es)
+      val f = fork(Future.reduceUnordered(Seq(f1,f2,f3))(intSetReducer))(es)
       
-      f.run.toSet must_== Set(1,2,3)
+      f.run must_== Set(1,2,3)
     }
 
 
-    "correctly process gatherUnordered for 1 future in non-blocking way" in {
+    "correctly process reduceUnordered for 1 future in non-blocking way" in {
       val f1 = fork(now(1))(es) 
 
-      val f = fork(Future.gatherUnordered(Seq(f1)))(es)
+      val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
 
-      f.run.toSet must_== Set(1)
+      f.run must_== Set(1)
     }
 
-    "correctly process gatherUnordered for empty seq of futures in non-blocking way" in {
-      val f = fork(Future.gatherUnordered(Seq()))(es)
+    "correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
+      val f = fork(Future.reduceUnordered(Seq())(intSetReducer))(es)
 
-      f.run.toSet must_== Set()
+      f.run must_== Set()
     }
   }
   
-  
-  "Timed Future " should {
-
-    "not block future's execution thread" in {
-      val es = Executors.newFixedThreadPool(1)
-      import scala.concurrent.duration._
+  "Timed Future" should {
+    "not run futures sequentially" in {
+      val times = Stream.iterate(100)(_ + 100).take(10)
 
       val start  = System.currentTimeMillis()
-      val t1 = Future.fork({Thread.sleep(500); Future.now(1)})(es).timed(10 second) 
-      val t2 = Future.fork({Thread.sleep(500); Future.now(2)})(es).timed(100 millis)
-
-      val result:Seq[Throwable \/ Int] =
-        Future.fork(Future.gatherUnordered(Seq(t1,t2))).run
+      val result = Future.fork(Future.gatherUnordered(times.map { time =>
+        Future.fork {
+          Thread.sleep(time)
+          Future.now(time)
+        }
+      })).run
       val duration = System.currentTimeMillis() - start
 
-      (result.head.isLeft must_== true) and
-      (result.last.isRight must_== true) and
-        ((duration-5000 <= 0) must_== true)
-
+      result.length must_== times.size and duration.toInt mustBe_< times.fold(0)(_ + _)
     }
-    
   }
-  
 
   /*
    * This is a little deadlock factory based on the code in #308.

@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -300,25 +300,34 @@ object Task {
    * @since 7.0.3
    */
   def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] =
-    if (!exceptionCancels) taskInstance.gatherUnordered(tasks)
+    reduceUnordered[A, List[A]](tasks, exceptionCancels)
+
+  def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
+    if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
     else tasks match {
       // Unfortunately we cannot reuse the future's combinator
       // due to early terminating requirement on task
       // when task fails.  This also makes implementation a bit trickier
-      case Seq() => Task.now(List())
-      case Seq(t) => t.map(List(_))
+      case Seq() => Task.now(R.zero)
+      case Seq(t) => t.map(R.unit)
       case _ => new Task(Future.Async { cb =>
         val interrupt = new AtomicBoolean(false)
-        val results = new ConcurrentLinkedQueue[A]
+        val results = new ConcurrentLinkedQueue[M]
         val togo = new AtomicInteger(tasks.size)
 
         tasks.foreach { t =>
           val handle: (Throwable \/ A) => Trampoline[Unit] = {
             case \/-(success) =>
-              results.add(success)
+              // Try to reduce number of values in the queue
+              val front = results.poll()
+              if (front == null)
+                results.add(R.unit(success))
+              else
+                results.add(R.cons(success, front))
+
               // only last completed f will hit the 0 here.
               if (togo.decrementAndGet() == 0)
-                cb(\/-(results.toList))
+                cb(\/-(results.toList.foldLeft(R.zero)((a, b) => R.append(a, b))))
               else
                 Trampoline.done(())
             case e@(-\/(failure)) =>
