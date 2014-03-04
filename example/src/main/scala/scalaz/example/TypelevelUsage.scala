@@ -71,7 +71,6 @@ object TypelevelUsage extends App {
   }
 
   object Folding {
-/*
     import KLists._
 
     object SomeCount extends HFold[Option, Int] {
@@ -89,7 +88,6 @@ object TypelevelUsage extends App {
 
     val count2 = klist1.fold[Option, Int, HFold.Count[Option]](new HFold.Count[Option])
     assert(count2 === 3)
-*/
   }
 
   object ALists {

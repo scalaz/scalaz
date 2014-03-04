@@ -55,7 +55,7 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val latestScala211PreRelease = "2.11.0-M8"
+  val latestScala211PreRelease = "2.11.0-RC1"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
@@ -236,11 +236,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0-RC5"
+      case _ => "1.0.0"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0-RC7"
+      case _ => "1.0.0"
     }
   )
 
