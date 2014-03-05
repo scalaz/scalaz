@@ -55,18 +55,11 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val latestScala211PreRelease = "2.11.0-RC1"
-
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-SNAPSHOT"),
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
-
-    scalaBinaryVersion in update := (
-      if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
-    ),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-RC1"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
