@@ -71,7 +71,7 @@ sealed trait MonadCatchIOFunctions {
     } yield r      
 
   /** An automatic resource management. */
-  def using[M[_]: MonadCatchIO, A, B](ma: M[A])(f: A => M[B])(implicit resource: Resource[A]) =
+  def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]) =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
 }
