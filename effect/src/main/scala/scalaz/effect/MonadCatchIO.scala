@@ -16,6 +16,27 @@ sealed trait MonadCatchIOFunctions {
           
   import scalaz.syntax.monad._
 
+ /**
+   * Executes the handler for exceptions that are raised and match the given predicate.
+   * Other exceptions are rethrown.
+   */
+  def catchSome[M[_]: MonadCatchIO, A, B](ma: M[A])(p: Throwable => Option[B], handler: B => M[A]): M[A] =
+    except(ma)(e => p(e) match {
+      case Some(z) => handler(z)
+      case None => throw e
+    })
+
+  /**
+   * Returns a disjunction result which is right if no exception was raised, or left if an
+   * exception was raised.
+   */
+  def catchLeft[M[_]: MonadCatchIO, A](ma: M[A]): M[Throwable \/ A] =
+    except(ma.map(\/.right[Throwable, A]))(t => \/.left[Throwable, A](t).point[M])
+
+  /** Like "catchLeft" but takes a predicate to select which exceptions are caught. */
+  def catchSomeLeft[M[_]: MonadCatchIO, A, B](ma: M[A])(p: Throwable => Option[B]): M[B \/ A] =
+    catchLeft(ma) map (_.leftMap(e => p(e).getOrElse(throw e)))
+
   /**Like "finally", but only performs the final action if there was an exception. */
   def onException[M[_]: MonadCatchIO, A, B](ma: M[A], action: M[B]): M[A] = 
     except(ma)(e ⇒
@@ -48,5 +69,10 @@ sealed trait MonadCatchIOFunctions {
       a ← before
       r ← onException(during(a), after(a))
     } yield r      
+
+  /** An automatic resource management. */
+  def using[M[_]: MonadCatchIO, A, B](ma: M[A])(f: A => M[B])(implicit resource: Resource[A]) =
+    bracket(ma)(resource.close(_).liftIO[M])(f)
+
 }
 
