@@ -7,6 +7,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   import collection.generic.CanBuildFrom
   import collection.immutable.IndexedSeq
   import Leibniz.===
+  import Liskov.<~<
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
@@ -62,8 +63,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def traverseS_[S, B](f: A => State[S, B]): State[S, Unit] = F.traverseS_(self)(f)
   final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(G)
   final def sequenceS_[S, B](implicit ev: A === State[S,B]): State[S,Unit] = F.sequenceS_(ev.subst[F](self))
-  final def sequenceF_[M[_],B](implicit ev: A === Free[M,B]): Free[M,Unit] = F.sequenceF_(ev.subst[F](self))
-  ////
+  def sequenceF_[M[_],B](implicit ev: F[A] <~< F[Free[M,B]]): Free[M, Unit] = F.sequenceF_(ev(self))
 }
 
 sealed trait ToFoldableOps0 {
