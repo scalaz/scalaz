@@ -27,10 +27,17 @@ object MonadIO {
       implicit def L = M0
     }
 
-  private[scalaz] def fromLiftIO[F[_]: LiftIO: Monad]: MonadIO[F] = new MonadIO[F] {
-    def point[A](a: => A) = Monad[F].point(a)
-    def bind[A, B](fa: F[A])(f: A => F[B]) = Monad[F].bind(fa)(f)
-    def liftIO[A](ioa: IO[A]) = LiftIO[F].liftIO(ioa)
+  private[scalaz] trait FromLiftIO[F[_]] extends MonadIO[F] {
+    def FM: Monad[F]
+    def FLO: LiftIO[F]
+    def point[A](a: => A) = FM.point(a)
+    def bind[A, B](fa: F[A])(f: A => F[B]) = FM.bind(fa)(f)
+    def liftIO[A](ioa: IO[A]) = FLO.liftIO(ioa)
+  }
+
+  private[scalaz] def fromLiftIO[F[_]: LiftIO: Monad]: MonadIO[F] = new FromLiftIO[F] {
+    def FM = Monad[F]
+    def FLO = LiftIO[F]
   }
 
   implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[({type λ[α]=IdT[F, α]})#λ]
