@@ -17,7 +17,10 @@ trait LiftIO[F[_]]  { self =>
   val liftIOSyntax = new scalaz.syntax.effect.LiftIOSyntax[F] { def F = LiftIO.this }
 }
 
-trait LiftIOInstances {
+object LiftIO {
+  @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
+
+  ////
   implicit def idTLiftIO[F[_]: LiftIO] = new LiftIO[({type λ[α]=IdT[F, α]})#λ] {
     def liftIO[A](ioa: IO[A]) = IdT(LiftIO[F].liftIO(ioa))
   }
@@ -49,12 +52,6 @@ trait LiftIOInstances {
   implicit def stateTLiftIO[F[_]: LiftIO, S] = new LiftIO[({type λ[α]=StateT[F, S, α]})#λ] {
     def liftIO[A](ioa: IO[A]) = StateT(s => LiftIO[F].liftIO(ioa.map((s, _))))
   }
-}
 
-object LiftIO extends LiftIOInstances {
-  @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
-
-  ////
-  
   ////
 }

@@ -15,7 +15,18 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] { def F = MonadIO.this }
 }
 
-trait MonadIOInstances {
+object MonadIO {
+  @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
+
+  ////
+
+  // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
+  implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
+    new MonadIO[({type λ[α] = RegionT[S, M, α]})#λ] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
+      implicit def M = M0
+      implicit def L = M0
+    }
+
   private[scalaz] def fromLiftIO[F[_]: LiftIO: Monad]: MonadIO[F] = new MonadIO[F] {
     def point[A](a: => A) = Monad[F].point(a)
     def bind[A, B](fa: F[A])(f: A => F[B]) = Monad[F].bind(fa)(f)
@@ -37,18 +48,6 @@ trait MonadIOInstances {
   implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[({type λ[α]=WriterT[F, W, α]})#λ]
 
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[({type λ[α]=StateT[F, S, α]})#λ]
-}
 
-object MonadIO extends MonadIOInstances {
-  @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
-
-  ////
-
-  // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
-  implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
-    new MonadIO[({type λ[α] = RegionT[S, M, α]})#λ] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
-      implicit def M = M0
-      implicit def L = M0
-    }
   ////
 }
