@@ -26,10 +26,10 @@ sealed abstract class ConstInstances {
     }
 }
 
-trait ConstFunctions {
+sealed trait ConstFunctions {
   /** A properly universally quantified constant function. */
-  def const[A](a: A): Id ~> ({type l[_] = A})#l =
-    new (Id ~> ({type l[_] = A})#l) {
-      override def apply[B](fa: B): A = a
+  def const[A](a: A): Function0 ~> ({type l[_] = A})#l =
+    new (Function0 ~> ({type l[_] = A})#l) {
+      override def apply[B](fa: Function0[B]): A = a
     }
 }

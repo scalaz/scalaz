@@ -11,7 +11,7 @@ object ConstTest extends SpecLite {
   checkAll(equal.laws[Const[Int, String]])
 
   "const functions" in {
-    "const" ! forAll { (x: Int, y: String) =>
+    "const" ! forAll { (x: Int, y: Function0[String]) =>
       const(x)(y) == x
     }
   }
