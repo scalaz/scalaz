@@ -77,6 +77,16 @@ scala> List(some(1), none).suml
 res2: Option[Int] = Some(1)
 ```
 
+## Resources
+
+Let the types speak for themselves via the [Scalaz Scaladocs](http://docs.typelevel.org/api/scalaz/)!
+
+The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
+
+The [typelevel blog](http://typelevel.org/blog/) has some great posts such as [Towards Scalaz](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
+
+[Learning Scalaz](http://eed3si9n.com/learning-scalaz/index.html) is a great series of blog posts by [Eugene Yokota](https://twitter.com/eed3si9n). Thanks, Eugene!
+
 ## Changes in Version 7
 
 Scalaz 7 represents a major reorganization of the library. We have taken a fresh look
