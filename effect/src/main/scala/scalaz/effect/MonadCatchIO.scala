@@ -74,5 +74,12 @@ sealed trait MonadCatchIOFunctions {
   def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]) =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
-}
+  implicit def KleisliMonadCatchIO[F[_], R](implicit F: MonadCatchIO[F]): MonadCatchIO[({type λ[α] = Kleisli[F, R, α]})#λ] =
+    new MonadCatchIO[({type λ[α] = Kleisli[F, R, α]})#λ] with MonadIO.FromLiftIO[({type λ[α] = Kleisli[F, R, α]})#λ] {
+      def FM = MonadIO.kleisliMonadIO[F, R]
+      def FLO = MonadIO.kleisliMonadIO[F, R]
+      def except[A](k: Kleisli[F, R, A])(h: Throwable ⇒ Kleisli[F, R, A]) =
+        Kleisli(r ⇒ F.except(k.run(r))(t ⇒ h(t).run(r)))
+    }
 
+}

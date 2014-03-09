@@ -117,7 +117,6 @@ object KleisliTest extends SpecLite {
 
   "Catchable[Kleisli]" should {
 
-    import effect.kleisliEffect
     import effect.IO
 
     type F[A] = Kleisli[IO, Int, A]
