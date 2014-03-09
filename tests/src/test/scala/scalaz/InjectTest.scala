@@ -101,7 +101,7 @@ object InjectTest extends SpecLite {
           } yield l((x ++ y ++ z).length)
 
     val res =
-      distr(test1[T](Seq("a")) >> test2[T](Seq("b")) >> test3[T](Seq("c")))
+      distr[T, Int]((test1[T](Seq("a")) >> test2[T](Seq("b")): Free[T, Int]) >> test3[T](Seq("c")))
 
     (res == Some(Return[T, Int](3))) must_===(true)
   }

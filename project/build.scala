@@ -43,18 +43,14 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  val latestScala211PreRelease = "2.11.0-M8"
   def scalaCheckVersion = "1.11.3"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.3",
-    crossScalaVersions := Seq("2.9.3", "2.10.3", latestScala211PreRelease),
+    crossScalaVersions := Seq("2.9.3", "2.10.3", "2.11.0-RC1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
-    scalaBinaryVersion in update := (
-      if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
-    ),
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
         if (sv startsWith "2.9")
@@ -184,11 +180,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0-RC5"
+      case _ => "1.0.0"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0-RC7"
+      case _ => "1.0.0"
     }
   )
 
