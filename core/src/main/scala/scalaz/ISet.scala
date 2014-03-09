@@ -485,7 +485,7 @@ sealed abstract class ISet[A] {
         balanceL(y, l.insertMin(x), r)
     }
 
-  private def merge(other: ISet[A]): ISet[A] =
+  protected def merge(other: ISet[A]): ISet[A] =
     (this, other) match {
       case (Tip(), r) => r
       case (l, Tip()) => l
