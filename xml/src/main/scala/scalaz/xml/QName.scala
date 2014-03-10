@@ -104,16 +104,15 @@ trait QNames {
 
   import std.AllInstances._
 
-  implicit val QNameEqual: Equal[QName] = new Equal[QName] {
-    def equal(q1: QName, q2: QName) =
-      Equal.equalBy[QName, (Str, Option[Str], Option[Str])](q => (q.name, q.uri, q.prefix)).equal(q1, q2)
-  }
-
   implicit val QNameOrder: Order[QName] = new Order[QName] {
     def order(q1: QName, q2: QName) =
-      (q1.uri, q2.uri) match {
-        case (None, None) => Order[Option[Str]].order(q1.prefix, q2.prefix)
-        case (u1, u2) => Order[Option[Str]].order(u1, u2)
+      Order[Str].order(q1.name, q2.name) match {
+        case Ordering.EQ =>
+          (q1.uri, q2.uri) match {
+            case (None, None) => Order[Option[Str]].order(q1.prefix, q2.prefix)
+            case (u1, u2) => Order[Option[Str]].order(u1, u2)
+          }
+        case x => x
       }
   }
 
