@@ -41,7 +41,7 @@ object Yoneda {
     }
 
   /** `F[A]` converts to `Yoneda[F,A]` for any functor `F` */
-  def apply[F[_]:Functor,A](fa: F[A]) = new Yoneda[F,A] {
+  def apply[F[_]:Functor,A](fa: F[A]): Yoneda[F, A] = new Yoneda[F, A] {
     def apply[B](f: A => B) = Functor[F].map(fa)(f)
   }
 
