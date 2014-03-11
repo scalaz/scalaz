@@ -46,7 +46,7 @@ abstract class Coyoneda[F[_], A] { coyo =>
 object Coyoneda extends CoyonedaInstances {
 
   /** `F[A]` converts to `Coyoneda[F,A]` for any `F` */
-  def apply[F[_],A](fa: F[A]) = new Coyoneda[F,A] {
+  def apply[F[_],A](fa: F[A]): Coyoneda[F, A] = new Coyoneda[F, A] {
     type I = A
     def k(a: A) = a
     val fi = fa
