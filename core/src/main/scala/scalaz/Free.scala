@@ -5,6 +5,7 @@ import Free._
 // See explanation in comments on function1CovariantByName
 import std.function.{function1Covariant => _, function1CovariantByName, _}
 import std.tuple._
+import Liskov.<~<
 
 // TODO report compiler bug when this appears just above FreeInstances:
 //      "java.lang.Error: typeConstructor inapplicable for <none>"
@@ -65,15 +66,30 @@ sealed abstract class Free[S[_], A] {
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Free[T, A] =
     resume match {
-      case -\/(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
+      case -\/(s) => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
       case \/-(r) => Return(r)
     }
+
+  /** Changes the inner type constructor in a free functor. */
+  final def mapSuspensionC[F[_], G[_]](f: F ~> G)(implicit ev: this.type <~< FreeC[F, A]): FreeC[G, A] = {
+    type CF[A] = Coyoneda[F, A]
+    type CG[A] = Coyoneda[G, A]
+    ev(this).mapSuspension(new (CF ~> CG) {
+      def apply[X](c: CF[X]): CG[X] = c.trans(f)
+    })
+  }
 
   /** Modifies the first suspension with the given natural transformation. */
   final def mapFirstSuspension(f: S ~> S)(implicit S: Functor[S]): Free[S, A] = resume match {
     case -\/(s) => Suspend(f(s))
     case \/-(r) => Return(r)
   }
+
+  /** Drops out of a free functor. */
+  final def unliftC[F[_]](implicit f: Functor[F], ev: this.type <~< FreeC[F, A]): Free[F, A] =
+    ev(this).mapSuspension(new (({type λ[x] = Coyoneda[F, x]})#λ ~> F) {
+      def apply[X](c: ({type λ[x] = Coyoneda[F, x]})#λ[X]): F[X] = c.run
+    })
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
   final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): C =
@@ -315,6 +331,10 @@ trait FreeFunctions {
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
     liftF(MA(value))(MA.TC)
+
+  /** A free monad over a free functor of `S`. */
+  def liftFC[S[_], A](s: S[A]): FreeC[S, A] =
+    liftFU(Coyoneda(s))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =

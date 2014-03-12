@@ -57,6 +57,15 @@ object FreeTest extends SpecLite {
     checkAll(equal.laws[FreeOneAndOpt[Int]])
   }
 
+  "Coyoneda suspension" in {
+    import Free._
+    val a: FreeC[Set, Int] = liftFC(Set(4))
+    val b: FreeC[List, Int] = a.mapSuspensionC(new (Set ~> List) {
+      def apply[A](s: Set[A]) = s.toList
+    })
+    val c: Free[List, Int] = b.unliftC
+  }
+
   object instances {
     def monad[F[_]: Functor] = Monad[({type λ[α] = Free[F, α]})#λ]
     def foldable[F[_]: Foldable: Functor] = Foldable[({type λ[α] = Free[F, α]})#λ]
