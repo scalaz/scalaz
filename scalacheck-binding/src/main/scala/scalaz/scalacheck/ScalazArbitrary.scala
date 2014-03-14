@@ -193,7 +193,7 @@ object ScalazArbitrary {
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
-  import scalaz.concurrent.Future
+  import scalaz.task.Future
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
 

@@ -1,7 +1,8 @@
-package scalaz.concurrent
+package scalaz
+package task
 
 import scalaz.{\/, SpecLite}
-import scalaz.concurrent.Task._
+import scalaz.task.Task._
 import java.util.concurrent.{ThreadFactory, Executors}
 import scala.collection.immutable.Queue
 import scala.concurrent.SyncVar

@@ -1,5 +1,5 @@
 package scalaz
-package concurrent
+package task
 
 import scala.annotation.tailrec
 import scala.collection.immutable.SortedMap

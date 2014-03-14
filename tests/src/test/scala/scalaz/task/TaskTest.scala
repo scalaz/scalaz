@@ -1,5 +1,5 @@
 package scalaz
-package concurrent
+package task
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
@@ -129,7 +129,7 @@ object TaskTest extends SpecLite {
 
 
   "Nondeterminism[Task]" should {
-    import scalaz.concurrent.Task._
+    import scalaz.task.Task._
     val es = Executors.newFixedThreadPool(1)
     val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
