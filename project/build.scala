@@ -301,7 +301,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, task, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
