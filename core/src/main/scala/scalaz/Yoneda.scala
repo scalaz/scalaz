@@ -107,4 +107,28 @@ object Coyoneda {
       def map[A,B](ya: Coyoneda[F,A])(f: A => B) = ya map f
     }
 
+  type CoyonedaF[F[_]] = ({type A[α] = Coyoneda[F, α]})
+
+  import Isomorphism._
+
+  def iso[F[_]: Functor]: CoyonedaF[F]#A <~> F =
+    new IsoFunctorTemplate[CoyonedaF[F]#A, F] {
+      def from[A](fa: F[A]) = lift(fa)
+      def to[A](fa: Coyoneda[F, A]) = fa.run
+    }
+
+  /** Turns a natural transformation F ~> G into CF ~> G */
+  def liftTF[F[_], G[_]: Functor](fg: F ~> G): CoyonedaF[F]#A ~> G = {
+    type CF[A] = Coyoneda[F, A]
+    type CG[A] = Coyoneda[G, A]
+    val m: (CF ~> CG) = liftT(fg)
+    val n: (CG ~> G) = iso[G].to
+    n compose m
+  }
+
+  /** Turns a natural transformation F ~> G into CF ~> CG */
+  def liftT[F[_], G[_]](fg: F ~> G): CoyonedaF[F]#A ~> CoyonedaF[G]#A =
+    new (CoyonedaF[F]#A ~> CoyonedaF[G]#A) {
+      def apply[A](c: Coyoneda[F, A]) = lift(fg(c.fi)).map(c.k)
+    }
 }
