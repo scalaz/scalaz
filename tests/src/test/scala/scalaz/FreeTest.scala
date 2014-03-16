@@ -59,11 +59,10 @@ object FreeTest extends SpecLite {
 
   "Coyoneda suspension" in {
     import Free._
+    import Coyoneda._
     val a: FreeC[Set, Int] = liftFC(Set(4))
-    val b: FreeC[List, Int] = a.mapSuspensionC(new (Set ~> List) {
-      def apply[A](s: Set[A]) = s.toList
-    })
-    val c: Free[List, Int] = b.unliftC
+    val f: Set ~> List = new (Set ~> List) { def apply[A](s: Set[A]) = s.toList }
+    val b: Free[List, Int] = a.mapSuspension(liftTF(f))
   }
 
   object instances {
