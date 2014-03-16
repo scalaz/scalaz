@@ -52,13 +52,31 @@ object Coyoneda extends CoyonedaInstances {
     val fi = fa
   }
 
+  type CoyonedaF[F[_]] = ({type A[α] = Coyoneda[F, α]})
+
   import Isomorphism._
 
-  def iso[F[_]: Functor]: ({type λ[α] = Coyoneda[F, α]})#λ <~> F =
-    new IsoFunctorTemplate[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  def iso[F[_]: Functor]: CoyonedaF[F]#A <~> F =
+    new IsoFunctorTemplate[CoyonedaF[F]#A, F] {
       def from[A](fa: F[A]) = Coyoneda(fa)
       def to[A](fa: Coyoneda[F, A]) = fa.run
     }
+
+  /** Turns a natural transformation F ~> G into CF ~> G */
+  def liftTF[F[_], G[_]: Functor](fg: F ~> G): CoyonedaF[F]#A ~> G = {
+    type CF[A] = Coyoneda[F, A]
+    type CG[A] = Coyoneda[G, A]
+    val m: (CF ~> CG) = liftT(fg)
+    val n: (CG ~> G) = iso[G].to
+    n compose m
+  }
+
+  /** Turns a natural transformation F ~> G into CF ~> CG */
+  def liftT[F[_], G[_]](fg: F ~> G): CoyonedaF[F]#A ~> CoyonedaF[G]#A =
+    new (CoyonedaF[F]#A ~> CoyonedaF[G]#A) {
+      def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
+    }
+
 }
 
 sealed abstract class CoyonedaInstances extends CoyonedaInstances0 {

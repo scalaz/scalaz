@@ -65,7 +65,7 @@ sealed abstract class Free[S[_], A] {
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Free[T, A] =
     resume match {
-      case -\/(s)  => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
+      case -\/(s) => Suspend(f(S.map(s)(((_: Free[S, A]) mapSuspension f))))
       case \/-(r) => Return(r)
     }
 
@@ -315,6 +315,10 @@ trait FreeFunctions {
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
     liftF(MA(value))(MA.TC)
+
+  /** A free monad over a free functor of `S`. */
+  def liftFC[S[_], A](s: S[A]): FreeC[S, A] =
+    liftFU(Coyoneda(s))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
