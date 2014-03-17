@@ -1,4 +1,5 @@
-package scalaz.concurrent
+package scalaz
+package task
 
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
@@ -9,6 +10,7 @@ import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.\/._
+import scalaz.concurrent.{Actor, Strategy}
 
 import collection.JavaConversions._
 import scala.concurrent.duration._

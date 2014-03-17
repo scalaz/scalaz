@@ -174,7 +174,7 @@ object build extends Build {
       excludedProjects in unidoc in ScalaUnidoc += "typelevel",
       publishArtifact := false
     ),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, task, tests, typelevel, xml)
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
@@ -246,6 +246,16 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
+  lazy val task = Project(
+    id = "task",
+    base = file("task"),
+    settings = standardSettings ++ Seq[Sett](
+      name := "scalaz-task",
+      osgiExport("scalaz.task")
+    ),
+    dependencies = Seq(core, concurrent)
+  )
+
   lazy val typelevel = Project(
     id = "typelevel",
     base = file("typelevel"),
@@ -280,7 +290,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
+    dependencies = Seq(core, concurrent, task, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
@@ -291,7 +301,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, task, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
