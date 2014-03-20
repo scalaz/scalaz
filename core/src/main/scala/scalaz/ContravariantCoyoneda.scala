@@ -29,7 +29,7 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   type I
 
   /** The underlying value. */
-  implicit val fi: F[I]
+  val fi: F[I]
 
   /** The transformer function, to be lifted into `F` by `run`. */
   val k: A => I
@@ -37,7 +37,7 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   import ContravariantCoyoneda.{Aux, apply}
 
   /** Converts to `F[A]` given that `F` is a contravariant. */
-  implicit final def run(implicit F: Contravariant[F]): F[A] =
+  final def run(implicit F: Contravariant[F]): F[A] =
     F.contramap(fi)(k)
 
   /** Alias for `run`. */
@@ -46,10 +46,10 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   /** Simple function composition. Allows map fusion without touching
     * the underlying `F`.
     */
-  final def contramap[B](f: B => A): Aux[F, B, I] = apply(k compose f)
+  final def contramap[B](f: B => A): Aux[F, B, I] = apply(fi)(k compose f)
 
   /** Natural transformation. */
-  final def trans[G[_]](f: F ~> G): Aux[G, A, I] = apply(k)(f(fi))
+  final def trans[G[_]](f: F ~> G): Aux[G, A, I] = apply(f(fi))(k)
 }
 
 sealed abstract class ContravariantCoyonedaInstances {
@@ -77,7 +77,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
   /** See `by` method. */
   final class By[F[_]] {
     @inline def apply[A, B](k: A => B)(implicit F: F[B]): Aux[F, A, B] =
-      ContravariantCoyoneda(k)
+      ContravariantCoyoneda(F)(k)
   }
 
   /** Partial application of type parameters to `apply`.  It is often
@@ -86,17 +86,17 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
     */
   @inline def by[F[_]]: By[F] = new By[F]
 
-  /** Like `lift(F).contramap(_k)`. */
-  def apply[F[_], A, B](_k: A => B)(implicit F: F[B]): Aux[F, A, B] =
+  /** Like `lift(fa).contramap(_k)`. */
+  def apply[F[_], A, B](fa: F[B])(_k: A => B): Aux[F, A, B] =
     new ContravariantCoyoneda[F, A]{
       type I = B
       val k = _k
-      val fi = F
+      val fi = fa
     }
 
   /** `F[A]` converts to `ContravariantCoyoneda[F,A]` for any `F`. */
   def lift[F[_], A](fa: F[A]): ContravariantCoyoneda[F, A] =
-    apply(conforms[A])(fa)
+    apply(fa)(conforms[A])
 
   import Isomorphism._
 

@@ -32,10 +32,10 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
 
   /** Simple function composition. Allows map fusion without touching the underlying `F`. */
   final def map[B](f: A => B): Aux[F, B, I] =
-    apply(f compose k)(fi)
+    apply(fi)(f compose k)
 
   final def trans[G[_]](f: F ~> G): Aux[G, A, I] =
-    apply(k)(f(fi))
+    apply(f(fi))(k)
 
   import Id._
 
@@ -54,26 +54,26 @@ object Coyoneda extends CoyonedaInstances {
   type Aux[F[_], A, B] = Coyoneda[F, A] {type I = B}
 
   /** `F[A]` converts to `Coyoneda[F,A]` for any `F` */
-  def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(conforms[A])(fa)
+  def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(fa)(conforms[A])
 
   /** See `by` method. */
   final class By[F[_]] {
     @inline def apply[A, B](k: A => B)(implicit F: F[A]): Aux[F, B, A] =
-      Coyoneda(k)(F)
+      Coyoneda(F)(k)
   }
 
   /** Partial application of type parameters to `apply`.  It is often
     * more convenient to invoke `Coyoneda.by[F]{x: X => ...}` then
-    * `Coyoneda[...]{x: X => ...}`.
+    * `Coyoneda[...](...){x => ...}`.
     */
   @inline def by[F[_]]: By[F] = new By[F]
 
-  /** Like `lift(F).map(_k)`. */
-  def apply[F[_], A, B](_k: A => B)(implicit F: F[A]): Aux[F, B, A] =
+  /** Like `lift(fa).map(_k)`. */
+  def apply[F[_], A, B](fa: F[A])(_k: A => B): Aux[F, B, A] =
     new Coyoneda[F, B]{
       type I = A
       val k = _k
-      val fi = F
+      val fi = fa
     }
 
   type CoyonedaF[F[_]] = ({type A[α] = Coyoneda[F, α]})
