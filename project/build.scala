@@ -59,7 +59,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-RC1"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0-RC3"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
@@ -229,11 +229,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0"
+      case _ => "1.0.1"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0"
+      case _ => "1.0.1"
     }
   )
 
