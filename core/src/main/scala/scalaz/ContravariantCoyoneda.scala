@@ -72,7 +72,8 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
   type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] {type I = B}
 
   /** Curried `ContravariantCoyoneda` type constructor. */
-  type ContravariantCoyonedaF[F[_]] = ({type A[α] = ContravariantCoyoneda[F, α]})
+  type ContravariantCoyonedaF[F[_]] =
+    ({type A[α] = ContravariantCoyoneda[F, α]})
 
   /** See `by` method. */
   final class By[F[_]] {
@@ -82,7 +83,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   /** Partial application of type parameters to `apply`.  It is often
     * more convenient to invoke `ContravariantCoyoneda.by[F]{x: X =>
-    * ...}` then `ContravariantCoyoneda[...]{x: X => ...}`.
+    * ...}` then `ContravariantCoyoneda[...](...){x: X => ...}`.
     */
   @inline def by[F[_]]: By[F] = new By[F]
 

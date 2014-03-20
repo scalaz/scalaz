@@ -30,7 +30,9 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
     def apply[B](f: A => B) = F.map(fi)(k andThen f)
   }
 
-  /** Simple function composition. Allows map fusion without touching the underlying `F`. */
+  /** Simple function composition. Allows map fusion without touching
+    * the underlying `F`.
+    */
   final def map[B](f: A => B): Aux[F, B, I] =
     apply(fi)(f compose k)
 
