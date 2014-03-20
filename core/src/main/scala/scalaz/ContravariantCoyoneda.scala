@@ -1,16 +1,21 @@
 package scalaz
 
-/** Decomposition of `fa.contramap(liftee)` into its components, as
-  * it is frequently convenient to apply `liftee` separately from
-  * sorting or whatever process with `fa`, even when `B` is
-  * unknown, which is very common.
+/** Decomposition of `fi.contramap(k)` into its components, as it is
+  * frequently convenient to apply `k` separately from sorting or
+  * whatever process with `fi`, even when `B` is unknown, which is
+  * very common.
+  * 
+  * This is isomorphic to `F` as long as `F` itself is a contravariant
+  * functor.  The homomorphism from `F[A]` to
+  * `ContravariantCoyoneda[F,A]` exists even when `F` is not a
+  * contravariant functor.
   *
   * The pattern for `ContravariantCoyoneda` over `F`s like `Order` of
-  * running `liftee` across the list, doing the sort, and then
-  * dropping the `liftee` value is encoded in the `schwartzian*`
-  * members.  Their use derives from their type.  See the test
-  * "Schwartzian-transformed sort equals normal sort" in
-  * `ContravariantCoyonedaTest.scala` for a demonstration.
+  * running `k` across the list, doing the sort, and then dropping the
+  * `k` value is encoded in the `schwartzian*` members.  Their use
+  * derives from their type.  See the test "Schwartzian-transformed
+  * sort equals normal sort" in `ContravariantCoyonedaTest.scala` for
+  * a demonstration.
   *
   * As `ContravariantCoyoneda(identity)(o).unlift` = `o`, further
   * factoring can occur as follows, for free:
@@ -22,49 +27,82 @@ package scalaz
   *
   * @see http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html
   */
-sealed abstract class ContravariantCoyoneda[F[_], A] {
-  type B
-  val liftee: A => B
-  implicit val fa: F[B]
+sealed abstract class ContravariantCoyoneda[F[_], A] { coyo =>
+  type I
+  val k: A => I
+  implicit val fi: F[I]
 
-  implicit final def unlift(implicit F: Contravariant[F]): F[A] =
-    F.contramap(fa)(liftee)
+  import ContravariantCoyoneda.{Aux, apply}
 
-  @inline final def schwartzianPre: A => (B, A) = a => (liftee(a), a)
-  @inline final def schwartzianPost: ((B, A)) => A = _._2
+  /** Converts to `F[A]` given that `F` is a contravariant. */
+  implicit final def run(implicit F: Contravariant[F]): F[A] =
+    F.contramap(fi)(k)
+
+  @inline final def schwartzianPre: A => (I, A) = a => (k(a), a)
+  @inline final def schwartzianPost: ((I, A)) => A = _._2
   @inline final implicit def schwartzianOrder(implicit F: Contravariant[F])
-      : F[(B, A)] = F.contramap(fa)(_._1)
+      : F[(I, A)] = F.contramap(fi)(_._1)
 
-  override final def toString = s"ContravariantCoyoneda(${liftee})(${fa})"
+  /** Simple function composition. Allows map fusion without touching
+    * the underlying `F`.
+    */
+  final def contramap[B](f: B => A): Aux[F, B, I] = apply(k compose f)
+
+  /** Natural transformation. */
+  final def trans[G[_]](f: F ~> G): Aux[G, A, I] = apply(k)(f(fi))
 }
 
-object ContravariantCoyoneda {
-  /** Lift the `B` type member to a parameter.  It is usually more
+sealed abstract class ContravariantCoyonedaInstances {
+  import ContravariantCoyoneda.ContravariantCoyonedaF
+
+  /** `ContravariantCoyoneda[F,_]` is a contravariant functor for any
+    * `F`.
+    */
+  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyonedaF[F]#A] =
+    new Contravariant[ContravariantCoyonedaF[F]#A] {
+      def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
+        fa contramap f
+    }
+}
+
+object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
+  /** Lift the `I` type member to a parameter.  It is usually more
     * convenient to use `Aux` than a structural type.
     */
-  type Aux[F[_], A, B0] = ContravariantCoyoneda[F, A] {type B = B0}
+  type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] {type I = B}
 
-  /** See `on` method. */
-  final class On[F[_]] {
-    @inline def apply[A, B0](liftee: A => B0)(implicit F: F[B0]): Aux[F, A, B0] =
-      ContravariantCoyoneda.apply[F, A, B0](liftee)
+  /** Curried `ContravariantCoyoneda` type constructor. */
+  type ContravariantCoyonedaF[F[_]] = ({type A[α] = ContravariantCoyoneda[F, α]})
+
+  /** See `by` method. */
+  final class By[F[_]] {
+    @inline def apply[A, B](k: A => B)(implicit F: F[B]): Aux[F, A, B] =
+      ContravariantCoyoneda(k)
   }
 
   /** Partial application of type parameters to `apply`.  It is often
-    * more convenient to invoke `ContravariantCoyoneda.on[F]{x: X =>
+    * more convenient to invoke `ContravariantCoyoneda.by[F]{x: X =>
     * ...}` then `ContravariantCoyoneda[...]{x: X => ...}`.
     */
-  @inline def on[F[_]]: On[F] = new On[F]
+  @inline def by[F[_]]: By[F] = new By[F]
 
-  /** Create a new instance. */
-  def apply[F[_], A, B0](_liftee: A => B0)(implicit F: F[B0]): Aux[F, A, B0] =
+  /** Like `lift(F).contramap(_k)`. */
+  def apply[F[_], A, B](_k: A => B)(implicit F: F[B]): Aux[F, A, B] =
     new ContravariantCoyoneda[F, A]{
-      type B = B0
-      val liftee = _liftee
-      val fa = F
+      type I = B
+      val k = _k
+      val fi = F
     }
 
-  /** Like `ContravariantCoyoneda(identity)(inst)`. */
+  /** `F[A]` converts to `ContravariantCoyoneda[F,A]` for any `F`. */
   def lift[F[_], A](implicit F: F[A]): ContravariantCoyoneda[F, A] =
     apply(conforms[A])(F)
+
+  import Isomorphism._
+
+  def iso[F[_]: Contravariant]: ContravariantCoyonedaF[F]#A <~> F =
+    new IsoFunctorTemplate[ContravariantCoyonedaF[F]#A, F] {
+      def from[A](fa: F[A]) = lift(fa)
+      def to[A](fa: ContravariantCoyoneda[F, A]) = fa.run
+    }
 }

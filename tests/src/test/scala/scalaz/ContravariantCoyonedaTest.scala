@@ -9,11 +9,11 @@ import std.string._
 import std.tuple._
 
 object ContravariantCoyonedaGens {
-  val CtCoOrder = ContravariantCoyoneda.on[Order]
+  val CtCoOrder = ContravariantCoyoneda.by[Order]
   type CtCoOrder[A] = ContravariantCoyoneda[Order, A]
 
   def cmappedOrderLaws[A: Arbitrary](co: CtCoOrder[A]) = {
-    import co.unlift
+    import co.run
     scalaz.scalacheck.ScalazProperties.order.laws[A]
   }
 
@@ -46,13 +46,13 @@ object ContravariantCoyonedaTest extends SpecLite {
 
   "contravariant identity law" ! forAll {(xs: List[Int]) =>
     val co = CtCoOrder(conforms[Int])
-    xs.sorted(co.unlift.toScalaOrdering) must_=== xs.sorted
+    xs.sorted(co.run.toScalaOrdering) must_=== xs.sorted
   }
 
   "Schwartzian-transformed sort equals normal sort" ! forAll{
     (xs: List[Int], o: CtCoOrder[Int]) =>
     xs.map(o.schwartzianPre)
       .sorted(o.schwartzianOrder.toScalaOrdering)
-      .map(o.schwartzianPost) must_=== xs.sorted(o.unlift.toScalaOrdering)
+      .map(o.schwartzianPost) must_=== xs.sorted(o.run.toScalaOrdering)
   }
 }
