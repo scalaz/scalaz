@@ -7,8 +7,13 @@ package scalaz
  * `F` is not a functor.
  */
 abstract class Coyoneda[F[_], A] { coyo =>
+  /** The pivot between `fi` and `k`, usually existential. */
   type I
+
+  /** The underlying value. */
   def fi: F[I]
+
+  /** The transformer function, to be lifted into `F` by `run`. */
   def k(i: I): A
 
   /** Converts to `F[A]` given that `F` is a functor */

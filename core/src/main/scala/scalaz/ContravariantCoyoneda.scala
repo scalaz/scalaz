@@ -28,8 +28,13 @@ package scalaz
   * @see http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html
   */
 sealed abstract class ContravariantCoyoneda[F[_], A] {
+  /** The pivot between `fi` and `k`, usually existential. */
   type I
+
+  /** The underlying value. */
   implicit val fi: F[I]
+
+  /** The transformer function, to be lifted into `F` by `run`. */
   val k: A => I
 
   import ContravariantCoyoneda.{Aux, apply}
