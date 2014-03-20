@@ -40,6 +40,9 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   implicit final def run(implicit F: Contravariant[F]): F[A] =
     F.contramap(fi)(k)
 
+  /** Alias for `run`. */
+  @inline final def unlift(implicit F: Contravariant[F]): F[A] = run
+
   /** Simple function composition. Allows map fusion without touching
     * the underlying `F`.
     */
@@ -92,8 +95,8 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
     }
 
   /** `F[A]` converts to `ContravariantCoyoneda[F,A]` for any `F`. */
-  def lift[F[_], A](implicit F: F[A]): ContravariantCoyoneda[F, A] =
-    apply(conforms[A])(F)
+  def lift[F[_], A](fa: F[A]): ContravariantCoyoneda[F, A] =
+    apply(conforms[A])(fa)
 
   import Isomorphism._
 

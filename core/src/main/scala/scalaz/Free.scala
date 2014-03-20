@@ -318,7 +318,7 @@ trait FreeFunctions {
 
   /** A free monad over a free functor of `S`. */
   def liftFC[S[_], A](s: S[A]): FreeC[S, A] =
-    liftFU(Coyoneda(s))
+    liftFU(Coyoneda lift s)
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =

@@ -14,11 +14,7 @@ abstract class Yoneda[F[_], A] { yo =>
   def run: F[A] = apply(a => a)
 
   /** Converts to `Coyoneda[F,A]` even without a `Functor` instance for `F` */
-  def toCoyoneda: Coyoneda[F,A] = new Coyoneda[F, A] {
-    type I = A
-    val fi = yo.run
-    def k(i: A) = i
-  }
+  def toCoyoneda: Coyoneda.Aux[F,A,A] = Coyoneda(conforms[A])(run)
 
   /** Simple function composition. Allows map fusion without traversing an `F`. */
   def map[B](f: A => B): Yoneda[F, B] = new Yoneda[F, B] {
