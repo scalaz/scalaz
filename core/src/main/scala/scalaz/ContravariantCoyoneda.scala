@@ -27,7 +27,7 @@ package scalaz
   *
   * @see http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html
   */
-sealed abstract class ContravariantCoyoneda[F[_], A] { coyo =>
+sealed abstract class ContravariantCoyoneda[F[_], A] {
   type I
   implicit val fi: F[I]
   val k: A => I
