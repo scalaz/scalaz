@@ -10,12 +10,9 @@ package scalaz
   * `ContravariantCoyoneda[F,A]` exists even when `F` is not a
   * contravariant functor.
   *
-  * The pattern for `ContravariantCoyoneda` over `F`s like `Order` of
-  * running `k` across the list, doing the sort, and then dropping the
-  * `k` value is encoded in the `schwartzian*` members.  Their use
-  * derives from their type.  See the test "Schwartzian-transformed
-  * sort equals normal sort" in `ContravariantCoyonedaTest.scala` for
-  * a demonstration.
+  * See the test "Schwartzian-transformed sort equals normal sort" in
+  * `ContravariantCoyonedaTest.scala` for an interesting usage
+  * demonstration.
   *
   * As `ContravariantCoyoneda(identity)(o).unlift` = `o`, further
   * factoring can occur as follows, for free:
@@ -42,11 +39,6 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
   /** Converts to `F[A]` given that `F` is a contravariant. */
   implicit final def run(implicit F: Contravariant[F]): F[A] =
     F.contramap(fi)(k)
-
-  @inline final def schwartzianPre: A => (I, A) = a => (k(a), a)
-  @inline final def schwartzianPost: ((I, A)) => A = _._2
-  @inline final implicit def schwartzianOrder(implicit F: Contravariant[F])
-      : F[(I, A)] = F.contramap(fi)(_._1)
 
   /** Simple function composition. Allows map fusion without touching
     * the underlying `F`.

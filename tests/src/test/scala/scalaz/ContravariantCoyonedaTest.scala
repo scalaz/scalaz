@@ -12,6 +12,17 @@ object ContravariantCoyonedaGens {
   val CtCoOrder = ContravariantCoyoneda.by[Order]
   type CtCoOrder[A] = ContravariantCoyoneda[Order, A]
 
+  final class Schwartzian[F[_], A, FA <: ContravariantCoyoneda[F, A]](val self: FA) /*extends AnyVal*/ {
+    import self._
+    @inline def schwartzianPre: A => (I, A) = a => (k(a), a)
+    @inline def schwartzianPost: ((I, A)) => A = _._2
+    @inline def schwartzianOrder(implicit F: Contravariant[F])
+        : F[(I, A)] = F.contramap(fi)(_._1)
+  }
+
+  @inline implicit def Schwartzian[F[_], A](co: ContravariantCoyoneda[F, A])
+      : Schwartzian[F, A, co.type] = new Schwartzian(co)
+
   def cmappedOrderLaws[A: Arbitrary](co: CtCoOrder[A]) = {
     import co.run
     scalaz.scalacheck.ScalazProperties.order.laws[A]
