@@ -29,8 +29,8 @@ package scalaz
   */
 sealed abstract class ContravariantCoyoneda[F[_], A] { coyo =>
   type I
-  val k: A => I
   implicit val fi: F[I]
+  val k: A => I
 
   import ContravariantCoyoneda.{Aux, apply}
 
