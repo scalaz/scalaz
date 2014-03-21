@@ -21,7 +21,7 @@ object ContravariantCoyonedaGens {
   }
 
   @inline implicit def Schwartzian[F[_], A](co: ContravariantCoyoneda[F, A])
-      : Schwartzian[F, A, co.type] = new Schwartzian(co)
+      : Schwartzian[F, A, co.type] = new Schwartzian[F, A, co.type](co)
 
   def cmappedOrderLaws[A: Arbitrary](co: CtCoOrder[A]) = {
     implicit val ran = co.run
@@ -42,7 +42,8 @@ object ContravariantCoyonedaGens {
   }
 
   val intOrders: Gen[CtCoOrder[Int]] =
-    Gen.oneOf(aToString[Int], evensFirst, negated, probablePrime)
+    Gen.oneOf[CtCoOrder[Int]](
+      aToString[Int], evensFirst, negated, probablePrime)
 }
 
 object ContravariantCoyonedaTest extends SpecLite {
