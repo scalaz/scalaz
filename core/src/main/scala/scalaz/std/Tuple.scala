@@ -365,32 +365,41 @@ private[scalaz] trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {
 private[scalaz] trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
   implicit def _1 : Semigroup[A1]
   implicit def _2 : Semigroup[A2]
-  def append(f1: (A1, A2), f2: => (A1, A2)) = (
+  def append(f1: (A1, A2), _f2: => (A1, A2)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2)
     )
+  }
 }
 private[scalaz] trait Tuple3Semigroup[A1, A2, A3] extends Semigroup[(A1, A2, A3)] {
   implicit def _1 : Semigroup[A1]
   implicit def _2 : Semigroup[A2]
   implicit def _3 : Semigroup[A3]
-  def append(f1: (A1, A2, A3), f2: => (A1, A2, A3)) = (
+  def append(f1: (A1, A2, A3), _f2: => (A1, A2, A3)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3)
     )
+  }
 }
 private[scalaz] trait Tuple4Semigroup[A1, A2, A3, A4] extends Semigroup[(A1, A2, A3, A4)] {
   implicit def _1 : Semigroup[A1]
   implicit def _2 : Semigroup[A2]
   implicit def _3 : Semigroup[A3]
   implicit def _4 : Semigroup[A4]
-  def append(f1: (A1, A2, A3, A4), f2: => (A1, A2, A3, A4)) = (
+  def append(f1: (A1, A2, A3, A4), _f2: => (A1, A2, A3, A4)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3),
     _4.append(f1._4, f2._4)
     )
+  }
 }
 private[scalaz] trait Tuple5Semigroup[A1, A2, A3, A4, A5] extends Semigroup[(A1, A2, A3, A4, A5)] {
   implicit def _1 : Semigroup[A1]
@@ -398,13 +407,16 @@ private[scalaz] trait Tuple5Semigroup[A1, A2, A3, A4, A5] extends Semigroup[(A1,
   implicit def _3 : Semigroup[A3]
   implicit def _4 : Semigroup[A4]
   implicit def _5 : Semigroup[A5]
-  def append(f1: (A1, A2, A3, A4, A5), f2: => (A1, A2, A3, A4, A5)) = (
+  def append(f1: (A1, A2, A3, A4, A5), _f2: => (A1, A2, A3, A4, A5)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3),
     _4.append(f1._4, f2._4),
     _5.append(f1._5, f2._5)
     )
+  }
 }
 private[scalaz] trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6] extends Semigroup[(A1, A2, A3, A4, A5, A6)] {
   implicit def _1 : Semigroup[A1]
@@ -413,7 +425,9 @@ private[scalaz] trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6] extends Semigroup[
   implicit def _4 : Semigroup[A4]
   implicit def _5 : Semigroup[A5]
   implicit def _6 : Semigroup[A6]
-  def append(f1: (A1, A2, A3, A4, A5, A6), f2: => (A1, A2, A3, A4, A5, A6)) = (
+  def append(f1: (A1, A2, A3, A4, A5, A6), _f2: => (A1, A2, A3, A4, A5, A6)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3),
@@ -421,6 +435,7 @@ private[scalaz] trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6] extends Semigroup[
     _5.append(f1._5, f2._5),
     _6.append(f1._6, f2._6)
     )
+  }
 }
 private[scalaz] trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] extends Semigroup[(A1, A2, A3, A4, A5, A6, A7)] {
   implicit def _1 : Semigroup[A1]
@@ -430,7 +445,9 @@ private[scalaz] trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] extends Semigr
   implicit def _5 : Semigroup[A5]
   implicit def _6 : Semigroup[A6]
   implicit def _7 : Semigroup[A7]
-  def append(f1: (A1, A2, A3, A4, A5, A6, A7), f2: => (A1, A2, A3, A4, A5, A6, A7)) = (
+  def append(f1: (A1, A2, A3, A4, A5, A6, A7), _f2: => (A1, A2, A3, A4, A5, A6, A7)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3),
@@ -439,6 +456,7 @@ private[scalaz] trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] extends Semigr
     _6.append(f1._6, f2._6),
     _7.append(f1._7, f2._7)
     )
+  }
 }
 private[scalaz] trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Semigroup[(A1, A2, A3, A4, A5, A6, A7, A8)] {
   implicit def _1 : Semigroup[A1]
@@ -449,7 +467,9 @@ private[scalaz] trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Se
   implicit def _6 : Semigroup[A6]
   implicit def _7 : Semigroup[A7]
   implicit def _8 : Semigroup[A8]
-  def append(f1: (A1, A2, A3, A4, A5, A6, A7, A8), f2: => (A1, A2, A3, A4, A5, A6, A7, A8)) = (
+  def append(f1: (A1, A2, A3, A4, A5, A6, A7, A8), _f2: => (A1, A2, A3, A4, A5, A6, A7, A8)) = {
+    lazy val f2 = _f2
+    (
     _1.append(f1._1, f2._1),
     _2.append(f1._2, f2._2),
     _3.append(f1._3, f2._3),
@@ -459,6 +479,7 @@ private[scalaz] trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Se
     _7.append(f1._7, f2._7),
     _8.append(f1._8, f2._8)
     )
+  }
 }
 private[scalaz] trait Tuple1Functor extends Traverse[Tuple1] {
   override def map[A, B](fa: Tuple1[A])(f: A => B) =
