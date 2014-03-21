@@ -410,9 +410,13 @@ object ContravariantCoyonedaUsage extends App {
   println("sortedByNonCityL: " |+| sortedByNonCity.shows)
 
   // Our three properties of Order listed under "Products" now come
-  // into play.  That `unitOrd' doesn't change behavior of the sort,
-  // combined with the free theorems of `ordFanout', means that we can
-  // build a lawful monoid from those two functions.
+  // into play, in addition to a fourth.
+  //
+  // 4. There exists a lawful `InvariantFunctor' instance for `Order'.
+  //
+  // That `unitOrd' doesn't change behavior of the sort, combined with
+  // the 4th property and the free theorems of `ordFanout', means that
+  // we can build a lawful monoid from those two functions.
 
   implicit def ctCoyoOrdMonoid[A]: Monoid[CtCoyo[Order, A]] =
     Monoid instance (ordFanout(_, _), unitOrd)
@@ -426,7 +430,7 @@ object ContravariantCoyonedaUsage extends App {
   // "But how can this follow the monoid laws; it isn't associative
   // because `I' changes depending on the order of the fold!"  Well,
   // you're not allowed to care about that under the rules of
-  // parametricity [2], just like you're not allowed to test stack
+  // parametricity [3], just like you're not allowed to test stack
   // depth in a function and claim that the changing results means the
   // functor identity law is violated for `Function1'.  It's *some*
   // `I', and that's all you get.  Nothing that actually knows how to
@@ -450,7 +454,7 @@ object ContravariantCoyonedaUsage extends App {
   // components, and we get it all back and merge the results.
   //
   // There are various type-safe binary format libraries, such as
-  // scodec [3] and f0 [4].  Let's simulate one of those.  Never mind
+  // scodec [4] and f0 [5].  Let's simulate one of those.  Never mind
   // that this is phantom; assume that serialization and
   // deserialization methods are defined:
 
@@ -475,8 +479,11 @@ object ContravariantCoyonedaUsage extends App {
   }
 
   // A bidirectional formatter, unlike `Order', does not have a
-  // `Contravariant' instance.  But that doesn't matter; contravariant
-  // coyoneda does all the work.
+  // `Contravariant' instance.  (Bidirectional formatters have
+  // InvariantFunctor instances, but that's only necessary to satisfy
+  // [2], so we don't bother defining one for Binfmt.)  Whether your
+  // `F' is contravariant is irrelevant; contravariant coyoneda does
+  // all the work.
   //
   // Previously, we proved at every step that we had a function and an
   // Order that lined up.  Now, we need a function, Order, *and*
@@ -552,7 +559,9 @@ object ContravariantCoyonedaUsage extends App {
   println("finalsort: " |+| finalsort.shows)
 
   // [1] https://en.wikipedia.org/wiki/Schwartzian_transform
-  // [2] http://failex.blogspot.com/2013/06/fake-theorems-for-free.html
-  // [3] https://github.com/scodec/scodec
-  // [4] https://github.com/joshcough/f0
+  // [2] Without the additional 4th property, it would be possible for
+  //     a GADT-style Order to violate the associativity monoid law.
+  // [3] http://failex.blogspot.com/2013/06/fake-theorems-for-free.html
+  // [4] https://github.com/scodec/scodec
+  // [5] https://github.com/joshcough/f0
 }
