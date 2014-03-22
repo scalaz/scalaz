@@ -282,9 +282,9 @@ object ContravariantCoyonedaUsage extends App {
   // 2. There's an Order[Unit], O_∅.
   //
   // 3. O_∅ is a left and right identity for the product operator,
-  //    O_×; `Order[(A, Unit)]' and `Order[(Unit, A)]', constructed
-  //    from O_∅ and O_×, have the same sort behavior as the
-  //    underlying Order[A]; i.e.
+  //    O_×; i.e. `Order[(A, Unit)]' and `Order[(Unit, A)]',
+  //    constructed from O_∅ and O_×, have the same sort behavior as
+  //    the underlying Order[A].
   //
   // Given that, we can produce a contravariant Coyoneda order product
   // function that feeds the value under consideration to both
