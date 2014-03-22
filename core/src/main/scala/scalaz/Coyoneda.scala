@@ -6,32 +6,38 @@ package scalaz
  * The homomorphism from `F[A]` to `Coyoneda[F,A]` exists even when
  * `F` is not a functor.
  */
-abstract class Coyoneda[F[_], A] { coyo =>
+sealed abstract class Coyoneda[F[_], A] { coyo =>
+  /** The pivot between `fi` and `k`, usually existential. */
   type I
-  def fi: F[I]
-  def k(i: I): A
+
+  /** The underlying value. */
+  val fi: F[I]
+
+  /** The transformer function, to be lifted into `F` by `run`. */
+  val k: I => A
+
+  import Coyoneda.{Aux, apply}
 
   /** Converts to `F[A]` given that `F` is a functor */
-  def run(implicit F: Functor[F]): F[A] =
+  final def run(implicit F: Functor[F]): F[A] =
     F.map(fi)(k)
 
+  /** Alias for `run`. */
+  @inline final def unlift(implicit F: Functor[F]): F[A] = run
+
   /** Converts to `Yoneda[F,A]` given that `F` is a functor */
-  def toYoneda(implicit F: Functor[F]): Yoneda[F, A] = new Yoneda[F, A] {
-    def apply[B](f: A => B) = F.map(fi)(k _ andThen f)
+  final def toYoneda(implicit F: Functor[F]): Yoneda[F, A] = new Yoneda[F, A] {
+    def apply[B](f: A => B) = F.map(fi)(k andThen f)
   }
 
-  /** Simple function composition. Allows map fusion without touching the underlying `F`. */
-  def map[B](f: A => B): Coyoneda[F, B] = new Coyoneda[F, B] {
-    type I = coyo.I
-    val fi = coyo.fi
-    def k(i: I) = f(coyo k i)
-  }
+  /** Simple function composition. Allows map fusion without touching
+    * the underlying `F`.
+    */
+  final def map[B](f: A => B): Aux[F, B, I] =
+    apply(fi)(f compose k)
 
-  def trans[G[_]](f: F ~> G): Coyoneda[G, A] = new Coyoneda[G, A] {
-    type I = coyo.I
-    val fi = f(coyo.fi)
-    def k(i: I) = coyo k i
-  }
+  final def trans[G[_]](f: F ~> G): Aux[G, A, I] =
+    apply(f(fi))(k)
 
   import Id._
 
@@ -44,13 +50,33 @@ abstract class Coyoneda[F[_], A] { coyo =>
 }
 
 object Coyoneda extends CoyonedaInstances {
+  /** Lift the `I` type member to a parameter.  It is usually more
+    * convenient to use `Aux` than a structural type.
+    */
+  type Aux[F[_], A, B] = Coyoneda[F, A] {type I = B}
 
   /** `F[A]` converts to `Coyoneda[F,A]` for any `F` */
-  def apply[F[_],A](fa: F[A]): Coyoneda[F, A] = new Coyoneda[F, A] {
-    type I = A
-    def k(a: A) = a
-    val fi = fa
+  def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(fa)(conforms[A])
+
+  /** See `by` method. */
+  final class By[F[_]] {
+    @inline def apply[A, B](k: A => B)(implicit F: F[A]): Aux[F, B, A] =
+      Coyoneda(F)(k)
   }
+
+  /** Partial application of type parameters to `apply`.  It is often
+    * more convenient to invoke `Coyoneda.by[F]{x: X => ...}` then
+    * `Coyoneda[...](...){x => ...}`.
+    */
+  @inline def by[F[_]]: By[F] = new By[F]
+
+  /** Like `lift(fa).map(_k)`. */
+  def apply[F[_], A, B](fa: F[A])(_k: A => B): Aux[F, B, A] =
+    new Coyoneda[F, B]{
+      type I = A
+      val k = _k
+      val fi = fa
+    }
 
   type CoyonedaF[F[_]] = ({type A[α] = Coyoneda[F, α]})
 
@@ -58,7 +84,7 @@ object Coyoneda extends CoyonedaInstances {
 
   def iso[F[_]: Functor]: CoyonedaF[F]#A <~> F =
     new IsoFunctorTemplate[CoyonedaF[F]#A, F] {
-      def from[A](fa: F[A]) = Coyoneda(fa)
+      def from[A](fa: F[A]) = lift(fa)
       def to[A](fa: Coyoneda[F, A]) = fa.run
     }
 
