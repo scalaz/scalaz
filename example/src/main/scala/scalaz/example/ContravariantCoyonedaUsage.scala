@@ -125,8 +125,8 @@ object ContravariantCoyonedaUsage extends App {
   /*
   val byFunListSorts = for {
     (f, i) <- List((caseInsensitively _, 0),
-                  (parseDate _, 1),
-                  (parseCommaNum _, 2))
+                   (parseDate _, 1),
+                   (parseCommaNum _, 2))
   } yield schwartzian(unstructuredData)(v => f(v(i)))
 
 …/example/src/main/scala/scalaz/example/ContravariantCoyonedaUsage.scala:125: could not find implicit value for parameter B: scalaz.Order[java.io.Serializable]
@@ -154,8 +154,8 @@ object ContravariantCoyonedaUsage extends App {
 
   val byOrdListSorts: List[List[Vector[String]]] = for {
     (ord, i) <- List((caseInsensitivelyOrd, 0),
-                    (dateOrd, 1),
-                    (numerically2, 2))
+                     (dateOrd, 1),
+                     (numerically2, 2))
   } yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
 
   // We can no longer use `schwartzian', though, because there is no
