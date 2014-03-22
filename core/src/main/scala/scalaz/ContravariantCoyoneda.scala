@@ -10,16 +10,15 @@ package scalaz
   * `ContravariantCoyoneda[F,A]` exists even when `F` is not a
   * contravariant functor.
   *
-  * See the test "Schwartzian-transformed sort equals normal sort" in
-  * `ContravariantCoyonedaTest.scala` for an interesting usage
-  * demonstration.
+  * See `ContravariantCoyonedaUsage.scala` in the scalaz source tree
+  * for an interesting usage demonstration.
   *
   * As `ContravariantCoyoneda(identity)(o).unlift` = `o`, further
   * factoring can occur as follows, for free:
   *
   * {{{
-  * ContravariantCoyoneda(f)(o contramap g) =
-  *   ContravariantCoyoneda(g compose f)(o)
+  * ContravariantCoyoneda(o contramap g)(f).unlift =
+  *   ContravariantCoyoneda(o)(g compose f).unlift
   * }}}
   *
   * @see http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html
