@@ -85,13 +85,21 @@ object Yoneda {
 }
 
 object Coyoneda {
+  /** Lift the `I` type member to a parameter.  It is usually more
+    * convenient to use `Aux` than a structural type.
+    */
+  type Aux[F[_], A, I0] = Coyoneda[F, A]{type I = I0}
 
   /** `F[A]` converts to `Coyoneda[F,A]` for any `F` */
-  def apply[F[_],A](fa: F[A]) = new Coyoneda[F,A] {
+  def lift[F[_],A](fa: F[A]): Aux[F, A, A] = new Coyoneda[F,A] {
     type I = A
     def k(a: A) = a
     val fi = fa
   }
+
+  /** Old name for `lift`. */
+  @deprecated("Coyoneda.apply will take a new argument in 7.1; use the forward-compatible `lift' in current code instead", "7.0.7")
+  def apply[F[_],A](fa: F[A]) = lift(fa)
 
   /** `Coyoneda[F,_]` is a functor for any `F` */
   implicit def coyonedaFunctor[F[_]]: Functor[({type λ[α] = Coyoneda[F,α]})#λ] =
