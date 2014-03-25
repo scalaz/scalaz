@@ -17,6 +17,9 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def monoidCoproductArbitrary[M: Arbitrary, N: Arbitrary]: Arbitrary[M :+: N] =
+    Functor[Arbitrary].map(arb[Vector[M \/ N]])(new :+:(_))
+
   /** @since 7.0.3 */
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
