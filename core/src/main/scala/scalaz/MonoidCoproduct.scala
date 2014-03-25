@@ -28,33 +28,35 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
   }
 
   /** Append a value from the left monoid */
-  def appendLeft[A >: M, B >: N](m: A)
-    (implicit A: Monoid[A], B: Monoid[B]): A :+: B = |+|[A,B](:+:.inL(m))
+  def appendLeft[A >: M : Monoid, B >: N : Monoid](m: A) : A :+: B =
+    |+|[A,B](:+:.inL(m))
 
   /** Append a value from the right monoid */
-  def appendRight[A >: M, B >: N](n: B)
-    (implicit A: Monoid[A], B: Monoid[B]): A :+: B = |+|[A,B](:+:.inR(n))
+  def appendRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
+    |+|[A,B](:+:.inR(n))
 
   /** Prepend a value from the left monoid */
-  def prependLeft[A >: M, B >: N](m: A)
-    (implicit A: Monoid[A], B: Monoid[B]): A :+: B = :+:.inL(m) |+| (this:(A :+: B))
+  def prependLeft[A >: M : Monoid, B >: N : Monoid](m: A): A :+: B =
+    :+:.inL(m) |+| (this:(A :+: B))
 
   /** Prepend a value from the right monoid */
-  def prependRight[A >: M, B >: N](n: B)
-    (implicit A: Monoid[A], B: Monoid[B]): A :+: B = :+:.inR(n) |+| (this:(A :+: B))
+  def prependRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
+    :+:.inR(n) |+| (this:(A :+: B))
 
   /** Project out the value in the left monoid */
-  def left[A >: M](implicit A: Monoid[A]): A = rep.foldLeft(mzero[A]) { (m, e) =>
-    m |+| e.fold(a => a, _ => mzero[A])
-  }
+  def left[A >: M : Monoid]: A =
+    rep.foldLeft(mzero[A]) { (m, e) =>
+      m |+| e.fold(a => a, _ => mzero[A])
+    }
 
   /** Project out the value in the right monoid */
-  def right[A >: N](implicit A: Monoid[A]): A = rep.foldLeft(mzero[A]) { (n, e) =>
-    n |+| e.fold(_ => mzero[A], a => a)
-  }
+  def right[A >: N : Monoid]: A =
+    rep.foldLeft(mzero[A]) { (n, e) =>
+      n |+| e.fold(_ => mzero[A], a => a)
+    }
 
   /** Project out both monoids individually */
-  def both[A >: M, B >: N](implicit A: Monoid[A], B: Monoid[B]): (A, B) =
+  def both[A >: M : Monoid, B >: N : Monoid]: (A, B) =
     fold(m => (m, mzero[B]), n => (mzero[A], n))
 
   /** A homomorphism to a monoid `Z` (if `f` and `g` are homomorphisms). */
@@ -69,28 +71,28 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
    * This allows you to add up `N` values while having the opportunity to "track"
    * an evolving `M` value, and vice versa.
    */
-  def untangle[A >: M, B >: N](f: (B, A) => A, g: (A, B) => B)
-              (implicit A: Monoid[A], B: Monoid[B]): (A, B) =
-    rep.foldLeft(mzero[(A, B)]) {
-      case ((curm, curn), -\/(m)) =>
-        (curm |+| f(curn, m), curn)
-      case ((curm, curn), \/-(n)) =>
-        (curm, curn |+| g(curm, n))
-    }
+  def untangle[A >: M : Monoid, B >: N: Monoid]
+    (f: (B, A) => A, g: (A, B) => B): (A, B) =
+      rep.foldLeft(mzero[(A, B)]) {
+        case ((curm, curn), -\/(m)) =>
+          (curm |+| f(curn, m), curn)
+        case ((curm, curn), \/-(n)) =>
+          (curm, curn |+| g(curm, n))
+      }
 
   /**
    * Like `untangle`, except `M` values are simply combined without regard to the
    * `N` values to the left of it.
    */
-  def untangleLeft[A >: M, B >: N](f: (A, B) => B)
-    (implicit A: Monoid[A], B: Monoid[B]): (A, B) = untangle[A,B]((_, m) => m, f)
+  def untangleLeft[A >: M : Monoid, B >: N : Monoid](f: (A, B) => B): (A, B) =
+    untangle[A,B]((_, m) => m, f)
 
   /**
    * Like `untangle`, except `N` values are simply combined without regard to the
    * `N` values to the left of it.
    */
-  def untangleRight[A >: M, B >: N](f: (B, A) => A)
-    (implicit A: Monoid[A], B: Monoid[B]): (A, B) = untangle[A,B](f, (_, n) => n)
+  def untangleRight[A >: M : Monoid, B >: N : Monoid](f: (B, A) => A): (A, B) =
+    untangle[A,B](f, (_, n) => n)
 
 }
 
@@ -100,6 +102,7 @@ object :+: {
   def inL[A](a: A): A :+: Nothing = new :+:(Vector(left(a)))
   def inR[A](a: A): Nothing :+: A = new :+:(Vector(right(a)))
 
+  /** The identity of the monoid coproduct */
   def empty[M,N]: M :+: N = new :+:(Vector())
 
   implicit def instance[M:Monoid,N:Monoid]: Monoid[M :+: N] = new Monoid[M :+: N] {
