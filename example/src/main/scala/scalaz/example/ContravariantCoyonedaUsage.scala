@@ -26,14 +26,14 @@ object ContravariantCoyonedaUsage extends App {
          Vector("München", "1158", "1,388,308"),
          Vector("Boston", "1630-09-07", "636,479"))
 
-  // Or, really, maybe it has some structure.  That's not important.
+  // Or, really, maybe it has some structure.  That’s not important.
   // What matters is, I want to sort the data according to various
   // rules.
 
   def numerically1: Order[String] =
     Order.order((a, b) => parseCommaNum(a) ?|? parseCommaNum(b))
 
-  // Which is a silly way to write this.  Let's try again:
+  // Which is a silly way to write this.  Let’s try again:
 
   def numerically2: Order[String] =
     Order orderBy parseCommaNum
@@ -48,8 +48,8 @@ object ContravariantCoyonedaUsage extends App {
   // interesting thing that `numerically3' reveals is that this is
   // just applying the ordinary contravariant functor for `Order'.
   //
-  // We'll call `parseCommaNum' a "sort key" function.  Here's that,
-  // and the other two we'll be using for this example.
+  // We’ll call `parseCommaNum' a “sort key” function.  Here’s that,
+  // and the other two we’ll be using for this example.
 
   def parseCommaNum(s: String): Long \/ String =
     ("""-?[0-9,]+""".r findFirstIn s
@@ -69,7 +69,7 @@ object ContravariantCoyonedaUsage extends App {
               } yield (yi, None)) <\/ s
 
   // With sort keys in hand, we can produced contramapped `Order's all
-  // on the argument type, String, that will compare two values by
+  // on the argument type, `String', that will compare two values by
   // applying the sort key function to each argument and comparing the
   // result.
 
@@ -83,12 +83,12 @@ object ContravariantCoyonedaUsage extends App {
   // ---------------------
   //
   // The problem with using these `Order[String]'s directly is that
-  // the "sort key" function gets applied twice for each *comparison*
+  // the “sort key” function gets applied twice for each *comparison*
   // between two elements, rather than once for each element.  A
   // typical sort can compare a given element many times, wasting the
   // work of calling the sort key function repeatedly.
   //
-  // For simple functions, this doesn't matter.  For complex sort key
+  // For simple functions, this doesn’t matter.  For complex sort key
   // functions, it can make a great deal of difference.  So we use the
   // Schwartzian transform:
 
@@ -101,7 +101,7 @@ object ContravariantCoyonedaUsage extends App {
     xs.sorted(Order.orderBy(f).toScalaOrdering)
 
   // The above two functions are guaranteed to return the same result for
-  // pure 'f', but `schwartzian' may be faster for complex `f'.  By
+  // pure `f', but `schwartzian' may be faster for complex `f'.  By
   // the simple expedient of separating the sort key from the Order
   // passed to the real sort algorithm, we guarantee that the sort key
   // function will only be called once per element.
@@ -111,7 +111,7 @@ object ContravariantCoyonedaUsage extends App {
   // Simple sort key usage
   // ---------------------
   //
-  // It's straightforward enough to use our sort key functions to sort
+  // It’s straightforward enough to use our sort key functions to sort
   // by particular elements of the data above.
 
   val byDirectSorts: List[List[Vector[String]]] =
@@ -134,7 +134,7 @@ object ContravariantCoyonedaUsage extends App {
                                        ^
    */
 
-  // Fails to compile with the given type error.  That's because the
+  // Fails to compile with the given type error.  That’s because the
   // type of that list of sort key functions and indexes is:
 
   val untypedSortKeys: List[(String => java.io.Serializable, Int)] =
@@ -150,7 +150,7 @@ object ContravariantCoyonedaUsage extends App {
   // apply an `Order[(Int, Option[(Int, Int)]) \/ String]'.
   //
   // The standard way to solve this is to fuse the sort key into its
-  // result's ordering.  That's what happens here:
+  // result’s ordering.  That’s what happens here:
 
   val byOrdListSorts: List[List[Vector[String]]] = for {
     (ord, i) <- List((caseInsensitivelyOrd, 0),
@@ -162,11 +162,11 @@ object ContravariantCoyonedaUsage extends App {
   // way to separate the sort key from the underlying Order.  We could
   // combine them all into a single ADT, but that would be closed, it
   // would be inconvenient to build a correct Order instance, and the
-  // complication turns out to be unnecessary.  Contravariant coyoneda
+  // complication turns out to be unnecessary.  Contravariant co-Yoneda
   // is here to simplify our lives.
   //
-  // Enter Contravariant Coyoneda
-  // ----------------------------
+  // Enter Contravariant co-Yoneda
+  // -----------------------------
   //
   // Recall that sort keys are applied by contramap, as seen in the
   // definition of `numerically3'.  What if we represented that
@@ -177,14 +177,14 @@ object ContravariantCoyonedaUsage extends App {
     CtCoyo(Order[Long \/ String])(parseCommaNum)
 
   // This separates the sort key and the underlying order, but the
-  // sort key's result type no longer appears!  It's been made
+  // sort key’s result type no longer appears!  It’s been made
   // *existential*, and the main feature of the
   // `ContravariantCoyoneda' structure, for our purposes, is that it
   // remembers that the output type of the function is exactly the
-  // type of the `Order', *even though it's forgotten what that type
+  // type of the `Order', *even though it’s forgotten what that type
   // is*.
   //
-  // That's enough to call `schwartzian': `schwartzian' doesn't care
+  // That’s enough to call `schwartzian': `schwartzian' doesn’t care
   // about *what* the `B' type argument is, just that it gets
   // arguments that line up for it!
   //
@@ -200,31 +200,32 @@ object ContravariantCoyonedaUsage extends App {
          (CCOrder(parseDate), 1),
          (numerically4, 2))
 
-  // Now we're ready.
+  // Now we’re ready.
 
   val bySchwartzianListSorts: List[List[Vector[String]]] = for {
     (ccord, i) <- decomposedSortKeys
   } yield schwartzian(unstructuredData)(v => ccord.k(v(i)))(ccord.fi)
 
   // But we know that for each `schwartzian' call, the result type of
-  // the lambda we give it changes.  So how does the `B' type argument
-  // get picked?
+  // the lambda we give it changes; for `caseInsensitively', it’s
+  // `String', but for `parseCommaNum', it’s `Long \/ String', and so
+  // on.  So how does the `B' type argument get picked?
 
   val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
     (ccord, i) <- decomposedSortKeys
   } yield (schwartzian[Vector[String], ccord.I]
              (unstructuredData)(v => ccord.k(v(i)))(ccord.fi))
 
-  // `I' is the "pivot", how the function `k' result type and `fi'
+  // `I' is the “pivot”, how the function `k' result type and `fi'
   // order type relate to each other.  As seen above, this existential
   // type member is usually inferred as well as normal Scala types,
-  // but you'll see it in type errors, and of course, can refer to it
-  // as in `bySchwartzianListSortsTP' if you find it can't be
-  // inferred.
+  // but you’ll see it in type errors, and of course, can refer to it
+  // with syntax like `someVar.I', as in `bySchwartzianListSortsTP',
+  // if you find it can’t be inferred.
   //
-  // Sure, `I' is "really" changing for each call.  But, again, no one
+  // Sure, `I' is “really” changing for each call.  But, again, no one
   // cares that the `B' type parameter changes for each call, as long
-  // as it's consistent between the 2nd and 3rd args in a given call.
+  // as it’s consistent between the 2nd and 3rd args in a given call.
   //
   // A sort specification algebra
   // ----------------------------
@@ -244,13 +245,13 @@ object ContravariantCoyonedaUsage extends App {
   type SortSpec = List[(SortType, Int)]
 
   // With a sample specification that sorts the columns left-to-right,
-  // with the sort key associations we've been using.
+  // with the sort key associations we’ve been using.
 
   val mainLtoRsort: SortSpec =
     List((SortType.CI, 0), (SortType.Dateish, 1), (SortType.Num, 2))
 
-  // It's simple enough to "interpret" each `SortType' to a
-  // contravariant Coyoneda Order.
+  // It’s simple enough to “interpret” each `SortType' to a
+  // contravariant co-Yoneda Order.
 
   def sortTypeOrd(s: SortType): CtCoyo[Order, String] = s match {
     case SortType.CI => CCOrder(caseInsensitively)
@@ -271,23 +272,23 @@ object ContravariantCoyonedaUsage extends App {
   // Products
   // --------
   //
-  // We're going to produce multiple values of type `CtCoyo[Order,
-  // Vector[String]]', and we have to combine them in some way to
-  // produce a final value of the same type.  We can take advantage of
-  // a few things we know about `Order' itself:
+  // We’re going to produce multiple values of type
+  // `CtCoyo[Order, Vector[String]]', and we have to combine them in
+  // some way to produce a final value of the same type.  We can take
+  // advantage of a few things we know about `Order' itself:
   //
-  // 1. There's a polymorphic Order product: `[A, B](Order[A],
-  //    Order[B]): Order[(A, B)]'.
+  // 1. There’s a polymorphic Order product, O_×:
+  //    `[A, B](Order[A], Order[B]): Order[(A, B)]'.
   //
-  // 2. There's an Order[Unit], O_∅.
+  // 2. There’s an Order[Unit], O_∅.
   //
-  // 3. O_∅ is a left and right identity for the product operator,
-  //    O_×; i.e. `Order[(A, Unit)]' and `Order[(Unit, A)]',
+  // 3. O_∅ is a left and right identity for
+  //    O_×; i.e. `Order[(A, Unit)]' and `Order[(Unit, A)]',
   //    constructed from O_∅ and O_×, have the same sort behavior as
   //    the underlying Order[A].
   //
-  // Given that, we can produce a contravariant Coyoneda order product
-  // function that feeds the value under consideration to both
+  // Given that, we can produce a contravariant co-Yoneda order
+  // product function that feeds the value under consideration to both
   // underlying functions, and the results to both orders, but then
   // forgets that the whole thing happened, without forgetting the new
   // type relationships.  And we can produce a base case, too.
@@ -298,7 +299,7 @@ object ContravariantCoyonedaUsage extends App {
   def unitOrd[A]: CtCoyo.Aux[Order, A, Unit] = CCOrder(a => ())
 
   // I use the `Aux' type to illustrate what we know about the `I'
-  // type member in each case.  We'll drop it entirely when using
+  // type member in each case.  We’ll drop it entirely when using
   // these functions.
 
   def ordFanout[A](l: CtCoyo[Order, A], r: CtCoyo[Order, A])
@@ -308,7 +309,7 @@ object ContravariantCoyonedaUsage extends App {
     CCOrder(l.k &&& r.k)
   }
 
-  // Now we have a base case, and an induction step.  I think we're
+  // Now we have a base case, and an induction step.  I think we’re
   // ready.
 
   def sortSpecOrd(s: SortSpec): CtCoyo[Order, Vector[String]] =
@@ -343,23 +344,24 @@ object ContravariantCoyonedaUsage extends App {
   // The step function passed to the above fold is a logical induction
   // step.  It calls no functions that actually care about what any
   // `I' is; `ordFanout' only cares that it gets two functions and two
-  // Orders, and each function's return type matches up with its
-  // associative order!  `ContravariantCoyoneda' acts as a bit of
+  // Orders, and each function’s return type matches up with its
+  // associated order!  `ContravariantCoyoneda' acts as a bit of
   // scaffolding to maintain the proof as we perform each inductive
   // step.  The only place we know the type is in the `sortTypeOrd'
   // function body, and we throw it away before returning.
   //
   // So we end up using an arbitrary nesting of tuples in the ultimate
-  // `I' that results, but it doesn't matter, because each step of the
+  // `I' that results, but it doesn’t matter, because each step of the
   // code that results knows exactly enough type information for this
-  // to be sound.  If you're wondering, here's the type that got
+  // to be sound.  If you’re wondering, here’s the type that got
   // erased for `mainLtoRsort':
   //
   // (String, ((Int, Option[(Int, Int)]) \/ String,
   //           (Long \/ String, Unit)))
   //
-  // Let's check out the Is via the unsafe `toString' method for what
-  // must have been used for `sortedBySpec' and `sortedByNonCity'.
+  // Let’s check out the `I's that must have been used for
+  // `sortedBySpec' and `sortedByNonCity', via the unsafe `toString'
+  // method.
 
   val mainLtoRcoyo: CtCoyo[Order, Vector[String]] =
     sortSpecOrd(mainLtoRsort)
@@ -375,7 +377,7 @@ object ContravariantCoyonedaUsage extends App {
   // Digression: the monoid
   // ----------------------
   //
-  // Something interesting about `sortSpecOrd': it's completely
+  // Something interesting about `sortSpecOrd': it’s completely
   // coincidental that I wrote it with a right fold.  It works just as
   // well with a left fold.
 
@@ -385,7 +387,7 @@ object ContravariantCoyonedaUsage extends App {
       ordFanout(acc, recItemOrd(i, sortTypeOrd(st)))
     }
 
-  // What does `I' look like then?  Let's use the unsafe `toString'
+  // What does `I' look like then?  Let’s use the unsafe `toString'
   // again to see.
 
   val mainLtoRcoyoL: CtCoyo[Order, Vector[String]] =
@@ -410,14 +412,14 @@ object ContravariantCoyonedaUsage extends App {
 
   println("sortedByNonCityL: " |+| sortedByNonCity.shows)
 
-  // Our three properties of Order listed under "Products" now come
+  // Our three properties of Order listed under “Products” now come
   // into play, in addition to a fourth.
   //
-  // 4. Where a, b, and c are existential types, the `Order[((a, b),
-  //    c)]' and `Order[(a, (b, c))]' as constructed with O_× are
-  //    indistinguishable, i.e. O_× is associative.
+  // 4. Where a, b, and c are existential types, the
+  //    `Order[((a, b), c)]' and `Order[(a, (b, c))]' as constructed
+  //    with O_× are indistinguishable, i.e. O_× is associative.
   //
-  // That `unitOrd' doesn't change behavior of the sort, combined with
+  // That `unitOrd' doesn’t change behavior of the sort, combined with
   // the 4th property, means that we can build a lawful monoid from
   // those two functions.
 
@@ -430,15 +432,15 @@ object ContravariantCoyonedaUsage extends App {
   def sortSpecOrdF(s: SortSpec): CtCoyo[Order, Vector[String]] =
     s.foldMap{case (st, i) => recItemOrd(i, sortTypeOrd(st))}
 
-  // "But how can this follow the monoid laws; it isn't associative
-  // because `I' changes depending on the order of the fold!"  Well,
-  // you're not allowed to care about that under the rules of
-  // parametricity [2], just like you're not allowed to test stack
+  // “But how can this follow the monoid laws; it isn’t associative
+  // because `I' changes depending on the order of the fold!”  Well,
+  // you’re not allowed to care about that under the rules of
+  // parametricity [2], just like you’re not allowed to test stack
   // depth in a function and claim that the changing results means the
-  // functor identity law is violated for `Function1'.  It's *some*
-  // `I', and that's all you get.  Nothing that actually knows how to
+  // functor identity law is violated for `Function1'.  It’s *some*
+  // `I', and that’s all you get.  Nothing that actually knows how to
   // work with `I' in this result cares about the grouping of
-  // combination, so it's a monoid.
+  // combination, so it’s a monoid.
   //
   // How well does this generalize to `F's other than `Order'?  I
   // think the presence of a universally-quantified product satisfying
@@ -448,16 +450,16 @@ object ContravariantCoyonedaUsage extends App {
   // Knowing more about `I'
   // ----------------------
   //
-  // Contravariant Coyoneda isn't *for* Order.  That's just the
-  // example I've shown here.  `F' is abstract for a reason.
+  // Contravariant co-Yoneda isn’t *for* Order.  That’s just the
+  // example I’ve shown here.  `F' is abstract for a reason.
   //
-  // Let's consider some kind of distributed arrangement for sorting:
+  // Let’s consider some kind of distributed arrangement for sorting:
   // we cut data into slices, deliver them – and the sort spec — to
   // each node, *they* do the transition to `I' and sort their
   // components, and we get it all back and merge the results.
   //
   // There are various type-safe binary format libraries, such as
-  // scodec [3] and f0 [4].  Let's simulate one of those.  Never mind
+  // scodec [3] and f0 [4].  Let’s simulate one of those.  Never mind
   // that this is phantom; assume that serialization and
   // deserialization methods are defined:
 
@@ -483,15 +485,15 @@ object ContravariantCoyonedaUsage extends App {
 
   // A bidirectional formatter, unlike `Order', does not have a
   // `Contravariant' instance.  Whether your `F' is contravariant is
-  // irrelevant; contravariant coyoneda does all the work.
+  // irrelevant; contravariant co-Yoneda does all the work.
   //
   // Previously, we proved at every step that we had a function and an
   // Order that lined up.  Now, we need a function, Order, *and*
-  // Binfmt that line up.  We didn't make the previous functions
-  // general enough, so let's revisit them to include `Binfmt' as
+  // Binfmt that line up.  We didn’t make the previous functions
+  // general enough, so let’s revisit them to include `Binfmt' as
   // simply as possible.  Using the `F' abstraction, you can make the
   // idea of which Binfmt typeclass abstract in your own designs; this
-  // works well for an "open world" style `SortSpec', though our
+  // works well for an “open world” style `SortSpec', though our
   // example is closed.
 
   type BinOrd[A] = (Binfmt[A], Order[A])
@@ -525,8 +527,8 @@ object ContravariantCoyonedaUsage extends App {
     CCBinOrd(l.k &&& r.k)
   }
 
-  // I've chosen the `Binfmt' instances with a bit of care to preserve
-  // their monoid-hood.  It's not a requirement for you to do this
+  // I’ve chosen the `Binfmt' instances with a bit of care to preserve
+  // their monoid-hood.  That isn’t a requirement for you to do this
   // kind of abstracting, though.
 
   implicit def ctCoyoBinOrdMonoid[A]: Monoid[CtCoyo[BinOrd, A]] =
@@ -535,9 +537,9 @@ object ContravariantCoyonedaUsage extends App {
   def sortSpecBinOrdF(s: SortSpec): CtCoyo[BinOrd, Vector[String]] =
     s.foldMap{case (st, i) => recItem[BinOrd](i, sortTypeBinOrd(st))}
 
-  // The drawback here is that I can't just build a separate stack
+  // The drawback here is that I can’t just build a separate stack
   // willynilly for `Binfmt'.  I have to prove at each step that *the
-  // same* `I' is used for the Binfmt and the Order for this to be
+  // same* `I' is used for the `Binfmt' and the `Order' for this to be
   // useful.  Once again, an idea of a fold step that can be fused
   // with the `Order' construction safely can be abstracted out here.
 
