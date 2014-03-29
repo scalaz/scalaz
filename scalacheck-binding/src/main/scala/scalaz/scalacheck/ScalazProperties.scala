@@ -28,6 +28,9 @@ object ScalazProperties {
   }
 
   object order {
+    def antisymmetric[A](implicit A: Order[A], arb: Arbitrary[A]) =
+      forAll(A.orderLaw.antisymmetric _)
+
     def transitiveOrder[A](implicit A: Order[A], arb: Arbitrary[A]) = forAll(A.orderLaw.transitiveOrder _)
 
     def orderAndEqualConsistent[A](implicit A: Order[A], arb: Arbitrary[A]) = forAll(A.orderLaw.orderAndEqualConsistent _)
@@ -38,6 +41,7 @@ object ScalazProperties {
 
     def laws[A](implicit A: Order[A], arb: Arbitrary[A]) = new Properties("order") {
       include(equal.laws[A])
+      property("antisymmetric") = antisymmetric[A]
       property("transitive order") = transitiveOrder[A]
       property("order and equal consistent") = orderAndEqualConsistent[A]
     }

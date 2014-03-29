@@ -48,6 +48,10 @@ trait Order[F] extends Equal[F] { self =>
   trait OrderLaw extends EqualLaw {
     import std.boolean.conditional
 
+    /** f1 < f2 means f2 > f1, and so on. */
+    def antisymmetric(f1: F, f2: F): Boolean =
+      order(f1, f2).complement == order(f2, f1)
+
     /** `order` yields a total order, in the mathematical sense. */
     def transitiveOrder(f1: F, f2: F, f3: F): Boolean = {
       val f1f2: Ordering = order(f1, f2)
