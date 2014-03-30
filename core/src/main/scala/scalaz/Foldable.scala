@@ -148,6 +148,12 @@ trait Foldable[F[_]]  { self =>
   def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
     foldLeft(fa, c())(_ += _).result
 
+  def toIList[A](fa: F[A]): IList[A] =
+    foldLeft(fa, IList.empty[A])((t, h) => h :: t).reverse
+
+  def toEphemeralStream[A](fa: F[A]): EphemeralStream[A] =
+    foldRight(fa, EphemeralStream.emptyEphemeralStream[A])(EphemeralStream.cons(_, _))
+
   /** Whether all `A`s in `fa` yield true from `p`. */
   def all[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, true)(p(_) && _)
   /** `all` with monadic traversal. */
