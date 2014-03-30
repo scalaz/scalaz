@@ -243,71 +243,8 @@ trait Foldable[F[_]]  { self =>
       }
     })._1
 
-  def collapse[X[_], A](x: F[A])(implicit F: Foldable[F], A: ApplicativePlus[X]): X[A] =
-    F.foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))
-
-  def collapse2[G[_], X[_], A](x: F[G[A]])(implicit
-                                            F: Foldable[F]
-                                          , G: Foldable[G]
-                                          , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G
-    Z collapse x
-  }
-
-  def collapse3[G[_], H[_], X[_], A](x: F[G[H[A]]])(implicit
-                                                     F: Foldable[F]
-                                                   , G: Foldable[G]
-                                                   , H: Foldable[H]
-                                                   , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G compose H
-    Z.collapse(x)
-  }
-
-  def collapse4[G[_], H[_], I[_], X[_], A](x: F[G[H[I[A]]]])(implicit
-                                                              F: Foldable[F]
-                                                            , G: Foldable[G]
-                                                            , H: Foldable[H]
-                                                            , I: Foldable[I]
-                                                            , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G compose H compose I
-    Z.collapse(x)
-  }
-
-  def collapse5[G[_], H[_], I[_], J[_], X[_], A](x: F[G[H[I[J[A]]]]])(implicit
-                                                                       F: Foldable[F]
-                                                                     , G: Foldable[G]
-                                                                     , H: Foldable[H]
-                                                                     , I: Foldable[I]
-                                                                     , J: Foldable[J]
-                                                                     , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G compose H compose I compose J
-    Z.collapse(x)
-  }
-
-  def collapse6[G[_], H[_], I[_], J[_], K[_], X[_], A](x: F[G[H[I[J[K[A]]]]]])(implicit
-                                                                                F: Foldable[F]
-                                                                              , G: Foldable[G]
-                                                                              , H: Foldable[H]
-                                                                              , I: Foldable[I]
-                                                                              , J: Foldable[J]
-                                                                              , K: Foldable[K]
-                                                                              , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G compose H compose I compose J compose K
-    Z.collapse(x)
-  }
-
-  def collapse7[G[_], H[_], I[_], J[_], K[_], L[_], X[_], A](x: F[G[H[I[J[K[L[A]]]]]]])(implicit
-                                                                                         F: Foldable[F]
-                                                                                       , G: Foldable[G]
-                                                                                       , H: Foldable[H]
-                                                                                       , I: Foldable[I]
-                                                                                       , J: Foldable[J]
-                                                                                       , K: Foldable[K]
-                                                                                       , L: Foldable[L]
-                                                                                       , A: ApplicativePlus[X]): X[A] = {
-    implicit val Z = F compose G compose H compose I compose J compose K compose L
-    Z.collapse(x)
-  }
+  def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
+    foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))
 
   trait FoldableLaw {
     import std.vector._
