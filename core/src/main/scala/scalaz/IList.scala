@@ -538,6 +538,8 @@ sealed abstract class IListInstances extends IListInstance0 {
         (a, b) => loop(a, b, empty)
       }
 
+      override def toIList[A](fa: IList[A]) = fa
+
       override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)
 
