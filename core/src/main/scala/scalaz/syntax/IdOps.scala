@@ -42,6 +42,9 @@ sealed class IdOps[A](self: A) {
   /** Alias for `unsafeTap`. */
   final def <|(f: A => Any): A = unsafeTap(f)
 
+  /** Alias for `unsafeTap`. */
+  final def ◃(f: A => Any): A = unsafeTap(f)
+
   final def squared: (A, A) =
     (self, self)
 
