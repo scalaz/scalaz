@@ -24,11 +24,23 @@ sealed abstract class Heap[A] {
   /**Is the heap empty? O(1)*/
   def isEmpty = fold(true, (_, _, _) => false)
 
+  /**Is the heap populated? O(1)*/
+  final def nonEmpty = !isEmpty
+
   /**The number of elements in the heap. O(1)*/
   def size = fold(0, (s, _, _) => s)
 
   /**Insert a new value into the heap. O(1)*/
-  def insert(x: A)(implicit o: Order[A]) = insertWith(o.lessThanOrEqual, x)
+  def insert(a: A)(implicit o: Order[A]) = insertWith(o.lessThanOrEqual, a)
+
+  /** Alias for insert */
+  final def +(a: A)(implicit o: Order[A]) = this insert a
+
+  def insertAll(as: TraversableOnce[A])(implicit o: Order[A]): Heap[A] =
+    (this /: as)((h,a) => h insert a)
+
+  def insertAllF[F[_]](as: F[A])(implicit F: Foldable[F], o: Order[A]): Heap[A] =
+    F.foldLeft(as, this)((h,a) => h insert a)
 
   /**Meld the values from two heaps into one heap. O(1)*/
   def union(as: Heap[A]) = (this, as) match {
