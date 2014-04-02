@@ -61,6 +61,9 @@ sealed abstract class Heap[A] {
   /**Get the minimum key on the (nonempty) heap. O(1) */
   def minimum: A = fold(sys.error("Heap.minimum: empty heap"), (_, _, t) => t.rootLabel.value)
 
+  /**Get the minimum key on the (nonempty) heap. O(1) */
+  def minimumO: Option[A] = fold(None, (_, _, t) => Some(t.rootLabel.value))
+
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
     fold(Empty[A], (s, leq, t) => t match {
