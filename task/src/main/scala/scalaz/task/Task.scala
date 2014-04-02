@@ -275,6 +275,10 @@ object Task {
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Try(a))(pool))
 
+  /** Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away */
+  def start[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
+    new Task(Future(Task.Try(a))(pool).start)
+
   /**
    * Returns a `Future` that produces the same result as the given `Future`,
    * but forks its evaluation off into a separate (logical) thread, using
@@ -283,6 +287,7 @@ object Task {
    */
   def fork[A](a: => Task[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     apply(a).join
+
 
   /**
    * Create a `Future` from an asynchronous computation, which takes the form
