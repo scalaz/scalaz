@@ -194,6 +194,12 @@ trait MapSubFunctions extends MapSub {
     */
   final def insertWith[K:BuildKeyConstraint,A](m1: XMap[K, A], k: K, v: A)(f: (A, A) => A): XMap[K, A] =
     if(m1 contains k) ab_+(m1, k, f(m1(k), v)) else ab_+(m1, k, v)
+
+  /** Grab a value out of Map if it's present. Otherwise evaluate
+    * a value to be placed at that key in the Map.
+    */
+  final def getOrAdd[F[_],K,A](m: XMap[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F], K: BuildKeyConstraint[K]): F[(XMap[K, A], A)] =
+    (m get k).map(a => F.point(m, a)).getOrElse(F.map(fa)(a => (ab_+(m, k, a), a)))
 }
 
 trait MapInstances extends MapSubInstances with MapSubMap
