@@ -27,6 +27,10 @@ sealed class IdOps[A](self: A) {
   final def |>[B](f: A => B): B =
     f(self)
 
+  /**Applies `self` to the provided function. The Thrush combinator. */
+  final def ▹[B](f: A => B): B =
+    f(self)
+
   /**Applies `self` to the provide function for its side effect, and returns `self`. The Kestrel combinator. 
    * Mostly for use with dodgy libraries that give you values that need additional initialization or 
    * mutation before they're valid to use.  
