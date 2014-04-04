@@ -109,6 +109,8 @@ package object scalaz {
   type ⊥ = Nothing
   type ⊤ = Any
 
+  type ∨[A, B] = A \/ B
+
   type |>=|[G[_], F[_]] = MonadPartialOrder[G, F]
 
   type ReaderT[F[_], E, A] = Kleisli[F, E, A]
