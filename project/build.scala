@@ -172,8 +172,9 @@ object build extends Build {
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
       excludedProjects in unidoc in ScalaUnidoc += "typelevel",
-      publishArtifact := false
-    ),
+      artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
+      packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
+    ) ++ Defaults.packageTaskSettings(packageDoc, unidoc.map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, task, tests, typelevel, xml)
   )
 
