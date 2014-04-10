@@ -100,6 +100,13 @@ package object scalaz {
    */
   type @@[+T, Tag] = T with Tagged[Tag]
 
+  /**
+   * Like `@@` tagging but the resulting type is NOT a subtype of `T`.
+   *
+   * Can not be accidentally lost via a LUB.
+   */
+  type @@@[+T, Tag] = Tagged[Tag]
+
   /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
   /** A [[scalaz.NaturalTransformation]][G, F]. */

@@ -7,6 +7,12 @@ object Tag {
     */
   @inline def apply[@specialized A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
 
+  /** Adds a tag which can not accidentally be lost. */
+  def lossless[A, T](a: A): A @@@ T = a.asInstanceOf[A @@@ T]
+
+  /** Removes a "lossless" tag. */
+  def unwrap[A, T](a: A @@@ T): A = a.asInstanceOf[A]
+
   /** Add a tag `T` to `A`. */
   def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
 
@@ -18,6 +24,12 @@ object Tag {
       extends (Id.Id ~> ({type λ[α] = α @@ T})#λ) {
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
+
+    /** Like `Tag.lossless`, but specify only the `T`. */
+    def lossless[A](a: A): A @@@ T = Tag.lossless(a)
+
+    /** Like `Tag.unwrap`, but specify only the `T`. */
+    def unwrap[A](a: A @@@ T): A = Tag.unwrap(a)
 
     /** Like `Tag.subst`, but specify only the `T`. */
     def subst[F[_], A](fa: F[A]): F[A @@ T] = Tag.subst(fa)
@@ -45,4 +57,17 @@ object Tag {
     * type parameters.
     */
   def of[T]: TagOf[T] = new TagOf[T]
+
+  /** Isomorphisms between the two types of tags and values. */
+  import Isomorphism.<=>
+
+  def losslessi[T, A] = new (A <=> (A @@@ T)) {
+    def from: A @@@ T => A = _.asInstanceOf[A]
+    def to: A => A @@@ T = _.asInstanceOf[A @@@ T]
+  }
+
+  def tagsi[T, A] = new ((A @@ T) <=> (A @@@ T)) {
+    def from: A @@@ T => A @@ T = _.asInstanceOf[A @@ T]
+    def to: A @@ T => A @@@ T = _.asInstanceOf[A @@@ T]
+  }
 }
