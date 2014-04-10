@@ -142,7 +142,13 @@ trait OptionTFunctions {
   }
 }
 
-object OptionT extends OptionTFunctions with OptionTInstances
+object OptionT extends OptionTFunctions with OptionTInstances {
+  def some[M[+_], A](v: => A)(implicit M: Monad[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(Some(v)))
+
+  def none[M[+_], A](implicit M: Monad[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(None))
+}
 
 //
 // Implementation traits for type class instances
