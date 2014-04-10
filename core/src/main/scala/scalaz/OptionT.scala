@@ -149,10 +149,10 @@ trait OptionTFunctions {
 }
 
 object OptionT extends OptionTFunctions with OptionTInstances {
-  def some[M[+_], A](v: => A)(implicit M: Monad[M]): OptionT[M, A] =
+  def some[M[+_], A](v: => A)(implicit M: Applicative[M]): OptionT[M, A] =
     OptionT.optionT[M].apply[A](M.point(Some(v)))
 
-  def none[M[+_], A](implicit M: Monad[M]): OptionT[M, A] =
+  def none[M[+_], A](implicit M: Applicative[M]): OptionT[M, A] =
     OptionT.optionT[M].apply[A](M.point(None))
 
   implicit def optionTShow[F[+_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] = Contravariant[Show].contramap(F0)(_.run)
