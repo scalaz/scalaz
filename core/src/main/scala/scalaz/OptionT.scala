@@ -190,12 +190,6 @@ private trait OptionTMonadTell[F[_, _], W] extends MonadTell[({ type λ[α, β] 
 
   def writer[A](w: W, v: A): OptionT[({ type λ[α] = F[W, α] })#λ, A] =
     liftM[({ type λ[α] = F[W, α] })#λ, A](MT.writer(w, v))
-
-  def some[A](v: => A): OptionT[({ type λ[α] = F[W, α] })#λ, A] =
-    OptionT.optionT[({ type λ[α] = F[W, α] })#λ].apply[A](MT.point(Some(v)))
-
-  def none[A]: OptionT[({ type λ[α] = F[W, α] })#λ, A] =
-    OptionT.optionT[({ type λ[α] = F[W, α] })#λ].apply[A](MT.point(None))
 }
 
 private trait OptionTMonadListen[F[_, _], W] extends MonadListen[({ type λ[α, β] = OptionT[({ type f[x] = F[α, x] })#f, β] })#λ, W] with OptionTMonadTell[F, W] {
