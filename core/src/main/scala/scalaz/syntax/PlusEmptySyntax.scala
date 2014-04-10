@@ -20,6 +20,7 @@ trait ToPlusEmptyOps extends ToPlusEmptyOps0 with ToPlusOps {
 
   ////
 
+  def mempty[F[_], A](implicit F: PlusEmpty[F]): F[A] = F.empty[A]
   ////
 }
 
