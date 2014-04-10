@@ -121,6 +121,12 @@ trait OptionTFunctions {
     def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
   }
 
+  def some[M[_], A](v: => A)(implicit M: Monad[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(Some(v)))
+
+  def none[M[_], A](implicit M: Monad[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(None))
+
   def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]): MonadTell[({type λ[α, β]=OptionT[({type f[x]=F[α, x]})#f, β] })#λ, W] = new OptionTMonadTell[F, W] {
     def MT = MT0
   }
