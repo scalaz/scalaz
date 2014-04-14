@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 object Tag {
   /** `subst` specialized to `Id`.
     *
@@ -7,11 +9,17 @@ object Tag {
     */
   @inline def apply[@specialized A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
 
+  /** `losslessSubst` specialized to `Id`. */
+  def lossless[A, T](a: A): A @@@ T = losslessSubst[A, Id, T](a)
+
+  /** `unsubst` specialized to `Id`. */
+  def unwrap[A, T](a: A @@@ T): A = losslessUnsubst[A, Id, T](a)
+
   /** Adds a tag which can not accidentally be lost. */
-  def lossless[A, T](a: A): A @@@ T = a.asInstanceOf[A @@@ T]
+  def losslessSubst[A, F[_], T](fa: F[A]): F[A @@@ T] = fa.asInstanceOf[F[A @@@ T]]
 
   /** Removes a "lossless" tag. */
-  def unwrap[A, T](a: A @@@ T): A = a.asInstanceOf[A]
+  def losslessUnsubst[A, F[_], T](fa: F[A @@@ T]): F[A] = fa.asInstanceOf[F[A]]
 
   /** Add a tag `T` to `A`. */
   def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
@@ -62,12 +70,12 @@ object Tag {
   import Isomorphism.<=>
 
   def losslessi[T, A] = new (A <=> (A @@@ T)) {
-    def from: A @@@ T => A = _.asInstanceOf[A]
-    def to: A => A @@@ T = _.asInstanceOf[A @@@ T]
+    def from: A @@@ T => A = unwrap
+    def to: A => A @@@ T = lossless
   }
 
   def tagsi[T, A] = new ((A @@ T) <=> (A @@@ T)) {
-    def from: A @@@ T => A @@ T = _.asInstanceOf[A @@ T]
-    def to: A @@ T => A @@@ T = _.asInstanceOf[A @@@ T]
+    def from: A @@@ T => A @@ T = a => apply(unwrap(a))
+    def to: A @@ T => A @@@ T = lossless
   }
 }
