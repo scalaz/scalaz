@@ -110,6 +110,12 @@ trait CofreeFunctions {
     val (a, fb) = f(b)
     Cofree(a, F.map(fb)(unfold(_)(f)))
   }
+
+  def unfoldT[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[F, A] = {
+    val (a, fb) = f(b)
+    val nt = T.map(Trampoline.done(fb))(fbb => F.map(fbb)(unfold(_)(f)))
+    Cofree.CofreeT(a, nt)
+  }
 }
 
 import Cofree.CofreeZip
