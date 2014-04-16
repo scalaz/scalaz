@@ -1,7 +1,17 @@
 package scalaz
 
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
-final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]]) {
+sealed trait Cofree[S[_], A] {
+
+  def head: A 
+
+  def tail: S[Cofree[S, A]]
+
+  /** Applies `f` to the head and `g` through the tail. */
+  def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] 
+  //= Cofree(f(head), S.map(tail)(g))
+
+  /* Derived methods */
 
   /** Alias for `head`, for compatibility with Scalaz 6 */
   final def extract: A = head
@@ -47,11 +57,7 @@ final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]]) {
   final def inject[B](b: B)(implicit S: Functor[S]): Cofree[S, B] =
     applyTail(b, _ inject b)
 
-  /** Applies `f` to the head and `g` through the tail. */
-  final def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] =
-    Cofree(f(head), S.map(tail)(g))
-
-  /** Replaces the head with `b` and applies `g` through the tail. */
+   /** Replaces the head with `b` and applies `g` through the tail. */
   final def applyTail[B](b: B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] =
     applyCofree(x => b, g)
 
@@ -64,7 +70,29 @@ final case class Cofree[S[_], A](head: A, tail: S[Cofree[S, A]]) {
     zapWith(fs)((a, f) => f(a))
 }
 
-object Cofree extends CofreeInstances with CofreeFunctions
+object Cofree extends CofreeInstances with CofreeFunctions {
+
+  def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = new Cofree[S,A] {
+    
+    def head = h
+    
+    def tail = t
+    
+    def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] = 
+      Cofree(f(head), S.map(tail)(g))
+  }
+  
+  //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
+  def CofreeT[S[_],A](a: A, t: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[S, A] = new Cofree[S,A] {
+    
+    def head = a
+    
+    def tail = t.run
+
+    def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =  
+      CofreeT(f(head), T.map(t)(s => S.map(s)(g)))
+  }
+}
 
 
 trait CofreeFunctions {
@@ -200,8 +228,8 @@ private trait CofreeBind[F[_]] extends Bind[({type λ[α] = Cofree[F, α]})#λ] 
   implicit def G: Plus[F]
 
   def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] = {
-    val Cofree(h, t) = f(fa.head)
-    Cofree(h, G.plus(t, F.map(fa.tail)(bind(_)(f))))
+    val c = f(fa.head)
+    Cofree(c.head, G.plus(c.tail, F.map(fa.tail)(bind(_)(f))))
   }
 }
 
