@@ -72,6 +72,31 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     }
 
   /**
+   * Apply a function to 3 results, nondeterminstically ordering their effects 
+   */
+  def map3[A,B,C,R](a: F[A], b: F[B], c: F[C])(f: (A,B,C) ⇒ R): F[R] =
+    mapBoth(mapBoth(a, b)((_,_)), c)((ab,c) ⇒ f(ab._1, ab._2, c))
+
+  /**
+   * Apply a function to 4 results, nondeterminstically ordering their effects 
+   */
+  def map4[A,B,C,D,R](a: F[A], b: F[B], c: F[C], d: F[D])(f: (A,B,C,D) ⇒ R): F[R] =
+    mapBoth(mapBoth(a, b)((_,_)), mapBoth(c,d)((_,_)))((ab,cd) ⇒ f(ab._1, ab._2, cd._1, cd._2))
+
+  /**
+   * Apply a function to 5 results, nondeterminstically ordering their effects 
+   */
+  def map5[A,B,C,D,E,R](a: F[A], b: F[B], c: F[C], d: F[D], e: F[E])(f: (A,B,C,D,E) ⇒ R): F[R] =
+    mapBoth(mapBoth(a, b)((_,_)), map3(c,d,e)((_,_,_)))((ab,cde) ⇒ f(ab._1, ab._2, cde._1, cde._2, cde._3))
+
+  /**
+   * Apply a function to 6 results, nondeterminstically ordering their effects 
+   */
+  def map6[A,B,C,D,E,FF,R](a: F[A], b: F[B], c: F[C], d: F[D], e: F[E], ff:F[FF])(f: (A,B,C,D,E,FF) ⇒ R): F[R] =
+    mapBoth(map3(a, b, c)((_,_,_)), map3(d,e,ff)((_,_,_)))((abc,deff) ⇒ f(abc._1, abc._2, abc._3, deff._1, deff._2, deff._3))
+
+
+  /**
    * Obtain results from both `a` and `b`, nondeterministically ordering
    * their effects.
    */
