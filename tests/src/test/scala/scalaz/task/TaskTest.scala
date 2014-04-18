@@ -207,7 +207,7 @@ object TaskTest extends SpecLite {
       t3v.get must_== 0
     }
 
-    "map6 must run Tasks in parallel" in {
+    "nmap6 must run Tasks in parallel" in {
       import Thread._
       val sb = new StringBuffer
       val t1 = fork { sleep(1000); sb.append("a") ; now("a") }
@@ -217,7 +217,7 @@ object TaskTest extends SpecLite {
       val t5 = fork { sb.append("e") ; now("e") }
       val t6 = fork { sleep(600); sb.append("f") ; now("f") }
 
-      val r = Nondeterminism[Task].map6(t1, t2, t3, t4, t5, t6)(List(_,_,_,_,_,_))
+      val r = Nondeterminism[Task].nmap6(t1, t2, t3, t4, t5, t6)(List(_,_,_,_,_,_))
       r.run must_== List("a","b","c","d","e","f")
       sb.toString must_==("ecdfba")
     }
