@@ -136,6 +136,11 @@ trait ListFunctions {
     intersperse0(Nil, as).reverse
   }
 
+  final def tailOption[A](as: List[A]): Option[List[A]] = as match {
+    case Nil    => None
+    case _ :: t => Some(t)
+  }
+
   /** [[scala.Nil]] with a sometimes more convenient type */
   final def nil[A]: List[A] = Nil
 

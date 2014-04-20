@@ -8,6 +8,8 @@ import scalaz.std.{list => l}
 final class ListOps[A](self: List[A]) {
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
+  final def tailOption: Option[List[A]] = l.tailOption(self)
+
   final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
 
   final def toZipper: Option[Zipper[A]] = l.toZipper(self)
