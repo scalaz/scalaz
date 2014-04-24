@@ -72,25 +72,17 @@ sealed trait Cofree[S[_], A] {
 
 object Cofree extends CofreeInstances with CofreeFunctions {
 
-  def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = new Cofree[S,A] {
-    
-    def head = h
-    
-    def tail = t
-    
-    def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] = 
-      Cofree(f(head), S.map(tail)(g))
-  }
+  def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.done(t))
   
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
-  def CofreeT[S[_],A](a: A, t: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[S, A] = new Cofree[S,A] {
+  def applyT[S[_],A](a: A, t: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[S, A] = new Cofree[S,A] {
     
     def head = a
     
     def tail = t.run
 
     def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =  
-      CofreeT(f(head), T.map(t)(s => S.map(s)(g)))
+      applyT(f(head), T.map(t)(s => S.map(s)(g)))
   }
 }
 
@@ -106,15 +98,10 @@ trait CofreeFunctions {
   def unfoldC[F[_], A](a: A)(f: A => F[A])(implicit F: Functor[F]): Cofree[F, A] =
     Cofree(a, F.map(f(a))(unfoldC(_)(f)))
 
-  def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F]): Cofree[F, A] = {
-    val (a, fb) = f(b)
-    Cofree(a, F.map(fb)(unfold(_)(f)))
-  }
-
-  def unfoldT[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[F, A] = {
+  def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[F, A] = {
     val (a, fb) = f(b)
     val nt = T.map(Trampoline.done(fb))(fbb => F.map(fbb)(unfold(_)(f)))
-    Cofree.CofreeT(a, nt)
+    Cofree.applyT(a, nt)
   }
 }
 
