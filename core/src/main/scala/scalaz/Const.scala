@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 case class Const[A, B](getConst: A) {
   def ===(x: Const[A, B])(implicit A: Equal[A]): Boolean =
     A.equal(getConst, x.getConst)
@@ -18,6 +16,13 @@ sealed abstract class ConstInstances {
       override def map[A, B](fa: Const[C, A])(f: A => B): Const[C, B] =
         fa.map(f)
     }
+
+  implicit def constApplicative[F: Monoid] = new Applicative[({ type l[a] = Const[F, a] })#l] {
+    def point[A](a: => A): Const[F, A] = Const(Monoid[F].zero)
+
+    def ap[A, B](fa: => Const[F, A])(f: => Const[F, A => B]): Const[F, B] =
+      Const(Monoid[F].append(fa.getConst, f.getConst))
+  }
 
   implicit def constEqual[A : Equal, B]: Equal[Const[A, B]] =
     new Equal[Const[A, B]] {
