@@ -15,6 +15,8 @@ object CofreeTest extends SpecLite {
   type CofreeLazyOption[A] = Cofree[LazyOption, A]
   type CofreeStream[A] = Cofree[Stream, A]
   type OneAndStream[A] = OneAnd[Stream, A]
+  type OneAndList[A] = OneAnd[List, A]
+  type CofreeOption[A] = Cofree[Option, A]
 
   implicit val lazyOptionEqualNat = new (Equal ~> ({type λ[α] = Equal[LazyOption[α]]})#λ){
     def apply[A](a: Equal[A]) = LazyOption.lazyOptionEqual(a)
@@ -23,6 +25,20 @@ object CofreeTest extends SpecLite {
   implicit val streamEqualNat = new (Equal ~> ({type λ[α] = Equal[Stream[α]]})#λ){
     def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
   }
+
+ implicit def cofreeOptEquals[A]: Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
+  override def equal(a: CofreeOption[A], b: CofreeOption[A]): Boolean = true
+ }
+ 
+  val oneAndListNat: OneAndList ~> CofreeOption =
+    new (OneAndList ~> CofreeOption) {
+      def apply[A](fa: OneAndList[A]): CofreeOption[A] =
+        Cofree.unfold(fa) {
+          case OneAnd(a, h :: t) => 
+            (a, None)
+          case OneAnd(a, _) => (a, None)
+        }
+    }
 
   val oneAndStreamCofreeLazyOptionIso: OneAndStream <~> CofreeLazyOption =
     new IsoFunctorTemplate[OneAndStream, CofreeLazyOption] {
@@ -50,9 +66,20 @@ object CofreeTest extends SpecLite {
 
   implicit def CofreeLazyOptionArb[A: Arbitrary]: Arbitrary[CofreeLazyOption[A]] =
     Functor[Arbitrary].map(implicitly[Arbitrary[OneAndStream[A]]])(oneAndStreamCofreeLazyOptionIso.to(_))
-
+  
   implicit def CofreeStreamArb[A: Arbitrary]: Arbitrary[CofreeStream[A]] =
     Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to)
+
+
+  implicit def CoffreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
+    import org.scalacheck.Arbitrary._
+    import org.scalacheck.Gen
+    val arb = Arbitrary { Gen.listOfN(5000, implicitly[Arbitrary[A]].arbitrary ) }   
+    Functor[Arbitrary].map(arb){ 
+      case h :: Nil => oneAndListNat( OneAnd(h, Nil))
+      case h :: t => oneAndListNat( OneAnd(h, t) )
+    }    
+  }
 
   checkAll("CofreeLazyOption", comonad.laws[CofreeLazyOption])
   checkAll("CofreeLazyOption", traverse1.laws[CofreeLazyOption])
@@ -63,6 +90,11 @@ object CofreeTest extends SpecLite {
   checkAll("CofreeStream", traverse1.laws[CofreeStream])
   checkAll("CofreeStream", monad.laws[CofreeStream])
   checkAll("CofreeStream", equal.laws[CofreeStream[Int]])
+
+  checkAll("CofreeOption", comonad.laws[CofreeOption])
+  checkAll("CofreeOption", monad.laws[CofreeOption])
+  
+
 
   {
     type CofreeZipLazyOption[A] = CofreeZip[LazyOption, A]

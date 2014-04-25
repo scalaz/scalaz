@@ -9,7 +9,6 @@ sealed trait Cofree[S[_], A] {
 
   /** Applies `f` to the head and `g` through the tail. */
   def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] 
-  //= Cofree(f(head), S.map(tail)(g))
 
   /* Derived methods */
 
