@@ -7,13 +7,15 @@ private sealed trait ConstFunctor[C] extends Functor[({type λ[α] = Const[C, α
 }
 
 private sealed trait ConstApply[C] extends Apply[({type λ[α] = Const[C, α]})#λ] with ConstFunctor[C]{
-  def C: Monoid[C]
+  def C: Semigroup[C]
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
     Const(C.append(fa.getConst, f.getConst))
 }
 
 private sealed trait ConstApplicative[C] extends Applicative[({type λ[α] = Const[C, α]})#λ] with ConstApply[C]{
+  def C: Monoid[C]
+
   override def point[A](a: => A): Const[C, A] = Const(C.zero)
 }
 
@@ -24,18 +26,17 @@ private sealed trait ConstEqual[A, B] extends Equal[Const[A, B]] {
     OA.equal(a1.getConst, a2.getConst)
 }
 
-sealed trait ConstInstances3 {
+sealed abstract class ConstInstances3 {
   implicit def constFunctor[C]: Functor[({type λ[α] = Const[C, α]})#λ] = new ConstFunctor[C]{}
 }
 
-sealed trait ConstInstances2 extends ConstInstances3 {
-  implicit def constApply[C: Monoid]: Apply[({type λ[α] = Const[C, α]})#λ] = new ConstApply[C] {
-    val C: Monoid[C] = implicitly
+sealed abstract class ConstInstances2 extends ConstInstances3 {
+  implicit def constApply[C: Semigroup]: Apply[({type λ[α] = Const[C, α]})#λ] = new ConstApply[C] {
+    val C: Semigroup[C] = implicitly
   }
 }
 
-
-sealed trait ConstInstances1 extends ConstInstances2 {
+sealed abstract class ConstInstances1 extends ConstInstances2 {
   implicit def constApplicative[C: Monoid]: Applicative[({type λ[α] = Const[C, α]})#λ] = new ConstApplicative[C] {
     val C: Monoid[C] = implicitly
   }
@@ -47,9 +48,7 @@ sealed abstract class ConstInstances0 extends ConstInstances1 {
   }
 }
 
-sealed abstract class ConstInstances extends ConstInstances0
-
-object Const extends ConstInstances with ConstFunctions
+object Const extends ConstInstances0 with ConstFunctions
 
 
 sealed trait ConstFunctions {
