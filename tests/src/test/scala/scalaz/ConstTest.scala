@@ -7,12 +7,22 @@ import Const._
 import org.scalacheck.Prop.forAll
 
 object ConstTest extends SpecLite {
-  checkAll(functor.laws[({type l[a] = Const[Int, a]})#l])
-  checkAll(equal.laws[Const[Int, String]])
+  checkAll("Const", equal.laws[Const[Int, String]])
+
+  checkAll("Const List"  , applicative.laws[({type λ[α]  = Const[List[Int], α]})#λ])
+  checkAll("Const Option", applicative.laws[({type λ[α]  = Const[Option[Int], α]})#λ])
+
 
   "const functions" in {
     "const" ! forAll { (x: Int, y: Function0[String]) =>
       const(x)(y) == x
     }
+  }
+
+  object instances {
+    def functor[C] = Functor[({type λ[α] = Const[C, α]})#λ]
+    def functorMax[C: Monoid] = Functor[({type λ[α] = Const[C, α]})#λ]
+    def apply[C: Semigroup] = Apply[({type λ[α] = Const[C, α]})#λ]
+    def applicative[C: Monoid] = Applicative[({type λ[α] = Const[C, α]})#λ]
   }
 }
