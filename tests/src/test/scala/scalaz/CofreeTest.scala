@@ -35,7 +35,7 @@ object CofreeTest extends SpecLite {
       def apply[A](fa: OneAndList[A]): CofreeOption[A] =
         Cofree.unfold(fa) {
           case OneAnd(a, h :: t) => 
-            (a, None)
+            (a, Some(OneAnd(h, t)))
           case OneAnd(a, _) => (a, None)
         }
     }
@@ -94,8 +94,6 @@ object CofreeTest extends SpecLite {
   checkAll("CofreeOption", comonad.laws[CofreeOption])
   checkAll("CofreeOption", monad.laws[CofreeOption])
   
-
-
   {
     type CofreeZipLazyOption[A] = CofreeZip[LazyOption, A]
 
