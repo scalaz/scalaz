@@ -26,8 +26,21 @@ object CofreeTest extends SpecLite {
     def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
   }
 
- implicit def cofreeOptEquals[A]: Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
-  override def equal(a: CofreeOption[A], b: CofreeOption[A]): Boolean = true
+  implicit val cofreeOptionEqulNat = new (Equal ~>({ type λ[α] = Equal[Option[α]]})#λ){
+    def apply[A](a: Equal[A]) = std.option.optionEqual(a)
+  }
+
+  //needed to prevent SOE for testing wiht equality
+ implicit def cofreeOptEquals[A](implicit e: Equal[A]): Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
+   override def equal(a: CofreeOption[A], b: CofreeOption[A]): Boolean = {
+      def tr(a: CofreeOption[A], b: CofreeOption[A]): Boolean = 
+        (a.tail, b.tail) match {
+          case (Some(at), Some(bt)) if (e.equal(a.head, b.head)) => true
+          case (None, None) if (e.equal(a.head, b.head)) => true
+          case _ => false
+        }
+     tr(a,b) 
+   }
  }
  
   val oneAndListNat: OneAndList ~> CofreeOption =
