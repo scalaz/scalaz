@@ -31,7 +31,7 @@ object CofreeTest extends SpecLite {
     override def equal(a: CofreeOption[A], b: CofreeOption[A]): Boolean = {
       def tr(a: CofreeOption[A], b: CofreeOption[A]): Boolean = 
         (a.tail, b.tail) match {
-          case (Some(at), Some(bt)) if (e.equal(a.head, b.head)) => true
+          case (Some(at), Some(bt)) if (e.equal(a.head, b.head)) => tr(at, bt) 
           case (None, None) if (e.equal(a.head, b.head)) => true
           case _ => false
         }
