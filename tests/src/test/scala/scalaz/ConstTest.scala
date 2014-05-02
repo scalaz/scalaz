@@ -7,7 +7,7 @@ import Const._
 import org.scalacheck.Prop.forAll
 
 object ConstTest extends SpecLite {
-  checkAll("Const", equal.laws[Const[Int, String]])
+  checkAll("Const", order.laws[Const[Int, String]])
 
   checkAll("Const List"  , applicative.laws[({type λ[α]  = Const[List[Int], α]})#λ])
   checkAll("Const Option", applicative.laws[({type λ[α]  = Const[Option[Int], α]})#λ])
@@ -24,5 +24,8 @@ object ConstTest extends SpecLite {
     def functorMax[C: Monoid] = Functor[({type λ[α] = Const[C, α]})#λ]
     def apply[C: Semigroup] = Apply[({type λ[α] = Const[C, α]})#λ]
     def applicative[C: Monoid] = Applicative[({type λ[α] = Const[C, α]})#λ]
+    def equal[C: Equal, A] = Equal[Const[C, A]]
+    def equalMax[C: Order, A] = Equal[Const[C, A]]
+    def order[C: Order, A] = Order[Const[C, A]]
   }
 }
