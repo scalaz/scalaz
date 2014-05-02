@@ -10,7 +10,7 @@ private sealed trait ConstApply[C] extends Apply[({type λ[α] = Const[C, α]})#
   def C: Semigroup[C]
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
-    Const(C.append(fa.getConst, f.getConst))
+    Const(C.append(f.getConst, fa.getConst))
 }
 
 private sealed trait ConstApplicative[C] extends Applicative[({type λ[α] = Const[C, α]})#λ] with ConstApply[C]{
