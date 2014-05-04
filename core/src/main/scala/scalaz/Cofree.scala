@@ -1,7 +1,7 @@
 package scalaz
 
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
-sealed trait Cofree[S[_], A] {
+sealed abstract class Cofree[S[_], A] {
 
   def head: A 
 
@@ -74,6 +74,8 @@ sealed trait Cofree[S[_], A] {
 object Cofree extends CofreeInstances with CofreeFunctions {
 
   def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.done(t))
+
+  def unapply[S[_], A](c: Cofree[S, A]): Option[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
   
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
   def applyT[S[_],A](a: A, tf: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[S, A] = new Cofree[S,A] {
