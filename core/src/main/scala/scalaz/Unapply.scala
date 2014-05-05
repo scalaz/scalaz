@@ -1,7 +1,6 @@
 package scalaz
 
 import scala.annotation._
-import Id.Id
 import Leibniz.{===, refl}
 
 /**
