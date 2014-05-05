@@ -5,7 +5,6 @@ package scalaz
 import Ordering.{ EQ, LT, GT }
 
 import std.anyVal._
-import std.list._
 import std.option._
 
 import syntax.equal._
