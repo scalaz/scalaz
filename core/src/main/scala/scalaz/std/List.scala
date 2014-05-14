@@ -221,16 +221,16 @@ trait ListFunctions {
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
 
   @deprecated("use groupWhenM", "7.1")
-  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = groupWhenM(as)(p)
+  final def groupByM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = groupWhenM(as)(p)
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
-  final def groupWhenM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[List[A]]] = as match {
+  final def groupWhenM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
-    case h :: t => {
-      Monad[M].bind(spanM(t)(p(h, _))) {
+    case h :: t =>
+      val stateP = (i: A) => StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
+      Monad[M].bind(spanM[A, ({type s[a] = StateT[M, A, a]})#s](t)(stateP).eval(h)) {
         case (x, y) =>
-          Monad[M].map(groupWhenM(y)(p))((g: List[List[A]]) => (h :: x) :: g)
+          Monad[M].map(groupWhenM(y)(p))(g => NonEmptyList.nel(h, x) :: g)
       }
-    }
   }
 
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
@@ -240,13 +240,18 @@ trait ListFunctions {
   } mapValues (_.reverse)
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
-  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[List[A]] = {
+  final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {
     @tailrec
-    def go(xs: List[A], acc: List[List[A]]): List[List[A]] = xs match {
+    def span1(xs: List[A], s: A, l: List[A]): (List[A], List[A]) = xs match {
+      case Nil    => (l, Nil)
+      case h :: t => if (p(s, h)) span1(t, h, h :: l) else (l, xs)
+    }
+    @tailrec
+    def go(xs: List[A], acc: List[NonEmptyList[A]]): List[NonEmptyList[A]] = xs match {
       case Nil    => acc.reverse
       case h :: t =>
-        val (x, y) = t.span(p(h, _))
-        go(y, (h :: x) :: acc)
+        val (x, y) = span1(t, h, Nil)
+        go(y, NonEmptyList.nel(h, x.reverse) :: acc)
     }
     go(as, Nil)
   }

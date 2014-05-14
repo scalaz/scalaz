@@ -45,7 +45,22 @@ object ListTest extends SpecLite {
 
   "groupWhenM[Id].flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhenM[Id](p).flatten must_===(a)
+      a.groupWhenM[Id](p).map(_.list).flatten must_===(a)
+  }
+
+  "groupByWhenM[Id] ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupWhenM[Id](p).forall { group: NonEmptyList[Int] =>
+        list.adjacentPairs(group.list).forall(p.tupled)
+      }
+  }
+
+  "groupByWhenM[Id] ∀ i | 0<i<result.len: p(result(i).last, result(i+1).head) yields false" ! forAll {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      val pairs = list.adjacentPairs(a.groupWhen(p))
+      pairs.forall {
+        case (l, r) => !p(l.last, r.head)
+      }
   }
 
   "groupBy1" ! forAll {
@@ -56,17 +71,30 @@ object ListTest extends SpecLite {
   
   "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhen(p).flatten must_===(a)
+      a.groupWhen(p).map(_.list).flatten must_===(a)
   }
 
   "filterM" ! forAll {
     (xs: List[Int]) => xs.filterM[Id](_ % 2 == 0) == xs.filter(_ % 2 == 0)
   }
 
-  "groupByWhen splits a list at each point where `p(as(n), as(n+1))` yields false" ! forAll {
+  "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhen(p).forall { group: List[Int] =>
-        (0 until group.size - 1).forall { i: Int => p(group(i), group(i+1)) }
+      a.groupWhen(p).map(_.list).flatten must_===(a)
+  }
+
+  "groupByWhen ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      a.groupWhen(p).forall { group: NonEmptyList[Int] =>
+        list.adjacentPairs(group.list).forall(p.tupled)
+      }
+  }
+
+  "groupByWhen ∀ i | 0<i<result.len: p(result(i).last, result(i+1).head) yields false" ! forAll {
+    (a: List[Int], p: (Int, Int) => Boolean) =>
+      val pairs = list.adjacentPairs(a.groupWhen(p))
+      pairs.forall {
+        case (l, r) => !p(l.last, r.head)
       }
   }
 
