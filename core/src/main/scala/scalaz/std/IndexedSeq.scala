@@ -199,20 +199,30 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def groupWhenM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
     if (as.isEmpty)
       Monad[M].point(empty)
-    else
-      Monad[M].bind(spanM(as.tail)(p(as.head, _))) {
+    else {
+      val stateP = (i: A) => StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
+      Monad[M].bind(spanM[A, ({type s[a] = StateT[M, A, a]})#s](as.tail)(stateP).eval(as.head)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))((g: IxSq[IxSq[A]]) => (as.head +: x) +: g)
       }
+    }
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] = {
     @tailrec
+    def span1(xs: IxSq[A], s: A, l: IxSq[A]): (IxSq[A], IxSq[A]) =
+      if (xs.isEmpty) (l, empty)
+      else {
+        val h = xs.head
+        val t = xs.tail
+        if (p(s, h)) span1(t, h, l :+ h) else (l, xs)
+      }
+    @tailrec
     def go(xs: IxSq[A], acc: IxSq[IxSq[A]]): IxSq[IxSq[A]] = {
       if(xs.isEmpty)
         acc
-      else{
-        val (x, y) = xs.tail.span(p(xs.head, _))
+      else {
+        val (x, y) = span1(xs.tail, xs.head, empty)
         go(y, acc :+ (xs.head +: x))
       }
     }
