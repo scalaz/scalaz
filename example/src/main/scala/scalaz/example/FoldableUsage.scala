@@ -42,8 +42,6 @@ object FoldableUsage extends App {
   import scalaz.syntax.foldable._
   assert(trues.foldr(false)(lazyOr))
   assert(trues.foldMap((b: Boolean) ⇒ Tags.Disjunction(b)))
-
-  // max of 0,1,2,3,4,5,6,7,8,9 is: Some(9) min: Some(0)
   assert(digits.map(_.toString).intercalate(",") === "0,1,2,3,4,5,6,7,8,9")
   assert(digits.maximum === Some(9))
   assert(digits.minimum === Some(0))
@@ -70,7 +68,7 @@ object FoldableUsage extends App {
   assert(deepFolder.collapse[IList, Int](deep) === IList(1,2,3))
   assert(deepFolder.foldLeft(deep, "")(_ + _.toString) === "123")
 
-  // Monadic Folds: we can fold over a structure which a function
+  // Monadic Folds: we can fold over a structure with a function
   // which returns its value in a Monad, 
   val sumEvens: (Int,Int) ⇒ Option[Int] = { (x, y) ⇒
     // if the right int is even, add it to the left
