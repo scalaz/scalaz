@@ -94,6 +94,16 @@
     }
   }
   $.get("https://api.github.com/repos/scalaz/scalaz/git/trees/gh-pages", {}, callback)
+
+  var scalaBinaryVersion = "2.11";
+  var tags = ["7.1.0-M7"];
+  var name = "scalaz_" + scalaBinaryVersion;
+  var sonatype = "https://oss.sonatype.org/service/local/repositories/releases/archive/org/scalaz/" + name + "/";
+  for(var i = 0; i < tags.length; i++){
+    var tag = tags[i];
+    var url = sonatype + tag + "/" + name + "-" + tag + "-javadoc.jar/!/index.html#scalaz.package";
+    $("#scaladoc").append("<li><a target='_blank' href='" + url + "'>" + tag + "</a></li>");
+  }
 })()
 </script>
 </html>
