@@ -1,7 +1,6 @@
 package scalaz
 
 import collection.Iterator
-import syntax.semigroup._
 import syntax.reducer._
 import std.option.optionSyntax._
 import syntax.Ops
@@ -116,7 +115,7 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
 
 case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
-  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2)
+  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(f(a1), f(a2))
 
   def +:(a: A) = Three(a cons v, a, a1, a2)
 
@@ -155,7 +154,7 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
 
   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
     val va1 = r.unit(a1)
-    val accVa1 = accV |+| va1
+    val accVa1 = sg.append(accV, va1)
     if (pred(accVa1))
       (None, a1, Some(one(a2)))
     else
@@ -163,7 +162,7 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
   }
 }
 case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
-  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3)
+  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(m.append(f(a1), f(a2)), f(a3))
 
   def +:(a: A) = Four(a cons v, a, a1, a2, a3)
 
@@ -203,7 +202,7 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 
   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
     val va1 = r.unit(a1)
-    val accVa1 = accV |+| va1
+    val accVa1 = sg.append(accV, va1)
     if (pred(accVa1))
       (None, a1, Some(two(a2, a3)))
     else {
@@ -216,7 +215,7 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
   }
 }
 case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V]) extends Finger[V, A] {
-  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = f(a1) |+| f(a2) |+| f(a3) |+| f(a4)
+  def foldMap[B](f: A => B)(implicit m: Semigroup[B]) = m.append(m.append(f(a1), f(a2)), m.append(f(a3), f(a4)))
 
   def +:(a: A) = sys.error("Digit overflow")
 
@@ -257,7 +256,7 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 
   private[scalaz] def split1(pred: V => Boolean, accV: V) = {
     val va1 = r.unit(a1)
-    val accVa1 = accV |+| va1
+    val accVa1 = sg.append(accV, va1)
     if (pred(accVa1))
       (None, a1, Some(three(a2, a3, a4)))
     else {
@@ -279,8 +278,8 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B): B
 
   def foldMap[B](f: A => B)(implicit m: Semigroup[B]): B = fold(
-    (v, a1, a2) => f(a1) |+| f(a2),
-    (v, a1, a2, a3) => f(a1) |+| f(a2) |+| f(a3))
+    (v, a1, a2) => m.append(f(a1), f(a2)),
+    (v, a1, a2, a3) => m.append(m.append(f(a1), f(a2)), f(a3)))
 
   def toDigit = fold(
     (v, a1, a2) => Two(v, a1, a2),
@@ -311,7 +310,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
   private[scalaz] def split1(pred: V => Boolean, accV: V): (Option[Finger[V, A]], A, Option[Finger[V, A]]) = fold(
     (v, a1, a2) => {
       val va1 = r.unit(a1)
-      val accVa1 = accV |+| va1
+      val accVa1 = sg.append(accV, va1)
       if (pred(accVa1))
         (None, a1, Some(one(a2)))
       else
@@ -319,7 +318,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
     },
     (v, a1, a2, a3) => {
       val va1 = r.unit(a1)
-      val accVa1 = accV |+| va1
+      val accVa1 = sg.append(accV, va1)
       if (pred(accVa1))
         (None, a1, Some(two(a2, a3)))
       else {
@@ -364,7 +363,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def measure: V = this.unit[V]
 
   def foldMap[B](f: A => B)(implicit s: Monoid[B]): B =
-    fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) => pr.foldMap(f) |+| m.foldMap(x => x.foldMap(f)) |+| sf.foldMap(f))
+    fold(v => s.zero, (v, x) => f(x), (v, pr, m, sf) =>
+      s.append(s.append(pr.foldMap(f), m.foldMap(x => x.foldMap(f))), sf.foldMap(f)))
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = {
     foldMap((a: A) => (Endo.endo(f(a, _: B)))) apply z
@@ -438,7 +438,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
         rightz.fold(
           v => this,
           (v, x) => this :+ x,
-          (v2, pr2, m2, sf2) => deep(v1 |+| v2, pr1, addDigits0(m1, sf1, pr2, m2), sf2)
+          (v2, pr2, m2, sf2) => deep(measurer.append(v1, v2), pr1, addDigits0(m1, sf1, pr2, m2), sf2)
         )
     )
   }
@@ -459,7 +459,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           v => this :+ n,
           (v, x) => this :+ n :+ x,
           (v2, pr2, m2, sf2) =>
-            deep((v1 snoc n) |+| v2, pr1, addDigits1(m1, sf1, n, pr2, m2), sf2)
+            deep(measurer.append((v1 snoc n), v2), pr1, addDigits1(m1, sf1, n, pr2, m2), sf2)
         )
     )
   }
@@ -476,7 +476,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           v => this :+ n1 :+ n2,
           (v, x) => this :+ n1 :+ n2 :+ x,
           (v2, pr2, m2, sf2) =>
-            deep((v1 snoc n1 snoc n2) |+| v2, pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
+            deep(measurer.append((v1 snoc n1 snoc n2), v2), pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
         )
     )
   }
@@ -494,7 +494,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
            v => this :+ n1 :+ n2 :+ n3,
            (v, x) => this :+ n1 :+ n2 :+ n3 :+ x,
            (v2, pr2, m2, sf2) =>
-             deep((v1 snoc n1 snoc n2 snoc n3) |+| v2,
+             deep(measurer.append((v1 snoc n1 snoc n2 snoc n3), v2),
                pr1, addDigits3(m1, sf1, n1, n2, n3, pr2, m2), sf2)
         )
     )
@@ -514,7 +514,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           v => this :+ n1 :+ n2 :+ n3 :+ n4,
           (v, x) => this :+ n1 :+ n2 :+ n3 :+ n4 :+ x,
           (v2, pr2, m2, sf2) =>
-            deep((v1 snoc n1 snoc n2 snoc n3 snoc n4) |+| v2,
+            deep(measurer.append((v1 snoc n1 snoc n2 snoc n3 snoc n4), v2),
               pr1, addDigits4(m1, sf1, n1, n2, n3, n4, pr2, m2), sf2)
         )
     )
