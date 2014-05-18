@@ -68,7 +68,7 @@ object TraverseUsage extends App {
   val result: ValidationNel[String, Vector[Int]] = validations.sequenceU
   assert(result === NonEmptyList("failure2","failure4").failure[Vector[Int]])
 
-  val onlyEvenAllowed: Int ⇒ ValidationNel[String, Int] = x ⇒ if(x % 2 === 0) x.successNel else s"$x is not even".failureNel
+  val onlyEvenAllowed: Int ⇒ ValidationNel[String, Int] = x ⇒ if(x % 2 === 0) x.successNel else (x.toString + " is not even").failureNel
 
   val evens = IList(2,4,6,8)
   val notAllEvens = List(1,2,3,4)
