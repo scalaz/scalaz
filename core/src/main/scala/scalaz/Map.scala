@@ -7,9 +7,6 @@ import Ordering.{ EQ, LT, GT }
 import std.anyVal._
 import std.option._
 
-import syntax.equal._
-import syntax.std.option._
-
 import annotation.tailrec
 
 /** @since 7.0.3 */
@@ -78,7 +75,7 @@ sealed abstract class ==>>[A, B] {
     adjustWithKey(k, (_, x) => f(x))
 
   def adjustWithKey(k: A, f: (A, B) => B)(implicit o: Order[A]): A ==>> B =
-    updateWithKey(k, (a, b) => f(a, b).some)
+    updateWithKey(k, (a, b) => some(f(a, b)))
 
   def update(k: A, f: B => Option[B])(implicit o: Order[A]): A ==>> B =
     updateWithKey(k, (_, x) => f(x))
@@ -118,9 +115,9 @@ sealed abstract class ==>>[A, B] {
           case EQ =>
             f(kx, x) match {
               case Some(xx) =>
-                (xx.some, Bin(kx, xx, l, r))
+                (some(xx), Bin(kx, xx, l, r))
               case None =>
-                (x.some, glue(l, r))
+                (some(x), glue(l, r))
             }
         }
     }
@@ -142,7 +139,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             balance(kx, x, l, r.alter(k, f))
           case EQ =>
-            f(x.some) match {
+            f(some(x)) match {
               case None =>
                 glue(l, r)
               case Some(xx) =>
@@ -163,7 +160,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.lookup(k)
           case EQ =>
-            x.some
+            some(x)
         }
     }
 
@@ -179,7 +176,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.lookupAssoc(k)
           case EQ =>
-            (kx, x).some
+            some((kx, x))
         }
     }
 
@@ -220,7 +217,7 @@ sealed abstract class ==>>[A, B] {
             case GT =>
               go(n + l.size + 1, r)
             case EQ =>
-              (n + l.size).some
+              some((n + l.size))
           }
       }
 
@@ -239,7 +236,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.elemAt(i - l.size - 1)
           case EQ =>
-            (kx, x).some
+            some((kx, x))
         }
     }
 
@@ -269,7 +266,7 @@ sealed abstract class ==>>[A, B] {
   final def findMin: Option[(A, B)] =
     this match {
       case Bin(kx, x, Tip(), _) =>
-        (kx, x).some
+        some((kx, x))
       case Bin(_, _, l, _) =>
         l.findMin
       case Tip() =>
@@ -280,7 +277,7 @@ sealed abstract class ==>>[A, B] {
   final def findMax: Option[(A, B)] =
     this match {
       case Bin(kx, x, _, Tip()) =>
-        (kx, x).some
+        some((kx, x))
       case Bin(_, _, _, r) =>
         r.findMax
       case Tip() =>
@@ -348,7 +345,7 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         none
       case x @ Bin(_, _, _, _) =>
-        deleteFindMin(x).some
+        some(deleteFindMin(x))
     }
 
   def maxViewWithKey: Option[((A, B), A ==>> B)] =
@@ -356,7 +353,7 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         none
       case x @ Bin(_, _, _, _) =>
-        deleteFindMax(x).some
+        some(deleteFindMax(x))
     }
 
   def minView: Option[(B, A ==>> B)] =
@@ -365,7 +362,7 @@ sealed abstract class ==>>[A, B] {
         none
       case x @ Bin(_, _, _, _) =>
         val r = deleteFindMin(x)
-        (r._1._2, r._2).some
+        some((r._1._2, r._2))
     }
 
   def maxView: Option[(B, A ==>> B)] =
@@ -374,7 +371,7 @@ sealed abstract class ==>>[A, B] {
         none
       case x @ Bin(_, _, _, _) =>
         val r = deleteFindMax(x)
-        (r._1._2, r._2).some
+        some((r._1._2, r._2))
     }
 
   protected def merge(other: A ==>> B): A ==>> B =
@@ -815,7 +812,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.trimLookupLo(lo, cmphi)
           case EQ =>
-            ((kx, x).some, r.trim(a => o.order(lo, a), cmphi))
+            (some((kx, x)), r.trim(a => o.order(lo, a), cmphi))
         }
     }
 
@@ -1028,7 +1025,7 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
   implicit def A: Equal[A]
   implicit def B: Equal[B]
   final override def equal(a1: A ==>> B, a2: A ==>> B) =
-    a1.size === a2.size && a1.toAscList === a2.toAscList
+    Equal[Int].equal(a1.size, a2.size) && Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
 }
 
 trait MapFunctions {
