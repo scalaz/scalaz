@@ -2,8 +2,8 @@ package scalaz
 
 import collection.Iterator
 import syntax.reducer._
-import std.option.optionSyntax._
 import syntax.Ops
+import std.option._
 
 /**View of the left end of a sequence.*/
 sealed abstract class ViewL[S[_], A] {
@@ -706,7 +706,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       val accVpr = accV snoc pr
       if (pred(accVpr)) {
         val (l, x, r) = pr.split1(pred, accV)
-        (l.cata(_.toTree, empty), x, deepL(r, m, sf))
+        (cata(l)(_.toTree, empty), x, deepL(r, m, sf))
       } else {
         val accVm = mappendVal(accVpr, m)
         if (pred(accVm)) {
@@ -715,7 +715,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           (deepR(pr, ml, l), x, deepL(r, mr, sf))
         } else {
           val (l, x, r) = sf.split1(pred, accVm)
-          (deepR(pr, m, l), x, r.cata(_.toTree, empty))
+          (deepR(pr, m, l), x, cata(r)(_.toTree, empty))
         }
       }
     }
