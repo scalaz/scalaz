@@ -1,7 +1,5 @@
 package scalaz.example
 
-import scalaz.Id._
-
 object TraverseUsage extends App {
   import scalaz._
 
@@ -9,6 +7,7 @@ object TraverseUsage extends App {
   import scalaz.std.vector._
   import scalaz.std.option._
   import scalaz.std.anyVal._
+  import scalaz.std.boolean._
   import scalaz.std.string._
   import scalaz.syntax.equal._      // for === syntax
   import scalaz.syntax.validation._ // for .success and .failure syntax
@@ -69,7 +68,7 @@ object TraverseUsage extends App {
   val result: ValidationNel[String, Vector[Int]] = validations.sequenceU
   assert(result === NonEmptyList("failure2","failure4").failure[Vector[Int]])
 
-  val onlyEvenAllowed: Int ⇒ ValidationNel[String, Int] = x ⇒ if(x % 2 == 0) x.successNel else s"$x is not even".failureNel
+  val onlyEvenAllowed: Int ⇒ ValidationNel[String, Int] = x ⇒ if(x % 2 === 0) x.successNel else s"$x is not even".failureNel
 
   val evens = IList(2,4,6,8)
   val notAllEvens = List(1,2,3,4)
@@ -101,4 +100,13 @@ object TraverseUsage extends App {
 
   assert(res1.foldMap(Tags.Disjunction(_)) == false)
   assert(res2.foldMap(Tags.Disjunction(_)) == true)
+
+  // Here's a variation of above which might be a bit of a head
+  // scratcher, but this works because a Monoid gives rise to an
+  // Applicative Functor.  Because Boolean is not a * → * type
+  // constructor, we need traverseU instead of traverse to find the
+  // Applicative.
+  import scalaz.Applicative.monoidApplicative
+  assert(res1.traverseU(Tags.Disjunction(_)) == false)
+  assert(res2.traverseU(Tags.Disjunction(_)) == true)
 }
