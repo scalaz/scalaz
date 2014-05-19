@@ -285,16 +285,6 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
-
-  implicit def freeEqual[F[_], A](implicit A: Equal[A], N: Equal ~> ({type λ[α] = Equal[F[α]]})#λ, F: Functor[F]): Equal[Free[F, A]] =
-    Equal.equal{ (aa, bb) =>
-      (aa.resume, bb.resume) match {
-        case (\/-(a), \/-(b)) => A.equal(a, b)
-        case (-\/(a), -\/(b)) => N(freeEqual[F, A]).equal(a, b)
-        case (\/-(_), -\/(_)) => false
-        case (-\/(_), \/-(_)) => false
-      }
-    }
 }
 
 trait FreeFunctions {
