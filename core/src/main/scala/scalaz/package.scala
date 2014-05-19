@@ -285,4 +285,7 @@ package object scalaz {
 
   @deprecated("Cojoin has been merged into Cobind", "7.1")
   val Cojoin = Cobind
+
+  type IMap[A, B] = ==>>[A, B]
+  val IMap = ==>>
 }
