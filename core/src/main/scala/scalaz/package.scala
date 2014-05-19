@@ -270,4 +270,7 @@ package object scalaz {
   object Cont extends IndexedContsTFunctions with IndexedContsTInstances {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
+
+  type IMap[A, B] = ==>>[A, B]
+  val IMap = ==>>
 }
