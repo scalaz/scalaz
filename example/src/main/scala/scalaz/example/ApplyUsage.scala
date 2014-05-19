@@ -78,7 +78,7 @@ object ApplyUsage extends App {
   assert(someOf8Options === 36.some)
 
   // the applicative builder created by |@| also has a "tupled" method
-  // which will tuple the arguemnts
+  // which will tuple the arguments
   assert((List(1,2,3) |@| List("a","b","c")).tupled ===
            List(1 → "a", 1 → "b", 1 → "c",
                 2 → "a", 2 → "b", 2 → "c",
