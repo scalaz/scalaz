@@ -3,7 +3,6 @@ package scalaz
 import annotation.tailrec
 import Ordering._
 import std.option._
-import syntax.std.option._
 
 // http://www.haskell.org/ghc/docs/latest/html/libraries/containers-0.5.0.0/src/Data-Set-Base.html#Set
 
@@ -44,7 +43,7 @@ sealed abstract class ISet[A] {
     def withBest(x: A, best: A, t: ISet[A]): Option[A] =
       t match {
         case Tip() =>
-          best.some
+          some(best)
         case Bin(y, l, r) =>
           if (o.lessThanOrEqual(x, y)) withBest(x, best, l) else withBest(x, y, r)
       }
@@ -63,7 +62,7 @@ sealed abstract class ISet[A] {
     def withBest(x: A, best: A, t: ISet[A]): Option[A] =
       t match {
         case Tip() =>
-          best.some
+          some(best)
         case Bin(y, l, r) =>
           if (o.lessThan(x, y)) withBest(x, best, l) else withBest(x, best, r)
       }
@@ -82,13 +81,13 @@ sealed abstract class ISet[A] {
     def withBest(x: A, best: A, t: ISet[A]): Option[A] =
       t match {
         case Tip() =>
-          best.some
+          some(best)
         case Bin(y, l, r) =>
           o.order(x, y) match {
             case LT =>
               withBest(x, best, l)
             case EQ =>
-              y.some
+              some(y)
             case GT =>
               withBest(x, y, r)
           }
@@ -102,7 +101,7 @@ sealed abstract class ISet[A] {
           case LT =>
             l.lookupLE(x)
           case EQ =>
-            y.some
+            some(y)
           case GT =>
             withBest(x, y, r)
         }
@@ -115,13 +114,13 @@ sealed abstract class ISet[A] {
     def withBest(x: A, best: A, t: ISet[A]): Option[A] =
       t match {
         case Tip() =>
-          best.some
+          some(best)
         case Bin(y, l, r) =>
           o.order(x, y) match {
             case LT =>
               withBest(x, y, l)
             case EQ =>
-              y.some
+              some(y)
             case GT =>
               withBest(x, best, r)
           }
@@ -135,7 +134,7 @@ sealed abstract class ISet[A] {
           case LT =>
             withBest(x, y, l)
           case EQ =>
-            y.some
+            some(y)
           case GT =>
             r.lookupGE(x)
         }
@@ -197,7 +196,7 @@ sealed abstract class ISet[A] {
         case (_, Bin(x, Tip(), Tip())) =>
           t1.insertR(x)
         case (Bin(x, l, r), _) =>
-          val bmi = x.some
+          val bmi = some(x)
           join(x, hedgeUnion(blo, bmi, l, t2.trim(blo, bmi)), hedgeUnion(bmi, bhi, r, t2.trim(bmi, bhi)))
       }
 
@@ -234,7 +233,7 @@ sealed abstract class ISet[A] {
         case (Bin(x, l, r), Tip()) =>
           join(x, l.filterGt(blo), r.filterLt(bhi))
         case (t, Bin(x, l, r)) =>
-          val bmi = x.some
+          val bmi = some(x)
           hedgeDiff(blo, bmi, t.trim(blo, bmi), l) merge hedgeDiff(bmi, bhi, t.trim(bmi, bhi), r)
       }
 
@@ -260,7 +259,7 @@ sealed abstract class ISet[A] {
         case (Tip(), _) =>
           t1
         case (Bin(x, l, r), t2) =>
-          val bmi = x.some
+          val bmi = some(x)
           val l2 = hedgeInt(blo, bmi, l, t2.trim(blo, bmi))
           val r2 = hedgeInt(bmi, bhi, r, t2.trim(bmi, bhi))
           if (t2.member(x)) join(x, l2, r2) else l2 merge r2
@@ -373,7 +372,7 @@ sealed abstract class ISet[A] {
   final def findMin: Option[A] =
     this match {
       case Tip() => none
-      case Bin(x, Tip(), _) => x.some
+      case Bin(x, Tip(), _) => some(x)
       case Bin(_, l, _) => l.findMin
     }
 
@@ -381,7 +380,7 @@ sealed abstract class ISet[A] {
   final def findMax: Option[A] =
     this match {
       case Tip() => none
-      case Bin(x, _, Tip()) => x.some
+      case Bin(x, _, Tip()) => some(x)
       case Bin(_, _, r) => r.findMax
     }
 
@@ -422,13 +421,13 @@ sealed abstract class ISet[A] {
   final def minView: Option[(A, ISet[A])] =
     this match {
       case Tip() => none
-      case x => x.deleteFindMin.some
+      case x => some(x.deleteFindMin)
     }
 
   final def maxView: Option[(A, ISet[A])] =
     this match {
       case Tip() => none
-      case x => x.deleteFindMax.some
+      case x => some(x.deleteFindMax)
     }
 
   // -- ** List
@@ -526,7 +525,7 @@ sealed abstract class ISet[A] {
     }
 
   final def filterGt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    a.cata(s => this match {
+    cata(a)(s => this match {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(s, x) match {
@@ -537,7 +536,7 @@ sealed abstract class ISet[A] {
     }, this)
 
   final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    a.cata(s => this match {
+    cata(a)(s => this match {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(x, s) match {
