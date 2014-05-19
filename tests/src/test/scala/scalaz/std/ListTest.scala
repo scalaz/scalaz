@@ -58,6 +58,10 @@ object ListTest extends SpecLite {
     (xs: List[Int]) => xs.filterM[Id](_ % 2 == 0) == xs.filter(_ % 2 == 0)
   }
 
+  "filter consistent with fiterM[Id]" ! forAll {
+    (xs: List[Int], p: Int => Boolean) => MonadPlus[List].filter(xs)(p) must_=== xs.filterM[Id](p)
+  }
+
   "takeWhileM example" in {
     def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[({type λ[α] = State[Int, α]})#λ](a => State {
       i =>

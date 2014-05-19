@@ -20,6 +20,7 @@ trait ListInstances extends ListInstances0 {
     def empty[A] = Nil
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
+    override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
 
     def zip[A, B](a: => List[A], b: => List[B]) = {
       val _a = a

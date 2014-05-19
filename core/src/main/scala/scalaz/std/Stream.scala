@@ -50,6 +50,8 @@ trait StreamInstances {
     override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
+    override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
+
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b

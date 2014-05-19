@@ -32,6 +32,10 @@ object IndexedSeqTest extends SpecLite {
     (xs: IndexedSeq[Int]) => xs.filterM[Id](evenp) == xs.filter(_ % 2 == 0)
   }
 
+  "filter consistent with fiterM[Id]" ! forAll {
+    (xs: IndexedSeq[Int], p: Int => Boolean) => MonadPlus[IndexedSeq].filter(xs)(p) must_=== xs.filterM[Id](p)
+  }
+
   "initz" ! forAll {
     (xs: IndexedSeq[Int]) =>
       initz(xs) must_===(xs.inits.toIndexedSeq.reverse)
