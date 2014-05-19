@@ -389,11 +389,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def +:(a: => A): FingerTree[V, A] = {
     implicit val nm = nodeMeasure[A, V]
     lazy val az = a
-    fold(v => single(measurer.cons(az, v), az), (v, b) => deep(measurer.cons(az, v), one(az), empty[V, Node[V, A]], one(b)), (v, pr, m, sf) => {
-      val mz = m
-      pr match {
-        case Four(vf, b, c, d, e) => deep(measurer.cons(az, v), two(az, b), node3(c, d, e) +: mz, sf)
-        case _ => deep(measurer.cons(az, v), az +: pr, mz, sf)
+    fold(
+      v => single(measurer.cons(az, v), az),
+      (v, b) => deep(measurer.cons(az, v), one(az), empty[V, Node[V, A]], one(b)),
+      (v, pr, m, sf) => {
+        val mz = m
+        pr match {
+          case Four(vf, b, c, d, e) => deep(measurer.cons(az, v), two(az, b), node3(c, d, e) +: mz, sf)
+          case _ => deep(measurer.cons(az, v), az +: pr, mz, sf)
       }})
   }
 
@@ -401,11 +404,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def :+(a: => A): FingerTree[V, A] = {
     implicit val nm = nodeMeasure[A, V]
     lazy val az = a
-    fold(v => single(measurer.snoc(v, az), az), (v, b) => deep(measurer.snoc(v, az), one(b), empty[V, Node[V, A]], one(az)), (v, pr, m, sf) => {
-      val mz = m
-      sf match {
-        case Four(vf, b, c, d, e) => deep(measurer.snoc(v, az), pr, (mz :+ node3(b, c, d)), two(e, az))
-        case _ => deep(measurer.snoc(v, az), pr, mz, sf :+ az)
+    fold(
+      v => single(measurer.snoc(v, az), az),
+      (v, b) => deep(measurer.snoc(v, az), one(b), empty[V, Node[V, A]], one(az)),
+      (v, pr, m, sf) => {
+        val mz = m
+        sf match {
+          case Four(vf, b, c, d, e) => deep(measurer.snoc(v, az), pr, (mz :+ node3(b, c, d)), two(e, az))
+          case _ => deep(measurer.snoc(v, az), pr, mz, sf :+ az)
       }})
   }
 
@@ -475,7 +481,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           v => this :+ n1 :+ n2,
           (v, x) => this :+ n1 :+ n2 :+ x,
           (v2, pr2, m2, sf2) =>
-            deep(measurer.append(measurer.snoc(measurer.snoc(v1, n1), n2), v2), pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
+            deep(measurer.append(measurer.snoc(measurer.snoc(v1, n1), n2), v2),
+              pr1, addDigits2(m1, sf1, n1, n2, pr2, m2), sf2)
         )
     )
   }
@@ -1127,7 +1134,8 @@ sealed abstract class OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
    *                                priority than `a`, and of lower or equal priority respectively.
    */
   def partition(a: A): (OrdSeq[A], OrdSeq[A]) =
-  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(a1 => Order[LastOption[A]].greaterThanOrEqual(a1, Tags.Last(some(a)))))
+  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(a1 =>
+    Order[LastOption[A]].greaterThanOrEqual(a1, Tags.Last(some(a)))))
 
   /** Insert `a` at a the first point that all elements to the left are of higher priority */
   def insert(a: A): OrdSeq[A] = partition(a) match {
