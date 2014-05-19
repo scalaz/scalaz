@@ -11,14 +11,14 @@ import std.tuple._
 object Free extends FreeInstances with FreeFunctions {
 
   /** Return from the computation with the given value. */
-  case class Return[S[_], A](a: A) extends Free[S, A]
+  private[scalaz] case class Return[S[_], A](a: A) extends Free[S, A]
 
   /** Suspend the computation with the given suspension. */
-  case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
+  private[scalaz] case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  case class Gosub[S[_], A, B](a: () => Free[S, A],
-                                        f: A => Free[S, B]) extends Free[S, B]
+  private[scalaz] case class Gosub[S[_], A, B](a: () => Free[S, A],
+                                               f: A => Free[S, B]) extends Free[S, B]
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[A] = Free[Function0, A]
@@ -50,6 +50,10 @@ sealed abstract class Free[S[_], A] {
     case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(() => g(x), f))
     case a           => Gosub(() => a, f)
   }
+
+  /** Catamorphism. Run the first given function if Return, otherwise, the second given function. */
+  final def fold[B](r: A => B, s: S[Free[S, A]] => B)(implicit S: Functor[S]): B =
+    resume.fold(s, r)
 
   /** Evaluates a single layer of the free monad. */
   @tailrec final def resume(implicit S: Functor[S]): (S[Free[S, A]] \/ A) = this match {
