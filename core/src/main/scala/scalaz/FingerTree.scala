@@ -799,13 +799,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Convert the tree to a `String`. Unsafe: this uses `Any#toString` for types `V` and `A` */
   override def toString = {
-    import syntax.show._
-    def showA[A] = new Show[A] {
-      override def shows(a: A) = a.toString
-    }
-    implicit val v = showA[V]
-    implicit val a = showA[A]
-    this.shows
+    val showV = Show.showFromToString[V]
+    val showA = Show.showFromToString[A]
+    fingerTreeShow(showV, showA).shows(this)
   }
 }
 
@@ -1042,7 +1038,6 @@ object IndSeq {
 sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
   import syntax.arrow._
   import std.function._
-  import syntax.order._
   import std.option._
 
   implicit val ord: Order[A]
@@ -1052,7 +1047,7 @@ sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
    *                                priority than `a`, and of lower or equal priority respectively.
    */
   def partition(a: A): (OrdSeq[A], OrdSeq[A]) =
-  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(_ gte Tags.Last(some(a))))
+  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(a1 => Order[LastOption[A]].greaterThanOrEqual(a1, Tags.Last(some(a)))))
 
   /** Insert `a` at a the first point that all elements to the left are of higher priority */
   def insert(a: A): OrdSeq[A] = partition(a) match {
