@@ -25,7 +25,7 @@ object FoldableUsage extends App {
   // which traverses the stream from left to right lazily, so, given a
   // function which is lazy in the right argument, we can use a foldr
   // on an infinite stream.
-  def lazyOr(x: Boolean)(y: ⇒ Boolean) = x || y
+  def lazyOr(x: Boolean)(y: => Boolean) = x || y
   assert(Foldable[Stream].foldr(trues, false)(lazyOr))
 
   // when we have an available Monoid for the parameterized type, we
@@ -36,12 +36,12 @@ object FoldableUsage extends App {
   // we can also map the structure to values for which we have a
   // monoid, we can collapse the list, as we can see, this one is also
   // properly lazy, allowing us to collapse our infinite stream again
-  assert(Foldable[Stream].foldMap(trues)((b: Boolean) ⇒ Tags.Disjunction(b)))
+  assert(Foldable[Stream].foldMap(trues)((b: Boolean) => Tags.Disjunction(b)))
 
   // We can import syntax for foldable, allowing us to "enhance" the foldable with the new methods:
   import scalaz.syntax.foldable._
   assert(trues.foldr(false)(lazyOr))
-  assert(trues.foldMap((b: Boolean) ⇒ Tags.Disjunction(b)))
+  assert(trues.foldMap((b: Boolean) => Tags.Disjunction(b)))
   assert(digits.map(_.toString).intercalate(",") === "0,1,2,3,4,5,6,7,8,9")
   assert(digits.maximum === Some(9))
   assert(digits.minimum === Some(0))
@@ -70,7 +70,7 @@ object FoldableUsage extends App {
 
   // Monadic Folds: we can fold over a structure with a function
   // which returns its value in a Monad, 
-  val sumEvens: (Int,Int) ⇒ Option[Int] = { (x, y) ⇒
+  val sumEvens: (Int,Int) => Option[Int] = { (x, y) =>
     // if the right int is even, add it to the left
     // otherwise return None
     if((y % 2) == 0) Some(x+y) else None

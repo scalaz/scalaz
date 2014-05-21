@@ -11,8 +11,8 @@ object STUsage extends App {
 
   // Creates a new mutable reference and mutates it
   def e1[A] = for {
-    r ← newVar[A](0)
-    x ← r.mod(_ + 1)
+    r <- newVar[A](0)
+    x <- r.mod(_ + 1)
   } yield x
 
   // Creates a new mutable reference, mutates it, and reads its value.
@@ -36,8 +36,8 @@ object STUsage extends App {
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
-  def binSort[A: Manifest](size: Int, key: A ⇒ Int, as: List[A]): ImmutableArray[List[A]] =
-    accumArray(size, (vs: List[A], v: A) ⇒ v :: vs, List(), for { a ← as } yield (key(a), a))
+  def binSort[A: Manifest](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
+    accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
 
   assert(binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List("", "one", "twenty four"))
   assert(compiles === 1)

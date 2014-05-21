@@ -174,7 +174,7 @@ private trait IOLiftIO extends LiftIO[IO] {
 }
 
 private trait IOMonadCatchIO extends MonadCatchIO[IO] {
-  def except[A](io: IO[A])(h: Throwable ⇒ IO[A]): IO[A] = io.except(h)
+  def except[A](io: IO[A])(h: Throwable => IO[A]): IO[A] = io.except(h)
 }
 
 /** IO Actions for writing to standard output and and reading from standard input */

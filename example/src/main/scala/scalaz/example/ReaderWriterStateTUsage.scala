@@ -31,9 +31,9 @@ object Token {
   implicit val euqalsRef: Equal[Token] = Equal.equalRef
   implicit val showTok: Show[Token] = new Show[Token] {
     override def show(t: Token) = t match {
-      case A ⇒ Cord("A")
-      case B ⇒ Cord("B")
-      case C ⇒ Cord("C")
+      case A => Cord("A")
+      case B => Cord("B")
+      case C => Cord("C")
     }
   }
 }
@@ -85,12 +85,12 @@ object CABRunLengthEncoder {
   type RunLength[A] = ReaderWriterStateT[Trampoline, RunLengthConfig, Cord, RunLengthState, A]
 
   // At its essence the RWST monad transformer is a wrap around a function with the following shape:
-  // (ReaderType, StateType) ⇒ Monad[WriterType, Result, StateType]
+  // (ReaderType, StateType) => Monad[WriterType, Result, StateType]
   // we can directly wrap a function of this shape:
   /**
     *  read a token from the input
     */
-  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) ⇒ 
+  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) => 
     val (nextTok, newState) = oldState.uncons
     Applicative[Trampoline].point((Monoid[Cord].zero, nextTok, newState))
   }
@@ -112,19 +112,19 @@ object CABRunLengthEncoder {
     */
   val readToken2: RunLength[Token] = 
     for {
-      oldState ← get            // fetch the current state
+      oldState <- get            // fetch the current state
 
                                 // take a token off the input, getting
                                 // a token and a new state
       (nextTok, newState) = oldState.uncons
-      _ ← put(newState)         // store the new state
+      _ <- put(newState)         // store the new state
     } yield nextTok             // return the token
 
   /**
     have we exhausted the input?
     */
   def done: RunLength[Boolean] =
-    get flatMap { state ⇒
+    get flatMap { state =>
       if(state.input.isEmpty)
         // we have, better emit whatever tokens are stored in the
         // current state
@@ -148,9 +148,9 @@ object CABRunLengthEncoder {
     */
   def emit: RunLength[Unit] =
     for {
-       state ← get
-      config ← ask
-           _ ← state.lastToken.cata(none = point(),  // nothing to emit
+       state <- get
+      config <- ask
+           _ <- state.lastToken.cata(none = point(),  // nothing to emit
                                     some = writeOutput(_, state.length, config.minRun))
     } yield ()
 
@@ -160,9 +160,9 @@ object CABRunLengthEncoder {
     */ 
   def maybeEmit: RunLength[Unit] =
     for {
-      state ← get
-       next ← readToken
-           _ ← { if(state.lastToken.map(_ == next) getOrElse(false))
+      state <- get
+       next <- readToken
+           _ <- { if(state.lastToken.map(_ == next) getOrElse(false))
                  // Same token as last, so we just increment our counter 
                  modify(_.incLength)
                else
