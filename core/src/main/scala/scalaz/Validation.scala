@@ -349,6 +349,10 @@ final case class Failure[E, A](e: E) extends Validation[E, A]
 
 object Validation extends ValidationFunctions with ValidationInstances {
 
+  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
+  def failureNel[E, A](e: E): ValidationNel[E, A] =
+    Failure(NonEmptyList(e))
+
   /** Spin in tail-position on the success value of the given validation. */
   @annotation.tailrec
   final def loopSuccess[E, A, X](d: Validation[E, A], success: A => X \/ Validation[E, A], failure: E => X): X =
