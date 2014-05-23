@@ -17,9 +17,9 @@ object ApplyUsage extends App {
   // ap, the function is also in the same context. Here are some
   // examples, contrasted with map
 
-  val intToString: Int ⇒ String = _.toString
-  val double: Int ⇒ Int = _ * 2
-  val addTwo: Int ⇒ Int = _ + 2
+  val intToString: Int => String = _.toString
+  val double: Int => Int = _ * 2
+  val addTwo: Int => Int = _ + 2
 
   // map
   assert(Apply[Option].map(1.some)(intToString) === "1".some)
@@ -30,8 +30,8 @@ object ApplyUsage extends App {
   assert(Apply[Option].ap(1.some)(some(intToString)) === "1".some)
   assert(Apply[Option].ap(1.some)(some(double)) === 2.some)
   assert(Apply[Option].ap(none)(some(double)) === none)
-  assert(Apply[Option].ap(1.some)(none[Int ⇒ Int]) === none[Int])
-  assert(Apply[Option].ap(none)(none[Int ⇒ Int]) === none[Int])
+  assert(Apply[Option].ap(1.some)(none[Int => Int]) === none[Int])
+  assert(Apply[Option].ap(none)(none[Int => Int]) === none[Int])
   assert(Apply[List].ap(List(1,2,3))(List(double, addTwo)) === List(2,4,6,3,4,5))
 
   // from these two methods (map and ap) we are able to derive some
@@ -62,8 +62,8 @@ object ApplyUsage extends App {
   import scalaz.syntax.apply._
 
   // <*> is syntax for the "ap" method
-  val plus1: Int ⇒ Int = _ + 1
-  val plus2: Int ⇒ Int = _ + 2
+  val plus1: Int => Int = _ + 1
+  val plus2: Int => Int = _ + 2
   assert(List(1,2,3) <*> List(plus1, plus2) === List(2,3,4,3,4,5))
 
   // |@| is refered to as "applicative builder", it allows you to

@@ -39,7 +39,7 @@ object TraverseUsage extends App {
   // fa.traverse(f):
   val smallNumbers = List(1,2,3,4,5)
   val bigNumbers = List(10,20,30,40,50)
-  val doubleSmall: Int ⇒ Option[Int] = (x ⇒ if(x < 30) Some(x*2) else None)
+  val doubleSmall: Int => Option[Int] = (x => if(x < 30) Some(x*2) else None)
 
   assert(smallNumbers.traverse(doubleSmall) === Some(List(2,4,6,8,10)))
   assert(smallNumbers.traverse(doubleSmall) === smallNumbers.map(doubleSmall).sequence)
@@ -52,8 +52,8 @@ object TraverseUsage extends App {
   // and traverseU, these are useful in the case when the scala
   // compiler fails to infer an implicit Applicative instance for the
   // "inner" type. This will commonly happen when there is a "Kind
-  // mismatch", for example with Validation, which is kind *,* → *
-  // instead of the expected * → * kind of an Applicative, since the
+  // mismatch", for example with Validation, which is kind *,* -> *
+  // instead of the expected * -> * kind of an Applicative, since the
   // Validation type constructor takes two arguments instead of one.
 
   val validations: Vector[ValidationNel[String,Int]] = Vector(1.success, "failure2".failureNel, 3.success, "failure4".failureNel)
@@ -68,7 +68,7 @@ object TraverseUsage extends App {
   val result: ValidationNel[String, Vector[Int]] = validations.sequenceU
   assert(result === NonEmptyList("failure2","failure4").failure[Vector[Int]])
 
-  val onlyEvenAllowed: Int ⇒ ValidationNel[String, Int] = x ⇒ if(x % 2 === 0) x.successNel else (x.toString + " is not even").failureNel
+  val onlyEvenAllowed: Int => ValidationNel[String, Int] = x => if(x % 2 === 0) x.successNel else (x.toString + " is not even").failureNel
 
   val evens = IList(2,4,6,8)
   val notAllEvens = List(1,2,3,4)
@@ -82,10 +82,10 @@ object TraverseUsage extends App {
 
   import scalaz.State._
   // state stores the last seen Int, returns whether of not the current was a repeat
-  val checkForRepeats: Int ⇒ State[Option[Int], Boolean] = { next ⇒
+  val checkForRepeats: Int => State[Option[Int], Boolean] = { next =>
     for {
-      last ← get
-      _ ← put(some(next))
+      last <- get
+      _ <- put(some(next))
     } yield (last === some(next))
   }
 
@@ -103,7 +103,7 @@ object TraverseUsage extends App {
 
   // Here's a variation of above which might be a bit of a head
   // scratcher, but this works because a Monoid gives rise to an
-  // Applicative Functor.  Because Boolean is not a * → * type
+  // Applicative Functor.  Because Boolean is not a * -> * type
   // constructor, we need traverseU instead of traverse to find the
   // Applicative.
   import scalaz.Applicative.monoidApplicative
