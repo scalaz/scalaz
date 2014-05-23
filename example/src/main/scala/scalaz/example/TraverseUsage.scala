@@ -15,7 +15,7 @@ object TraverseUsage extends App {
   // An easy to understand first step in using the Traverse typeclass
   // is the sequence operation, which given a Traverse[F] and
   // Applicative[G] turns F[G[A]] into G[F[A]].  This is like "turning
-  // the structure "inside-out":
+  // the structure 'inside-out'":
   val list1: List[Option[Int]] = List(Some(1), Some(2), Some(3), Some(4))
   assert(Traverse[List].sequence(list1) === Some(List(1,2,3,4)))
 
@@ -32,10 +32,10 @@ object TraverseUsage extends App {
   assert(list1.sequence.sequence === list1)
 
   // A next step in using the Traverse TypeClass is the traverse
-  // method. The traverse method maps function over s structure
+  // method. The traverse method maps function over a structure
   // through the effects of the inner applicative. You can think of
   // this method as combining a map with a sequence, so when you find
-  // yourself calling fa.map(f).sequence, it can be replaces with just
+  // yourself calling fa.map(f).sequence, it can be replaced with just
   // fa.traverse(f):
   val smallNumbers = List(1,2,3,4,5)
   val bigNumbers = List(10,20,30,40,50)
@@ -44,7 +44,7 @@ object TraverseUsage extends App {
   assert(smallNumbers.traverse(doubleSmall) === Some(List(2,4,6,8,10)))
   assert(smallNumbers.traverse(doubleSmall) === smallNumbers.map(doubleSmall).sequence)
 
-  // when we hit the 30, we get a None, which "failures" the whole computation
+  // when we hit the 30, we get a None, which "fails" the whole computation
   assert(bigNumbers.traverse(doubleSmall) === none[List[Int]])
   assert(bigNumbers.traverse(doubleSmall) === bigNumbers.map(doubleSmall).sequence)
 
