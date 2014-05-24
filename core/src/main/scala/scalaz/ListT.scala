@@ -14,6 +14,9 @@ final case class ListT[M[_], A](run: M[List[A]]){
     }
   }
 
+	@deprecated("Underlying is deprecated. Use run instead", "7.1")
+	def underlying: M[List[A]] = run
+
   def ::(a: A)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(list => a :: list))
 
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(run)(_.isEmpty)
