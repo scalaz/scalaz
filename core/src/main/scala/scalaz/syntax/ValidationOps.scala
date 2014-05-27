@@ -10,7 +10,7 @@ final class ValidationOps[A](self: A) {
 
   def fail[X]: Validation[A, X] = failure[X]
 
-  def failureNel[X]: ValidationNel[A, X] = Validation.failure[NonEmptyList[A], X](NonEmptyList(self))
+  def failureNel[X]: ValidationNel[A, X] = Validation.failureNel[A, X](self)
 
   def failNel[X]: ValidationNel[A, X] = failureNel[X]
 }
