@@ -7,7 +7,6 @@ object TraverseUsage extends App {
   import scalaz.std.vector._
   import scalaz.std.option._
   import scalaz.std.anyVal._
-  import scalaz.std.boolean._
   import scalaz.std.string._
   import scalaz.syntax.equal._      // for === syntax
   import scalaz.syntax.validation._ // for .success and .failure syntax

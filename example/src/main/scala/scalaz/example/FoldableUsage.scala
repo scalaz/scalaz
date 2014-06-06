@@ -7,7 +7,6 @@ object FoldableUsage extends App {
   import scalaz.std.string._
   import scalaz.std.option._
   import scalaz.std.anyVal._
-  import scalaz.std.function._
   import scalaz.std.vector._
   import scalaz.syntax.std.option._
   import scalaz.syntax.equal._

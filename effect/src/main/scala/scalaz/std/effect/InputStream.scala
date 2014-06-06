@@ -1,7 +1,7 @@
 package scalaz
 package std.effect
 
-import effect.{IO, Resource}
+import effect.Resource
 
 import java.io.InputStream
 

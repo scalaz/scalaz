@@ -5,7 +5,6 @@ object WriterUsage extends App {
   import scalaz._
   import std.list._
   import syntax.writer._
-  import syntax.id._
   import syntax.semigroup._ // for |+|
   import syntax.apply._     // for |@|
 
