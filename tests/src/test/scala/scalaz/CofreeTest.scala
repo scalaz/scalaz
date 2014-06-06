@@ -141,6 +141,13 @@ object CofreeTest extends SpecLite {
     OneAnd(h, t) must_=== oneAndStreamCofreeLazyOptionIso.from(y)
   }
 
+  "no stack overflow unfoldC, mapBranching" in {
+    import syntax.foldable._
+    val n = 100
+    val list = Cofree.unfoldC(1)(a => Option(a + 1)).mapBranching(NaturalTransformation.refl).toStream.take(n).toList
+    list must_=== (1 to n).toList
+  }
+
   object instances{
     def comonad[F[_]: Functor] = Comonad[({type λ[α] = Cofree[F, α]})#λ]
     def bind[F[_]: Plus: Functor] = Bind[({type λ[α] = Cofree[F, α]})#λ]

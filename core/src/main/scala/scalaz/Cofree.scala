@@ -48,11 +48,11 @@ sealed abstract class Cofree[S[_], A] {
 
   /** Changes the branching functor by the given natural transformation. */
   final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Cofree[T, A] =
-    Cofree(head, f(S.map(tail)(_ mapBranching f)))
+    Cofree.delay(head, f(S.map(tail)(_ mapBranching f)))
 
   /** Modifies the first branching with the given natural transformation. */
   final def mapFirstBranching(f: S ~> S): Cofree[S, A] =
-    Cofree(head, f(tail))
+    Cofree.delay(head, f(tail))
 
   /** Injects a constant value into this structure. */
   final def inject[B](b: B)(implicit S: Functor[S]): Cofree[S, B] =
@@ -74,6 +74,8 @@ sealed abstract class Cofree[S[_], A] {
 object Cofree extends CofreeInstances with CofreeFunctions {
 
   def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.done(t))
+
+  def delay[S[_], A](h: A, t: => S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.delay(t))
 
   def unapply[S[_], A](c: Cofree[S, A]): Option[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
   
@@ -99,7 +101,7 @@ trait CofreeFunctions {
 
   /** Cofree corecursion. */
   def unfoldC[F[_], A](a: A)(f: A => F[A])(implicit F: Functor[F]): Cofree[F, A] =
-    Cofree(a, F.map(f(a))(unfoldC(_)(f)))
+    Cofree.delay(a, F.map(f(a))(unfoldC(_)(f)))
 
   def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[F, A] = {
     val (a, fb) = f(b)
