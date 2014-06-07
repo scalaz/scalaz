@@ -58,9 +58,9 @@ object FreeTest extends SpecLite {
   }
 
   object instances {
-    def monad[F[_]: Functor] = Monad[({type λ[α] = Free[F, α]})#λ]
-    def foldable[F[_]: Foldable: Functor] = Foldable[({type λ[α] = Free[F, α]})#λ]
-    def foldable1[F[_]: Foldable1: Functor] = Foldable1[({type λ[α] = Free[F, α]})#λ]
+    def monad[F[_]] = Monad[({type λ[α] = Free[F, α]})#λ]
+    def foldable[F[_]: Foldable] = Foldable[({type λ[α] = Free[F, α]})#λ]
+    def foldable1[F[_]: Foldable1] = Foldable1[({type λ[α] = Free[F, α]})#λ]
     def traverse[F[_]: Traverse] = Traverse[({type λ[α] = Free[F, α]})#λ]
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Free[F, α]})#λ]
 
