@@ -5,19 +5,14 @@ import Isomorphism.{<~>, IsoFunctorTemplate}
 
 /** An optional value
  *
- * A `Maybe[A]` will either be a wrapped `A` instance (`Just`), or a lack of underlying
- * `A` instance (`Empty`).
+ * A `Maybe[A]` will either be a wrapped `A` instance (`Just[A]`), or a lack of underlying
+ * `A` instance (`Empty[A]`).
  *
  * `Maybe[A]` is isomorphic to `Option[A]`, however there are some differences between
  * the two. `Maybe` is invariant in `A` while `Option` is covariant. `Maybe[A]` does not expose
  * an unsafe `get` operation to access the underlying `A` value (that may not exist) like
  * `Option[A]` does. `Maybe[A]` does not come with an implicit conversion to `Iterable[A]` (a
  * trait with over a dozen super types).
- *
- * Unfortunately, representing `Empty` as a singleton object while avoiding covariance on
- * `Maybe` requires jumping through some Scala hoops. To avoid exposing said hoops,
- * case matching on `Maybe` is not supported and [[cata]] (or other methods) should be
- * used instead.
  */
 sealed abstract class Maybe[A] {
   import Maybe._
