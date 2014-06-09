@@ -208,6 +208,11 @@ package object scalaz {
   type MinOption[A] = Option[A] @@ Tags.Min
   type MaxOption[A] = Option[A] @@ Tags.Max
 
+  type FirstMaybe[A] = Maybe[A] @@ Tags.First
+  type LastMaybe[A] = Maybe[A] @@ Tags.Last
+  type MinMaybe[A] = Maybe[A] @@ Tags.Min
+  type MaxMaybe[A] = Maybe[A] @@ Tags.Max
+
   //
   // Lens type aliases
   //
