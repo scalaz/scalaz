@@ -1,6 +1,7 @@
 package scalaz
 
 import Ordering._
+import Isomorphism.{<~>, IsoFunctorTemplate}
 
 /** An optional value
  *
@@ -70,7 +71,13 @@ final case class Empty[A]() extends Maybe[A]
 
 final case class Just[A](a: A) extends Maybe[A]
 
-object Maybe extends MaybeFunctions with MaybeInstances
+object Maybe extends MaybeFunctions with MaybeInstances {
+  val optionMaybeIso: Option <~> Maybe =
+    new IsoFunctorTemplate[Option, Maybe] {
+      def to[A](fa: Option[A]) = std.option.toMaybe(fa)
+      def from[A](ga: Maybe[A]) = ga.toOption
+    }
+}
 
 sealed trait MaybeFunctions {
   import Maybe._
