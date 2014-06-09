@@ -66,14 +66,11 @@ sealed abstract class Maybe[A] {
   final def max: MaxMaybe[A] = Tag(this)
 }
 
-object Maybe extends MaybeFunctions with MaybeInstances {
-  private[scalaz] case object Empty extends Maybe[Nothing] {
-    def apply[A](): Maybe[A] = this.asInstanceOf[Maybe[A]]
-    def unapply[A](m: Maybe[A]) = m == this
-  }
+final case class Empty[A]() extends Maybe[A]
 
-  private[scalaz] final case class Just[A](a: A) extends Maybe[A]
-}
+final case class Just[A](a: A) extends Maybe[A]
+
+object Maybe extends MaybeFunctions with MaybeInstances
 
 sealed trait MaybeFunctions {
   import Maybe._
