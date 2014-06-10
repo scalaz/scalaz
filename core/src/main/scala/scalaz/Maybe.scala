@@ -91,11 +91,12 @@ sealed abstract class Maybe[A] {
     cata(f, false)
 }
 
-final case class Empty[A]() extends Maybe[A]
-
-final case class Just[A](a: A) extends Maybe[A]
-
 object Maybe extends MaybeFunctions with MaybeInstances {
+
+  final case class Empty[A]() extends Maybe[A]
+
+  final case class Just[A](a: A) extends Maybe[A]
+
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {
       def to[A](fa: Option[A]) = fa match {
