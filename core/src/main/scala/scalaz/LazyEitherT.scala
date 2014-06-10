@@ -4,6 +4,7 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   import LazyEither._
   import LazyEitherT._
   import OptionT._
+  import MaybeT._
   import LazyOptionT._
 
   def ?[X](left: => X, right: => X)(implicit F: Functor[F]): F[X] =
@@ -40,6 +41,9 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
 
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
     optionT(F.map(run)(_.toOption))
+
+  def toMaybe(implicit F: Functor[F]): MaybeT[F, B] =
+    maybeT(F.map(run)(_.toMaybe))
 
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.toList)

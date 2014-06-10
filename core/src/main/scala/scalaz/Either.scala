@@ -165,6 +165,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => Some(b)
     }
 
+  /** Return an empty maybe or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
+  def toMaybe[BB >: B]: Maybe[BB] =
+    this match {
+      case -\/(_) => Maybe.empty
+      case \/-(b) => Maybe.just(b)
+    }
+
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither: Either[A, B] =
     this match {

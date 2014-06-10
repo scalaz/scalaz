@@ -121,6 +121,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
     optionT[F](F.map(run)((_: (A \/ B)).toOption))
 
+  /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
+  def toMaybe(implicit F: Functor[F]): MaybeT[F, B] =
+    maybeT[F](F.map(run)((_: (A \/ B)).toMaybe))
+
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither(implicit F: Functor[F]): F[Either[A, B]] =
     F.map(run)(_.toEither)
