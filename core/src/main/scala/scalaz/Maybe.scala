@@ -23,6 +23,9 @@ sealed abstract class Maybe[A] {
       case Empty() => b
     }
 
+  final def getOrElse(a: => A): A =
+    cata(identity, a)
+
   final def toFailure[B](b: => B): Validation[A, B] =
     cata(Failure(_), Success(b))
 
@@ -60,6 +63,32 @@ sealed abstract class Maybe[A] {
   final def min: MinMaybe[A] = Tag(this)
 
   final def max: MaxMaybe[A] = Tag(this)
+
+  final def cojoin: Maybe[Maybe[A]] = map(just)
+
+  final def cobind[B](f: Maybe[A] => B): Maybe[B] =
+    map(_ => f(this))
+
+  final def zip[B](fb: Maybe[B]): Maybe[(A, B)] =
+    for {
+      a <- this
+      b <- fb
+    } yield (a, b)
+
+  final def zipWith[B, C](fb: Maybe[B])(f: (A, B) => C): Maybe[C] =
+    for {
+      a <- this
+      b <- fb
+    } yield f(a, b)
+
+  final def filter(f: A => Boolean): Maybe[A] =
+    flatMap(a => if (f(a)) this else empty)
+
+  final def forall(f: A => Boolean): Boolean =
+    cata(f, true)
+
+  final def exists(f: A => Boolean): Boolean =
+    cata(f, false)
 }
 
 final case class Empty[A]() extends Maybe[A]
@@ -208,20 +237,19 @@ sealed trait MaybeInstances {
     def cozip[A, B](fa: Maybe[A \/ B]) =
       fa.cata(_.leftMap(just).map(just), \/.left(empty))
 
-    def zip[A, B](a: => Maybe[A], b: => Maybe[B]) =
-      for {
-        x <- a
-        y <- b
-      } yield (x, y)
+    def zip[A, B](a: => Maybe[A], b: => Maybe[B]) = a.zip(b)
 
     def unzip[A, B](a: Maybe[(A, B)]) =
       a.cata(ab => (just(ab._1), just(ab._2)), (empty, empty))
 
     def cobind[A, B](fa: Maybe[A])(f: Maybe[A] => B) =
-      fa.map(a => f(just(a)))
+      fa.cobind(f)
 
     def isEmpty[A](fa: Maybe[A]) =
       fa.isEmpty
+
+    override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
+      fa.filter(f)
   }
 }
 
