@@ -17,30 +17,44 @@ import Isomorphism.{<~>, IsoFunctorTemplate}
 sealed abstract class Maybe[A] {
   import Maybe._
 
+  /** Catamorphism.
+   * Run the given function on the underlying value if present, otherwise return
+   * the provided fallback value */
   final def cata[B](f: A => B, b: => B): B =
     this match {
       case Just(a) => f(a)
       case Empty() => b
     }
 
+  /** Return the underlying value if present, otherwise the provided fallback value */
   final def getOrElse(a: => A): A =
     cata(identity, a)
 
+  /** Turn the underlying value into a failure validation if present, otherwise
+   * return a success validation with the provided fallback value */
   final def toFailure[B](b: => B): Validation[A, B] =
     cata(Failure(_), Success(b))
 
+  /** Turn the underlying value into a success validation if present, otherwise
+   * return a failure validation with the provided fallback value */
   final def toSuccess[B](b: => B): Validation[B, A] =
     cata(Success(_), Failure(b))
 
+  /** Turn the underlying value into a left disjunction if present, otherwise
+   * return a right disjunction with the provided fallback value */
   final def toLeft[B](b: => B): A \/ B =
     cata(\/.left(_), \/.right(b))
 
+  /** Turn the underlying value into a right disjunction if present, otherwise
+   * return a left disjunction with the provided fallback value */
   final def toRight[B](b: => B): B \/ A =
     cata(\/.right(_), \/.left(b))
 
+  /** True if an underlying value is present */
   final def isJust: Boolean =
     cata(_ => true, false)
 
+  /** True if no underlying value is present */
   final def isEmpty: Boolean =
     cata(_ => false, true)
 
@@ -50,18 +64,24 @@ sealed abstract class Maybe[A] {
   final def flatMap[B](f: A => Maybe[B]) =
     cata(f, empty[B])
 
+  /** Convert to a standard library `Option` */
   final def toOption: Option[A] =
     cata(Some(_), None)
 
+  /** Return this instance if it is a [[Maybe.Just]], otherwise the provided fallback */
   final def orElse(oa: => Maybe[A]): Maybe[A] =
     cata(_ => this, oa)
 
+  /** Tag with [[Tags.First]] */
   final def first: FirstMaybe[A] = Tag(this)
 
+  /** Tag with [[Tags.Last]] */
   final def last: LastMaybe[A] = Tag(this)
 
+  /** Tag with [[Tags.Min]] */
   final def min: MinMaybe[A] = Tag(this)
 
+  /** Tag with [[Tags.Max]] */
   final def max: MaxMaybe[A] = Tag(this)
 
   final def cojoin: Maybe[Maybe[A]] = map(just)
@@ -84,9 +104,13 @@ sealed abstract class Maybe[A] {
   final def filter(f: A => Boolean): Maybe[A] =
     flatMap(a => if (f(a)) this else empty)
 
+  /** Return `true` if this is a [[Maybe.Empty]] or if this is a [[Maybe.Just]]
+   * and the underlying value satisfies the provided predicate */
   final def forall(f: A => Boolean): Boolean =
     cata(f, true)
 
+  /** Return `true` if this is a [[Maybe.Just]] and the underlying value
+   * satisfies the provided predicate */
   final def exists(f: A => Boolean): Boolean =
     cata(f, false)
 }
