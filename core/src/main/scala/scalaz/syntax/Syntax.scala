@@ -130,6 +130,8 @@ trait Syntaxes {
 
   object these extends ToTheseOps
 
+  object maybe extends ToMaybeOps
+
   //
   // Mixed
   //
@@ -149,6 +151,7 @@ trait ToDataOps
   with ToEitherOps
   with ToNelOps
   with ToTheseOps
+  with ToMaybeOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToLengthOps with ToShowOps

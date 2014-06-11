@@ -202,6 +202,11 @@ trait OptionFunctions {
     case None    => \/-(b)
   }
 
+  final def toMaybe[A](oa: Option[A]): Maybe[A] = oa match {
+    case Some(a) => Maybe.just(a)
+    case None    => Maybe.empty
+  }
+
   /**
    * Returns the item contained in the Option wrapped in type M if the Option is defined,
    * otherwise, the empty value for type M.
