@@ -14,6 +14,7 @@ final class MapOps[Map[_, _], BKC[_], K, A](self: Map[K, A])
   final def unionWithKey(m: Map[K, A])(f: (K, A, A) => A)(implicit bk: BKC[K]): Map[K, A] = dict.unionWithKey(self, m)(f)
   final def unionWith(m: Map[K, A])(f: (A, A) => A)(implicit bk: BKC[K]): Map[K, A] = dict.unionWith(self, m)(f)
   final def insertWith(k: K, v: A)(f: (A, A) => A)(implicit bk: BKC[K]): Map[K, A] = dict.insertWith(self, k, v)(f)
+  final def getOrAdd[F[_]](k: K)(fa: => F[A])(implicit F: Applicative[F], bk: BKC[K]): F[(Map[K, A], A)] = dict.getOrAdd(self, k)(fa)
 }
 
 trait ToMapOps {

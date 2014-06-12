@@ -1,5 +1,5 @@
 package scalaz
-package task
+package concurrent
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
@@ -129,7 +129,7 @@ object TaskTest extends SpecLite {
 
 
   "Nondeterminism[Task]" should {
-    import scalaz.task.Task._
+    import scalaz.concurrent.Task._
     val es = Executors.newFixedThreadPool(1)
     val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
@@ -207,6 +207,20 @@ object TaskTest extends SpecLite {
       t3v.get must_== 0
     }
 
+    "nmap6 must run Tasks in parallel" in {
+      import Thread._
+      val sb = new StringBuffer
+      val t1 = fork { sleep(1000); sb.append("a") ; now("a") }
+      val t2 = fork { sleep(800); sb.append("b") ; now("b") }
+      val t3 = fork { sleep(200); sb.append("c") ; now("c") }
+      val t4 = fork { sleep(400); sb.append("d") ; now("d") }
+      val t5 = fork { sb.append("e") ; now("e") }
+      val t6 = fork { sleep(600); sb.append("f") ; now("f") }
+
+      val r = Nondeterminism[Task].nmap6(t1, t2, t3, t4, t5, t6)(List(_,_,_,_,_,_))
+      r.run must_== List("a","b","c","d","e","f")
+      sb.toString must_==("ecdfba")
+    }
 
     "correctly exit when timeout is exceeded on runFor" in {
 

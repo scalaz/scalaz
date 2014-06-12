@@ -105,6 +105,9 @@ object :+: {
   /** The identity of the monoid coproduct */
   def empty[M,N]: M :+: N = new :+:(Vector())
 
+  implicit def monoidCoproductEqual[M: Equal, N: Equal]: Equal[M :+: N] =
+    Equal.equalBy(_.rep)
+
   implicit def instance[M:Monoid,N:Monoid]: Monoid[M :+: N] = new Monoid[M :+: N] {
     val zero = empty
     def append(a: M :+: N, b: => M :+: N) = a |+| b

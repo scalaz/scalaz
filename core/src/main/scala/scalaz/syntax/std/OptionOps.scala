@@ -93,6 +93,8 @@ final class OptionOps[A](self: Option[A]) {
   final def foldLift[F[_] : Applicative, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
 
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
+
+  final def toMaybe: Maybe[A] = o.toMaybe(self)
 }
 
 trait ToOptionOps {

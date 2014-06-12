@@ -1,5 +1,4 @@
-package scalaz
-package task
+package scalaz.concurrent
 
 import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit, Executors}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
@@ -11,7 +10,6 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
 import scalaz.{\/, -\/, \/-}
-import scalaz.concurrent.Strategy
 
 import scala.concurrent.SyncVar
 import scala.concurrent.duration._

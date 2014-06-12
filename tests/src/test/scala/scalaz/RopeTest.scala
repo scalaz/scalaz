@@ -105,16 +105,16 @@ object RopeTest extends SpecLite {
     for (i <- 0 until rope.size) elems(i) must_===(rope(i))
   }
 
-  "concatenating ropes work correctly" ! forAll {(t1: Rope[Int], t2: Rope[Int]) ⇒
+  "concatenating ropes work correctly" ! forAll {(t1: Rope[Int], t2: Rope[Int]) =>
     (!t1.isEmpty && !t2.isEmpty) ==>
       ((t1 ++ t2).toStream must_===(t1.toStream ++ t2.toStream))
   }
 
-  "chunk append works correctly" ! forAll {(tree: Rope[Int], arr: ImmutableArray[Int]) ⇒
+  "chunk append works correctly" ! forAll {(tree: Rope[Int], arr: ImmutableArray[Int]) =>
     (tree ::+ arr).toStream must_===(tree.toStream ++ arr.toStream)
   }
 
-  "chunk prepend works correctly" ! forAll {(tree: Rope[Int], arr: ImmutableArray[Int]) ⇒
+  "chunk prepend works correctly" ! forAll {(tree: Rope[Int], arr: ImmutableArray[Int]) =>
     (arr +:: tree).toStream must_===(arr.toStream ++ tree.toStream)
   }
 
@@ -128,11 +128,11 @@ object RopeTest extends SpecLite {
 //    (splitTree._1.toStream, splitTree._2.toStream) === asStream.splitAt(index)
 //  }
 
-  "head works correctly" ! forAll {(tree: Rope[Int]) ⇒
+  "head works correctly" ! forAll {(tree: Rope[Int]) =>
     !tree.isEmpty ==> (tree.head must_===(tree.toStream.head))
   }
 
-  "last works correctly" ! forAll {(tree: Rope[Int]) ⇒
+  "last works correctly" ! forAll {(tree: Rope[Int]) =>
     !tree.isEmpty ==> (tree.last must_===(tree.toStream.last))
   }
 

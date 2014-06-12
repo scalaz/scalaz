@@ -8,53 +8,42 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object FreeTest extends SpecLite {
+case class FreeList[A](f: Free[List, A])
 
-  implicit def freeArb[F[_], A](implicit A: Arbitrary[A], F: Arbitrary ~> ({type λ[α] = Arbitrary[F[α]]})#λ): Arbitrary[Free[F, A]] =
-    Arbitrary(Gen.frequency(
-      (1, Functor[Arbitrary].map(A)(Return[F, A](_)).arbitrary),
-      (1, Functor[Arbitrary].map(F(freeArb[F, A]))(Suspend[F, A](_)).arbitrary)
-    ))
-
-  private trait Template[F[_], G[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
-    override final def apply[A](a: G[A]) = lift(a)
-
-    def lift[A: G]: G[F[A]]
+object FreeList {
+  implicit def freeListTraverse = new Traverse[FreeList] {
+    def traverseImpl[G[_], A, B](fa: FreeList[A])(f: A => G[B])(implicit G: Applicative[G]) =
+      G.map(Traverse[({type λ[α] = Free[List, α]})#λ].traverseImpl(fa.f)(f))(FreeList.apply)
   }
+
+  implicit def freeListMonad = new Monad[FreeList] {
+    def point[A](a: => A): FreeList[A] = FreeList(Monad[({type λ[α] =
+      Free[List, α]})#λ].point(a))
+
+    def bind[A, B](fa: FreeList[A])(f: A => FreeList[B]): FreeList[B] =
+      FreeList(Monad[({type λ[α] = Free[List, α]})#λ].bind(fa.f) { a => f(a).f })
+  }
+
+  implicit def freeListArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeList[A]] =
+    Arbitrary(FreeTest.freeGen[List, A](
+      Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeListArb[A].arbitrary.map(_.f)))
+    ).map(FreeList.apply))
+
+  implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] = new Equal[FreeList[A]] {
+    def equal(a: FreeList[A], b: FreeList[A]) = Equal[List[A]].equal(a.f.runM(identity), b.f.runM(identity))
+  }
+}
+
+object FreeTest extends SpecLite {
+  implicit def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
+    Gen.frequency(
+      (1, Functor[Arbitrary].map(A)(Return[F, A](_)).arbitrary),
+      (1, Functor[Arbitrary].map(Arbitrary(g))(Suspend[F, A](_)).arbitrary)
+    )
 
   "List" should {
-    type FreeList[A] = Free[List, A]
-
-    implicit val listArb = new Template[List, Arbitrary] {
-      def lift[A](implicit A: Arbitrary[A]) = Arbitrary(
-        Gen.choose(0, 2).flatMap(Gen.listOfN(_, A.arbitrary)) // avoid stack overflow
-      )
-    }
-
-    implicit val listEq = new Template[List, Equal] {
-      def lift[A: Equal] = implicitly
-    }
-
     checkAll(traverse.laws[FreeList])
     checkAll(monad.laws[FreeList])
-    checkAll(equal.laws[FreeList[Int]])
-  }
-
-  "OneAnd[Option, A]" should {
-    type OneAndOpt[A] = OneAnd[Option, A]
-    type FreeOneAndOpt[A] = Free[OneAndOpt, A]
-
-    implicit val oneAndOptArb = new Template[OneAndOpt, Arbitrary] {
-      def lift[A: Arbitrary] = implicitly
-    }
-
-    implicit val oneAndOptEqual = new Template[OneAndOpt, Equal] {
-      def lift[A: Equal] = implicitly
-    }
-
-    checkAll(traverse1.laws[FreeOneAndOpt])
-    checkAll(monad.laws[FreeOneAndOpt])
-    checkAll(equal.laws[FreeOneAndOpt[Int]])
   }
 
   object instances {
@@ -71,4 +60,3 @@ object FreeTest extends SpecLite {
     def traverse[F[_]: Traverse1] = Traverse[({type λ[α] = Free[F, α]})#λ]
   }
 }
-

@@ -81,6 +81,8 @@ res2: Option[Int] = Some(1)
 
 Let the types speak for themselves via the [Scalaz Scaladocs](http://docs.typelevel.org/api/scalaz/)!
 
+The [examples module](https://github.com/scalaz/scalaz/tree/scalaz-seven/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
+
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
 The [typelevel blog](http://typelevel.org/blog/) has some great posts such as [Towards Scalaz](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).

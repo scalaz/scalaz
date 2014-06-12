@@ -4,6 +4,8 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Foldable1` */
 final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable1[F]) extends Ops[F[A]] {
   ////
+  import Leibniz.===
+
   final def foldMapRight1[B](z: A => B)(f: (A, => B) => B): B = F.foldMapRight1(self)(z)(f)
   final def foldMapLeft1[B](z: A => B)(f: (B, A) => B): B = F.foldMapLeft1(self)(z)(f)
   final def foldRight1(f: (A, => A) => A): A = F.foldRight1(self)(f)
@@ -20,6 +22,7 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
   final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
   final def intercalate1(a: A)(implicit A: Semigroup[A]): A = F.intercalate1(self, a)
+  final def msuml1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.foldLeft1[G[B]](ev.subst[F](self))(G.plus[B](_, _))
   ////
 }
 

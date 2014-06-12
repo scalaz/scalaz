@@ -484,6 +484,10 @@ trait ValidationFunctions {
   def failure[E, A]: E => Validation[E, A] =
     Failure(_)
 
+  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
+  def failureNel[E, A](e: E): ValidationNel[E, A] =
+    Failure(NonEmptyList(e))
+
   /** Evaluate the given value, which might throw an exception. */
   @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {

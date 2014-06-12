@@ -184,6 +184,7 @@ sealed abstract class EphemeralStreamInstances {
     def alignWith[A, B, C](f: A \&/ B => C) =
       (a, b) =>
         a.alignWith(f)(b)
+    override def toEphemeralStream[A](fa: EphemeralStream[A]) = fa
     override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
       if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =

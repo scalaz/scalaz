@@ -283,6 +283,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => ev(b)
     }
 
+  /** Convert to a These. */
+  def toThese: A \&/ B =
+    fold(
+      a => \&/.This(a),
+      b => \&/.That(b)
+    )
+
 }
 final case class -\/[+A](a: A) extends (A \/ Nothing)
 final case class \/-[+B](b: B) extends (Nothing \/ B)
