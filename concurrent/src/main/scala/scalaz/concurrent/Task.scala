@@ -237,6 +237,10 @@ object Task {
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
   }
+  
+  implicit val taskLiftTask: LiftTask[Task] = new LiftTask[Task] {
+    def liftTask[A](task: Task[A]): Task[A] = task
+  }
 
   /** signals task was interrupted **/
   case object TaskInterrupted extends InterruptedException {
