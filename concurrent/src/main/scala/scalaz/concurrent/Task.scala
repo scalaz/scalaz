@@ -222,7 +222,7 @@ object Task {
 
   implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] = new Nondeterminism[Task] with Catchable[Task] {
     val F = Nondeterminism[Future]
-    def point[A](a: => A) = new Task(Future.now(Try(a)))
+    def point[A](a: => A) = new Task(Future.delay(Try(a)))
     def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
       a flatMap f
     def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
