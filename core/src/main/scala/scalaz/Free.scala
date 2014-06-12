@@ -17,8 +17,18 @@ object Free extends FreeInstances with FreeFunctions {
   private[scalaz] case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  private[scalaz] case class Gosub[S[_], A, B](a: () => Free[S, A],
-                                               f: A => Free[S, B]) extends Free[S, B]
+  private sealed abstract case class Gosub[S[_], B]() extends Free[S, B] {
+    type C
+    val a: () => Free[S, C]
+    val f: C => Free[S, B]
+  }
+
+  def gosub[S[_], A, B](a0: () => Free[S, A])(f0: A => Free[S, B]): Free[S, B] =
+    new Gosub[S, B] {
+      type C = A
+      val a = a0
+      val f = f0
+    }
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[A] = Free[Function0, A]
@@ -47,8 +57,8 @@ sealed abstract class Free[S[_], A] {
   /** Binds the given continuation to the result of this computation.
     * All left-associated binds are reassociated to the right. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] = this match {
-    case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(() => g(x), f))
-    case a           => Gosub(() => a, f)
+    case a @ Gosub() => gosub(a.a)(x => gosub(() => a.f(x))(f))
+    case a           => gosub(() => a)(f)
   }
 
   /** Catamorphism. Run the first given function if Return, otherwise, the second given function. */
@@ -59,10 +69,10 @@ sealed abstract class Free[S[_], A] {
   @tailrec final def resume(implicit S: Functor[S]): (S[Free[S, A]] \/ A) = this match {
     case Return(a)  => \/-(a)
     case Suspend(t) => -\/(t)
-    case a Gosub f  => a() match {
-      case Return(a)  => f(a).resume
-      case Suspend(t) => -\/(S.map(t)(((_: Free[S, Any]) flatMap f)))
-      case b Gosub g  => b().flatMap((x: Any) => g(x) flatMap f).resume
+    case x @ Gosub() => x.a() match {
+      case Return(a)   => x.f(a).resume
+      case Suspend(t)  => -\/(S.map(t)(_ flatMap x.f))
+      case y @ Gosub() => y.a().flatMap(z => y.f(z) flatMap x.f).resume
     }
   }
 
