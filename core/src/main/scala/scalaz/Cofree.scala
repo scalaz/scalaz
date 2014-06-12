@@ -3,12 +3,12 @@ package scalaz
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
 sealed abstract class Cofree[S[_], A] {
 
-  def head: A 
+  def head: A
 
   def t: Free[Function0, S[Cofree[S,A]]]
 
   /** Applies `f` to the head and `g` through the tail. */
-  def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] 
+  def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B]
 
   /* Derived methods */
 
@@ -78,15 +78,15 @@ object Cofree extends CofreeInstances with CofreeFunctions {
   def delay[S[_], A](h: A, t: => S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.delay(t))
 
   def unapply[S[_], A](c: Cofree[S, A]): Option[(A, S[Cofree[S,A]])] = Some( (c.head, c.tail) )
-  
+
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
   def applyT[S[_],A](a: A, tf: Free[Function0,S[Cofree[S,A]]])(implicit T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[S, A] = new Cofree[S,A] {
-    
+
     def head = a
-    
+
     def t = tf
 
-    def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =  
+    def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =
       applyT(f(head), T.map(t)(s => S.map(s)(g)))
   }
 }
@@ -110,7 +110,7 @@ trait CofreeFunctions {
   }
 
   def mapUnfold[F[_],W[_],A](z: W[A])(f: W ~> F)(implicit W: Comonad[W]): Cofree[F,A] =
-    Cofree(W copoint z, f(W.extend(z)(mapUnfold(_:W[A])(f))))
+    Cofree.delay(W copoint z, f(W.extend(z)(mapUnfold(_:W[A])(f))))
 }
 
 import Cofree.CofreeZip
@@ -175,11 +175,11 @@ sealed abstract class CofreeInstances0 extends CofreeInstances1 {
       def G = implicitly
     }
 
-  implicit def cofreeEqual[A, F[_]](implicit A: Equal[A], F: Equal ~> ({type λ[α] = Equal[F[α]]})#λ): Equal[Cofree[F, A]] = 
+  implicit def cofreeEqual[A, F[_]](implicit A: Equal[A], F: Equal ~> ({type λ[α] = Equal[F[α]]})#λ): Equal[Cofree[F, A]] =
     Equal.equal{ (a, b) =>
       A.equal(a.head, b.head) && F(cofreeEqual[A, F]).equal(a.tail, b.tail)
     }
-  
+
 
   implicit def cofreeZipEqual[A, F[_]](implicit A: Equal[A], F: Equal ~> ({type λ[α] = Equal[F[α]]})#λ): Equal[CofreeZip[F, A]] =
     Tag.subst(cofreeEqual[A, F])
@@ -212,7 +212,7 @@ private trait CofreeZipFunctor[F[_]] extends Functor[({type λ[α] = CofreeZip[F
 private trait CofreeZipApply[F[_]] extends Apply[({type λ[α] = CofreeZip[F, α]})#λ] with CofreeZipFunctor[F]{
   implicit def F: Apply[F]
 
-  override final def ap[A, B](fa: => CofreeZip[F, A])(f: => CofreeZip[F, A => B]): CofreeZip[F, B] = 
+  override final def ap[A, B](fa: => CofreeZip[F, A])(f: => CofreeZip[F, A => B]): CofreeZip[F, B] =
     Tags.Zip(
       Cofree.applyT(f.head(fa.head),
         fa.t.flatMap(fat => f.t.map(fab => F.apply2(Tags.Zip.subst(fat), Tags.Zip.subst(fab))(ap(_)(_))))
