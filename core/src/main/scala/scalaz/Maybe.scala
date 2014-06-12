@@ -30,6 +30,10 @@ sealed abstract class Maybe[A] {
   final def getOrElse(a: => A): A =
     cata(identity, a)
 
+  /** alias for [[getOrElse]] */
+  final def |(a: => A): A =
+    getOrElse(a)
+
   /** Turn the underlying value into a failure validation if present, otherwise
    * return a success validation with the provided fallback value */
   final def toFailure[B](b: => B): Validation[A, B] =
@@ -45,10 +49,18 @@ sealed abstract class Maybe[A] {
   final def toLeft[B](b: => B): A \/ B =
     cata(\/.left(_), \/.right(b))
 
+  /** alias for [[toLeft]] */
+  final def <\/[B](b: => B): A \/ B =
+    toLeft(b)
+
   /** Turn the underlying value into a right disjunction if present, otherwise
    * return a left disjunction with the provided fallback value */
   final def toRight[B](b: => B): B \/ A =
     cata(\/.right(_), \/.left(b))
+
+  /** alias for [[toRight]] */
+  final def \/>[B](b: => B): B \/ A =
+    toRight(b)
 
   /** True if an underlying value is present */
   final def isJust: Boolean =
@@ -104,6 +116,9 @@ sealed abstract class Maybe[A] {
   final def filter(f: A => Boolean): Maybe[A] =
     flatMap(a => if (f(a)) this else empty)
 
+  final def filterNot(f: A => Boolean): Maybe[A] =
+    filter(f.andThen(!_))
+
   /** Return `true` if this is a [[Maybe.Empty]] or if this is a [[Maybe.Just]]
    * and the underlying value satisfies the provided predicate */
   final def forall(f: A => Boolean): Boolean =
@@ -113,6 +128,20 @@ sealed abstract class Maybe[A] {
    * satisfies the provided predicate */
   final def exists(f: A => Boolean): Boolean =
     cata(f, false)
+
+  /** Return the underlying value if present, otherwise the monoid zero */
+  final def orZero(implicit F: Monoid[A]): A =
+    getOrElse(F.zero)
+
+  /** alias for [[orZero]] */
+  final def unary_~(implicit z: Monoid[A]): A =
+    orZero
+
+  /**
+   * Return the underlying value wrapped in type `F` if present, otherwise the
+   * empty value for type `F` */
+  final def orEmpty[F[_]](implicit F: Applicative[F], G: PlusEmpty[F]): F[A] =
+    cata(F.point(_), G.empty)
 }
 
 object Maybe extends MaybeFunctions with MaybeInstances {
