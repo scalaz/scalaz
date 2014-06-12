@@ -315,7 +315,7 @@ trait FreeFunctions {
     liftFU(Coyoneda lift s)
 
   /** Interpret a free monad over a free functor of `S` via natural transformation to monad `M`. */
-  def runFC[S[_], A, M[_]](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
+  def runFC[S[_], M[_], A](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
     sa.foldMap[M](new (({type λ[α] = Coyoneda[S, α]})#λ ~> M) {
       def apply[A](cy: Coyoneda[S, A]): M[A] =
         M.map(interp(cy.fi))(cy.k)
