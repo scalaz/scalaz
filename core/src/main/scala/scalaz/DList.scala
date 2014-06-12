@@ -66,6 +66,9 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
   /** Map over a difference list, then flatten. */
   def flatMap[B](f: A => DList[B]) =
     foldr(DList[B]())((x, y) => f(x) ++ y)
+
+  def zip[B](bs: ⇒ DList[B]): DList[(A,B)] = uncons(DList(), (h,t) => bs.uncons(DList(), (h2,t2) => (h → h2) +: (t zip t2)))
+
 }
 
 object DList extends DListInstances with DListFunctions {
@@ -77,16 +80,20 @@ sealed abstract class DListInstances {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonadPlus: MonadPlus[DList] = new MonadPlus[DList] {
+  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with Zip[DList] = new MonadPlus[DList] with Traverse[DList] with Zip[DList]  {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
     def empty[A] = DList()
+    def zip[A,B](a: => DList[A], b: ⇒ DList[B]): DList[(A, B)] = a zip b
+    def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
+      fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
   }
   implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
     import std.list._
     Equal[List[A]].contramap((_: DList[A]).toList)
   }
+
 }
 
 trait DListFunctions {
