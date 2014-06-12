@@ -82,6 +82,9 @@ trait CofreeFunctions {
     val (a, fb) = f(b)
     Cofree(a, F.map(fb)(unfold(_)(f)))
   }
+
+  def mapUnfold[F[_],W[_],A](z: W[A])(f: W ~> F)(implicit W: Comonad[W]): Cofree[F,A] =
+    Cofree(W copoint z, f(W.extend(z)(mapUnfold(_:W[A])(f))))
 }
 
 import Cofree.CofreeZip
