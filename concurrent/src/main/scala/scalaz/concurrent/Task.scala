@@ -274,6 +274,15 @@ object Task {
     new Task(Future(Try(a))(pool))
 
   /**
+   * Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away.
+   * This will start executing side effects immediately, and is thus morally equivalent to
+   * `unsafePerformIO`. The resulting `Task` cannot be rerun to repeat the effects.
+   * Use with care.
+   */
+  def unsafeStart[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
+    new Task(Future(Task.Try(a))(pool).start)
+
+  /**
    * Returns a `Future` that produces the same result as the given `Future`,
    * but forks its evaluation off into a separate (logical) thread, using
    * the given `ExecutorService`. Note that this forking is only described
@@ -281,6 +290,7 @@ object Task {
    */
   def fork[A](a: => Task[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     apply(a).join
+
 
   /**
    * Create a `Future` from an asynchronous computation, which takes the form
