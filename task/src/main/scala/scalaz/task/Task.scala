@@ -275,8 +275,13 @@ object Task {
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Try(a))(pool))
 
-  /** Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away */
-  def start[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
+  /**
+   * Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away.
+   * This will start executing side effects immediately, and is thus morally equivalent to
+   * `unsafePerformIO`. The resulting `Task` cannot be rerun to repeat the effects.
+   * Use with care.
+   */
+  def unsafeStart[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Task.Try(a))(pool).start)
 
   /**
