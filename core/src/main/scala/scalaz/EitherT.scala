@@ -223,7 +223,13 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     }
 }
 
-sealed abstract class EitherTInstances2 {
+sealed abstract class EitherTInstances3 {
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[({type λ[α, β] = EitherT[F, α, β]})#λ, E] = new EitherTMonadError[F, E] {
+    implicit def F = F0
+  }
+}
+
+sealed abstract class EitherTInstances2 extends EitherTInstances3 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[({type λ[α]=EitherT[F, L, α]})#λ] = new EitherTFunctor[F, L] {
     implicit def F = F0
   }
@@ -387,4 +393,14 @@ private trait EitherTMonadListen[F[_, _], W, A] extends MonadListen[({type λ[α
 
     EitherT[({type λ[α] = F[W, α]})#λ, A, (B, W)](tmp)
   }
+}
+
+private trait EitherTMonadError[F[_], E] extends MonadError[({ type λ[α, β] = EitherT[F, α, β] })#λ, E] with EitherTMonad[F, E] {
+  implicit def F: Monad[F]
+  def raiseError[A](e: E): EitherT[F, E, A] = EitherT(F.point(-\/(e)))
+  def handleError[A](fa: EitherT[F, E, A])(f: E => EitherT[F, E, A]): EitherT[F, E, A] =
+    EitherT(F.bind(fa.run) {
+      case -\/(e) => f(e).run
+      case r => F.point(r)
+    })
 }
