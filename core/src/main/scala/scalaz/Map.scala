@@ -9,17 +9,27 @@ import std.option._
 
 import annotation.tailrec
 
-/** @since 7.0.3 */
+/** An immutable map of key/value pairs implemented as a balanced binary tree
+ *
+ * Based on Haskell's Data.Map
+ *
+ * @since 7.0.3 */
 sealed abstract class ==>>[A, B] {
   import ==>>._
 
+  /** number of key/value pairs - O(1) */
   val size: Int
 
+  /** returns `true` if this map contains no key/value pairs - O(1) */
   def isEmpty: Boolean = this == empty
 
+  /** tupled form of [[insert]] */
   def + (a: (A, B))(implicit o: Order[A]): A ==>> B =
     insert(a._1, a._2)
 
+  /** inserts a new key/value - O(log n).
+   *
+   * If the key is already present, its value is replaced by the provided value.  */
   def insert(kx: A, x: B)(implicit n: Order[A]): A ==>> B =
     this match {
       case Tip() =>
@@ -35,9 +45,21 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  /** inserts a new key/value pair, resolving the conflict if the key already exists - O(log n)
+   *
+   * @param f function to resolve conflict with existing key:
+   *   (existingValue, insertedValue) => resolvedValue
+   * @param kx key
+   * @param x value to insert if the key is not already present */
   def insertWith(f: (B, B) => B, kx: A, x: B)(implicit o: Order[A]): A ==>> B =
     insertWithKey((_, a, b) => f(a,b), kx, x)
 
+  /** inserts a new key/value pair, resolving the conflict if the key already exists - O(log n)
+   *
+   * @param f function to resolve conflict with existing key:
+   *   (key, existingValue, insertedValue) => resolvedValue
+   * @param kx key
+   * @param x value to insert if the key is not already present */
   def insertWithKey(f: (A, B, B) => B, kx: A, x: B)(implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
@@ -53,9 +75,11 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  /** alias for [[delete]] */
   def -(k: A)(implicit o: Order[A]) =
     delete(k)
 
+  /** removes a key/value pair - O(log n) */
   def delete(k: A)(implicit n: Order[A]): A ==>> B =
     this match {
       case Tip() =>
@@ -71,15 +95,21 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  /** if the key exists, transforms its value - O(log n) */
   def adjust(k: A, f: B => B)(implicit o: Order[A]): A ==>> B =
     adjustWithKey(k, (_, x) => f(x))
 
+  /** like [[adjust]] but with the key available in the transformation - O(log n) */
   def adjustWithKey(k: A, f: (A, B) => B)(implicit o: Order[A]): A ==>> B =
     updateWithKey(k, (a, b) => some(f(a, b)))
 
+  /** updates or removes a value - O(log n)
+   *
+   * if `f` returns `None`, then the key is removed from the map */
   def update(k: A, f: B => Option[B])(implicit o: Order[A]): A ==>> B =
     updateWithKey(k, (_, x) => f(x))
 
+  /** like [[update]] but with the key available in the update function - O(log n) */
   def updateWithKey(k: A, f: (A, B) => Option[B])(implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
@@ -100,6 +130,10 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  /** looks up a key and updates its value - O(log n)
+   *
+   * Similar to [[updateWithKey]] but also returns the value. If the value was updated, returns the
+   * new value. If the value was deleted, returns the old value. */
   def updateLookupWithKey(k: A, f: (A, B) => Option[B])(implicit o: Order[A]): (Option[B], A ==>> B) =
     this match {
       case Tip() =>
