@@ -25,6 +25,8 @@ final case class ListT[M[_], A](run: M[List[A]]){
   def head(implicit M: Functor[M]) : M[A] = M.map(run)(_.head)
 
   def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.headOption))
+
+  def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(l ⇒ Maybe.fromOption(l.headOption)))
   
   def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
