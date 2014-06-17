@@ -147,6 +147,9 @@ sealed abstract class LazyEitherTInstances1 {
     implicit def G = lazyEitherTFunctor[F, L]
     def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
   }
+  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[({type λ[α, β] = LazyEitherT[F, α, β]})#λ, L] = new LazyEitherTMonadError[F, L] {
+    implicit def F = F0
+  }
 }
 
 sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
@@ -269,4 +272,9 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] =
 
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: A => G[C], g: B => G[D]): G[LazyEitherT[F, C, D]] =
     Applicative[G].map(F.traverse(fab.run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
+}
+
+private trait LazyEitherTMonadError[F[_], E] extends MonadError[({type λ[α, β] = LazyEitherT[F, α, β]})#λ, E] with LazyEitherTMonad[F, E] {
+  def raiseError[A](e: E): LazyEitherT[F, E, A] = LazyEitherT.lazyLeftT(e)
+  def handleError[A](fa: LazyEitherT[F, E, A])(f: E => LazyEitherT[F, E, A]): LazyEitherT[F, E, A] = fa.left.flatMap(e => f(e))
 }

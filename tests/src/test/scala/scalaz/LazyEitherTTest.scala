@@ -19,6 +19,7 @@ object LazyEitherTTest extends SpecLite {
   checkAll(monad.laws[LazyEitherTListInt])
   checkAll(traverse.laws[LazyEitherTListInt])
   checkAll(bitraverse.laws[LazyEitherTList])
+  checkAll(monadError.laws[LazyEitherTList, Int])
 
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
@@ -34,6 +35,7 @@ object LazyEitherTTest extends SpecLite {
     def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
     def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
+    def monadError[F[_] : Monad, A] = MonadError[({type λ[α, β] = LazyEitherT[F, α, β]})#λ, A]
   }
 
 }
