@@ -216,6 +216,10 @@ class Task[+A](val get: Future[Throwable \/ A]) {
       }
       Task.async { help(delays, Stream()).runAsync }
     }
+
+  /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
+  def ensure(failure: => Throwable)(f: A => Boolean): Task[A] =
+    flatMap(a => if(f(a)) Task.now(a) else Task.fail(failure))
 }
 
 object Task {
