@@ -629,8 +629,8 @@ sealed trait ISetFunctions {
   final def fromList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(empty[A])((a, b) => a insert b)
 
-  final def fromFoldable[F[_]: Foldable, A](xs: F[A])(implicit o: Order[A]): ISet[A] =
-    Foldable[F].foldLeft(xs, empty[A])((a, b) => a insert b)
+  final def fromFoldable[F[_], A](xs: F[A])(implicit F: Foldable[F], o: Order[A]): ISet[A] =
+    F.foldLeft(xs, empty[A])((a, b) => a insert b)
 
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(ISet.empty[A])(_ union _)
