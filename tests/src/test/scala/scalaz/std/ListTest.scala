@@ -104,8 +104,10 @@ object ListTest extends SpecLite {
 
   "lookups in assoc lists sometime return a value" ! forAll {
     (a: List[(Int, Int)]) => {
-      val aKey = a.headOption
-      aKey.fold(a.lookup[Int, Int](0) must_===(None))(x => a.lookup[Int, Int](x._1) must_===(Some(x._2)))
+      a.headOption match {
+        case None    => a.lookup[Int, Int](0)    must_===(None)
+        case Some(x) => a.lookup[Int, Int](x._1) must_===(Some(x._2))
+      }
     }
   }
 
