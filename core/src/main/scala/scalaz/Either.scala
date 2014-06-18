@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.util.control.NonFatal
 import Liskov.<~<
 
 /** Represents a disjunction: a result that is either an `A` or a `B`.
@@ -457,7 +458,7 @@ trait DisjunctionFunctions {
     e fold (left, right)
 
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     \/-(a)
   } catch {
@@ -468,5 +469,11 @@ trait DisjunctionFunctions {
     \/-(a)
   } catch {
     case e if ex.erasure.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
+    \/-(a)
+  } catch {
+    case NonFatal(t) => -\/(t)
   }
 }

@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.util.control.NonFatal
+
 /**
  * Represents a computation of type `F[A \/ B]`.
  *
@@ -208,7 +210,7 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
@@ -221,6 +223,14 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     } catch {
       case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
     }
+
+  def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
+    try {
+      right(a)
+    } catch {
+      case NonFatal(t) => left(F.point(t))
+    }
+
 }
 
 sealed abstract class EitherTInstances2 {
