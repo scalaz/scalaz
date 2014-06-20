@@ -43,7 +43,7 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  def scalaCheckVersion = "1.11.3"
+  def scalaCheckVersion = "1.11.4"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
