@@ -520,8 +520,6 @@ object ScalazProperties {
   }
 
   object monadError {
-    def nonErrorsUnhandled[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], aa: Arbitrary[A], afea: Arbitrary[E => F[E,A]]) =
-      forAll(me.monadErrorLaw.nonErrorsUnhandled[A] _)
     def raisedErrorsHandled[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], afea: Arbitrary[E => F[E,A]]) =
       forAll(me.monadErrorLaw.raisedErrorsHandled[A] _)
     def errorsRaised[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
@@ -532,7 +530,6 @@ object ScalazProperties {
     def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E]) =
       new Properties("monad error") {
         include(monad.laws[({ type λ[α] = F[E, α] })#λ])
-        property("nonErrorsUnhandled") = nonErrorsUnhandled[F, E, Int]
         property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
         property("errorsRaised") = errorsRaised[F, E, Int]
         property("errorsStopComputation") = errorsStopComputation[F, E, Int]
