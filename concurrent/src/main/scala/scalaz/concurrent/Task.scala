@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -224,7 +224,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
 object Task {
 
-  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] = new Nondeterminism[Task] with Catchable[Task] {
+  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[({type λ[α,β] = Task[β]})#λ,Throwable] = new Nondeterminism[Task] with Catchable[Task] with MonadError[({type λ[α,β] = Task[β]})#λ,Throwable] {
     val F = Nondeterminism[Future]
     def point[A](a: => A) = new Task(Future.now(Try(a)))
     def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
@@ -240,6 +240,9 @@ object Task {
     }
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
+    def raiseError[A](e: Throwable): Task[A] = fail(e)
+    def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
+      fa.handleWith { case t => f(t) }
   }
 
   /** signals task was interrupted **/
