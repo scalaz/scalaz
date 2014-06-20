@@ -375,7 +375,7 @@ object Validation extends ValidationFunctions with ValidationInstances {
       case Success(a) => success(a)
     }
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit ex: ClassManifest[E]): Validation[E, T] = try {
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): Validation[E, T] = try {
     Success(a)
   } catch {
     case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
