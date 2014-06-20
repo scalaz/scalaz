@@ -42,6 +42,8 @@ final class ListOps[A](self: List[A]) {
 
   final def groupWhen(p: (A, A) => Boolean): List[NonEmptyList[A]] = l.groupWhen(self)(p)
 
+  final def lookup[B, C](key: B)(implicit eq: Equal[B], ev: A =:= (B, C)): Option[C] = self.find((x: A) => eq.equal(ev(x)._1, key)).map(_._2)
+  
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumLeft(self)(c, f)
 
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumRight(self)(c, f)

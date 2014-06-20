@@ -102,6 +102,15 @@ object ListTest extends SpecLite {
       }
   }
 
+  "lookups in assoc lists sometime return a value" ! forAll {
+    (a: List[(Int, Int)]) => {
+      a.headOption match {
+        case None    => a.lookup[Int, Int](0)    must_===(None)
+        case Some(x) => a.lookup[Int, Int](x._1) must_===(Some(x._2))
+      }
+    }
+  }
+
   "takeWhileM example" in {
     def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[({type λ[α] = State[Int, α]})#λ](a => State {
       i =>
