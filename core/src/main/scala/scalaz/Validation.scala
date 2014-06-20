@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.util.control.NonFatal
 
 /**
  * Represents either:
@@ -489,7 +490,7 @@ trait ValidationFunctions {
     Failure(NonEmptyList(e))
 
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     Success(a)
   } catch {
@@ -500,6 +501,12 @@ trait ValidationFunctions {
     Success(a)
   } catch {
     case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
+    Success(a)
+  } catch {
+    case NonFatal(t) => Failure(t)
   }
 
   /** Construct a `Validation` from an `Either`. */
