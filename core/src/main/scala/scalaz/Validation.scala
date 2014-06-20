@@ -179,6 +179,13 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
       case Success(a) => Some(a)
     }
 
+  /** Return an empty maybe or maybe with the element on the success of this validation. Useful to sweep errors under the carpet. */
+  def toMaybe[AA >: A]: Maybe[AA] =
+    this match {
+      case Failure(_) => Maybe.empty
+      case Success(a) => Maybe.just(a)
+    }
+
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither: Either[E, A] =
     this match {
