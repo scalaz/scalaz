@@ -1,9 +1,27 @@
 package scalaz
 
+import scala.util.control.NonFatal
 import Liskov.<~<
 
-/**
- * Represents disjunction. Isomorphic to `scala.Either`. Does not have left/right projections, instead right-bias and use `swap` or `swapped`.
+/** Represents a disjunction: a result that is either an `A` or a `B`.
+ * 
+ * An instance of `A` [[\/]] B is either a [[-\/]]`[A]` (aka a "left") or a [[\/-]]`[B]` (aka a "right").
+ *
+ * A common use of a disjunction is to explicitly represent the possibility of failure in a result as opposed to
+ * throwing an exception. By convention, the left is used for errors and the right is reserved for successes.
+ * For example, a function that attempts to parse an integer from a string may have a return type of
+ * `NumberFormatException` [[\/]] `Int`. However, since there is no need to actually throw an exception, the type (`A`)
+ * chosen for the "left" could be any type representing an error and has no need to actually extend `Exception`.
+ *
+ * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased, so methods such as `map` and
+ * `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more convenient to use
+ * than `scala.Either` in a monadic context. Methods such as `swap`, `swapped`, and `leftMap` provide functionality
+ * that `scala.Either` exposes through left projections.
+ *
+ * `A` [[\/]] `B` is also isomorphic to [[Validation]]`[A, B]`. The subtle but important difference is that [[Applicative]]
+ * instances for [[Validation]] accumulates errors ("lefts") while [[Applicative]] instances for [[\/]] fail fast on the
+ * first "left" they evaluate. This fail-fast behavior allows [[\/]] to have lawful [[Monad]] instances that are consistent
+ * with their [[Applicative]] instances, while [[Validation]] cannot.
  */
 sealed abstract class \/[+A, +B] extends Product with Serializable {
   final class SwitchingDisjunction[X](r: => X) {
@@ -165,6 +183,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => Some(b)
     }
 
+  /** Return an empty maybe or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
+  def toMaybe[BB >: B]: Maybe[BB] =
+    this match {
+      case -\/(_) => Maybe.empty
+      case \/-(b) => Maybe.just(b)
+    }
+
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither: Either[A, B] =
     this match {
@@ -283,8 +308,25 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => ev(b)
     }
 
+  /** Convert to a These. */
+  def toThese: A \&/ B =
+    fold(
+      a => \&/.This(a),
+      b => \&/.That(b)
+    )
+
 }
+
+/** A left disjunction
+ *
+ * Often used to represent the failure case of a result
+ */
 final case class -\/[+A](a: A) extends (A \/ Nothing)
+
+/** A right disjunction
+ *
+ * Often used to represent the success case of a result
+ */
 final case class \/-[+B](b: B) extends (Nothing \/ B)
 
 object \/ extends DisjunctionInstances with DisjunctionFunctions {
@@ -416,7 +458,7 @@ trait DisjunctionFunctions {
     e fold (left, right)
 
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[T](a: => T): Throwable \/ T = try {
     \/-(a)
   } catch {
@@ -427,5 +469,11 @@ trait DisjunctionFunctions {
     \/-(a)
   } catch {
     case e if ex.erasure.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
+    \/-(a)
+  } catch {
+    case NonFatal(t) => -\/(t)
   }
 }

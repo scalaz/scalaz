@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.util.control.NonFatal
 
 /**
  * Represents either:
@@ -176,6 +177,13 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     this match {
       case Failure(_) => None
       case Success(a) => Some(a)
+    }
+
+  /** Return an empty maybe or maybe with the element on the success of this validation. Useful to sweep errors under the carpet. */
+  def toMaybe[AA >: A]: Maybe[AA] =
+    this match {
+      case Failure(_) => Maybe.empty
+      case Success(a) => Maybe.just(a)
     }
 
   /** Convert to a core `scala.Either` at your own peril. */
@@ -484,8 +492,12 @@ trait ValidationFunctions {
   def failure[E, A]: E => Validation[E, A] =
     Failure(_)
 
+  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
+  def failureNel[E, A](e: E): ValidationNel[E, A] =
+    Failure(NonEmptyList(e))
+
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
     Success(a)
   } catch {
@@ -496,6 +508,12 @@ trait ValidationFunctions {
     Success(a)
   } catch {
     case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
+    Success(a)
+  } catch {
+    case NonFatal(t) => Failure(t)
   }
 
   /** Construct a `Validation` from an `Either`. */

@@ -34,7 +34,6 @@ private[scalaz] trait AbstractHStream {
 trait HStream[T[_ <: Nat]] extends AbstractHStream { self =>
 
   import HFold._
-  import HStream._
   import Nats._
 
 

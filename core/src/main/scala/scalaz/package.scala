@@ -80,6 +80,7 @@
  *  - [[scalaz.StateT]] Computations that modify state.
  *  - [[scalaz.WriterT]] Computations that log a value
  *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
+ *  - [[scalaz.MaybeT]] Represents computations of type `F[Maybe[A]]`
  *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
@@ -219,6 +220,11 @@ package object scalaz {
   type MinOption[A] = Option[A] @@ Tags.Min
   type MaxOption[A] = Option[A] @@ Tags.Max
 
+  type FirstMaybe[A] = Maybe[A] @@ Tags.First
+  type LastMaybe[A] = Maybe[A] @@ Tags.Last
+  type MinMaybe[A] = Maybe[A] @@ Tags.Min
+  type MaxMaybe[A] = Maybe[A] @@ Tags.Max
+
   //
   // Lens type aliases
   //
@@ -293,4 +299,7 @@ package object scalaz {
 
   @deprecated("Cojoin has been merged into Cobind", "7.1")
   val Cojoin = Cobind
+
+  type IMap[A, B] = ==>>[A, B]
+  val IMap = ==>>
 }

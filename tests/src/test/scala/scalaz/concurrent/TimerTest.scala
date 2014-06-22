@@ -1,5 +1,5 @@
 package scalaz
-package task
+package concurrent
 
 import ConcurrentTest._
 import scalaz.syntax.either._

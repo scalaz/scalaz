@@ -35,6 +35,9 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   /** Returns this context converted to the `Option` context. */
   def toOption: Option[A] = F.toOption(self)
 
+  /** Returns this context converted to the `Maybe` context. */
+  def toMaybe: Maybe[A] = F.toMaybe(self)
+
   ////
 }
 

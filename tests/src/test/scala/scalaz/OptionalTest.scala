@@ -13,6 +13,7 @@ object OptionalTest extends SpecLite {
     O.isEmpty(context)             must_===(false)
     O.?(context)(1,0)              must_===(1)
     O.toOption(context)            must_===(Option(value))
+    O.toMaybe(context)             must_===(Maybe.just(value))
   }
 
   def undefinedTests[F[_],A](context: F[A], default: A, alternative: F[A])(implicit O: Optional[F], EA: Equal[A], EFA: Equal[F[A]], SA: Show[A], SFA: Show[F[A]]) = {
@@ -23,6 +24,7 @@ object OptionalTest extends SpecLite {
     O.isEmpty(context)             must_===(true)
     O.?(context)(1,0)              must_===(0)
     O.toOption(context)            must_===(Option.empty[A])
+    O.toMaybe(context)             must_===(Maybe.empty[A])
   }
 
   """\/ instance tests""" in {
@@ -63,6 +65,11 @@ object OptionalTest extends SpecLite {
 
     definedTests(success(1), 1, 0, success(0))
     undefinedTests(failure("oO"), 0, success(0))
+  }
+
+  "Maybe instance tests" in {
+    definedTests(Maybe.just(1), 1, 0, Maybe.just(0))
+    undefinedTests(Maybe.empty[Int], 0, Maybe.just(0))
   }
 
   "syntax test" in {

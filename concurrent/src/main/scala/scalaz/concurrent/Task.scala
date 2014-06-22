@@ -1,5 +1,4 @@
-package scalaz
-package task
+package scalaz.concurrent
 
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
@@ -10,7 +9,6 @@ import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.\/._
-import scalaz.concurrent.{Actor, Strategy}
 
 import collection.JavaConversions._
 import scala.concurrent.duration._
@@ -218,6 +216,10 @@ class Task[+A](val get: Future[Throwable \/ A]) {
       }
       Task.async { help(delays, Stream()).runAsync }
     }
+
+  /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
+  def ensure(failure: => Throwable)(f: A => Boolean): Task[A] =
+    flatMap(a => if(f(a)) Task.now(a) else Task.fail(failure))
 }
 
 object Task {
@@ -276,6 +278,15 @@ object Task {
     new Task(Future(Try(a))(pool))
 
   /**
+   * Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away.
+   * This will start executing side effects immediately, and is thus morally equivalent to
+   * `unsafePerformIO`. The resulting `Task` cannot be rerun to repeat the effects.
+   * Use with care.
+   */
+  def unsafeStart[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
+    new Task(Future(Task.Try(a))(pool).start)
+
+  /**
    * Returns a `Future` that produces the same result as the given `Future`,
    * but forks its evaluation off into a separate (logical) thread, using
    * the given `ExecutorService`. Note that this forking is only described
@@ -283,6 +294,7 @@ object Task {
    */
   def fork[A](a: => Task[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
     apply(a).join
+
 
   /**
    * Create a `Future` from an asynchronous computation, which takes the form

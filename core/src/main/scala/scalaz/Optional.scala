@@ -43,6 +43,9 @@ trait Optional[F[_]]  { self =>
   /** Returns this context converted to the `Option` context. */
   def toOption[A](fa: F[A]): Option[A] = pextract(fa).toOption
 
+  /** Returns this context converted to the `Maybe` context. */
+  def toMaybe[A](fa: F[A]): Maybe[A] = pextract(fa).toMaybe
+
   ////
   val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }
 }

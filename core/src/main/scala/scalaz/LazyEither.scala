@@ -49,6 +49,9 @@ sealed abstract class LazyEither[+A, +B] {
   def toOption: Option[B] =
     fold(_ => None, Some(_))
 
+  def toMaybe[BB >: B]: Maybe[BB] =
+    fold(_ => Maybe.empty, Maybe.just(_))
+
   def toList: List[B] =
     fold(_ => Nil, _ :: Nil)
 

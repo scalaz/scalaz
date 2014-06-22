@@ -9,7 +9,6 @@ import scalaz.std.string._
 import scalaz.std.tuple._
 import scalaz.std.vector._
 import scalaz.syntax.arrow._
-import scalaz.syntax.id._
 import scalaz.syntax.monoid._
 import scalaz.syntax.order._
 import scalaz.syntax.show._

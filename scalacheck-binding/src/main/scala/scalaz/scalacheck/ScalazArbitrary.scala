@@ -89,6 +89,9 @@ object ScalazArbitrary {
   implicit def Arbitrary_ISet[A](implicit o: Order[A], A: Arbitrary[A]): Arbitrary[ISet[A]] =
     Functor[Arbitrary].map(arb[List[A]])(as => ISet.fromList(as))
 
+  implicit def Arbitrary_Maybe[A](implicit A: Arbitrary[A]): Arbitrary[Maybe[A]] =
+    Functor[Arbitrary].map(arb[Option[A]])(Maybe.fromOption)
+
   import scalaz.Ordering._
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
@@ -139,6 +142,14 @@ object ScalazArbitrary {
   implicit def MinOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinOption[A]] = Tag.subst(arb[Option[A]])
 
   implicit def MaxOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxOption[A]] = Tag.subst(arb[Option[A]])
+
+  implicit def FirstMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ First] = Functor[Arbitrary].map(arb[Maybe[A]])(_.first)
+
+  implicit def LastMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ Last] = Functor[Arbitrary].map(arb[Maybe[A]])(_.last)
+
+  implicit def MinMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinMaybe[A]] = Tag.subst(arb[Maybe[A]])
+
+  implicit def MaxMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
   implicit def EitherLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.left)
 
@@ -196,7 +207,7 @@ object ScalazArbitrary {
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
-  import scalaz.task.Future
+  import scalaz.concurrent.Future
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
 
@@ -218,6 +229,9 @@ object ScalazArbitrary {
 
   implicit def optionTArb[F[+_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Functor[Arbitrary].map(A)(OptionT[F, A](_))
+
+  implicit def maybeTArb[F[+_], A](implicit A: Arbitrary[F[Maybe[A]]]): Arbitrary[MaybeT[F, A]] =
+    Functor[Arbitrary].map(A)(MaybeT[F, A](_))
 
   implicit def lazyOptionArb[F[_], A](implicit A: Arbitrary[Option[A]]): Arbitrary[LazyOption[A]] =
     Functor[Arbitrary].map(A)(LazyOption.fromOption[A](_))

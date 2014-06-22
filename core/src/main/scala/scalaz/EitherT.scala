@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.util.control.NonFatal
+
 /**
  * Represents a computation of type `F[A \/ B]`.
  *
@@ -96,7 +98,6 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     MonadPlus[({type λ[α] = EitherT[F, A, α]})#λ].filter(this)(p)
 
   /** Alias for `filter`.
-   * @since 7.0.2
    */
   def withFilter(p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
     filter(p)(M, F)
@@ -120,6 +121,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
   def toOption(implicit F: Functor[F]): OptionT[F, B] =
     optionT[F](F.map(run)((_: (A \/ B)).toOption))
+
+  /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
+  def toMaybe(implicit F: Functor[F]): MaybeT[F, B] =
+    MaybeT(F.map(run)((_: (A \/ B)).toMaybe))
 
   /** Convert to a core `scala.Either` at your own peril. */
   def toEither(implicit F: Functor[F]): F[Either[A, B]] =
@@ -205,7 +210,7 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable", "7.1.0")
+  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
   def fromTryCatch[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
@@ -218,6 +223,14 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     } catch {
       case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
     }
+
+  def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
+    try {
+      right(a)
+    } catch {
+      case NonFatal(t) => left(F.point(t))
+    }
+
 }
 
 sealed abstract class EitherTInstances2 {

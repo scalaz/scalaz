@@ -43,13 +43,13 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  def scalaCheckVersion = "1.11.3"
+  def scalaCheckVersion = "1.11.4"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.0-RC4"),
+    crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
@@ -171,21 +171,21 @@ object build extends Build {
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
-      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
+      unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
-    ) ++ Defaults.packageTaskSettings(packageDoc, unidoc.map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, task, tests, typelevel, xml)
+    ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
-  val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
+  val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
       case _ => "1.0.1"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.1"
+      case _ => "1.0.2"
     }
   )
 
@@ -199,10 +199,9 @@ object build extends Build {
         dir => Seq(GenerateTupleW(dir))
       },
       libraryDependencies ++= {
-        val version = ScalaVersion(scalaVersion.value)
-        if (version.isModularised)
+        if (scalaVersion.value.startsWith("2.11"))
           coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(version) intransitive()
+            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
           }
         else Nil
       },
@@ -247,16 +246,6 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
-  lazy val task = Project(
-    id = "task",
-    base = file("task"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-task",
-      osgiExport("scalaz.task")
-    ),
-    dependencies = Seq(core, concurrent)
-  )
-
   lazy val typelevel = Project(
     id = "typelevel",
     base = file("typelevel"),
@@ -291,7 +280,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, task, typelevel, xml, iteratee),
+    dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
@@ -302,7 +291,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, task, typelevel, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,

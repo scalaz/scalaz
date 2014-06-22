@@ -11,14 +11,24 @@ import std.tuple._
 object Free extends FreeInstances with FreeFunctions {
 
   /** Return from the computation with the given value. */
-  case class Return[S[_], A](a: A) extends Free[S, A]
+  private[scalaz] case class Return[S[_], A](a: A) extends Free[S, A]
 
   /** Suspend the computation with the given suspension. */
-  case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
+  private[scalaz] case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  case class Gosub[S[_], A, B](a: () => Free[S, A],
-                                        f: A => Free[S, B]) extends Free[S, B]
+  private sealed abstract case class Gosub[S[_], B]() extends Free[S, B] {
+    type C
+    val a: () => Free[S, C]
+    val f: C => Free[S, B]
+  }
+
+  def gosub[S[_], A, B](a0: () => Free[S, A])(f0: A => Free[S, B]): Free[S, B] =
+    new Gosub[S, B] {
+      type C = A
+      val a = a0
+      val f = f0
+    }
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[A] = Free[Function0, A]
@@ -47,18 +57,22 @@ sealed abstract class Free[S[_], A] {
   /** Binds the given continuation to the result of this computation.
     * All left-associated binds are reassociated to the right. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] = this match {
-    case Gosub(a, g) => Gosub(a, (x: Any) => Gosub(() => g(x), f))
-    case a           => Gosub(() => a, f)
+    case a @ Gosub() => gosub(a.a)(x => gosub(() => a.f(x))(f))
+    case a           => gosub(() => a)(f)
   }
+
+  /** Catamorphism. Run the first given function if Return, otherwise, the second given function. */
+  final def fold[B](r: A => B, s: S[Free[S, A]] => B)(implicit S: Functor[S]): B =
+    resume.fold(s, r)
 
   /** Evaluates a single layer of the free monad. */
   @tailrec final def resume(implicit S: Functor[S]): (S[Free[S, A]] \/ A) = this match {
     case Return(a)  => \/-(a)
     case Suspend(t) => -\/(t)
-    case a Gosub f  => a() match {
-      case Return(a)  => f(a).resume
-      case Suspend(t) => -\/(S.map(t)(((_: Free[S, Any]) flatMap f)))
-      case b Gosub g  => b().flatMap((x: Any) => g(x) flatMap f).resume
+    case x @ Gosub() => x.a() match {
+      case Return(a)   => x.f(a).resume
+      case Suspend(t)  => -\/(S.map(t)(_ flatMap x.f))
+      case y @ Gosub() => y.a().flatMap(z => y.f(z) flatMap x.f).resume
     }
   }
 
@@ -285,16 +299,6 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
-
-  implicit def freeEqual[F[_], A](implicit A: Equal[A], N: Equal ~> ({type λ[α] = Equal[F[α]]})#λ, F: Functor[F]): Equal[Free[F, A]] =
-    Equal.equal{ (aa, bb) =>
-      (aa.resume, bb.resume) match {
-        case (\/-(a), \/-(b)) => A.equal(a, b)
-        case (-\/(a), -\/(b)) => N(freeEqual[F, A]).equal(a, b)
-        case (\/-(_), -\/(_)) => false
-        case (-\/(_), \/-(_)) => false
-      }
-    }
 }
 
 trait FreeFunctions {
@@ -319,6 +323,13 @@ trait FreeFunctions {
   /** A free monad over a free functor of `S`. */
   def liftFC[S[_], A](s: S[A]): FreeC[S, A] =
     liftFU(Coyoneda lift s)
+
+  /** Interpret a free monad over a free functor of `S` via natural transformation to monad `M`. */
+  def runFC[S[_], M[_], A](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
+    sa.foldMap[M](new (({type λ[α] = Coyoneda[S, α]})#λ ~> M) {
+      def apply[A](cy: Coyoneda[S, A]): M[A] =
+        M.map(interp(cy.fi))(cy.k)
+      })
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
