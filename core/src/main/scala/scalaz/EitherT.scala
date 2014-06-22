@@ -217,7 +217,7 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     case e: Throwable => left(F.point(e))
   }
 
-  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], ex: ClassManifest[B]): EitherT[F, B, A] =
+  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassManifest[B]): EitherT[F, B, A] =
     try {
       right(a)
     } catch {
