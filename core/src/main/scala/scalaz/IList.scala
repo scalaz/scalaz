@@ -461,6 +461,9 @@ object IList extends IListInstances with IListFunctions{
   def fromList[A](as: List[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
+  def fromFoldable[F[_]: Foldable, A](as: F[A]): IList[A] =
+    Foldable[F].foldRight(as, empty[A])(ICons(_, _))
+
   def fromOption[A](a: Option[A]): IList[A] =
     cata(a)(single(_), IList.empty[A])
 
