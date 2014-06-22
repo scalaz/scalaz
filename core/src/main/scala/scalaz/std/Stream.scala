@@ -92,8 +92,8 @@ trait StreamInstances {
   implicit val streamZipApplicative: Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] = new Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
     def point[A](a: => A) = Zip(Stream.continually(a))
     def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
-      Zip(if (f.isEmpty || fa.isEmpty) Stream.empty[B]
-      else Stream.cons((f.head)(fa.head), ap(Zip(fa.tail))(Zip(f.tail))))
+      Zip(if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty) Stream.empty[B]
+      else Stream.cons((Tag.unwrap(f).head)(Tag.unwrap(fa).head), Tag.unwrap(ap(Zip(Tag.unwrap(fa).tail))(Zip(Tag.unwrap(f).tail)))))
     }
   }
 

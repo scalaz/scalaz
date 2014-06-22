@@ -203,7 +203,7 @@ sealed trait MaybeInstances {
   implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] {
     val zero: FirstMaybe[A] = Tag(empty)
 
-    def append(fa1: FirstMaybe[A], fa2: => FirstMaybe[A]): FirstMaybe[A] = Tag(fa1.orElse(fa2))
+    def append(fa1: FirstMaybe[A], fa2: => FirstMaybe[A]): FirstMaybe[A] = Tag(Tag.unwrap(fa1).orElse(Tag.unwrap(fa2)))
   }
 
   implicit def maybeFirstShow[A](implicit A: Show[Maybe[A]]): Show[FirstMaybe[A]] = Tag.subst(A)
@@ -212,14 +212,16 @@ sealed trait MaybeInstances {
 
   implicit val maybeFirstMonad: Monad[FirstMaybe] = new Monad[FirstMaybe] {
     def point[A](a: => A): FirstMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: FirstMaybe[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: FirstMaybe[A])(f: A => FirstMaybe[B]): FirstMaybe[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: FirstMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
+    def bind[A, B](fa: FirstMaybe[A])(f: A => FirstMaybe[B]): FirstMaybe[B] = Tag(Tag unwrap fa flatMap { a =>
+      Tag unwrap f(a)
+    })
   }
 
   implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] = new Monoid[LastMaybe[A]] {
     val zero: LastMaybe[A] = Tag(empty)
 
-    def append(fa1: LastMaybe[A], fa2: => LastMaybe[A]): LastMaybe[A] = Tag(fa2.orElse(fa1))
+    def append(fa1: LastMaybe[A], fa2: => LastMaybe[A]): LastMaybe[A] = Tag(Tag.unwrap(fa2).orElse(Tag.unwrap(fa1)))
   }
 
   implicit def maybeLastShow[A](implicit A: Show[Maybe[A]]): Show[LastMaybe[A]] = Tag.subst(A)
@@ -228,14 +230,16 @@ sealed trait MaybeInstances {
 
   implicit val maybeLastMonad: Monad[LastMaybe] = new Monad[LastMaybe] {
     def point[A](a: => A): LastMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: LastMaybe[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: LastMaybe[A])(f: A => LastMaybe[B]): LastMaybe[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: LastMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
+    def bind[A, B](fa: LastMaybe[A])(f: A => LastMaybe[B]): LastMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
+      Tag.unwrap(f(a))
+    })
   }
 
   implicit def maybeMin[A](implicit o: Order[A]) = new Monoid[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
 
-    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag(Order[Maybe[A]].min(f1, f2))
+    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag(Order[Maybe[A]].min(Tag.unwrap(f1), Tag.unwrap(f2)))
   }
 
   implicit def maybeMinShow[A: Show]: Show[MinMaybe[A]] = Tag.subst(Show[Maybe[A]])
@@ -244,14 +248,16 @@ sealed trait MaybeInstances {
 
   implicit def maybeMinMonad: Monad[MinMaybe] = new Monad[MinMaybe] {
     def point[A](a: => A): MinMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: MinMaybe[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: MinMaybe[A])(f: A => MinMaybe[B]): MinMaybe[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: MinMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
+    def bind[A, B](fa: MinMaybe[A])(f: A => MinMaybe[B]): MinMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
+      Tag.unwrap(f(a))
+    })
   }
 
   implicit def maybeMax[A](implicit o: Order[A]) = new Monoid[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
 
-    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag(Order[Maybe[A]].max(f1, f2))
+    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag(Order[Maybe[A]].max(Tag.unwrap(f1), Tag.unwrap(f2)))
   }
 
   implicit def maybeMaxShow[A: Show]: Show[MaxMaybe[A]] = Tag.subst(Show[Maybe[A]])
@@ -260,8 +266,10 @@ sealed trait MaybeInstances {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = new Monad[MaxMaybe] {
     def point[A](a: => A): MaxMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: MaxMaybe[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: MaxMaybe[A])(f: A => MaxMaybe[B]): MaxMaybe[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: MaxMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
+    def bind[A, B](fa: MaxMaybe[A])(f: A => MaxMaybe[B]): MaxMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
+      Tag.unwrap(f(a))
+    })
   }
 
   implicit val maybeInstance = new Traverse[Maybe] with MonadPlus[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {

@@ -55,17 +55,17 @@ object Profunctor {
   implicit def upStarProfunctor[F[_]:Functor]: Profunctor[({type λ[α,β]=UpStar[F,α,β]})#λ] =
     new Profunctor[({type λ[α,β] = UpStar[F,α,β]})#λ] {
       def mapfst[A,B,C](h: UpStar[F,A,B])(f: C => A): UpStar[F,C,B] =
-        UpStar(h compose f)
+        UpStar(Tag unwrap h compose f)
       def mapsnd[A,B,C](h: UpStar[F,A,B])(f: B => C): UpStar[F,A,C] =
-        UpStar(a => Functor[F].map(h(a))(f))
+        UpStar(a => Functor[F].map(Tag.unwrap(h)(a))(f))
     }
 
   implicit def downStarProfunctor[F[_]:Functor]: Profunctor[({type λ[α,β]=DownStar[F,α,β]})#λ] =
     new Profunctor[({type λ[α,β]=DownStar[F,α,β]})#λ] {
       def mapfst[A,B,C](h: DownStar[F,A,B])(f: C => A): DownStar[F,C,B] =
-        DownStar(fa => h(Functor[F].map(fa)(f)))
+        DownStar(fa => Tag.unwrap(h)(Functor[F].map(fa)(f)))
       def mapsnd[A,B,C](h: DownStar[F,A,B])(f: B => C): DownStar[F,A,C] =
-        DownStar(f compose h)
+        DownStar(f compose Tag.unwrap(h))
     }
 
   implicit def upStarFunctor[F[_]:Functor,D]: Functor[({type λ[α]=UpStar[F,D,α]})#λ] =
@@ -75,7 +75,7 @@ object Profunctor {
 
   implicit def downStarFunctor[F[_],D]: Functor[({type λ[α]=DownStar[F,D,α]})#λ] =
     new Functor[({type λ[α]=DownStar[F,D,α]})#λ] {
-      def map[A,B](f: DownStar[F,D,A])(k: A => B) = DownStar(k compose f)
+      def map[A,B](f: DownStar[F,D,A])(k: A => B) = DownStar[F,D,B](k compose Tag.unwrap(f))
     }
   ////
 }

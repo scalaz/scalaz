@@ -10,14 +10,14 @@ object NewTypeUsage extends App {
   assert(!booleanInstance.disjunction.zero)
   assert(booleanInstance.conjunction.zero)
 
-  assert(!Monoid[Boolean @@ Disjunction].zero)
-  assert(Monoid[Boolean @@ Conjunction].zero)
+  assert(!Tag.unwrap(Monoid[Boolean @@ Disjunction].zero))
+  assert(Tag.unwrap(Monoid[Boolean @@ Conjunction].zero))
 
   val bools = List(true, false)
 
   val boolDisjunctions: List[Boolean @@ Disjunction] = Tag.subst(bools)
-  assert(listInstance.fold(boolDisjunctions))
+  assert(Tag.unwrap(listInstance.fold(boolDisjunctions)))
   
   val boolConjunctions: List[Boolean @@ Conjunction] = Tag.subst(bools)
-  assert(!listInstance.fold(boolConjunctions))
+  assert(!Tag.unwrap(listInstance.fold(boolConjunctions)))
 }

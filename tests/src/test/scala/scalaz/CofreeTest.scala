@@ -7,6 +7,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
+import Cofree._
 import Cofree.CofreeZip
 import Isomorphism._
 
@@ -109,14 +110,14 @@ object CofreeTest extends SpecLite {
     implicit def CofreeZipLazyOptionArb[A: Arbitrary]: Arbitrary[CofreeZipLazyOption[A]] =
       Tags.Zip.subst(CofreeLazyOptionArb[A])
 
-    // avoid stack overflow because `Applicative[CofreeZipLazyOption].point` is infinite stream
-    implicit def CofreeZipLazyOptionEqual[A: Equal]: Equal[CofreeZipLazyOption[A]] =
+    // Hack: avoid stack overflow because `Applicative[CofreeLazyOption].point` is infinite stream
+    def CofreeZipLazyOptionEqual[A: Equal]: Equal[CofreeZipLazyOption[A]] =
       Equal.equalBy{ a =>
-        val OneAnd(h, t) = oneAndStreamCofreeLazyOptionIso.from(a)
+        val OneAnd(h, t) = oneAndStreamCofreeLazyOptionIso.from(Tag.unwrap(a))
         h -> t.take(1000)
       }
 
-    checkAll("CofreeZipLazyOption", applicative.laws[CofreeZipLazyOption])
+    checkAll("CofreeZipLazyOption", applicative.laws[CofreeZipLazyOption](implicitly, implicitly, implicitly, CofreeZipLazyOptionEqual))
   }
 
   {
@@ -133,12 +134,12 @@ object CofreeTest extends SpecLite {
 
     import syntax.foldable._
     val f = (_: Int) + (_: Int)
-    val h #:: t = Applicative[({type λ[α]=Stream[α] @@ Tags.Zip})#λ].apply2(Tags.Zip(a.toStream), Tags.Zip(b.toStream))(f)
+    val h #:: t = Tag.unwrap(Applicative[({type λ[α]=Stream[α] @@ Tags.Zip})#λ].apply2(Tags.Zip[Stream[Int]](a.toStream), Tags.Zip[Stream[Int]](b.toStream))(f))
 
     val aa = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(a))
     val bb = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(b))
     val y = Applicative[({type λ[α] = CofreeZip[LazyOption, α]})#λ].apply2(aa, bb)(f)
-    OneAnd(h, t) must_=== oneAndStreamCofreeLazyOptionIso.from(y)
+    OneAnd(h, t) must_=== oneAndStreamCofreeLazyOptionIso.from(Tag.unwrap(y))
   }
 
   "no stack overflow unfoldC, mapBranching" in {

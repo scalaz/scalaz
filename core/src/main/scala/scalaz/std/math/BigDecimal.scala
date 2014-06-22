@@ -23,7 +23,7 @@ trait BigDecimalInstances {
   import Tags.Multiplication
 
   implicit val BigDecimalMultiplicationNewType: Monoid[BigDecimal @@ Multiplication] = new Monoid[BigDecimal @@ Multiplication] {
-    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) = Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
 
     def zero = Multiplication(1)
   }

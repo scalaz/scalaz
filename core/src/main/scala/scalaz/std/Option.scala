@@ -100,7 +100,7 @@ trait OptionInstances extends OptionInstances0 {
   implicit def optionFirst[A] = new Monoid[FirstOption[A]] {
     def zero: FirstOption[A] = Tag(None)
 
-    def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(f1.orElse(f2))
+    def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
   }
 
   implicit def optionFirstShow[A: Show]: Show[FirstOption[A]] = Tag.subst(Show[Option[A]])
@@ -109,15 +109,17 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit val optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
     def point[A](a: => A): FirstOption[A] = Tag(Some(a))
-    override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
+    def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(Tag unwrap fa flatMap { a =>
+      Tag unwrap f(a)
+    })
   }
 
 
   implicit def optionLast[A] = new Monoid[LastOption[A]] {
     def zero: LastOption[A] = Tag(None)
 
-    def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(f2.orElse(f1))
+    def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
   }
 
   implicit def optionLastShow[A: Show]: Show[LastOption[A]] = Tag.subst(Show[Option[A]])
@@ -126,14 +128,16 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit val optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
     def point[A](a: => A): LastOption[A] = Tag(Some(a))
-    override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
+    def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(Tag unwrap fa flatMap { a =>
+      Tag unwrap f(a)
+    })
   }
 
   implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
 
-    def append(f1: MinOption[A], f2: => MinOption[A]) = Tag(Order[Option[A]].min(f1, f2))
+    def append(f1: MinOption[A], f2: => MinOption[A]) = Tag(Order[Option[A]].min(Tag unwrap f1, Tag unwrap f2))
   }
 
   implicit def optionMinShow[A: Show]: Show[MinOption[A]] = Tag.subst(Show[Option[A]])
@@ -142,14 +146,16 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMinMonad: Monad[MinOption] = new Monad[MinOption] {
     def point[A](a: => A): MinOption[A] = Tag(Some(a))
-    override def map[A, B](fa: MinOption[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: MinOption[A])(f: A => MinOption[B]): MinOption[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: MinOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
+    def bind[A, B](fa: MinOption[A])(f: A => MinOption[B]): MinOption[B] = Tag(Tag unwrap fa flatMap { a =>
+      Tag unwrap f(a)
+    })
   }
 
   implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
 
-    def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag(Order[Option[A]].max(f1, f2))
+    def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag(Order[Option[A]].max(Tag unwrap f1, Tag unwrap f2))
   }
 
   implicit def optionMaxShow[A: Show]: Show[MaxOption[A]] = Tag.subst(Show[Option[A]])
@@ -158,8 +164,10 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMaxMonad: Monad[MaxOption] = new Monad[MaxOption] {
     def point[A](a: => A): MaxOption[A] = Tag(Some(a))
-    override def map[A, B](fa: MaxOption[A])(f: A => B) = Tag(fa map f)
-    def bind[A, B](fa: MaxOption[A])(f: A => MaxOption[B]): MaxOption[B] = Tag(fa flatMap f)
+    override def map[A, B](fa: MaxOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
+    def bind[A, B](fa: MaxOption[A])(f: A => MaxOption[B]): MaxOption[B] = Tag(Tag unwrap fa flatMap { a =>
+      Tag unwrap f(a)
+    })
   }
 }
 
