@@ -65,6 +65,7 @@ object SyntaxUsage extends App {
   }
 
   def stdSyntax() {
+    import scalaz.Tags.Last
     import scalaz.std.anyVal._
     import scalaz.std.stream.streamSyntax._
 
@@ -77,7 +78,7 @@ object SyntaxUsage extends App {
     import scalaz.syntax.equal._
 
     val lists: List[Int] = some(1).orEmpty[List]
-    ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
+    Last.unwrap((some(1).last |+| some(2).last)) assert_=== some(2)
   }
 
   def stdSyntaxUeber() {
@@ -92,7 +93,7 @@ object SyntaxUsage extends App {
     // syntax to provide `x.op(args)`
     some(1).orEmpty[List]
 
-    ((some(1).last |+| some(2).last): Option[Int]) assert_=== some(2)
+    Tag.unwrap((some(1).last |+| some(2).last)) assert_=== some(2)
     some(some(1)).join assert_=== some(1)
 
     List(1, 2, 3).powerset.join
