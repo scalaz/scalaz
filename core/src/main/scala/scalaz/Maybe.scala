@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.util.control.NonFatal
 import Ordering._
 import Isomorphism.{<~>, IsoFunctorTemplate}
 
@@ -166,6 +167,18 @@ sealed trait MaybeFunctions {
 
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
+
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): Maybe[T] = try {
+    just(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => empty
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Maybe[T] = try {
+    just(a)
+  } catch {
+    case NonFatal(t) => empty
+  }
 }
 
 sealed trait MaybeInstances {
