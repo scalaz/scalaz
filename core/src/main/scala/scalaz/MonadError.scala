@@ -13,6 +13,10 @@ trait MonadError[F[_,_], E] extends Monad[({ type λ[α] = F[E, α] })#λ] {
       FEA.equal(bind(raiseError(e))(_ => point(a)), raiseError(e))
   }
   def monadErrorLaw = new MonadErrorLaw {}
+
+  val monadErrorSyntax = new syntax.MonadErrorSyntax[F, E] {
+    val F = MonadError.this
+  }
 }
 
 object MonadError {
