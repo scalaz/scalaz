@@ -1,5 +1,7 @@
 package scalaz
 
+import Id.Id
+
 ////
 /**
  * A type giving rise to two unrelated [[scalaz.Foldable]]s.
@@ -63,6 +65,19 @@ trait Bifoldable[F[_, _]]  { self =>
   /** Unify the foldable over both params. */
   def uFoldable: Foldable[({type λ[α] = F[α, α]})#λ] = new UFoldable[F] {val F = self}
 
+  /** Embed one Foldable at each side of this Bifoldable */
+  def embed[G[_],H[_]](implicit G0: Foldable[G], H0: Foldable[H]): Bifoldable[({type λ[α, β]=F[G[α],H[β]]})#λ] = new CompositionBifoldableFoldables[F,G,H] {
+    def F = self
+    def G = G0
+    def H = H0
+  }
+
+  /** Embed one Foldable to the left of this Bifoldable .*/
+  def embedLeft[G[_]](implicit G0: Foldable[G]): Bifoldable[({type λ[α, β]=F[G[α],β]})#λ] = embed[G,Id.Id]
+
+  /** Embed one Foldable to the right of this Bifoldable .*/
+  def embedRight[H[_]](implicit H0: Foldable[H]): Bifoldable[({type λ[α, β]=F[α,H[β]]})#λ] = embed[Id.Id,H]
+
   trait BifoldableLaw {
     import std.vector._
 
@@ -76,7 +91,6 @@ trait Bifoldable[F[_, _]]  { self =>
   }
 
   def bifoldableLaw = new BifoldableLaw {}
-
   ////
   val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
