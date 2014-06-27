@@ -80,9 +80,9 @@ object ApplyUsage extends App {
   // the applicative builder created by |@| also has a "tupled" method
   // which will tuple the arguments
   assert((List(1,2,3) |@| List("a","b","c")).tupled ===
-           List(1 → "a", 1 → "b", 1 → "c",
-                2 → "a", 2 → "b", 2 → "c",
-                3 → "a", 3 → "b", 3 → "c"))
+           List(1 -> "a", 1 -> "b", 1 -> "c",
+                2 -> "a", 2 -> "b", 2 -> "c",
+                3 -> "a", 3 -> "b", 3 -> "c"))
 
 
   // there are ^, ^^, ^^^, etc methods which correspond respectively

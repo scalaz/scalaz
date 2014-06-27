@@ -14,7 +14,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   )
 
   def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
-    F.bind(self.run)(_.cata((a ⇒ F.map(f(a))(just)), F.point(empty)))
+    F.bind(self.run)(_.cata((a => F.map(f(a))(just)), F.point(empty)))
   )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
@@ -26,7 +26,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   }
 
   def ap[B](f: => MaybeT[F, A => B])(implicit F: Monad[F]): MaybeT[F, B] =
-    MaybeT(F.bind(f.run)(_.cata(ff ⇒ F.map(run)(_ map ff), F.point(empty))))
+    MaybeT(F.bind(f.run)(_.cata(ff => F.map(run)(_ map ff), F.point(empty))))
 
   /** Apply a function in the environment of both maybes, containing
     * both `F`s.  It is not compatible with `Monad#bind`.
@@ -53,7 +53,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
 
   def orElse(a: => MaybeT[F, A])(implicit F: Monad[F]): MaybeT[F, A] =
-    MaybeT(F.bind(run)(_.cata(a ⇒ F.point(just(a)), a.run)))
+    MaybeT(F.bind(run)(_.cata(a => F.point(just(a)), a.run)))
 
   def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(_.toRight(e)))
 
@@ -180,7 +180,7 @@ private trait MaybeTMonadListen[F[_, _], W] extends MonadListen[({ type λ[α, �
   def MT: MonadListen[F, W]
 
   def listen[A](ma: MaybeT[({ type λ[α] = F[W, α] })#λ, A]): MaybeT[({ type λ[α] = F[W, α] })#λ, (A, W)] = {
-    val tmp = MT.bind[(Maybe[A], W), Maybe[(A, W)]](MT.listen(ma.run)){case (m, w) ⇒ m.cata(j ⇒ MT.point(Maybe.just((j, w))), MT.point(Maybe.empty))}
+    val tmp = MT.bind[(Maybe[A], W), Maybe[(A, W)]](MT.listen(ma.run)){case (m, w) => m.cata(j => MT.point(Maybe.just((j, w))), MT.point(Maybe.empty))}
 
     MaybeT.maybeT[({ type λ[α] = F[W, α] })#λ].apply[(A, W)](tmp)
   }
