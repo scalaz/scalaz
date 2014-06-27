@@ -369,6 +369,13 @@ sealed abstract class ==>>[A, B] {
         Tip()
     }
 
+  /**
+    * insert v into the map at k. If there is already a value for k,
+    * append to the existing value using the Semigroup
+    */
+  def updateAppend(k: A, v: B)(implicit o: Order[A], bsg: Semigroup[B]) =
+    alter(k, old ⇒ Some(old.map(bsg.append(_, v)).getOrElse(v)))
+
   def minViewWithKey: Option[((A, B), A ==>> B)] =
     this match {
       case Tip() =>
