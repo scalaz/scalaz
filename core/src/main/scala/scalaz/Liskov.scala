@@ -51,7 +51,7 @@ trait LiskovFunctions {
     def subst[F[-_]](p: F[B]): F[A] = p
   }
 
-  /**We can witness equality by using it to convert between types */
+  /**We can witness subtyping by using it to convert between types */
   implicit def witness[A, B](lt: A <~< B): A => B = {
     type f[-X] = X => B
     lt.subst[f](identity)
