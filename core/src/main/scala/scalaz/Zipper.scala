@@ -51,6 +51,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Moves to the next element to the right of focus, or error if there is no element on the right.
    */
+  @deprecated("this method is unsafe, use `next` or `nextOr` instead", "7.1")
   def tryNext: Zipper[A] = nextOr(sys.error("cannot move to next element"))
 
   /**
