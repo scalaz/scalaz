@@ -35,12 +35,12 @@ object FoldableUsage extends App {
   // we can also map the structure to values for which we have a
   // monoid, we can collapse the list, as we can see, this one is also
   // properly lazy, allowing us to collapse our infinite stream again
-  assert(Foldable[Stream].foldMap(trues)((b: Boolean) => Tags.Disjunction(b)))
+  assert(Tag.unwrap(Foldable[Stream].foldMap(trues)((b: Boolean) => Tags.Disjunction(b))))
 
   // We can import syntax for foldable, allowing us to "enhance" the foldable with the new methods:
   import scalaz.syntax.foldable._
   assert(trues.foldr(false)(lazyOr))
-  assert(trues.foldMap((b: Boolean) => Tags.Disjunction(b)))
+  assert(Tag.unwrap(trues.foldMap((b: Boolean) => Tags.Disjunction(b))))
   assert(digits.map(_.toString).intercalate(",") === "0,1,2,3,4,5,6,7,8,9")
   assert(digits.maximum === Some(9))
   assert(digits.minimum === Some(0))

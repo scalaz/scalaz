@@ -30,11 +30,11 @@ trait BigIntegerInstances {
   implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
     override def shows(f: scalaz.@@[BigInteger, Multiplication]) = f.toString
 
-    def append(f1: BigInteger @@ Multiplication, f2: => BigInteger @@ Multiplication) = Multiplication(f1 multiply f2)
+    def append(f1: BigInteger @@ Multiplication, f2: => BigInteger @@ Multiplication) = Multiplication(Tag.unwrap(f1) multiply Tag.unwrap(f2))
 
     def zero: BigInteger @@ Multiplication = Multiplication(BigInteger.ONE)
 
-    def order(x: BigInteger @@ Multiplication, y: BigInteger @@ Multiplication) = x.compareTo(y) match {
+    def order(x: BigInteger @@ Multiplication, y: BigInteger @@ Multiplication) = Tag.unwrap(x).compareTo(Tag.unwrap(y)) match {
       case x if x < 0   => Ordering.LT
       case x if x == 0 => Ordering.EQ
       case x if x > 0   => Ordering.GT

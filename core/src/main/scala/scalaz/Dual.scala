@@ -21,7 +21,7 @@ sealed abstract class DualInstances extends DualInstances0 {
 
 private trait DualSemigroup[F] extends Semigroup[F @@ Tags.Dual] {
   implicit def F: Semigroup[F]
-  def append(f1: F @@ Tags.Dual, f2: => F @@ Tags.Dual) = Tag(F.append(f2, f1))
+  def append(f1: F @@ Tags.Dual, f2: => F @@ Tags.Dual) = Tag(F.append(Tag.unwrap(f2), Tag.unwrap(f1)))
 }
 
 private trait DualMonoid[F] extends Monoid[F @@ Tags.Dual] with DualSemigroup[F] {

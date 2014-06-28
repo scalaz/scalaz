@@ -87,13 +87,13 @@ object Semigroup {
   @inline implicit def lastTaggedSemigroup[A] = lastSemigroup[A @@ Tags.LastVal]
 
   def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] = new Semigroup[A @@ Tags.MinVal] {
-    def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(f1, f2))
+    def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
   }
 
   @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
 
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] = new Semigroup[A @@ Tags.MaxVal] {
-    def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(f1, f2))
+    def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
   }
 
   @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]

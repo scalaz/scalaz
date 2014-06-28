@@ -206,7 +206,7 @@ private trait CofreeComonad[S[_]] extends Comonad[({type f[x] = Cofree[S, x]})#f
 private trait CofreeZipFunctor[F[_]] extends Functor[({type λ[α] = CofreeZip[F, α]})#λ]{
   implicit def F: Functor[F]
 
-  override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) = Tags.Zip(fa map f)
+  override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) = Tags.Zip(Tag unwrap fa map f)
 }
 
 private trait CofreeZipApply[F[_]] extends Apply[({type λ[α] = CofreeZip[F, α]})#λ] with CofreeZipFunctor[F]{
@@ -214,8 +214,10 @@ private trait CofreeZipApply[F[_]] extends Apply[({type λ[α] = CofreeZip[F, α
 
   override final def ap[A, B](fa: => CofreeZip[F, A])(f: => CofreeZip[F, A => B]): CofreeZip[F, B] =
     Tags.Zip(
-      Cofree.applyT(f.head(fa.head),
-        fa.t.flatMap(fat => f.t.map(fab => F.apply2(Tags.Zip.subst(fat), Tags.Zip.subst(fab))(ap(_)(_))))
+      Cofree.applyT(Tag.unwrap(f).head(Tag.unwrap(fa).head),
+        Tag.unwrap(fa).t.flatMap(fat => Tag.unwrap(f).t.map(fab => F.apply2(Tags.Zip.subst(fat), Tags.Zip.subst(fab)) { (a, b) =>
+          Tag.unwrap(ap(a)(b))
+        }))
       )
     )
 }
@@ -223,7 +225,7 @@ private trait CofreeZipApply[F[_]] extends Apply[({type λ[α] = CofreeZip[F, α
 private trait CofreeZipApplicative[F[_]] extends Applicative[({type λ[α] = CofreeZip[F, α]})#λ] with CofreeZipApply[F]{
   implicit def F: Applicative[F]
 
-  def point[A](a: => A) = CofreeZip(a, F.point(point(a)))
+  def point[A](a: => A) = CofreeZip[F, A](a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a))))
 }
 
 private trait CofreeBind[F[_]] extends Bind[({type λ[α] = Cofree[F, α]})#λ] with CofreeComonad[F]{

@@ -88,10 +88,10 @@ package object scalaz {
 
   implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] = Id.id
 
-  type Tagged[T] = {type Tag = T}
+  private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
 
   /**
-   * Tag a type `T` with `Tag`. The resulting type is a subtype of `T`.
+   * Tag a type `T` with `Tag`.
    *
    * The resulting type is used to discriminate between type class instances.
    *
@@ -99,7 +99,7 @@ package object scalaz {
    *
    * Credit to Miles Sabin for the idea.
    */
-  type @@[+T, Tag] = T with Tagged[Tag]
+  type @@[T, Tag] = Tagged[T, Tag]
 
   /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
