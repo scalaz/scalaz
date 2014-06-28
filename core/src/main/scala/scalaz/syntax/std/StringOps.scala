@@ -12,8 +12,6 @@ final class StringOps(self: String) {
    */
   def plural(n: Long): String = s.plural(self, n)
 
-  def encode(implicit c: CharSet): Array[Byte] = s.encode(self)
-
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */

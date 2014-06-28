@@ -197,9 +197,6 @@ object ScalazArbitrary {
 
   implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
 
-  implicit def RopeArbitrary[A : Arbitrary : ClassTag]: Arbitrary[Rope[A]] =
-    Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
-
   import java.util.concurrent.Callable
 
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
@@ -279,11 +276,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
-  implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
-  }
-
-  // backwards compatability
+  // backwards compatibility
   def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = indexedStoreTArb[F, A, A, B](A)
 
   implicit def indexedStoreTArb[F[+_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))

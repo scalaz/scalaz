@@ -116,9 +116,6 @@ trait StreamFunctions {
     else s1.head #:: interleave(s2, s1.tail)
   }
 
-  @deprecated("renamed to `interleave` for consistency and to avoid collision with `Align#merge`", "7.1")
-  final def merge[A](s1: Stream[A], s2: Stream[A]): Stream[A] = interleave(s1, s2)
-
   import scala.Stream.{Empty, empty}
 
   final def toZipper[A](as: Stream[A]): Option[Zipper[A]] = as match {

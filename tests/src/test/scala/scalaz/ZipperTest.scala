@@ -74,15 +74,6 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "Zipper tryNext returns Some of next or throws" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
-    val z = zipper(l, f, r)
-    if (r.length > 0) {
-      z.next must_===(Some(z.tryNext))
-    } else {
-      z.tryNext.mustThrowA[RuntimeException]
-    }
-  }
-
   "Previous Affects Lengths" ! forAll { (xs: Stream[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.previous)
