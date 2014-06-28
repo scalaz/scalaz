@@ -43,6 +43,20 @@ trait Bifunctor[F[_, _]]  { self =>
 
   def umap[A, B](faa: F[A, A])(f: A => B): F[B, B] =
     bimap(faa)(f, f)
+
+  /** Embed two Functors , one on each side */
+  def embed[G[_],H[_]](implicit G0: Functor[G], H0: Functor[H]): Bifunctor[({type λ[α, β]=F[G[α],H[β]]})#λ] = new CompositionBifunctorFunctors[F,G,H] {
+    def F = self
+    def G = G0
+    def H = H0
+  }
+
+  /** Embed one Functor to the left */
+  def embedLeft[G[_]](implicit G0: Functor[G]): Bifunctor[({type λ[α, β]=F[G[α],β]})#λ] = embed[G,Id.Id]
+
+  /** Embed one Functor to the right */
+  def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[({type λ[α, β]=F[α,H[β]]})#λ] = embed[Id.Id,H]
+
   ////
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
