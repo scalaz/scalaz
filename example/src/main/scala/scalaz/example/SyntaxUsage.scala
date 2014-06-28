@@ -69,7 +69,7 @@ object SyntaxUsage extends App {
     import scalaz.std.anyVal._
     import scalaz.std.stream.streamSyntax._
 
-    val merged = Stream(1, 3, 5).merge(Stream(2, 4, 6))
+    val interleaved = Stream(1, 3, 5).interleave(Stream(2, 4, 6))
 
     import scalaz.std.list._
     import scalaz.std.option._

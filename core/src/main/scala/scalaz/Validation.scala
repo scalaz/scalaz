@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import scala.reflect.ClassTag
 
 /**
  * Represents either:
@@ -498,10 +499,10 @@ trait ValidationFunctions {
     case e: Throwable => failure(e)
   }
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): Validation[E, T] = try {
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
-    case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
+    case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
   }
 
   def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {

@@ -13,8 +13,8 @@ object KleisliTest extends SpecLite {
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
     Arbitrary(Gen.frequency[Int => Option[Int]](
-      (1, Gen.value((x: Int) => Some(x))),
-      (1, Gen.value((x: Int) => Some(x + 1))),
+      (1, Gen.const((x: Int) => Some(x))),
+      (1, Gen.const((x: Int) => Some(x + 1))),
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
 

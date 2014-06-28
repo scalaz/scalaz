@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import scala.reflect.ClassTag
 
 /**
  * Represents a computation of type `F[A \/ B]`.
@@ -216,11 +217,11 @@ object EitherT extends EitherTInstances with EitherTFunctions {
     case e: Throwable => left(F.point(e))
   }
 
-  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassManifest[B]): EitherT[F, B, A] =
+  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
       right(a)
     } catch {
-      case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+      case e if ex.runtimeClass.isInstance(e) => left(F.point(e.asInstanceOf[B]))
     }
 
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =

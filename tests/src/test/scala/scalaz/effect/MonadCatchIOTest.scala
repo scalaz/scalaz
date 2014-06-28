@@ -6,7 +6,6 @@ import java.io.{ StringReader, IOException }
 
 object MonadCatchIOTest extends SpecLite {
   import Kleisli.kleisli
-  import kleisliEffect._
   import syntax.monad._
   import syntax.effect.monadCatchIO._
   import std.effect.closeable._
