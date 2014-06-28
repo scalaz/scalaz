@@ -294,4 +294,7 @@ package object scalaz {
 
   type IMap[A, B] = ==>>[A, B]
   val IMap = ==>>
+
+  type GlorifiedTuple[+A, +B] = A \/ B
+  type Disjunction[+A, +B] = A \/ B
 }

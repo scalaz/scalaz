@@ -356,12 +356,6 @@ object \/ extends DisjunctionInstances with DisjunctionFunctions {
 }
 
 sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
-  /** Turns out that Either is just a glorified tuple; who knew? */
-  type GlorifiedTuple[+A, +B] =
-  A \/ B
-}
-
-sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
@@ -379,7 +373,7 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
     }
 }
 
-sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
+sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
     new Equal[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
@@ -396,8 +390,8 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     }
 }
 
-sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] {
+sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
+  implicit def DisjunctionInstances1[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] {
     override def map[A, B](fa: L \/ A)(f: A => B) =
       fa map f
 
@@ -441,8 +435,8 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
 
 }
 
-sealed abstract class DisjunctionInstances3 {
-  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+sealed abstract class DisjunctionInstances2 {
+  implicit val DisjunctionInstances2 : Bitraverse[\/] = new Bitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
