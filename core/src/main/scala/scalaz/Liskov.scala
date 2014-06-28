@@ -42,14 +42,15 @@ trait LiskovFunctions0 {
   this: LiskovFunctions =>
   import Liskov._
 
-  //This is safe by case analysis on the creator of lt — assuming lt is valid per se
-  //(e.g. it's not null or an exception or...
-  implicit def from_<:<[A, B](implicit lt: A <:< B): A <~< B =
-    force
 }
 
 trait LiskovFunctions extends LiskovFunctions0 {
   import Liskov._
+
+  //This is safe by case analysis on the creator of lt — assuming lt is valid per se
+  //(e.g. it's not null or an exception or...
+  implicit def from_<:<[A, B](implicit lt: A <:< B): A <~< B =
+    force
 
   /**Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
