@@ -292,8 +292,14 @@ package object scalaz {
   /**A flipped alias, for those used to their arrows running left to right */
   type >~>[+B, -A] = Liskov[A, B]
 
+  /**A convenient value alias for Liskov */
+  val <~< = Liskov
+
   /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
   type ===[A,B] = Leibniz[⊥, ⊤, A, B]
+
+  /**A convenient value alias for Leibniz */
+  val === = Leibniz
 
   @deprecated("Cojoin has been merged into Cobind", "7.1")
   type Cojoin[F[_]] = Cobind[F]
