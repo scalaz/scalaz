@@ -1,8 +1,10 @@
 package scalaz
 
 /** Newtype for strings representing character sets. */
+@deprecated("CharSet is deprecated", "7.1")
 final case class CharSet private(value: String)
 
+@deprecated("CharSet is deprecated", "7.1")
 object CharSet extends CharSetFunctions {
 
   def charset(v: String): CharSet = CharSet(v)
@@ -21,5 +23,6 @@ object CharSet extends CharSetFunctions {
 }
 
 trait CharSetFunctions {
+  @deprecated("CharSet is deprecated", "7.1")
   implicit def ToStringFromCharSet(charSet:CharSet): String = charSet.value
 }

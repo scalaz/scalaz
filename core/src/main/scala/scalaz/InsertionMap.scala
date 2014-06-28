@@ -1,6 +1,7 @@
 package scalaz
 
 /** Returns a list in order of key insertion. */
+@deprecated("InsertionMap is deprecated", "7.1")
 final class InsertionMap[K, V] private[scalaz](
   private[scalaz] val assoc: Map[K, (V, Long)],
   private[scalaz] val next: Long) {
@@ -84,8 +85,10 @@ final class InsertionMap[K, V] private[scalaz](
     "InsertionMap(" + (toList mkString ", ") + ")"
 }
 
+@deprecated("InsertionMap is deprecated", "7.1")
 object InsertionMap extends InsertionMapInstances with InsertionMapFunctions
 
+@deprecated("InsertionMap is deprecated", "7.1")
 trait InsertionMapFunctions {
   private[scalaz] def build[K, V](a: Map[K, (V, Long)], n: Long): InsertionMap[K, V] =
     new InsertionMap[K, V](a, n)
@@ -109,6 +112,7 @@ trait InsertionMapFunctions {
 
 }
 
+@deprecated("InsertionMap is deprecated", "7.1")
 sealed abstract class InsertionMapInstances {
   import std.list._, std.map._, std.tuple._
   import syntax.foldable._

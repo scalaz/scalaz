@@ -20,6 +20,7 @@ import FingerTree._
   *
   * @see [[http://citeseer.ist.psu.edu/viewdoc/download?doi=10.1.1.14.9450&rep=rep1&type=pdf]]
   */
+@deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableArray[A]])
     extends Ops[Rope.FingerTreeIntPlus[ImmutableArray[A]]] {
   import Rope._
@@ -110,6 +111,7 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
   def chunks: Stream[ImmutableArray[A]] = self.toStream
 }
     
+@deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
     extends Ops[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {
   import Rope._
@@ -142,6 +144,7 @@ sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
 }
 
 
+@deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 sealed class RopeCharW(val self: Rope[Char]) extends Ops[Rope[Char]] {
   def asString = {
     val stringBuilder = new StringBuilder(self.length)
@@ -157,6 +160,8 @@ sealed class RopeCharW(val self: Rope[Char]) extends Ops[Rope[Char]] {
 
 import collection.mutable.Builder
 import scalaz.{ImmutableArray => IA}
+
+@deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
   import Rope._
   private var startRope: Rope[A] = Rope.empty[A]
@@ -216,6 +221,7 @@ final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
   }
 }
 
+@deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 object Rope {
   type FingerTreeIntPlus[A] = FingerTree[Int, A]
 

@@ -6,6 +6,7 @@ package scalaz
  * @see [[http://www.chuusai.com/2011/06/09/scala-union-types-curry-howard/]]
  * @see [[http://en.wikipedia.org/wiki/Curry-Howard_correspondence]]
  */
+@deprecated("unboxed union types are deprecated", "7.1")
 trait UnionTypes {
 
   type ![A] = A => Nothing
@@ -42,7 +43,5 @@ trait UnionTypes {
 
 }
 
+@deprecated("unboxed union types are deprecated", "7.1")
 object UnionTypes extends UnionTypes
-
-// vim: expandtab:ts=2:sw=2
-
