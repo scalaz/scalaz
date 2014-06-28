@@ -15,6 +15,7 @@ object EitherTTest extends SpecLite {
   checkAll(monadPlus.laws[EitherTListInt])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
+  checkAll(monadError.laws[EitherTList, Int])
 
   "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
     val F = new Bitraverse[EitherTList]{
@@ -44,6 +45,7 @@ object EitherTTest extends SpecLite {
     def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
     def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = EitherT[F, α, β]})#λ]
     def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = EitherT[F, α, β]})#λ]
+    def monadError[F[_] : Monad, A] = MonadError[({type λ[α, β] = EitherT[F, α, β] })#λ, A]
   }
 
   // compilation test

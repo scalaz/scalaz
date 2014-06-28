@@ -138,7 +138,7 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({type λ[α]=LazyEither[E, α]})#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] with Optional[({type λ[α]=LazyEither[E, α]})#λ] {
+  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({ type λ[α] = LazyEither[E, α] })#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] with Optional[({type λ[α]=LazyEither[E, α]})#λ] with MonadError[LazyEither, E] {
     def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
       fa traverse f
 
@@ -165,6 +165,12 @@ sealed abstract class LazyEitherInstances {
 
    def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
      fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
+
+    def raiseError[A](e: E): LazyEither[E, A] =
+      LazyEither.lazyLeft(e)
+
+    def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
+      fa.left.flatMap(e => f(e))
   }
 
   implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {

@@ -397,7 +397,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 }
 
 sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
-  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] {
+  implicit def DisjunctionInstances2[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] {
     override def map[A, B](fa: L \/ A)(f: A => B) =
       fa map f
 
@@ -428,6 +428,14 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
     def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
       case l@ -\/(_) => -\/(l)
       case r@ \/-(_) => r
+    }
+
+    def raiseError[A](e: L): L \/ A =
+      -\/(e)
+
+    def handleError[A](fa: L \/ A)(f: L => L \/ A): L \/ A = fa match {
+      case -\/(e) => f(e)
+      case r => r
     }
   }
 
