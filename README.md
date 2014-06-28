@@ -122,7 +122,6 @@ Scalaz has been been modularised.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
 * **scalaz-concurrent**: Actor and Promise implementation
 * **scalaz-iteratee**: Experimental new Iteratee implementation
-* **scalaz-xml**: Error-correcting XML parser
 
 ### Type Class Hierarchy
 

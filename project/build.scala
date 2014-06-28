@@ -175,7 +175,7 @@ object build extends Build {
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, xml)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
   )
 
   lazy val core = Project(
@@ -228,21 +228,10 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
-  lazy val xml = Project(
-    id = "xml",
-    base = file("xml"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-xml",
-      typeClasses := TypeClass.xml,
-      osgiExport("scalaz.xml")
-    ),
-    dependencies = Seq(core)
-  )
-
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent, xml),
+    dependencies = Seq(core, iteratee, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       publishArtifact := false
@@ -252,7 +241,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, xml, iteratee),
+    dependencies = Seq(core, concurrent, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
@@ -263,7 +252,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,

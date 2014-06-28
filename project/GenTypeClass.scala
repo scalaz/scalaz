@@ -112,7 +112,6 @@ object TypeClass {
     arrow
   )
   lazy val concurrent = Seq[TypeClass]()
-  lazy val xml = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
 }
 
