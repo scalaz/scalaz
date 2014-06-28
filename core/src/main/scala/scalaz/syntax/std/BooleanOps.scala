@@ -237,7 +237,7 @@ final class BooleanOps(self: Boolean) {
 
   final class ConditionalEither[A](a: => A) {
     def or[B](b: => B) =
-      if (self) -\/(a) else \/-(b)
+      if (self) \/-(a) else -\/(b)
   }
 
   /**
