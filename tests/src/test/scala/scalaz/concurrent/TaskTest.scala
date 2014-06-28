@@ -126,6 +126,13 @@ object TaskTest extends SpecLite {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.attemptRun ==
       -\/(SadTrombone)
   }
+  
+  "evalutes Monad[Task].point lazily" in {
+    val M = implicitly[Monad[Task]]
+    var x = 0
+    M point { x += 1 }
+    x must_== 0
+  }
 
 
   "Nondeterminism[Task]" should {
