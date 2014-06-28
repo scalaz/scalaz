@@ -97,8 +97,8 @@ object TraverseUsage extends App {
   val res1: List[Boolean] = nonRepeating.traverseS(checkForRepeats).eval(None)
   val res2: List[Boolean] = repeating.traverseS(checkForRepeats).eval(None)
 
-  assert(res1.foldMap(Tags.Disjunction(_)) == false)
-  assert(res2.foldMap(Tags.Disjunction(_)) == true)
+  assert(Tag.unwrap(res1.foldMap(Tags.Disjunction(_))) == false)
+  assert(Tag.unwrap(res2.foldMap(Tags.Disjunction(_))) == true)
 
   // Here's a variation of above which might be a bit of a head
   // scratcher, but this works because a Monoid gives rise to an
@@ -106,6 +106,6 @@ object TraverseUsage extends App {
   // constructor, we need traverseU instead of traverse to find the
   // Applicative.
   import scalaz.Applicative.monoidApplicative
-  assert(res1.traverseU(Tags.Disjunction(_)) == false)
-  assert(res2.traverseU(Tags.Disjunction(_)) == true)
+  assert(Tag.unwrap(res1.traverseU(Tags.Disjunction(_))) == false)
+  assert(Tag.unwrap(res2.traverseU(Tags.Disjunction(_))) == true)
 }
