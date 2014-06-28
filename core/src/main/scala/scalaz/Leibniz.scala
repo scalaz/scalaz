@@ -32,11 +32,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     subst(U(fa))
 }
 
-object Leibniz extends LeibnizInstances with LeibnizFunctions{
-
-  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
-  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
-}
+object Leibniz extends LeibnizInstances with LeibnizFunctions
 
 sealed abstract class LeibnizInstances {
   import Leibniz._

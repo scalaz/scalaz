@@ -35,12 +35,6 @@ sealed abstract class LiskovInstances {
 
 object Liskov extends LiskovInstances with LiskovFunctions {
 
-  /**A convenient type alias for Liskov */
-  type <~<[-A, +B] = Liskov[A, B]
-
-  /**A flipped alias, for those used to their arrows running left to right */
-  type >~>[+B, -A] = Liskov[A, B]
-
   @inline def apply[A, B](implicit <~< : A <~< B): A <~< B = <~<
 }
 

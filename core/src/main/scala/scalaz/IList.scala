@@ -5,7 +5,7 @@ import scala.annotation.unchecked.uncheckedVariance
 import std.option.{ cata, none, some }
 import std.stream.{ toZipper => sToZipper }
 import std.tuple.{ tuple2Bitraverse => BFT }
-import Liskov.{ <~<, refl }
+import Liskov.refl
 import IList.{empty, single}
 
 /**

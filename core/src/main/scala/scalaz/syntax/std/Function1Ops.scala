@@ -2,8 +2,6 @@ package scalaz
 package syntax
 package std
 
-import Leibniz.===
-
 final class Function1Ops[T, R](self: T => R) {
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))

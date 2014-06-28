@@ -6,8 +6,6 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   ////
   import collection.generic.CanBuildFrom
   import collection.immutable.IndexedSeq
-  import Leibniz.===
-  import Liskov.<~<
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
