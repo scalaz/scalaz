@@ -273,4 +273,6 @@ package object scalaz {
 
   type IMap[A, B] = ==>>[A, B]
   val IMap = ==>>
+
+  type Disjunction[+A, +B] = A \/ B
 }
