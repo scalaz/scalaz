@@ -127,7 +127,20 @@ final class BooleanOps(self: Boolean) {
   final def <--(q: => Boolean) = b.inverseConditional(self, q)
 
   /**
-   * Negational of Conditional.
+   * Inverse Conditional.
+   *
+   * {{{
+   * p q  p ⇐ q
+   * 0 0  1
+   * 0 1  0
+   * 1 0  1
+   * 1 1  1
+   * }}}
+   */
+  final def ⇐(q: => Boolean) = b.inverseConditional(self, q)
+
+  /**
+   * Negation of Conditional.
    *
    * {{{
    * p q  p ⇏ q
@@ -140,7 +153,7 @@ final class BooleanOps(self: Boolean) {
   final def ⇏(q: => Boolean) = b.negConditional(self, q)
 
   /**
-   * Negational of Conditional.
+   * Negation of Conditional.
    *
    * {{{
    * p q  p -/> q
