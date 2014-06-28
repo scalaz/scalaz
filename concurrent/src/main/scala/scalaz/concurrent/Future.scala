@@ -242,7 +242,7 @@ object Future {
   implicit val futureInstance: Nondeterminism[Future] = new Nondeterminism[Future] {
     def bind[A,B](fa: Future[A])(f: A => Future[B]): Future[B] =
       fa flatMap f
-    def point[A](a: => A): Future[A] = now(a)
+    def point[A](a: => A): Future[A] = delay(a)
 
     def chooseAny[A](h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
       Async { cb =>
