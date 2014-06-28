@@ -104,19 +104,6 @@ final class BooleanOps(self: Boolean) {
    * Conditional.
    *
    * {{{
-   * p q  p → q
-   * 0 0  1
-   * 0 1  1
-   * 1 0  0
-   * 1 1  1
-   * }}}
-   */
-  final def →(q: => Boolean) = b.conditional(self, q)
-
-  /**
-   * Conditional.
-   *
-   * {{{
    * p q  p --> q
    * 0 0  1
    * 0 1  1
