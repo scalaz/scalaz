@@ -4,14 +4,14 @@ private trait LeftFunctor[F[_,_], X] extends Functor[({type λ[α] = F[α, X]})#
   implicit def F: Bifunctor[F]
 
   override def map[A, C](fax: F[A, X])(f: A => C): F[C, X] =
-    F.bimap(fax)(f, conforms)
+    F.bimap(fax)(f, identity)
 }
 
 private trait RightFunctor[F[_,_], X] extends Functor[({type λ[α] = F[X, α]})#λ] {
   implicit def F: Bifunctor[F]
 
   override def map[A, C](fax: F[X, A])(f: A => C): F[X, C] =
-    F.bimap(fax)(conforms, f)
+    F.bimap(fax)(identity, f)
 }
 
 private trait UFunctor[F[_,_]] extends Functor[({type λ[α] = F[α, α]})#λ] {

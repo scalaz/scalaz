@@ -56,7 +56,7 @@ object Coyoneda extends CoyonedaInstances {
   type Aux[F[_], A, B] = Coyoneda[F, A] {type I = B}
 
   /** `F[A]` converts to `Coyoneda[F,A]` for any `F` */
-  def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(fa)(conforms[A])
+  def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(fa)(identity[A])
 
   /** See `by` method. */
   final class By[F[_]] {

@@ -33,7 +33,7 @@ sealed abstract class RepresentableInstances {
 
   implicit def curryRepresentable[E]: Representable[({type λ[α] = E => α})#λ, (E, Unit)] =
     new Representable[({type λ[α] = E => α})#λ, (E, Unit)] {
-      def rep[A](f: ((E, Unit)) => A): E => A = e => f(e -> ())
+      def rep[A](f: ((E, Unit)) => A): E => A = e => f((e, ()))
       def unrep[A](f: E => A): ((E, Unit)) => A = e => f(e._1)
     }
 

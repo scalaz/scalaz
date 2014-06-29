@@ -3,7 +3,7 @@ package std
 
 trait TypeConstraintInstances {
   val <:< = new Category[<:<] {
-    def id[A] = conforms[A]
+    def id[A] = implicitly[A <:< A]
     def compose[A, B, C](f: B <:< C, g: A <:< B) = f.asInstanceOf[A <:< C]
   }
 
