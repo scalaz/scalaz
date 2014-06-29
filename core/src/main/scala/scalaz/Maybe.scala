@@ -144,7 +144,7 @@ sealed abstract class Maybe[A] {
     cata(F.point(_), G.empty)
 }
 
-object Maybe extends MaybeFunctions with MaybeInstances {
+object Maybe extends MaybeInstances with MaybeFunctions {
 
   final case class Empty[A]() extends Maybe[A]
 
@@ -177,7 +177,7 @@ sealed trait MaybeFunctions {
   }
 }
 
-sealed trait MaybeInstances {
+sealed abstract class MaybeInstances {
   import Maybe._
 
   implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
