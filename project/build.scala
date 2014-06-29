@@ -55,6 +55,8 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
+  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
@@ -74,7 +76,7 @@ object build extends Build {
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
-      val tagOrBranch = if(v endsWith "SNAPSHOT") "series/7.0.x" else ("v" + v)
+      val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
 
