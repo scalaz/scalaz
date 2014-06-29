@@ -207,7 +207,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     if (p(focus)) Some(this)
     else {
       val c = this.positions
-      std.stream.merge(c.lefts, c.rights).find((x => p(x.focus)))
+      std.stream.interleave(c.lefts, c.rights).find((x => p(x.focus)))
     }
 
   /**

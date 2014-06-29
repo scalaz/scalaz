@@ -116,7 +116,7 @@ trait StreamInstances {
 trait StreamFunctions {
   final def interleave[A](s1: Stream[A], s2: Stream[A]): Stream[A] = {
     if (s1.isEmpty) s2
-    else s1.head #:: merge(s2, s1.tail)
+    else s1.head #:: interleave(s2, s1.tail)
   }
 
   @deprecated("renamed to `interleave` for consistency and to avoid collision with `Align#merge`", "7.1")
