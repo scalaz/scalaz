@@ -36,7 +36,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /**Right-associative fold of a structure. */
   def foldRight1[A](fa: F[A])(f: (A, => A) => A): A =
-    foldMapRight1(fa)(conforms)(f)
+    foldMapRight1(fa)(identity)(f)
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
     foldMapRight1(fa)(f(_, z))(f)
@@ -52,7 +52,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /**Left-associative fold of a structure. */
   def foldLeft1[A](fa: F[A])(f: (A, A) => A): A =
-    foldMapLeft1(fa)(conforms)(f)
+    foldMapLeft1(fa)(identity)(f)
 
   // XXX Would make a ⊥ with default foldMapLeft1; you can use it if
   // you also overrode foldMapLeft1

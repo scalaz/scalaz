@@ -298,7 +298,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     IList(toList.sortBy(f)(B.toScalaOrdering): _*)
 
   def sorted(implicit ev: Order[A]): IList[A] =
-    sortBy(conforms)
+    sortBy(identity)
 
   def span(f: A => Boolean): (IList[A], IList[A]) = {
     @tailrec def span0(as: IList[A], accum: IList[A]): (IList[A], IList[A]) =

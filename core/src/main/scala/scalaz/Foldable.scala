@@ -97,7 +97,7 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, None: Option[B])((a, optB) =>
       optB map (f(a, _)) orElse Some(z(a)))
   def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] =
-    foldMapRight1Opt(fa)(conforms)(f)
+    foldMapRight1Opt(fa)(identity)(f)
   def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = foldRight(fa, None: Option[A])((a, optA) => optA map (aa => f(a)(aa)) orElse Some(a))
 
   /**Curried version of `foldLeft` */
@@ -106,7 +106,7 @@ trait Foldable[F[_]]  { self =>
     foldLeft(fa, None: Option[B])((optB, a) =>
       optB map (f(_, a)) orElse Some(z(a)))
   def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] =
-    foldMapLeft1Opt(fa)(conforms)(f)
+    foldMapLeft1Opt(fa)(identity)(f)
   def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */

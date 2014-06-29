@@ -96,7 +96,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   /** `F[A]` converts to `ContravariantCoyoneda[F,A]` for any `F`. */
   def lift[F[_], A](fa: F[A]): ContravariantCoyoneda[F, A] =
-    apply(fa)(conforms[A])
+    apply(fa)(identity[A])
 
   import Isomorphism._
 
