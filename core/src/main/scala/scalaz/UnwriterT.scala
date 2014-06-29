@@ -143,7 +143,7 @@ trait UnwriterTFunctions {
   def unwriter[W, A](v: (W, A)): Unwriter[W, A] =
     unwriterT[Id, W, A](v)
 
-  def tell[W](w: W): Unwriter[W, Unit] = unwriter(w -> (()))
+  def tell[W](w: W): Unwriter[W, Unit] = unwriter((w, ()))
 
   def unput[F[_], W, A](value: F[A])(w: W)(implicit F: Functor[F]): UnwriterT[F, W, A] =
     UnwriterT(F.map(value)(a => (w, a)))
