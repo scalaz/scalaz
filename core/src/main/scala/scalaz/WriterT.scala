@@ -223,7 +223,7 @@ trait WriterTFunctions {
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)
 
-  def tell[W](w: W): Writer[W, Unit] = writer(w -> ())
+  def tell[W](w: W): Writer[W, Unit] = writer(w -> (()))
 
   def put[F[_], W, A](value: F[A])(w: W)(implicit F: Functor[F]): WriterT[F, W, A] =
     WriterT(F.map(value)(a => (w, a)))
