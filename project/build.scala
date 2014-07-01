@@ -206,7 +206,7 @@ object build extends Build {
   ) ++ Seq[Sett](
     previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
       basOpt match {
-        case Some(bas) if !(sbv startsWith "2.11") =>
+        case Some(bas) =>
           Some(o % (n + "_" + sbv) % bas)
         case _ =>
           None
