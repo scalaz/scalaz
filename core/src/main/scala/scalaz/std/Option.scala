@@ -107,14 +107,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit val optionFirstMonad: Monad[FirstOption] = new Monad[FirstOption] {
-    def point[A](a: => A): FirstOption[A] = Tag(Some(a))
-    override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
-    def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(Tag unwrap fa flatMap { a =>
-      Tag unwrap f(a)
-    })
-  }
-
+  implicit def optionFirstMonad: Monad[FirstOption] = Tags.First.subst1[Monad, Option](Monad[Option])
 
   implicit def optionLast[A] = new Monoid[LastOption[A]] {
     def zero: LastOption[A] = Tag(None)
@@ -126,13 +119,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit val optionLastMonad: Monad[LastOption] = new Monad[LastOption] {
-    def point[A](a: => A): LastOption[A] = Tag(Some(a))
-    override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
-    def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(Tag unwrap fa flatMap { a =>
-      Tag unwrap f(a)
-    })
-  }
+  implicit def optionLastMonad: Monad[LastOption] = Tags.Last.subst1[Monad, Option](Monad[Option])
 
   implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
@@ -144,13 +131,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMinOrder[A: Order]: Order[MinOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionMinMonad: Monad[MinOption] = new Monad[MinOption] {
-    def point[A](a: => A): MinOption[A] = Tag(Some(a))
-    override def map[A, B](fa: MinOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
-    def bind[A, B](fa: MinOption[A])(f: A => MinOption[B]): MinOption[B] = Tag(Tag unwrap fa flatMap { a =>
-      Tag unwrap f(a)
-    })
-  }
+  implicit def optionMinMonad: Monad[MinOption] = Tags.Min.subst1[Monad, Option](Monad[Option])
 
   implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
@@ -162,13 +143,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMaxOrder[A: Order]: Order[MaxOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionMaxMonad: Monad[MaxOption] = new Monad[MaxOption] {
-    def point[A](a: => A): MaxOption[A] = Tag(Some(a))
-    override def map[A, B](fa: MaxOption[A])(f: A => B) = Tag(Tag unwrap fa map f)
-    def bind[A, B](fa: MaxOption[A])(f: A => MaxOption[B]): MaxOption[B] = Tag(Tag unwrap fa flatMap { a =>
-      Tag unwrap f(a)
-    })
-  }
+  implicit def optionMaxMonad: Monad[MaxOption] = Tags.Max.subst1[Monad, Option](Monad[Option])
 }
 
 trait OptionFunctions {

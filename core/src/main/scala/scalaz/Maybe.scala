@@ -223,13 +223,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeFirstOrder[A](implicit A: Order[Maybe[A]]): Order[FirstMaybe[A]] = Tag.subst(A)
 
-  implicit val maybeFirstMonad: Monad[FirstMaybe] = new Monad[FirstMaybe] {
-    def point[A](a: => A): FirstMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: FirstMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
-    def bind[A, B](fa: FirstMaybe[A])(f: A => FirstMaybe[B]): FirstMaybe[B] = Tag(Tag unwrap fa flatMap { a =>
-      Tag unwrap f(a)
-    })
-  }
+  implicit def maybeFirstMonad: Monad[FirstMaybe] = Tags.First.subst1[Monad, Maybe](Monad[Maybe])
 
   implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] = new Monoid[LastMaybe[A]] {
     val zero: LastMaybe[A] = Tag(empty)
@@ -241,13 +235,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeLastOrder[A](implicit A: Order[Maybe[A]]): Order[LastMaybe[A]] = Tag.subst(A)
 
-  implicit val maybeLastMonad: Monad[LastMaybe] = new Monad[LastMaybe] {
-    def point[A](a: => A): LastMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: LastMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
-    def bind[A, B](fa: LastMaybe[A])(f: A => LastMaybe[B]): LastMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
-      Tag.unwrap(f(a))
-    })
-  }
+  implicit def maybeLastMonad: Monad[LastMaybe] = Tags.Last.subst1[Monad, Maybe](Monad[Maybe])
 
   implicit def maybeMin[A](implicit o: Order[A]) = new Monoid[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
@@ -259,13 +247,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMinOrder[A: Order]: Order[MinMaybe[A]] = Tag.subst(Order[Maybe[A]])
 
-  implicit def maybeMinMonad: Monad[MinMaybe] = new Monad[MinMaybe] {
-    def point[A](a: => A): MinMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: MinMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
-    def bind[A, B](fa: MinMaybe[A])(f: A => MinMaybe[B]): MinMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
-      Tag.unwrap(f(a))
-    })
-  }
+  implicit def maybeMinMonad: Monad[MinMaybe] = Tags.Min.subst1[Monad, Maybe](Monad[Maybe])
 
   implicit def maybeMax[A](implicit o: Order[A]) = new Monoid[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
@@ -277,13 +259,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMaxOrder[A: Order]: Order[MaxMaybe[A]] = Tag.subst(Order[Maybe[A]])
 
-  implicit def maybeMaxMonad: Monad[MaxMaybe] = new Monad[MaxMaybe] {
-    def point[A](a: => A): MaxMaybe[A] = Tag(just(a))
-    override def map[A, B](fa: MaxMaybe[A])(f: A => B) = Tag(Tag.unwrap(fa) map f)
-    def bind[A, B](fa: MaxMaybe[A])(f: A => MaxMaybe[B]): MaxMaybe[B] = Tag(Tag.unwrap(fa) flatMap { a =>
-      Tag.unwrap(f(a))
-    })
-  }
+  implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
   implicit val maybeInstance = new Traverse[Maybe] with MonadPlus[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 

@@ -174,24 +174,11 @@ trait EitherInstances extends EitherInstances0 {
     }
   }
 
-  implicit def eitherFirstRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ First})#λ] {
-    def point[A](a: => A) = First(Right(a).right)
-    def bind[A, B](fa: RightProjection[L, A] @@ First)(f: A => RightProjection[L, B] @@ First) = First(
-      Tag.unwrap(fa).e match {
-        case Left(a)  => Left(a).right
-        case Right(b) => Tag.unwrap(f(b))
-      }
-    )
-  }
+  implicit def eitherFirstRightLInstance[L]: Monad[({type λ[α] = RightProjection[L, α] @@ First})#λ] =
+    Tags.First.subst1[Monad, ({type λ[α] = RightProjection[L, α]})#λ](Monad[({type λ[α] = RightProjection[L, α]})#λ])
 
-  implicit def eitherLastRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] {
-    def point[A](a: => A) = Last(Right(a).right)
-    def bind[A, B](fa: RightProjection[L, A] @@ Last)(f: A => RightProjection[L, B] @@ Last) =
-      Tag.unwrap(fa).e match {
-        case Left(a)  => Last(Left(a).right)
-        case Right(b) => f(b)
-      }
-  }
+  implicit def eitherLastRightLInstance[L]: Monad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] =
+    Tags.Last.subst1[Monad, ({type λ[α] = RightProjection[L, α]})#λ](Monad[({type λ[α] = RightProjection[L, α]})#λ])
 
   implicit def eitherLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
     def point[A](a: => A) = Left(a).left
@@ -201,25 +188,11 @@ trait EitherInstances extends EitherInstances0 {
     }
   }
 
-  implicit def eitherFirstLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] {
-    def point[A](a: => A) = First(Left(a).left)
-    def bind[A, B](fa: LeftProjection[A, R] @@ First)(f: A => LeftProjection[B, R] @@ First) = First(
-      Tag.unwrap(fa).e match {
-        case Left(a)  => Tag.unwrap(f(a))
-        case Right(b) => Right(b).left
-      }
-    )
-  }
+  implicit def eitherFirstLeftRInstance[R]: Monad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] =
+    Tags.First.subst1[Monad, ({type λ[α] = LeftProjection[α, R]})#λ](Monad[({type λ[α] = LeftProjection[α, R]})#λ])
 
-  implicit def eitherLastLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] {
-    def point[A](a: => A) = Last(Left(a).left)
-    def bind[A, B](fa: LeftProjection[A, R] @@ Last)(f: A => LeftProjection[B, R] @@ Last) = Last(
-      Tag.unwrap(fa).e match {
-        case Left(a)  => Tag.unwrap(f(a))
-        case Right(b) => Right(b).left
-      }
-    )
-  }
+  implicit def eitherLastLeftRInstance[R]: Monad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] =
+    Tags.Last.subst1[Monad, ({type λ[α] = LeftProjection[α, R]})#λ](Monad[({type λ[α] = LeftProjection[α, R]})#λ])
 
   implicit def eitherOrder[A, B](implicit OrderA: Order[A], OrderB: Order[B]): Order[Either[A, B]] = new EitherOrder[A, B] {
     implicit def A = OrderA
