@@ -136,6 +136,8 @@ trait Syntaxes {
 
   object maybe extends ToMaybeOps
 
+  object tag extends ToTagOps
+
   //
   // Mixed
   //
