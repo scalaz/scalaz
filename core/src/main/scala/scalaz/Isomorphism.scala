@@ -349,6 +349,15 @@ trait IsomorphismTraverse1[F[_], G[_]] extends Traverse1[F] with IsomorphismTrav
     Apply[H].map(G.traverse1Impl(iso.to(fa))(f))(iso.from.apply)
 }
 
+trait IsomorphismOptional[F[_], G[_]] extends Optional[F] {
+  implicit def G: Optional[G]
+
+  def iso: F <~> G
+
+  override def pextract[B, A](fa: F[A]): F[B] \/ A =
+    G.pextract(iso.to(fa)).leftMap(iso.from)
+}
+
 trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
   def iso: F <~~> G
 
