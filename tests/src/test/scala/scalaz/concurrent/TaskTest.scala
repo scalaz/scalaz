@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
 import org.scalacheck.Prop._
 
-import java.util.concurrent.{Executors, TimeoutException}
+import java.util.concurrent.{Executors, TimeoutException, TimeUnit}
 import java.util.concurrent.atomic._
 import org.scalacheck.Prop.forAll
 
@@ -217,17 +217,20 @@ object TaskTest extends SpecLite {
     "nmap6 must run Tasks in parallel" in {
       import Thread._
       import java.{util => ju}
+      import ju.concurrent.CyclicBarrier
 
+      //Ensure at least 6 different threads are available.
       implicit val es6 =
         Executors.newFixedThreadPool(6)
+      val barrier = new CyclicBarrier(6);
 
       val seenThreadNames = scala.collection.JavaConversions.asScalaSet(ju.Collections.synchronizedSet(new ju.HashSet[String]()))
       val t =
-        for (i <- 0 to 5)
-          yield fork {
+        for (i <- 0 to 5) yield fork {
           seenThreadNames += currentThread().getName()
-          //Make it harder for es6 to reuse threads.
-          sleep(100)
+          //Prevent the execution scheduler from reusing threads. This will only
+          //proceed after all 6 threads reached this point.
+          barrier.await(1, TimeUnit.SECONDS)
           now(('a' + i).toChar)
         }
 
