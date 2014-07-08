@@ -55,9 +55,13 @@ object Free extends FreeFunctions with FreeInstances {
       t => Functor[G].map(fa)(a => f(a)(t))
   }
 
-  /** Suspends a value within a functor in a single step. */
+  /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
   def liftF[S[+_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
     Suspend(S.map(value)(Return[S, A]))
+
+  /** Monadic join for the higher-order monad `Free` */
+  def joinF[S[+_], A](value: Free[({type λ[+α] = Free[S, α]})#λ, A])(implicit S: Functor[S]): Free[S, A] =
+    value.flatMapSuspension(NaturalTransformation.refl[({type λ[α] = Free[S, α]})#λ])
 
   /** Return the given value in the free monad. */
   def point[S[+_]: Functor, A](value: => A): Free[S, A] = Return[S, A](value)
