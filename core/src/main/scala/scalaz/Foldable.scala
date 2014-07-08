@@ -63,7 +63,11 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
-  
+
+  /** Specialization of foldLeftM when `B` has a `Monoid`. */
+  def foldMapM[G[_], A, B](fa: F[A])(f: A => G[B])(implicit B: Monoid[B], G: Monad[G]): G[B] =
+    foldLeftM[G, A, B](fa, B.zero)((b1, a) => G.map(f(a))(b2 => B.append(b1, b2)))
+
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
