@@ -106,6 +106,16 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
     case \/-(r) => Return(r)
   }
 
+  /**
+   * Substitutes a free monad over the given functor into the suspension functor of this program.
+   * `Free` is a monad in an endofunctor category and this is its monadic bind.
+   */
+  final def flatMapSuspension[T[+_]](f: S ~> ({type λ[α] = Free[T, α]})#λ)(
+    implicit S: Functor[S], T: Functor[T]): Free[T, A] = resume match {
+    case -\/(s) => f(s).flatMap(_.flatMapSuspension(f))
+    case \/-(r) => Return(r)
+  }
+
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
   final def zapWith[G[+_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
     Zap.monadComonadZap.zapWith(this, bs)(f)
