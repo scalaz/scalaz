@@ -309,6 +309,12 @@ trait FreeFunctions {
   def return_[S[_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(Return[S, A](value)))
 
+  /** Return the given value in the free monad. */
+  def point[S[_], A](value: => A): Free[S, A] = Return[S, A](value)
+
+  /** Alias for `point` */
+  def pure[S[_], A](value: => A): Free[S, A] = point(value)
+
   def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(value))
 
