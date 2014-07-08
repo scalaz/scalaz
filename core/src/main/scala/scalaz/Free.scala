@@ -328,7 +328,7 @@ trait FreeFunctions {
   def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
     Suspend[S, A](S.point(value))
 
-  /** Suspends a value within a functor in a single step. */
+  /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
   def liftF[S[_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
     Suspend(S.map(value)(Return[S, A]))
 
@@ -339,6 +339,12 @@ trait FreeFunctions {
   /** A free monad over a free functor of `S`. */
   def liftFC[S[_], A](s: S[A]): FreeC[S, A] =
     liftFU(Coyoneda lift s)
+
+  /** Monadic join for the higher-order monad `Free` */
+  def joinF[S[_], A](value: Free[({type λ[α] = Free[S, α]})#λ, A])(implicit S: Functor[S]): Free[S, A] =
+    value.flatMapSuspension(new (({type λ[α] = Free[S, α]})#λ ~> ({type λ[α] = Free[S, α]})#λ) {
+      def apply[B](mb: Free[S, B]) = mb
+    })
 
   /** Interpret a free monad over a free functor of `S` via natural transformation to monad `M`. */
   def runFC[S[_], M[_], A](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
