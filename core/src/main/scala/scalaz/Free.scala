@@ -342,9 +342,7 @@ trait FreeFunctions {
 
   /** Monadic join for the higher-order monad `Free` */
   def joinF[S[_], A](value: Free[({type λ[α] = Free[S, α]})#λ, A])(implicit S: Functor[S]): Free[S, A] =
-    value.flatMapSuspension(new (({type λ[α] = Free[S, α]})#λ ~> ({type λ[α] = Free[S, α]})#λ) {
-      def apply[B](mb: Free[S, B]) = mb
-    })
+    value.flatMapSuspension(NaturalTransformation.refl[({type λ[α] = Free[S, α]})#λ])
 
   /** Interpret a free monad over a free functor of `S` via natural transformation to monad `M`. */
   def runFC[S[_], M[_], A](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
