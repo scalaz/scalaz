@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
 import org.scalacheck.Prop._
 
-import java.util.concurrent.{Executors, TimeoutException}
+import java.util.concurrent.{Executors, TimeoutException, TimeUnit}
 import java.util.concurrent.atomic._
 import org.scalacheck.Prop.forAll
 
@@ -216,17 +216,29 @@ object TaskTest extends SpecLite {
 
     "nmap6 must run Tasks in parallel" in {
       import Thread._
-      val sb = new StringBuffer
-      val t1 = fork { sleep(1000); sb.append("a") ; now("a") }
-      val t2 = fork { sleep(800); sb.append("b") ; now("b") }
-      val t3 = fork { sleep(200); sb.append("c") ; now("c") }
-      val t4 = fork { sleep(400); sb.append("d") ; now("d") }
-      val t5 = fork { sb.append("e") ; now("e") }
-      val t6 = fork { sleep(600); sb.append("f") ; now("f") }
+      import java.{util => ju}
+      import ju.concurrent.CyclicBarrier
 
-      val r = Nondeterminism[Task].nmap6(t1, t2, t3, t4, t5, t6)(List(_,_,_,_,_,_))
-      r.run must_== List("a","b","c","d","e","f")
-      sb.toString must_==("ecdfba")
+      //Ensure at least 6 different threads are available.
+      implicit val es6 =
+        Executors.newFixedThreadPool(6)
+      val barrier = new CyclicBarrier(6);
+
+      val seenThreadNames = scala.collection.JavaConversions.asScalaSet(ju.Collections.synchronizedSet(new ju.HashSet[String]()))
+      val t =
+        for (i <- 0 to 5) yield fork {
+          seenThreadNames += currentThread().getName()
+          //Prevent the execution scheduler from reusing threads. This will only
+          //proceed after all 6 threads reached this point.
+          barrier.await(1, TimeUnit.SECONDS)
+          now(('a' + i).toChar)
+        }
+
+      val r = Nondeterminism[Task].nmap6(t(0), t(1), t(2), t(3), t(4), t(5))(List(_,_,_,_,_,_))
+      val chars = List('a','b','c','d','e','f')
+      r.run must_== chars
+      //Ensure we saw 6 distinct threads.
+      seenThreadNames.size must_== 6
     }
 
     "correctly exit when timeout is exceeded on runFor" in {
