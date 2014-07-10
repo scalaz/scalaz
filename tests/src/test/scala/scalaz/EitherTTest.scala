@@ -30,6 +30,10 @@ object EitherTTest extends SpecLite {
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
   }
 
+  "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
+    a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
+  }
+
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
     def monad[F[_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
