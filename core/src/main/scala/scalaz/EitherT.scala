@@ -226,6 +226,8 @@ object EitherT extends EitherTFunctions with EitherTInstances {
     } catch {
       case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
     }
+
+  implicit def eitherTShow[F[+_], A, B](implicit F0: Show[F[A \/ B]]): Show[EitherT[F, A, B]] = Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait EitherTInstances1 {
