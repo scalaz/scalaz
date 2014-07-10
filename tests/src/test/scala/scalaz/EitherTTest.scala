@@ -26,6 +26,10 @@ object EitherTTest extends SpecLite {
     Bifoldable[EitherTList].bifoldMap(a)(_ :: Nil)(_ :: Nil) must_=== F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
   }
 
+  "show" ! forAll { a: EitherTList[Int, Int] =>
+    Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
+  }
+
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
     def monad[F[_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
