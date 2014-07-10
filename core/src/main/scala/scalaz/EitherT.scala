@@ -283,6 +283,8 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
   implicit def eitherTHoist[A]: Hoist[({type λ[α[_], β] = EitherT[α, A, β]})#λ] = new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] = F0.contramap((_: EitherT[F, A, B]).run)
+
+  implicit def eitherTShow[F[_], A, B](implicit F0: Show[F[A \/ B]]): Show[EitherT[F, A, B]] = Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait EitherTFunctions {
