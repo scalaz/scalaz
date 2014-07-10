@@ -89,6 +89,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def flatMap[C](f: B => EitherT[F, A, C])(implicit F: Monad[F]): EitherT[F, A, C] =
     EitherT(F.bind(run)(_.fold(a => F.point(-\/(a): (A \/ C)), b => f(b).run)))
 
+  /** Bind the inner monad through the right of this disjunction. */
+  def flatMapF[C](f: B => F[A \/ C])(implicit F: Monad[F]): EitherT[F, A, C] =
+    EitherT(F.bind(run)(_.fold(a => F.point(-\/(a): (A \/ C)), b => f(b))))
+
   /** Fold on the right of this disjunction. */
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
