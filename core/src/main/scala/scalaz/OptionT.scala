@@ -114,6 +114,8 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
   }
 
   implicit def optionTEqual[F[_], A](implicit F0: Equal[F[Option[A]]]): Equal[OptionT[F, A]] = F0.contramap((_: OptionT[F, A]).run)
+
+  implicit def optionTShow[F[_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] = Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait OptionTFunctions {

@@ -14,6 +14,10 @@ object OptionTTest extends SpecLite {
   checkAll(monadPlus.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
 
+  "show" ! forAll { a: OptionTList[Int] =>
+    Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
+  }
+
   object instances {
     def functor[F[_] : Functor] = Functor[({type λ[α] = OptionT[F, α]})#λ]
     def monad[F[_] : Monad] = MonadPlus[({type λ[α] = OptionT[F, α]})#λ]
