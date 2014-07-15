@@ -86,7 +86,7 @@ trait IndexedStateT[F[_], -S1, S2, A] { self =>
     }
   }
   
-  def liftF[S <: S1](implicit GG: Functor[({ type l[a] = IndexedStateT[F, S, S2, a]})#l]) = Free.liftF[({ type l[a] = IndexedStateT[F, S, S2, a]})#l, A](self)
+  def liftF[S <: S1](implicit F: Functor[({ type l[a] = IndexedStateT[F, S, S2, a]})#l]) = Free.liftF[({ type l[a] = IndexedStateT[F, S, S2, a]})#l, A](self)
 
 }
 
