@@ -11,8 +11,8 @@ import org.scalacheck.Prop.forAll
 object OptionTest extends SpecLite {
 
   checkAll("Option", order.laws[Option[Int]])
-  checkAll("Option @@ First", order.laws[Option[Int] @@ First])
-  checkAll("Option @@ Last", order.laws[Option[Int] @@ Last])
+  checkAll("Option @@ First", order.laws[FirstOption[Int]])
+  checkAll("Option @@ Last", order.laws[LastOption[Int]])
   checkAll("Option @@ Min", order.laws[MinOption[Int]])
   checkAll("Option @@ Max", order.laws[MaxOption[Int]])
 
@@ -24,8 +24,8 @@ object OptionTest extends SpecLite {
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
   
-  checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])
-  checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
+  checkAll("Option @@ First", monoid.laws[FirstOption[Int]])
+  checkAll("Option @@ Last", monoid.laws[LastOption[Int]])
   checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
   checkAll("Option @@ Max", monoid.laws[MaxOption[Int]])
 
