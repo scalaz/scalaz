@@ -15,14 +15,14 @@ object MaybeTest extends SpecLite {
   import Maybe._
 
   checkAll("Maybe", order.laws[Maybe[Int]])
-  checkAll("Maybe @@ First", order.laws[Maybe[Int] @@ First])
-  checkAll("Maybe @@ Last", order.laws[Maybe[Int] @@ Last])
+  checkAll("Maybe @@ First", order.laws[FirstMaybe[Int]])
+  checkAll("Maybe @@ Last", order.laws[LastMaybe[Int]])
   checkAll("Maybe @@ Min", order.laws[MinMaybe[Int]])
   checkAll("Maybe @@ Max", order.laws[MaxMaybe[Int]])
 
   checkAll("Maybe", monoid.laws[Maybe[Int]])
-  checkAll("Maybe @@ First", monoid.laws[Maybe[Int] @@ First])
-  checkAll("Maybe @@ Last", monoid.laws[Maybe[Int] @@ Last])
+  checkAll("Maybe @@ First", monoid.laws[FirstMaybe[Int]])
+  checkAll("Maybe @@ Last", monoid.laws[LastMaybe[Int]])
   checkAll("Maybe @@ Min", monoid.laws[MinMaybe[Int]])
   checkAll("Maybe @@ Max", monoid.laws[MaxMaybe[Int]])
 
