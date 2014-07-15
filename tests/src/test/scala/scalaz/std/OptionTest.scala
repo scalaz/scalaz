@@ -26,12 +26,25 @@ object OptionTest extends SpecLite {
   
   checkAll("Option @@ First", monoid.laws[Option[Int] @@ First])
   checkAll("Option @@ Last", monoid.laws[Option[Int] @@ Last])
+  checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
+  checkAll("Option @@ Max", monoid.laws[MaxOption[Int]])
+
   checkAll("Option @@ First", monad.laws[FirstOption])
   checkAll("Option @@ Last", monad.laws[LastOption])
   checkAll("Option @@ Min", monad.laws[MinOption])
   checkAll("Option @@ Max", monad.laws[MaxOption])
 
   "None is less than anything else" ! forAll { (x: Option[Int]) => Order[Option[Int]].greaterThanOrEqual(x, None) }
+
+  "None is ignored in Option[A]@@Min" ! forAll { (x: Option[Int]) =>
+    import syntax.monoid._
+    (Min(x) |+| Min(None)) must_=== Min(x)
+  }
+
+  "None is ignored in Option[A]@@Max" ! forAll { (x: Option[Int]) =>
+    import syntax.monoid._
+    (Max(x) |+| Max(None)) must_=== Max(x)
+  }
 
   object instances {
     def equal[A: Equal] = Equal[Option[A]]
