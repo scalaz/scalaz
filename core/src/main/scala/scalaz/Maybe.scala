@@ -244,7 +244,12 @@ sealed abstract class MaybeInstances {
   implicit def maybeMin[A](implicit o: Order[A]) = new Monoid[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
 
-    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag(Order[Maybe[A]].min(f1, f2))
+    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag( (f1: Maybe[A], f2: Maybe[A]) match {
+      case (Just(v1), Just(v2)) => Just(Order[A].min(v1, v2))
+      case (_f1 @ Just(_), Empty()) => _f1
+      case (Empty(), _f2 @ Just(_)) => _f2
+      case (Empty(), Empty()) => empty
+    })
   }
 
   implicit def maybeMinShow[A: Show]: Show[MinMaybe[A]] = Tag.subst(Show[Maybe[A]])
@@ -260,7 +265,12 @@ sealed abstract class MaybeInstances {
   implicit def maybeMax[A](implicit o: Order[A]) = new Monoid[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
 
-    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag(Order[Maybe[A]].max(f1, f2))
+    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag( (f1: Maybe[A], f2: Maybe[A]) match {
+      case (Just(v1), Just(v2)) => Just(Order[A].max(v1, v2))
+      case (_f1 @ Just(_), Empty()) => _f1
+      case (Empty(), _f2 @ Just(_)) => _f2
+      case (Empty(), Empty()) => Empty()
+    })
   }
 
   implicit def maybeMaxShow[A: Show]: Show[MaxMaybe[A]] = Tag.subst(Show[Maybe[A]])

@@ -23,6 +23,9 @@ object MaybeTest extends SpecLite {
   checkAll("Maybe", monoid.laws[Maybe[Int]])
   checkAll("Maybe @@ First", monoid.laws[Maybe[Int] @@ First])
   checkAll("Maybe @@ Last", monoid.laws[Maybe[Int] @@ Last])
+  checkAll("Maybe @@ Min", monoid.laws[MinMaybe[Int]])
+  checkAll("Maybe @@ Max", monoid.laws[MaxMaybe[Int]])
+
   checkAll("Maybe @@ First", monad.laws[FirstMaybe])
   checkAll("Maybe @@ Last", monad.laws[LastMaybe])
   checkAll("Maybe @@ Min", monad.laws[MinMaybe])
@@ -34,6 +37,16 @@ object MaybeTest extends SpecLite {
   checkAll(equal.laws[Maybe[Int]])
 
   "Empty is less than anything else" ! forAll { x: Maybe[Int] => Order[Maybe[Int]].greaterThanOrEqual(x, Maybe.empty) }
+
+  "Empty is ignored in Maybe[A]@@Min" ! forAll { x: Maybe[Int] =>
+    import syntax.monoid._
+    (Min(x) |+| Min(empty)) must_=== Min(x)
+  }
+
+  "Empty is ignored in Maybe[A]@@Max" ! forAll { x: Maybe[Int] =>
+    import syntax.monoid._
+    (Max(x) |+| Max(empty)) must_=== Max(x)
+  }
 
   "just toFailure is failure" ! forAll { (x: Int, s: String) => just(x).toFailure(s).isFailure }
 
