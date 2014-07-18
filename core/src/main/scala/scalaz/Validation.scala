@@ -405,7 +405,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
     }
 }
 
-final class ValidationFlatMap[E, A] private[scalaz](self: Validation[E, A]) {
+final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) {
   /** Bind through the success of this validation. */
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     self match {
