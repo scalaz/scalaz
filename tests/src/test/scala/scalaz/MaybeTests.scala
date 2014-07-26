@@ -15,14 +15,17 @@ object MaybeTest extends SpecLite {
   import Maybe._
 
   checkAll("Maybe", order.laws[Maybe[Int]])
-  checkAll("Maybe @@ First", order.laws[Maybe[Int] @@ First])
-  checkAll("Maybe @@ Last", order.laws[Maybe[Int] @@ Last])
+  checkAll("Maybe @@ First", order.laws[FirstMaybe[Int]])
+  checkAll("Maybe @@ Last", order.laws[LastMaybe[Int]])
   checkAll("Maybe @@ Min", order.laws[MinMaybe[Int]])
   checkAll("Maybe @@ Max", order.laws[MaxMaybe[Int]])
 
   checkAll("Maybe", monoid.laws[Maybe[Int]])
-  checkAll("Maybe @@ First", monoid.laws[Maybe[Int] @@ First])
-  checkAll("Maybe @@ Last", monoid.laws[Maybe[Int] @@ Last])
+  checkAll("Maybe @@ First", monoid.laws[FirstMaybe[Int]])
+  checkAll("Maybe @@ Last", monoid.laws[LastMaybe[Int]])
+  checkAll("Maybe @@ Min", monoid.laws[MinMaybe[Int]])
+  checkAll("Maybe @@ Max", monoid.laws[MaxMaybe[Int]])
+
   checkAll("Maybe @@ First", monad.laws[FirstMaybe])
   checkAll("Maybe @@ Last", monad.laws[LastMaybe])
   checkAll("Maybe @@ Min", monad.laws[MinMaybe])
@@ -37,6 +40,16 @@ object MaybeTest extends SpecLite {
   checkAll(equal.laws[Maybe[Int]])
 
   "Empty is less than anything else" ! forAll { x: Maybe[Int] => Order[Maybe[Int]].greaterThanOrEqual(x, Maybe.empty) }
+
+  "Empty is ignored in Maybe[A]@@Min" ! forAll { x: Maybe[Int] =>
+    import syntax.monoid._
+    (Min(x) |+| Min(empty)) must_=== Min(x)
+  }
+
+  "Empty is ignored in Maybe[A]@@Max" ! forAll { x: Maybe[Int] =>
+    import syntax.monoid._
+    (Max(x) |+| Max(empty)) must_=== Max(x)
+  }
 
   "Preserved through Option" ! forAll { x: Maybe[Int] => std.option.toMaybe(x.toOption) === x }
 

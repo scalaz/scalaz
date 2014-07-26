@@ -124,7 +124,12 @@ trait OptionInstances extends OptionInstances0 {
   implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
 
-    def append(f1: MinOption[A], f2: => MinOption[A]) = Tag(Order[Option[A]].min(Tag unwrap f1, Tag unwrap f2))
+    def append(f1: MinOption[A], f2: => MinOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
+      case (Some(v1), Some(v2)) => Some(Order[A].min(v1, v2))
+      case (_f1 @ Some(_), None) => _f1
+      case (None, _f2 @ Some(_)) => _f2
+      case (None, None) => None
+    })
   }
 
   implicit def optionMinShow[A: Show]: Show[MinOption[A]] = Tag.subst(Show[Option[A]])
@@ -136,7 +141,12 @@ trait OptionInstances extends OptionInstances0 {
   implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
 
-    def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag(Order[Option[A]].max(Tag unwrap f1, Tag unwrap f2))
+    def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
+      case (Some(v1), Some(v2)) => Some(Order[A].max(v1, v2))
+      case (_f1 @ Some(_), None) => _f1
+      case (None, _f2 @ Some(_)) => _f2
+      case (None, None) => None
+    })
   }
 
   implicit def optionMaxShow[A: Show]: Show[MaxOption[A]] = Tag.subst(Show[Option[A]])
