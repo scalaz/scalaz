@@ -51,7 +51,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.2"),
+    crossScalaVersions := Seq("2.10.4", "2.11.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
