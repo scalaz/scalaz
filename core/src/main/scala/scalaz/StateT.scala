@@ -85,6 +85,9 @@ trait IndexedStateT[F[_], -S1, S2, A] { self =>
       case (s2, a) => (l.set(s0, s2), a)
     }
   }
+  
+  def liftF[S <: S1](implicit F: Functor[({ type l[a] = IndexedStateT[F, S, S2, a]})#l]) = Free.liftF[({ type l[a] = IndexedStateT[F, S, S2, a]})#l, A](self)
+
 }
 
 object IndexedStateT extends StateTInstances with StateTFunctions {
