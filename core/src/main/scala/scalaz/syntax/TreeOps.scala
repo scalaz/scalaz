@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class TreeOps[A](self: A) {
+final class TreeOps[A](val self: A) extends AnyVal {
   def node(subForest: Tree[A]*): Tree[A] = Tree.node(self, subForest.toStream)
 
   def leaf: Tree[A] = Tree.leaf(self)

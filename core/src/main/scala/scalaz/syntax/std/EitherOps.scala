@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-final class EitherOps[A, B](self: Either[A, B]) {
+final class EitherOps[A, B](val self: Either[A, B]) extends AnyVal {
 
   final def disjunction: A \/ B = \/ fromEither self
 
