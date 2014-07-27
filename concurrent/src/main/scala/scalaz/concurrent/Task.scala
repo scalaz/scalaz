@@ -18,10 +18,9 @@ import scala.concurrent.duration._
  * with some convenience functions for handling exceptions. Its
  * `Monad` and `Nondeterminism` instances are derived from `Future`.
  *
- * `Task` (and `Future`) differ in several key ways from
- * `scalaz.concurrent.Promise` and the `Future` implementation in
- * Scala 2.10 , and have a number of advantages. See the documentation
- * for `scalaz.concurrent.Future` for more information.
+ * `Task` (and `Future`) differ in several key ways from the `Future`
+ * implementation in Scala 2.10 , and have a number of advantages. See the
+ * documentation for `scalaz.concurrent.Future` for more information.
  *
  * `Task` is exception-safe when constructed using the primitives
  * in the companion object, but when calling the constructor, you

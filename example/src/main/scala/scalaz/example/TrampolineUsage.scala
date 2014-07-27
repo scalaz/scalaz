@@ -43,53 +43,6 @@ object TrampolineUsage extends App {
     println(sorted)
   }
 
-  import scalaz.concurrent._
-  import annotation.unchecked.uncheckedVariance
-  type PromiseCov[+A] = Promise[A @uncheckedVariance]
-
-  {
-    // Run in parallel.
-    val sorted = runQuickSort[PromiseCov, Int](xs)
-    println(sorted)
-  }
-
-
-  /**Run using `F1` as a binding for lists longer than `threshold`, and `F2` otherwise. */
-  def quickSort2[F[_] : Applicative, F2[_] : Applicative, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): Free[F, List[T]] = {
-    def qs(as: List[T]): Free[F, List[T]] =
-      if (as.lengthCompare(threshold) < 0) {
-        val free: Free[F2, List[T]] = quickSort2[F2, F2, T](as, NaturalTransformation.refl[F2], threshold)
-        free.mapSuspension(nat)
-      } else quickSort2[F, F2, T](as, nat, threshold)
-
-    xs match {
-      case Nil =>
-        return_ {
-          Nil
-        }
-      case x :: tail =>
-        suspend {
-          val (left, right) = tail.partition(_ < x)
-          for {
-            ls <- qs(left)
-            rs <- qs(right)
-          } yield ls ::: (x :: rs)
-        }
-    }
-  }
-
-  def runQuickSort2[F[_] : Applicative : Comonad, F2[_] : Applicative, T: Order](xs: List[T], nat: F2 ~> F, threshold: Int): List[T] =
-    quickSort2[F, F2, T](xs, nat, threshold).go(f => Comonad[F].copoint(f))(Applicative[F])
-
-
-  {
-    // mixed binding
-    val promise2Id = new (Id ~> PromiseCov) { def apply[A](a: A) = Promise(a)}
-
-    // run in parallel for lists larger then 8 elements, and on the stack for lists smaller.
-    val sorted = runQuickSort2[PromiseCov, Id, Int](xs, promise2Id, 8)
-    println(sorted)
-  }
 
   // Ackermann function. Blows the stack for very small inputs.
   def ack(m: Int, n: Int): Int =
@@ -109,6 +62,5 @@ object TrampolineUsage extends App {
       a <- suspend(ackermann(m, n - 1))
       b <- suspend(ackermann(m - 1, a))
     } yield b
-
 
 }

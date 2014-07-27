@@ -120,7 +120,7 @@ Scalaz has been been modularised.
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
-* **scalaz-concurrent**: Actor and Promise implementation
+* **scalaz-concurrent**: Actor and Future implementation
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 
 ### Type Class Hierarchy
