@@ -3,6 +3,7 @@ package concurrent
 
 import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch}
 
+@deprecated("use `Future` or other concurrency abstractions", "7.1")
 sealed trait Promise[A] {
 
   import Promise._
@@ -74,6 +75,7 @@ sealed trait Promise[A] {
   override def toString = "<promise>"
 }
 
+@deprecated("use `Future` or other concurrency abstractions", "7.1")
 object Promise extends PromiseInstances with PromiseFunctions {
   private case class Waiting[A](ok: A => Unit, err: Throwable => Unit)
 
@@ -172,6 +174,7 @@ object Promise extends PromiseInstances with PromiseFunctions {
 
 }
 
+@deprecated("use `Future` or other concurrency abstractions", "7.1")
 sealed abstract class PromiseInstances {
 
   import Promise._
@@ -188,6 +191,7 @@ sealed abstract class PromiseInstances {
   }
 }
 
+@deprecated("use `Future` or other concurrency abstractions", "7.1")
 trait PromiseFunctions {
   def emptyPromise[A](implicit s: Strategy): Promise[A] =
     new Promise[A] {
