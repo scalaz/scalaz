@@ -135,7 +135,7 @@ sealed abstract class NonEmptyListInstances0 {
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
-    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] with Length[NonEmptyList] {
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -166,8 +166,6 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def cobind[A, B](fa: NonEmptyList[A])(f: NonEmptyList[A] => B): NonEmptyList[B] = map(cojoin(fa))(f)
 
       override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
-
-      def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
 
       def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
 

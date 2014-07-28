@@ -213,24 +213,6 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
-@deprecated("Each is deprecated", "7.1")
-trait IsomorphismEach[F[_], G[_]] extends Each[F] {
-  implicit def G: Each[G]
-
-  def iso: F <~> G
-
-  def each[A](fa: F[A])(f: A => Unit) = G.each(iso.to(fa))(f)
-}
-
-@deprecated("Index is deprecated, use Foldable instead", "7.1")
-trait IsomorphismIndex[F[_], G[_]] extends Index[F] {
-  implicit def G: Index[G]
-
-  def iso: F <~> G
-
-  def index[A](fa: F[A], n: Int): Option[A] = G.index(iso.to(fa), n)
-}
-
 trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] {
   implicit def G: Functor[G]
 

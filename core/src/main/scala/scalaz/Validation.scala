@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import scala.reflect.ClassTag
 
 /**
  * Represents either:
@@ -368,13 +369,7 @@ object Validation extends ValidationInstances with ValidationFunctions {
       case Success(a) => success(a)
     }
 
-  @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` or `import scalaz.Validation.FlatMap._` instead""", "7.1")
-  @inline implicit def ValidationFlatMapDeprecated[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] = 
-    new ValidationFlatMap(d)
-
-  /** Import this if you wish to use `flatMap` without a deprecation
-    * warning.
-    */
+  /** Import this if you wish to use `flatMap` */
   object FlatMap {
     @inline implicit def ValidationFlatMapRequested[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] =
       new ValidationFlatMap(d)
@@ -496,18 +491,10 @@ trait ValidationFunctions {
   def failureNel[E, A](e: E): ValidationNel[E, A] =
     Failure(NonEmptyList(e))
 
-  /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
-  def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
-    case e: Throwable => failure(e)
-  }
-
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): Validation[E, T] = try {
-    Success(a)
-  } catch {
-    case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
+    case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
   }
 
   def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {

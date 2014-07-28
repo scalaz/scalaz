@@ -51,12 +51,7 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
   )
      
   def put(a: => A) = write(a, value.get)
-      
-//  def tryTake =
-//    value.get.map(_.map(some(_))).getOrElse(promise(none[A])(Sequential))
-//   
-//  def tryPut(a: Promise[A]) = value.get.map(_ => false)
-      
+
   def read(reader: => IO[Option[A]]) = {
     def read_ : IO[A] = 
       for {

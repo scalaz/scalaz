@@ -4,6 +4,7 @@ package scalacheck
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
+import reflect.ClassTag
 
 /**
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
@@ -31,14 +32,14 @@ object ScalazArbitrary {
   implicit def EphemeralStreamArbitrary[A : Arbitrary] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
-  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
+  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassTag] =
     Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
   implicit def ValueArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Value[A]] = Functor[Arbitrary].map(fa)(a => Value(a))
   implicit def NameArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Name[A]] = Functor[Arbitrary].map(fa)(a => Name(a))
   implicit def NeedArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Need[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
 
-  implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
+  implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(const(()))
 
   implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
 
@@ -196,16 +197,9 @@ object ScalazArbitrary {
 
   implicit def IndSeqArbibrary[A: Arbitrary]: Arbitrary[IndSeq[A]] = Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
 
-  implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
-    Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
-
   import java.util.concurrent.Callable
 
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
-
-  import scalaz.concurrent.Promise
-
-  implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
   import scalaz.concurrent.Future
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
@@ -278,15 +272,7 @@ object ScalazArbitrary {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
   }
 
-  implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
-  }
-
-  @deprecated("BKTree is deprecated", "7.0.1")
-  implicit def bkTreeArbitrary[A](implicit A: MetricSpace[A], arb: Arbitrary[List[A]]): Arbitrary[BKTree[A]] =
-    Functor[Arbitrary].map(arb)(as => BKTree[A](as: _*))
-
-  // backwards compatability
+  // backwards compatibility
   def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = indexedStoreTArb[F, A, A, B](A)
 
   implicit def indexedStoreTArb[F[+_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
@@ -308,88 +294,6 @@ object ScalazArbitrary {
       case _ => sys.error("Unexpected amount of items in paired list.")
     }
   })
-
-  import scalaz.xml._
-  import scalaz.xml.cursor._
-  import scalaz.xml.Xml.{Line, Str}
-
-  /** @see [[https://groups.google.com/d/topic/scalacheck/O7e7k5JZKKI]] */
-  def smallListArb[A](implicit A: Arbitrary[A]): Arbitrary[List[A]] =
-    Arbitrary(choose(0, 5).flatMap{ n =>
-      listOfN(n, arbitrary[A])
-    })
-
-  implicit val qnameArbitrary: Arbitrary[QName] =
-    ^^(arb[Str],arb[Option[Str]],arb[Option[Str]])(QName.qname)
-
-  implicit val attrArbitrary: Arbitrary[Attr] =
-    ^(arb[QName],arb[Str])(Attr.attr)
-
-  implicit val cdataKindArbitrary: Arbitrary[CDataKind] = {
-    import CDataKind._
-    Arbitrary(oneOf(cdataText, cdataVerbatim, cdataRaw))
-  }
-
-  implicit val cdataArbitrary: Arbitrary[CData] =
-    ^^(arb[CDataKind], arb[Str], arb[Option[Line]])(CData.cdata)
-
-  implicit val elementArbitrary: Arbitrary[Element] =
-    ^^^(arb[QName], arb[List[Attr]], smallListArb[Content], arb[Option[Line]])(Element.element)
-
-  implicit val contentArbitrary: Arbitrary[Content] = {
-    import Content._
-    Arbitrary(oneOf(
-      arbitrary[Element].map(elem),
-      arbitrary[CData].map(text),
-      arbitrary[Str].map(cref),
-      arbitrary[Str].map(comment)
-    ))
-  }
-
-  implicit val nsInfoArbitrary: Arbitrary[NSInfo] =
-    ^(arb[List[(Str, Str)]],arb[Option[Str]])(NSInfo.nsInfo)
-
-  implicit val tokenArbitrary: Arbitrary[Token] = {
-    import Token._
-    Arbitrary(oneOf(
-      ^^^(arbitrary[CData.Line], arbitrary[QName], arbitrary[List[Attr]], arbitrary[Boolean])(startToken),
-      ^(arbitrary[CData.Line], arbitrary[QName])(endToken),
-      arbitrary[Str].map(crefToken),
-      arbitrary[CData].map(textToken),
-      arbitrary[Str].map(commentToken)
-    ))
-  }
-
-  implicit val tagArbitrary: Arbitrary[Tag] =
-    ^^(arb[QName], arb[List[Attr]], arb[Option[Line]])(Tag.tag)
-
-  implicit val cursorArbitrary: Arbitrary[Cursor] =
-    ^^^(arb[Content], smallListArb[Content], smallListArb[Content], arb[Cursor.Path])(Cursor.cursor)
-
-  implicit def predicateArbitrary[A](implicit P: Arbitrary[A => Boolean]): Arbitrary[Predicate[A]] =
-    ^(P, arb[Option[List[Char]]])(Predicate.predicate)
-
-  implicit val opArbitrary: Arbitrary[Op] = {
-    import Op._
-    Arbitrary(oneOf(
-      arbitrary[History].map(choiceSucceedOp),
-      arbitrary[History].map(h => choiceSwitchOp(h,h)),
-      arbitrary[Predicate.CPredicate].map(findLeftOp),
-      arbitrary[Predicate.CPredicate].map(findRightOp),
-      arbitrary[Predicate.CPredicate].map(findChildOp),
-      arbitrary[Predicate.CPredicate].map(findRecOp),
-      arbitrary[Int].map(n => nthChildOp(n)),
-      ^(arbitrary[Cursor => Cursor], arbitrary[OpDescription])(succeedingOp),
-      ^(arbitrary[Cursor => Option[Cursor]], arbitrary[OpDescription])(genericOp),
-      oneOf(failedComposeOp, leftOp, rightOp, firstChildOp, lastChildOp, remove, removeLeftOp, removeRightOp, parentOp, rootOp, nextDepthFirstOp)
-    ))
-  }
-
-  implicit val historyArbitrary: Arbitrary[History] =
-    smallListArb[Op].map(_.foldRight(History.history)(_ +: _))
-
-  implicit val hCursorArbitrary: Arbitrary[HCursor] =
-    ^(arb[History], arb[Option[Cursor]])(HCursor.hcursor)
 
   implicit def iterateeInputArbitrary[A: Arbitrary]: Arbitrary[scalaz.iteratee.Input[A]] = {
     import scalaz.iteratee.Input._

@@ -91,13 +91,6 @@ object Monoid {
     def append(f1: A, f2: => A): A = f(f1,f2)
   }
 
-  @deprecated("use Semigroup.applySemigroup", "7.1")
-  trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
-    implicit def F: Applicative[F]
-    implicit def M: Semigroup[M]
-    def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
-  }
-
   private trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
     implicit def M: Monoid[M]

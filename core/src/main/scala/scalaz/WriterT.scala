@@ -45,10 +45,6 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): WriterT[F, W, B] =
     writerT(F.map(run)(wa => (wa._1, f(wa._2))))
 
-  @deprecated("Each/foreach is deprecated", "7.1")
-  def foreach[B](f: A => Unit)(implicit E: Each[F]): Unit =
-    E.each(run)(wa => f(wa._2))
-
   def ap[B](f: => WriterT[F, W, A => B])(implicit F: Apply[F], W: Semigroup[W]): WriterT[F, W, B] = writerT {
     F.apply2(f.run, run) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))
@@ -184,10 +180,6 @@ sealed abstract class WriterTInstances1 extends WriterTInstances2 {
   implicit def writerTraverse[W]: Traverse[({type λ[α]=Writer[W, α]})#λ] = new WriterTTraverse[Id, W] {
     implicit def F = idInstance
   }
-  @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def writerEach[W]: Each[({type λ[α]=Writer[W, α]})#λ] = new WriterTEach[Id, W] {
-    implicit def F = idInstance
-  }
 }
 
 sealed abstract class WriterTInstances0 extends WriterTInstances1 {
@@ -195,13 +187,6 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
     implicit def F = F0
   }
   implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
-    implicit def F = F0
-  }
-  @deprecated("Index is deprecated, use Foldable instead", "7.1")
-  implicit def writerIndex[W]: Index[({type λ[α]=Writer[W, α]})#λ] = new WriterIndex[W] {
-  }
-  @deprecated("Each/foreach is deprecated", "7.1")
-  implicit def writerTEach[F[_], W](implicit F0: Each[F]): Each[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTEach[F, W] {
     implicit def F = F0
   }
 }
@@ -258,16 +243,6 @@ private trait WriterTApplicative[F[_], W] extends Applicative[({type λ[α]=Writ
   def point[A](a: => A) = writerT(F.point((W.zero, a)))
 }
 
-private trait WriterTEach[F[_], W] extends Each[({type λ[α]=WriterT[F, W, α]})#λ] {
-  implicit def F: Each[F]
-
-  def each[A](fa: WriterT[F, W, A])(f: A => Unit) = fa foreach f
-}
-
-// TODO does Index it make sense for F other than Id?
-private trait WriterIndex[W] extends Index[({type λ[α]=Writer[W, α]})#λ] {
-  def index[A](fa: Writer[W, A], i: Int) = if(i == 0) Some(fa.value) else None
-}
 
 private trait WriterTMonad[F[_], W] extends Monad[({type λ[α]=WriterT[F, W, α]})#λ] with WriterTApplicative[F, W] {
   implicit def F: Monad[F]

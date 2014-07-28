@@ -39,11 +39,8 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] with Align[IxSq] {
-    def each[A](fa: IxSq[A])(f: A => Unit) = fa foreach f
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] with Align[IxSq] {
     override def index[A](fa: IxSq[A], i: Int) = fa.lift.apply(i)
-    // TODO remove after removal of Index
-    override def indexOr[A](fa: IxSq[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)
     override def length[A](fa: IxSq[A]) = fa.length
     def point[A](a: => A) = empty :+ a
     def bind[A, B](fa: IxSq[A])(f: A => IxSq[B]) = fa flatMap f
@@ -191,10 +188,6 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: IxSq[A])(p: A => M[Boolean]): M[(IxSq[A], IxSq[A])] =
     spanM(as)(a => Monad[M].map(p(a))((b: Boolean) => !b))
-
-  @deprecated("use groupWhenM", "7.1")
-  final def groupByM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =
-    groupWhenM(as)(p)
 
   /** Split at each point where `p(as(n), as(n+1))` yields false. */
   final def groupWhenM[A, M[_] : Monad](as: IxSq[A])(p: (A, A) => M[Boolean]): M[IxSq[IxSq[A]]] =

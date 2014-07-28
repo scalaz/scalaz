@@ -27,19 +27,6 @@ trait IterableInstances {
     }
   }
 
-  @deprecated("Length is deprecated, use Foldable#length instead", "7.1")
-  implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
-    def length[A](a: Iterable[A]) = {
-      var n = 0
-      val i = a.iterator
-      while (i.hasNext) {
-        n = n + 1
-        i.next
-      }
-      n
-    }
-  }
-
   implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
     def equal(a1: CC[A], a2: CC[A]) = {
       val i1 = a1.iterator

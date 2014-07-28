@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicReference
  * Implementation based on non-intrusive MPSC node-based queue, described by Dmitriy Vyukov:
  * [[http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue]]
  *
- * @see scalaz.concurrent.Promise for a use case.
- *
  * @param handler  The message handler
  * @param onError  Exception handler, called if the message handler throws any `Throwable`.
  * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`

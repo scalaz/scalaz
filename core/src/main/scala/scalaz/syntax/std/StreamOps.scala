@@ -7,8 +7,6 @@ import scalaz.std.{stream => s}
 
 final class StreamOps[A](self: Stream[A]) {
   final def interleave(other: Stream[A]): Stream[A] = s.interleave(self, other)
-  @deprecated("renamed to `interleave` for consistency and to avoid collision with `Align#merge`", "7.1")
-  final def merge(other: Stream[A]): Stream[A] = s.merge(self, other)
   final def toZipper: Option[Zipper[A]] = s.toZipper(self)
   final def zipperEnd: Option[Zipper[A]] = s.zipperEnd(self)
   final def heads: Stream[Stream[A]] = s.heads(self)

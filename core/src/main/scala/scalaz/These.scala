@@ -145,11 +145,6 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         }
     }
 
-  @deprecated("'These' forms no lawful Zip instances; use &&& instead",
-              "7.1.0")
-  def zip[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
-    &&&(t)
-
   def &&&[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
     for {
       b <- this
@@ -256,15 +251,7 @@ object \&/ extends TheseInstances with TheseFunctions {
 trait TheseFunctions {
   import \&/._
 
-  @deprecated("use Align typeclass", "7.1")
-  def alignStream[A, B](a: EphemeralStream[A], b: EphemeralStream[B]): EphemeralStream[A \&/ B] =
-    Align[EphemeralStream].align(a, b)
-
   import scalaz.std.list._
-
-  @deprecated("use Align typeclass", "7.1")
-  def alignList[A, B](a: List[A], b: List[B]): List[A \&/ B] =
-    Align[List].align(a, b)
 
   def concatThisList[A, B](x: List[A \&/ B]): List[A] =
     concatThis[List, A, B](x)

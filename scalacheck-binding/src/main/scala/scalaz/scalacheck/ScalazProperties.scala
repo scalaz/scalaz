@@ -238,7 +238,7 @@ object ScalazProperties {
 
   private def resizeProp(p: Prop, max: Int): Prop = new Prop{
     def apply(params: Gen.Parameters) =
-      p(params.resize(params.size % (max + 1)))
+      p(params.withSize(params.size % (max + 1)))
   }
 
   object traverse {
@@ -500,22 +500,6 @@ object ScalazProperties {
       property("identity") = identity[A, B](l)
       property("retention") = retention[A, B](l)
       property("doubleSet") = doubleSet[A, B](l)
-    }
-  }
-
-  @deprecated("MetricSpace is deprecated", "7.0.1")
-  object metricSpace {
-    def nonNegativity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.nonNegativity _)
-    def identity[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.identity _)
-    def equality[F](implicit F: MetricSpace[F], E: Equal[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.equality _)
-    def symmetry[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.symmetry _)
-    def triangleInequality[F](implicit F: MetricSpace[F], af: Arbitrary[F]) = forAll(F.metricSpaceLaw.triangleInequality _)
-    def laws[F](implicit F: MetricSpace[F], E: Equal[F], af: Arbitrary[F]) = new Properties("metric space") {
-      property("nonNegativity") = nonNegativity[F]
-      property("identity") = identity[F]
-      property("equality") = equality[F]
-      property("symmetry") = symmetry[F]
-      property("triangleInequality") = triangleInequality[F]
     }
   }
 

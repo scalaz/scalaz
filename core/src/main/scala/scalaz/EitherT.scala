@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import scala.reflect.ClassTag
 
 /**
  * Represents a computation of type `F[A \/ B]`.
@@ -72,11 +73,6 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (A \/ α)})#λ].traverse(o)(f)))(EitherT(_))
-
-  /** Run the side-effect on the right of this disjunction. */
-  @deprecated("Each/foreach is deprecated", "7.1")
-  def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
-    F.each(run)(_ foreach f)
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
@@ -213,19 +209,11 @@ object EitherT extends EitherTInstances with EitherTFunctions {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
-  /** Evaluate the given value, which might throw an exception. */
-  @deprecated("catches fatal exceptions, use fromTryCatchThrowable or fromTryCatchNonFatal", "7.1.0")
-  def fromTryCatch[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] = try {
-    right(a)
-  } catch {
-    case e: Throwable => left(F.point(e))
-  }
-
-  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassManifest[B]): EitherT[F, B, A] =
+  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
       right(a)
     } catch {
-      case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+      case e if ex.runtimeClass.isInstance(e) => left(F.point(e.asInstanceOf[B]))
     }
 
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =

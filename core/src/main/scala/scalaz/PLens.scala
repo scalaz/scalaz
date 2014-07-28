@@ -546,22 +546,6 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def distributePLens[A, B, C]: (A, B \/ C) @?> ((A, B) \/ (A, C)) =
     ~LensFamily.distributeLens
-
-  import util.parsing.json._
-
-  @deprecated("will be removed, because util.parsing.json is deprecated in Scala", "7.1")
-  def scalaJSONObjectPLens: JSONType @?> Map[String, Any] =
-    plens {
-      case JSONObject(m) => Some(Store(JSONObject(_), m))
-      case _             => None
-    }
-
-  @deprecated("will be removed, because util.parsing.json is deprecated in Scala", "7.1")
-  def scalaJSONArrayPLens: JSONType @?> List[Any] =
-    plens {
-      case JSONArray(a) => Some(Store(JSONArray(_), a))
-      case _            => None
-    }
 }
 
 abstract class PLensInstances {

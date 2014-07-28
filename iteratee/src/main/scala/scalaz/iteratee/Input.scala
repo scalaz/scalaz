@@ -82,7 +82,7 @@ object Input extends InputInstances with InputFunctions {
 sealed abstract class InputInstances {
   import Input._
 
-  implicit val input: Traverse[Input] with Monad[Input] with Plus[Input] with Each[Input] with Length[Input] = new Traverse[Input] with Monad[Input] with Plus[Input] with Each[Input] with Length[Input] {
+  implicit val input: Traverse[Input] with Monad[Input] with Plus[Input] = new Traverse[Input] with Monad[Input] with Plus[Input] {
      override def length[A](fa: Input[A]): Int = fa.fold(
        empty = 0
        , el = _ => 1
@@ -99,7 +99,6 @@ sealed abstract class InputInstances {
        , el = a => f(a, z)
        , eof = z
      )
-     def each[A](fa: Input[A])(f: A => Unit) = fa foreach (a => f(a))
      def plus[A](a: Input[A], b: => Input[A]): Input[A] = a.fold(
        empty = b
        , el = _ => a

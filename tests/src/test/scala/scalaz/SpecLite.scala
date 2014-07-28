@@ -1,5 +1,7 @@
 package scalaz
 
+import reflect.ClassTag
+
 import org.scalacheck._
 import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
@@ -89,8 +91,8 @@ abstract class SpecLite extends Properties("") {
         fail(koMessage)
     }
 
-    def mustThrowA[T <: Throwable](implicit man: ClassManifest[T]): Unit = {
-      val erasedClass = man.erasure
+    def mustThrowA[T <: Throwable](implicit man: ClassTag[T]): Unit = {
+      val erasedClass = man.runtimeClass
       try {
         actual
         fail("no exception thrown, expected " + erasedClass)
@@ -108,10 +110,7 @@ abstract class SpecLite extends Properties("") {
   implicit def check1[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = Prop.forAll((t: T) => toProp(result(t)))
   implicit def unitToProp(u: => Unit): Prop = booleanToProp({u; true})
   implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
-  //implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
   implicit def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
-//    implicit def callByNameMatchResultToProp[T](m: =>MatchResult[T]): Prop = resultProp(m.toResult)
-//    implicit def matchResultToProp[T](m: MatchResult[T]): Prop = resultProp(m.toResult)
 
   /**
    * Most of our scalacheck tests use (Int => Int). This generator includes non-constant
@@ -119,8 +118,8 @@ abstract class SpecLite extends Properties("") {
    */
   implicit def Function1IntInt[A](implicit A: Arbitrary[Int]): Arbitrary[Int => Int] =
     Arbitrary(Gen.frequency[Int => Int](
-      (1, Gen.value((x: Int) => x)),
-      (1, Gen.value((x: Int) => x + 1)),
+      (1, Gen.const((x: Int) => x)),
+      (1, Gen.const((x: Int) => x + 1)),
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
 }

@@ -1,5 +1,7 @@
 package scalaz.example
 
+import reflect.ClassTag
+
 object STUsage extends App {
   import scalaz._
   import std.list._
@@ -36,7 +38,7 @@ object STUsage extends App {
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
-  def binSort[A: Manifest](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
+  def binSort[A: ClassTag](size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
     accumArray(size, (vs: List[A], v: A) => v :: vs, List(), for { a <- as } yield (key(a), a))
 
   assert(binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List("", "one", "twenty four"))

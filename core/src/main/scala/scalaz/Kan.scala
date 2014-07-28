@@ -102,12 +102,7 @@ object Lan {
         val v = Applicative[H].point(())
         def f(gi: G[I]) = a
       }
-      def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]):
-        Lan[G, H, B] {
-          // TODO remove this structural type, needed only for 2.9.3
-          val xp: Lan[G, H, A]
-          val xfp: Lan[G, H, A => B]
-        } = new Lan[G, H, B] {
+      def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
         lazy val xfp = xf
         lazy val xp = x
         type I = (xfp.I, xp.I)

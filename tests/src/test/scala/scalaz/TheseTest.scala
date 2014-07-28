@@ -21,10 +21,10 @@ object TheseTest extends SpecLite {
 
   "align unalign" should {
     "List" ! forAll { (a: List[Int], b: List[Int]) =>
-      unalignList(alignList(a, b)) must_=== ((a, b))
+      unalignList(Align[List].align(a, b)) must_=== ((a, b))
     }
     "EphemeralStream" ! forAll { (a: EphemeralStream[Int], b: EphemeralStream[Int]) =>
-      unalignStream(alignStream(a, b)) must_=== ((a, b))
+      unalignStream(Align[EphemeralStream].align(a, b)) must_=== ((a, b))
     }
   }
 

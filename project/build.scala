@@ -53,18 +53,16 @@ object build extends Build {
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq("2.10.4", "2.11.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
-    scalacOptions <++= (scalaVersion) map { sv =>
-      val versionDepOpts =
-        if (sv startsWith "2.9")
-          Seq("-Ydependent-method-types", "-deprecation")
-        else
-          // does not contain -deprecation (because of ClassManifest)
-          // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
-
+    scalacOptions ++= Seq(
+      // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       // no generic signatures, see SI-7932 and #571
-      Seq("-unchecked", "-Yno-generic-signatures") ++ versionDepOpts
-    },
+      "-deprecation",
+      "-encoding", "UTF-8",
+      "-feature",
+      "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+      "-unchecked",
+      "-Yno-generic-signatures"
+    ),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
@@ -172,23 +170,10 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      // <https://github.com/scalaz/scalaz/issues/261>
-      unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
-  )
-
-  // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
-  val coreModuleDependencies211 = List[(String, String => String)] (
-    "scala-parser-combinators" -> {
-      case _ => "1.0.2"
-    }
-    ,
-    "scala-xml"                -> {
-      case _ => "1.0.2"
-    }
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
   )
 
   lazy val core = Project(
@@ -199,13 +184,6 @@ object build extends Build {
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
-      },
-      libraryDependencies ++= {
-        if (scalaVersion.value.startsWith("2.11"))
-          coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-          }
-        else Nil
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -248,31 +226,10 @@ object build extends Build {
     dependencies = Seq(effect)
   )
 
-  lazy val typelevel = Project(
-    id = "typelevel",
-    base = file("typelevel"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-typelevel",
-      osgiExport("scalaz.typelevel", "scalaz.syntax.typelevel")
-    ),
-    dependencies = Seq(core)
-  )
-
-  lazy val xml = Project(
-    id = "xml",
-    base = file("xml"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-xml",
-      typeClasses := TypeClass.xml,
-      osgiExport("scalaz.xml")
-    ),
-    dependencies = Seq(core)
-  )
-
   lazy val example = Project(
     id = "example",
     base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
+    dependencies = Seq(core, iteratee, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       publishArtifact := false
@@ -282,7 +239,7 @@ object build extends Build {
   lazy val scalacheckBinding = Project(
     id           = "scalacheck-binding",
     base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
+    dependencies = Seq(core, concurrent, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
@@ -293,7 +250,7 @@ object build extends Build {
   lazy val tests = Project(
     id = "tests",
     base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
+    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
