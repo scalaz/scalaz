@@ -3,7 +3,7 @@ package scalaz.syntax
 import scalaz._
 
 
-final class TagOps[A, T] private[syntax]( self: A @@ T) {
+final class TagOps[A, T] private[syntax](val self: A @@ T) extends AnyVal {
   def unwrap: A = Tag.unwrap(self)
 }
 

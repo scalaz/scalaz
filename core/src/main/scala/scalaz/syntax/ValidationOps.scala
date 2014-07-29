@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class ValidationOps[A](self: A) {
+final class ValidationOps[A](val self: A) extends AnyVal {
   def success[X]: Validation[X, A] = Validation.success[X, A](self)
 
   def successNel[X]: ValidationNel[X, A] = success
