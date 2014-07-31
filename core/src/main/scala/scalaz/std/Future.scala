@@ -1,11 +1,14 @@
 package scalaz
 package std
 
-import scala.concurrent.{Await, CanAwait, ExecutionContext, Future}
+import _root_.java.util.concurrent.atomic.AtomicInteger
+
+import scala.concurrent.{Await, CanAwait, ExecutionContext, Future, Promise}
 import scala.concurrent.duration.Duration
+import scala.util.{ Try, Success => TSuccess }
 
 trait FutureInstances1 {
-  implicit def futureInstance(implicit ec: ExecutionContext): Monad[Future] with Cobind[Future] =
+  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
@@ -24,12 +27,43 @@ trait FutureInstances extends FutureInstances1 {
     Monoid.liftMonoid[Future, A]
 }
 
-private class FutureInstance(implicit ec: ExecutionContext) extends Monad[Future] with Cobind[Future] {
+private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
   def cobind[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
   override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
+
+  def chooseAny[A](head: Future[A], tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+    val fs = (head +: tail).iterator.zipWithIndex.toIndexedSeq
+    val counter = new AtomicInteger(fs.size)
+    val result = Promise[(A, Int)]()
+    def attemptComplete(t: Try[(A, Int)]): Unit = {
+      val remaining = counter.decrementAndGet
+      t match {
+        case TSuccess(_) => result tryComplete t
+        case _ if remaining == 0 => result tryComplete t
+        case _ =>
+      }
+    }
+
+    fs foreach { case (fa, i) =>
+      fa.onComplete { t => attemptComplete(t.map(_ -> i)) }
+    }
+
+    result.future.map { case (a, i) =>
+      (a, fs.collect { case (fa, j) if j != i => fa })
+    }
+  }
+
+  override def mapBoth[A,B,C](a: Future[A], b: Future[B])(f: (A,B) => C): Future[C] =
+    (a zip b).map(f.tupled)
+
+  override def both[A,B](a: Future[A], b: Future[B]): Future[(A,B)] =
+    a zip b
+
+  override def gather[A](fs: Seq[Future[A]]): Future[List[A]] =
+    Future.sequence(fs.toList)
 
   // override for actual parallel execution
   override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
