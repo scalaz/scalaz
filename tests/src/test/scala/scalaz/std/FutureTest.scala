@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.std.AllInstances._
-import scalaz.syntax.functor._
+import scalaz.syntax.traverse._
 import scalaz.Tags._
 
 import scala.concurrent._
@@ -34,4 +34,16 @@ class FutureTest extends SpecLite {
     checkAll(comonad.laws[Future])
   }
 
+  "Apply[Future]" should {
+    "not SOE on traverse of big Stream" in {
+      val f = (1 to 100000).toStream.traverse { i => Promise.successful(i).future }
+      try {
+        Await.result(f, 10.seconds)
+        true
+      } catch {
+        case (soe: StackOverflowError) =>
+          fail("stack overflow")
+      }
+    }
+  }
 }
