@@ -185,7 +185,7 @@ trait KleisliFunctions {
   implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = k.run
 
   /**Pure Kleisli arrow */
-  def ask[M[_] : Monad, A]: Kleisli[M, A, A] = kleisli(a => Monad[M].point(a))
+  def ask[M[_] : Applicative, A]: Kleisli[M, A, A] = kleisli(a => Applicative[M].point(a))
 
   def local[M[_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = fa local f
 }
