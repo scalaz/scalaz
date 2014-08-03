@@ -1,25 +1,38 @@
 package scalaz
 package syntax
 
-final class MonadTellOps[F[_, _], W, A](self: F[W, A])(implicit MT: MonadTell[F, W]) {
+/** Wraps a value `self` and provides methods related to `MonadTell` */
+final class MonadTellOps[F[_, _], S, A] private[syntax](self: F[S, A])(implicit val F: MonadTell[F, S]) {
+  ////
 
-  final def :++>(w: => W): F[W, A] = MT.bind(self)(a => MT.map(MT.tell(w))(_ => a))
+  final def :++>(w: => S): F[S, A] = F.bind(self)(a => F.map(F.tell(w))(_ => a))
 
-  final def :++>>(f: A => W): F[W, A] =
-     MT.bind(self)(a => MT.map(MT.tell(f(a)))(_ => a))
+  final def :++>>(f: A => S): F[S, A] =
+    F.bind(self)(a => F.map(F.tell(f(a)))(_ => a))
+
+  ////
 }
 
 sealed trait ToMonadTellOps0 {
-  implicit def ToMonadTellOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadTell, FA]) = 
+  implicit def ToMonadTellOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadTell, FA]) =
     new MonadTellOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 }
 
-trait ToMonadTellOps extends ToMonadTellOps0 {
-  implicit def ToMonadTellOps[F[_, _], A, W](v: F[W, A])(implicit F0: MonadTell[F, W]) = 
-    new MonadTellOps[F, W, A](v)(F0)
+trait ToMonadTellOps extends ToMonadOps {
+  implicit def ToMonadTellOps[F[_, _], S, A](v: F[S, A])(implicit F0: MonadTell[F, S]) =
+    new MonadTellOps[F, S, A](v)
+
+  ////
+
+  ////
 }
 
-trait MonadTellSyntax[F[_, _], W] {
-  implicit def ToMonadTellOps[A](v: F[W, A])(implicit F0: MonadTell[F, W]) =
-    new MonadTellOps[F, W, A](v)(F0)
+trait MonadTellSyntax[F[_, _], S] extends MonadSyntax[({type λ[α] = F[S, α]})#λ] {
+  implicit def ToMonadTellOps[A](v: F[S, A]): MonadTellOps[F, S, A] =
+    new MonadTellOps[F, S, A](v)(MonadTellSyntax.this.F)
+
+  def F: MonadTell[F, S]
+  ////
+
+  ////
 }
