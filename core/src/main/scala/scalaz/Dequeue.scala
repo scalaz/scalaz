@@ -188,7 +188,7 @@ object Dequeue extends DequeueInstances {
   * special case of the queue when it contains just a single element
   * which can be accessed from either side of the queue
   */
-final case class SingletonDequeue[A](single: A) extends Dequeue[A] {
+private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[A] {
   override def isEmpty = false
   override def frontMaybe = Maybe.Just(single)
   override def backMaybe = Maybe.Just(single)
@@ -198,7 +198,7 @@ final case class SingletonDequeue[A](single: A) extends Dequeue[A] {
   * a queue which has at least two elements, it is guaranteed that the
   * front list and back lists cannot be empty
   */
-final case class FullDequeue[A](front: NonEmptyIList[A], fsize: Int, back: NonEmptyIList[A], backSize: Int) extends Dequeue[A]  {
+private[scalaz] final case class FullDequeue[A](front: NonEmptyIList[A], fsize: Int, back: NonEmptyIList[A], backSize: Int) extends Dequeue[A]  {
   override def isEmpty = false
   override def frontMaybe = Maybe.just(front.head)
   override def backMaybe = Maybe.just(back.head)
@@ -206,7 +206,7 @@ final case class FullDequeue[A](front: NonEmptyIList[A], fsize: Int, back: NonEm
 /**
   * a queue which has no elements
   */
-final case object EmptyDequeue extends Dequeue[Nothing] {
+private[scalaz] final case object EmptyDequeue extends Dequeue[Nothing] {
   override val isEmpty = true
   override val frontMaybe = Maybe.empty
   override val backMaybe = Maybe.empty
@@ -237,7 +237,7 @@ sealed abstract class DequeueInstances {
   }
 }
 
-private trait DequeueEqual[A] extends Equal[Dequeue[A]] {
+private[scalaz] trait DequeueEqual[A] extends Equal[Dequeue[A]] {
   implicit def A: Equal[A]
   import std.stream._
 
