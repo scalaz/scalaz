@@ -195,6 +195,8 @@ package object scalaz {
 
   type Alternative[F[_]] = ApplicativePlus[F]
 
+  type NonEmptyIList[A] = OneAnd[IList,A]
+
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
    *
