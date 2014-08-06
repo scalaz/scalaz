@@ -16,7 +16,7 @@ package scalaz
   * either side which would leave that side empty constructs the
   * resulting queue by taking elements from the opposite side
   */
-sealed trait Dequeue[A] {
+sealed abstract class Dequeue[A] {
   import Maybe.Just
 
   def isEmpty: Boolean
