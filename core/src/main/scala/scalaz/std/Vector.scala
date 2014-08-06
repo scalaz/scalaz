@@ -19,7 +19,15 @@ trait VectorInstances extends VectorInstances0 {
 
   implicit val vectorInstance = generic.ixSqInstance
 
-  implicit def vectorMonoid[A]: Monoid[Vector[A]] = generic.ixSqMonoid
+  // Vector concat is O(n^2) in Scala 2.10 - it's actually faster to do repeated appends
+  // https://issues.scala-lang.org/browse/SI-7725
+  //
+  // It was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
+  // https://issues.scala-lang.org/browse/SI-4442
+  implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
+    def zero = Vector.empty
+    def append(a: Vector[A], b: => Vector[A]) = b.foldLeft(a)(_ :+ _)
+  }
 
   implicit def vectorShow[A: Show]: Show[Vector[A]] = generic.ixSqShow
 
