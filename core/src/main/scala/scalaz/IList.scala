@@ -150,6 +150,9 @@ sealed abstract class IList[A] extends Product with Serializable {
   def headOption: Option[A] =
     uncons(None, (h, _) => Some(h))
 
+  def headMaybe: Maybe[A] =
+    uncons(Maybe.Empty(), (h, _) => Maybe.Just(h))
+
   def indexOf(a: A)(implicit ev: Equal[A]): Option[Int] =
     indexWhere(ev.equal(a, _))
 
@@ -607,7 +610,3 @@ private trait IListOrder[A] extends Order[IList[A]] with IListEqual[A] {
     }
 
 }
-
-
-
-
