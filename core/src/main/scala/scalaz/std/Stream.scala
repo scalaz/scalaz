@@ -185,4 +185,10 @@ trait StreamFunctions {
 
 object stream extends StreamInstances with StreamFunctions {
   object streamSyntax extends scalaz.syntax.std.ToStreamOps
+
+  def unfoldm[A, B](seed: A)(f: A => Maybe[(B, A)]): Stream[B] =
+    f(seed) match {
+      case Maybe.Empty() => Stream.empty
+      case Maybe.Just((b, a))  => Stream.cons(b, unfoldm(a)(f))
+    }
 }
