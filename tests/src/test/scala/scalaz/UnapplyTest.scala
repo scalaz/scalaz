@@ -16,7 +16,6 @@ object UnapplyTest extends SpecLite {
   }
 
   object unapply2 {
-    import std.function._
     val ue = Unapply2[Arrow, Kleisli[NonEmptyList, Int, String]]
     def mequiv[A,B] = implicitly[ue.M[A,B] === Kleisli[NonEmptyList, A, B]]
     implicitly[ue.A === Int]

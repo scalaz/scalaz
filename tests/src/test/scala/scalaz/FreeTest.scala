@@ -1,12 +1,10 @@
 package scalaz
 
 import org.scalacheck.{Arbitrary, Gen}
-import Isomorphism._
 import std.AllInstances._
 import Free.{Return, Suspend}
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.scalacheck.ScalazArbitrary._
 
 case class FreeList[A](f: Free[List, A])
 

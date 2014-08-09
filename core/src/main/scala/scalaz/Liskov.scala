@@ -1,7 +1,5 @@
 package scalaz
 
-import annotation.unchecked._
-
 /**
  * Liskov substitutability: A better `<:<`
  *

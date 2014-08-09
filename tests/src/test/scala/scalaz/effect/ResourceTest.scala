@@ -2,8 +2,6 @@ package scalaz
 package effect
 
 import java.io._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.effect.closeable._
 
 object ResourceTest extends SpecLite {
