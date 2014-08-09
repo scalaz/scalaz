@@ -1,15 +1,24 @@
 package scalaz
 
+////
 /** The class of monads supporting write operations
-  */
-trait MonadTell[F[_, _], W] extends Monad[({type λ[α] = F[W, α]})#λ] {
-  def writer[A](w: W, v: A): F[W, A]
+ *
+ */
+////
+trait MonadTell[F[_, _], S] extends Monad[({type λ[α] = F[S, α]})#λ] { self =>
+  ////
+  def writer[A](w: S, v: A): F[S, A]
 
-  def tell(w: W): F[W, Unit] = writer(w, ())
+  def tell(w: S): F[S, Unit] = writer(w, ())
 
-  val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, W]{}
+  ////
+  val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def F = MonadTell.this }
 }
 
 object MonadTell {
-  def apply[F[_, _], W](implicit F: MonadTell[F, W]) = F
+  @inline def apply[F[_, _], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
+
+  ////
+
+  ////
 }
