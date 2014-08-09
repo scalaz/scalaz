@@ -21,6 +21,8 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.Plugin._
 
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
@@ -42,6 +44,15 @@ object build extends Build {
     },
     enableCrossBuild = true
   )
+
+  lazy val setMimaVersion: ReleaseStep = { st: State =>
+    val extracted = Project.extract(st)
+
+    val (releaseV, _) = st.get(versions).getOrElse(sys.error("impossible"))
+    // TODO switch to `versionFile` key when updating sbt-release
+    IO.write(new File("version.sbt"), "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
+  }
 
   def scalaCheckVersion = "1.11.4"
 
@@ -120,6 +131,7 @@ object build extends Build {
       tagRelease,
       publishSignedArtifacts,
       setNextVersion,
+      setMimaVersion,
       commitNextVersion,
       pushChanges
     ),
@@ -166,12 +178,17 @@ object build extends Build {
       )
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
+  ) ++ mimaDefaultSettings ++ Seq[Sett](
+    previousArtifact := scalazMimaBasis.?.value.map { bas =>
+      (organization.value % (name.value + "_" + scalaBinaryVersion.value) % bas)
+    }
   )
 
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+      previousArtifact := None,
       // <https://github.com/scalaz/scalaz/issues/261>
       unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
@@ -275,6 +292,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
+      previousArtifact := None,
       publishArtifact := false
     )
   )
@@ -297,6 +315,7 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
+      previousArtifact := None,
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
     )
   )
@@ -318,6 +337,9 @@ object build extends Build {
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
+
+  lazy val scalazMimaBasis =
+    SettingKey[String]("scalaz-mima-basis", "Version of scalaz against which to run MIMA.")
 
   lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
 
