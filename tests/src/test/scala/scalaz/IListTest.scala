@@ -75,7 +75,7 @@ object IListTest extends SpecLite {
   }
 
   "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldMap1Opt(conforms) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
