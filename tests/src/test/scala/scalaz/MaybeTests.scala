@@ -6,7 +6,6 @@ import Tags._
 
 object MaybeTest extends SpecLite {
   import org.scalacheck.Arbitrary
-  import scalaz.scalacheck.ScalaCheckBinding._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._

@@ -9,7 +9,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
-import syntax.std._
 import org.scalacheck.Prop.forAll
 
 object IndexedSeqTest extends SpecLite {
