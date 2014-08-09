@@ -143,7 +143,7 @@ trait Foldable[F[_]]  { self =>
     index(fa, i) getOrElse default
 
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
-  def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
+  def toVector[A](fa: F[A]): Vector[A] = foldLeft(fa, Vector[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
   def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =

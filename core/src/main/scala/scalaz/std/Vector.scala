@@ -41,7 +41,7 @@ trait VectorInstances extends VectorInstances0 {
           (bs._1, acc._2 :+ bs._2)
         }))
 
-    override def toIndexedSeq[A](fa: Vector[A]) = fa
+    override def toVector[A](fa: Vector[A]) = fa
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
       var i = fa.length
