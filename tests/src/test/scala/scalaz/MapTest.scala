@@ -683,7 +683,7 @@ object MapTest extends SpecLite {
     val keysA = a.keySet
     val keysB = b.keySet
 
-    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
     x.keySet must_=== (keysA ++ keysB)
 
     x.filter(_.isThis).keySet must_=== (keysA -- keysB)
