@@ -81,7 +81,7 @@ res2: Option[Int] = Some(1)
 
 Let the types speak for themselves via the [Scalaz Scaladocs](http://docs.typelevel.org/api/scalaz/)!
 
-The [examples module](https://github.com/scalaz/scalaz/tree/scalaz-seven/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
+The [examples module](https://github.com/scalaz/scalaz/tree/series/7.2.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
@@ -284,8 +284,8 @@ The method `OptionT#map` requires an implicit parameter of type `Functor[F]`, wh
 requires one of type `Monad[F]`. The capabilities of `OptionT` increase with those of `F`. We need to encode
 this into the type class instances for `[a]OptionT[F[A]]`.
 
-This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L59)
-and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/OptionT.scala#L23).
+This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/v7.1.0/core/src/main/scala/scalaz/OptionT.scala#L122)
+and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/v7.1.0/core/src/main/scala/scalaz/OptionT.scala#L24).
 
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
 when in cases like the following:
@@ -313,7 +313,7 @@ type Id[A] = A
 
 ## Contributing
 
-[Documentation for contributors](https://github.com/scalaz/scalaz/blob/scalaz-seven/CONTRIBUTING.md)
+[Documentation for contributors](https://github.com/scalaz/scalaz/blob/series/7.2.x/CONTRIBUTING.md)
 
 ## Credits
 
