@@ -130,6 +130,9 @@ sealed abstract class StateTInstances1 extends IndexedStateTInstances {
 
 sealed abstract class StateTInstances0 extends StateTInstances1 {
   implicit def StateMonadTrans[S]: Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTHoist[S] {}
+
+  implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[({type λ[α] = StateT[F, S, α]})#λ] =
+    new StateTMonadStateMonadPlus[S, F] { implicit def F: MonadPlus[F] = F0 }
 }
 
 abstract class StateTInstances extends StateTInstances0 {
@@ -212,4 +215,12 @@ private trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})
   }
 
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StateT[G, S, α]})#λ] = StateT.stateTMonadState[S, G]
+}
+
+private trait StateTMonadStateMonadPlus[S, F[_]] extends StateTMonadState[S, F] with StateTHoist[S] with MonadPlus[({type λ[α] = StateT[F, S, α]})#λ] {
+  implicit def F: MonadPlus[F]
+
+  def empty[A]: StateT[F, S, A] = liftM[F, A](F.empty[A])
+
+  def plus[A](a: StateT[F, S, A], b: => StateT[F, S, A]): StateT[F, S, A] = StateT(s => F.plus(a.run(s), b.run(s)))
 }

@@ -20,6 +20,7 @@ object StateTTest extends SpecLite {
   object instances {
     def functor[S, F[_] : Functor] = Functor[({type λ[α] = StateT[F, S, α]})#λ]
     def monadState[S, F[_] : Monad] = MonadState[({type λ[α, β]=StateT[F, α, β]})#λ, S]
+    def monadPlus[S, F[_]: MonadPlus] = MonadPlus[({type λ[α] = StateT[F, S, α]})#λ]
 
     // F = Id
     def functor[S] = Functor[({type λ[α] = State[S, α]})#λ]
@@ -51,5 +52,15 @@ object StateTTest extends SpecLite {
 
   "monadState.modify" in {
     instances.monadState[Int].modify { _ + 1 }.run(10) must_===((11, ()))
+  }
+
+  "monadPlus.empty (List)" in {
+    instances.monadPlus[Boolean, List].empty[Int].run(false) must_===(Nil)
+  }
+
+  "monadPlus.plus (List)" in {
+    val a = StateT[List, Int, Boolean](s => List((s, false)))
+    val b = StateT[List, Int, Boolean](s => List((s, true)))
+    instances.monadPlus[Int, List].plus(a, b).run(0) must_===(List((0, false), (0, true)))
   }
 }
