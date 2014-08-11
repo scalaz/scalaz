@@ -7,10 +7,10 @@
  *  - related functions
  *
  * Type class instances and other functions related to the Scala and Java standard library
- * are in scalaz.[[scalaz.std]]
+ * are in [[scalaz.std]]
  *
  * Implicit conversions and wrapper classes that provide a more convenient syntax for accessing
- * the functionality of the library are in scalaz.[[scalaz.syntax]].
+ * the functionality of the library are in [[scalaz.syntax]].
  *
  * '''Type Classes Index'''
  *
