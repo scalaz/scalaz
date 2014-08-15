@@ -163,6 +163,10 @@ object Maybe extends MaybeInstances with MaybeFunctions {
 sealed trait MaybeFunctions {
   import Maybe._
 
+  /** Wrap a value in Just, or return Empty if the value is null */
+  final def fromNullable[A](a: A): Maybe[A] =
+    if (null == a) empty else just(a)
+
   final def empty[A]: Maybe[A] = Empty()
 
   final def just[A](a: A): Maybe[A] = Just(a)
