@@ -9,6 +9,7 @@ object MaybeTest extends SpecLite {
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._
+  import std.string._
   import syntax.equal._
 
   import Maybe._
@@ -81,6 +82,13 @@ object MaybeTest extends SpecLite {
   "empty to option is none" ! check(empty.toOption.isEmpty)
 
   "just orElse is just" ! forAll { (x: Int, m: Maybe[Int]) => just(x).orElse(m).isJust }
+
+  "fromNullable(null) is Empty" ! check {
+    val s: String = null
+    Maybe.fromNullable(s).isEmpty
+  }
+
+  "fromNullable(notNull) is just" ! forAll { (s: String) => Maybe.fromNullable(s) must_=== just(s) }
 
   object instances {
     def equal[A: Equal] = Equal[Maybe[A]]
