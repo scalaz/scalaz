@@ -1,10 +1,8 @@
 package scalaz
 
-import collection.immutable.IndexedSeq
-
 import std.anyVal._
+import std.vector._
 import std.string._
-import std.indexedSeq.indexedSeqMonoid
 
 /**
  * A `Cord` is a purely functional data structure for efficiently
@@ -109,9 +107,9 @@ final case class Cord(self: FingerTree[Int, String]) {
    */
   def map(f: Char => Char): Cord = cord(self map (_ map f))
 
-  def toList: List[Char] = toIndexedSeq.toList
-  def toStream: Stream[Char] = toIndexedSeq.toStream
-  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq)
+  def toList: List[Char] = toVector.toList
+  def toStream: Stream[Char] = toVector.toStream
+  def toVector: Vector[Char] = self.foldMap(_.toVector)
   override def toString: String = {
     import syntax.foldable._
     import Free._
@@ -122,7 +120,7 @@ final case class Cord(self: FingerTree[Int, String]) {
   }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
-  def flatMap(f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
+  def flatMap(f: Char => Cord): Cord = toVector.foldLeft(Cord())((as, a) => as ++ f(a))
 
   /** Returns whether this `Cord` will expand to an empty string. */
   def isEmpty: Boolean = !nonEmpty

@@ -135,16 +135,15 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
     def OK = Order[K]
     def OV = Equal[V]
     def order(x: XMap[K, V], y: XMap[K, V]): Ordering = {
-      import collection.immutable.IndexedSeq
-      import indexedSeq._
+      import vector._
       import anyVal._
       import tuple._
       implicit val ok = Order[K].toScalaOrdering
       Semigroup[Ordering]
        .append(Order[Int].order(x.size, y.size),
-               Order[IndexedSeq[(K, V)]]
-                .order(x.toIndexedSeq.sortBy((_:(K,V))._1),
-                       y.toIndexedSeq.sortBy((_:(K,V))._1)))
+               Order[Vector[(K, V)]]
+                .order(x.toVector.sortBy((_:(K,V))._1),
+                       y.toVector.sortBy((_:(K,V))._1)))
     }
   }
 }

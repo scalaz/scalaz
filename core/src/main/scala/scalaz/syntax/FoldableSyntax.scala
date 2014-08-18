@@ -5,7 +5,6 @@ package syntax
 final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
   ////
   import collection.generic.CanBuildFrom
-  import collection.immutable.IndexedSeq
   import Leibniz.===
   import Liskov.<~<
 
@@ -33,7 +32,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def sumr(implicit A: Monoid[A]): A = F.foldRight(self, A.zero)(A.append)
   final def suml(implicit A: Monoid[A]): A = F.foldLeft(self, A.zero)(A.append(_, _))
   final def toList: List[A] = F.toList(self)
-  final def toIndexedSeq: IndexedSeq[A] = F.toIndexedSeq(self)
+  final def toVector: Vector[A] = F.toVector(self)
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
   final def toIList: IList[A] = F.toIList(self)
