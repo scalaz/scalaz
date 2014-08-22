@@ -138,4 +138,14 @@ object FoldableTests {
     val expected = if (fa.empty) 0 else 1
     i === expected
   }
+
+  def allIsLazy[F[_], A](implicit F: Foldable[F], arb: Arbitrary[F[A]]) = forAll { fa: F[A] =>
+    var i = 0
+    fa all { x =>
+      i = i + 1
+      false
+    }
+    val expected = if (fa.empty) 0 else 1
+    i === expected
+  }
 }

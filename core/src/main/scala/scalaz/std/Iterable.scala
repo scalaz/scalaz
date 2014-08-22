@@ -78,6 +78,9 @@ trait IterableInstances {
 
     override def any[A](fa: I[A])(p: A => Boolean): Boolean =
       fa.exists(p)
+
+    override def all[A](fa: I[A])(p: A => Boolean): Boolean =
+      fa.forall(p)
   }
 }
 
