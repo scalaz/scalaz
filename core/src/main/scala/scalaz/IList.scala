@@ -556,6 +556,14 @@ sealed abstract class IListInstances extends IListInstance0 {
         }
         loop(fa)
       }
+
+      override def all[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => true
+          case ICons(h, t) => p(h) && loop(t)
+        }
+        loop(fa)
+      }
     }
 
 

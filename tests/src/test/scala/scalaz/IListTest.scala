@@ -383,4 +383,6 @@ object IListTest extends SpecLite {
 
   "any is lazy" ! FoldableTests.anyIsLazy[IList, Int]
 
+  "all is lazy" ! FoldableTests.allIsLazy[IList, Int]
+
 }

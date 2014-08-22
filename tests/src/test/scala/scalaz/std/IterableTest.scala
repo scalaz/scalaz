@@ -13,4 +13,6 @@ object IterableTest extends SpecLite {
   checkAll(order.laws[Iterable[Boolean]].withProp("benchmark", order.scalaOrdering[Iterable[Boolean]]))
 
   "any is lazy" ! FoldableTests.anyIsLazy[Iterable, Int]
+
+  "all is lazy" ! FoldableTests.allIsLazy[Iterable, Int]
 }
