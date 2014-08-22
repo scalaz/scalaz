@@ -64,6 +64,9 @@ trait IterableInstances {
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
 
     override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+    override def any[A](fa: I[A])(p: A => Boolean): Boolean =
+      fa.exists(p)
   }
 }
 

@@ -548,6 +548,14 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def mapAccumR[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
         fa.mapAccumRight(z, f)
+
+      override def any[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => false
+          case ICons(h, t) => p(h) || loop(t)
+        }
+        loop(fa)
+      }
     }
 
 
