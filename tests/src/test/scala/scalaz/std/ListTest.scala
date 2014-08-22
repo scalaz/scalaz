@@ -160,4 +160,6 @@ object ListTest extends SpecLite {
 
   "any is lazy" ! FoldableTests.anyIsLazy[List, Int]
 
+  "all is lazy" ! FoldableTests.allIsLazy[List, Int]
+
 }

@@ -98,6 +98,9 @@ trait ListInstances extends ListInstances0 {
 
     override def any[A](fa: List[A])(p: A => Boolean): Boolean =
       fa.exists(p)
+
+    override def all[A](fa: List[A])(p: A => Boolean): Boolean =
+      fa.forall(p)
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
