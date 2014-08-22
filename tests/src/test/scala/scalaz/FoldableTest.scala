@@ -2,7 +2,9 @@ package scalaz
 
 import std.AllInstances._
 import syntax.foldable._
+import syntax.equal._
 import org.scalacheck.Prop.forAll
+import org.scalacheck.Arbitrary
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
@@ -123,5 +125,17 @@ object FoldableTest extends SpecLite {
     (l: List[Int], l2: List[Int]) =>
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
+  }
+}
+
+object FoldableTests {
+  def anyIsLazy[F[_], A](implicit F: Foldable[F], arb: Arbitrary[F[A]]) = forAll { fa: F[A] =>
+    var i = 0
+    fa any { x =>
+      i = i + 1
+      true
+    }
+    val expected = if (fa.empty) 0 else 1
+    i === expected
   }
 }
