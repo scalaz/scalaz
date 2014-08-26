@@ -73,10 +73,27 @@ private trait CokleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = C
 
 private trait CokleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+  with Costrong[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
   with CokleisliProfunctor[F]
   with CokleisliCompose[F] {
 
   implicit def F: Comonad[F]
+
+  def left[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, A \/ C, B \/ C] =
+    Cokleisli { (ac: F[A \/ C]) =>
+      F.copoint(ac) match {
+        case -\/(a) => -\/(fa run (F.map(ac)(_ => a)))
+        case \/-(b) => \/-(b)
+      }
+    }
+
+  def right[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, C \/ A, C \/ B] =
+    Cokleisli { (ac: F[C \/ A]) =>
+      F.copoint(ac) match {
+        case -\/(b) => -\/(b)
+        case \/-(a) => \/-(fa run (F.map(ac)(_ => a)))
+      }
+    }
 
   def arr[A, B](f: A => B) = Cokleisli(a => f(F.copoint(a)))
   def id[A] = Cokleisli[F, A, A](F.copoint)

@@ -9,14 +9,11 @@ package scalaz
  * functions.
  */
 ////
-trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { self =>
   ////
 
   /** Lift an ordinary function. */
   def arr[A, B](f: A => B): A =>: B
-
-  /** Pass `C` through untouched. */
-  def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
 
   override def covariantInstance[C]: Applicative[({type λ[α] = (C =>: α)})#λ] =
     new Applicative[({type λ[α] = (C =>: α)})#λ] with SndCovariant[C] {

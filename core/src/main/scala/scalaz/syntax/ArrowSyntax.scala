@@ -4,12 +4,6 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Arrow` */
 final class ArrowOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Arrow[F]) extends Ops[F[A, B]] {
   ////
-  final def first[C]: F[(A, C), (B, C)] =
-    F.first(self)
-
-  final def second[C]: F[(C, A), (C, B)] =
-    F.second(self)
-
   final def ***[C, D](k: F[C, D]): F[(A, C), (B, D)] =
     F.splitA(self, k)
 
@@ -28,7 +22,7 @@ sealed trait ToArrowOps0 {
   
 }
 
-trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps with ToCategoryOps {
+trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToStrongOps with ToCategoryOps {
   
   implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
       new ArrowOps[F,A, B](v)
@@ -43,7 +37,7 @@ trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToProfunctorOps with T
   ////
 }
 
-trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with ProfunctorSyntax[F] with CategorySyntax[F] {
+trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with StrongSyntax[F] with CategorySyntax[F] {
   implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] = new ArrowOps[F, A, B](v)(ArrowSyntax.this.F)
 
   def F: Arrow[F]

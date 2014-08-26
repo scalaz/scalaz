@@ -52,10 +52,12 @@
  *  - [[scalaz.Nondeterminism]] extends [[scalaz.Monad]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Profunctor]]
+ *  - [[scalaz.Strong]] extends [[scalaz.Profunctor]]
+ *  - [[scalaz.Costrong]] extends [[scalaz.Profunctor]]
  *  - [[scalaz.Category]] extends [[scalaz.Compose]]
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]
- *  - [[scalaz.Arrow]] extends [[scalaz.Split]] with [[scalaz.Profunctor]] with [[scalaz.Category]]
+ *  - [[scalaz.Arrow]] extends [[scalaz.Split]] with [[scalaz.Strong]] with [[scalaz.Category]]
  *
  *  '''Data Structures Index'''
  *  - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
