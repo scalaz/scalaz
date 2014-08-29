@@ -53,7 +53,7 @@
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Profunctor]]
  *  - [[scalaz.Strong]] extends [[scalaz.Profunctor]]
- *  - [[scalaz.Costrong]] extends [[scalaz.Profunctor]]
+ *  - [[scalaz.ProChoice]] extends [[scalaz.Profunctor]]
  *  - [[scalaz.Category]] extends [[scalaz.Compose]]
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]

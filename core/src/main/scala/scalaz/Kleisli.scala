@@ -140,7 +140,7 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
     implicit def F = F0
   }
 
-  implicit def kleisliCostrong[F[_]](implicit F0: Applicative[F]): Costrong[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliCostrong[F] {
+  implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProChoice[F] {
     implicit def F = F0
   }
 
@@ -282,7 +282,7 @@ private trait KleisliStrong[F[_]] extends Strong[({type λ[α, β] = Kleisli[F, 
   override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
 }
 
-private trait KleisliCostrong[F[_]] extends Costrong[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliStrong[F] {
+private trait KleisliProChoice[F[_]] extends ProChoice[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliStrong[F] {
 
   implicit def F: Applicative[F]
 
@@ -310,12 +310,12 @@ private trait KleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ]
   with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ]
   with KleisliCompose[F]
-  with KleisliCostrong[F] {
+  with KleisliProChoice[F] {
 
   implicit def F: Monad[F]
 
   override def second[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (C, A), (C, B)] =
-    super[KleisliCostrong].second(f)
+    super[KleisliProChoice].second(f)
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
 

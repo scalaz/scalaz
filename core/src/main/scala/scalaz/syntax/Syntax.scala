@@ -83,7 +83,7 @@ trait Syntaxes {
 
   object strong extends ToStrongOps
 
-  object costrong extends ToCostrongOps
+  object proChoice extends ToProChoiceOps
 
   object category extends ToCategoryOps
 

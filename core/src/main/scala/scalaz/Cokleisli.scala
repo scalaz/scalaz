@@ -73,7 +73,7 @@ private trait CokleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = C
 
 private trait CokleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-  with Costrong[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+  with ProChoice[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
   with CokleisliProfunctor[F]
   with CokleisliCompose[F] {
 

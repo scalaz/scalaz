@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- * Generalizing upstar of a strong Functor
+ * Strength on a product.
  */
 ////
 trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
