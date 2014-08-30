@@ -190,6 +190,12 @@ trait StreamFunctions {
       case None         => Stream.empty
       case Some((b, a)) => Stream.cons(b, unfold(a)(f))
     }
+
+  def unfoldm[A, B](seed: A)(f: A => Maybe[(B, A)]): Stream[B] =
+    f(seed) match {
+      case Maybe.Empty() => Stream.empty
+      case Maybe.Just((b, a))  => Stream.cons(b, unfoldm(a)(f))
+    }
 }
 
 object stream extends StreamInstances with StreamFunctions {
