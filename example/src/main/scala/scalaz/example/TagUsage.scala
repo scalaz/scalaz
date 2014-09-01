@@ -63,8 +63,8 @@ object TagUsage extends App {
   assert(equalsTrue(Disjunction(true)))
 
   // however at compile time, they appear to be different types, so a
-  // typesafe comparison would fal to compile:
-  // assert(Disjunction(true) === true)
+  // typesafe comparison would fail to compile:
+  // assert(Disjunction(true) == true)
 
   // Tags have an unwrap method which converts the value back to a untagged type:
   assert(Disjunction.unwrap(Disjunction(true)) === true)
