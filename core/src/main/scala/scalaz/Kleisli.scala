@@ -136,7 +136,11 @@ sealed abstract class KleisliInstances1 extends KleisliInstances2 {
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
 
-  implicit def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+  implicit def kleisliStrong[F[_]](implicit F0: Functor[F]): Strong[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliStrong[F] {
+    implicit def F = F0
+  }
+
+  implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProChoice[F] {
     implicit def F = F0
   }
 
@@ -259,13 +263,40 @@ private trait KleisliContravariant[F[_], X] extends Contravariant[({type λ[α] 
 //
 // (* *) -> *
 //
-private trait KleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+private trait KleisliStrong[F[_]] extends Strong[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
 
   implicit def F: Functor[F]
+
+  def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] =
+    Kleisli {
+      case (a, c) => F.map(f.run(a))((b: B) => (b, c))
+    }
+
+  def second[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (C, A), (C, B)] =
+    Kleisli {
+      case (c, a) => F.map(f.run(a))((b: B) => (c, b))
+    }
 
   override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa local f
 
   override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
+}
+
+private trait KleisliProChoice[F[_]] extends ProChoice[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliStrong[F] {
+
+  implicit def F: Applicative[F]
+
+  def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
+    Kleisli {
+      case -\/(a) => F.map(fa run a)(-\/(_))
+      case \/-(b) => F.point(\/-(b))
+    }
+
+  def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
+    Kleisli {
+      case -\/(b) => F.point(-\/(b))
+      case \/-(a) => F.map(fa run a)(\/-(_))
+    }
 }
 
 private trait KleisliCompose[F[_]] extends Compose[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
@@ -279,17 +310,16 @@ private trait KleisliArrow[F[_]]
   extends Arrow[({type λ[α, β] = Kleisli[F, α, β]})#λ]
   with Choice[({type λ[α, β] = Kleisli[F, α, β]})#λ]
   with KleisliCompose[F]
-  with KleisliProfunctor[F] {
+  with KleisliProChoice[F] {
 
   implicit def F: Monad[F]
+
+  override def second[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (C, A), (C, B)] =
+    super[KleisliProChoice].second(f)
 
   def id[A]: Kleisli[F, A, A] = kleisli(a => F.point(a))
 
   def arr[A, B](f: A => B): Kleisli[F, A, B] = kleisli(a => F.point(f(a)))
-
-  def first[A, B, C](f: Kleisli[F, A, B]): Kleisli[F, (A, C), (B, C)] = kleisli[F, (A, C), (B, C)] {
-    case (a, c) => F.map(f.run(a))((b: B) => (b, c))
-  }
 
   def choice[A, B, C](f: => Kleisli[F, A, C], g: => Kleisli[F, B, C]): Kleisli[F, A \/ B, C] =
     Kleisli {

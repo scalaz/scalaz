@@ -81,6 +81,10 @@ trait Syntaxes {
 
   object profunctor extends ToProfunctorOps
 
+  object strong extends ToStrongOps
+
+  object proChoice extends ToProChoiceOps
+
   object category extends ToCategoryOps
 
   object arrow extends ToArrowOps
