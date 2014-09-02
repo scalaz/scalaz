@@ -504,23 +504,23 @@ trait BooleanFunctions {
 }
 
 trait IntFunctions {
-  def heaviside(i: Int) = if (i < 0) 0 else i
+  def heaviside(i: Int):Int = if (i < 0) 0 else 1
 }
 
 trait ShortFunctions {
-  def heaviside(i: Short) = if (i < 0) 0 else i
+  def heaviside(i: Short):Short = if (i < 0) 0 else 1
 }
 
 trait LongFunctions {
-  def heaviside(i: Long) = if (i < 0) 0 else i
+  def heaviside(i: Long):Long = if (i < 0) 0 else 1
 }
 
 trait DoubleFunctions {
-  def heaviside(i: Double) = if (i < 0) 0 else i
+  def heaviside(i: Double):Double = if (i < 0) 0 else 1.0
 }
 
 trait FloatFunctions {
-  def heaviside(i: Float) = if (i < 0) 0 else i
+  def heaviside(i: Float):Float = if (i < 0) 0 else 1.0f
 }
 
 object anyVal extends AnyValInstances
