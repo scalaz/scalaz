@@ -30,8 +30,8 @@ object FunctorUsage extends App {
   // map
   //
 
-  // Option is a which always returns a Some with the function applied
-  // when the Option value is a Some
+  // Option is a functor which always returns a Some with the function
+  // applied when the Option value is a Some
   assert(Functor[Option].map(Some("adsf"))(len) === Some(4))
   // when the Option is a None, it always returns None
   assert(Functor[Option].map(None)(len) === None)
