@@ -31,20 +31,20 @@ object FunctorUsage extends App {
   //
 
   // Option is a functor which always returns a Some with the function
-  // applied when the Option value is a Some
+  // applied when the Option value is a Some.
   assert(Functor[Option].map(Some("adsf"))(len) === Some(4))
-  // when the Option is a None, it always returns None
+  // When the Option is a None, it always returns None
   assert(Functor[Option].map(None)(len) === None)
 
   // List is a functor which applies the function to each element of
-  // the list
+  // the list.
   assert(Functor[List].map(List("qwer", "adsfg"))(len) === List(4,5))
 
   //
   // lift
   //
 
-  // we can use the Funtor to "lift" a function to operate on the Functor type:
+  // We can use the Funtor to "lift" a function to operate on the Functor type:
   val lenOption: Option[String] => Option[Int] = Functor[Option].lift(len)
   assert(lenOption(Some("abcd")) === Some(4))
 
@@ -52,9 +52,9 @@ object FunctorUsage extends App {
   // strength
   //
 
-  // functors in scalaz all come equipped with tensorial strenth! does
+  // Functors in scalaz all come equipped with tensorial strenth! does
   // that sound exciting? It's not that exciting, it means that we get
-  // two additional derrived functions which allow us to turn the
+  // two additional derived functions which allow us to turn the
   // contained values into tuples:
   assert(Functor[List].strengthL("a", List(1,2,3)) === List("a" -> 1, "a" -> 2, "a" -> 3)) 
   assert(Functor[List].strengthR(List(1,2,3), "a") === List(1 -> "a", 2 -> "a", 3 -> "a"))
@@ -79,10 +79,10 @@ object FunctorUsage extends App {
   // void
   //
   
-  // we can "void" a functor, which will change any F[A] into a F[Unit]
+  // We can "void" a functor, which will change any F[A] into a F[Unit]
   assert(Functor[Option].void(Some(1)) === Some(()))
 
-  // you might wonder why such a thing would ever be useful, it will
+  // You might wonder why such a thing would ever be useful, it will
   // become useful when we have functors that control side-effects
   // here's a bit of a contrived example to show where we might want
   // to void a functor.
@@ -92,7 +92,7 @@ object FunctorUsage extends App {
                      "aaa" → 2,
                      "qqq" → 3)
 
-  // return a Task which removes items from our database and returns the number of items deleted
+  // Return a Task which removes items from our database and returns the number of items deleted
   def del(f: String => Boolean): Task[Int] = Task.delay {
     val (count, db) = database.foldRight(0 → List.empty[(String,Int)]) {
       case ((k,_),(d,r)) if f(k) => (d+1, r)
@@ -102,7 +102,7 @@ object FunctorUsage extends App {
     count
   }
 
-  // this is a task which will delete two of the three items in our database
+  // This is a task which will delete two of the three items in our database,
   val delTask = del(_.startsWith("a"))
 
   // it hasn't run yet
@@ -113,20 +113,20 @@ object FunctorUsage extends App {
   // a Task[Unit]
   val voidTask: Task[Unit] = Functor[Task].void(delTask)
 
-  // there is syntax for void
+  // There is syntax for void.
   val voidTask2: Task[Unit] = delTask.void
 
-  // running the task returns a Unit
+  // Running the task returns a Unit.
   assert(voidTask.run === ())
 
-  // and now our database is smaller
+  // And now our database is smaller
   assert(database.size === 1)
 
   //
   // Composition
   //
 
-  // functors compose! Given any Functor F[_] and any Functor G[_] we
+  // Functors compose! Given any Functor F[_] and any Functor G[_] we
   // can compose the two Functors to create a new Functor on F[G[_]]:
   val listOpt = Functor[List] compose Functor[Option]
   assert(listOpt.map(List(Some(1), None, Some(3)))(_ + 1) === List(Some(2), None, Some(4)))
