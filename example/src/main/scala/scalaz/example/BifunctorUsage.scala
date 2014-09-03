@@ -15,7 +15,7 @@ import std.either._
 /**
   * A Bifunctor is very similar to a Functor, which you are hopefully
   * already familiar with. Whereas a Functor operates on a * → * and
-  * has a single operation `map` which takes a finction from A => B to
+  * has a single operation `map` which takes a function from A => B to
   * map a F[A] to a F[B], a Bifunctor operates on a *,* → * and has a
   * single operation `bimap` which takes two functions: A ⇒ C and a 
   * B ⇒ D to map a F[A,B] to a F[C,D]:
@@ -76,7 +76,7 @@ object BifunctorUsage extends App {
   //
 
   // we can compose a functor with a bifunctor to get a new bifunctor.
-  // for example, if we have a list a type for which we have a
+  // for example, if we have a list of a type for which we have a
   // bifunctor, we can get a bimap that operates on every item in the
   // list
   val bff = Functor[List] bicompose Bifunctor[\/]
