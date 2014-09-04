@@ -102,6 +102,10 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
 object WriterT extends WriterTInstances with WriterTFunctions
 
 sealed abstract class WriterTInstances12 {
+  implicit def writerTMonoid[F[_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
+    def zero = WriterT(M.zero)
+    def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
+  }
   implicit def writerFunctor[W]: Functor[({type λ[α]=Writer[W, α]})#λ] = new WriterTFunctor[Id, W] {
     implicit def F = idInstance
   }

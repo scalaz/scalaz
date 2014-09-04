@@ -14,6 +14,7 @@ object WriterTTest extends SpecLite {
   type WriterTOptInt[A] = WriterTOpt[Int, A]
 
   checkAll(equal.laws[WriterTOptInt[Int]])
+  checkAll(monoid.laws[WriterTOptInt[Int]])
   checkAll(monad.laws[WriterTOptInt])
   checkAll(traverse.laws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
