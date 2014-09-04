@@ -282,5 +282,15 @@ package object scalaz {
   type IMap[A, B] = ==>>[A, B]
   val IMap = ==>>
 
-  type Disjunction[+A, +B] = A \/ B
+  type Disjunction[+A, +B] = \/[A, B]
+  val Disjunction = \/
+
+  type DLeft[+A] = -\/[A]
+  val DLeft = -\/
+
+  type DRight[+B] = \/-[B]
+  val DRight = \/-
+
+  type DisjunctionT[F[+_], A, B] = EitherT[F, A, B]
+  val DisjunctionT = EitherT
 }
