@@ -103,6 +103,11 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
 object WriterT extends WriterTFunctions with WriterTInstances {
   def apply[F[+_], W, A](v: F[(W, A)]): WriterT[F, W, A] =
     writerT(v)
+
+  implicit def writerTMonoid[F[+_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
+    def zero = WriterT(M.zero)
+    def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
+  }
 }
 
 trait WriterTInstances12 {
