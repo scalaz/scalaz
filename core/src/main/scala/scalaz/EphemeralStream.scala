@@ -253,7 +253,7 @@ trait EphemeralStreamFunctions {
   def iterate[A](start: A)(f: A => A): EphemeralStream[A] =
     unfold(start){ a =>
       val fa = f(a)
-      Some((fa, fa))
+      Some((a, fa))
     }
 
   def range(lower: Int, upper: Int): EphemeralStream[Int] =
