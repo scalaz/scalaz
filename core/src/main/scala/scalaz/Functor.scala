@@ -15,6 +15,7 @@ package scalaz
 ////
 trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   ////
+  import Liskov.<~<
 
   /** Lift `f` into `F` and apply to `F[A]`. */
   def map[A, B](fa: F[A])(f: A => B): F[B]
@@ -86,6 +87,13 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 
     implicit def G = G0
   }
+
+  /**
+   * Functors are covariant by nature, so we can treat an `F[A]` as
+   * an `F[B]` if `A` is a subtype of `B`.
+   */
+  def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
+    map(fa)(ev.apply)
 
   trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */

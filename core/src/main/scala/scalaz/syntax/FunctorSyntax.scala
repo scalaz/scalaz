@@ -5,6 +5,7 @@ package syntax
 final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) extends Ops[F[A]] {
   ////
   import Leibniz.===
+  import Liskov.<~<
 
   final def map[B](f: A => B): F[B] = F.map(self)(f)
   final def distribute[G[_], B](f: A => G[B])(implicit D: Distributive[G]): G[F[B]] = D.distribute(self)(f)
@@ -19,6 +20,7 @@ final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: F
   final def fpoint[G[_]: Applicative]: F[G[A]] = F.map(self)(a => Applicative[G].point(a))
   final def >|[B](b: => B): F[B] = F.map(self)(_ => b)
   final def as[B](b: => B): F[B] = F.map(self)(_ => b)
+  final def widen[B](implicit ev: A <~< B): F[B] = F.widen(self)
   ////
 }
 
