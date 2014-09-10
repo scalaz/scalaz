@@ -52,7 +52,7 @@ object EphemeralStreamTest extends SpecLite {
 
   "take from infinite stream" in {
     val n = util.Random.nextInt(1000)
-    EphemeralStream.iterate(0)(_ + 1).take(n) must_===(EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).take(n)))
+    EphemeralStream.iterate(0)(_ + 1).take(n) must_===(EphemeralStream.fromStream(Stream.iterate(0)(_ + 1).take(n)))
   }
 
   "takeWhile" ! forAll { (xs: Stream[Int], n: Int) =>
@@ -61,7 +61,7 @@ object EphemeralStreamTest extends SpecLite {
 
   "takeWhile from infinite stream" in {
     val n = util.Random.nextInt(1000)
-    EphemeralStream.iterate(0)(_ + 1).takeWhile(_ < n) must_===(EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).takeWhile(_ < n)))
+    EphemeralStream.iterate(0)(_ + 1).takeWhile(_ < n) must_===(EphemeralStream.fromStream(Stream.iterate(0)(_ + 1).takeWhile(_ < n)))
   }
 
   "index" ! forAll {(xs: EphemeralStream[Int], i: Int) =>
@@ -94,7 +94,7 @@ object EphemeralStreamTest extends SpecLite {
     EphemeralStream.iterate(0)(_ + 1).tails
       .map(t => Foldable[EphemeralStream].toStream(t.take(n)))
       .take(n) must_===(
-      EphemeralStream.fromStream(Stream.iterate(1)(_ + 1).tails.map(_ take n).toStream.take(n))
+      EphemeralStream.fromStream(Stream.iterate(0)(_ + 1).tails.map(_ take n).toStream.take(n))
     )
   }
 
