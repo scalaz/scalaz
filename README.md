@@ -297,7 +297,7 @@ implicitly[Functor[OptionTList]]
 // Candidates:
 // 1. OptionT.OptionTFunctor[List](implicitly[Functor[List]])
 // 2. OptionT.OptionTMonad[List](implicitly[Functor[List]])
-// #2 is defined in a subclass of of the enclosing class of #1, so is preferred.
+// #2 is defined in a subclass of the enclosing class of #1, so #2 is preferred.
 ```
 
 ### Transformers and Identity
