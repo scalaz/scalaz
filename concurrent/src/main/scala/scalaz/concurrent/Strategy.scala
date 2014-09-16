@@ -15,28 +15,37 @@ trait Strategy {
   def apply[A](a: => A): () => A
 }
 
-object Strategy extends Strategys
+object Strategy extends Strategys {
+
+  /**
+   * Default thread factory to mark all threads as daemon
+   */
+  lazy val DefaultDaemonThreadFactory = new ThreadFactory {
+    val defaultThreadFactory = Executors.defaultThreadFactory()
+    def newThread(r: Runnable) = {
+      val t = defaultThreadFactory.newThread(r)
+      t.setDaemon(true)
+      t
+    }
+  }
+}
 
 trait Strategys extends StrategysLow {
+  import Strategy.DefaultDaemonThreadFactory
+
   /**
    * The default executor service is a fixed thread pool with N daemon threads,
    * where N is equal to the number of available processors.
    */
   val DefaultExecutorService: ExecutorService = {
-    Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, new ThreadFactory {
-      val defaultThreadFactory = Executors.defaultThreadFactory()
-      def newThread(r: Runnable) = {
-        val t = defaultThreadFactory.newThread(r)
-        t.setDaemon(true)
-        t
-      }
-    })
+    Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
   }
 
   /**
    * Default scheduler used for scheduling the tasks like timeout.
    */
-  val DefaultTimeoutScheduler: ScheduledExecutorService =  Executors.newScheduledThreadPool(1)
+  val DefaultTimeoutScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1,
+    DefaultDaemonThreadFactory)
 
   /**
    * A strategy that executes its arguments on `DefaultExecutorService`
