@@ -282,11 +282,11 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
 trait EitherTFunctions {
   def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
 
-  def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]): MonadTell[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] = new EitherTMonadTell[F, W, A]{
+  def monadTell[F[_, _], W, A](implicit MT0: MonadTell[F, W]): EitherTMonadTell[F, W, A] = new EitherTMonadTell[F, W, A]{
     def MT = MT0
   }
 
-  def monadListen[F[_, _], W, A](implicit ML0: MonadListen[F, W]): MonadListen[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] = new EitherTMonadListen[F, W, A]{
+  def monadListen[F[_, _], W, A](implicit ML0: MonadListen[F, W]): EitherTMonadListen[F, W, A] = new EitherTMonadListen[F, W, A]{
     def MT = ML0
   }
 }
@@ -371,7 +371,7 @@ private trait EitherTHoist[A] extends Hoist[({type λ[α[_], β] = EitherT[α, A
   implicit def apply[M[_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }
 
-private trait EitherTMonadTell[F[_, _], W, A] extends MonadTell[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[α] = F[W, α]})#λ, A] with EitherTHoist[A] {
+private[scalaz] trait EitherTMonadTell[F[_, _], W, A] extends MonadTell[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonad[({type λ[α] = F[W, α]})#λ, A] with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
   implicit def F = MT
@@ -386,7 +386,7 @@ private trait EitherTMonadTell[F[_, _], W, A] extends MonadTell[({type λ[α, β
     EitherT.right[({type λ[α] = F[W, α]})#λ, A, B](MT.point(v))
 }
 
-private trait EitherTMonadListen[F[_, _], W, A] extends MonadListen[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
+private[scalaz] trait EitherTMonadListen[F[_, _], W, A] extends MonadListen[({type λ[α, β] = EitherT[({type f[x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadTell[F, W, A] {
   implicit def MT: MonadListen[F, W]
 
   def listen[B](ma: EitherT[({type λ[α] = F[W, α]})#λ, A, B]): EitherT[({type λ[α] = F[W, α]})#λ, A, (B, W)] = {
