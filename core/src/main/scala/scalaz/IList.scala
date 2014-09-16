@@ -603,6 +603,9 @@ sealed abstract class IListInstances extends IListInstance0 {
         }
         loop(fa)
       }
+
+      override def widen[A, B](fa: IList[A])(implicit ev: A <~< B): IList[B] =
+        fa.widen[B]
     }
 
 
