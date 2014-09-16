@@ -22,13 +22,25 @@ class FutureTest extends SpecLite {
 
   val duration: Duration = 1.seconds
 
-  implicit def futureEqual[A : Equal] = Equal[A] contramap { future: Future[A] => Await.result(future, duration) }
+  implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
+
+  implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
+    val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
+    Await.result(futureWithError, duration)
+  }
 
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
+
+  case class SomeFailure(n: Int) extends Exception
+
+  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
 
   checkAll(monad.laws[Future])
   checkAll(monoid.laws[Future[Int]])
   checkAll(monoid.laws[Future[Int @@ Multiplication]])
+
+  // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
+  checkAll(monadError.laws[({ type f[a, b] = Future[b] })#f, Throwable](implicitly, implicitly, implicitly, implicitly, ArbitraryThrowable))
 
   // Scope these away from the rest as Copointed[Future] is a little evil.
   // Should fail to compile by default: implicitly[Copointed[Future]]
