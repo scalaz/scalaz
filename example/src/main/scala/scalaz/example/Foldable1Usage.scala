@@ -4,6 +4,7 @@ import scalaz.{Foldable1,IList,NonEmptyList,OneAnd}
 import scalaz.syntax.foldable1._
 import scalaz.syntax.equal._
 import scalaz.std.anyVal._
+import scalaz.std.option._
 import scalaz.std.string._
 
 object Foldable1Usage extends App {
