@@ -8,6 +8,9 @@ import Id._
 final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   import Kleisli._
 
+  def dimap[C, D](f: C => A, g: B => D)(implicit b: Functor[M]): Kleisli[M, C, D] =
+    Kleisli(c => b.map(run(f(c)))(g))
+
   /** alias for `andThen` */
   def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k.run))
 

@@ -5,6 +5,9 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
 
   import NullArgument._
 
+  def dimap[C, D](f: C => A, g: B => D): NullArgument[C, D] =
+    NullArgument(c => g(_apply(c.map(f))))
+
   def map[C](f: B => C): A ?=> C =
     NullArgument(_apply andThen f)
 
@@ -113,6 +116,16 @@ sealed abstract class NullArgumentInstances0 {
   implicit def nullArgumentSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullArgument[A, B]] =
     new NullArgumentSemigroup[A, B] {
       implicit val M = M0
+    }
+
+  implicit val nullArgumentProfunctor: Profunctor[NullArgument] =
+    new Profunctor[NullArgument] {
+      def mapfst[A, B, C](fab: NullArgument[A, B])(f: C => A) =
+        fab contramap f
+      def mapsnd[A, B, C](fab: NullArgument[A, B])(f: B => C) =
+        fab map f
+      override def dimap[A, B, C, D](fab: NullArgument[A, B])(f: C => A)(g: B => D) =
+        fab.dimap(f, g)
     }
 
 }
