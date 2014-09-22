@@ -4,6 +4,10 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
   def apply(fa: F[A]): B =
     run(fa)
 
+
+  def dimap[C, D](f: C => A, g: B => D)(implicit b: Functor[F]): Cokleisli[F, C, D] =
+    Cokleisli(c => g(run(b.map(c)(f)))) // b.map(run(f(c)))(g))
+
   def contramapValue[C](f: F[C] => F[A]): Cokleisli[F, C,  B] = Cokleisli(run compose f)
 
   def map[C](f: B => C): Cokleisli[F, A, C] = Cokleisli(f compose run)
@@ -63,6 +67,9 @@ private trait CokleisliCompose[F[_]] extends Compose[({type λ[α, β] = Cokleis
 
 private trait CokleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ] {
   implicit def F: Functor[F]
+
+  override def dimap[A, B, C, D](fab: Cokleisli[F, A, B])(f: C => A)(g: B => D) =
+    fab.dimap(f, g)
 
   override final def mapfst[A, B, C](fa: Cokleisli[F, A, B])(f: C => A) =
     Cokleisli[F, C, B](fc => fa(F.map(fc)(f)))
