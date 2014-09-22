@@ -69,6 +69,7 @@ trait OptionInstances extends OptionInstances0 {
       fa map \/.right getOrElse -\/(None)
     override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
     override def toOption[A](fa: Option[A]): Option[A] = fa
+    override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
   }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
