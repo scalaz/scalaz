@@ -135,6 +135,14 @@ sealed abstract class KleisliInstances2 extends KleisliInstances3 {
 sealed abstract class KleisliInstances1 extends KleisliInstances2 {
   implicit def kleisliIdApplicative[R]: Applicative[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApplicative[Id, R]
 
+  implicit def kleisliProfunctor[F[_]: Functor]: Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] = new Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+    def mapfst[A, B, C](fab: Kleisli[F, A, B])(f: C => A) =
+      fab local f
+    def mapsnd[A, B, C](fab: Kleisli[F, A, B])(f: B => C) =
+      fab map f
+    override def dimap[A, B, C, D](fab: Kleisli[F, A, B])(f: C => A)(g: B => D) =
+      fab.dimap(f, g)
+  }
 }
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
@@ -158,15 +166,6 @@ abstract class KleisliInstances extends KleisliInstances0 {
   }
 
   implicit def kleisliContravariant[F[_], A]: Contravariant[({type λ[α] = Kleisli[F, α, A]})#λ] = new KleisliContravariant[F, A] {}
-
-  implicit def kleisliProfunctor[F[_]: Functor]: Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] = new Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
-    def mapfst[A, B, C](fab: Kleisli[F, A, B])(f: C => A) =
-      fab local f
-    def mapsnd[A, B, C](fab: Kleisli[F, A, B])(f: B => C) =
-      fab map f
-    override def dimap[A, B, C, D](fab: Kleisli[F, A, B])(f: C => A)(g: B => D) =
-      fab.dimap(f, g)
-  }
 
   implicit def kleisliIdMonadReader[R]: MonadReader[({type λ[α, β] = Kleisli[Id, α, β]})#λ, R] = kleisliMonadReader[Id, R]
 
