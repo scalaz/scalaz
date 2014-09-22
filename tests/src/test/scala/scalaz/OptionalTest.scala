@@ -1,5 +1,6 @@
 package scalaz
 
+import Scalaz.Id
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
@@ -65,6 +66,10 @@ object OptionalTest extends SpecLite {
 
     definedTests(success(1), 1, 0, success(0))
     undefinedTests(failure("oO"), 0, success(0))
+  }
+
+  "Id instance tests" in {
+    definedTests[Id, Int](1, 1, 0, 0)
   }
 
   "Maybe instance tests" in {
