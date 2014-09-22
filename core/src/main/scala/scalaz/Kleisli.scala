@@ -8,6 +8,9 @@ import Id._
 final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   import Kleisli._
 
+  def dimap[C, D](f: C => A, g: B => D)(implicit b: Functor[M]): Kleisli[M, C, D] =
+    Kleisli(c => b.map(run(f(c)))(g))
+
   /** alias for `andThen` */
   def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k.run))
 
@@ -155,6 +158,15 @@ abstract class KleisliInstances extends KleisliInstances0 {
   }
 
   implicit def kleisliContravariant[F[_], A]: Contravariant[({type λ[α] = Kleisli[F, α, A]})#λ] = new KleisliContravariant[F, A] {}
+
+  implicit def kleisliProfunctor[F[_]: Functor]: Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] = new Profunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ] {
+    def mapfst[A, B, C](fab: Kleisli[F, A, B])(f: C => A) =
+      fab local f
+    def mapsnd[A, B, C](fab: Kleisli[F, A, B])(f: B => C) =
+      fab map f
+    override def dimap[A, B, C, D](fab: Kleisli[F, A, B])(f: C => A)(g: B => D) =
+      fab.dimap(f, g)
+  }
 
   implicit def kleisliIdMonadReader[R]: MonadReader[({type λ[α, β] = Kleisli[Id, α, β]})#λ, R] = kleisliMonadReader[Id, R]
 

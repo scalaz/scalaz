@@ -6,6 +6,9 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   import NullResult._
   import NullArgument._
 
+  def dimap[C, D](f: C => A, g: B => D): NullResult[C, D] =
+    NullResult(c => apply(f(c)) map g)
+
   def map[C](f: B => C): A =>? C =
     NullResult(apply(_) map f)
 
@@ -148,6 +151,16 @@ sealed abstract class NullResultInstances0 {
   implicit def nullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
       implicit val M = M0
+    }
+
+  implicit val nullResultProfunctor: Profunctor[NullResult] =
+    new Profunctor[NullResult] {
+      def mapfst[A, B, C](fab: NullResult[A, B])(f: C => A) =
+        fab contramap f
+      def mapsnd[A, B, C](fab: NullResult[A, B])(f: B => C) =
+        fab map f
+      override def dimap[A, B, C, D](fab: NullResult[A, B])(f: C => A)(g: B => D) =
+        fab.dimap(f, g)
     }
 
 }
