@@ -196,5 +196,14 @@ object TaskTest extends SpecLite {
       t3v.get must_== 0
     }
   }
+
+  "fromMaybe empty fails" ! forAll { t: Throwable =>
+    Task.fromMaybe(Maybe.empty)(t).attemptRun.isLeft
+  }
+
+  "fromMaybe just succeeds" ! forAll { (n: Int, t: Throwable) =>
+    Task.fromMaybe(Maybe.just(n))(t).attemptRun.isRight
+  }
+
 }
 
