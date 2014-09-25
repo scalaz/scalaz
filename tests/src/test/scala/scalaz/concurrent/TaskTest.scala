@@ -277,5 +277,14 @@ object TaskTest extends SpecLite {
     Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.run
     x == (xs.length + 1)
   }
+
+  "fromMaybe empty fails" ! forAll { t: Throwable =>
+    Task.fromMaybe(Maybe.empty)(t).attemptRun.isLeft
+  }
+
+  "fromMaybe just succeeds" ! forAll { (n: Int, t: Throwable) =>
+    Task.fromMaybe(Maybe.just(n))(t).attemptRun.isRight
+  }
+
 }
 

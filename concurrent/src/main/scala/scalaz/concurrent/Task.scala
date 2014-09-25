@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -376,5 +376,8 @@ object Task {
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
     try \/-(a) catch { case e: Throwable => -\/(e) }
+
+  def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
+    ma.cata(Task.now, Task.fail(t))
 }
 
