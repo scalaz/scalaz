@@ -300,4 +300,7 @@ object Task {
 
   def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
     ma.cata(Task.now, Task.fail(t))
+
+  def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
+    x.fold(Task.fail, Task.now)
 }
