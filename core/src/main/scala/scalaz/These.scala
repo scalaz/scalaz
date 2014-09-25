@@ -39,6 +39,41 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
       case Both(_, b) => Some(b)
     }
 
+  def onlyThis: Option[A] =
+    this match {
+      case This(a) => Some(a)
+      case That(_) => None
+      case Both(_, _) => None
+    }
+
+  def onlyThat: Option[B] =
+    this match {
+      case This(_) => None
+      case That(b) => Some(b)
+      case Both(_, _) => None
+    }
+
+  def onlyThisOrThat: Option[A \/ B] =
+    this match {
+      case This(a) => Some(-\/(a))
+      case That(b) => Some(\/-(b))
+      case Both(_, _) => None
+    }
+
+  def onlyBoth: Option[(A, B)] =
+    this match {
+      case This(_) => None
+      case That(_) => None
+      case Both(a, b) => Some(a, b)
+    }
+
+  def pad: (Option[A], Option[B]) =
+    this match {
+      case This(a) => (Some(a), None)
+      case That(b) => (None, Some(b))
+      case Both(a, b) => (Some(a), Some(b))
+    }
+
   def fold[X](s: A => X, t: B => X, q: (A, B) => X): X =
     this match {
       case This(a) => s(a)
@@ -224,6 +259,12 @@ object \&/ extends TheseInstances with TheseFunctions {
   final case class This[A, B](aa: A) extends (A \&/ B)
   final case class That[A, B](bb: B) extends (A \&/ B)
   final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
+
+  def apply[A, B](a: A, b: B): These[A, B] =
+    Both(a, b)
+
+  def unapply[A, B](t: Both[A, B]): Some[(A, B)] =
+    Some((t.aa, t.bb))
 }
 
 trait TheseFunctions {

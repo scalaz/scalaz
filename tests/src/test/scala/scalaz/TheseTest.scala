@@ -21,6 +21,15 @@ object TheseTest extends SpecLite {
     }
   }
 
+  "onlyThisOrThat" should {
+    "be invertible" ! forAll { ab: Int \/ String =>
+      ab.fold[Int \&/ String](This(_), That(_)).onlyThisOrThat must_=== Some(ab)
+    }
+    "handle both" ! forAll { (a: Int, b: String) =>
+      \&/.Both(a,b).onlyThisOrThat must_=== None
+    }
+  }
+
   object instances {
     def functor[L] = Functor[({type λ[α] = L \&/ α})#λ]
     def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
