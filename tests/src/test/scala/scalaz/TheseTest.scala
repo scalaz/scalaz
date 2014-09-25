@@ -28,6 +28,15 @@ object TheseTest extends SpecLite {
     }
   }
 
+  "disjunction/fromDisjunction" should {
+    "be invertible" ! forAll { ab: Int \/ String =>
+      \&/.fromDisjunction(ab).disjunction must_=== Some(ab)
+    }
+    "handle both" ! forAll { (a: Int, b: String) =>
+      \&/.Both(a,b).disjunction must_=== None
+    }
+  }
+
   object instances {
     def functor[L] = Functor[({type λ[α] = L \&/ α})#λ]
     def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
