@@ -39,6 +39,13 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
       case Both(_, b) => Some(b)
     }
 
+  def disjunction: Option[A \/ B] =
+    this match {
+      case This(a) => Some(-\/(a))
+      case That(b) => Some(\/-(b))
+      case Both(_, _) => None
+    }
+
   def onlyThis: Option[A] =
     this match {
       case This(a) => Some(a)
@@ -248,6 +255,9 @@ object \&/ extends TheseInstances with TheseFunctions {
 
   def apply[A, B](a: A, b: B): These[A, B] =
     Both(a, b)
+
+  def fromDisjunction[A, B](ab: A \/ B): These[A, B] =
+    ab.fold(This(_), That(_))
 
   def unapply[A, B](t: Both[A, B]): Some[(A, B)] =
     Some((t.aa, t.bb))
