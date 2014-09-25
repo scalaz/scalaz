@@ -28,12 +28,12 @@ object TheseTest extends SpecLite {
     }
   }
 
-  "disjunction/fromDisjunction" should {
+  "onlyThisOrThat" should {
     "be invertible" ! forAll { ab: Int \/ String =>
-      \&/.fromDisjunction(ab).disjunction must_=== Some(ab)
+      ab.toThese.onlyThisOrThat must_=== Some(ab)
     }
     "handle both" ! forAll { (a: Int, b: String) =>
-      \&/.Both(a,b).disjunction must_=== None
+      \&/.Both(a,b).onlyThisOrThat must_=== None
     }
   }
 
