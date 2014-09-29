@@ -14,12 +14,12 @@ import std.function._
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
  */
-final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
+final class DList[A] private[scalaz](f: (IList[A]) => Trampoline[IList[A]]) {
   import DList._
-  def apply(xs: => List[A]): Trampoline[List[A]] = f(xs)
+  def apply(xs: => IList[A]): Trampoline[IList[A]] = f(xs)
 
   /** Convert to a normal list. */
-  def toList: List[A] = apply(List()).run
+  def toList: List[A] = apply(IList()).run.toList
 
   /** Prepend a single element in constant time. */
   def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
@@ -33,9 +33,9 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-    (apply(List()) >>= {
-      case List() => return_(z)
-      case x :: xs => return_(f(x, fromList(xs)))
+    (apply(IList()) >>= {
+      case INil() => return_(z)
+      case ICons(x, xs) => return_(f(x, fromIList(xs)))
     }).run
 
   /** Get the first element of the list, if any. */
@@ -64,7 +64,7 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
 }
 
 object DList extends DListInstances with DListFunctions {
-  def apply[A](xs: A*) = fromList(xs.toList)
+  def apply[A](xs: A*): DList[A] = fromList(xs.toList)
 }
 
 sealed abstract class DListInstances {
@@ -89,16 +89,18 @@ sealed abstract class DListInstances {
 }
 
 trait DListFunctions {
-  def mkDList[A](f: (List[A]) => Trampoline[List[A]]): DList[A] =
+  def mkDList[A](f: (IList[A]) => Trampoline[IList[A]]): DList[A] =
     new DList[A](f)
-  def DL[A](f: (=> List[A]) => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
+  def DL[A](f: (=> IList[A]) => IList[A]): DList[A] = mkDList(xs => return_(f(xs)))
   def fromList[A](as: => List[A]): DList[A] =
+    fromIList(IList.fromList(as))
+  def fromIList[A](as: => IList[A]): DList[A] =
     DL(bs => as ++ bs)
-  def concat[A](xs: List[DList[A]]): DList[A] =
+  def concat[A](xs: IList[DList[A]]): DList[A] =
     xs.foldRight(DList[A]())(_ ++ _)
   def replicate[A](n: Int, a: A): DList[A] =
     DL(xs => {
-      def go(m: Int): List[A] = if (m <= 0) xs else a :: go(m - 1)
+      def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
       go(n)
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {
