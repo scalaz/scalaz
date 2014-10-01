@@ -50,4 +50,7 @@ object NonEmptyListTest extends SpecLite {
     val largeNel = NonEmptyList.nel(0, (1 to 100000).toList)
     (largeNel map Option.apply).sequence must_===(Option(largeNel))
   }
+  "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
+    Foldable1[NonEmptyList].toNel(xs) must_=== xs
+  }
 }
