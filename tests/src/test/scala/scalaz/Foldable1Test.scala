@@ -53,4 +53,9 @@ object Foldable1Test extends SpecLite {
     (l: NonEmptyList[List[Int]], x: List[Int]) =>
       l.intercalate1(x) must_=== Foldable[List].intercalate(l.list, x)
   }
+
+  "toNel" ! forAll {
+    intAnd: OneAnd[List, Int] =>
+    intAnd.toNel must_=== NonEmptyList.nel(intAnd.head, intAnd.tail)
+  }
 }

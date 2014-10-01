@@ -177,6 +177,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
+
+      override def toNel[A](fa: NonEmptyList[A]) = fa
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
