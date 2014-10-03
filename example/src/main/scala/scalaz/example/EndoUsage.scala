@@ -54,7 +54,7 @@ object EndoUsage extends App {
   val stewBefore = Person(" Stew ", "O'Connor", 70)
   assert(endos.suml.apply(stewBefore) == Person("stew", "o'connor", 71))
 
-  // endofunctors can be zipped together to get back an endofucntor that operates on tuples:
+  // endofunctors can be zipped together to get back an endofunctor that operates on tuples:
   val ints = IList(1,2,3)
   val strings = IList("a","b","c")
 
