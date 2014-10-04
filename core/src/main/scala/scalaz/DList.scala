@@ -33,9 +33,11 @@ final class DList[A] private[scalaz](f: (IList[A]) => Trampoline[IList[A]]) {
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-    (apply(IList()) >>= {
+   (apply(IList()) >>= {
       case INil() => return_(z)
-      case ICons(x, xs) => return_(f(x, fromIList(xs)))
+      case ICons(x, xs) => 
+        val r = f(x, fromIList(xs))
+        return_(r)
     }).run
 
   /** Get the first element of the list, if any. */
@@ -45,19 +47,18 @@ final class DList[A] private[scalaz](f: (IList[A]) => Trampoline[IList[A]]) {
   def tailOption: Option[DList[A]] = uncons(None, (_, y) => Some(y))
 
   /** Fold over a difference list. */
-  def foldr[B](z: => B)(f: (A, => B) => B): B = {
-    def go(xs: DList[A], z: => B, f: (A, => B) => B): Trampoline[B] =
-      suspend(xs.uncons(return_(z), (h, t) => go(t, z, f) map (x => f(h, x))))
-    go(this, z, f).run
-  }
-
+  def foldr[B](z: => B)(f: (A, => B) => B): B =  
+    apply(IList[A]()).run.foldRight(z)((a,b) => f(a,b))
+  
   /** Map over a difference list. */
   def map[B](f: A => B): DList[B] =
-    foldr(DList[B]())((x, y) => f(x) +: y)
+    DL(dl => (apply(IList[A]()).run.map(f)) ++ dl)
 
   /** Map over a difference list, then flatten. */
-  def flatMap[B](f: A => DList[B]) =
-    foldr(DList[B]())((x, y) => f(x) ++ y)
+  def flatMap[B](f: A => DList[B]): DList[B] = {
+    println("FLATMAP") 
+   foldr(DList[B]())((x, y) => f(x) ++ y)
+  }
 
   def zip[B](bs: => DList[B]): DList[(A,B)] = uncons(DList(), (h,t) => bs.uncons(DList(), (h2,t2) => (h → h2) +: (t zip t2)))
 
@@ -92,12 +93,16 @@ trait DListFunctions {
   def mkDList[A](f: (IList[A]) => Trampoline[IList[A]]): DList[A] =
     new DList[A](f)
   def DL[A](f: (=> IList[A]) => IList[A]): DList[A] = mkDList(xs => return_(f(xs)))
+  
   def fromList[A](as: => List[A]): DList[A] =
     fromIList(IList.fromList(as))
+
   def fromIList[A](as: => IList[A]): DList[A] =
     DL(bs => as ++ bs)
+  
   def concat[A](xs: IList[DList[A]]): DList[A] =
     xs.foldRight(DList[A]())(_ ++ _)
+  
   def replicate[A](n: Int, a: A): DList[A] =
     DL(xs => {
       def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
