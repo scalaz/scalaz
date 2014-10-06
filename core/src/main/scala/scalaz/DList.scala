@@ -55,13 +55,10 @@ final class DList[A] private[scalaz](f: (IList[A]) => Trampoline[IList[A]]) {
     DL(dl => (apply(IList[A]()).run.map(f)) ++ dl)
 
   /** Map over a difference list, then flatten. */
-  def flatMap[B](f: A => DList[B]): DList[B] = {
-    println("FLATMAP") 
+  def flatMap[B](f: A => DList[B]): DList[B] = 
    foldr(DList[B]())((x, y) => f(x) ++ y)
-  }
-
+  
   def zip[B](bs: => DList[B]): DList[(A,B)] = uncons(DList(), (h,t) => bs.uncons(DList(), (h2,t2) => (h → h2) +: (t zip t2)))
-
 }
 
 object DList extends DListInstances with DListFunctions {
