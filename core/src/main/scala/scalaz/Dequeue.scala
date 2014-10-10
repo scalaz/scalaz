@@ -18,6 +18,7 @@ package scalaz
   */
 sealed abstract class Dequeue[A] {
   import Maybe.Just
+  import Dequeue.reverseNEL
 
   def isEmpty: Boolean
 
@@ -43,7 +44,7 @@ sealed abstract class Dequeue[A] {
     */
   def unsnoc: Maybe[(A, Dequeue[A])] = this match {
     case EmptyDequeue() => Maybe.empty
-    case SingletonDequeue(a) => Just((a, EmptyDequeue())) 
+    case SingletonDequeue(a) => Just((a, EmptyDequeue()))
     case FullDequeue(OneAnd(single, INil()), 1, OneAnd(b, INil()), 1) => Just((b, SingletonDequeue(single)))
     case FullDequeue(OneAnd(x, ICons(xx,xs)), fs, OneAnd(b, INil()), 1) => {
       val xsr = reverseNEL(OneAnd(xx, xs))
@@ -53,8 +54,6 @@ sealed abstract class Dequeue[A] {
     case FullDequeue(front, fs, OneAnd(b, ICons(bb,bs)), s) => Just((b, FullDequeue(front, fs, OneAnd(bb,bs), s-1)))
   }
 
-  def reverseNEL[A](fa: NonEmptyIList[A]): NonEmptyIList[A] =
-    fa.tail.foldLeft[NonEmptyIList[A]](OneAnd(fa.head, INil()))((as,a) => OneAnd(a, ICons(as.head, as.tail)))
 
   /**
     * enqueue to the front of the queue
@@ -100,7 +99,7 @@ sealed abstract class Dequeue[A] {
   def toIList: IList[A] = this match {
     case EmptyDequeue() => INil()
     case SingletonDequeue(a) => ICons(a, INil())
-    case FullDequeue(front, fs, back, bs) => front.head +: (front.tail ++ (back.tail.reverse ++ (ICons(back.head, INil()))))
+    case FullDequeue(front, fs, back, bs) => front.head +: (front.tail ++ (back.tail reverse_::: ICons(back.head, INil())))
   }
 
   /**
@@ -123,8 +122,8 @@ sealed abstract class Dequeue[A] {
       case SingletonDequeue(a) => this :+ a
       case FullDequeue(of,ofs,ob,obs) =>
         FullDequeue(OneAnd(f.head, (f.tail ++
-                                      (b.head +: b.tail).reverse ++
-                                      ICons(of.head, of.tail))),
+                                      ((b.head +: b.tail) reverse_:::
+                                      ICons(of.head, of.tail)))),
                                     fs + bs + ofs,
                                     ob,
                                     obs)
@@ -142,7 +141,7 @@ sealed abstract class Dequeue[A] {
   }
 
   def foldRight[B](b: B)(f: (A,B) => B): B = this match {
-  case EmptyDequeue() => b
+    case EmptyDequeue() => b
     case SingletonDequeue(a) => f(a, b)
     case FullDequeue(front,_,back,_) => {
       val backb = back.tail.foldLeft(f(back.head, b))((b,a) => f(a,b))
@@ -188,6 +187,18 @@ object Dequeue extends DequeueInstances {
       case Maybe.Empty() => Stream.empty
       case Maybe.Just((b, a))  => Stream.cons(b, unfoldm(a)(f))
     }
+
+  private def reverseNEL[A](fa: NonEmptyIList[A]): NonEmptyIList[A] = {
+    @annotation.tailrec
+    def loop(xs: IList[A], acc: IList[A]): NonEmptyIList[A] =
+      (xs: @unchecked) match {
+        case ICons(h, INil()) =>
+          OneAnd(h, acc)
+        case ICons(h, t) =>
+          loop(t, h :: acc)
+      }
+    loop(fa.head :: fa.tail, INil())
+  }
 }
 
 /**
@@ -232,13 +243,14 @@ sealed abstract class DequeueInstances {
     def append(a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
   }
 
-  implicit val dequeueInstances: Foldable[Dequeue] with IsEmpty[Dequeue] with PlusEmpty[Dequeue] with Functor[Dequeue] = new Foldable[Dequeue] with IsEmpty[Dequeue] with PlusEmpty[Dequeue] with Functor[Dequeue] {
+  implicit val dequeueInstances: Foldable[Dequeue] with IsEmpty[Dequeue] with Functor[Dequeue] = new Foldable[Dequeue] with IsEmpty[Dequeue] with Functor[Dequeue] {
     override def foldRight[A,B](fa: Dequeue[A], b: => B)(f: (A, => B) =>B): B = fa.foldRight(b)((a,b) => f(a,b))
     override def foldLeft[A,B](fa: Dequeue[A], b: B)(f: (B,A)=>B): B = fa.foldLeft(b)(f)
     override def foldMap[A,B](fa: Dequeue[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldLeft(F.zero)((b,a) => F.append(b, f(a)))
     override def empty[A]: Dequeue[A] = Dequeue.empty
     override def plus[A](a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
     override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
+    override def length[A](fa: Dequeue[A]) = fa.size
     override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
   }
 }
