@@ -53,6 +53,13 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
       case Both(_, _) => None
     }
 
+  def onlyThisOrThat: Option[A \/ B] =
+    this match {
+      case This(a) => Some(-\/(a))
+      case That(b) => Some(\/-(b))
+      case Both(_, _) => None
+    }
+
   def onlyBoth: Option[(A, B)] =
     this match {
       case This(_) => None
