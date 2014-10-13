@@ -103,7 +103,7 @@ trait VectorFunctions {
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
   final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] =
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
+    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, IList.fromList(as.tail.toList)))
 
   final def toZipper[A](as: Vector[A]): Option[Zipper[A]] =
     stream.toZipper(as.toStream)
@@ -115,7 +115,7 @@ trait VectorFunctions {
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
    */
   final def <^>[A, B: Monoid](as: Vector[A])(f: NonEmptyList[A] => B): B =
-    if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, as.tail.toList))
+    if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, IList.fromList(as.tail.toList)))
 
   /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
     * any `p`s after the first false.

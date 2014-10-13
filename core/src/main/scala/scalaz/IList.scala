@@ -297,7 +297,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def slice(from: Int, until: Int): IList[A] =
     drop(from).take((until max 0)- (from max 0))
 
-  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
+  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] = 
     IList(toList.sortBy(f)(B.toScalaOrdering): _*)
 
   def sorted(implicit ev: Order[A]): IList[A] =
@@ -383,7 +383,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     foldRight(Nil : List[A])(_ :: _)
 
   def toNel: Option[NonEmptyList[A]] =
-    uncons(None, (h, t) => Some(NonEmptyList.nel(h, t.toList)))
+    uncons(None, (h, t) => Some(NonEmptyList.nel(h, t)))
 
   def toMap[K, V](implicit ev0: A <~< (K, V), ev1: Order[K]): K ==>> V =
     widen[(K,V)].foldLeft(==>>.empty[K,V])(_ + _)
@@ -406,7 +406,7 @@ sealed abstract class IList[A] extends Product with Serializable {
       case ICons(h, t) => c(h, t)
     }
 
-  def unzip[B, C](implicit ev: A <~< (B, C)): (IList[B], IList[C]) =
+  def unzip[B, C](implicit lk: A <~< (B, C)): (IList[B], IList[C]) =
     BFT.bimap(widen[(B,C)].foldLeft((IList.empty[B], IList.empty[C])) {
       case ((as, bs), (a, b)) => (a :: as, b :: bs)
     })(_.reverse, _.reverse)

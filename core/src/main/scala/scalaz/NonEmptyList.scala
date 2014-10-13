@@ -1,33 +1,35 @@
 package scalaz
 
 /** A singly-linked list that is guaranteed to be non-empty. */
-final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
+final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   import NonEmptyList._
   import Zipper._
+  import scalaz.Liskov._
+  
 
-  def <::[AA >: A](b: AA): NonEmptyList[AA] = nel(b, head :: tail)
+  def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
 
-  def <:::[AA >: A](bs: List[AA]): NonEmptyList[AA] = bs match {
-    case Nil => this
-    case b :: bs => nel(b, bs ::: list)
+  def <:::(bs: IList[A]): NonEmptyList[A] = bs match {
+    case INil() => this
+    case ICons(b, bs) => nel(b, bs ::: list)
   }
 
-  def :::>[AA >: A](bs: List[AA]): NonEmptyList[AA] = nel(head, tail ::: bs)
+  def :::>(bs: IList[A]): NonEmptyList[A] = nel(head, tail ::: bs)
 
   /** Append one nonempty list to another. */
-  def append[AA >: A](f2: NonEmptyList[AA]): NonEmptyList[AA] = list <::: f2
+  def append(f2: NonEmptyList[A]): NonEmptyList[A] = list <::: f2
 
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
   /** @since 7.0.3 */
   def foreach(f: A => Unit): Unit = {
     f(head)
-    tail foreach f
+    tail.toList.foreach(f)
   }
 
   import collection.mutable.ListBuffer
 
-  def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
+  def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = ??? /* {
     val b = new ListBuffer[B]
     val p = f(head)
     b += p.head
@@ -40,19 +42,19 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
     }
     val bb = b.toList
     nel(bb.head, bb.tail)
-  }
+  }*/
 
   def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
-    import std.list._
+    //import std.list._
     tail match {
-      case Nil => F.map(f(head))(nel(_, Nil))
-      case b :: bs => F.apply2(f(head), OneAnd.oneAndTraverse[List].traverse1(OneAnd(b, bs))(f)) {
+      case INil() => F.map(f(head))(nel(_, INil()))
+      case ICons(b, bs) => F.apply2(f(head), OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
         case (h, t) => nel(h, t.head :: t.tail)
       }
     }
   }
 
-  def list: List[A] = head :: tail
+  def list: IList[A] = head :: tail
 
   def stream: Stream[A] = head #:: tail.toStream
 
@@ -61,53 +63,57 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
   def zipperEnd: Zipper[A] = {
     import Stream._
     tail.reverse match {
-      case Nil     => zipper(empty, head, empty)
-      case t :: ts => zipper(ts.toStream :+ head, t, empty)
+      case INil()     => zipper(empty, head, empty)
+      case ICons(t, ts) => zipper(ts.toStream :+ head, t, empty)
     }
   }
 
   /** @since 7.0.2 */
-  def init: List[A] = if(tail.isEmpty) Nil else (head :: tail.init)
+  def init: IList[A] = tail.initOption.fold[IList[A]](INil())(il => head :: il)
 
   /** @since 7.0.2 */
-  def last: A = if(tail.isEmpty) head else tail.last
+  def last: A = tail.lastOption.fold( head )(l => l)
+    //if(tail.isEmpty) head else tail.last^
 
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
-    case Nil    => Nil
-    case h :: t => nel(h, t).tails.list
+    //case INil()    => INil()
+    case ICons(h, t) => nel(h, t).tails.list
   })
 
   def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
-    case x :: xs => nel(x, xs)
+    case ICons(x, xs) => nel(x, xs)
   }
 
   /** @since 7.0.2 */
-  def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
-    case x :: xs => nel(x, xs)
+  //def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
+  
+  def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f): @unchecked) match {
+    case ICons(x, xs) => nel(x, xs)
   }
 
   /** @since 7.0.2 */
-  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = (list.sortWith(lt): @unchecked) match {
-    case x :: xs => nel(x, xs)
-  }
+  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = ??? 
+  //(list.sortWith(lt): @unchecked) match {
+  //  case ICons(x, xs) => nel(x, xs)
+  //}
 
   /** @since 7.0.2 */
-  def sorted[B >: A](implicit o: Order[B]): NonEmptyList[A] = (list.sorted(o.toScalaOrdering): @unchecked) match {
-    case x :: xs => nel(x, xs)
+  def sorted(implicit o: Order[A]): NonEmptyList[A] = (list.sorted(o): @unchecked) match {
+    case ICons(x, xs) => nel(x, xs)
   }
 
-  def size: Int = 1 + tail.size
+  def size: Int = 1 + tail.count(a => true)
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] = {
     val _b = b
     nel((head, _b.head), tail zip _b.tail)
   }
 
-  def unzip[X, Y](implicit ev: A <:< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
-    val (a, b) = head: (X, Y)
-    val (aa, bb) = tail.unzip: (List[X], List[Y])
+  def unzip[X, Y](implicit ev: A <~< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
+    val (a, b) = ev(head) //: (X, Y)
+    val (aa, bb) = tail.unzip: (IList[X], IList[Y])
     (nel(a, aa), nel(b, bb))
-  }
+ }
 
   override def toString: String = "NonEmpty" + (head :: tail)
 
@@ -125,12 +131,12 @@ object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
-  def unapplySeq[A](v: NonEmptyList[A]): Option[(A, List[A])] =
+  def unapplySeq[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
     Some((v.head, v.tail))
 }
 
 sealed abstract class NonEmptyListInstances0 {
-  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], List[A]](_.list)(std.list.listEqual[A])
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] = Equal.equalBy[NonEmptyList[A], IList[A]](_.list)(IList.equal[A])
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
@@ -173,7 +179,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def alignWith[A, B, C](f: A \&/ B => C) = (a, b) => {
         import std.list._
-        NonEmptyList.nel(f(\&/.Both(a.head, b.head)), Align[List].alignWith(f)(a.tail, b.tail))
+        NonEmptyList.nel(f(\&/.Both(a.head, b.head)), Align[IList].alignWith(f)(a.tail, b.tail))
       }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
@@ -186,16 +192,16 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
-    Contravariant[Show].contramap(std.list.listShow[A])(_.list)
+    Contravariant[Show].contramap(IList.show[A])(_.list)
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
-    Order.orderBy[NonEmptyList[A], List[A]](_.list)(std.list.listOrder[A])
+    Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])//(std.list.listOrder[A])
 }
 
 trait NonEmptyListFunctions {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] =
+  def nel[A](h: A, t: IList[A]): NonEmptyList[A] =
     new NonEmptyList(h, t)
 
   def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, t.toList)
+    nel(h, IList.fromList(t.toList))
 }

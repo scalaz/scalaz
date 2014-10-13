@@ -97,7 +97,7 @@ sealed abstract class Tree[A] {
     import Stream._
     subForest match {
       case Empty => G.map(f(rootLabel))(Tree(_))
-      case x #:: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, xs.toList).traverse1(_.traverse1(f))) {
+      case x #:: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs.toList)).traverse1(_.traverse1(f))) {
         case (h, t) => Tree.node(h, t.list.toStream)
       }
     }
