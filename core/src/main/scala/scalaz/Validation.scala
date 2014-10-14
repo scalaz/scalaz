@@ -303,7 +303,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   }
 
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
-  def toValidationNel: ValidationNel[E, A] =
+  def toValidationNel[EE >: E, AA >: A]: ValidationNel[EE, AA] =
     this match {
       case a @ Success(_) => a
       case Failure(e) => Failure(NonEmptyList(e))
