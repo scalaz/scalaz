@@ -221,11 +221,12 @@ sealed abstract class Future[+A] {
   /**
    * Returns a `Future` that delays the execution of this `Future` by the duration `t`.
    */
-  def after(t: Duration): Future[A] =
-    after(t.toMillis)
+  def after(t: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Future[A] =
+    schedule((), t)(scheduler).flatMap(_ => this)
 
-  def after(t: Long): Future[A] =
-    Timer.default.valueWait((), t).flatMap(_ => this)
+
+  def afterMillis(delay: Long)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Future[A] =
+    after(FiniteDuration(delay, TimeUnit.MILLISECONDS))(scheduler)
 }
 
 object Future {
