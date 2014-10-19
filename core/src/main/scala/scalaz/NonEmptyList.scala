@@ -29,23 +29,10 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   import collection.mutable.ListBuffer
 
-  def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = ??? /* {
-    val b = new ListBuffer[B]
-    val p = f(head)
-    b += p.head
-    b ++= p.tail
-    tail.foreach {
-      a =>
-        val p = f(a)
-        b += p.head
-        b ++= p.tail
-    }
-    val bb = b.toList
-    nel(bb.head, bb.tail)
-  }*/
+  def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] =
+    tail.foldLeft(f(head))((nel, b) => nel.append(f(b)))
 
   def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
-    //import std.list._
     tail match {
       case INil() => F.map(f(head))(nel(_, INil()))
       case ICons(b, bs) => F.apply2(f(head), OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
@@ -72,11 +59,10 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   def init: IList[A] = tail.initOption.fold[IList[A]](INil())(il => head :: il)
 
   /** @since 7.0.2 */
-  def last: A = tail.lastOption.fold( head )(l => l)
-    //if(tail.isEmpty) head else tail.last^
+  def last: A = tail.lastOption.getOrElse(head)
 
   def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
-    //case INil()    => INil()
+    case INil()    => INil()
     case ICons(h, t) => nel(h, t).tails.list
   })
 
