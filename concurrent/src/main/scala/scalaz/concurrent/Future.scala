@@ -226,6 +226,13 @@ sealed abstract class Future[+A] {
 
   def after(t: Long): Future[A] =
     Timer.default.valueWait((), t).flatMap(_ => this)
+
+  /**
+    * Returns a new `Future` which when run will execute `f` with the result of this `Future`.
+    * The result value of the returned `Future` is the same as the one for this `Future`.
+    */
+  def onComplete(f: A => Unit) =
+    map { a => f(a); a }
 }
 
 object Future {

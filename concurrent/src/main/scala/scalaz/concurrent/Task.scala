@@ -219,6 +219,30 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
   def ensure(failure: => Throwable)(f: A => Boolean): Task[A] =
     flatMap(a => if(f(a)) Task.now(a) else Task.fail(failure))
+
+  /**
+   * Returns a new `Task` which when run will execute `f` with the result or exception of this `Task`.
+   * The result value of the returned `Task` is the same as the one for this `Task`.
+   */
+  def onComplete(f: Throwable \/ A => Unit) = get.onComplete(f)
+
+  /**
+   * Returns a new `Task` which when run will execute `f` with the result of this `Task` in the case of success.
+   * The result value of the returned `Task` is the same as the one for this `Task`.
+   */
+  def onSuccess(f: A => Unit) = get.onComplete {
+    case \/-(a) => f(a)
+    case _ => /* no op */
+  }
+
+  /**
+   * Returns a new `Task` which when run will execute `f` with the resulting throwable in the case of failure.
+   * The result value of the returned `Task` is the same as the one for this `Task`.
+   */
+  def onFailure(f: Throwable => Unit) = get.onComplete {
+    case -\/(e) => f(e)
+    case _ => /* no op */
+  }
 }
 
 object Task {
