@@ -85,7 +85,7 @@ package object scalaz {
 
   import Id._
 
-  implicit val idInstance: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] = Id.id
+  implicit val idInstance: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
 
   private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
 
@@ -288,5 +288,16 @@ package object scalaz {
   val IMap = ==>>
 
   type GlorifiedTuple[+A, +B] = A \/ B
-  type Disjunction[+A, +B] = A \/ B
+
+  type Disjunction[+A, +B] = \/[A, B]
+  val Disjunction = \/
+
+  type DLeft[+A] = -\/[A]
+  val DLeft = -\/
+
+  type DRight[+B] = \/-[B]
+  val DRight = \/-
+
+  type DisjunctionT[F[_], A, B] = EitherT[F, A, B]
+  val DisjunctionT = EitherT
 }

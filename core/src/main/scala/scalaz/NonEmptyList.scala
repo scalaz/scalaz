@@ -71,17 +71,16 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   /** @since 7.0.2 */
-  //def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f)(o.toScalaOrdering): @unchecked) match {
   
   def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f): @unchecked) match {
     case ICons(x, xs) => nel(x, xs)
   }
 
   /** @since 7.0.2 */
-  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = ??? 
-  //(list.sortWith(lt): @unchecked) match {
-  //  case ICons(x, xs) => nel(x, xs)
-  //}
+  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = 
+    (list.toList.sortWith(lt): @unchecked) match {
+      case x :: xs => nel(x, IList.fromList(xs))
+    }
 
   /** @since 7.0.2 */
   def sorted(implicit o: Order[A]): NonEmptyList[A] = (list.sorted(o): @unchecked) match {

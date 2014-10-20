@@ -13,8 +13,8 @@ trait IdInstances {
   // TODO Review!
   type Identity[+X] = Need[X]
 
-  val id: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] =
-    new Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] {
+  val id: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] =
+    new Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] {
       def point[A](a: => A): A = a
 
       def bind[A, B](a: A)(f: A => B): B = f(a)
@@ -58,6 +58,12 @@ trait IdInstances {
 
       // TODO Fun compiler bug? "can't existentially abstract over parameterized type G"
       // override def product1[G[_]](implicit G0: Applicative[G]): Applicative[G] = G0
+
+      override def pextract[B, A](a: Id[A])       : Id[B] \/ A = \/-(a)
+      override def getOrElse[A](a: Id[A])(d: => A): A          = a
+      override def isDefined[A](a: Id[A])         : Boolean    = true
+      override def toOption[A](a: Id[A])          : Option[A]  = Some(a)
+      override def toMaybe[A](a: Id[A])           : Maybe[A]   = Maybe.Just(a)
     }
 }
 
