@@ -34,9 +34,9 @@ object ScalazArbitrary {
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
-  implicit def ValueArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Value[A]] = Functor[Arbitrary].map(fa)(a => Value(a))
-  implicit def NameArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Name[A]] = Functor[Arbitrary].map(fa)(a => Name(a))
-  implicit def NeedArbitrary[A](implicit fa: Arbitrary[A]): Arbitrary[Need[A]] = Functor[Arbitrary].map(fa)(a => Need(a))
+  implicit def ValueArbitrary[A: Arbitrary]: Arbitrary[Value[A]] = Functor[Arbitrary].map(arb[A])(a => Value(a))
+  implicit def NameArbitrary[A: Arbitrary]: Arbitrary[Name[A]] = Functor[Arbitrary].map(arb[A])(a => Name(a))
+  implicit def NeedArbitrary[A: Arbitrary]: Arbitrary[Need[A]] = Functor[Arbitrary].map(arb[A])(a => Need(a))
 
   implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
 
@@ -89,13 +89,13 @@ object ScalazArbitrary {
   implicit def Arbitrary_ISet[A](implicit o: Order[A], A: Arbitrary[A]): Arbitrary[ISet[A]] =
     Functor[Arbitrary].map(arb[List[A]])(as => ISet.fromList(as))
 
-  implicit def Arbitrary_Maybe[A](implicit A: Arbitrary[A]): Arbitrary[Maybe[A]] =
+  implicit def Arbitrary_Maybe[A: Arbitrary]: Arbitrary[Maybe[A]] =
     Functor[Arbitrary].map(arb[Option[A]])(Maybe.fromOption)
 
   import scalaz.Ordering._
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
-  implicit def TreeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tree[A]] = Arbitrary {
+  implicit def TreeArbitrary[A: Arbitrary]: Arbitrary[Tree[A]] = Arbitrary {
   import scalaz.Tree._
     def tree(n: Int): Gen[Tree[A]] = n match {
       case 0 => arbitrary[A] map (leaf(_))
@@ -107,12 +107,12 @@ object ScalazArbitrary {
     Gen.sized(tree _)
   }
 
-  implicit def IterableArbitrary[A] (implicit a: Arbitrary[A]): Arbitrary[Iterable[A]] =
+  implicit def IterableArbitrary[A: Arbitrary]: Arbitrary[Iterable[A]] =
       Apply[Arbitrary].apply2[A, List[A], Iterable[A]](arb[A], arb[List[A]])((a, list) => a :: list)
 
   // could not use type alias `TreeLoc.Parents` and `TreeLoc.TreeForest`.
   // https://github.com/scalaz/scalaz/pull/527#discussion_r6315123
-  implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
+  implicit def TreeLocArbitrary[A: Arbitrary]: Arbitrary[TreeLoc[A]] =
     Apply[Arbitrary].apply4(
       arb[Tree[A]],
       arb[Stream[Tree[A]]],
@@ -120,50 +120,50 @@ object ScalazArbitrary {
       arb[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]
     )(TreeLoc.loc)
 
-  implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
+  implicit def DisjunctionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => -\/(a)
       case Right(b) => \/-(b)
     }
 
-  implicit def ValidationArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Validation[A, B]] =
+  implicit def ValidationArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Validation[A, B]] =
     Functor[Arbitrary].map(arb[A \/ B])(_.validation)
 
 //  implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
-  implicit def Tuple1Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Tuple1[A]] = Functor[Arbitrary].map(arb[A])(Tuple1(_))
+  implicit def Tuple1Arbitrary[A: Arbitrary]: Arbitrary[Tuple1[A]] = Functor[Arbitrary].map(arb[A])(Tuple1(_))
 
-  implicit def Function0Arbitrary[A](implicit a: Arbitrary[A]): Arbitrary[() => A] = Functor[Arbitrary].map(arb[A])(() => _)
+  implicit def Function0Arbitrary[A: Arbitrary]: Arbitrary[() => A] = Functor[Arbitrary].map(arb[A])(() => _)
 
-  implicit def FirstOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Option[A] @@ First] = Functor[Arbitrary].map(arb[Option[A]])(_.first)
+  implicit def FirstOptionArbitrary[A: Arbitrary]: Arbitrary[Option[A] @@ First] = Functor[Arbitrary].map(arb[Option[A]])(_.first)
 
-  implicit def LastOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Option[A] @@ Last] = Functor[Arbitrary].map(arb[Option[A]])(_.last)
+  implicit def LastOptionArbitrary[A: Arbitrary]: Arbitrary[Option[A] @@ Last] = Functor[Arbitrary].map(arb[Option[A]])(_.last)
 
-  implicit def MinOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinOption[A]] = Tag.subst(arb[Option[A]])
+  implicit def MinOptionArbitrary[A: Arbitrary]: Arbitrary[MinOption[A]] = Tag.subst(arb[Option[A]])
 
-  implicit def MaxOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxOption[A]] = Tag.subst(arb[Option[A]])
+  implicit def MaxOptionArbitrary[A: Arbitrary]: Arbitrary[MaxOption[A]] = Tag.subst(arb[Option[A]])
 
-  implicit def FirstMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ First] = Functor[Arbitrary].map(arb[Maybe[A]])(_.first)
+  implicit def FirstMaybeArbitrary[A: Arbitrary]: Arbitrary[Maybe[A] @@ First] = Functor[Arbitrary].map(arb[Maybe[A]])(_.first)
 
-  implicit def LastMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ Last] = Functor[Arbitrary].map(arb[Maybe[A]])(_.last)
+  implicit def LastMaybeArbitrary[A: Arbitrary]: Arbitrary[Maybe[A] @@ Last] = Functor[Arbitrary].map(arb[Maybe[A]])(_.last)
 
-  implicit def MinMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinMaybe[A]] = Tag.subst(arb[Maybe[A]])
+  implicit def MinMaybeArbitrary[A: Arbitrary]: Arbitrary[MinMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
-  implicit def MaxMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
+  implicit def MaxMaybeArbitrary[A: Arbitrary]: Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
-  implicit def EitherLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.left)
+  implicit def EitherLeftProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.LeftProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.left)
 
-  implicit def EitherRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.right)
+  implicit def EitherRightProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.RightProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.right)
 
-  implicit def EitherFirstLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B] @@ First] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.left))
+  implicit def EitherFirstLeftProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.LeftProjection[A, B] @@ First] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.left))
 
-  implicit def EitherFirstRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B] @@ First] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
+  implicit def EitherFirstRightProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.RightProjection[A, B] @@ First] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
 
-  implicit def EitherLastLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.left))
+  implicit def EitherLastLeftProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.LeftProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.left))
 
-  implicit def EitherLastRightProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.RightProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
+  implicit def EitherLastRightProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.RightProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
 
-  implicit def ArraySeqArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
+  implicit def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
 
   import FingerTree._
 
@@ -201,18 +201,18 @@ object ScalazArbitrary {
 
   import java.util.concurrent.Callable
 
-  implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
+  implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Promise
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
   import scalaz.concurrent.Future
-  implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
+  implicit def FutureArbitrary[A: Arbitrary]: Arbitrary[Future[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
 
   import Zipper._
-  implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
+  implicit def ZipperArbitrary[A: Arbitrary]: Arbitrary[Zipper[A]] =
     Apply[Arbitrary].apply3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
   implicit def KleisliArbitrary[M[+_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
@@ -239,7 +239,7 @@ object ScalazArbitrary {
   implicit def lazyOptionTArb[F[+_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
     Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
 
-  implicit def lazyEitherArb[F[_], A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyEither[A, B]] =
+  implicit def lazyEitherArb[F[_], A: Arbitrary, B: Arbitrary]: Arbitrary[LazyEither[A, B]] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a)  => LazyEither.lazyLeft(a)
       case Right(b) => LazyEither.lazyRight(b)
@@ -258,8 +258,8 @@ object ScalazArbitrary {
   implicit def eitherTArb[F[+_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
-  implicit def constArbitrary[A, B](implicit A: Arbitrary[A]): Arbitrary[Const[A, B]] =
-    Functor[Arbitrary].map(A)(Const(_))
+  implicit def constArbitrary[A: Arbitrary, B]: Arbitrary[Const[A, B]] =
+    Functor[Arbitrary].map(arb[A])(Const(_))
 
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
@@ -267,14 +267,14 @@ object ScalazArbitrary {
 
   implicit def dequeueArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(list => Dequeue(list: _*))
 
-  implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
-    Applicative[Arbitrary].apply2(A, B)(LazyTuple2(_, _))
+  implicit def lazyTuple2Arbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[LazyTuple2[A, B]] =
+    Applicative[Arbitrary].apply2(arb[A], arb[B])(LazyTuple2(_, _))
 
-  implicit def lazyTuple3Arbitrary[A, B, C](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C]): Arbitrary[LazyTuple3[A, B, C]] =
-    Applicative[Arbitrary].apply3(A, B, C)(LazyTuple3(_, _, _))
+  implicit def lazyTuple3Arbitrary[A: Arbitrary, B: Arbitrary, C: Arbitrary]: Arbitrary[LazyTuple3[A, B, C]] =
+    Applicative[Arbitrary].apply3(arb[A], arb[B], arb[C])(LazyTuple3(_, _, _))
 
-  implicit def lazyTuple4Arbitrary[A, B, C, D](implicit A: Arbitrary[A], B: Arbitrary[B], C: Arbitrary[C], D: Arbitrary[D]): Arbitrary[LazyTuple4[A, B, C, D]] =
-    Applicative[Arbitrary].apply4(A, B, C, D)(LazyTuple4(_, _, _, _))
+  implicit def lazyTuple4Arbitrary[A: Arbitrary, B: Arbitrary, C: Arbitrary, D: Arbitrary]: Arbitrary[LazyTuple4[A, B, C, D]] =
+    Applicative[Arbitrary].apply4(arb[A], arb[B], arb[C], arb[D])(LazyTuple4(_, _, _, _))
 
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
