@@ -224,25 +224,25 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * Returns a new `Task` which when run will execute `f` with the result or exception of this `Task`.
    * The result value of the returned `Task` is the same as the one for this `Task`.
    */
-  def onComplete(f: Throwable \/ A => Unit) = get.onComplete(f)
+  def onComplete(f: Throwable \/ A => Unit): Task[A] = new Task(get.onComplete(f))
 
   /**
    * Returns a new `Task` which when run will execute `f` with the result of this `Task` in the case of success.
    * The result value of the returned `Task` is the same as the one for this `Task`.
    */
-  def onSuccess(f: A => Unit) = get.onComplete {
+  def onSuccess(f: A => Unit): Task[A] = new Task(get.onComplete {
     case \/-(a) => f(a)
     case _ => /* no op */
-  }
+  })
 
   /**
    * Returns a new `Task` which when run will execute `f` with the resulting throwable in the case of failure.
    * The result value of the returned `Task` is the same as the one for this `Task`.
    */
-  def onFailure(f: Throwable => Unit) = get.onComplete {
+  def onFailure(f: Throwable => Unit): Task[A] = new Task(get.onComplete {
     case -\/(e) => f(e)
     case _ => /* no op */
-  }
+  })
 }
 
 object Task {
