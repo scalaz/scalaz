@@ -4,6 +4,7 @@ import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Ex
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
+import scalaz.syntax.ToIdOps
 
 import scalaz.{Nondeterminism, Reducer}
 import scalaz.Free.Trampoline
@@ -52,7 +53,7 @@ import scala.concurrent.duration._
  * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
-sealed abstract class Future[+A] {
+sealed abstract class Future[+A] extends ToIdOps {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
@@ -231,8 +232,8 @@ sealed abstract class Future[+A] {
     * Returns a new `Future` which when run will execute `f` with the result of this `Future`.
     * The result value of the returned `Future` is the same as the one for this `Future`.
     */
-    map { a => f(a); a }
   def onComplete(f: A => Unit): Future[A] =
+    map { _ <| f }
 }
 
 object Future {
