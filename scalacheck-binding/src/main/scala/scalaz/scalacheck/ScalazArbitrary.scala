@@ -205,6 +205,10 @@ object ScalazArbitrary {
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
 
+  import scalaz.concurrent.Task
+  implicit def TaskArbitrary[A: Arbitrary]: Arbitrary[Task[A]] =
+    Arbitrary(arbitrary[A] map ((x: A) => Task.now(x)))
+
   import Zipper._
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
     Apply[Arbitrary].apply3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
