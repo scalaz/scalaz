@@ -290,5 +290,19 @@ object TaskTest extends SpecLite {
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
     Task.fromDisjunction(x).attemptRun must_== x
   }
+
+  import org.scalacheck._
+  import Arbitrary.arbitrary
+
+  implicit val anyArb = Arbitrary[Any](Gen.oneOf(arbitrary[Number], arbitrary[Int], arbitrary[Boolean]))
+
+  "reduceOrdered garanties order in the resulting List" ! forAll { xs: List[Task[Any]] =>
+    val ordered = Task.gatherOrdered(xs).attemptRun
+    val runSeperately = xs.map(_.attemptRun)
+    ordered match {
+      case -\/(e) => runSeperately.contains(-\/(e))
+      case \/-(as) => runSeperately.collect { case \/-(a) => a} == as
+    }
+  }
 }
 
