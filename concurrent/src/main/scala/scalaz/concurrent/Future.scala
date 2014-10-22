@@ -11,6 +11,7 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
 import scalaz.{\/, -\/, \/-}
+import scalaz.syntax.id._
 
 import scala.concurrent.SyncVar
 import scala.concurrent.duration._
@@ -53,7 +54,7 @@ import scala.concurrent.duration._
  * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
-sealed abstract class Future[+A] extends ToIdOps {
+sealed abstract class Future[+A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
