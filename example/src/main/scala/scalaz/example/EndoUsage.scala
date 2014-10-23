@@ -1,4 +1,4 @@
-package scalaz.exmaple
+package scalaz.example
 
 import scalaz.{Endo,IList,Zip}
 import scalaz.std.function._
