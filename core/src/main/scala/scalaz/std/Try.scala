@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import Isomorphism.{<~>, IsoFunctorTemplate}
 import scala.util.{Failure, Success, Try}
 
 trait TryFunctions {
@@ -12,6 +13,19 @@ trait TryFunctions {
 
   def toDisjunction[A](t: Try[A]): Throwable \/ A =
     cata(t)(\/.right, \/.left)
+
+  def fromDisjunction[T <: Throwable, A](d: T \/ A): Try[A] =
+    d.fold(Failure.apply, Success.apply)
 }
 
-object `try` extends TryFunctions
+trait TryInstances {
+  import scalaz.std.{`try` => t}
+
+  val tryDisjunctionIso: Try <~> ({type λ[α] = Throwable \/ α})#λ =
+    new IsoFunctorTemplate[Try, ({type λ[α] = Throwable \/ α})#λ] {
+      def to[A](fa: Try[A]) = t.toDisjunction(fa)
+      def from[A](ga: Throwable \/ A) = t.fromDisjunction(ga)
+    }
+}
+
+object `try` extends TryFunctions with TryInstances
