@@ -14,6 +14,7 @@ package object std {
   object either extends ToEitherOps
   object map extends ToMapOps
   object sortedMap extends ToSortedMapOps
+  object `try` extends ToTryOps
 
   object all extends ToAllStdOps
 }
