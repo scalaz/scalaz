@@ -68,6 +68,16 @@ object ISetTest extends SpecLite {
     }
   }
 
+  "lookupGT" ! forAll { (a: ISet[Int], i: Int) =>
+    a.lookupGT(i) match {
+      case Some(b) =>
+        (i < b) must_=== true
+        a.split(i)._2.findMin must_=== Option(b)
+      case None =>
+        a.split(i)._2 must_=== ISet.empty
+    }
+  }
+
   "member" ! forAll {(a: ISet[Int], i: Int) =>
     a.member(i) must_=== a.toList.contains(i)
   }

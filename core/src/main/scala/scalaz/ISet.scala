@@ -64,7 +64,7 @@ sealed abstract class ISet[A] {
         case Tip() =>
           some(best)
         case Bin(y, l, r) =>
-          if (o.lessThan(x, y)) withBest(x, best, l) else withBest(x, best, r)
+          if (o.lessThan(x, y)) withBest(x, y, l) else withBest(x, best, r)
       }
 
     this match {
