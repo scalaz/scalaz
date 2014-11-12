@@ -36,8 +36,10 @@ trait StringFunctions {
    */
   def charsNel(s:String, e: => NonEmptyList[Char]) : NonEmptyList[Char] = charsNel(s) getOrElse e
 
+  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
   def charsNelErr(s:String, message: => String): NonEmptyList[Char] = charsNel(s, sys.error(message))
 
+  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
   def unsafeCharsNel(s:String) : NonEmptyList[Char] = charsNelErr(s, "cannot turn empty string into NonEmptyList")
 
   // Parsing functions.
