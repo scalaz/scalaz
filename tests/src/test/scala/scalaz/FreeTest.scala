@@ -37,6 +37,11 @@ object FreeList {
     def append(f1: FreeList[A], f2: => FreeList[A]) =
       FreeList(Monoid[Free[List, A]].append(f1.f, f2.f))
   }
+
+  implicit def freeListSemigroup[A:Semigroup]: Semigroup[FreeList[A]] = new Semigroup[FreeList[A]] {
+    def append(f1: FreeList[A], f2: => FreeList[A]) =
+      FreeList(Semigroup[Free[List, A]].append(f1.f, f2.f))
+  }
 }
 
 object FreeTest extends SpecLite {
@@ -50,6 +55,7 @@ object FreeTest extends SpecLite {
     checkAll(traverse.laws[FreeList])
     checkAll(monad.laws[FreeList])
     checkAll(monoid.laws[FreeList[Int]])
+    checkAll(semigroup.laws[FreeList[Int]])
   }
 
   object instances {
@@ -59,6 +65,7 @@ object FreeTest extends SpecLite {
     def traverse[F[_]: Traverse] = Traverse[({type λ[α] = Free[F, α]})#λ]
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Free[F, α]})#λ]
     def monoid[F[_]: Functor, A: Monoid] = Monoid[Free[F, A]]
+    def semigroup[F[_]: Functor, A: Semigroup] = Semigroup[Free[F, A]]
 
     // checking absence of ambiguity
     def functor[F[_]: Traverse1] = Functor[({type λ[α] = Free[F, α]})#λ]
