@@ -30,6 +30,13 @@ object FreeList {
   implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] = new Equal[FreeList[A]] {
     def equal(a: FreeList[A], b: FreeList[A]) = Equal[List[A]].equal(a.f.runM(identity), b.f.runM(identity))
   }
+
+  implicit def freeListMonoid[A:Monoid]: Monoid[FreeList[A]] = new Monoid[FreeList[A]] {
+    def zero = FreeList(Monoid[Free[List, A]].zero)
+
+    def append(f1: FreeList[A], f2: => FreeList[A]) =
+      FreeList(Monoid[Free[List, A]].append(f1.f, f2.f))
+  }
 }
 
 object FreeTest extends SpecLite {
@@ -42,6 +49,7 @@ object FreeTest extends SpecLite {
   "List" should {
     checkAll(traverse.laws[FreeList])
     checkAll(monad.laws[FreeList])
+    checkAll(monoid.laws[FreeList[Int]])
   }
 
   object instances {
@@ -50,11 +58,13 @@ object FreeTest extends SpecLite {
     def foldable1[F[_]: Foldable1: Functor] = Foldable1[({type λ[α] = Free[F, α]})#λ]
     def traverse[F[_]: Traverse] = Traverse[({type λ[α] = Free[F, α]})#λ]
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Free[F, α]})#λ]
+    def monoid[F[_]: Functor, A: Monoid] = Monoid[Free[F, A]]
 
     // checking absence of ambiguity
     def functor[F[_]: Traverse1] = Functor[({type λ[α] = Free[F, α]})#λ]
     def foldable[F[_]: Traverse1] = Foldable[({type λ[α] = Free[F, α]})#λ]
     def foldable1[F[_]: Traverse1] = Foldable1[({type λ[α] = Free[F, α]})#λ]
     def traverse[F[_]: Traverse1] = Traverse[({type λ[α] = Free[F, α]})#λ]
+    def semigroup[F[_]: Functor, A: Monoid] = Semigroup[Free[F, A]]
   }
 }
