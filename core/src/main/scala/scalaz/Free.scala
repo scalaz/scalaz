@@ -298,6 +298,9 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
     new FreeTraverse1[F] {
       def F = implicitly
     }
+
+  implicit def freeSemigroup[S[_]:Functor, A:Semigroup]: Semigroup[Free[S, A]] =
+    Semigroup.liftSemigroup[({type λ[α] = Free[S, α]})#λ, A]
 }
 
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
