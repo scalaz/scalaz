@@ -64,6 +64,12 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
 
   def getOrElse[AA >: A](default: => AA)(implicit F: Functor[F]): F[AA] = mapO(_.getOrElse(default))
 
+  def getOrElseF[AA >: A](default: => F[AA])(implicit F: Monad[F]): F[AA] =
+    F.bind(self.run) {
+      case None => default
+      case Some(a) => F.point(a)
+    }
+
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
