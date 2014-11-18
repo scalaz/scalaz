@@ -3,6 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
+import scala.reflect.ClassTag
 import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
@@ -317,6 +318,53 @@ object Task {
    */
   def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] =
     reduceUnordered[A, List[A]](tasks, exceptionCancels)
+
+  def gatherOrdered[A: ClassTag](tasks: Seq[Task[A]], exceptionsCancels: Boolean = false): Task[List[A]] = tasks match {
+    case Seq() => Task.now(Nil)
+    case Seq(t) => t.map(List(_))
+    case tasks => new Task[List[A]](Future.Async { cb =>
+      val interrupt = new AtomicBoolean(false)
+      val results: Array[A] = Array.ofDim(tasks.size)
+      val togo = new AtomicInteger(tasks.size)
+
+      def tryComplete = {
+        if (togo.decrementAndGet() == 0)
+          cb(\/-(results.toList))
+        else
+          Trampoline.done(())
+      }
+
+      def tryFailure(e: Throwable): Trampoline[Unit] = {
+        @annotation.tailrec
+        def firstFailure: Boolean = {
+          val current = togo.get
+          if (current > 0) {
+            if (togo.compareAndSet(current, 0)) true
+            else firstFailure
+          }
+          else false
+        }
+
+        if (firstFailure) {
+          cb(-\/(e)) *> Trampoline.delay { if (exceptionsCancels) interrupt.set(true); () }
+        }
+        else
+          Trampoline.done(())
+      }
+
+      tasks.zipWithIndex.foreach { case (f, i) =>
+        val handle: (Throwable \/ A) => Trampoline[Unit] = {
+          case \/-(success) =>
+            results(i) = success
+            tryComplete
+          case -\/(e) =>
+            tryFailure(e)
+        }
+
+        f.get.listenInterruptibly(handle, interrupt)
+      }
+    })
+  }
 
   def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
     if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
