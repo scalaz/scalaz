@@ -4,12 +4,14 @@ import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Ex
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
+import scalaz.syntax.ToIdOps
 
 import scalaz.{Nondeterminism, Reducer}
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
 import scalaz.{\/, -\/, \/-}
+import scalaz.syntax.id._
 
 import scala.concurrent.SyncVar
 import scala.concurrent.duration._
@@ -226,6 +228,13 @@ sealed abstract class Future[+A] {
 
   def after(t: Long): Future[A] =
     Timer.default.valueWait((), t).flatMap(_ => this)
+
+  /**
+    * Returns a new `Future` which when run will execute `f` with the result of this `Future`.
+    * The result value of the returned `Future` is the same as the one for this `Future`.
+    */
+  def onComplete(f: A => Unit): Future[A] =
+    map { _ <| f }
 }
 
 object Future {
