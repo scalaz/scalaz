@@ -1,13 +1,12 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
+import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Trampoline, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
-import scalaz.Trampoline
 import scalaz.\/._
 
 import collection.JavaConversions._
@@ -307,6 +306,9 @@ object Task {
    */
   def async[A](register: ((Throwable \/ A) => Unit) => Unit): Task[A] =
     new Task(Future.async(register))
+
+  def schedule[A](a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
+    Strategy.DefaultTimeoutScheduler): Task[A] = new Task(Future.schedule(Try(a), delay))
 
   /**
    * Like `Nondeterminism[Task].gatherUnordered`, but if `exceptionCancels` is true,
