@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Trampoline, Traverse, \/, -\/, \/-}
+import scalaz._
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -309,6 +309,12 @@ object Task {
 
   def schedule[A](a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
     Strategy.DefaultTimeoutScheduler): Task[A] = new Task(Future.schedule(Try(a), delay))
+
+  def gather[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] = {
+    val tasksWithIndices = tasks.zipWithIndex.map { case (t,i) => Functor[Task].strengthR(t,i) }
+    val sortAndRemoveIndices = (ais: List[(A,Int)]) => ais.sortBy(_._2).map(_._1)
+    gatherUnordered(tasksWithIndices, exceptionCancels).map(sortAndRemoveIndices)
+  }
 
   /**
    * Like `Nondeterminism[Task].gatherUnordered`, but if `exceptionCancels` is true,
