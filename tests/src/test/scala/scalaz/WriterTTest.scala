@@ -19,7 +19,7 @@ object WriterTTest extends SpecLite {
   checkAll(traverse.laws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[NonEmptyList])
-  //checkAll(functor.laws[({type λ[α]=WriterT[NonEmptyList, Int, α]})#λ])
+  checkAll(functor.laws[({type λ[α]=WriterT[NonEmptyList, Int, α]})#λ])
   checkAll(bitraverse.laws[WriterTOpt])
 
   implicit def writerArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =

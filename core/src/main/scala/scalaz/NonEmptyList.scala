@@ -95,7 +95,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   def unzip[X, Y](implicit ev: A <~< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
-    val (a, b) = ev(head) //: (X, Y)
+    val (a, b) = ev(head) 
     val (aa, bb) = tail.unzip: (IList[X], IList[Y])
     (nel(a, aa), nel(b, bb))
  }

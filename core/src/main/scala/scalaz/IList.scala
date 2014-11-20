@@ -406,7 +406,7 @@ sealed abstract class IList[A] extends Product with Serializable {
       case ICons(h, t) => c(h, t)
     }
 
-  def unzip[B, C](implicit lk: A <~< (B, C)): (IList[B], IList[C]) =
+  def unzip[B, C](implicit ev: A <~< (B, C)): (IList[B], IList[C]) =
     BFT.bimap(widen[(B,C)].foldLeft((IList.empty[B], IList.empty[C])) {
       case ((as, bs), (a, b)) => (a :: as, b :: bs)
     })(_.reverse, _.reverse)
