@@ -196,7 +196,7 @@ object TaskTest extends SpecLite {
     implicit val anyArb = Arbitrary[Any](Gen.oneOf(arbitrary[Number], arbitrary[Int], arbitrary[Boolean]))
 
     "early terminate once any of the tasks failed (ordered)" ! forAll { (xs: List[Task[Any]], ex: Throwable, time: Byte, index: Int) =>
-      val fail = Task.schedule(throw ex, time.milliseconds)
+      val fail = Task.schedule(throw ex, time.toInt.milliseconds)
       val toSeq =
         if (xs.isEmpty) List(fail)
         else {
