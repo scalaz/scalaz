@@ -5,7 +5,7 @@ import java.util.concurrent._
 import ConcurrentTest._
 
 object ActorTest extends SpecLite {
-  val NumOfMessages = 100000
+  val NumOfMessages = 10000
   val NumOfThreads = 4
 
   "actor with sequential strategy" should {
