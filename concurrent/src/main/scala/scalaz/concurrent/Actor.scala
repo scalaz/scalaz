@@ -1,7 +1,7 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.ExecutorService
+import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
  * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`
  * @tparam A       The type of messages accepted by this actor.
  */
-final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrow)
+final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor.rethrow)
                          (implicit val strategy: Strategy) {
   private val head = new AtomicReference[Node[A]]
 
@@ -45,14 +45,14 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
   @annotation.tailrec
-  private def act(n: Node[A], i: Int = 1024): Unit = {
-    try handler(n.a) catch {
+  private def act(n: Node[A], i: Int = 1024, f: A => Unit = handler): Unit = {
+    try f(n.a) catch {
       case ex: Throwable => onError(ex)
     }
     val n2 = n.get
     if (n2 eq null) scheduleLastTry(n)
     else if (i == 0) schedule(n2)
-    else act(n2, i - 1)
+    else act(n2, i - 1, f)
   }
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
@@ -69,22 +69,6 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
 
 private class Node[A](val a: A) extends AtomicReference[Node[A]]
 
-private object ActorUtils {
-  val rethrow: Throwable => Unit = {
-    case _: InterruptedException => Thread.currentThread.interrupt()
-    case e => throw e
-  }
-
-  val handleAndRethrow: Throwable => Unit = {
-    case _: InterruptedException => Thread.currentThread.interrupt()
-    case e =>
-      val t = Thread.currentThread
-      val h = t.getUncaughtExceptionHandler
-      if (h ne null) h.uncaughtException(t, e)
-      throw e
-  }
-}
-
 object Actor extends ActorInstances with ActorFunctions
 
 sealed abstract class ActorInstances {
@@ -94,11 +78,19 @@ sealed abstract class ActorInstances {
 }
 
 trait ActorFunctions {
-  def actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrow)
+  def actor[A](handler: A => Unit, onError: Throwable => Unit = rethrow)
               (implicit s: Strategy): Actor[A] = new Actor[A](handler, onError)(s)
 
   implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
 
+  val rethrow: Throwable => Unit = {
+    case _: InterruptedException => Thread.currentThread.interrupt()
+    case e =>
+      val t = Thread.currentThread
+      val h = t.getUncaughtExceptionHandler
+      if (h ne null) h.uncaughtException(t, e)
+      throw e
+  }
   /**
    * Creates a strategy that optimized for actors.
    * WARNING: This strategy cannot be used for evaluation of values.
@@ -121,9 +113,7 @@ trait ActorFunctions {
           def setRawResult(unit: Unit): Unit = ()
 
           def exec(): Boolean = {
-            try a catch {
-              case ex: Throwable => ActorUtils.handleAndRethrow(ex)
-            }
+            a
             false
           }
         }
@@ -132,11 +122,7 @@ trait ActorFunctions {
         null
       }
     }
-// TODO uncomment if Java 6 support will be discarded or add dependency on JSR166 classes compiled for Java 6
-/*    case p: java.util.concurrent.ForkJoinPool => new Strategy {
-
-      import java.util.concurrent.ForkJoinTask
-
+    case p: ForkJoinPool => new Strategy {
       def apply[A](a: => A): () => A = {
         val t = new ForkJoinTask[Unit] {
           def getRawResult: Unit = ()
@@ -144,9 +130,7 @@ trait ActorFunctions {
           def setRawResult(unit: Unit): Unit = ()
 
           def exec(): Boolean = {
-            try a catch {
-              case ex: Throwable => ActorUtils.handleAndRethrowError(ex)
-            }
+            a
             false
           }
         }
@@ -154,7 +138,7 @@ trait ActorFunctions {
         else p.execute(t)
         null
       }
-    }*/
+    }
     case p => new Strategy {
       def apply[A](a: => A): () => A = {
         p.execute(new Runnable {
