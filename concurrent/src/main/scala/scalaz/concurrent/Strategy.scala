@@ -1,7 +1,7 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.{ScheduledExecutorService, ExecutorService, ThreadFactory, Executors}
+import java.util.concurrent._
 
 /**
  * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
@@ -22,8 +22,9 @@ trait Strategys extends StrategysLow {
   /**
    * Default thread factory to mark all threads as daemon
    */
-  val DefaultDaemonThreadFactory = new ThreadFactory {
+  lazy val DefaultDaemonThreadFactory = new ThreadFactory {
     val defaultThreadFactory = Executors.defaultThreadFactory()
+
     def newThread(r: Runnable) = {
       val t = defaultThreadFactory.newThread(r)
       t.setDaemon(true)
@@ -35,20 +36,19 @@ trait Strategys extends StrategysLow {
    * The default executor service is a fixed thread pool with N daemon threads,
    * where N is equal to the number of available processors.
    */
-  val DefaultExecutorService: ExecutorService = {
+  lazy val DefaultExecutorService: ExecutorService =
     Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
-  }
 
   /**
    * Default scheduler used for scheduling the tasks like timeout.
    */
-  val DefaultTimeoutScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1,
+  lazy val DefaultTimeoutScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1,
     DefaultDaemonThreadFactory)
 
   /**
    * A strategy that executes its arguments on `DefaultExecutorService`
    */
-  implicit val DefaultStrategy: Strategy = Executor(DefaultExecutorService)
+  implicit lazy val DefaultStrategy: Strategy = Executor(DefaultExecutorService)
 }
 
 trait StrategysLow {
@@ -63,15 +63,10 @@ trait StrategysLow {
     }
   }
 
-  import java.util.concurrent.ExecutorService
-
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
    */
   implicit def Executor(implicit s: ExecutorService) = new Strategy {
-
-    import java.util.concurrent.Callable
-
     def apply[A](a: => A) = {
       val fut = s.submit(new Callable[A] {
         def call = a
@@ -92,13 +87,12 @@ trait StrategysLow {
    */
   implicit val Naive: Strategy = new Strategy {
     def apply[A](a: => A) = {
-      import java.util.concurrent.Callable
-      val thread = java.util.concurrent.Executors.newSingleThreadExecutor
-      val fut = thread.submit(new Callable[A] {
+      val executorService = Executors.newSingleThreadExecutor(Strategy.DefaultDaemonThreadFactory)
+      val future = executorService.submit(new Callable[A] {
         def call = a
       })
-      thread.shutdown()
-      () => fut.get
+      executorService.shutdown()
+      () => future.get
     }
   }
 
@@ -111,9 +105,9 @@ trait StrategysLow {
 
     def apply[A](a: => A) = {
       val worker = new SwingWorker[A, Unit] {
-        def doInBackground = a
+        def doInBackground() = a
       }
-      worker.execute
+      worker.execute()
       () => worker.get
     }
   }
@@ -124,7 +118,6 @@ trait StrategysLow {
   implicit val SwingInvokeLater: Strategy = new Strategy {
 
     import javax.swing.SwingUtilities.invokeLater
-    import java.util.concurrent.{Callable, FutureTask}
 
     def apply[A](a: => A) = {
       val task = new FutureTask[A](new Callable[A] {
