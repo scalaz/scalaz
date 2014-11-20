@@ -63,11 +63,16 @@ object OneAndTest extends SpecLite {
     (Traverse1[OneAndList].traverse1(ints)(f)
        must_==(Traverse[OneAndList].traverse(ints)(f)))
   }
+  
+  implicit def OneAndNelEqual[A](implicit E: Equal[IList[A]]): Equal[NonEmptyList[OneAndNel[A]]] = new Equal[NonEmptyList[OneAndNel[A]]] {
+    override def equal(a: NonEmptyList[OneAndNel[A]], b: NonEmptyList[OneAndNel[A]]): Boolean = 
+      Equal[IList[A]].equal(a.map(oa => oa.head +: oa.tail.list).list.flatten, b.map(bb => bb.head +: bb.tail.list).list.flatten) 
+  }
 
   "traverse1 on traverse1" ! forAll {(ints: OneAnd[NonEmptyList, Int],
                                     f: Int => NonEmptyList[Int]) =>
     (Traverse1[OneAndNel].traverse1(ints)(f)
-       must_==(Traverse[OneAndNel].traverse(ints)(f)))
+       must_===(Traverse[OneAndNel].traverse(ints)(f)))
   }
 
   "inequality exists" ! forAll {(a: OneAnd[List, Int]) =>
@@ -76,7 +81,7 @@ object OneAndTest extends SpecLite {
     }
   }
 
-  object instances {
+object instances {
     def functor[F[_]: Functor] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def apply[F[_]: Applicative: Plus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
