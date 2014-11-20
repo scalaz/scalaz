@@ -96,14 +96,15 @@ object ActorTest extends SpecLite {
     }
 
     "handle messages in order of sending by each thread" in {
-      val latch = new CountDownLatch(n)
+      val nRounded = (n / NumOfThreads) * NumOfThreads
+      val latch = new CountDownLatch(nRounded)
       val actor = countingDownActor(latch)
       for (j <- 1 to NumOfThreads) fork {
-        for (i <- 1 to n / NumOfThreads) {
+        for (i <- 1 to nRounded / NumOfThreads) {
           actor !(j, i)
         }
       }
-      assertCountDown(latch, "Should process " + n + " messages")
+      assertCountDown(latch, "Should process " + nRounded + " messages")
     }
 
     "redirect unhandled errors to uncaught exception handler of thread" in {
