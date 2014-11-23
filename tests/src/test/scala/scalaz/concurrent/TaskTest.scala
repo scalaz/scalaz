@@ -125,7 +125,7 @@ object TaskTest extends SpecLite {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.attemptRun ==
       -\/(SadTrombone)
   }
-  
+
   "evalutes Monad[Task].point lazily" in {
     val M = implicitly[Monad[Task]]
     var x = 0
@@ -289,6 +289,24 @@ object TaskTest extends SpecLite {
 
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
     Task.fromDisjunction(x).attemptRun must_== x
+  }
+
+  "back to the future" ! {
+    import scalaz.std.FutureTest._
+    import scala.concurrent.Await
+    forAll { fa: scala.concurrent.Future[Int] =>
+      val marty = scala.concurrent.ExecutionContext.global
+      val task = Task.stdFutureToTask(fa)(marty)
+      Await.result(Task.taskToStdFuture(task), duration) must_===
+        Await.result(fa, duration)
+    }
+  }
+
+  "task to the future" ! forAll { task: Task[Int] =>
+    val doc = scala.concurrent.ExecutionContext.global
+    val future = Task.taskToStdFuture(task)
+    Task.stdFutureToTask(future)(doc).attemptRun must_==
+      task.attemptRun
   }
 }
 

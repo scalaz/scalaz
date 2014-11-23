@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Kleisli, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-, ~>}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -12,6 +12,7 @@ import scalaz.\/._
 
 import collection.JavaConversions._
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future => StdFuture}
 
 /*
  * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
@@ -388,5 +389,27 @@ object Task {
 
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
+
+  val stdFutureToTask: StdFuture ~> ({type λ[α] = Kleisli[Task, ExecutionContext, α]})#λ =
+    new (StdFuture ~> ({type λ[α] = Kleisli[Task, ExecutionContext, α]})#λ) {
+      def apply[A](fa: StdFuture[A]) = Kleisli(ec =>
+        Task.async(register =>
+          fa.onComplete(a =>
+            register(scalaz.std.`try`.tryDisjunctionIso.to(a))
+          )(ec)))
+    }
+
+  /** Warning: this runs the Task in order to convert it to a scala.concurrent.Future */
+  val taskToStdFuture: Task ~> StdFuture =
+    new (Task ~> StdFuture) {
+      def apply[A](fa: Task[A]) = {
+        val p = scala.concurrent.Promise[A]()
+        fa.runAsync {
+          case -\/(t) => p.failure(t)
+          case \/-(a) => p.success(a)
+        }
+        p.future
+      }
+    }
 }
 
