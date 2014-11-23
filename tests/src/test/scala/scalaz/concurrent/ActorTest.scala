@@ -8,48 +8,36 @@ object ActorTest extends SpecLite {
   val NumOfMessages = 10000
   val NumOfThreads = 4
 
-  "actor with sequential strategy" should {
+  "actor with the sequential strategy" should {
     actorTests(NumOfMessages)(Strategy.Sequential)
   }
 
-  "actor with default strategy" should {
+  "actor with the default strategy" should {
     actorTests(NumOfMessages)(Strategy.DefaultStrategy)
   }
 
-  "actor with executor strategy backed by Scala fork-join pool" should {
+  "actor with an executor strategy backed by Scala fork-join pool" should {
     actorTests(NumOfMessages)(Strategy.Executor(new scala.concurrent.forkjoin.ForkJoinPool()))
   }
 
-  "actor with executor strategy backed by Java fork-join pool" should {
+  "actor with an executor strategy backed by Java fork-join pool" should {
     actorTests(NumOfMessages)(Strategy.Executor(new ForkJoinPool()))
   }
 
-  "actor with executor strategy backed by fixed thread pool" should {
+  "actor with an executor strategy backed by fixed thread pool" should {
     actorTests(NumOfMessages)(Strategy.Executor(Executors.newFixedThreadPool(NumOfThreads, Strategy.DefaultDaemonThreadFactory)))
   }
 
-  "actor with naive strategy" should {
-    actorTests(NumOfMessages / 1000)(Strategy.Naive)
+  "actor with the naive strategy" should {
+    actorTests(NumOfMessages / 100)(Strategy.Naive)
   }
 
-  "actor with Swing worker strategy" should {
-    actorTests(NumOfMessages)(Strategy.SwingWorker)
+  "actor with the Swing worker strategy" should {
+    actorTests(NumOfMessages / 10)(Strategy.SwingWorker)
   }
 
-  "actor with Swing invoke later strategy" should {
-    actorTests(NumOfMessages)(Strategy.SwingInvokeLater)
-  }
-
-  "actor with actor strategy backed by Scala fork-join pool" should {
-    actorTests(NumOfMessages)(Actor.strategy(new scala.concurrent.forkjoin.ForkJoinPool()))
-  }
-
-  "actor with actor strategy backed by Java fork-join pool" should {
-    actorTests(NumOfMessages)(Actor.strategy(new ForkJoinPool()))
-  }
-
-  "actor with actor strategy backed by fixed thread pool" should {
-    actorTests(NumOfMessages)(Actor.strategy(Executors.newFixedThreadPool(NumOfThreads, Strategy.DefaultDaemonThreadFactory)))
+  "actor with the Swing invoke later strategy" should {
+    actorTests(NumOfMessages / 10)(Strategy.SwingInvokeLater)
   }
 
   def actorTests(n: Int)(implicit s: Strategy) = {
@@ -107,26 +95,46 @@ object ActorTest extends SpecLite {
       assertCountDown(latch, "Should process " + nRounded + " messages")
     }
 
+    "doesn't handle messages in simultaneous threads" in {
+      val nPerThread = n / NumOfThreads
+      val latch = new CountDownLatch(1)
+      val actor = Actor[Int] {
+        val expectedSum = (1L to (nPerThread * NumOfThreads)).sum
+        var sum = 0L
+        (i: Int) =>
+          val newSum = sum + i
+          Thread.`yield`() // slowdown for possible thread racing
+          sum = newSum
+          if (sum == expectedSum) latch.countDown()
+      }
+      for (j <- 0 until NumOfThreads) fork {
+        val off = j * nPerThread
+        for (i <- 1 to nPerThread) {
+          actor ! i + off
+        }
+      }
+      assertCountDown(latch, "Should calculate sum of range without atomic operations")
+    }
+
     "redirect unhandled errors to uncaught exception handler of thread" in {
-      val l = new CountDownLatch(1)
+      val latch = new CountDownLatch(1)
       val err = System.err
       try {
         System.setErr(new java.io.PrintStream(new java.io.OutputStream {
-          override def write(b: Int): Unit = l.countDown()
+          override def write(b: Int): Unit = latch.countDown()
         }))
         Actor((_: Int) => 1 / 0) ! 1
-        assertCountDown(l, "Should print to System.err uncaught exception")
+        assertCountDown(latch, "Should print to System.err uncaught exception")
       } catch {
         case e: ArithmeticException if e.getMessage == "/ by zero" =>
-          l.countDown() // for a sequential strategy
-          assertCountDown(l, "Should print to System.err uncaught exception")
+          latch.countDown() // for the sequential strategy
+          assertCountDown(latch, "Should print to System.err uncaught exception")
       } finally System.setErr(err)
     }
   }
 
   def countingDownActor(latch: CountDownLatch): Actor[(Int, Int)] = Actor[(Int, Int)] {
     val ms = collection.mutable.Map[Int, Int]()
-
     (m: (Int, Int)) =>
       val (j, i) = m
       if (ms.getOrElse(j, 0) + 1 == i) {

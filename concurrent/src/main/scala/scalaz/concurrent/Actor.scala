@@ -1,7 +1,6 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent._
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -45,7 +44,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
   @annotation.tailrec
-  private def act(n: Node[A], i: Int = 1024, f: A => Unit = handler): Unit = {
+  private def act(n: Node[A], i: Long = strategy.batch, f: A => Unit = handler): Unit = {
     try f(n.a) catch {
       case ex: Throwable => onError(ex)
     }
@@ -90,62 +89,5 @@ trait ActorFunctions {
       val h = t.getUncaughtExceptionHandler
       if (h ne null) h.uncaughtException(t, e)
       throw e
-  }
-  /**
-   * Creates a strategy that optimized for actors.
-   * WARNING: This strategy cannot be used for evaluation of values.
-   *
-   * Implementation based on improvements committed to Akka by Viktor Klang:
-   * https://github.com/akka/akka/pull/16152
-   *
-   * @param s an executor service instance
-   * @return a strategy for actors
-   */
-  def strategy(implicit s: ExecutorService) = s match {
-    case p: scala.concurrent.forkjoin.ForkJoinPool => new Strategy {
-
-      import scala.concurrent.forkjoin.ForkJoinTask
-
-      def apply[A](a: => A): () => A = {
-        val t = new ForkJoinTask[Unit] {
-          def getRawResult: Unit = ()
-
-          def setRawResult(unit: Unit): Unit = ()
-
-          def exec(): Boolean = {
-            a
-            false
-          }
-        }
-        if (ForkJoinTask.getPool eq p) t.fork()
-        else p.execute(t)
-        null
-      }
-    }
-    case p: ForkJoinPool => new Strategy {
-      def apply[A](a: => A): () => A = {
-        val t = new ForkJoinTask[Unit] {
-          def getRawResult: Unit = ()
-
-          def setRawResult(unit: Unit): Unit = ()
-
-          def exec(): Boolean = {
-            a
-            false
-          }
-        }
-        if (ForkJoinTask.getPool eq p) t.fork()
-        else p.execute(t)
-        null
-      }
-    }
-    case p => new Strategy {
-      def apply[A](a: => A): () => A = {
-        p.execute(new Runnable {
-          def run(): Unit = a
-        })
-        null
-      }
-    }
   }
 }

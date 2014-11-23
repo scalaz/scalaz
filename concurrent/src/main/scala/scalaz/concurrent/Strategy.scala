@@ -13,6 +13,11 @@ import java.util.concurrent._
  */
 trait Strategy {
   def apply[A](a: => A): () => A
+
+  /**
+   * Number of messages that will be handled in batch by actors.
+   */
+  private[concurrent] def batch: Long = 10
 }
 
 object Strategy extends Strategys
@@ -40,6 +45,15 @@ trait Strategys extends StrategysLow {
     Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
 
   /**
+   * Default fork-join pool with FIFO scheduling mode for forked tasks,
+   * where parallelism is equal to the number of available processors.
+   * This pool is more efficient for actors than a fixed thread pool backed by
+   * `java.util.concurrent.LinkedBlockingQueue` as in `DefaultExecutorService`.
+   */
+  lazy val DefaultForkJoinPool: ForkJoinPool =
+    new ForkJoinPool(Runtime.getRuntime.availableProcessors, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true)
+
+  /**
    * Default scheduler used for scheduling the tasks like timeout.
    */
   lazy val DefaultTimeoutScheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1,
@@ -61,22 +75,89 @@ trait StrategysLow {
       val v = a
       () => v
     }
+
+    private[concurrent] override val batch: Long = -1 // maximize batch size to avoid stack overflow in actors
   }
 
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
    */
-  implicit def Executor(implicit s: ExecutorService) = new Strategy {
-    def apply[A](a: => A) = {
-      val fut = s.submit(new Callable[A] {
-        def call = a
-      })
-      () => fut.get
+  implicit def Executor(implicit s: ExecutorService): Strategy =
+    Executor(execService = s, batchSize = 10)
+
+  /**
+   * A strategy that evaluates its arguments using an ExecutorService.
+   *
+   * Implementation of tasks for FJ pools is based on improvements committed to Akka by Viktor Klang:
+   * https://github.com/akka/akka/pull/16152
+   *
+   * @param execService Executor service that will run strategy
+   * @param batchSize   Number of messages that actor will handle in batch
+   *                    before next actor will handle own messages in the same thread,
+   *                    set to 1 for as fair as possible
+   */
+  def Executor(execService: ExecutorService, batchSize: Long): Strategy = execService match {
+    case pool: scala.concurrent.forkjoin.ForkJoinPool => new Strategy {
+
+      import scala.concurrent.forkjoin.ForkJoinTask
+
+      def apply[A](a: => A) = {
+        val task = new ForkJoinTask[A] {
+          private var r: A = _
+
+          def getRawResult: A = r
+
+          def setRawResult(a: A): Unit = r = a
+
+          def exec(): Boolean = {
+            r = a
+            true
+          }
+        }
+        if (ForkJoinTask.getPool eq pool) task.fork()
+        else pool.execute(task)
+        () => task.get
+      }
+
+      private[concurrent] override val batch: Long = batchSize
+    }
+    case pool: ForkJoinPool => new Strategy {
+      def apply[A](a: => A) = {
+        val task = new ForkJoinTask[A] {
+          private var r: A = _
+
+          def getRawResult: A = r
+
+          def setRawResult(a: A): Unit = r = a
+
+          def exec(): Boolean = {
+            r = a
+            true
+          }
+        }
+        if (ForkJoinTask.getPool eq pool) task.fork()
+        else pool.execute(task)
+        () => task.get
+      }
+
+      private[concurrent] override val batch: Long = batchSize
+    }
+    case pool => new Strategy {
+      def apply[A](a: => A) = {
+        val future = pool.submit(new Callable[A] {
+          def call = a
+        })
+        () => future.get
+      }
+
+      private[concurrent] override val batch: Long = batchSize
     }
   }
 
   /**
    * A strategy that performs no evaluation of its argument.
+   *
+   * This strategy doesn't work with actors.
    */
   implicit val Id: Strategy = new Strategy {
     def apply[A](a: => A) = () => a
@@ -89,11 +170,13 @@ trait StrategysLow {
     def apply[A](a: => A) = {
       val executorService = Executors.newSingleThreadExecutor(Strategy.DefaultDaemonThreadFactory)
       val future = executorService.submit(new Callable[A] {
-        def call = a
+        def call: A = a
       })
       executorService.shutdown()
       () => future.get
     }
+
+    private[concurrent] override val batch: Long = -1 // maximize batch size to minimize forking of threads
   }
 
   /**
@@ -105,7 +188,7 @@ trait StrategysLow {
 
     def apply[A](a: => A) = {
       val worker = new SwingWorker[A, Unit] {
-        def doInBackground() = a
+        def doInBackground(): A = a
       }
       worker.execute()
       () => worker.get
@@ -121,7 +204,7 @@ trait StrategysLow {
 
     def apply[A](a: => A) = {
       val task = new FutureTask[A](new Callable[A] {
-        def call = a
+        def call: A = a
       })
       invokeLater(task)
       () => task.get
