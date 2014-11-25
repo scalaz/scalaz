@@ -297,7 +297,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def slice(from: Int, until: Int): IList[A] =
     drop(from).take((until max 0)- (from max 0))
 
-  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] = 
+  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
     IList(toList.sortBy(f)(B.toScalaOrdering): _*)
 
   def sorted(implicit ev: Order[A]): IList[A] =
