@@ -45,12 +45,19 @@ trait Strategys extends StrategysLow {
     Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
 
   /**
+   * Default fork-join pool with LIFO scheduling mode for forked tasks,
+   * where parallelism is equal to the number of available processors.
+   * This pool is suitable for parallel algorithms where tasks are joined.
+   */
+  lazy val DefaultLIFOForkJoinPool: ForkJoinPool =
+    new ForkJoinPool(Runtime.getRuntime.availableProcessors, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true)
+
+  /**
    * Default fork-join pool with FIFO scheduling mode for forked tasks,
    * where parallelism is equal to the number of available processors.
-   * This pool is more efficient for actors than a fixed thread pool backed by
-   * `java.util.concurrent.LinkedBlockingQueue` as in `DefaultExecutorService`.
+   * This pool is suitable for actors and other message-passing systems.
    */
-  lazy val DefaultForkJoinPool: ForkJoinPool =
+  lazy val DefaultFIFOForkJoinPool: ForkJoinPool =
     new ForkJoinPool(Runtime.getRuntime.availableProcessors, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true)
 
   /**
@@ -145,7 +152,7 @@ trait StrategysLow {
     case pool => new Strategy {
       def apply[A](a: => A) = {
         val future = pool.submit(new Callable[A] {
-          def call = a
+          def call: A = a
         })
         () => future.get
       }
