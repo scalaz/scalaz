@@ -14,6 +14,8 @@ import java.util.concurrent._
 trait Strategy {
   def apply[A](a: => A): () => A
 
+  def apply(a: => Unit): Unit
+
   /**
    * Number of messages that will be handled in batch by actors.
    */
@@ -78,10 +80,12 @@ trait StrategysLow {
    * A strategy that evaluates its argument in the current thread.
    */
   implicit val Sequential: Strategy = new Strategy {
-    def apply[A](a: => A) = {
+    def apply[A](a: => A): () => A = {
       val v = a
       () => v
     }
+
+    def apply(a: => Unit): Unit = a
 
     private[concurrent] override val batch: Long = -1 // maximize batch size to avoid stack overflow in actors
   }
@@ -105,57 +109,58 @@ trait StrategysLow {
    */
   def Executor(execService: ExecutorService, batchSize: Long): Strategy = execService match {
     case pool: scala.concurrent.forkjoin.ForkJoinPool => new Strategy {
-
-      import scala.concurrent.forkjoin.ForkJoinTask
-
-      def apply[A](a: => A) = {
-        val task = new ForkJoinTask[A] {
-          private var r: A = _
-
-          def getRawResult: A = r
-
-          def setRawResult(a: A): Unit = r = a
-
+      def apply[A](a: => A): () => A = {
+        val task = new ScalaForkJoinTask[A](pool) {
           def exec(): Boolean = {
             r = a
             true
           }
         }
-        if (ForkJoinTask.getPool eq pool) task.fork()
-        else pool.execute(task)
         () => task.get
       }
+
+      def apply(a: => Unit): Unit =
+        new ScalaForkJoinTask[Unit](pool) {
+          def exec(): Boolean = {
+            a
+            false
+          }
+        }
 
       private[concurrent] override val batch: Long = batchSize
     }
     case pool: ForkJoinPool => new Strategy {
-      def apply[A](a: => A) = {
-        val task = new ForkJoinTask[A] {
-          private var r: A = _
-
-          def getRawResult: A = r
-
-          def setRawResult(a: A): Unit = r = a
-
+      def apply[A](a: => A): () => A = {
+        val task = new JavaForkJoinTask[A](pool) {
           def exec(): Boolean = {
             r = a
             true
           }
         }
-        if (ForkJoinTask.getPool eq pool) task.fork()
-        else pool.execute(task)
         () => task.get
       }
+
+      def apply(a: => Unit): Unit =
+        new JavaForkJoinTask[Unit](pool) {
+          def exec(): Boolean = {
+            a
+            false
+          }
+        }
 
       private[concurrent] override val batch: Long = batchSize
     }
     case pool => new Strategy {
-      def apply[A](a: => A) = {
+      def apply[A](a: => A): () => A = {
         val future = pool.submit(new Callable[A] {
           def call: A = a
         })
         () => future.get
       }
+
+      def apply(a: => Unit): Unit = pool.execute(new Runnable {
+        def run(): Unit = a
+      })
 
       private[concurrent] override val batch: Long = batchSize
     }
@@ -164,17 +169,19 @@ trait StrategysLow {
   /**
    * A strategy that performs no evaluation of its argument.
    *
-   * This strategy doesn't work with actors.
+   * This strategy doesn't work with actors, use the sequential strategy instead.
    */
   implicit val Id: Strategy = new Strategy {
-    def apply[A](a: => A) = () => a
+    def apply[A](a: => A): () => A = () => a
+
+    def apply(a: => Unit): Unit = ()
   }
 
   /**
    * A simple strategy that spawns a new thread for every evaluation.
    */
   implicit val Naive: Strategy = new Strategy {
-    def apply[A](a: => A) = {
+    def apply[A](a: => A): () => A = {
       val executorService = Executors.newSingleThreadExecutor(Strategy.DefaultDaemonThreadFactory)
       val future = executorService.submit(new Callable[A] {
         def call: A = a
@@ -182,6 +189,10 @@ trait StrategysLow {
       executorService.shutdown()
       () => future.get
     }
+
+    def apply(a: => Unit): Unit = Strategy.DefaultDaemonThreadFactory.newThread(new Runnable {
+      def run(): Unit = a
+    }).start()
 
     private[concurrent] override val batch: Long = -1 // maximize batch size to minimize forking of threads
   }
@@ -193,13 +204,17 @@ trait StrategysLow {
 
     import javax.swing.SwingWorker
 
-    def apply[A](a: => A) = {
+    def apply[A](a: => A): () => A = {
       val worker = new SwingWorker[A, Unit] {
         def doInBackground(): A = a
       }
       worker.execute()
       () => worker.get
     }
+
+    def apply(a: => Unit): Unit = new SwingWorker[Unit, Unit] {
+      def doInBackground(): Unit = a
+    }.execute()
   }
 
   /**
@@ -209,12 +224,40 @@ trait StrategysLow {
 
     import javax.swing.SwingUtilities.invokeLater
 
-    def apply[A](a: => A) = {
+    def apply[A](a: => A): () => A = {
       val task = new FutureTask[A](new Callable[A] {
         def call: A = a
       })
       invokeLater(task)
       () => task.get
     }
+
+    def apply(a: => Unit): Unit = invokeLater(new Runnable {
+      def run(): Unit = a
+    })
   }
+}
+
+private abstract class JavaForkJoinTask[A](pool: ForkJoinPool) extends ForkJoinTask[A] {
+  protected var r: A = _
+
+  if (ForkJoinTask.getPool eq pool) fork()
+  else pool.execute(this)
+
+  def getRawResult: A = r
+
+  def setRawResult(a: A): Unit = r = a
+}
+
+import scala.concurrent.forkjoin.{ForkJoinPool, ForkJoinTask}
+
+private abstract class ScalaForkJoinTask[A](pool: ForkJoinPool) extends ForkJoinTask[A] {
+  protected var r: A = _
+
+  if (ForkJoinTask.getPool eq pool) fork()
+  else pool.execute(this)
+
+  def getRawResult: A = r
+
+  def setRawResult(a: A): Unit = r = a
 }
