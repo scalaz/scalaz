@@ -226,6 +226,19 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def after(t: Duration): Task[A] =
     new Task(get after t)
+
+  /**
+   * Runs this Task asynchronously, exposing the (eventual) result
+   * as a scala.concurrent.Future.
+   */
+  def unsafeRunAsStdFuture(): StdFuture[A] = {
+    val p = scala.concurrent.Promise[A]()
+    runAsync {
+      case -\/(t) => p.failure(t)
+      case \/-(a) => p.success(a)
+    }
+    p.future
+  }
 }
 
 object Task {
@@ -398,18 +411,4 @@ object Task {
             register(scalaz.std.`try`.tryDisjunctionIso.to(a))
           )(ec)))
     }
-
-  /** Warning: this runs the Task in order to convert it to a scala.concurrent.Future */
-  val taskToStdFuture: Task ~> StdFuture =
-    new (Task ~> StdFuture) {
-      def apply[A](fa: Task[A]) = {
-        val p = scala.concurrent.Promise[A]()
-        fa.runAsync {
-          case -\/(t) => p.failure(t)
-          case \/-(a) => p.success(a)
-        }
-        p.future
-      }
-    }
 }
-

@@ -297,14 +297,14 @@ object TaskTest extends SpecLite {
     forAll { fa: scala.concurrent.Future[Int] =>
       val marty = scala.concurrent.ExecutionContext.global
       val task = Task.stdFutureToTask(fa)(marty)
-      Await.result(Task.taskToStdFuture(task), duration) must_===
+      Await.result(task.unsafeRunAsStdFuture(), duration) must_===
         Await.result(fa, duration)
     }
   }
 
   "task to the future" ! forAll { task: Task[Int] =>
     val doc = scala.concurrent.ExecutionContext.global
-    val future = Task.taskToStdFuture(task)
+    val future = task.unsafeRunAsStdFuture()
     Task.stdFutureToTask(future)(doc).attemptRun must_==
       task.attemptRun
   }
