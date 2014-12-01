@@ -268,7 +268,6 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
     }
 
     final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
-//      protected[this] lazy val elemTag = ClassTag[A](array.getClass.getComponentType)
       protected[this] lazy val elemTag = ClassTag[A](immArray.componentType)
     }
 
