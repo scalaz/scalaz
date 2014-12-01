@@ -99,6 +99,8 @@ trait ImmutableArrayFunctions {
     // override def stringPrefix = "ImmutableArray"
     // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemManifest)
 
+    def componentType = arr.getClass().getComponentType
+
     def apply(idx: Int) = arr(idx)
 
     def length = arr.length
@@ -117,7 +119,7 @@ trait ImmutableArrayFunctions {
   }
 
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
-    protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+    protected[this] lazy val elemManifest = ClassManifest.classType[A](componentType)
   }
 
   final class ofByte(array: Array[Byte]) extends ImmutableArray1[Byte](array) {
@@ -232,7 +234,7 @@ object ImmutableArray extends ImmutableArrayFunctions {
     }
 
     final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
-      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.componentType)
     }
 
     final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
