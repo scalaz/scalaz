@@ -19,7 +19,7 @@ trait Strategy {
   /**
    * Number of messages that will be handled in batch by actors.
    */
-  private[concurrent] def batch: Long = 10
+  private[concurrent] def batch: Int = 10
 }
 
 object Strategy extends Strategys
@@ -87,7 +87,7 @@ trait StrategysLow {
 
     def apply(a: => Unit): Unit = a
 
-    private[concurrent] override val batch: Long = -1 // maximize batch size to avoid stack overflow in actors
+    private[concurrent] override val batch: Int = -1
   }
 
   /**
@@ -107,7 +107,7 @@ trait StrategysLow {
    *                    before next actor will handle own messages in the same thread,
    *                    set to 1 for as fair as possible
    */
-  def Executor(execService: ExecutorService, batchSize: Long): Strategy = execService match {
+  def Executor(execService: ExecutorService, batchSize: Int): Strategy = execService match {
     case pool: scala.concurrent.forkjoin.ForkJoinPool => new Strategy {
       def apply[A](a: => A): () => A = {
         val task = new ScalaForkJoinTask[A](pool) {
@@ -127,7 +127,7 @@ trait StrategysLow {
           }
         }
 
-      private[concurrent] override val batch: Long = batchSize
+      private[concurrent] override val batch: Int = batchSize
     }
     case pool: ForkJoinPool => new Strategy {
       def apply[A](a: => A): () => A = {
@@ -148,7 +148,7 @@ trait StrategysLow {
           }
         }
 
-      private[concurrent] override val batch: Long = batchSize
+      private[concurrent] override val batch: Int = batchSize
     }
     case pool => new Strategy {
       def apply[A](a: => A): () => A = {
@@ -162,7 +162,7 @@ trait StrategysLow {
         def run(): Unit = a
       })
 
-      private[concurrent] override val batch: Long = batchSize
+      private[concurrent] override val batch: Int = batchSize
     }
   }
 
@@ -194,7 +194,7 @@ trait StrategysLow {
       def run(): Unit = a
     }).start()
 
-    private[concurrent] override val batch: Long = -1 // maximize batch size to minimize forking of threads
+    private[concurrent] override val batch: Int = -1
   }
 
   /**

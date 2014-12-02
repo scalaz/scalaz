@@ -43,30 +43,47 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
 
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
+  private def act(n: Node[A]): Unit = {
+    val b = strategy.batch
+    if (b < 0) nonRecLoop(n)
+    else loop(n, b)
+  }
+
   @annotation.tailrec
-  private def act(n: Node[A], i: Long = strategy.batch, f: A => Unit = handler): Unit = {
+  private def loop(n: Node[A], i: Int, f: A => Unit = handler): Unit = {
     try f(n.a) catch {
       case ex: Throwable => onError(ex)
     }
     val n2 = n.get
     if (n2 eq null) scheduleLastTry(n)
     else if (i == 0) schedule(n2)
-    else act(n2, i - 1, f)
+    else loop(n2, i - 1, f)
+  }
+
+  @annotation.tailrec
+  private def nonRecLoop(n: Node[A], f: A => Unit = handler): Unit = {
+    try f(n.a) catch {
+      case ex: Throwable => onError(ex)
+    }
+    val n2 = n.get
+    if (n2 eq null) {
+      if (!head.compareAndSet(n, null)) nonRecLoop(n.next, f)
+    } else nonRecLoop(n2, f)
   }
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
 
-  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(next(n))
-
-  @annotation.tailrec
-  private def next(n: Node[A]): Node[A] = {
-    val n2 = n.get
-    if (n2 ne null) n2
-    else next(n)
-  }
+  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(n.next)
 }
 
-private class Node[A](val a: A) extends AtomicReference[Node[A]]
+private final class Node[A](val a: A) extends AtomicReference[Node[A]] {
+  @annotation.tailrec
+  def next: Node[A] = {
+    val n2 = get
+    if (n2 ne null) n2
+    else next
+  }
+}
 
 object Actor extends ActorInstances with ActorFunctions
 
