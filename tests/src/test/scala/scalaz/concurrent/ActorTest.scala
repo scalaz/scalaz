@@ -71,16 +71,17 @@ object ActorTest extends SpecLite {
       assertCountDown(latch, "Should exchange " + n + " messages")
     }
 
-    "send messages to itself and process them" in {
+    "create chain of actors and send message through it" in {
       val latch = new CountDownLatch(1)
-      var actor: Actor[Int] = null
-      actor = Actor[Int] {
+
+      def actor: Actor[Int] = Actor[Int] {
         (i: Int) =>
           if (i > 0) actor ! i - 1
           else latch.countDown()
       }
-      actor ! n
-      assertCountDown(latch, "Should send & process " + n + " messages")
+
+      actor ! (if (s eq  Strategy.Sequential) 100 else n)
+      assertCountDown(latch, "Should send message through chain of " + n + " actors")
     }
 
     "handle messages in order of sending by each thread" in {
