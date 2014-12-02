@@ -36,7 +36,7 @@ object StrategyTest extends SpecLite {
   }
 
   "the naive strategy" should {
-    recursiveStrategyTests(NumOfIterations, Strategy.Naive)
+    recursiveStrategyTests(NumOfIterations / 100, Strategy.Naive)
   }
 
   "the Swing worker strategy" should {
