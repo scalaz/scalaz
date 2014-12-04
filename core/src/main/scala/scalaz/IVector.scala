@@ -1437,6 +1437,30 @@ sealed abstract class IVectorInstances extends IVectorInstance0 {
 
       override def foldMap[A, B](fa: IVector[A])(f: A => B)(implicit M: Monoid[B]) =
         fa.foldLeft(M.zero) { (b, a) => M.append(b, f(a)) }
+
+      override def any[A](fa: IVector[A])(p: A => Boolean): Boolean = {
+        @tailrec
+        def loop(index: Int): Boolean = {
+          if (index < fa.length)
+            p(fa(index)) || loop(index + 1)
+          else
+            false
+        }
+
+        loop(0)
+      }
+
+      override def all[A](fa: IVector[A])(p: A => Boolean): Boolean = {
+        @tailrec
+        def loop(index: Int): Boolean = {
+          if (index < fa.length)
+            p(fa(index)) && loop(index + 1)
+          else
+            true
+        }
+
+        loop(0)
+      }
     }
   }
 
