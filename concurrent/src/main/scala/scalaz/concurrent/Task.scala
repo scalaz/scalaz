@@ -231,7 +231,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * Runs this Task asynchronously, exposing the (eventual) result
    * as a scala.concurrent.Future.
    */
-  def unsafeRunAsStdFuture(): StdFuture[A] = {
+  def unsafeToStdFuture(): StdFuture[A] = {
     val p = scala.concurrent.Promise[A]()
     runAsync {
       case -\/(t) => p.failure(t)
@@ -403,12 +403,9 @@ object Task {
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
 
-  val stdFutureToTask: StdFuture ~> ({type λ[α] = Kleisli[Task, ExecutionContext, α]})#λ =
-    new (StdFuture ~> ({type λ[α] = Kleisli[Task, ExecutionContext, α]})#λ) {
-      def apply[A](fa: StdFuture[A]) = Kleisli(ec =>
-        Task.async(register =>
-          fa.onComplete(a =>
-            register(scalaz.std.`try`.tryDisjunctionIso.to(a))
-          )(ec)))
-    }
+  def stdFutureToTask[A](fa: => StdFuture[A])(ec: ExecutionContext): Task[A] =
+    Task.async(register =>
+      fa.onComplete(a =>
+        register(scalaz.std.`try`.tryDisjunctionIso.to(a))
+      )(ec))
 }

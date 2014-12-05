@@ -8,6 +8,7 @@ import org.scalacheck.Prop._
 import java.util.concurrent.{Executors, TimeoutException, TimeUnit}
 import java.util.concurrent.atomic._
 import org.scalacheck.Prop.forAll
+import scala.concurrent.{ExecutionContext, Future => StdFuture}
 
 object TaskTest extends SpecLite {
 
@@ -294,19 +295,32 @@ object TaskTest extends SpecLite {
   "back to the future" ! {
     import scalaz.std.FutureTest._
     import scala.concurrent.Await
-    forAll { fa: scala.concurrent.Future[Int] =>
-      val marty = scala.concurrent.ExecutionContext.global
-      val task = Task.stdFutureToTask(fa)(marty)
-      Await.result(task.unsafeRunAsStdFuture(), duration) must_===
+    forAll { fa: StdFuture[Int] =>
+      val task = Task.stdFutureToTask(fa)(ExecutionContext.global)
+      Await.result(task.unsafeToStdFuture(), duration) must_===
         Await.result(fa, duration)
     }
   }
 
   "task to the future" ! forAll { task: Task[Int] =>
-    val doc = scala.concurrent.ExecutionContext.global
-    val future = task.unsafeRunAsStdFuture()
-    Task.stdFutureToTask(future)(doc).attemptRun must_==
+    val future = task.unsafeToStdFuture()
+    Task.stdFutureToTask(future)(ExecutionContext.global).attemptRun must_==
       task.attemptRun
+  }
+
+  "stdFutureToTask is deferred" in {
+    var i = 0
+    val task = Task.stdFutureToTask(
+      StdFuture.successful{
+        i = i + 1
+        i
+      }
+    )(ExecutionContext.global)
+
+    task.run must_== 1
+    i must_== 1
+    task.run must_== 2
+    i must_== 2
   }
 }
 
