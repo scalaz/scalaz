@@ -108,6 +108,9 @@ object WriterT extends WriterTFunctions with WriterTInstances {
     def zero = WriterT(M.zero)
     def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
   }
+
+  implicit def writerTShow[F[+_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[F, W, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait WriterTInstances12 {
