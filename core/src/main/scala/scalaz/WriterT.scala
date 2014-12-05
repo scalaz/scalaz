@@ -207,6 +207,9 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
   implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type λ[α[_], β] = WriterT[α, W, β]})#λ] = new WriterTHoist[W] {
     implicit def W = W0
   }
+
+  implicit def writerTShow[F[_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[F, W, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait WriterTFunctions {
