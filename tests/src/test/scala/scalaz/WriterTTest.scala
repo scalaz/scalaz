@@ -26,6 +26,11 @@ object WriterTTest extends SpecLite {
 
   checkAll(comonad.laws[({type λ[α]=Writer[Int, α]})#λ])
 
+  "flatMapF consistent with flatMap" ! forAll {
+    (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>
+      fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
+  }
+
   object instances {
     def functor[F[_]: Functor, W] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Monad, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
