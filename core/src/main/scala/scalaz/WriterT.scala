@@ -52,8 +52,11 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   }
 
   def flatMap[B](f: A => WriterT[F, W, B])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] =
+    flatMapF(f.andThen(_.run))
+
+  def flatMapF[B](f: A => F[(W, B)])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] =
     writerT(F.bind(run){wa =>
-      val z = f(wa._2).run
+      val z = f(wa._2)
       F.map(z)(wb => (s.append(wa._1, wb._1), wb._2))
     })
 
