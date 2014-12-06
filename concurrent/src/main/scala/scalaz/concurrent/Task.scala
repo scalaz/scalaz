@@ -403,7 +403,7 @@ object Task {
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
 
-  def stdFutureToTask[A](fa: => StdFuture[A])(ec: ExecutionContext): Task[A] =
+  def fromStdFuture[A](fa: => StdFuture[A])(ec: ExecutionContext): Task[A] =
     Task.async(register =>
       fa.onComplete(a =>
         register(scalaz.std.`try`.tryDisjunctionIso.to(a))
