@@ -109,5 +109,13 @@ object Monoid {
     def plus[A](f1: A0[A], f2: => A0[A]): A0[A] = M0.append(f1, f2)
   }
 
+  /** Monoid is an invariant functor. */
+  implicit val monoidInvariantFunctor: InvariantFunctor[Monoid] = new InvariantFunctor[Monoid] {
+    def xmap[A, B](ma: Monoid[A], f: A => B, g: B => A): Monoid[B] = new Monoid[B] {
+      def zero: B = f(ma.zero)
+      def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
+    }
+  }
+
   ////
 }
