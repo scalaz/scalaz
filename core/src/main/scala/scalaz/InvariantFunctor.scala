@@ -50,20 +50,5 @@ object InvariantFunctor {
   @inline def apply[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
 
   ////
-
-  /** Semigroup is an invariant functor. */
-  implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {
-    def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] = new Semigroup[B] {
-      def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
-    }
-  }
-
-  /** Monoid is an invariant functor. */
-  implicit val monoidInvariantFunctor: InvariantFunctor[Monoid] = new InvariantFunctor[Monoid] {
-    def xmap[A, B](ma: Monoid[A], f: A => B, g: B => A): Monoid[B] = new Monoid[B] {
-      def zero: B = f(ma.zero)
-      def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
-    }
-  }
   ////
 }

@@ -41,4 +41,13 @@ object MonoidTest extends SpecLite {
     ((Foldable[List] compose Foldable[Vector]).intercalate(xs, Cord("!!")).toString
      must_===(Cord("this!!has!!elements!!beneath").toString))
   }
+
+  "invariant functor" in {
+    import InvariantFunctorTest._
+    import syntax.invariantFunctor._
+
+    val sg: Monoid[Num] = Monoid[Int].xmap[Num](Num.apply _, _.x)
+    sg.append(Num(1), Num(2)) must_===(Num(3))
+    sg.zero must_===(Num(0))
+  }
 }
