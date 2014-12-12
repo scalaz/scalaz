@@ -93,8 +93,8 @@ object EitherTTest extends SpecLite {
 
     val r: String \/ Int = \/-(123)
     val l: String \/ Int = -\/("Fail")
-    val et1: EitherT[Option, String, Int] = r.liftEitherT[Option]
-    val et2: EitherT[Option, String, Int] = l.liftEitherT[Option]
+    r.liftEitherT[Option]: EitherT[Option, String, Int]
+    l.liftEitherT[Option]: EitherT[Option, String, Int]
   }
 
 }
