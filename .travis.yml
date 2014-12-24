@@ -1,3 +1,11 @@
+# Use Docker-based container (instead of OpenVZ)
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.sbt
+    - $HOME/.ivy2
+
 language: scala
 scala:
   - 2.11.2
@@ -7,4 +15,8 @@ jdk:
   - oraclejdk7
   - openjdk6
 
-script: sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test mima-report-binary-issues
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test mima-report-binary-issues
+
+  # Trick to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" | xargs rm
