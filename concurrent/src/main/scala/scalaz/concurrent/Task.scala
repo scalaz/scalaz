@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Kleisli, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-, ~>}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -12,6 +12,7 @@ import scalaz.\/._
 
 import collection.JavaConversions._
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future => StdFuture}
 
 /*
  * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
@@ -225,6 +226,19 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def after(t: Duration): Task[A] =
     new Task(get after t)
+
+  /**
+   * Runs this Task asynchronously, exposing the (eventual) result
+   * as a scala.concurrent.Future.
+   */
+  def unsafeToStdFuture(): StdFuture[A] = {
+    val p = scala.concurrent.Promise[A]()
+    runAsync {
+      case -\/(t) => p.failure(t)
+      case \/-(a) => p.success(a)
+    }
+    p.future
+  }
 }
 
 object Task {
@@ -388,5 +402,10 @@ object Task {
 
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
-}
 
+  def fromStdFuture[A](fa: => StdFuture[A])(ec: ExecutionContext): Task[A] =
+    Task.async(register =>
+      fa.onComplete(a =>
+        register(scalaz.std.`try`.tryDisjunctionIso.to(a))
+      )(ec))
+}

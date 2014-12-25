@@ -19,21 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class FutureTest extends SpecLite {
-
-  val duration: Duration = 1.seconds
-
-  implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
-
-  implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
-    val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
-    Await.result(futureWithError, duration)
-  }
-
-  implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
-
-  case class SomeFailure(n: Int) extends Exception
-
-  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
+  import FutureTest._
 
   checkAll(monad.laws[Future])
   checkAll(monoid.laws[Future[Int]])
@@ -79,4 +65,23 @@ class FutureTest extends SpecLite {
       Await.result(f, duration) must_== xs
     }
   }
+
+}
+
+object FutureTest {
+
+  val duration: Duration = 1.seconds
+
+  implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
+
+  implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A] contramap { future: Future[A] =>
+    val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
+    Await.result(futureWithError, duration)
+  }
+
+  implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
+
+  case class SomeFailure(n: Int) extends Exception
+
+  implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
 }

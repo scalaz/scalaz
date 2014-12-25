@@ -8,6 +8,7 @@ import org.scalacheck.Prop._
 import java.util.concurrent.{Executors, TimeoutException, TimeUnit}
 import java.util.concurrent.atomic._
 import org.scalacheck.Prop.forAll
+import scala.concurrent.{ExecutionContext, Future => StdFuture}
 
 object TaskTest extends SpecLite {
 
@@ -125,7 +126,7 @@ object TaskTest extends SpecLite {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.attemptRun ==
       -\/(SadTrombone)
   }
-  
+
   "evalutes Monad[Task].point lazily" in {
     val M = implicitly[Monad[Task]]
     var x = 0
@@ -289,6 +290,37 @@ object TaskTest extends SpecLite {
 
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
     Task.fromDisjunction(x).attemptRun must_== x
+  }
+
+  "back to the future" ! {
+    import scalaz.std.FutureTest._
+    import scala.concurrent.Await
+    forAll { fa: StdFuture[Int] =>
+      val task = Task.fromStdFuture(fa)(ExecutionContext.global)
+      Await.result(task.unsafeToStdFuture(), duration) must_===
+        Await.result(fa, duration)
+    }
+  }
+
+  "task to the future" ! forAll { task: Task[Int] =>
+    val future = task.unsafeToStdFuture()
+    Task.fromStdFuture(future)(ExecutionContext.global).attemptRun must_==
+      task.attemptRun
+  }
+
+  "fromStdFuture is deferred" in {
+    var i = 0
+    val task = Task.fromStdFuture(
+      StdFuture.successful{
+        i = i + 1
+        i
+      }
+    )(ExecutionContext.global)
+
+    task.run must_== 1
+    i must_== 1
+    task.run must_== 2
+    i must_== 2
   }
 }
 
