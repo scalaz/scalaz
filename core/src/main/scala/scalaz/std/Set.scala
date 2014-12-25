@@ -17,7 +17,9 @@ trait SetInstances {
       fa.foreach(a => s += a)
       var r = z
       while (!s.isEmpty) {
-        r = f(s.pop, r)
+        // Fixes stack overflow issue (#866)
+        val w = r
+        r = f(s.pop, w)
       }
       r
     }
