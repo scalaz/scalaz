@@ -3,8 +3,19 @@ sudo: false
 
 cache:
   directories:
-    - $HOME/.sbt
-    - $HOME/.ivy2
+    - $HOME/.ivy2/cache
+
+    # At the moment, sbt 0.13.5 is preinstalled in Travis VM image,
+    # which fortunately corresponds to current scalaz settings.
+    # The line below can be used to cache a given sbt version.
+    # - $HOME/.sbt/launchers/0.13.x
+
+    # At the moment, Scala 2.11.2 and 2.10.4 are preinstalled in Travis VM
+    # image, which fortunately corresponds to current scalaz settings.
+    # The line below is used to cache the scala version used by the build
+    # job, as these versions might be replaced after a Travis CI build
+    # environment upgrade (e.g. scala 2.11.2 could be replaced by scala 2.11.4).
+    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
 
 language: scala
 scala:
@@ -16,5 +27,6 @@ jdk:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test
 
-  # Trick to avoid unnecessary cache updates
+  # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
