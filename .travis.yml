@@ -25,7 +25,7 @@ jdk:
   - openjdk7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
