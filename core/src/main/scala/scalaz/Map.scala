@@ -48,7 +48,7 @@ sealed abstract class ==>>[A, B] {
   /** inserts a new key/value pair, resolving the conflict if the key already exists - O(log n)
    *
    * @param f function to resolve conflict with existing key:
-   *   (existingValue, insertedValue) => resolvedValue
+   *   (insertedValue, existingValue) => resolvedValue
    * @param kx key
    * @param x value to insert if the key is not already present */
   def insertWith(f: (B, B) => B, kx: A, x: B)(implicit o: Order[A]): A ==>> B =
@@ -57,7 +57,7 @@ sealed abstract class ==>>[A, B] {
   /** inserts a new key/value pair, resolving the conflict if the key already exists - O(log n)
    *
    * @param f function to resolve conflict with existing key:
-   *   (key, existingValue, insertedValue) => resolvedValue
+   *   (key, insertedValue, existingValue) => resolvedValue
    * @param kx key
    * @param x value to insert if the key is not already present */
   def insertWithKey(f: (A, B, B) => B, kx: A, x: B)(implicit o: Order[A]): A ==>> B =
