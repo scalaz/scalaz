@@ -4,8 +4,8 @@ package scalaz
  * Free applicative functors. Less expressive than free monads, but more
  * flexible to inspect and interpret.
  */
-sealed trait Frap[F[_],A] {
-  import Frap._
+sealed trait FreeAp[F[_],A] {
+  import FreeAp._
 
   /**
    * The canonical natural transformation that interprets this free
@@ -19,7 +19,7 @@ sealed trait Frap[F[_],A] {
     }
 
   /** Provides access to the first instruction of this program, if present */
-  def para[B](pure: A => B, ap: ({type λ[α] = (F[α], Frap[F, α => A])})#λ ~>
+  def para[B](pure: A => B, ap: ({type λ[α] = (F[α], FreeAp[F, α => A])})#λ ~>
                                 ({type λ[α] = B})#λ): B =
     this match {
       case Pure(x) => pure(x)
@@ -33,7 +33,7 @@ sealed trait Frap[F[_],A] {
    * Example:
    *
    * {{{
-   * def count[F[_],B](p: Frap[F,B]): Int =
+   * def count[F[_],B](p: FreeAp[F,B]): Int =
    *   p.analyze(new (F ~> ({ type λ[α] = Int })#λ) {
    *     def apply[A](a: F[A]) = 1
    *   })
@@ -45,11 +45,11 @@ sealed trait Frap[F[_],A] {
     }).getConst
 
   /**
-   * The natural transformation from `Frap[F,_]` to `Frap[G,_]`
+   * The natural transformation from `FreeAp[F,_]` to `FreeAp[G,_]`
    */
-  def hoist[G[_]](f: F ~> G): Frap[G,A] = this match {
+  def hoist[G[_]](f: F ~> G): FreeAp[G,A] = this match {
     case Pure(a) => Pure(a)
-    case x@Ap() => Frap(f(x.v()), x.k() hoist f)
+    case x@Ap() => FreeAp(f(x.v()), x.k() hoist f)
   }
 
   /**
@@ -70,45 +70,45 @@ sealed trait Frap[F[_],A] {
     })
 
   /** Idiomatic function application */
-  def ap[B](f: Frap[F, A => B]): Frap[F,B] = f match {
+  def ap[B](f: FreeAp[F, A => B]): FreeAp[F,B] = f match {
     case Pure(g) => map(g)
-    case x@Ap() => Frap(x.v(), ap(x.k().map(g => (a:A) => (b:x.I) => g(b)(a))))
+    case x@Ap() => FreeAp(x.v(), ap(x.k().map(g => (a:A) => (b:x.I) => g(b)(a))))
   }
 
   /** Append a function to the end of this program */
-  def map[B](f: A => B): Frap[F,B] = this match {
+  def map[B](f: A => B): FreeAp[F,B] = this match {
     case Pure(a) => Pure(f(a))
-    case x@Ap() => Frap(x.v(), x.k().map(f compose _))
+    case x@Ap() => FreeAp(x.v(), x.k().map(f compose _))
   }
 }
 
-object Frap {
-  implicit def freeInstance[F[_]]: Applicative[({type λ[α] = Frap[F,α]})#λ] =
-    new Applicative[({type λ[α] = Frap[F,α]})#λ] {
-      def point[A](a: => A) = Frap.point(a)
-      def ap[A,B](fa: => Frap[F,A])(ff: => Frap[F, A => B]) = fa ap ff
+object FreeAp {
+  implicit def freeInstance[F[_]]: Applicative[({type λ[α] = FreeAp[F,α]})#λ] =
+    new Applicative[({type λ[α] = FreeAp[F,α]})#λ] {
+      def point[A](a: => A) = FreeAp.point(a)
+      def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa ap ff
     }
 
   /** Return a value in a free applicative functor */
-  def point[F[_],A](a: A): Frap[F,A] = Pure(a)
+  def point[F[_],A](a: A): FreeAp[F,A] = Pure(a)
 
   /** Return a value in a free applicative functor. Alias for `point`. */
-  def pure[F[_],A](a: A): Frap[F,A] = point(a)
+  def pure[F[_],A](a: A): FreeAp[F,A] = point(a)
 
   /** Lift a value in `F` into the free applicative functor on `F` */
-  def lift[F[_],A](x: => F[A]): Frap[F, A] = Frap(x, Pure((a: A) => a))
+  def lift[F[_],A](x: => F[A]): FreeAp[F, A] = FreeAp(x, Pure((a: A) => a))
 
-  private [scalaz] case class Pure[F[_],A](a: A) extends Frap[F,A]
-  private abstract case class Ap[F[_],A]() extends Frap[F,A] {
+  private [scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
+  private abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
     type I
     val v: () => F[I]
-    val k: () => Frap[F, I => A]
+    val k: () => FreeAp[F, I => A]
   }
 
   /**
    * Add an effect to the front of a program that produces a continuation for it.
    */
-  def apply[F[_],A,B](value: => F[A], function: => Frap[F, A => B]): Frap[F,B] =
+  def apply[F[_],A,B](value: => F[A], function: => FreeAp[F, A => B]): FreeAp[F,B] =
     new Ap[F,B] {
       type I = A
       val v = () => value
