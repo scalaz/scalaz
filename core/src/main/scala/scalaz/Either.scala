@@ -316,6 +316,26 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       b => \&/.That(b)
     )
 
+  /** Reassociate a 3-way disjunction to the left; A \/ (B \/ C) => (A \/ B) \/ C. */
+  def reassocL[BB, CC](implicit ev: B <~< (BB \/ CC)): (A \/ BB) \/ CC =
+    this match {
+      case -\/(a) => -\/(-\/(a))
+      case \/-(b) => ev(b) match {
+        case -\/(bb) => -\/(\/-(bb))
+        case \/-(cc) => \/-(cc)
+      }
+    }
+
+  /** Reassociate a 3-way disjunction to the right; (A \/ B) \/ C => A \/ (B \/ C). */
+  def reassocR[AA, CC](implicit ev: A <~< (AA \/ CC)): AA \/ (CC \/ B) =
+    this match {
+      case -\/(a) => ev(a) match {
+        case -\/(aa) => -\/(aa)
+        case \/-(cc) => \/-(-\/(cc))
+      }
+      case \/-(b) => \/-(\/-(b))
+    }
+
 }
 
 /** A left disjunction
