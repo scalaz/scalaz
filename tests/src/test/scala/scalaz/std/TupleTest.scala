@@ -41,16 +41,16 @@ object TupleTest extends SpecLite {
   checkAll("Tuple8", monoid.laws[(A, B, C, D, E, F, G, H)])
 
   checkAll("Tuple1", monad.laws[Tuple1])
-  checkAll("Tuple2", monad.laws[({type λ[α] = (B, α)})#λ])
-  checkAll("Tuple3", monad.laws[({type λ[α] = (B, C, α)})#λ])
-  checkAll("Tuple4", monad.laws[({type λ[α] = (B, C, D, α)})#λ])
-  checkAll("Tuple5", monad.laws[({type λ[α] = (B, C, D, E, α)})#λ])
-  checkAll("Tuple6", monad.laws[({type λ[α] = (B, C, D, E, F, α)})#λ])
-  checkAll("Tuple7", monad.laws[({type λ[α] = (B, C, D, E, F, G, α)})#λ])
-  checkAll("Tuple8", monad.laws[({type λ[α] = (B, C, D, E, F, G, H, α)})#λ])
+  checkAll("Tuple2", monad.laws[(B, ?)])
+  checkAll("Tuple3", monad.laws[(B, C, ?)])
+  checkAll("Tuple4", monad.laws[(B, C, D, ?)])
+  checkAll("Tuple5", monad.laws[(B, C, D, E, ?)])
+  checkAll("Tuple6", monad.laws[(B, C, D, E, F, ?)])
+  checkAll("Tuple7", monad.laws[(B, C, D, E, F, G, ?)])
+  checkAll("Tuple8", monad.laws[(B, C, D, E, F, G, H, ?)])
 
   checkAll("Tuple1", comonad.laws[Tuple1])
-  checkAll("Tuple2", comonad.laws[({type λ[α]=(Int, α)})#λ])
+  checkAll("Tuple2", comonad.laws[(Int, ?)])
 
   "syntax" should {
     import std.tuple.tupleSyntax._
@@ -90,14 +90,14 @@ object TupleTest extends SpecLite {
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
       
       def bitraverse = Bitraverse[Tuple2]
-      def functor = Functor[({type λ[α] = (B, α)})#λ]
-      def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
-      def cozip = Cozip[({type λ[α] = (A, α)})#λ]
+      def functor = Functor[(B, ?)]
+      def monad[A: Monoid] = Functor[(A, ?)]
+      def cozip = Cozip[(A, ?)]
 
       // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]
       def semigroup[A: Monoid, B: Monoid] = Semigroup[(A, B)]
-      def functor[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]
+      def functor[A: Monoid] = Functor[(A, ?)]
     }
     object tuple3 {
       def show[A: Show, B: Show, C: Show] = Show[(A, B, C)]

@@ -6,7 +6,7 @@ import ST._
 import org.scalacheck.Prop.forAll
 
 object STTest extends SpecLite {
-  type ForallST[A] = Forall[({type λ[S] = ST[S, A]})#λ]
+  type ForallST[A] = Forall[ST[?, A]]
 
   "STRef" in {
     def e1[S] = for {

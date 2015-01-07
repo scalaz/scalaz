@@ -25,13 +25,13 @@ object IterateeTTest extends SpecLite {
 
   object instances {
     object iterateet {
-      def monad[F[_]: Monad, E] = Monad[({type λ[α] = IterateeT[E, F, α]})#λ]
-      def liftIO[F[_]: MonadIO, E] = LiftIO[({type λ[α] = IterateeT[E, F, α]})#λ]
-      def monadIO[F[_]: MonadIO, E] = MonadIO[({type λ[α] = IterateeT[E, F, α]})#λ]
+      def monad[F[_]: Monad, E] = Monad[IterateeT[E, F, ?]]
+      def liftIO[F[_]: MonadIO, E] = LiftIO[IterateeT[E, F, ?]]
+      def monadIO[F[_]: MonadIO, E] = MonadIO[IterateeT[E, F, ?]]
     }
 
     object iteratee {
-      def monad[E, F] = Monad[({type λ[α] = Iteratee[E, α]})#λ]
+      def monad[E, F] = Monad[Iteratee[E, ?]]
     }
   }
 }

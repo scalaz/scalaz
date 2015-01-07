@@ -22,12 +22,12 @@ sealed trait ToStrongOps0 {
 trait ToStrongOps extends ToStrongOps0 with ToProfunctorOps {
   
   implicit def ToStrongOps[F[_, _],A, B](v: F[A, B])(implicit F0: Strong[F]) =
-      new StrongOps[F,A, B](v)
+    new StrongOps[F,A, B](v)
   
 
   
-  implicit def ToStrongVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Strong[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new StrongOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToStrongVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Strong[F[G, ?, ?]]) =
+    new StrongOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

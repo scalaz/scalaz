@@ -172,39 +172,41 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
-    def id[A] =
-      NullResult.lift(identity)
-    override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
-      f compose g
-    override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
-      f *** g
-    override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
-      r contramap f
-    override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
-      r map f
-    override def arr[A, B](f: A => B) =
-      NullResult.lift(f)
-    override def first[A, B, C](r: NullResult[A, B]) =
-      r.first
-  }
+  implicit val nullResultArrow: Arrow[NullResult] =
+    new Arrow[NullResult] {
+      def id[A] =
+        NullResult.lift(identity)
+      override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
+        f compose g
+      override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
+        f *** g
+      override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
+        r contramap f
+      override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
+        r map f
+      override def arr[A, B](f: A => B) =
+        NullResult.lift(f)
+      override def first[A, B, C](r: NullResult[A, B]) =
+        r.first
+    }
 
-  implicit def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = new Monad[({type λ[α] = NullResult[X, α]})#λ] {
-    override def map[A, B](a: NullResult[X, A])(f: A => B) =
-      a map f
-    override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
-      a ap f
-    override def point[A](a: => A): NullResult[X, A] =
-      NullResult.always(a)
-    override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
-      a flatMap f
-  }
+  implicit def nullResultMonad[X]: Monad[NullResult[X, ?]] =
+    new Monad[NullResult[X, ?]] {
+      override def map[A, B](a: NullResult[X, A])(f: A => B) =
+        a map f
+      override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
+        a ap f
+      override def point[A](a: => A): NullResult[X, A] =
+        NullResult.always(a)
+      override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
+        a flatMap f
+    }
 
-  implicit def nullResultContravariant[X]: Contravariant[({type λ[α] = NullResult[α, X]})#λ] = new Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
-    override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
-      a contramap f
-  }
-
+  implicit def nullResultContravariant[X]: Contravariant[NullResult[?, X]] =
+    new Contravariant[NullResult[?, X]] {
+      override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
+        a contramap f
+    }
 }
 
 private trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {

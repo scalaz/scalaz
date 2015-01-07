@@ -23,15 +23,15 @@ object EitherTest extends SpecLite {
   checkAll("Either.RightProjection @@ First", monoid.laws[Either.RightProjection[Int, Int] @@ First])
   checkAll("Either.RightProjection @@ Last", monoid.laws[Either.RightProjection[Int, Int] @@ Last])
 
-  checkAll("Either.LeftProjection", monad.laws[({type λ[α] = Either.LeftProjection[α, Int]})#λ])
-  checkAll("Either.RightProjection", monad.laws[({type λ[α] = Either.RightProjection[Int, α]})#λ])
-  checkAll("Either.LeftProjection @@ First", monad.laws[({type λ[α] = Either.LeftProjection[α, Int] @@ First})#λ])
-  checkAll("Either.RightProjection @@ First", monad.laws[({type λ[α] = Either.RightProjection[Int, α] @@ First})#λ])
-  checkAll("Either.LeftProjection @@ Last", monad.laws[({type λ[α] = Either.LeftProjection[α, Int] @@ Last})#λ])
-  checkAll("Either.RightProjection @@ Last", monad.laws[({type λ[α] = Either.RightProjection[Int, α] @@ Last})#λ])
+  checkAll("Either.LeftProjection", monad.laws[Either.LeftProjection[?, Int]])
+  checkAll("Either.RightProjection", monad.laws[Either.RightProjection[Int, ?]])
+  checkAll("Either.LeftProjection @@ First", monad.laws[λ[α => Either.LeftProjection[α, Int] @@ First]])
+  checkAll("Either.RightProjection @@ First", monad.laws[λ[α => Either.RightProjection[Int, α] @@ First]])
+  checkAll("Either.LeftProjection @@ Last", monad.laws[λ[α => Either.LeftProjection[α, Int] @@ Last]])
+  checkAll("Either.RightProjection @@ Last", monad.laws[λ[α => Either.RightProjection[Int, α] @@ Last]])
 
-  checkAll("Either", monad.laws[({type f[x] = Either[Int, x]})#f])
+  checkAll("Either", monad.laws[Either[Int, ?]])
   checkAll("Either", bifunctor.laws[Either])
-  checkAll("Either", traverse.laws[({type f[x] = Either[Int, x]})#f])
+  checkAll("Either", traverse.laws[Either[Int, ?]])
   checkAll("Either", bitraverse.laws[Either])
 }

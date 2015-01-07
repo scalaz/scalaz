@@ -15,10 +15,10 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
    })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String]) extends SpecLite {
   import dict._
 
-  checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
-  checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
-  checkAll(bind.laws[({type F[V] = Map[Int,V]})#F])
-  checkAll(align.laws[({type F[V] = Map[Int,V]})#F])
+  checkAll(traverse.laws[Map[Int, ?]])
+  checkAll(isEmpty.laws[Map[Int, ?]])
+  checkAll(bind.laws[Map[Int, ?]])
+  checkAll(align.laws[Map[Int, ?]])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
   checkAll(equal.laws[Map[Int,String]])
@@ -58,13 +58,13 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
 
   "align" ! forAll { (a: Map[Int, String], b: Map[Int, Long]) =>
     import std.set._, \&/._
-    val F = Align[({type λ[α] = Map[Int, α]})#λ]
+    val F = Align[Map[Int, ?]]
     val x = F.align(a, b)
     val keysA = a.keySet
     val keysB = b.keySet
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
-    ==>>.fromList(x.toList) must_=== Align[({type λ[α] = Int ==>> α})#λ].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
+    ==>>.fromList(x.toList) must_=== Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
     x.keySet must_=== (keysA ++ keysB)
 
     x.filter(_._2.isThis).keySet must_=== (keysA -- keysB)
@@ -95,9 +95,8 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   }
 }
 
-private object DIContravariant extends Contravariant[({type λ[α] = DummyImplicit})#λ] {
+private object DIContravariant extends Contravariant[λ[α => DummyImplicit]] {
   def contramap[A, B](fa: DummyImplicit)(f: B => A) = fa
 }
 
-object MapTest extends XMapTest[SMap, ({type λ[α] = DummyImplicit})#λ
-    ](std.map)(DIContravariant, implicitly, implicitly)
+object MapTest extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant, implicitly, implicitly)

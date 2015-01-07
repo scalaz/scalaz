@@ -221,12 +221,13 @@ trait IOStd {
 
 trait IOFunctions extends IOStd {
   type RunInBase[M[_], Base[_]] =
-  Forall[({type λ[B] = M[B] => Base[M[B]]})#λ]
+  Forall[λ[α => M[α] => Base[M[α]]]]
 
   /** Construct an IO action from a world-transition function. */
-  def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] = new IO[A] {
-    private[effect] def apply(rw: Tower[IvoryTower]) = Suspend(() => f(rw))
-  }
+  def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] =
+    new IO[A] {
+      private[effect] def apply(rw: Tower[IvoryTower]) = Suspend(() => f(rw))
+    }
 
   // Mutable variables in the IO monad
   def newIORef[A](a: => A): IO[IORef[A]] =
@@ -248,12 +249,12 @@ trait IOFunctions extends IOStd {
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
   def onExit[S, P[_] : MonadIO](finalizer: IO[Unit]):
-  RegionT[S, P, FinalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ]] =
+  RegionT[S, P, FinalizerHandle[RegionT[S, P, ?]]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)
       h = refCountedFinalizer(finalizer, refCntIORef)
       _ <- hsIORef.mod(h :: _)
-    } yield finalizerHandle[({type λ[α] = RegionT[S, P, α]})#λ](h)).liftIO[P]))
+    } yield finalizerHandle[RegionT[S, P, ?]](h)).liftIO[P]))
 
   /**
    * Execute a region inside its parent region P. All resources which have been opened in the given
@@ -263,7 +264,7 @@ trait IOFunctions extends IOStd {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegionT[P[_] : MonadControlIO, A](r: Forall[({type λ[S] = RegionT[S, P, A]})#λ]): P[A] = {
+  def runRegionT[P[_] : MonadControlIO, A](r: Forall[RegionT[?, P, A]]): P[A] = {
     def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {

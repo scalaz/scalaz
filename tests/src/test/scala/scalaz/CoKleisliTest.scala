@@ -39,7 +39,7 @@ object CokleisliTest extends SpecLite {
       a(None) == b(None) && Iterator.fill(20)(util.Random.nextInt).map(Option(_)).forall(n => a(n) == b(n))
     }
 
-  checkAll(bind.laws[({type λ[α] = Cokleisli[Option, Int, α]})#λ])
+  checkAll(bind.laws[Cokleisli[Option, Int, ?]])
 
   "compose" in {
     import std.AllInstances._
@@ -51,14 +51,13 @@ object CokleisliTest extends SpecLite {
   }
 
   object instances {
-    def monad[F[_], W] = Monad[({type λ[α] = Cokleisli[F, W, α]})#λ]
-    def compose[F[_], W](implicit F: Cobind[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def profunctor[F[_]: Functor, W] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def arrow[F[_] : Comonad, W] = Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def monad[F[_], W] = Monad[Cokleisli[F, W, ?]]
+    def compose[F[_], W](implicit F: Cobind[F]) = Compose[Cokleisli[F, ?, ?]]
+    def profunctor[F[_]: Functor, W] = Profunctor[Cokleisli[F, ?, ?]]
+    def arrow[F[_] : Comonad, W] = Arrow[Cokleisli[F, ?, ?]]
 
     // checking absence of ambiguity
-    def compose[F[_], W](implicit F: Comonad[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def profunctor[F[_]: Comonad, W] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def compose[F[_], W](implicit F: Comonad[F]) = Compose[Cokleisli[F, ?, ?]]
+    def profunctor[F[_]: Comonad, W] = Profunctor[Cokleisli[F, ?, ?]]
   }
-
 }

@@ -62,23 +62,23 @@ trait LiskovFunctions {
 
   /**Subtyping is transitive */
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
-    g.subst[({type λ[-α]= α <~< C})#λ](f)
+    g.subst[λ[`-α` => α <~< C]](f)
 
   /**We can lift subtyping into any covariant type constructor */
   def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
-    a.subst[({type λ[-α]= T[α] <~< T[A2]})#λ](refl)
+    a.subst[λ[`-α` => T[α] <~< T[A2]]](refl)
 
   def co2[T[+_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
-    a.subst[({type λ[-α]= T[α, B] <~< T[Z, B]})#λ](refl)
+    a.subst[λ[`-α` => T[α, B] <~< T[Z, B]]](refl)
 
   def co2_2[T[_, +_], Z, A, B](a: B <~< Z): T[A, B] <~< T[A, Z] =
-    a.subst[({type λ[-α]= T[A, α] <~< T[A, Z]})#λ](refl)
+    a.subst[λ[`-α` => T[A, α] <~< T[A, Z]]](refl)
 
   def co3[T[+_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
-    a.subst[({type λ[-α]= T[α, B, C] <~< T[Z, B, C]})#λ](refl)
+    a.subst[λ[`-α` => T[α, B, C] <~< T[Z, B, C]]](refl)
 
   def co4[T[+_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
-    a.subst[({type λ[-α]=T[α, B, C, D] <~< T[Z, B, C, D]})#λ](refl)
+    a.subst[λ[`-α` => T[α, B, C, D] <~< T[Z, B, C, D]]](refl)
 
   /**lift2(a,b) = co1_2(a) compose co2_2(b) */
   def lift2[T[+_, +_], A, A2, B, B2](
@@ -118,36 +118,36 @@ trait LiskovFunctions {
 
   /**We can lift subtyping into any contravariant type constructor */
   def contra[T[-_], A, A2](a: A <~< A2): (T[A2] <~< T[A]) =
-    a.subst[({type λ[-α]=T[A2] <~< T[α]})#λ](refl)
+    a.subst[λ[`-α` => T[A2] <~< T[α]]](refl)
 
   // binary
   def contra1_2[T[-_, _], Z, A, B](a: A <~< Z): (T[Z, B] <~< T[A, B]) =
-    a.subst[({type λ[-α]=T[Z, B] <~< T[α, B]})#λ](refl)
+    a.subst[λ[`-α` => T[Z, B] <~< T[α, B]]](refl)
 
   def contra2_2[T[_, -_], Z, A, B](a: B <~< Z): (T[A, Z] <~< T[A, B]) =
-    a.subst[({type λ[-α]=T[A, Z] <~< T[A, α]})#λ](refl)
+    a.subst[λ[`-α` => T[A, Z] <~< T[A, α]]](refl)
 
   // ternary
   def contra1_3[T[-_, _, _], Z, A, B, C](a: A <~< Z): (T[Z, B, C] <~< T[A, B, C]) =
-    a.subst[({type λ[-α]=T[Z, B, C] <~< T[α, B, C]})#λ](refl)
+    a.subst[λ[`-α` => T[Z, B, C] <~< T[α, B, C]]](refl)
 
   def contra2_3[T[_, -_, _], Z, A, B, C](a: B <~< Z): (T[A, Z, C] <~< T[A, B, C]) =
-    a.subst[({type λ[-α]=T[A, Z, C] <~< T[A, α, C]})#λ](refl)
+    a.subst[λ[`-α` => T[A, Z, C] <~< T[A, α, C]]](refl)
 
   def contra3_3[T[_, _, -_], Z, A, B, C](a: C <~< Z): (T[A, B, Z] <~< T[A, B, C]) =
-    a.subst[({type λ[-α]=T[A, B, Z] <~< T[A, B, α]})#λ](refl)
+    a.subst[λ[`-α` => T[A, B, Z] <~< T[A, B, α]]](refl)
 
   def contra1_4[T[-_, _, _, _], Z, A, B, C, D](a: A <~< Z): (T[Z, B, C, D] <~< T[A, B, C, D]) =
-    a.subst[({type λ[-α]=T[Z, B, C, D] <~< T[α, B, C, D]})#λ](refl)
+    a.subst[λ[`-α` => T[Z, B, C, D] <~< T[α, B, C, D]]](refl)
 
   def contra2_4[T[_, -_, _, _], Z, A, B, C, D](a: B <~< Z): (T[A, Z, C, D] <~< T[A, B, C, D]) =
-    a.subst[({type λ[-α]=T[A, Z, C, D] <~< T[A, α, C, D]})#λ](refl)
+    a.subst[λ[`-α` => T[A, Z, C, D] <~< T[A, α, C, D]]](refl)
 
   def contra3_4[T[_, _, -_, _], Z, A, B, C, D](a: C <~< Z): (T[A, B, Z, D] <~< T[A, B, C, D]) =
-    a.subst[({type λ[-α]=T[A, B, Z, D] <~< T[A, B, α, D]})#λ](refl)
+    a.subst[λ[`-α` => T[A, B, Z, D] <~< T[A, B, α, D]]](refl)
 
   def contra4_4[T[_, _, _, -_], Z, A, B, C, D](a: D <~< Z): (T[A, B, C, Z] <~< T[A, B, C, D]) =
-    a.subst[({type λ[-α]=T[A, B, C, Z] <~< T[A, B, C, α]})#λ](refl)
+    a.subst[λ[`-α` => T[A, B, C, Z] <~< T[A, B, C, α]]](refl)
 
   /**Lift subtyping into a Function1-like type
    * liftF1(a,r) = contra1_2(a) compose co2_2(b)
@@ -217,9 +217,10 @@ trait LiskovFunctions {
    */
 
   /**Unsafely force a claim that A is a subtype of B */
-  def force[A, B]: A <~< B = new (A <~< B) {
-    def subst[F[-_]](p: F[B]): F[A] = p.asInstanceOf[F[A]]
-  }
+  def force[A, B]: A <~< B =
+    new (A <~< B) {
+      def subst[F[-_]](p: F[B]): F[A] = p.asInstanceOf[F[A]]
+    }
 
 
   def unco[F[_] : Injective, Z, A](
@@ -246,4 +247,3 @@ trait LiskovFunctions {
     a: F[A, B] <~< F[A, Z]
   ): (Z <~< B) = force[Z, B]
 }
-

@@ -161,7 +161,8 @@ object build extends Build {
           }
         }
         </developers>
-      )
+      ),
+    addCompilerPlugin("org.spire-math" % "kind-projector_2.10" % "0.5.2")
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )

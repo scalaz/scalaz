@@ -17,15 +17,15 @@ object CodensityTest extends SpecLite {
       : Equal[Codensity[F, A]] =
     Equal.equalBy(_.improve)
 
-  checkAll("List", monadPlus.laws[({type λ[α] = Codensity[List, α]})#λ])
-  checkAll("Option", monadPlus.laws[({type λ[α] = Codensity[Option, α]})#λ])
+  checkAll("List", monadPlus.laws[Codensity[List, ?]])
+  checkAll("Option", monadPlus.laws[Codensity[Option, ?]])
 
   object instances {
-    def functor[F[_]: MonadPlus, A] = Functor[({type λ[α] = Codensity[F, α]})#λ]
-    def apply[F[_]: MonadPlus, A] = Apply[({type λ[α] = Codensity[F, α]})#λ]
-    def applicative[F[_]: MonadPlus, A] = Applicative[({type λ[α] = Codensity[F, α]})#λ]
-    def plus[F[_]: MonadPlus, A] = Plus[({type λ[α] = Codensity[F, α]})#λ]
-    def monad[F[_]: MonadPlus, A] = Monad[({type λ[α] = Codensity[F, α]})#λ]
-    def monade[F[_], A] = Monad[({type λ[α] = Codensity[F, α]})#λ]
+    def functor[F[_]: MonadPlus, A] = Functor[Codensity[F, ?]]
+    def apply[F[_]: MonadPlus, A] = Apply[Codensity[F, ?]]
+    def applicative[F[_]: MonadPlus, A] = Applicative[Codensity[F, ?]]
+    def plus[F[_]: MonadPlus, A] = Plus[Codensity[F, ?]]
+    def monad[F[_]: MonadPlus, A] = Monad[Codensity[F, ?]]
+    def monade[F[_], A] = Monad[Codensity[F, ?]]
   }
 }

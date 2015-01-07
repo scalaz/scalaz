@@ -38,18 +38,18 @@ object TheseTest extends SpecLite {
   }
 
   object instances {
-    def functor[L] = Functor[({type λ[α] = L \&/ α})#λ]
-    def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
-    def applicative[L: Semigroup] = Applicative[({type λ[α] = L \&/ α})#λ]
-    def monad[L: Semigroup] = Monad[({type λ[α] = L \&/ α})#λ]
-    def cobind[L] = Cobind[({type λ[α] = L \&/ α})#λ]
-    def foldable[L] = Foldable[({type λ[α] = L \&/ α})#λ]
-    def traverse[L] = Traverse[({type λ[α] = L \&/ α})#λ]
+    def functor[L] = Functor[L \&/ ?]
+    def apply[L: Semigroup] = Apply[L \&/ ?]
+    def applicative[L: Semigroup] = Applicative[L \&/ ?]
+    def monad[L: Semigroup] = Monad[L \&/ ?]
+    def cobind[L] = Cobind[L \&/ ?]
+    def foldable[L] = Foldable[L \&/ ?]
+    def traverse[L] = Traverse[L \&/ ?]
     def bifunctor = Bifunctor[\&/]
     def bifoldable = Bifoldable[\&/]
     def bitraverse = Bitraverse[\&/]
 
     // checking absence of ambiguity
-    def functor[L: Semigroup] = Functor[({type λ[α] = L \&/ α})#λ]
+    def functor[L: Semigroup] = Functor[L \&/ ?]
   }
 }

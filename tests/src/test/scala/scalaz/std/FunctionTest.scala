@@ -32,21 +32,21 @@ object FunctionTest extends SpecLite {
   checkAll("Function1", monoid.laws[Int => Int])
 
   checkAll("Function0", monad.laws[Function0])
-  checkAll("Function1", monad.laws[({type λ[α] = (B) => α})#λ])
-  checkAll("Function2", monad.laws[({type λ[α] = (B, C) => α})#λ])
-  checkAll("Function3", monad.laws[({type λ[α] = (B, C, D) => α})#λ])
-  checkAll("Function4", monad.laws[({type λ[α] = (B, C, D, E) => α})#λ])
-  checkAll("Function5", monad.laws[({type λ[α] = (B, C, D, E, F) => α})#λ])
+  checkAll("Function1", monad.laws[(B) => ?])
+  checkAll("Function2", monad.laws[(B, C) => ?])
+  checkAll("Function3", monad.laws[(B, C, D) => ?])
+  checkAll("Function4", monad.laws[(B, C, D, E) => ?])
+  checkAll("Function5", monad.laws[(B, C, D, E, F) => ?])
 
   checkAll("Function0", traverse.laws[Function0])
 
-  checkAll("Function1", contravariant.laws[({type λ[α] = (α) => B})#λ])
+  checkAll("Function1", contravariant.laws[(?) => B])
 
   checkAll("Function1", category.laws[Function1])
 
-  checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])
+  checkAll("Function1", comonad.laws[Int => ?])
 
-  checkAll("Function1", zip.laws[({type λ[α]=(Int => α)})#λ])
+  checkAll("Function1", zip.laws[Int => ?])
 
   // Likely could be made to cover all the FunctionN types.
   "Function0 map eagerness" ! forAll{(number: Int) =>
@@ -76,7 +76,7 @@ object FunctionTest extends SpecLite {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]
     def monoid[A, R: Monoid] = Monoid[A => R]
-    def comonad[A: Monoid, R] = Comonad[({type λ[α]=A => α})#λ]
+    def comonad[A: Monoid, R] = Comonad[A => ?]
 
     // checking absence of ambiguity
     def semigroup[A, R: Monoid] = Semigroup[A => R]

@@ -1,6 +1,6 @@
 package scalaz
 
-private trait CompositionFunctor[F[_], G[_]] extends Functor[({type λ[α] = F[G[α]]})#λ] {
+private trait CompositionFunctor[F[_], G[_]] extends Functor[λ[α => F[G[α]]]] {
   implicit def F: Functor[F]
 
   implicit def G: Functor[G]
@@ -8,7 +8,7 @@ private trait CompositionFunctor[F[_], G[_]] extends Functor[({type λ[α] = F[G
   override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] = F(fga)(ga => G(ga)(f))
 }
 
-private trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
+private trait CompositionApply[F[_], G[_]] extends Apply[λ[α => F[G[α]]]] with CompositionFunctor[F, G] {
   implicit def F: Apply[F]
 
   implicit def G: Apply[G]
@@ -17,7 +17,7 @@ private trait CompositionApply[F[_], G[_]] extends Apply[({type λ[α] = F[G[α]
     F.apply2(f, fa)((ff, ga) => G.ap(ga)(ff))
 }
 
-private trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[α] = F[G[α]]})#λ] with CompositionApply[F, G] {
+private trait CompositionApplicative[F[_], G[_]] extends Applicative[λ[α => F[G[α]]]] with CompositionApply[F, G] {
   implicit def F: Applicative[F]
 
   implicit def G: Applicative[G]
@@ -25,7 +25,7 @@ private trait CompositionApplicative[F[_], G[_]] extends Applicative[({type λ[�
   def point[A](a: => A): F[G[A]] = F.point(G.point(a))
 }
 
-private trait CompositionPlus[F[_], G[_]] extends Plus[({type λ[α] = F[G[α]]})#λ] {
+private trait CompositionPlus[F[_], G[_]] extends Plus[λ[α => F[G[α]]]] {
   implicit def F: Plus[F]
 
   implicit def G: Plus[G]
@@ -34,7 +34,7 @@ private trait CompositionPlus[F[_], G[_]] extends Plus[({type λ[α] = F[G[α]]}
     F.plus(a, b)
 }
 
-private trait CompositionPlusEmpty[F[_], G[_]] extends PlusEmpty[({type λ[α] = F[G[α]]})#λ] with CompositionPlus[F, G] {
+private trait CompositionPlusEmpty[F[_], G[_]] extends PlusEmpty[λ[α => F[G[α]]]] with CompositionPlus[F, G] {
   implicit def F: PlusEmpty[F]
 
   implicit def G: PlusEmpty[G]
@@ -42,13 +42,13 @@ private trait CompositionPlusEmpty[F[_], G[_]] extends PlusEmpty[({type λ[α] =
   def empty[A]: F[G[A]] = F.empty[G[A]]
 }
 
-private trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[({type λ[α] = F[G[α]]})#λ] with CompositionApplicative[F, G] with CompositionPlusEmpty[F, G] {
+private trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[α => F[G[α]]]] with CompositionApplicative[F, G] with CompositionPlusEmpty[F, G] {
   implicit def F: ApplicativePlus[F]
 
   implicit def G: ApplicativePlus[G]
 }
 
-private trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ[α] = F[G[α]]})#λ]  {
+private trait CompositionFoldable[F[_], G[_]] extends Foldable[λ[α => F[G[α]]]]  {
   implicit def F: Foldable[F]
 
   implicit def G: Foldable[G]
@@ -63,7 +63,7 @@ private trait CompositionFoldable[F[_], G[_]] extends Foldable[({type λ[α] = F
     F.foldLeft(fa, z)((b, a) => G.foldLeft(a, b)(f))
 }
 
-private trait CompositionTraverse[F[_], G[_]] extends Traverse[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] with CompositionFoldable[F, G] {
+private trait CompositionTraverse[F[_], G[_]] extends Traverse[λ[α => F[G[α]]]] with CompositionFunctor[F, G] with CompositionFoldable[F, G] {
   implicit def F: Traverse[F]
 
   implicit def G: Traverse[G]
@@ -73,7 +73,7 @@ private trait CompositionTraverse[F[_], G[_]] extends Traverse[({type λ[α] = F
 
 }
 
-private trait CompositionFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] = F[G[α]]})#λ] with CompositionFoldable[F, G] {
+private trait CompositionFoldable1[F[_], G[_]] extends Foldable1[λ[α => F[G[α]]]] with CompositionFoldable[F, G] {
   implicit def F: Foldable1[F]
 
   implicit def G: Foldable1[G]
@@ -88,7 +88,7 @@ private trait CompositionFoldable1[F[_], G[_]] extends Foldable1[({type λ[α] =
     F.foldMapLeft1(fa)(G.foldMapLeft1(_)(z)(f))((b, ga) => G.foldLeft(ga, b)(f))
 }
 
-private trait CompositionTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] = F[G[α]]})#λ] with CompositionFoldable1[F, G] {
+private trait CompositionTraverse1[F[_], G[_]] extends Traverse1[λ[α => F[G[α]]]] with CompositionFoldable1[F, G] {
   implicit def F: Traverse1[F]
 
   implicit def G: Traverse1[G]
@@ -97,7 +97,7 @@ private trait CompositionTraverse1[F[_], G[_]] extends Traverse1[({type λ[α] =
     F.traverse1(a)(G.traverse1(_)(f))
 }
 
-private trait CompositionDistributive[F[_], G[_]] extends Distributive[({type λ[α] = F[G[α]]})#λ] with CompositionFunctor[F, G] {
+private trait CompositionDistributive[F[_], G[_]] extends Distributive[λ[α => F[G[α]]]] with CompositionFunctor[F, G] {
   implicit def F: Distributive[F]
 
   implicit def G: Distributive[G]
@@ -106,7 +106,7 @@ private trait CompositionDistributive[F[_], G[_]] extends Distributive[({type λ
     F(F.distribute(a)(f))(G.cosequence(_))
 }
 
-private trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G[α]]})#λ] {
+private trait CompositionZip[F[_], G[_]] extends Zip[λ[α => F[G[α]]]] {
   implicit def T: Functor[F]
 
   implicit def F: Zip[F]
@@ -117,7 +117,7 @@ private trait CompositionZip[F[_], G[_]] extends Zip[({type λ[α] = F[G[α]]})#
     F.zipWith(a, b)(G.zip(_, _))
 }
 
-private trait CompositionUnzip[F[_], G[_]] extends Unzip[({type λ[α] = F[G[α]]})#λ] {
+private trait CompositionUnzip[F[_], G[_]] extends Unzip[λ[α => F[G[α]]]] {
   implicit def T: Functor[F]
 
   implicit def F: Unzip[F]
@@ -131,7 +131,7 @@ private trait CompositionUnzip[F[_], G[_]] extends Unzip[({type λ[α] = F[G[α]
   }
 }
 
-private trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {
+private trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[λ[(α, β) => F[G[α, β], G[α, β]]]] {
   implicit def F: Bifunctor[F]
 
   implicit def G: Bifunctor[G]
@@ -140,7 +140,7 @@ private trait CompositionBifunctor[F[_, _], G[_, _]] extends Bifunctor[({type λ
     F.bimap(fab)(G.bimap(_)(f, g), G.bimap(_)(f, g))
 }
 
-private trait CompositionBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {
+private trait CompositionBifoldable[F[_, _], G[_, _]] extends Bifoldable[λ[(α, β) => F[G[α, β], G[α, β]]]] {
   implicit def F: Bifoldable[F]
 
   implicit def G: Bifoldable[G]
@@ -154,7 +154,7 @@ private trait CompositionBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type 
 }
 
 private trait CompositionBitraverse[F[_, _], G[_, _]]
-  extends Bitraverse[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ]
+  extends Bitraverse[λ[(α, β) => F[G[α, β], G[α, β]]]]
   with CompositionBifunctor[F, G] with CompositionBifoldable[F, G]{
 
   implicit def F: Bitraverse[F]
@@ -166,7 +166,7 @@ private trait CompositionBitraverse[F[_, _], G[_, _]]
 
 }
 
-private trait CompositionFunctorBifunctor[F[_], G[_, _]] extends Bifunctor[({type λ[α, β]=F[G[α, β]]})#λ] {
+private trait CompositionFunctorBifunctor[F[_], G[_, _]] extends Bifunctor[λ[(α, β) => F[G[α, β]]]] {
   def F: Functor[F]
 
   def G: Bifunctor[G]
@@ -175,7 +175,7 @@ private trait CompositionFunctorBifunctor[F[_], G[_, _]] extends Bifunctor[({typ
     F.map(fab)(G.bimap(_)(f, g))
 }
 
-private trait CompositionBifunctorFunctors[F[_,_], G[_], H[_]] extends Bifunctor[({type λ[α, β]=F[G[α],H[β]]})#λ] {
+private trait CompositionBifunctorFunctors[F[_,_], G[_], H[_]] extends Bifunctor[λ[(α, β) => F[G[α],H[β]]]] {
   def F: Bifunctor[F]
 
   def G: Functor[G]
@@ -186,7 +186,7 @@ private trait CompositionBifunctorFunctors[F[_,_], G[_], H[_]] extends Bifunctor
     F.bimap(fgahb)(ga => G.map(ga)(f) , hb => H.map(hb)(g) )
 }
 
-private trait CompositionFoldableBifoldable[F[_], G[_, _]] extends Bifoldable[({type λ[α, β]=F[G[α, β]]})#λ] {
+private trait CompositionFoldableBifoldable[F[_], G[_, _]] extends Bifoldable[λ[(α, β) => F[G[α, β]]]] {
   def F: Foldable[F]
 
   def G: Bifoldable[G]
@@ -199,7 +199,7 @@ private trait CompositionFoldableBifoldable[F[_], G[_, _]] extends Bifoldable[({
     F.foldLeft(fa, z)((c, gab) => G.bifoldLeft(gab, c)(f)(g))
 }
 
-private trait CompositionBifoldableFoldables[F[_,_], G[_], H[_]] extends Bifoldable[({type λ[α, β]=F[G[α],H[β]]})#λ]{
+private trait CompositionBifoldableFoldables[F[_,_], G[_], H[_]] extends Bifoldable[λ[(α, β) => F[G[α],H[β]]]] {
   def F: Bifoldable[F]
 
   def G: Foldable[G]
@@ -215,7 +215,7 @@ private trait CompositionBifoldableFoldables[F[_,_], G[_], H[_]] extends Bifolda
 }
 
 private trait CompositionTraverseBitraverse[F[_], G[_, _]]
-  extends Bitraverse[({type λ[α, β]=F[G[α, β]]})#λ]
+  extends Bitraverse[λ[(α, β) => F[G[α, β]]]]
   with CompositionFunctorBifunctor[F, G]
   with CompositionFoldableBifoldable[F, G] {
   def F: Traverse[F]
@@ -227,7 +227,7 @@ private trait CompositionTraverseBitraverse[F[_], G[_, _]]
 }
 
 private trait CompositionBitraverseTraverses[F[_,_], G[_], H[_]] 
-  extends Bitraverse[({type λ[α, β]=F[G[α], H[β]]})#λ]
+  extends Bitraverse[λ[(α, β) => F[G[α], H[β]]]]
   with CompositionBifunctorFunctors[F, G, H]
   with CompositionBifoldableFoldables[F, G, H] {
     def F: Bitraverse[F]

@@ -15,8 +15,8 @@ trait Enumeratee2T[J, K, I, F[_]] {
 trait Enumeratee2TFunctions {
   import scalaz.syntax.order._
 
-  @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, ({type λ[α] = IterateeT[K, F, α] })#λ, A] =
-    IterateeT.IterateeTMonadTrans[J].liftM[({type λ[α] = IterateeT[K, F, α]})#λ, A](iter)
+  @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, IterateeT[K, F, ?], A] =
+    IterateeT.IterateeTMonadTrans[J].liftM[IterateeT[K, F, ?], A](iter)
 
   def cogroupI[J, K, F[_]](implicit M: Monad[F], order: (J, K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
     new Enumeratee2T[J, K, Either3[J, (J, K), K], F] {
@@ -141,7 +141,7 @@ trait Enumeratee2TFunctions {
     }
 
   private def endStep[J, K, EE, F[_]: Monad, A](sa: StepT[Either3[J, (J, K), K], F, StepT[EE, F, A]]) = {
-    IterateeT.IterateeTMonadTransT[J, ({ type λ[β[_], α] = IterateeT[K, β, α] })#λ].liftM(sa.pointI.run)
+    IterateeT.IterateeTMonadTransT[J, λ[(β[_], α) => IterateeT[K, β, α]]].liftM(sa.pointI.run)
   }
 }
 

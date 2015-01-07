@@ -289,8 +289,8 @@ object ScalazProperties {
         property("consistent right bifold") = rightFMConsistent[F, Int, Int]
         private implicit val left = F.leftFoldable[Int]
         private implicit val right = F.rightFoldable[Int]
-        include(foldable.laws[({type λ[α]=F[α, Int]})#λ])
-        include(foldable.laws[({type λ[α]=F[Int, α]})#λ])
+        include(foldable.laws[F[?, Int]])
+        include(foldable.laws[F[Int, ?]])
       }
   }
 
@@ -300,8 +300,8 @@ object ScalazProperties {
         include(bifoldable.laws[F])
         private implicit val left = F.leftTraverse[Int]
         private implicit val right = F.rightTraverse[Int]
-        include(traverse.laws[({type f[a]=F[a, Int]})#f])
-        include(traverse.laws[({type f[a]=F[Int, a]})#f])
+        include(traverse.laws[F[?, Int]])
+        include(traverse.laws[F[Int, ?]])
       }
   }
 
@@ -486,8 +486,8 @@ object ScalazProperties {
   object bifunctor {
     def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]) = new Properties("bifunctor") {
-      include(functor.laws[({type λ[α]=F[α, Int]})#λ](F.leftFunctor[Int], implicitly, implicitly, implicitly))
-      include(functor.laws[({type λ[α]=F[Int, α]})#λ](F.rightFunctor[Int], implicitly, implicitly, implicitly))
+      include(functor.laws[F[?, Int]](F.leftFunctor[Int], implicitly, implicitly, implicitly))
+      include(functor.laws[F[Int, ?]](F.rightFunctor[Int], implicitly, implicitly, implicitly))
     }
   }
 
@@ -513,7 +513,7 @@ object ScalazProperties {
 
     def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E]) =
       new Properties("monad error") {
-        include(monad.laws[({ type λ[α] = F[E, α] })#λ])
+        include(monad.laws[F[E, ?]])
         property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
         property("errorsRaised") = errorsRaised[F, E, Int]
         property("errorsStopComputation") = errorsStopComputation[F, E, Int]

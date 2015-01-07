@@ -77,17 +77,17 @@ object OneAndTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_]: Functor] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
-    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
-    def apply[F[_]: Applicative: Plus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
-    def applicative[F[_]: ApplicativePlus] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
-    def bind[F[_]: Monad: Plus] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
-    def monad[F[_]: MonadPlus] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
-    def plus[F[_]: Applicative: Plus] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
-    def foldable[F[_]: Foldable] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
-    def foldable1[F[_]: Foldable1] = Foldable1[({type λ[α] = OneAnd[F, α]})#λ]
-    def traverse[F[_]: Traverse] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
-    def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Functor] = Functor[OneAnd[F, ?]]
+    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[OneAnd[F, ?]]
+    def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, ?]]
+    def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, ?]]
+    def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, ?]]
+    def monad[F[_]: MonadPlus] = Monad[OneAnd[F, ?]]
+    def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, ?]]
+    def foldable[F[_]: Foldable] = Foldable1[OneAnd[F, ?]]
+    def foldable1[F[_]: Foldable1] = Foldable1[OneAnd[F, ?]]
+    def traverse[F[_]: Traverse] = Traverse1[OneAnd[F, ?]]
+    def traverse1[F[_]: Traverse1] = Traverse1[OneAnd[F, ?]]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }

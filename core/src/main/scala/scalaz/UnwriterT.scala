@@ -85,41 +85,49 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
 object UnwriterT extends UnwriterTInstances with UnwriterTFunctions
 
 sealed abstract class UnwriterTInstances2 {
-  implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTFunctor[F, W] {
-    implicit def F = F0
-  }
+  implicit def unwriterTFunctor[F[_], W](implicit F0: Functor[F]): Functor[UnwriterT[F, W, ?]] =
+    new UnwriterTFunctor[F, W] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class UnwriterTInstances1 extends UnwriterTInstances2 {
-  implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]): Apply[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTApply[F, W] {
-    implicit def F = F0
-  }
+  implicit def unwriterTApply[F[_], W](implicit F0: Apply[F]): Apply[UnwriterT[F, W, ?]] =
+    new UnwriterTApply[F, W] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class UnwriterTInstances0 extends UnwriterTInstances1 {
-  implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=UnwriterT[F, α, β]})#λ] = new UnwriterTBifunctor[F] {
-    implicit def F = F0
-  }
-  implicit def unwriterTBind[F[_], W](implicit F0: Bind[F]): Bind[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTBind[F, W] {
-    implicit def F = F0
-  }
-  implicit def unwriterTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTFoldable[F, W] {
-    implicit def F = F0
-  }
+  implicit def unwriterTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[UnwriterT[F, ?, ?]] =
+    new UnwriterTBifunctor[F] {
+      implicit def F = F0
+    }
+  implicit def unwriterTBind[F[_], W](implicit F0: Bind[F]): Bind[UnwriterT[F, W, ?]] =
+    new UnwriterTBind[F, W] {
+      implicit def F = F0
+    }
+  implicit def unwriterTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[UnwriterT[F, W, ?]] =
+    new UnwriterTFoldable[F, W] {
+      implicit def F = F0
+    }
   implicit def unwriterTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[UnwriterT[F, W, A]] =
     E.contramap((_: UnwriterT[F, W, A]).run)
 }
 
 sealed abstract class UnwriterTInstances extends UnwriterTInstances0 {
-  implicit def unwriterTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=UnwriterT[F, α, β]})#λ] = new UnwriterTBitraverse[F] {
-    implicit def F = F0
-  }
-  implicit def unwriterComonad[W]: Comonad[({type λ[α]=Unwriter[W, α]})#λ] = new UnwriterComonad[W] {
-    implicit def F = implicitly
-  }
-  implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=UnwriterT[F, W, α]})#λ] = new UnwriterTTraverse[F, W] {
-    implicit def F = F0
-  }
+  implicit def unwriterTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[UnwriterT[F, ?, ?]] =
+    new UnwriterTBitraverse[F] {
+      implicit def F = F0
+    }
+  implicit def unwriterComonad[W]: Comonad[Unwriter[W, ?]] =
+    new UnwriterComonad[W] {
+      implicit def F = implicitly
+    }
+  implicit def unwriterTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[UnwriterT[F, W, ?]] =
+    new UnwriterTTraverse[F, W] {
+      implicit def F = F0
+    }
   implicit def unwriterEqual[W, A](implicit W: Equal[W], A: Equal[A]): Equal[Unwriter[W, A]] = {
     import std.tuple._
     Equal[(W, A)].contramap((_: Unwriter[W, A]).run)
@@ -148,52 +156,52 @@ trait UnwriterTFunctions {
 // Type class implementation traits
 //
 
-private trait UnwriterTFunctor[F[_], W] extends Functor[({type λ[α]=UnwriterT[F, W, α]})#λ] {
+private trait UnwriterTFunctor[F[_], W] extends Functor[UnwriterT[F, W, ?]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: UnwriterT[F, W, A])(f: A => B) = fa map f
 }
 
-private trait UnwriterTApply[F[_], W] extends Apply[({type λ[α]=UnwriterT[F, W, α]})#λ] with UnwriterTFunctor[F, W] {
+private trait UnwriterTApply[F[_], W] extends Apply[UnwriterT[F, W, ?]] with UnwriterTFunctor[F, W] {
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa ap f
 }
 
 
-private trait UnwriterTBind[F[_], W] extends Bind[({type λ[α]=UnwriterT[F, W, α]})#λ] with UnwriterTApply[F, W] {
+private trait UnwriterTBind[F[_], W] extends Bind[UnwriterT[F, W, ?]] with UnwriterTApply[F, W] {
   implicit def F: Bind[F]
 
   def bind[A, B](fa: UnwriterT[F, W, A])(f: A => UnwriterT[F, W, B]) = fa flatMap f
 }
 
-private trait UnwriterTFoldable[F[_], W] extends Foldable.FromFoldr[({type λ[α]=UnwriterT[F, W, α]})#λ] {
+private trait UnwriterTFoldable[F[_], W] extends Foldable.FromFoldr[UnwriterT[F, W, ?]] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: UnwriterT[F, W, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
 }
 
-private trait UnwriterTTraverse[F[_], W] extends Traverse[({type λ[α]=UnwriterT[F, W, α]})#λ] with UnwriterTFoldable[F, W] {
+private trait UnwriterTTraverse[F[_], W] extends Traverse[UnwriterT[F, W, ?]] with UnwriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa traverse f
 }
 
-private trait UnwriterTBifunctor[F[_]] extends Bifunctor[({type λ[α, β]=UnwriterT[F, α, β]})#λ] {
+private trait UnwriterTBifunctor[F[_]] extends Bifunctor[UnwriterT[F, ?, ?]] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: UnwriterT[F, A, B])(f: A => C, g: B => D) =
     fab.bimap(f, g)
 }
 
-private trait UnwriterTBitraverse[F[_]] extends Bitraverse[({type λ[α, β]=UnwriterT[F, α, β]})#λ] with UnwriterTBifunctor[F] {
+private trait UnwriterTBitraverse[F[_]] extends Bitraverse[UnwriterT[F, ?, ?]] with UnwriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: UnwriterT[F, A, B])(f: A => G[C], g: B => G[D]) =
     fab.bitraverse(f, g)
 }
 
-private trait UnwriterComonad[W] extends Comonad[({type λ[α] = Unwriter[W, α]})#λ] with UnwriterTFunctor[Id, W] {
+private trait UnwriterComonad[W] extends Comonad[Unwriter[W, ?]] with UnwriterTFunctor[Id, W] {
 
   override def cojoin[A](fa: Unwriter[W, A]): Unwriter[W, Unwriter[W, A]] =
     Unwriter(fa.unwritten, fa)
@@ -201,5 +209,4 @@ private trait UnwriterComonad[W] extends Comonad[({type λ[α] = Unwriter[W, α]
   override def cobind[A, B](fa: Unwriter[W, A])(f: (Unwriter[W, A]) => B): Unwriter[W, B] =
     Unwriter(fa.unwritten, f(fa))
   def copoint[A](p: Unwriter[W, A]): A = p.value
-
 }

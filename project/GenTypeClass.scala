@@ -220,7 +220,7 @@ object GenTypeClass {
       case Seq() => ""
       case es    =>
         if(kind == Kind.*^*->*->*)
-          es.map(n => n + suffix + "[({type λ[α] = F[S, α]})#λ]").mkString("extends ", " with ", "")
+          es.map(n => n + suffix + "[F[S, ?]]").mkString("extends ", " with ", "")
         else
           es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
     }
@@ -354,13 +354,13 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
   """
         val ToVKleisli =
   s"""
-  implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ${typeClassName}Ops[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[F[G, ?, ?]]) =
+    new ${typeClassName}Ops[F[G, ?, ?], A, B](v)(F0)
 """
        val ToVFAB =
   s"""
   implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: ${typeClassName}[F]) =
-      new ${typeClassName}Ops[F,A, B](v)
+    new ${typeClassName}Ops[F,A, B](v)
   """
 
 

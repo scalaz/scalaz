@@ -63,22 +63,28 @@ object LazyOptionT extends LazyOptionTInstances with LazyOptionTFunctions
 //
 
 sealed abstract class LazyOptionTInstances1 {
-  implicit def lazyOptionTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTFunctor[F] {
-    implicit def F: Functor[F] = F0
-  }
+  implicit def lazyOptionTFunctor[F[_]](implicit F0: Functor[F]): Functor[LazyOptionT[F, ?]] =
+    new LazyOptionTFunctor[F] {
+      implicit def F: Functor[F] = F0
+    }
 }
 
 sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
-  implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] = Equal.equalBy((_: LazyOptionT[F, A]).run)
+  implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] =
+    Equal.equalBy((_: LazyOptionT[F, A]).run)
 }
 
 sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
-  implicit val lazyOptionTMonadTrans: Hoist[LazyOptionT] = new LazyOptionTHoist {}
+  implicit val lazyOptionTMonadTrans: Hoist[LazyOptionT] =
+    new LazyOptionTHoist {}
 
-  implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTMonad[F] {
-    implicit def F: Monad[F] = F0
-  }
-  implicit def lazyOptionOrder[F[_], A](implicit FA: Order[F[LazyOption[A]]]): Order[LazyOptionT[F, A]] = Order.orderBy((_: LazyOptionT[F, A]).run)
+  implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[LazyOptionT[F, ?]] =
+    new LazyOptionTMonad[F] {
+      implicit def F: Monad[F] = F0
+    }
+
+  implicit def lazyOptionOrder[F[_], A](implicit FA: Order[F[LazyOption[A]]]): Order[LazyOptionT[F, A]] =
+    Order.orderBy((_: LazyOptionT[F, A]).run)
 }
 
 trait LazyOptionTFunctions {
@@ -99,31 +105,36 @@ trait LazyOptionTFunctions {
 // Implementation traits for type class instances
 //
 
-private trait LazyOptionTFunctor[F[_]] extends Functor[({type λ[α] = LazyOptionT[F, α]})#λ] {
+private trait LazyOptionTFunctor[F[_]] extends Functor[LazyOptionT[F, ?]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: LazyOptionT[F, A])(f: A => B): LazyOptionT[F, B] = fa map (a => f(a))
+  override def map[A, B](fa: LazyOptionT[F, A])(f: A => B): LazyOptionT[F, B] =
+    fa map (a => f(a))
 }
 
-private trait LazyOptionTMonad[F[_]] extends Monad[({type λ[α] = LazyOptionT[F, α]})#λ] with LazyOptionTFunctor[F] {
+private trait LazyOptionTMonad[F[_]] extends Monad[LazyOptionT[F, ?]] with LazyOptionTFunctor[F] {
   implicit def F: Monad[F]
 
   override def ap[A, B](fa: => LazyOptionT[F, A])(f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
     LazyOptionT(F.bind(f.run)(_ fold (ff => F.map(fa.run)(_ map ((ff:A=>B)(_))),
                                       F.point(LazyOption.lazyNone))))
 
-  def point[A](a: => A): LazyOptionT[F, A] = LazyOptionT[F, A](F.point(LazyOption.lazySome(a)))
+  def point[A](a: => A): LazyOptionT[F, A] =
+    LazyOptionT[F, A](F.point(LazyOption.lazySome(a)))
 
-  def bind[A, B](fa: LazyOptionT[F, A])(f: A => LazyOptionT[F, B]): LazyOptionT[F, B] = fa flatMap (a => f(a))
+  def bind[A, B](fa: LazyOptionT[F, A])(f: A => LazyOptionT[F, B]): LazyOptionT[F, B] =
+    fa flatMap (a => f(a))
 }
 
 private trait LazyOptionTHoist extends Hoist[LazyOptionT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): LazyOptionT[G, A] =
     LazyOptionT[G, A](G.map[A, LazyOption[A]](a)((a: A) => LazyOption.lazySome(a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = LazyOptionT[M, x]})#f ~> ({type f[x] = LazyOptionT[N, x]})#f) {
-    def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
-  }
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+    new (LazyOptionT[M, ?] ~> LazyOptionT[N, ?]) {
+      def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
+    }
 
-  implicit def apply[G[_] : Monad]: Monad[({type λ[α] = LazyOptionT[G, α]})#λ] = LazyOptionT.lazyOptionTMonad[G]
+  implicit def apply[G[_] : Monad]: Monad[LazyOptionT[G, ?]] =
+    LazyOptionT.lazyOptionTMonad[G]
 }

@@ -14,15 +14,15 @@ object MaybeTTest extends SpecLite {
   checkAll(traverse.laws[MaybeTList])
 
   object instances {
-    def functor[F[_] : Functor] = Functor[({type λ[α] = MaybeT[F, α]})#λ]
-    def monad[F[_] : Monad] = MonadPlus[({type λ[α] = MaybeT[F, α]})#λ]
-    def foldable[F[_] : Foldable] = Foldable[({type λ[α] = MaybeT[F, α]})#λ]
-    def traverse[F[_] : Traverse] = Traverse[({type λ[α] = MaybeT[F, α]})#λ]
+    def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]
+    def monad[F[_] : Monad] = MonadPlus[MaybeT[F, ?]]
+    def foldable[F[_] : Foldable] = Foldable[MaybeT[F, ?]]
+    def traverse[F[_] : Traverse] = Traverse[MaybeT[F, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad] = Functor[({type λ[α] = MaybeT[F, α]})#λ]
-    def functor[F[_] : Monad : Traverse] = Functor[({type λ[α] = MaybeT[F, α]})#λ]
-    def apply[F[_] : Monad] = Apply[({type λ[α] = MaybeT[F, α]})#λ]
-    def foldable[F[_] : Traverse] = Foldable[({type λ[α] = MaybeT[F, α]})#λ]
+    def functor[F[_] : Monad] = Functor[MaybeT[F, ?]]
+    def functor[F[_] : Monad : Traverse] = Functor[MaybeT[F, ?]]
+    def apply[F[_] : Monad] = Apply[MaybeT[F, ?]]
+    def foldable[F[_] : Traverse] = Foldable[MaybeT[F, ?]]
   }
 }

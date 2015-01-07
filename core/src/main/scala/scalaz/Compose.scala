@@ -11,7 +11,7 @@ trait Compose[=>:[_, _]]  { self =>
   /** Associative `=>:` binary operator. */
   def compose[A, B, C](f: B =>: C, g: A =>: B): (A =>: C)
 
-  protected[this] trait ComposePlus extends Plus[({type λ[α]=(α =>: α)})#λ] {
+  protected[this] trait ComposePlus extends Plus[λ[α => α =>: α]] {
     def plus[A](f1: (A =>: A), f2: => (A =>: A)) = self.compose(f1, f2)
   }
   protected[this] trait ComposeSemigroup[A] extends Semigroup[A =>: A] {
@@ -19,7 +19,7 @@ trait Compose[=>:[_, _]]  { self =>
   }
 
   /** `semigroup`, but universally quantified. */
-  def plus: Plus[({type λ[α]=(α =>: α)})#λ] = new ComposePlus {}
+  def plus: Plus[λ[α => α =>: α]] = new ComposePlus {}
   /** The endomorphism semigroup, where `append`=`compose`. */
   def semigroup[A]: Semigroup[A =>: A] = new ComposeSemigroup[A] {}
 

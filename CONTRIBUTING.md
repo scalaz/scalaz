@@ -242,13 +242,20 @@ but the consistency is worth it.
     class Foo[F[_], A, B] // good
     class Foo[A, F[_], B] // bad
 
-Define type lambdas with either lower case or greek letters as the type parameters. This helps to distinguish them
-from the applied types.
+Define type lambdas using the kind-projector plugin. Raw type-lambdas should be defined with either lower case or greek
+letters as the type parameters. This helps to distinguish them from the applied types. Type Lambdas should use the 
+kind-projector syntax.
 
-    ({type λ[α]=F[X, α]})#λ
-    ({type λ[α, β]=F[X, α, β]})#λ
-    ({type l[a]=F[X, a]})#l
-    ({type l[a, b]=F[X, a, b]})#l
+    F[X, ?]     ===  ({type λ[α] = F[X, α]})#λ
+    F[X, ?, ?]  ===  ({type λ[α, β] = F[X, α, β]})#λ
+    F[X, ?]     ===  ({type l[a] = F[X, a]})#l
+    F[X, ?, ?]  ===  ({type l[a, b] = F[X, a, b]})#l
+
+When using Lambda Type Function syntax when kind-projector's inline syntax doesn't work, use greek letters for
+parameters.
+
+    λ[α => (α, α)]  ===  ({type λ[α] = (α, α)})#λ
+    λ[α[_] => F[α]  ===  ({type λ[α[_]] = F[α]})#λ
 
 ### Parameters
 

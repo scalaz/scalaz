@@ -20,18 +20,18 @@ trait Apply[F[_]] extends Functor[F] { self =>
     traverse1(as)(a => a)
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
-  def compose[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = F[G[α]]})#λ] = new CompositionApply[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] = 
+    new CompositionApply[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
-  def product[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = (F[α], G[α])})#λ] = new ProductApply[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] = 
+    new ProductApply[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /** Flipped variant of `ap`. */
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)
@@ -114,8 +114,8 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply12(_, _, _, _, _, _, _, _, _, _, _, _)(f)
 
   /** Add a unit to any Apply to form an Applicative. */
-  def applyApplicative: Applicative[({type λ[α] = F[α] \/ α})#λ] =
-    new Applicative[({type λ[α] = F[α] \/ α})#λ] {
+  def applyApplicative: Applicative[λ[α => F[α] \/ α]] =
+    new Applicative[λ[α => F[α] \/ α]] {
       // transliterated from semigroupoids 3.0.2, thanks edwardk
       def point[A](a: => A) = \/-(a)
       def ap[A, B](a: => F[A] \/ A)(f: => F[A => B] \/ (A => B)) = (f, a) match {

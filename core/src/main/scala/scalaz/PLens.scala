@@ -559,8 +559,8 @@ abstract class PLensInstances {
   implicit def PLensFamilyState[A, B](plens: PLensFamily[A, _, B, _]): PState[A, B] =
     plens.st
 
-  implicit def PLensFamilyUnzip[S, R]: Unzip[({type λ[α] = PLensFamily[S, R, α, α]})#λ] =
-    new Unzip[({type λ[α] = PLensFamily[S, R, α, α]})#λ] {
+  implicit def PLensFamilyUnzip[S, R]: Unzip[λ[α => PLensFamily[S, R, α, α]]] =
+    new Unzip[λ[α => PLensFamily[S, R, α, α]]] {
       def unzip[A, B](a: PLensFamily[S, R, (A, B), (A, B)]) =
         (
           plensFamily(x => a run x map (c => {

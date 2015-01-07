@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait MonadTell[F[_, _], S] extends Monad[({type λ[α] = F[S, α]})#λ] { self =>
+trait MonadTell[F[_, _], S] extends Monad[F[S, ?]] { self =>
   ////
   def writer[A](w: S, v: A): F[S, A]
 

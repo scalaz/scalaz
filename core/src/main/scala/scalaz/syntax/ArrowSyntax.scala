@@ -25,12 +25,12 @@ sealed trait ToArrowOps0 {
 trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToStrongOps with ToCategoryOps {
   
   implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
-      new ArrowOps[F,A, B](v)
+    new ArrowOps[F,A, B](v)
   
 
   
-  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Arrow[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ArrowOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Arrow[F[G, ?, ?]]) =
+    new ArrowOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

@@ -57,7 +57,7 @@ trait EndoFunctions {
     def from: (A => A) => Endo[A] = endo
   }
 
-  implicit val IsoFunctorEndo = new IsoFunctorTemplate[Endo, ({type λ[α]=(α => α)})#λ] {
+  implicit val IsoFunctorEndo = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
     def to[A](fa: Endo[A]): A => A = fa.run
     def from[A](ga: A => A): Endo[A] = endo(ga)
   }

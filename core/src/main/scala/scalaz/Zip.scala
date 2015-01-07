@@ -12,20 +12,19 @@ trait Zip[F[_]]  { self =>
   // derived functions
 
   /**The composition of Zip `F` and `G`, `[x]F[G[x]]`, is a Zip (if F is a Functor) */
-  def compose[G[_]](implicit T0: Functor[F], G0: Zip[G]): Zip[({type λ[α] = F[G[α]]})#λ] = new CompositionZip[F, G] {
-    implicit def T = T0
-
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit T0: Functor[F], G0: Zip[G]): Zip[λ[α => F[G[α]]]] =
+    new CompositionZip[F, G] {
+      implicit def T = T0
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Zips `F` and `G`, `[x](F[x], G[x]])`, is a Zip */
-  def product[G[_]](implicit G0: Zip[G]): Zip[({type λ[α] = (F[α], G[α])})#λ] = new ProductZip[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Zip[G]): Zip[λ[α => (F[α], G[α])]] =
+    new ProductZip[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   def zipWith[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C)(implicit F: Functor[F]): F[C] =
     F.map(zip(fa, fb)) {

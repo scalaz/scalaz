@@ -22,20 +22,20 @@ object LazyEitherTTest extends SpecLite {
   checkAll(monadError.laws[LazyEitherTList, Int])
 
   object instances {
-    def functor[F[_] : Functor, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def monad[F[_] : Monad, A] = Monad[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def foldable[F[_] : Foldable, A] = Foldable[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def traverse[F[_] : Traverse, A] = Traverse[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def bifunctor[F[_] : Functor] = Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
-    def bifoldable[F[_] : Foldable] = Bifoldable[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
-    def bitraverse[F[_] : Traverse] = Bitraverse[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
+    def functor[F[_] : Functor, A] = Functor[LazyEitherT[F, A, ?]]
+    def monad[F[_] : Monad, A] = Monad[LazyEitherT[F, A, ?]]
+    def foldable[F[_] : Foldable, A] = Foldable[LazyEitherT[F, A, ?]]
+    def traverse[F[_] : Traverse, A] = Traverse[LazyEitherT[F, A, ?]]
+    def bifunctor[F[_] : Functor] = Bifunctor[LazyEitherT[F, ?, ?]]
+    def bifoldable[F[_] : Foldable] = Bifoldable[LazyEitherT[F, ?, ?]]
+    def bitraverse[F[_] : Traverse] = Bitraverse[LazyEitherT[F, ?, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad : Traverse, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = LazyEitherT[F, A, α]})#λ]
-    def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
-    def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
-    def monadError[F[_] : Monad, A] = MonadError[({type λ[α, β] = LazyEitherT[F, α, β]})#λ, A]
+    def functor[F[_] : Monad : Traverse, A] = Functor[LazyEitherT[F, A, ?]]
+    def foldable[F[_] : Traverse, A] = Foldable[LazyEitherT[F, A, ?]]
+    def bifunctor[F[_] : Traverse] = Bifunctor[LazyEitherT[F, ?, ?]]
+    def bifoldable[F[_] : Traverse] = Bifoldable[LazyEitherT[F, ?, ?]]
+    def monadError[F[_] : Monad, A] = MonadError[LazyEitherT[F, ?, ?], A]
   }
 
 }

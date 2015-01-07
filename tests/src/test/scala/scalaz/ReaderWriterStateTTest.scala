@@ -28,12 +28,12 @@ object ReaderWriterStateTTest extends SpecLite {
   checkAll(monad.laws[RWSOptInt])
 
   object instances {
-    def functor[F[_]: Functor, R, W, S] = Functor[({type λ[α]=RWST[F, R, W, S, α]})#λ]
-    def monad[F[_]: Monad, R, W: Monoid, S] = Monad[({type λ[α]=RWST[F, R, W, S, α]})#λ]
-    def monadReader[F[_]: Monad, R, W: Monoid, S] = MonadReader[({type λ[r, α]=RWST[F, r, W, S, α]})#λ, R]
-    def monadState[F[_]: Monad, R, W: Monoid, S] = MonadState[({type λ[s, α]=RWST[F, R, W, s, α]})#λ, S]
-    def monadTrans[R, W: Monoid, S] = MonadTrans[({type λ[f[_], α]=RWST[f, R, W, S, α]})#λ]
+    def functor[F[_]: Functor, R, W, S] = Functor[RWST[F, R, W, S, ?]]
+    def monad[F[_]: Monad, R, W: Monoid, S] = Monad[RWST[F, R, W, S, ?]]
+    def monadReader[F[_]: Monad, R, W: Monoid, S] = MonadReader[RWST[F, ?, W, S, ?], R]
+    def monadState[F[_]: Monad, R, W: Monoid, S] = MonadState[RWST[F, R, W, ?, ?], S]
+    def monadTrans[R, W: Monoid, S] = MonadTrans[λ[(f[_], α) => RWST[f, R, W, S, α]]]
     // checking absence of ambiguity
-    def functor[F[_]: Monad, R, W: Monoid, S] = Functor[({type λ[α]=RWST[F, R, W, S, α]})#λ]
+    def functor[F[_]: Monad, R, W: Monoid, S] = Functor[RWST[F, R, W, S, ?]]
   }
 }
