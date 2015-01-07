@@ -9,6 +9,7 @@ import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.\/._
+import scalaz.Liskov._
 
 import collection.JavaConversions._
 import scala.concurrent.duration._
@@ -47,6 +48,10 @@ class Task[+A](val get: Future[Throwable \/ A]) {
       case -\/(e) => \/-(-\/(e))
       case \/-(a) => \/-(\/-(a))
     })
+
+  /** 'Rethrows' exceptions in the given task.  The inverse of attempt. */
+  def rethrow[B](implicit subst: A <~< (Throwable \/ B)): Task[B] =
+    new Task(get map { _ flatMap subst.apply })
 
   /**
    * Returns a new `Task` in which `f` is scheduled to be run on completion.
