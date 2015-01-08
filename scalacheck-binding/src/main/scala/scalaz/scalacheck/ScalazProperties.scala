@@ -489,6 +489,13 @@ object ScalazProperties {
 
     def rightLeft[=>:[_, _], X, Y, Z](implicit F: Associative[=>:], af: Arbitrary[(X =>: Y) =>: Z], ef: Equal[(X =>: Y) =>: Z]) =
       forAll(F.associativeLaw.rightLeft[X, Y, Z] _)
+
+    def laws[=>:[_, _]](implicit F: Associative[=>:],
+                        al: Arbitrary[(Int =>: Int) =>: Int], ar: Arbitrary[Int =>: (Int =>: Int)],
+                        el: Equal[(Int =>: Int) =>: Int], er: Equal[Int =>: (Int =>: Int)]) = new Properties("associative") {
+      property("left and then right reassociation is identity") = leftRight[=>:, Int, Int, Int]
+      property("right and then left reassociation is identity") = rightLeft[=>:, Int, Int, Int]
+    }
   }
 
   object bifunctor {
