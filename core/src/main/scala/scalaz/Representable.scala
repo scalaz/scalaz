@@ -25,22 +25,23 @@ sealed abstract class RepresentableInstances {
   import scalaz.std.function._
 
   /** The identity representable. */
-  implicit def readerRepresentable[E]: Representable[({type λ[α] = E => α})#λ, E] =
-    new Representable[({type λ[α] = E => α})#λ, E] {
+  implicit def readerRepresentable[E]: Representable[E => ?, E] =
+    new Representable[E => ?, E] {
       def rep[A](f: E => A) = f
       def unrep[A](f: E => A) = f
     }
 
-  implicit def curryRepresentable[E]: Representable[({type λ[α] = E => α})#λ, (E, Unit)] =
-    new Representable[({type λ[α] = E => α})#λ, (E, Unit)] {
+  implicit def curryRepresentable[E]: Representable[E => ?, (E, Unit)] =
+    new Representable[E => ?, (E, Unit)] {
       def rep[A](f: ((E, Unit)) => A): E => A = e => f((e, ()))
       def unrep[A](f: E => A): ((E, Unit)) => A = e => f(e._1)
     }
 
-  implicit val f0Representable: Representable[Function0, Unit] = new Representable[Function0, Unit] {
-    def rep[A](f: Unit => A) = () => f(())
-    def unrep[A](f: () => A) = u => f()
-  }
+  implicit val f0Representable: Representable[Function0, Unit] =
+    new Representable[Function0, Unit] {
+      def rep[A](f: Unit => A) = () => f(())
+      def unrep[A](f: () => A) = u => f()
+    }
 }
 
 object Representable extends RepresentableInstances
@@ -59,4 +60,3 @@ abstract class Corepresentable[F[_], X](implicit F: Contravariant[F]) {
 
   def corepresentableLaw = new CorepresentableLaw {}
 }
-

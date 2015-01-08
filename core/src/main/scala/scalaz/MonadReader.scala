@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait MonadReader[F[_, _], S] extends Monad[({type λ[α] = F[S, α]})#λ] { self =>
+trait MonadReader[F[_, _], S] extends Monad[F[S, ?]] { self =>
   ////
 
   def ask: F[S,S]

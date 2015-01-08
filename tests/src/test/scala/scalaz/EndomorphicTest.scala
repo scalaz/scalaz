@@ -12,16 +12,16 @@ object EndomorphicTest extends SpecLite {
 
   implicit def endoEqual[F[_], G[_[_], _, _], A](
     implicit F: Equal[G[F, A, A]]
-  ): Equal[Endomorphic[({type λ[α, β] = G[F, α, β]})#λ, A]] =
+  ): Equal[Endomorphic[G[F, ?, ?], A]] =
     Equal.equalBy(_.run)
 
   implicit def endoArb[F[_], G[_[_], _, _], A](
     implicit F: Arbitrary[G[F, A, A]]
-  ): Arbitrary[Endomorphic[({type λ[α, β] = G[F, α, β]})#λ, A]] =
-    Functor[Arbitrary].map(F)(Endomorphic[({type λ[α, β] = G[F, α, β]})#λ, A](_))
+  ): Arbitrary[Endomorphic[G[F, ?, ?], A]] =
+    Functor[Arbitrary].map(F)(Endomorphic[G[F, ?, ?], A](_))
 
-  checkAll(monoid.laws[Endomorphic[({type λ[α, β] = Kleisli[Option, α, β]})#λ, Int]])
-  checkAll(semigroup.laws[Endomorphic[({type λ[α, β] = Cokleisli[Option, α, β]})#λ, Int]])
+  checkAll(monoid.laws[Endomorphic[Kleisli[Option, ?, ?], Int]])
+  checkAll(semigroup.laws[Endomorphic[Cokleisli[Option, ?, ?], Int]])
 
   object instances{
     def semigroup[F[_, _]: Compose, A] = Semigroup[Endomorphic[F, A]]
@@ -30,17 +30,17 @@ object EndomorphicTest extends SpecLite {
     def semigroup[F[_, _]: Category, A] = Semigroup[Endomorphic[F, A]]
 
     object kleisli {
-      def semigroup[F[_]: Bind, A] = Semigroup[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]]
-      def monoid[F[_]: Monad, A] = Monoid[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]]
+      def semigroup[F[_]: Bind, A] = Semigroup[Endomorphic[Kleisli[F, ?, ?], A]]
+      def monoid[F[_]: Monad, A] = Monoid[Endomorphic[Kleisli[F, ?, ?], A]]
 
-      def semigroup[F[_]: Monad, A] = Semigroup[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]]
+      def semigroup[F[_]: Monad, A] = Semigroup[Endomorphic[Kleisli[F, ?, ?], A]]
     }
 
     object cokleisli {
-      def semigroup[F[_]: Cobind, A] = Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]]
-      def monoid[F[_]: Comonad, A] = Monoid[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]]
+      def semigroup[F[_]: Cobind, A] = Semigroup[Endomorphic[Cokleisli[F, ?, ?], A]]
+      def monoid[F[_]: Comonad, A] = Monoid[Endomorphic[Cokleisli[F, ?, ?], A]]
 
-      def semigroup[F[_]: Comonad, A] = Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]]
+      def semigroup[F[_]: Comonad, A] = Semigroup[Endomorphic[Cokleisli[F, ?, ?], A]]
     }
   }
 }

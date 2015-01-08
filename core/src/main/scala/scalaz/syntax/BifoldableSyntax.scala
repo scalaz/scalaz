@@ -24,12 +24,12 @@ sealed trait ToBifoldableOps0 {
 trait ToBifoldableOps extends ToBifoldableOps0 {
   
   implicit def ToBifoldableOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bifoldable[F]) =
-      new BifoldableOps[F,A, B](v)
+    new BifoldableOps[F,A, B](v)
   
 
   
-  implicit def ToBifoldableVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bifoldable[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new BifoldableOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToBifoldableVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bifoldable[F[G, ?, ?]]) =
+    new BifoldableOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

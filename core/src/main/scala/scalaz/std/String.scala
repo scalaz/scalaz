@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait StringInstances {
-  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[({ type λ[α] = String })#λ] {
+  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[λ[α => String]] {
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""

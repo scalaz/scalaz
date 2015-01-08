@@ -9,18 +9,18 @@ trait Plus[F[_]]  { self =>
   ////
 
   /**The composition of Plus `F` and `G`, `[x]F[G[x]]`, is a Plus */
-  def compose[G[_]](implicit G0: Plus[G]): Plus[({type λ[α] = F[G[α]]})#λ] = new CompositionPlus[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit G0: Plus[G]): Plus[λ[α => F[G[α]]]] =
+    new CompositionPlus[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Plus `F` and `G`, `[x](F[x], G[x]])`, is a Plus */
-  def product[G[_]](implicit G0: Plus[G]): Plus[({type λ[α] = (F[α], G[α])})#λ] = new ProductPlus[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Plus[G]): Plus[λ[α => (F[α], G[α])]] =
+    new ProductPlus[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   def plus[A](a: F[A], b: => F[A]): F[A]
 
@@ -32,7 +32,8 @@ trait Plus[F[_]]  { self =>
     def associative[A](f1: F[A], f2: F[A], f3: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(plus(f1, plus(f2, f3)), plus(plus(f1, f2), f3))
   }
-  def plusLaw = new PlusLaw {}
+  def plusLaw = 
+    new PlusLaw {}
   ////
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def F = Plus.this }
 }

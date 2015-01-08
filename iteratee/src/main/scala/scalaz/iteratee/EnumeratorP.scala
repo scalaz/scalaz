@@ -98,13 +98,13 @@ trait EnumeratorPFunctions {
     }
   }
 
-  def liftE2[J, K, I, F[_]](e2t: ForallM[({type λ[β[_]] = Enumeratee2T[J, K, I, β]})#λ]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
+  def liftE2[J, K, I, F[_]](e2t: ForallM[λ[β[_] => Enumeratee2T[J, K, I, β]]]): (EnumeratorP[J, F], EnumeratorP[K, F]) => EnumeratorP[I, F] = {
     (e1: EnumeratorP[J, F], e2: EnumeratorP[K, F]) => new EnumeratorP[I, F] {
       def apply[G[_]](implicit MO: MonadPartialOrder[G, F]): EnumeratorT[I, G] =
         new EnumeratorT[I, G] {
           import MO._
-          implicit val IOrd = MO.transform[({ type λ[β[_], α] = IterateeT[K, β, α] })#λ]
-          lazy val enum1 = e1[({ type λ[α] = IterateeT[K, G, α]})#λ]
+          implicit val IOrd = MO.transform[λ[(β[_], α) => IterateeT[K, β, α]]]
+          lazy val enum1 = e1[IterateeT[K, G, ?]]
           lazy val enum2 = e2[G]
 
           def apply[A] = {
@@ -115,19 +115,19 @@ trait EnumeratorPFunctions {
   }
 
   def cogroupE[J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering) = liftE2[J, K, Either3[J, (J, K), K], F] {
-    new ForallM[({type λ[β[_]] = Enumeratee2T[J, K, Either3[J, (J, K), K], β]})#λ] {
+    new ForallM[λ[β[_] => Enumeratee2T[J, K, Either3[J, (J, K), K], β]]] {
       def apply[G[_]: Monad] = cogroupI[J, K, G]
     }
   }
 
   def joinE[J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering) = liftE2[J, K, (J, K), F] {
-    new ForallM[({type λ[β[_]] = Enumeratee2T[J, K, (J, K), β]})#λ] {
+    new ForallM[λ[β[_] => Enumeratee2T[J, K, (J, K), β]]] {
       def apply[G[_]: Monad] = joinI[J, K, G]
     }
   }
 
   def mergeE[E: Order, F[_]: Monad] = liftE2[E, E, E, F] {
-    new ForallM[({type λ[β[_]] = Enumeratee2T[E, E, E, β]})#λ] {
+    new ForallM[λ[β[_] => Enumeratee2T[E, E, E, β]]] {
       def apply[G[_]: Monad] = mergeI[E, G]
     }
   }

@@ -59,34 +59,34 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
     }
 
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
-  def compose[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = F[G[α]]})#λ] = new CompositionFunctor[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit G0: Functor[G]): Functor[λ[α => F[G[α]]]] = 
+    new CompositionFunctor[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /** The composition of Functor F and Contravariant G, `[x]F[G[x]]`,
     * is contravariant.
     */
-  def icompose[G[_]](implicit G0: Contravariant[G]): Contravariant[({type λ[α] = F[G[α]]})#λ] =
-    new Contravariant[({type λ[α] = F[G[α]]})#λ] {
+  def icompose[G[_]](implicit G0: Contravariant[G]): Contravariant[λ[α => F[G[α]]]] =
+    new Contravariant[λ[α => F[G[α]]]] {
       def contramap[A, B](fa: F[G[A]])(f: B => A) =
         self.map(fa)(ga => G0.contramap(ga)(f))
     }
 
   /** The composition of Functor `F` and Bifunctor `G`, `[x, y]F[G[x, y]]`, is a Bifunctor */
-  def bicompose[G[_, _]: Bifunctor]: Bifunctor[({type λ[α, β] = F[G[α, β]]})#λ] =
+  def bicompose[G[_, _]: Bifunctor]: Bifunctor[λ[(α, β) => F[G[α, β]]]] =
     new CompositionFunctorBifunctor[F, G] {
       def F = self
       def G = implicitly
     }
 
   /**The product of Functors `F` and `G`, `[x](F[x], G[x]])`, is a Functor */
-  def product[G[_]](implicit G0: Functor[G]): Functor[({type λ[α] = (F[α], G[α])})#λ] = new ProductFunctor[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Functor[G]): Functor[λ[α => (F[α], G[α])]] = 
+    new ProductFunctor[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**
    * Functors are covariant by nature, so we can treat an `F[A]` as

@@ -21,7 +21,7 @@ import scala.reflect.ClassTag
  *
  * def parseInt(s: String): Validation[String, Int] =
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
- * val V = Applicative[({type λ[α]=ValidationNel[String, α]})#λ]
+ * val V = Applicative[λ[α => ValidationNel[String, ?]]]
  *
  * val x: ValidationNel[String, Int] =
  *   V.apply2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
@@ -427,54 +427,57 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] = new Traverse[({type l[a] = Validation[L, a]})#l] with Cozip[({type l[a] = Validation[L, a]})#l] with Plus[({type l[a] = Validation[L, a]})#l] with Optional[({type l[a] = Validation[L, a]})#l] {
+  implicit def ValidationInstances1[L]: Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] =
+    new Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] {
 
-    override def map[A, B](fa: Validation[L, A])(f: A => B) =
-      fa map f
+      override def map[A, B](fa: Validation[L, A])(f: A => B) =
+        fa map f
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
-      fa.traverse(f)
+      def traverseImpl[G[_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
+        fa.traverse(f)
 
-    override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
-      fa.foldRight(z)(f)
+      override def foldRight[A, B](fa: Validation[L, A], z: => B)(f: (A, => B) => B) =
+        fa.foldRight(z)(f)
 
-    def cozip[A, B](x: Validation[L, A \/ B]) =
-      x match {
-        case l @ Failure(_) => -\/(l)
-        case Success(e) => e match {
-          case -\/(a) => -\/(Success(a))
-          case \/-(b) => \/-(Success(b))
+      def cozip[A, B](x: Validation[L, A \/ B]) =
+        x match {
+          case l @ Failure(_) => -\/(l)
+          case Success(e) => e match {
+            case -\/(a) => -\/(Success(a))
+            case \/-(b) => \/-(Success(b))
+          }
         }
-      }
 
-    def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
-      a orElse b
+      def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
+        a orElse b
 
-    def pextract[B, A](fa: Validation[L,A]): Validation[L,B] \/ A =
-      fa.fold(l => -\/(Failure(l)), \/.right)
+      def pextract[B, A](fa: Validation[L,A]): Validation[L,B] \/ A =
+        fa.fold(l => -\/(Failure(l)), \/.right)
+    }
   }
-}
 
 sealed abstract class ValidationInstances3 {
-  implicit val ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
-    override def bimap[A, B, C, D](fab: Validation[A, B])
-                                  (f: A => C, g: B => D) = fab bimap (f, g)
+  implicit val ValidationInstances0 : Bitraverse[Validation] =
+    new Bitraverse[Validation] {
+      override def bimap[A, B, C, D](fab: Validation[A, B])
+                                    (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])
-                                                  (f: A => G[C], g: B => G[D]) =
-      fab.bitraverse(f, g)
-  }
+      def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])
+                                                    (f: A => G[C], g: B => G[D]) =
+        fab.bitraverse(f, g)
+    }
 
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
-    override def map[A, B](fa: Validation[L, A])(f: A => B) =
-      fa map f
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, ?]] =
+    new Applicative[Validation[L, ?]] {
+      override def map[A, B](fa: Validation[L, A])(f: A => B) =
+        fa map f
 
-    def point[A](a: => A) =
-      Success(a)
+      def point[A](a: => A) =
+        Success(a)
 
-    def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
-      fa ap f
-  }
+      def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
+        fa ap f
+    }
 
 }
 

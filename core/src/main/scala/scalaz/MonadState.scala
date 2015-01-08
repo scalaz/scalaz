@@ -6,7 +6,7 @@ package scalaz
  *
  */
 ////
-trait MonadState[F[_, _], S] extends Monad[({type λ[α] = F[S, α]})#λ] { self =>
+trait MonadState[F[_, _], S] extends Monad[F[S, ?]] { self =>
   ////
 
   def state[A](a: A): F[S, A] = bind(init)(s => point(a))

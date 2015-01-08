@@ -19,28 +19,28 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   // derived functions
 
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
-  def compose[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = F[G[α]]})#λ] = new CompositionTraverse[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => F[G[α]]]] =
+    new CompositionTraverse[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /** The composition of Traverse `F` and Bitraverse `G`, `[x, y]F[G[x, y]]`, is a Bitraverse */
-  def bicompose[G[_, _]: Bitraverse]: Bitraverse[({type λ[α, β]= F[G[α, β]]})#λ] =
+  def bicompose[G[_, _]: Bitraverse]: Bitraverse[λ[(α, β) => F[G[α, β]]]] =
     new CompositionTraverseBitraverse[F, G] {
       def F = self
       def G = implicitly
     }
 
   /**The product of Traverses `F` and `G`, `[x](F[x], G[x]])`, is a Traverse */
-  def product[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = (F[α], G[α])})#λ] = new ProductTraverse[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => (F[α], G[α])]] =
+    new ProductTraverse[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Traverse `F` and Traverse1 `G`, `[x](F[x], G[x]])`, is a Traverse1 */
-  def product0[G[_]](implicit G0: Traverse1[G]): Traverse1[({type λ[α] = (F[α], G[α])})#λ] =
+  def product0[G[_]](implicit G0: Traverse1[G]): Traverse1[λ[α => (F[α], G[α])]] =
     new ProductTraverse1R[F, G] {
       def F = self
       def G = G0
@@ -53,8 +53,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   // reduce - given monoid
   def traversal[G[_]:Applicative]: Traversal[G] =
     new Traversal[G]
-  def traversalS[S]: Traversal[({type f[x]=State[S,x]})#f] =
-    new Traversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad){
+  def traversalS[S]: Traversal[State[S, ?]] =
+    new Traversal[State[S, ?]]()(StateT.stateMonad) {
       override def run[A, B](fa: F[A])(f: A => State[S, B]) = traverseS(fa)(f)
     }
 
@@ -81,7 +81,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](s => {
-      val st = traverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B](fa)(f(_: A).lift[Trampoline])
+      val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
       st.run(s).run
     })
   }
@@ -91,7 +91,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](s => {
-      val kl = traverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
+      val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run
     })
   }
@@ -105,9 +105,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traverseS(fga)(x => x)
 
   /** A version of `sequence` that infers the nested type constructor. */
-  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
+  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = 
     G.TC.traverse(self)(x => G.apply(x))(this)
-  }
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
@@ -168,9 +167,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     }
 
     /** Traversal with the `point` function is the same as applying the `point` function directly */
-    def purity[G[_], A](fa: F[A])(implicit G: Applicative[G], GFA: Equal[G[F[A]]]): Boolean = {
+    def purity[G[_], A](fa: F[A])(implicit G: Applicative[G], GFA: Equal[G[F[A]]]): Boolean =
       GFA.equal(traverse[G, A, A](fa)(G.point[A](_)), G.point(fa))
-    }
 
     /**
      * @param nat A natural transformation from `M` to `N` for which these properties hold:

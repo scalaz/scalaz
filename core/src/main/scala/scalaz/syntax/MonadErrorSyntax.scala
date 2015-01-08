@@ -27,7 +27,7 @@ trait ToMonadErrorOps extends ToMonadOps {
   ////
 }
 
-trait MonadErrorSyntax[F[_, _], S] extends MonadSyntax[({type λ[α] = F[S, α]})#λ] {
+trait MonadErrorSyntax[F[_, _], S] extends MonadSyntax[F[S, ?]] {
   implicit def ToMonadErrorOps[A](v: F[S, A]): MonadErrorOps[F, S, A] =
     new MonadErrorOps[F, S, A](v)(MonadErrorSyntax.this.F)
 

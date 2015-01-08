@@ -56,7 +56,7 @@ trait MapSubInstances0 extends MapSub {
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
   }
 
-  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[({type F[V] = XMap[K,V]})#F] {
+  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[XMap[K, ?]] {
     override def foldLeft[A, B](fa: XMap[K, A], z: B)(f: (B, A) => B) =
       fa.valuesIterator.foldLeft(z)(f)
 
@@ -64,12 +64,14 @@ trait MapSubInstances0 extends MapSub {
       fa.foldRight(z)((p, b) => f(p._2, b))
   }
 
-  implicit def mapEqual[K: Order, V: Equal]: Equal[XMap[K, V]] = new MapEqual[K, V] {
-    def OK = Order[K]
-    def OV = Equal[V]
-  }
+  implicit def mapEqual[K: Order, V: Equal]: Equal[XMap[K, V]] =
+    new MapEqual[K, V] {
+      def OK = Order[K]
+      def OV = Equal[V]
+    }
 
-  implicit def mapFoldable[K]: Foldable[({type F[V] = XMap[K,V]})#F] = new MapFoldable[K]{}
+  implicit def mapFoldable[K]: Foldable[XMap[K, ?]] =
+    new MapFoldable[K]{}
 }
 
 trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
@@ -78,52 +80,54 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] with Bind[({type F[V] = XMap[K,V]})#F] with Align[({type F[V] = XMap[K,V]})#F] = new Traverse[({type F[V] = XMap[K,V]})#F] with IsEmpty[({type F[V] = XMap[K,V]})#F] with Bind[({type F[V] = XMap[K,V]})#F] with MapFoldable[K] with Align[({type F[V] = XMap[K,V]})#F] {
-    def empty[V] = fromSeq[K, V]()
-    def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
-    def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
-    def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
-    override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
-    def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
-      G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
-    import \&/._
-    override def alignWith[A, B, C](f: A \&/ B => C) = {
-      case (a, b) if b.isEmpty => map(a)(v => f(This(v)))
-      case (a, b) if a.isEmpty => map(b)(v => f(That(v)))
-      case (a, b) =>
-        map(unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)){
-          case (This(aa), That(bb)) => Both(aa, bb)
-          case _ => sys.error("Map alignWith")
-        })(f)
+  implicit def mapInstance[K: BuildKeyConstraint]: Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]] with Bind[XMap[K, ?]] with Align[XMap[K, ?]] =
+    new Traverse[XMap[K, ?]] with IsEmpty[XMap[K, ?]] with Bind[XMap[K, ?]] with MapFoldable[K] with Align[XMap[K, ?]] {
+      def empty[V] = fromSeq[K, V]()
+      def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
+      def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
+      def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
+      override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
+      def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
+        G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
+      import \&/._
+      override def alignWith[A, B, C](f: A \&/ B => C) = {
+        case (a, b) if b.isEmpty => map(a)(v => f(This(v)))
+        case (a, b) if a.isEmpty => map(b)(v => f(That(v)))
+        case (a, b) =>
+          map(unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)){
+            case (This(aa), That(bb)) => Both(aa, bb)
+            case _ => sys.error("Map alignWith")
+          })(f)
+      }
+      override def align[A, B](a: XMap[K, A], b: XMap[K, B]) = (a, b) match {
+        case (a, b) if b.isEmpty => map(a)(This(_))
+        case (a, b) if a.isEmpty => map(b)(That(_))
+        case (a, b) =>
+          unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)){
+            case (This(aa), That(bb)) => Both(aa, bb)
+            case _ => sys.error("Map align")
+          }
+      }
     }
-    override def align[A, B](a: XMap[K, A], b: XMap[K, B]) = (a, b) match {
-      case (a, b) if b.isEmpty => map(a)(This(_))
-      case (a, b) if a.isEmpty => map(b)(That(_))
-      case (a, b) =>
-        unionWith(map(a)(This(_): A \&/ B), map(b)(That(_): A \&/ B)){
-          case (This(aa), That(bb)) => Both(aa, bb)
-          case _ => sys.error("Map align")
-        }
-    }
-  }
 
   /** Map union monoid, unifying values with `V`'s `append`. */
-  implicit def mapMonoid[K: BuildKeyConstraint, V: Semigroup]: Monoid[XMap[K, V]] = new Monoid[XMap[K, V]] {
-    def zero = fromSeq[K, V]()
-    def append(m1: XMap[K, V], m2: => XMap[K, V]) = {
-      // Eagerly consume m2 as the value is used more than once.
-      val m2Instance: XMap[K, V] = m2
-      // semigroups are not commutative, so order may matter.
-      val (from, to, semigroup) = {
-        if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
-        else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
-      }
+  implicit def mapMonoid[K: BuildKeyConstraint, V: Semigroup]: Monoid[XMap[K, V]] =
+    new Monoid[XMap[K, V]] {
+      def zero = fromSeq[K, V]()
+      def append(m1: XMap[K, V], m2: => XMap[K, V]) = {
+        // Eagerly consume m2 as the value is used more than once.
+        val m2Instance: XMap[K, V] = m2
+        // semigroups are not commutative, so order may matter.
+        val (from, to, semigroup) = {
+          if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
+          else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
+        }
 
-      from.foldLeft(to) {
-        case (to, (k, v)) => ab_+(to, k, to.get(k).map(semigroup(_, v)).getOrElse(v))
+        from.foldLeft(to) {
+          case (to, (k, v)) => ab_+(to, k, to.get(k).map(semigroup(_, v)).getOrElse(v))
+        }
       }
     }
-  }
 
   implicit def mapShow[K, V](implicit K: Show[K], V: Show[V]): Show[XMap[K, V]] =
     Show.show(m => "Map[" +:
@@ -131,21 +135,22 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
                   case (k, v) => Cord(K show k, "->", V show v)
                 }: _*) :+ "]")
 
-  implicit def mapOrder[K: Order, V: Order]: Order[XMap[K, V]] = new Order[XMap[K, V]] with MapEqual[K, V] {
-    def OK = Order[K]
-    def OV = Equal[V]
-    def order(x: XMap[K, V], y: XMap[K, V]): Ordering = {
-      import vector._
-      import anyVal._
-      import tuple._
-      implicit val ok = Order[K].toScalaOrdering
-      Semigroup[Ordering]
-       .append(Order[Int].order(x.size, y.size),
-               Order[Vector[(K, V)]]
-                .order(x.toVector.sortBy((_:(K,V))._1),
-                       y.toVector.sortBy((_:(K,V))._1)))
+  implicit def mapOrder[K: Order, V: Order]: Order[XMap[K, V]] =
+    new Order[XMap[K, V]] with MapEqual[K, V] {
+      def OK = Order[K]
+      def OV = Equal[V]
+      def order(x: XMap[K, V], y: XMap[K, V]): Ordering = {
+        import vector._
+        import anyVal._
+        import tuple._
+        implicit val ok = Order[K].toScalaOrdering
+        Semigroup[Ordering]
+         .append(Order[Int].order(x.size, y.size),
+                 Order[Vector[(K, V)]]
+                  .order(x.toVector.sortBy((_:(K,V))._1),
+                         y.toVector.sortBy((_:(K,V))._1)))
+      }
     }
-  }
 }
 
 trait MapSubFunctions extends MapSub {

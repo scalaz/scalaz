@@ -22,7 +22,7 @@ object LazyTupleTest extends SpecLite {
   checkAll("LazyTuple3", monoid.laws[LazyTuple3[A, B, C]])
   checkAll("LazyTuple4", monoid.laws[LazyTuple4[A, B, C, D]])
 
-  checkAll("LazyTuple2", monad.laws[({type λ[α] = LazyTuple2[B, α]})#λ])
-  checkAll("LazyTuple3", monad.laws[({type λ[α] = LazyTuple3[B, C, α]})#λ])
-  checkAll("LazyTuple4", monad.laws[({type λ[α] = LazyTuple4[B, C, D, α]})#λ])
+  checkAll("LazyTuple2", monad.laws[LazyTuple2[B, ?]])
+  checkAll("LazyTuple3", monad.laws[LazyTuple3[B, C, ?]])
+  checkAll("LazyTuple4", monad.laws[LazyTuple4[B, C, D, ?]])
 }

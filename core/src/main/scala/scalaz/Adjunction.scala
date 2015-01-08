@@ -39,13 +39,13 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
   }
 
   /** Every adjunction gives rise to a monad. */
-  implicit val monad: Monad[({type λ[α] = G[F[α]]})#λ] = new Monad[({type λ[α] = G[F[α]]})#λ] {
+  implicit val monad: Monad[λ[α => G[F[α]]]] = new Monad[λ[α => G[F[α]]]] {
     def point[A](a: => A) = unit(a)
     def bind[A,B](a: G[F[A]])(f: A => G[F[B]]) = G.map(a)(rightAdjunct(_)(f))
   }
 
   /** Every adjunction gives rise to a comonad. */
-  implicit val comonad: Comonad[({type λ[α] = F[G[α]]})#λ] = new Comonad[({type λ[α] = F[G[α]]})#λ] {
+  implicit val comonad: Comonad[λ[α => F[G[α]]]] = new Comonad[λ[α => F[G[α]]]] {
     def copoint[A](a: F[G[A]]) = counit(a)
     def cobind[A,B](a: F[G[A]])(f: F[G[A]] => B): F[G[B]] = F.map(a)(leftAdjunct(_)(f))
     def map[A,B](a: F[G[A]])(f: A => B) = cobind(a)(x => f(counit(x)))
@@ -58,12 +58,12 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
    * Adjunctions compose in a natural fashion. If `F -| G` is an adjunction, and `P -| Q` is an
    * adjunction, then PF -| GQ is an adjunction. In fact, adjunctions in Scala form a monoid.
    */
-  def compose[P[_], Q[_]](implicit A: P -| Q): ({type λ[α] = P[F[α]]})#λ -| ({type λ[α] = G[Q[α]]})#λ = {
+  def compose[P[_], Q[_]](implicit A: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] = {
     implicit val P = A.F
     implicit val Q = A.G
     implicit val PF = P compose F
     implicit val GQ = G compose Q
-    new (({type λ[α] = P[F[α]]})#λ -| ({type λ[α] = G[Q[α]]})#λ) {
+    new (λ[α => P[F[α]]] -| λ[α => G[Q[α]]]) {
       override def unit[A](a: => A): G[Q[P[F[A]]]] = self.G.map(self.unit(a))(x => A.unit(x))
       override def counit[A](a: P[F[G[Q[A]]]]): A = A.counit(P.map(a)(self.counit))
     }
@@ -82,46 +82,51 @@ trait AdjunctionFunctions {
 sealed abstract class AdjunctionInstances {
   import Adjunction.-|
 
-  implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](implicit A1: F -| G, A2: P -| Q): ({type λ[α] = P[F[α]]})#λ -| ({type λ[α] = G[Q[α]]})#λ =
+  implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](implicit A1: F -| G, A2: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] =
     A1 compose A2
 
   import Id._
   import std.tuple._
   import std.function._
 
-  implicit def curryUncurryAdjunction[S]: ({type λ[α] = (S, α)})#λ -| ({type λ[α] = S => α})#λ =
-    new Adjunction[({type λ[α] = (S, α)})#λ, ({type λ[α] = S => α})#λ] {
+  implicit def curryUncurryAdjunction[S]: (S, ?) -| (S => ?) =
+    new Adjunction[(S, ?), (S => ?)] {
       override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f(s, a)
       override def rightAdjunct[A, B](a: (S, A))(f: A => S => B): B = f(a._2)(a._1)
     }
 
-  implicit val identityAdjunction: Id -| Id = new Adjunction[Id, Id] {
-    override def leftAdjunct[A, B](a: => A)(f: A => B): B = f(a)
-    override def rightAdjunct[A, B](a: A)(f: A => B): B = f(a)
-  }
-
-  implicit val f0Adjunction: Function0 -| Function0 = new Adjunction[Function0, Function0] {
-    override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): () => B = () => f(() => a)
-    override def rightAdjunct[A, B](a: () => A)(f: A => () => B): B = f(a())()
-  }
-
-  implicit val idF0Adjunction: Id -| Function0 = new Adjunction[Id, Function0] {
-    override def leftAdjunct[A, B](a: => A)(f: A => B): () => B = () => f(a)
-    override def rightAdjunct[A, B](a: A)(f: A => () => B): B = f(a)()
-  }
-
-  implicit val f0IdAdjunction: Function0 -| Id = new Adjunction[Function0, Id] {
-    override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): B = f(() => a)
-    override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
-  }
-
-  implicit def writerReaderAdjunction[E]: Adjunction[({type λ[α] = Writer[E, α]})#λ, ({type λ[α] = Reader[E, α]})#λ] = new Adjunction[({type λ[α] = Writer[E, α]})#λ, ({type λ[α] = Reader[E, α]})#λ] {
-    override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
-      Reader(e => f(Writer(e, a)))
-    override def rightAdjunct[A, B](w: Writer[E, A])(f: A => Reader[E, B]): B = {
-      val (e, a) = w.run
-      f(a)(e)
+  implicit val identityAdjunction: Id -| Id = 
+    new Adjunction[Id, Id] {
+      override def leftAdjunct[A, B](a: => A)(f: A => B): B = f(a)
+      override def rightAdjunct[A, B](a: A)(f: A => B): B = f(a)
     }
-  }
+
+  implicit val f0Adjunction: Function0 -| Function0 =
+    new Adjunction[Function0, Function0] {
+      override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): () => B = () => f(() => a)
+      override def rightAdjunct[A, B](a: () => A)(f: A => () => B): B = f(a())()
+    }
+
+  implicit val idF0Adjunction: Id -| Function0 = 
+    new Adjunction[Id, Function0] {
+      override def leftAdjunct[A, B](a: => A)(f: A => B): () => B = () => f(a)
+      override def rightAdjunct[A, B](a: A)(f: A => () => B): B = f(a)()
+    }
+
+  implicit val f0IdAdjunction: Function0 -| Id = 
+    new Adjunction[Function0, Id] {
+      override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): B = f(() => a)
+      override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
+    }
+
+  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] = 
+    new Adjunction[Writer[E, ?], Reader[E, ?]] {
+      override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
+        Reader(e => f(Writer(e, a)))
+      override def rightAdjunct[A, B](w: Writer[E, A])(f: A => Reader[E, B]): B = {
+        val (e, a) = w.run
+        f(a)(e)
+      }
+    }
 }
 

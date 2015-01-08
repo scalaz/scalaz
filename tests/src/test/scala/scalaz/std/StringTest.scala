@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 object StringTest extends SpecLite {
   checkAll(monoid.laws[String])
-  checkAll(isEmpty.laws[({type λ[α] = String})#λ])
+  checkAll(isEmpty.laws[λ[α => String]])
 
   checkAll(order.laws[String].withProp("benchmark", order.scalaOrdering[String]))
 

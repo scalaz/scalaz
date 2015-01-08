@@ -27,12 +27,12 @@ sealed trait ToComposeOps0 {
 trait ToComposeOps extends ToComposeOps0 {
   
   implicit def ToComposeOps[F[_, _],A, B](v: F[A, B])(implicit F0: Compose[F]) =
-      new ComposeOps[F,A, B](v)
+    new ComposeOps[F,A, B](v)
   
 
   
-  implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ComposeOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Compose[F[G, ?, ?]]) =
+    new ComposeOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
   ////

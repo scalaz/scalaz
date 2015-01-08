@@ -87,46 +87,52 @@ sealed abstract class CoproductInstances3 {
   implicit def coproductEqual[F[_], G[_], A](implicit E: Equal[F[A] \/ G[A]]): Equal[Coproduct[F, G, A]] =
     Equal.equalBy(_.run)
 
-  implicit def coproductFunctor[F[_], G[_]](implicit F0: Functor[F], G0: Functor[G]): Functor[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductFunctor[F, G] {
-    implicit def F: Functor[F] = F0
-    implicit def G: Functor[G] = G0
-  }
+  implicit def coproductFunctor[F[_], G[_]](implicit F0: Functor[F], G0: Functor[G]): Functor[Coproduct[F, G, ?]] = 
+    new CoproductFunctor[F, G] {
+      implicit def F: Functor[F] = F0
+      implicit def G: Functor[G] = G0
+    }
 
-  implicit def coproductFoldable[F[_], G[_]](implicit F0: Foldable[F], G0: Foldable[G]): Foldable[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductFoldable[F, G] {
-    implicit def F: Foldable[F] = F0
-    implicit def G: Foldable[G] = G0
-  }
+  implicit def coproductFoldable[F[_], G[_]](implicit F0: Foldable[F], G0: Foldable[G]): Foldable[Coproduct[F, G, ?]] = 
+    new CoproductFoldable[F, G] {
+      implicit def F: Foldable[F] = F0
+      implicit def G: Foldable[G] = G0
+    }
 }
 
 sealed abstract class CoproductInstances2 extends CoproductInstances3 {
-  implicit def coproductContravariant[F[_], G[_]](implicit F0: Contravariant[F], G0: Contravariant[G]): Contravariant[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductContravariant[F, G] {
-    implicit def F: Contravariant[F] = F0
-    implicit def G: Contravariant[G] = G0
-  }
+  implicit def coproductContravariant[F[_], G[_]](implicit F0: Contravariant[F], G0: Contravariant[G]): Contravariant[Coproduct[F, G, ?]] = 
+    new CoproductContravariant[F, G] {
+      implicit def F: Contravariant[F] = F0
+      implicit def G: Contravariant[G] = G0
+    }
 }
 
 sealed abstract class CoproductInstances1 extends CoproductInstances2 {
-  implicit def coproductCobind[F[_], G[_]](implicit F0: Cobind[F], G0: Cobind[G]): Cobind[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductCobind[F, G] {
-    implicit def F: Cobind[F] = F0
-    implicit def G: Cobind[G] = G0
-  }
+  implicit def coproductCobind[F[_], G[_]](implicit F0: Cobind[F], G0: Cobind[G]): Cobind[Coproduct[F, G, ?]] = 
+    new CoproductCobind[F, G] {
+      implicit def F: Cobind[F] = F0
+      implicit def G: Cobind[G] = G0
+    }
 }
 
 sealed abstract class CoproductInstances0 extends CoproductInstances1 {
-  implicit def coproductTraverse[F[_], G[_]](implicit F0: Traverse[F], G0: Traverse[G]): Traverse[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductTraverse[F, G] {
-    implicit def F: Traverse[F] = F0
-    implicit def G: Traverse[G] = G0
-  }
+  implicit def coproductTraverse[F[_], G[_]](implicit F0: Traverse[F], G0: Traverse[G]): Traverse[Coproduct[F, G, ?]] =
+    new CoproductTraverse[F, G] {
+      implicit def F: Traverse[F] = F0
+      implicit def G: Traverse[G] = G0
+    }
 }
 
 sealed abstract class CoproductInstances extends CoproductInstances0 {
-  implicit def coproductComonad[F[_], G[_]](implicit F0: Comonad[F], G0: Comonad[G]): Comonad[({type λ[α]=Coproduct[F, G, α]})#λ] = new CoproductComonad[F, G] {
-    implicit def F: Comonad[F] = F0
-    implicit def G: Comonad[G] = G0
-  }
+  implicit def coproductComonad[F[_], G[_]](implicit F0: Comonad[F], G0: Comonad[G]): Comonad[Coproduct[F, G, ?]] =
+    new CoproductComonad[F, G] {
+      implicit def F: Comonad[F] = F0
+      implicit def G: Comonad[G] = G0
+    }
 }
 
-private trait CoproductFunctor[F[_], G[_]] extends Functor[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductFunctor[F[_], G[_]] extends Functor[Coproduct[F, G, ?]] {
   implicit def F: Functor[F]
   implicit def G: Functor[G]
 
@@ -134,7 +140,7 @@ private trait CoproductFunctor[F[_], G[_]] extends Functor[({type λ[α]=Coprodu
     a map f
 }
 
-private trait CoproductContravariant[F[_], G[_]] extends Contravariant[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductContravariant[F[_], G[_]] extends Contravariant[Coproduct[F, G, ?]] {
   implicit def F: Contravariant[F]
   implicit def G: Contravariant[G]
 
@@ -142,7 +148,7 @@ private trait CoproductContravariant[F[_], G[_]] extends Contravariant[({type λ
     a contramap f
 }
 
-private trait CoproductFoldable[F[_], G[_]] extends Foldable[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductFoldable[F[_], G[_]] extends Foldable[Coproduct[F, G, ?]] {
   implicit def F: Foldable[F]
   implicit def G: Foldable[G]
 
@@ -153,7 +159,7 @@ private trait CoproductFoldable[F[_], G[_]] extends Foldable[({type λ[α]=Copro
     fa foldMap f
 }
 
-private trait CoproductTraverse[F[_], G[_]] extends Traverse[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductTraverse[F[_], G[_]] extends Traverse[Coproduct[F, G, ?]] {
   implicit def F: Traverse[F]
   implicit def G: Traverse[G]
 
@@ -164,7 +170,7 @@ private trait CoproductTraverse[F[_], G[_]] extends Traverse[({type λ[α]=Copro
     fa traverse f
 }
 
-private trait CoproductCobind[F[_], G[_]] extends Cobind[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductCobind[F[_], G[_]] extends Cobind[Coproduct[F, G, ?]] {
   implicit def F: Cobind[F]
   implicit def G: Cobind[G]
 
@@ -176,7 +182,7 @@ private trait CoproductCobind[F[_], G[_]] extends Cobind[({type λ[α]=Coproduct
 
 }
 
-private trait CoproductComonad[F[_], G[_]] extends Comonad[({type λ[α]=Coproduct[F, G, α]})#λ] {
+private trait CoproductComonad[F[_], G[_]] extends Comonad[Coproduct[F, G, ?]] {
   implicit def F: Comonad[F]
   implicit def G: Comonad[G]
 

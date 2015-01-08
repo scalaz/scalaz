@@ -156,9 +156,10 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
     flatMap(_ => f)
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
-  def liftsNT: ({type m[x] = IndexedState[B1,B2,x]})#m ~> ({type n[x] = IndexedState[A1,A2,x]})#n =
-    new (({type m[x] = IndexedState[B1,B2,x]})#m ~> ({type n[x] = IndexedState[A1,A2,x]})#n) {
-      def apply[C](s : IndexedState[B1,B2,C]): IndexedState[A1,A2,C] = IndexedState[A1,A2,C](a => modp(s(_), a))
+  def liftsNT: IndexedState[B1, B2, ?] ~> IndexedState[A1, A2, ?] =
+    new (IndexedState[B1, B2, ?] ~> IndexedState[A1, A2, ?]) {
+      def apply[C](s : IndexedState[B1, B2, C]): IndexedState[A1, A2, C] =
+        IndexedState[A1, A2, C](a => modp(s(_), a))
     }
 
   /** Lenses can be composed */
@@ -427,8 +428,8 @@ abstract class LensInstances extends LensInstances0 {
   implicit def LensFamilyState[A, B](lens: LensFamily[A, _, B, _]): State[A, B] =
     lens.st
 
-  implicit def LensFamilyUnzip[S, R]: Unzip[({type λ[α] = LensFamily[S, R, α, α]})#λ] =
-    new Unzip[({type λ[α] = LensFamily[S, R, α, α]})#λ] {
+  implicit def LensFamilyUnzip[S, R]: Unzip[λ[α => LensFamily[S, R, α, α]]] =
+    new Unzip[λ[α => LensFamily[S, R, α, α]]] {
       def unzip[A, B](a: LensFamily[S, R, (A, B), (A, B)]) =
         (
           lensFamily(x => {

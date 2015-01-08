@@ -19,8 +19,7 @@ sealed trait FreeAp[F[_],A] {
     }
 
   /** Provides access to the first instruction of this program, if present */
-  def para[B](pure: A => B, ap: ({type λ[α] = (F[α], FreeAp[F, α => A])})#λ ~>
-                                ({type λ[α] = B})#λ): B =
+  def para[B](pure: A => B, ap: λ[α => (F[α], FreeAp[F, α => A])] ~> λ[α => B]): B =
     this match {
       case Pure(x) => pure(x)
       case x@Ap() => ap(x.v() -> x.k())
@@ -34,13 +33,13 @@ sealed trait FreeAp[F[_],A] {
    *
    * {{{
    * def count[F[_],B](p: FreeAp[F,B]): Int =
-   *   p.analyze(new (F ~> ({ type λ[α] = Int })#λ) {
+   *   p.analyze(new (F ~> λ[α => Int]) {
    *     def apply[A](a: F[A]) = 1
    *   })
    * }}}
    */
-  def analyze[M:Monoid](f: F ~> ({ type λ[α] = M })#λ): M =
-    foldMap[({ type λ[α] = Const[M,α] })#λ](new (F ~> ({ type λ[α] = Const[M,α] })#λ) {
+  def analyze[M:Monoid](f: F ~> λ[α => M]): M =
+    foldMap[Const[M, ?]](new (F ~> Const[M, ?]) {
       def apply[X](x: F[X]): Const[M,X] = Const(f(x))
     }).getConst
 
@@ -83,8 +82,8 @@ sealed trait FreeAp[F[_],A] {
 }
 
 object FreeAp {
-  implicit def freeInstance[F[_]]: Applicative[({type λ[α] = FreeAp[F,α]})#λ] =
-    new Applicative[({type λ[α] = FreeAp[F,α]})#λ] {
+  implicit def freeInstance[F[_]]: Applicative[FreeAp[F, ?]] =
+    new Applicative[FreeAp[F, ?]] {
       def point[A](a: => A) = FreeAp.point(a)
       def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa ap ff
     }

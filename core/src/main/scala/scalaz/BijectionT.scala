@@ -97,7 +97,7 @@ trait BijectionTFunctions {
     zipB[Endo, A, B]
 
   def zipReaderB[T, A, B]: Bijection[(T => A, T => B), T => (A, B)] =
-    zipB[({type l[a] = (T => a)})#l, A, B]
+    zipB[T => ?, A, B]
 
   def tuple3B[A, B, C]: Bijection[(A, B, C), (A, (B, C))] =
     bijection({ case (a, b, c) => (a, (b, c)) }, { case (a, (b, c)) => (a, b, c) })
@@ -118,7 +118,7 @@ trait BijectionTFunctions {
 
 
 sealed abstract class BijectionTInstances0 {
-  implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+  implicit def bijectionTSplit[F[_], G[_]](implicit F0: Bind[F], G0: Bind[G]): Split[BijectionT[F, G, ?, ?]] =
     new BijectionTSplit[F, G] {
       implicit def F = F0
       implicit def G = G0
@@ -126,14 +126,14 @@ sealed abstract class BijectionTInstances0 {
 }
 
 sealed abstract class BijectionTInstances extends BijectionTInstances0 {
-  implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] =
+  implicit def bijectionTCategory[F[_], G[_]](implicit F0: Monad[F], G0: Monad[G]): Category[BijectionT[F, G, ?, ?]] =
     new BijectionTCategory[F, G] {
       implicit def F = F0
       implicit def G = G0
     }
 }
 
-private trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] {
+private trait BijectionTSplit[F[_], G[_]] extends Split[BijectionT[F, G, ?, ?]] {
   implicit def F: Bind[F]
   implicit def G: Bind[G]
 
@@ -146,7 +146,7 @@ private trait BijectionTSplit[F[_], G[_]] extends Split[({type λ[α, β] = Bije
     )
 }
 
-private trait BijectionTCategory[F[_], G[_]] extends Category[({type λ[α, β] = BijectionT[F, G, α, β]})#λ] with BijectionTSplit[F, G] {
+private trait BijectionTCategory[F[_], G[_]] extends Category[BijectionT[F, G, ?, ?]] with BijectionTSplit[F, G] {
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 

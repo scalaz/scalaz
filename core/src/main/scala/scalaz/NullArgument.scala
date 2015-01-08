@@ -137,33 +137,35 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[NullArgument] = new Split[NullArgument] with Profunctor[NullArgument] {
-    override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
-      f compose g
-    override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
-      f *** g
-    override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
-      r contramap f
-    override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
-      r map f
-  }
+  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[NullArgument] =
+    new Split[NullArgument] with Profunctor[NullArgument] {
+      override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
+        f compose g
+      override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
+        f *** g
+      override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
+        r contramap f
+      override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
+        r map f
+    }
 
-  implicit def nullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] = new Monad[({type λ[α] = NullArgument[X, α]})#λ] {
-    override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
-      a ap f
-    override def map[A, B](a: NullArgument[X, A])(f: A => B) =
-      a map f
-    override def point[A](a: => A): NullArgument[X, A] =
-      NullArgument.always(a)
-    override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
-      a flatMap f
-  }
+  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] =
+    new Monad[NullArgument[X, ?]] {
+      override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
+        a ap f
+      override def map[A, B](a: NullArgument[X, A])(f: A => B) =
+        a map f
+      override def point[A](a: => A): NullArgument[X, A] =
+        NullArgument.always(a)
+      override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
+        a flatMap f
+    }
 
-  implicit def nullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] = new Contravariant[({type λ[α] = NullArgument[α, X]})#λ] {
-    override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
-      a contramap f
-  }
-
+  implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[?, X]] =
+    new Contravariant[NullArgument[?, X]] {
+      override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
+        a contramap f
+    }
 }
 
 private trait NullArgumentSemigroup[A, B] extends Semigroup[NullArgument[A, B]] {

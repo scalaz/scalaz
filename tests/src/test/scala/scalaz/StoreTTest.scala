@@ -13,17 +13,17 @@ object StoreTTest extends SpecLite {
     }
   }
 
-  checkAll(comonad.laws[({type λ[α] = StoreT[Tuple1, Int, α]})#λ])
+  checkAll(comonad.laws[StoreT[Tuple1, Int, ?]])
 
   object instances {
     type A = Int
-    def functor[F[_] : Functor] = Functor[({type λ[α] = StoreT[F, A, α]})#λ]
-    def cobind[F[_] : Cobind] = Cobind[({type λ[α] = StoreT[F, A, α]})#λ]
-    def comonad[F[_] : Comonad] = Comonad[({type λ[α] = StoreT[F, A, α]})#λ]
+    def functor[F[_] : Functor] = Functor[StoreT[F, A, ?]]
+    def cobind[F[_] : Cobind] = Cobind[StoreT[F, A, ?]]
+    def comonad[F[_] : Comonad] = Comonad[StoreT[F, A, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Comonad] = Functor[({type λ[α] = StoreT[F, A, α]})#λ]
-    def cobind[F[_] : Comonad] = Cobind[({type λ[α] = StoreT[F, A, α]})#λ]
+    def functor[F[_] : Comonad] = Functor[StoreT[F, A, ?]]
+    def cobind[F[_] : Comonad] = Cobind[StoreT[F, A, ?]]
   }
 
 }

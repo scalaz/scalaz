@@ -19,8 +19,8 @@ object Endomorphic extends EndomorphicInstances with EndomorphicFunctions
 trait EndomorphicFunctions {
 
   /** Endomorphic Kleisli arrow */
-  final def endoKleisli[F[_]: Monad, A](f: A => F[A]): Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A] =
-    Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A](Kleisli(f))
+  final def endoKleisli[F[_]: Monad, A](f: A => F[A]): Endomorphic[Kleisli[F, ?, ?], A] =
+    Endomorphic[Kleisli[F, ?, ?], A](Kleisli(f))
 }
 
 sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
@@ -31,11 +31,11 @@ sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
       def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
     }
 
-  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
-    endomorphicMonoid[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
+  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[Kleisli[F, ?, ?], A]] =
+    endomorphicMonoid[Kleisli[F, ?, ?], A]
 
-  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
-    endomorphicMonoid[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
+  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[Cokleisli[F, ?, ?], A]] =
+    endomorphicMonoid[Cokleisli[F, ?, ?], A]
 }
 
 sealed abstract class EndomorphicInstances0 {
@@ -45,11 +45,11 @@ sealed abstract class EndomorphicInstances0 {
       val F = G
     }
 
-  implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
-    endomorphicSemigroup[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
+  implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[Kleisli[F, ?, ?], A]] =
+    endomorphicSemigroup[Kleisli[F, ?, ?], A]
 
-  implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
-    endomorphicSemigroup[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
+  implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[Cokleisli[F, ?, ?], A]] =
+    endomorphicSemigroup[Cokleisli[F, ?, ?], A]
 
 }
 

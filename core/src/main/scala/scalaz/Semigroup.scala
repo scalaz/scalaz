@@ -22,7 +22,7 @@ trait Semigroup[F]  { self =>
   def append(f1: F, f2: => F): F
 
   // derived functions
-  protected[this] trait SemigroupCompose extends Compose[({type λ[α, β]=F})#λ] {
+  protected[this] trait SemigroupCompose extends Compose[λ[(α, β) => F]] {
     def compose[A, B, C](f: F, g: F) = append(f, g)
   }
 
@@ -31,20 +31,22 @@ trait Semigroup[F]  { self =>
     *
     * @note `compose.semigroup` = `this`
     */
-  final def compose: Compose[({type λ[α, β]=F})#λ] = new SemigroupCompose {}
+  final def compose: Compose[λ[(α, β) => F]] =
+    new SemigroupCompose {}
 
-  protected[this] trait SemigroupApply extends Apply[({type λ[α]=F})#λ] {
+  protected[this] trait SemigroupApply extends Apply[λ[α => F]] {
     override def map[A, B](fa: F)(f: A => B) = fa
     def ap[A, B](fa: => F)(f: => F) = append(f, fa)
   }
 
   /**
    * An [[scalaz.Apply]], that implements `ap` with `append`.  Note
-   * that the type parameter `α` in `Apply[({type λ[α]=F})#λ]` is
+   * that the type parameter `α` in `Apply[λ[α => F]]` is
    * discarded; it is a phantom type.  As such, the functor cannot
    * support [[scalaz.Bind]].
    */
-  final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply {}
+  final def apply: Apply[λ[α => F]] =
+    new SemigroupApply {}
 
   /**
    * A semigroup in type F must satisfy two laws:
@@ -68,33 +70,38 @@ object Semigroup {
 
   ////
   /** Make an associative binary function into an instance. */
-  def instance[A](f: (A, => A) => A): Semigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = f(f1,f2)
-  }
+  def instance[A](f: (A, => A) => A): Semigroup[A] = 
+    new Semigroup[A] {
+      def append(f1: A, f2: => A): A = f(f1,f2)
+    }
 
   /** A purely left-biased semigroup. */
-  def firstSemigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = f1
-  }
+  def firstSemigroup[A] =
+    new Semigroup[A] {
+      def append(f1: A, f2: => A): A = f1
+    }
 
   @inline implicit def firstTaggedSemigroup[A] = firstSemigroup[A @@ Tags.FirstVal]
 
   /** A purely right-biased semigroup. */
-  def lastSemigroup[A] = new Semigroup[A] {
-    def append(f1: A, f2: => A): A = f2
-  }
+  def lastSemigroup[A] =
+    new Semigroup[A] {
+      def append(f1: A, f2: => A): A = f2
+    }
 
   @inline implicit def lastTaggedSemigroup[A] = lastSemigroup[A @@ Tags.LastVal]
 
-  def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] = new Semigroup[A @@ Tags.MinVal] {
-    def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
-  }
+  def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] =
+    new Semigroup[A @@ Tags.MinVal] {
+      def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
+    }
 
   @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
 
-  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] = new Semigroup[A @@ Tags.MaxVal] {
-    def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
-  }
+  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] =
+    new Semigroup[A @@ Tags.MaxVal] {
+      def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
+    }
 
   @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
 
@@ -105,10 +112,11 @@ object Semigroup {
   }
 
   /**A semigroup for sequencing Apply effects. */
-  def liftSemigroup[F[_], M](implicit F0: Apply[F], M0: Semigroup[M]): Semigroup[F[M]] = new ApplySemigroup[F, M] {
-    implicit def F: Apply[F] = F0
-    implicit def M: Semigroup[M] = M0
-  }
+  def liftSemigroup[F[_], M](implicit F0: Apply[F], M0: Semigroup[M]): Semigroup[F[M]] =
+    new ApplySemigroup[F, M] {
+      implicit def F: Apply[F] = F0
+      implicit def M: Semigroup[M] = M0
+    }
 
   /** `point(a) append (point(a) append (point(a)...` */
   def repeat[F[_], A](a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
@@ -119,11 +127,13 @@ object Semigroup {
     m.append(F.point(a), iterate[F, A](f(a))(f))
 
   /** Semigroup is an invariant functor. */
-  implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {
-    def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] = new Semigroup[B] {
-      def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
+  implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = 
+    new InvariantFunctor[Semigroup] {
+      def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] =
+        new Semigroup[B] {
+          def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
+        }
     }
-  }
 
   ////
 }

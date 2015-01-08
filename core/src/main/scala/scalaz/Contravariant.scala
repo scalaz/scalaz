@@ -32,8 +32,8 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   /** The composition of Contravariant F and G, `[x]F[G[x]]`, is
     * covariant.
     */
-  def compose[G[_]](implicit G0: Contravariant[G]): Functor[({type λ[α] = F[G[α]]})#λ] =
-    new Functor[({type λ[α] = F[G[α]]})#λ] {
+  def compose[G[_]](implicit G0: Contravariant[G]): Functor[λ[α => F[G[α]]]] =
+    new Functor[λ[α => F[G[α]]]] {
       def map[A, B](fa: F[G[A]])(f: A => B) =
         self.contramap(fa)(gb => G0.contramap(gb)(f))
     }
@@ -41,8 +41,8 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   /** The composition of Contravariant F and Functor G, `[x]F[G[x]]`,
     * is contravariant.
     */
-  def icompose[G[_]](implicit G0: Functor[G]): Contravariant[({type λ[α] = F[G[α]]})#λ] =
-    new Contravariant[({type λ[α] = F[G[α]]})#λ] {
+  def icompose[G[_]](implicit G0: Functor[G]): Contravariant[λ[α => F[G[α]]]] =
+    new Contravariant[λ[α => F[G[α]]]] {
       def contramap[A, B](fa: F[G[A]])(f: B => A) =
         self.contramap(fa)(gb => G0.map(gb)(f))
     }
@@ -50,8 +50,8 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   /** The product of Contravariant `F` and `G`, `[x](F[x], G[x]])`, is
     * contravariant.
     */
-  def product[G[_]](implicit G0: Contravariant[G]): Contravariant[({type λ[α] = (F[α], G[α])})#λ] =
-    new Contravariant[({type λ[α] = (F[α], G[α])})#λ] {
+  def product[G[_]](implicit G0: Contravariant[G]): Contravariant[λ[α => (F[α], G[α])]] =
+    new Contravariant[λ[α => (F[α], G[α])]] {
       def contramap[A, B](fa: (F[A], G[A]))(f: B => A) =
         (self.contramap(fa._1)(f), G0.contramap(fa._2)(f))
     }

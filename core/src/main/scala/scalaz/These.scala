@@ -319,8 +319,8 @@ sealed abstract class TheseInstances extends TheseInstances0 {
 
 sealed abstract class TheseInstances0 extends TheseInstances1 {
 
-  implicit def TheseInstance0[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] =
-    new Monad[({type l[a] = L \&/ a})#l] {
+  implicit def TheseInstance0[L: Semigroup]: Monad[L \&/ ?] =
+    new Monad[L \&/ ?] {
       override def map[A, B](x: L \&/ A)(f: A => B) =
         x map f
 
@@ -350,8 +350,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
 sealed abstract class TheseInstances1 {
 
-  implicit def TheseInstance1[L]: Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] =
-    new Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] {
+  implicit def TheseInstance1[L]: Traverse[L \&/ ?] with Cobind[L \&/ ?] =
+    new Traverse[L \&/ ?] with Cobind[L \&/ ?] {
       def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
         fa traverse f
 

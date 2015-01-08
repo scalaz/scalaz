@@ -28,12 +28,12 @@ sealed trait ToBitraverseOps0 {
 trait ToBitraverseOps extends ToBitraverseOps0 with ToBifunctorOps with ToBifoldableOps {
   
   implicit def ToBitraverseOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bitraverse[F]) =
-      new BitraverseOps[F,A, B](v)
+    new BitraverseOps[F,A, B](v)
   
 
   
-  implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bitraverse[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new BitraverseOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bitraverse[F[G, ?, ?]]) =
+    new BitraverseOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

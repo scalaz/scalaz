@@ -22,7 +22,7 @@ object MonadIO {
 
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
   implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
-    new MonadIO[({type λ[α] = RegionT[S, M, α]})#λ] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
+    new MonadIO[RegionT[S, M, ?]] with RegionTLiftIO[S, M] with RegionTMonad[S, M] {
       implicit def M = M0
       implicit def L = M0
     }
@@ -40,21 +40,21 @@ object MonadIO {
     def FLO = LiftIO[F]
   }
 
-  implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[({type λ[α]=IdT[F, α]})#λ]
+  implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[IdT[F, ?]]
 
-  implicit def listTMonadIO[F[_]: MonadIO] = fromLiftIO[({type λ[α]=ListT[F, α]})#λ]
+  implicit def listTMonadIO[F[_]: MonadIO] = fromLiftIO[ListT[F, ?]]
 
-  implicit def optionTMonadIO[F[_]: MonadIO] = fromLiftIO[({type λ[α]=OptionT[F, α]})#λ]
+  implicit def optionTMonadIO[F[_]: MonadIO] = fromLiftIO[OptionT[F, ?]]
 
-  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[({type λ[α]=EitherT[F, E, α]})#λ]
+  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
 
-  implicit def streamTMonadIO[F[_]: MonadIO: Applicative] = fromLiftIO[({type λ[α]=StreamT[F, α]})#λ]
+  implicit def streamTMonadIO[F[_]: MonadIO: Applicative] = fromLiftIO[StreamT[F, ?]]
 
-  implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[({type λ[α]=Kleisli[F, E, α]})#λ]
+  implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
 
-  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[({type λ[α]=WriterT[F, W, α]})#λ]
+  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
 
-  implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[({type λ[α]=StateT[F, S, α]})#λ]
+  implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
 
   ////
 }

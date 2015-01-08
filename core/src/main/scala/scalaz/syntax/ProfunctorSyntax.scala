@@ -32,12 +32,12 @@ sealed trait ToProfunctorOps0 {
 trait ToProfunctorOps extends ToProfunctorOps0 {
   
   implicit def ToProfunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Profunctor[F]) =
-      new ProfunctorOps[F,A, B](v)
+    new ProfunctorOps[F,A, B](v)
   
 
   
-  implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Profunctor[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ProfunctorOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Profunctor[F[G, ?, ?]]) =
+    new ProfunctorOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

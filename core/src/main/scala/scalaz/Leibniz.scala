@@ -25,7 +25,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
   def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, B, C]): Leibniz[L2, H2, A, C] =
     Leibniz.trans[L2, H2, A, B, C](that, this)
 
-  def onF[X](fa: X => A): X => B = subst[({type λ[α] = X => α})#λ](fa)
+  def onF[X](fa: X => A): X => B = subst[X => ?](fa)
   def onCov[FA](fa: FA)(implicit U: Unapply.AuxA[Functor, FA, A]): U.M[B] =
     subst(U(fa))
   def onContra[FA](fa: FA)(implicit U: Unapply.AuxA[Contravariant, FA, A]): U.M[B] =
@@ -82,7 +82,7 @@ trait LeibnizFunctions {
    * We rely on subtyping to enable this to work for any Leibniz arrow
    */
   implicit def witness[A, B](f: A === B): A => B =
-    f.subst[({type λ[X] = A => X})#λ](identity)
+    f.subst[A => ?](identity)
 
   implicit def subst[A, B](a: A)(implicit f: A === B): B = f.subst[Id](a)
 
@@ -91,13 +91,13 @@ trait LeibnizFunctions {
     f: Leibniz[L, H, B, C],
     g: Leibniz[L, H, A, B]
   ): Leibniz[L, H, A, C] =
-    f.subst[({type λ[X >: L <: H] = Leibniz[L, H, A, X]})#λ](g)
+    f.subst[({type λ[X >: L <: H] = Leibniz[L, H, A, X]})#λ](g) // note kind-projector 0.5.2 cannot do super/subtype bounds
 
   /** Equality is symmetric */
   def symm[L, H >: L, A >: L <: H, B >: L <: H](
     f: Leibniz[L, H, A, B]
   )  : Leibniz[L, H, B, A] =
-    f.subst[({type λ[X>:L<:H]=Leibniz[L, H, X, A]})#λ](refl)
+    f.subst[({type λ[X>:L<:H]=Leibniz[L, H, X, A]})#λ](refl) // note kind-projector 0.5.2 cannot do super/subtype bounds
 
   /** We can lift equality into any type constructor */
   def lift[
@@ -108,7 +108,7 @@ trait LeibnizFunctions {
   ](
     a: Leibniz[LA, HA, A, A2]
   ): Leibniz[LT, HT, T[A], T[A2]] =
-    a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A], T[X]]})#λ](refl)
+    a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A], T[X]]})#λ](refl) // note kind-projector 0.5.2 cannot do super/subtype bounds
 
   /** We can lift equality into any type constructor */
   def lift2[
@@ -121,8 +121,8 @@ trait LeibnizFunctions {
     a: Leibniz[LA, HA, A, A2],
     b: Leibniz[LB, HB, B, B2]
   ) : Leibniz[LT, HT, T[A, B], T[A2, B2]] =
-    b.subst[({type λ[X >: LB <: HB] = Leibniz[LT, HT, T[A, B], T[A2, X]]})#λ](
-      a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A, B], T[X, B]]})#λ](
+    b.subst[({type λ[X >: LB <: HB] = Leibniz[LT, HT, T[A, B], T[A2, X]]})#λ]( // note kind-projector 0.5.2 cannot do super/subtype bounds
+      a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A, B], T[X, B]]})#λ]( // note kind-projector 0.5.2 cannot do super/subtype bounds
         refl))
 
   /** We can lift equality into any type constructor */
@@ -138,9 +138,9 @@ trait LeibnizFunctions {
     b: Leibniz[LB, HB, B, B2],
     c: Leibniz[LC, HC, C, C2]
   ): Leibniz[LT, HT, T[A, B, C], T[A2, B2, C2]] =
-    c.subst[({type λ[X >: LC <: HC] = Leibniz[LT, HT, T[A, B, C], T[A2, B2, X]]})#λ](
-      b.subst[({type λ[X >: LB <: HB] = Leibniz[LT, HT, T[A, B, C], T[A2, X, C]]})#λ](
-        a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A, B, C], T[X, B, C]]})#λ](
+    c.subst[({type λ[X >: LC <: HC] = Leibniz[LT, HT, T[A, B, C], T[A2, B2, X]]})#λ]( // note kind-projector 0.5.2 cannot do super/subtype bounds
+      b.subst[({type λ[X >: LB <: HB] = Leibniz[LT, HT, T[A, B, C], T[A2, X, C]]})#λ]( // note kind-projector 0.5.2 cannot do super/subtype bounds
+        a.subst[({type λ[X >: LA <: HA] = Leibniz[LT, HT, T[A, B, C], T[X, B, C]]})#λ]( // note kind-projector 0.5.2 cannot do super/subtype bounds
           refl)))
 
   /**

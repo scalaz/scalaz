@@ -933,8 +933,8 @@ object ==>> extends MapInstances with MapFunctions {
 
 sealed abstract class MapInstances0 {
 
-  implicit def scalazMapInstance[S: Order]: Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] with Zip[({type λ[α] = S ==>> α})#λ] =
-    new Bind[({type λ[α] = S ==>> α})#λ] with Align[({type λ[α] = S ==>> α})#λ] with Zip[({type λ[α] = S ==>> α})#λ]{
+  implicit def scalazMapInstance[S: Order]: Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
+    new Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
@@ -972,7 +972,7 @@ sealed abstract class MapInstances0 {
         else a0.intersectionWith(b)(Tuple2.apply)
       }
 
-      override def zipWith[A, B, C](a: => (S ==>> A), b: => (S ==>> B))(f: (A, B) => C)(implicit F: Functor[({type λ[α] = S ==>> α})#λ]) = {
+      override def zipWith[A, B, C](a: => (S ==>> A), b: => (S ==>> B))(f: (A, B) => C)(implicit F: Functor[S ==>> ?]) = {
         val a0 = a
         if(a0.isEmpty) ==>>.empty
         else a0.intersectionWith(b)(f)
@@ -1008,8 +1008,8 @@ sealed abstract class MapInstances extends MapInstances0 {
     Tag.subst(Semigroup.instance((l, r) =>
       (l intersectionWith r)(B.append(_, _))))
 
-  implicit def mapCovariant[S]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
-    new Traverse[({type λ[α] = ==>>[S, α]})#λ] {
+  implicit def mapCovariant[S]: Traverse[S ==>> ?] =
+    new Traverse[S ==>> ?] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 

@@ -15,16 +15,18 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   def id[A]: A =>: A
 
   /** `monoid`, but universally quantified. */
-  def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
-    def empty[A] = id
-  }
+  def empty: PlusEmpty[λ[α => α =>: α]] = 
+    new PlusEmpty[λ[α => α =>: α]] with ComposePlus {
+      def empty[A] = id
+    }
 
   /** The endomorphism monoid, where `zero`=`id` and
     * `append`=`compose`.
     */
-  def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
-    def zero = id
-  }
+  def monoid[A]: Monoid[A =>: A] =
+    new Monoid[A =>: A] with ComposeSemigroup[A] {
+      def zero = id
+    }
 
   trait CategoryLaw extends ComposeLaw {
     /** `_ <<< id` is vacuous. */

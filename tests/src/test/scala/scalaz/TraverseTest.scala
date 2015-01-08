@@ -91,7 +91,7 @@ object TraverseTest extends SpecLite {
     }
 
     "traverse with monadic join" in {
-      val s: Writer[String, List[Int]] = List(1, 2, 3).traverseM[({ type λ[α] = Writer[String, α] })#λ, Int](x => Writer(x.toString, List(x, x * 2)))
+      val s: Writer[String, List[Int]] = List(1, 2, 3).traverseM[Writer[String, ?], Int](x => Writer(x.toString, List(x, x * 2)))
       s.run must_===(("123", List(1, 2, 2, 4, 3, 6)))
     }
   }

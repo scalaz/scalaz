@@ -19,15 +19,15 @@ object OptionTTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_] : Functor] = Functor[({type λ[α] = OptionT[F, α]})#λ]
-    def monad[F[_] : Monad] = MonadPlus[({type λ[α] = OptionT[F, α]})#λ]
-    def foldable[F[_] : Foldable] = Foldable[({type λ[α] = OptionT[F, α]})#λ]
-    def traverse[F[_] : Traverse] = Traverse[({type λ[α] = OptionT[F, α]})#λ]
+    def functor[F[_] : Functor] = Functor[OptionT[F, ?]]
+    def monad[F[_] : Monad] = MonadPlus[OptionT[F, ?]]
+    def foldable[F[_] : Foldable] = Foldable[OptionT[F, ?]]
+    def traverse[F[_] : Traverse] = Traverse[OptionT[F, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad] = Functor[({type λ[α] = OptionT[F, α]})#λ]
-    def functor[F[_] : Monad : Traverse] = Functor[({type λ[α] = OptionT[F, α]})#λ]
-    def apply[F[_] : Monad] = Apply[({type λ[α] = OptionT[F, α]})#λ]
-    def foldable[F[_] : Traverse] = Foldable[({type λ[α] = OptionT[F, α]})#λ]
+    def functor[F[_] : Monad] = Functor[OptionT[F, ?]]
+    def functor[F[_] : Monad : Traverse] = Functor[OptionT[F, ?]]
+    def apply[F[_] : Monad] = Apply[OptionT[F, ?]]
+    def foldable[F[_] : Traverse] = Foldable[OptionT[F, ?]]
   }
 }
