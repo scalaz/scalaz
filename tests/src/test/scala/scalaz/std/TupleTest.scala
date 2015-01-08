@@ -52,6 +52,8 @@ object TupleTest extends SpecLite {
   checkAll("Tuple1", comonad.laws[Tuple1])
   checkAll("Tuple2", comonad.laws[(Int, ?)])
 
+  checkAll("Tuple2", associative.laws[Tuple2])
+
   "syntax" should {
     import std.tuple.tupleSyntax._
     "mapElements" in {
@@ -89,6 +91,7 @@ object TupleTest extends SpecLite {
       def semigroup[A: Semigroup, B: Semigroup] = Semigroup[(A, B)]
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
       
+      def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[(B, ?)]
       def monad[A: Monoid] = Functor[(A, ?)]

@@ -9,6 +9,11 @@ sealed trait TupleInstances0 {
       Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
   }
 
+  implicit val tuple2Associative: Associative[Tuple2] = new Associative[Tuple2] {
+    def reassociateLeft[A, B, C](f: (A, (B, C))): ((A, B), C) = ((f._1, f._2._1), f._2._2)
+    def reassociateRight[A, B, C](f: ((A, B), C)): (A, (B, C)) = (f._1._1, (f._1._2, f._2))
+  }
+
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]): Semigroup[Tuple1[A1]] = new Tuple1Semigroup[A1] {
     implicit def _1: Semigroup[A1] = A1
   }
