@@ -22,11 +22,11 @@ import java.util.concurrent.atomic.AtomicReference
  * @param strategy Execution strategy, for example, a strategy that is backed by an `ExecutorService`
  * @tparam A       The type of messages accepted by this actor.
  */
-final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)
+final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor.rethrow)
                          (implicit val strategy: Strategy) {
   private val head = new AtomicReference[Node[A]]
 
-  val toEffect: Run[A] = Run[A](a => this ! a)
+  def toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
   def !(a: A): Unit = {
@@ -43,33 +43,46 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
 
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
+  private def act(n: Node[A]): Unit = {
+    val b = strategy.batch
+    if (b < 0) nonRecLoop(n)
+    else loop(n, b)
+  }
+
   @annotation.tailrec
-  private def act(n: Node[A], i: Int = 1024): Unit = {
-    try handler(n.a) catch {
+  private def loop(n: Node[A], i: Int, f: A => Unit = handler): Unit = {
+    try f(n.a) catch {
       case ex: Throwable => onError(ex)
     }
     val n2 = n.get
     if (n2 eq null) scheduleLastTry(n)
     else if (i == 0) schedule(n2)
-    else act(n2, i - 1)
+    else loop(n2, i - 1, f)
+  }
+
+  @annotation.tailrec
+  private def nonRecLoop(n: Node[A], f: A => Unit = handler): Unit = {
+    try f(n.a) catch {
+      case ex: Throwable => onError(ex)
+    }
+    val n2 = n.get
+    if (n2 eq null) {
+      if (!head.compareAndSet(n, null)) nonRecLoop(n.next, f)
+    } else nonRecLoop(n2, f)
   }
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
 
-  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(next(n))
-
-  @annotation.tailrec
-  private def next(n: Node[A]): Node[A] = {
-    val n2 = n.get
-    if (n2 ne null) n2
-    else next(n)
-  }
+  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(n.next)
 }
 
-private class Node[A](val a: A) extends AtomicReference[Node[A]]
-
-private object ActorUtils {
-  val rethrowError: Throwable => Unit = throw _
+private final class Node[A](val a: A) extends AtomicReference[Node[A]] {
+  @annotation.tailrec
+  def next: Node[A] = {
+    val n2 = get
+    if (n2 ne null) n2
+    else next
+  }
 }
 
 object Actor extends ActorInstances with ActorFunctions
@@ -81,8 +94,17 @@ sealed abstract class ActorInstances {
 }
 
 trait ActorFunctions {
-  def actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)
+  def actor[A](handler: A => Unit, onError: Throwable => Unit = rethrow)
               (implicit s: Strategy): Actor[A] = new Actor[A](handler, onError)(s)
 
   implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
+
+  val rethrow: Throwable => Unit = {
+    case _: InterruptedException => Thread.currentThread.interrupt()
+    case e =>
+      val t = Thread.currentThread
+      val h = t.getUncaughtExceptionHandler
+      if (h ne null) h.uncaughtException(t, e)
+      throw e
+  }
 }
