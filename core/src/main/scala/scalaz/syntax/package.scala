@@ -8,6 +8,8 @@ package scalaz
  */
 package object syntax extends Syntaxes{
 
+  object associative extends ToAssociativeOps
+
   object proChoice extends ToProChoiceOps
 
 }

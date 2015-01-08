@@ -50,6 +50,7 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
+  lazy val associative = TypeClass("Associative", *^*->*)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
@@ -101,6 +102,7 @@ object TypeClass {
     foldable1,
     traverse,
     traverse1,
+    associative,
     bifunctor,
     bifoldable,
     bitraverse,
@@ -195,7 +197,7 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrow, category, choice, split, compose, profunctor, proChoice)(tc)) "=>:"
+    val classifiedTypeIdent = if (Set(arrow, associative, category, choice, split, compose, profunctor, proChoice)(tc)) "=>:"
     else "F"
 
     val typeShape: String = kind match {
