@@ -174,6 +174,26 @@ sealed abstract class LazyEitherInstances {
         fa.left.flatMap(e => f(e))
     }
 
+  implicit val lazyEitherAssociative: Associative[LazyEither] = new Associative[LazyEither] {
+    def reassociateLeft[A, B, C](f: LazyEither[A, LazyEither[B, C]]) =
+      f.fold(
+        a => LazyEither.lazyLeft(LazyEither.lazyLeft(a)),
+        _.fold(
+          b => LazyEither.lazyLeft(LazyEither.lazyRight(b)),
+          LazyEither.lazyRight(_)
+        )
+      )
+
+    def reassociateRight[A, B, C](f: LazyEither[LazyEither[A, B], C]) =
+      f.fold(
+        _.fold(
+          LazyEither.lazyLeft(_),
+          b => LazyEither.lazyRight(LazyEither.lazyLeft(b))
+        ),
+        c => LazyEither.lazyRight(LazyEither.lazyRight(c))
+      )
+  }
+
   implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
