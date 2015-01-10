@@ -138,7 +138,7 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = 
+  implicit def lazyEitherInstance[E] =
     new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
