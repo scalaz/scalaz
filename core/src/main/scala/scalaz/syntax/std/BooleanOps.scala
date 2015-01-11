@@ -241,8 +241,8 @@ final class BooleanOps(self: Boolean) {
   }
 
   /**
-   * Returns the first argument in `Left` if this is `true`, otherwise the second argument in
-   * `Right`.
+   * Returns the first argument in `\/-` if this is `true`, otherwise the second argument in
+   * `-\/`.
    */
   final def either[A, B](a: => A): ConditionalEither[A] = new ConditionalEither(a)
 
