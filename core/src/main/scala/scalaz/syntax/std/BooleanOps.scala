@@ -229,8 +229,8 @@ trait BooleanOps extends Ops[Boolean] {
   }
 
   /**
-   * Returns the first argument in `Left` if this is `true`, otherwise the second argument in
-   * `Right`.
+   * Returns the first argument in `\/-` if this is `true`, otherwise the second argument in
+   * `-\/`.
    */
   final def either[A, B](a: => A) = new ConditionalEither[A] {
     def or[B](b: => B) =
