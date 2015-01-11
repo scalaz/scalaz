@@ -157,13 +157,13 @@ trait EitherInstances extends EitherInstances0 {
       def from[A, B](ga: Either[A, B]) = Last(ga.right)
     }
 
-  implicit val eitherLeftInstance = 
+  implicit val eitherLeftInstance =
     new IsomorphismBifunctor[LeftProjection, Either] {
       def iso = LeftProjectionIso2
       implicit def G: Bifunctor[Either] = eitherInstance
     }
 
-  implicit val eitherFirstLeftInstance = 
+  implicit val eitherFirstLeftInstance =
     new IsomorphismBifunctor[λ[(α, β) => LeftProjection[α, β] @@ First], Either] {
       def iso = FirstLeftProjectionIso2
       implicit def G: Bifunctor[Either] = eitherInstance
@@ -260,6 +260,27 @@ trait EitherInstances extends EitherInstances0 {
       implicit def X = MonoidX
       implicit def A = MonoidA
     }
+
+  implicit def eitherAssociative: Associative[Either] = new Associative[Either] {
+    override def reassociateLeft[A, B, C](f: Either[A, Either[B, C]]): Either[Either[A, B], C] =
+      f.fold(
+        a => Left(Left(a)),
+        _.fold(
+          b => Left(Right(b)),
+          Right(_)
+        )
+      )
+
+    override def reassociateRight[A, B, C](f: Either[Either[A, B], C]): Either[A, Either[B, C]] =
+      f.fold(
+        _.fold(
+          Left(_),
+          b => Right(Left(b))
+        ),
+        c => Right(Right(c))
+      )
+
+  }
 }
 
 object either extends EitherInstances

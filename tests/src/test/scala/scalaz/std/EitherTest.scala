@@ -34,4 +34,5 @@ object EitherTest extends SpecLite {
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[Either[Int, ?]])
   checkAll("Either", bitraverse.laws[Either])
+  checkAll("Either", associative.laws[Either])
 }
