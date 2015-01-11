@@ -322,8 +322,8 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     disjunctioned(k)
-    
-  /** 
+
+  /**
    * Return a Validation formed by the application of a partial function across the
    * success of this value:
    * {{{
@@ -403,6 +403,27 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
       def zero =
         Success(Monoid[A].zero)
     }
+
+  implicit val ValidationAssociative: Associative[Validation] = new Associative[Validation] {
+    override def reassociateLeft[A, B, C](f: Validation[A, Validation[B, C]]): Validation[Validation[A, B], C] =
+      f.fold(
+        a => Failure(Failure(a)),
+        _.fold(
+          b => Failure(Success(b)),
+          Success(_)
+        )
+      )
+
+    override def reassociateRight[A, B, C](f: Validation[Validation[A, B], C]): Validation[A, Validation[B, C]] =
+      f.fold(
+        _.fold(
+          Failure(_),
+          b => Success(Failure(b))
+        ),
+        c => Success(Success(c))
+      )
+
+  }
 }
 
 final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) {

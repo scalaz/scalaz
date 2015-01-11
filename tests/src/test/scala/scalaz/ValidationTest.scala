@@ -18,6 +18,7 @@ object ValidationTest extends SpecLite {
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
   checkAll("Validation", bitraverse.laws[Validation])
+  checkAll("Validation", associative.laws[Validation])
 
   "fpoint and point" in {
 
@@ -77,12 +78,12 @@ object ValidationTest extends SpecLite {
     "return first success" in {
       val succ = Validation.success[String, Int](1).toValidationNel
       val fail = Validation.failure[String, Int]("2").toValidationNel
-    
+
       (succ findSuccess fail).shows must_===(succ.shows)
       (fail findSuccess succ).shows must_===(succ.shows)
     }
   }
-    
+
   "excepting" in {
     import syntax.std.string._
     import syntax.validation._
