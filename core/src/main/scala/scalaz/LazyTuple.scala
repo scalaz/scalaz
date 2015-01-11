@@ -98,6 +98,13 @@ sealed abstract class LazyTuple2Instances0 {
 
   implicit def lazyTuple2Functor[A1]: Functor[LazyTuple2[A1, ?]] =
     new LazyTuple2Functor[A1] {}
+
+  implicit val lazyTuple2Associative: Associative[LazyTuple2] = new Associative[LazyTuple2] {
+    def reassociateLeft[A, B, C](f: LazyTuple2[A, LazyTuple2[B, C]]): LazyTuple2[LazyTuple2[A, B], C] =
+      LazyTuple2(LazyTuple2(f._1, f._2._1), f._2._2)
+    def reassociateRight[A, B, C](f: LazyTuple2[LazyTuple2[A, B], C]): LazyTuple2[A, LazyTuple2[B, C]] =
+      LazyTuple2(f._1._1, LazyTuple2(f._1._2, f._2))
+  }
 }
 
 sealed abstract class LazyTuple2Instances extends LazyTuple2Instances0 {
