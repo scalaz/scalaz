@@ -49,6 +49,9 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def lift[L[_]: Applicative]: Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] =
     kleisli[({type λ[α]=L[M[α]]})#λ, A, B](a => Applicative[L].point(self(a)))
 
+  def lower(implicit M: Monad[M]): Kleisli[M, A, M[B]] =
+    Kleisli(a => M.pure(this(a)))
+
   import Liskov._
   def unlift[N[_], FF[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[α] = N[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] =
     kleisli[FF, A, B]{a => Comonad[N].copoint(ev(self) run a)}
