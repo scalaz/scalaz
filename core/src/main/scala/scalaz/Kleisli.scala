@@ -49,6 +49,9 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def lift[L[_]: Applicative]: Kleisli[λ[α => L[M[α]]], A, B] =
     kleisli[λ[α => L[M[α]]], A, B](a => Applicative[L].point(self(a)))
 
+  def lower(implicit M: Monad[M]): Kleisli[M, A, M[B]] =
+    Kleisli(a => M.pure(this(a)))
+
   import Liskov._
   def unlift[N[_], FF[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[λ[α => N[FF[α]]], A, B]): Kleisli[FF, A, B] =
     kleisli[FF, A, B]{a => Comonad[N].copoint(ev(self) run a)}
@@ -74,8 +77,8 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 
   def endo(implicit M: Functor[M], ev: A >~> B): Endomorphic[Kleisli[M, ?, ?], A] =
     Endomorphic[Kleisli[M, ?, ?], A](map(ev.apply))
-  
-  def liftF(implicit F: Functor[Kleisli[M, A, ?]]) = 
+
+  def liftF(implicit F: Functor[Kleisli[M, A, ?]]) =
     Free.liftF[Kleisli[M, A, ?], B](self)
 }
 
@@ -417,7 +420,7 @@ private trait KleisliPlusEmpty[F[_], A] extends PlusEmpty[Kleisli[F, A, ?]] with
 private trait KleisliCatchable[F[_], A] extends Catchable[Kleisli[F, A, ?]] {
   implicit def F: Catchable[F]
 
-  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] = 
+  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] =
     Kleisli(a => F.attempt(try f.run(a) catch { case t: Throwable => F.fail(t) }))
 
   def fail[B](err: Throwable): Kleisli[F, A, B] =
