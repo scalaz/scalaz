@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 import Liskov.<~<
 
 /** Represents a disjunction: a result that is either an `A` or a `B`.
- * 
+ *
  * An instance of `A` [[\/]] B is either a [[-\/]]`[A]` (aka a "left") or a [[\/-]]`[B]` (aka a "right").
  *
  * A common use of a disjunction is to explicitly represent the possibility of failure in a result as opposed to
@@ -392,7 +392,7 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] = 
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] =
     new Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
@@ -445,6 +445,26 @@ sealed abstract class DisjunctionInstances2 {
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
   }
+
+  implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
+    def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
+      f.fold(
+        a => \/.left(\/.left(a)),
+        _.fold(
+          b => \/.left(\/.right(b)),
+          \/.right(_)
+        )
+      )
+
+    def reassociateRight[A, B, C](f: \/[\/[A, B], C]) =
+      f.fold(
+        _.fold(
+          \/.left(_),
+          b => \/.right(\/.left(b))
+        ),
+        c => \/.right(\/.right(c))
+      )
+  }
 }
 
 trait DisjunctionFunctions {
@@ -459,7 +479,7 @@ trait DisjunctionFunctions {
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
-  
+
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {

@@ -138,7 +138,7 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = 
+  implicit def lazyEitherInstance[E] =
     new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
@@ -173,6 +173,26 @@ sealed abstract class LazyEitherInstances {
       def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
         fa.left.flatMap(e => f(e))
     }
+
+  implicit val lazyEitherAssociative: Associative[LazyEither] = new Associative[LazyEither] {
+    def reassociateLeft[A, B, C](f: LazyEither[A, LazyEither[B, C]]) =
+      f.fold(
+        a => LazyEither.lazyLeft(LazyEither.lazyLeft(a)),
+        _.fold(
+          b => LazyEither.lazyLeft(LazyEither.lazyRight(b)),
+          LazyEither.lazyRight(_)
+        )
+      )
+
+    def reassociateRight[A, B, C](f: LazyEither[LazyEither[A, B], C]) =
+      f.fold(
+        _.fold(
+          LazyEither.lazyLeft(_),
+          b => LazyEither.lazyRight(LazyEither.lazyLeft(b))
+        ),
+        c => LazyEither.lazyRight(LazyEither.lazyRight(c))
+      )
+  }
 
   implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =

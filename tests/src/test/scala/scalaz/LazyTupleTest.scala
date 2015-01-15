@@ -25,4 +25,6 @@ object LazyTupleTest extends SpecLite {
   checkAll("LazyTuple2", monad.laws[LazyTuple2[B, ?]])
   checkAll("LazyTuple3", monad.laws[LazyTuple3[B, C, ?]])
   checkAll("LazyTuple4", monad.laws[LazyTuple4[B, C, D, ?]])
+
+  checkAll("LazyTuple2", associative.laws[LazyTuple2])
 }
