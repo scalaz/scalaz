@@ -23,28 +23,28 @@ trait Foldable[F[_]]  { self =>
   def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B
 
   /**The composition of Foldables `F` and `G`, `[x]F[G[x]]`, is a Foldable */
-  def compose[G[_]](implicit G0: Foldable[G]): Foldable[({type λ[α] = F[G[α]]})#λ] = new CompositionFoldable[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => F[G[α]]]] = 
+    new CompositionFoldable[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /** The composition of Foldable `F` and Bifoldable `G`, `[x, y]F[G[x, y]]`, is a Bifoldable */
-  def bicompose[G[_, _]: Bifoldable]: Bifoldable[({type l[a, b] = F[G[a, b]]})#l] =
+  def bicompose[G[_, _]: Bifoldable]: Bifoldable[λ[(α, β) => F[G[α, β]]]] =
     new CompositionFoldableBifoldable[F, G] {
       def F = self
       def G = implicitly
     }
 
   /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
-  def product[G[_]](implicit G0: Foldable[G]): Foldable[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => (F[α], G[α])]] = 
+    new ProductFoldable[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */
-  def product0[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+  def product0[G[_]](implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] =
     new ProductFoldable1R[F, G] {
       def F = self
       def G = G0
@@ -81,7 +81,7 @@ trait Foldable[F[_]]  { self =>
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
-    traverse_[({type λ[α]=State[S, α]})#λ, A, B](fa)(f)
+    traverse_[State[S, ?], A, B](fa)(f)
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =

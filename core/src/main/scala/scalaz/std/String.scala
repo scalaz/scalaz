@@ -2,7 +2,7 @@ package scalaz
 package std
 
 trait StringInstances {
-  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[({ type λ[α] = String })#λ] {
+  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[λ[α => String]] {
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
@@ -36,8 +36,10 @@ trait StringFunctions {
    */
   def charsNel(s:String, e: => NonEmptyList[Char]) : NonEmptyList[Char] = charsNel(s) getOrElse e
 
+  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
   def charsNelErr(s:String, message: => String): NonEmptyList[Char] = charsNel(s, sys.error(message))
 
+  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
   def unsafeCharsNel(s:String) : NonEmptyList[Char] = charsNelErr(s, "cannot turn empty string into NonEmptyList")
 
   // Parsing functions.

@@ -437,7 +437,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   // IList is invariant in behavior but covariant by nature, so we can safely widen to IList[B]
   // given evidence that A is a subtype of B.
   def widen[B](implicit ev: A <~< B): IList[B] =
-    ev.subst[({type λ[-α] = IList[α @uncheckedVariance] <~< IList[B]})#λ](refl)(this)
+    ev.subst[λ[`-α` => IList[α @uncheckedVariance] <~< IList[B]]](refl)(this)
 
   def zipWithIndex: IList[(A, Int)] =
     zip(IList(0 until length : _*))

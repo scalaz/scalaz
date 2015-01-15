@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_, _], S] extends Monad[({type λ[α] = F[S, α]})#λ] { self =>
+trait MonadError[F[_, _], S] extends Monad[F[S, ?]] { self =>
   ////
 
   def raiseError[A](e: S): F[S, A]

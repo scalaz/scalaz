@@ -51,7 +51,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    crossScalaVersions := Seq("2.10.4", "2.11.5"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
@@ -161,7 +161,10 @@ object build extends Build {
           }
         }
         </developers>
-      )
+      ),
+    // kind-projector plugin
+    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
+    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.5.2"  cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )

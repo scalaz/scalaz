@@ -20,5 +20,5 @@ object ProductTest extends SpecLite {
   checkAll(traverse1.laws[OneAndOptionPair])
 
   implicit val eitherTuple2 = Bitraverse[Either].product[Tuple2]
-  checkAll(bitraverse.laws[({type λ[α, β] = (Either[α, β], (α, β))})#λ])
+  checkAll(bitraverse.laws[λ[(α, β) => (Either[α, β], (α, β))]])
 }

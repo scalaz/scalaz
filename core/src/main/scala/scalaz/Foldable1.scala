@@ -10,14 +10,14 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   ////
 
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */
-  def product[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable1[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_]](implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] = 
+    new ProductFoldable1[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The composition of Foldable1 `F` and `G`, `[x]F[G[x]]`, is a Foldable1 */
-  def compose[G[_]: Foldable1]: Foldable1[({type λ[α] = F[G[α]]})#λ] =
+  def compose[G[_]: Foldable1]: Foldable1[λ[α => F[G[α]]]] =
     new CompositionFoldable1[F, G] {
       def F = self
       def G = implicitly
@@ -120,7 +120,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   final override def empty[A](fa: F[A]): Boolean = false
 
   /**The product of Foldable1 `F` and Foldable `G`, `[x](F[x], G[x]])`, is a Foldable1 */
-  def product0[G[_]](implicit G0: Foldable[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] =
+  def product0[G[_]](implicit G0: Foldable[G]): Foldable1[λ[α => (F[α], G[α])]] =
     new ProductFoldable1L[F, G] {
       def F = self
       def G = G0

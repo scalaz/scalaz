@@ -86,61 +86,67 @@ trait StreamInstances {
    * streamZipApplicative.apply2(Zip(Stream(1, 2)), Zip(Stream(3, 4)))(_ * _) // Stream(3, 8)
    * }}}
    */
-  implicit val streamZipApplicative: Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] = new Applicative[({type λ[α]=Stream[α] @@ Zip})#λ] {
-    def point[A](a: => A) = Zip(Stream.continually(a))
-    def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
-      Zip(if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty) Stream.empty[B]
-      else Stream.cons((Tag.unwrap(f).head)(Tag.unwrap(fa).head), Tag.unwrap(ap(Zip(Tag.unwrap(fa).tail))(Zip(Tag.unwrap(f).tail)))))
+  implicit val streamZipApplicative: Applicative[λ[α => Stream[α] @@ Zip]] =
+    new Applicative[λ[α => Stream[α] @@ Zip]] {
+      def point[A](a: => A) = Zip(Stream.continually(a))
+      def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
+        Zip(if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty) Stream.empty[B]
+        else Stream.cons((Tag.unwrap(f).head)(Tag.unwrap(fa).head), Tag.unwrap(ap(Zip(Tag.unwrap(fa).tail))(Zip(Tag.unwrap(f).tail)))))
+      }
     }
-  }
 
   implicit def streamMonoid[A] = new Monoid[Stream[A]] {
     def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
     def zero: Stream[A] = scala.Stream.empty
   }
 
-  implicit def streamEqual[A](implicit A0: Equal[A]) = new Equal[Stream[A]] {
-    def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
-  }
-  implicit def streamShow[A](implicit A0: Show[A]) = new Show[Stream[A]] {
-    override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
-  }
+  implicit def streamEqual[A](implicit A0: Equal[A]) =
+    new Equal[Stream[A]] {
+      def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
+    }
+  implicit def streamShow[A](implicit A0: Show[A]) =
+    new Show[Stream[A]] {
+      override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
+    }
 
 
   // TODO order, ...
 }
 
 trait StreamFunctions {
-  final def interleave[A](s1: Stream[A], s2: Stream[A]): Stream[A] = {
+  final def interleave[A](s1: Stream[A], s2: Stream[A]): Stream[A] =
     if (s1.isEmpty) s2
     else s1.head #:: interleave(s2, s1.tail)
-  }
 
   import scala.Stream.{Empty, empty}
 
-  final def toZipper[A](as: Stream[A]): Option[Zipper[A]] = as match {
-    case Empty   => None
-    case h #:: t => Some(Zipper.zipper(empty, h, t))
-  }
+  final def toZipper[A](as: Stream[A]): Option[Zipper[A]] =
+    as match {
+      case Empty   => None
+      case h #:: t => Some(Zipper.zipper(empty, h, t))
+    }
 
-  final def zipperEnd[A](as: Stream[A]): Option[Zipper[A]] = as match {
-    case Empty => None
-    case _     =>
-      val x = as.reverse
-      Some(Zipper.zipper(x.tail, x.head, empty))
-  }
+  final def zipperEnd[A](as: Stream[A]): Option[Zipper[A]] =
+    as match {
+      case Empty => None
+      case _     =>
+        val x = as.reverse
+        Some(Zipper.zipper(x.tail, x.head, empty))
+    }
 
   /** `[as take 1, as take 2, ..., as]` */
-  final def heads[A](as: Stream[A]): Stream[Stream[A]] = as match {
-    case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
-    case _       => empty
-  }
+  final def heads[A](as: Stream[A]): Stream[Stream[A]] = 
+    as match {
+      case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
+      case _       => empty
+    }
 
   /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
-  final def tails[A](as: Stream[A]): Stream[Stream[A]] = as match {
-    case h #:: t => as #:: tails(t)
-    case _       => empty
-  }
+  final def tails[A](as: Stream[A]): Stream[Stream[A]] = 
+    as match {
+      case h #:: t => as #:: tails(t)
+      case _       => empty
+    }
 
   final def zapp[A, B, C](a: Stream[A])(f: Stream[A => B => C]): Stream[B => C] = {
     val ff = f

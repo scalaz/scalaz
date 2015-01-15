@@ -19,11 +19,11 @@ object CofreeTest extends SpecLite {
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
 
-  implicit val lazyOptionEqualNat = new (Equal ~> ({type λ[α] = Equal[LazyOption[α]]})#λ){
+  implicit val lazyOptionEqualNat = new (Equal ~> λ[α => Equal[LazyOption[α]]]) {
     def apply[A](a: Equal[A]) = LazyOption.lazyOptionEqual(a)
   }
 
-  implicit val streamEqualNat = new (Equal ~> ({type λ[α] = Equal[Stream[α]]})#λ){
+  implicit val streamEqualNat = new (Equal ~> λ[α => Equal[Stream[α]]]) {
     def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
   }
 
@@ -129,16 +129,16 @@ object CofreeTest extends SpecLite {
     checkAll("CofreeZipStream", ScalazProperties.apply.laws[CofreeZipStream])
   }
 
-  "Applicative[({type λ[α] = CofreeZip[LazyOption, α]})#λ] is Applicative[({type λ[α]=Stream[α] @@ Zip})#λ]" ! forAll{
+  "Applicative[λ[α => CofreeZip[LazyOption, α]]] is Applicative[λ[α => Stream[α] @@ Zip]]" ! forAll{
     (a: OneAndStream[Int], b: OneAndStream[Int]) =>
 
     import syntax.foldable._
     val f = (_: Int) + (_: Int)
-    val h #:: t = Tag.unwrap(Applicative[({type λ[α]=Stream[α] @@ Tags.Zip})#λ].apply2(Tags.Zip[Stream[Int]](a.toStream), Tags.Zip[Stream[Int]](b.toStream))(f))
+    val h #:: t = Tag.unwrap(Applicative[λ[α => Stream[α] @@ Tags.Zip]].apply2(Tags.Zip[Stream[Int]](a.toStream), Tags.Zip[Stream[Int]](b.toStream))(f))
 
     val aa = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(a))
     val bb = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(b))
-    val y = Applicative[({type λ[α] = CofreeZip[LazyOption, α]})#λ].apply2(aa, bb)(f)
+    val y = Applicative[λ[α => CofreeZip[LazyOption, α]]].apply2(aa, bb)(f)
     OneAnd(h, t) must_=== oneAndStreamCofreeLazyOptionIso.from(Tag.unwrap(y))
   }
 
@@ -150,26 +150,26 @@ object CofreeTest extends SpecLite {
   }
 
   object instances{
-    def comonad[F[_]: Functor] = Comonad[({type λ[α] = Cofree[F, α]})#λ]
-    def bind[F[_]: Plus: Functor] = Bind[({type λ[α] = Cofree[F, α]})#λ]
-    def monad[F[_]: PlusEmpty: Functor] = Monad[({type λ[α] = Cofree[F, α]})#λ]
-    def foldable1[F[_]: Foldable] = Foldable1[({type λ[α] = Cofree[F, α]})#λ]
-    def traverse1[F[_]: Traverse] = Traverse1[({type λ[α] = Cofree[F, α]})#λ]
+    def comonad[F[_]: Functor] = Comonad[Cofree[F, ?]]
+    def bind[F[_]: Plus: Functor] = Bind[Cofree[F, ?]]
+    def monad[F[_]: PlusEmpty: Functor] = Monad[Cofree[F, ?]]
+    def foldable1[F[_]: Foldable] = Foldable1[Cofree[F, ?]]
+    def traverse1[F[_]: Traverse] = Traverse1[Cofree[F, ?]]
 
     // checking absence of ambiguity
-    def bind[F[_]: PlusEmpty: Functor] = Bind[({type λ[α] = Cofree[F, α]})#λ]
-    def functor[F[_]: PlusEmpty: Traverse] = Functor[({type λ[α] = Cofree[F, α]})#λ]
-    def foldable1[F[_]: Traverse1] = Foldable1[({type λ[α] = Cofree[F, α]})#λ]
-    def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Cofree[F, α]})#λ]
+    def bind[F[_]: PlusEmpty: Functor] = Bind[Cofree[F, ?]]
+    def functor[F[_]: PlusEmpty: Traverse] = Functor[Cofree[F, ?]]
+    def foldable1[F[_]: Traverse1] = Foldable1[Cofree[F, ?]]
+    def traverse1[F[_]: Traverse1] = Traverse1[Cofree[F, ?]]
 
     object zip{
-      def functor[F[_]: Functor] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
-      def apply[F[_]: Apply] = Apply[({type λ[α] = CofreeZip[F, α]})#λ]
-      def applicative[F[_]: Applicative] = Applicative[({type λ[α] = CofreeZip[F, α]})#λ]
+      def functor[F[_]: Functor] = Functor[CofreeZip[F, ?]]
+      def apply[F[_]: Apply] = Apply[CofreeZip[F, ?]]
+      def applicative[F[_]: Applicative] = Applicative[CofreeZip[F, ?]]
 
       // checking absence of ambiguity
-      def functor[F[_]: Applicative] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
-      def apply[F[_]: Applicative] = Apply[({type λ[α] = CofreeZip[F, α]})#λ]
+      def functor[F[_]: Applicative] = Functor[CofreeZip[F, ?]]
+      def apply[F[_]: Applicative] = Apply[CofreeZip[F, ?]]
     }
 
   }

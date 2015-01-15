@@ -35,25 +35,25 @@ object EitherTTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def monad[F[_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
-    def plus[F[_] : Monad, A: Semigroup] = Plus[({type λ[α] = EitherT[F, A, α]})#λ]
-    def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[({type λ[α] = EitherT[F, A, α]})#λ]
-    def foldable[F[_] : Foldable, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
-    def traverse[F[_] : Traverse, A] = Traverse[({type λ[α] = EitherT[F, A, α]})#λ]
-    def bifunctor[F[_] : Functor] = Bifunctor[({type λ[α, β] = EitherT[F, α, β]})#λ]
-    def bifoldable[F[_] : Foldable] = Bifoldable[({type λ[α, β] = EitherT[F, α, β]})#λ]
-    def bitraverse[F[_] : Traverse] = Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ]
+    def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
+    def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
+    def plus[F[_] : Monad, A: Semigroup] = Plus[EitherT[F, A, ?]]
+    def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[EitherT[F, A, ?]]
+    def foldable[F[_] : Foldable, A] = Foldable[EitherT[F, A, ?]]
+    def traverse[F[_] : Traverse, A] = Traverse[EitherT[F, A, ?]]
+    def bifunctor[F[_] : Functor] = Bifunctor[EitherT[F, ?, ?]]
+    def bifoldable[F[_] : Foldable] = Bifoldable[EitherT[F, ?, ?]]
+    def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad, A: Monoid] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
-    def apply[F[_] : Monad, A: Monoid] = Apply[({type λ[α] = EitherT[F, A, α]})#λ]
-    def monad[F[_] : Monad, A: Monoid] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
-    def plus[F[_] : Monad, A: Monoid] = Plus[({type λ[α] = EitherT[F, A, α]})#λ]
-    def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = EitherT[F, A, α]})#λ]
-    def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = EitherT[F, α, β]})#λ]
-    def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = EitherT[F, α, β]})#λ]
-    def monadError[F[_] : Monad, A] = MonadError[({type λ[α, β] = EitherT[F, α, β] })#λ, A]
+    def functor[F[_] : Monad, A: Monoid] = Functor[EitherT[F, A, ?]]
+    def apply[F[_] : Monad, A: Monoid] = Apply[EitherT[F, A, ?]]
+    def monad[F[_] : Monad, A: Monoid] = Monad[EitherT[F, A, ?]]
+    def plus[F[_] : Monad, A: Monoid] = Plus[EitherT[F, A, ?]]
+    def foldable[F[_] : Traverse, A] = Foldable[EitherT[F, A, ?]]
+    def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[F, ?, ?]]
+    def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[F, ?, ?]]
+    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, ?, ?], A]
   }
 
   // compilation test
@@ -84,5 +84,4 @@ object EitherTTest extends SpecLite {
       (a,b) <- brokenMethod
     } yield "yay"
   }
-
 }

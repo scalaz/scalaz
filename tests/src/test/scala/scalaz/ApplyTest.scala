@@ -10,7 +10,7 @@ import org.scalacheck.Prop.forAll
 object ApplyTest extends SpecLite {
   checkAll("List applyApplicative", {
              implicit val F = Apply[List].applyApplicative
-             applicative.laws[({type λ[α] = List[α] \/ α})#λ]
+             applicative.laws[λ[α => List[α] \/ α]]
            })
 
   "mapN" in {

@@ -98,12 +98,12 @@ object EphemeralStreamTest extends SpecLite {
     )
   }
 
-  "no stack overflow infinite stream foldMap" in {
+  "foldMap evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(false)(identity)
     Foldable[EphemeralStream].foldMap(infiniteStream)(identity)(booleanInstance.conjunction) must_===(false)
   }
 
-  "no stack overflow infinite stream foldRight" in {
+  "foldRight evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(true)(identity)
     Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must_===(true)
   }

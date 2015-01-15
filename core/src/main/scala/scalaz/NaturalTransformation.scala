@@ -18,23 +18,28 @@ trait NaturalTransformation[-F[_], +G[_]] {
   def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G) {
     def apply[A](ea: E[A]) = self(f(ea))
   }
+
+  def andThen[H[_]](f: G ~> H): F ~> H =
+    f compose self
 }
 
 trait NaturalTransformations {
   /** A function type encoded as a natural transformation by adding a
     * phantom parameter.
     */
-  type ->[A, B] = (({type λ[α]=A})#λ) ~> (({type λ[α]=B})#λ)
+  type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id = new (Id ~> Id) {
-    def apply[A](a: A) = a
-  }
+  def id = 
+    new (Id ~> Id) {
+      def apply[A](a: A) = a
+    }
 
   /** A universally quantified identity function */
-  def refl[F[_]] = new (F ~> F) {
-    def apply[A](fa: F[A]) = fa
-  }
+  def refl[F[_]] =
+    new (F ~> F) {
+      def apply[A](fa: F[A]) = fa
+    }
 
   /** Reify a `NaturalTransformation`. */
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
@@ -47,9 +52,10 @@ trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
   self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
-  def compose[E[_, _]](f: BiNaturalTransformation[E, F]) = new BiNaturalTransformation[E, G] {
-    def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
-  }
+  def compose[E[_, _]](f: BiNaturalTransformation[E, F]) =
+    new BiNaturalTransformation[E, G] {
+      def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
+    }
 }
 
 /** A constrained natural transformation */

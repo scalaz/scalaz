@@ -12,7 +12,7 @@ object UnapplyTest extends SpecLite {
     implicitly[ue.A === String]
 
     // needs only transient stable type
-    Unapply[Monad, Int \/ String].TC : Monad[({type λ[α] = Int \/ α})#λ]
+    Unapply[Monad, Int \/ String].TC : Monad[Int \/ ?]
   }
 
   object unapply2 {
@@ -22,7 +22,6 @@ object UnapplyTest extends SpecLite {
     implicitly[ue.B === String]
 
     // needs only transient stable type
-    Unapply2[Arrow, Kleisli[NonEmptyList, Int, String]].TC
-        : Arrow[({type λ[α,β] = Kleisli[NonEmptyList, α, β]})#λ]
+    Unapply2[Arrow, Kleisli[NonEmptyList, Int, String]].TC: Arrow[Kleisli[NonEmptyList, ?, ?]]
   }
 }

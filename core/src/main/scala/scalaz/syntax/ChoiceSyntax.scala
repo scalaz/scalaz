@@ -18,12 +18,12 @@ sealed trait ToChoiceOps0 {
 trait ToChoiceOps extends ToChoiceOps0 with ToCategoryOps {
   
   implicit def ToChoiceOps[F[_, _],A, B](v: F[A, B])(implicit F0: Choice[F]) =
-      new ChoiceOps[F,A, B](v)
+    new ChoiceOps[F,A, B](v)
   
 
   
-  implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Choice[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ChoiceOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Choice[F[G, ?, ?]]) =
+    new ChoiceOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

@@ -17,29 +17,31 @@ abstract class Yoneda[F[_], A] { yo =>
   def toCoyoneda: Coyoneda.Aux[F,A,A] = Coyoneda(run)(identity[A])
 
   /** Simple function composition. Allows map fusion without traversing an `F`. */
-  def map[B](f: A => B): Yoneda[F, B] = new Yoneda[F, B] {
-    def apply[C](g: B => C) = yo(f andThen g)
-  }
+  def map[B](f: A => B): Yoneda[F, B] = 
+    new Yoneda[F, B] {
+      def apply[C](g: B => C) = yo(f andThen g)
+    }
 
   import Id._
   /** `Yoneda[F, _]` is the right Kan extension of `F` along `Id` */
-  def toRan: Ran[Id, F, A] = new Ran[Id, F, A] {
-    def apply[B](f: A => B) = yo(f)
-  }
+  def toRan: Ran[Id, F, A] = 
+    new Ran[Id, F, A] {
+      def apply[B](f: A => B) = yo(f)
+    }
 }
 
 object Yoneda {
 
   /** `Yoneda[F,_]` is a functor for any `F` */
-  implicit def yonedaFunctor[F[_]]: Functor[({type λ[α] = Yoneda[F,α]})#λ] =
-    new Functor[({type λ[α] = Yoneda[F,α]})#λ] {
+  implicit def yonedaFunctor[F[_]]: Functor[Yoneda[F, ?]] =
+    new Functor[Yoneda[F, ?]] {
       def map[A,B](ya: Yoneda[F,A])(f: A => B) = ya map f
     }
 
   /** `F[A]` converts to `Yoneda[F,A]` for any functor `F` */
-  def apply[F[_]:Functor,A](fa: F[A]): Yoneda[F, A] = new Yoneda[F, A] {
-    def apply[B](f: A => B) = Functor[F].map(fa)(f)
-  }
-
+  def apply[F[_]:Functor,A](fa: F[A]): Yoneda[F, A] =
+    new Yoneda[F, A] {
+      def apply[B](f: A => B) = Functor[F].map(fa)(f)
+    }
 }
 

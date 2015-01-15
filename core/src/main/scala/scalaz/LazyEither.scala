@@ -138,39 +138,60 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] = new Traverse[({type λ[α]=LazyEither[E, α]})#λ] with Monad[({ type λ[α] = LazyEither[E, α] })#λ] with Cozip[({type λ[α]=LazyEither[E, α]})#λ] with Optional[({type λ[α]=LazyEither[E, α]})#λ] with MonadError[LazyEither, E] {
-    def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
-      fa traverse f
+  implicit def lazyEitherInstance[E] =
+    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
+      def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
+        fa traverse f
 
-    override def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
-      fa.foldRight(z)(f)
+      override def foldRight[A, B](fa: LazyEither[E, A], z: => B)(f: (A, => B) => B): B =
+        fa.foldRight(z)(f)
 
-    def bind[A, B](fa: LazyEither[E, A])(f: A => LazyEither[E, B]): LazyEither[E, B] =
-      fa flatMap (a => f(a))
+      def bind[A, B](fa: LazyEither[E, A])(f: A => LazyEither[E, B]): LazyEither[E, B] =
+        fa flatMap (a => f(a))
 
-    override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, A => B]): LazyEither[E, B] =
-      fa ap f
+      override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, A => B]): LazyEither[E, B] =
+        fa ap f
 
-    def point[A](a: => A): LazyEither[E, A] =
-      LazyEither.lazyRight(a)
+      def point[A](a: => A): LazyEither[E, A] =
+        LazyEither.lazyRight(a)
 
-    def cozip[A, B](a: LazyEither[E, A \/ B]) =
-      a.fold(
-        e => -\/(LazyEither.lazyLeft(e))
-      , {
-          case -\/(a) => -\/(LazyEither.lazyRight(a))
-          case \/-(b) => \/-(LazyEither.lazyRight(b))
-        }
+      def cozip[A, B](a: LazyEither[E, A \/ B]) =
+        a.fold(
+          e => -\/(LazyEither.lazyLeft(e))
+        , {
+            case -\/(a) => -\/(LazyEither.lazyRight(a))
+            case \/-(b) => \/-(LazyEither.lazyRight(b))
+          }
+        )
+
+     def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
+       fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
+
+      def raiseError[A](e: E): LazyEither[E, A] =
+        LazyEither.lazyLeft(e)
+
+      def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
+        fa.left.flatMap(e => f(e))
+    }
+
+  implicit val lazyEitherAssociative: Associative[LazyEither] = new Associative[LazyEither] {
+    def reassociateLeft[A, B, C](f: LazyEither[A, LazyEither[B, C]]) =
+      f.fold(
+        a => LazyEither.lazyLeft(LazyEither.lazyLeft(a)),
+        _.fold(
+          b => LazyEither.lazyLeft(LazyEither.lazyRight(b)),
+          LazyEither.lazyRight(_)
+        )
       )
 
-   def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
-     fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
-
-    def raiseError[A](e: E): LazyEither[E, A] =
-      LazyEither.lazyLeft(e)
-
-    def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
-      fa.left.flatMap(e => f(e))
+    def reassociateRight[A, B, C](f: LazyEither[LazyEither[A, B], C]) =
+      f.fold(
+        _.fold(
+          LazyEither.lazyLeft(_),
+          b => LazyEither.lazyRight(LazyEither.lazyLeft(b))
+        ),
+        c => LazyEither.lazyRight(LazyEither.lazyRight(c))
+      )
   }
 
   implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {

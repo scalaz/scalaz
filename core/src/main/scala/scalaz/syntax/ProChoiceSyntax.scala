@@ -22,12 +22,12 @@ sealed trait ToProChoiceOps0 {
 trait ToProChoiceOps extends ToProChoiceOps0 with ToProfunctorOps {
   
   implicit def ToProChoiceOps[F[_, _],A, B](v: F[A, B])(implicit F0: ProChoice[F]) =
-      new ProChoiceOps[F,A, B](v)
+    new ProChoiceOps[F,A, B](v)
   
 
   
-  implicit def ToProChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ProChoice[({type λ[α, β]=F[G, α, β]})#λ]) =
-        new ProChoiceOps[({type λ[α, β]=F[G, α, β]})#λ, A, B](v)(F0)
+  implicit def ToProChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ProChoice[F[G, ?, ?]]) =
+    new ProChoiceOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 

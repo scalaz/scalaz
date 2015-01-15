@@ -16,18 +16,18 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   // derived functions
 
   /**The composition of Bitraverses `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bitraverse */
-  def compose[G[_, _]](implicit G0: Bitraverse[G]): Bitraverse[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] = new CompositionBitraverse[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def compose[G[_, _]](implicit G0: Bitraverse[G]): Bitraverse[λ[(α, β) => F[G[α, β], G[α, β]]]] = 
+    new CompositionBitraverse[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /**The product of Bitraverses `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bitraverse */
-  def product[G[_, _]](implicit G0: Bitraverse[G]): Bitraverse[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBitraverse[F, G] {
-    implicit def F = self
-
-    implicit def G = G0
-  }
+  def product[G[_, _]](implicit G0: Bitraverse[G]): Bitraverse[λ[(α, β) => (F[α, β], G[α, β])]] =
+    new ProductBitraverse[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }
 
   /** Flipped `bitraverse`. */
   def bitraverseF[G[_] : Applicative, A, B, C, D](f: A => G[C], g: B => G[D]): F[A, B] => G[F[C, D]] =
@@ -38,15 +38,16 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   }
 
   /** Extract the Traverse on the first param. */
-  def leftTraverse[X]: Traverse[({type λ[α] = F[α, X]})#λ] =
+  def leftTraverse[X]: Traverse[F[?, X]] =
     new LeftTraverse[F, X] {val F = self}
 
   /** Extract the Traverse on the second param. */
-  def rightTraverse[X]: Traverse[({type λ[α] = F[X, α]})#λ] =
+  def rightTraverse[X]: Traverse[F[X, ?]] =
     new RightTraverse[F, X] {val F = self}
 
   /** Unify the traverse over both params. */
-  def uTraverse: Traverse[({type λ[α] = F[α, α]})#λ] = new UTraverse[F] {val F = self}
+  def uTraverse: Traverse[λ[α => F[α, α]]] =
+    new UTraverse[F] {val F = self}
 
   class Bitraversal[G[_]](implicit G: Applicative[G]) {
     def run[A,B,C,D](fa: F[A,B])(f: A => G[C])(g: B => G[D]): G[F[C, D]] = bitraverseImpl[G,A,B,C,D](fa)(f, g)
@@ -56,8 +57,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bitraversal[G[_]:Applicative]: Bitraversal[G] =
     new Bitraversal[G]
 
-  def bitraversalS[S]: Bitraversal[({type f[x]=State[S,x]})#f] =
-    new Bitraversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad)
+  def bitraversalS[S]: Bitraversal[State[S, ?]] =
+    new Bitraversal[State[S, ?]]()(StateT.stateMonad)
 
   def bitraverse[G[_]:Applicative,A,B,C,D](fa: F[A,B])(f: A => G[C])(g: B => G[D]): G[F[C, D]] =
     bitraversal[G].run(fa)(f)(g)
@@ -75,7 +76,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 
     new State[S, G[F[C, D]]] {
       def apply(initial: S) = {
-        val st = bitraverse[({type λ[α]=StateT[Trampoline, S, G[α]]})#λ, A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
+        val st = bitraverse[λ[α => StateT[Trampoline, S, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
         st(initial).run
       }
     }
@@ -87,7 +88,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
 
     Kleisli[G, S, F[C, D]](s => {
-      val kl = bitraverse[({type λ[α]=Kleisli[Trampoline, S, G[α]]})#λ, A, B, C, D](fa)(z => Kleisli[Id, S, G[C]](i => f(z)(i)).lift[Trampoline])(z => Kleisli[Id, S, G[D]](i => g(z)(i)).lift[Trampoline])
+      val kl = bitraverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B, C, D](fa)(z => Kleisli[Id, S, G[C]](i => f(z)(i)).lift[Trampoline])(z => Kleisli[Id, S, G[D]](i => g(z)(i)).lift[Trampoline])
       kl.run(s).run
     })
   }
@@ -107,17 +108,20 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) => (Endo.endo(g(b, _: C)))) apply z
 
   /** Embed a Traverse on each side of this Bitraverse . */
-  def embed[G[_],H[_]](implicit G0: Traverse[G], H0: Traverse[H]): Bitraverse[({type λ[α, β]=F[G[α], H[β]]})#λ] = new CompositionBitraverseTraverses[F, G, H] {
-    def F = self
-    def G = G0
-    def H = H0
-  }
+  def embed[G[_],H[_]](implicit G0: Traverse[G], H0: Traverse[H]): Bitraverse[λ[(α, β) => F[G[α], H[β]]]] =
+    new CompositionBitraverseTraverses[F, G, H] {
+      def F = self
+      def G = G0
+      def H = H0
+    }
 
   /** Embed a Traverse on the left side of this Bitraverse . */
-  def embedLeft[G[_]](implicit G0: Traverse[G]): Bitraverse[({type λ[α, β]=F[G[α], β]})#λ] = embed[G,Id.Id]
+  def embedLeft[G[_]](implicit G0: Traverse[G]): Bitraverse[λ[(α, β) => F[G[α], β]]] = 
+    embed[G,Id.Id]
 
   /** Embed a Traverse on the right side of this Bitraverse . */
-  def embedRight[H[_]](implicit H0: Traverse[H]): Bitraverse[({type λ[α, β]=F[α, H[β]]})#λ] = embed[Id.Id,H]
+  def embedRight[H[_]](implicit H0: Traverse[H]): Bitraverse[λ[(α, β) => F[α, H[β]]]] = 
+    embed[Id.Id,H]
 
   ////
   val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }

@@ -30,15 +30,4 @@ object InvariantFunctorTest extends SpecLite {
   case class Num(x: Int)
   implicit val showNum = Show.showA[Num]
   implicit val eqNum = Equal.equalA[Num]
-
-  "semigroup" in {
-    val sg: Semigroup[Num] = Semigroup[Int].xmap[Num](Num.apply _, _.x)
-    sg.append(Num(1), Num(2)) must_===(Num(3))
-  }
-
-  "monoid" in {
-    val sg: Monoid[Num] = Monoid[Int].xmap[Num](Num.apply _, _.x)
-    sg.append(Num(1), Num(2)) must_===(Num(3))
-    sg.zero must_===(Num(0))
-  }
 }

@@ -219,30 +219,37 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
   def ensure(failure: => Throwable)(f: A => Boolean): Task[A] =
     flatMap(a => if(f(a)) Task.now(a) else Task.fail(failure))
+
+  /**
+   * Delays the execution of this `Task` by the duration `t`.
+   */
+  def after(t: Duration): Task[A] =
+    new Task(get after t)
 }
 
 object Task {
 
-  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[({type λ[α,β] = Task[β]})#λ,Throwable] = new Nondeterminism[Task] with Catchable[Task] with MonadError[({type λ[α,β] = Task[β]})#λ,Throwable] {
-    val F = Nondeterminism[Future]
-    def point[A](a: => A) = new Task(Future.delay(Try(a)))
-    def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
-      a flatMap f
-    def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
-      new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) =>
-        a.map((_, residuals.map(new Task(_))))
-      })
-    override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
-      new Task (F.map(F.gatherUnordered(fs.map(_ get)))(eithers =>
-        Traverse[List].sequenceU(eithers)
-      ))
+  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] =
+    new Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] {
+      val F = Nondeterminism[Future]
+      def point[A](a: => A) = new Task(Future.delay(Try(a)))
+      def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
+        a flatMap f
+      def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
+        new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) =>
+          a.map((_, residuals.map(new Task(_))))
+        })
+      override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
+        new Task (F.map(F.gatherUnordered(fs.map(_ get)))(eithers =>
+          Traverse[List].sequenceU(eithers)
+        ))
+      }
+      def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
+      def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
+      def raiseError[A](e: Throwable): Task[A] = fail(e)
+      def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
+        fa.handleWith { case t => f(t) }
     }
-    def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
-    def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
-    def raiseError[A](e: Throwable): Task[A] = fail(e)
-    def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
-      fa.handleWith { case t => f(t) }
-  }
 
   /** signals task was interrupted **/
   case object TaskInterrupted extends InterruptedException {

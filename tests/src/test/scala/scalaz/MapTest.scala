@@ -677,7 +677,7 @@ object MapTest extends SpecLite {
 
   "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
     import std.set._, \&/._
-    val F = Align[({type λ[α] = Int ==>> α})#λ]
+    val F = Align[Int ==>> ?]
     val x = F.align(a, b)
     val keysA = a.keySet
     val keysB = b.keySet
@@ -702,10 +702,10 @@ object MapTest extends SpecLite {
   checkAll(bifoldable.laws[==>>])
 
   object instances {
-    def bind[A: Order] = Bind[({type λ[α] = A ==>> α})#λ]
-    def traverse[A] = Traverse[({type λ[α] = A ==>> α})#λ]
+    def bind[A: Order] = Bind[A ==>> ?]
+    def traverse[A] = Traverse[A ==>> ?]
 
     // checking absence of ambiguity
-    def functor[A: Order] = Functor[({type λ[α] = A ==>> α})#λ]
+    def functor[A: Order] = Functor[A ==>> ?]
   }
 }

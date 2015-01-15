@@ -9,6 +9,11 @@ sealed trait TupleInstances0 {
       Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
   }
 
+  implicit val tuple2Associative: Associative[Tuple2] = new Associative[Tuple2] {
+    def reassociateLeft[A, B, C](f: (A, (B, C))): ((A, B), C) = ((f._1, f._2._1), f._2._2)
+    def reassociateRight[A, B, C](f: ((A, B), C)): (A, (B, C)) = (f._1._1, (f._1._2, f._2))
+  }
+
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]): Semigroup[Tuple1[A1]] = new Tuple1Semigroup[A1] {
     implicit def _1: Semigroup[A1] = A1
   }
@@ -69,283 +74,322 @@ sealed trait TupleInstances0 {
   }
 
   /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Traverse[({type f[x] = (A1, x)})#f] with Comonad[({type f[x] = (A1, x)})#f] = new Tuple2Functor[A1] with Comonad[({type f[x] = (A1, x)})#f] {
+  implicit def tuple2Instance[A1]: Traverse[(A1, ?)] with Comonad[(A1, ?)] = new Tuple2Functor[A1] with Comonad[(A1, ?)] {
     override def cojoin[A](a: (A1, A)) = (a._1, a)
     def copoint[A](p: (A1, A)) = p._2
     def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
   }
 
-  implicit def tuple3Functor[A1, A2]: Traverse[({type f[x] = (A1, A2, x)})#f] = new Tuple3Functor[A1, A2] {}
-  implicit def tuple4Functor[A1, A2, A3]: Traverse[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Functor[A1, A2, A3] {}
-  implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Functor[A1, A2, A3, A4] {}
-  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
+  implicit def tuple3Functor[A1, A2]: Traverse[(A1, A2, ?)] = new Tuple3Functor[A1, A2] {}
+  implicit def tuple4Functor[A1, A2, A3]: Traverse[(A1, A2, A3, ?)] = new Tuple4Functor[A1, A2, A3] {}
+  implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[(A1, A2, A3, A4, ?)] = new Tuple5Functor[A1, A2, A3, A4] {}
+  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[(A1, A2, A3, A4, A5, ?)] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
 
-  implicit def tuple1Equal[A1](implicit A1: Equal[A1]): Equal[Tuple1[A1]] = new Tuple1Equal[A1] {
-    implicit def _1 = A1
-  }
-  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] = new Tuple2Equal[A1, A2] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-  }
-  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] = new Tuple3Equal[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] = new Tuple4Equal[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-  }
-  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] = new Tuple5Equal[A1, A2, A3, A4, A5] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-  }
-  implicit def tuple6Equal[A1, A2, A3, A4, A5, A6](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6]): Equal[(A1, A2, A3, A4, A5, A6)] = new Tuple6Equal[A1, A2, A3, A4, A5, A6] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-  }
-  implicit def tuple7Equal[A1, A2, A3, A4, A5, A6, A7](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6], A7: Equal[A7]): Equal[(A1, A2, A3, A4, A5, A6, A7)] = new Tuple7Equal[A1, A2, A3, A4, A5, A6, A7] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-  }
-  implicit def tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6], A7: Equal[A7], A8: Equal[A8]): Equal[(A1, A2, A3, A4, A5, A6, A7, A8)] = new Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-    implicit def _8 = A8
-  }
+  implicit def tuple1Equal[A1](implicit A1: Equal[A1]): Equal[Tuple1[A1]] =
+    new Tuple1Equal[A1] {
+      implicit def _1 = A1
+    }
+  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] = 
+    new Tuple2Equal[A1, A2] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+    }
+  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] = 
+    new Tuple3Equal[A1, A2, A3] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+    }
+  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] = 
+    new Tuple4Equal[A1, A2, A3, A4] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+    }
+  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] = 
+    new Tuple5Equal[A1, A2, A3, A4, A5] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+    }
+  implicit def tuple6Equal[A1, A2, A3, A4, A5, A6](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6]): Equal[(A1, A2, A3, A4, A5, A6)] =
+    new Tuple6Equal[A1, A2, A3, A4, A5, A6] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+    }
+  implicit def tuple7Equal[A1, A2, A3, A4, A5, A6, A7](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6], A7: Equal[A7]): Equal[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Equal[A1, A2, A3, A4, A5, A6, A7] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+    }
+  implicit def tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5], A6: Equal[A6], A7: Equal[A7], A8: Equal[A8]): Equal[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+      implicit def _8 = A8
+    }
 }
 sealed trait TupleInstances1 extends TupleInstances0 {
 
-  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = new Tuple1Show[A1] {
-    implicit def _1 = A1
-  }
-  implicit def tuple2Show[A1, A2](implicit A1: Show[A1], A2: Show[A2]): Show[(A1, A2)]  = new Tuple2Show[A1, A2] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-  }
-  implicit def tuple3Show[A1, A2, A3](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]): Show[(A1, A2, A3)]  = new Tuple3Show[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-  implicit def tuple4Show[A1, A2, A3, A4](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4]): Show[(A1, A2, A3, A4)]  = new Tuple4Show[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-  }
-  implicit def tuple5Show[A1, A2, A3, A4, A5](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5]): Show[(A1, A2, A3, A4, A5)]  = new Tuple5Show[A1, A2, A3, A4, A5] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-  }
-  implicit def tuple6Show[A1, A2, A3, A4, A5, A6](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6]): Show[(A1, A2, A3, A4, A5, A6)]  = new Tuple6Show[A1, A2, A3, A4, A5, A6] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-  }
-  implicit def tuple7Show[A1, A2, A3, A4, A5, A6, A7](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6], A7: Show[A7]): Show[(A1, A2, A3, A4, A5, A6, A7)]  = new Tuple7Show[A1, A2, A3, A4, A5, A6, A7] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-  }
-  implicit def tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6], A7: Show[A7], A8: Show[A8]): Show[(A1, A2, A3, A4, A5, A6, A7, A8)] = new Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-    implicit def _8 = A8
-  }
-
-  implicit def tuple1Order[A1](implicit A1: Order[A1]): Order[Tuple1[A1]] = new Tuple1Order[A1] {
-    implicit def _1 = A1
-  }
-  implicit def tuple2Order[A1, A2](implicit A1: Order[A1], A2: Order[A2]): Order[(A1, A2)] = new Tuple2Order[A1, A2] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-  }
-  implicit def tuple3Order[A1, A2, A3](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3]): Order[(A1, A2, A3)] = new Tuple3Order[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-  implicit def tuple4Order[A1, A2, A3, A4](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4]): Order[(A1, A2, A3, A4)] = new Tuple4Order[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-  }
-  implicit def tuple5Order[A1, A2, A3, A4, A5](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5]): Order[(A1, A2, A3, A4, A5)] = new Tuple5Order[A1, A2, A3, A4, A5] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-  }
-  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] = new Tuple6Order[A1, A2, A3, A4, A5, A6] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-  }
-  implicit def tuple7Order[A1, A2, A3, A4, A5, A6, A7](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6], A7: Order[A7]): Order[(A1, A2, A3, A4, A5, A6, A7)] = new Tuple7Order[A1, A2, A3, A4, A5, A6, A7] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-  }
-  implicit def tuple8Order[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6], A7: Order[A7], A8: Order[A8]): Order[(A1, A2, A3, A4, A5, A6, A7, A8)] = new Tuple8Order[A1, A2, A3, A4, A5, A6, A7, A8] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-    implicit def _8 = A8
-  }
-  implicit def tuple1Monoid[A1](implicit A1: Monoid[A1]): Monoid[Tuple1[A1]] = new Tuple1Monoid[A1] {
+  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = 
+    new Tuple1Show[A1] {
       implicit def _1 = A1
-  }
-  implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] = new Tuple2Monoid[A1, A2] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-  }
-  implicit def tuple3Monoid[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monoid[(A1, A2, A3)] = new Tuple3Monoid[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-  implicit def tuple4Monoid[A1, A2, A3, A4](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4]): Monoid[(A1, A2, A3, A4)] = new Tuple4Monoid[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-  }
-  implicit def tuple5Monoid[A1, A2, A3, A4, A5](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5]): Monoid[(A1, A2, A3, A4, A5)] = new Tuple5Monoid[A1, A2, A3, A4, A5] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-  }
-  implicit def tuple6Monoid[A1, A2, A3, A4, A5, A6](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6]): Monoid[(A1, A2, A3, A4, A5, A6)] = new Tuple6Monoid[A1, A2, A3, A4, A5, A6] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-  }
-  implicit def tuple7Monoid[A1, A2, A3, A4, A5, A6, A7](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7]): Monoid[(A1, A2, A3, A4, A5, A6, A7)] = new Tuple7Monoid[A1, A2, A3, A4, A5, A6, A7] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-  }
-  implicit def tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7], A8: Monoid[A8]): Monoid[(A1, A2, A3, A4, A5, A6, A7, A8)] = new Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-    implicit def _8 = A8
-  }
+    }
+  implicit def tuple2Show[A1, A2](implicit A1: Show[A1], A2: Show[A2]): Show[(A1, A2)] =
+    new Tuple2Show[A1, A2] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+    }
+  implicit def tuple3Show[A1, A2, A3](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3]): Show[(A1, A2, A3)] =
+    new Tuple3Show[A1, A2, A3] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+    }
+  implicit def tuple4Show[A1, A2, A3, A4](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4]): Show[(A1, A2, A3, A4)] =
+    new Tuple4Show[A1, A2, A3, A4] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+    }
+  implicit def tuple5Show[A1, A2, A3, A4, A5](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5]): Show[(A1, A2, A3, A4, A5)] =
+    new Tuple5Show[A1, A2, A3, A4, A5] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+    }
+  implicit def tuple6Show[A1, A2, A3, A4, A5, A6](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6]): Show[(A1, A2, A3, A4, A5, A6)] =
+    new Tuple6Show[A1, A2, A3, A4, A5, A6] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+    }
+  implicit def tuple7Show[A1, A2, A3, A4, A5, A6, A7](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6], A7: Show[A7]): Show[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Show[A1, A2, A3, A4, A5, A6, A7] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+    }
+  implicit def tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Show[A1], A2: Show[A2], A3: Show[A3], A4: Show[A4], A5: Show[A5], A6: Show[A6], A7: Show[A7], A8: Show[A8]): Show[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+      implicit def _8 = A8
+    }
+
+  implicit def tuple1Order[A1](implicit A1: Order[A1]): Order[Tuple1[A1]] =
+    new Tuple1Order[A1] {
+      implicit def _1 = A1
+    }
+  implicit def tuple2Order[A1, A2](implicit A1: Order[A1], A2: Order[A2]): Order[(A1, A2)] =
+    new Tuple2Order[A1, A2] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+    }
+  implicit def tuple3Order[A1, A2, A3](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3]): Order[(A1, A2, A3)] =
+    new Tuple3Order[A1, A2, A3] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+    }
+  implicit def tuple4Order[A1, A2, A3, A4](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4]): Order[(A1, A2, A3, A4)] =
+    new Tuple4Order[A1, A2, A3, A4] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+    }
+  implicit def tuple5Order[A1, A2, A3, A4, A5](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5]): Order[(A1, A2, A3, A4, A5)] =
+    new Tuple5Order[A1, A2, A3, A4, A5] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+    }
+  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] = 
+    new Tuple6Order[A1, A2, A3, A4, A5, A6] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+    }
+  implicit def tuple7Order[A1, A2, A3, A4, A5, A6, A7](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6], A7: Order[A7]): Order[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Order[A1, A2, A3, A4, A5, A6, A7] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+    }
+  implicit def tuple8Order[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6], A7: Order[A7], A8: Order[A8]): Order[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Order[A1, A2, A3, A4, A5, A6, A7, A8] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+      implicit def _8 = A8
+    }
+  implicit def tuple1Monoid[A1](implicit A1: Monoid[A1]): Monoid[Tuple1[A1]] =
+    new Tuple1Monoid[A1] {
+      implicit def _1 = A1
+    }
+  implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] =
+    new Tuple2Monoid[A1, A2] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+    }
+  implicit def tuple3Monoid[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monoid[(A1, A2, A3)] =
+    new Tuple3Monoid[A1, A2, A3] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+    }
+  implicit def tuple4Monoid[A1, A2, A3, A4](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4]): Monoid[(A1, A2, A3, A4)] =
+    new Tuple4Monoid[A1, A2, A3, A4] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+    }
+  implicit def tuple5Monoid[A1, A2, A3, A4, A5](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5]): Monoid[(A1, A2, A3, A4, A5)] =
+    new Tuple5Monoid[A1, A2, A3, A4, A5] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+    }
+  implicit def tuple6Monoid[A1, A2, A3, A4, A5, A6](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6]): Monoid[(A1, A2, A3, A4, A5, A6)] =
+    new Tuple6Monoid[A1, A2, A3, A4, A5, A6] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+    }
+  implicit def tuple7Monoid[A1, A2, A3, A4, A5, A6, A7](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7]): Monoid[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Monoid[A1, A2, A3, A4, A5, A6, A7] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+    }
+  implicit def tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7], A8: Monoid[A8]): Monoid[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+      implicit def _8 = A8
+    }
 
   implicit val tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
-  implicit def tuple2Cozip[A1]: Cozip[({type f[x] = (A1, x)})#f] = new Tuple2Cozip[A1] {}
-  implicit def tuple3Cozip[A1, A2]: Cozip[({type f[x] = (A1, A2, x)})#f] = new Tuple3Cozip[A1, A2] {}
-  implicit def tuple4Cozip[A1, A2, A3]: Cozip[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Cozip[A1, A2, A3] {}
-  implicit def tuple5Cozip[A1, A2, A3, A4]: Cozip[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Cozip[A1, A2, A3, A4] {}
-  implicit def tuple6Cozip[A1, A2, A3, A4, A5]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Cozip[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]: Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
+  implicit def tuple2Cozip[A1]: Cozip[(A1, ?)] = new Tuple2Cozip[A1] {}
+  implicit def tuple3Cozip[A1, A2]: Cozip[(A1, A2, ?)] = new Tuple3Cozip[A1, A2] {}
+  implicit def tuple4Cozip[A1, A2, A3]: Cozip[(A1, A2, A3, ?)] = new Tuple4Cozip[A1, A2, A3] {}
+  implicit def tuple5Cozip[A1, A2, A3, A4]: Cozip[(A1, A2, A3, A4, ?)] = new Tuple5Cozip[A1, A2, A3, A4] {}
+  implicit def tuple6Cozip[A1, A2, A3, A4, A5]: Cozip[(A1, A2, A3, A4, A5, ?)] = new Tuple6Cozip[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]: Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
 
-  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[({type f[x] = (A1, x)})#f] = new Tuple2Monad[A1] {
-    implicit def _1 = A1
-  }
-  implicit def tuple3Monad[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monad[({type f[x] = (A1, A2, x)})#f] = new Tuple3Monad[A1, A2] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-  }
-  implicit def tuple4Monad[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monad[({type f[x] = (A1, A2, A3, x)})#f] = new Tuple4Monad[A1, A2, A3] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-  }
-  implicit def tuple5Monad[A1, A2, A3, A4](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4]): Monad[({type f[x] = (A1, A2, A3, A4, x)})#f] = new Tuple5Monad[A1, A2, A3, A4] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-  }
-  implicit def tuple6Monad[A1, A2, A3, A4, A5](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5]): Monad[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] = new Tuple6Monad[A1, A2, A3, A4, A5] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-  }
-  implicit def tuple7Monad[A1, A2, A3, A4, A5, A6](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6]): Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] = new Tuple7Monad[A1, A2, A3, A4, A5, A6] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-  }
-  implicit def tuple8Monad[A1, A2, A3, A4, A5, A6, A7](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7]): Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] = new Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] {
-    implicit def _1 = A1
-    implicit def _2 = A2
-    implicit def _3 = A3
-    implicit def _4 = A4
-    implicit def _5 = A5
-    implicit def _6 = A6
-    implicit def _7 = A7
-  }
+  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] =
+    new Tuple2Monad[A1] {
+      implicit def _1 = A1
+    }
+  implicit def tuple3Monad[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monad[(A1, A2, ?)] =
+    new Tuple3Monad[A1, A2] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+    }
+  implicit def tuple4Monad[A1, A2, A3](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3]): Monad[(A1, A2, A3, ?)] =
+    new Tuple4Monad[A1, A2, A3] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+    }
+  implicit def tuple5Monad[A1, A2, A3, A4](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4]): Monad[(A1, A2, A3, A4, ?)] =
+    new Tuple5Monad[A1, A2, A3, A4] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+    }
+  implicit def tuple6Monad[A1, A2, A3, A4, A5](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5]): Monad[(A1, A2, A3, A4, A5, ?)] =
+    new Tuple6Monad[A1, A2, A3, A4, A5] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+    }
+  implicit def tuple7Monad[A1, A2, A3, A4, A5, A6](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6]): Monad[(A1, A2, A3, A4, A5, A6, ?)] =
+    new Tuple7Monad[A1, A2, A3, A4, A5, A6] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+    }
+  implicit def tuple8Monad[A1, A2, A3, A4, A5, A6, A7](implicit A1: Monoid[A1], A2: Monoid[A2], A3: Monoid[A3], A4: Monoid[A4], A5: Monoid[A5], A6: Monoid[A6], A7: Monoid[A7]): Monad[(A1, A2, A3, A4, A5, A6, A7, ?)] =
+    new Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] {
+      implicit def _1 = A1
+      implicit def _2 = A2
+      implicit def _3 = A3
+      implicit def _4 = A4
+      implicit def _5 = A5
+      implicit def _6 = A6
+      implicit def _7 = A7
+    }
 
 }
 
@@ -487,43 +531,43 @@ private trait Tuple1Functor extends Traverse[Tuple1] {
   def traverseImpl[G[_], A, B](fa: Tuple1[A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._1))(Tuple1.apply)
 }
-private trait Tuple2Functor[A1] extends Traverse[({type f[x] = (A1, x)})#f] {
+private trait Tuple2Functor[A1] extends Traverse[(A1, ?)] {
   override def map[A, B](fa: (A1, A))(f: A => B) =
     (fa._1, f(fa._2))
   def traverseImpl[G[_], A, B](fa: (A1, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._2))((fa._1, _))
 }
-private trait Tuple3Functor[A1, A2] extends Traverse[({type f[x] = (A1, A2, x)})#f] {
+private trait Tuple3Functor[A1, A2] extends Traverse[(A1, A2, ?)] {
   override def map[A, B](fa: (A1, A2, A))(f: A => B) =
     (fa._1, fa._2, f(fa._3))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._3))((fa._1, fa._2, _))
 }
-private trait Tuple4Functor[A1, A2, A3] extends Traverse[({type f[x] = (A1, A2, A3, x)})#f] {
+private trait Tuple4Functor[A1, A2, A3] extends Traverse[(A1, A2, A3, ?)] {
   override def map[A, B](fa: (A1, A2, A3, A))(f: A => B) =
     (fa._1, fa._2, fa._3, f(fa._4))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._4))((fa._1, fa._2, fa._3, _))
 }
-private trait Tuple5Functor[A1, A2, A3, A4] extends Traverse[({type f[x] = (A1, A2, A3, A4, x)})#f] {
+private trait Tuple5Functor[A1, A2, A3, A4] extends Traverse[(A1, A2, A3, A4, ?)] {
   override def map[A, B](fa: (A1, A2, A3, A4, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, f(fa._5))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._5))((fa._1, fa._2, fa._3, fa._4, _))
 }
-private trait Tuple6Functor[A1, A2, A3, A4, A5] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] {
+private trait Tuple6Functor[A1, A2, A3, A4, A5] extends Traverse[(A1, A2, A3, A4, A5, ?)] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, f(fa._6))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._6))((fa._1, fa._2, fa._3, fa._4, fa._5, _))
 }
-private trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] {
+private trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Traverse[(A1, A2, A3, A4, A5, A6, ?)] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, f(fa._7))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._7))((fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, _))
 }
-private trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Traverse[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
+private trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] {
   override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => B) =
     (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, f(fa._8))
   def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => G[B])(implicit G: Applicative[G]) =
@@ -534,31 +578,31 @@ private trait Tuple1Cozip extends Cozip[Tuple1] {
   override def cozip[A, B](x: Tuple1[A \/ B]) =
     x._1.bimap(Tuple1(_), Tuple1(_))
 }
-private trait Tuple2Cozip[A1] extends Cozip[({type f[x] = (A1, x)})#f] {
+private trait Tuple2Cozip[A1] extends Cozip[(A1, ?)] {
   override def cozip[A, B](x: (A1, A \/ B)) =
     x._2.bimap((x._1, _), (x._1, _))
 }
-private trait Tuple3Cozip[A1, A2] extends Cozip[({type f[x] = (A1, A2, x)})#f] {
+private trait Tuple3Cozip[A1, A2] extends Cozip[(A1, A2, ?)] {
   override def cozip[A, B](x: (A1, A2, A \/ B)) =
     x._3.bimap((x._1, x._2, _), (x._1, x._2, _))
 }
-private trait Tuple4Cozip[A1, A2, A3] extends Cozip[({type f[x] = (A1, A2, A3, x)})#f] {
+private trait Tuple4Cozip[A1, A2, A3] extends Cozip[(A1, A2, A3, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A \/ B)) =
     x._4.bimap((x._1, x._2, x._3, _), (x._1, x._2, x._3, _))
 }
-private trait Tuple5Cozip[A1, A2, A3, A4] extends Cozip[({type f[x] = (A1, A2, A3, A4, x)})#f] {
+private trait Tuple5Cozip[A1, A2, A3, A4] extends Cozip[(A1, A2, A3, A4, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A \/ B)) =
     x._5.bimap((x._1, x._2, x._3, x._4, _), (x._1, x._2, x._3, x._4, _))
 }
-private trait Tuple6Cozip[A1, A2, A3, A4, A5] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] {
+private trait Tuple6Cozip[A1, A2, A3, A4, A5] extends Cozip[(A1, A2, A3, A4, A5, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A \/ B)) =
     x._6.bimap((x._1, x._2, x._3, x._4, x._5, _), (x._1, x._2, x._3, x._4, x._5, _))
 }
-private trait Tuple7Cozip[A1, A2, A3, A4, A5, A6] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] {
+private trait Tuple7Cozip[A1, A2, A3, A4, A5, A6] extends Cozip[(A1, A2, A3, A4, A5, A6, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A \/ B)) =
     x._7.bimap((x._1, x._2, x._3, x._4, x._5, x._6, _), (x._1, x._2, x._3, x._4, x._5, x._6, _))
 }
-private trait Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] extends Cozip[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] {
+private trait Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] extends Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A7, A \/ B)) =
     x._8.bimap((x._1, x._2, x._3, x._4, x._5, x._6, x._7, _), (x._1, x._2, x._3, x._4, x._5, x._6, x._7, _))
 }
@@ -894,7 +938,7 @@ private trait Tuple1Monad extends Monad[Tuple1] {
 // TupleN forms a Monad if the element types other than the last are Monoids.
 
 
-private trait Tuple2Monad[A1] extends Monad[({type f[x] = (A1, x)})#f] with Tuple2Functor[A1] {
+private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with Tuple2Functor[A1] {
   implicit def _1 : Monoid[A1]
   def bind[A, B](fa: (A1, A))(f: A => (A1, B)) = {
     val t = f(fa._2)
@@ -903,7 +947,7 @@ private trait Tuple2Monad[A1] extends Monad[({type f[x] = (A1, x)})#f] with Tupl
   }
   def point[A](a: => A) = (_1.zero, a)
 }
-private trait Tuple3Monad[A1, A2] extends Monad[({type f[x] = (A1, A2, x)})#f] with Tuple3Functor[A1, A2] {
+private trait Tuple3Monad[A1, A2] extends Monad[(A1, A2, ?)] with Tuple3Functor[A1, A2] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   def bind[A, B](fa: (A1, A2, A))(f: A => (A1, A2, B)) = {
@@ -914,7 +958,7 @@ private trait Tuple3Monad[A1, A2] extends Monad[({type f[x] = (A1, A2, x)})#f] w
 
   def point[A](a: => A) = (_1.zero, _2.zero, a)
 }
-private trait Tuple4Monad[A1, A2, A3] extends Monad[({type f[x] = (A1, A2, A3, x)})#f] with Tuple4Functor[A1, A2, A3] {
+private trait Tuple4Monad[A1, A2, A3] extends Monad[(A1, A2, A3, ?)] with Tuple4Functor[A1, A2, A3] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -925,7 +969,7 @@ private trait Tuple4Monad[A1, A2, A3] extends Monad[({type f[x] = (A1, A2, A3, x
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, a)
 }
-private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[({type f[x] = (A1, A2, A3, A4, x)})#f] with Tuple5Functor[A1, A2, A3, A4] {
+private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[(A1, A2, A3, A4, ?)] with Tuple5Functor[A1, A2, A3, A4] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -937,7 +981,7 @@ private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[({type f[x] = (A1, A2, A
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, a)
 }
-private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] with Tuple6Functor[A1, A2, A3, A4, A5] {
+private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[(A1, A2, A3, A4, A5, ?)] with Tuple6Functor[A1, A2, A3, A4, A5] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -950,7 +994,7 @@ private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[({type f[x] = (A1, A
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, a)
 }
-private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] with Tuple7Functor[A1, A2, A3, A4, A5, A6] {
+private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[(A1, A2, A3, A4, A5, A6, ?)] with Tuple7Functor[A1, A2, A3, A4, A5, A6] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -965,7 +1009,7 @@ private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[({type f[x] = (A
 
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, a)
 }
-private trait Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] with Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {
+private trait Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends Monad[(A1, A2, A3, A4, A5, A6, A7, ?)] with Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]

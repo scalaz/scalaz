@@ -44,13 +44,13 @@ sealed trait STRef[S, A] {
 
 object STRef extends STRefInstances with STRefFunctions {
 
-  def apply[S]: (Id ~> ({type λ[α] = STRef[S, α]})#λ) =
+  def apply[S]: (Id ~> STRef[S, ?]) =
     stRef[S]
 }
 
 trait STRefFunctions {
 
-  def stRef[S]: (Id ~> ({type λ[α] = STRef[S, α]})#λ) = new (Id ~> ({type λ[α] = STRef[S, α]})#λ) {
+  def stRef[S]: (Id ~> STRef[S, ?]) = new (Id ~> STRef[S, ?]) {
     def apply[A](a: A) = new STRef[S, A] {
       var value = a
     }
@@ -153,13 +153,14 @@ trait STFunctions {
     st(s => (s, a))
 
   /**Run a state thread */
-  def runST[A](f: Forall[({type λ[S] = ST[S, A]})#λ]): A =
+  def runST[A](f: Forall[ST[?, A]]): A =
     f.apply.apply(ivoryTower)._2
 
   /**Allocates a fresh mutable reference. */
-  def newVar[S]: (Id ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) = new (Id ~> ({type λ[α] = ST[S, STRef[S, α]]})#λ) {
-    def apply[A](a: A) = returnST(stRef[S](a))
-  }
+  def newVar[S]: Id ~> λ[α => ST[S, STRef[S, α]]] =
+    new (Id ~> λ[α => ST[S, STRef[S, α]]]) {
+      def apply[A](a: A) = returnST(stRef[S](a))
+    }
 
   /**Allocates a fresh mutable array. */
   def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
@@ -190,15 +191,16 @@ trait STFunctions {
 
 sealed abstract class STInstance0 {
   implicit def stSemigroup[S, A](implicit A: Semigroup[A]): Semigroup[ST[S, A]] =
-      Semigroup.liftSemigroup[({type λ[α] = ST[S, α]})#λ, A](ST.stMonad[S], A)
+      Semigroup.liftSemigroup[ST[S, ?], A](ST.stMonad[S], A)
 }
 
 sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
-    Monoid.liftMonoid[({type λ[α] = ST[S, α]})#λ, A](stMonad[S], A)
+    Monoid.liftMonoid[ST[S, ?], A](stMonad[S], A)
 
-  implicit def stMonad[S]: Monad[({type λ[α] = ST[S, α]})#λ] = new Monad[({type λ[α] = ST[S, α]})#λ] {
-    def point[A](a: => A): ST[S, A] = returnST(a)
-    def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f
-  }
+  implicit def stMonad[S]: Monad[ST[S, ?]] = 
+    new Monad[ST[S, ?]] {
+      def point[A](a: => A): ST[S, A] = returnST(a)
+      def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f
+    }
 }

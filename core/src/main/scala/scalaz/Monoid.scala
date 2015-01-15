@@ -49,20 +49,22 @@ trait Monoid[F] extends Semigroup[F] { self =>
     *
     * @note `category.monoid` = `this`
     */
-  final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
-    def id[A] = zero
-  }
+  final def category: Category[λ[(α, β) => F]] =
+    new Category[λ[(α, β) => F]] with SemigroupCompose {
+      def id[A] = zero
+    }
 
   /**
    * A monoidal applicative functor, that implements `point` and `ap`
    * with the operations `zero` and `append` respectively.  Note that
-   * the type parameter `α` in `Applicative[({type λ[α]=F})#λ]` is
+   * the type parameter `α` in `Applicative[λ[α => F]]` is
    * discarded; it is a phantom type.  As such, the functor cannot
    * support [[scalaz.Bind]].
    */
-  final def applicative: Applicative[({type λ[α]=F})#λ] = new Applicative[({type λ[α]=F})#λ] with SemigroupApply {
-    def point[A](a: => A) = zero
-  }
+  final def applicative: Applicative[λ[α =>F]] =
+    new Applicative[λ[α => F]] with SemigroupApply {
+      def point[A](a: => A) = zero
+    }
 
   /**
    * Monoid instances must satisfy [[scalaz.Semigroup.SemigroupLaw]] and 2 additional laws:
@@ -86,10 +88,11 @@ object Monoid {
   ////
 
   /** Make an append and zero into an instance. */
-  def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {
-    def zero = z
-    def append(f1: A, f2: => A): A = f(f1,f2)
-  }
+  def instance[A](f: (A, => A) => A, z: A): Monoid[A] =
+    new Monoid[A] {
+      def zero = z
+      def append(f1: A, f2: => A): A = f(f1,f2)
+    }
 
   private trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
@@ -98,16 +101,27 @@ object Monoid {
   }
 
   /**A monoid for sequencing Applicative effects. */
-  def liftMonoid[F[_], M](implicit F0: Applicative[F], M0: Monoid[M]): Monoid[F[M]] = new ApplicativeMonoid[F, M] {
-    implicit def F: Applicative[F] = F0
-    implicit def M: Monoid[M] = M0
-  }
+  def liftMonoid[F[_], M](implicit F0: Applicative[F], M0: Monoid[M]): Monoid[F[M]] =
+    new ApplicativeMonoid[F, M] {
+      implicit def F: Applicative[F] = F0
+      implicit def M: Monoid[M] = M0
+    }
 
-  def liftPlusEmpty[A](implicit M0: Monoid[A]): PlusEmpty[({ type λ[α] = A })#λ] = new PlusEmpty[({ type λ[α] = A })#λ] {
-    type A0[α] = A
-    def empty[A]: A0[A] = M0.zero
-    def plus[A](f1: A0[A], f2: => A0[A]): A0[A] = M0.append(f1, f2)
-  }
+  def liftPlusEmpty[A](implicit M0: Monoid[A]): PlusEmpty[λ[α => A]] =
+    new PlusEmpty[λ[α => A]] {
+      type A0[α] = A
+      def empty[A]: A0[A] = M0.zero
+      def plus[A](f1: A0[A], f2: => A0[A]): A0[A] = M0.append(f1, f2)
+    }
+
+  /** Monoid is an invariant functor. */
+  implicit val monoidInvariantFunctor: InvariantFunctor[Monoid] =
+    new InvariantFunctor[Monoid] {
+      def xmap[A, B](ma: Monoid[A], f: A => B, g: B => A): Monoid[B] = new Monoid[B] {
+        def zero: B = f(ma.zero)
+        def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
+      }
+    }
 
   ////
 }

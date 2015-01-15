@@ -114,8 +114,8 @@ sealed abstract class CoyonedaInstances extends CoyonedaInstances0 {
 }
 
 sealed abstract class CoyonedaInstances0 extends CoyonedaInstances1 {
-  implicit def coyonedaComonad[F[_]: Comonad]: Comonad[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismComonad[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaComonad[F[_]: Comonad]: Comonad[Coyoneda[F, ?]] =
+    new IsomorphismComonad[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
@@ -128,110 +128,110 @@ sealed abstract class CoyonedaInstances1 extends CoyonedaInstances2 {
       def iso = Coyoneda.iso[F].unlift
     }
 
-  implicit def coyonedaCobind[F[_]: Cobind]: Cobind[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismCobind[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaCobind[F[_]: Cobind]: Cobind[Coyoneda[F, ?]] =
+    new IsomorphismCobind[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances2 extends CoyonedaInstances3 {
-  implicit def coyonedaTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismTraverse1[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaTraverse1[F[_]: Traverse1]: Traverse1[Coyoneda[F, ?]] =
+    new IsomorphismTraverse1[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances3 extends CoyonedaInstances4 {
-  implicit def coyonedaMonadPlus[F[_]: MonadPlus]: MonadPlus[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismMonadPlus[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaMonadPlus[F[_]: MonadPlus]: MonadPlus[Coyoneda[F, ?]] =
+    new IsomorphismMonadPlus[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances4 extends CoyonedaInstances5 {
-  implicit def coyonedaApplicativePlus[F[_]: ApplicativePlus]: ApplicativePlus[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismApplicativePlus[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaApplicativePlus[F[_]: ApplicativePlus]: ApplicativePlus[Coyoneda[F, ?]] =
+    new IsomorphismApplicativePlus[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances5 extends CoyonedaInstances6 {
-  implicit def coyonedaMonad[F[_]: Monad]: Monad[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismMonad[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaMonad[F[_]: Monad]: Monad[Coyoneda[F, ?]] =
+    new IsomorphismMonad[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 
-  implicit def coyonedaPlusEmpty[F[_]: PlusEmpty: Functor]: PlusEmpty[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismEmpty[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaPlusEmpty[F[_]: PlusEmpty: Functor]: PlusEmpty[Coyoneda[F, ?]] =
+    new IsomorphismEmpty[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances6 extends CoyonedaInstances7 {
-  implicit def coyonedaBind[F[_]: Bind]: Bind[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismBind[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaBind[F[_]: Bind]: Bind[Coyoneda[F, ?]] =
+    new IsomorphismBind[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 
-  implicit def coyonedaPlus[F[_]: Plus: Functor]: Plus[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismPlus[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaPlus[F[_]: Plus: Functor]: Plus[Coyoneda[F, ?]] =
+    new IsomorphismPlus[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances7 extends CoyonedaInstances8 {
-  implicit def coyonedaApplicative[F[_]: Applicative]: Applicative[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismApplicative[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaApplicative[F[_]: Applicative]: Applicative[Coyoneda[F, ?]] =
+    new IsomorphismApplicative[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances8 extends CoyonedaInstances9 {
-  implicit def coyonedaFoldable1[F[_]: Foldable1]: Foldable1[({type λ[α] = Coyoneda[F, α]})#λ] =
+  implicit def coyonedaFoldable1[F[_]: Foldable1]: Foldable1[Coyoneda[F, ?]] =
     new CoyonedaFoldable1[F]{ def F = implicitly }
 
-  implicit def coyonedaApply[F[_]: Apply]: Apply[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismApply[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaApply[F[_]: Apply]: Apply[Coyoneda[F, ?]] =
+    new IsomorphismApply[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances9 extends CoyonedaInstances10 {
-  implicit def coyonedaTraverse[F[_]: Traverse]: Traverse[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismTraverse[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaTraverse[F[_]: Traverse]: Traverse[Coyoneda[F, ?]] =
+    new IsomorphismTraverse[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 
-  implicit def coyonedaContravariant[F[_]: Contravariant: Functor]: Contravariant[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new IsomorphismContravariant[({type λ[α] = Coyoneda[F, α]})#λ, F] {
+  implicit def coyonedaContravariant[F[_]: Contravariant: Functor]: Contravariant[Coyoneda[F, ?]] =
+    new IsomorphismContravariant[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }
 }
 
 sealed abstract class CoyonedaInstances10 {
-  implicit def coyonedaFoldable[F[_]: Foldable]: Foldable[({type λ[α] = Coyoneda[F, α]})#λ] =
+  implicit def coyonedaFoldable[F[_]: Foldable]: Foldable[Coyoneda[F, ?]] =
     new CoyonedaFoldable[F]{ def F = implicitly }
 
   /** `Coyoneda[F,_]` is a functor for any `F` */
-  implicit def coyonedaFunctor[F[_]]: Functor[({type λ[α] = Coyoneda[F, α]})#λ] =
-    new Functor[({type λ[α] = Coyoneda[F,α]})#λ] {
+  implicit def coyonedaFunctor[F[_]]: Functor[Coyoneda[F, ?]] =
+    new Functor[Coyoneda[F, ?]] {
       def map[A, B](ya: Coyoneda[F, A])(f: A => B) = ya map f
     }
 }
 
-private trait CoyonedaFoldable[F[_]] extends Foldable[({type λ[α] = Coyoneda[F, α]})#λ] {
+private trait CoyonedaFoldable[F[_]] extends Foldable[Coyoneda[F, ?]] {
   def F: Foldable[F]
 
   override final def foldMap[A, B: Monoid](fa: Coyoneda[F, A])(f: A => B) =
@@ -242,7 +242,7 @@ private trait CoyonedaFoldable[F[_]] extends Foldable[({type λ[α] = Coyoneda[F
     F.foldLeft(fa.fi, z)((b, i) => f(b, fa.k(i)))
 }
 
-private abstract class CoyonedaFoldable1[F[_]] extends Foldable1[({type λ[α] = Coyoneda[F, α]})#λ] with CoyonedaFoldable[F] {
+private abstract class CoyonedaFoldable1[F[_]] extends Foldable1[Coyoneda[F, ?]] with CoyonedaFoldable[F] {
   def F: Foldable1[F]
 
   override final def foldMap1[A, B: Semigroup](fa: Coyoneda[F, A])(f: A => B) =

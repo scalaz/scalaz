@@ -9,10 +9,11 @@ object DisjunctionTest extends SpecLite {
 
   checkAll(order.laws[Int \/ Int])
   checkAll(monoid.laws[Int \/ Int])
-  checkAll(monad.laws[({type λ[α] = Int \/ α})#λ])
-  checkAll(plus.laws[({type λ[α] = Int \/ α})#λ])
-  checkAll(traverse.laws[({type λ[α] = Int \/ α})#λ])
+  checkAll(monad.laws[Int \/ ?])
+  checkAll(plus.laws[Int \/ ?])
+  checkAll(traverse.laws[Int \/ ?])
   checkAll(bitraverse.laws[\/])
+  checkAll(associative.laws[\/])
   checkAll(monadError.laws[\/, Int])
 
   "fromTryCatchThrowable" in {

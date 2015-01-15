@@ -18,6 +18,7 @@ object ValidationTest extends SpecLite {
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
   checkAll("Validation", bitraverse.laws[Validation])
+  checkAll("Validation", associative.laws[Validation])
 
   "fpoint and point" in {
 
@@ -51,7 +52,7 @@ object ValidationTest extends SpecLite {
       val fail1 = Failure("1").toValidationNel
       val fail2 = Failure("2").toValidationNel
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNel[String, a]})#l].ap2(fail1, fail2)(Success(f)).shows must_===("""Failure(["1","2"])""")
+      Apply[ValidationNel[String, ?]].ap2(fail1, fail2)(Success(f)).shows must_===("""Failure(["1","2"])""")
     }
   }
 
@@ -61,7 +62,7 @@ object ValidationTest extends SpecLite {
       val fail1 = Failure("1").toValidationNel
       val fail2 = Failure("2").toValidationNel
       val f = (_:Int) + (_:Int)
-      Apply[({type l[a] = ValidationNel[String, a]})#l].apply2(fail1, fail2)(f).shows must_===("""Failure(["1","2"])""")
+      Apply[ValidationNel[String, ?]].apply2(fail1, fail2)(f).shows must_===("""Failure(["1","2"])""")
     }
   }
 
@@ -77,12 +78,12 @@ object ValidationTest extends SpecLite {
     "return first success" in {
       val succ = Validation.success[String, Int](1).toValidationNel
       val fail = Validation.failure[String, Int]("2").toValidationNel
-    
+
       (succ findSuccess fail).shows must_===(succ.shows)
       (fail findSuccess succ).shows must_===(succ.shows)
     }
   }
-    
+
   "excepting" in {
     import syntax.std.string._
     import syntax.validation._
@@ -115,9 +116,9 @@ object ValidationTest extends SpecLite {
     def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]
     def order[E: Order, A: Order] = Order[Validation[E, A]]
     def semigroup[E: Semigroup, A: Semigroup] = Semigroup[Validation[E, A]]
-    def applicative[E: Semigroup] = Applicative[({type λ[α]=Validation[E, α]})#λ]
-    def traverse[E: Semigroup] = Traverse[({type λ[α]=Validation[E, α]})#λ]
-    def plus[E: Semigroup] = Plus[({type λ[α]=Validation[E, α]})#λ]
+    def applicative[E: Semigroup] = Applicative[Validation[E, ?]]
+    def traverse[E: Semigroup] = Traverse[Validation[E, ?]]
+    def plus[E: Semigroup] = Plus[Validation[E, ?]]
     def bitraverse = Bitraverse[Validation]
 
     // checking absence of ambiguity

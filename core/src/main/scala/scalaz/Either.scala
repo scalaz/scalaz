@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 import Liskov.<~<
 
 /** Represents a disjunction: a result that is either an `A` or a `B`.
- * 
+ *
  * An instance of `A` [[\/]] B is either a [[-\/]]`[A]` (aka a "left") or a [[\/-]]`[B]` (aka a "right").
  *
  * A common use of a disjunction is to explicitly represent the possibility of failure in a result as opposed to
@@ -392,48 +392,48 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionInstances1[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] {
-    override def map[A, B](fa: L \/ A)(f: A => B) =
-      fa map f
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] =
+    new Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] {
+      override def map[A, B](fa: L \/ A)(f: A => B) =
+        fa map f
 
-    def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
-      fa flatMap f
+      def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
+        fa flatMap f
 
-    def point[A](a: => A) =
-      \/-(a)
+      def point[A](a: => A) =
+        \/-(a)
 
-    def traverseImpl[G[_] : Applicative, A, B](fa: L \/ A)(f: A => G[B]) =
-      fa.traverse(f)
+      def traverseImpl[G[_] : Applicative, A, B](fa: L \/ A)(f: A => G[B]) =
+        fa.traverse(f)
 
-    override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
-      fa.foldRight(z)(f)
+      override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
+        fa.foldRight(z)(f)
 
-    def cozip[A, B](x: L \/ (A \/ B)) =
-      x match {
-        case l @ -\/(_) => -\/(l)
-        case \/-(e) => e match {
-          case -\/(a) => -\/(\/-(a))
-          case b @ \/-(_) => \/-(b)
+      def cozip[A, B](x: L \/ (A \/ B)) =
+        x match {
+          case l @ -\/(_) => -\/(l)
+          case \/-(e) => e match {
+            case -\/(a) => -\/(\/-(a))
+            case b @ \/-(_) => \/-(b)
+          }
         }
+
+      def plus[A](a: L \/ A, b: => L \/ A) =
+        a orElse b
+
+      def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
+        case l@ -\/(_) => -\/(l)
+        case r@ \/-(_) => r
       }
 
-    def plus[A](a: L \/ A, b: => L \/ A) =
-      a orElse b
+      def raiseError[A](e: L): L \/ A =
+        -\/(e)
 
-    def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
-      case l@ -\/(_) => -\/(l)
-      case r@ \/-(_) => r
+      def handleError[A](fa: L \/ A)(f: L => L \/ A): L \/ A = fa match {
+        case -\/(e) => f(e)
+        case r => r
+      }
     }
-
-    def raiseError[A](e: L): L \/ A =
-      -\/(e)
-
-    def handleError[A](fa: L \/ A)(f: L => L \/ A): L \/ A = fa match {
-      case -\/(e) => f(e)
-      case r => r
-    }
-  }
-
 }
 
 sealed abstract class DisjunctionInstances2 {
@@ -444,6 +444,26 @@ sealed abstract class DisjunctionInstances2 {
     def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
+  }
+
+  implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
+    def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
+      f.fold(
+        a => \/.left(\/.left(a)),
+        _.fold(
+          b => \/.left(\/.right(b)),
+          \/.right(_)
+        )
+      )
+
+    def reassociateRight[A, B, C](f: \/[\/[A, B], C]) =
+      f.fold(
+        _.fold(
+          \/.left(_),
+          b => \/.right(\/.left(b))
+        ),
+        c => \/.right(\/.right(c))
+      )
   }
 }
 
@@ -459,7 +479,7 @@ trait DisjunctionFunctions {
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
-  
+
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
