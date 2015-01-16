@@ -323,10 +323,29 @@ sealed abstract class IList[A] extends Product with Serializable {
     drop(from).take((until max 0)- (from max 0))
 
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
-    IList(toList.sortBy(f)(B.toScalaOrdering): _*)
+    sorted(B.contramap(f))
 
-  def sorted(implicit ev: Order[A]): IList[A] =
-    sortBy(identity)
+  def sorted(implicit ev: Order[A]): IList[A] = {
+    val len = length
+    if(len <= 1){
+      this
+    }else{
+      val array = new Array[AnyRef](len)
+      @tailrec def listToArray(i: Int, list: IList[A]): Unit = list match {
+        case ICons(h, t) =>
+          array(i) = h.asInstanceOf[AnyRef]
+          listToArray(i + 1, t)
+        case INil() =>
+      }
+      listToArray(0, this)
+      java.util.Arrays.sort(array, ev.toScalaOrdering.asInstanceOf[scala.math.Ordering[AnyRef]])
+      @tailrec def arrayToList(i: Int, list: IList[A]): IList[A] = {
+        if(i >= 0) arrayToList(i - 1, ICons(array(i).asInstanceOf[A], list))
+        else list
+      }
+      arrayToList(len - 1, INil())
+    }
+  }
 
   def span(f: A => Boolean): (IList[A], IList[A]) = {
     @tailrec def span0(as: IList[A], accum: IList[A]): (IList[A], IList[A]) =
