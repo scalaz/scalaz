@@ -38,7 +38,7 @@ object FreeAp {
  * Free applicative functors. Less expressive than free monads, but more
  * flexible to inspect and interpret.
  */
-sealed trait FreeAp[F[_],A] {
+sealed abstract class FreeAp[F[_],A] {
   import FreeAp._
 
   /**
