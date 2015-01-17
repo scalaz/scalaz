@@ -97,6 +97,10 @@ object FreeAp {
   /** Lift a value in `F` into the free applicative functor on `F` */
   def lift[F[_],A](x: => F[A]): FreeAp[F, A] = FreeAp(x, Pure((a: A) => a))
 
+  /** A version of `lift` that infers the nested type constructor. */
+  def liftU[FA](x: => FA)(implicit FA: Unapply[Functor, FA]): FreeAp[FA.M, FA.A] =
+    lift(FA(x))
+
   private [scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
   private abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
     type I
