@@ -13,7 +13,7 @@ package scalaz
   * See `ContravariantCoyonedaUsage.scala` in the scalaz source tree
   * for an interesting usage demonstration.
   *
-  * As `ContravariantCoyoneda(identity)(o).unlift` = `o`, further
+  * As `ContravariantCoyoneda(o)(identity).unlift` = `o`, further
   * factoring can occur as follows, for free:
   *
   * {{{
