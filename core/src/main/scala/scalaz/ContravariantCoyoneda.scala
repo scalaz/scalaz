@@ -52,13 +52,11 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
 }
 
 sealed abstract class ContravariantCoyonedaInstances {
-  import ContravariantCoyoneda.ContravariantCoyonedaF
-
   /** `ContravariantCoyoneda[F,_]` is a contravariant functor for any
     * `F`.
     */
-  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyonedaF[F]#A] =
-    new Contravariant[ContravariantCoyonedaF[F]#A] {
+  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyoneda[F, ?]] =
+    new Contravariant[ContravariantCoyoneda[F, ?]] {
       def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
         fa contramap f
     }
@@ -69,10 +67,6 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
     * convenient to use `Aux` than a structural type.
     */
   type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] {type I = B}
-
-  /** Curried `ContravariantCoyoneda` type constructor. */
-  type ContravariantCoyonedaF[F[_]] =
-    ({type A[α] = ContravariantCoyoneda[F, α]})
 
   /** See `by` method. */
   final class By[F[_]] {
@@ -100,8 +94,8 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   import Isomorphism._
 
-  def iso[F[_]: Contravariant]: ContravariantCoyonedaF[F]#A <~> F =
-    new IsoFunctorTemplate[ContravariantCoyonedaF[F]#A, F] {
+  def iso[F[_]: Contravariant]: ContravariantCoyoneda[F, ?] <~> F =
+    new IsoFunctorTemplate[ContravariantCoyoneda[F, ?], F] {
       def from[A](fa: F[A]) = lift(fa)
       def to[A](fa: ContravariantCoyoneda[F, A]) = fa.run
     }
