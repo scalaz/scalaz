@@ -66,12 +66,26 @@ trait Unapply[TC[_[_]], MA] {
   @inline final def apply(ma: MA): M[A] = leibniz(ma)
 }
 
-sealed trait Unapply_4 {
+sealed trait Unapply_5 {
+  /**Unpack a value of type `M0[F[_], A0, B0, C0, D0, E0]` into types `[e]M0[F, A0, B0, C0, D0, e]` and `E0`, given an instance of `TC` */
+  implicit def unapplyMFABCDE5[TC[_[_]], F[_], M0[F[_], _, _, _, _, _], A0, B0, C0, D0, E0](implicit TC0: TC[M0[F, A0, B0, C0, D0, ?]]): Unapply[TC, M0[F, A0, B0, C0, D0, E0]] {
+    type M[X] = M0[F, A0, B0, C0, D0, X]
+    type A = E0
+  } =
+    new Unapply[TC, M0[F, A0, B0, C0, D0, E0]] {
+      type M[X] = M0[F, A0, B0, C0, D0, X]
+      type A = E0
+      def TC = TC0
+      def leibniz = refl
+    }
+}
+
+sealed trait Unapply_4 extends Unapply_5 {
   // /** Unpack a value of type `A0` into type `[a]A0`, given a instance of `TC` */
   implicit def unapplyA[TC[_[_]], A0](implicit TC0: TC[λ[α => A0]]): Unapply[TC, A0] {
     type M[X] = A0
     type A = A0
-  } = 
+  } =
     new Unapply[TC, A0] {
       type M[X] = A0
       type A = A0
@@ -85,7 +99,7 @@ sealed trait Unapply_3 extends Unapply_4 {
   implicit def unapplyMFABC1and2[TC[_[_]], F[_], M0[F[_], _, _, _], A0, B0](implicit TC0: TC[λ[α => M0[F, α, α, B0]]]): Unapply[TC, M0[F, A0, A0, B0]] {
     type M[X] = M0[F, X, X, B0]
     type A = A0
-  } = 
+  } =
     new Unapply[TC, M0[F, A0, A0, B0]] {
       type M[X] = M0[F, X, X, B0]
       type A = A0
@@ -97,7 +111,7 @@ sealed trait Unapply_3 extends Unapply_4 {
   implicit def unapplyMFABC3[TC[_[_]], F[_], M0[F[_], _, _, _], A0, B0, C0](implicit TC0: TC[M0[F, A0, B0, ?]]): Unapply[TC, M0[F, A0, B0, C0]] {
     type M[X] = M0[F, A0, B0, X]
     type A = C0
-  } = 
+  } =
     new Unapply[TC, M0[F, A0, B0, C0]] {
       type M[X] = M0[F, A0, B0, X]
       type A = C0
