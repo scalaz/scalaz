@@ -78,18 +78,16 @@ object Coyoneda extends CoyonedaInstances {
       val fi = fa
     }
 
-  type CoyonedaF[F[_]] = ({type A[α] = Coyoneda[F, α]})
-
   import Isomorphism._
 
-  def iso[F[_]: Functor]: CoyonedaF[F]#A <~> F =
-    new IsoFunctorTemplate[CoyonedaF[F]#A, F] {
+  def iso[F[_]: Functor]: Coyoneda[F, ?] <~> F =
+    new IsoFunctorTemplate[Coyoneda[F, ?], F] {
       def from[A](fa: F[A]) = lift(fa)
       def to[A](fa: Coyoneda[F, A]) = fa.run
     }
 
   /** Turns a natural transformation F ~> G into CF ~> G */
-  def liftTF[F[_], G[_]: Functor](fg: F ~> G): CoyonedaF[F]#A ~> G = {
+  def liftTF[F[_], G[_]: Functor](fg: F ~> G): Coyoneda[F, ?] ~> G = {
     type CF[A] = Coyoneda[F, A]
     type CG[A] = Coyoneda[G, A]
     val m: (CF ~> CG) = liftT(fg)
@@ -98,8 +96,8 @@ object Coyoneda extends CoyonedaInstances {
   }
 
   /** Turns a natural transformation F ~> G into CF ~> CG */
-  def liftT[F[_], G[_]](fg: F ~> G): CoyonedaF[F]#A ~> CoyonedaF[G]#A =
-    new (CoyonedaF[F]#A ~> CoyonedaF[G]#A) {
+  def liftT[F[_], G[_]](fg: F ~> G): Coyoneda[F, ?] ~> Coyoneda[G, ?] =
+    new (Coyoneda[F, ?] ~> Coyoneda[G, ?]) {
       def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
     }
 
