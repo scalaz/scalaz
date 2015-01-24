@@ -13,6 +13,7 @@ object TheseTest extends SpecLite {
   checkAll(monad.laws[TheseInt])
   checkAll(traverse.laws[TheseInt])
   checkAll(equal.laws[Int \&/ Int])
+  checkAll(semigroup.laws[Int \&/ Int])
   checkAll(bitraverse.laws[\&/])
 
   "align unalign" should {
@@ -35,6 +36,7 @@ object TheseTest extends SpecLite {
     def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
     def applicative[L: Semigroup] = Applicative[({type λ[α] = L \&/ α})#λ]
     def monad[L: Semigroup] = Monad[({type λ[α] = L \&/ α})#λ]
+    def semigroup[L: Semigroup, R: Semigroup] = Semigroup[L \&/ R]
     def zip[L: Semigroup] = Zip[({type λ[α] = L \&/ α})#λ]
     def cobind[L] = Cobind[({type λ[α] = L \&/ α})#λ]
     def foldable[L] = Foldable[({type λ[α] = L \&/ α})#λ]
