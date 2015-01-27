@@ -285,12 +285,12 @@ private trait KleisliProChoice[F[_]] extends ProChoice[({type λ[α, β] = Kleis
   def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
     Kleisli {
       case -\/(a) => F.map(fa run a)(\/.left)
-      case \/-(b) => F.point(\/-(b))
+      case b @ \/-(_) => F.point(b)
     }
 
   def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
     Kleisli {
-      case -\/(b) => F.point(-\/(b))
+      case b @ -\/(_) => F.point(b)
       case \/-(a) => F.map(fa run a)(\/.right)
     }
 }
