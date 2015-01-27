@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import Liskov.<~<
 
 /**
  * Represents a computation of type `F[A \/ B]`.
@@ -198,6 +199,14 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ validationed k))
+
+  /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
+  def merge[AA >: A](implicit F: Functor[F], ev: B <~< AA): F[AA] = {
+    F.map(run) {
+      case -\/(a) => a
+      case \/-(b) => ev(b)
+    }
+  }
 }
 
 object EitherT extends EitherTInstances with EitherTFunctions {
