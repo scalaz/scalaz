@@ -103,6 +103,11 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 object ListT extends ListTInstances {
   def empty[M[_], A](implicit M: Applicative[M]): ListT[M, A] = new ListT[M, A](M.point(Nil))
 
+  def listT[M[_]]: ({type l[a] = M[List[a]]})#l ~> ({type l[a] = ListT[M, a]})#l =
+    new (({type l[a] = M[List[a]]})#l ~> ({type l[a] = ListT[M, a]})#l){
+      def apply[A](a: M[List[A]]) = new ListT[M, A](a)
+    }
+
   def fromList[M[_], A](mas: M[List[A]]): ListT[M, A] = new ListT(mas)
 }
 
