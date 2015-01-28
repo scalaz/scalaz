@@ -53,6 +53,11 @@ object ListTTest extends SpecLite {
     ListT.fromList(list).map(_ * 2).toList must_===(list.map(_.map(_ * 2)))
     ()
   }
+  
+  "listT" ! forAll {
+    (ass: Option[List[Int]]) =>
+      ListT.listT(ass).underlying == ass
+  }
 
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
