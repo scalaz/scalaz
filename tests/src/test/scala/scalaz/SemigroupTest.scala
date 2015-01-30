@@ -1,8 +1,6 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Arbitrary
 
 object SemigroupTest extends SpecLite {

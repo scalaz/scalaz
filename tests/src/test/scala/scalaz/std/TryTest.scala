@@ -6,7 +6,6 @@ import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Arbitrary
 import scala.util.{Failure, Success, Try}
-import scalaz.syntax.std.`try`._
 
 object TryTest extends SpecLite {
 

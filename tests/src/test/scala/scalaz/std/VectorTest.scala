@@ -6,7 +6,6 @@ import org.scalacheck.Arbitrary
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
-import syntax.std._
 import org.scalacheck.Prop.forAll
 
 object VectorTest extends SpecLite {
