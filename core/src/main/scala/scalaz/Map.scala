@@ -857,6 +857,17 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: ==>>[A, B] =>
+        ==>>.mapEqual[A, B](Equal.equalA, Equal.equalA).equal(this, that)
+      case _ =>
+        false
+    }
+
+  override def hashCode: Int =
+    toAscList.hashCode
+
   // filters on keys
   private def filterGt(f: A => Ordering)(implicit o: Order[A]): A ==>> B =
     this match {
