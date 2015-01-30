@@ -18,6 +18,12 @@ object DataMapTest extends SpecLite {
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
   }
 
+  "equals/hashCode" ! forAll { a: Int ==>> Int =>
+    val b = ==>>.fromList(scala.util.Random.shuffle(a.toList))
+    a must_== b
+    a.## must_=== b.##
+  }
+
   "==>> fromList" should {
     "succeed" in {
       fromList(List.empty[(Int, String)]) must_===(empty[Int, String])
