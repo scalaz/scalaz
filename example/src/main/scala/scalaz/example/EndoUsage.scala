@@ -2,10 +2,8 @@ package scalaz.example
 
 import scalaz.{Endo,IList,Zip}
 import scalaz.std.function._
-import scalaz.std.string._
 import scalaz.std.anyVal._
 import scalaz.syntax.monoid._
-import scalaz.syntax.id._
 import scalaz.syntax.foldable._
 
 object EndoUsage extends App {
