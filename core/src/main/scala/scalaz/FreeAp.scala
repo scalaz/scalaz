@@ -1,5 +1,39 @@
 package scalaz
 
+object FreeAp {
+  implicit def freeInstance[F[_]]: Applicative[({type λ[α] = FreeAp[F,α]})#λ] =
+    new Applicative[({type λ[α] = FreeAp[F,α]})#λ] {
+      def point[A](a: => A) = FreeAp.point(a)
+      def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa ap ff
+    }
+
+  /** Return a value in a free applicative functor */
+  def point[F[_],A](a: A): FreeAp[F,A] = Pure(a)
+
+  /** Return a value in a free applicative functor. Alias for `point`. */
+  def pure[F[_],A](a: A): FreeAp[F,A] = point(a)
+
+  /** Lift a value in `F` into the free applicative functor on `F` */
+  def lift[F[_],A](x: => F[A]): FreeAp[F, A] = FreeAp(x, Pure((a: A) => a))
+
+  private [scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
+  private abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
+    type I
+    val v: () => F[I]
+    val k: () => FreeAp[F, I => A]
+  }
+
+  /**
+   * Add an effect to the front of a program that produces a continuation for it.
+   */
+  def apply[F[_],A,B](value: => F[A], function: => FreeAp[F, A => B]): FreeAp[F,B] =
+    new Ap[F,B] {
+      type I = A
+      val v = () => value
+      val k = () => function
+    }
+}
+
 /**
  * Free applicative functors. Less expressive than free monads, but more
  * flexible to inspect and interpret.
@@ -81,38 +115,3 @@ sealed trait FreeAp[F[_],A] {
     case x@Ap() => FreeAp(x.v(), x.k().map(f compose _))
   }
 }
-
-object FreeAp {
-  implicit def freeInstance[F[_]]: Applicative[({type λ[α] = FreeAp[F,α]})#λ] =
-    new Applicative[({type λ[α] = FreeAp[F,α]})#λ] {
-      def point[A](a: => A) = FreeAp.point(a)
-      def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa ap ff
-    }
-
-  /** Return a value in a free applicative functor */
-  def point[F[_],A](a: A): FreeAp[F,A] = Pure(a)
-
-  /** Return a value in a free applicative functor. Alias for `point`. */
-  def pure[F[_],A](a: A): FreeAp[F,A] = point(a)
-
-  /** Lift a value in `F` into the free applicative functor on `F` */
-  def lift[F[_],A](x: => F[A]): FreeAp[F, A] = FreeAp(x, Pure((a: A) => a))
-
-  private [scalaz] case class Pure[F[_],A](a: A) extends FreeAp[F,A]
-  private abstract case class Ap[F[_],A]() extends FreeAp[F,A] {
-    type I
-    val v: () => F[I]
-    val k: () => FreeAp[F, I => A]
-  }
-
-  /**
-   * Add an effect to the front of a program that produces a continuation for it.
-   */
-  def apply[F[_],A,B](value: => F[A], function: => FreeAp[F, A => B]): FreeAp[F,B] =
-    new Ap[F,B] {
-      type I = A
-      val v = () => value
-      val k = () => function
-    }
-}
-
