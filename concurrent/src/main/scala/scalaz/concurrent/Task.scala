@@ -4,6 +4,7 @@ import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, Ex
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.effect.Capture
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -229,8 +230,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
 object Task {
 
-  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] =
-    new Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] {
+  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] with Capture[Task] =
+    new Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] with Capture[Task] {
       val F = Nondeterminism[Future]
       def point[A](a: => A) = new Task(Future.delay(Try(a)))
       def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
@@ -249,6 +250,8 @@ object Task {
       def raiseError[A](e: Throwable): Task[A] = fail(e)
       def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
         fa.handleWith { case t => f(t) }
+      def capture[A](a: => A) = delay(a)
+      def unsafeRun[A](fa: Task[A]) = fa.run
     }
 
   /** signals task was interrupted **/
