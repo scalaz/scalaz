@@ -545,6 +545,17 @@ sealed abstract class ISet[A] {
           case GT => l.filterLt(a)
         }
     }, this)
+
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: ISet[A] =>
+        ISet.setEqual[A](Equal.equalA).equal(this, that)
+      case _ =>
+        false
+    }
+
+  override def hashCode: Int =
+    toAscList.hashCode
 }
 
 object ISet extends ISetInstances with ISetFunctions {
