@@ -2,6 +2,7 @@ package scalaz
 
 import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
+import scala.util.Random
 
 object MapTest extends SpecLite {
   import org.scalacheck.Arbitrary
@@ -19,6 +20,12 @@ object MapTest extends SpecLite {
   def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
     val al = m.toAscList
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
+
+  "equals/hashCode" ! forAll { a: Int ==>> Int =>
+    val b = ==>>.fromList(Random.shuffle(a.toList))
+    a must_== b
+    a.## must_=== b.##
   }
 
   "minViewWithKey" ! forAll { a: Int ==>> Int =>
