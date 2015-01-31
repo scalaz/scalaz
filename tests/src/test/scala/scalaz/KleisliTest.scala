@@ -44,8 +44,8 @@ object KleisliTest extends SpecLite {
     def empty[F[+_] : PlusEmpty, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def monadReader[F[+_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
 
-    def category[F[+_]: Monad, A] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def arrow[F[+_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def category[F[+_]: Monad] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def arrow[F[+_]: Monad] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
     def semigroup[F[+_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
