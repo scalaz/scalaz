@@ -52,12 +52,12 @@ object CokleisliTest extends SpecLite {
 
   object instances {
     def monad[F[_], W] = Monad[Cokleisli[F, W, ?]]
-    def compose[F[_], W](implicit F: Cobind[F]) = Compose[Cokleisli[F, ?, ?]]
-    def profunctor[F[_]: Functor, W] = Profunctor[Cokleisli[F, ?, ?]]
-    def arrow[F[_] : Comonad, W] = Arrow[Cokleisli[F, ?, ?]]
+    def compose[F[_]](implicit F: Cobind[F]) = Compose[Cokleisli[F, ?, ?]]
+    def profunctor[F[_]: Functor] = Profunctor[Cokleisli[F, ?, ?]]
+    def arrow[F[_] : Comonad] = Arrow[Cokleisli[F, ?, ?]]
 
     // checking absence of ambiguity
-    def compose[F[_], W](implicit F: Comonad[F]) = Compose[Cokleisli[F, ?, ?]]
-    def profunctor[F[_]: Comonad, W] = Profunctor[Cokleisli[F, ?, ?]]
+    def compose[F[_]](implicit F: Comonad[F]) = Compose[Cokleisli[F, ?, ?]]
+    def profunctor[F[_]: Comonad] = Profunctor[Cokleisli[F, ?, ?]]
   }
 }
