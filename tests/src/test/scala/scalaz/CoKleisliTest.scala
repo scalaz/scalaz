@@ -55,6 +55,7 @@ object CokleisliTest extends SpecLite {
     def compose[F[_], W](implicit F: Cobind[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
     def profunctor[F[_]: Functor, W] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
     def arrow[F[_] : Comonad, W] = Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def prochoice[F[_] : Comonad] = ProChoice[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
     def compose[F[_], W](implicit F: Comonad[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]

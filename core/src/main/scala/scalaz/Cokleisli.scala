@@ -28,7 +28,11 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
     Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A](ev.subst[({type λ[α] = Cokleisli[F, A, α]})#λ](this))
 }
 
-object Cokleisli extends CokleisliInstances with CokleisliFunctions
+object Cokleisli extends CokleisliInstances with CokleisliFunctions {
+  implicit def cokleisliProChoice[F[_]](implicit F0: Comonad[F]): ProChoice[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliProChoice[F] {
+    override implicit def F = F0
+  }
+}
 
 sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[({type λ[α, β]=Cokleisli[F, α, β]})#λ] = new CokleisliCompose[F] {
@@ -83,4 +87,26 @@ private trait CokleisliArrow[F[_]]
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
       Cokleisli[F, (A, C), (B, C)](w => (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
+}
+
+private trait CokleisliProChoice[F[_]]
+  extends ProChoice[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+  with CokleisliProfunctor[F] {
+  implicit def F: Comonad[F]
+
+  def left[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, A \/ C, B \/ C] =
+    Cokleisli { (ac: F[A \/ C]) =>
+      F.copoint(ac) match {
+        case -\/(a) => -\/(fa run (F.map(ac)(_ => a)))
+        case b @ \/-(_) => b
+      }
+    }
+
+  def right[A, B, C](fa: Cokleisli[F, A, B]): Cokleisli[F, C \/ A, C \/ B] =
+    Cokleisli { (ac: F[C \/ A]) =>
+      F.copoint(ac) match {
+        case b @ -\/(_) => b
+        case \/-(a) => \/-(fa run (F.map(ac)(_ => a)))
+      }
+    }
 }

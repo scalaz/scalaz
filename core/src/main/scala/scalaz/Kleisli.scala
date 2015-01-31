@@ -140,6 +140,10 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
     implicit def F = F0
   }
 
+  implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProChoice[F] {
+    implicit def F = F0
+  }
+
   implicit def kleisliCompose[F[_]](implicit F0: Bind[F]): Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliCompose[F] {
     implicit def F = F0
   }
@@ -266,6 +270,23 @@ private trait KleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Kle
   override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa local f
 
   override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
+}
+
+private trait KleisliProChoice[F[_]] extends ProChoice[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliProfunctor[F] {
+
+  implicit def F: Applicative[F]
+
+  def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
+    Kleisli {
+      case -\/(a) => F.map(fa run a)(\/.left)
+      case \/-(b) => F.point(\/-(b))
+    }
+
+  def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
+    Kleisli {
+      case -\/(b) => F.point(-\/(b))
+      case \/-(a) => F.map(fa run a)(\/.right)
+    }
 }
 
 private trait KleisliCompose[F[_]] extends Compose[({type λ[α, β] = Kleisli[F, α, β]})#λ] {

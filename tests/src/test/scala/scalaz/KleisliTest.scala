@@ -45,6 +45,7 @@ object KleisliTest extends SpecLite {
     def monadReader[F[_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
 
     def profunctor[F[_]: Functor, A] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def proChoice[F[_]: Applicative, A] = ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def compose[F[_]: Bind, A] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def category[F[_]: Monad, A] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def arrow[F[_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
@@ -57,6 +58,7 @@ object KleisliTest extends SpecLite {
     def plus[F[_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def profunctor[F[_]: Monad, A] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def proChoice[F[_]: Monad, A] = ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def compose[F[_]: Monad, A] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     object reader {
@@ -97,6 +99,11 @@ object KleisliTest extends SpecLite {
     object profunctor{
       import syntax.profunctor._
       k1.mapsnd(x => x)
+    }
+
+    object proChoice{
+      import syntax.proChoice._
+      k1.proleft
     }
 
     object arrow{

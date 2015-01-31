@@ -56,6 +56,7 @@
  *  - [[scalaz.Nondeterminism]] extends [[scalaz.Monad]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Profunctor]]
+ *  - [[scalaz.ProChoice]] extends [[scalaz.Profunctor]]
  *  - [[scalaz.Category]] extends [[scalaz.Compose]]
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]
