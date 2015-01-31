@@ -112,7 +112,7 @@ sealed abstract class Dequeue[A] {
   }
 
   /**
-    * Append another Deuque to this dequeue
+    * Append another Dequeue to this dequeue
     */
   def ++(other: Dequeue[A]): Dequeue[A] = this match {
     case EmptyDequeue() => other
