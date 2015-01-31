@@ -44,13 +44,13 @@ object KleisliTest extends SpecLite {
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[Kleisli[F, A, ?]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, ?, ?], A]
 
-    def profunctor[F[_]: Functor, A] = Profunctor[Kleisli[F, ?, ?]]
-    def strong[F[_]: Functor, A] = Strong[Kleisli[F, ?, ?]]
-    def proChoice[F[_]: Applicative, A] = ProChoice[Kleisli[F, ?, ?]]
-    def compose[F[_]: Bind, A] = Compose[Kleisli[F, ?, ?]]
-    def category[F[_]: Monad, A] = Category[Kleisli[F, ?, ?]]
-    def arrow[F[_]: Monad, A] = Arrow[Kleisli[F, ?, ?]]
-    def choice[F[_]: Monad, A] = Choice[Kleisli[F, ?, ?]]
+    def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
+    def strong[F[_]: Functor] = Strong[Kleisli[F, ?, ?]]
+    def proChoice[F[_]: Applicative] = ProChoice[Kleisli[F, ?, ?]]
+    def compose[F[_]: Bind] = Compose[Kleisli[F, ?, ?]]
+    def category[F[_]: Monad] = Category[Kleisli[F, ?, ?]]
+    def arrow[F[_]: Monad] = Arrow[Kleisli[F, ?, ?]]
+    def choice[F[_]: Monad] = Choice[Kleisli[F, ?, ?]]
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -58,10 +58,10 @@ object KleisliTest extends SpecLite {
     def apply[F[_] : Monad, A] = Apply[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
-    def profunctor[F[_]: Monad, A] = Profunctor[Kleisli[F, ?, ?]]
-    def strong[F[_]: Monad, A] = Strong[Kleisli[F, ?, ?]]
-    def proChoice[F[_]: Monad, A] = ProChoice[Kleisli[F, ?, ?]]
-    def compose[F[_]: Monad, A] = Compose[Kleisli[F, ?, ?]]
+    def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]
+    def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
+    def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
+    def compose[F[_]: Monad] = Compose[Kleisli[F, ?, ?]]
 
     object reader {
       // F = Id
