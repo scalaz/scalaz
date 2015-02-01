@@ -50,8 +50,8 @@ trait Functor[F[_]]  { self =>
 
   def counzip[A, B](a: F[A] \/ F[B]): F[(A \/ B)] =
     a match {
-      case -\/(x) => map(x)(-\/(_))
-      case \/-(x) => map(x)(\/-(_))
+      case -\/(x) => map(x)(\/.left)
+      case \/-(x) => map(x)(\/.right)
     }
 
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */

@@ -101,8 +101,8 @@ sealed trait \/[+A, +B] {
   /** Binary functor traverse on this disjunction. */
   def bitraverse[F[+_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
     this match {
-      case -\/(a) => Functor[F].map(f(a))(-\/(_))
-      case \/-(b) => Functor[F].map(g(b))(\/-(_))
+      case -\/(a) => Functor[F].map(f(a))(\/.left)
+      case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
   /** Map on the right of this disjunction. */
@@ -116,7 +116,7 @@ sealed trait \/[+A, +B] {
   def traverse[F[+_]: Applicative, D](g: B => F[D]): F[A \/ D] =
     this match {
       case a @ -\/(_) => Applicative[F].point(a)
-      case \/-(b) => Functor[F].map(g(b))(\/-(_))
+      case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
   /** Run the side-effect on the right of this disjunction. */

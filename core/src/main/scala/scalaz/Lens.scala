@@ -184,9 +184,9 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
     lensFamily{
       case -\/(a) =>
-        run(a) map  (-\/(_))
+        run(a) map  (\/.left)
       case \/-(c) =>
-        that run c map (\/-(_))
+        that run c map (\/.right)
     }
 
   /** Alias for `sum` */
@@ -677,9 +677,9 @@ private[scalaz] trait LensCategory
   def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[A \/ B, C] =
     LensFamily.lens {
       case -\/(a) =>
-        f run a map (-\/(_))
+        f run a map (\/.left)
       case \/-(b) =>
-        g run b map (\/-(_))
+        g run b map (\/.right)
     }
 
   def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =
