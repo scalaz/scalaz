@@ -103,8 +103,8 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
 
   /** Binary functor traverse on this validation. */
   def bitraverse[G[_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
-    case Failure(a) => Functor[G].map(f(a))(Failure(_))
-    case Success(b) => Functor[G].map(g(b))(Success(_))
+    case Failure(a) => Functor[G].map(f(a))(Validation.failure)
+    case Success(b) => Functor[G].map(g(b))(Validation.success)
   }
 
   /** Map on the success of this validation. */
@@ -115,7 +115,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
 
   /** Traverse on the success of this validation. */
   def traverse[G[_] : Applicative, EE >: E, B](f: A => G[B]): G[Validation[EE, B]] = this match {
-    case Success(a) => Applicative[G].map(f(a))(Success(_))
+    case Success(a) => Applicative[G].map(f(a))(Validation.success)
     case e @ Failure(_) => Applicative[G].point(e)
   }
 
