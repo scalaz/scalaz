@@ -73,6 +73,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def count(f: A => Boolean): Int =
     foldLeft(0)((n, a) => if (f(a)) n + 1 else n)
 
+  def distinct(implicit A: Order[A]): IList[A] = {
+    @tailrec def loop(src: IList[A], seen: ISet[A], acc: IList[A]): IList[A] =
+      src match {
+        case ICons(h, t) =>
+          if(seen.notMember(h)){
+            loop(t, seen.insert(h), h :: acc)
+          }else{
+            loop(t, seen, acc)
+          }
+        case INil() =>
+          acc.reverse
+      }
+    loop(this, ISet.empty[A], empty[A])
+  }
+
   def drop(n: Int): IList[A] = {
     @tailrec def drop0(as: IList[A], n: Int): IList[A] =
       if (n < 1) as else as match {
