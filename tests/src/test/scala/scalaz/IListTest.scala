@@ -140,6 +140,10 @@ object IListTest extends SpecLite {
     ns.count(p) must_=== ns.toList.count(p)
   }
 
+  "distinct" ! forAll { xs: IList[Int] =>
+    xs.distinct.toList must_=== xs.toList.distinct
+  }
+
   "drop" ! forAll { (ns: IList[Int], n: Int) =>
     ns.drop(n).toList must_=== ns.toList.drop(n)
   }
