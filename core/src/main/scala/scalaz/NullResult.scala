@@ -37,8 +37,8 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
 
   def +++[C, D](x: C =>? D): (A \/ C) =>? (B \/ D) =
     NullResult {
-      case -\/(a) => apply(a) map (-\/(_))
-      case \/-(c) => x(c) map (\/-(_))
+      case -\/(a) => apply(a) map (\/.left)
+      case \/-(c) => x(c) map (\/.right)
     }
 
   def first[C]: (A, C) =>? (B, C) =
@@ -53,14 +53,14 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
 
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
-      case -\/(a) => apply(a) map (-\/(_))
+      case -\/(a) => apply(a) map (\/.left)
       case c @ \/-(_) => Some(c)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
       case c @ -\/(_) => Some(c)
-      case \/-(a) => apply(a) map (\/-(_))
+      case \/-(a) => apply(a) map (\/.right)
     }
 
   def |(x: => A =>? B): A =>? B =

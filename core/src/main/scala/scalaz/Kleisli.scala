@@ -341,14 +341,14 @@ private trait KleisliProChoice[F[_]] extends ProChoice[Kleisli[F, ?, ?]] with Kl
 
   def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
     Kleisli {
-      case -\/(a) => F.map(fa run a)(-\/(_))
+      case -\/(a) => F.map(fa run a)(\/.left)
       case b @ \/-(_) => F.point(b)
     }
 
   def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
     Kleisli {
       case b @ -\/(_) => F.point(b)
-      case \/-(a) => F.map(fa run a)(\/-(_))
+      case \/-(a) => F.map(fa run a)(\/.right)
     }
 }
 

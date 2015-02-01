@@ -179,9 +179,9 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def sum[C1, C2](that: => PLensFamily[C1, C2, B1, B2]): PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
     plensFamily {
       case -\/(a) =>
-        run(a) map (_ map (-\/(_)))
+        run(a) map (_ map (\/.left))
       case \/-(c) =>
-        that run c map (_ map (\/-(_)))
+        that run c map (_ map (\/.right))
     }
 
   /** Alias for `sum` */
@@ -242,13 +242,13 @@ trait PLensFamilyFunctions extends PLensInstances {
 
   def leftPLensFamily[A1, A2, B]: PLensFamily[A1 \/ B, A2 \/ B, A1, A2] =
     plensFamily {
-      case -\/(a) => Some(IndexedStore(-\/(_), a))
+      case -\/(a) => Some(IndexedStore(\/.left, a))
       case \/-(_) => None
     }
 
   def rightPLensFamily[A, B1, B2]: PLensFamily[A \/ B1, A \/ B2, B1, B2] =
     plensFamily {
-      case \/-(b) => Some(IndexedStore(\/-(_), b))
+      case \/-(b) => Some(IndexedStore(\/.right, b))
       case -\/(_) => None
     }
 
@@ -342,13 +342,13 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def leftPLens[A, B]: (A \/ B) @?> A =
     plens {
-      case -\/(a) => Some(Store(-\/(_), a))
+      case -\/(a) => Some(Store(\/.left, a))
       case \/-(_) => None
     }
 
   def rightPLens[A, B]: (A \/ B) @?> B =
     plens {
-      case \/-(b) => Some(Store(\/-(_), b))
+      case \/-(b) => Some(Store(\/.right, b))
       case -\/(_) => None
     }
 
@@ -619,9 +619,9 @@ private[scalaz] trait PLensCategory
   def choice[A, B, C](f: => PLens[A, C], g: => PLens[B, C]): PLens[A \/ B, C] =
     PLensFamily.plens[A \/ B, C] {
       case -\/(a) =>
-        f run a map (_ map (-\/(_)))
+        f run a map (_ map (\/.left))
       case \/-(b) =>
-        g run b map (_ map (\/-(_)))
+        g run b map (_ map (\/.right))
     }
 
   def split[A, B, C, D](f: PLens[A, B], g: PLens[C, D]): PLens[(A,  C), (B, D)] =
