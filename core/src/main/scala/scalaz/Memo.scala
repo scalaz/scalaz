@@ -5,7 +5,7 @@ import reflect.ClassTag
 /** A function memoization strategy.  See companion for various
   * instances employing various strategies.
   */
-sealed trait Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
+sealed abstract class Memo[@specialized(Int) K, @specialized(Int, Long, Double) V] {
   def apply(z: K => V): K => V
 }
 

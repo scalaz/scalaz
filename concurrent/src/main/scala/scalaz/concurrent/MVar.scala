@@ -7,7 +7,7 @@ import effect._
 import Atomic._
 import PhasedLatch._
 
-sealed trait MVar[A] {
+sealed abstract class MVar[A] {
   def put(a: => A): IO[Unit]
   def take: IO[A]
 

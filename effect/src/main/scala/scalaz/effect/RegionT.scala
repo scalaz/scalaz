@@ -13,7 +13,7 @@ import Kleisli._
  * to return an opened resource from the region, and no I/O with closed
  * resources is possible.
  */
-sealed trait RegionT[S, P[_], A] {
+sealed abstract class RegionT[S, P[_], A] {
   def value: Kleisli[P, IORef[List[RefCountedFinalizer]], A]
 
   def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =

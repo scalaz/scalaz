@@ -6,7 +6,7 @@ import effect.IO
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
-sealed trait PhasedLatch {
+sealed abstract class PhasedLatch {
   /** Release the current phase. */
   def release(): IO[Unit]
 

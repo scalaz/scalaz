@@ -10,7 +10,7 @@ object MonadCatchIO extends MonadCatchIOFunctions {
   @inline def apply[M[_]](implicit M: MonadCatchIO[M]): MonadCatchIO[M] = M
 }
 
-sealed trait MonadCatchIOFunctions {
+sealed abstract class MonadCatchIOFunctions {
   def except[M[_], A](ma: M[A])(handler: Throwable => M[A])(implicit M: MonadCatchIO[M]): M[A] =
     M.except(ma)(handler)
 

@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-sealed trait RefCountedFinalizer {
+sealed abstract class RefCountedFinalizer {
   val finalizer: IO[Unit]
   val refcount: IORef[Int]
 }

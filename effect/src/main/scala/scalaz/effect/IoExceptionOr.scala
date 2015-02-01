@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-sealed trait IoExceptionOr[A] {
+sealed abstract class IoExceptionOr[A] {
 
   import IoExceptionOr._
 

@@ -4,7 +4,7 @@ package concurrent
 import MVar._
 import effect.IO
 
-sealed trait Chan[A] {
+sealed abstract class Chan[A] {
   def read: IO[A]
   def write(a: A): IO[Unit]
 }

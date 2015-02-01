@@ -17,7 +17,7 @@ import Id._
  *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.iteratee.Iteratee]].
  * @tparam A The type of the calculated result
  */
-sealed trait IterateeT[E, F[_], A] {
+sealed abstract class IterateeT[E, F[_], A] {
   def value: F[StepT[E, F, A]]
 
   def foldT[Z](

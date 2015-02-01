@@ -11,7 +11,7 @@ import std.function._
 import Id._
 
 /**Mutable variable in state thread S containing a value of type A. [[http://research.microsoft.com/en-us/um/people/simonpj/papers/lazy-functional-state-threads.ps.Z]] */
-sealed trait STRef[S, A] {
+sealed abstract class STRef[S, A] {
   protected var value: A
 
   /**Reads the value pointed at by this reference. */
@@ -65,7 +65,7 @@ sealed abstract class STRefInstances {
 }
 
 /**Mutable array in state thread S containing values of type A. */
-sealed trait STArray[S, A] {
+sealed abstract class STArray[S, A] {
   def size: Int
   def z: A
   implicit def tag: ClassTag[A]
@@ -118,7 +118,7 @@ trait STArrayFunctions {
  * Purely functional mutable state threads.
  * Based on JL and SPJ's paper "Lazy Functional State Threads"
  */
-sealed trait ST[S, A] {
+sealed abstract class ST[S, A] {
   private[effect] def apply(s: Tower[S]): (Tower[S], A)
 
   import ST._
