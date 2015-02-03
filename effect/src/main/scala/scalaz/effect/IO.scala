@@ -161,6 +161,12 @@ sealed abstract class IOInstances extends IOInstances0 {
       def fail[A](err: Throwable): IO[A] = IO(throw err)
     }
 
+  implicit val ioCapture: Capture[IO] = 
+    new Capture[IO] {
+      def capture[A](a: => A) = IO(a)
+      def unsafeRun[A](fa: IO[A]) = fa.unsafePerformIO
+    }
+
 }
 
 private trait IOMonad extends Monad[IO] {
