@@ -79,7 +79,7 @@ res2: Option[Int] = Some(1)
 
 ## Resources
 
-Let the types speak for themselves via the [Scalaz Scaladocs](http://docs.typelevel.org/api/scalaz/)!
+Let the types speak for themselves via the [Scalaz Scaladocs](http://scalaz.github.io/scalaz/#scaladoc)!
 
 The [examples module](https://github.com/scalaz/scalaz/tree/series/7.2.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
 
