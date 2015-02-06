@@ -10,25 +10,25 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.1.0, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
+The current stable version is 7.1.1, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
 
 If you're using SBT, add the following lines to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.0"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.1"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.1.0%22).
+For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.1.1%22).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.1.0.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.1.1.jar`.
 
 Note: In some cases, Maven will warn about "multiple versions of scala libraries", e.g.
 
 ```
 [WARNING]  Expected all dependencies to require Scala version: 2.10.1
-[WARNING]  org.scalaz:scalaz-core_2.10:7.1.0 requires scala version: 2.10.0
+[WARNING]  org.scalaz:scalaz-core_2.10:7.1.1 requires scala version: 2.10.0
 ```
 
 You can safely ignore this warning, as the Scala 2.10.x versions are compatible.
@@ -284,8 +284,8 @@ The method `OptionT#map` requires an implicit parameter of type `Functor[F]`, wh
 requires one of type `Monad[F]`. The capabilities of `OptionT` increase with those of `F`. We need to encode
 this into the type class instances for `[a]OptionT[F[A]]`.
 
-This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/v7.1.0/core/src/main/scala/scalaz/OptionT.scala#L122)
-and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/v7.1.0/core/src/main/scala/scalaz/OptionT.scala#L24).
+This is done with a hierarchy of [type class implementation traits](https://github.com/scalaz/scalaz/blob/v7.1.1/core/src/main/scala/scalaz/OptionT.scala#L122)
+and a corresponding set of [prioritized implicit methods](https://github.com/scalaz/scalaz/blob/v7.1.1/core/src/main/scala/scalaz/OptionT.scala#L24).
 
 In case of ambiguous implicits, Scala will favour one defined in a sub-class of the other. This is to avoid ambiguity
 when in cases like the following:
