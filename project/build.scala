@@ -43,7 +43,7 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  def scalaCheckVersion = "1.11.6"
+  def scalaCheckVersion = "1.12.2"
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
