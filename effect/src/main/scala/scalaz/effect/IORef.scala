@@ -7,7 +7,7 @@ import ST._
  * A mutable reference in the IO monad. Note that unsafePerformIO will allow leaking
  * such a reference out of the monad, but any operations on a leaked reference are still monadic.
  */
-sealed trait IORef[A] {
+sealed abstract class IORef[A] {
   val value: STRef[IvoryTower, A]
 
   def read: IO[A] = STToIO(value.read)

@@ -10,7 +10,7 @@ import Kleisli._
 import Free._
 import std.function._
 
-sealed trait IO[A] {
+sealed abstract class IO[A] {
   private[effect] def apply(rw: Tower[IvoryTower]): Trampoline[(Tower[IvoryTower], A)]
 
   import IO._

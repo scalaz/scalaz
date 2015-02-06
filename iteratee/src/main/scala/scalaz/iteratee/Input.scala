@@ -5,7 +5,7 @@ import LazyOption._
 import Iteratee._
 
 /**The input to an iteratee. **/
-sealed trait Input[E] {
+sealed abstract class Input[E] {
 
   def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
 
@@ -45,7 +45,7 @@ sealed trait Input[E] {
   def exists(p: (=> E) => Boolean): Boolean =
     fold(false, p, false)
 
-  abstract override def toString = fold("Empty", el => el.toString, "EOF")
+  override final def toString = fold("Empty", el => el.toString, "EOF")
 }
 
 object Input extends InputInstances with InputFunctions {

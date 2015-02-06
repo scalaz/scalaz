@@ -16,7 +16,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
   def |@|[C](cc: M[C]) = ⊛(cc)
 
-  sealed trait ApplicativeBuilder3[C] {
+  sealed abstract class ApplicativeBuilder3[C] {
     val c: M[C]
 
     def apply[D](f: (A, B, C) => D)(implicit ap: Apply[M]): M[D] = ap.apply3(a, b, c)(f)
@@ -29,7 +29,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
     def |@|[D](dd: M[D]) = ⊛(dd)
 
-    sealed trait ApplicativeBuilder4[D] {
+    sealed abstract class ApplicativeBuilder4[D] {
       val d: M[D]
 
       def apply[E](f: (A, B, C, D) => E)(implicit ap: Apply[M]): M[E] = ap.apply4(a, b, c, d)(f)
@@ -42,7 +42,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
       def |@|[E](ee: M[E]) = ⊛(ee)
 
-      sealed trait ApplicativeBuilder5[E] {
+      sealed abstract class ApplicativeBuilder5[E] {
         val e: M[E]
 
         def apply[F](f: (A, B, C, D, E) => F)(implicit ap: Apply[M]): M[F] = ap.apply5(a, b, c, d, e)(f)
@@ -55,7 +55,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
         def |@|[F](f: M[F]) = ⊛(f)
 
-        sealed trait ApplicativeBuilder6[F] {
+        sealed abstract class ApplicativeBuilder6[F] {
           val ff: M[F]
 
           def apply[G](f: (A, B, C, D, E, F) => G)(implicit ap: Apply[M]): M[G] = ap.apply6(a, b, c, d, e, ff)(f)
@@ -68,7 +68,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
           def |@|[G](gg: M[G]) = ⊛(gg)
 
-          sealed trait ApplicativeBuilder7[G] {
+          sealed abstract class ApplicativeBuilder7[G] {
             val g: M[G]
 
             def apply[H](f: (A, B, C, D, E, F, G) => H)(implicit ap: Apply[M]): M[H] = ap.apply7(a, b, c, d, e, ff, g)(f)
@@ -81,7 +81,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
             def |@|[H](hh: M[H]) = ⊛(hh)
 
-            sealed trait ApplicativeBuilder8[H] {
+            sealed abstract class ApplicativeBuilder8[H] {
               val h: M[H]
 
               def apply[I](f: (A, B, C, D, E, F, G, H) => I)(implicit ap: Apply[M]): M[I] = ap.apply8(a, b, c, d, e, ff, g, h)(f)
@@ -94,7 +94,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
               def |@|[I](ii: M[I]) = ⊛(ii)
 
-              sealed trait ApplicativeBuilder9[I] {
+              sealed abstract class ApplicativeBuilder9[I] {
                 val i: M[I]
 
                 def apply[J](f: (A, B, C, D, E, F, G, H, I) => J)(implicit ap: Apply[M]): M[J] = ap.apply9(a, b, c, d, e, ff, g, h, i)(f)
@@ -107,7 +107,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
                 def |@|[J](jj: M[J]) = ⊛(jj)
 
-                sealed trait ApplicativeBuilder10[J] {
+                sealed abstract class ApplicativeBuilder10[J] {
                   val j: M[J]
 
                   def apply[K](f: (A, B, C, D, E, F, G, H, I, J) => K)(implicit ap: Apply[M]): M[K] = ap.apply10(a, b, c, d, e, ff, g, h, i, j)(f)
@@ -120,7 +120,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
                   def |@|[K](kk: M[K]) = ⊛(kk)
 
-                  sealed trait ApplicativeBuilder11[K] {
+                  sealed abstract class ApplicativeBuilder11[K] {
                     val k: M[K]
 
                     def apply[L](f: (A, B, C, D, E, F, G, H, I, J, K) => L)(implicit ap: Apply[M]): M[L] =
@@ -134,7 +134,7 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
                     def |@|[L](ll: M[L]) = ⊛(ll)
 
-                    sealed trait ApplicativeBuilder12[L] {
+                    sealed abstract class ApplicativeBuilder12[L] {
                       val l: M[L]
 
                       def apply[MM](f: (A, B, C, D, E, F, G, H, I, J, K, L) => MM)(implicit ap: Apply[M]): M[MM] =

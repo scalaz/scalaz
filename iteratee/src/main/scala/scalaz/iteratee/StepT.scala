@@ -13,7 +13,7 @@ import Iteratee._
  *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.iteratee.Step]].
  * @tparam A The type of the calculated result
  */
-sealed trait StepT[E, F[_], A] {
+sealed abstract class StepT[E, F[_], A] {
   def fold[Z](
                cont: (Input[E] => IterateeT[E, F, A]) => Z
                , done: (=> A, => Input[E]) => Z
