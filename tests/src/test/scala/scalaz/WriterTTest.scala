@@ -14,6 +14,7 @@ object WriterTTest extends SpecLite {
   type WriterTOptInt[A] = WriterTOpt[Int, A]
 
   checkAll(equal.laws[WriterTOptInt[Int]])
+  checkAll(monoid.laws[WriterTOptInt[Int]])
   checkAll(monad.laws[WriterTOptInt])
   checkAll(traverse.laws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
@@ -24,6 +25,11 @@ object WriterTTest extends SpecLite {
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
 
   checkAll(comonad.laws[({type λ[α]=Writer[Int, α]})#λ])
+
+  "flatMapF consistent with flatMap" ! forAll {
+    (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>
+      fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
+  }
 
   object instances {
     def functor[F[_]: Functor, W] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]

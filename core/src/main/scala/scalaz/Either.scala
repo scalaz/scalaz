@@ -101,8 +101,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Binary functor traverse on this disjunction. */
   def bitraverse[F[_]: Functor, C, D](f: A => F[C], g: B => F[D]): F[C \/ D] =
     this match {
-      case -\/(a) => Functor[F].map(f(a))(-\/(_))
-      case \/-(b) => Functor[F].map(g(b))(\/-(_))
+      case -\/(a) => Functor[F].map(f(a))(\/.left)
+      case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
   /** Map on the right of this disjunction. */
@@ -116,7 +116,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
     this match {
       case a @ -\/(_) => Applicative[F].point(a)
-      case \/-(b) => Functor[F].map(g(b))(\/-(_))
+      case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
   /** Run the side-effect on the right of this disjunction. */
@@ -433,6 +433,25 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     }
   }
 
+  implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
+    def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
+      f.fold(
+        a => \/.left(\/.left(a)),
+        _.fold(
+          b => \/.left(\/.right(b)),
+          \/.right(_)
+        )
+      )
+
+    def reassociateRight[A, B, C](f: \/[\/[A, B], C]) =
+      f.fold(
+        _.fold(
+          \/.left(_),
+          b => \/.right(\/.left(b))
+        ),
+        c => \/.right(\/.right(c))
+      )
+  }
 }
 
 sealed abstract class DisjunctionInstances2 {

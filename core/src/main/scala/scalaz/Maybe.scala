@@ -156,6 +156,10 @@ object Maybe extends MaybeInstances with MaybeFunctions {
       def to[A](fa: Option[A]) = std.option.toMaybe(fa)
       def from[A](ga: Maybe[A]) = ga.toOption
     }
+
+  /** Wrap a value in Just, or return Empty if the value is null */
+  final def fromNullable[A](a: A): Maybe[A] =
+    if (null == a) empty else just(a)
 }
 
 sealed trait MaybeFunctions {

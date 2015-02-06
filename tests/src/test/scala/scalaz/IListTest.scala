@@ -75,7 +75,7 @@ object IListTest extends SpecLite {
   }
 
   "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldMap1Opt(conforms) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
@@ -153,6 +153,10 @@ object IListTest extends SpecLite {
 
   "count" ! forAll { (ns: IList[Int], p: Int => Boolean) =>
     ns.count(p) must_=== ns.toList.count(p)
+  }
+
+  "distinct" ! forAll { xs: IList[Int] =>
+    xs.distinct.toList must_=== xs.toList.distinct
   }
 
   "drop" ! forAll { (ns: IList[Int], n: Int) =>
@@ -402,5 +406,9 @@ object IListTest extends SpecLite {
   "zipWithIndex" ! forAll { ns: IList[Int] =>
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
+
+  "any is lazy" ! FoldableTests.anyIsLazy[IList, Int]
+
+  "all is lazy" ! FoldableTests.allIsLazy[IList, Int]
 
 }

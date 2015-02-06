@@ -100,7 +100,12 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
   }
 
   implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
-    def append(f1: IxSq[A], f2: => IxSq[A]) = f1 ++ f2
+    // Vector concat is O(n^2) in Scala 2.10 - it's actually faster to do repeated appends
+    // https://issues.scala-lang.org/browse/SI-7725
+    //
+    // It was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
+    // https://issues.scala-lang.org/browse/SI-4442
+    def append(f1: IxSq[A], f2: => IxSq[A]) = f2.foldLeft(f1)(_ :+ _)
     def zero: IxSq[A] = empty
   }
 

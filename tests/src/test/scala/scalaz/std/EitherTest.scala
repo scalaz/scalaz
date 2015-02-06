@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import std.AllInstances._
+import std.either._, std.anyVal._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
@@ -34,4 +34,5 @@ object EitherTest extends SpecLite {
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[({type f[x] = Either[Int, x]})#f])
   checkAll("Either", bitraverse.laws[Either])
+  checkAll("Either", associative.laws[Either])
 }

@@ -13,6 +13,7 @@ object DisjunctionTest extends SpecLite {
   checkAll(plus.laws[({type λ[α] = Int \/ α})#λ])
   checkAll(traverse.laws[({type λ[α] = Int \/ α})#λ])
   checkAll(bitraverse.laws[\/])
+  checkAll(associative.laws[\/])
   checkAll(monadError.laws[\/, Int])
 
   "fromTryCatchThrowable" in {

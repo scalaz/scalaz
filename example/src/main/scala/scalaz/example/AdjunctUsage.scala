@@ -26,9 +26,9 @@ object AdjunctUsage extends App {
   val res2: List[Boolean] = Traverse[List].traverseS(repeating)(checkForRepeats).eval(None)
  
   // when we collapse the lists of booleans, we expect the non-repeating list to all be false
-  assert(res1.foldMap(Tags.Disjunction(_)) == false)
+  assert(Tag.unwrap(res1.foldMap(Tags.Disjunction(_))) === false)
   // and we expect the repeating list to have at least one true
-  assert(res2.foldMap(Tags.Disjunction(_)) == true)
+  assert(Tag.unwrap(res2.foldMap(Tags.Disjunction(_))) === true)
  
   //-------------------------------------------
   // using reader and write adjunction as State

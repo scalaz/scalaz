@@ -2,10 +2,10 @@ package scalaz
 
 import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
+import scala.util.Random
 
 object MapTest extends SpecLite {
   import org.scalacheck.Arbitrary
-  import scalaz.scalacheck.ScalaCheckBinding._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._
@@ -20,6 +20,12 @@ object MapTest extends SpecLite {
   def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
     val al = m.toAscList
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
+
+  "equals/hashCode" ! forAll { a: Int ==>> Int =>
+    val b = ==>>.fromList(Random.shuffle(a.toList))
+    a must_== b
+    a.## must_=== b.##
   }
 
   "minViewWithKey" ! forAll { a: Int ==>> Int =>
@@ -683,7 +689,7 @@ object MapTest extends SpecLite {
     val keysA = a.keySet
     val keysB = b.keySet
 
-    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
     x.keySet must_=== (keysA ++ keysB)
 
     x.filter(_.isThis).keySet must_=== (keysA -- keysB)

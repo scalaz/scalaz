@@ -298,6 +298,9 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
     new FreeTraverse1[F] {
       def F = implicitly
     }
+
+  implicit def freeSemigroup[S[_]:Functor, A:Semigroup]: Semigroup[Free[S, A]] =
+    Semigroup.liftSemigroup[({type λ[α] = Free[S, α]})#λ, A]
 }
 
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
@@ -309,6 +312,9 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
+
+  implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
+    Monoid.liftMonoid[({type λ[α] = Free[S, α]})#λ, A]
 }
 
 trait FreeFunctions {

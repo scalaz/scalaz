@@ -11,6 +11,26 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
       case (w, a, s1) => (s1, a)
     })
 
+  /** Calls `run` using `Monoid[S].zero` as the initial state */
+  def runZero[S <: S1](r: R)(implicit S: Monoid[S]): F[(W, A, S2)] =
+    run(r, S.zero)
+
+  /** Run, discard the final state, and return the final value in the context of `F` */
+  def eval(r: R, s: S1)(implicit F: Functor[F]): F[(W, A)] =
+    F.map(run(r,s)) { case (w,a,s2) => (w,a) }
+
+  /** Calls `eval` using `Monoid[S].zero` as the initial state */
+  def evalZero[S <: S1](r:R)(implicit F: Functor[F], S: Monoid[S]): F[(W,A)] =
+    eval(r,S.zero)
+
+  /** Run, discard the final value, and return the final state in the context of `F` */
+  def exec(r: R, s: S1)(implicit F: Functor[F]): F[(W,S2)] =
+    F.map(run(r,s)){case (w,a,s2) => (w,s2)}
+
+  /** Calls `exec` using `Monoid[S].zero` as the initial state */
+  def execZero[S <: S1](r:R)(implicit F: Functor[F], S: Monoid[S]): F[(W,S2)] =
+    exec(r,S.zero)
+
   def map[B](f: A => B)(implicit F: Functor[F]): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = new IndexedReaderWriterStateT[F, R, W, S1, S2, B] {
     def run(r: R, s: S1): F[(W, B, S2)] = F.map(self.run(r, s)) {
       case (w, a, s) => (w, f(a), s)

@@ -53,6 +53,13 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
       case Both(_, _) => None
     }
 
+  def onlyThisOrThat: Option[A \/ B] =
+    this match {
+      case This(a) => Some(-\/(a))
+      case That(b) => Some(\/-(b))
+      case Both(_, _) => None
+    }
+
   def onlyBoth: Option[(A, B)] =
     this match {
       case This(_) => None
@@ -89,6 +96,20 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
 
   def ~[AA, BB](k: (B \&/ A) => (BB \&/ AA)): (AA \&/ BB) =
     swapped(k)
+
+  def append[AA >: A, BB >: B](that: => (AA \&/ BB))(implicit SA: Semigroup[AA], SB: Semigroup[BB]): (AA \&/ BB) =
+    (this, that) match {
+      case (This(a1),     This(a2))     => This(SA.append(a1, a2))
+      case (This(a1),     Both(a2, b))  => Both(SA.append(a1, a2), b)
+      case (This(a),      That(b))      => Both(a,                 b)
+      case (Both(a1, b),  This(a2))     => Both(SA.append(a1, a2), b)
+      case (Both(a1, b1), Both(a2, b2)) =>
+        Both(SA.append(a1, a2), SB.append(b1, b2))
+      case (Both(a, b1),  That(b2))     => Both(a, SB.append(b1, b2))
+      case (That(b),      This(a))      => Both(a, b)
+      case (That(b1),     Both(a, b2))  => Both(a, SB.append(b1, b2))
+      case (That(b1),     That(b2))     => That(   SB.append(b1, b2))
+    }
 
   def bimap[C, D](f: A => C, g: B => D): (C \&/ D) =
     this match {
@@ -373,6 +394,9 @@ sealed abstract class TheseInstances1 {
 
   implicit def TheseEqual[A, B](implicit EA: Equal[A], EB: Equal[B]): Equal[A \&/ B] =
     Equal.equal(_ === _)
+
+  implicit def TheseSemigroup[A, B](implicit SA: Semigroup[A], SB: Semigroup[B]): Semigroup[A \&/ B] =
+    Semigroup.instance(_.append(_))
 
   implicit def TheseShow[A, B](implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] =
     Show.show(_.show)

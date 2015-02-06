@@ -242,7 +242,30 @@ trait EitherInstances extends EitherInstances0 {
   }
 }
 
-object either extends EitherInstances
+object either extends EitherInstances {
+
+  implicit val eitherAssociative: Associative[Either] = new Associative[Either] {
+    override def reassociateLeft[A, B, C](f: Either[A, Either[B, C]]): Either[Either[A, B], C] =
+      f.fold(
+        a => Left(Left(a)),
+        _.fold(
+          b => Left(Right(b)),
+          Right(_)
+        )
+      )
+
+    override def reassociateRight[A, B, C](f: Either[Either[A, B], C]): Either[A, Either[B, C]] =
+      f.fold(
+        _.fold(
+          Left(_),
+          b => Right(Left(b))
+        ),
+        c => Right(Right(c))
+      )
+
+  }
+
+}
 
 
 private trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {

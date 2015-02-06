@@ -2,10 +2,10 @@ package scalaz
 
 import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
+import scala.util.Random
 
 object ISetTest extends SpecLite {
   import org.scalacheck.Arbitrary
-  import scalaz.scalacheck.ScalaCheckBinding._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import syntax.std.option._
@@ -25,6 +25,12 @@ object ISetTest extends SpecLite {
   def structurallySound[A: Order: Show](s: ISet[A]) = {
     val al = s.toAscList
     al must_===(al.sorted)(Order[A].toScalaOrdering)
+  }
+
+  "equals/hashCode" ! forAll { a: ISet[Int] =>
+    val b = ISet.fromList(Random.shuffle(a.toList))
+    a must_== b
+    a.## must_=== b.##
   }
 
   "split" ! forAll { (a: ISet[Int], i: Int) =>
@@ -66,6 +72,16 @@ object ISetTest extends SpecLite {
         a.filter(x => b < x && x < i) must_=== ISet.empty
       case None =>
         a.split(i)._1 must_=== ISet.empty
+    }
+  }
+
+  "lookupGT" ! forAll { (a: ISet[Int], i: Int) =>
+    a.lookupGT(i) match {
+      case Some(b) =>
+        (i < b) must_=== true
+        a.split(i)._2.findMin must_=== Option(b)
+      case None =>
+        a.split(i)._2 must_=== ISet.empty
     }
   }
 

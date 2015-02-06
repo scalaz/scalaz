@@ -7,10 +7,10 @@
  *  - related functions
  *
  * Type class instances and other functions related to the Scala and Java standard library
- * are in scalaz.[[scalaz.std]]
+ * are in [[scalaz.std]]
  *
  * Implicit conversions and wrapper classes that provide a more convenient syntax for accessing
- * the functionality of the library are in scalaz.[[scalaz.syntax]].
+ * the functionality of the library are in [[scalaz.syntax]].
  *
  * '''Type Classes Index'''
  *
@@ -56,6 +56,7 @@
  *  - [[scalaz.Nondeterminism]] extends [[scalaz.Monad]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Profunctor]]
+ *  - [[scalaz.ProChoice]] extends [[scalaz.Profunctor]]
  *  - [[scalaz.Category]] extends [[scalaz.Compose]]
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]
@@ -195,6 +196,8 @@ package object scalaz {
 
   type Alternative[F[_]] = ApplicativePlus[F]
 
+  type NonEmptyIList[A] = OneAnd[IList,A]
+
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
    *
@@ -296,5 +299,16 @@ package object scalaz {
   val IMap = ==>>
 
   type GlorifiedTuple[+A, +B] = A \/ B
-  type Disjunction[+A, +B] = A \/ B
+
+  type Disjunction[+A, +B] = \/[A, B]
+  val Disjunction = \/
+
+  type DLeft[+A] = -\/[A]
+  val DLeft = -\/
+
+  type DRight[+B] = \/-[B]
+  val DRight = \/-
+
+  type DisjunctionT[F[_], A, B] = EitherT[F, A, B]
+  val DisjunctionT = EitherT
 }

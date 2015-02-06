@@ -353,6 +353,11 @@ trait TupleInstances extends TupleInstances1
 
 object tuple extends TupleInstances {
   object tupleSyntax extends scalaz.syntax.std.ToTupleOps
+
+  implicit val tuple2Associative: Associative[Tuple2] = new Associative[Tuple2] {
+    def reassociateLeft[A, B, C](f: (A, (B, C))): ((A, B), C) = ((f._1, f._2._1), f._2._2)
+    def reassociateRight[A, B, C](f: ((A, B), C)): (A, (B, C)) = (f._1._1, (f._1._2, f._2))
+  }
 }
 
 private trait Tuple1Semigroup[A1] extends Semigroup[Tuple1[A1]] {

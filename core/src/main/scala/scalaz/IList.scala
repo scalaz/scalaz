@@ -73,6 +73,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def count(f: A => Boolean): Int =
     foldLeft(0)((n, a) => if (f(a)) n + 1 else n)
 
+  def distinct(implicit A: Order[A]): IList[A] = {
+    @tailrec def loop(src: IList[A], seen: ISet[A], acc: IList[A]): IList[A] =
+      src match {
+        case ICons(h, t) =>
+          if(seen.notMember(h)){
+            loop(t, seen.insert(h), h :: acc)
+          }else{
+            loop(t, seen, acc)
+          }
+        case INil() =>
+          acc.reverse
+      }
+    loop(this, ISet.empty[A], empty[A])
+  }
+
   def drop(n: Int): IList[A] = {
     @tailrec def drop0(as: IList[A], n: Int): IList[A] =
       if (n < 1) as else as match {
@@ -149,6 +164,9 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def headOption: Option[A] =
     uncons(None, (h, _) => Some(h))
+
+  def headMaybe: Maybe[A] =
+    uncons(Maybe.Empty(), (h, _) => Maybe.Just(h))
 
   def indexOf(a: A)(implicit ev: Equal[A]): Option[Int] =
     indexWhere(ev.equal(a, _))
@@ -584,6 +602,22 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def mapAccumR[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
         fa.mapAccumRight(z, f)
+
+      override def any[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => false
+          case ICons(h, t) => p(h) || loop(t)
+        }
+        loop(fa)
+      }
+
+      override def all[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => true
+          case ICons(h, t) => p(h) && loop(t)
+        }
+        loop(fa)
+      }
     }
 
 
@@ -646,7 +680,3 @@ private trait IListOrder[A] extends Order[IList[A]] with IListEqual[A] {
     }
 
 }
-
-
-
-

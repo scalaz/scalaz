@@ -3,7 +3,7 @@ package std
 
 import collection.immutable.IndexedSeq
 
-import std.AllInstances._
+import std.tuple._, std.anyVal._, std.list._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
@@ -52,6 +52,8 @@ object TupleTest extends SpecLite {
   checkAll("Tuple1", comonad.laws[Tuple1])
   checkAll("Tuple2", comonad.laws[({type λ[α]=(Int, α)})#λ])
 
+  checkAll("Tuple2", associative.laws[Tuple2])
+
   "syntax" should {
     import std.tuple.tupleSyntax._
     "mapElements" in {
@@ -89,6 +91,7 @@ object TupleTest extends SpecLite {
       def semigroup[A: Semigroup, B: Semigroup] = Semigroup[(A, B)]
       def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
       
+      def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[({type λ[α] = (B, α)})#λ]
       def monad[A: Monoid] = Functor[({type λ[α] = (A, α)})#λ]

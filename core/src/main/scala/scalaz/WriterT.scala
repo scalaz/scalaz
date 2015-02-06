@@ -56,8 +56,11 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   }
 
   def flatMap[B](f: A => WriterT[F, W, B])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] =
+    flatMapF(f.andThen(_.run))
+
+  def flatMapF[B](f: A => F[(W, B)])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] =
     writerT(F.bind(run){wa =>
-      val z = f(wa._2).run
+      val z = f(wa._2)
       F.map(z)(wb => (s.append(wa._1, wb._1), wb._2))
     })
 
@@ -102,6 +105,10 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
 object WriterT extends WriterTInstances with WriterTFunctions
 
 sealed abstract class WriterTInstances12 {
+  implicit def writerTMonoid[F[_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
+    def zero = WriterT(M.zero)
+    def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
+  }
   implicit def writerFunctor[W]: Functor[({type λ[α]=Writer[W, α]})#λ] = new WriterTFunctor[Id, W] {
     implicit def F = idInstance
   }
@@ -215,6 +222,9 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
   implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type λ[α[_], β] = WriterT[α, W, β]})#λ] = new WriterTHoist[W] {
     implicit def W = W0
   }
+
+  implicit def writerTShow[F[_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[F, W, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait WriterTFunctions {

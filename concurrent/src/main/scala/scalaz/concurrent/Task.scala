@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Maybe, MonadError, Nondeterminism, Reducer, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -220,6 +220,12 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
   def ensure(failure: => Throwable)(f: A => Boolean): Task[A] =
     flatMap(a => if(f(a)) Task.now(a) else Task.fail(failure))
+
+  /**
+   * Delays the execution of this `Task` by the duration `t`.
+   */
+  def after(t: Duration): Task[A] =
+    new Task(get after t)
 }
 
 object Task {
@@ -377,5 +383,11 @@ object Task {
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
     try \/-(a) catch { case e: Throwable => -\/(e) }
+
+  def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
+    ma.cata(Task.now, Task.fail(t))
+
+  def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
+    x.fold(Task.fail, Task.now)
 }
 

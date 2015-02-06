@@ -44,11 +44,12 @@ object KleisliTest extends SpecLite {
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def monadReader[F[_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
 
-    def profunctor[F[_]: Functor, A] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def compose[F[_]: Bind, A] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def category[F[_]: Monad, A] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def arrow[F[_]: Monad, A] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def choice[F[_]: Monad, A] = Choice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def profunctor[F[_]: Functor] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def proChoice[F[_]: Applicative] = ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def compose[F[_]: Bind] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def category[F[_]: Monad] = Category[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def arrow[F[_]: Monad] = Arrow[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def choice[F[_]: Monad] = Choice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -56,8 +57,9 @@ object KleisliTest extends SpecLite {
     def apply[F[_] : Monad, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
-    def profunctor[F[_]: Monad, A] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
-    def compose[F[_]: Monad, A] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def profunctor[F[_]: Monad] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def proChoice[F[_]: Monad] = ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
+    def compose[F[_]: Monad] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]
 
     object reader {
       // F = Id
@@ -97,6 +99,11 @@ object KleisliTest extends SpecLite {
     object profunctor{
       import syntax.profunctor._
       k1.mapsnd(x => x)
+    }
+
+    object proChoice{
+      import syntax.proChoice._
+      k1.proleft
     }
 
     object arrow{

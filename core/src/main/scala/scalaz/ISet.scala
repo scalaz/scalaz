@@ -64,7 +64,7 @@ sealed abstract class ISet[A] {
         case Tip() =>
           some(best)
         case Bin(y, l, r) =>
-          if (o.lessThan(x, y)) withBest(x, best, l) else withBest(x, best, r)
+          if (o.lessThan(x, y)) withBest(x, y, l) else withBest(x, best, r)
       }
 
     this match {
@@ -545,6 +545,17 @@ sealed abstract class ISet[A] {
           case GT => l.filterLt(a)
         }
     }, this)
+
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: ISet[A] =>
+        ISet.setEqual[A](Equal.equalA).equal(this, that)
+      case _ =>
+        false
+    }
+
+  override def hashCode: Int =
+    toAscList.hashCode
 }
 
 object ISet extends ISetInstances with ISetFunctions {

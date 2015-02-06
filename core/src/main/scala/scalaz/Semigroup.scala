@@ -16,7 +16,7 @@ trait Semigroup[F]  { self =>
   /**
    * The binary operation to combine `f1` and `f2`.
    *
-   * Implementations should not evaluate tbe by-name parameter `f2` if result
+   * Implementations should not evaluate the by-name parameter `f2` if result
    * can be determined by `f1`.
    */
   def append(f1: F, f2: => F): F

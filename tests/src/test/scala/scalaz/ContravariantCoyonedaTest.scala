@@ -57,7 +57,7 @@ object ContravariantCoyonedaTest extends SpecLite {
   checkAll(cmappedOrderLaws(probablePrime))
 
   "contravariant identity law" ! forAll {(xs: List[Int]) =>
-    val co = CtCoOrder(conforms[Int])
+    val co = CtCoOrder(identity[Int])
     xs.sorted(co.run.toScalaOrdering) must_=== xs.sorted
   }
 

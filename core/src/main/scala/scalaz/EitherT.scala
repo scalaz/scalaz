@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.util.control.NonFatal
+import Liskov.<~<
 
 /**
  * Represents a computation of type `F[A \/ B]`.
@@ -198,6 +199,14 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ validationed k))
+
+  /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
+  def merge[AA >: A](implicit F: Functor[F], ev: B <~< AA): F[AA] = {
+    F.map(run) {
+      case -\/(a) => a
+      case \/-(b) => ev(b)
+    }
+  }
 }
 
 object EitherT extends EitherTInstances with EitherTFunctions {
@@ -378,7 +387,7 @@ private trait EitherTHoist[A] extends Hoist[({type λ[α[_], β] = EitherT[α, A
     def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
   }
 
-  def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
+  def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 
   implicit def apply[M[_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }

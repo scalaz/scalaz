@@ -8,6 +8,9 @@ import Id._
 final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   import Kleisli._
 
+  def dimap[C, D](f: C => A, g: B => D)(implicit b: Functor[M]): Kleisli[M, C, D] =
+    Kleisli(c => b.map(run(f(c)))(g))
+
   /** alias for `andThen` */
   def >=>[C](k: Kleisli[M, B, C])(implicit b: Bind[M]): Kleisli[M, A, C] =  kleisli((a: A) => b.bind(this(a))(k.run))
 
@@ -45,6 +48,9 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 
   def lift[L[_]: Applicative]: Kleisli[({type λ[α]=L[M[α]]})#λ, A, B] =
     kleisli[({type λ[α]=L[M[α]]})#λ, A, B](a => Applicative[L].point(self(a)))
+
+  def lower(implicit M: Monad[M]): Kleisli[M, A, M[B]] =
+    Kleisli(a => M.pure(this(a)))
 
   import Liskov._
   def unlift[N[_], FF[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[({type λ[α] = N[FF[α]]})#λ, A, B]): Kleisli[FF, A, B] =
@@ -137,6 +143,10 @@ sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
 
   implicit def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+    implicit def F = F0
+  }
+
+  implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProChoice[F] {
     implicit def F = F0
   }
 
@@ -266,6 +276,23 @@ private trait KleisliProfunctor[F[_]] extends Profunctor[({type λ[α, β] = Kle
   override def mapfst[A, B, C](fa: Kleisli[F, A, B])(f: C => A) = fa local f
 
   override def mapsnd[A, B, C](fa: Kleisli[F, A, B])(f: B => C) = fa map f
+}
+
+private trait KleisliProChoice[F[_]] extends ProChoice[({type λ[α, β] = Kleisli[F, α, β]})#λ] with KleisliProfunctor[F] {
+
+  implicit def F: Applicative[F]
+
+  def left[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, A \/ C, B \/ C] =
+    Kleisli {
+      case -\/(a) => F.map(fa run a)(\/.left)
+      case b @ \/-(_) => F.point(b)
+    }
+
+  def right[A, B, C](fa: Kleisli[F, A, B]): Kleisli[F, C \/ A, C \/ B] =
+    Kleisli {
+      case b @ -\/(_) => F.point(b)
+      case \/-(a) => F.map(fa run a)(\/.right)
+    }
 }
 
 private trait KleisliCompose[F[_]] extends Compose[({type λ[α, β] = Kleisli[F, α, β]})#λ] {

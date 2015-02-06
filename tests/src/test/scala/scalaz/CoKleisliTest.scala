@@ -52,13 +52,14 @@ object CokleisliTest extends SpecLite {
 
   object instances {
     def monad[F[_], W] = Monad[({type λ[α] = Cokleisli[F, W, α]})#λ]
-    def compose[F[_], W](implicit F: Cobind[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def profunctor[F[_]: Functor, W] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def arrow[F[_] : Comonad, W] = Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def compose[F[_]](implicit F: Cobind[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def profunctor[F[_]: Functor] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def arrow[F[_] : Comonad] = Arrow[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def prochoice[F[_] : Comonad] = ProChoice[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
 
     // checking absence of ambiguity
-    def compose[F[_], W](implicit F: Comonad[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
-    def profunctor[F[_]: Comonad, W] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def compose[F[_]](implicit F: Comonad[F]) = Compose[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+    def profunctor[F[_]: Comonad] = Profunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
   }
 
 }

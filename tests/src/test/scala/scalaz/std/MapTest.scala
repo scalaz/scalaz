@@ -63,7 +63,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
     val keysA = a.keySet
     val keysB = b.keySet
 
-    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
     ==>>.fromList(x.toList) must_=== Align[({type λ[α] = Int ==>> α})#λ].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
     x.keySet must_=== (keysA ++ keysB)
 

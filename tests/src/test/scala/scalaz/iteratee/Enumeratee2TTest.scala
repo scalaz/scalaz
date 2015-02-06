@@ -4,7 +4,6 @@ package iteratee
 import std.AllInstances._
 import Iteratee._
 import Enumeratee2T._
-import effect._
 import Either3._
 import MonadPartialOrder._
 import Id._

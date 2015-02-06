@@ -1,9 +1,8 @@
 package scalaz
 package concurrent
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
+import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop._
 
 import java.util.concurrent.{Executors, TimeoutException, TimeUnit}
@@ -278,6 +277,18 @@ object TaskTest extends SpecLite {
     var x = 0
     Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.run
     x == (xs.length + 1)
+  }
+
+  "fromMaybe empty fails" ! forAll { t: Throwable =>
+    Task.fromMaybe(Maybe.empty)(t).attemptRun.isLeft
+  }
+
+  "fromMaybe just succeeds" ! forAll { (n: Int, t: Throwable) =>
+    Task.fromMaybe(Maybe.just(n))(t).attemptRun.isRight
+  }
+
+  "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
+    Task.fromDisjunction(x).attemptRun must_== x
   }
 }
 
