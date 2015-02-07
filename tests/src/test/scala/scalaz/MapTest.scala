@@ -707,6 +707,7 @@ object MapTest extends SpecLite {
   checkAll(align.laws[IntMap])
   checkAll(zip.laws[IntMap])
   checkAll(bifoldable.laws[==>>])
+  checkAll(FoldableTests.anyAndAllLazy[IntMap])
 
   object instances {
     def bind[A: Order] = Bind[A ==>> ?]
