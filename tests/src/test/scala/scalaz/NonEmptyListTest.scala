@@ -13,6 +13,7 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", order.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", traverse1.laws[NonEmptyList])
+  checkAll("NonEmptyList", FoldableTests.anyAndAllLazy[NonEmptyList])
   checkAll("NonEmptyList", zip.laws[NonEmptyList])
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
