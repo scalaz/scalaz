@@ -8,7 +8,7 @@ import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-class ZipperTest extends SpecLite {
+object ZipperTest extends SpecLite {
 
   "Zipper From Stream" ! forAll { (xs: Stream[Int]) =>
     (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs

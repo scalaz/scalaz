@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 import syntax.traverse._
 
-class ApplyTest extends SpecLite {
+object ApplyTest extends SpecLite {
   "mapN" in {
     Apply[Option].apply2(some("1"), some("2"))(_ + _) must_===(some("12"))
     Apply[Option].apply3(some("1"), some("2"), some("3"))(_ + _ + _) must_===(some("123"))
