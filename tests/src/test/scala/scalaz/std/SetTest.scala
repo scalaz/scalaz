@@ -12,6 +12,7 @@ object SetTest extends SpecLite {
   checkAll(monoid.laws[Set[Int]])
   checkAll(isEmpty.laws[Set])
   checkAll(foldable.laws[Set])
+  checkAll(FoldableTests.anyAndAllLazy[Set])
 
   "foldLeftM" should {
 
