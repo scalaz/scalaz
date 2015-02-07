@@ -4,7 +4,7 @@ import std.anyVal._
 import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Properties}
 
 object FoldableTests {
   def anyIsLazy[F[_], A](implicit F: Foldable[F], arb: Arbitrary[F[A]]) = forAll { fa: F[A] =>
@@ -26,4 +26,22 @@ object FoldableTests {
     val expected = if (fa.empty) 0 else 1
     i === expected
   }
+
+  def anyConsistent[F[_], A](f: A => Boolean)(implicit F: Foldable[F], fa: Arbitrary[F[A]]) =
+    forAll { fa: F[A] =>
+      F.any(fa)(f) === F.toList(fa).exists(f)
+    }
+
+  def allConsistent[F[_], A](f: A => Boolean)(implicit F: Foldable[F], fa: Arbitrary[F[A]]) =
+    forAll { fa: F[A] =>
+      F.all(fa)(f) === F.toList(fa).forall(f)
+    }
+
+  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) =
+    new Properties("foldable") {
+      property("consistent any") = anyConsistent[F, Int](_ > 0)
+      property("consistent all") = allConsistent[F, Int](_ > 0)
+      property("any is lazy") = anyIsLazy[F, Int]
+      property("all is lazy") = allIsLazy[F, Int]
+    }
 }

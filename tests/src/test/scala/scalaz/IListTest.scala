@@ -385,8 +385,6 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
-  "any is lazy" ! FoldableTests.anyIsLazy[IList, Int]
-
-  "all is lazy" ! FoldableTests.allIsLazy[IList, Int]
+  checkAll(FoldableTests.anyAndAllLazy[IList])
 
 }

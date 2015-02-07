@@ -90,8 +90,5 @@ object ListTest extends SpecLite {
     (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 
-  "any is lazy" ! FoldableTests.anyIsLazy[List, Int]
-
-  "all is lazy" ! FoldableTests.allIsLazy[List, Int]
-
+  checkAll(FoldableTests.anyAndAllLazy[List])
 }
