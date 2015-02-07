@@ -16,6 +16,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   import dict._
 
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
+  checkAll(FoldableTests.anyAndAllLazy[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(bind.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(align.laws[({type F[V] = Map[Int,V]})#F])

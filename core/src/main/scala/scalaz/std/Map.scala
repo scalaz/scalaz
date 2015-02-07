@@ -69,7 +69,13 @@ trait MapSubInstances0 extends MapSub {
     def OV = Equal[V]
   }
 
-  implicit def mapFoldable[K]: Foldable[({type F[V] = XMap[K,V]})#F] = new MapFoldable[K]{}
+  implicit def mapFoldable[K]: Foldable[({type F[V] = XMap[K,V]})#F] = new MapFoldable[K]{
+    override final def all[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.forall(f)
+
+    override final def any[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.exists(f)
+  }
 }
 
 trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
@@ -105,6 +111,11 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
           case _ => sys.error("Map align")
         }
     }
+    override final def all[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.forall(f)
+
+    override final def any[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.exists(f)
   }
 
   /** Map union monoid, unifying values with `V`'s `append`. */
