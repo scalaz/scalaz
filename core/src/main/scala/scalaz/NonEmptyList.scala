@@ -179,6 +179,12 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
+
+      override def all[A](fa: NonEmptyList[A])(f: A => Boolean) =
+        f(fa.head) && fa.tail.forall(f)
+
+      override def any[A](fa: NonEmptyList[A])(f: A => Boolean) =
+        f(fa.head) || fa.tail.exists(f)
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
