@@ -21,6 +21,7 @@ object IndexedSeqTest extends SpecLite {
   checkAll(monadPlus.strongLaws[IndexedSeq])
   checkAll(traverse.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
+  checkAll(FoldableTests.anyAndAllLazy[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
   import syntax.index._
