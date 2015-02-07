@@ -16,6 +16,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   import dict._
 
   checkAll(traverse.laws[Map[Int, ?]])
+  checkAll(FoldableTests.anyAndAllLazy[Map[Int, ?]])
   checkAll(isEmpty.laws[Map[Int, ?]])
   checkAll(bind.laws[Map[Int, ?]])
   checkAll(align.laws[Map[Int, ?]])

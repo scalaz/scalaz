@@ -62,6 +62,12 @@ trait MapSubInstances0 extends MapSub {
 
     override def foldRight[A, B](fa: XMap[K, A], z: => B)(f: (A, => B) => B) =
       fa.foldRight(z)((p, b) => f(p._2, b))
+
+    override final def all[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.forall(f)
+
+    override final def any[A](fa: XMap[K, A])(f: A => Boolean) =
+      fa.valuesIterator.exists(f)
   }
 
   implicit def mapEqual[K: Order, V: Equal]: Equal[XMap[K, V]] =
