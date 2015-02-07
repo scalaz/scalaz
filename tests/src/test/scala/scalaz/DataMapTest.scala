@@ -586,4 +586,5 @@ object DataMapTest extends SpecLite {
   type IntMap[A] = Int ==>> A
   checkAll(functor.laws[IntMap])
   checkAll(traverse.laws[IntMap])
+  checkAll(FoldableTests.anyAndAllLazy[IntMap])
 }
