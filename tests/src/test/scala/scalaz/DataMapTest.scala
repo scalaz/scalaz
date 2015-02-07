@@ -1,6 +1,6 @@
 package scalaz
 
-class DataMapTest extends SpecLite {
+object DataMapTest extends SpecLite {
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import org.scalacheck.Prop.forAll
@@ -67,6 +67,10 @@ class DataMapTest extends SpecLite {
     "not find a match" in {
       d.elemAt(2) must_== None
     }
+
+    "elemAt" ! forAll { (a: Byte ==>> Int, b: Byte) =>
+      a.elemAt(b) must_=== a.toList.lift(b)
+    }
   }
 
   "==>> conversions" should {
@@ -92,6 +96,22 @@ class DataMapTest extends SpecLite {
       d.lookupIndex(3).get must_== 0
       d.lookupIndex(5).get must_== 1
       d.lookupIndex(6).isDefined must_== false
+    }
+
+    "lookup" ! forAll { (a: Byte ==>> Int, n: Byte) =>
+      a.lookup(n) must_=== a.toList.find(_._1 == n).map(_._2)
+    }
+
+    "lookupAssoc" ! forAll { (a: Byte ==>> Int, n: Byte) =>
+      a.lookupAssoc(n) must_=== a.lookup(n).map(n -> _)
+    }
+
+    "lookupIndex" ! forAll { (a: Byte ==>> Int, n: Byte) =>
+      val x = a.keys.indexOf(n)
+      a.lookupIndex(n) must_=== (if(x < 0) None else Some(x))
+      a.lookupIndex(n).foreach{ b =>
+        a.elemAt(b).map(_._1) must_=== Some(n)
+      }
     }
   }
 
@@ -129,7 +149,13 @@ class DataMapTest extends SpecLite {
       empty.delete(5) must_===(empty[Int, Int])
     }
     "be sound" ! forAll {(m: Int ==>> Int, i: Int) =>
-      structurallySound(m delete i)
+      val a = m delete i
+      structurallySound(a)
+      (a member i) must_=== false
+      if(m member i)
+        (m.size - 1) must_=== a.size
+      else
+        m must_=== a
     }
   }
 
@@ -141,7 +167,13 @@ class DataMapTest extends SpecLite {
     }
 
     "insert sound" ! forAll {(m: Int ==>> Int, a: Int, b: Int) =>
-      structurallySound(m insert (a, b))
+      val c = m insert (a, b)
+      structurallySound(c)
+      if(m member a)
+        m.size must_=== c.size
+      else
+        (m.size + 1) must_=== c.size
+      c.lookup(a) must_=== Some(b)
     }
 
     "insertWith" in {
@@ -181,7 +213,10 @@ class DataMapTest extends SpecLite {
 
   "==>> union operations" should {
     "be sound" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      structurallySound(a union b)
+      import std.set._
+      val c = a union b
+      structurallySound(c)
+      (a.keySet ++ b.keySet) must_=== c.keySet
     }
 
     "union" in {
@@ -373,6 +408,14 @@ class DataMapTest extends SpecLite {
       fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)), o.lessThan) must_== false
       fromList(List('a' -> 1, 'b' -> 2)).isSubmapOfBy(fromList(List('a' -> 1)), o.equal) must_== false
     }
+
+    "isSubmapOf" ! forAll { (a: Byte ==>> Byte, b: Byte ==>> Byte) =>
+      if(a isSubmapOf b){
+        (a.keySet subsetOf b.keySet) must_=== true
+        a.difference(b) must_=== ==>>.empty
+        a.toList.foreach{case (k, v) => b.lookup(k) must_=== Some(v)}
+      }
+    }
   }
 
   "==>> filter" should {
@@ -382,6 +425,12 @@ class DataMapTest extends SpecLite {
       m.filter(_ > "a") must_===(singleton(3, "b"))
       m.filter(_ > "x") must_===(empty[Int, String])
       m.filter(_ < "a") must_===(empty[Int, String])
+    }
+
+    "be sound" ! forAll { (a: Byte ==>> Byte, n: Byte) =>
+      val b = a.filter(_ > n)
+      structurallySound(b)
+      fromList(a.toList.filter(_._2 > n)) must_=== b
     }
   }
 
@@ -394,10 +443,11 @@ class DataMapTest extends SpecLite {
       m.partition(_ > "x") must_===((empty[Int, String], fromList(List(3 -> "b", 5 -> "a"))))
     }
 
-    "be sound" ! forAll {(m: Int ==>> Int, p: Int => Boolean) =>
-      val (ma, mb) = m partition p
+    "be sound" ! forAll { (m: Int ==>> Int, n: Int) =>
+      val (ma, mb) = m.partition(n > _)
       structurallySound(ma)
       structurallySound(mb)
+      (ma union mb) must_=== m
     }
 
     "partitionWithKey" in {
