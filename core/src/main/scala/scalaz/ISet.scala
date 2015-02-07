@@ -625,6 +625,20 @@ sealed abstract class ISetInstances {
 
     override def empty[A](fa: ISet[A]) =
       fa.isEmpty
+
+    override def any[A](fa: ISet[A])(f: A => Boolean) =
+      fa match {
+        case Tip() => false
+        case Bin(x, l, r) =>
+          any(l)(f) || f(x) || any(r)(f)
+      }
+
+    override def all[A](fa: ISet[A])(f: A => Boolean) =
+      fa match {
+        case Tip() => true
+        case Bin(x, l, r) =>
+          all(l)(f) && f(x) && all(r)(f)
+      }
   }
 }
 
