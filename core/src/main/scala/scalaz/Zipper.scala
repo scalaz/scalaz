@@ -366,6 +366,10 @@ sealed abstract class ZipperInstances {
       fa ap f
     override def map[A, B](fa: Zipper[A])(f: A => B): Zipper[B] =
       fa map f
+    override def all[A](fa: Zipper[A])(f: A => Boolean) =
+      fa.lefts.forall(f) && f(fa.focus) && fa.rights.forall(f)
+    override def any[A](fa: Zipper[A])(f: A => Boolean) =
+      fa.lefts.exists(f) || f(fa.focus) || fa.rights.exists(f)
   }
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {

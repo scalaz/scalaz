@@ -495,6 +495,7 @@ object ZipperTest extends SpecLite {
 
   checkAll("Zipper", equal.laws[Zipper[Int]])
   checkAll("Zipper", traverse.laws[Zipper])
+  checkAll("Zipper", FoldableTests.anyAndAllLazy[Zipper])
   checkAll("Zipper", comonad.laws[Zipper])
 
   {
