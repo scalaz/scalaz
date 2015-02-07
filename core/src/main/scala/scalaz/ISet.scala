@@ -599,7 +599,7 @@ sealed abstract class ISetInstances {
       a union b
   }
 
-  implicit def setFoldable: Foldable[ISet] = new Foldable[ISet] {
+  implicit val setFoldable: Foldable[ISet] = new Foldable[ISet] {
     def foldMap[A, B](fa: ISet[A])(f: A => B)(implicit F: Monoid[B]): B =
       fa match {
         case Tip() =>
