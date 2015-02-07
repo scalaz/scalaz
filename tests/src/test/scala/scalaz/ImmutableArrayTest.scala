@@ -18,5 +18,6 @@ object ImmutableArrayTest extends SpecLite {
 
   checkAll(equal.laws[ImmutableArray[Int]])
   checkAll(foldable.laws[ImmutableArray])
+  checkAll(FoldableTests.anyAndAllLazy[ImmutableArray])
 
 }
