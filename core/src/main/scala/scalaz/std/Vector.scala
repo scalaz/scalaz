@@ -65,6 +65,12 @@ trait VectorInstances extends VectorInstances0 {
           bs.drop(sizeA).map(b => f(\&/.That(b)))
       }
     }
+
+    override def all[A](fa: Vector[A])(f: A => Boolean) =
+      fa forall f
+
+    override def any[A](fa: Vector[A])(f: A => Boolean) =
+      fa exists f
   }
 
   implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {

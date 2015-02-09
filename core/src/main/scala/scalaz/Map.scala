@@ -1050,6 +1050,21 @@ sealed abstract class MapInstances extends MapInstances0 {
 
       override def length[A](fa: S ==>> A) =
         fa.size
+
+      override def any[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Tip() => false
+          case Bin(_, x, l, r) =>
+            any(l)(f) || f(x) || any(r)(f)
+        }
+
+      override def all[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Tip() => true
+          case Bin(_, x, l, r) =>
+            all(l)(f) && f(x) && all(r)(f)
+        }
+
     }
 
   implicit val mapBifoldable: Bifoldable[==>>] = new Bifoldable[==>>] {
