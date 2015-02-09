@@ -80,9 +80,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Boolean].min map (Disjunction(_))
+    override def min = Disjunction.subst(Enum[Boolean].min)
 
-    override def max = Enum[Boolean].max map (Disjunction(_))
+    override def max = Disjunction.subst(Enum[Boolean].max)
 
   }
 
@@ -101,9 +101,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Boolean @@ Conjunction) = Conjunction(Enum[Boolean].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Boolean].min map (Conjunction(_))
+    override def min = Conjunction.subst(Enum[Boolean].min)
 
-    override def max = Enum[Boolean].max map (Conjunction(_))
+    override def max = Conjunction.subst(Enum[Boolean].max)
 
   }
 
@@ -143,9 +143,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Byte @@ Multiplication) = Multiplication(Enum[Byte].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Byte].min map (Multiplication(_))
+    override def min = Multiplication.subst(Enum[Byte].min)
 
-    override def max = Enum[Byte].max map (Multiplication(_))
+    override def max = Multiplication.subst(Enum[Byte].max)
 
     override def equalIsNatural: Boolean = true
 
@@ -185,9 +185,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Char @@ Multiplication) = Multiplication(Enum[Char].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Char].min map (Multiplication(_))
+    override def min = Multiplication.subst(Enum[Char].min)
 
-    override def max = Enum[Char].max map (Multiplication(_))
+    override def max = Multiplication.subst(Enum[Char].max)
 
     override def equalIsNatural: Boolean = true
   }
@@ -224,9 +224,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Short @@ Multiplication) = Multiplication(Enum[Short].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Short].min map (Multiplication(_))
+    override def min = Multiplication.subst(Enum[Short].min)
 
-    override def max = Enum[Short].max map (Multiplication(_))
+    override def max = Multiplication.subst(Enum[Short].max)
 
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(Tag.unwrap(a1), Tag.unwrap(a2))
   }
@@ -269,9 +269,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Int @@ Multiplication) = Multiplication(Enum[Int].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Int].min map (Multiplication(_))
+    override def min = Multiplication.subst(Enum[Int].min)
 
-    override def max = Enum[Int].max map (Multiplication(_))
+    override def max = Multiplication.subst(Enum[Int].max)
 
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(Tag.unwrap(a1), Tag.unwrap(a2))
   }
@@ -308,9 +308,9 @@ trait AnyValInstances {
 
     override def predn(n: Int, b: Long @@ Multiplication) = Multiplication(Enum[Long].predn(n, Tag.unwrap(b)))
 
-    override def min = Enum[Long].min map (Multiplication(_))
+    override def min = Multiplication.subst(Enum[Long].min)
 
-    override def max = Enum[Long].max map (Multiplication(_))
+    override def max = Multiplication.subst(Enum[Long].max)
 
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(Tag.unwrap(a1), Tag.unwrap(a2))
   }
