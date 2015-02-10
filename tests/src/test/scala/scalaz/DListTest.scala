@@ -12,6 +12,7 @@ object DListTest extends SpecLite {
   checkAll(monoid.laws[DList[Int]])
   checkAll(zip.laws[DList])
   checkAll(traverse.laws[DList])
+  checkAll(isEmpty.laws[DList])
   checkAll(monadPlus.strongLaws[DList])
   "DList append" ! ((0 to 100000).foldLeft(DList[Int]())(_ :+ _).toList must_== (0 to 100000).toList)
 
