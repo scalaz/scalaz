@@ -83,11 +83,12 @@ sealed abstract class DListInstances {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with Zip[DList] = new MonadPlus[DList] with Traverse[DList] with Zip[DList]  {
+  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
     def empty[A] = DList()
+    def isEmpty[A](fa: DList[A]) = fa.isEmpty
     def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
