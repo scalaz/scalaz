@@ -23,6 +23,8 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
     F.ifM(value, ifTrue, ifFalse)
   }
 
+  def mproduct[B](f: A => F[B]) = F.mproduct(self)(f)
+
   ////
 }
 
