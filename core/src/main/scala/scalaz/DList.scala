@@ -49,6 +49,9 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
   /** Get the first element of the list, if any. */
   def headOption: Option[A] = uncons(None, (x, _) => Some(x))
 
+  /** Tests whether list is empty. */
+  def isEmpty: Boolean = uncons(true, (_, _) => false)
+
   /** Get the tail of the list, if any. */
   def tailOption: Option[DList[A]] = uncons(None, (_, y) => Some(y))
 
