@@ -5,7 +5,6 @@ import scalaz.scalacheck.ScalazArbitrary
 import scalaz.scalacheck.ScalazArbitrary.{stateTArb => _, indexedStateTArb => _, _}
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
-import Id._
 
 object StateTTest extends SpecLite {
 

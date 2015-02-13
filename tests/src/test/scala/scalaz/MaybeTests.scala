@@ -10,7 +10,6 @@ object MaybeTest extends SpecLite {
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._
   import std.string._
-  import syntax.equal._
 
   import Maybe._
 

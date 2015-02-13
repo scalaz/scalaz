@@ -3,7 +3,6 @@ package scalaz.syntax
 import annotation.tailrec
 import scalaz.{Applicative, Monoid, NonEmptyList, Kleisli, Reader, \/}
 
-import scalaz.Id._
 
 trait IdOps[A] extends Ops[A] {
   /**Returns `self` if it is non-null, otherwise returns `d`. */

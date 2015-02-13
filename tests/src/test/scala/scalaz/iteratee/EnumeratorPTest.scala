@@ -4,15 +4,8 @@ package iteratee
 import std.AllInstances._
 import Either3._
 import Iteratee._
-import effect._
-
 import org.scalacheck.{Gen, Arbitrary}
-import Arbitrary._
-import Gen._
-import syntax.functor._
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import Id._
 import org.scalacheck.Prop.forAll
 

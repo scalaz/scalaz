@@ -789,7 +789,6 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
 
   import scala.collection.immutable.Stream
-  import scala.collection.immutable.Stream._
 
   /** Convert the leaves of the tree to a `scala.Stream` */
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
@@ -858,7 +857,6 @@ trait FingerTreeInstances {
   }
 
   implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
-    import syntax.show._
     import std.iterable._
     val AS = Show[List[A]]
     import Cord._
@@ -1036,7 +1034,6 @@ object IndSeq {
  * item with the highest priority contained recursively below that node.
  */
 sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
-  import syntax.arrow._
   import std.function._
   import std.option._
 

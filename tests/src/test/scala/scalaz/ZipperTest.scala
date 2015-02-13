@@ -3,7 +3,6 @@ package scalaz
 import Scalaz._
 import NonEmptyList._
 import Zipper._
-import org.scalacheck._
 import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._

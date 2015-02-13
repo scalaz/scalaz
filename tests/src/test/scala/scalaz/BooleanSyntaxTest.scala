@@ -5,7 +5,6 @@ import org.scalacheck.Prop.forAll
 
 object BooleanSyntaxTest extends SpecLite {
   "boolean syntax" in {
-    import syntax.id._
     import syntax.std.boolean._
 
     "true.option" ! forAll { (i: Int) =>

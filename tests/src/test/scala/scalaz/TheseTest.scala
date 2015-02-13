@@ -4,7 +4,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import \&/._
-import syntax.contravariant._
 import org.scalacheck.Prop.forAll
 
 object TheseTest extends SpecLite {

@@ -3,7 +3,6 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
-import java.io._
 import collection.mutable.ArraySeq
 
 /**
@@ -124,7 +123,6 @@ object ScalazArbitrary {
       arb[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]
     )(TreeLoc.loc)
 
-  import Validation._
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => \/.left(a)
@@ -207,7 +205,6 @@ object ScalazArbitrary {
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Promise
-  import scalaz.concurrent.Promise._
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
@@ -287,7 +284,6 @@ object ScalazArbitrary {
   }
 
   implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
   }
 

@@ -4,12 +4,9 @@ package typelevel
 import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
-import scalaz.scalacheck.ScalaCheckBinding._
 import org.scalacheck.Arbitrary
 
 object CompositionTest extends SpecLite {
-
-  import syntax.typelevel.all._
 
   checkAll("Identity composition", applicative.laws[TCNil#Composed])
   checkAll("Identity composition", traverse.laws[TCNil#Composed])

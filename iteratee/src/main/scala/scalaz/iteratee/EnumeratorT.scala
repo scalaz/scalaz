@@ -3,7 +3,6 @@ package iteratee
 
 import effect._
 import Iteratee._
-import Ordering._
 import Id._
 
 trait EnumeratorT[E, F[_]] { self =>

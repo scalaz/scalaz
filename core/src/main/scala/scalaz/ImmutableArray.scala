@@ -24,7 +24,6 @@ trait ImmutableArray[+A] {
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  import ImmutableArray.fromArray
   def ++[B >: A](other: ImmutableArray[B]): ImmutableArray[A]
 }
 

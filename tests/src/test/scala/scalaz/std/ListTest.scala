@@ -7,7 +7,6 @@ import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
-import syntax.std._
 
 object ListTest extends SpecLite {
   checkAll(equal.laws[List[Int]])
@@ -19,7 +18,6 @@ object ListTest extends SpecLite {
 
   import std.list.listSyntax._
   import syntax.foldable._
-  import syntax.monad._
   import syntax.index._
 
   "intercalate empty list is flatten" ! forAll((a: List[List[Int]]) => a.intercalate(List[Int]()) must_===(a.flatten))

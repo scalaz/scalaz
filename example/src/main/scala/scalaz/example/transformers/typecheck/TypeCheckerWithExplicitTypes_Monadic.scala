@@ -5,7 +5,6 @@ package typecheck
 object TypeCheckerWithExplicitTypes_Monadic {
 
   import TypeCheckerWithExplicitTypesAST._
-  import scalaz.syntax.monad._
   import scalaz.{\/, \/-, -\/}
 
   def success(t: Type): String \/ Type = \/-(t)
