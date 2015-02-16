@@ -6,6 +6,6 @@ final class EitherTOps[A, B](val self: A \/ B) extends AnyVal {
     EitherT(A0.point(self))
 }
 
-trait ToEitherTOps {
-  implicit def ToEitherTOps[A, B](a: A \/ B) = new EitherTOps(a)
+trait EitherToEitherTOps {
+  implicit def EitherToEitherTOps[A, B](a: A \/ B) = new EitherTOps(a)
 }
