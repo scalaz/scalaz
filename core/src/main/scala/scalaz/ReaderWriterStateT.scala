@@ -50,6 +50,8 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
         }
       }
     }
+  
+  def liftF[SS <: S1, RR <: R](implicit F: Functor[F]) = Free.liftF[IndexedReaderWriterStateT[F, RR, W, SS, S2, ?],A](this)
 }
 
 object IndexedReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
