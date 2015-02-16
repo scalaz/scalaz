@@ -74,6 +74,7 @@
  *  - [[scalaz.StateT]] Computations that modify state.
  *  - [[scalaz.WriterT]] Computations that log a value
  *  - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
+ *  - [[scalaz.MaybeT]] Represents computations of type `F[Maybe[A]]`
  *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
@@ -191,6 +192,8 @@ package object scalaz {
 
   type Alternative[F[_]] = ApplicativePlus[F]
 
+  type NonEmptyIList[A] = OneAnd[IList,A]
+
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
    *
@@ -207,6 +210,11 @@ package object scalaz {
   type LastOption[A] = Option[A] @@ Tags.Last
   type MinOption[A] = Option[A] @@ Tags.Min
   type MaxOption[A] = Option[A] @@ Tags.Max
+
+  type FirstMaybe[A] = Maybe[A] @@ Tags.First
+  type LastMaybe[A] = Maybe[A] @@ Tags.Last
+  type MinMaybe[A] = Maybe[A] @@ Tags.Min
+  type MaxMaybe[A] = Maybe[A] @@ Tags.Max
 
   //
   // Lens type aliases
@@ -270,4 +278,19 @@ package object scalaz {
   object Cont extends IndexedContsTFunctions with IndexedContsTInstances {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
+
+  type IMap[A, B] = ==>>[A, B]
+  val IMap = ==>>
+
+  type Disjunction[+A, +B] = \/[A, B]
+  val Disjunction = \/
+
+  type DLeft[+A] = -\/[A]
+  val DLeft = -\/
+
+  type DRight[+B] = \/-[B]
+  val DRight = \/-
+
+  type DisjunctionT[F[+_], A, B] = EitherT[F, A, B]
+  val DisjunctionT = EitherT
 }

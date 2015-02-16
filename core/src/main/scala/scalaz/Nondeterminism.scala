@@ -29,7 +29,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    */
   def choose[A,B](a: F[A], b: F[B]): F[(  A,  F[B]) \/
                                        (F[A],   B )] = 
-    map(chooseAny(List[F[A \/ B]](map(a)(-\/(_)), map(b)(\/-(_)))).get) { 
+    map(chooseAny(List[F[A \/ B]](map(a)(\/.left), map(b)(\/.right))).get) {
       (x: (A \/ B, Seq[F[A \/ B]])) => x match {
         case (-\/(a), Seq(br)) => 
           -\/((a, map(br) { 

@@ -5,7 +5,6 @@ sealed trait LazyEitherT[F[+_], +A, +B] {
 
   import LazyEither._
   import LazyEitherT._
-  import EitherT._
   import OptionT._
   import LazyOptionT._
 

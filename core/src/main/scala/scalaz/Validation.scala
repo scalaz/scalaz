@@ -1,6 +1,5 @@
 package scalaz
 
-import Id._
 
 /**
  * Represents either:
@@ -32,7 +31,6 @@ import Id._
  */
 sealed trait Validation[+E, +A] {
 
-  import Validation._
 
   sealed trait SwitchingValidation[X] {
     def s: X
@@ -105,8 +103,8 @@ sealed trait Validation[+E, +A] {
 
   /** Binary functor traverse on this validation. */
   def bitraverse[G[+_] : Functor, C, D](f: E => G[C], g: A => G[D]): G[Validation[C, D]] = this match {
-    case Failure(a) => Functor[G].map(f(a))(Failure(_))
-    case Success(b) => Functor[G].map(g(b))(Success(_))
+    case Failure(a) => Functor[G].map(f(a))(Validation.failure)
+    case Success(b) => Functor[G].map(g(b))(Validation.success)
   }
 
   /** Map on the success of this validation. */
@@ -117,7 +115,7 @@ sealed trait Validation[+E, +A] {
 
   /** Traverse on the success of this validation. */
   def traverse[G[+_] : Applicative, B](f: A => G[B]): G[Validation[E, B]] = this match {
-    case Success(a) => Applicative[G].map(f(a))(Success(_))
+    case Success(a) => Applicative[G].map(f(a))(Validation.success)
     case Failure(e) => Applicative[G].point(Failure(e))
   }
 
@@ -349,6 +347,10 @@ final case class Failure[E, A](e: E) extends Validation[E, A]
 
 object Validation extends ValidationFunctions with ValidationInstances {
 
+  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
+  def failureNel[E, A](e: E): ValidationNel[E, A] =
+    Failure(NonEmptyList(e))
+
   /** Spin in tail-position on the success value of the given validation. */
   @annotation.tailrec
   final def loopSuccess[E, A, X](d: Validation[E, A], success: A => X \/ Validation[E, A], failure: E => X): X =
@@ -371,6 +373,11 @@ object Validation extends ValidationFunctions with ValidationInstances {
       case Success(a) => success(a)
     }
 
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): Validation[E, T] = try {
+    Success(a)
+  } catch {
+    case e if ex.erasure.isInstance(e) => Failure(e.asInstanceOf[E])
+  }
 }
 
 

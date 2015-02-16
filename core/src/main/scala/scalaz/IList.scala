@@ -73,6 +73,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def count(f: A => Boolean): Int =
     foldLeft(0)((n, a) => if (f(a)) n + 1 else n)
 
+  def distinct(implicit A: Order[A]): IList[A] = {
+    @tailrec def loop(src: IList[A], seen: ISet[A], acc: IList[A]): IList[A] =
+      src match {
+        case ICons(h, t) =>
+          if(seen.notMember(h)){
+            loop(t, seen.insert(h), h :: acc)
+          }else{
+            loop(t, seen, acc)
+          }
+        case INil() =>
+          acc.reverse
+      }
+    loop(this, ISet.empty[A], empty[A])
+  }
+
   def drop(n: Int): IList[A] = {
     @tailrec def drop0(as: IList[A], n: Int): IList[A] =
       if (n < 1) as else as match {
@@ -149,6 +164,9 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def headOption: Option[A] =
     uncons(None, (h, _) => Some(h))
+
+  def headMaybe: Maybe[A] =
+    uncons(Maybe.Empty(), (h, _) => Maybe.Just(h))
 
   def indexOf(a: A)(implicit ev: Equal[A]): Option[Int] =
     indexWhere(ev.equal(a, _))
@@ -344,11 +362,11 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def take(n: Int): IList[A] = {
     @tailrec def take0(n: Int, as: IList[A], accum: IList[A]): IList[A] =
-      if (n < 1) accum else as match {
-        case INil() => accum
+      if (n < 1) accum.reverse else as match {
         case ICons(h, t) => take0(n - 1, t, h :: accum)
+        case INil() => this
       }
-    take0(n, this, empty).reverse
+    take0(n, this, empty)
   }
 
   def takeRight(n: Int): IList[A] =
@@ -461,6 +479,9 @@ object IList extends IListInstances with IListFunctions{
   def fromList[A](as: List[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
+  def fromFoldable[F[_]: Foldable, A](as: F[A]): IList[A] =
+    Foldable[F].foldRight(as, empty[A])(ICons(_, _))
+
   def fromOption[A](a: Option[A]): IList[A] =
     cata(a)(single(_), IList.empty[A])
 
@@ -542,6 +563,22 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def mapAccumR[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
         fa.mapAccumRight(z, f)
+
+      override def any[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => false
+          case ICons(h, t) => p(h) || loop(t)
+        }
+        loop(fa)
+      }
+
+      override def all[A](fa: IList[A])(p: A => Boolean): Boolean = {
+        @tailrec def loop(fa: IList[A]): Boolean = fa match {
+          case INil() => true
+          case ICons(h, t) => p(h) && loop(t)
+        }
+        loop(fa)
+      }
     }
 
 
@@ -604,7 +641,3 @@ private trait IListOrder[A] extends Order[IList[A]] with IListEqual[A] {
     }
 
 }
-
-
-
-

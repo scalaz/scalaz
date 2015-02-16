@@ -24,7 +24,6 @@ trait ImmutableArray[+A] {
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  import ImmutableArray.fromArray
   def ++[B >: A](other: ImmutableArray[B]): ImmutableArray[A]
 }
 
@@ -99,6 +98,8 @@ trait ImmutableArrayFunctions {
     // override def stringPrefix = "ImmutableArray"
     // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemManifest)
 
+    def componentType = arr.getClass().getComponentType
+
     def apply(idx: Int) = arr(idx)
 
     def length = arr.length
@@ -117,7 +118,7 @@ trait ImmutableArrayFunctions {
   }
 
   final class ofRef[A <: AnyRef](array: Array[A]) extends ImmutableArray1[A](array) {
-    protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+    protected[this] lazy val elemManifest = ClassManifest.classType[A](componentType)
   }
 
   final class ofByte(array: Array[Byte]) extends ImmutableArray1[Byte](array) {
@@ -232,7 +233,7 @@ object ImmutableArray extends ImmutableArrayFunctions {
     }
 
     final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
-      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.getClass.getComponentType)
+      protected[this] lazy val elemManifest = ClassManifest.classType[A](array.componentType)
     }
 
     final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
@@ -281,4 +282,48 @@ object ImmutableArray extends ImmutableArrayFunctions {
   }
 
   implicit def wrapRopeChar(array: ImmutableArray[Char]): ImmutableArrayCharW = new ImmutableArrayCharW(array)
+
+  implicit def immutableArrayEqual[A](implicit A: Equal[A]): Equal[ImmutableArray[A]] =
+    Equal.equal{ (a, b) =>
+      (a.length == b.length) && (0 until a.length).forall(i => A.equal(a(i), b(i)))
+    }
+
+  implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[ImmutableArray] =
+    new Foldable[ImmutableArray] with Zip[ImmutableArray] {
+      override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
+        fa.foldLeft(z)(f)
+      def foldMap[A, B](fa: ImmutableArray[A])(f: A => B)(implicit F: Monoid[B]): B = {
+        var i = 0
+        var b = F.zero
+        while(i < fa.length){
+          b = F.append(b, f(fa(i)))
+          i += 1
+        }
+        b
+      }
+      def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
+        fa.foldRight(z)((a, b) => f(a, b))
+      def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) =
+        new ImmutableArray.ofRef((a.iterator zip b.iterator).toArray)
+      override def empty[A](fa: ImmutableArray[A]) =
+        fa.isEmpty
+      override def all[A](fa: ImmutableArray[A])(f: A => Boolean) = {
+        val len = fa.length
+        @annotation.tailrec
+        def loop(i: Int): Boolean = {
+          if(i < len) f(fa(i)) && loop(i + 1)
+          else true
+        }
+        loop(0)
+      }
+      override def any[A](fa: ImmutableArray[A])(f: A => Boolean) = {
+        val len = fa.length
+        @annotation.tailrec
+        def loop(i: Int): Boolean = {
+          if(i < len) f(fa(i)) || loop(i + 1)
+          else false
+        }
+        loop(0)
+      }
+    }
 }

@@ -8,7 +8,6 @@ import std.stream._
 import std.string._
 import std.tuple._
 import std.option._
-import syntax.applicative._
 import syntax.equal._
 import WriterT._
 import org.scalacheck.Prop

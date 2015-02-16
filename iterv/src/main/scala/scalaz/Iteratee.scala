@@ -66,7 +66,6 @@ sealed trait IterV[E, A] {
 /** Monadic Iteratees */
 @deprecated("Scalaz 6 compatibility. Migrate to scalaz.iteratee.", "7.0.0")
 sealed trait IterVM[M[+_], E, A] {
-  import IterV._
   def fold[Z](done: (=> A, => Input[E]) => Z, cont: (Input[E] => Iteratee[M, E, A]) => Z): Z
 }
 

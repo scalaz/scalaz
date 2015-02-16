@@ -55,11 +55,13 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
+  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1", "2.11.0"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.4", "2.11.5"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
@@ -74,7 +76,7 @@ object build extends Build {
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
-      val tagOrBranch = if(v endsWith "SNAPSHOT") "series/7.0.x" else ("v" + v)
+      val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
 
@@ -220,20 +222,21 @@ object build extends Build {
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       previousArtifact := None,
       // <https://github.com/scalaz/scalaz/issues/261>
-      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
-      publishArtifact := false
-    ),
+      unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
+      artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
+      packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
+    ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(core, concurrent, effect, example, iterv, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.1"
+      case _ => "1.0.3"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.1"
+      case _ => "1.0.3"
     }
   )
 

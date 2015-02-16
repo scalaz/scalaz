@@ -54,6 +54,8 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
 
   def isEmpty(implicit F: Functor[F]): F[Boolean] = mapO(_.isEmpty)
 
+  def filter(f: A => Boolean)(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(self.run) { _ filter f })
+
   def fold[X](some: A => X, none: => X)(implicit F: Functor[F]): F[X] =
     mapO {
       case None => none
@@ -61,6 +63,12 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
     }
 
   def getOrElse[AA >: A](default: => AA)(implicit F: Functor[F]): F[AA] = mapO(_.getOrElse(default))
+
+  def getOrElseF[AA >: A](default: => F[AA])(implicit F: Monad[F]): F[AA] =
+    F.bind(self.run) {
+      case None => default
+      case Some(a) => F.point(a)
+    }
 
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
@@ -140,7 +148,15 @@ trait OptionTFunctions {
   }
 }
 
-object OptionT extends OptionTFunctions with OptionTInstances
+object OptionT extends OptionTFunctions with OptionTInstances {
+  def some[M[+_], A](v: => A)(implicit M: Applicative[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(Some(v)))
+
+  def none[M[+_], A](implicit M: Applicative[M]): OptionT[M, A] =
+    OptionT.optionT[M].apply[A](M.point(None))
+
+  implicit def optionTShow[F[+_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] = Contravariant[Show].contramap(F0)(_.run)
+}
 
 //
 // Implementation traits for type class instances

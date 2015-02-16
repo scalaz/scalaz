@@ -47,6 +47,8 @@ sealed case class ListT[M[+_], +A](underlying: M[List[A]]){
     }
   })
 
+  def flatMapF[B](f: A => M[List[B]])(implicit M: Monad[M]) : ListT[M, B] = flatMap(f andThen ListT.apply)
+
   def map[B](f: A => B)(implicit M: Functor[M]) : ListT[M, B] = new ListT(M.map(underlying)(_.map(f)))
 
   /**Don't use iteratively! */
@@ -93,6 +95,11 @@ trait ListTInstances extends ListTInstances1 {
 }
 
 object ListT extends ListTInstances {
+  def listT[M[+_]]: ({type λ[α] = M[List[α]]})#λ ~> ({type λ[α] = ListT[M, α]})#λ =
+    new (({type λ[α] = M[List[α]]})#λ ~> ({type λ[α] = ListT[M, α]})#λ) {
+      def apply[A](a: M[List[A]]) = new ListT[M, A](a)
+    }
+
   def empty[M[+_], A](implicit M: Applicative[M]): ListT[M, A] = new ListT[M, A](M.point(Nil))
 
   def fromList[M[+_], A](mas: M[List[A]]): ListT[M, A] = new ListT(mas)

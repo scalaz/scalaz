@@ -72,12 +72,10 @@ sealed trait IterateeT[E, F[_], A] {
    * F and G will have the same monad.
    */
   def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA])(implicit MO: G |>=| F): IterateeT[EE, G, AA] = {
-    import MO._
     iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
   }
 
   def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]])(implicit MO: G |>=| F): G[StepT[EE, F, AA]] = {
-    import MO._
     MO.MG.bind(MO.promote(value))(s => f(s))
   }
 

@@ -3,12 +3,11 @@ package scalaz
 import Scalaz._
 import NonEmptyList._
 import Zipper._
-import org.scalacheck._
 import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-class ZipperTest extends SpecLite {
+object ZipperTest extends SpecLite {
 
   "Zipper From Stream" ! forAll { (xs: Stream[Int]) =>
     (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs
@@ -128,6 +127,7 @@ class ZipperTest extends SpecLite {
 
   checkAll("Zipper", equal.laws[Zipper[Int]])
   checkAll("Zipper", traverse.laws[Zipper])
+  checkAll("Zipper", FoldableTests.anyAndAllLazy[Zipper])
   checkAll("Zipper", comonad.laws[Zipper])
 
   {

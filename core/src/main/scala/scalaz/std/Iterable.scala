@@ -59,11 +59,17 @@ trait IterableInstances {
   }
 
   implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
-    def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldRight(fa, F.zero)((x,y) => Monoid[B].append(f(x), y))
+    def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
 
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
 
     override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+    override def any[A](fa: I[A])(p: A => Boolean): Boolean =
+      fa.exists(p)
+
+    override def all[A](fa: I[A])(p: A => Boolean): Boolean =
+      fa.forall(p)
   }
 }
 

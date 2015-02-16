@@ -33,9 +33,9 @@ object ActorTest extends SpecLite {
     actor1 = Actor[Int] {
       (i: Int) =>
         if (i == latch.getCount) {
+          latch.countDown()
+          latch.countDown()
           if (i != 0) actor2 ! i - 1
-          latch.countDown()
-          latch.countDown()
         }
     }
     actor1 ! NumOfMessages

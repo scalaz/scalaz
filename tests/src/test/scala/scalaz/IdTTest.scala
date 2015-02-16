@@ -1,9 +1,4 @@
 package scalaz
-import org.scalacheck.Prop.forAll
-
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import std.AllInstances._
 
 object IdTTest extends SpecLite {
 

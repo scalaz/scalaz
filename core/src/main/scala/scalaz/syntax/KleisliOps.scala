@@ -3,7 +3,6 @@ package syntax
 
 import Id._
 
-import UnapplyCo._
 
 trait KleisliIdOps[A] extends Ops[A] {
   /** Lift the value into a Kleisli */

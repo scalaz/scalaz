@@ -55,6 +55,19 @@ object Free extends FreeFunctions with FreeInstances {
       t => Functor[G].map(fa)(a => f(a)(t))
   }
 
+  /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
+  def liftF[S[+_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
+    Suspend(S.map(value)(Return[S, A]))
+
+  /** Monadic join for the higher-order monad `Free` */
+  def joinF[S[+_], A](value: Free[({type λ[+α] = Free[S, α]})#λ, A])(implicit S: Functor[S]): Free[S, A] =
+    value.flatMapSuspension(NaturalTransformation.refl[({type λ[α] = Free[S, α]})#λ])
+
+  /** Return the given value in the free monad. */
+  def point[S[+_]: Functor, A](value: => A): Free[S, A] = Return[S, A](value)
+
+  /** Alias for `point` */
+  def pure[S[+_]: Functor, A](value: => A): Free[S, A] = point(value)
 }
 
 /** A free operational monad for some functor `S`. Binding is done using the heap instead of the stack,
@@ -94,6 +107,16 @@ sealed abstract class Free[S[+_], +A](implicit S: Functor[S]) {
   /** Modifies the first suspension with the given natural transformation. */
   final def mapFirstSuspension(f: S ~> S): Free[S, A] = resume match {
     case -\/(s) => Suspend(f(s))
+    case \/-(r) => Return(r)
+  }
+
+  /**
+   * Substitutes a free monad over the given functor into the suspension functor of this program.
+   * `Free` is a monad in an endofunctor category and this is its monadic bind.
+   */
+  final def flatMapSuspension[T[+_]](f: S ~> ({type λ[α] = Free[T, α]})#λ)(
+    implicit S: Functor[S], T: Functor[T]): Free[T, A] = resume match {
+    case -\/(s) => f(s).flatMap(_.flatMapSuspension(f))
     case \/-(r) => Return(r)
   }
 

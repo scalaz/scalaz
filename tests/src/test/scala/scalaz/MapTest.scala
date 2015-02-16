@@ -6,7 +6,7 @@ import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
 
-class MapTest extends SpecLite {
+object MapTest extends SpecLite {
   checkAll(order.laws[Map[Int, String]])
   checkAll(monoid.laws[Map[Int, String]])
   checkAll(traverse.laws[({type λ[α]=Map[Int, α]})#λ])

@@ -56,11 +56,11 @@ object StreamTest extends SpecLite {
       must_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 
-  "no stack overflow infinite stream foldMap" in {
+  "foldMap evaluates lazily" in {
     Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(false)
   }
 
-  "no stack overflow infinite stream foldRight" in {
+  "foldRight evaluates lazily" in {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===(true)
   }
 
@@ -74,5 +74,9 @@ object StreamTest extends SpecLite {
     F.zipL(finite, infinite) must_===((finite zip infinite).map{x => (x._1, Option(x._2))})
     F.zipL(infinite, finite).take(1000).length must_===(1000)
     F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_===(size)
+  }
+
+  "filter" ! forAll {
+    (xs: Stream[Int], p: Int => Boolean) => MonadPlus[Stream].filter(xs)(p) must_=== xs.filter(p)
   }
 }

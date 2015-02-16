@@ -3,8 +3,6 @@ package std
 
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
 object PartialFunctionTest extends SpecLite {
   private type PF[-A, +B] = PartialFunction[A, B]

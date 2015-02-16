@@ -9,7 +9,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
-import syntax.std._
 import org.scalacheck.Prop.forAll
 
 object IndexedSeqTest extends SpecLite {
@@ -22,6 +21,7 @@ object IndexedSeqTest extends SpecLite {
   checkAll(monadPlus.strongLaws[IndexedSeq])
   checkAll(traverse.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
+  checkAll(FoldableTests.anyAndAllLazy[IndexedSeq])
 
   import std.indexedSeq.indexedSeqSyntax._
   import syntax.index._
@@ -30,6 +30,10 @@ object IndexedSeqTest extends SpecLite {
 
   "filterM" ! forAll {
     (xs: IndexedSeq[Int]) => xs.filterM[Id](evenp) == xs.filter(_ % 2 == 0)
+  }
+
+  "filter consistent with fiterM[Id]" ! forAll {
+    (xs: IndexedSeq[Int], p: Int => Boolean) => MonadPlus[IndexedSeq].filter(xs)(p) must_=== xs.filterM[Id](p)
   }
 
   "initz" ! forAll {

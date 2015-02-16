@@ -39,6 +39,10 @@ trait MapInstances extends MapInstances0 {
       import G.functorSyntax._
       list.listInstance.traverseImpl(m.toList)({ case (k, v) => f(v) map (k -> _) }) map (_.toMap)
     }
+    override final def all[A](fa: Map[K, A])(f: A => Boolean) =
+      fa.valuesIterator.forall(f)
+    override final def any[A](fa: Map[K, A])(f: A => Boolean) =
+      fa.valuesIterator.exists(f)
   }
 
   /** Map union monoid, unifying values with `V`'s `append`. */

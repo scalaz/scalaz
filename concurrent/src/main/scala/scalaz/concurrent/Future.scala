@@ -247,7 +247,7 @@ object Future {
                 Trampoline.done(()) // noop; another thread will have already invoked `cb` w/ our residual
               }
             val notifyListener = 
-              if (listener.compareAndSet(null, finishedCallback.asInstanceOf[A => Trampoline[Unit]]))
+              if (listener.compareAndSet(null, finishedCallback))
                 // noop; no listeners yet, any added after this will use result stored in `ref`
                 Trampoline.done(()) 
               else // there is a registered listener, invoke it with the result
@@ -258,8 +258,8 @@ object Future {
       }
     }
 
-    private val finishedCallback: String => Trampoline[Unit] = 
-      s => sys.error("impossible, since there can only be one runner of chooseAny")
+    private val finishedCallback: Any => Trampoline[Unit] =
+      _ => sys.error("impossible, since there can only be one runner of chooseAny")
 
     // implementation runs all threads, dumping to a shared queue
     // last thread to finish invokes the callback with the results

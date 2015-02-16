@@ -26,7 +26,6 @@ object FibStateExample extends App {
   val S = scalaz.StateT.stateMonad[(Int, Int)]
   import S.monadSyntax._
   import scalaz.State._
-  import scalaz.std.list._
 
   val initialState = (0, 1)
 
@@ -62,11 +61,8 @@ object FibStateExample extends App {
   */
 object LaunchburyInterpreter extends App {
   import scala.collection.immutable.HashMap
-  import scalaz.StreamT._
   import scalaz.std.function._
   import scalaz.std.list._
-  import scalaz.std.map._
-  import scalaz.syntax.foldable._
   import scalaz.syntax.traverse._
   import scalaz.syntax.arrow._
 

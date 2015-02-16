@@ -2,9 +2,8 @@ package scalaz
 
 import std.AllInstances._
 import std.option.{some, none}
-import syntax.functor._
 
-class MonadPlusTest extends SpecLite {
+object MonadPlusTest extends SpecLite {
 
   "unite" in {
     MonadPlus[List].unite(List(some(1), none[Int], some(2))) must_===(List(1, 2))

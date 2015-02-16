@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Maybe, Nondeterminism, Traverse, \/, -\/, \/-}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -215,6 +215,10 @@ object Task {
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
     new Task(Future(Try(a))(pool))
 
+  /** Create a `Future` that starts evaluating `a` using the given `ExecutorService` right away */
+  def start[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] =
+    new Task(Future(Task.Try(a))(pool).start)
+
   /** 
    * Returns a `Future` that produces the same result as the given `Future`, 
    * but forks its evaluation off into a separate (logical) thread, using
@@ -293,4 +297,10 @@ object Task {
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
     try \/-(a) catch { case e: Exception => -\/(e) }
+
+  def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
+    ma.cata(Task.now, Task.fail(t))
+
+  def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
+    x.fold(Task.fail, Task.now)
 }

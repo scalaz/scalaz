@@ -157,7 +157,6 @@ sealed trait TreeLoc[A] {
   }
 
   def cojoin: TreeLoc[TreeLoc[A]] = {
-    import std.stream.{streamInstance, streamMonoid}
 
     val lft = (_: TreeLoc[A]).left
     val rgt = (_: TreeLoc[A]).right

@@ -103,6 +103,14 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
 object WriterT extends WriterTFunctions with WriterTInstances {
   def apply[F[+_], W, A](v: F[(W, A)]): WriterT[F, W, A] =
     writerT(v)
+
+  implicit def writerTMonoid[F[+_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
+    def zero = WriterT(M.zero)
+    def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
+  }
+
+  implicit def writerTShow[F[+_], W, A](implicit F0: Show[F[(W, A)]]): Show[WriterT[F, W, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait WriterTInstances12 {
@@ -226,12 +234,11 @@ trait WriterTFunctions {
     val run = v
   }
 
-  import StoreT._
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
     writerT[Id, W, A](v)
 
-  def tell[W](w: W): Writer[W, Unit] = writer(w -> ())
+  def tell[W](w: W): Writer[W, Unit] = writer((w, ()))
 
   def put[F[+_], W, A](value: F[A])(w: W)(implicit F: Functor[F]): WriterT[F, W, A] =
     WriterT(F.map(value)(a => (w, a)))

@@ -3,7 +3,6 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
-import java.io._
 import collection.mutable.ArraySeq
 
 /**
@@ -20,6 +19,9 @@ object ScalazArbitrary {
   // implicit def ShowPretty[A: Show](a: A): Pretty = Pretty { _ => a.show }
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
+
+  implicit def monoidCoproductArbitrary[M: Arbitrary, N: Arbitrary]: Arbitrary[M :+: N] =
+    Functor[Arbitrary].map(arb[List[M \/ N]])(list => new :+:(Vector(list: _*)))
 
   /** @since 7.0.3 */
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
@@ -86,6 +88,12 @@ object ScalazArbitrary {
   implicit def Arbitrary_==>>[A, B](implicit o: Order[A], A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[A ==>> B] =
     Functor[Arbitrary].map(arb[List[(A, B)]])(as => ==>>.fromList(as))
 
+  implicit def Arbitrary_ISet[A](implicit o: Order[A], A: Arbitrary[A]): Arbitrary[ISet[A]] =
+    Functor[Arbitrary].map(arb[List[A]])(as => ISet.fromList(as))
+
+  implicit def Arbitrary_Maybe[A](implicit A: Arbitrary[A]): Arbitrary[Maybe[A]] =
+    Functor[Arbitrary].map(arb[Option[A]])(Maybe.fromOption)
+
   import scalaz.Ordering._
   implicit def OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
@@ -115,7 +123,6 @@ object ScalazArbitrary {
       arb[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]
     )(TreeLoc.loc)
 
-  import Validation._
   implicit def DisjunctionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[A \/ B] =
     Functor[Arbitrary].map(arb[Either[A, B]]) {
       case Left(a) => \/.left(a)
@@ -138,6 +145,14 @@ object ScalazArbitrary {
   implicit def MinOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinOption[A]] = Tag.subst(arb[Option[A]])
 
   implicit def MaxOptionArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxOption[A]] = Tag.subst(arb[Option[A]])
+
+  implicit def FirstMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ First] = Functor[Arbitrary].map(arb[Maybe[A]])(_.first)
+
+  implicit def LastMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Maybe[A] @@ Last] = Functor[Arbitrary].map(arb[Maybe[A]])(_.last)
+
+  implicit def MinMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MinMaybe[A]] = Tag.subst(arb[Maybe[A]])
+
+  implicit def MaxMaybeArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
   implicit def EitherLeftProjectionArbitrary[A, B](implicit a: Arbitrary[A], b: Arbitrary[B]): Arbitrary[Either.LeftProjection[A, B]] = Functor[Arbitrary].map(arb[Either[A, B]])(_.left)
 
@@ -190,13 +205,16 @@ object ScalazArbitrary {
   implicit def CallableArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
 
   import scalaz.concurrent.Promise
-  import scalaz.concurrent.Promise._
 
   implicit def PromiseArbitrary[A](implicit a: Arbitrary[A], s: concurrent.Strategy): Arbitrary[Promise[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Promise(x))
 
   import scalaz.concurrent.Future
   implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Future.now(x)))
+
+  import scalaz.concurrent.Task
+  implicit def TaskArbitrary[A: Arbitrary]: Arbitrary[Task[A]] =
+    Arbitrary(arbitrary[A] map ((x: A) => Task.now(x)))
 
   import Zipper._
   implicit def ZipperArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Zipper[A]] =
@@ -213,6 +231,9 @@ object ScalazArbitrary {
 
   implicit def optionTArb[F[+_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Functor[Arbitrary].map(A)(OptionT[F, A](_))
+
+  implicit def maybeTArb[F[+_], A](implicit A: Arbitrary[F[Maybe[A]]]): Arbitrary[MaybeT[F, A]] =
+    Functor[Arbitrary].map(A)(MaybeT[F, A](_))
 
   implicit def lazyOptionArb[F[_], A](implicit A: Arbitrary[Option[A]]): Arbitrary[LazyOption[A]] =
     Functor[Arbitrary].map(A)(LazyOption.fromOption[A](_))
@@ -239,9 +260,14 @@ object ScalazArbitrary {
   implicit def eitherTArb[F[+_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
+  implicit def constArbitrary[A, B](implicit A: Arbitrary[A]): Arbitrary[Const[A, B]] =
+    Functor[Arbitrary].map(A)(Const(_))
+
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
   implicit def ilistArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(IList.fromList)
+
+  implicit def dequeueArbitrary[A](implicit A: Arbitrary[List[A]]) = Functor[Arbitrary].map(A)(xs => Dequeue(xs: _*))
 
   implicit def lazyTuple2Arbitrary[A, B](implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[LazyTuple2[A, B]] =
     Applicative[Arbitrary].apply2(A, B)(LazyTuple2(_, _))
@@ -258,7 +284,6 @@ object ScalazArbitrary {
   }
 
   implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
-    import std.list._
     Functor[Arbitrary].map(A)(as => InsertionMap(as: _*))
   }
 

@@ -1,6 +1,5 @@
 package scalaz
 
-import StoreT._
 import Id._
 
 /**
@@ -184,9 +183,9 @@ sealed trait LensFamily[-A1, +A2, +B1, -B2] {
   def sum[C1, C2, B1m >: B1, B2m <: B2](that: => LensFamily[C1, C2, B1m, B2m]): LensFamily[A1 \/ C1, A2 \/ C2, B1m, B2m] =
     lensFamily{
       case -\/(a) =>
-        run(a) map  (-\/(_))
+        run(a) map  (\/.left)
       case \/-(c) =>
-        that run c map (\/-(_))
+        that run c map (\/.right)
     }
 
   /** Alias for `sum` */
@@ -232,7 +231,6 @@ object LensFamily extends LensFunctions with LensInstances {
 }
 
 trait LensFamilyFunctions {
-  import StoreT._
 
   def lensFamily[A1, A2, B1, B2](r: A1 => IndexedStore[B1, B2, A2]): LensFamily[A1, A2, B1, B2] = new LensFamily[A1, A2, B1, B2] {
     def run(a: A1): IndexedStore[B1, B2, A2] = r(a)
@@ -677,9 +675,9 @@ private[scalaz] trait LensCategory
   def choice[A, B, C](f: => Lens[A, C], g: => Lens[B, C]): Lens[A \/ B, C] =
     LensFamily.lens {
       case -\/(a) =>
-        f run a map (-\/(_))
+        f run a map (\/.left)
       case \/-(b) =>
-        g run b map (\/-(_))
+        g run b map (\/.right)
     }
 
   def split[A, B, C, D](f: Lens[A, B], g: Lens[C, D]): Lens[(A,  C), (B, D)] =

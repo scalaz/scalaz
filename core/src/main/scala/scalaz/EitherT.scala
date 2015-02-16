@@ -219,6 +219,15 @@ object EitherT extends EitherTFunctions with EitherTInstances {
   } catch {
     case e => left(F.point(e))
   }
+
+  def fromTryCatchThrowable[F[+_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassManifest[B]): EitherT[F, B, A] =
+    try {
+      right(a)
+    } catch {
+      case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+    }
+
+  implicit def eitherTShow[F[+_], A, B](implicit F0: Show[F[A \/ B]]): Show[EitherT[F, A, B]] = Contravariant[Show].contramap(F0)(_.run)
 }
 
 trait EitherTInstances1 {
@@ -314,7 +323,7 @@ private[scalaz] trait EitherTHoist[A] extends Hoist[({type λ[α[+_], β] = Eith
     def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
   }
 
-  def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
+  def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 
   implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
 }

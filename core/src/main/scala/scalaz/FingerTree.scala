@@ -3,8 +3,8 @@ package scalaz
 import collection.Iterator
 import syntax.semigroup._
 import syntax.reducer._
-import std.option.optionSyntax._
 import syntax.Ops
+import std.option._
 
 /**View of the left end of a sequence.*/
 sealed abstract class ViewL[S[_], A] {
@@ -656,7 +656,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
       val accVpr = accV snoc pr
       if (pred(accVpr)) {
         val (l, x, r) = pr.split1(pred, accV)
-        (l.cata(_.toTree, empty), x, deepL(r, m, sf))
+        (cata(l)(_.toTree, empty), x, deepL(r, m, sf))
       } else {
         val accVm = mappendVal(accVpr, m)
         if (pred(accVm)) {
@@ -665,7 +665,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
           (deepR(pr, ml, l), x, deepL(r, mr, sf))
         } else {
           val (l, x, r) = sf.split1(pred, accVm)
-          (deepR(pr, m, l), x, r.cata(_.toTree, empty))
+          (deepR(pr, m, l), x, cata(r)(_.toTree, empty))
         }
       }
     }
@@ -789,7 +789,6 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
 
   import scala.collection.immutable.Stream
-  import scala.collection.immutable.Stream._
 
   /** Convert the leaves of the tree to a `scala.Stream` */
   def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
@@ -799,13 +798,9 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Convert the tree to a `String`. Unsafe: this uses `Any#toString` for types `V` and `A` */
   override def toString = {
-    import syntax.show._
-    def showA[A] = new Show[A] {
-      override def shows(a: A) = a.toString
-    }
-    implicit val v = showA[V]
-    implicit val a = showA[A]
-    this.shows
+    val showV = Show.showFromToString[V]
+    val showA = Show.showFromToString[A]
+    fingerTreeShow(showV, showA).shows(this)
   }
 }
 
@@ -862,7 +857,6 @@ trait FingerTreeInstances {
   }
 
   implicit def fingerTreeShow[V, A](implicit V: Show[V], A: Show[A]): Show[FingerTree[V,A]] = new Show[FingerTree[V,A]] {
-    import syntax.show._
     import std.iterable._
     val AS = Show[List[A]]
     import Cord._
@@ -1040,9 +1034,7 @@ object IndSeq {
  * item with the highest priority contained recursively below that node.
  */
 sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
-  import syntax.arrow._
   import std.function._
-  import syntax.order._
   import std.option._
 
   implicit val ord: Order[A]
@@ -1052,7 +1044,7 @@ sealed trait OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
    *                                priority than `a`, and of lower or equal priority respectively.
    */
   def partition(a: A): (OrdSeq[A], OrdSeq[A]) =
-  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(_ gte Tags.Last(some(a))))
+  function1Instance.product(OrdSeq.ordSeq[A](_: FingerTree[LastOption[A], A]))(self.split(a1 => Order[LastOption[A]].greaterThanOrEqual(a1, Tags.Last(some(a)))))
 
   /** Insert `a` at a the first point that all elements to the left are of higher priority */
   def insert(a: A): OrdSeq[A] = partition(a) match {

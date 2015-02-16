@@ -1,7 +1,6 @@
 package scalaz
 package iteratee
 
-import effect._
 import Iteratee._
 import Ordering.{EQ, GT, LT}
 
@@ -14,7 +13,6 @@ trait Enumeratee2T[J, K, I, F[_]] {
 }
 
 trait Enumeratee2TFunctions {
-  import scalaz.syntax.bind._
   import scalaz.syntax.order._
 
   @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, ({type λ[α] = IterateeT[K, F, α] })#λ, A] =

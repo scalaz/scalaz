@@ -144,7 +144,6 @@ trait LeibnizFunctions {
     def subst[F[_ >: L <: H]](fa: F[A]): F[B] = fa.asInstanceOf[F[B]]
   }
 
-  import Injectivity._
 
   /**
    * Emir Pasalic's PhD thesis mentions that it is unknown whether or not `((A,B) === (C,D)) => (A === C)` is inhabited.

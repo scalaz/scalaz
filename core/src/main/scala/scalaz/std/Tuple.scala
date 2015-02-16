@@ -688,7 +688,6 @@ private[scalaz] trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] extends Show[(A
 
 private[scalaz] trait Tuple1Order[A1] extends Order[Tuple1[A1]] with Tuple1Equal[A1] {
   implicit def _1 : Order[A1]
-  import Ordering.EQ
   def order(f1: Tuple1[A1], f2: Tuple1[A1]) = _1.order(f1._1, f2._1)
 }
 private[scalaz] trait Tuple2Order[A1, A2] extends Order[(A1, A2)] with Tuple2Equal[A1, A2] {

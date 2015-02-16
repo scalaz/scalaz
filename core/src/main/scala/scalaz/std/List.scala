@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import scalaz.Id._
 import annotation.tailrec
 
 trait ListInstances0 {
@@ -20,6 +19,7 @@ trait ListInstances extends ListInstances0 {
     def empty[A] = Nil
     def plus[A](a: List[A], b: => List[A]) = a ++ b
     override def map[A, B](l: List[A])(f: A => B) = l map f
+    override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
 
     def zip[A, B](a: => List[A], b: => List[B]) = {
       val _a = a
@@ -73,6 +73,12 @@ trait ListInstances extends ListInstances0 {
     override def toList[A](fa: List[A]) = fa
 
     def isEmpty[A](fa: List[A]) = fa.isEmpty
+
+    override def any[A](fa: List[A])(p: A => Boolean): Boolean =
+      fa.exists(p)
+
+    override def all[A](fa: List[A])(p: A => Boolean): Boolean =
+      fa.forall(p)
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
