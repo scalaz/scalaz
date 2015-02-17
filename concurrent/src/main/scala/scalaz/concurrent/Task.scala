@@ -306,11 +306,10 @@ object Task {
 
 
   /**
-   * Create a `Future` from an asynchronous computation, which takes the form
+   * Create a `Task` from an asynchronous computation, which takes the form
    * of a function with which we can register a callback. This can be used
    * to translate from a callback-based API to a straightforward monadic
-   * version. See `Task.async` for a version that allows for asynchronous
-   * exceptions.
+   * version.
    */
   def async[A](register: ((Throwable \/ A) => Unit) => Unit): Task[A] =
     new Task(Future.async(register))
