@@ -35,7 +35,7 @@ sealed class IdOps[A](self: A) {
    * Mostly for use with dodgy libraries that give you values that need additional initialization or 
    * mutation before they're valid to use.  
    * 
-   * The name `tap` comes from the Ruby method: http://ruby-doc.org/core-2.0.0/Object.html#method-i-tap
+   * The name `tap` comes from the Ruby method: [[http://ruby-doc.org/core-2.0.0/Object.html#method-i-tap]]
    * which allows you to "tap into" a method call chain, in order to perform operations on intermediate 
    * results within the chain.  `unsafe` because it enables side effects.
    */
