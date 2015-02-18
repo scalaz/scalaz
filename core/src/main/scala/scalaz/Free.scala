@@ -68,35 +68,37 @@ sealed abstract class Free[S[_], A] {
   final def fold[B](r: A => B, s: S[Free[S, A]] => B)(implicit S: Functor[S]): B =
     resume.fold(s, r)
 
-  
-  /** performs a bind type operation eliding tail recursion along with the expansion of Gosubs */
-  final def fastFlatMap[B](size: Int, i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = {
-    if (i > size) {
-      flatMap(f)
-    } else 
-      this match {
-        case Return(a) => f(a)
-        case Suspend(t) => Suspend(S.map(t)(_ fastFlatMap(size, i+1, f)))
-        case x @ Gosub() => x.a().fastFlatMap(size, i+1, aa => x.f(aa).fastFlatMap(size, i+1, f))
+  /* performs a bind type operation that does not cause expansion of Gosubs at the expense of not being tail recursive*/
+  final def fastFlatMap[B](i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = {
+    this match {
+      case Return(a) => f(a)
+      case Suspend(t) => Suspend(S.map(t)(_ fastFlatMap(i+1, f)))
+      case a @ Gosub() => 
+        if (i < 500)
+          a.a().fastFlatMap(i+1, aa => a.f(aa).fastFlatMap(i+1, f))
+        else 
+          gosub(a.a)(x => gosub(() => a.f(x))(f))
       }
   }
 
+  /** Evaluates a single layer of the free monad **/
   @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) = {
-    val size = 500
+    resumeCtr = resumeCtr + 1
     this match {
       case Return(a) => \/-(a)
       case Suspend(t) => -\/(t)
       case x @ Gosub() => x.a() match { 
         case Return(a) => x.f(a).resume
-        case Suspend(t) => -\/(S.map(t)(_ fastFlatMap(size, 1, x.f)))
+        case Suspend(t) => -\/(S.map(t)(_ fastFlatMap(0, x.f)))
         case y @ Gosub() => 
-          y.a().fastFlatMap(size, 0, (z => y.f(z).fastFlatMap(size, 0, x.f) ) ).resume
+          y.a().fastFlatMap(0, (z => y.f(z).fastFlatMap(0, x.f) ) ).resume
       }
     }
   }
 
-  /** Evaluates a single layer of the free monad. */
+  /** Evaluates a single layer of the free monad, left in for performance comparison */
   @tailrec final def resumeOld(implicit S: Functor[S]): (S[Free[S, A]] \/ A) = {
+    resumeCtr = resumeCtr + 1
     this match {
       case Return(a)  => \/-(a)
       case Suspend(t) => -\/(t)
@@ -107,6 +109,7 @@ sealed abstract class Free[S[_], A] {
       }
     }
   }
+
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Free[T, A] =
     resume match {
@@ -198,9 +201,9 @@ sealed abstract class Free[S[_], A] {
     foldRun2(this, b)
   }
 
-  /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
+  /** Old version using the old resume, left in for perf. comparision purposes */
   final def foldRunOld[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {
-    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resume match {
+    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resumeOld match {
       case -\/(s) =>
         val (b1, s1) = f(z, s)
         foldRun2(s1, b1)
