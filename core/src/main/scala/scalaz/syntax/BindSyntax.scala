@@ -18,6 +18,8 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
 
   def >>[B](b: => F[B]): F[B] = F.bind(self)(_ => b)
 
+  def >>![B](f: A => F[B]): F[A] = F.bind(self)(a => F.map(f(a))(_ => a))
+
   def ifM[B](ifTrue: => F[B], ifFalse: => F[B])(implicit ev: A === Boolean): F[B] = {
     val value: F[Boolean] = ev.subst(self)
     F.ifM(value, ifTrue, ifFalse)
