@@ -19,7 +19,7 @@ package scalaz
  *
  * def parseInt(s: String): Validation[String, Int] =
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
- * val V = Validation.validationNelApplicative[String]
+ * val V = Applicative[({type l[a] = ValidationNel[String, a]})#l]
  *
  * val x: ValidationNel[String, Int] =
  *   V.map2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
