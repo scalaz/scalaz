@@ -21,7 +21,7 @@ import scala.reflect.ClassTag
  *
  * def parseInt(s: String): Validation[String, Int] =
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
- * val V = Applicative[λ[α => ValidationNel[String, ?]]]
+ * val V = Applicative[ValidationNel[String, ?]]
  *
  * val x: ValidationNel[String, Int] =
  *   V.apply2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
