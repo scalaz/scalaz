@@ -11,6 +11,11 @@ object PLensTest extends SpecLite {
     listHeadPLens[Int].get(Nil) must_===(None)
   }
 
+  "seq head" in {
+    seqHeadPLens[Int].get(Seq(1, 2)) must_===(Some(1))
+    seqHeadPLens[Int].get(Nil) must_===(None)
+  }
+
   object instances {
     def category = Category[PLens]
     def choice = Choice[PLens]

@@ -395,6 +395,26 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   def lazyRightPLens[A, B]: LazyEither[A, B] @?> B =
     plens(_.fold(_ => None, b => Some(Store(lazyRight(_), b))))
 
+  def seqHeadPLens[A]: Seq[A] @?> A =
+    plens {
+      case Nil => None
+      case h :: t => Some(Store(_ :: t, h))
+    }
+
+  def seqTailPLens[A]: Seq[A] @?> Seq[A] =
+    plens {
+      case Nil => None
+      case h :: t => Some(Store(_ :+ h, t))
+    }
+
+  def seqNthPLens[A](n: Int): Seq[A] @?> A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      seqHeadPLens
+    else
+      seqNthPLens(n - 1) compose seqTailPLens
+
   def listHeadPLens[A]: List[A] @?> A =
     plens {
       case Nil => None
