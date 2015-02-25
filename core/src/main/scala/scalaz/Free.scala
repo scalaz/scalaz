@@ -66,7 +66,7 @@ sealed abstract class Free[S[_], A] {
     resume.fold(s, r)
 
   /* performs a bind type operation that does not cause expansion of Gosubs at the expense of not being tail recursive*/
-  final def fastFlatMap[B](i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = 
+  private final def fastFlatMap[B](i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = 
     this match {
       case Return(a) => f(a)
       case Suspend(t) => Suspend(S.map(t)(_ fastFlatMap(i+1, f)))
