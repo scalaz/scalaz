@@ -10,15 +10,12 @@ import std.tuple._
 //      "java.lang.Error: typeConstructor inapplicable for <none>"
 object Free extends FreeInstances with FreeFunctions {
 
-  var resumeCtr = 0
-
   /** Return from the computation with the given value. */
   private[scalaz] case class Return[S[_], A](a: A) extends Free[S, A]
 
   /** Suspend the computation with the given suspension. */
   private[scalaz] case class Suspend[S[_], A](a: S[Free[S, A]]) extends Free[S, A]
 
-  
   /** Call a subroutine and continue with the given function. */
   private sealed abstract case class Gosub[S[_], B]() extends Free[S, B] {
     type C
@@ -69,21 +66,19 @@ sealed abstract class Free[S[_], A] {
     resume.fold(s, r)
 
   /* performs a bind type operation that does not cause expansion of Gosubs at the expense of not being tail recursive*/
-  final def fastFlatMap[B](i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = {
+  final def fastFlatMap[B](i: Int, f: A => Free[S,B])(implicit S: Functor[S]): Free[S,B] = 
     this match {
       case Return(a) => f(a)
       case Suspend(t) => Suspend(S.map(t)(_ fastFlatMap(i+1, f)))
-      case a @ Gosub() => 
-        if (i < 500)
-          a.a().fastFlatMap(i+1, aa => a.f(aa).fastFlatMap(i+1, f))
-        else 
-          gosub(a.a)(x => gosub(() => a.f(x))(f))
+      case a @ Gosub() => if (i < 500)
+                            a.a().fastFlatMap(i+1, aa => a.f(aa).fastFlatMap(i+1, f))
+                          else 
+                            gosub(a.a)(x => gosub(() => a.f(x))(f))
       }
-  }
+  
 
   /** Evaluates a single layer of the free monad **/
-  @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) = {
-    resumeCtr = resumeCtr + 1
+  @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) = 
     this match {
       case Return(a) => \/-(a)
       case Suspend(t) => -\/(t)
@@ -94,21 +89,6 @@ sealed abstract class Free[S[_], A] {
           y.a().fastFlatMap(0, (z => y.f(z).fastFlatMap(0, x.f) ) ).resume
       }
     }
-  }
-
-  /** Evaluates a single layer of the free monad, left in for performance comparison */
-  @tailrec final def resumeOld(implicit S: Functor[S]): (S[Free[S, A]] \/ A) = {
-    resumeCtr = resumeCtr + 1
-    this match {
-      case Return(a)  => \/-(a)
-      case Suspend(t) => -\/(t)
-      case x @ Gosub() => x.a() match {
-        case Return(a)   => x.f(a).resumeOld
-        case Suspend(t)  => -\/(S.map(t)(_ flatMap x.f))
-        case y @ Gosub() => y.a().flatMap(z => y.f(z) flatMap x.f).resumeOld
-      }
-    }
-  }
 
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Free[T, A] =
@@ -201,17 +181,6 @@ sealed abstract class Free[S[_], A] {
     foldRun2(this, b)
   }
 
-  /** Old version using the old resume, left in for perf. comparision purposes */
-  final def foldRunOld[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {
-    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resumeOld match {
-      case -\/(s) =>
-        val (b1, s1) = f(z, s)
-        foldRun2(s1, b1)
-      case \/-(r) => (z, r)
-    }
-    foldRun2(this, b)
-  }
-  
   /** Runs a trampoline all the way to the end, tail-recursively. */
   def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
     ev(this).go(_())
