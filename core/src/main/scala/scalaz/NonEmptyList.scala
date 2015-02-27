@@ -186,7 +186,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
     Contravariant[Show].contramap(IList.show[A])(_.list)
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
-    Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])//(std.list.listOrder[A])
+    Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
 }
 
 trait NonEmptyListFunctions {
