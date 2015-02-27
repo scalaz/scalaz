@@ -32,6 +32,11 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     rev.tail.foldLeft(f(rev.head))((nel, b) => f(b) append nel)
   }
 
+  def distinct(implicit A: Order[A]): NonEmptyList[A] =
+    (list.distinct: @unchecked) match {
+      case ICons(x, xs) => nel(x, xs)
+    }
+
   def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
     tail match {
       case INil() => F.map(f(head))(nel(_, INil()))

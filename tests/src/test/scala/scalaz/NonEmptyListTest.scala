@@ -18,6 +18,10 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
+  "distinct" ! forAll { xs: NonEmptyList[Int] =>
+    Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
+  }
+
   "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>
     xs.size must_===(1 + xs.tail.count(b => true)) 
   }
