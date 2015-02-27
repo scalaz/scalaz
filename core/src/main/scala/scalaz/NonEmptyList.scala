@@ -27,8 +27,6 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     tail.toList.foreach(f)
   }
 
-  import collection.mutable.ListBuffer
-
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val rev = reverse
     rev.tail.foldLeft(f(rev.head))((nel, b) => f(b) append nel)
