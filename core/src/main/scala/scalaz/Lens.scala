@@ -350,7 +350,7 @@ trait LensFunctions extends LensFamilyFunctions {
     lens(l => Store(NonEmptyList.nel(_, l.tail), l.head))
 
   def nelTailLens[A]: NonEmptyList[A] @> List[A] =
-    lens(l => Store(NonEmptyList.nel(l.head, _), l.tail))
+    lens(l => Store(ll => NonEmptyList.nel(l.head, IList.fromList(ll)), l.tail.toList))
 
   /** Access the value at a particular key of a Map **/
   def mapVLens[K, V](k: K): Map[K, V] @> Option[V] =

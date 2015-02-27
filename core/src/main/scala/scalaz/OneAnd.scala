@@ -254,7 +254,7 @@ trait OneAndFunctions {
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =
     new IsoFunctorTemplate[NonEmptyList, OneAnd[List, ?]] {
-      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
-      def from[A](ga: OneAnd[List, A]) = NonEmptyList.nel(ga.head, ga.tail)
+      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail.toList)
+      def from[A](ga: OneAnd[List, A]) = NonEmptyList.nel(ga.head, IList.fromList(ga.tail))
     }
 }

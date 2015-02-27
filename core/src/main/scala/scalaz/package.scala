@@ -200,7 +200,7 @@ package object scalaz {
    *
    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
    */
-  type ValidationNel[+E, +X] = Validation[NonEmptyList[E], X]
+  type ValidationNel[E, +X] = Validation[NonEmptyList[E], X]
 
   type FirstOf[A] = A @@ Tags.FirstVal
   type LastOf[A] = A @@ Tags.LastVal

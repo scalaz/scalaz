@@ -45,13 +45,13 @@ object ListTest extends SpecLite {
 
   "groupWhenM[Id].flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhenM[Id](p).map(_.list).flatten must_===(a)
+      a.groupWhenM[Id](p).map(_.list.toList).flatten must_===(a)
   }
 
   "groupByWhenM[Id] ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhenM[Id](p).forall { group: NonEmptyList[Int] =>
-        list.adjacentPairs(group.list).forall(p.tupled)
+        list.adjacentPairs(group.list.toList).forall(p.tupled)
       }
   }
 
@@ -66,12 +66,12 @@ object ListTest extends SpecLite {
   "groupBy1" ! forAll {
       (a: List[String]) =>
       val strlen = (_ : String).length
-      (a groupBy strlen) must_===((a groupBy1 strlen) mapValues (_.list))
+      (a groupBy strlen) must_===((a groupBy1 strlen) mapValues (_.list.toList))
   }
   
   "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhen(p).map(_.list).flatten must_===(a)
+      a.groupWhen(p).map(_.list.toList).flatten must_===(a)
   }
 
   "filterM" ! forAll {
@@ -84,13 +84,13 @@ object ListTest extends SpecLite {
 
   "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhen(p).map(_.list).flatten must_===(a)
+      a.groupWhen(p).map(_.list.toList).flatten must_===(a)
   }
 
   "groupByWhen ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).forall { group: NonEmptyList[Int] =>
-        list.adjacentPairs(group.list).forall(p.tupled)
+        list.adjacentPairs(group.list.toList).forall(p.tupled)
       }
   }
 

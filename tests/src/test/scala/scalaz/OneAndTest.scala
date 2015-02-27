@@ -41,8 +41,8 @@ object OneAndTest extends SpecLite {
 
   "fold1 on fold1" ! forAll {(ints: OneAnd[NonEmptyList, Int]) =>
     val lst = ints.head :: ints.tail.list
-    Foldable[OneAndNel].foldMap(ints)(_ + 1) must_===(lst.size + lst.sum)
-    Foldable1[OneAndNel].foldMap1(ints)(_ + 1) must_===(lst.size + lst.sum)
+    Foldable[OneAndNel].foldMap(ints)(_ + 1) must_===(lst.count(_ => true) + lst.toList.sum)
+    Foldable1[OneAndNel].foldMap1(ints)(_ + 1) must_===(lst.count(_ => true) + lst.toList.sum)
   }
 
   "right fold1 on fold" ! forAll {(ints: OneAnd[List, Int]) =>
@@ -53,7 +53,7 @@ object OneAndTest extends SpecLite {
   }
 
   "right fold1 on fold1" ! forAll {(ints: OneAnd[NonEmptyList, Int]) =>
-    val lst = ints.head :: ints.tail.list
+    val lst = ints.head :: ints.tail.list.toList
     val llst = Functor[OneAndNel].map(ints)(List(_))
     Foldable[OneAndNel].foldRight(ints, List.empty[Int])(_ :: _) must_===(lst)
     Foldable1[OneAndNel].foldRight1(llst)(_ ++ _) must_===(lst)
@@ -63,11 +63,16 @@ object OneAndTest extends SpecLite {
     (Traverse1[OneAndList].traverse1(ints)(f)
        must_==(Traverse[OneAndList].traverse(ints)(f)))
   }
+  
+  implicit def OneAndNelEqual[A](implicit E: Equal[IList[A]]): Equal[NonEmptyList[OneAndNel[A]]] = new Equal[NonEmptyList[OneAndNel[A]]] {
+    override def equal(a: NonEmptyList[OneAndNel[A]], b: NonEmptyList[OneAndNel[A]]): Boolean = 
+      Equal[IList[A]].equal(a.map(oa => oa.head +: oa.tail.list).list.flatten, b.map(bb => bb.head +: bb.tail.list).list.flatten) 
+  }
 
   "traverse1 on traverse1" ! forAll {(ints: OneAnd[NonEmptyList, Int],
                                     f: Int => NonEmptyList[Int]) =>
     (Traverse1[OneAndNel].traverse1(ints)(f)
-       must_==(Traverse[OneAndNel].traverse(ints)(f)))
+       must_===(Traverse[OneAndNel].traverse(ints)(f)))
   }
 
   "inequality exists" ! forAll {(a: OneAnd[List, Int]) =>

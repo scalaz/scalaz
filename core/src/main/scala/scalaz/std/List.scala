@@ -149,7 +149,7 @@ trait ListFunctions {
 
   final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
     case Nil    => None
-    case h :: t => Some(NonEmptyList.nel(h, t))
+    case h :: t => Some(NonEmptyList.nel(h, IList.fromList(t)))
   }
 
   final def toZipper[A](as: List[A]): Option[Zipper[A]] =
@@ -163,7 +163,7 @@ trait ListFunctions {
    */
   final def <^>[A, B: Monoid](as: List[A])(f: NonEmptyList[A] => B): B = as match {
     case Nil    => Monoid[B].zero
-    case h :: t => f(NonEmptyList.nel(h, t))
+    case h :: t => f(NonEmptyList.nel(h, IList.fromList(t)))
   }
 
   /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
@@ -230,7 +230,7 @@ trait ListFunctions {
       val stateP = (i: A) => StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
       Monad[M].bind(spanM[A, StateT[M, A, ?]](t)(stateP).eval(h)) {
         case (x, y) =>
-          Monad[M].map(groupWhenM(y)(p))(g => NonEmptyList.nel(h, x) :: g)
+          Monad[M].map(groupWhenM(y)(p))(g => NonEmptyList.nel(h, IList.fromList(x)) :: g)
       }
   }
 
@@ -252,7 +252,7 @@ trait ListFunctions {
       case Nil    => acc.reverse
       case h :: t =>
         val (x, y) = span1(t, h, Nil)
-        go(y, NonEmptyList.nel(h, x.reverse) :: acc)
+        go(y, NonEmptyList.nel(h, IList.fromList(x.reverse)) :: acc)
     }
     go(as, Nil)
   }

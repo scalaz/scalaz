@@ -127,7 +127,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     }
 
   def toNel[A](fa: F[A]): NonEmptyList[A] =
-    foldMapRight1(fa)(NonEmptyList.nel(_, Nil))(_ <:: _)
+    foldMapRight1(fa)(NonEmptyList.nel(_, INil()))(_ <:: _)
 
   trait Foldable1Law extends FoldableLaw {
     import std.vector._

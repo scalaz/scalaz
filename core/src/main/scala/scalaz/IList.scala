@@ -398,7 +398,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     foldRight(Nil : List[A])(_ :: _)
 
   def toNel: Option[NonEmptyList[A]] =
-    uncons(None, (h, t) => Some(NonEmptyList.nel(h, t.toList)))
+    uncons(None, (h, t) => Some(NonEmptyList.nel(h, t)))
 
   def toMap[K, V](implicit ev0: A <~< (K, V), ev1: Order[K]): K ==>> V =
     widen[(K,V)].foldLeft(==>>.empty[K,V])(_ + _)
