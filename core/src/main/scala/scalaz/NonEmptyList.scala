@@ -176,6 +176,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       override def toNel[A](fa: NonEmptyList[A]) = fa
 
+      override def toIList[A](fa: NonEmptyList[A]) = fa.list
+
       override def all[A](fa: NonEmptyList[A])(f: A => Boolean) =
         f(fa.head) && Foldable[IList].all(fa.tail)(f)
 
