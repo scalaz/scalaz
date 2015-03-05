@@ -61,7 +61,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.4", "2.11.5"),
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.5", "2.11.5"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
       val versionDepOpts =
@@ -342,7 +342,7 @@ object build extends Build {
       publishArtifact := false,
       sources in Compile := {
         val fs = (sources in Compile).value
-        if (scalaVersion.value.contains("2.11.")) fs.filterNot(_.getName == "WordCount.scala") // See SI-8290
+        if (scalaVersion.value.contains("2.1")) fs.filterNot(_.getName == "WordCount.scala") // See SI-8290
         else fs
       }
     )
