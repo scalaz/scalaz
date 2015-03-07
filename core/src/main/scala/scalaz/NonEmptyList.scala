@@ -201,5 +201,5 @@ trait NonEmptyListFunctions {
     new NonEmptyList(h, t)
 
   def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, IList.fromList(t.toList))
+    nel(h, IList(t: _*))
 }
