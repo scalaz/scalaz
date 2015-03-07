@@ -83,7 +83,7 @@ sealed trait WriterT[F[+_], +W, +A] { self =>
 
   def bitraverse[G[_], C, D](f: W => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {
-      case (a, b) => G.apply2(f(a), g(b))((_, _))
+      case (a, b) => G.tuple2(f(a), g(b))
     })(writerT(_))
 
   def rwst[R, S](implicit F: Functor[F]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
