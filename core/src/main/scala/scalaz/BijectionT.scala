@@ -12,10 +12,10 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def flip: BijectionT[G, F, B, A] = new BijectionT[G, F, B, A](_from, _to)
 
   def toK: Kleisli[F, A, B] =
-    Kleisli(to(_))
+    Kleisli(_to)
 
   def fromK: Kleisli[G, B, A] =
-    Kleisli(from(_))
+    Kleisli(_from)
 
   def lens(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Lens[A, B] =
     Lens(a => Store(from(_), to(a)))
