@@ -71,7 +71,7 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
 
   def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (U, A), (C, D)](run) {
-      case (a, b) => G.apply2(f(a), g(b))((_, _))
+      case (a, b) => G.tuple2(f(a), g(b))
     })(unwriterT(_))
 
   def wpoint[G[_]](implicit F: Functor[F], P: Applicative[G]): UnwriterT[F, G[U], A] =

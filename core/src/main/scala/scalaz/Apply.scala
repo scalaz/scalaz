@@ -54,32 +54,32 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     ap(fb)(map(fa)(f.curried))
   def apply3[A, B, C, D](fa: => F[A], fb: => F[B], fc: => F[C])(f: (A, B, C) => D): F[D] =
-    apply2(apply2(fa, fb)((_, _)), fc)((ab, c) => f(ab._1, ab._2, c))
+    apply2(tuple2(fa, fb), fc)((ab, c) => f(ab._1, ab._2, c))
   def apply4[A, B, C, D, E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: (A, B, C, D) => E): F[E] =
-    apply2(apply2(fa, fb)((_, _)), apply2(fc, fd)((_, _)))((t, d) => f(t._1, t._2, d._1, d._2))
+    apply2(tuple2(fa, fb), tuple2(fc, fd))((t, d) => f(t._1, t._2, d._1, d._2))
   def apply5[A, B, C, D, E, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(f: (A, B, C, D, E) => R): F[R] =
-    apply2(apply3(fa, fb, fc)((_, _, _)), apply2(fd, fe)((_, _)))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2))
+    apply2(tuple3(fa, fb, fc), tuple2(fd, fe))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2))
   def apply6[A, B, C, D, E, FF, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF])(f: (A, B, C, D, E, FF) => R): F[R] =
-    apply2(apply3(fa, fb, fc)((_, _, _)), apply3(fd, fe, ff)((_, _, _)))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3))
+    apply2(tuple3(fa, fb, fc), tuple3(fd, fe, ff))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3))
   def apply7[A, B, C, D, E, FF, G, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G])(f: (A, B, C, D, E, FF, G) => R): F[R] =
-    apply2(apply4(fa, fb, fc, fd)((_, _, _, _)), apply3(fe, ff, fg)((_, _, _)))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3))
+    apply2(tuple4(fa, fb, fc, fd), tuple3(fe, ff, fg))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3))
   def apply8[A, B, C, D, E, FF, G, H, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: (A, B, C, D, E, FF, G, H) => R): F[R] =
-    apply2(apply4(fa, fb, fc, fd)((_, _, _, _)), apply4(fe, ff, fg, fh)((_, _, _, _)))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4))
+    apply2(tuple4(fa, fb, fc, fd), tuple4(fe, ff, fg, fh))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4))
   def apply9[A, B, C, D, E, FF, G, H, I, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I])(f: (A, B, C, D, E, FF, G, H, I) => R): F[R] =
-    apply3(apply3(fa, fb, fc)((_, _, _)), apply3(fd, fe, ff)((_, _, _)), apply3(fg, fh, fi)((_, _, _)))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3))
+    apply3(tuple3(fa, fb, fc), tuple3(fd, fe, ff), tuple3(fg, fh, fi))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3))
   def apply10[A, B, C, D, E, FF, G, H, I, J, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J])(f: (A, B, C, D, E, FF, G, H, I, J) => R): F[R] =
-    apply3(apply3(fa, fb, fc)((_, _, _)), apply3(fd, fe, ff)((_, _, _)), apply4(fg, fh, fi, fj)((_, _, _, _)))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3, t3._4))
+    apply3(tuple3(fa, fb, fc), tuple3(fd, fe, ff), tuple4(fg, fh, fi, fj))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3, t3._4))
   def apply11[A, B, C, D, E, FF, G, H, I, J, K, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K])(f: (A, B, C, D, E, FF, G, H, I, J, K) => R): F[R] =
-    apply3(apply3(fa, fb, fc)((_, _, _)), apply4(fd, fe, ff, fg)((_, _, _, _)), apply4(fh, fi, fj, fk)((_, _, _, _)))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
+    apply3(tuple3(fa, fb, fc), tuple4(fd, fe, ff, fg), tuple4(fh, fi, fj, fk))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
   def apply12[A, B, C, D, E, FF, G, H, I, J, K, L, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): F[R] =
-    apply3(apply4(fa, fb, fc, fd)((_, _, _, _)), apply4(fe, ff, fg, fh)((_, _, _, _)), apply4(fi, fj, fk, fl)((_, _, _, _)))((t, t2, t3) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
+    apply3(tuple4(fa, fb, fc, fd), tuple4(fe, ff, fg, fh), tuple4(fi, fj, fk, fl))((t, t2, t3) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
 
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))

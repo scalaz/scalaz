@@ -107,7 +107,7 @@ object Lan {
         lazy val xfp = xf
         lazy val xp = x
         type I = (xfp.I, xp.I)
-        lazy val v = Applicative[H].apply2(xfp.v, xp.v)((_, _))
+        lazy val v = Applicative[H].tuple2(xfp.v, xp.v)
         def f(gi: G[I]) = xfp.f(Functor[G].map(gi)(_._1))(xp.f(Functor[G].map(gi)(_._2)))
       }
     }
