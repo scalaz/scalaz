@@ -439,14 +439,14 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         a => \/.left(\/.left(a)),
         _.fold(
           b => \/.left(\/.right(b)),
-          \/.right(_)
+          \/.right
         )
       )
 
     def reassociateRight[A, B, C](f: \/[\/[A, B], C]) =
       f.fold(
         _.fold(
-          \/.left(_),
+          \/.left,
           b => \/.right(\/.left(b))
         ),
         c => \/.right(\/.right(c))
