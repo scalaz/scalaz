@@ -37,17 +37,17 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a failure validation if present, otherwise
    * return a success validation with the provided fallback value */
   final def toFailure[B](b: => B): Validation[A, B] =
-    cata(Failure(_), Success(b))
+    cata(Validation.failure, Success(b))
 
   /** Turn the underlying value into a success validation if present, otherwise
    * return a failure validation with the provided fallback value */
   final def toSuccess[B](b: => B): Validation[B, A] =
-    cata(Success(_), Failure(b))
+    cata(Validation.success, Failure(b))
 
   /** Turn the underlying value into a left disjunction if present, otherwise
    * return a right disjunction with the provided fallback value */
   final def toLeft[B](b: => B): A \/ B =
-    cata(\/.left(_), \/.right(b))
+    cata(\/.left, \/.right(b))
 
   /** alias for [[toLeft]] */
   final def <\/[B](b: => B): A \/ B =
@@ -56,7 +56,7 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a right disjunction if present, otherwise
    * return a left disjunction with the provided fallback value */
   final def toRight[B](b: => B): B \/ A =
-    cata(\/.right(_), \/.left(b))
+    cata(\/.right, \/.left(b))
 
   /** alias for [[toRight]] */
   final def \/>[B](b: => B): B \/ A =
