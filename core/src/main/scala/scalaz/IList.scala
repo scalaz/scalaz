@@ -494,6 +494,13 @@ object IList extends IListInstances with IListFunctions{
     else go(n, empty)
   }
 
+  import Isomorphism._
+
+  val listIListIso: List <~> IList =
+    new IsoFunctorTemplate[List, IList] {
+      def to[A](fa: List[A]) = fromList(fa)
+      def from[A](fa: IList[A]) = fa.toList
+    }
 }
 
 sealed trait IListFunctions
