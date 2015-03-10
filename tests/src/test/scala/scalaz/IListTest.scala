@@ -210,6 +210,22 @@ object IListTest extends SpecLite {
     ns.inits.map(_.toList).toList must_=== ns.toList.inits.toList
   }
 
+  "interleave" ! forAll { (xs: IList[Int], ys: IList[Int]) =>
+    val a = xs interleave ys
+    (xs.length + ys.length) must_=== a.length
+    val min = math.min(xs.length, ys.length)
+
+    Foldable[IList].all(xs.zipWithIndex){ case (x, i) =>
+      val index = if(i <= min) i * 2 else (min * 2) + i - min
+      a.toList.lift(index) == Some(x)
+    } must_=== true
+
+    Foldable[IList].all(ys.zipWithIndex){ case (y, i) =>
+      val index = if(i < min) (i * 2) + 1 else (min * 2) + i - min
+      a.toList.lift(index) == Some(y)
+    } must_=== true
+  }
+
   // intersperse is tested above
   // isEmpty is tested by empty laws
 
