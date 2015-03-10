@@ -195,6 +195,16 @@ sealed abstract class IList[A] extends Product with Serializable {
   def inits: IList[IList[A]] =
     reverse.tails.map(_.reverse)
 
+  def interleave(that: IList[A]): IList[A] = {
+    @tailrec def loop(xs: IList[A], ys: IList[A], acc: IList[A]): IList[A] = xs match {
+      case ICons(h, t) =>
+        loop(ys, t, h :: acc)
+      case INil() =>
+        acc reverse_::: ys
+    }
+    loop(this, that, IList.empty[A])
+  }
+
   def intersperse(a: A): IList[A] = {
     @tailrec def intersperse0(accum: IList[A], rest: IList[A]): IList[A] = rest match {
       case INil() => accum
