@@ -38,7 +38,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
     kleisli(a => M.map(run(a))(f))
 
   def mapK[N[_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
-    kleisli(a => f(run(a)))
+    kleisli(run andThen f)
 
   def flatMapK[C](f: B => M[C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli(a => M.bind(run(a))(f))
