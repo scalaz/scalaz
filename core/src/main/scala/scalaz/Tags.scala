@@ -85,4 +85,9 @@ object Tags {
   sealed trait Conjunction
 
   def Conjunction[A](a: A): A @@ Conjunction = Tag[A, Conjunction](a)
+
+  /** Type tag to choose a [[scalaz.Applicative]] instance that runs scalaz.concurrent.Futures in parallel. */
+  sealed trait Parallel
+
+  val Parallel = Tag.of[Parallel]
 }

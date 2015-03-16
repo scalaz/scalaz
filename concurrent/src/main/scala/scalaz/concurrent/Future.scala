@@ -4,14 +4,12 @@ import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, Ex
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
 
 import collection.JavaConversions._
+import scalaz.Tags.Parallel
 
-import scalaz.{Monad, Nondeterminism}
+import scalaz._
 import scalaz.Free.Trampoline
-import scalaz.Free
-import scalaz.Trampoline
 import scalaz.syntax.monad._
 import scalaz.std.function._
-import scalaz.{\/, -\/, \/-}
 
 import scala.concurrent.SyncVar
 
@@ -281,6 +279,20 @@ object Future {
         }
       }
     }
+  }
+
+  /** type for Futures which need to be executed in parallel when using an Applicative instance */
+  type ParallelFuture[A] = Future[A] @@ Parallel
+
+  /**
+   * This Applicative instance runs Futures in parallel.
+   *
+   * It is different from the Applicative instance obtained from Monad[Future] which runs futures sequentially.
+   */
+  val futureParallelApplicativeInstance: Applicative[ParallelFuture] = new Applicative[ParallelFuture] {
+    def point[A](a: => A): ParallelFuture[A] = Parallel(futureInstance.point(a))
+    def ap[A,B](fa: => ParallelFuture[A])(fab: => ParallelFuture[A => B]): ParallelFuture[B] =
+      Parallel(futureInstance.mapBoth(fa, fab)((a, f) => f(a)))
   }
 
   /** Convert a strict value to a `Future`. */
