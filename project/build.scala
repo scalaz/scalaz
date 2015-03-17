@@ -138,7 +138,7 @@ object build extends Build {
         <licenses>
           <license>
             <name>BSD-style</name>
-            <url>http://www.opensource.org/licenses/bsd-license.php</url>
+            <url>http://opensource.org/licenses/BSD-3-Clause</url>
             <distribution>repo</distribution>
           </license>
         </licenses>
