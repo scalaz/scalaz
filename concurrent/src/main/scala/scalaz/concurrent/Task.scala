@@ -144,7 +144,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   /**
    * Run this computation to obtain either a result or an exception, then
    * invoke the given callback. Any pure, non-asynchronous computation at the 
-   * head of this `Future` will be forced in the calling thread. At the first 
+   * head of this `Task` will be forced in the calling thread. At the first
    * `Async` encountered, control to whatever thread backs the `Async` and 
    * this function returns immediately.
    */
@@ -211,7 +211,7 @@ object Task {
       case \/-(f) => f
   }))
 
-  /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
+  /** Create a `Task` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
     new Task(Future(Try(a))(pool))
 
@@ -220,10 +220,10 @@ object Task {
     new Task(Future(Task.Try(a))(pool).start)
 
   /** 
-   * Returns a `Future` that produces the same result as the given `Future`, 
+   * Returns a `Task` that produces the same result as the given `Future`,
    * but forks its evaluation off into a separate (logical) thread, using
    * the given `ExecutorService`. Note that this forking is only described
-   * by the returned `Future`--nothing occurs until the `Future` is run. 
+   * by the returned `Task`--nothing occurs until the `Task` is run.
    */
   def fork[A](a: => Task[A])(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Task[A] = 
     apply(a).join
