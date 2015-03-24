@@ -326,6 +326,8 @@ sealed abstract class MaybeInstances {
 
     override def toOption[A](fa: Maybe[A]): Option[A] = fa.toOption
 
+    override def toMaybe[A](fa: Maybe[A]) = fa
+
     override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
       fa.filter(f)
   }
