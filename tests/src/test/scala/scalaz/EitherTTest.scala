@@ -84,4 +84,12 @@ object EitherTTest extends SpecLite {
       (a,b) <- brokenMethod
     } yield "yay"
   }
+
+  //compilation test for eitherTU
+  {
+    val se: State[Vector[String], Int \/ Float] = null
+    EitherT.eitherTU(se)
+    val ee: String \/ (Int \/ Float) = null
+    EitherT.eitherTU(ee)
+  }
 }
