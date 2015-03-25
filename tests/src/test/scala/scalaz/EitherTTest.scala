@@ -56,40 +56,42 @@ object EitherTTest extends SpecLite {
     def monadError[F[_] : Monad, A] = MonadError[EitherT[F, ?, ?], A]
   }
 
-  // compilation test
-  // https://gist.github.com/vmarquez/5106252/
-  {
-    import scalaz.syntax.either._
+  def compilationTests() = {
+    // compilation test
+    // https://gist.github.com/vmarquez/5106252/
+    {
+      import scalaz.syntax.either._
 
-    case class ABC(s:String)
+      case class ABC(s:String)
 
-    implicit val m = new Monoid[(ABC, Int)] {
-      def zero: (ABC, Int) = (null, -1)
-      def append(f1: (ABC, Int), f2: => (ABC, Int)): (ABC, Int) = f1
-    }
-
-    def brokenMethod: EitherT[Option, (ABC, Int), (ABC, String)] =
-      EitherT(Some((ABC("abcData"),"Success").right))
-
-    def filterComp =
-      brokenMethod
-      .filter {
-        case (abc,"Success") => true
-        case _ => false
-      }.map {
-        case (abc, "Success") => "yay"
+      implicit val m = new Monoid[(ABC, Int)] {
+        def zero: (ABC, Int) = (null, -1)
+        def append(f1: (ABC, Int), f2: => (ABC, Int)): (ABC, Int) = f1
       }
 
-    for {
-      (a,b) <- brokenMethod
-    } yield "yay"
-  }
+      def brokenMethod: EitherT[Option, (ABC, Int), (ABC, String)] =
+        EitherT(Some((ABC("abcData"),"Success").right))
 
-  //compilation test for eitherTU
-  {
-    val se: State[Vector[String], Int \/ Float] = null
-    EitherT.eitherTU(se)
-    val ee: String \/ (Int \/ Float) = null
-    EitherT.eitherTU(ee)
+      def filterComp =
+        brokenMethod
+        .filter {
+          case (abc,"Success") => true
+          case _ => false
+        }.map {
+          case (abc, "Success") => "yay"
+        }
+
+      for {
+        (a,b) <- brokenMethod
+      } yield "yay"
+    }
+
+    //compilation test for eitherTU
+    {
+      val se: State[Vector[String], Int \/ Float] = null
+      EitherT.eitherTU(se)
+      val ee: String \/ (Int \/ Float) = null
+      EitherT.eitherTU(ee)
+    }
   }
 }
