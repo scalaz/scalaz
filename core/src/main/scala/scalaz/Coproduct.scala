@@ -70,6 +70,14 @@ object Coproduct extends CoproductInstances with CoproductFunctions {
       override def F = F0
       override def G = G0
     }
+
+  import Isomorphism._
+
+  def coproductIso[F[_], G[_]]: Coproduct[F, G, ?] <~> λ[A => F[A] \/ G[A]] =
+    new IsoFunctorTemplate[Coproduct[F, G, ?], λ[A => F[A] \/ G[A]]] {
+      def from[A](ga: F[A] \/ G[A]) = Coproduct(ga)
+      def to[A](fa: Coproduct[F, G, A]) = fa.run
+    }
 }
 
 trait CoproductFunctions {
