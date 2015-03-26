@@ -61,6 +61,14 @@ object Coproduct extends CoproductFunctions with CoproductInstances0 {
     new Coproduct[F, G, A] {
       val run = x
     }
+
+  import Isomorphism._
+
+  def coproductIso[F[+_], G[+_]]: ({type l[a] = Coproduct[F, G, a]})#l <~> ({type l[a] = F[a] \/ G[a]})#l =
+    new IsoFunctorTemplate[({type l[a] = Coproduct[F, G, a]})#l, ({type l[a] = F[a] \/ G[a]})#l] {
+      def from[A](ga: F[A] \/ G[A]) = Coproduct(ga)
+      def to[A](fa: Coproduct[F, G, A]) = fa.run
+    }
 }
 
 trait CoproductFunctions {
