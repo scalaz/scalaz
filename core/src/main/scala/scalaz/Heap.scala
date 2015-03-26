@@ -86,10 +86,10 @@ sealed abstract class Heap[A] {
       Heap(s, leq, heapify(leq)( Cofree(Ranked(r, f(x)), xs)))
   }
 
-  def toUnsortedStream: IList[A] = ???
+  def toUnsortedStream: Stream[A] = toUnsortedList.toStream 
 
-  def toUnsortedList: IList[A] = toUnsortedStream
-  
+  def toUnsortedList: IList[A] = fold(INil[A](), (_, _, t) => Foldable[CTree].foldRight(t, (INil(): IList[A]))((a,b) => a.value :: b) ) 
+
   def toList: IList[A] = toListHeap(this, INil())
   
   def toStream: Stream[A] = toList.toStream 
@@ -400,9 +400,12 @@ sealed abstract class HeapInstances {
       M.append(root, tail)
     } 
     
-    def foldRight[A, B](fa: CTree[A], z: => B)(f: (A, =>B) => B): B = ???
+    def foldRight[A, B](ct: CTree[A], z: => B)(f: (A, =>B) => B): B = {
+      Foldable[IList].foldRight(Cofree[IList, A](ct.head, INil()) :: ct.tail, z)( (a,b) => {
+          Foldable[CTree].foldRight(a, b)(f) 
+      }) 
+    }
   }
-  
   
   implicit val heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
     def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
