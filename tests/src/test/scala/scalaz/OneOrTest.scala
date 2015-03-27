@@ -9,9 +9,6 @@ import org.scalacheck.Prop.forAll
 
 object OneOrTest extends SpecLite {
   import OneOr._
-  property("myprop") = forAll { l: List[Int] =>
-    l.reverse.reverse == l
-  }
   checkAll("OneOr", equal.laws[OneOr[List, Int]])
   checkAll("OneOr", order.laws[OneOr[List, Int]])
   checkAll("OneOr List", traverse.laws[OneOrList])
