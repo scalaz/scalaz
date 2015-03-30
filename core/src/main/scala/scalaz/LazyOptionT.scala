@@ -39,8 +39,11 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
   def toLeft[X](right: => X)(implicit F: Functor[F]): EitherT[F, A, X] =
     eitherT(F.map(run)(_.fold[A \/ X](z => -\/(z), \/-(right))))
 
-  def orElse(a: => LazyOption[A])(implicit F: Functor[F]): LazyOptionT[F, A] =
-    lazyOptionT(F.map(LazyOptionT.this.run)(_.orElse(a)))
+  def orElse(a: => LazyOptionT[F, A])(implicit F: Monad[F]): LazyOptionT[F, A] =
+    LazyOptionT(F.bind(run) {
+      case LazyNone => a.run
+      case x@LazySome(_) => F.point(x)
+    })
 
   def map[B](f: (=> A) => B)(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_ map f))
