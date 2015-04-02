@@ -136,7 +136,7 @@ package object scalaz {
 
   type StateT[F[_], S, A] = IndexedStateT[F, S, S, A]
   type IndexedState[-S1, S2, A] = IndexedStateT[Id, S1, S2, A]
-  /** A state transition, representing a function `S => (A, S)`. */
+  /** A state transition, representing a function `S => (S, A)`. */
   type State[S, A] = StateT[Id, S, A]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
