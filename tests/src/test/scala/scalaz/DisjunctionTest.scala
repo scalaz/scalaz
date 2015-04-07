@@ -32,4 +32,38 @@ object DisjunctionTest extends SpecLite {
     \/.fromTryCatchThrowable[Int, Foo](throw bar) must_=== \/.left(bar)
     \/.fromTryCatchThrowable[Int, Bar](throw foo).mustThrowA[Foo]
   }
+
+  "recover" in {
+    sealed trait Foo
+    case object Bar extends Foo
+    case object Baz extends Foo
+
+    implicit val equalFoo = Equal.equalA[Foo]
+    implicit val showFoo = Show.showA[Foo]
+
+    -\/[Foo](Bar).recover({ case Bar => 1 }) must_=== \/-(1)
+    -\/[Foo](Bar).recover({ case Baz => 1 }) must_=== -\/(Bar)
+    \/.right[Foo, Int](1).recover({ case Bar => 4 }) must_=== \/-(1)
+  }
+
+  "recoverWith" in {
+    sealed trait Foo
+    case object Bar extends Foo
+    case object Baz extends Foo
+
+    implicit val equalFoo = Equal.equalA[Foo]
+    implicit val showFoo = Show.showA[Foo]
+
+    val barToBaz: PartialFunction[Foo, \/[Foo, Int]] = {
+      case Bar => -\/(Baz)
+    }
+
+    val bazToInt: PartialFunction[Foo, \/[Foo, Int]] = {
+      case Baz => \/-(1)
+    }
+
+    -\/[Foo](Bar).recoverWith(barToBaz) must_=== -\/(Baz)
+    -\/[Foo](Bar).recoverWith(bazToInt) must_=== -\/(Bar)
+    \/.right[Foo, Int](1).recoverWith(barToBaz) must_=== \/-(1)
+  }
 }
