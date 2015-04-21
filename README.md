@@ -12,7 +12,7 @@ a large number of data structures.
 
 The current stable version is 7.1.1, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
 
-If you're using SBT, add the following lines to your build file:
+If you're using SBT, add the following line to your build file:
 
 ```scala
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.1"
