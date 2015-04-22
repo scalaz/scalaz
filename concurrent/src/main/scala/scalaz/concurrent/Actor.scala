@@ -24,15 +24,15 @@ import java.util.concurrent.atomic.AtomicReference
  */
 final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor.rethrow)
                          (implicit val strategy: Strategy) {
-  private val head = new AtomicReference[Node[A]]
+  private val last = new AtomicReference[Node[A]]
 
   def toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
   def !(a: A): Unit = {
     val n = new Node(a)
-    val h = head.getAndSet(n)
-    if (h ne null) h.lazySet(n)
+    val l = last.getAndSet(n)
+    if (l ne null) l.lazySet(n)
     else schedule(n)
   }
 
@@ -67,13 +67,13 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
     }
     val n2 = n.get
     if (n2 eq null) {
-      if (!head.compareAndSet(n, null)) nonRecLoop(n.next, f)
+      if (!last.compareAndSet(n, null)) nonRecLoop(n.next, f)
     } else nonRecLoop(n2, f)
   }
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
 
-  private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(n.next)
+  private def lastTry(n: Node[A]): Unit = if (!last.compareAndSet(n, null)) act(n.next)
 }
 
 private final class Node[A](val a: A) extends AtomicReference[Node[A]] {
