@@ -99,7 +99,7 @@
       var tree = data.tree[i]
       if(tree.type === "tree"){
         var path = tree.path
-        $("#scaladoc").append("<li><a target='_blank' href='" + path + "/doc/index.html#scalaz.package'>" + path + "</a></li>")
+        $("#scaladoc").append("<li><a target='_blank' href='" + path + "/doc/index.html#scalaz.package'>" + path.replace("scalaz-2.9.0-1-", "").replace(/scalaz-2(\.[0-9]+)+-/, "") + "</a></li>")
       }
     }
   }
