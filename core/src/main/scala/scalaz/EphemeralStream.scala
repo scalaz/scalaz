@@ -87,6 +87,15 @@ sealed abstract class EphemeralStream[A] {
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
 
+  def findMapM[M[_]: Monad, B](f: A => M[Option[B]]): M[Option[B]] = {
+    if(isEmpty)
+      Monad[M].point(None)
+    else{
+      val hh = head()
+      Monad[M].bind(f(hh)) { case Some(b) => Monad[M].point(Some(b)); case None => tail() findMapM f }
+    }
+  }
+
   def reverse: EphemeralStream[A] = {
     def lcons(xs: => List[A])(x: => A) = x :: xs
     apply(foldLeft(Nil: List[A])(lcons _) : _*)

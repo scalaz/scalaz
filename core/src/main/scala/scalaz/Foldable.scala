@@ -121,6 +121,10 @@ trait Foldable[F[_]]  { self =>
   final def foldlM[G[_], A, B](fa: F[A], z: => B)(f: B => A => G[B])(implicit M: Monad[G]): G[B] =
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
+  /** map elements in a Foldable with a monadic function and return the first element that is mapped successfully */
+  final def findMapM[M[_]: Monad, A, B](fa: F[A])(f: A => M[Option[B]]): M[Option[B]] =
+    toEphemeralStream(fa) findMapM f
+
   /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
 
