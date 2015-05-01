@@ -19,6 +19,7 @@ object IndexedSeqTest extends SpecLite {
   checkAll(monoid.laws[IndexedSeq[Int]])
   checkAll(monadPlus.strongLaws[IndexedSeq])
   checkAll(traverse.laws[IndexedSeq])
+  checkAll(FoldableTests.anyAndAllLazy[IndexedSeq])
   checkAll(zip.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
   checkAll(align.laws[IndexedSeq])

@@ -97,6 +97,12 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
           bs.drop(sizeA).map(b => f(\&/.That(b)))
       }
     }
+
+    override def all[A](fa: IxSq[A])(f: A => Boolean) =
+      fa forall f
+
+    override def any[A](fa: IxSq[A])(f: A => Boolean) =
+      fa exists f
   }
 
   implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
