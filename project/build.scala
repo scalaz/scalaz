@@ -54,14 +54,19 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  def scalaCheckVersion = "1.11.4"
+  val scalaCheckVersion: String => String = {
+    case "2.12.0-M1" =>
+      "1.11.6"
+    case _ =>
+      "1.11.4"
+  }
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.12.0-M1",
     crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -218,11 +223,12 @@ object build extends Build {
         dir => Seq(GenerateTupleW(dir))
       },
       libraryDependencies ++= {
-        if (scalaVersion.value.startsWith("2.11"))
-          coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-          }
-        else Nil
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+            coreModuleDependencies211 map {
+              case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
+            }
+        }
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -303,7 +309,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value),
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -316,7 +322,7 @@ object build extends Build {
       name := "scalaz-tests",
       publishArtifact := false,
       previousArtifact := None,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value) % "test"
     )
   )
 

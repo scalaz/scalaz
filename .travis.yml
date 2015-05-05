@@ -19,9 +19,7 @@ cache:
 
 language: scala
 scala:
-  - 2.11.6
-  - 2.10.5
-  - 2.9.3
+  - 2.12.0-M1
 jdk:
   - oraclejdk7
   - openjdk6
