@@ -60,7 +60,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.12.0-M1",
     crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.4", "2.11.5"),
 
     scalacOptions <++= (scalaVersion) map { sv =>
@@ -72,7 +72,7 @@ object build extends Build {
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
-      Seq("-unchecked") ++ versionDepOpts ++ (if (sv startsWith "2.11") Seq("-Xsource:2.10") else Seq())
+      Seq("-unchecked") ++ versionDepOpts ++ (if ((sv startsWith "2.11") || (sv startsWith "2.12")) Seq("-Xsource:2.10") else Seq())
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -232,11 +232,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, String => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.3"
+      case _ => "1.0.4"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.3"
+      case _ => "1.0.4"
     }
   )
 
@@ -250,11 +250,14 @@ object build extends Build {
         dir => Seq(generateTupleW(dir))
       },
       libraryDependencies ++= {
-        if (scalaVersion.value.startsWith("2.11"))
-          coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-          }
-        else Nil
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+            coreModuleDependencies211 map {
+              case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
+            }
+          case _ =>
+            Nil
+        }
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -339,7 +342,7 @@ object build extends Build {
       publishArtifact := false,
       sources in Compile := {
         val fs = (sources in Compile).value
-        if (scalaVersion.value.contains("2.11.")) fs.filterNot(_.getName == "WordCount.scala") // See SI-8290
+        if (scalaVersion.value.startsWith("2.11.") || scalaVersion.value.startsWith("2.12.")) fs.filterNot(_.getName == "WordCount.scala") // See SI-8290
         else fs
       }
     )
@@ -375,7 +378,9 @@ object build extends Build {
 
   object Dependencies {
     def scalacheck(sv: String) =
-      if (sv startsWith "2.11")
+      if (sv startsWith "2.12")
+        "1.11.6"
+      else if (sv startsWith "2.11")
         "1.11.3"
       else
         "1.10.1"
