@@ -138,8 +138,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
 
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
     this match {
-      case This(a) =>
-        Applicative[F].point(This(a))
+      case a @ This(_) =>
+        Applicative[F].point(a)
       case That(b) =>
         Functor[F].map(g(b))(That(_))
       case Both(a, b) =>
@@ -151,8 +151,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
 
   def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
     this match {
-      case This(a) =>
-        This(a)
+      case a @ This(_) =>
+        a
       case That(b) =>
         g(b)
       case Both(a, b) =>

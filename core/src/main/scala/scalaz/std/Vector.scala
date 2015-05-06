@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import vector._
 import annotation.tailrec
 
 sealed trait VectorInstances0 {
@@ -10,7 +11,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance = new Traverse[Vector] with MonadPlus[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = empty :+ a
@@ -29,7 +30,7 @@ trait VectorInstances extends VectorInstances0 {
     def unzip[A, B](a: Vector[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      DList.fromList(v.toList).foldr(F.point(empty[B])) {
+      DList.fromIList(IList.fromFoldable(v)).foldr(F.point(empty[B])) {
          (a, fbs) => F.apply2(f(a), fbs)(_ +: _)
       }
     }
@@ -109,7 +110,7 @@ trait VectorFunctions {
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
   final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] =
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, IList.fromList(as.tail.toList)))
+    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
 
   final def toZipper[A](as: Vector[A]): Option[Zipper[A]] =
     stream.toZipper(as.toStream)
@@ -121,7 +122,7 @@ trait VectorFunctions {
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
    */
   final def <^>[A, B: Monoid](as: Vector[A])(f: NonEmptyList[A] => B): B =
-    if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, IList.fromList(as.tail.toList)))
+    if (as.isEmpty) Monoid[B].zero else f(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
 
   /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
     * any `p`s after the first false.

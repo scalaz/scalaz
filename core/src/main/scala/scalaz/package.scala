@@ -134,7 +134,7 @@ package object scalaz {
 
   type StateT[F[_], S, A] = IndexedStateT[F, S, S, A]
   type IndexedState[-S1, S2, A] = IndexedStateT[Id, S1, S2, A]
-  /** A state transition, representing a function `S => (A, S)`. */
+  /** A state transition, representing a function `S => (S, A)`. */
   type State[S, A] = StateT[Id, S, A]
 
   object StateT extends StateTInstances with StateTFunctions {
