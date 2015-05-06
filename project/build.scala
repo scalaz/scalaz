@@ -218,11 +218,14 @@ object build extends Build {
         dir => Seq(GenerateTupleW(dir))
       },
       libraryDependencies ++= {
-        if (scalaVersion.value.startsWith("2.11"))
-          coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-          }
-        else Nil
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+            coreModuleDependencies211 map {
+              case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
+            }
+          case _ =>
+            Nil
+        }
       },
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
