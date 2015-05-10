@@ -167,8 +167,9 @@ object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunc
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
     import EphemeralStream._
+    override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
       case _ ##:: tl  => if (tl.isEmpty) EphemeralStream(a)
                          else cons(a, cojoin(tl))
