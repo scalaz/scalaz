@@ -12,6 +12,7 @@ object LazyOptionTest extends SpecLite {
   checkAll(traverse.laws[LazyOption])
   checkAll(zip.laws[LazyOption])
   checkAll(align.laws[LazyOption])
+  checkAll(isEmpty.laws[LazyOption])
   checkAll(monoid.laws[LazyOption[Int]])
 
   "monoid" ! forAll { (a: LazyOption[Int], b: LazyOption[Int]) =>
