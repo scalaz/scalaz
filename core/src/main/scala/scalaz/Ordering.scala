@@ -6,7 +6,7 @@ package scalaz
   *       [[scalaz.Order]].  This `Ordering` is analogous to the
   *       `Int`s returned by [[scala.math.Ordering]].
   */
-sealed abstract class Ordering(val toInt: Int, val name: String) {
+sealed abstract class Ordering(val toInt: Int, val name: String) extends Product with Serializable {
   def complement: Ordering
 }
 
