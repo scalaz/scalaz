@@ -64,7 +64,7 @@ sealed abstract class FreeAp[F[_],A] {
    * Embeds this program in the free monad on `F`.
    */
   def monadic(implicit F: Functor[F]): Free[F,A] =
-    foldMap[({type λ[α] = Free[F,α]})#λ](new (F ~> ({type λ[α] = Free[F,α]})#λ) {
+    foldMap[Free[F,?]](new (F ~> Free[F,?]) {
       def apply[B](fb: F[B]) = Free.liftF(fb)
     })
 
