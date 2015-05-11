@@ -63,13 +63,17 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
+  // no generic signatures for scala 2.10.x and 2.9.x, see SI-7932, #571 and #828
+  def scalac210Options = Seq("-Yno-generic-signatures")
+
   lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
     crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
-    scalacOptions <++= (scalaVersion) map { sv =>
+    scalacOptions ++= {
+      val sv = scalaVersion.value
       val versionDepOpts =
         if (sv startsWith "2.9")
           Seq("-Ydependent-method-types", "-deprecation")
@@ -78,9 +82,11 @@ object build extends Build {
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
-      // no generic signatures, see SI-7932 and #571
-      Seq("-unchecked", "-Yno-generic-signatures") ++ versionDepOpts
-    },
+      Seq("-unchecked") ++ versionDepOpts
+    } ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 10 => scalac210Options
+      case _ => Nil
+    }),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
