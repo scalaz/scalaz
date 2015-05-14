@@ -14,7 +14,7 @@ import std.function._
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
  */
-final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
+final class DList[A] private[scalaz](f: List[A] => Trampoline[List[A]]) {
   import DList._
   def apply(xs: => List[A]): Trampoline[List[A]] = f(xs)
 
@@ -29,7 +29,7 @@ final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
 
   /** Append one list to another in constant time. */
   def ++(as: => DList[A]): DList[A] =
-    mkDList(xs => as(xs) >>= (ys => apply(ys)))
+    mkDList(xs => suspend(as(xs) >>= (apply(_))))
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
