@@ -29,7 +29,7 @@ trait DList[A] {
 
   /** Append one list to another in constant time. */
   def ++(as: => DList[A]): DList[A] =
-    mkDList(xs => as(xs) >>= (ys => apply(ys)))
+    mkDList(xs => suspend(as(xs) >>= (apply(_))))
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
