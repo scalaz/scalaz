@@ -12,6 +12,7 @@ object TreeTest extends SpecLite {
   checkAll("Tree", traverse1.laws[Tree])
   checkAll("Tree", applicative.laws[Tree])
   checkAll("Tree", comonad.laws[Tree])
+  checkAll("Tree", align.laws[Tree])
 
   "A tree must can be rendered as an ASCII string" ! {
       node(1, Stream(node(2, Stream(leaf(3))), leaf(4))).drawTree must_== Seq(

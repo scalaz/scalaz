@@ -116,7 +116,7 @@ object Tree extends TreeInstances with TreeFunctions {
 }
 
 sealed abstract class TreeInstances {
-  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] {
+  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa cobind f
     def copoint[A](p: Tree[A]): A = p.rootLabel
@@ -133,6 +133,15 @@ sealed abstract class TreeInstances {
       case h #:: t => t.foldLeft(z(h))(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
+    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = { 
+      def align(ta: Tree[A], tb: Tree[B]): Tree[C] =
+        Tree.node(f(\&/(ta.rootLabel, tb.rootLabel)), Align[Stream].alignWith[Tree[A], Tree[B], Tree[C]]({
+          case \&/.This(sta) ⇒ sta map {a ⇒ f(\&/.This(a))}
+          case \&/.That(stb) ⇒ stb map {b ⇒ f(\&/.That(b))}
+          case \&/(sta, stb) ⇒ align(sta, stb)
+        })(ta.subForest, tb.subForest))
+      align _
+    }
   }
 
   implicit def treeEqual[A](implicit A: Equal[A]): Equal[Tree[A]] = new Equal[Tree[A]] {
