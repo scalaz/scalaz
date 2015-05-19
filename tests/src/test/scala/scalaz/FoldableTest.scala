@@ -59,6 +59,20 @@ object FoldableTest extends SpecLite {
         (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
   }
 
+  "sumr1Opt" ! forAll {
+    (xs: List[String]) => xs match {
+      case Nil => xs.sumr1Opt must_== None
+      case _ => xs.sumr1Opt must_== Some(xs.mkString)
+    }
+  }
+
+  "suml1Opt" ! forAll {
+    (xs: List[String]) => xs match {
+      case Nil => xs.suml1Opt must_== None
+      case _ => xs.suml1Opt must_== Some(xs.mkString)
+    }
+  }
+
   "non-empty folding" should {
 
     val gt1: (Int, Int)    => Int = (i, j) => i - j
