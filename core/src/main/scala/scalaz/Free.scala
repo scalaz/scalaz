@@ -61,17 +61,6 @@ sealed abstract class Free[S[_], A] {
   final def fold[B](r: A => B, s: S[Free[S, A]] => B)(implicit S: Functor[S]): B =
     resume.fold(s, r)
 
-  /* performs a bind type operation that does not cause expansion of Gosubs at the expense of not being tail recursive*/
-  private final def fastFlatMap[B](i: Int, f: A => Free[S,B]): Free[S,B] =
-    this match {
-      case Return(a)   => f(a)
-      case Gosub(a, g) => if (i < 500)
-                            a.fastFlatMap(i+1, aa => g(aa).fastFlatMap(i+1, f))
-                          else
-                            a.flatMap(x => g(x).flatMap(f))
-      case x           => x flatMap f
-    }
-
   /** Evaluates a single layer of the free monad **/
   @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) =
     this match {
@@ -80,7 +69,7 @@ sealed abstract class Free[S[_], A] {
       case Gosub(x, f) => x match {
         case Return(a) => f(a).resume
         case Suspend(t) => -\/(S.map(t)(f))
-        case Gosub(y, g) => y.fastFlatMap(0, z => g(z).fastFlatMap(0, f)).resume
+        case Gosub(y, g) => y.flatMap(z => g(z).flatMap(f)).resume
       }
     }
 
@@ -355,7 +344,7 @@ trait FreeFunctions {
 
   /** Suspend a computation in a pure step of the applicative functor `S` */
   def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
-    roll(S.pure(value))
+    liftF(S.pure(())).flatMap(_ => value)
 
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
