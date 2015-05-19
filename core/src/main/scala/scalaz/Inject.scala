@@ -36,7 +36,7 @@ sealed abstract class InjectInstances {
 
 trait InjectFunctions {
   def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit F: Functor[F], I: Inject[G, F]): Free[F, A] =
-    Suspend[F, A](I.inj(ga))
+    Free[F, A](I.inj(ga))
 
   def match_[F[_], G[_], A](fa: Free[F, A])(implicit F: Functor[F], I: Inject[G, F]): Option[G[Free[F, A]]] =
     fa.resume.fold(I.prj(_), _ => none)
