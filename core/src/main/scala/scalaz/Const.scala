@@ -2,11 +2,14 @@ package scalaz
 
 final case class Const[A, B](getConst: A)
 
-private sealed trait ConstFunctor[C] extends Functor[Const[C, ?]] {
+private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
   override def map[A, B](fa: Const[C, A])(f: A => B): Const[C, B] = Const(fa.getConst)
+
+  override def traverseImpl[G[_], A, B](fa: Const[C, A])(f: A => G[B])(implicit G: Applicative[G]) =
+    G.point(Const(fa.getConst))
 }
 
-private sealed trait ConstApply[C] extends Apply[Const[C, ?]] with ConstFunctor[C] {
+private sealed trait ConstApply[C] extends Apply[Const[C, ?]] with ConstTraverse[C] {
   def C: Semigroup[C]
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
@@ -36,8 +39,8 @@ private sealed trait ConstOrder[A, B] extends Order[Const[A, B]] with ConstEqual
 }
 
 sealed abstract class ConstInstances1 {
-  implicit def constFunctor[C]: Functor[Const[C, ?]] = 
-    new ConstFunctor[C] {}
+  implicit def constTraverse[C]: Traverse[Const[C, ?]] =
+    new ConstTraverse[C] {}
 }
 
 sealed abstract class ConstInstances0 extends ConstInstances1 {
