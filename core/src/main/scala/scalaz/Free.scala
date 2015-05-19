@@ -320,7 +320,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
-  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] =
+  implicit def freeMonad[S[_]:Functor]: Monad[Free[S, ?]] =
     new Monad[Free[S, ?]] {
       def point[A](a: => A) = Return(a)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
