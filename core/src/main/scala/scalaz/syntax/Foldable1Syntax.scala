@@ -13,8 +13,8 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def foldr1(f: A => (=> A) => A): A = F.foldr1(self)(f)
   final def foldl1(f: A => A => A): A = F.foldl1(self)(f)
   final def foldMap1[B: Semigroup](f: A => B = (a: A) => a): B = F.foldMap1(self)(f)
-  final def sumr1(implicit A: Semigroup[A]): A = F.foldRight1(self)(A.append)
-  final def suml1(implicit A: Semigroup[A]): A = F.foldLeft1(self)(A.append(_, _))
+  final def sumr1(implicit A: Semigroup[A]): A = F.sumr1(self)
+  final def suml1(implicit A: Semigroup[A]): A = F.suml1(self)
   final def maximum1(implicit A: Order[A]): A = F.maximum1(self)
   final def maximumOf1[B: Order](f: A => B): B = F.maximumOf1(self)(f)
   final def maximumBy1[B: Order](f: A => B): A = F.maximumBy1(self)(f)
@@ -22,7 +22,7 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
   final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
   final def intercalate1(a: A)(implicit A: Semigroup[A]): A = F.intercalate1(self, a)
-  final def msuml1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.foldLeft1[G[B]](ev.subst[F](self))(G.plus[B](_, _))
+  final def msuml1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.msuml1(ev.subst[F](self))
   final def toNel: NonEmptyList[A] = F.toNel(self)
   ////
 }
