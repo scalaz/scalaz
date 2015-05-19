@@ -39,7 +39,7 @@ object Free extends FreeInstances with FreeFunctions {
     Suspend(value)
 
   /** Return the given value in the free monad. */
-  def point[S[_], A](value: => A): Free[S, A] = Return[S, A](value)
+  def point[S[_], A](value: A): Free[S, A] = Return[S, A](value)
 
 }
 
@@ -336,7 +336,7 @@ trait FreeFunctions {
     liftF[S, A](S.point(value))
 
   /** Alias for `point` */
-  def pure[S[_], A](value: => A): Free[S, A] = point(value)
+  def pure[S[_], A](value: A): Free[S, A] = point(value)
 
   /** Absorb a step into the free monad. */
   def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
