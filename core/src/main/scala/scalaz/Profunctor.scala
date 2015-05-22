@@ -46,13 +46,11 @@ object Profunctor {
   ////
   sealed trait UpStarF
   type UpStar[F[_], D, C] = (D => F[C]) @@ UpStarF
-  def UpStar[F[_], D, C](f: D => F[C]): UpStar[F, D, C] = 
-    Tag[D => F[C], UpStarF](f)
+  val UpStar = Tag.of[UpStarF]
 
   sealed trait DownStarF
   type DownStar[F[_], D, C] = (F[D] => C) @@ DownStarF
-  def DownStar[F[_], D, C](f: F[D] => C): DownStar[F, D, C] = 
-    Tag[F[D] => C, DownStarF](f)
+  val DownStar = Tag.of[DownStarF]
 
   implicit def upStarProfunctor[F[_]: Functor]: Profunctor[UpStar[F, ?, ?]] =
     new Profunctor[UpStar[F, ?, ?]] {
@@ -79,7 +77,7 @@ object Profunctor {
   implicit def downStarFunctor[F[_], D]: Functor[DownStar[F, D, ?]] =
     new Functor[DownStar[F, D, ?]] {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
-        DownStar[F, D, B](k compose Tag.unwrap(f))
+        DownStar(k compose Tag.unwrap(f))
     }
   ////
 }

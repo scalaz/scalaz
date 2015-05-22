@@ -211,6 +211,21 @@ trait Foldable[F[_]]  { self =>
       case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
     } map (_._1)
 
+  def sumr[A](fa: F[A])(implicit A: Monoid[A]): A =
+    foldRight(fa, A.zero)(A.append)
+
+  def sumr1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
+    foldRight1Opt(fa)(A.append(_, _))
+
+  def suml[A](fa: F[A])(implicit A: Monoid[A]): A =
+    foldLeft(fa, A.zero)(A.append(_, _))
+
+  def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
+    foldLeft1Opt(fa)(A.append(_, _))
+
+  def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+    foldLeft(fa, G.empty[A])(G.plus[A](_, _))
+
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)

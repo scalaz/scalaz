@@ -47,6 +47,9 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
+  // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
+  def scalac210Options = Seq("-Yno-generic-signatures")
+
   lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
@@ -55,14 +58,15 @@ object build extends Build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-      // no generic signatures, see SI-7932 and #571
       "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
-      "-unchecked",
-      "-Yno-generic-signatures"
-    ),
+      "-unchecked"
+    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2,10)) => scalac210Options
+      case _ => Nil
+    }),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
@@ -164,7 +168,7 @@ object build extends Build {
       ),
     // kind-projector plugin
     resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.5.2"  cross CrossVersion.binary)
+    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.5.4" cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )

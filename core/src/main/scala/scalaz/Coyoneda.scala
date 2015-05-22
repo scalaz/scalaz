@@ -233,7 +233,7 @@ private trait CoyonedaFoldable[F[_]] extends Foldable[Coyoneda[F, ?]] {
   def F: Foldable[F]
 
   override final def foldMap[A, B: Monoid](fa: Coyoneda[F, A])(f: A => B) =
-    F.foldMap(fa.fi)(i => f(fa.k(i)))
+    F.foldMap(fa.fi)(fa.k andThen f)
   override final def foldRight[A, B](fa: Coyoneda[F, A], z: => B)(f: (A, => B) => B) =
     F.foldRight(fa.fi, z)((i, b) => f(fa.k(i), b))
   override final def foldLeft[A, B](fa: Coyoneda[F, A], z: B)(f: (B, A) => B) =
@@ -244,7 +244,7 @@ private abstract class CoyonedaFoldable1[F[_]] extends Foldable1[Coyoneda[F, ?]]
   def F: Foldable1[F]
 
   override final def foldMap1[A, B: Semigroup](fa: Coyoneda[F, A])(f: A => B) =
-    F.foldMap1(fa.fi)(i => f(fa.k(i)))
+    F.foldMap1(fa.fi)(fa.k andThen f)
   override final def foldMapRight1[A, B](fa: Coyoneda[F, A])(z: A => B)(f: (A, => B) => B) =
     F.foldMapRight1(fa.fi)(i => z(fa.k(i)))((i, b) => f(fa.k(i), b))
 }
