@@ -22,6 +22,10 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
     F.map(run)(_ getOrElse default)
 
+  /** alias for [[getOrElse]] */
+  def |(default: => B)(implicit F: Functor[F]): F[B] =
+    getOrElse(default)
+
   def exists(f: (=> B) => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_ exists f)
 
@@ -35,6 +39,10 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
       , _ => g
     )))
   }
+
+  /** alias for [[orElse]] */
+  def |||(x: => LazyEitherT[F, A, B])(implicit F: Bind[F]): LazyEitherT[F, A, B] =
+    orElse(x)
 
   def toLazyOption(implicit F: Functor[F]): LazyOptionT[F, B] =
     lazyOptionT(F.map(run)(_.toLazyOption))

@@ -86,6 +86,10 @@ sealed abstract class Maybe[A] {
   final def orElse(oa: => Maybe[A]): Maybe[A] =
     cata(_ => this, oa)
 
+  /** alias for [[orElse]] */
+  final def |||(oa: => Maybe[A]): Maybe[A] =
+    orElse(oa)
+
   /** Tag with [[Tags.First]] */
   final def first: FirstMaybe[A] = Tag(this)
 
