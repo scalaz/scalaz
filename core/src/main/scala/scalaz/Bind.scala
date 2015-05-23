@@ -32,9 +32,9 @@ trait Bind[F[_]] extends Apply[F] { self =>
    * and `ifFalse`, not the other.
    */
   def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] = {
-    lazy val t = ifTrue
-    lazy val f = ifFalse
-    bind(value)(if(_) t else f)
+    val t: () => F[B] = ifTrue _
+    val f: () => F[B] = ifFalse _
+    bind(value)(if(_) t() else f())
   }
 
   /**
