@@ -18,6 +18,9 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
   def getOrElse(default: => A)(implicit F: Functor[F]): F[A] =
     F.map(run)(_.getOrElse(default))
 
+  def |(default: => A)(implicit F: Functor[F]): F[A] =
+    getOrElse(default)
+
   def exists(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.exists(f))
 
