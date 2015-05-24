@@ -65,6 +65,9 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def getOrElse(default: => A)(implicit F: Functor[F]): F[A] = mapO(_.getOrElse(default))
 
+  /** Alias for `getOrElse`. */
+  def |(default: => A)(implicit F: Functor[F]): F[A] = getOrElse(default)
+
   def getOrElseF(default: => F[A])(implicit F: Monad[F]): F[A] =
     F.bind(self.run) {
       case None => default
@@ -80,6 +83,9 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
       case None => a.run
       case x@Some(_) => F.point(x)
     })
+
+  def |||(a: => OptionT[F, A])(implicit F: Monad[F]): OptionT[F, A] =
+    orElse(a)
 
   /** @since 7.0.3 */
   def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
