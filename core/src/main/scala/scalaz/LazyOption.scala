@@ -25,6 +25,9 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def getOrElse[AA >: A](default: => AA): AA =
     fold(a => a, default)
 
+  def |[AA >: A](default: => AA): AA =
+    getOrElse(default)
+
   def exists(f: (=> A) => Boolean): Boolean =
     fold(f, false)
 
