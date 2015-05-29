@@ -1,14 +1,14 @@
 package scalaz.example
 
-import scalaz.{ Free, Coyoneda, Monad, ~>, State, NonEmptyList }
+import scalaz.{ Free, Monad, ~>, State, NonEmptyList }
 import scalaz.std.function._
 import scalaz.syntax.monad._
 import scalaz.effect.IO
 
 import scala.util.Random
 
-// Example usage of free monad over free functor
-object FreeCoyoUsage extends App {
+// Example usage of free monad
+object FreeUsage extends App {
 
   // An algebra of primitive operations in the context of a random number generator
   sealed trait RngOp[A]
@@ -26,21 +26,20 @@ object FreeCoyoUsage extends App {
   }
 
   // Free monad over the free functor of RngOp. The instance is not inferrable.
-  type Rng[A] = Free.FreeC[RngOp, A]
-  implicit val MonadRng: Monad[Rng] = 
-    Free.freeMonad[({type λ[α] = Coyoneda[RngOp, α]})#λ]
+  type Rng[A] = Free[RngOp, A]
+  implicit val MonadRng: Monad[Rng] = Free.freeMonad[RngOp]
 
   // Smart constructors for Rng[A]
-  val nextBoolean              = Free.liftFC(RngOp.NextBoolean)
-  val nextDouble               = Free.liftFC(RngOp.NextDouble)
-  val nextFloat                = Free.liftFC(RngOp.NextFloat)
-  val nextGaussian             = Free.liftFC(RngOp.NextGaussian)
-  val nextInt                  = Free.liftFC(RngOp.NextInt)
-  def nextIntInRange(max: Int) = Free.liftFC(RngOp.NextIntInRange(max))
-  val nextLong                 = Free.liftFC(RngOp.NextLong)
-  val nextPrintableChar        = Free.liftFC(RngOp.NextPrintableChar)
-  def nextString(length: Int)  = Free.liftFC(RngOp.NextString(length))
-  def setSeed(seed: Long)      = Free.liftFC(RngOp.SetSeed(seed))
+  val nextBoolean              = Free.liftF(RngOp.NextBoolean)
+  val nextDouble               = Free.liftF(RngOp.NextDouble)
+  val nextFloat                = Free.liftF(RngOp.NextFloat)
+  val nextGaussian             = Free.liftF(RngOp.NextGaussian)
+  val nextInt                  = Free.liftF(RngOp.NextInt)
+  def nextIntInRange(max: Int) = Free.liftF(RngOp.NextIntInRange(max))
+  val nextLong                 = Free.liftF(RngOp.NextLong)
+  val nextPrintableChar        = Free.liftF(RngOp.NextPrintableChar)
+  def nextString(length: Int)  = Free.liftF(RngOp.NextString(length))
+  def setSeed(seed: Long)      = Free.liftF(RngOp.SetSeed(seed))
 
   // You can of course derive new operations from the primitives
   def nextNonNegativeInt       = nextInt.map(_.abs)
@@ -48,7 +47,7 @@ object FreeCoyoUsage extends App {
 
   // Natural transformation to (Random => A)
   type RandomReader[A] = Random => A
-  val toState: RngOp ~> RandomReader = 
+  val toState: RngOp ~> RandomReader =
     new (RngOp ~> RandomReader) {
       def apply[A](fa: RngOp[A]) =
         fa match {
@@ -67,7 +66,7 @@ object FreeCoyoUsage extends App {
 
   // Now we have enough structure to run a program
   def runRng[A](program: Rng[A], seed: Long): A =
-    Free.runFC[RngOp, RandomReader, A](program)(toState).apply(new Random(seed))
+    program.foldMap(toState).apply(new Random(seed))
 
   // Syntax
   implicit class RngOps[A](ma: Rng[A]) {
@@ -93,3 +92,4 @@ object FreeCoyoUsage extends App {
   println(nextBoolean.replicateM(10).exec(0L))
 
 }
+

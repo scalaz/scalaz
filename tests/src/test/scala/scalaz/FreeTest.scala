@@ -2,7 +2,7 @@ package scalaz
 
 import org.scalacheck.{Arbitrary, Gen}
 import std.AllInstances._
-import Free.{Return, Suspend}
+import Free._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 
@@ -47,8 +47,8 @@ object FreeList {
 object FreeTest extends SpecLite {
   implicit def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
     Gen.frequency(
-      (1, Functor[Arbitrary].map(A)(Return[F, A](_)).arbitrary),
-      (1, Functor[Arbitrary].map(Arbitrary(g))(Suspend[F, A](_)).arbitrary)
+      (1, Functor[Arbitrary].map(A)(Free.pure[F, A](_)).arbitrary),
+      (1, Functor[Arbitrary].map(Arbitrary(g))(Free[F, A](_)).arbitrary)
     )
 
   "List" should {

@@ -88,8 +88,8 @@ object MixedBag extends App {
         f(as._1) -> f(as._2)
     }
 
-    def leaf[A](a: A): Tree[A] = Return(a)
-    def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Suspend[Pair, A](l -> r)
+    def leaf[A](a: A): Tree[A] = Free.pure(a)
+    def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Free[Pair, A](l -> r)
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {

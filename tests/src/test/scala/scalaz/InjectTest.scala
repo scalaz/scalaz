@@ -1,7 +1,7 @@
 package scalaz
 
 import syntax.all._
-import Inject._, Free.Return
+import Inject._
 import org.scalacheck.Prop.forAll
 
 object InjectTest extends SpecLite {
@@ -22,7 +22,7 @@ object InjectTest extends SpecLite {
 
   sealed trait Test1AlgebraFunctions {
     def test1[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test1Algebra :<: F): Free[F, Int] =
-      inject[F, Test1Algebra, Int](Test1(keys, Return(_)))
+      inject[F, Test1Algebra, Int](Test1(keys, Free.pure(_)))
   }
 
   object Test1Algebra extends Test1AlgebraInstances with Test1AlgebraFunctions
@@ -41,7 +41,7 @@ object InjectTest extends SpecLite {
 
   sealed trait Test2AlgebraFunctions {
     def test2[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test2Algebra :<: F): Free[F, Int] =
-      inject[F, Test2Algebra, Int](Test2(keys, Return(_)))
+      inject[F, Test2Algebra, Int](Test2(keys, Free.pure(_)))
   }
 
   object Test2Algebra extends Test2AlgebraInstances with Test2AlgebraFunctions
@@ -60,7 +60,7 @@ object InjectTest extends SpecLite {
 
   sealed trait Test3AlgebraFunctions {
     def test3[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test3Algebra :<: F): Free[F, Int] =
-      inject[F, Test3Algebra, Int](Test3(keys, Return(_)))
+      inject[F, Test3Algebra, Int](Test3(keys, Free.pure(_)))
   }
 
   object Test3Algebra extends Test3AlgebraInstances with Test3AlgebraFunctions
@@ -103,16 +103,16 @@ object InjectTest extends SpecLite {
     val res =
       distr[T, Int]((test1[T](Seq("a")) >> test2[T](Seq("b")): Free[T, Int]) >> test3[T](Seq("c")))
 
-    (res == Some(Return[T, Int](3))) must_===(true)
+    (res == Some(Free.pure[T, Int](3))) must_===(true)
   }
 
   "apply in left" in {
-    val fa = Test1(Seq("a"), Return[Test1Algebra, Int](_))
+    val fa = Test1(Seq("a"), Free.pure[Test1Algebra, Int](_))
     (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must_===(true)
   }
 
   "apply in right" in {
-    val fa = Test2(Seq("a"), Return[Test2Algebra, Int](_))
+    val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
     (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must_===(true)
   }
 }
