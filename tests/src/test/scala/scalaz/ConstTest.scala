@@ -12,6 +12,7 @@ object ConstTest extends SpecLite {
   checkAll("Const List"  , applicative.laws[({type λ[α]  = Const[List[Int], α]})#λ])
   checkAll("Const Option", applicative.laws[({type λ[α]  = Const[Option[Int], α]})#λ])
 
+  checkAll(contravariant.laws[({type λ[α] = Const[Int, α]})#λ])
 
   "const functions" in {
     "const" ! forAll { (x: Int, y: Function0[String]) =>
