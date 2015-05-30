@@ -38,9 +38,17 @@ private sealed trait ConstOrder[A, B] extends Order[Const[A, B]] with ConstEqual
     OA.order(a1.getConst, a2.getConst)
 }
 
+private class ConstContravariant[C] extends Contravariant[Const[C, ?]] {
+  def contramap[A, B](r: Const[C, A])(f: B => A) =
+    Const(r.getConst)
+}
+
 sealed abstract class ConstInstances1 {
   implicit def constTraverse[C]: Traverse[Const[C, ?]] =
     new ConstTraverse[C] {}
+
+  implicit def constContravariant[C]: Contravariant[Const[C, ?]] =
+    new ConstContravariant[C]
 }
 
 sealed abstract class ConstInstances0 extends ConstInstances1 {
