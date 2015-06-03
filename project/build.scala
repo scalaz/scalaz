@@ -9,8 +9,7 @@ import java.awt.Desktop
 import scala.collection.immutable.IndexedSeq
 
 import sbtrelease._
-import sbtrelease.ReleasePlugin._
-import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 
@@ -48,9 +47,8 @@ object build extends Build {
   lazy val setMimaVersion: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
 
-    val (releaseV, _) = st.get(versions).getOrElse(sys.error("impossible"))
-    // TODO switch to `versionFile` key when updating sbt-release
-    IO.write(new File("version.sbt"), "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
+    IO.write(extracted get releaseVersionFile, "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
@@ -66,7 +64,7 @@ object build extends Build {
   // no generic signatures for scala 2.10.x and 2.9.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
 
-  lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
