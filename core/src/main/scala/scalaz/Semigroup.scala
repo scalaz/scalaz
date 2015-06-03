@@ -62,7 +62,7 @@ trait Semigroup[F]  { self =>
 
 
   ////
-  val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] { def F = Semigroup.this }
+  @transient lazy val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] { def F = Semigroup.this }
 }
 
 object Semigroup {

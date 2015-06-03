@@ -31,7 +31,7 @@ trait Associative[=>:[_, _]]  { self =>
 
   def associativeLaw = new AssociativeLaw {}
   ////
-  val associativeSyntax = new scalaz.syntax.AssociativeSyntax[=>:] { def F = Associative.this }
+  @transient lazy val associativeSyntax = new scalaz.syntax.AssociativeSyntax[=>:] { def F = Associative.this }
 }
 
 object Associative {

@@ -6,7 +6,7 @@ trait MonadListen[F[_, _], W] extends MonadTell[F, W] {
   def pass[A](ma: F[W, (A, W => W)]): F[W, A] =
     bind(listen(ma)){ case ((a, f), w) => writer(f(w), a) }
 
-  val monadListenSyntax = new scalaz.syntax.MonadListenSyntax[F, W]{def F = MonadListen.this}
+  @transient lazy val monadListenSyntax = new scalaz.syntax.MonadListenSyntax[F, W]{def F = MonadListen.this}
 }
 
 object MonadListen {

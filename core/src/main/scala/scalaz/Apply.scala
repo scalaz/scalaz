@@ -135,7 +135,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def applyLaw = new ApplyLaw {}
 
   ////
-  val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
+  @transient lazy val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }
 
 object Apply {

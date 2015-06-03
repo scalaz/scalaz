@@ -19,7 +19,7 @@ trait Resource[F]  { self =>
   }
 
   ////
-  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
+  @transient lazy val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
 }
 
 object Resource {

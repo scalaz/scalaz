@@ -195,7 +195,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def traverseLaw = new TraverseLaw {}
 
   ////
-  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
+  @transient lazy val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
 }
 
 object Traverse {

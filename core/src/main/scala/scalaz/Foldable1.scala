@@ -154,7 +154,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def foldable1Law = new Foldable1Law {}
 
   ////
-  val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
+  @transient lazy val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
 
 object Foldable1 {

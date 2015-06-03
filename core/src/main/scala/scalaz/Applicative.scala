@@ -110,7 +110,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   def applicativeLaw = new ApplicativeLaw {}
 
   ////
-  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
+  @transient lazy val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
 
 object Applicative {

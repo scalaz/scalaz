@@ -37,7 +37,7 @@ trait Profunctor[=>:[_, _]]  { self =>
     }
 
   ////
-  val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
+  @transient lazy val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
 }
 
 object Profunctor {

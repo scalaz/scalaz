@@ -284,7 +284,7 @@ trait Foldable[F[_]]  { self =>
   def foldableLaw = new FoldableLaw {}
 
   ////
-  val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] { def F = Foldable.this }
+  @transient lazy val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] { def F = Foldable.this }
 }
 
 object Foldable {

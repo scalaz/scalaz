@@ -63,7 +63,7 @@ trait Bifunctor[F[_, _]]  { self =>
     embed[Id.Id,H]
 
   ////
-  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
+  @transient lazy val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
 object Bifunctor {

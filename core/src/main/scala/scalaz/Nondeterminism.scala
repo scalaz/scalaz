@@ -159,7 +159,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     map(gatherUnordered(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a,b) => implicitly[Monoid[A]].append(a,b)))
 
   ////
-  val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
+  @transient lazy val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
 }
 
 object Nondeterminism {
