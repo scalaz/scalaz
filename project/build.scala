@@ -9,8 +9,7 @@ import java.awt.Desktop
 import scala.collection.immutable.IndexedSeq
 
 import sbtrelease._
-import sbtrelease.ReleasePlugin._
-import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 
@@ -19,7 +18,7 @@ import com.typesafe.sbt.pgp.PgpKeys._
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.sbt.osgi.SbtOsgi._
 
-import sbtbuildinfo.Plugin._
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
@@ -50,7 +49,7 @@ object build extends Build {
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
 
-  lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
@@ -186,19 +185,18 @@ object build extends Build {
   lazy val core = Project(
     id = "core",
     base = file("core"),
-    settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
+    settings = standardSettings ++ Seq[Sett](
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
       },
-      sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
-  )
+  ).enablePlugins(sbtbuildinfo.BuildInfoPlugin)
 
   lazy val concurrent = Project(
     id = "concurrent",
