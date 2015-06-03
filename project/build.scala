@@ -9,8 +9,7 @@ import java.awt.Desktop
 import scala.collection.immutable.IndexedSeq
 
 import sbtrelease._
-import sbtrelease.ReleasePlugin._
-import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 
@@ -19,7 +18,7 @@ import com.typesafe.sbt.pgp.PgpKeys._
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.sbt.osgi.SbtOsgi._
 
-import sbtbuildinfo.Plugin._
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
@@ -48,16 +47,14 @@ object build extends Build {
 
   lazy val setMimaVersion: ReleaseStep = { st: State =>
     val extracted = Project.extract(st)
-
-    val (releaseV, _) = st.get(versions).getOrElse(sys.error("impossible"))
-    // TODO switch to `versionFile` key when updating sbt-release
-    IO.write(new File("version.sbt"), "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
+    IO.write(extracted get releaseVersionFile, "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.9.2",
@@ -243,7 +240,7 @@ object build extends Build {
   lazy val core = Project(
     id = "core",
     base = file("core"),
-    settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
+    settings = standardSettings ++ Seq[Sett](
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -259,13 +256,12 @@ object build extends Build {
             Nil
         }
       },
-      sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
-  )
+  ).enablePlugins(sbtbuildinfo.BuildInfoPlugin)
 
   lazy val concurrent = Project(
     id = "concurrent",
