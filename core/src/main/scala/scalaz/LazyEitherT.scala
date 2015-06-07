@@ -137,6 +137,11 @@ object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
       LazyEitherT(M.bind(lazyEitherT.run)(_.fold(a => f(a).run, b => M.point(LazyEither.lazyRight[C](b)))))
   }
 
+  implicit def lazyEitherTMonadPlus[F[_], L](implicit F0: Monad[F], L: Monoid[L]): MonadPlus[LazyEitherT[F, L, ?]] =
+    new LazyEitherTMonadPlus[F, L] {
+      override def E = L
+      override def F = F0
+    }
 }
 
 sealed abstract class LazyEitherTInstances1 {
@@ -155,6 +160,12 @@ sealed abstract class LazyEitherTInstances1 {
   implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, ?, ?], L] =
     new LazyEitherTMonadError[F, L] {
       implicit def F = F0
+    }
+
+  implicit def lazyEitherTPlus[F[_], L](implicit F0: Monad[F], L: Semigroup[L]): Plus[LazyEitherT[F, L, ?]] =
+    new LazyEitherTPlus[F, L] {
+      override def F = F0
+      override def E = L
     }
 }
 
@@ -271,6 +282,30 @@ private trait LazyEitherTMonad[F[_], E] extends Monad[LazyEitherT[F, E, ?]] with
   def point[A](a: => A): LazyEitherT[F, E, A] = LazyEitherT.lazyRightT(a)
 
   def bind[A, B](fa: LazyEitherT[F, E, A])(f: A => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] = fa flatMap (a => f(a))
+}
+
+private trait LazyEitherTPlus[F[_], E] extends Plus[LazyEitherT[F, E, ?]] {
+  implicit def F: Monad[F]
+  def E: Semigroup[E]
+
+  override def plus[A](a: LazyEitherT[F, E, A], b: => LazyEitherT[F, E, A]) =
+    LazyEitherT(F.bind(a.run){ r =>
+      r.fold(
+        l => F.map(b.run){ rr =>
+          rr.fold(
+            ll => LazyEither.lazyLeft(E.append(l, ll)),
+            _ => rr
+          )
+        },
+        _ => F.point(r)
+      )
+    })
+}
+
+private trait LazyEitherTMonadPlus[F[_], E] extends MonadPlus[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] with LazyEitherTPlus[F, E] {
+  override def E: Monoid[E]
+
+  override def empty[A] = LazyEitherT.lazyLeftT(E.zero)
 }
 
 private trait LazyEitherTFoldable[F[_], E] extends Foldable.FromFoldr[LazyEitherT[F, E, ?]] {
