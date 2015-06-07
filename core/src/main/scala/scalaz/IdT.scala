@@ -51,6 +51,9 @@ sealed abstract class IdTInstances0 extends IdTInstances1 {
     new IdTMonad[F] {
       implicit def F: Monad[F] = F0
     }
+
+  implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
+    F.contramap(_.run)
 }
 
 sealed abstract class IdTInstances extends IdTInstances0 {
@@ -60,6 +63,9 @@ sealed abstract class IdTInstances extends IdTInstances0 {
     new IdTTraverse[F] {
       implicit def F: Traverse[F] = F0
     }
+
+  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
 }
 
 trait IdTFunctions {
