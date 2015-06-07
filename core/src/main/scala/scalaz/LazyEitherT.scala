@@ -145,6 +145,11 @@ object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
       LazyEitherT(M.bind(lazyEitherT.run)(_.fold(a => f(a).run, b => M.point(LazyEither.lazyRight[C](b)))))
   }
 
+  implicit def lazyEitherTMonadPlus[F[_], L](implicit F0: Monad[F], L: Monoid[L]): MonadPlus[({type λ[α]=LazyEitherT[F, L, α]})#λ] =
+    new LazyEitherTMonadPlus[F, L] {
+      override def E = L
+      override def F = F0
+    }
 }
 
 sealed abstract class LazyEitherTInstances1 {
@@ -158,6 +163,12 @@ sealed abstract class LazyEitherTInstances1 {
   implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[({type λ[α, β] = LazyEitherT[F, α, β]})#λ, L] = new LazyEitherTMonadError[F, L] {
     implicit def F = F0
   }
+
+  implicit def lazyEitherTPlus[F[_], L](implicit F0: Monad[F], L: Semigroup[L]): Plus[({type λ[α]=LazyEitherT[F, L, α]})#λ] =
+    new LazyEitherTPlus[F, L] {
+      override def F = F0
+      override def E = L
+    }
 }
 
 sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
@@ -247,6 +258,30 @@ private trait LazyEitherTMonad[F[_], E] extends Monad[({type λ[α]=LazyEitherT[
   def point[A](a: => A): LazyEitherT[F, E, A] = LazyEitherT.lazyRightT(a)
 
   def bind[A, B](fa: LazyEitherT[F, E, A])(f: A => LazyEitherT[F, E, B]): LazyEitherT[F, E, B] = fa flatMap (a => f(a))
+}
+
+private trait LazyEitherTPlus[F[_], E] extends Plus[({type λ[α]=LazyEitherT[F, E, α]})#λ] {
+  implicit def F: Monad[F]
+  def E: Semigroup[E]
+
+  override def plus[A](a: LazyEitherT[F, E, A], b: => LazyEitherT[F, E, A]) =
+    LazyEitherT(F.bind(a.run){ r =>
+      r.fold(
+        l => F.map(b.run){ rr =>
+          rr.fold(
+            ll => LazyEither.lazyLeft(E.append(l, ll)),
+            _ => rr
+          )
+        },
+        _ => F.point(r)
+      )
+    })
+}
+
+private trait LazyEitherTMonadPlus[F[_], E] extends MonadPlus[({type λ[α]=LazyEitherT[F, E, α]})#λ] with LazyEitherTMonad[F, E] with LazyEitherTPlus[F, E] {
+  override def E: Monoid[E]
+
+  override def empty[A] = LazyEitherT.lazyLeftT(E.zero)
 }
 
 private trait LazyEitherTFoldable[F[_], E] extends Foldable.FromFoldr[({type λ[α]=LazyEitherT[F, E, α]})#λ] {

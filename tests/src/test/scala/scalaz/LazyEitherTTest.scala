@@ -3,7 +3,6 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
 
 object LazyEitherTTest extends SpecLite {
 
@@ -16,14 +15,16 @@ object LazyEitherTTest extends SpecLite {
   type LazyEitherTListInt[A] = LazyEitherT[List, Int, A]
 
   checkAll(equal.laws[LazyEitherTListInt[Int]])
-  checkAll(monad.laws[LazyEitherTListInt])
+  checkAll(monadPlus.laws[LazyEitherTListInt])
   checkAll(traverse.laws[LazyEitherTListInt])
   checkAll(bitraverse.laws[LazyEitherTList])
   checkAll(monadError.laws[LazyEitherTList, Int])
 
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
+    def plus[F[_] : Monad, A: Semigroup] = Plus[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def monad[F[_] : Monad, A] = Monad[({type λ[α] = LazyEitherT[F, A, α]})#λ]
+    def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def foldable[F[_] : Foldable, A] = Foldable[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def traverse[F[_] : Traverse, A] = Traverse[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def bifunctor[F[_] : Functor] = Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
@@ -32,6 +33,8 @@ object LazyEitherTTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[F[_] : Monad : Traverse, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
+    def functor[F[_] : Monad, A: Monoid] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
+    def monad[F[_] : Monad, A: Monoid] = Monad[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def foldable[F[_] : Traverse, A] = Foldable[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def bifunctor[F[_] : Traverse] = Bifunctor[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
     def bifoldable[F[_] : Traverse] = Bifoldable[({type λ[α, β] = LazyEitherT[F, α, β]})#λ]
