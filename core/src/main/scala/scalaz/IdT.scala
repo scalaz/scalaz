@@ -65,7 +65,10 @@ trait IdTInstances extends IdTInstances0 {
 trait IdTFunctions {
 }
 
-object IdT extends IdTFunctions with IdTInstances 
+object IdT extends IdTFunctions with IdTInstances {
+  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
+}
 
 //
 // Implementation traits for type class instances

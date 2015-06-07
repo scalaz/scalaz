@@ -3,6 +3,7 @@ package scalaz
 object IdTTest extends SpecLite {
 
   object instances {
+    def equal[F[_], A](implicit F: Equal[F[A]]) = Equal[IdT[F, A]]
     def functor[F[+_] : Functor] = Functor[({type λ[α] = IdT[F, α]})#λ]
     def apply[F[+_] : Apply] = Apply[({type λ[α] = IdT[F, α]})#λ]
     def monad[F[+_] : Monad] = Monad[({type λ[α] = IdT[F, α]})#λ]
