@@ -55,4 +55,7 @@ object NonEmptyListTest extends SpecLite {
     val largeNel = NonEmptyList.nel(0, (1 to 100000).toList)
     (largeNel map Option.apply).sequence must_===(Option(largeNel))
   }
+  "zipWithIndex" ! forAll { xs: NonEmptyList[Int] =>
+    xs.zipWithIndex.list must_== xs.list.zipWithIndex
+  }
 }

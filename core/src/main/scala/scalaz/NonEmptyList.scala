@@ -114,6 +114,16 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
     (nel(a, aa), nel(b, bb))
   }
 
+  def zipWithIndex: NonEmptyList[(A, Int)] = {
+    @annotation.tailrec
+    def loop(as: List[A], i: Int, acc: List[(A, Int)]): List[(A, Int)] =
+      as match {
+        case x :: y => loop(y, i + 1, (x, i) :: acc)
+        case _ => acc.reverse
+      }
+    new NonEmptyList((head, 0), loop(tail, 1, Nil))
+  }
+
   override def toString: String = "NonEmpty" + (head :: tail)
 
   override def equals(any: Any): Boolean =
