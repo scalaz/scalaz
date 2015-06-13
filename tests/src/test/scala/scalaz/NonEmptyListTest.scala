@@ -58,4 +58,7 @@ object NonEmptyListTest extends SpecLite {
   "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
     Foldable1[NonEmptyList].toNel(xs) must_=== xs
   }
+  "zipWithIndex" ! forAll { xs: NonEmptyList[Int] =>
+    xs.zipWithIndex.list must_== xs.list.zipWithIndex
+  }
 }
