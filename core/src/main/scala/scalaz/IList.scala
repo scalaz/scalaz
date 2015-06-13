@@ -245,11 +245,11 @@ sealed abstract class IList[A] extends Product with Serializable {
     as.foldLeft((c, IList.empty[B])) { case ((c, bs), a) => BFT.rightMap(f(c, a))(_ :: bs) }
 
   /** All of the `B`s, in order, and the final `C` acquired by a stateful left fold over `as`. */
-  def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, IList[B]) =
+  def mapAccumLeft[B, C](c: C)(f: (C, A) => (C, B)): (C, IList[B]) =
     BFT.rightMap(mapAccum(this)(c, f))(_.reverse)
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired by a stateful right fold over `as`. */
-  final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, IList[B]) =
+  final def mapAccumRight[B, C](c: C)(f: (C, A) => (C, B)): (C, IList[B]) =
     mapAccum(reverse)(c, f)
 
   // no min/max; use Foldable#minimum, maximum, etc.
@@ -615,10 +615,10 @@ sealed abstract class IListInstances extends IListInstance0 {
         fa.reverse
 
       override def mapAccumL[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
-        fa.mapAccumLeft(z, f)
+        fa.mapAccumLeft(z)(f)
 
       override def mapAccumR[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
-        fa.mapAccumRight(z, f)
+        fa.mapAccumRight(z)(f)
 
       override def any[A](fa: IList[A])(p: A => Boolean): Boolean = {
         @tailrec def loop(fa: IList[A]): Boolean = fa match {
