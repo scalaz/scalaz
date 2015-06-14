@@ -162,7 +162,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
                                                (implicit N: Applicative[N], M: Applicative[M], MN: Equal[M[N[F[C]]]]): Boolean = {
       type MN[A] = M[N[A]]
       val t1: MN[F[C]] = M.map(traverse[M, A, B](fa)(amb))(fb => traverse[N, B, C](fb)(bnc))
-      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(b => bnc(b)))(M compose N)
+      val t2: MN[F[C]] = traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
       MN.equal(t1, t2)
     }
 
