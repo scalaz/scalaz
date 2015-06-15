@@ -34,6 +34,11 @@ object EitherTTest extends SpecLite {
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }
 
+  "liftEitherT must use the default minimal context of the lifted monad" ! forAll { (a: Int \/ Int) =>
+    import scalaz.syntax.eitherT._
+    a.liftEitherT[Option].run must_=== Some(a)
+  }
+
   object instances {
     def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
@@ -83,5 +88,12 @@ object EitherTTest extends SpecLite {
     for {
       (a,b) <- brokenMethod
     } yield "yay"
+
+    import scalaz.syntax.eitherT._
+
+    val r: String \/ Int = \/-(123)
+    val l: String \/ Int = -\/("Fail")
+    r.liftEitherT[Option]: EitherT[Option, String, Int]
+    l.liftEitherT[Option]: EitherT[Option, String, Int]
   }
 }

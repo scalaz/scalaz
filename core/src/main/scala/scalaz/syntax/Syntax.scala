@@ -121,6 +121,8 @@ trait Syntaxes {
 
   object either extends ToEitherOps
 
+  object eitherT extends EitherToEitherTOps
+
   object nel extends ToNelOps
 
   object these extends ToTheseOps
@@ -146,6 +148,7 @@ trait ToDataOps
   with ToValidationOps
   with ToKleisliOps
   with ToEitherOps
+  with EitherToEitherTOps
   with ToNelOps
   with ToTheseOps
   with ToMaybeOps
