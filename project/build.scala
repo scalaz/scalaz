@@ -52,8 +52,10 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
+  private[this] val Scala212 = "2.12.0-M1"
+
   val scalaCheckVersion: String => String = {
-    case "2.12.0-M1" =>
+    case Scala212 =>
       "1.11.6"
     case _ =>
       "1.11.4"
@@ -68,7 +70,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
+    crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6", Scala212),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= {
       val sv = scalaVersion.value
