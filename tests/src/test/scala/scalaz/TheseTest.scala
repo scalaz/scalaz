@@ -11,7 +11,7 @@ object TheseTest extends SpecLite {
 
   checkAll(monad.laws[TheseInt])
   checkAll(traverse.laws[TheseInt])
-  checkAll(equal.laws[Int \&/ Int])
+  checkAll(order.laws[Int \&/ Int])
   checkAll(semigroup.laws[Int \&/ Int])
   checkAll(bitraverse.laws[\&/])
 
@@ -31,6 +31,8 @@ object TheseTest extends SpecLite {
   }
 
   object instances {
+    def equal[A: Equal, B: Equal] = Equal[A \&/ B]
+    def order[A: Order, B: Order] = Order[A \&/ B]
     def functor[L] = Functor[({type λ[α] = L \&/ α})#λ]
     def apply[L: Semigroup] = Apply[({type λ[α] = L \&/ α})#λ]
     def applicative[L: Semigroup] = Applicative[({type λ[α] = L \&/ α})#λ]
@@ -46,5 +48,6 @@ object TheseTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[L: Semigroup] = Functor[({type λ[α] = L \&/ α})#λ]
+    def equal[A: Order, B: Order] = Equal[A \&/ B]
   }
 }
