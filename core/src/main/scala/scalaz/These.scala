@@ -360,6 +360,39 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
         fab.bitraverse(f, g)
     }
 
+  implicit final def TheseOrder[A, B](implicit A: Order[A], B: Order[B]): Order[A \&/ B] =
+    new Order[A \&/ B] {
+      override def equal(x: A \&/ B, y: A \&/ B) =
+        x === y
+      override def order(x: A \&/ B, y: A \&/ B) = x match {
+        case \&/.This(a1) =>
+          y match {
+            case \&/.This(a2) =>
+              A.order(a1, a2)
+            case _ =>
+              Ordering.GT
+          }
+        case \&/.That(b1) =>
+          y match {
+            case \&/.That(b2) =>
+              B.order(b1, b2)
+            case _ =>
+              Ordering.LT
+          }
+        case \&/.Both(a1, b1) =>
+          y match {
+            case \&/.Both(a2, b2) =>
+              A.order(a1, a2) match {
+                case Ordering.EQ => B.order(b1, b2)
+                case o => o
+              }
+            case \&/.This(_) =>
+              Ordering.LT
+            case \&/.That(_) =>
+              Ordering.GT
+          }
+      }
+    }
 }
 
 sealed abstract class TheseInstances1 {
