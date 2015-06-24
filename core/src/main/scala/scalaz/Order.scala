@@ -28,6 +28,8 @@ trait Order[F] extends Equal[F] { self =>
 
   def min(x: F, y: F) = if (lessThan(x, y)) x else y
 
+  def sort(x: F, y: F) = if (lessThanOrEqual(x, y)) (x, y) else (y, x)
+
   override def contramap[B](f: B => F): Order[B] = new Order[B] {
     def order(b1: B, b2: B): Ordering = self.order(f(b1), f(b2))
     override def equal(b1: B, b2: B) = self.equal(f(b1), f(b2))
