@@ -448,10 +448,16 @@ trait BooleanFunctions {
    */
   final def unlessM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.unlessM(cond)(f)
 
+  /** A version of `unlessM` that infers the type constructor `M`. */
+  final def unlessMU[MA](cond: Boolean)(f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] = M.TC.unlessM(cond)(M(f))
+
   /**
    * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
    */
   final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.whenM(cond)(f)
+
+  /** A version of `whenM` that infers the type constructor `M`. */
+  final def whenMU[MA](cond: Boolean)(f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] = M.TC.whenM(cond)(M(f))
 
   /**
    * @return `t` if `cond` is `true`, `f` otherwise
