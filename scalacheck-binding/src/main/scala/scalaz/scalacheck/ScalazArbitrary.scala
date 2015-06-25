@@ -219,7 +219,7 @@ object ScalazArbitrary {
   implicit def ZipperArbitrary[A: Arbitrary]: Arbitrary[Zipper[A]] =
     Apply[Arbitrary].apply3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
 
-  implicit def KleisliArbitrary[M[+_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
+  implicit def KleisliArbitrary[M[_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
     Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
 
   implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
