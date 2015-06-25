@@ -4,6 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.{Prop, Gen, Arbitrary}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {
@@ -25,14 +26,20 @@ object KleisliTest extends SpecLite {
       M.equal(mb1, mb2)
     }
   }
-  
+
+  // Needed because scalac inference has trouble with \/
+  implicit def KleisliDisjunctionArbitrary[E : Arbitrary, R : Arbitrary, A : Arbitrary]: Arbitrary[Kleisli[\/[E, ?], R, A]] = KleisliArbitrary[\/[E, +?], R, A]
+
+  implicit def KleisliDisjunctionEqual[E : Equal] = KleisliEqual[\/[E, ?]]
+
   "mapK" ! forAll {
-    (f: Int => Option[Int], a: Int) => 
+    (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
