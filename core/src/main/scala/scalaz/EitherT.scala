@@ -197,6 +197,13 @@ sealed trait EitherT[F[+_], +A, +B] {
 }
 
 object EitherT extends EitherTFunctions with EitherTInstances {
+  def fromDisjunction[F[+_]]: FromDisjunctionAux[F] = new FromDisjunctionAux
+
+  final class FromDisjunctionAux[F[+_]] private[EitherT] {
+    def apply[A, B](a: A \/ B)(implicit F: Applicative[F]): EitherT[F, A, B] =
+      eitherT(F.point(a))
+  }
+
   /** Construct a disjunction value. */
   def apply[F[+_], A, B](a: F[A \/ B]): EitherT[F, A, B] =
     eitherT[F, A, B](a)

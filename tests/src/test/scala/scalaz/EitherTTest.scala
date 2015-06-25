@@ -20,6 +20,10 @@ object EitherTTest extends SpecLite {
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
   }
 
+  "fromDisjunction" ! forAll { (a: String \/ Int) =>
+    Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
+  }
+
   object instances {
     def functor[F[+_] : Functor, A] = Functor[({type λ[α] = EitherT[F, A, α]})#λ]
     def monad[F[+_] : Monad, A] = Monad[({type λ[α] = EitherT[F, A, α]})#λ]
