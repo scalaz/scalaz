@@ -200,7 +200,12 @@ trait KleisliFunctions {
   def local[M[_] : Monad, A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] = fa local f
 }
 
-object Kleisli extends KleisliInstances with KleisliFunctions
+object Kleisli extends KleisliInstances with KleisliFunctions {
+  implicit def kleisliMonadError[F[_, _], E, R](implicit F0: MonadError[F, E]): MonadError[({type x[E0, A] = Kleisli[({type y[a] = F[E0, a]})#y, R, A]})#x, E] =
+    new KleisliMonadError[F, E, R] {
+      def F = F0
+    }
+}
 
 //
 // Implementation traits for type class instances
@@ -260,6 +265,16 @@ private trait KleisliHoist[R] extends Hoist[({type λ[α[_], β] = Kleisli[α, R
 
 private trait KleisliMonadPlus[F[_], R] extends MonadPlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPlusEmpty[F, R] with KleisliMonad[F, R] {
   implicit def F: MonadPlus[F]
+}
+
+private trait KleisliMonadError[F[_, _], E, R] extends MonadError[({type x[E0, A] = Kleisli[({type y[a] = F[E0, a]})#y, R, A]})#x, E] with KleisliMonad[({type l[a] = F[E, a]})#l, R] {
+  implicit def F: MonadError[F, E]
+
+  def handleError[A](fa: Kleisli[({type l[a] = F[E, a]})#l, R, A])(f: E => Kleisli[({type l[a] = F[E, a]})#l, R, A]) =
+    Kleisli[({type l[a] = F[E, a]})#l, R, A](r => F.handleError(fa.run(r))(e => f(e).run(r)))
+
+  def raiseError[A](e: E) =
+    Kleisli[({type l[a] = F[E, a]})#l, R, A](_ => F.raiseError(e))
 }
 
 private trait KleisliContravariant[F[_], X] extends Contravariant[({type λ[α] = Kleisli[F, α, X]})#λ] {
