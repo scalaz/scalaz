@@ -206,10 +206,16 @@ final class BooleanOps(self: Boolean) {
    */
   final def unlessM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.unlessM(self)(f)
 
+  /** A version of `unlessM` that infers the type constructor `M`. */
+  final def unlessMU[MA](f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] = M.TC.unlessM(self)(M(f))
+
   /**
    * Returns the given argument if `cond` is true`, otherwise, unit lifted into M.
    */
   final def whenM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.whenM(self)(f)
+
+  /** A version of `whenM` that infers the type constructor `M`. */
+  final def whenMU[MA](f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] = M.TC.whenM(self)(M(f))
 
   /**
    * @return `t` if true, `f` otherwise
