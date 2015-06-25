@@ -30,6 +30,10 @@ object EitherTTest extends SpecLite {
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
   }
 
+  "fromDisjunction" ! forAll { (a: String \/ Int) =>
+    Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
+  }
+
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }

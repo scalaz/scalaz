@@ -210,6 +210,13 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances with EitherTFunctions {
+  def fromDisjunction[F[_]]: FromDisjunctionAux[F] = new FromDisjunctionAux
+
+  final class FromDisjunctionAux[F[_]] private[EitherT] {
+    def apply[A, B](a: A \/ B)(implicit F: Applicative[F]): EitherT[F, A, B] =
+      eitherT(F.point(a))
+  }
+
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left))
