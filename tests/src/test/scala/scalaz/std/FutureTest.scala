@@ -15,7 +15,6 @@ import scalaz.syntax.functor._
 import scalaz.Tags._
 
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class FutureTest extends SpecLite {
@@ -24,12 +23,15 @@ class FutureTest extends SpecLite {
 
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
+ {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
     val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
     Await.result(futureWithError, duration)
   }
 
-  private[this] def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
+  def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future.successful(x) }
 
   case class SomeFailure(n: Int) extends Exception
 
@@ -49,6 +51,7 @@ class FutureTest extends SpecLite {
     implicit val cm: Comonad[Future] = futureComonad(duration)
     checkAll(comonad.laws[Future])
   }
+ }
 
   "Nondeterminism[Future]" should {
     implicit val es: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
