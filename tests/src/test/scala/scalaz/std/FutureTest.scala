@@ -29,18 +29,19 @@ class FutureTest extends SpecLite {
     Await.result(futureWithError, duration)
   }
 
-  implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
+  private[this] def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
 
   case class SomeFailure(n: Int) extends Exception
 
   implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
 
-  checkAll(monad.laws[Future])
   checkAll(monoid.laws[Future[Int]])
   checkAll(monoid.laws[Future[Int @@ Multiplication]])
 
+  // can not use `org.scalacheck.Arbitrary.arbFuture` due to https://github.com/scalaz/scalaz/issues/964
+  // https://github.com/rickynils/scalacheck/blob/1.12.4/src/main/scala/org/scalacheck/Arbitrary.scala#L291-L293
   // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
-  checkAll(monadError.laws[λ[(α, β) => Future[β]], Throwable](implicitly, implicitly, implicitly, implicitly, ArbitraryThrowable))
+  checkAll(monadError.laws[λ[(α, β) => Future[β]], Throwable](implicitly, FutureArbitrary, FutureArbitrary, implicitly, ArbitraryThrowable))
 
   // Scope these away from the rest as Comonad[Future] is a little evil.
   // Should fail to compile by default: implicitly[Comonad[Future]]
