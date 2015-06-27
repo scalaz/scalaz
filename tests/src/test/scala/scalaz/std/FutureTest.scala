@@ -27,8 +27,8 @@ class FutureTest extends SpecLite {
   checkAll(monoid.laws[Future[Int]])
   checkAll(monoid.laws[Future[Int @@ Multiplication]])
 
-  // Scope these away from the rest as Copointed[Future] is a little evil.
-  // Should fail to compile by default: implicitly[Copointed[Future]]
+  // Scope these away from the rest as Comonad[Future] is a little evil.
+  // Should fail to compile by default: implicitly[Comonad[Future]]
   {
     implicit val cm: Comonad[Future] = futureComonad(duration)
     checkAll(comonad.laws[Future])
