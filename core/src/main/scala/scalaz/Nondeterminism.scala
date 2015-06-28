@@ -15,6 +15,8 @@ package scalaz
 trait Nondeterminism[F[_]] extends Monad[F] { self =>
   ////
 
+  import scalaz.std.anyVal._
+
   /**
    * A commutative operation which chooses nondeterministically to obtain
    * a value from either `a` or `b`. If `a` 'wins', a 'residual' context
@@ -119,6 +121,13 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def gatherUnordered[A](fs: Seq[F[A]]): F[List[A]] =
     reduceUnordered[A, List[A]](fs)
 
+  def gatherUnordered1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] = {
+    val R = implicitly[Reducer[A, List[A]]]
+    bind(chooseAny(fs.head, fs.tail.toList)) { case (a, residuals) =>
+      map(reduceUnordered(residuals)(R))(list => NonEmptyList.nels(a, list: _*))
+    }
+  }
+
   /**
    * Nondeterministically gather results from the given sequence of actions.
    * The result will be arbitrarily reordered, depending on the order
@@ -145,11 +154,18 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     map(gatherUnordered(fs.zipWithIndex.map { case (f,i) => strengthR(f,i) }))(
       ais => ais.sortBy(_._2).map(_._1))
 
+  def gather1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] =
+    map(gatherUnordered1(fs.zipWithIndex.map { case (f,i) => strengthR(f,i) }))(
+      ais => ais.sortBy(_._2).map(_._1))
+
   /**
    * Nondeterministically sequence `fs`, collecting the results using a `Monoid`.
    */
   def aggregate[A: Monoid](fs: Seq[F[A]]): F[A] =
     map(gather(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a,b) => implicitly[Monoid[A]].append(a,b)))
+
+  def aggregate1[A: Semigroup](fs: NonEmptyList[F[A]]): F[A] =
+    map(gather1(fs))(Foldable1[NonEmptyList].suml1(_))
 
   /**
    * Nondeterministically sequence `fs`, collecting the results using
@@ -157,6 +173,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    */
   def aggregateCommutative[A: Monoid](fs: Seq[F[A]]): F[A] =
     map(gatherUnordered(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a,b) => implicitly[Monoid[A]].append(a,b)))
+
+  def aggregateCommutative1[A: Semigroup](fs: NonEmptyList[F[A]]): F[A] =
+    map(gatherUnordered1(fs))(Foldable1[NonEmptyList].suml1(_))
 
   ////
   val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
