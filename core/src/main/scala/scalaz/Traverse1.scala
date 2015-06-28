@@ -45,6 +45,9 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   def traverse1[G[_], A, B](fa: F[A])(f: A => G[B])(implicit a: Apply[G]): G[F[B]] =
     traverse1Impl(fa)(f)
 
+  final def traverse1U[A, GB](fa: F[A])(f: A => GB)(implicit G: Unapply[Apply, GB]): G.M[F[G.A]] =
+    traverse1(fa)(G.leibniz.onF(f))(G.TC)
+
   def sequence1[G[_]:Apply,A](fga: F[G[A]]): G[F[A]] =
     traverse1Impl[G, G[A], A](fga)(identity)
 
