@@ -15,6 +15,7 @@ package scalaz
 trait Nondeterminism[F[_]] extends Monad[F] { self =>
   ////
 
+  import scalaz.Tags.Parallel
   import scalaz.std.anyVal._
 
   /**
@@ -176,6 +177,15 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 
   def aggregateCommutative1[A: Semigroup](fs: NonEmptyList[F[A]]): F[A] =
     map(gatherUnordered1(fs))(Foldable1[NonEmptyList].suml1(_))
+
+  def parallel: Applicative[λ[α => F[α] @@ Parallel]] =
+    new Applicative[λ[α => F[α] @@ Parallel]] {
+      def point[A](a: => A) = Parallel(self.point(a))
+      override def map[A, B](fa: F[A] @@ Parallel)(f: A => B) =
+        Parallel(self.map(Tag.unwrap(fa))(f))
+      def ap[A, B](fa: => F[A] @@ Parallel)(fab: => F[A => B] @@ Parallel) =
+        Parallel(self.mapBoth(Tag.unwrap(fa), Tag.unwrap(fab))((a, f) => f(a)))
+    }
 
   ////
   val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
