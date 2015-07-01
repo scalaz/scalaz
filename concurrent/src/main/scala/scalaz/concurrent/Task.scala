@@ -3,7 +3,8 @@ package scalaz.concurrent
 import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Maybe, Nondeterminism, Traverse, \/, -\/, \/-}
+import scalaz._
+import scalaz.Tags.Parallel
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -303,4 +304,20 @@ object Task {
 
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
+
+  /** type for Tasks which need to be executed in parallel when using an Applicative instance */
+  type ParallelTask[A] = Task[A] @@ Parallel
+
+  /** This Applicative instance runs Tasks in parallel.
+   *
+   * It is different from the Applicative instance obtained from Monad[Task] which runs tasks sequentially.
+   */
+  implicit val taskParallelApplicativeInstance: Applicative[ParallelTask] =
+    new Applicative[ParallelTask] {
+      def point[A](a: => A) = Parallel(Nondeterminism[Task].point(a))
+      override def map[A, B](fa: ParallelTask[A])(f: A => B) =
+        Parallel(Nondeterminism[Task].map(fa)(f))
+      def ap[A, B](fa: => ParallelTask[A])(fab: => ParallelTask[A => B]) =
+        Parallel(Nondeterminism[Task].mapBoth(fa, fab)((a, f) => f(a)))
+    }
 }
