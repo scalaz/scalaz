@@ -20,6 +20,11 @@ object LazyEitherTTest extends SpecLite {
   checkAll(bitraverse.laws[LazyEitherTList])
   checkAll(monadError.laws[LazyEitherTList, Int])
 
+  private def lazyEitherTUcompilationTest: Unit = {
+    val a: String \/ LazyEither[Int, Boolean] = null
+    LazyEitherT.lazyEitherTU(a)
+  }
+
   object instances {
     def functor[F[_] : Functor, A] = Functor[({type λ[α] = LazyEitherT[F, A, α]})#λ]
     def plus[F[_] : Monad, A: Semigroup] = Plus[({type λ[α] = LazyEitherT[F, A, α]})#λ]

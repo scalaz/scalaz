@@ -101,6 +101,12 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
 }
 
 object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
+  def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
+    u1: Unapply[Functor, FAB]{type A = AB},
+    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+    l: Leibniz.===[AB, LazyEither[A0, B0]]
+  ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
+
   final class LeftProjectionT[F[_], A, B](val lazyEitherT: LazyEitherT[F, A, B]) {
     import OptionT._
     import LazyOptionT._
