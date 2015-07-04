@@ -14,6 +14,7 @@ import scalaz.std.vector._
 sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
   /** The associative operation of the monoid coproduct */
   def |+|[A >: M : Monoid, B >: N : Monoid](m: A :+: B): A :+: B = {
+    @annotation.tailrec
     def go(r1: Vector[A \/ B], r2: Vector[A \/ B]): Vector[A \/ B] =
        (r1, r2) match {
          case (Vector(), es) => es
