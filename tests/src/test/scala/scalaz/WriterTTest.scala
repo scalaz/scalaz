@@ -35,18 +35,25 @@ object WriterTTest extends SpecLite {
   object instances {
     def functor[F[_]: Functor, W] = Functor[WriterT[F, W, ?]]
     def apply[F[_]: Apply, W: Semigroup] = Apply[WriterT[F, W, ?]]
+    def applicative[F[_]: Applicative, W: Monoid] = Applicative[WriterT[F, W, ?]]
     def monad[F[_]: Monad, W: Monoid] = Monad[WriterT[F, W, ?]]
     def foldable[F[_]: Foldable, W] = Foldable[WriterT[F, W, ?]]
     def traverse[F[_]: Traverse, W] = Traverse[WriterT[F, W, ?]]
 
     def functor[F[_]: Monad, W: Monoid] = Functor[WriterT[F, W, ?]]
     def apply[F[_]: Monad, W: Monoid] = Apply[WriterT[F, W, ?]]
+    def apply[F[_]: Monad, W: Semigroup] = Apply[WriterT[F, W, ?]]
+    def apply[F[_]: Bind, W: Monoid] = Apply[WriterT[F, W, ?]]
+    def apply[F[_]: Bind, W: Semigroup] = Apply[WriterT[F, W, ?]]
+    def apply[F[_]: Apply, W: Monoid] = Apply[WriterT[F, W, ?]]
+    def applicative[F[_]: Monad, W: Monoid] = Applicative[WriterT[F, W, ?]]
     def functor[F[_]: Traverse, W: Monoid] = Functor[WriterT[F, W, ?]]
     def foldable[F[_]: Traverse, W] = Foldable[WriterT[F, W, ?]]
     
     object writer {
       def functor[W] = Functor[Writer[W, ?]]
       def apply[W: Semigroup] = Apply[Writer[W, ?]]
+      def applicative[W: Monoid] = Applicative[Writer[W, ?]]
       def monad[W: Monoid] = Monad[Writer[W, ?]]
       def foldable[W] = Foldable[Writer[W, ?]](WriterT.writerTFoldable[Id, W])
       def traverse[W] = Traverse[Writer[W, ?]]
