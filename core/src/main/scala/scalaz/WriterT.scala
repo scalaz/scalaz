@@ -122,8 +122,8 @@ sealed abstract class WriterTInstances11 extends WriterTInstances12 {
 }
 
 sealed abstract class WriterTInstances10 extends WriterTInstances11 {
-  implicit def writerApply[W](implicit W0: Semigroup[W]): Apply[Writer[W, ?]] =
-    new WriterTApply[Id, W] {
+  implicit def writerBind[W](implicit W0: Semigroup[W]): Bind[Writer[W, ?]] =
+    new WriterTBind[Id, W] {
       implicit def F = idInstance
       implicit def W = W0
     }
@@ -138,6 +138,11 @@ sealed abstract class WriterTInstances9 extends WriterTInstances10 {
 }
 
 sealed abstract class WriterTInstances8 extends WriterTInstances9 {
+  implicit def writerTBind[F[_], W](implicit W0: Semigroup[W], F0: Bind[F]): Bind[WriterT[F, W, ?]] =
+    new WriterTBind[F, W] {
+      implicit def F = F0
+      implicit def W = W0
+    }
 }
 
 sealed abstract class WriterTInstances7 extends WriterTInstances8 {
@@ -276,11 +281,14 @@ private trait WriterTApplicative[F[_], W] extends Applicative[WriterT[F, W, ?]] 
   def point[A](a: => A) = writerT(F.point((W.zero, a)))
 }
 
+private trait WriterTBind[F[_], W] extends Bind[WriterT[F, W, ?]] with WriterTApply[F, W] {
+  implicit def F: Bind[F]
 
-private trait WriterTMonad[F[_], W] extends Monad[WriterT[F, W, ?]] with WriterTApplicative[F, W] {
+  override final def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]) = fa flatMap f
+}
+
+private trait WriterTMonad[F[_], W] extends Monad[WriterT[F, W, ?]] with WriterTApplicative[F, W] with WriterTBind[F, W] {
   implicit def F: Monad[F]
-
-  def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]) = fa flatMap f
 }
 
 private trait WriterTFoldable[F[_], W] extends Foldable.FromFoldr[WriterT[F, W, ?]] {
