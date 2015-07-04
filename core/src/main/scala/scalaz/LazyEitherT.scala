@@ -243,6 +243,12 @@ trait LazyEitherTFunctions {
   def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] =
     LazyEitherT(a)
 
+  def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
+    u1: Unapply[Functor, FAB]{type A = AB},
+    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+    l: Leibniz.===[AB, LazyEither[A0, B0]]
+  ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
+
   import LazyEither._
 
   def lazyLeftT[F[_], A, B](a: => A)(implicit p: Applicative[F]): LazyEitherT[F, A, B] =
