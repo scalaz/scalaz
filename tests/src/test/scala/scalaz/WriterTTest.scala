@@ -34,7 +34,7 @@ object WriterTTest extends SpecLite {
 
   object instances {
     def functor[F[_]: Functor, W] = Functor[WriterT[F, W, ?]]
-    def apply[F[_]: Monad, W: Semigroup] = Apply[WriterT[F, W, ?]]
+    def apply[F[_]: Apply, W: Semigroup] = Apply[WriterT[F, W, ?]]
     def monad[F[_]: Monad, W: Monoid] = Monad[WriterT[F, W, ?]]
     def foldable[F[_]: Foldable, W] = Foldable[WriterT[F, W, ?]]
     def traverse[F[_]: Traverse, W] = Traverse[WriterT[F, W, ?]]
