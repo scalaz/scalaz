@@ -138,11 +138,6 @@ sealed abstract class WriterTInstances9 extends WriterTInstances10 {
 }
 
 sealed abstract class WriterTInstances8 extends WriterTInstances9 {
-  implicit def writerApplicative[W](implicit W0: Monoid[W]): Applicative[Writer[W, ?]] =
-    new WriterTApplicative[Id, W] {
-      implicit def F = idInstance
-      implicit def W = W0
-    }
 }
 
 sealed abstract class WriterTInstances7 extends WriterTInstances8 {
