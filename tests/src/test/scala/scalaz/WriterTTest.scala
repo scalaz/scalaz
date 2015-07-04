@@ -31,6 +31,12 @@ object WriterTTest extends SpecLite {
       fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
   }
 
+  private def writerTUcompilationTest: Unit = {
+    import syntax.either._
+    val a: String \/ (Int, Boolean) = (1, true).right[String]
+    WriterT.writerTU(a)
+  }
+
   object instances {
     def functor[F[_]: Functor, W] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Apply, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]

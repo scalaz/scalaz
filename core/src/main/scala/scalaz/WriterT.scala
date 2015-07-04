@@ -102,7 +102,15 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def colocal[X](f: W => X)(implicit F: Functor[F]): WriterT[F, X, A] = mapWritten(f)
 }
 
-object WriterT extends WriterTInstances with WriterTFunctions
+object WriterT extends WriterTInstances with WriterTFunctions {
+
+  def writerTU[FAB, AB, A0, B0](fab: FAB)(implicit
+    u1: Unapply[Functor, FAB]{type A = AB},
+    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+    l: Leibniz.===[AB, (A0, B0)]
+  ): WriterT[u1.M, A0, B0] = WriterT(l.subst[u1.M](u1(fab)))
+
+}
 
 sealed abstract class WriterTInstances12 {
   implicit def writerTMonoid[F[_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
