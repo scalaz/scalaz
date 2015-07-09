@@ -49,6 +49,9 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def lift[L[_]: Applicative]: Kleisli[λ[α => L[M[α]]], A, B] =
     kleisli[λ[α => L[M[α]]], A, B](a => Applicative[L].point(self(a)))
 
+  def transform[N[_]](f: M ~> N): Kleisli[N, A, B] =
+    kleisli(a => f(run(a)))
+
   def lower(implicit M: Monad[M]): Kleisli[M, A, M[B]] =
     Kleisli(a => M.pure(this(a)))
 
