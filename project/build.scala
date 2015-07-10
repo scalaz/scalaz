@@ -69,7 +69,10 @@ object build extends Build {
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
           Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
-      Seq("-unchecked") ++ versionDepOpts ++ (if (sv startsWith "2.11") Seq("-Xsource:2.10") else Seq())
+      Seq("-unchecked") ++ versionDepOpts ++ PartialFunction.condOpt(CrossVersion.partialVersion(sv)){
+        case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+          Seq("-Xsource:2.10")
+      }.toList.flatten
     },
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -366,8 +369,12 @@ object build extends Build {
       previousArtifact := None,
       sources in Test := {
         val fs = (sources in Test).value
-        if (scalaVersion.value.contains("2.11.")) fs.filterNot(_.getName == "FuncTest.scala") // See SI-8290
-        else fs
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+            fs.filterNot(_.getName == "FuncTest.scala") // See SI-8290
+          case _ =>
+            fs
+        }
       }
     )
   )
