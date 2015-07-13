@@ -382,28 +382,46 @@ trait UnapplyProduct[TC[_[_]], MA, MB] {
 
 object UnapplyProduct {
   import Isomorphism.<~>
-  // This seems to motivate multiple implicit parameter sections. Is there another way?
-  // Currently, a type annotation in a parameter declaration may be path-dependent on a
-  // parameter from a previous parameter section, hence `iso` can't be in the first parameter
-  // section; which itself can't be implicit.
-  //
-  // There are two possible changes to Scalac that could help:
-  //
-  // 1. Allow multiple implicit parameter sections
-  // 2. Allow path-dependent parameter types to refer to the current (or even subsequent)
-  //    parameter sections.
-  //
-  //    A motivating example for #2 is in neg/depmet_try_implicit.scala
-  //
-  //    def foo[T, T2](a: T, x: T2)(implicit w: ComputeT2[T, T2]) // awkward, if you provide T you must also provide T2
-  //    def foo[T](a: T, x: w.T2)(implicit w: ComputeT2[T])       // more compact, and allows you to provide T1 and infer T2.
-  //
-  /*implicit */ def unapply[TC[_[_]], MA0, MB0](/*implicit */U1: Unapply[TC, MA0], U2: Unapply[TC, MB0])(implicit iso: U1.M <~> U2.M) = new UnapplyProduct[TC, MA0, MB0] {
-    type M[X] = U1.M[X]
-    type A = U1.A
-    type B = U2.A
-    def TC = U1.TC
-    def _1(ma: MA0) = U1(ma)
-    def _2(mb: MB0) = iso.from(U2(mb))
+
+  /** Fetch a well-typed `UnapplyProduct` for the given typeclass and types. */
+  def apply[TC[_[_]], MA, MB](implicit U: UnapplyProduct[TC, MA, MB]): U.type {
+    type M[A] = U.M[A]
+    type A = U.A
+    type B = U.B
+  } = U
+
+  /**
+   * This is a workaround that allows us to approximate multiple implicit
+   * parameter sections (which Scala does not currently support). See this gist
+   * by Miles Sabin for the original context:
+   *
+   *   https://gist.github.com/milessabin/cadd73b7756fe4097ca0
+   *
+   * The key idea is that we can use an intermediate type to capture the type
+   * members of the two `Unapply` instances in such a way that we can refer to
+   * them in the implicit parameter list.
+   */
+  case class SingletonOf[T, U <: { type A; type M[_] }](widen: T { type A = U#A; type M[x] = U#M[x] })
+
+  object SingletonOf {
+    implicit def mkSingletonOf[T <: { type A; type M[_] }](implicit t: T): SingletonOf[T, t.type] =
+      SingletonOf(t)
+  }
+
+  implicit def unapply[TC[_[_]], MA0, MB0, U1 <: { type A; type M[_] }, U2 <: { type A; type M[_] }](implicit
+    sU1: SingletonOf[Unapply[TC, MA0], U1],
+    sU2: SingletonOf[Unapply[TC, MB0], U2],
+    iso: U1#M <~> U2#M
+  ): UnapplyProduct[TC, MA0, MB0] {
+    type M[x] = U1#M[x]
+    type A = U1#A
+    type B = U2#A
+  } = new UnapplyProduct[TC, MA0, MB0] {
+    type M[x] = U1#M[x]
+    type A = U1#A
+    type B = U2#A
+    def TC = sU1.widen.TC
+    def _1(ma: MA0) = sU1.widen(ma)
+    def _2(mb: MB0) = iso.from(sU2.widen(mb))
   }
 }
