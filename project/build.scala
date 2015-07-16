@@ -53,7 +53,7 @@ object build extends Build {
   }
 
   val scalaCheckVersion: String => String = {
-    case "2.12.0-M1" =>
+    case "2.12.0-M2" =>
       "1.11.6"
     case _ =>
       "1.11.4"
@@ -67,7 +67,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.12.0-M2",
     crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= {
