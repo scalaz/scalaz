@@ -130,6 +130,15 @@ object build extends Build {
       pushChanges
     ),
 
+    Dependencies.scalacheckVersion := {
+      val sv = scalaVersion.value
+      if (sv startsWith "2.12")
+        "1.11.6"
+      else if (sv startsWith "2.11")
+        "1.11.3"
+      else
+        "1.10.1"
+    },
     pomIncludeRepository := {
       x => false
     },
@@ -353,7 +362,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % Dependencies.scalacheck(scalaVersion.value),
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % Dependencies.scalacheckVersion.value,
       conflictWarning in Global ~= { _.copy(failOnConflict = false) }, // workaround for 2.11
       osgiExport("scalaz.scalacheck")
     )
@@ -380,11 +389,7 @@ object build extends Build {
   )
 
   object Dependencies {
-    def scalacheck(sv: String) =
-      if (sv startsWith "2.11")
-        "1.11.3"
-      else
-        "1.10.1"
+    val scalacheckVersion = SettingKey[String]("scalacheckVersion")
   }
 
   lazy val publishSetting = publishTo <<= (version).apply{

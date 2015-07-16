@@ -18,3 +18,9 @@ jdk:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test mima-report-binary-issues
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+
+matrix:
+  include:
+    - scala: 2.12.0-M2
+      jdk: oraclejdk8
+      script: sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test && rm -rf $HOME/.ivy2/cache
