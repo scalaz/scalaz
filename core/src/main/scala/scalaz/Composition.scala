@@ -28,8 +28,6 @@ private trait CompositionApplicative[F[_], G[_]] extends Applicative[λ[α => F[
 private trait CompositionPlus[F[_], G[_]] extends Plus[λ[α => F[G[α]]]] {
   implicit def F: Plus[F]
 
-  implicit def G: Plus[G]
-
   def plus[A](a: F[G[A]], b: => F[G[A]]): F[G[A]] =
     F.plus(a, b)
 }
@@ -37,15 +35,13 @@ private trait CompositionPlus[F[_], G[_]] extends Plus[λ[α => F[G[α]]]] {
 private trait CompositionPlusEmpty[F[_], G[_]] extends PlusEmpty[λ[α => F[G[α]]]] with CompositionPlus[F, G] {
   implicit def F: PlusEmpty[F]
 
-  implicit def G: PlusEmpty[G]
-
   def empty[A]: F[G[A]] = F.empty[G[A]]
 }
 
 private trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[α => F[G[α]]]] with CompositionApplicative[F, G] with CompositionPlusEmpty[F, G] {
   implicit def F: ApplicativePlus[F]
 
-  implicit def G: ApplicativePlus[G]
+  implicit def G: Applicative[G]
 }
 
 private trait CompositionFoldable[F[_], G[_]] extends Foldable[λ[α => F[G[α]]]]  {
