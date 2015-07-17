@@ -52,14 +52,7 @@ object build extends Build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  private[this] val Scala212 = "2.12.0-M1"
-
-  val scalaCheckVersion: String => String = {
-    case Scala212 =>
-      "1.11.6"
-    case _ =>
-      "1.11.4"
-  }
+  val scalacheckVersion = SettingKey[String]("scalacheckVersion")
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
@@ -70,7 +63,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6", Scala212),
+    crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= {
       val sv = scalaVersion.value
@@ -147,6 +140,13 @@ object build extends Build {
       pushChanges
     ),
 
+    scalacheckVersion := {
+      val sv = scalaVersion.value
+      if (sv startsWith "2.12")
+        "1.11.6"
+      else
+        "1.11.4"
+    },
     pomIncludeRepository := {
       x => false
     },
@@ -317,7 +317,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value),
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value,
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -330,7 +330,7 @@ object build extends Build {
       name := "scalaz-tests",
       publishArtifact := false,
       previousArtifact := None,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion(scalaVersion.value) % "test"
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value % "test"
     )
   )
 
