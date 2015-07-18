@@ -9,10 +9,9 @@ trait Plus[F[_]]  { self =>
   ////
 
   /**The composition of Plus `F` and `G`, `[x]F[G[x]]`, is a Plus */
-  def compose[G[_]](implicit G0: Plus[G]): Plus[λ[α => F[G[α]]]] =
+  def compose[G[_]]: Plus[λ[α => F[G[α]]]] =
     new CompositionPlus[F, G] {
       implicit def F = self
-      implicit def G = G0
     }
 
   /**The product of Plus `F` and `G`, `[x](F[x], G[x]])`, is a Plus */
