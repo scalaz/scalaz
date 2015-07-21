@@ -129,7 +129,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   def ap[EE >: E, B](x: => Validation[EE, A => B])(implicit E: Semigroup[EE]): Validation[EE, B] = (this, x) match {
     case (Success(a), Success(f))   => Success(f(a))
     case (e @ Failure(_), Success(_)) => e
-    case (Success(f), e @ Failure(_)) => e
+    case (Success(_), e @ Failure(_)) => e
     case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
