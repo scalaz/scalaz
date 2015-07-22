@@ -309,7 +309,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
       def F = implicitly
     }
 
-  implicit def freeSemigroup[S[_]:Functor, A:Semigroup]: Semigroup[Free[S, A]] =
+  implicit def freeSemigroup[S[_], A: Semigroup]: Semigroup[Free[S, A]] =
     Semigroup.liftSemigroup[Free[S, ?], A]
 }
 
@@ -323,7 +323,7 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 
-  implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
+  implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[Free[S, ?], A]
 }
 
@@ -351,7 +351,7 @@ trait FreeFunctions {
     liftF(MA(value))
 
   /** Monadic join for the higher-order monad `Free` */
-  def joinF[S[_], A](value: Free[Free[S, ?], A])(implicit S: Functor[S]): Free[S, A] =
+  def joinF[S[_], A](value: Free[Free[S, ?], A]): Free[S, A] =
     value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
 
   /** A trampoline step that doesn't do anything. */
