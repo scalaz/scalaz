@@ -1,6 +1,11 @@
 package scalaz
 package concurrent
 
+import org.scalacheck.{Gen, Arbitrary}
+import Arbitrary.arbitrary
+
+
+import scala.concurrent.duration._
 import scalaz.std.AllInstances._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop._
@@ -185,6 +190,25 @@ object TaskTest extends SpecLite {
 
       t1v.get must_== 0
       t3v.get must_== 0
+    }
+
+    implicit val arb3: Arbitrary[Byte] = Arbitrary(Gen.choose(0, Byte.MaxValue))
+    implicit val anyArb = Arbitrary[Any](Gen.oneOf(arbitrary[Number], arbitrary[Int], arbitrary[Boolean]))
+
+    "early terminate once any of the tasks failed (ordered)" ! forAll { (xs: List[Task[Any]], ex: Throwable, time: Byte, index: Int) =>
+      val fail = Task.schedule(throw ex, time.toInt.milliseconds)
+      val toSeq =
+        if (xs.isEmpty) List(fail)
+        else {
+          val (begin, end) = xs.splitAt(index % xs.length)
+          begin ::: fail :: end
+        }
+
+      val sequenced = Task.gather(toSeq)
+      val result = sequenced.attemptRunFor((time + 20).milliseconds)
+      result match {
+        case -\/(failure) => failure == ex
+      }
     }
 
     "early terminate once any of the tasks failed, and cancels execution" in {
