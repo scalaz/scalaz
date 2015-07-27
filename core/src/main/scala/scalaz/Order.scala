@@ -39,10 +39,11 @@ trait Order[F] extends Equal[F] { self =>
     def compare(x: F, y: F) = self.order(x, y).toInt
   }
 
-  final def reverseOrder = new Order[F] {
+  def reverseOrder: Order[F] = new Order[F] {
     def order(x: F, y: F): Ordering = self.order(y, x)
     override def equal(x: F, y: F) = self.equal(x, y)
     override def equalIsNatural = self.equalIsNatural
+    override def reverseOrder = self
   }
 
   trait OrderLaw extends EqualLaw {
