@@ -31,6 +31,13 @@ object BooleanSyntaxTest extends SpecLite {
       p <-- q == (p || !q)
     }
 
+    "bi-conditional" in {
+      assert(false <--> false)
+      assert(true <--> true)
+      assert(!(true <--> false))
+      assert(!(false <--> true))
+    }
+
     "negate conditional" ! forAll { (p:Boolean, q:Boolean) =>
       p -/> q == (p && !q)
     }
