@@ -127,6 +127,19 @@ final class BooleanOps(self: Boolean) {
   final def <--(q: => Boolean) = b.inverseConditional(self, q)
 
   /**
+   * Bi-Conditional.
+   *
+   * {{{
+   * p q  p <--> q
+   * 0 0  1
+   * 0 1  0
+   * 1 0  0
+   * 1 1  1
+   * }}}
+   */
+  final def <-->(q: => Boolean) = b.conditional(self, q) && b.inverseConditional(self, q)
+
+  /**
    * Inverse Conditional.
    *
    * {{{
