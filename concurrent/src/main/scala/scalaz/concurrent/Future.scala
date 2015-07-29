@@ -182,7 +182,7 @@ sealed abstract class Future[+A] {
     runAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
-      -\/(new TimeoutException())
+      -\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
@@ -203,7 +203,7 @@ sealed abstract class Future[+A] {
         def run() { 
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
-            cb(-\/(new TimeoutException()))
+            cb(-\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds")))
           } 
         }
       }
