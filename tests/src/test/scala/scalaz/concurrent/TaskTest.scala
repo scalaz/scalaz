@@ -290,5 +290,14 @@ object TaskTest extends SpecLite {
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
     Task.fromDisjunction(x).attemptRun must_== x
   }
+
+  "can be used in a for comprehension that makes use of pattern matching" in {
+    val greeting = "hello"
+    val sample = Task.now((greeting, 8))
+    val result = for {
+      (greeting, nb) <- sample
+    } yield greeting
+    result.run == greeting
+  }
 }
 
