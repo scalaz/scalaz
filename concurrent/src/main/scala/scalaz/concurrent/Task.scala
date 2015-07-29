@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import scalaz._
 import scalaz.Tags.Parallel
+import scalaz.concurrent.Task.FilterException
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -225,9 +226,25 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def after(t: Duration): Task[A] =
     new Task(get after t)
+
+  /**
+   * Fail the `Task` if the result does not satisfy the given predicate.
+   * @param predicate A predicate function that determines whether the original result should succeed
+   * @return A new Task that when executed will succeed if the result satisfies the predicate or will fail
+   *         with a `FilterException` if it does not.
+   */
+  def filter(predicate: A => Boolean) = flatMap(a => if(predicate(a)) Task.now(a) else Task.fail(FilterException(a)))
+
+  /**
+   * Same as filter. Scala issues a warning when filter is used instead of withFilter in a for-comprehension.
+   * The definition of this function avoids this warning.
+   */
+  def withFilter(p: A => Boolean) = filter(p)
 }
 
 object Task {
+
+  case class FilterException[A](considered: A) extends Exception(s"object $considered failed to pass filter test")
 
   implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] =
     new Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] {
