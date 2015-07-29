@@ -17,6 +17,12 @@ object EitherTTest extends SpecLite {
   checkAll(bitraverse.laws[EitherTList])
   checkAll(monadError.laws[EitherTList, Int])
 
+  "rightU" should {
+    val a: String \/ Int = \/-(1)
+    val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
+    b must_== EitherT.right[({type l[a] = String \/ a})#l, Boolean, Int](a)
+  }
+
   "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
     val F = new Bitraverse[EitherTList]{
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
