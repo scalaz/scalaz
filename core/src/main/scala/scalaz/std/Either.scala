@@ -63,11 +63,20 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L] = new Traverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] with Cozip[({type l[a] = Either[L, a]})#l] {
+  implicit def eitherMonad[L]: Traverse[({type l[a] = Either[L, a]})#l] with MonadError[Either, L] with Cozip[({type l[a] = Either[L, a]})#l] = new Traverse[({type l[a] = Either[L, a]})#l] with MonadError[Either, L] with Cozip[({type l[a] = Either[L, a]})#l] {
     def bind[A, B](fa: Either[L, A])(f: A => Either[L, B]) = fa match {
       case Left(a)  => Left(a)
       case Right(b) => f(b)
     }
+
+    def handleError[A](fa: Either[L, A])(f: L => Either[L, A]) =
+      fa match {
+        case a @ Right(_) => a
+        case Left(a) => f(a)
+      }
+
+    def raiseError[A](e: L) =
+      Left(e)
 
     def point[A](a: => A) = Right(a)
 
