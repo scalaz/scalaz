@@ -177,7 +177,7 @@ trait Future[+A] {
         def run() { 
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
-            cb(-\/(new TimeoutException()))
+            cb(-\/(new TimeoutException("Timed out after " + timeoutInMillis + " milliseconds")))
           } 
         }
       }
