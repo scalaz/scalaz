@@ -15,11 +15,17 @@ object WriterTTest extends SpecLite {
 
   checkAll(equal.laws[WriterTOptInt[Int]])
   checkAll(monoid.laws[WriterTOptInt[Int]])
-  checkAll(monad.laws[WriterTOptInt])
+  checkAll(monadError.laws[({type x[E, A] = WriterT[({type y[a] = E \/ a})#y, Int, A]})#x, Int])
   checkAll(traverse.laws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[({type λ[α]=WriterT[NonEmptyList, Int, α]})#λ])
   checkAll(bitraverse.laws[WriterTOpt])
+
+  private[this] implicit def writerTArb0[F[_, _], E, W, A](implicit F: Arbitrary[F[E, (W, A)]]): Arbitrary[WriterT[({type l[a] = F[E, a]})#l, W, A]] =
+    writerTArb[({type l[a] = F[E, a]})#l, W, A]
+
+  private[this] implicit def writerTEqual0[F[_, _], E, W, A](implicit F: Equal[F[E, (W, A)]]): Equal[WriterT[({type l[a] = F[E, a]})#l, W, A]] =
+    WriterT.writerTEqual[({type l[a] = F[E, a]})#l, W, A]
 
   implicit def writerArb[W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
@@ -42,6 +48,7 @@ object WriterTTest extends SpecLite {
     def apply[F[_]: Apply, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def applicative[F[_]: Applicative, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
     def monad[F[_]: Monad, W: Monoid] = Monad[({type λ[α]=WriterT[F, W, α]})#λ]
+    def monadError[F[_, _], W, E](implicit W: Monoid[W], F: MonadError[F, E]) = MonadError[({type x[E0, A] = WriterT[({type y[a] = F[E0, a]})#y, W, A]})#x, E]
     def foldable[F[_]: Foldable, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
     def traverse[F[_]: Traverse, W] = Traverse[({type λ[α]=WriterT[F, W, α]})#λ]
 
