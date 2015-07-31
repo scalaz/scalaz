@@ -14,6 +14,9 @@ final class BitraverseOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 
   final def bisequence[G[_], A1, B1](implicit G: Applicative[G], eva: A === G[A1], evb: B === G[B1]): G[F[A1, B1]] =
     bitraverse(fa => eva(fa), fb => evb(fb))
+
+  final def bisequenceU[GC, GD](implicit eva: A === GC, evb: B === GD, G1: UnapplyProduct[Applicative, GC, GD]): G1.M[F[G1.A, G1.B]] =
+    bitraverseU(eva, evb)
   ////
 }
 
