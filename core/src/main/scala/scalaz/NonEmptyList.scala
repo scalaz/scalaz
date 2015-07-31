@@ -178,7 +178,6 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
       def alignWith[A, B, C](f: A \&/ B => C) = (a, b) => {
-        import std.list._
         NonEmptyList.nel(f(\&/.Both(a.head, b.head)), Align[IList].alignWith(f)(a.tail, b.tail))
       }
 
