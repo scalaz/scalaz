@@ -108,7 +108,7 @@ object CABRunLengthEncoder {
 
   /** 
     * with the above syntax imported, we can perform the same
-    * comuptation as above, but use a for comprehension
+    * computation as above, but use a for comprehension
     */
   val readToken2: RunLength[Token] = 
     for {
