@@ -33,7 +33,7 @@ object AdjunctUsage extends App {
   //-------------------------------------------
   // using reader and write adjunction as State
 
-  // Writer and Reader Functors form and adjuntion that gives us a
+  // Writer and Reader Functors form and adjunction that gives us a
   // Monad the behaves like State, think of it as a function which
   // Reads the state perfoms a computation and Writes the new state.
   type RWState[S,A] = Reader[S, Writer[S, A]]
