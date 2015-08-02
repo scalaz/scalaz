@@ -2,8 +2,6 @@ package scalaz
 
 import std.option.{none, some}
 
-import Free.Suspend
-
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *
