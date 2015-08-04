@@ -126,6 +126,28 @@ object FoldableTest extends SpecLite {
       (xs: List[String]) => xs.foldMapM(x => Some(x): Option[String]) must_== Some(xs.mkString)
     }
 
+    type StateInt[A] = State[Int, A]
+
+    def found(z: Int): State[Int, Option[Int]] =
+      State(n => (n + 1, Some(z * 2)))
+
+    def notfound: State[Int, Option[Int]] =
+      State(n => (n + 1, None))
+
+    "findMapM: finding the first element performs transform and only runs only necessary effects" ! forAll {
+      (x: Int, xs: List[Int]) => (x :: xs).findMapM[StateInt, Int](found).run(0) must_== (1 -> Some(x * 2))
+    }
+
+    "findMapM: finding the last element performs transform and runs all effects (once only)" ! forAll {
+      (x: Int, xs: List[Int]) => !xs.contains(x) ==> {
+        (xs ++ List(x)).findMapM[StateInt, Int](z => if (z == x) found(z) else notfound).run(0) must_==
+          ((xs.length + 1) -> Some(x * 2))
+      }
+    }
+
+    "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
+      (xs: List[Int]) => xs.findMapM[StateInt, Int](_ => notfound).run(0) must_== (xs.length -> None)
+    }
   }
 
   private val L = Foldable[List]
