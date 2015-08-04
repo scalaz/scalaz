@@ -152,9 +152,9 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   // no forall; use Foldable#all
 
-  def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> IList[A] =
-    foldLeft(==>>.empty[K, IList[A]]) { (m, a) =>
-      m.alter(f(a), _.map(a :: _) orElse Some(single(a)))
+  def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> NonEmptyList[A] =
+    foldLeft(==>>.empty[K, NonEmptyList[A]]) { (m, a) =>
+      m.alter(f(a), _.map(a <:: _) orElse Some(NonEmptyList(a)))
     } .map(_.reverse) // should we bother with this? we don't do it for groupBy1
 
   def groupBy1[K](f: A => K)(implicit ev: Order[K]): K ==>> OneAnd[IList, A] =
