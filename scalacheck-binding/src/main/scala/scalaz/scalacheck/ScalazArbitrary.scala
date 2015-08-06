@@ -222,19 +222,19 @@ object ScalazArbitrary {
   implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
     Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
 
-  implicit def unwriterTArb[F[+_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
+  implicit def unwriterTArb[F[_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
     Functor[Arbitrary].map(A)(UnwriterT[F, U, A](_))
 
-  implicit def optionTArb[F[+_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
+  implicit def optionTArb[F[_], A](implicit A: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Functor[Arbitrary].map(A)(OptionT[F, A](_))
 
-  implicit def maybeTArb[F[+_], A](implicit A: Arbitrary[F[Maybe[A]]]): Arbitrary[MaybeT[F, A]] =
+  implicit def maybeTArb[F[_], A](implicit A: Arbitrary[F[Maybe[A]]]): Arbitrary[MaybeT[F, A]] =
     Functor[Arbitrary].map(A)(MaybeT[F, A](_))
 
   implicit def lazyOptionArb[F[_], A](implicit A: Arbitrary[Option[A]]): Arbitrary[LazyOption[A]] =
     Functor[Arbitrary].map(A)(LazyOption.fromOption[A](_))
 
-  implicit def lazyOptionTArb[F[+_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
+  implicit def lazyOptionTArb[F[_], A](implicit A: Arbitrary[F[LazyOption[A]]]): Arbitrary[LazyOptionT[F, A]] =
     Functor[Arbitrary].map(A)(LazyOptionT[F, A](_))
 
   implicit def lazyEitherArb[F[_], A: Arbitrary, B: Arbitrary]: Arbitrary[LazyEither[A, B]] =
@@ -243,7 +243,7 @@ object ScalazArbitrary {
       case Right(b) => LazyEither.lazyRight(b)
     }
 
-  implicit def lazyEitherTArb[F[+_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
+  implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
   // backwards compatibility
@@ -253,7 +253,7 @@ object ScalazArbitrary {
   implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
     Functor[Arbitrary].map(A)(IndexedStateT[F, S1, S2, A](_))
 
-  implicit def eitherTArb[F[+_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
+  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
   implicit def constArbitrary[A: Arbitrary, B]: Arbitrary[Const[A, B]] =
@@ -281,11 +281,11 @@ object ScalazArbitrary {
   // backwards compatibility
   def storeTArb[F[+_], A, B](implicit A: Arbitrary[(F[A => B], A)]): Arbitrary[StoreT[F, A, B]] = indexedStoreTArb[F, A, A, B](A)
 
-  implicit def indexedStoreTArb[F[+_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
+  implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 
-  implicit def listTArb[F[+_], A](implicit FA: Arbitrary[F[List[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
+  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
 
-  implicit def streamTArb[F[+_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
+  implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
 
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
   private def arbDouble: Arbitrary[Double] = Arbitrary { Gen.oneOf(posNum[Double], negNum[Double])}
