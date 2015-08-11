@@ -109,6 +109,11 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
     new OptionTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
+
+  implicit def optionTMonadError[F[_, _], E](implicit F0: MonadError[F, E]): MonadError[λ[(E0, A) => OptionT[F[E0, ?], A]], E] =
+    new OptionTMonadError[F, E] {
+      def F = F0
+    }
 }
 
 sealed abstract class OptionTInstances0 extends OptionTInstances1 {
@@ -177,6 +182,16 @@ private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTFuncto
 
   def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
 
+}
+
+private trait OptionTMonadError[F[_, _], E] extends MonadError[λ[(E0, A) => OptionT[F[E0, ?], A]], E] with OptionTMonad[F[E, ?]] {
+  override def F: MonadError[F, E]
+
+  override def raiseError[A](e: E) =
+    OptionT[F[E, ?], A](F.map(F.raiseError[A](e))(Some(_)))
+
+  override def handleError[A](fa: OptionT[F[E, ?], A])(f: E => OptionT[F[E, ?], A]) =
+    OptionT[F[E, ?], A](F.handleError(fa.run)(f(_).run))
 }
 
 private trait OptionTFoldable[F[_]] extends Foldable.FromFoldr[OptionT[F, ?]] {
