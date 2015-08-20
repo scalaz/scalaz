@@ -313,6 +313,9 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 
+  implicit def freeMonadC[S[_]]: Monad[({type f[x] = FreeC[S, x]})#f] =
+    freeMonad[({type f[x] = Coyoneda[S, x]})#f]
+
   implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[({type λ[α] = Free[S, α]})#λ, A]
 }
