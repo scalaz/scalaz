@@ -10,12 +10,11 @@ object ProductTest extends SpecLite {
   type OneAndOption[α] = OneAnd[Option, α]
   type OneAndOptionPair[α] = (OneAndOption[α], OneAndOption[α])
 
-  implicit val optionListApplicativePlus = ApplicativePlus[Option].product[List]
+  implicit val optionListMonadPlus = MonadPlus[Option].product[List]
   implicit val optionListZip = Zip[Option].product[List]
   implicit val oneAndOptionPairTraverse1 = Traverse1[OneAndOption].product[OneAndOption]
 
-  checkAll(applicative.laws[OptionList])
-  checkAll(plusEmpty.laws[OptionList])
+  checkAll(monadPlus.strongLaws[OptionList])
   checkAll(zip.laws[OptionList])
   checkAll(traverse1.laws[OneAndOptionPair])
 

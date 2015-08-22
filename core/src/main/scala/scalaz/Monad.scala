@@ -66,6 +66,13 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def iterateUntil[A](f: F[A])(p: A => Boolean): F[A] =
     bind(f)(y => if (p(y)) point(y) else iterateUntil(f)(p))
 
+  /**The product of Monad `F` and `G`, `[x](F[x], G[x]])`, is a Monad */
+  def product[G[_]](implicit G0: Monad[G]): Monad[λ[α => (F[α], G[α])]] =
+    new ProductMonad[F, G] {
+      def F = self
+      def G = G0
+    }
+
   trait MonadLaw extends ApplicativeLaw with BindLaw {
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(bind(a)(point(_: A)), a)
