@@ -142,6 +142,12 @@ object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
 
   def unapplySeq[A](v: NonEmptyList[A]): Option[(A, List[A])] =
     Some((v.head, v.tail))
+
+  def lift[A, B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
+    case INil() ⇒ None
+    case ICons(h, t) ⇒ Some(f(NonEmptyList.nel(h, t.toList)))
+  }
+
 }
 
 sealed abstract class NonEmptyListInstances0 {
