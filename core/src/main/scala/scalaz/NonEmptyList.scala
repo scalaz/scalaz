@@ -214,7 +214,7 @@ trait NonEmptyListFunctions {
     
   def lift[A,B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
     case INil() ⇒ None
-    case h :: t ⇒ Some(f(NonEmptyList.nel(h,t))) 
+    case ICons(h, t) ⇒ Some(f(NonEmptyList.nel(h,t))) 
   } 
 
 }
