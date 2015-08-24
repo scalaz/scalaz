@@ -212,8 +212,8 @@ trait NonEmptyListFunctions {
   def nels[A](h: A, t: A*): NonEmptyList[A] =
     nel(h, IList(t: _*))
     
-  def lift[A,B](f: NonEmptyList[A] => B): List[A] => Option[B] = {
-    case Nil ⇒ None
+  def lift[A,B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
+    case INil() ⇒ None
     case h :: t ⇒ Some(f(NonEmptyList.nel(h,t))) 
   } 
 
