@@ -1,15 +1,17 @@
 package scalaz
 
+trait BaseMonadError[F[_], S] extends Monad[F] {
+  def raiseError[A](e: S): F[A]
+  def handleError[A](fa: F[A])(f: S => F[A]): F[A]
+}
+
 ////
 /**
  *
  */
 ////
-trait MonadError[F[_, _], S] extends Monad[F[S, ?]] { self =>
+trait MonadError[F[_, _], S] extends BaseMonadError[F[S, ?], S] { self =>
   ////
-
-  def raiseError[A](e: S): F[S, A]
-  def handleError[A](fa: F[S, A])(f: S => F[S, A]): F[S, A]
 
   trait MonadErrorLaw {
     def raisedErrorsHandled[A](e: S, f: S => F[S, A])(implicit FEA: Equal[F[S, A]]): Boolean =
