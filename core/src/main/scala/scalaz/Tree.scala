@@ -2,6 +2,7 @@ package scalaz
 
 import std.stream.{streamInstance, streamMonoid}
 import std.string.stringInstance
+import Free.Trampoline
 
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
@@ -24,8 +25,13 @@ sealed abstract class Tree[A] {
     Foldable[Stream].foldRight(flatten, z)(f)
 
   /** A 2D String representation of this Tree. */
-  def drawTree(implicit sh: Show[A]): String =
-    Foldable[Stream].foldMap(draw)((_: String) + "\n")
+  def drawTree(implicit sh: Show[A]): String = {
+    val reversedLines = draw.run
+    val first = new StringBuilder(reversedLines.head.toString.reverse)
+    first.append("\n").append(reversedLines.tail.reduceLeft { (acc, elem) => 
+      acc.append("\n").append(elem.toString.reverse)
+    }.append("\n").toString).toString
+  }
 
   /** A histomorphic transform. Each element in the resulting tree
    * is a function of the corresponding element in this tree
@@ -36,19 +42,38 @@ sealed abstract class Tree[A] {
     node(g(rootLabel, c), c)
   }
 
-  /** A 2D String representation of this Tree, separated into lines. */
-  def draw(implicit sh: Show[A]): Stream[String] = {
-    def drawSubTrees(s: Stream[Tree[A]]): Stream[String] = s match {
-      case Stream.Empty => Stream.Empty
-      case Stream(t)    => "|" #:: shift("`- ", "   ", t.draw)
-      case t #:: ts     => "|" #:: shift("+- ", "|  ", t.draw) append drawSubTrees(ts)
-    }
-    def shift(first: String, other: String, s: Stream[String]): Stream[String] =
-      (first #:: Stream.continually(other)).zip(s).map {
-        case (a, b) => a + b
-      }
+  /** A 2D String representation of this Tree, separated into lines. 
+    * Uses reversed StringBuilders for performance, because they are
+    * prepended to.
+    **/
+  private def draw(implicit sh: Show[A]): Trampoline[Vector[StringBuilder]] = {
+    import Trampoline._
+    val branch = " -+" // "+- ".reverse
+    val stem = " -`" // "`- ".reverse
+    val trunk = "  |" // "|  ".reverse
 
-    sh.shows(rootLabel) #:: drawSubTrees(subForest)
+    def drawSubTrees(s: Stream[Tree[A]]): Trampoline[Vector[StringBuilder]] = s match {
+      case ts if ts.isEmpty       => done(Vector.empty[StringBuilder])
+      case t #:: ts if ts.isEmpty => suspend(t.draw).map(subtree => new StringBuilder("|") +: shift(stem, "   ", subtree))
+      case t #:: ts               => for {
+                                       subtree <- suspend(t.draw)
+                                       otherSubtrees <- suspend(drawSubTrees(ts))
+                                     } yield new StringBuilder("|") +: (shift(branch, trunk, subtree) ++ otherSubtrees)
+    }
+
+    def shift(first: String, other: String, s: Vector[StringBuilder]): Vector[StringBuilder] = {
+      var i = 0
+      while (i < s.length) {
+        if (i == 0) s(i).append(first)
+        else s(i).append(other)
+        i += 1
+      }
+      s
+    }
+    
+    drawSubTrees(subForest).map { subtrees => 
+      new StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
+    }
   }
 
   /** Pre-order traversal. */
