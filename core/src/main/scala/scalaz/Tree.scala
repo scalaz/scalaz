@@ -28,9 +28,10 @@ sealed abstract class Tree[A] {
   def drawTree(implicit sh: Show[A]): String = {
     val reversedLines = draw.run
     val first = new StringBuilder(reversedLines.head.toString.reverse)
-    first.append("\n").append(reversedLines.tail.reduceLeft { (acc, elem) => 
-      acc.append("\n").append(elem.toString.reverse)
-    }.append("\n").toString).toString
+    val rest = reversedLines.tail
+    rest.foldLeft(first) { (acc, elem) => 
+      acc.append("\n").append(elem.toString.reverse) 
+    }.append("\n").toString
   }
 
   /** A histomorphic transform. Each element in the resulting tree
