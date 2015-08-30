@@ -457,6 +457,32 @@ object ScalazProperties {
     }
   }
 
+  object divide {
+    def composition[F[_], A](implicit F: Divide[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divideLaw.composition[A] _)
+
+    def laws[F[_]](implicit F: Divide[F], af: Arbitrary[F[Int]], axy: Arbitrary[Int => Int],
+                   ef: Equal[F[Int]]) = new Properties("divide") {
+      include(contravariant.laws[F])
+      property("composition") = composition[F, Int]
+    }
+  }
+
+  object divisible {
+    def rightIdentity[F[_], A](implicit F: Divisible[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divisibleLaw.rightIdentity[A] _)
+
+    def leftIdentity[F[_], A](implicit F: Divisible[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divisibleLaw.leftIdentity[A] _)
+
+    def laws[F[_]](implicit F: Divisible[F], af: Arbitrary[F[Int]], axy: Arbitrary[Int => Int],
+                   ef: Equal[F[Int]]) = new Properties("divisible") {
+      include(divide.laws[F])
+      property("right identity") = rightIdentity[F, Int]
+      property("left identity") = leftIdentity[F, Int]
+    }
+  }
+
   object compose {
     def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
