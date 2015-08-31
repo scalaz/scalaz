@@ -10,10 +10,17 @@ sealed abstract class Ordering(val toInt: Int, val name: String) extends Product
   def complement: Ordering
 }
 
-object Ordering extends OrderingInstances with OrderingFunctions {
+object Ordering extends OrderingInstances {
   case object LT extends Ordering(-1, "LT") { def complement = GT }
   case object EQ extends Ordering(0,  "EQ") { def complement = EQ }
   case object GT extends Ordering(1,  "GT") { def complement = LT }
+
+  def fromLessThan[A](a1: A, a2: A)(f: (A, A) => Boolean): Ordering =
+    if (f(a1, a2)) LT
+    else if (f(a2, a1)) GT
+    else EQ
+
+  def fromInt(intOrdering: Int): Ordering = if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
 }
 
 sealed abstract class OrderingInstances {
@@ -71,15 +78,4 @@ sealed abstract class OrderingInstances {
     override def min = Some(LT)
     override def max = Some(GT)
   }
-}
-
-trait OrderingFunctions {
-  import Ordering._
-
-  def fromLessThan[A](a1: A, a2: A)(f: (A, A) => Boolean): Ordering =
-    if (f(a1, a2)) LT
-    else if (f(a2, a1)) GT
-    else EQ
-
-  def fromInt(intOrdering: Int): Ordering = if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
 }

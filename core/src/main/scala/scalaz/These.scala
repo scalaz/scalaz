@@ -257,7 +257,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
 
 }
 
-object \&/ extends TheseInstances with TheseFunctions {
+object \&/ extends TheseInstances {
   final case class This[A](aa: A) extends (A \&/ Nothing)
   final case class That[B](bb: B) extends (Nothing \&/ B)
   final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
@@ -267,10 +267,6 @@ object \&/ extends TheseInstances with TheseFunctions {
 
   def unapply[A, B](t: Both[A, B]): Some[(A, B)] =
     Some((t.aa, t.bb))
-}
-
-trait TheseFunctions {
-  import \&/._
 
   import scalaz.std.list._
 

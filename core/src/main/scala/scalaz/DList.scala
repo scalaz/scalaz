@@ -64,33 +64,9 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   def zip[B](bs: => DList[B]): DList[(A,B)] = uncons(DList(), (h,t) => bs.uncons(DList(), (h2,t2) => (h → h2) +: (t zip t2)))
 }
 
-object DList extends DListInstances with DListFunctions {
+object DList extends DListInstances {
   def apply[A](xs: A*): DList[A] = fromIList(IList(xs: _*))
-}
 
-sealed abstract class DListInstances {
-  implicit def dlistMonoid[A]: Monoid[DList[A]] = new Monoid[DList[A]] {
-    val zero = DList[A]()
-    def append(a: DList[A], b: => DList[A]) = a ++ b
-  }
-  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] {
-    def point[A](a: => A) = DList(a)
-    def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
-    def plus[A](a: DList[A], b: => DList[A]) = a ++ b
-    def empty[A] = DList()
-    def isEmpty[A](fa: DList[A]) = fa.isEmpty
-    def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
-    def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
-      fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
-  }
-  implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
-    import std.list._
-    Equal[List[A]].contramap((_: DList[A]).toList)
-  }
-
-}
-
-trait DListFunctions {
   def mkDList[A](f: (IList[A]) => Trampoline[IList[A]]): DList[A] =
     new DList[A](f)
   def DL[A](f: (=> IList[A]) => IList[A]): DList[A] = mkDList(xs => return_(f(xs)))
@@ -114,4 +90,26 @@ trait DListFunctions {
       f(b) map { case (a, c) => suspend(go(c, f)) map (a +: _) } getOrElse return_(DList())
     go(b, f).run
   }
+}
+
+sealed abstract class DListInstances {
+  implicit def dlistMonoid[A]: Monoid[DList[A]] = new Monoid[DList[A]] {
+    val zero = DList[A]()
+    def append(a: DList[A], b: => DList[A]) = a ++ b
+  }
+  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Traverse[DList] with Zip[DList] with IsEmpty[DList] {
+    def point[A](a: => A) = DList(a)
+    def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
+    def plus[A](a: DList[A], b: => DList[A]) = a ++ b
+    def empty[A] = DList()
+    def isEmpty[A](fa: DList[A]) = fa.isEmpty
+    def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
+    def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
+      fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
+  }
+  implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
+    import std.list._
+    Equal[List[A]].contramap((_: DList[A]).toList)
+  }
+
 }

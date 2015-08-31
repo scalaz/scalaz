@@ -6,8 +6,6 @@ trait Dup[H[_[_]]] {
   def dup[PP[_]: MonadIO, CS, PS]: H[RegionT[CS, RegionT[PS, PP, ?], ?]] => RegionT[CS, RegionT[PS, PP, ?], H[RegionT[PS, PP, ?]]]
 }
 
-object Dup extends DupInstances with DupFunctions
-
 sealed abstract class DupInstances {
   import Dup._
 
@@ -21,7 +19,7 @@ sealed abstract class DupInstances {
     }
 }
 
-trait DupFunctions {
+object Dup extends DupInstances {
 
   /**Duplicates a handle to its parent region. */
   def dup[H[_[_]] : Dup, PP[_] : MonadIO, CS, PS](h: H[RegionT[CS, RegionT[PS, PP, ?], ?]]):

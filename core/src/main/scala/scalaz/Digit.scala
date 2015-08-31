@@ -9,7 +9,7 @@ sealed abstract class Digit extends Product with Serializable {
   final def toChar: Char = (toLong + 48).toChar
 }
 
-object Digit extends DigitInstances with DigitFunctions {
+object Digit extends DigitInstances {
 
   case object _0 extends Digit {
     override val toInt = 0
@@ -50,12 +50,6 @@ object Digit extends DigitInstances with DigitFunctions {
   case object _9 extends Digit {
     override val toInt = 9
   }
-
-}
-
-trait DigitFunctions {
-
-  import Digit._
 
   val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 

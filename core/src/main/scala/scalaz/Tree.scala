@@ -130,17 +130,6 @@ sealed abstract class Tree[A] {
   }
 }
 
-object Tree extends TreeInstances with TreeFunctions {
-  /** Construct a tree node with no children. */
-  def apply[A](root: => A): Tree[A] = leaf(root)
-
-  object Node {
-    def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
-  }
-
-
-}
-
 sealed abstract class TreeInstances {
   implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
@@ -181,7 +170,14 @@ sealed abstract class TreeInstances {
    */
 }
 
-trait TreeFunctions {
+object Tree extends TreeInstances {
+  /** Construct a tree node with no children. */
+  def apply[A](root: => A): Tree[A] = leaf(root)
+
+  object Node {
+    def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
+  }
+
   /** Construct a new Tree node. */
   def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
     lazy val rootLabel = root

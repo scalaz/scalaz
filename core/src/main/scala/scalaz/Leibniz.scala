@@ -32,12 +32,6 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     subst(U(fa))
 }
 
-object Leibniz extends LeibnizInstances with LeibnizFunctions{
-
-  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
-  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
-}
-
 sealed abstract class LeibnizInstances {
   import Leibniz._
 
@@ -70,8 +64,10 @@ sealed abstract class LeibnizInstances {
 
 }
 
-trait LeibnizFunctions {
-  import Leibniz._
+object Leibniz extends LeibnizInstances {
+
+  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
+  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
   implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A] {

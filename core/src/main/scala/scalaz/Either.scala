@@ -342,7 +342,31 @@ final case class -\/[+A](a: A) extends (A \/ Nothing)
  */
 final case class \/-[+B](b: B) extends (Nothing \/ B)
 
-object \/ extends DisjunctionInstances with DisjunctionFunctions {
+object \/ extends DisjunctionInstances {
+
+  /** Construct a left disjunction value. */
+  def left[A, B]: A => A \/ B =
+    -\/(_)
+
+  /** Construct a right disjunction value. */
+  def right[A, B]: B => A \/ B =
+    \/-(_)
+
+  /** Construct a disjunction value from a standard `scala.Either`. */
+  def fromEither[A, B](e: Either[A, B]): A \/ B =
+    e fold (left, right)
+
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
+    \/-(a)
+  } catch {
+    case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
+    \/-(a)
+  } catch {
+    case NonFatal(t) => -\/(t)
+  }
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec
@@ -476,31 +500,5 @@ sealed abstract class DisjunctionInstances2 {
         ),
         c => \/.right(\/.right(c))
       )
-  }
-}
-
-trait DisjunctionFunctions {
-  /** Construct a left disjunction value. */
-  def left[A, B]: A => A \/ B =
-    -\/(_)
-
-  /** Construct a right disjunction value. */
-  def right[A, B]: B => A \/ B =
-    \/-(_)
-
-  /** Construct a disjunction value from a standard `scala.Either`. */
-  def fromEither[A, B](e: Either[A, B]): A \/ B =
-    e fold (left, right)
-
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
-    \/-(a)
-  } catch {
-    case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
-  }
-
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
-    \/-(a)
-  } catch {
-    case NonFatal(t) => -\/(t)
   }
 }

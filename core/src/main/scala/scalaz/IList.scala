@@ -474,7 +474,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 final case class INil[A]() extends IList[A]
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
-object IList extends IListInstances with IListFunctions{
+object IList extends IListInstances {
   private[this] val nil: IList[Nothing] = INil()
 
   def apply[A](as: A*): IList[A] =
@@ -512,8 +512,6 @@ object IList extends IListInstances with IListFunctions{
       def from[A](fa: IList[A]) = fa.toList
     }
 }
-
-sealed trait IListFunctions
 
 sealed abstract class IListInstance0 {
 

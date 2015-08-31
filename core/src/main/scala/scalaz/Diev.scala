@@ -205,15 +205,12 @@ trait DievImplementation {
   }
 }
 
-trait DievFunctions extends DievImplementation {
+object Diev extends DievInstances {
   def empty[A](implicit E: Enum[A]): Diev[A] = DieVector()
 
   def fromValuesSeq[A](values: Seq[A])(implicit E: Enum[A]): Diev[A] = values.foldLeft(empty[A])(_ + _)
 
   def fromIntervalsSeq[A](intervals: Seq[(A, A)])(implicit E: Enum[A]): Diev[A] = intervals.foldLeft(empty[A])(_ + _)
-}
-
-object Diev extends DievInstances with DievFunctions {
 }
 
 sealed abstract class DievInstances extends DievImplementation {

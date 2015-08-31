@@ -31,18 +31,13 @@ sealed abstract class LiskovInstances {
   }
 }
 
-object Liskov extends LiskovInstances with LiskovFunctions {
+object Liskov extends LiskovInstances {
 
   /**A convenient type alias for Liskov */
   type <~<[-A, +B] = Liskov[A, B]
 
   /**A flipped alias, for those used to their arrows running left to right */
   type >~>[+B, -A] = Liskov[A, B]
-
-}
-
-trait LiskovFunctions {
-  import Liskov._
 
   /**Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {

@@ -66,8 +66,6 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
 
 }
 
-object LazyOptionT extends LazyOptionTInstances with LazyOptionTFunctions
-
 //
 // Prioritized Implicits for type class instances
 //
@@ -97,7 +95,7 @@ sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
     Order.orderBy((_: LazyOptionT[F, A]).run)
 }
 
-trait LazyOptionTFunctions {
+object LazyOptionT extends LazyOptionTInstances {
   def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
     LazyOptionT(r)
 
