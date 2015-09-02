@@ -79,7 +79,7 @@ object FoldableUsage extends App {
   val allEvens = List(2,4,6,8,10)
   assert(allEvens.foldLeftM[Option,Int](0)(sumEvens) === Some(30))
 
-  // when the 7 is encoutered, the entire computation results in None
+  // when the 7 is encountered, the entire computation results in None
   val notAllEvens = List(2,4,7,8,10)
   assert(notAllEvens.foldLeftM[Option,Int](0)(sumEvens) === None)
 }
