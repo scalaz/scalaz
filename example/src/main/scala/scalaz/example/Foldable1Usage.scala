@@ -1,4 +1,4 @@
-package scala.example
+package scalaz.example
 
 import scalaz.{Foldable1,IList,NonEmptyList,OneAnd}
 import scalaz.syntax.foldable1._
