@@ -140,7 +140,7 @@ object LaunchburyInterpreter extends App {
   /** performs "big-step" reduction: a single call maps a term to its final result
     * reduces lambda-terms to whnf or "weak head normal form".  For our purposes,
     * whnf means a lambda term (generally, it also refers to primitives and constructors,
-    * which we've ommitted).
+    * which we've omitted).
     */
   private def reduce(e:Expr): State[ReduceState, Expr] = {
 
