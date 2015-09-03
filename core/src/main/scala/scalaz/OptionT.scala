@@ -73,6 +73,10 @@ final case class OptionT[F[+_], +A](run: F[Option[A]]) {
       case Some(a) => F.point(a)
     }
 
+  def orZero[AA >: A](implicit F0: Functor[F], M0: Monoid[AA]): F[AA] = getOrElse(M0.zero)
+
+  def unary_~[AA >: A](implicit F0: Functor[F], M0: Monoid[AA]): F[AA] = orZero[AA]
+
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
