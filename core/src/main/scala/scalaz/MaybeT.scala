@@ -55,6 +55,10 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   def getOrElseF(default: => F[A])(implicit F: Monad[F]): F[A] =
     F.bind(self.run)(_.cata(F.point(_), default))
 
+  def orZero(implicit F0: Functor[F], M0: Monoid[A]): F[A] = getOrElse(M0.zero)
+
+  def unary_~(implicit F0: Functor[F], M0: Monoid[A]): F[A] = orZero
+
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
