@@ -19,11 +19,11 @@ object HeapTest extends SpecLite {
   "toList / toStream" ! forAll {
     (a: Heap[Int]) => a.toStream must_===(a.toList.toStream)
   }
-
+  
   "filter" ! forAll {
     (a: Heap[Int]) => a.filter(pred).toStream must_===(a.toStream.filter(pred))
   }
-
+  
   "partition" ! forAll {
     (a: Heap[Int]) =>
       val (ts, fs) = a.partition(pred)
@@ -37,5 +37,9 @@ object HeapTest extends SpecLite {
       lt.forall(_ < x) must_===(true)
       eq.forall(_ == x) must_===(true)
       gt.forall(_ > x) must_===(true)
+  }
+  "no stack overflow for toList" in {
+    val li = (0 to 3000).toList
+    IList.fromList(li) must_===(Heap.fromData(li).toList)
   }
 }
