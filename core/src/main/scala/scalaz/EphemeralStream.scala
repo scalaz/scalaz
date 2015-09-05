@@ -137,6 +137,9 @@ sealed abstract class EphemeralStream[A] {
       if(p(h)) cons(h, tail().takeWhile(p))
       else emptyEphemeralStream
     }else this
+
+  def zipWithIndex: EphemeralStream[(A, Int)] =
+    zip(iterate(0)(_ + 1))
 }
 
 object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
