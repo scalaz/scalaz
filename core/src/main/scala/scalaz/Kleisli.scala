@@ -89,14 +89,14 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class KleisliInstances9 {
+sealed abstract class KleisliInstances10 {
   implicit def kleisliFunctor[F[_], R](implicit F0: Functor[F]): Functor[Kleisli[F, R, ?]] =
     new KleisliFunctor[F, R] {
       implicit def F: Functor[F] = F0
     }
 }
 
-sealed abstract class KleisliInstances8 extends KleisliInstances9 {
+sealed abstract class KleisliInstances9 extends KleisliInstances10 {
 
   implicit def kleisliApply[F[_], R](implicit F0: Apply[F]): Apply[Kleisli[F, R, ?]] =
     new KleisliApply[F, R] {
@@ -106,6 +106,13 @@ sealed abstract class KleisliInstances8 extends KleisliInstances9 {
   implicit def kleisliDistributive[F[_], R](implicit F0: Distributive[F]): Distributive[Kleisli[F, R, ?]] =
     new KleisliDistributive[F, R] {
       implicit def F: Distributive[F] = F0
+    }
+}
+
+sealed abstract class KleisliInstances8 extends KleisliInstances9 {
+  implicit def kleisliBind[F[_], R](implicit F0: Bind[F]): Bind[Kleisli[F, R, ?]] =
+    new KleisliBind[F, R] {
+      def F = F0
     }
 }
 
@@ -281,16 +288,20 @@ private trait KleisliDistributive[F[_], R] extends Distributive[Kleisli[F, R, ?]
     Kleisli(r => F.distribute(a)(f(_) run r))
 }
 
+private trait KleisliBind[F[_], R] extends Bind[Kleisli[F, R, ?]] with KleisliApply[F, R] {
+  implicit def F: Bind[F]
+  override final def bind[A, B](fa: Kleisli[F, R, A])(f: A => Kleisli[F, R, B]) =
+    fa flatMap f
+}
+
 private trait KleisliApplicative[F[_], R] extends Applicative[Kleisli[F, R, ?]] with KleisliApply[F, R] {
   implicit def F: Applicative[F]
   def point[A](a: => A): Kleisli[F, R, A] =
     kleisli((r: R) => F.point(a))
 }
 
-private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, ?]] with KleisliApplicative[F, R] {
+private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, ?]] with KleisliApplicative[F, R] with KleisliBind[F, R] {
   implicit def F: Monad[F]
-  def bind[A, B](fa: Kleisli[F, R, A])(f: A => Kleisli[F, R, B]): Kleisli[F, R, B] =
-    fa flatMap f
 }
 
 private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, ?, ?], R] with KleisliApplicative[F, R] with KleisliMonad[F, R] {
