@@ -55,9 +55,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def >=>[C](that: BijectionT[F, G, B, C])(implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
 
 }
-object BijectionT extends BijectionTInstances with BijectionTFunctions
-
-trait BijectionTFunctions {
+object BijectionT extends BijectionTInstances {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B](t, f)
 

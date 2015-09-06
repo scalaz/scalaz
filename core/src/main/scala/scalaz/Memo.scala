@@ -9,14 +9,13 @@ sealed abstract class Memo[@specialized(Int) K, @specialized(Int, Long, Double) 
   def apply(z: K => V): K => V
 }
 
-object Memo extends MemoInstances with MemoFunctions
 
 sealed abstract class MemoInstances {
 }
 
 /** @define immuMapNote As this memo uses a single var, it's
   * thread-safe. */
-trait MemoFunctions {
+object Memo extends MemoInstances {
   def memo[@specialized(Int) K, @specialized(Int, Long, Double) V](f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
     def apply(z: K => V) = f(z)
   }

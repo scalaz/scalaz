@@ -340,7 +340,10 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   }
 }
 
-object Zipper extends ZipperInstances with ZipperFunctions
+object Zipper extends ZipperInstances {
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
+    Zipper(ls, a, rs)
+}
 
 sealed abstract class ZipperInstances {
   import Zipper._
@@ -387,9 +390,4 @@ sealed abstract class ZipperInstances {
         Show[A].show(f.focus), ", ",
         Show[Stream[A]].show(f.rights), ")")
   }
-}
-
-trait ZipperFunctions {
-  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
-    Zipper(ls, a, rs)
 }

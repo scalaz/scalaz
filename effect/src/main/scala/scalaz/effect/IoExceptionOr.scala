@@ -26,7 +26,7 @@ sealed abstract class IoExceptionOr[A] {
     fold(_ => a, x => x)
 }
 
-object IoExceptionOr extends IoExceptionOrFunctions {
+object IoExceptionOr {
   def apply[A](a: => A): IoExceptionOr[A] =
     try {
       ioExceptionOr(a)
@@ -34,9 +34,7 @@ object IoExceptionOr extends IoExceptionOrFunctions {
       case e: java.io.IOException => ioException(e)
     }
   def unapply[A](ioExceptionOr: IoExceptionOr[A]) = ioExceptionOr.toOption
-}
 
-trait IoExceptionOrFunctions {
   type IoException =
   java.io.IOException
 

@@ -211,7 +211,60 @@ sealed abstract class Heap[A] {
 
 case class Ranked[A](rank: Int, value: A)
 
-object Heap extends HeapInstances with HeapFunctions {
+object Heap extends HeapInstances {
+  type Forest[A] = Stream[Tree[Ranked[A]]]
+  type ForestZipper[A] = (Forest[A], Forest[A])
+
+  /**The empty heap */
+  object Empty {
+    def apply[A]: Heap[A] = new Heap[A] {
+      def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B = empty
+    }
+
+    def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
+  }
+
+  import Heap.impl._
+
+  def fromData[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
+    Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
+
+  def fromCodata[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
+    Foldable[F].foldr(as, Empty[A])(x => y => y insert x)
+
+  def fromDataWith[F[_] : Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
+    Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
+
+  /**Heap sort */
+  def sort[F[_] : Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
+
+  /**Heap sort */
+  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
+
+  /**A heap with one element. */
+  def singleton[A: Order](a: A): Heap[A] = singletonWith[A](Order[A].lessThanOrEqual, a)
+
+  /**Create a heap consisting of multiple copies of the same value. O(log n) */
+  def replicate[A: Order](a: A, i: Int): Heap[A] = {
+    def f(x: Heap[A], y: Int): Heap[A] =
+      if (y % 2 == 0) f(x union x, y / 2)
+      else
+      if (y == 1) x
+      else
+        g(x union x, (y - 1) / 2, x)
+    def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
+      if (y % 2 == 0) g(x union x, y / 2, z)
+      else
+      if (y == 1) x union z
+      else
+        g(x union x, (y - 1) / 2, x union z)
+    if (i < 0) sys.error("Heap.replicate: negative length")
+    else
+    if (i == 0) Empty[A]
+    else
+      f(singleton(a), i)
+  }
+
   def apply[A](sz: Int, leq: (A, A) => Boolean, t: Tree[Ranked[A]]): Heap[A] = new Heap[A] {
     def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B) =
       nonempty(sz, leq, t)
@@ -374,59 +427,4 @@ sealed abstract class HeapInstances {
   import std.stream._
 
   implicit def heapEqual[A: Equal]: Equal[Heap[A]] = Equal.equalBy((_: Heap[A]).toStream)
-}
-
-trait HeapFunctions {
-  type Forest[A] = Stream[Tree[Ranked[A]]]
-  type ForestZipper[A] = (Forest[A], Forest[A])
-
-  /**The empty heap */
-  object Empty {
-    def apply[A]: Heap[A] = new Heap[A] {
-      def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B = empty
-    }
-
-    def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
-  }
-
-  import Heap.impl._
-
-  def fromData[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
-
-  def fromCodata[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldr(as, Empty[A])(x => y => y insert x)
-
-  def fromDataWith[F[_] : Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
-    Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
-
-  /**Heap sort */
-  def sort[F[_] : Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
-
-  /**Heap sort */
-  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
-
-  /**A heap with one element. */
-  def singleton[A: Order](a: A): Heap[A] = singletonWith[A](Order[A].lessThanOrEqual, a)
-
-  /**Create a heap consisting of multiple copies of the same value. O(log n) */
-  def replicate[A: Order](a: A, i: Int): Heap[A] = {
-    def f(x: Heap[A], y: Int): Heap[A] =
-      if (y % 2 == 0) f(x union x, y / 2)
-      else
-      if (y == 1) x
-      else
-        g(x union x, (y - 1) / 2, x)
-    def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
-      if (y % 2 == 0) g(x union x, y / 2, z)
-      else
-      if (y == 1) x union z
-      else
-        g(x union x, (y - 1) / 2, x union z)
-    if (i < 0) sys.error("Heap.replicate: negative length")
-    else
-    if (i == 0) Empty[A]
-    else
-      f(singleton(a), i)
-  }
 }

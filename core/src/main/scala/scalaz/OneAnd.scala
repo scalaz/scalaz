@@ -250,9 +250,7 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
     }
 }
 
-object OneAnd extends OneAndInstances with OneAndFunctions
-
-trait OneAndFunctions {
+object OneAnd extends OneAndInstances {
   def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =

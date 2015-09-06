@@ -231,7 +231,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
     }
 }
 
-trait KleisliFunctions {
+object Kleisli extends KleisliInstances {
   /**Construct a Kleisli from a Function1 */
   def kleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] =
     Kleisli(f)
@@ -256,8 +256,6 @@ trait KleisliFunctions {
   def local[M[_], A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] =
     fa local f
 }
-
-object Kleisli extends KleisliInstances with KleisliFunctions
 
 //
 // Implementation traits for type class instances

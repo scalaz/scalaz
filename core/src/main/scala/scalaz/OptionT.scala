@@ -142,7 +142,7 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
     Contravariant[Show].contramap(F0)(_.run)
 }
 
-trait OptionTFunctions {
+object OptionT extends OptionTInstances {
   def optionT[M[_]] =
     new (λ[α => M[Option[α]]] ~> OptionT[M, ?]) {
       def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
@@ -164,8 +164,6 @@ trait OptionTFunctions {
       def MT = ML0
     }
 }
-
-object OptionT extends OptionTInstances with OptionTFunctions
 
 //
 // Implementation traits for type class instances

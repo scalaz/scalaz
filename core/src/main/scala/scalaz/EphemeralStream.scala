@@ -146,35 +146,6 @@ sealed abstract class EphemeralStream[A] {
     zip(iterate(0)(_ + 1))
 }
 
-object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
-  def apply[A]: EphemeralStream[A] =
-    emptyEphemeralStream
-
-  def apply[A](as: A*): EphemeralStream[A] = {
-    val as0 = as match{
-      case indexedSeq: collection.IndexedSeq[A] => indexedSeq
-      case other => other.toIndexedSeq
-    }
-    val size = as.size
-    unfold(0)(b =>
-      if (b < size) Some((as0(b), b + 1))
-      else None)
-  }
-
-  class ConsWrap[A](e: => EphemeralStream[A]) {
-    def ##::(h: A): EphemeralStream[A] = cons(h, e)
-  }
-
-  implicit def consWrapper[A](e: => EphemeralStream[A]): ConsWrap[A] =
-    new ConsWrap[A](e)
-
-  object ##:: {
-    def unapply[A](xs: EphemeralStream[A]): Option[(A, EphemeralStream[A])] =
-      if (xs.isEmpty) None
-      else Some((xs.head(), xs.tail()))
-  }
-}
-
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
   implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
@@ -239,7 +210,8 @@ sealed abstract class EphemeralStreamInstances {
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
 }
 
-trait EphemeralStreamFunctions {
+object EphemeralStream extends EphemeralStreamInstances {
+
   type EStream[A] = EphemeralStream[A]
 
   def emptyEphemeralStream[A]: EphemeralStream[A] = new EphemeralStream[A] {
@@ -304,5 +276,32 @@ trait EphemeralStreamFunctions {
         x
       }
     }
+  }
+
+  def apply[A]: EphemeralStream[A] =
+    emptyEphemeralStream
+
+  def apply[A](as: A*): EphemeralStream[A] = {
+    val as0 = as match{
+      case indexedSeq: collection.IndexedSeq[A] => indexedSeq
+      case other => other.toIndexedSeq
+    }
+    val size = as.size
+    unfold(0)(b =>
+      if (b < size) Some((as0(b), b + 1))
+      else None)
+  }
+
+  class ConsWrap[A](e: => EphemeralStream[A]) {
+    def ##::(h: A): EphemeralStream[A] = cons(h, e)
+  }
+
+  implicit def consWrapper[A](e: => EphemeralStream[A]): ConsWrap[A] =
+    new ConsWrap[A](e)
+
+  object ##:: {
+    def unapply[A](xs: EphemeralStream[A]): Option[(A, EphemeralStream[A])] =
+      if (xs.isEmpty) None
+      else Some((xs.head(), xs.tail()))
   }
 }

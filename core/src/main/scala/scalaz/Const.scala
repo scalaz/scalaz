@@ -99,10 +99,8 @@ sealed abstract class ConstInstances extends ConstInstances0 {
     }
 }
 
-object Const extends ConstInstances with ConstFunctions
+object Const extends ConstInstances {
 
-
-sealed trait ConstFunctions {
   /** A properly universally quantified constant function. */
   def const[A](a: A): Function0 ~> λ[α => A] =
     new (Function0 ~> λ[α => A]) {

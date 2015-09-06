@@ -558,19 +558,6 @@ sealed abstract class ISet[A] {
     toAscList.hashCode
 }
 
-object ISet extends ISetInstances with ISetFunctions {
-  private[scalaz] abstract case class Tip[A] private() extends ISet[A] {
-    val size = 0
-  }
-  private[scalaz] object Tip extends Tip[Nothing] {
-    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
-  }
-
-  private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {
-    val size = l.size + r.size + 1
-  }
-}
-
 sealed abstract class ISetInstances {
   import ISet._
 
@@ -642,9 +629,7 @@ sealed abstract class ISetInstances {
   }
 }
 
-sealed trait ISetFunctions {
-  import ISet._
-
+object ISet extends ISetInstances {
   final def empty[A]: ISet[A] =
     Tip()
 
@@ -726,6 +711,17 @@ sealed trait ISetFunctions {
             } else Bin(x, l, r)
         }
     }
+
+  private[scalaz] abstract case class Tip[A] private() extends ISet[A] {
+    val size = 0
+  }
+  private[scalaz] object Tip extends Tip[Nothing] {
+    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
+  }
+
+  private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {
+    val size = l.size + r.size + 1
+  }
 }
 
 private sealed trait ISetEqual[A] extends Equal[ISet[A]] {

@@ -118,7 +118,7 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
     F0.contramap((_: MaybeT[F, A]).run)
 }
 
-trait MaybeTFunctions {
+object MaybeT extends MaybeTInstances {
   def maybeT[M[_]] = 
     new (λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]) {
       def apply[A](a: M[Maybe[A]]) = new MaybeT[M, A](a)
@@ -140,8 +140,6 @@ trait MaybeTFunctions {
       def MT = ML0
     }
 }
-
-object MaybeT extends MaybeTInstances with MaybeTFunctions
 
 //
 // Implementation traits for type class instances

@@ -96,7 +96,39 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   def left: LeftProjectionT[F, A, B] = new LazyEitherT.LeftProjectionT[F, A, B](LazyEitherT.this)
 }
 
-object LazyEitherT extends LazyEitherTInstances with LazyEitherTFunctions {
+object LazyEitherT extends LazyEitherTInstances {
+
+  def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] =
+    LazyEitherT(a)
+
+  def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
+    u1: Unapply[Functor, FAB]{type A = AB},
+    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+    l: Leibniz.===[AB, LazyEither[A0, B0]]
+  ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
+
+  import LazyEither._
+
+  def lazyLeftT[F[_], A, B](a: => A)(implicit p: Applicative[F]): LazyEitherT[F, A, B] =
+    lazyEitherT(p.point(lazyLeft(a)))
+
+  def lazyRightT[F[_], A, B](b: => B)(implicit p: Applicative[F]): LazyEitherT[F, A, B] =
+    lazyEitherT(p.point(lazyRight(b)))
+
+  import Isomorphism.{IsoFunctorTemplate, IsoBifunctorTemplate}
+
+  implicit def lazyEitherTLeftProjectionEIso2[F[_], E] =
+    new IsoFunctorTemplate[LazyEitherT.LeftProjectionT[F, E, ?], LazyEitherT[F, E, ?]] {
+      def to[A](fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] = fa.lazyEitherT
+      def from[A](ga: LazyEitherT[F, E, A]): LazyEitherT.LeftProjectionT[F, E, A] = ga.left
+    }
+
+  implicit def lazyEitherTLeftProjectionIso2[F[_]] =
+    new IsoBifunctorTemplate[LazyEitherT.LeftProjectionT[F, ?, ?], LazyEitherT[F, ?, ?]] {
+      def to[A, B](fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] = fa.lazyEitherT
+      def from[A, B](ga: LazyEitherT[F, A, B]): LazyEitherT.LeftProjectionT[F, A, B] = ga.left
+    }
+
   final class LeftProjectionT[F[_], A, B](val lazyEitherT: LazyEitherT[F, A, B]) {
     import OptionT._
     import LazyOptionT._
@@ -239,38 +271,6 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
     }
 }
 
-trait LazyEitherTFunctions {
-  def lazyEitherT[F[_], A, B](a: F[LazyEither[A, B]]): LazyEitherT[F, A, B] =
-    LazyEitherT(a)
-
-  def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
-    u1: Unapply[Functor, FAB]{type A = AB},
-    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-    l: Leibniz.===[AB, LazyEither[A0, B0]]
-  ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
-
-  import LazyEither._
-
-  def lazyLeftT[F[_], A, B](a: => A)(implicit p: Applicative[F]): LazyEitherT[F, A, B] =
-    lazyEitherT(p.point(lazyLeft(a)))
-
-  def lazyRightT[F[_], A, B](b: => B)(implicit p: Applicative[F]): LazyEitherT[F, A, B] =
-    lazyEitherT(p.point(lazyRight(b)))
-
-  import Isomorphism.{IsoFunctorTemplate, IsoBifunctorTemplate}
-
-  implicit def lazyEitherTLeftProjectionEIso2[F[_], E] =
-    new IsoFunctorTemplate[LazyEitherT.LeftProjectionT[F, E, ?], LazyEitherT[F, E, ?]] {
-      def to[A](fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] = fa.lazyEitherT
-      def from[A](ga: LazyEitherT[F, E, A]): LazyEitherT.LeftProjectionT[F, E, A] = ga.left
-    }
-
-  implicit def lazyEitherTLeftProjectionIso2[F[_]] =
-    new IsoBifunctorTemplate[LazyEitherT.LeftProjectionT[F, ?, ?], LazyEitherT[F, ?, ?]] {
-      def to[A, B](fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] = fa.lazyEitherT
-      def from[A, B](ga: LazyEitherT[F, A, B]): LazyEitherT.LeftProjectionT[F, A, B] = ga.left
-    }
-}
 
 //
 // Type class implementation traits

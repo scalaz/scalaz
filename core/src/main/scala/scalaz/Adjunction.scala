@@ -70,10 +70,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
   }
 }
 
-object Adjunction extends AdjunctionInstances with AdjunctionFunctions
-
-trait AdjunctionFunctions {
-
+object Adjunction extends AdjunctionInstances {
   type -|[F[_], G[_]] = Adjunction[F, G]
 
   def apply[F[_], G[_]](implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A

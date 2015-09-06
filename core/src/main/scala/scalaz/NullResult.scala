@@ -111,12 +111,10 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
     OptionT(F.map(a)(_apply))
 }
 
-object NullResult extends NullResultInstances with NullResultFunctions {
+object NullResult extends NullResultInstances {
   def apply[A, B](f: A => Option[B]): A =>? B =
     new (A =>? B)(f)
-}
 
-trait NullResultFunctions {
   type =>?[A, B] = NullResult[A, B]
 
   def kleisli[A, B](k: Kleisli[Option, A, B]): A =>? B =

@@ -67,7 +67,7 @@ object UnitReducer {
   }
 }
 
-object Reducer extends ReducerInstances with ReducerFunctions {
+object Reducer extends ReducerInstances {
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
     */
@@ -75,7 +75,7 @@ object Reducer extends ReducerInstances with ReducerFunctions {
     reducer(u, cs, sc)
 }
 
-sealed abstract class ReducerInstances { self: ReducerFunctions =>
+sealed abstract class ReducerInstances {
 
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
@@ -146,9 +146,6 @@ sealed abstract class ReducerInstances { self: ReducerFunctions =>
   implicit def LastReducer[A]: Reducer[A, Option[A] @@ Last] = unitReducer(a => Tag[Option[A], Last](Some(a)))
 
   implicit def LastOptionReducer[A]: Reducer[Option[A], Option[A] @@ Last] = unitReducer(o => Tag[Option[A], Last](o))
-}
-
-trait ReducerFunctions {
 
   /** Alias for [[scalaz.Reducer]]`.apply`. */
   def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =

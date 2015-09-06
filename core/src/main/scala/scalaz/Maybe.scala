@@ -146,7 +146,7 @@ sealed abstract class Maybe[A] {
     cata(F.point(_), G.empty)
 }
 
-object Maybe extends MaybeInstances with MaybeFunctions {
+object Maybe extends MaybeInstances {
 
   final case class Empty[A]() extends Maybe[A]
 
@@ -157,10 +157,6 @@ object Maybe extends MaybeInstances with MaybeFunctions {
       def to[A](fa: Option[A]) = std.option.toMaybe(fa)
       def from[A](ga: Maybe[A]) = ga.toOption
     }
-}
-
-sealed trait MaybeFunctions {
-  import Maybe._
 
   /** Wrap a value in Just, or return Empty if the value is null */
   final def fromNullable[A](a: A): Maybe[A] =
