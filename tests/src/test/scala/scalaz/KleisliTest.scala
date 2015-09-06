@@ -40,6 +40,7 @@ object KleisliTest extends SpecLite {
     def monoid[F[+_], A, B](implicit FB: Monoid[F[B]]) = Monoid[Kleisli[F, A, B]]
     def functor[F[+_] : Functor, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
     def apply[F[+_] : Apply, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
+    def applicative[F[+_] : Applicative, A] = Applicative[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[+_] : Plus, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[+_] : PlusEmpty, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
     def monadReader[F[+_] : Monad, A] = MonadReader[({type f[s, a] = Kleisli[F, s, a]})#f, A]
@@ -50,7 +51,11 @@ object KleisliTest extends SpecLite {
     // checking absence of ambiguity
     def semigroup[F[+_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def functor[F[+_] : Monad, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
+    def functor[F[+_] : Apply, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
+    def functor[F[+_] : Applicative, A] = Functor[({type f[a] = Kleisli[F, A, a]})#f]
     def apply[F[+_] : Monad, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
+    def apply[F[+_] : Applicative, A] = Apply[({type f[a] = Kleisli[F, A, a]})#f]
+    def applicative[F[+_] : Monad, A] = Applicative[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[+_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[+_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
 
