@@ -230,6 +230,11 @@ object StreamT extends StreamTInstances {
     def apply[Z](yieldd: (Nothing, => Nothing) => Z, skip: => Nothing => Z, done: => Z) = done
     def unapply[A, S](s: Step[A, S]): Boolean = s((_, _) => false, _ => false, true)
   }
+
+  implicit def StreamTInstance1[F[_]](implicit F0: Functor[F]): Bind[({type λ[α] = StreamT[F, α]})#λ] with Plus[({type λ[α] = StreamT[F, α]})#λ] =
+    new StreamTInstance1[F] {
+      def F = F0
+    }
 }
 
 //
@@ -240,6 +245,19 @@ private trait StreamTFunctor[F[_]] extends Functor[({type λ[α] = StreamT[F, α
   implicit def F: Functor[F]
 
   override def map[A, B](fa: StreamT[F, A])(f: A => B): StreamT[F, B] = fa map f
+}
+
+private trait StreamTInstance1[F[_]] extends Bind[({type λ[α] = StreamT[F, α]})#λ] with Plus[({type λ[α] = StreamT[F, α]})#λ] {
+  implicit def F: Functor[F]
+
+  override final def map[A, B](fa: StreamT[F, A])(f: A => B) =
+    fa map f
+
+  override final def bind[A, B](fa: StreamT[F, A])(f: A => StreamT[F, B]) =
+    fa flatMap f
+
+  override final def plus[A](a: StreamT[F, A], b: => StreamT[F, A]) =
+    a ++ b
 }
 
 private trait StreamTSemigroup[F[_], A] extends Semigroup[StreamT[F, A]] {
