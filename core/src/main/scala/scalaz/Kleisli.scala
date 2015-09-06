@@ -114,6 +114,12 @@ sealed abstract class KleisliInstances8 extends KleisliInstances9 {
     new KleisliBind[F, R] {
       def F = F0
     }
+
+  implicit def kleisliZip[F[_], R](implicit F: Zip[F]): Zip[Kleisli[F, R, ?]] =
+    new Zip[Kleisli[F, R, ?]] {
+      def zip[A, B](a: => Kleisli[F, R, A], b: => Kleisli[F, R, B]) =
+        Kleisli(r => F.zip(a(r), b(r)))
+    }
 }
 
 sealed abstract class KleisliInstances7 extends KleisliInstances8 {
