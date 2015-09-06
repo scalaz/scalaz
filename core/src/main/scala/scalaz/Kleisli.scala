@@ -87,6 +87,12 @@ sealed abstract class KleisliInstances8 {
   implicit def kleisliFunctor[F[_], R](implicit F0: Functor[F]): Functor[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliFunctor[F, R] {
     implicit def F: Functor[F] = F0
   }
+
+  implicit def kleisliZip[F[_], R](implicit F: Zip[F]): Zip[({type λ[α] = Kleisli[F, R, α]})#λ] =
+    new Zip[({type λ[α] = Kleisli[F, R, α]})#λ] {
+      def zip[A, B](a: => Kleisli[F, R, A], b: => Kleisli[F, R, B]) =
+        Kleisli(r => F.zip(a(r), b(r)))
+    }
 }
 
 sealed abstract class KleisliInstances7 extends KleisliInstances8 {
