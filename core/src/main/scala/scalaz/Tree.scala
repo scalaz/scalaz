@@ -54,7 +54,7 @@ sealed abstract class Tree[A] {
   /** Pre-order traversal. */
   def flatten: Stream[A] = {
     def squish(tree: Tree[A], xs: Stream[A]): Stream[A] =
-      Stream.cons(tree.rootLabel, Foldable[Stream].foldr[Tree[A], Stream[A]](tree.subForest, xs)(a => b => squish(a, b)))
+      Stream.cons(tree.rootLabel, Foldable[Stream].foldRight(tree.subForest, xs)(squish(_, _)))
 
     squish(this, Stream.Empty)
   }
