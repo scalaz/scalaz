@@ -226,29 +226,45 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  /** A lens that doesn't transform the type of the record. */
+  /**
+   * A lens that doesn't transform the type of the record.
+   *
+   * @see [[scalaz.@>]]
+   */
   type Lens[A, B] = LensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  /**
+   * @see [[scalaz.Lens]]
+   */
   object Lens extends LensInstances with LensFunctions {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
   }
 
+  /** @see [[scalaz.Lens]] */
   type @>[A, B] = Lens[A, B]
 
   //
   // Partial Lens type aliases
   //
-  /** A partial lens that doesn't transform the type of the record. */
+  /**
+   * A partial lens that doesn't transform the type of the record.
+   *
+   * @see [[scalaz.@?>]]
+   */
   type PLens[A, B] = PLensFamily[A, A, B, B]
 
   // important to define here, rather than at the top-level, to avoid Scala 2.9.2 bug
+  /**
+   * @see [[scalaz.PLens]]
+   */
   object PLens extends PLensInstances with PLensFunctions {
     def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
   }
 
+  /** @see [[scalaz.PLens]] */
   type @?>[A, B] = PLens[A, B]
 
   type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[F, S1, S2, Option[A]]
