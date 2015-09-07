@@ -24,4 +24,9 @@ object TreeTest extends SpecLite {
       "|",
       "`- 4").mkString("", "\n", "\n")
   }
+
+  "Issue #673" ! {
+    Tree.node(0, (1 to 100000).toStream.map(i => Tree.leaf(i)))
+      .flatten must_== (0 to 100000).toStream
+  }
 }
