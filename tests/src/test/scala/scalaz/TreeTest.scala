@@ -29,6 +29,12 @@ object TreeTest extends SpecLite {
     checkAll("Tree", comonad.laws[Tree])
   }
 
+  "deep Tree flatten should not cause a stack overflow" ! {
+    val size = 1000000
+    val tree = (1 to size).foldLeft(leaf(0))((x, y) => node(y, Stream(x)))
+    tree.flatten must_== (size to 0 by -1).toStream
+  }
+
   "A tree must can be rendered as an ASCII string" ! {
       node(1, Stream(node(2, Stream(leaf(3))), leaf(4))).drawTree must_== Seq(
       "1",
