@@ -7,7 +7,7 @@ import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object StreamTest extends SpecLite {
-  checkAll(equal.laws[Stream[Int]])
+  checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
   checkAll(traverse.laws[Stream])
@@ -18,6 +18,20 @@ object StreamTest extends SpecLite {
 
   import std.stream.streamSyntax._
   import syntax.foldable._
+
+  "Order[Stream[Int]] is consistent with Order[List[Int]]" ! forAll {
+    (a: Stream[Int], b: Stream[Int]) =>
+      Order[Stream[Int]].order(a, b) must_=== Order[List[Int]].order(a.toList, b.toList)
+  }
+
+  "Order[Stream[Int]] is lazy" ! {
+    var evaluated = false
+    val a = 1 #:: {evaluated = true; 2} #:: Stream.empty[Int]
+    val b = 0 #:: Stream.empty[Int]
+    Order[Stream[Int]].order(a, b) must_=== Ordering.GT
+    Order[Stream[Int]].order(b, a) must_=== Ordering.LT
+    evaluated must_=== false
+  }
 
   "intercalate empty stream is flatten" ! forAll((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must_===(a.flatten))
 
