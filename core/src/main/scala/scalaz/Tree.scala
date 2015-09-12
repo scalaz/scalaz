@@ -126,7 +126,7 @@ object Tree extends TreeFunctions with TreeInstances {
 }
 
 trait TreeInstances {
-  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Cobind.FromCojoin[Tree] {
+  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Zip[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Cobind.FromCojoin[Tree] with Zip[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cojoin[A](a: Tree[A]): Tree[Tree[A]] = a.cobind(identity(_))
     def copoint[A](p: Tree[A]): A = p.rootLabel
@@ -143,6 +143,15 @@ trait TreeInstances {
       case h #:: t => t.foldLeft(h)(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
+
+    def zip[A, B](aa: => Tree[A], bb: => Tree[B]) = {
+      val a = aa
+      val b = bb
+      Tree.node(
+        (a.rootLabel, b.rootLabel),
+        Zip[Stream].zipWith(a.subForest, b.subForest)(zip(_, _))
+      )
+    }
   }
 
   implicit def treeEqual[A](implicit A0: Equal[A]): Equal[Tree[A]] =
