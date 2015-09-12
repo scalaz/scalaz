@@ -116,7 +116,7 @@ object Tree extends TreeInstances with TreeFunctions {
 }
 
 sealed abstract class TreeInstances {
-  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] {
+  implicit val treeInstance: Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] {
     def point[A](a: => A): Tree[A] = Tree.leaf(a)
     def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa cobind f
     def copoint[A](p: Tree[A]): A = p.rootLabel
@@ -141,6 +141,14 @@ sealed abstract class TreeInstances {
           case \&/.Both(sta, stb) ⇒ align(sta, stb)
         })(ta.subForest, tb.subForest))
       align _
+    }
+    def zip[A, B](aa: => Tree[A], bb: => Tree[B]) = {
+      val a = aa
+      val b = bb
+      Tree.node(
+        (a.rootLabel, b.rootLabel),
+        Zip[Stream].zipWith(a.subForest, b.subForest)(zip(_, _))
+      )
     }
   }
 
