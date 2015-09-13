@@ -159,11 +159,20 @@ sealed abstract class TreeInstances {
     }
   }
 
-  implicit def treeEqual[A](implicit A: Equal[A]): Equal[Tree[A]] = new Equal[Tree[A]] {
-    def equal(a1: Tree[A], a2: Tree[A]): Boolean = {
-      A.equal(a1.rootLabel, a2.rootLabel) && a1.subForest.corresponds(a2.subForest)(equal _)
+  implicit def treeEqual[A](implicit A0: Equal[A]): Equal[Tree[A]] =
+    new TreeEqual[A] { def A = A0 }
+
+  implicit def treeOrder[A](implicit A0: Order[A]): Order[Tree[A]] =
+    new Order[Tree[A]] with TreeEqual[A] {
+      def A = A0
+      import std.stream._
+      override def order(x: Tree[A], y: Tree[A]) =
+        A.order(x.rootLabel, y.rootLabel) match {
+          case Ordering.EQ =>
+            Order[Stream[Tree[A]]].order(x.subForest, y.subForest)
+          case x => x
+        }
     }
-  }
 
   /* TODO
   def applic[A, B](f: Tree[A => B]) = a => Tree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipStream]].applic(f.subForest.map(applic[A, B](_)).ʐ)(a.subForest ʐ).value)
@@ -196,4 +205,10 @@ object Tree extends TreeInstances {
     f(v) match {
       case (a, bs) => node(a, unfoldForest(bs.apply())(f))
     }
+}
+
+private trait TreeEqual[A] extends Equal[Tree[A]] {
+  def A: Equal[A]
+  override final def equal(a1: Tree[A], a2: Tree[A]) =
+    A.equal(a1.rootLabel, a2.rootLabel) && a1.subForest.corresponds(a2.subForest)(equal _)
 }
