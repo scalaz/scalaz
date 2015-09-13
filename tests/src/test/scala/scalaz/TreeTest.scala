@@ -8,7 +8,7 @@ import org.scalacheck.Prop.forAll
 
 object TreeTest extends SpecLite {
 
-  checkAll("Tree", equal.laws[Tree[Int]])
+  checkAll("Tree", order.laws[Tree[Int]])
 
   "satisfy foldable1 law" ! forAll { xs: Tree[Int] =>
     val F = Foldable1[Tree]
