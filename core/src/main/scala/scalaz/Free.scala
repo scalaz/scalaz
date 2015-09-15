@@ -272,9 +272,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Duplication in `Free` as a comonad in the endofunctor category. */
-  def duplicateF: Free[Free[S, ?], A] = extendF[Free[S,?]](new (Free[S, ?] ~> Free[S, ?]) {
-    def apply[X](x: Free[S, X]) = x
-  })
+  def duplicateF: Free[Free[S, ?], A] = extendF[Free[S,?]](NaturalTransformation.refl[Free[S,?]])
 
   /** Extension in `Free` as a comonad in the endofunctor category. */
   def extendF[T[_]](f: Free[S, ?] ~> T): Free[T, A] = mapSuspension(new (S ~> T) {
@@ -282,10 +280,7 @@ sealed abstract class Free[S[_], A] {
   })
 
   /** Extraction from `Free` as a comonad in the endofunctor category. */
-  def extractF(implicit S: Monad[S]): S[A] =
-    foldMap(new (S ~> S) {
-      def apply[X](x: S[X]) = x
-    })
+  def extractF(implicit S: Monad[S]): S[A] = foldMap(NaturalTransformation.refl[S])
 }
 
 object Trampoline extends TrampolineInstances {
