@@ -129,6 +129,13 @@ object CofreeTest extends SpecLite {
     checkAll("CofreeZipStream", ScalazProperties.apply.laws[CofreeZipStream])
   }
 
+  "no stack overflow Applicative[CofreeZip[IList, ?]]#point" in {
+    val a = 1
+    val b = Applicative[({type l[a] = CofreeZip[IList, a]})#l].point(a)
+    val size = 10
+    Foldable[({type l[a] = Cofree[IList, a]})#l].toStream(Tag.unwrap(b)).take(size) must_=== Stream.fill(size)(a)
+  }
+
   "Applicative[({type λ[α] = CofreeZip[LazyOption, α]})#λ] is Applicative[({type λ[α]=Stream[α] @@ Zip})#λ]" ! forAll{
     (a: OneAndStream[Int], b: OneAndStream[Int]) =>
 
