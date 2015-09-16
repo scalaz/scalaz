@@ -13,6 +13,7 @@ object TreeTest extends SpecLite {
   checkAll("Tree", applicative.laws[Tree])
   checkAll("Tree", comonad.laws[Tree])
   checkAll("Tree", align.laws[Tree])
+  checkAll("Tree", zip.laws[Tree])
 
   "infinite Tree flatten" ! {
     Tree.node(0, Stream.from(1).map(Tree.leaf(_))).flatten
