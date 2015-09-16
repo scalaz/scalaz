@@ -22,6 +22,8 @@ object OptionTTest extends SpecLite {
       OptionT.optionT(ass).run == ass
   }
 
+  "listT" ! forAll { a: OptionTList[Int] => a.toListT.underlying must_=== a.run.map(_.toList)}
+
   object instances {
     def functor[F[+_] : Functor] = Functor[({type λ[α] = OptionT[F, α]})#λ]
     def monad[F[+_] : Monad] = MonadPlus[({type λ[α] = OptionT[F, α]})#λ]
