@@ -20,10 +20,12 @@ sealed abstract class RegionT[S, P[_], A] {
     value.run(r)
 }
 
-object RegionT extends RegionTInstances with RegionTFunctions {
+object RegionT extends RegionTInstances {
   def apply[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
     val value = k
   }
+
+  def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
 }
 
 sealed abstract class RegionTInstances1 {
@@ -37,10 +39,6 @@ sealed abstract class RegionTInstances1 {
 }
 
 sealed abstract class RegionTInstances extends RegionTInstances1 {
-}
-
-trait RegionTFunctions {
-  def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
 }
 
 trait RegionTMonad[S, M[_]] extends Monad[RegionT[S, M, ?]] {

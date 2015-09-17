@@ -22,6 +22,26 @@ trait Semigroup[F]  { self =>
   def append(f1: F, f2: => F): F
 
   // derived functions
+
+  /**
+   * For `n = 0`, `value`
+   * For `n = 1`, `append(value, value)`
+   * For `n = 2`, `append(append(value, value), value)`
+   *
+   * The default definition uses peasant multiplication, exploiting associativity to only
+   * require `O(log n)` uses of [[append]]
+   */
+  def multiply1(value: F, n: Int): F = {
+    @scala.annotation.tailrec
+    def go(x: F, y: Int, z: F): F = y match {
+      case y if (y & 1) == 0 => go(append(x, x), y >>> 1, z)
+      case y if (y == 1)     => append(x, z)
+      case _                 => go(append(x, x), (y - 1) >>>  1, append(x, z))
+    }
+    if (n <= 0) value else go(value, n, value)
+  }
+
+
   protected[this] trait SemigroupCompose extends Compose[λ[(α, β) => F]] {
     def compose[A, B, C](f: F, g: F) = append(f, g)
   }

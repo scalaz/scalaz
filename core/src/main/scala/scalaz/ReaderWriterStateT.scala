@@ -69,7 +69,15 @@ sealed abstract class IndexedReaderWriterStateTInstances {
     }
 }
 
-abstract class ReaderWriterStateTInstances extends IndexedReaderWriterStateTInstances {
+sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterStateTInstances {
+  implicit def rwstBind[F[_], R, W, S](implicit F0: Bind[F], W0: Semigroup[W]): Bind[ReaderWriterStateT[F, R, W, S, ?]] =
+    new ReaderWriterStateTBind[F, R, W, S] {
+      def F = F0
+      def W = W0
+    }
+}
+
+abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 {
   implicit def rwstMonad[F[_], R, W, S](implicit W0: Monoid[W], F0: Monad[F]):
   MonadReader[ReaderWriterStateT[F, ?, W, S, ?], R] with
   MonadState[ReaderWriterStateT[F, R, W, ?, ?], S] with
@@ -89,18 +97,25 @@ abstract class ReaderWriterStateTInstances extends IndexedReaderWriterStateTInst
 private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2] extends Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
+  override final def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
+}
+
+private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterStateT[F, R, W, S, ?]] with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {
+  implicit def F: Bind[F]
+  implicit def W: Semigroup[W]
+
+  override final def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => ReaderWriterStateT[F, R, W, S, B]) =
+    fa flatMap f
 }
 
 private trait ReaderWriterStateTMonad[F[_], R, W, S]
   extends MonadReader[ReaderWriterStateT[F, ?, W, S, ?], R]
   with MonadState[ReaderWriterStateT[F, R, W, ?, ?], S]
   with MonadListen[ReaderWriterStateT[F, R, ?, S, ?], W]
-  with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {
+  with ReaderWriterStateTBind[F, R, W, S] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 
-  def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => ReaderWriterStateT[F, R, W, S, B]): ReaderWriterStateT[F, R, W, S, B] = fa flatMap f
   def point[A](a: => A): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((_, s) => F.point((W.zero, a, s)))
   def ask: ReaderWriterStateT[F, R, W, S, R] =

@@ -19,7 +19,7 @@ cache:
 
 language: scala
 scala:
-  - 2.11.6
+  - 2.11.7
   - 2.10.5
 jdk:
   - openjdk7
@@ -30,3 +30,8 @@ script:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+
+matrix:
+  include:
+    - scala: 2.12.0-M2
+      jdk: oraclejdk8

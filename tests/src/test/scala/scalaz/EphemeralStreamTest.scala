@@ -120,4 +120,15 @@ object EphemeralStreamTest extends SpecLite {
     F.zipL(infinite, finite).take(1000).length must_===(1000)
     F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_===(size)
   }
+
+  "zipWithIndex" ! forAll { (xs: Stream[Int], n: Int) =>
+    EphemeralStream.fromStream(xs).take(n).zipWithIndex must_===(EphemeralStream.fromStream(xs.take(n).zipWithIndex))
+  }
+
+  "zipWithIndex from infinite stream" in {
+    val n = util.Random.nextInt(1000)
+    EphemeralStream.iterate(0)(_ + 1).zipWithIndex.take(n) must_===(
+      EphemeralStream.fromStream(Stream.iterate(0)(_ + 1).zipWithIndex.take(n))
+    )
+  }
 }

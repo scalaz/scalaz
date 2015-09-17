@@ -55,6 +55,10 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   def getOrElseF(default: => F[A])(implicit F: Monad[F]): F[A] =
     F.bind(self.run)(_.cata(F.point(_), default))
 
+  def orZero(implicit F0: Functor[F], M0: Monoid[A]): F[A] = getOrElse(M0.zero)
+
+  def unary_~(implicit F0: Functor[F], M0: Monoid[A]): F[A] = orZero
+
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
@@ -88,6 +92,11 @@ sealed abstract class MaybeTInstances1 extends MaybeTInstances2 {
     new MaybeTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
+
+  implicit def maybeTMonadError[F[_, _], E](implicit F0: MonadError[F, E]): MonadError[λ[(E0, A) => MaybeT[F[E0, ?], A]], E] =
+    new MaybeTMonadError[F, E] {
+      def F = F0
+    }
 }
 
 sealed abstract class MaybeTInstances0 extends MaybeTInstances1 {
@@ -109,7 +118,7 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
     F0.contramap((_: MaybeT[F, A]).run)
 }
 
-trait MaybeTFunctions {
+object MaybeT extends MaybeTInstances {
   def maybeT[M[_]] = 
     new (λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]) {
       def apply[A](a: M[Maybe[A]]) = new MaybeT[M, A](a)
@@ -131,8 +140,6 @@ trait MaybeTFunctions {
       def MT = ML0
     }
 }
-
-object MaybeT extends MaybeTInstances with MaybeTFunctions
 
 //
 // Implementation traits for type class instances
@@ -185,6 +192,16 @@ private trait MaybeTMonadPlus[F[_]] extends MonadPlus[MaybeT[F, ?]] with MaybeTM
 
   def empty[A]: MaybeT[F, A] = MaybeT(F point Maybe.empty)
   def plus[A](a: MaybeT[F, A], b: => MaybeT[F, A]): MaybeT[F, A] = a orElse b
+}
+
+private trait MaybeTMonadError[F[_, _], E] extends MonadError[λ[(E0, A) => MaybeT[F[E0, ?], A]], E] with MaybeTMonad[F[E, ?]] {
+  override def F: MonadError[F, E]
+
+  override def raiseError[A](e: E) =
+    MaybeT[F[E, ?], A](F.map(F.raiseError[A](e))(Maybe.just))
+
+  override def handleError[A](fa: MaybeT[F[E, ?], A])(f: E => MaybeT[F[E, ?], A]) =
+    MaybeT[F[E, ?], A](F.handleError(fa.run)(f(_).run))
 }
 
 private trait MaybeTMonadTell[F[_, _], W] extends MonadTell[λ[(α, β) => MaybeT[F[α, ?], β]], W] with MaybeTMonad[F[W, ?]] with MaybeTHoist {

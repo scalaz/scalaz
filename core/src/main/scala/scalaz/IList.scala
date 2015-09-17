@@ -152,9 +152,9 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   // no forall; use Foldable#all
 
-  def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> IList[A] =
-    foldLeft(==>>.empty[K, IList[A]]) { (m, a) =>
-      m.alter(f(a), _.map(a :: _) orElse Some(single(a)))
+  def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> NonEmptyList[A] =
+    foldLeft(==>>.empty[K, NonEmptyList[A]]) { (m, a) =>
+      m.alter(f(a), _.map(a <:: _) orElse Some(NonEmptyList(a)))
     } .map(_.reverse) // should we bother with this? we don't do it for groupBy1
 
   def groupBy1[K](f: A => K)(implicit ev: Order[K]): K ==>> OneAnd[IList, A] =
@@ -474,7 +474,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 final case class INil[A]() extends IList[A]
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
-object IList extends IListInstances with IListFunctions{
+object IList extends IListInstances {
   private[this] val nil: IList[Nothing] = INil()
 
   def apply[A](as: A*): IList[A] =
@@ -512,8 +512,6 @@ object IList extends IListInstances with IListFunctions{
       def from[A](fa: IList[A]) = fa.toList
     }
 }
-
-sealed trait IListFunctions
 
 sealed abstract class IListInstance0 {
 

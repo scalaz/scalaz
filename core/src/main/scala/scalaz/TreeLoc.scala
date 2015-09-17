@@ -190,8 +190,6 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
     }
 }
 
-object TreeLoc extends TreeLocInstances with TreeLocFunctions
-
 sealed abstract class TreeLocInstances {
   // TODO more instances
   implicit val treeLocInstance: Comonad[TreeLoc] = new Comonad[TreeLoc] {
@@ -215,7 +213,7 @@ sealed abstract class TreeLocInstances {
     }
 }
 
-trait TreeLocFunctions {
+object TreeLoc extends TreeLocInstances {
   type TreeForest[A] =
   Stream[Tree[A]]
 

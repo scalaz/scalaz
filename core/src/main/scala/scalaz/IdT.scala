@@ -68,10 +68,7 @@ sealed abstract class IdTInstances extends IdTInstances0 {
     F.contramap(_.run)
 }
 
-trait IdTFunctions {
-}
-
-object IdT extends IdTInstances with IdTFunctions 
+object IdT extends IdTInstances
 
 //
 // Implementation traits for type class instances

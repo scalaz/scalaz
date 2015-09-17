@@ -95,7 +95,29 @@ private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
 
 private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
-object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
+object LazyEither extends LazyEitherInstances {
+
+  /**
+   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
+   * `LazyRight`
+   */
+  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
+
+  sealed abstract class LazyLeftConstruct[B] {
+    def apply[A](a: => A): LazyEither[A, B]
+  }
+
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
+    def apply[A](a: => A) = LazyLeft(() => a)
+  }
+
+  sealed abstract class LazyRightConstruct[A] {
+    def apply[B](b: => B): LazyEither[A, B]
+  }
+
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
+    def apply[B](b: => B) = LazyRight(() => b)
+  }
 
   final case class LeftProjection[+A, +B](e: LazyEither[A, B]) {
     import LazyOption._
@@ -204,30 +226,5 @@ sealed abstract class LazyEitherInstances {
         a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
         b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
       )
-  }
-}
-
-trait LazyEitherFunctions {
-
-  /**
-   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
-   * `LazyRight`
-   */
-  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
-
-  sealed abstract class LazyLeftConstruct[B] {
-    def apply[A](a: => A): LazyEither[A, B]
-  }
-
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
-    def apply[A](a: => A) = LazyLeft(() => a)
-  }
-
-  sealed abstract class LazyRightConstruct[A] {
-    def apply[B](b: => B): LazyEither[A, B]
-  }
-
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
-    def apply[B](b: => B) = LazyRight(() => b)
   }
 }

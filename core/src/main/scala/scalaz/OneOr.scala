@@ -212,9 +212,7 @@ private sealed trait OneOrShow[F[_], A] extends Show[OneOr[F, A]] {
     a.run.show
 }
 
-object OneOr extends OneOrInstances with OneOrFunctions
-
-trait OneOrFunctions {
+object OneOr extends OneOrInstances {
   type OneOrList[A] = OneOr[List, A]
   type OneOrNel[A] = OneOr[NonEmptyList, A]
   type OneOrOption[A] = OneOr[Option, A]

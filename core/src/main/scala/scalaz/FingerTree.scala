@@ -935,7 +935,7 @@ sealed abstract class FingerTreeInstances {
     }
 }
 
-trait FingerTreeFunctions {
+object FingerTree extends FingerTreeInstances {
 
   def Node2[V, A](v: V, a1: => A, a2: => A)(implicit r: Reducer[A, V]) =
     new Node[V, A] {
@@ -1042,8 +1042,6 @@ trait FingerTreeFunctions {
       (mm, a) => deep(mappendVal(pr.measure, m), pr, mm, a.toDigit))
 
 }
-
-object FingerTree extends FingerTreeInstances with FingerTreeFunctions
 
 /** Indexed sequences, based on [[scalaz.FingerTree]]
  *

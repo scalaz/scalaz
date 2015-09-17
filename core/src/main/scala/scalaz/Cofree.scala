@@ -71,7 +71,7 @@ sealed abstract class Cofree[S[_], A] {
     zapWith(fs)((a, f) => f(a))
 }
 
-object Cofree extends CofreeInstances with CofreeFunctions {
+object Cofree extends CofreeInstances {
 
   def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S,A] = applyT(h, Trampoline.done(t))
 
@@ -90,10 +90,6 @@ object Cofree extends CofreeInstances with CofreeFunctions {
       def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =
         applyT(f(head), T.map(t)(s => S.map(s)(g)))
     }
-}
-
-
-trait CofreeFunctions {
 
   private[scalaz] final type CofreeZip[F[_], A] = Cofree[F, A] @@ Tags.Zip
 
@@ -226,7 +222,7 @@ private trait CofreeZipApply[F[_]] extends Apply[CofreeZip[F, ?]] with CofreeZip
 private trait CofreeZipApplicative[F[_]] extends Applicative[CofreeZip[F, ?]] with CofreeZipApply[F]{
   implicit def F: Applicative[F]
 
-  def point[A](a: => A) = CofreeZip[F, A](a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a))))
+  def point[A](a: => A) = Tags.Zip(Cofree.delay(a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a)))))
 }
 
 private trait CofreeBind[F[_]] extends Bind[Cofree[F, ?]] with CofreeComonad[F]{

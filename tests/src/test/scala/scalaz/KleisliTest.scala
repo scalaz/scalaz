@@ -4,6 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.{Prop, Gen, Arbitrary}
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {
@@ -25,14 +26,21 @@ object KleisliTest extends SpecLite {
       M.equal(mb1, mb2)
     }
   }
-  
+
+  // Needed because scalac inference has trouble with \/
+  implicit def KleisliDisjunctionArbitrary[E : Arbitrary, R : Arbitrary, A : Arbitrary]: Arbitrary[Kleisli[\/[E, ?], R, A]] = KleisliArbitrary[\/[E, +?], R, A]
+
+  implicit def KleisliDisjunctionEqual[E : Equal] = KleisliEqual[\/[E, ?]]
+
   "mapK" ! forAll {
-    (f: Int => Option[Int], a: Int) => 
+    (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(zip.laws[KleisliOptInt])
+  checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
@@ -40,9 +48,12 @@ object KleisliTest extends SpecLite {
     def monoid[F[_], A, B](implicit FB: Monoid[F[B]]) = Monoid[Kleisli[F, A, B]]
     def functor[F[_] : Functor, A] = Functor[Kleisli[F, A, ?]]
     def apply[F[_] : Apply, A] = Apply[Kleisli[F, A, ?]]
+    def applicative[F[_] : Applicative, A] = Applicative[Kleisli[F, A, ?]]
+    def bind[F[_] : Bind , A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : Plus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[Kleisli[F, A, ?]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, ?, ?], A]
+    def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Functor] = Strong[Kleisli[F, ?, ?]]
@@ -55,7 +66,13 @@ object KleisliTest extends SpecLite {
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def functor[F[_] : Monad, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : Bind, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : Apply, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : Applicative, A] = Functor[Kleisli[F, A, ?]]
     def apply[F[_] : Monad, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : Bind, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : Applicative, A] = Apply[Kleisli[F, A, ?]]
+    def applicative[F[_] : Monad, A] = Applicative[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
     def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]

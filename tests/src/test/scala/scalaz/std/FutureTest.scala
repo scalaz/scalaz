@@ -15,7 +15,6 @@ import scalaz.syntax.functor._
 import scalaz.Tags._
 
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class FutureTest extends SpecLite {
@@ -24,30 +23,35 @@ class FutureTest extends SpecLite {
 
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
+ {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
   implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
     val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
     Await.result(futureWithError, duration)
   }
 
-  implicit def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future(x) }
+  def FutureArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[Future[A]] = implicitly[Arbitrary[A]] map { x => Future.successful(x) }
 
   case class SomeFailure(n: Int) extends Exception
 
   implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
 
-  checkAll(monad.laws[Future])
   checkAll(monoid.laws[Future[Int]])
   checkAll(monoid.laws[Future[Int @@ Multiplication]])
 
+  // can not use `org.scalacheck.Arbitrary.arbFuture` due to https://github.com/scalaz/scalaz/issues/964
+  // https://github.com/rickynils/scalacheck/blob/1.12.4/src/main/scala/org/scalacheck/Arbitrary.scala#L291-L293
   // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
-  checkAll(monadError.laws[λ[(α, β) => Future[β]], Throwable](implicitly, implicitly, implicitly, implicitly, ArbitraryThrowable))
+  checkAll(monadError.laws[λ[(α, β) => Future[β]], Throwable](implicitly, FutureArbitrary, FutureArbitrary, implicitly, ArbitraryThrowable))
 
-  // Scope these away from the rest as Copointed[Future] is a little evil.
-  // Should fail to compile by default: implicitly[Copointed[Future]]
+  // Scope these away from the rest as Comonad[Future] is a little evil.
+  // Should fail to compile by default: implicitly[Comonad[Future]]
   {
     implicit val cm: Comonad[Future] = futureComonad(duration)
     checkAll(comonad.laws[Future])
   }
+ }
 
   "Nondeterminism[Future]" should {
     implicit val es: ExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))

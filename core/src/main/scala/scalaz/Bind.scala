@@ -46,6 +46,13 @@ trait Bind[F[_]] extends Apply[F] { self =>
   def mproduct[A, B](fa: F[A])(f: A => F[B]): F[(A, B)] =
     bind(fa)(a => map(f(a))((a, _)))
 
+  /**The product of Bind `F` and `G`, `[x](F[x], G[x]])`, is a Bind */
+  def product[G[_]](implicit G0: Bind[G]): Bind[λ[α => (F[α], G[α])]] =
+    new ProductBind[F, G] {
+      def F = self
+      def G = G0
+    }
+
   trait BindLaw extends ApplyLaw {
     /**
      * As with semigroups, monadic effects only change when their

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 #
 # A more capable sbt runner, coincidentally also called sbt.
-# Author: Paul Phillips <paulp@typesafe.com>
+# Author: Paul Phillips <paulp@improving.org>
 
 # todo - make this dynamic
-declare -r sbt_release_version="0.13.5"
-declare -r sbt_unreleased_version="0.13.6-MSERVER-1"
+declare -r sbt_release_version="0.13.8"
+declare -r sbt_unreleased_version="0.13.9-M1"
 declare -r buildProps="project/build.properties"
 
 declare sbt_jar sbt_dir sbt_create sbt_version
-declare scala_version java_home sbt_explicit_version
+declare scala_version sbt_explicit_version
 declare verbose noshare batch trace_level log_level
-declare sbt_saved_stty
+declare sbt_saved_stty debugUs
 
 echoerr () { echo >&2 "$@"; }
 vlog ()    { [[ -n "$verbose" ]] && echoerr "$@"; }
@@ -19,7 +19,7 @@ vlog ()    { [[ -n "$verbose" ]] && echoerr "$@"; }
 # spaces are possible, e.g. sbt.version = 0.13.0
 build_props_sbt () {
   [[ -r "$buildProps" ]] && \
-    grep '^sbt\.version' "$buildProps" | tr '=' ' ' | awk '{ print $2; }'
+    grep '^sbt\.version' "$buildProps" | tr '=\r' ' ' | awk '{ print $2; }'
 }
 
 update_build_props_sbt () {
@@ -101,12 +101,12 @@ init_default_option_file () {
 
 declare -r cms_opts="-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
 declare -r jit_opts="-XX:ReservedCodeCacheSize=256m -XX:+TieredCompilation"
-declare -r default_jvm_opts="-XX:MaxPermSize=384m -Xms512m -Xmx1536m -Xss2m $jit_opts $cms_opts"
+declare -r default_jvm_opts_common="-Xms512m -Xmx1536m -Xss2m $jit_opts $cms_opts"
 declare -r noshare_opts="-Dsbt.global.base=project/.sbtboot -Dsbt.boot.directory=project/.boot -Dsbt.ivy.home=project/.ivy"
 declare -r latest_28="2.8.2"
 declare -r latest_29="2.9.3"
-declare -r latest_210="2.10.4"
-declare -r latest_211="2.11.1"
+declare -r latest_210="2.10.5"
+declare -r latest_211="2.11.7"
 
 declare -r script_path="$(get_script_path "$BASH_SOURCE")"
 declare -r script_name="${script_path##*/}"
@@ -115,7 +115,7 @@ declare -r script_name="${script_path##*/}"
 declare java_cmd="java"
 declare sbt_opts_file="$(init_default_option_file SBT_OPTS .sbtopts)"
 declare jvm_opts_file="$(init_default_option_file JVM_OPTS .jvmopts)"
-declare sbt_launch_repo="http://typesafe.artifactoryonline.com/typesafe/ivy-releases"
+declare sbt_launch_repo="http://repo.typesafe.com/typesafe/ivy-releases"
 
 # pull -J and -D options to give to java.
 declare -a residual_args
@@ -126,13 +126,78 @@ declare -a sbt_commands
 # args to jvm/sbt via files or environment variables
 declare -a extra_jvm_opts extra_sbt_opts
 
-# if set, use JAVA_HOME over java found in path
-[[ -e "$JAVA_HOME/bin/java" ]] && java_cmd="$JAVA_HOME/bin/java"
+addJava () {
+  vlog "[addJava] arg = '$1'"
+  java_args+=("$1")
+}
+addSbt () {
+  vlog "[addSbt] arg = '$1'"
+  sbt_commands+=("$1")
+}
+setThisBuild () {
+  vlog "[addBuild] args = '$@'"
+  local key="$1" && shift
+  addSbt "set $key in ThisBuild := $@"
+}
+addScalac () {
+  vlog "[addScalac] arg = '$1'"
+  scalac_args+=("$1")
+}
+addResidual () {
+  vlog "[residual] arg = '$1'"
+  residual_args+=("$1")
+}
+addResolver () {
+  addSbt "set resolvers += $1"
+}
+addDebugger () {
+  addJava "-Xdebug"
+  addJava "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$1"
+}
+setScalaVersion () {
+  [[ "$1" == *"-SNAPSHOT" ]] && addResolver 'Resolver.sonatypeRepo("snapshots")'
+  addSbt "++ $1"
+}
+setJavaHome () {
+  java_cmd="$1/bin/java"
+  setThisBuild javaHome "Some(file(\"$1\"))"
+  export JAVA_HOME="$1"
+  export JDK_HOME="$1"
+  export PATH="$JAVA_HOME/bin:$PATH"
+}
+setJavaHomeQuietly () {
+  addSbt warn
+  setJavaHome "$1"
+  addSbt info
+}
+
+# if set, use JDK_HOME/JAVA_HOME over java found in path
+if [[ -e "$JDK_HOME/lib/tools.jar" ]]; then
+  setJavaHomeQuietly "$JDK_HOME"
+elif [[ -e "$JAVA_HOME/bin/java" ]]; then
+  setJavaHomeQuietly "$JAVA_HOME"
+fi
 
 # directory to store sbt launchers
 declare sbt_launch_dir="$HOME/.sbt/launchers"
 [[ -d "$sbt_launch_dir" ]] || mkdir -p "$sbt_launch_dir"
 [[ -w "$sbt_launch_dir" ]] || sbt_launch_dir="$(mktemp -d -t sbt_extras_launchers.XXXXXX)"
+
+java_version () {
+  local version=$("$java_cmd" -version 2>&1 | grep -E -e '(java|openjdk) version' | awk '{ print $3 }' | tr -d \")
+  vlog "Detected Java version: $version"
+  echo "${version:2:1}"
+}
+
+# MaxPermSize critical on pre-8 jvms but incurs noisy warning on 8+
+default_jvm_opts () {
+  local v="$(java_version)"
+  if [[ $v -ge 8 ]]; then
+    echo "$default_jvm_opts_common"
+  else
+    echo "-XX:MaxPermSize=384m $default_jvm_opts_common"
+  fi
+}
 
 build_props_scala () {
   if [[ -r "$buildProps" ]]; then
@@ -157,9 +222,7 @@ execRunner () {
     vlog ""
   }
 
-  if [[ -n "$batch" ]]; then
-    exec </dev/null
-  fi
+  [[ -n "$batch" ]] && exec </dev/null
   exec "$@"
 }
 
@@ -181,7 +244,7 @@ download_url () {
 
   mkdir -p "${jar%/*}" && {
     if which curl >/dev/null; then
-      curl --fail --silent "$url" --output "$jar"
+      curl --fail --silent --location "$url" --output "$jar"
     elif which wget >/dev/null; then
       wget --quiet -O "$jar" "$url"
     fi
@@ -204,10 +267,18 @@ options to this runner use a single dash. Any sbt command can be scheduled
 to run first by prefixing the command with --, so --warn, --error and so on
 are not special.
 
+Output filtering: if there is a file in the home directory called .sbtignore
+and this is not an interactive sbt session, the file is treated as a list of
+bash regular expressions. Output lines which match any regex are not echoed.
+One can see exactly which lines would have been suppressed by starting this
+runner with the -x option.
+
   -h | -help         print this message
   -v                 verbose operation (this runner is chattier)
   -d, -w, -q         aliases for --debug, --warn, --error (q means quiet)
+  -x                 debug this script
   -trace <level>     display stack traces with a max of <level> frames (default: -1, traces suppressed)
+  -debug-inc         enable debugging log for the incremental compiler
   -no-colors         disable ANSI color codes
   -sbt-create        start sbt even if current directory contains no sbt project
   -sbt-dir   <path>  path to global settings/plugins directory (default: ~/.sbt/<version>)
@@ -220,7 +291,9 @@ are not special.
   -prompt <expr>     Set the sbt prompt; in expr, 's' is the State and 'e' is Extracted
 
   # sbt version (default: sbt.version from $buildProps if present, otherwise $sbt_release_version)
+  -sbt-force-latest         force the use of the latest release of sbt: $sbt_release_version
   -sbt-version  <version>   use the specified version of sbt (default: $sbt_release_version)
+  -sbt-dev                  use the latest pre-release version of sbt: $sbt_unreleased_version
   -sbt-jar      <path>      use the specified jar as the sbt launcher
   -sbt-launch-dir <path>    directory to hold sbt launchers (default: ~/.sbt/launchers)
   -sbt-launch-repo <url>    repo url for downloading sbt launcher jar (default: $sbt_launch_repo)
@@ -239,7 +312,7 @@ are not special.
 
   # passing options to the jvm - note it does NOT use JAVA_OPTS due to pollution
   # The default set is used if JVM_OPTS is unset and no -jvm-opts file is found
-  <default>        $default_jvm_opts
+  <default>        $(default_jvm_opts)
   JVM_OPTS         environment variable holding either the jvm args directly, or
                    the reference to a file containing jvm args if given path is prepended by '@' (e.g. '@/etc/jvmopts')
                    Note: "@"-file is overridden by local '.jvmopts' or '-jvm-opts' argument.
@@ -256,34 +329,6 @@ are not special.
 EOM
 }
 
-addJava () {
-  vlog "[addJava] arg = '$1'"
-  java_args=( "${java_args[@]}" "$1" )
-}
-addSbt () {
-  vlog "[addSbt] arg = '$1'"
-  sbt_commands=( "${sbt_commands[@]}" "$1" )
-}
-addScalac () {
-  vlog "[addScalac] arg = '$1'"
-  scalac_args=( "${scalac_args[@]}" "$1" )
-}
-addResidual () {
-  vlog "[residual] arg = '$1'"
-  residual_args=( "${residual_args[@]}" "$1" )
-}
-addResolver () {
-  addSbt "set resolvers += $1"
-}
-addDebugger () {
-  addJava "-Xdebug"
-  addJava "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$1"
-}
-setScalaVersion () {
-  [[ "$1" == *"-SNAPSHOT" ]] && addResolver 'Resolver.sonatypeRepo("snapshots")'
-  addSbt "++ $1"
-}
-
 process_args ()
 {
   require_arg () {
@@ -297,45 +342,50 @@ process_args ()
   }
   while [[ $# -gt 0 ]]; do
     case "$1" in
-       -h|-help) usage; exit 1 ;;
-             -v) verbose=true && shift ;;
-             -d) addSbt "--debug" && shift ;;
-             -w) addSbt "--warn" && shift ;;
-             -q) addSbt "--error" && shift ;;
-         -trace) require_arg integer "$1" "$2" && trace_level="$2" && shift 2 ;;
-           -ivy) require_arg path "$1" "$2" && addJava "-Dsbt.ivy.home=$2" && shift 2 ;;
-     -no-colors) addJava "-Dsbt.log.noformat=true" && shift ;;
-      -no-share) noshare=true && shift ;;
-      -sbt-boot) require_arg path "$1" "$2" && addJava "-Dsbt.boot.directory=$2" && shift 2 ;;
-       -sbt-dir) require_arg path "$1" "$2" && sbt_dir="$2" && shift 2 ;;
-     -debug-inc) addJava "-Dxsbt.inc.debug=true" && shift ;;
-       -offline) addSbt "set offline := true" && shift ;;
-     -jvm-debug) require_arg port "$1" "$2" && addDebugger "$2" && shift 2 ;;
-         -batch) batch=true && shift ;;
-        -prompt) require_arg "expr" "$1" "$2" && addSbt "set shellPrompt in ThisBuild := (s => { val e = Project.extract(s) ; $2 })" && shift 2 ;;
+          -h|-help) usage; exit 1 ;;
+                -v) verbose=true && shift ;;
+                -d) addSbt "--debug" && addSbt debug && shift ;;
+                -w) addSbt "--warn"  && addSbt warn  && shift ;;
+                -q) addSbt "--error" && addSbt error && shift ;;
+                -x) debugUs=true && shift ;;
+            -trace) require_arg integer "$1" "$2" && trace_level="$2" && shift 2 ;;
+              -ivy) require_arg path "$1" "$2" && addJava "-Dsbt.ivy.home=$2" && shift 2 ;;
+        -no-colors) addJava "-Dsbt.log.noformat=true" && shift ;;
+         -no-share) noshare=true && shift ;;
+         -sbt-boot) require_arg path "$1" "$2" && addJava "-Dsbt.boot.directory=$2" && shift 2 ;;
+          -sbt-dir) require_arg path "$1" "$2" && sbt_dir="$2" && shift 2 ;;
+        -debug-inc) addJava "-Dxsbt.inc.debug=true" && shift ;;
+          -offline) addSbt "set offline := true" && shift ;;
+        -jvm-debug) require_arg port "$1" "$2" && addDebugger "$2" && shift 2 ;;
+            -batch) batch=true && shift ;;
+           -prompt) require_arg "expr" "$1" "$2" && setThisBuild shellPrompt "(s => { val e = Project.extract(s) ; $2 })" && shift 2 ;;
 
-    -sbt-create) sbt_create=true && shift ;;
-       -sbt-jar) require_arg path "$1" "$2" && sbt_jar="$2" && shift 2 ;;
-   -sbt-version) require_arg version "$1" "$2" && sbt_explicit_version="$2" && shift 2 ;;
-       -sbt-dev) sbt_explicit_version="$sbt_unreleased_version" && shift ;;
--sbt-launch-dir) require_arg path "$1" "$2" && sbt_launch_dir="$2" && shift 2 ;;
--sbt-launch-repo) require_arg path "$1" "$2" && sbt_launch_repo="$2" && shift 2 ;;
- -scala-version) require_arg version "$1" "$2" && setScalaVersion "$2" && shift 2 ;;
--binary-version) require_arg version "$1" "$2" && addSbt "set scalaBinaryVersion in ThisBuild := \"$2\"" && shift 2 ;;
-    -scala-home) require_arg path "$1" "$2" && addSbt "set every scalaHome := Some(file(\"$2\"))" && shift 2 ;;
-     -java-home) require_arg path "$1" "$2" && java_cmd="$2/bin/java" && shift 2 ;;
-      -sbt-opts) require_arg path "$1" "$2" && sbt_opts_file="$2" && shift 2 ;;
-      -jvm-opts) require_arg path "$1" "$2" && jvm_opts_file="$2" && shift 2 ;;
+       -sbt-create) sbt_create=true && shift ;;
+          -sbt-jar) require_arg path "$1" "$2" && sbt_jar="$2" && shift 2 ;;
+      -sbt-version) require_arg version "$1" "$2" && sbt_explicit_version="$2" && shift 2 ;;
+ -sbt-force-latest) sbt_explicit_version="$sbt_release_version" && shift ;;
+          -sbt-dev) sbt_explicit_version="$sbt_unreleased_version" && shift ;;
+   -sbt-launch-dir) require_arg path "$1" "$2" && sbt_launch_dir="$2" && shift 2 ;;
+  -sbt-launch-repo) require_arg path "$1" "$2" && sbt_launch_repo="$2" && shift 2 ;;
+    -scala-version) require_arg version "$1" "$2" && setScalaVersion "$2" && shift 2 ;;
+   -binary-version) require_arg version "$1" "$2" && setThisBuild scalaBinaryVersion "\"$2\"" && shift 2 ;;
+       -scala-home) require_arg path "$1" "$2" && setThisBuild scalaHome "Some(file(\"$2\"))" && shift 2 ;;
+        -java-home) require_arg path "$1" "$2" && setJavaHome "$2" && shift 2 ;;
+         -sbt-opts) require_arg path "$1" "$2" && sbt_opts_file="$2" && shift 2 ;;
+         -jvm-opts) require_arg path "$1" "$2" && jvm_opts_file="$2" && shift 2 ;;
 
-            -D*) addJava "$1" && shift ;;
-            -J*) addJava "${1:2}" && shift ;;
-            -S*) addScalac "${1:2}" && shift ;;
-            -28) setScalaVersion "$latest_28" && shift ;;
-            -29) setScalaVersion "$latest_29" && shift ;;
-           -210) setScalaVersion "$latest_210" && shift ;;
-           -211) setScalaVersion "$latest_211" && shift ;;
+               -D*) addJava "$1" && shift ;;
+               -J*) addJava "${1:2}" && shift ;;
+               -S*) addScalac "${1:2}" && shift ;;
+               -28) setScalaVersion "$latest_28" && shift ;;
+               -29) setScalaVersion "$latest_29" && shift ;;
+              -210) setScalaVersion "$latest_210" && shift ;;
+              -211) setScalaVersion "$latest_211" && shift ;;
 
-              *) addResidual "$1" && shift ;;
+           --debug) addSbt debug && addResidual "$1" && shift ;;
+            --warn) addSbt warn  && addResidual "$1" && shift ;;
+           --error) addSbt error && addResidual "$1" && shift ;;
+                 *) addResidual "$1" && shift ;;
     esac
   done
 }
@@ -375,7 +425,7 @@ set_sbt_version
 setTraceLevel() {
   case "$sbt_version" in
     "0.7."* | "0.10."* | "0.11."* ) echoerr "Cannot set trace level in sbt version $sbt_version" ;;
-                                 *) addSbt "set every traceLevel := $trace_level" ;;
+                                 *) setThisBuild traceLevel $trace_level ;;
   esac
 }
 
@@ -442,16 +492,52 @@ elif [[ -n "$JVM_OPTS" && ! ("$JVM_OPTS" =~ ^@.*) ]]; then
   extra_jvm_opts=( $JVM_OPTS )
 else
   vlog "Using default jvm options"
-  extra_jvm_opts=( $default_jvm_opts )
+  extra_jvm_opts=( $(default_jvm_opts) )
 fi
 
 # traceLevel is 0.12+
 [[ -n "$trace_level" ]] && setTraceLevel
 
+main () {
+  execRunner "$java_cmd" \
+    "${extra_jvm_opts[@]}" \
+    "${java_args[@]}" \
+    -jar "$sbt_jar" \
+    "${sbt_commands[@]}" \
+    "${residual_args[@]}"
+}
+
+# sbt inserts this string on certain lines when formatting is enabled:
+#   val OverwriteLine = "\r\u001BM\u001B[2K"
+# ...in order not to spam the console with a million "Resolving" lines.
+# Unfortunately that makes it that much harder to work with when
+# we're not going to print those lines anyway. We strip that bit of
+# line noise, but leave the other codes to preserve color.
+mainFiltered () {
+  local ansiOverwrite='\r\x1BM\x1B[2K'
+  local excludeRegex=$(egrep -v '^#|^$' ~/.sbtignore | paste -sd'|' -)
+
+  echoLine () {
+    local line="$1"
+    local line1="$(echo "$line" | sed -r 's/\r\x1BM\x1B\[2K//g')"       # This strips the OverwriteLine code.
+    local line2="$(echo "$line1" | sed -r 's/\x1B\[[0-9;]*[JKmsu]//g')" # This strips all codes - we test regexes against this.
+
+    if [[ $line2 =~ $excludeRegex ]]; then
+      [[ -n $debugUs ]] && echo "[X] $line1"
+    else
+      [[ -n $debugUs ]] && echo "    $line1" || echo "$line1"
+    fi
+  }
+
+  echoLine "Starting sbt with output filtering enabled."
+  main | while read -r line; do echoLine "$line"; done
+}
+
+# Only filter if there's a filter file and we don't see a known interactive command.
+# Obviously this is super ad hoc but I don't know how to improve on it. Testing whether
+# stdin is a terminal is useless because most of my use cases for this filtering are
+# exactly when I'm at a terminal, running sbt non-interactively.
+shouldFilter () { [[ -f ~/.sbtignore ]] && ! egrep -q '\b(shell|console|consoleProject)\b' <<<"${residual_args[@]}"; }
+
 # run sbt
-execRunner "$java_cmd" \
-  "${extra_jvm_opts[@]}" \
-  "${java_args[@]}" \
-  -jar "$sbt_jar" \
-  "${sbt_commands[@]}" \
-  "${residual_args[@]}"
+if shouldFilter; then mainFiltered; else main; fi

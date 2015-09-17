@@ -71,6 +71,10 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
       case Some(a) => F.point(a)
     }
 
+  def orZero(implicit F0: Functor[F], M0: Monoid[A]): F[A] = getOrElse(M0.zero)
+
+  def unary_~(implicit F0: Functor[F], M0: Monoid[A]): F[A] = orZero
+
   def exists(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.exists(f))
 
   def forall(f: A => Boolean)(implicit F: Functor[F]): F[Boolean] = mapO(_.forall(f))
@@ -86,6 +90,8 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   /** @since 7.0.3 */
   def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
+
+  def toListT(implicit F: Functor[F]) : ListT[F, A] =  ListT[F,A](F.map(run)(_.toList))
 
   /** @since 7.0.3 */
   def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
@@ -108,6 +114,11 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
   implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[OptionT[F, ?]] =
     new OptionTFoldable[F] {
       implicit def F: Foldable[F] = F0
+    }
+
+  implicit def optionTMonadError[F[_, _], E](implicit F0: MonadError[F, E]): MonadError[λ[(E0, A) => OptionT[F[E0, ?], A]], E] =
+    new OptionTMonadError[F, E] {
+      def F = F0
     }
 }
 
@@ -133,7 +144,7 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
     Contravariant[Show].contramap(F0)(_.run)
 }
 
-trait OptionTFunctions {
+object OptionT extends OptionTInstances {
   def optionT[M[_]] =
     new (λ[α => M[Option[α]]] ~> OptionT[M, ?]) {
       def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
@@ -156,8 +167,6 @@ trait OptionTFunctions {
     }
 }
 
-object OptionT extends OptionTInstances with OptionTFunctions
-
 //
 // Implementation traits for type class instances
 //
@@ -177,6 +186,16 @@ private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTFuncto
 
   def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
 
+}
+
+private trait OptionTMonadError[F[_, _], E] extends MonadError[λ[(E0, A) => OptionT[F[E0, ?], A]], E] with OptionTMonad[F[E, ?]] {
+  override def F: MonadError[F, E]
+
+  override def raiseError[A](e: E) =
+    OptionT[F[E, ?], A](F.map(F.raiseError[A](e))(Some(_)))
+
+  override def handleError[A](fa: OptionT[F[E, ?], A])(f: E => OptionT[F[E, ?], A]) =
+    OptionT[F[E, ?], A](F.handleError(fa.run)(f(_).run))
 }
 
 private trait OptionTFoldable[F[_]] extends Foldable.FromFoldr[OptionT[F, ?]] {

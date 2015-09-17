@@ -31,6 +31,13 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   final def uniteU[T](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =
     unite(T.leibniz.subst(value))(T.TC)
 
+  /**The product of MonadPlus `F` and `G`, `[x](F[x], G[x]])`, is a MonadPlus */
+  def product[G[_]](implicit G0: MonadPlus[G]): MonadPlus[λ[α => (F[α], G[α])]] =
+    new ProductMonadPlus[F, G] {
+      def F = self
+      def G = G0
+    }
+
   trait MonadPlusLaw extends EmptyLaw with MonadLaw {
     /** `empty[A]` is a polymorphic value over `A`. */
     def emptyMap[A](f1: A => A)(implicit FA: Equal[F[A]]): Boolean =

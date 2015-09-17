@@ -10,11 +10,20 @@ final class Traverse1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def traverse1[G[_], B](f: A => G[B])(implicit G: Apply[G]): G[F[B]] =
     G.traverse1(self)(f)
 
+  /** A version of `traverse1` that infers the type constructor `G` */
+  final def traverse1U[GB](f: A => GB)(implicit G: Unapply[Apply, GB]): G.M[F[G.A]] =
+    F.traverse1U[A, GB](self)(f)(G)
+
   /** Traverse with the identity function */
   final def sequence1[G[_], B](implicit ev: A === G[B], G: Apply[G]): G[F[B]] = {
     val fgb: F[G[B]] = ev.subst[F](self)
     F.sequence1(fgb)
   }
+
+  /** A version of `sequence1` that infers the nested type constructor */
+  final def sequence1U(implicit G: Unapply[Apply, A]): G.M[F[G.A]] =
+    F.sequence1U(self)
+
   ////
 }
 

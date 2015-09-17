@@ -58,7 +58,15 @@ object StreamTTest extends SpecLite {
     def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
     def monoid[F[_]: Applicative, A] = Monoid[StreamT[F, A]]
     def functor[F[_]: Functor, A] = Functor[StreamT[F, ?]]
+    def bind[F[_]: Functor, A] = Bind[StreamT[F, ?]]
+    def plus[F[_]: Functor, A] = Plus[StreamT[F, ?]]
     def monad[F[_]: Applicative, A] = Monad[StreamT[F, ?]]
     def monadPlus[F[_]: Applicative, A] = MonadPlus[StreamT[F, ?]]
+
+    // checking absence of ambiguity
+    def semigroup[F[_]: Applicative, A] = Semigroup[StreamT[F, A]]
+    def functor[F[_]: Applicative, A] = Functor[StreamT[F, ?]]
+    def bind[F[_]: Applicative, A] = Bind[StreamT[F, ?]]
+    def plus[F[_]: Applicative, A] = Plus[StreamT[F, ?]]
   }
 }

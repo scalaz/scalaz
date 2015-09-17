@@ -46,10 +46,6 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
 
   ////
 
-  implicit def lift2[F[_],A,B,C](f: (A,B) => C)(implicit F: Apply[F]) = F.lift2(f)
-  implicit def lift3[F[_],A,B,C,D](f: (A,B,C) => D)(implicit F: Apply[F]) = F.lift3(f)
-  implicit def lift4[F[_],A,B,C,D,E](f: (A,B,C,D) => E)(implicit F: Apply[F]) = F.lift4(f)
-
   def ^[F[_],A,B,C](fa: => F[A], fb: => F[B])(
                f: (A, B) => C)(implicit F: Apply[F]): F[C] =
     F.apply2(fa, fb)(f)
@@ -82,10 +78,6 @@ trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
 
   def F: Apply[F]
   ////
-  implicit def lift2[A,B,C](f: (A,B) => C) = F.lift2(f)
-  implicit def lift3[A,B,C,D](f: (A,B,C) => D) = F.lift3(f)
-  implicit def lift4[A,B,C,D,E](f: (A,B,C,D) => E) = F.lift4(f)
-
   def ^[A,B,C](fa: => F[A], fb: => F[B])(
                f: (A, B) => C): F[C] =
     F.apply2(fa, fb)(f)

@@ -105,8 +105,6 @@ private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private case object LazyNone extends LazyOption[Nothing]
 
-object LazyOption extends LazyOptionInstances with LazyOptionFunctions
-
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
@@ -173,7 +171,7 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
   Order.orderBy(_.toOption)*/
 }
 
-trait LazyOptionFunctions {
+object LazyOption extends LazyOptionInstances {
   def lazySome[A](a: => A): LazyOption[A] =
     LazySome(() => a)
 

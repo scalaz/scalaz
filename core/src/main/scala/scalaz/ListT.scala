@@ -104,7 +104,7 @@ sealed abstract class ListTInstances extends ListTInstances1 {
     new ListTHoist {}
 }
 
-trait ListTFunctions {
+object ListT extends ListTInstances {
   def listT[M[_]]: (λ[α => M[List[α]]] ~> ListT[M, ?]) =
     new (λ[α => M[List[α]]] ~> ListT[M, ?]) {
       def apply[A](a: M[List[A]]) = new ListT[M, A](a)
@@ -116,8 +116,6 @@ trait ListTFunctions {
   def fromList[M[_], A](mas: M[List[A]]): ListT[M, A] =
     new ListT(mas)
 }
-
-object ListT extends ListTInstances with ListTFunctions
 
 //
 // Implementation traits for type class instances

@@ -928,20 +928,6 @@ sealed abstract class ==>>[A, B] {
     }
 }
 
-object ==>> extends MapInstances with MapFunctions {
-  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
-    val size = 0
-
-    def unapply[A, B](a: A ==>> B): Boolean = a eq this
-
-    def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
-  }
-
-  private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {
-    val size = l.size + r.size + 1
-  }
-}
-
 sealed abstract class MapInstances0 {
 
   implicit def scalazMapInstance[S: Order]: Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
@@ -1095,8 +1081,18 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
     Equal[Int].equal(a1.size, a2.size) && Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
 }
 
-trait MapFunctions {
-  import ==>>._
+object ==>> extends MapInstances {
+  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
+    val size = 0
+
+    def unapply[A, B](a: A ==>> B): Boolean = a eq this
+
+    def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
+  }
+
+  private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {
+    val size = l.size + r.size + 1
+  }
 
   final def apply[A: Order, B](x: (A, B)*): A ==>> B =
     x.foldLeft(empty[A, B])((a, c) => a.insert(c._1, c._2))

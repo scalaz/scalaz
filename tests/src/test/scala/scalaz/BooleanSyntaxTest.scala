@@ -31,6 +31,13 @@ object BooleanSyntaxTest extends SpecLite {
       p <-- q == (p || !q)
     }
 
+    "bi-conditional" in {
+      assert(false <--> false)
+      assert(true <--> true)
+      assert(!(true <--> false))
+      assert(!(false <--> true))
+    }
+
     "negate conditional" ! forAll { (p:Boolean, q:Boolean) =>
       p -/> q == (p && !q)
     }
@@ -53,6 +60,16 @@ object BooleanSyntaxTest extends SpecLite {
 
     "boolean.unlessM" ! forAll { (b: Boolean) =>
       b.unlessM(None).isDefined == b
+    }
+
+    "boolean.whenMU" ! forAll { (b: Boolean) =>
+      import syntax.validation._
+      b.whenMU("false".failure).isSuccess != b
+    }
+
+    "boolean.unlessMU" ! forAll { (b: Boolean) =>
+      import syntax.validation._
+      b.unlessMU("false".failure).isSuccess == b
     }
 
     "boolean.guard" ! forAll { (b: Boolean, s: String) =>

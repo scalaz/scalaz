@@ -27,8 +27,6 @@ sealed abstract class LazyTuple4[A, B, C, D] {
   def _4: D
 }
 
-object LazyTuple extends LazyTupleFunctions
-
 object LazyTuple2 extends LazyTuple2Instances {
   def apply[A, B](a: => A, b: => B): LazyTuple2[A, B] = new LazyTuple2[A, B] {
     def _1 = a
@@ -53,7 +51,7 @@ object LazyTuple4 extends LazyTuple4Instances {
   }
 }
 
-trait LazyTupleFunctions {
+object LazyTuple {
   type :&:[A, B] = LazyTuple2[A, B]
 
   def lazyTuple2[A, B](a: => A, b: => B): (A :&: B) = new (A :&: B) {

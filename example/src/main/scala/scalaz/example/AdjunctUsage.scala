@@ -33,7 +33,7 @@ object AdjunctUsage extends App {
   //-------------------------------------------
   // using reader and write adjunction as State
 
-  // Writer and Reader Functors form and adjuntion that gives us a
+  // Writer and Reader Functors form and adjunction that gives us a
   // Monad the behaves like State, think of it as a function which
   // Reads the state perfoms a computation and Writes the new state.
   type RWState[S,A] = Reader[S, Writer[S, A]]
@@ -88,7 +88,7 @@ object AdjunctUsage extends App {
   // composed together, so that they happen on a single pass through a
   // Traversable,
   type ROIRIWW[A] = Reader[Option[Int],      // read the previous value for computing repeats
-                           Reader[Int,       // read the accumuated sum
+                           Reader[Int,       // read the accumulated sum
                                   Writer[Int,// write the new sum
                                          Writer[Option[Int],A]]]] // write the next value for computing repeats
  

@@ -29,7 +29,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
    * For `n = 2`, `append(append(zero, value), value)`
    */
   def multiply(value: F, n: Int): F =
-    Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
+    if (n <= 0) zero else multiply1(value, n - 1)
 
   /** Whether `a` == `zero`. */
   def isMZero(a: F)(implicit eq: Equal[F]): Boolean =

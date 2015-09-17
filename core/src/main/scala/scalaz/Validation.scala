@@ -130,7 +130,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   def ap[EE >: E, B](x: => Validation[EE, A => B])(implicit E: Semigroup[EE]): Validation[EE, B] = (this, x) match {
     case (Success(a), Success(f))   => Success(f(a))
     case (e @ Failure(_), Success(_)) => e
-    case (Success(f), e @ Failure(_)) => e
+    case (Success(_), e @ Failure(_)) => e
     case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
   }
 
@@ -345,7 +345,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
 final case class Success[A](a: A) extends Validation[Nothing, A]
 final case class Failure[E](e: E) extends Validation[E, Nothing]
 
-object Validation extends ValidationInstances with ValidationFunctions {
+object Validation extends ValidationInstances {
 
   /** Spin in tail-position on the success value of the given validation. */
   @annotation.tailrec
@@ -374,6 +374,34 @@ object Validation extends ValidationInstances with ValidationFunctions {
     @inline implicit def ValidationFlatMapRequested[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] =
       new ValidationFlatMap(d)
   }
+
+  /** Construct a success validation value. */
+  def success[E, A]: A => Validation[E, A] =
+    Success(_)
+
+  /** Construct a failure validation value. */
+  def failure[E, A]: E => Validation[E, A] =
+    Failure(_)
+
+  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
+  def failureNel[E, A](e: E): ValidationNel[E, A] =
+    Failure(NonEmptyList(e))
+
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
+    Success(a)
+  } catch {
+    case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
+    Success(a)
+  } catch {
+    case NonFatal(t) => Failure(t)
+  }
+
+  /** Construct a `Validation` from an `Either`. */
+  def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
+    e.fold(failure, success)
 }
 
 
@@ -421,7 +449,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   }
 }
 
-final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) {
+final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) extends AnyVal {
   /** Bind through the success of this validation. */
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     self match {
@@ -502,32 +530,3 @@ sealed abstract class ValidationInstances3 {
 
 }
 
-trait ValidationFunctions {
-  /** Construct a success validation value. */
-  def success[E, A]: A => Validation[E, A] =
-    Success(_)
-
-  /** Construct a failure validation value. */
-  def failure[E, A]: E => Validation[E, A] =
-    Failure(_)
-
-  /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
-  def failureNel[E, A](e: E): ValidationNel[E, A] =
-    Failure(NonEmptyList(e))
-
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
-    Success(a)
-  } catch {
-    case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
-  }
-
-  def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
-    Success(a)
-  } catch {
-    case NonFatal(t) => Failure(t)
-  }
-
-  /** Construct a `Validation` from an `Either`. */
-  def fromEither[E, A](e: Either[E, A]): Validation[E, A] =
-    e.fold(failure, success)
-}

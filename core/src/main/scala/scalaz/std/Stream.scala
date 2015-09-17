@@ -100,9 +100,26 @@ trait StreamInstances {
     def zero: Stream[A] = scala.Stream.empty
   }
 
-  implicit def streamEqual[A](implicit A0: Equal[A]) =
-    new Equal[Stream[A]] {
-      def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
+  implicit def streamEqual[A](implicit A0: Equal[A]): Equal[Stream[A]] =
+    new StreamEqual[A] { def A = A0 }
+  implicit def streamOrder[A](implicit A0: Order[A]): Order[Stream[A]] =
+    new Order[Stream[A]] with StreamEqual[A] {
+      def A = A0
+      import Ordering._
+      @annotation.tailrec
+      override final def order(a: Stream[A], b: Stream[A]): Ordering =
+        if(a.isEmpty) {
+          if(b.isEmpty) EQ
+          else LT
+        } else {
+          if(b.isEmpty) GT
+          else {
+            A.order(a.head, b.head) match {
+              case EQ => order(a.tail, b.tail)
+              case x => x
+            }
+          }
+        }
     }
   implicit def streamShow[A](implicit A0: Show[A]) =
     new Show[Stream[A]] {
@@ -110,7 +127,6 @@ trait StreamInstances {
     }
 
 
-  // TODO order, ...
 }
 
 trait StreamFunctions {
@@ -206,4 +222,9 @@ trait StreamFunctions {
 
 object stream extends StreamInstances with StreamFunctions {
   object streamSyntax extends scalaz.syntax.std.ToStreamOps
+}
+
+private trait StreamEqual[A] extends Equal[Stream[A]] {
+  def A: Equal[A]
+  override final def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A.equal)
 }

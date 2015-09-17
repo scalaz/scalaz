@@ -233,8 +233,11 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 
   implicit def oneAndZip[F[_]: Zip]: Zip[OneAnd[F, ?]] =
     new Zip[OneAnd[F, ?]] {
-      def zip[A, B](a: => OneAnd[F, A], b: => OneAnd[F, B]) =
-        OneAnd((a.head, b.head), Zip[F].zip(a.tail, b.tail))
+      def zip[A, B](a: => OneAnd[F, A], b: => OneAnd[F, B]) = {
+        val a0 = a
+        val b0 = b
+        OneAnd((a0.head, b0.head), Zip[F].zip(a0.tail, b0.tail))
+      }
     }
 
   implicit def oneAndUnzip[F[_]: Unzip]: Unzip[OneAnd[F, ?]] =
@@ -247,9 +250,7 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
     }
 }
 
-object OneAnd extends OneAndInstances with OneAndFunctions
-
-trait OneAndFunctions {
+object OneAnd extends OneAndInstances {
   def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =

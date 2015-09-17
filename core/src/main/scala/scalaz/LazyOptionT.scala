@@ -21,6 +21,10 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
   def |(default: => A)(implicit F: Functor[F]): F[A] =
     getOrElse(default)
 
+  def orZero(implicit F0: Functor[F], M0: Monoid[A]): F[A] = getOrElse(M0.zero)
+
+  def unary_~(implicit F0: Functor[F], M0: Monoid[A]): F[A] = orZero
+
   def exists(f: (=> A) => Boolean)(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.exists(f))
 
@@ -62,8 +66,6 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
 
 }
 
-object LazyOptionT extends LazyOptionTInstances with LazyOptionTFunctions
-
 //
 // Prioritized Implicits for type class instances
 //
@@ -93,7 +95,7 @@ sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
     Order.orderBy((_: LazyOptionT[F, A]).run)
 }
 
-trait LazyOptionTFunctions {
+object LazyOptionT extends LazyOptionTInstances {
   def lazyOptionT[F[_], A](r: F[LazyOption[A]]): LazyOptionT[F, A] =
     LazyOptionT(r)
 

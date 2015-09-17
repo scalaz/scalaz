@@ -38,11 +38,9 @@ trait Distributive[F[_]] extends Functor[F] { self =>
 
 }
 
-object Distributive extends DistributiveFunctions {
+object Distributive {
   @inline def apply[F[_]](implicit F: Distributive[F]): Distributive[F] = F
 
-}
-trait DistributiveFunctions {
   // Distributive is the dual of Traverse.
   type Cotraverse[F[_]] =
   Distributive[F]

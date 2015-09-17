@@ -2,6 +2,20 @@ package scalaz
 
 final case class Const[A, B](getConst: A)
 
+private sealed trait ConstSemigroup[A, B] extends Semigroup[Const[A, B]] {
+  def A: Semigroup[A]
+
+  override def append(f1: Const[A, B], f2: => Const[A, B]): Const[A, B] =
+    Const(A.append(f1.getConst, f2.getConst))
+}
+
+private sealed trait ConstMonoid[A, B] extends Monoid[Const[A, B]] with ConstSemigroup[A, B] {
+  def A: Monoid[A]
+
+  override def zero: Const[A, B] =
+    Const(A.zero)
+}
+
 private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
   override def map[A, B](fa: Const[C, A])(f: A => B): Const[C, B] = Const(fa.getConst)
 
@@ -57,6 +71,11 @@ sealed abstract class ConstInstances0 extends ConstInstances1 {
       val OA: Equal[A] = implicitly
     }
 
+  implicit def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] =
+    new ConstSemigroup[A, B] {
+      val A: Semigroup[A] = implicitly
+    }
+
   implicit def constApply[C: Semigroup]: Apply[Const[C, ?]] =
     new ConstApply[C] {
       val C: Semigroup[C] = implicitly
@@ -69,16 +88,19 @@ sealed abstract class ConstInstances extends ConstInstances0 {
       val OA: Order[A] = implicitly
     }
 
+  implicit def constMonoid[A: Monoid, B]: Monoid[Const[A, B]] =
+    new ConstMonoid[A, B] {
+      val A: Monoid[A] = implicitly
+    }
+
   implicit def constApplicative[C: Monoid]: Applicative[Const[C, ?]] =
     new ConstApplicative[C] {
       val C: Monoid[C] = implicitly
     }
 }
 
-object Const extends ConstInstances with ConstFunctions
+object Const extends ConstInstances {
 
-
-sealed trait ConstFunctions {
   /** A properly universally quantified constant function. */
   def const[A](a: A): Function0 ~> λ[α => A] =
     new (Function0 ~> λ[α => A]) {

@@ -32,7 +32,9 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
     Endomorphic[Cokleisli[F, ?, ?], A](ev.subst[Cokleisli[F, A, ?]](this))
 }
 
-object Cokleisli extends CokleisliInstances with CokleisliFunctions
+object Cokleisli extends CokleisliInstances {
+
+}
 
 sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[Cokleisli[F, ?, ?]] =
@@ -54,8 +56,6 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
       override implicit def F = F0
     }
 }
-
-trait CokleisliFunctions
 
 private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] {
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)

@@ -87,12 +87,10 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
 
 }
 
-object NullArgument extends NullArgumentInstances with NullArgumentFunctions {
+object NullArgument extends NullArgumentInstances {
   def apply[A, B](f: Option[A] => B): A ?=> B =
     new (A ?=> B)(f)
-}
 
-trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
 
   def always[A, B](b: => B): A ?=> B =

@@ -17,6 +17,12 @@ object EitherTTest extends SpecLite {
   checkAll(bitraverse.laws[EitherTList])
   checkAll(monadError.laws[EitherTList, Int])
 
+  "rightU" should {
+    val a: String \/ Int = \/-(1)
+    val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
+    b must_== EitherT.right[({type l[a] = String \/ a})#l, Boolean, Int](a)
+  }
+
   "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
     val F = new Bitraverse[EitherTList]{
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
@@ -28,6 +34,10 @@ object EitherTTest extends SpecLite {
 
   "show" ! forAll { a: EitherTList[Int, Int] =>
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
+  }
+
+  "fromDisjunction" ! forAll { (a: String \/ Int) =>
+    Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
   }
 
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
@@ -56,32 +66,42 @@ object EitherTTest extends SpecLite {
     def monadError[F[_] : Monad, A] = MonadError[EitherT[F, ?, ?], A]
   }
 
-  // compilation test
-  // https://gist.github.com/vmarquez/5106252/
-  {
-    import scalaz.syntax.either._
+  def compilationTests() = {
+    // compilation test
+    // https://gist.github.com/vmarquez/5106252/
+    {
+      import scalaz.syntax.either._
 
-    case class ABC(s:String)
+      case class ABC(s:String)
 
-    implicit val m = new Monoid[(ABC, Int)] {
-      def zero: (ABC, Int) = (null, -1)
-      def append(f1: (ABC, Int), f2: => (ABC, Int)): (ABC, Int) = f1
-    }
-
-    def brokenMethod: EitherT[Option, (ABC, Int), (ABC, String)] =
-      EitherT(Some((ABC("abcData"),"Success").right))
-
-    def filterComp =
-      brokenMethod
-      .filter {
-        case (abc,"Success") => true
-        case _ => false
-      }.map {
-        case (abc, "Success") => "yay"
+      implicit val m = new Monoid[(ABC, Int)] {
+        def zero: (ABC, Int) = (null, -1)
+        def append(f1: (ABC, Int), f2: => (ABC, Int)): (ABC, Int) = f1
       }
 
-    for {
-      (a,b) <- brokenMethod
-    } yield "yay"
+      def brokenMethod: EitherT[Option, (ABC, Int), (ABC, String)] =
+        EitherT(Some((ABC("abcData"),"Success").right))
+
+      def filterComp =
+        brokenMethod
+        .filter {
+          case (abc,"Success") => true
+          case _ => false
+        }.map {
+          case (abc, "Success") => "yay"
+        }
+
+      for {
+        (a,b) <- brokenMethod
+      } yield "yay"
+    }
+
+    //compilation test for eitherTU
+    {
+      val se: State[Vector[String], Int \/ Float] = null
+      EitherT.eitherTU(se)
+      val ee: String \/ (Int \/ Float) = null
+      EitherT.eitherTU(ee)
+    }
   }
 }

@@ -6,9 +6,44 @@ import Free._
 import std.function.{function1Covariant => _, function1CovariantByName, _}
 import std.tuple._
 
-// TODO report compiler bug when this appears just above FreeInstances:
-//      "java.lang.Error: typeConstructor inapplicable for <none>"
-object Free extends FreeInstances with FreeFunctions {
+object Free extends FreeInstances {
+
+  /** Collapse a trampoline to a single step. */
+  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
+
+  /** Suspend the given computation in a single step. */
+  def return_[S[_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
+    liftF[S, A](S.point(value))
+
+  /** Alias for `point` */
+  def pure[S[_], A](value: A): Free[S, A] = point(value)
+
+  /** Absorb a step into the free monad. */
+  def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
+    liftF(value).flatMap(x => x)
+
+  /** Suspend a computation in a pure step of the applicative functor `S` */
+  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
+    liftF(S.pure(())).flatMap(_ => value)
+
+  /** A version of `liftF` that infers the nested type constructor. */
+  def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
+    liftF(MA(value))
+
+  /** Monadic join for the higher-order monad `Free` */
+  def joinF[S[_], A](value: Free[Free[S, ?], A]): Free[S, A] =
+    value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
+
+  /** A trampoline step that doesn't do anything. */
+  def pause: Trampoline[Unit] =
+    return_(())
+
+  /** A source that produces the given value. */
+  def produce[A](a: A): Source[A, Unit] =
+    liftF[(A, ?), Unit](a -> point[(A, ?), Unit](()))
+
+  /** A sink that waits for a single value and returns it. */
+  def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
 
   /** Absorb a step in `S` into the free monad for `S` */
   def apply[S[_], A](s: S[Free[S, A]]): Free[S, A] =
@@ -235,6 +270,17 @@ sealed abstract class Free[S[_], A] {
     }
     go(source, ev(this))
   }
+
+  /** Duplication in `Free` as a comonad in the endofunctor category. */
+  def duplicateF: Free[Free[S, ?], A] = extendF[Free[S,?]](NaturalTransformation.refl[Free[S,?]])
+
+  /** Extension in `Free` as a comonad in the endofunctor category. */
+  def extendF[T[_]](f: Free[S, ?] ~> T): Free[T, A] = mapSuspension(new (S ~> T) {
+    def apply[X](x: S[X]) = f(liftF(x))
+  })
+
+  /** Extraction from `Free` as a comonad in the endofunctor category. */
+  def extractF(implicit S: Monad[S]): S[A] = foldMap(NaturalTransformation.refl[S])
 }
 
 object Trampoline extends TrampolineInstances {
@@ -309,7 +355,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
       def F = implicitly
     }
 
-  implicit def freeSemigroup[S[_]:Functor, A:Semigroup]: Semigroup[Free[S, A]] =
+  implicit def freeSemigroup[S[_], A: Semigroup]: Semigroup[Free[S, A]] =
     Semigroup.liftSemigroup[Free[S, ?], A]
 }
 
@@ -323,47 +369,8 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 
-  implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
+  implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[Free[S, ?], A]
-}
-
-trait FreeFunctions {
-  /** Collapse a trampoline to a single step. */
-  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
-
-  /** Suspend the given computation in a single step. */
-  def return_[S[_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
-    liftF[S, A](S.point(value))
-
-  /** Alias for `point` */
-  def pure[S[_], A](value: A): Free[S, A] = point(value)
-
-  /** Absorb a step into the free monad. */
-  def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
-    liftF(value).flatMap(x => x)
-
-  /** Suspend a computation in a pure step of the applicative functor `S` */
-  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
-    liftF(S.pure(())).flatMap(_ => value)
-
-  /** A version of `liftF` that infers the nested type constructor. */
-  def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
-    liftF(MA(value))
-
-  /** Monadic join for the higher-order monad `Free` */
-  def joinF[S[_], A](value: Free[Free[S, ?], A])(implicit S: Functor[S]): Free[S, A] =
-    value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
-
-  /** A trampoline step that doesn't do anything. */
-  def pause: Trampoline[Unit] =
-    return_(())
-
-  /** A source that produces the given value. */
-  def produce[A](a: A): Source[A, Unit] =
-    liftF[(A, ?), Unit](a -> point[(A, ?), Unit](()))
-
-  /** A sink that waits for a single value and returns it. */
-  def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
 }
 
 private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {

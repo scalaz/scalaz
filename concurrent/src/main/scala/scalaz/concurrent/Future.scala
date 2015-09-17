@@ -182,7 +182,7 @@ sealed abstract class Future[+A] {
     runAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
-      -\/(new TimeoutException())
+      -\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
@@ -203,7 +203,7 @@ sealed abstract class Future[+A] {
         def run() { 
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
-            cb(-\/(new TimeoutException()))
+            cb(-\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds")))
           } 
         }
       }
@@ -332,11 +332,8 @@ object Future {
    *
    * It is different from the Applicative instance obtained from Monad[Future] which runs futures sequentially.
    */
-  val futureParallelApplicativeInstance: Applicative[ParallelFuture] = new Applicative[ParallelFuture] {
-    def point[A](a: => A): ParallelFuture[A] = Parallel(futureInstance.point(a))
-    def ap[A,B](fa: => ParallelFuture[A])(fab: => ParallelFuture[A => B]): ParallelFuture[B] =
-      Parallel(futureInstance.mapBoth(Tag.unwrap(fa), Tag.unwrap(fab))((a, f) => f(a)))
-  }
+  implicit val futureParallelApplicativeInstance: Applicative[ParallelFuture] =
+    futureInstance.parallel
 
   /** Convert a strict value to a `Future`. */
   def now[A](a: A): Future[A] = Now(a)

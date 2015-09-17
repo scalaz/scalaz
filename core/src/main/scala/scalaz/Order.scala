@@ -39,10 +39,11 @@ trait Order[F] extends Equal[F] { self =>
     def compare(x: F, y: F) = self.order(x, y).toInt
   }
 
-  final def reverseOrder = new Order[F] {
+  def reverseOrder: Order[F] = new Order[F] {
     def order(x: F, y: F): Ordering = self.order(y, x)
     override def equal(x: F, y: F) = self.equal(x, y)
     override def equalIsNatural = self.equalIsNatural
+    override def reverseOrder = self
   }
 
   trait OrderLaw extends EqualLaw {
@@ -74,8 +75,20 @@ object Order {
 
   ////
 
-  implicit val orderInstance: Contravariant[Order] = new Contravariant[Order] {
-    def contramap[A, B](r: Order[A])(f: B => A): Order[B] = r.contramap(f)
+  implicit val orderInstance: Divisible[Order] = new Divisible[Order] {
+    def contramap[A, B](r: Order[A])(f: B => A) = r.contramap(f)
+
+    override def conquer[A] = order((_, _) => Ordering.EQ)
+
+    override def divide[A, B, C](fa: Order[A], fb: Order[B])(f: C => (A, B)) =
+      order[C]{ (c1, c2) =>
+        val (a1, b1) = f(c1)
+        val (a2, b2) = f(c2)
+        fa.order(a1, a2) match {
+          case Ordering.EQ => fb.order(b1, b2)
+          case o => o
+        }
+      }
   }
 
   def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
