@@ -222,7 +222,7 @@ private trait CofreeZipApply[F[_]] extends Apply[CofreeZip[F, ?]] with CofreeZip
 private trait CofreeZipApplicative[F[_]] extends Applicative[CofreeZip[F, ?]] with CofreeZipApply[F]{
   implicit def F: Applicative[F]
 
-  def point[A](a: => A) = CofreeZip[F, A](a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a))))
+  def point[A](a: => A) = Tags.Zip(Cofree.delay(a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a)))))
 }
 
 private trait CofreeBind[F[_]] extends Bind[Cofree[F, ?]] with CofreeComonad[F]{
