@@ -10,25 +10,25 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.1.3, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
+The current stable version is 7.1.4, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.3"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.4"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.1.3%22).
+For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.1.4%22).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.1.3.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.1.4.jar`.
 
 Note: In some cases, Maven will warn about "multiple versions of scala libraries", e.g.
 
 ```
 [WARNING]  Expected all dependencies to require Scala version: 2.10.1
-[WARNING]  org.scalaz:scalaz-core_2.10:7.1.3 requires scala version: 2.10.0
+[WARNING]  org.scalaz:scalaz-core_2.10:7.1.4 requires scala version: 2.10.0
 ```
 
 You can safely ignore this warning, as the Scala 2.10.x versions are compatible.
