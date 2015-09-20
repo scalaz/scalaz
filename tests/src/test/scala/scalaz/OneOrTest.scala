@@ -23,15 +23,15 @@ object OneOrTest extends SpecLite {
 //  }
 
   object instances {
-    def functor[F[_]: Functor, A] = Functor[({type λ[α] = OneOr[F, α]})#λ]
-    def apply[F[_]: Apply, A] = Apply[({type λ[α] = OneOr[F, α]})#λ]
-    def applicative[F[_]: Apply, A] = Applicative[({type λ[α] = OneOr[F, α]})#λ]
-    def cobind[F[_]: Cobind, A] = Cobind[({type λ[α] = OneOr[F, α]})#λ]
-    def comonad[F[_]: Comonad, A] = Comonad[({type λ[α] = OneOr[F, α]})#λ]
-    def foldable[F[_]: Foldable, A] = Foldable[({type λ[α] = OneOr[F, α]})#λ]
-    def foldable1[F[_]: Foldable1, A] = Foldable1[({type λ[α] = OneOr[F, α]})#λ]
-    def traverse[F[_]: Traverse, A] = Traverse[({type λ[α] = OneOr[F, α]})#λ]
-    def traverse1[F[_]: Traverse1, A] = Traverse1[({type λ[α] = OneOr[F, α]})#λ]
+    def functor[F[_]: Functor] = Functor[({type λ[α] = OneOr[F, α]})#λ]
+    def apply[F[_]: Apply] = Apply[({type λ[α] = OneOr[F, α]})#λ]
+    def applicative[F[_]: Apply] = Applicative[({type λ[α] = OneOr[F, α]})#λ]
+    def cobind[F[_]: Cobind] = Cobind[({type λ[α] = OneOr[F, α]})#λ]
+    def comonad[F[_]: Comonad] = Comonad[({type λ[α] = OneOr[F, α]})#λ]
+    def foldable[F[_]: Foldable] = Foldable[({type λ[α] = OneOr[F, α]})#λ]
+    def foldable1[F[_]: Foldable1] = Foldable1[({type λ[α] = OneOr[F, α]})#λ]
+    def traverse[F[_]: Traverse] = Traverse[({type λ[α] = OneOr[F, α]})#λ]
+    def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = OneOr[F, α]})#λ]
   }
 
 }
