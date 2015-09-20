@@ -23,15 +23,15 @@ object OneOrTest extends SpecLite {
 //  }
 
   object instances {
-    def functor[F[_]: Functor, A] = Functor[OneOr[F, ?]]
-    def apply[F[_]: Apply, A] = Apply[OneOr[F, ?]]
-    def applicative[F[_]: Apply, A] = Applicative[OneOr[F, ?]]
-    def cobind[F[_]: Cobind, A] = Cobind[OneOr[F, ?]]
-    def comonad[F[_]: Comonad, A] = Comonad[OneOr[F, ?]]
-    def foldable[F[_]: Foldable, A] = Foldable[OneOr[F, ?]]
-    def foldable1[F[_]: Foldable1, A] = Foldable1[OneOr[F, ?]]
-    def traverse[F[_]: Traverse, A] = Traverse[OneOr[F, ?]]
-    def traverse1[F[_]: Traverse1, A] = Traverse1[OneOr[F, ?]]
+    def functor[F[_]: Functor] = Functor[OneOr[F, ?]]
+    def apply[F[_]: Apply] = Apply[OneOr[F, ?]]
+    def applicative[F[_]: Apply] = Applicative[OneOr[F, ?]]
+    def cobind[F[_]: Cobind] = Cobind[OneOr[F, ?]]
+    def comonad[F[_]: Comonad] = Comonad[OneOr[F, ?]]
+    def foldable[F[_]: Foldable] = Foldable[OneOr[F, ?]]
+    def foldable1[F[_]: Foldable1] = Foldable1[OneOr[F, ?]]
+    def traverse[F[_]: Traverse] = Traverse[OneOr[F, ?]]
+    def traverse1[F[_]: Traverse1] = Traverse1[OneOr[F, ?]]
   }
 
 }

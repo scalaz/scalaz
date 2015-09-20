@@ -73,10 +73,10 @@ object ListTTest extends SpecLite {
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
     def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
-    def monad[F[_]: Monad, A] = Monad[ListT[F, ?]]
-    def functor[F[_]: Functor, A] = Functor[ListT[F, ?]]
+    def monad[F[_]: Monad] = Monad[ListT[F, ?]]
+    def functor[F[_]: Functor] = Functor[ListT[F, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_]: Monad, A] = Functor[ListT[F, ?]]  
+    def functor[F[_]: Monad] = Functor[ListT[F, ?]]
   }
 }

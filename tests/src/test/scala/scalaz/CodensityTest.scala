@@ -21,11 +21,11 @@ object CodensityTest extends SpecLite {
   checkAll("Option", monadPlus.laws[Codensity[Option, ?]])
 
   object instances {
-    def functor[F[_]: MonadPlus, A] = Functor[Codensity[F, ?]]
-    def apply[F[_]: MonadPlus, A] = Apply[Codensity[F, ?]]
-    def applicative[F[_]: MonadPlus, A] = Applicative[Codensity[F, ?]]
-    def plus[F[_]: MonadPlus, A] = Plus[Codensity[F, ?]]
-    def monad[F[_]: MonadPlus, A] = Monad[Codensity[F, ?]]
-    def monade[F[_], A] = Monad[Codensity[F, ?]]
+    def functor[F[_]: MonadPlus] = Functor[Codensity[F, ?]]
+    def apply[F[_]: MonadPlus] = Apply[Codensity[F, ?]]
+    def applicative[F[_]: MonadPlus] = Applicative[Codensity[F, ?]]
+    def plus[F[_]: MonadPlus] = Plus[Codensity[F, ?]]
+    def monad[F[_]: MonadPlus] = Monad[Codensity[F, ?]]
+    def monade[F[_]] = Monad[Codensity[F, ?]]
   }
 }
