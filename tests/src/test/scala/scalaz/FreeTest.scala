@@ -59,19 +59,19 @@ object FreeTest extends SpecLite {
   }
 
   object instances {
-    def monad[F[_]: Functor] = Monad[Free[F, ?]]
+    def monad[F[_]] = Monad[Free[F, ?]]
     def foldable[F[_]: Foldable: Functor] = Foldable[Free[F, ?]]
     def foldable1[F[_]: Foldable1: Functor] = Foldable1[Free[F, ?]]
     def traverse[F[_]: Traverse] = Traverse[Free[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[Free[F, ?]]
-    def monoid[F[_]: Functor, A: Monoid] = Monoid[Free[F, A]]
-    def semigroup[F[_]: Functor, A: Semigroup] = Semigroup[Free[F, A]]
+    def monoid[F[_], A: Monoid] = Monoid[Free[F, A]]
+    def semigroup[F[_], A: Semigroup] = Semigroup[Free[F, A]]
 
     // checking absence of ambiguity
     def functor[F[_]: Traverse1] = Functor[Free[F, ?]]
     def foldable[F[_]: Traverse1] = Foldable[Free[F, ?]]
     def foldable1[F[_]: Traverse1] = Foldable1[Free[F, ?]]
     def traverse[F[_]: Traverse1] = Traverse[Free[F, ?]]
-    def semigroup[F[_]: Functor, A: Monoid] = Semigroup[Free[F, A]]
+    def semigroup[F[_], A: Monoid] = Semigroup[Free[F, A]]
   }
 }
