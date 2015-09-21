@@ -131,11 +131,11 @@ sealed abstract class Free[S[_], A] {
     foldMap[Free[T,?]](f)(freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], d: Zap[S, G]): C =
     Zap.monadComonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
-  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
