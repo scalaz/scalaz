@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 object TreeLocTest extends SpecLite {
 
-  checkAll("TreeLoc", equal.laws[TreeLoc[Int]])
+  checkAll("TreeLoc", order.laws[TreeLoc[Int]])
 
   {
     def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {
@@ -20,5 +20,13 @@ object TreeLocTest extends SpecLite {
     // TODO checkAll("TreeLoc", traverse.laws[TreeLoc])
     // TODO checkAll("TreeLoc", applicative.laws[TreeLoc])
     checkAll("TreeLoc", comonad.laws[TreeLoc])
+  }
+
+  object instances {
+    def equal[A: Equal] = Equal[TreeLoc[A]]
+    def order[A: Order] = Order[TreeLoc[A]]
+
+    // checking absence of ambiguity
+    def equal[A: Order] = Equal[TreeLoc[A]]
   }
 }

@@ -204,14 +204,17 @@ sealed abstract class TreeLocInstances {
     override def cojoin[A](a: TreeLoc[A]): TreeLoc[TreeLoc[A]] = a.cojoin
   }
 
-  import std.stream._, std.tuple._
 
   implicit def treeLocEqual[A](implicit A: Equal[A]): Equal[TreeLoc[A]] =
-    Equal.equal{ (a, b) =>
-      Equal[Tree[A]].equal(a.tree, b.tree) &&
-      Equal[TreeForest[A]].equal(a.lefts, b.lefts) &&
-      Equal[TreeForest[A]].equal(a.rights, b.rights) &&
-      Equal[Parents[A]].equal(a.parents, b.parents)
+    new TreeLocEqual[A] { def E = A }
+
+  implicit def treeLocOrder[A](implicit A: Order[A]): Order[TreeLoc[A]] =
+    new Order[TreeLoc[A]] with TreeLocEqual[A] {
+      def E = A
+      import std.stream._, std.tuple._
+
+      override def order(a: TreeLoc[A], b: TreeLoc[A]) =
+        Divide[Order].deriving4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
     }
 }
 
@@ -230,5 +233,17 @@ trait TreeLocFunctions {
 
   def fromForest[A](ts: TreeForest[A]) = ts match {
     case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))
+  }
+}
+
+private trait TreeLocEqual[A] extends Equal[TreeLoc[A]] {
+  implicit def E: Equal[A]
+  import std.stream._, std.tuple._
+
+  override final def equal(a: TreeLoc[A], b: TreeLoc[A]) = {
+    Equal[Tree[A]].equal(a.tree, b.tree) &&
+    Equal[TreeForest[A]].equal(a.lefts, b.lefts) &&
+    Equal[TreeForest[A]].equal(a.rights, b.rights) &&
+    Equal[Parents[A]].equal(a.parents, b.parents)
   }
 }
