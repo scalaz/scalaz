@@ -69,7 +69,7 @@ trait FunctionInstances extends FunctionInstances0 {
     def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
   }
 
-  implicit val function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
+  implicit val function1Instance: Arrow[Function1] with Choice[Function1] = new Arrow[Function1] with Choice[Function1] {
     def arr[A, B](f: A => B) = f
 
     def first[A, B, C](a: A => B) =(ac: (A, C)) => (a(ac._1), ac._2)
