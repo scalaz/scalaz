@@ -10,6 +10,8 @@ object TreeTest extends SpecLite {
 
   checkAll("Tree", order.laws[Tree[Int]])
 
+  checkAll(FoldableTests.anyAndAllLazy[Tree])
+
   "satisfy foldable1 law" ! forAll { xs: Tree[Int] =>
     val F = Foldable1[Tree]
     F.foldMap1(xs)(Vector(_)) must_===(F.foldRight1(xs.map(Vector(_)))((a, b) => b ++ a))
