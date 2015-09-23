@@ -15,6 +15,8 @@ object TreeTest extends SpecLite {
   checkAll("Tree", align.laws[Tree])
   checkAll("Tree", zip.laws[Tree])
 
+  checkAll(FoldableTests.anyAndAllLazy[Tree])
+
   "infinite Tree flatten" ! {
     Tree.node(0, Stream.from(1).map(Tree.leaf(_))).flatten
     true
