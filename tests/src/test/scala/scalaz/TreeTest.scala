@@ -16,6 +16,8 @@ object TreeTest extends SpecLite {
   checkAll("Tree", align.laws[Tree])
   checkAll("Tree", zip.laws[Tree])
 
+  checkAll(FoldableTests.anyAndAllLazy[Tree])
+
   "ScalazArbitrary.treeGenSized" ! forAll(Gen.choose(1, 200)){ size =>
     val gen = treeGenSized[Unit](size)
     Stream.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
