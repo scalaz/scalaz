@@ -167,8 +167,8 @@ object build extends Build {
         </developers>
       ),
     // kind-projector plugin
-    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.6.1" cross CrossVersion.binary)
+    resolvers += Resolver.sonatypeRepo("releases"),
+    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.6.3" cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
