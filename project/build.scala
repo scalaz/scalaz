@@ -245,7 +245,7 @@ object build extends Build {
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.4"
+      case _ => "1.0.5"
     }
   )
 
