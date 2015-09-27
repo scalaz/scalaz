@@ -87,7 +87,7 @@ object Cofree extends CofreeInstances with CofreeFunctions {
     def t = tf
 
     def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =
-      applyT(f(head), T.map(t)(s => S.map(s)(g)))
+      applyT(f(head), T.map(t)(S.lift(g)))
   }
 }
 
@@ -105,7 +105,7 @@ trait CofreeFunctions {
 
   def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[({ type l[a] = Free[Function0, a]})#l]): Cofree[F, A] = {
     val (a, fb) = f(b)
-    val nt = T.map(Trampoline.done(fb))(fbb => F.map(fbb)(unfold(_)(f)))
+    val nt = T.map(Trampoline.done(fb))(F.lift(unfold(_)(f)))
     Cofree.applyT(a, nt)
   }
 
