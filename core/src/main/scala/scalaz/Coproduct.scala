@@ -7,7 +7,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   import Coproduct._
 
   def map[B](f: A => B)(implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =
-    Coproduct(run.bimap(F.map(_)(f), G.map(_)(f)))
+    Coproduct(run.bimap(F.lift(f), G.lift(f)))
 
   def cobind[B](f: Coproduct[F, G, A] => B)(implicit F: Cobind[F], G: Cobind[G]): Coproduct[F, G, B] =
     Coproduct(

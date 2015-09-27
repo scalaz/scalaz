@@ -88,7 +88,7 @@ object Cofree extends CofreeInstances {
       def t = tf
 
       def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S,B] =
-        applyT(f(head), T.map(t)(s => S.map(s)(g)))
+        applyT(f(head), T.map(t)(S.lift(g)))
     }
 
   private[scalaz] final type CofreeZip[F[_], A] = Cofree[F, A] @@ Tags.Zip
@@ -102,7 +102,7 @@ object Cofree extends CofreeInstances {
 
   def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(implicit F: Functor[F], T: Functor[λ[a => Free[Function0, a]]]): Cofree[F, A] = {
     val (a, fb) = f(b)
-    val nt = T.map(Trampoline.done(fb))(fbb => F.map(fbb)(unfold(_)(f)))
+    val nt = T.map(Trampoline.done(fb))(F.lift(unfold(_)(f)))
     Cofree.applyT(a, nt)
   }
 

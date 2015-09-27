@@ -5,7 +5,7 @@ private trait CompositionFunctor[F[_], G[_]] extends Functor[λ[α => F[G[α]]]]
 
   implicit def G: Functor[G]
 
-  override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] = F(fga)(ga => G(ga)(f))
+  override def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] = F(fga)(G.lift(f))
 }
 
 private trait CompositionApply[F[_], G[_]] extends Apply[λ[α => F[G[α]]]] with CompositionFunctor[F, G] {
@@ -179,7 +179,7 @@ private trait CompositionBifunctorFunctors[F[_,_], G[_], H[_]] extends Bifunctor
   def H: Functor[H]
 
   override def bimap[A, B, C, D](fgahb: F[G[A], H[B]])(f: A => C, g: B => D): F[G[C], H[D]] = 
-    F.bimap(fgahb)(ga => G.map(ga)(f) , hb => H.map(hb)(g) )
+    F.bimap(fgahb)(G.lift(f), H.lift(g))
 }
 
 private trait CompositionFoldableBifoldable[F[_], G[_, _]] extends Bifoldable[λ[(α, β) => F[G[α, β]]]] {
