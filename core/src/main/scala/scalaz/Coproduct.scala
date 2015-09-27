@@ -8,7 +8,7 @@ sealed trait Coproduct[F[+_], G[+_], A] {
   import Coproduct._
 
   def map[B](f: A => B)(implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =
-    Coproduct(run.bimap(F.map(_)(f), G.map(_)(f)))
+    Coproduct(run.bimap(F.lift(f), G.lift(f)))
 
   def foreach(f: A => Unit)(implicit F: Each[F], G: Each[G]): Unit =
     run.fold(F.each(_)(f), G.each(_)(f))
