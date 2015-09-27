@@ -7,7 +7,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   import Coproduct._
 
   def map[B](f: A => B)(implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =
-    Coproduct(run.bimap(F.map(_)(f), G.map(_)(f)))
+    Coproduct(run.bimap(F.lift(f), G.lift(f)))
 
   @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: A => Unit)(implicit F: Each[F], G: Each[G]): Unit =

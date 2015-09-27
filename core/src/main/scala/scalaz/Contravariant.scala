@@ -44,7 +44,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   def icompose[G[_]](implicit G0: Functor[G]): Contravariant[({type λ[α] = F[G[α]]})#λ] =
     new Contravariant[({type λ[α] = F[G[α]]})#λ] {
       def contramap[A, B](fa: F[G[A]])(f: B => A) =
-        self.contramap(fa)(gb => G0.map(gb)(f))
+        self.contramap(fa)(G0.lift(f))
     }
 
   /** The product of Contravariant `F` and `G`, `[x](F[x], G[x]])`, is
