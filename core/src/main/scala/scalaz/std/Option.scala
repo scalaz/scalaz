@@ -183,6 +183,16 @@ trait OptionFunctions {
     case None    => Success(b)
   }
 
+  final def toSuccessNel[A,E](oa: Option[A])(e: => E) : ValidationNel[E,A] = oa match {
+    case Some(a) => Success(a)
+    case None    => Failure(NonEmptyList(e))
+  }
+
+  final def toFailureNel[A,B](oa: Option[A])(b: => B) : ValidationNel[A,B] = oa match {
+    case Some(a) => Failure(NonEmptyList(a))
+    case None    => Success(b)
+  }
+
   final def toRight[A, E](oa: Option[A])(e: => E): E \/ A = oa match {
     case Some(a) => \/-(a)
     case None    => -\/(e)
