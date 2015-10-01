@@ -1,0 +1,167 @@
+package scalaz
+
+/**
+ * @see [[https://github.com/ekmett/comonad/blob/v4.2.7.2/src/Control/Comonad/Trans/Traced.hs]]
+ */
+final case class TracedT[W[_], A, B](run: W[A => B]) {
+  def map[C](f: B => C)(implicit W: Functor[W]): TracedT[W, A, C] =
+    TracedT(W.map(run)(_ andThen f))
+
+  def cobind[C](f: TracedT[W, A, B] => C)(implicit W: Cobind[W], A: Semigroup[A]): TracedT[W, A, C] =
+    TracedT(
+      W.cobind(run) { wf => m =>
+        f(TracedT(W.map(wf)(_.compose(A.append(_, m)))))
+      }
+    )
+
+  def trans[M[_]](f: W ~> M): TracedT[M, A, B] =
+    TracedT(f(run))
+
+  def copoint(implicit W: Comonad[W], A: Monoid[A]): B =
+    W.copoint(run).apply(A.zero)
+
+  def lower(implicit W: Functor[W], A: Monoid[A]): W[B] =
+    W.map(run)(_ apply A.zero)
+
+  def contramap[C](f: C => A)(implicit W: Functor[W]): TracedT[W, C, B] =
+    TracedT(W.map(run)(f.andThen))
+}
+
+sealed abstract class TracedTInstances4 {
+  implicit final def tracedTFunctor[W[_]: Functor, C]: Functor[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTFunctor[W, C]{
+      def W = implicitly
+    }
+
+  implicit final def tracedTContravariant[W[_]: Functor, C]: Contravariant[({type l[a] = TracedT[W, a, C]})#l] =
+    new Contravariant[({type l[a] = TracedT[W, a, C]})#l]{
+      override def contramap[A, B](r: TracedT[W, A, C])(f: B => A) =
+        r contramap f
+    }
+}
+
+sealed abstract class TracedTInstances3 extends TracedTInstances4 {
+  implicit final def tracedTDistributive[W[_]: Distributive, C]: Distributive[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTDistributive[W, C] {
+      def W = implicitly
+    }
+}
+
+sealed abstract class TracedTInstances2 extends TracedTInstances3 {
+  implicit final def tracedTApply[W[_]: Apply, C]: Apply[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTApply[W, C]{
+      def W = implicitly
+    }
+}
+
+sealed abstract class TracedTInstances1 extends TracedTInstances2 {
+  implicit final def tracedTApplicative[W[_]: Applicative, C]: Applicative[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTApplicative[W, C]{
+      def W = implicitly
+    }
+}
+
+sealed abstract class TracedTInstances0 extends TracedTInstances1 {
+  implicit final def tracedTCobind[W[_]: Cobind, C: Semigroup]: Cobind[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTCobind[W, C]{
+      def W = implicitly
+      def C = implicitly
+    }
+}
+
+sealed abstract class TracedTInstances extends TracedTInstances0 {
+
+  implicit final def tracedTComonad[W[_]: Comonad, C: Monoid]: Comonad[({type l[a] = TracedT[W, C, a]})#l] =
+    new TracedTComonad[W, C]{
+      def W = implicitly
+      def C = implicitly
+    }
+
+  implicit final def tracedTCohoist[C: Monoid]: Cohoist[({type l[w[_], b] = TracedT[w, C, b]})#l] =
+    new Cohoist[({type l[w[_], b] = TracedT[w, C, b]})#l] {
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+        new (({type l[a] = TracedT[M, C, a]})#l ~> ({type l[a] = TracedT[N, C, a]})#l) {
+          def apply[A](fa: TracedT[M, C, A]) = fa.trans(f)
+        }
+      override def lower[G[_], A](a: TracedT[G, C, A])(implicit G: Cobind[G]) =
+        a.lower
+    }
+
+  implicit final def tracedTEqual[W[_], A, B](implicit W: Equal[W[A => B]]): Equal[TracedT[W, A, B]] =
+    W.contramap(_.run)
+
+}
+
+object TracedT extends TracedTInstances {
+
+  def tracedTU[WAB, AB, A0, B0](wab: WAB)(implicit
+    U1: Unapply[Functor, WAB]{type A = AB},
+    U2: Unapply2[Profunctor, AB]{type A = A0; type B = B0},
+    L: Leibniz.===[AB, A0 => B0]
+  ): TracedT[U1.M, A0, B0] = TracedT(L.subst[U1.M](U1(wab)))
+
+  import scalaz.Isomorphism._
+
+  def iso[W[_]]: ({type l[a, b] = TracedT[W, a, b]})#l <~~> ({type l[a, b] = W[a => b]})#l =
+    new IsoBifunctorTemplate[({type l[a, b] = TracedT[W, a, b]})#l, ({type l[a, b] = W[a => b]})#l] {
+      override def to[A, B](fa: TracedT[W, A, B]) = fa.run
+      override def from[A, B](ga: W[A => B]) = TracedT(ga)
+    }
+
+}
+
+private trait TracedTFunctor[W[_], C] extends Functor[({type l[a] = TracedT[W, C, a]})#l] {
+  implicit def W: Functor[W]
+
+  override final def map[A, B](fa: TracedT[W, C, A])(f: A => B) =
+    fa map f
+}
+
+private trait TracedTDistributive[W[_], C] extends Distributive[({type l[a] = TracedT[W, C, a]})#l] with TracedTFunctor[W, C] {
+  def W: Distributive[W]
+
+  import scalaz.std.function._
+
+  override final def distributeImpl[G[_], A, B](fa: G[A])(f: A => TracedT[W, C, B])(implicit G: Functor[G]) =
+    TracedT(
+      W.map(W.cosequence(G.map(fa)(f(_).run))){
+        Distributive[({type l[a] = C => a})#l].cosequence(_)
+      }
+    )
+}
+
+private trait TracedTApply[W[_], C] extends Apply[({type l[a] = TracedT[W, C, a]})#l] with TracedTFunctor[W, C] {
+  def W: Apply[W]
+
+  override final def ap[A, B](fa: => TracedT[W, C, A])(f: => TracedT[W, C, A => B]) =
+    TracedT(
+      W.ap(fa.run)(
+        W.map(f.run)(cab => ca => c => cab(c).apply(ca(c)))
+      )
+    )
+}
+
+private trait TracedTApplicative[W[_], C] extends Applicative[({type l[a] = TracedT[W, C, a]})#l] with TracedTApply[W, C] {
+  def W: Applicative[W]
+
+  override final def point[A](a: => A) = TracedT(W.point(Function.const(a)))
+}
+
+private trait TracedTCobind[W[_], C] extends Cobind[({type l[a] = TracedT[W, C, a]})#l] with TracedTFunctor[W, C] {
+  implicit def W: Cobind[W]
+  implicit def C: Semigroup[C]
+
+  override final def cobind[A, B](fa: TracedT[W, C, A])(f: TracedT[W, C, A] => B) =
+    fa cobind f
+}
+
+private trait TracedTComonad[W[_], C] extends Comonad[({type l[a] = TracedT[W, C, a]})#l] with TracedTCobind[W, C] {
+  implicit def W: Comonad[W]
+  implicit def C: Monoid[C]
+
+  override final def copoint[A](p: TracedT[W, C, A]): A =
+    p.copoint
+
+  override final def cojoin[A](a: TracedT[W, C, A]) =
+    cobind(a)(x => x)
+}
