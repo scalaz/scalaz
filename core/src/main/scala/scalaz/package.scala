@@ -170,6 +170,8 @@ package object scalaz {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }
 
+  type Traced[A, B] = TracedT[Id, A, B]
+  def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
   type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
   object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
