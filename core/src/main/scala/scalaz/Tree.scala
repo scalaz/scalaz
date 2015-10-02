@@ -108,10 +108,38 @@ object Tree extends TreeInstances with TreeFunctions {
   /** Construct a tree node with no children. */
   def apply[A](root: => A): Tree[A] = leaf(root)
 
+  /**
+   * Node represents a tree node that may have children.
+   *
+   * You can use Node for tree construction or pattern matching.
+   */
   object Node {
+    def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
+      node[A](root, forest)
+    }
+
     def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
+  /**
+   *  Leaf represents a a tree node with no children.
+   *
+   *  You can use Leaf for tree construction or pattern matching.
+   */
+  object Leaf {
+    def apply[A](root: => A): Tree[A] = {
+      leaf(root)
+    }
+
+    def unapply[A](t: Tree[A]): Option[A] = {
+      t match {
+        case Node(root, Stream.Empty) =>
+          Some(root)
+        case _ =>
+          None
+      }
+    }
+  }
 
 }
 
