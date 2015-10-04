@@ -17,6 +17,7 @@ object WriterTTest extends SpecLite {
   checkAll(monoid.laws[WriterTOptInt[Int]])
   checkAll(monadError.laws[({type x[E, A] = WriterT[({type y[a] = E \/ a})#y, Int, A]})#x, Int])
   checkAll(traverse.laws[WriterTOptInt])
+  checkAll(monadPlus.strongLaws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[({type λ[α]=WriterT[NonEmptyList, Int, α]})#λ])
   checkAll(bitraverse.laws[WriterTOpt])
@@ -44,21 +45,32 @@ object WriterTTest extends SpecLite {
   }
 
   object instances {
+    def plus[F[_]: Plus, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
+    def plusEmpty[F[_]: PlusEmpty, W] = PlusEmpty[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: Functor, W] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Apply, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def applicative[F[_]: Applicative, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
     def monad[F[_]: Monad, W: Monoid] = Monad[({type λ[α]=WriterT[F, W, α]})#λ]
+    def monadPlus[F[_]: MonadPlus, W: Monoid] = MonadPlus[({type λ[α]=WriterT[F, W, α]})#λ]
     def monadError[F[_, _], W, E](implicit W: Monoid[W], F: MonadError[F, E]) = MonadError[({type x[E0, A] = WriterT[({type y[a] = F[E0, a]})#y, W, A]})#x, E]
     def foldable[F[_]: Foldable, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
     def traverse[F[_]: Traverse, W] = Traverse[({type λ[α]=WriterT[F, W, α]})#λ]
 
+    // checking absence of ambiguity
+    def plus[F[_]: PlusEmpty, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
+    def plus[F[_]: MonadPlus, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
+    def plusEmpty[F[_]: MonadPlus, W] = PlusEmpty[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: Monad, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: MonadPlus, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def apply[F[_]: MonadPlus, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Monad, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Monad, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Bind, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Bind, W: Semigroup] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Apply, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def applicative[F[_]: Monad, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
+    def applicative[F[_]: MonadPlus, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
+    def monad[F[_]: MonadPlus, W: Monoid] = Monad[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: Traverse, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def foldable[F[_]: Traverse, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
     
