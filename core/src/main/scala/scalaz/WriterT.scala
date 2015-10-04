@@ -106,12 +106,22 @@ sealed abstract class WriterTInstances13 {
       def zero = WriterT(M.zero)
       def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
     }
+
+  implicit def writerTPlus[F[_], W](implicit F0: Plus[F]): Plus[WriterT[F, W, ?]] =
+    new WriterTPlus[F, W] {
+      def F = F0
+    }
 }
 
 sealed abstract class WriterTInstances12 extends WriterTInstances13 {
   implicit def writerFunctor[W]: Functor[Writer[W, ?]] =
     new WriterTFunctor[Id, W] {
       implicit def F = idInstance
+    }
+
+  implicit def writerTPlusEmpty[F[_], W](implicit F0: PlusEmpty[F]): PlusEmpty[WriterT[F, W, ?]] =
+    new WriterTPlusEmpty[F, W] {
+      def F = F0
     }
 }
 sealed abstract class WriterTInstances11 extends WriterTInstances12 {
@@ -193,6 +203,12 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
       implicit def F = F0
     }
   implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
+
+  implicit def writerTMonadPlus[F[_], W](implicit W0: Monoid[W], F0: MonadPlus[F]): MonadPlus[WriterT[F, W, ?]] =
+    new WriterTMonadPlus[F, W] {
+      def F = F0
+      def W = W0
+    }
 }
 
 sealed abstract class WriterTInstances2 extends WriterTInstances3 {
@@ -268,6 +284,18 @@ trait WriterTFunctions {
 //
 import WriterT.writerT
 
+private trait WriterTPlus[F[_], W] extends Plus[WriterT[F, W, ?]] {
+  def F: Plus[F]
+  override final def plus[A](a: WriterT[F, W, A], b: => WriterT[F, W, A]) =
+    WriterT(F.plus(a.run, b.run))
+}
+
+private trait WriterTPlusEmpty[F[_], W] extends PlusEmpty[WriterT[F, W, ?]] with WriterTPlus[F, W] {
+  def F: PlusEmpty[F]
+
+  override final def empty[A] = WriterT(F.empty)
+}
+
 private trait WriterTFunctor[F[_], W] extends Functor[WriterT[F, W, ?]] {
   implicit def F: Functor[F]
 
@@ -295,6 +323,10 @@ private trait WriterTBind[F[_], W] extends Bind[WriterT[F, W, ?]] with WriterTAp
 
 private trait WriterTMonad[F[_], W] extends Monad[WriterT[F, W, ?]] with WriterTApplicative[F, W] with WriterTBind[F, W] {
   implicit def F: Monad[F]
+}
+
+private trait WriterTMonadPlus[F[_], W] extends MonadPlus[WriterT[F, W, ?]] with WriterTMonad[F, W] with WriterTPlusEmpty[F, W] {
+  def F: MonadPlus[F]
 }
 
 private trait WriterTMonadError[F[_, _], E, W] extends MonadError[Lambda[(E0, A) => WriterT[F[E0, ?], W, A]], E] with WriterTMonad[F[E, ?], W] {
