@@ -25,11 +25,14 @@ object ReaderWriterStateTTest extends SpecLite {
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
   }
 
-  checkAll(monad.laws[RWSOptInt])
+  checkAll(monadPlus.strongLaws[RWSOptInt])
 
   object instances {
     def functor[F[_]: Functor, R, W, S] = Functor[RWST[F, R, W, S, ?]]
+    def plus[F[_]: Plus, R, W, S1, S2] = Plus[IRWST[F, R, W, S1, S2, ?]]
+    def plusEmpty[F[_]: PlusEmpty, R, W, S1, S2] = PlusEmpty[IRWST[F, R, W, S1, S2, ?]]
     def monad[F[_]: Monad, R, W: Monoid, S] = Monad[RWST[F, R, W, S, ?]]
+    def monadPlus[F[_]: MonadPlus, R, W: Monoid, S] = MonadPlus[RWST[F, R, W, S, ?]]
     def bind[F[_]: Bind, R, W: Semigroup, S] = Bind[RWST[F, R, W, S, ?]]
     def monadReader[F[_]: Monad, R, W: Monoid, S] = MonadReader[RWST[F, ?, W, S, ?], R]
     def monadState[F[_]: Monad, R, W: Monoid, S] = MonadState[RWST[F, R, W, ?, ?], S]
@@ -37,5 +40,12 @@ object ReaderWriterStateTTest extends SpecLite {
     // checking absence of ambiguity
     def functor[F[_]: Monad, R, W: Monoid, S] = Functor[RWST[F, R, W, S, ?]]
     def functor[F[_]: Bind, R, W: Semigroup, S] = Functor[RWST[F, R, W, S, ?]]
+    def functor[F[_]: MonadPlus, R, W: Monoid, S] = Functor[RWST[F, R, W, S, ?]]
+    def plus[F[_]: PlusEmpty, R, W, S] = Plus[RWST[F, R, W, S, ?]]
+    def plus[F[_]: MonadPlus, R, W, S] = Plus[RWST[F, R, W, S, ?]]
+    def plusEmpty[F[_]: MonadPlus, R, W, S] = PlusEmpty[RWST[F, R, W, S, ?]]
+    def bind[F[_]: Monad, R, W: Monoid, S] = Bind[RWST[F, R, W, S, ?]]
+    def bind[F[_]: MonadPlus, R, W: Monoid, S] = Bind[RWST[F, R, W, S, ?]]
+    def monad[F[_]: MonadPlus, R, W: Monoid, S] = Monad[RWST[F, R, W, S, ?]]
   }
 }
