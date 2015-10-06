@@ -290,6 +290,13 @@ trait EitherInstances extends EitherInstances0 {
       )
 
   }
+
+  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = new Show[Either[A,B]] {
+    override def show(f: Either[A, B]): Cord = f match {
+      case Left(a) => ("Left(" : Cord) ++ SA.show(a) :- ')'
+      case Right(b) => ("Right(" : Cord) ++ SB.show(b) :- ')'
+    }
+  }
 }
 
 object either extends EitherInstances
