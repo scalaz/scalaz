@@ -297,7 +297,14 @@ trait EitherInstances extends EitherInstances0 {
   }
 }
 
-object either extends EitherInstances
+object either extends EitherInstances {
+  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = new Show[Either[A,B]] {
+    override def show(f: Either[A, B]): Cord = f match {
+      case Left(a) => ("Left(" : Cord) ++ SA.show(a) :- ')'
+      case Right(b) => ("Right(" : Cord) ++ SB.show(b) :- ')'
+    }
+  }
+}
 
 
 private[scalaz] trait EitherRightEqual[X, A] extends Equal[RightProjection[X, A]] {

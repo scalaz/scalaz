@@ -34,4 +34,13 @@ object EitherTest extends SpecLite {
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[({type f[x] = Either[Int, x]})#f])
   checkAll("Either", bitraverse.laws[Either])
+
+  "show" in {
+    import syntax.show._
+    import std.either._
+    val left : Either[String, Int] = Left("leftside")
+    val right : Either[String, Int] = Right(0)
+    left.shows must_===("Left(\"leftside\")")
+    right.shows must_===("Right(0)")
+  }
 }
