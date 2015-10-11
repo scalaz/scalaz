@@ -63,4 +63,11 @@ object StateTTest extends SpecLite {
     val b = StateT[List, Int, Boolean](s => List((s, true)))
     instances.monadPlus[Int, List].plus(a, b).run(0) must_===(List((0, false), (0, true)))
   }
+
+  "StateT can be trampolined without stack overflow" in {
+    import scalaz.Free._
+    val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
+      .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
+    4000 must_=== result(0).run._1
+  }
 }

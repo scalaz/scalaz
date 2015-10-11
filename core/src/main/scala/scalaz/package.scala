@@ -139,19 +139,13 @@ package object scalaz {
   type State[S, A] = StateT[Id, S, A]
 
   object StateT extends StateTInstances with StateTFunctions {
-    def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
-      def apply(s: S) = f(s)
-    }
+    def apply[F[_], S, A](f: S => F[(S, A)])(implicit F: Monad[F]): StateT[F, S, A] = IndexedStateT[F, S, S, A](f)
   }
   object IndexedState extends StateFunctions {
-    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = new IndexedState[S1, S2, A] {
-      def apply(s: S1) = f(s)
-    }
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[Id, S1, S2, A](f)
   }
   object State extends StateFunctions {
-    def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
-      def apply(s: S) = f(s)
-    }
+    def apply[S, A](f: S => (S, A)): State[S, A] = StateT[Id, S, A](f)
   }
 
   type StoreT[F[_], A, B] = IndexedStoreT[F, A, A, B]
