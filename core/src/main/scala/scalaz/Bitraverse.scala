@@ -74,13 +74,11 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
 
-    new State[S, G[F[C, D]]] {
-      def apply(initial: S) = {
-        val st = bitraverse[λ[α => StateT[Trampoline, S, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
-        st(initial).run
-      }
-    }
-  }
+    State[S, G[F[C, D]]](initial => {
+      val st = bitraverse[λ[α => StateT[Trampoline, S, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
+      st(initial).run
+    })
+   }
 
   /** Bitraverse `fa` with a `Kleisli[G, S, C]` and `Kleisli[G, S, D]`, internally using a `Trampoline` to avoid stack overflow. */
   def bitraverseKTrampoline[S, G[_] : Applicative, A, B, C, D](fa: F[A, B])(f: A => Kleisli[G, S, C])(g: B => Kleisli[G, S, D]): Kleisli[G, S, F[C, D]] = {
