@@ -216,14 +216,14 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
+  def orElse[C, BB >: B](x: => C \/ BB): C \/ BB =
     this match {
       case -\/(_) => x
-      case \/-(_) => this
+      case right@ \/-(_) => right
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
+  def |||[C, BB >: B](x: => C \/ BB): C \/ BB =
     orElse(x)
 
   /**
