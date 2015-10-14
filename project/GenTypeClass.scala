@@ -77,6 +77,8 @@ object TypeClass {
   lazy val monadTell = TypeClass("MonadTell", *^*->*->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", *^*->*->*, extendsList = Seq(monad), createSyntax = false)
 
+  lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
+
   def core: List[TypeClass] = List(semigroup,
     monoid,
     equal,
@@ -125,7 +127,8 @@ object TypeClass {
     monadState,
     monadError,
     monadTell,
-    monadReader
+    monadReader,
+    bindRec
   )
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)

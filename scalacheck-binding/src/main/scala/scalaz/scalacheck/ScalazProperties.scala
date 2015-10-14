@@ -192,6 +192,17 @@ object ScalazProperties {
     }
   }
 
+  object bindRec {
+    def tailrecBindConsistency[M[_], X](implicit M: BindRec[M], ax: Arbitrary[X], af: Arbitrary[X => M[X]],
+                                        emx: Equal[M[X]]) =
+      forAll(M.bindRecLaw.tailrecBindConsistency[X] _)
+
+    def laws[M[_]](implicit a: BindRec[M], am: Arbitrary[M[Int]],
+                   af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("bindRec") {
+      property("tailrecM is consistent with bind") = bindRec.tailrecBindConsistency[M, Int]
+    }
+  }
+
   object monad {
     def rightIdentity[M[_], X](implicit M: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
       forAll(M.monadLaw.rightIdentity[X] _)
