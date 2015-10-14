@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 import scala.reflect.ClassTag
 import Liskov.<~<
@@ -435,10 +436,18 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] =
-    new Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] {
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] =
+    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
+
+      @scala.annotation.tailrec
+      def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
+        f(a) match {
+          case -\/(l) => -\/(l)
+          case \/-(-\/(a0)) => tailrecM(f)(a0)
+          case \/-(rb @ \/-(b)) => rb
+        }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
         fa flatMap f
