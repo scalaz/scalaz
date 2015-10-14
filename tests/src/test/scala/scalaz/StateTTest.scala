@@ -20,6 +20,7 @@ object StateTTest extends SpecLite {
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
     def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
+    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[F, S, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[F, ?, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
 
