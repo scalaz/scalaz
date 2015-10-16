@@ -558,8 +558,22 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def cojoin[A](a: IList[A]) =
         a.uncons(empty, (_, t) => a :: cojoin(t))
 
-      def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
-        fa.foldRight(F.point(IList.empty[B]))((a, fbs) => F.apply2(f(a), fbs)(_ :: _))
+      def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] = {
+        type StackEnt = F[IList[B] => IList[B]]
+        @tailrec
+        def roll(count: Int, stack: IList[StackEnt]): IList[StackEnt] =
+          if ((count & 1) == 0) {
+            val ICons(h, ICons(th, t)) = stack
+            roll(count >> 1, F.apply2(th, h)(_ compose _) :: t)
+          } else stack
+        fa.foldLeft((0, IList[StackEnt]())){
+          case ((count, stack), a) =>
+            (count + 1,
+             roll(count + 1, F.map(f(a))(a => (a :: (_:IList[B]))) :: stack))
+        }._2.foldLeft(F.point(IList[B]())){(acc, se) =>
+          F.apply2(se, acc)(_(_))
+        }
+      }
 
       def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =
         a.unzip
