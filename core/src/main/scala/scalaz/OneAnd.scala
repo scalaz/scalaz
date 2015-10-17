@@ -4,7 +4,32 @@ import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
 import scalaz.std.option.{optionMonoid, none, some}
 import scalaz.Ordering.orderingInstance
 
-/** @since 7.0.3 */
+/** A generalization of `NonEmptyList` to non-`List` things.  For
+  * example, `OneAnd[Vector, A]` is a non-empty `Vector` of `A`.
+  *
+  * Only `head` and `tail` are provided as direct methods, because
+  * there's little you can do with a `OneAnd` without knowing a bit
+  * about `F`.  So useful functions are provided in the form of
+  * typeclass instances on `OneAnd`'s companion; in combination with
+  * syntax extensions provided by `scalaz.syntax`, `OneAnd` has a
+  * large possible set of methods available by importing.  For
+  * example, `Applicative` on this requires `ApplicativePlus[F]`, and
+  * `Traverse1` on this requires `Traverse[F]`.  See the companion
+  * documentation for a complete list of instances.
+  *
+  * Additionally, unlike `λ[α => (α, F[α])]`, the behavior of typeclass
+  * operations on `OneAnd` should be preserved across the natural
+  * transformation to [[scalaz.NonEmptyList]] where one exists.  That
+  * is it should "be like" a nonempty structure.  For example,
+  * `ap`-ing two `OneAnd[Vector, ?]`s or `NonEmptyList`s of lengths
+  * *a* and *b* yields a sequence of same type of length *a*×*b*, but
+  * two `λ[α => (α, Vector[α])]`s of length *c* and *d* `ap` to one of
+  * length 1+(*c*–1)×(*d*–1).  For another example, `point` of the
+  * former two yield a one-element sequence, but `point` of the latter
+  * yields a two-element sequence.
+  *
+  * @since 7.0.3
+  */
 final case class OneAnd[F[_], A](head: A, tail: F[A])
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
