@@ -9,6 +9,15 @@ package scalaz
 ////
 trait Apply[F[_]] extends Functor[F] { self =>
   ////
+  /** Sequence `f`, then `fa`, combining their results by function
+    * application.
+    *
+    * NB: with respect to `apply2` and all other combinators, as well
+    * as [[scalaz.Bind]], the `f` action appears to the *left*.  So
+    * `f` should be the "first" `F`-action to perform.  This is in
+    * accordance with all other implementations of this typeclass in
+    * common use, which are "function first".
+    */
   def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B]
 
   // derived functions
