@@ -570,9 +570,7 @@ sealed abstract class IListInstances extends IListInstance0 {
           case ((count, stack), a) =>
             (count + 1,
              roll(count + 1, F.map(f(a))(a => (a :: (_:IList[B]))) :: stack))
-        }._2.foldLeft(F.point(IList[B]())){(acc, se) =>
-          F.apply2(se, acc)(_(_))
-        }
+        }._2.foldLeft(F.point(IList[B]()))(F.ap(_)(_))
       }
 
       def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =
