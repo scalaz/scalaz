@@ -560,6 +560,8 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] = {
         type StackEnt = F[IList[B] => IList[B]]
+        // For a brief explanation of 'roll':
+        // https://github.com/scalaz/scalaz/pull/1022#issuecomment-148694245
         @tailrec
         def roll(count: Int, stack: IList[StackEnt]): IList[StackEnt] =
           if ((count & 1) == 0) {
