@@ -29,6 +29,8 @@ object OneAndTest extends SpecLite {
   checkAll("OneAnd Nel", semigroup.laws[OneAnd[NonEmptyList, Int]])
   checkAll("OneAnd Option", semigroup.laws[OneAnd[Option, Int]])
 
+  checkAll(FoldableTests.anyAndAllLazy[OneAndList])
+
   "oneAndNelIso is iso" ! forAll {(nel: NonEmptyList[Int]) =>
     oneAndNelIso.from(oneAndNelIso.to(nel)) must_===(nel)
   }
