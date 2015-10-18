@@ -116,6 +116,38 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
 
   override def foldLeft[A, B](fa: OneAnd[F, A], z: B)(f: (B, A) => B) =
     F.foldLeft(fa.tail, f(z, fa.head))(f)
+
+  override def traverseS_[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
+    State{s: S => F.traverseS_(fa.tail)(f)(f(fa.head)(s)._1)}
+
+  override def length[A](fa: OneAnd[F, A]) = 1 + F.length(fa.tail)
+
+  override def index[A](fa: OneAnd[F, A], i: Int) =
+    if (i == 0) Some(fa.head) else F.index(fa.tail, i - 1)
+
+  override def toVector[A](fa: OneAnd[F, A]) =
+    fa.head +: F.toVector(fa.tail)
+
+  override def toList[A](fa: OneAnd[F, A]) =
+    fa.head :: F.toList(fa.tail)
+
+  override def toIList[A](fa: OneAnd[F, A]) =
+    fa.head :: F.toIList(fa.tail)
+
+  override def toSet[A](fa: OneAnd[F, A]) =
+    F.toSet(fa.tail) + fa.head
+
+  override def toStream[A](fa: OneAnd[F, A]) =
+    fa.head #:: F.toStream(fa.tail)
+
+  override def toEphemeralStream[A](fa: OneAnd[F, A]) =
+    EphemeralStream.cons(fa.head, F.toEphemeralStream(fa.tail))
+
+  override def all[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    f(fa.head) && F.all(fa.tail)(f)
+
+  override def any[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    f(fa.head) || F.any(fa.tail)(f)
 }
 
 private sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
@@ -138,6 +170,13 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, ?]] with O
 
   override def traverseImpl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
+
+  override def traverseS[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
+    State{s: S =>
+      val (s2, b) = f(fa.head)(s)
+      val (s3, bs) = F.traverseS(fa.tail)(f)(s2)
+      (s3, OneAnd(b, bs))
+    }
 }
 
 private sealed trait OneAndTraverse1[F[_]] extends OneAndTraverse[F] with OneAndFoldable1[F] {
