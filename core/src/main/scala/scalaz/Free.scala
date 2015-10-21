@@ -369,6 +369,17 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
 
+  implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
+    new Zip[Free[S, ?]] {
+      override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
+        (aa.resume, bb.resume) match {
+          case (-\/(a), -\/(b)) => roll(Z.zipWith(a, b)(zip(_, _)))
+          case (-\/(a), \/-(b)) => roll(F.map(a)(zip(_, point(b))))
+          case (\/-(a), -\/(b)) => roll(F.map(b)(zip(point(a), _)))
+          case (\/-(a), \/-(b)) => point((a, b))
+        }
+    }
+
   implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[Free[S, ?], A]
 }
