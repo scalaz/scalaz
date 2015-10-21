@@ -229,10 +229,10 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
 object Task {
 
-  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] =
-    new Nondeterminism[Task] with Catchable[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] {
+  implicit val taskInstance: Nondeterminism[Task] with Catchable[Task] with BindRec[Task] with MonadError[λ[(α,β) => Task[β]],Throwable] =
+    new Nondeterminism[Task] with Catchable[Task] with BindRec[Task] with MonadError[λ[(α, β) => Task[β]], Throwable] {
       val F = Nondeterminism[Future]
-      def point[A](a: => A) = new Task(Future.delay(Try(a)))
+      def point[A](a: => A) = Task.point(a)
       def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
         a flatMap f
       def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
@@ -246,6 +246,7 @@ object Task {
       }
       def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
       def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
+      def tailrecM[A, B](f: A => Task[A \/ B])(a: A): Task[B] = Task.tailrecM(f)(a)
       def raiseError[A](e: Throwable): Task[A] = fail(e)
       def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
         fa.handleWith { case t => f(t) }
@@ -255,6 +256,8 @@ object Task {
   case object TaskInterrupted extends InterruptedException {
     override def fillInStackTrace = this
   }
+
+  def point[A](a: => A) = new Task(Future.delay(Try(a)))
 
   /** A `Task` which fails with the given `Throwable`. */
   def fail(e: Throwable): Task[Nothing] = new Task(Future.now(-\/(e)))
@@ -391,6 +394,12 @@ object Task {
 
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
+
+  def tailrecM[A, B](f: A => Task[A \/ B])(a: A): Task[B] =
+    f(a).flatMap {
+      case -\/(a0) => tailrecM(f)(a0)
+      case \/-(b) => point(b)
+    }
 
   /** type for Tasks which need to be executed in parallel when using an Applicative instance */
   type ParallelTask[A] = Task[A] @@ Parallel
