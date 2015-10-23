@@ -100,7 +100,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
   /** Like `run`, but returns exceptions as values. */
   def attemptRun: Throwable \/ A =
-    try get.run catch { case t: Throwable => -\/(t) }
+    get.run
 
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
