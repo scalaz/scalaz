@@ -19,6 +19,7 @@ object StateTTest extends SpecLite {
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
+    def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[F, ?, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
 
@@ -28,6 +29,7 @@ object StateTTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[S, F[_] : Monad] = Functor[StateT[F, S, ?]]
+    def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
   }
 
   "monadState.state" in {
