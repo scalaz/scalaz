@@ -120,6 +120,11 @@ sealed abstract class IndexedStateTInstances extends IndexedStateTInstances0 {
   implicit def indexedStateTFunctorRight[S1, S2, F[_]](implicit F0: Functor[F]): Functor[({type f[a] = IndexedStateT[F, S1, S2, a]})#f] = new IndexedStateTFunctorRight[S1, S2, F] {
     implicit def F: Functor[F] = F0
   }
+
+  implicit def indexedStateTPlus[F[_]: Plus, S1, S2]: Plus[({type l[a] = IndexedStateT[F, S1, S2, a]})#l] =
+    new IndexedStateTPlus[F, S1, S2] {
+      def G = implicitly
+    }
 }
 
 sealed abstract class StateTInstances1 extends IndexedStateTInstances {
@@ -215,6 +220,12 @@ private trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})
   }
 
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = StateT[G, S, α]})#λ] = StateT.stateTMonadState[S, G]
+}
+
+private trait IndexedStateTPlus[F[_], S1, S2] extends Plus[({type l[a] = IndexedStateT[F, S1, S2, a]})#l] {
+  implicit def G: Plus[F]
+  override final def plus[A](a: IndexedStateT[F, S1, S2, A], b: => IndexedStateT[F, S1, S2, A]) =
+    IndexedStateT(s => G.plus(a.run(s), b.run(s)))
 }
 
 private trait StateTMonadStateMonadPlus[S, F[_]] extends StateTMonadState[S, F] with StateTHoist[S] with MonadPlus[({type λ[α] = StateT[F, S, α]})#λ] {
