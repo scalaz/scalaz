@@ -8,10 +8,19 @@ import scalaz.scalacheck.ScalaCheckBinding._
 
 case class FreeList[A](f: Free[List, A])
 
-object FreeList {
+sealed abstract class FreeListInstances {
   implicit def freeListTraverse = new Traverse[FreeList] {
     def traverseImpl[G[_], A, B](fa: FreeList[A])(f: A => G[B])(implicit G: Applicative[G]) =
       G.map(Traverse[Free[List, ?]].traverseImpl(fa.f)(f))(FreeList.apply)
+  }
+}
+
+object FreeList extends FreeListInstances {
+
+  implicit val freeListZip: Zip[FreeList] = new Zip[FreeList] {
+    val Z = Zip[Free[List, ?]]
+    override def zip[A, B](a: => FreeList[A], b: => FreeList[B]) =
+      FreeList(Z.zip(a.f, b.f))
   }
 
   implicit def freeListMonad = new Monad[FreeList] {
@@ -56,6 +65,7 @@ object FreeTest extends SpecLite {
     checkAll(monad.laws[FreeList])
     checkAll(monoid.laws[FreeList[Int]])
     checkAll(semigroup.laws[FreeList[Int]])
+    checkAll(zip.laws[FreeList])
   }
 
   object instances {
