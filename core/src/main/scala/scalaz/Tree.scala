@@ -106,6 +106,7 @@ sealed abstract class Tree[A] {
 
 object Tree extends TreeInstances with TreeFunctions {
   /** Construct a tree node with no children. */
+  @deprecated("Use Leaf.apply or Node.apply instead.")
   def apply[A](root: => A): Tree[A] = leaf(root)
 
   /**
