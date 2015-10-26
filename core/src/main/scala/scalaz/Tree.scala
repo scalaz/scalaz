@@ -177,6 +177,7 @@ sealed abstract class TreeInstances {
 
 trait TreeFunctions {
   /** Construct a new Tree node. */
+  @deprecated("Use Node.apply instead.")
   def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
     lazy val rootLabel = root
     lazy val subForest = forest
@@ -185,6 +186,7 @@ trait TreeFunctions {
   }
 
   /** Construct a tree node with no children. */
+  @deprecated("Use Leaf.apply instead.")
   def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
 
   def unfoldForest[A, B](s: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
