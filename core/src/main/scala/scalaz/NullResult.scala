@@ -170,8 +170,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullResultArrow: Arrow[NullResult] =
-    new Arrow[NullResult] {
+  implicit val nullResultArrow: Arrow[NullResult] with Choice[NullResult] with ProChoice[NullResult] =
+    new Arrow[NullResult] with Choice[NullResult] with ProChoice[NullResult] {
       def id[A] =
         NullResult.lift(identity)
       override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
@@ -186,6 +186,15 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         NullResult.lift(f)
       override def first[A, B, C](r: NullResult[A, B]) =
         r.first
+      override def left[A, B, C](fa: NullResult[A, B]) =
+        fa.left
+      override def right[A, B, C](fa: NullResult[A, B]) =
+        fa.right
+      override def choice[A, B, C](f: => NullResult[A, C], g: => NullResult[B, C]) =
+        NullResult{
+          case \/-(a) => g(a)
+          case -\/(a) => f(a)
+        }
     }
 
   implicit def nullResultMonad[X]: Monad[NullResult[X, ?]] =
