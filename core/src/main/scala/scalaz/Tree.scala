@@ -116,7 +116,12 @@ object Tree extends TreeInstances with TreeFunctions {
    */
   object Node {
     def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
-      node[A](root, forest)
+      new Tree[A] {
+        lazy val rootLabel = root
+        lazy val subForest = forest
+
+        override def toString = "<tree>"
+      }
     }
 
     def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
@@ -129,7 +134,7 @@ object Tree extends TreeInstances with TreeFunctions {
    */
   object Leaf {
     def apply[A](root: => A): Tree[A] = {
-      leaf(root)
+      Node(root, Stream.empty)
     }
 
     def unapply[A](t: Tree[A]): Option[A] = {
@@ -178,16 +183,11 @@ sealed abstract class TreeInstances {
 trait TreeFunctions {
   /** Construct a new Tree node. */
   @deprecated("Use Node.apply instead.")
-  def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
-    lazy val rootLabel = root
-    lazy val subForest = forest
-
-    override def toString = "<tree>"
-  }
+  def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = Tree.Node(root, forest)
 
   /** Construct a tree node with no children. */
   @deprecated("Use Leaf.apply instead.")
-  def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
+  def leaf[A](root: => A): Tree[A] = Tree.Leaf(root)
 
   def unfoldForest[A, B](s: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
     s.map(unfoldTree(_)(f))
