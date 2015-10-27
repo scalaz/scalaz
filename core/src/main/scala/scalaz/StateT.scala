@@ -2,7 +2,7 @@ package scalaz
 
 import Id._
 
-trait IndexedStateT[F[_], -S1, S2, A] { self =>
+sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   def getF[S <: S1]: Monad[F] => F[S => F[(S2, A)]]
 
   /** Run and return the final value and state in the context of `F` */
