@@ -299,10 +299,17 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
     }
 
-  /** Convert to a validation. */
+  /** Convert to a Validation. */
   def validation: Validation[A, B] =
     this match {
       case -\/(a) => Failure(a)
+      case \/-(b) => Success(b)
+    }
+  
+  /** Convert to a ValidationNel. */
+  def validationNel[AA>:A] : ValidationNel[AA,B] = 
+    this match {
+      case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
     }
 

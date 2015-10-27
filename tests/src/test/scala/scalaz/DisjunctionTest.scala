@@ -66,4 +66,22 @@ object DisjunctionTest extends SpecLite {
     -\/[Foo](Bar).recoverWith(bazToInt) must_=== -\/(Bar)
     \/.right[Foo, Int](1).recoverWith(barToBaz) must_=== \/-(1)
   }
+
+  "validation" in {
+    import syntax.either._
+    import syntax.validation._
+
+    3.right[String].validation must_=== 3.success[String]
+    "Hello".left[Int].validation must_=== "Hello".failure[Int]
+  }
+
+  "validationNel" in {
+    import syntax.either._
+    import syntax.validation._
+    import syntax.apply._
+
+    3.right[String].validationNel must_=== 3.successNel[String]
+    ("hello".left[Int].validationNel |@| "world".left[Int].validationNel).tupled must_===
+      ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
+  }
 }
