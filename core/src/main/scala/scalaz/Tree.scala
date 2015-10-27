@@ -106,12 +106,46 @@ sealed abstract class Tree[A] {
 
 object Tree extends TreeInstances with TreeFunctions {
   /** Construct a tree node with no children. */
+  @deprecated("Use Leaf.apply or Node.apply instead.")
   def apply[A](root: => A): Tree[A] = leaf(root)
 
+  /**
+   * Node represents a tree node that may have children.
+   *
+   * You can use Node for tree construction or pattern matching.
+   */
   object Node {
+    def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
+      new Tree[A] {
+        lazy val rootLabel = root
+        lazy val subForest = forest
+
+        override def toString = "<tree>"
+      }
+    }
+
     def unapply[A](t: Tree[A]): Option[(A, Stream[Tree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
+  /**
+   *  Leaf represents a a tree node with no children.
+   *
+   *  You can use Leaf for tree construction or pattern matching.
+   */
+  object Leaf {
+    def apply[A](root: => A): Tree[A] = {
+      Node(root, Stream.empty)
+    }
+
+    def unapply[A](t: Tree[A]): Option[A] = {
+      t match {
+        case Node(root, Stream.Empty) =>
+          Some(root)
+        case _ =>
+          None
+      }
+    }
+  }
 
 }
 
@@ -148,15 +182,12 @@ sealed abstract class TreeInstances {
 
 trait TreeFunctions {
   /** Construct a new Tree node. */
-  def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = new Tree[A] {
-    lazy val rootLabel = root
-    lazy val subForest = forest
-
-    override def toString = "<tree>"
-  }
+  @deprecated("Use Node.apply instead.")
+  def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = Tree.Node(root, forest)
 
   /** Construct a tree node with no children. */
-  def leaf[A](root: => A): Tree[A] = node(root, Stream.empty)
+  @deprecated("Use Leaf.apply instead.")
+  def leaf[A](root: => A): Tree[A] = Tree.Leaf(root)
 
   def unfoldForest[A, B](s: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
     s.map(unfoldTree(_)(f))
