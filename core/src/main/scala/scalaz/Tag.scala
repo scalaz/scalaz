@@ -7,7 +7,23 @@ object Tag {
     */
   @inline def apply[@specialized A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
 
-  /** Add a tag `T` to `A`. */
+  /** Add a tag `T` to `A`.
+    *
+    * NB: It is unsafe to `subst` or `unsubst` a tag in an `F` that is
+    * sensitive to the `A` type within.  For example, if `F` is a
+    * GADT, rather than a normal ADT, it is probably unsafe.  For
+    * "normal" types like `List` and function types, it is safe.  More
+    * broadly, if it is possible to write a ''legal''
+    * [[scalaz.InvariantFunctor]] over the parameter, `subst` of that
+    * parameter is safe.
+    * 
+    * We do not have a
+    * <a href="https://ghc.haskell.org/trac/ghc/wiki/Roles">type role</a>
+    * system in Scala with which to declare the exact situations under
+    * which `subst` is safe.  If we did, we would declare that `subst`
+    * is safe if and only if the parameter has "representational" or
+    * "phantom" role.
+    */
   def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
 
   /** Remove the tag `T`, leaving `A`. */
