@@ -29,7 +29,7 @@ object UnapplyInference extends App {
     import scalaz._, Scalaz._
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
-    val traverseState: State[Int, List[Int]] = ls.traverse[({type λ[α] = State[Int, α]})#λ, Int](a => State((x: Int) => (x + 1, a)))
+    val traverseState: State[Int, List[Int]] = ls.traverse[State[Int,?],Int](a => State((x: Int) => (x+1,a)))
   }
 
   // With Unapply (in the signature of traverseU)
@@ -55,7 +55,7 @@ object UnapplyInference extends App {
 
   def kleisliU() {
     import scalaz._
-    val k: Kleisli[({type λ[α] = NumberFormatException \/ α})#λ, String, Int] =
+    val k: Kleisli[NumberFormatException \/ ?, String, Int] =
       Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
   }
 
@@ -65,7 +65,7 @@ object UnapplyInference extends App {
 
     val e: String \/ Int = \/-(1)
 
-    ToFunctorOps[({type λ[α] = String \/ α})#λ, Int](e.map(1 +)).map(1 +)
+    ToFunctorOps[String \/ ?, Int](e.map(1 +)).map(1 +)
     ToFunctorOpsUnapply(e.map(1 +)).map(1 +)
 
     e.map(1 +).map(1 +)
