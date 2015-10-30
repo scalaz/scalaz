@@ -71,7 +71,7 @@ object CofreeTest extends SpecLite {
       def to[A](tree: Tree[A]): CofreeStream[A] =
         Cofree(tree.rootLabel, tree.subForest.map(to))
       def from[A](c: CofreeStream[A]): Tree[A] =
-        Tree.node(c.head, c.tail.map(from(_)))
+        Tree.Node(c.head, c.tail.map(from(_)))
     }
 
   implicit def CofreeLazyOptionArb[A: Arbitrary]: Arbitrary[CofreeLazyOption[A]] =
