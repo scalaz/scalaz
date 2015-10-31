@@ -49,9 +49,9 @@ sealed abstract class Heap[A] {
     case (Heap(s1, leq, t1@Node(Ranked(r1, x1), f1)),
     Heap(s2, _, t2@Node(Ranked(r2, x2), f2))) =>
       if (leq(x1, x2))
-        Heap(s1 + s2, leq, node(Ranked(0, x1), skewInsert(leq, t2, f1)))
+        Heap(s1 + s2, leq, Node(Ranked(0, x1), skewInsert(leq, t2, f1)))
       else
-        Heap(s1 + s2, leq, node(Ranked(0, x2), skewInsert(leq, t1, f2)))
+        Heap(s1 + s2, leq, Node(Ranked(0, x2), skewInsert(leq, t1, f2)))
   }
 
   /**Split the heap into the minimum element and the remainder. O(log n)*/
@@ -73,14 +73,14 @@ sealed abstract class Heap[A] {
         val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
         val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
         val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
-        Heap(s - 1, leq, node(Ranked(0, x), f3))
+        Heap(s - 1, leq, Node(Ranked(0, x), f3))
       }
     })
   }
 
   def adjustMin(f: A => A): Heap[A] = this match {
     case Heap(s, leq, Node(Ranked(r, x), xs)) =>
-      Heap(s, leq, heapify(leq)(node(Ranked(r, f(x)), xs)))
+      Heap(s, leq, heapify(leq)(Node(Ranked(r, f(x)), xs)))
   }
 
   def toUnsortedStream: Stream[A] = fold(Stream(), (_, _, t) => t.flatten.map(_.value))
@@ -190,10 +190,10 @@ sealed abstract class Heap[A] {
   private[scalaz] def insertWith(f: (A, A) => Boolean, x: A) =
     fold(singletonWith(f, x), (s, _, t) => {
       val y = t.rootLabel.value
-      if (f(x, y)) Heap(s + 1, f, node(Ranked(0, x), Stream(t)))
+      if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
       else
-        Heap(s + 1, f, node(Ranked(0, y),
-          skewInsert(f, node(Ranked(0, x), Stream()), t.subForest)))
+        Heap(s + 1, f, Node(Ranked(0, y),
+          skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
     })
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {
@@ -320,12 +320,12 @@ object Heap extends HeapInstances {
         val (left, Node(Ranked(rp, ap), asp) #:: right) = minZ(leq)(as)
         if (leq(a, ap)) n
         else
-          node(Ranked(r, ap), rezip((left, heapify(leq)(node(Ranked(rp, a), asp)) #:: right)))
+          Node(Ranked(r, ap), rezip((left, heapify(leq)(Node(Ranked(rp, a), asp)) #:: right)))
       }
     }
 
     def singletonWith[A](f: (A, A) => Boolean, a: A) =
-      Heap(1, f, node(Ranked(0, a), Stream()))
+      Heap(1, f, Node(Ranked(0, a), Stream()))
 
 
     def rank[A](t: Tree[Ranked[A]]) = t.rootLabel.rank
@@ -335,19 +335,19 @@ object Heap extends HeapInstances {
                     t1: Tree[Ranked[A]],
                     t2: Tree[Ranked[A]]): Tree[Ranked[A]] = (t0, t1, t2) match {
       case (Node(Ranked(r0, x0), cf0), Node(Ranked(r1, x1), cf1), Node(Ranked(r2, x2), cf2)) =>
-        if (f(x1, x0) && f(x1, x2)) node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1)
+        if (f(x1, x0) && f(x1, x2)) Node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1)
         else
-        if (f(x2, x0) && f(x2, x1)) node(Ranked(r2 + 1, x2), t0 #:: t1 #:: cf2)
+        if (f(x2, x0) && f(x2, x1)) Node(Ranked(r2 + 1, x2), t0 #:: t1 #:: cf2)
         else
-          node(Ranked(r1 + 1, x0), t1 #:: t2 #:: cf0)
+          Node(Ranked(r1 + 1, x0), t1 #:: t2 #:: cf0)
     }
 
     def link[A](f: (A, A) => Boolean):
     (Tree[Ranked[A]], Tree[Ranked[A]]) => Tree[Ranked[A]] = {
       case (t1@Node(Ranked(r1, x1), cf1), t2@Node(Ranked(r2, x2), cf2)) =>
-        if (f(x1, x2)) node(Ranked(r1 + 1, x1), t2 #:: cf1)
+        if (f(x1, x2)) Node(Ranked(r1 + 1, x1), t2 #:: cf1)
         else
-          node(Ranked(r2 + 1, x2), t1 #:: cf2)
+          Node(Ranked(r2 + 1, x2), t1 #:: cf2)
     }
 
     def skewInsert[A](f: (A, A) => Boolean, t: Tree[Ranked[A]], ts: Forest[A]): Forest[A] =

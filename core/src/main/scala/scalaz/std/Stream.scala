@@ -175,7 +175,7 @@ trait StreamFunctions {
     as.map(a => {
       def unfoldTree(x: A): Tree[B] =
         f(x) match {
-          case (b, bs) => Tree.node(b, unfoldForest(bs())(f))
+          case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
         }
 
       unfoldTree(a)
@@ -190,7 +190,7 @@ trait StreamFunctions {
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
         Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: Stream[Tree[B]]) =>
-          Tree.node(abs._1, ts)))
+          Tree.Node(abs._1, ts)))
 
     mapM(as, unfoldTreeM)
   }

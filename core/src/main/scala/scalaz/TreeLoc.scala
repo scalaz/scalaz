@@ -19,7 +19,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
   /** Select the parent of the current node. */
   def parent: Option[TreeLoc[A]] = parents match {
-    case (pls, v, prs) #:: ps => Some(loc(node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
+    case (pls, v, prs) #:: ps => Some(loc(Node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
     case Stream.Empty         => None
   }
 
@@ -113,7 +113,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
   def getLabel: A = tree.rootLabel
 
   /** Set the label of the current node. */
-  def setLabel(a: A): TreeLoc[A] = modifyTree((t: Tree[A]) => node(a, t.subForest))
+  def setLabel(a: A): TreeLoc[A] = modifyTree((t: Tree[A]) => Node(a, t.subForest))
 
   /** Insert the given node to the left of the current node and give it focus. */
   def insertLeft(t: Tree[A]): TreeLoc[A] = loc(t, lefts, Stream.cons(tree, rights), parents)
@@ -136,7 +136,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
     case Stream.cons(t, ts) => Some(loc(t, lefts, ts, parents))
     case _                  => lefts match {
       case Stream.cons(t, ts) => Some(loc(t, ts, rights, parents))
-      case _                  => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => node(t.rootLabel, Stream.Empty))
+      case _                  => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => Node(t.rootLabel, Stream.Empty))
     }
   }
 
