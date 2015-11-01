@@ -198,7 +198,9 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       }
   }
 
-  implicit def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = new Monad[({type λ[α] = NullResult[X, α]})#λ] {
+  def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = nullResultMonadPlus[X]
+
+  implicit def nullResultMonadPlus[X]: MonadPlus[({type λ[α] = NullResult[X, α]})#λ] = new MonadPlus[({type λ[α] = NullResult[X, α]})#λ] {
     override def map[A, B](a: NullResult[X, A])(f: A => B) =
       a map f
     override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
@@ -207,6 +209,10 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       NullResult.always(a)
     override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
       a flatMap f
+    override def empty[A] =
+      NullResult.never[X, A]
+    override def plus[A](a: NullResult[X, A], b: => NullResult[X, A]) =
+      NullResult[X, A](x => a(x) orElse b(x))
   }
 
   implicit def nullResultContravariant[X]: Contravariant[({type λ[α] = NullResult[α, X]})#λ] = new Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
