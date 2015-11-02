@@ -17,6 +17,7 @@ object WriterTTest extends SpecLite {
   checkAll(monoid.laws[WriterTOptInt[Int]])
   checkAll(monadError.laws[Lambda[(E, A) => WriterT[E \/ ?, Int, A]], Int])
   checkAll(traverse.laws[WriterTOptInt])
+  checkAll(bindRec.laws[WriterTOptInt])
   checkAll(monadPlus.strongLaws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[NonEmptyList])
