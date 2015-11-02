@@ -135,6 +135,11 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
 }
 
 sealed abstract class KleisliInstances6 extends KleisliInstances7 {
+  implicit def kleisliBindRec[F[_], R](implicit F0: BindRec[F]): BindRec[Kleisli[F, R, ?]] =
+    new KleisliBindRec[F, R] {
+      implicit def F: BindRec[F] = F0
+    }
+
   implicit def kleisliApplicativePlus[F[_], R](implicit F0: ApplicativePlus[F]): ApplicativePlus[Kleisli[F, R, ?]] =
     new ApplicativePlus[Kleisli[F, R, ?]] with KleisliApplicative[F, R] with KleisliPlusEmpty[F, R] {
       implicit def F: ApplicativePlus[F] = F0
@@ -302,6 +307,13 @@ private trait KleisliApplicative[F[_], R] extends Applicative[Kleisli[F, R, ?]] 
   implicit def F: Applicative[F]
   def point[A](a: => A): Kleisli[F, R, A] =
     kleisli((r: R) => F.point(a))
+}
+
+private trait KleisliBindRec[F[_], R] extends BindRec[Kleisli[F, R, ?]] with KleisliBind[F, R] {
+  implicit def F: BindRec[F]
+
+  def tailrecM[A, B](f: A => Kleisli[F, R, A \/ B])(a: A): Kleisli[F, R, B] =
+    Kleisli(r => F.tailrecM(f(_: A).run(r))(a))
 }
 
 private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, ?]] with KleisliApplicative[F, R] with KleisliBind[F, R] {
