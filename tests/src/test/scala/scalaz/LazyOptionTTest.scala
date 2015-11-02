@@ -10,7 +10,7 @@ object LazyOptionTTest extends SpecLite {
   type LazyOptionTList[A] = LazyOptionT[List, A]
 
   checkAll(equal.laws[LazyOptionTList[Int]])
-  checkAll(monad.laws[LazyOptionTList])
+  checkAll(monadPlus.laws[LazyOptionTList])
 
   object instances {
     def functor[F[_] : Functor] = Functor[LazyOptionT[F, ?]]
