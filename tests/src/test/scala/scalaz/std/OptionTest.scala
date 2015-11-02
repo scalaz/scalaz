@@ -17,6 +17,7 @@ object OptionTest extends SpecLite {
   checkAll("Option @@ Max", order.laws[MaxOption[Int]])
 
   checkAll("Option", monoid.laws[Option[Int]])
+  checkAll("Option", bindRec.laws[Option])
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", zip.laws[Option])

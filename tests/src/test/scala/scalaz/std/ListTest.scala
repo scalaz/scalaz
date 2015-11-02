@@ -10,6 +10,7 @@ import org.scalacheck.Prop.forAll
 object ListTest extends SpecLite {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
+  checkAll(bindRec.laws[List])
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
   checkAll(zip.laws[List])
