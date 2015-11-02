@@ -13,6 +13,7 @@ object IListTest extends SpecLite {
   checkAll(equal.laws[IList[Int]])
   checkAll(monoid.laws[IList[Int]])
   checkAll(monadPlus.strongLaws[IList])
+  checkAll(bindRec.laws[IList])
   checkAll(traverse.laws[IList])
   checkAll(zip.laws[IList])
   checkAll(align.laws[IList])
