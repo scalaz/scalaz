@@ -16,6 +16,7 @@ object VectorTest extends SpecLite {
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])
   checkAll(monadPlus.strongLaws[Vector])
+  checkAll(bindRec.laws[Vector])
   checkAll(traverse.laws[Vector])
   checkAll(FoldableTests.anyAndAllLazy[Vector])
   checkAll(zip.laws[Vector])

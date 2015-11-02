@@ -109,7 +109,7 @@ trait ListInstances extends ListInstances0 {
         @scala.annotation.tailrec
         def go(xs: List[List[A \/ B]]): Unit =
           xs match {
-            case (\/-(b) :: tail) :: rest => 
+            case (\/-(b) :: tail) :: rest =>
               bs += b
               go(tail :: rest)
             case (-\/(a0) :: tail) :: rest => 
