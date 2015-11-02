@@ -62,10 +62,18 @@ trait ReaderWriterStateTFunctions {
 
 }
 
-sealed abstract class IndexedReaderWriterStateTInstances0 {
+sealed abstract class IndexedReaderWriterStateTInstances1 {
   implicit def irwstFunctor[F[_], R, W, S1, S2](implicit F0: Functor[F]): Functor[IndexedReaderWriterStateT[F, R, W, S1, S2, ?]] =
     new IndexedReaderWriterStateTFunctor[F, R, W, S1, S2] {
       implicit def F = F0
+    }
+}
+
+sealed abstract class IndexedReaderWriterStateTInstances0 extends IndexedReaderWriterStateTInstances1 {
+  implicit def rwstBind[F[_], R, W, S](implicit F0: Bind[F], W0: Semigroup[W]): Bind[ReaderWriterStateT[F, R, W, S, ?]] =
+    new ReaderWriterStateTBind[F, R, W, S] {
+      def F = F0
+      def W = W0
     }
 }
 
@@ -75,9 +83,10 @@ sealed abstract class IndexedReaderWriterStateTInstances extends IndexedReaderWr
       override def F = F0
     }
 
-  implicit def rwstBind[F[_], R, W, S](implicit F0: Bind[F], W0: Semigroup[W]): Bind[ReaderWriterStateT[F, R, W, S, ?]] =
-    new ReaderWriterStateTBind[F, R, W, S] {
+  implicit def rwstBindRec[F[_], R, W, S](implicit F0: BindRec[F], F1: Applicative[F], W0: Semigroup[W]): BindRec[ReaderWriterStateT[F, R, W, S, ?]] =
+    new ReaderWriterStateTBindRec[F, R, W, S] {
       def F = F0
+      def A = F1
       def W = W0
     }
 }
@@ -139,6 +148,25 @@ private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterSta
 
   override final def bind[A, B](fa: ReaderWriterStateT[F, R, W, S, A])(f: A => ReaderWriterStateT[F, R, W, S, B]) =
     fa flatMap f
+}
+
+private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWriterStateT[F, R, W, S, ?]] with ReaderWriterStateTBind[F, R, W, S] {
+  implicit def F: BindRec[F]
+  implicit def A: Applicative[F]
+
+  def tailrecM[A, B](f: A => ReaderWriterStateT[F, R, W, S, A \/ B])(a: A): ReaderWriterStateT[F, R, W, S, B] = {
+    def go(r: R)(t: (W, A, S)): F[(W, A, S) \/ (W, B, S)] =
+      F.map(f(t._2).run(r, t._3)) {
+        case (w0, e, s0) =>
+          val w1 = W.append(t._1, w0)
+          e.bimap((w1, _, s0), (w1, _, s0))
+      }
+
+    ReaderWriterStateT((r, s) => F.bind(f(a).run(r, s)) {
+      case (w, -\/(a0), s0) => F.tailrecM(go(r))(w, a0, s0)
+      case (w, \/-(b), s0) => A.point((w, b, s0))
+    })
+  }
 }
 
 private abstract class ReaderWriterStateTMonadPlus[F[_], R, W, S]
