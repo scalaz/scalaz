@@ -10,6 +10,7 @@ import org.scalacheck.Prop.forAll
 object TheseTest extends SpecLite {
   type TheseInt[a] = Int \&/ a
 
+  checkAll(bindRec.laws[TheseInt])
   checkAll(monad.laws[TheseInt])
   checkAll(cobind.laws[TheseInt])
   checkAll(traverse.laws[TheseInt])
