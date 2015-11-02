@@ -318,6 +318,11 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
       implicit def F = F0
       implicit def G = L0
     }
+  implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
+    new EitherTBindRec[F, E] {
+      implicit def F = F0
+      implicit def B = B0
+    }
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[EitherT[F, L, ?]] =
     new EitherTFoldable[F, L] {
       implicit def F = F0
@@ -351,12 +356,29 @@ private trait EitherTFunctor[F[_], E] extends Functor[EitherT[F, E, ?]] {
   override def map[A, B](fa: EitherT[F, E, A])(f: A => B): EitherT[F, E, B] = fa map f
 }
 
-private trait EitherTMonad[F[_], E] extends Monad[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
+private trait EitherTBind[F[_], E] extends Bind[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
+  implicit def F: Monad[F]
+
+  final def bind[A, B](fa: EitherT[F, E, A])(f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
+}
+
+private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] with EitherTBind[F, E] {
+  implicit def F: Monad[F] 
+  implicit def B: BindRec[F]
+
+  final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
+    EitherT(
+      B.tailrecM[A, E \/ B](a => F.map(f(a).run) { 
+        // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
+        _.fold(e => \/.right(\/.left(e)), _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
+      })(a)
+    )
+}
+
+private trait EitherTMonad[F[_], E] extends Monad[EitherT[F, E, ?]] with EitherTBind[F, E] {
   implicit def F: Monad[F]
 
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
-
-  def bind[A, B](fa: EitherT[F, E, A])(f: A => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
 
 private trait EitherTPlus[F[_], E] extends Plus[EitherT[F, E, ?]] {

@@ -198,7 +198,8 @@ private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[
 }
 
 private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBind[F] {
-  implicit def F: Monad[F] with BindRec[F]
+  implicit def F: Monad[F] 
+  implicit def B: BindRec[F]
 
   final def tailrecM[A, B](f: A => OptionT[F, A \/ B])(a: A): OptionT[F, B] =
     OptionT(
