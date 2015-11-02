@@ -10,6 +10,7 @@ object MaybeTTest extends SpecLite {
   type MaybeTList[A] = MaybeT[List, A]
 
   checkAll(equal.laws[MaybeTList[Int]])
+  checkAll(bindRec.laws[MaybeTList])
   checkAll(monadPlus.laws[MaybeTList])
   checkAll(traverse.laws[MaybeTList])
 
