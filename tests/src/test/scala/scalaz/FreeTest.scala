@@ -114,6 +114,7 @@ object FreeTest extends SpecLite {
   }
 
   object instances {
+    def bindRec[F[_]] = BindRec[Free[F, ?]]
     def monad[F[_]] = Monad[Free[F, ?]]
     def foldable[F[_]: Foldable: Functor] = Foldable[Free[F, ?]]
     def foldable1[F[_]: Foldable1: Functor] = Foldable1[Free[F, ?]]

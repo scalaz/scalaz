@@ -52,6 +52,7 @@ object KleisliTest extends SpecLite {
     def bind[F[_] : Bind , A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : Plus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[Kleisli[F, A, ?]]
+    def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, ?]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, ?, ?], A]
     def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
 

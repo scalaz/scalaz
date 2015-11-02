@@ -45,6 +45,7 @@ object TheseTest extends SpecLite {
     def functor[L] = Functor[L \&/ ?]
     def apply[L: Semigroup] = Apply[L \&/ ?]
     def applicative[L: Semigroup] = Applicative[L \&/ ?]
+    def bindRec[L: Semigroup] = BindRec[L \&/ ?]
     def monad[L: Semigroup] = Monad[L \&/ ?]
     def semigroup[L: Semigroup, R: Semigroup] = Semigroup[L \&/ R]
     def cobind[L] = Cobind[L \&/ ?]

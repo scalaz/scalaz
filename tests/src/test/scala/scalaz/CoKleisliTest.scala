@@ -51,6 +51,7 @@ object CokleisliTest extends SpecLite {
   }
 
   object instances {
+    def bindRec[F[_], W] = BindRec[Cokleisli[F, W, ?]]
     def monad[F[_], W] = Monad[Cokleisli[F, W, ?]]
     def compose[F[_]](implicit F: Cobind[F]) = Compose[Cokleisli[F, ?, ?]]
     def profunctor[F[_]: Functor] = Profunctor[Cokleisli[F, ?, ?]]

@@ -94,7 +94,8 @@ object MaybeTest extends SpecLite {
     def equal[A: Equal] = Equal[Maybe[A]]
     def order[A: Order] = Order[Maybe[A]]
     def semigroup[A: Semigroup] = Monoid[Maybe[A]]
-    def monad[A] = Monad[Maybe]
+    def bindRec = BindRec[Maybe]
+    def monad = Monad[Maybe]
 
     def monoidFirst[A] = Monoid[Maybe[A] @@ First]
     def monoidLast[A] = Monoid[Maybe[A] @@ Last]
