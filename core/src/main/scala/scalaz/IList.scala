@@ -524,9 +524,9 @@ sealed abstract class IListInstance0 {
 
 sealed abstract class IListInstances extends IListInstance0 {
 
-  implicit val instances: Traverse[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
+  implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
-    new Traverse[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] =
         fa map f
@@ -636,6 +636,18 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def widen[A, B](fa: IList[A])(implicit ev: A <~< B): IList[B] =
         fa.widen[B]
+
+      def tailrecM[A, B](f: A => IList[A \/ B])(a: A): IList[B] = {
+        @tailrec
+        def go(xs: IList[IList[A \/ B]], bs: IList[B]): IList[B] =
+          xs match {
+            case ICons(ICons(-\/(a0), tail), rest) => go(ICons(f(a0), ICons(tail, rest)), bs)
+            case ICons(ICons(\/-(b), tail), rest) => go(ICons(tail, rest), b :: bs)
+            case ICons(INil(), rest) => go(rest, bs)
+            case INil() => bs.reverse
+          }
+        go(IList(f(a)), INil())
+      }
     }
 
 
