@@ -160,4 +160,22 @@ object ListTest extends SpecLite {
   }
 
   checkAll(FoldableTests.anyAndAllLazy[List])
+
+
+  object instances {
+    def equal[A: Equal] = Equal[List[A]]
+    def order[A: Order] = Order[List[A]]
+    def semigroup[A: Semigroup] = Monoid[List[A]]
+    def bindRec = BindRec[List]
+    def monadPlus = MonadPlus[List] 
+    def traverse = Traverse[List] 
+    def zip = Zip[List]
+    def unzip = Unzip[List]
+    def align = Align[List] 
+    def isEmpty = IsEmpty[List] 
+    def cobind = Cobind[List]
+    
+    // checking absence of ambiguity
+    def equal[A: Order] = Equal[Option[A]]
+  }
 }
