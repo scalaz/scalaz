@@ -25,6 +25,7 @@ object ReaderWriterStateTTest extends SpecLite {
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
   }
 
+  checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
 
   object instances {

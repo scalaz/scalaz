@@ -31,6 +31,7 @@ object MaybeTest extends SpecLite {
   checkAll("Maybe @@ Min", monad.laws[MinMaybe])
   checkAll("Maybe @@ Max", monad.laws[MaxMaybe])
 
+  checkAll(bindRec.laws[Maybe])
   checkAll(monadPlus.strongLaws[Maybe])
   checkAll(traverse.laws[Maybe])
   checkAll(zip.laws[Maybe])

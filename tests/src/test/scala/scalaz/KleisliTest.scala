@@ -38,6 +38,7 @@ object KleisliTest extends SpecLite {
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
+  checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
   checkAll(zip.laws[KleisliOptInt])
   checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])

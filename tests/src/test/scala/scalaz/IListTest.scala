@@ -431,7 +431,7 @@ object IListTest extends SpecLite {
   object instances {
     def equal[A: Equal] = Equal[IList[A]]
     def order[A: Order] = Order[IList[A]]
-    def monoid[A: Semigroup] = Monoid[IList[A]]
+    def monoid[A] = Monoid[IList[A]]
     def monadPlus = MonadPlus[IList]
     def bindrec = BindRec[IList]
     def traverse = Traverse[IList]

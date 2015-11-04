@@ -15,6 +15,7 @@ object StateTTest extends SpecLite {
   implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 
   checkAll(equal.laws[StateTListInt[Int]])
+  checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
 
   object instances {

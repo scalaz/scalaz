@@ -101,14 +101,14 @@ object StreamTest extends SpecLite {
   object instances {
     def equal[A: Equal] = Equal[Stream[A]]
     def order[A: Order] = Order[Stream[A]]
-    def semigroup[A: Semigroup] = Monoid[Stream[A]]
+    def monoid[A] = Monoid[Stream[A]]
     def bindRec = BindRec[Stream]
-    def monadPlus = MonadPlus[Stream] 
-    def traverse = Traverse[Stream] 
+    def monadPlus = MonadPlus[Stream]
+    def traverse = Traverse[Stream]
     def zip = Zip[Stream]
     def unzip = Unzip[Stream]
-    def align = Align[Stream] 
-    def isEmpty = IsEmpty[Stream] 
+    def align = Align[Stream]
+    def isEmpty = IsEmpty[Stream]
     def cobind = Cobind[Stream]
   }
 }
