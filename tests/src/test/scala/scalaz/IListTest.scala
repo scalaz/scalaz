@@ -428,4 +428,16 @@ object IListTest extends SpecLite {
 
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
+  object instances {
+    def equal[A: Equal] = Equal[IList[A]]
+    def order[A: Order] = Order[IList[A]]
+    def monoid[A: Semigroup] = Monoid[IList[A]]
+    def monadPlus = MonadPlus[IList]
+    def bindrec = BindRec[IList]
+    def traverse = Traverse[IList]
+    def zip = Zip[IList]
+    def align = Align[IList]
+    def isEmpty = IsEmpty[IList]
+    def cobind = Cobind[IList]
+  }
 }

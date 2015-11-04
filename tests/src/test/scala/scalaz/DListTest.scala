@@ -32,4 +32,13 @@ object DListTest extends SpecLite {
     
   }
 
+  object instances {
+    def equal[A: Equal] = Equal[DList[A]]
+    def monoid[A: Semigroup] = Monoid[DList[A]]
+    def monadPlus = MonadPlus[DList]
+    def bindrec = BindRec[DList]
+    def traverse = Traverse[DList]
+    def zip = Zip[DList]
+    def isEmpty = IsEmpty[DList]
+  }
 }
