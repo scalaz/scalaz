@@ -341,7 +341,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
   implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
   implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]: Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
 
-  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] =
+  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] with BindRec[(A1, ?)] =
     new Tuple2Monad[A1] {
       implicit def _1 = A1
     }
@@ -938,7 +938,7 @@ private trait Tuple1Monad extends Monad[Tuple1] {
 // TupleN forms a Monad if the element types other than the last are Monoids.
 
 
-private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with Tuple2Functor[A1] {
+private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with BindRec[(A1, ?)] with Tuple2Functor[A1] {
   implicit def _1 : Monoid[A1]
   def bind[A, B](fa: (A1, A))(f: A => (A1, B)) = {
     val t = f(fa._2)
@@ -946,6 +946,21 @@ private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with Tuple2Functor[A1] {
     (_1.append(fa._1, t._1), t._2)
   }
   def point[A](a: => A) = (_1.zero, a)
+
+  final def tailrecM[A, B](f: A => (A1, A \/ B))(a: A): (A1, B) = {
+    @annotation.tailrec
+    def go(as: A1)(a: A): (A1, B) =
+      f(a) match {
+        case (a1, e) =>
+          val a2 = _1.append(as, a1)
+          e match {
+            case -\/(a3) => go(a2)(a3)
+            case \/-(b) => (a2, b)
+          }
+      }
+
+    go(_1.zero)(a)
+  }
 }
 private trait Tuple3Monad[A1, A2] extends Monad[(A1, A2, ?)] with Tuple3Functor[A1, A2] {
   implicit def _1 : Monoid[A1]

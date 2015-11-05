@@ -40,6 +40,8 @@ object TupleTest extends SpecLite {
   checkAll("Tuple7", monoid.laws[(A, B, C, D, E, F, G)])
   checkAll("Tuple8", monoid.laws[(A, B, C, D, E, F, G, H)])
 
+  checkAll("Tuple2", bindRec.laws[(B, ?)])
+
   checkAll("Tuple1", monad.laws[Tuple1])
   checkAll("Tuple2", monad.laws[(B, ?)])
   checkAll("Tuple3", monad.laws[(B, C, ?)])
@@ -94,7 +96,8 @@ object TupleTest extends SpecLite {
       def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[(B, ?)]
-      def monad[A: Monoid] = Functor[(A, ?)]
+      def bindRec[A: Monoid] = BindRec[(A, ?)]
+      def monad[A: Monoid] = Monad[(A, ?)]
       def cozip = Cozip[(A, ?)]
 
       // checking absence of ambiguity
