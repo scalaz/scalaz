@@ -11,6 +11,8 @@ object KleisliTest extends SpecLite {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
+  type IntOr[A] = Int \/ A
+  type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
     Arbitrary(Gen.frequency[Int => Option[Int]](
@@ -27,11 +29,6 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  // Needed because scalac inference has trouble with \/
-  implicit def KleisliDisjunctionArbitrary[E : Arbitrary, R : Arbitrary, A : Arbitrary]: Arbitrary[Kleisli[\/[E, ?], R, A]] = KleisliArbitrary[\/[E, +?], R, A]
-
-  implicit def KleisliDisjunctionEqual[E : Equal] = KleisliEqual[\/[E, ?]]
-
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
@@ -40,8 +37,8 @@ object KleisliTest extends SpecLite {
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
-  checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
