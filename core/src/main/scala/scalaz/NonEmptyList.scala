@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.annotation.tailrec
+
 /** A singly-linked list that is guaranteed to be non-empty. */
 final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
   import NonEmptyList._
@@ -42,10 +44,19 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
     nel(bb.head, bb.tail)
   }
 
-  def distinct[AA >: A](implicit A: Order[AA]): NonEmptyList[A] =
-    (list.distinct: @unchecked) match {
-      case x :: xs => nel(x, xs)
-    }
+  def distinct[AA>:A](implicit A: Order[AA]): NonEmptyList[AA] = {
+    @tailrec def loop(src: List[A], seen: ISet[AA], acc: NonEmptyList[AA]): NonEmptyList[AA] =
+      src match {
+        case h :: t =>
+          if (seen.notMember(h))
+            loop(t, seen.insert(h), h <:: acc)
+          else
+            loop(t, seen, acc)
+        case Nil =>
+          acc.reverse
+      }
+    loop(tail, ISet.singleton(head), NonEmptyList(head))
+  }
 
   def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
     import std.list._
