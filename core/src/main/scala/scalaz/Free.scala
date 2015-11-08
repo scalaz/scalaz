@@ -166,6 +166,19 @@ sealed abstract class Free[S[_], A] {
   }
 
   /**
+    * Run Free using constant stack.
+    */
+  final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
+    def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
+      e match {
+        case -\/(sf) => M.map(f(sf))(\/.left)
+        case \/-(a) => M.point(\/-(a))
+      }
+
+    B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
+  }
+
+  /**
    * Evaluate one layer in the free monad, re-associating any left-nested binds to the right
    * and pulling the first suspension to the top.
    */
@@ -296,13 +309,15 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] =
-    new Monad[Trampoline] with Comonad[Trampoline] {
+  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
+    new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
+      def tailrecM[A, B](f: A => Trampoline[A \/ B])(a: A): Trampoline[B] =
+        f(a).flatMap(_.fold(tailrecM(f), point(_)))
     }
 }
 
@@ -362,11 +377,14 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
-  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] =
-    new Monad[Free[S, ?]] {
-      def point[A](a: => A) = Free.point(a)
+  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
+    new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
+      def point[A](a: => A) = Free.point(a)
+      // Free trampolines, should be alright to just perform binds.
+      def tailrecM[A, B](f: A => Free[S, A \/ B])(a: A): Free[S, B] =
+        f(a).flatMap(_.fold(tailrecM(f), point(_)))
     }
 
   implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
@@ -382,6 +400,11 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
 
   implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[Free[S, ?], A]
+}
+
+private sealed trait FreeBind[F[_]] extends Bind[Free[F, ?]] {
+  override def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
+  def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
 }
 
 private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {

@@ -8,6 +8,7 @@ import org.scalacheck.Prop.forAll
 
 object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
+  checkAll("NonEmptyList", bindRec.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
   checkAll("NonEmptyList", semigroup.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])

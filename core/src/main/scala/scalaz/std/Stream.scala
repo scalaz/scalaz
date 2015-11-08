@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -72,6 +72,19 @@ trait StreamInstances {
           b.map(x => f(\&/.That(x)))
         else
           f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
+
+    def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
+      def go(s: Stream[A \/ B]): Stream[B] = {
+        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] = 
+          abs match {
+            case \/-(b) #:: tail => b #:: go(tail)
+            case -\/(a) #:: tail => rec(f(a) #::: tail)
+            case Stream.Empty => Stream.Empty
+          }
+        rec(s)
+      }
+      go(f(a))
+    }
   }
 
   import Tags.Zip

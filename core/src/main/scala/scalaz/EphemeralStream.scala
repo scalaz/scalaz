@@ -148,7 +148,7 @@ sealed abstract class EphemeralStream[A] {
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
     import EphemeralStream._
     override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
@@ -202,6 +202,19 @@ sealed abstract class EphemeralStreamInstances {
         }
         if (these.isEmpty) None else Some(these.head())
       }
+    }
+    def tailrecM[A, B](f: A => EphemeralStream[A \/ B])(a: A): EphemeralStream[B] = {
+      def go(s: EphemeralStream[A \/ B]): EphemeralStream[B] = {
+        @annotation.tailrec
+        def rec(abs: EphemeralStream[A \/ B]): EphemeralStream[B] =
+          abs match {
+            case \/-(b) ##:: tail => cons(b, go(tail))
+            case -\/(a0) ##:: tail => rec(f(a0) ++ tail)
+            case _ => emptyEphemeralStream
+          }
+        rec(s)
+      }
+      go(f(a))
     }
   }
 

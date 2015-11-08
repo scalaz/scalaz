@@ -31,6 +31,7 @@ object MaybeTest extends SpecLite {
   checkAll("Maybe @@ Min", monad.laws[MinMaybe])
   checkAll("Maybe @@ Max", monad.laws[MaxMaybe])
 
+  checkAll(bindRec.laws[Maybe])
   checkAll(monadPlus.strongLaws[Maybe])
   checkAll(traverse.laws[Maybe])
   checkAll(zip.laws[Maybe])
@@ -94,7 +95,8 @@ object MaybeTest extends SpecLite {
     def equal[A: Equal] = Equal[Maybe[A]]
     def order[A: Order] = Order[Maybe[A]]
     def semigroup[A: Semigroup] = Monoid[Maybe[A]]
-    def monad[A] = Monad[Maybe]
+    def bindRec = BindRec[Maybe]
+    def monad = Monad[Maybe]
 
     def monoidFirst[A] = Monoid[Maybe[A] @@ First]
     def monoidLast[A] = Monoid[Maybe[A] @@ Last]

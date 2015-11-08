@@ -143,7 +143,15 @@ sealed abstract class IndexedStateTInstances extends IndexedStateTInstances0 {
     }
 }
 
-sealed abstract class StateTInstances2 extends IndexedStateTInstances {
+sealed abstract class StateTInstances3 extends IndexedStateTInstances {
+  implicit def stateTBindRec[S, F[_]](implicit F0: Monad[F], F1: BindRec[F]): BindRec[StateT[F, S, ?]] =
+    new StateTBindRec[S, F] {
+      implicit def F: Monad[F] = F0
+      implicit def B: BindRec[F] = F1
+    }
+}
+
+sealed abstract class StateTInstances2 extends StateTInstances3 {
   implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, ?, ?], S] = 
     new StateTMonadState[S, F] {
       implicit def F: Monad[F] = F0
@@ -206,10 +214,34 @@ private trait IndexedStateTFunctorRight[S1, S2, F[_]] extends Functor[IndexedSta
   override def map[A, B](fa: IndexedStateT[F, S1, S2, A])(f: A => B): IndexedStateT[F, S1, S2, B] = fa.map(f)
 }
 
-private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, ?, ?], S] {
+private trait StateTBind[S, F[_]] extends Bind[StateT[F, S, ?]] {
   implicit def F: Monad[F]
 
+  override def map[A, B](fa: StateT[F, S, A])(f: A => B): StateT[F, S, B] = fa.map(f)
+
   def bind[A, B](fa: StateT[F, S, A])(f: A => StateT[F, S, B]): StateT[F, S, B] = fa.flatMap(f)
+}
+
+private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[StateT[F, S, ?]] {
+  implicit def F: Monad[F]
+  implicit def B: BindRec[F]
+
+  def tailrecM[A, B](f: A => StateT[F, S, A \/ B])(a: A): StateT[F, S, B] = {
+    def go(t: (S, A)): F[(S, A) \/ (S, B)] = {
+      F.map(f(t._2)(t._1)) { case (s, m) =>
+        m match {
+          case -\/(a0) => -\/((s, a0))
+          case \/-(b) => \/-((s, b))
+        }
+      }
+    }
+
+    IndexedStateT(s => B.tailrecM(go)((s, a)))
+  }
+}
+
+private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, ?, ?], S] with StateTBind[S, F] {
+  implicit def F: Monad[F]
 
   def point[A](a: => A): StateT[F, S, A] = {
     lazy val aa = a

@@ -10,6 +10,7 @@ import org.scalacheck.Prop.forAll
 object ListTest extends SpecLite {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
+  checkAll(bindRec.laws[List])
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
   checkAll(zip.laws[List])
@@ -159,4 +160,22 @@ object ListTest extends SpecLite {
   }
 
   checkAll(FoldableTests.anyAndAllLazy[List])
+
+
+  object instances {
+    def equal[A: Equal] = Equal[List[A]]
+    def order[A: Order] = Order[List[A]]
+    def monoid[A] = Monoid[List[A]]
+    def bindRec = BindRec[List]
+    def monadPlus = MonadPlus[List]
+    def traverse = Traverse[List]
+    def zip = Zip[List]
+    def unzip = Unzip[List]
+    def align = Align[List]
+    def isEmpty = IsEmpty[List]
+    def cobind = Cobind[List]
+
+    // checking absence of ambiguity
+    def equal[A: Order] = Equal[Option[A]]
+  }
 }

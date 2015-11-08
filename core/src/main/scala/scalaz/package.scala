@@ -85,7 +85,7 @@ package object scalaz {
 
   import Id._
 
-  implicit val idInstance: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
+  implicit val idInstance: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
 
   private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
 

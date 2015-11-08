@@ -9,6 +9,7 @@ object IdTTest extends SpecLite {
     def order[F[_], A](implicit F: Order[F[A]]) = Order[IdT[F, A]]
     def functor[F[_] : Functor] = Functor[IdT[F, ?]]
     def apply[F[_] : Apply] = Apply[IdT[F, ?]]
+    def bindRec[F[_] : BindRec] = BindRec[IdT[F, ?]]
     def monad[F[_] : Monad] = Monad[IdT[F, ?]]
     def foldable[F[_] : Foldable] = Foldable[IdT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[IdT[F, ?]]

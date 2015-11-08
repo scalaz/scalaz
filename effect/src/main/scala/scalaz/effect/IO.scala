@@ -137,7 +137,7 @@ sealed abstract class IOInstances1 {
 
   implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
 
-  implicit val ioMonad: Monad[IO] = new IOMonad {}
+  implicit val ioMonad: Monad[IO] with BindRec[IO] = new IOMonad {}
 }
 
 sealed abstract class IOInstances0 extends IOInstances1 {
@@ -158,10 +158,11 @@ sealed abstract class IOInstances extends IOInstances0 {
 
 }
 
-private trait IOMonad extends Monad[IO] {
+private trait IOMonad extends Monad[IO] with BindRec[IO] {
   def point[A](a: => A): IO[A] = IO(a)
   override def map[A, B](fa: IO[A])(f: A => B) = fa map f
   def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f
+  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] = IO.tailrecM(f)(a)
 }
 
 private trait IOLiftIO extends LiftIO[IO] {
@@ -268,6 +269,17 @@ object IO extends IOInstances {
     } yield ()
     newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
+
+  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] =
+    io(rw =>
+      BindRec[Trampoline].tailrecM[(Tower[IvoryTower], A), (Tower[IvoryTower], B)] {
+        case (nw0, x) =>
+          f(x)(nw0).map {
+            case (nw1, e) =>
+              e.bimap((nw1, _), (nw1, _))
+          }
+      }((rw, a))
+    )
 
   /** An IO action is an ST action. */
   implicit def IOToST[A](io: IO[A]): ST[IvoryTower, A] =

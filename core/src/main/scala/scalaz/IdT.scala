@@ -44,6 +44,10 @@ sealed abstract class IdTInstances1 extends IdTInstances2 {
     new IdTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
+  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
+    new IdTBindRec[F] {
+      implicit def F: BindRec[F] = F0
+    }
 }
 
 sealed abstract class IdTInstances0 extends IdTInstances1 {
@@ -92,10 +96,21 @@ private trait IdTApplicative[F[_]] extends Applicative[IdT[F, ?]] with IdTApply[
   def point[A](a: => A) = new IdT[F, A](F.point(a))
 }
 
-private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] {
-  implicit def F: Monad[F]
+private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
+  implicit def F: Bind[F]
 
-  def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
+  final def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
+}
+
+private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
+  implicit def F: BindRec[F]
+
+  final def tailrecM[A, B](f: A => IdT[F, A \/ B])(a: A): IdT[F, B] =
+    IdT(F.tailrecM[A, B](a => F.map(f(a).run)(identity))(a))
+}
+
+private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {
+  implicit def F: Monad[F]
 }
 
 private trait IdTFoldable[F[_]] extends Foldable.FromFoldr[IdT[F, ?]] {

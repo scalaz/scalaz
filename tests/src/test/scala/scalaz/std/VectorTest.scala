@@ -16,6 +16,7 @@ object VectorTest extends SpecLite {
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])
   checkAll(monadPlus.strongLaws[Vector])
+  checkAll(bindRec.laws[Vector])
   checkAll(traverse.laws[Vector])
   checkAll(FoldableTests.anyAndAllLazy[Vector])
   checkAll(zip.laws[Vector])
@@ -107,5 +108,18 @@ object VectorTest extends SpecLite {
   "groupWhen is groupWhenM[Id]" ! forAll { xs: Vector[Int] =>
     val f: (Int, Int) => Boolean = _ > _
     xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
+  }
+
+  object instances {
+    def equal[A: Equal] = Equal[Vector[A]]
+    def order[A: Order] = Order[Vector[A]]
+    def semigroup[A: Semigroup] = Monoid[Vector[A]]
+    def bindRec = BindRec[Vector]
+    def monadPlus = MonadPlus[Vector] 
+    def traverse = Traverse[Vector] 
+    def zip = Zip[Vector]
+    def unzip = Unzip[Vector]
+    def align = Align[Vector] 
+    def isEmpty = IsEmpty[Vector] 
   }
 }

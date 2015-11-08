@@ -10,6 +10,7 @@ object MaybeTTest extends SpecLite {
   type MaybeTList[A] = MaybeT[List, A]
 
   checkAll(equal.laws[MaybeTList[Int]])
+  checkAll(bindRec.laws[MaybeTList])
   checkAll(monadPlus.laws[MaybeTList])
   checkAll(traverse.laws[MaybeTList])
 
@@ -26,6 +27,7 @@ object MaybeTTest extends SpecLite {
   object instances {
     def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]
     def monad[F[_] : Monad] = MonadPlus[MaybeT[F, ?]]
+    def bindRec[F[_] : Monad : BindRec] = BindRec[MaybeT[F, ?]]
     def monadError[F[_, _], E](implicit F: MonadError[F, E]) = MonadError[λ[(E0, A) => MaybeT[F[E0, ?], A]], E]
     def foldable[F[_] : Foldable] = Foldable[MaybeT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[MaybeT[F, ?]]

@@ -13,6 +13,7 @@ object IListTest extends SpecLite {
   checkAll(equal.laws[IList[Int]])
   checkAll(monoid.laws[IList[Int]])
   checkAll(monadPlus.strongLaws[IList])
+  checkAll(bindRec.laws[IList])
   checkAll(traverse.laws[IList])
   checkAll(zip.laws[IList])
   checkAll(align.laws[IList])
@@ -427,4 +428,16 @@ object IListTest extends SpecLite {
 
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
+  object instances {
+    def equal[A: Equal] = Equal[IList[A]]
+    def order[A: Order] = Order[IList[A]]
+    def monoid[A] = Monoid[IList[A]]
+    def monadPlus = MonadPlus[IList]
+    def bindrec = BindRec[IList]
+    def traverse = Traverse[IList]
+    def zip = Zip[IList]
+    def align = Align[IList]
+    def isEmpty = IsEmpty[IList]
+    def cobind = Cobind[IList]
+  }
 }

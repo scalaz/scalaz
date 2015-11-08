@@ -17,6 +17,7 @@ object WriterTTest extends SpecLite {
   checkAll(monoid.laws[WriterTOptInt[Int]])
   checkAll(monadError.laws[Lambda[(E, A) => WriterT[E \/ ?, Int, A]], Int])
   checkAll(traverse.laws[WriterTOptInt])
+  checkAll(bindRec.laws[WriterTOptInt])
   checkAll(monadPlus.strongLaws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[NonEmptyList])
@@ -52,6 +53,7 @@ object WriterTTest extends SpecLite {
     def apply[F[_]: Apply, W: Semigroup] = Apply[WriterT[F, W, ?]]
     def applicative[F[_]: Applicative, W: Monoid] = Applicative[WriterT[F, W, ?]]
     def bind[F[_]: Bind, W: Semigroup] = Bind[WriterT[F, W, ?]]
+    def bindRec[F[_]: BindRec: Applicative, W: Semigroup] = BindRec[WriterT[F, W, ?]]
     def monad[F[_]: Monad, W: Monoid] = Monad[WriterT[F, W, ?]]
     def monadPlus[F[_]: MonadPlus, W: Monoid] = MonadPlus[WriterT[F, W, ?]]
     def monadError[F[_, _], W: Monoid, E](implicit F: MonadError[F, E]) = MonadError[Lambda[(E0, A) => WriterT[F[E0, ?], W, A]], E]

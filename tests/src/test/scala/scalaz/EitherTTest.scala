@@ -12,6 +12,7 @@ object EitherTTest extends SpecLite {
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
 
   checkAll(equal.laws[EitherTListInt[Int]])
+  checkAll(bindRec.laws[EitherTListInt])
   checkAll(monadPlus.laws[EitherTListInt])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])

@@ -103,10 +103,18 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class OptionTInstances2 {
+sealed abstract class OptionTInstances3 {
   implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[OptionT[F, ?]] =
     new OptionTFunctor[F] {
       implicit def F: Functor[F] = F0
+    }
+}
+
+sealed abstract class OptionTInstances2 extends OptionTInstances3 {
+  implicit def optionTBindRec[F[_]](implicit F0: Monad[F], B0: BindRec[F]): BindRec[OptionT[F, ?]] =
+    new OptionTBindRec[F] {
+      implicit def F = F0
+      implicit def B = B0
     }
 }
 
@@ -177,15 +185,34 @@ private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
   override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] = fa map f
 }
 
-private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTFunctor[F] {
+private trait OptionTApply[F[_]] extends Apply[OptionT[F, ?]] with OptionTFunctor[F]{
+  implicit def F: Monad[F]
+  
+  override final def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
+}
+
+private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[F]{
+  implicit def F: Monad[F]
+  
+  final def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
+}
+
+private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBind[F] {
+  implicit def F: Monad[F] 
+  implicit def B: BindRec[F]
+
+  final def tailrecM[A, B](f: A => OptionT[F, A \/ B])(a: A): OptionT[F, B] =
+    OptionT(
+      B.tailrecM[A, Option[B]](a0 => F.map(f(a0).run) {
+        _.fold(\/.right[A, Option[B]](None: Option[B]))(_.map(Some.apply))
+      })(a)
+    )
+}
+
+private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] {
   implicit def F: Monad[F]
 
-  override def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
-
   def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
-
-  def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
-
 }
 
 private trait OptionTMonadError[F[_, _], E] extends MonadError[λ[(E0, A) => OptionT[F[E0, ?], A]], E] with OptionTMonad[F[E, ?]] {

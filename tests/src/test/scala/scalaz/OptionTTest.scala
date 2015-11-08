@@ -12,6 +12,7 @@ object OptionTTest extends SpecLite {
   type OptionTOption[A] = OptionT[Option, A]
 
   checkAll(equal.laws[OptionTList[Int]])
+  checkAll(bindRec.laws[OptionTList])
   checkAll(monadPlus.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
 
