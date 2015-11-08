@@ -35,6 +35,18 @@ object Foldable1Test extends SpecLite {
       (xs minimumBy1 f) must_===((xs.list zip (xs.list map f)).toList.minBy(_._2)._1)
   }
 
+  "distinct1" ! forAll {
+    (xs: NonEmptyList[Int]) =>
+      xs.distinct1.toList must_== xs.toList.distinct
+      xs.distinct1(Order.order((_,_) => Ordering.EQ)).length must_== 1
+  }
+
+  "distinctE1" ! forAll {
+    (xs: NonEmptyList[Int]) =>
+      xs.distinctE1.toList must_== xs.toList.distinct
+      xs.distinctE1(Equal.equal((_,_) => true)).length must_== 1
+  }
+
   private val L = Foldable1[NonEmptyList]
 
   "product foldRight1 equivalence" ! forAll {

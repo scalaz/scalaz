@@ -269,6 +269,24 @@ trait Foldable[F[_]]  { self =>
       }
     })._1
 
+  /** ``O(n log n)`` complexity */
+  def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =
+    foldLeft(fa, (ISet.empty[A],IList.empty[A])) {
+      case ((seen, acc), a) =>
+        if (seen.notMember(a))
+          (seen.insert(a), a :: acc)
+        else (seen, acc)
+    }._2.reverse
+
+  /** ``O(n^2^)`` complexity */
+  def distinctE[A](fa: F[A])(implicit A: Equal[A]): IList[A] =
+    foldLeft(fa, IList.empty[A]) {
+      case (seen, a) =>
+        if (!IList.instances.element(seen,a))
+          a :: seen
+        else seen
+    }.reverse
+
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))
 
