@@ -22,6 +22,11 @@ object NonEmptyListTest extends SpecLite {
     Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }
 
+  "distinct honors Order" in {
+    val dummyOrdering = new Order[Int] { override def order(x: Int, y: Int): Ordering = Ordering.EQ }
+    NonEmptyList(1,2,3).distinct(dummyOrdering).size must_=== 1
+  }
+
   "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>
     xs.size must_===(1 + xs.tail.size) 
   }
