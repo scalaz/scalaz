@@ -278,8 +278,16 @@ object EitherT extends EitherTInstances {
 
 }
 
-sealed abstract class EitherTInstances3 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, ?, ?], E] = 
+sealed abstract class EitherTInstances4 {
+  implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
+    new EitherTBindRec[F, E] {
+      implicit def F = F0
+      implicit def B = B0
+    }
+}
+
+sealed abstract class EitherTInstances3 extends EitherTInstances4 {
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, ?, ?], E] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -317,11 +325,6 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
     new EitherTMonadPlus[F, L] {
       implicit def F = F0
       implicit def G = L0
-    }
-  implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
-    new EitherTBindRec[F, E] {
-      implicit def F = F0
-      implicit def B = B0
     }
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[EitherT[F, L, ?]] =
     new EitherTFoldable[F, L] {

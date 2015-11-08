@@ -47,6 +47,7 @@ object EitherTTest extends SpecLite {
 
   object instances {
     def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
+    def bindRec[F[_] : Monad: BindRec, A] = BindRec[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
     def plus[F[_] : Monad, A: Semigroup] = Plus[EitherT[F, A, ?]]
     def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[EitherT[F, A, ?]]
@@ -57,7 +58,9 @@ object EitherTTest extends SpecLite {
     def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
 
     // checking absence of ambiguity
+    def functor[F[_] : BindRec, A] = Functor[EitherT[F, A, ?]]
     def functor[F[_] : Monad, A: Monoid] = Functor[EitherT[F, A, ?]]
+    def functor[F[_] : Monad : BindRec, A: Monoid] = Functor[EitherT[F, A, ?]]
     def apply[F[_] : Monad, A: Monoid] = Apply[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A: Monoid] = Monad[EitherT[F, A, ?]]
     def plus[F[_] : Monad, A: Monoid] = Plus[EitherT[F, A, ?]]

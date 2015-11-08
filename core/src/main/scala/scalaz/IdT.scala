@@ -20,26 +20,28 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT(F.ap(run)(f.run))
 }
 
-sealed abstract class IdTInstances3 {
+sealed abstract class IdTInstances4 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, ?]] =
     new IdTFunctor[F] {
       implicit def F: Functor[F] = F0
     }
 }
 
-sealed abstract class IdTInstances2 extends IdTInstances3 {
+sealed abstract class IdTInstances3 extends IdTInstances4 {
   implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[IdT[F, ?]] =
     new IdTApply[F] {
       implicit def F: Apply[F] = F0
     }
 }
 
-sealed abstract class IdTInstances1 extends IdTInstances2 {
+sealed abstract class IdTInstances2 extends IdTInstances3 {
   implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[IdT[F, ?]] =
     new IdTApplicative[F] {
       implicit def F: Applicative[F] = F0
     }
+}
 
+sealed abstract class IdTInstances1 extends IdTInstances2 {
   implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[IdT[F, ?]] =
     new IdTFoldable[F] {
       implicit def F: Foldable[F] = F0
