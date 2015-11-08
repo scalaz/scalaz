@@ -220,8 +220,10 @@ sealed abstract class ==>>[A, B] {
   def keys: List[A] =
     foldrWithKey(List.empty[A])((x, _, xs) => x :: xs)
 
-  def keySet(implicit o: Order[A]): ISet[A] =
-    ISet.fromList(keys)
+  def keySet: ISet[A] = this match {
+    case Bin(k,v,l,r) => ISet.Bin(k,l.keySet,r.keySet)
+    case _            => ISet.Tip[A]
+  }
 
   def toList =
     toAscList
