@@ -27,8 +27,7 @@ object TimerTest extends SpecLite {
       withTimer{timer =>
         val start = System.currentTimeMillis
         withTimeout(5000){
-          val future = timer.valueWait("Test", 100)
-          future.run must_== "Test"
+          timer.valueWait("Test", 100).unsafePerformSync must_== "Test"
           (System.currentTimeMillis - start) >= 100
         }
       }
@@ -37,7 +36,7 @@ object TimerTest extends SpecLite {
       withTimer{timer =>
         val future = timer.withTimeout(Future{Thread.sleep(500); "Test"}, 100)
         withTimeout(5000){
-          future.run must_== Timeout.left
+          future.unsafePerformSync must_== Timeout.left
         }
       }
     }
@@ -45,7 +44,7 @@ object TimerTest extends SpecLite {
       withTimer{timer =>
         val future = timer.withTimeout(Future{Thread.sleep(50); "Test"}, 200)
         withTimeout(5000){
-          future.run must_== "Test".right
+          future.unsafePerformSync must_== "Test".right
         }
       }
     }
