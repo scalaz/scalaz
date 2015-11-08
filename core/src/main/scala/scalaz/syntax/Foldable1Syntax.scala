@@ -21,6 +21,8 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def minimum1(implicit A: Order[A]): A = F.minimum1(self)
   final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
   final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
+  final def distinct1(implicit A: Order[A]): NonEmptyList[A] = F.distinct1(self)
+  final def distinctE1(implicit A: Equal[A]): NonEmptyList[A] = F.distinctE1(self)
   final def intercalate1(a: A)(implicit A: Semigroup[A]): A = F.intercalate1(self, a)
   final def msuml1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.foldLeft1[G[B]](ev.subst[F](self))(G.plus[B](_, _))
   ////
