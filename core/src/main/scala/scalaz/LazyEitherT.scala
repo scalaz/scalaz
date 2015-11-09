@@ -189,12 +189,6 @@ sealed abstract class LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
-    new LazyEitherTBindRec[F, L] {
-      implicit def F = F0
-      implicit def B = B0
-    }
-
   implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, ?, ?], L] =
     new LazyEitherTMonadError[F, L] {
       implicit def F = F0
@@ -204,6 +198,12 @@ sealed abstract class LazyEitherTInstances1 {
     new LazyEitherTPlus[F, L] {
       override def F = F0
       override def E = L
+    }
+
+  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
+    new LazyEitherTBindRec[F, L] {
+      implicit def F = F0
+      implicit def B = B0
     }
 }
 

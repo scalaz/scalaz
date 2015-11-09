@@ -44,6 +44,7 @@ object LazyEitherTTest extends SpecLite {
     def plus[F[_] : Monad, A: Semigroup] = Plus[LazyEitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[LazyEitherT[F, A, ?]]
     def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[LazyEitherT[F, A, ?]]
+    def bind[F[_] : Monad, A] = Bind[LazyEitherT[F, A, ?]]
     def foldable[F[_] : Foldable, A] = Foldable[LazyEitherT[F, A, ?]]
     def traverse[F[_] : Traverse, A] = Traverse[LazyEitherT[F, A, ?]]
     def bifunctor[F[_] : Functor] = Bifunctor[LazyEitherT[F, ?, ?]]
