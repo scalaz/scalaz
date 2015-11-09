@@ -80,6 +80,11 @@ sealed abstract class LazyOptionTInstances1 {
 sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] =
     Equal.equalBy((_: LazyOptionT[F, A]).run)
+
+  implicit def lazyOptionTBindRec[F[_]](implicit F0: Monad[F]): BindRec[LazyOptionT[F, ?]] =
+    new LazyOptionTBindRec[F] {
+      implicit def F: Monad[F] = F0
+    }
 }
 
 sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
@@ -138,6 +143,14 @@ private trait LazyOptionTMonad[F[_]] extends MonadPlus[LazyOptionT[F, ?]] with L
 
   override def empty[A] =
     LazyOptionT.lazyNoneT[F, A]
+}
+
+private trait LazyOptionTBindRec[F[_]] extends BindRec[LazyOptionT[F, ?]] with LazyOptionTMonad[F] {
+  def tailrecM[A, B](f: A => LazyOptionT[F, A \/ B])(a: A): LazyOptionT[F, B] =
+    f(a).flatMap {
+      case \/-(b) => point(b)
+      case -\/(a0) => tailrecM(f)(a0)
+    }
 }
 
 private trait LazyOptionTHoist extends Hoist[LazyOptionT] {

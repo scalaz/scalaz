@@ -160,8 +160,8 @@ object LazyEither extends LazyEitherInstances {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] =
-    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
+  implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] =
+    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
 
@@ -194,6 +194,12 @@ sealed abstract class LazyEitherInstances {
 
       def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
         fa.left.flatMap(e => f(e))
+
+      def tailrecM[A, B](f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
+        f(a).flatMap {
+          case -\/(a0) => tailrecM(f)(a0)
+          case \/-(b) => point(b)
+        }
     }
 
   implicit val lazyEitherAssociative: Associative[LazyEither] = new Associative[LazyEither] {

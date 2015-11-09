@@ -18,6 +18,7 @@ object LazyEitherTTest extends SpecLite {
   checkAll(monadPlus.laws[LazyEitherTListInt])
   checkAll(traverse.laws[LazyEitherTListInt])
   checkAll(bitraverse.laws[LazyEitherTList])
+  checkAll(bindRec.laws[LazyEitherTListInt])
   checkAll(monadError.laws[LazyEitherTList, Int])
 
   private def lazyEitherTUcompilationTest: Unit = {
