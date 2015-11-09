@@ -189,9 +189,10 @@ sealed abstract class LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F]): BindRec[LazyEitherT[F, L, ?]] =
+  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
     new LazyEitherTBindRec[F, L] {
       implicit def F = F0
+      implicit def B = B0
     }
 
   implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, ?, ?], L] =
@@ -365,11 +366,14 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[LazyEitherT[F, ?, ?
 }
 
 private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] {
-  def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
-    f(a).flatMap {
-      case \/-(b) => point(b)
-      case -\/(a0) => tailrecM(f)(a0)
-    }
+  implicit def B: BindRec[F]
+
+  final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
+    LazyEitherT(
+      B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
+        _.fold(e => \/.right(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
+      })(a)
+    )
 }
 
 

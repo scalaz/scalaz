@@ -21,6 +21,19 @@ object LazyEitherTTest extends SpecLite {
   checkAll(bindRec.laws[LazyEitherTListInt])
   checkAll(monadError.laws[LazyEitherTList, Int])
 
+  "tail recursive tailrecM" in {
+    import Scalaz.Id
+    type LazyEitherId[A] = LazyEitherT[Id, Int, A]
+
+    val times = 10000
+
+    val result = 
+      BindRec[LazyEitherId].tailrecM[Int, Int] { 
+        i => LazyEitherT[Id, Int, Int \/ Int](LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i))) 
+      }(0)
+    result.getOrElse(0) must_=== times
+  }
+  
   private def lazyEitherTUcompilationTest: Unit = {
     val a: String \/ LazyEither[Int, Boolean] = null
     LazyEitherT.lazyEitherTU(a)

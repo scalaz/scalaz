@@ -195,10 +195,14 @@ sealed abstract class LazyEitherInstances {
       def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
         fa.left.flatMap(e => f(e))
 
+      @annotation.tailrec
       def tailrecM[A, B](f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
-        f(a).flatMap {
-          case -\/(a0) => tailrecM(f)(a0)
-          case \/-(b) => point(b)
+        f(a) match {
+          case LazyLeft(l) => LazyLeft(l)
+          case LazyRight(r) => r() match {
+            case \/-(b) => LazyEither.lazyRight(b)
+            case -\/(a0) => tailrecM(f)(a0)
+          }
         }
     }
 
