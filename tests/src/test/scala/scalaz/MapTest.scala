@@ -295,7 +295,7 @@ object MapTest extends SpecLite {
       import std.set._
       val c = a union b
       structurallySound(c)
-      (a.keySet ++ b.keySet) must_=== c.keySet
+      (a.keySet union b.keySet) must_=== c.keySet
     }
 
     "union" in {
@@ -357,7 +357,7 @@ object MapTest extends SpecLite {
     }
 
     "produce right keyset" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      (a \\ b).keySet must_== (a.keySet diff b.keySet)
+      (a \\ b).keySet must_== (a.keySet \\ b.keySet)
     }
 
     "be an inverse" ! forAll {(a: Int ==>> Int) =>
@@ -490,7 +490,7 @@ object MapTest extends SpecLite {
 
     "isSubmapOf" ! forAll { (a: Byte ==>> Byte, b: Byte ==>> Byte) =>
       if(a isSubmapOf b){
-        (a.keySet subsetOf b.keySet) must_=== true
+        (a.keySet isSubsetOf b.keySet) must_=== true
         a.difference(b) must_=== ==>>.empty
         a.toList.foreach{case (k, v) => b.lookup(k) must_=== Some(v)}
       }
@@ -631,8 +631,8 @@ object MapTest extends SpecLite {
     "keySet" in {
       import std.set._
 
-      fromList(List(5 -> "a", 3 -> "b")).keySet must_===(Set(3, 5))
-      empty[Int, String].keySet must_===(Set.empty[Int])
+      fromList(List(5 -> "a", 3 -> "b")).keySet must_===(ISet.fromList(List(3, 5)))
+      empty[Int, String].keySet must_===(ISet.empty[Int])
     }
 
     "fromList" in {
@@ -690,15 +690,15 @@ object MapTest extends SpecLite {
     val keysB = b.keySet
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
-    x.keySet must_=== (keysA ++ keysB)
+    x.keySet must_=== (keysA union keysB)
 
-    x.filter(_.isThis).keySet must_=== (keysA -- keysB)
-    x.filter(_.isThat).keySet must_=== (keysB -- keysA)
-    x.filter(_.isBoth).keySet must_=== (keysA & keysB)
+    x.filter(_.isThis).keySet must_=== (keysA difference keysB)
+    x.filter(_.isThat).keySet must_=== (keysB difference keysA)
+    x.filter(_.isBoth).keySet must_=== (keysA intersection keysB)
 
-    x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB(k)).map(This(_))
-    x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA(k)).map(That(_))
-    x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB(k)).mapWithKey((k, v) => Both(v, b.lookup(k).get))
+    x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB.member(k)).map(This(_))
+    x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA.member(k)).map(That(_))
+    x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB.member(k)).mapWithKey((k, v) => Both(v, b.lookup(k).get))
   }
 
   type IntMap[A] = Int ==>> A
