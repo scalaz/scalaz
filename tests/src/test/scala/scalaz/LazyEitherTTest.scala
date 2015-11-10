@@ -53,7 +53,10 @@ object LazyEitherTTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[F[_] : Monad : Traverse, A] = Functor[LazyEitherT[F, A, ?]]
+    def functor[F[_] : Monad : BindRec, A] = Functor[LazyEitherT[F, A, ?]]
+    def functor[F[_] : BindRec: Traverse, A] = Functor[LazyEitherT[F, A, ?]]
     def functor[F[_] : Monad, A: Monoid] = Functor[LazyEitherT[F, A, ?]]
+    def bind[F[_] : Monad : BindRec, A] = Bind[LazyEitherT[F, A, ?]]
     def monad[F[_] : Monad, A: Monoid] = Monad[LazyEitherT[F, A, ?]]
     def foldable[F[_] : Traverse, A] = Foldable[LazyEitherT[F, A, ?]]
     def bifunctor[F[_] : Traverse] = Bifunctor[LazyEitherT[F, ?, ?]]
