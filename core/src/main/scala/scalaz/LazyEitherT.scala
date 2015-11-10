@@ -199,6 +199,12 @@ sealed abstract class LazyEitherTInstances1 {
       override def F = F0
       override def E = L
     }
+
+  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
+    new LazyEitherTBindRec[F, L] {
+      implicit def F = F0
+      implicit def B = B0
+    }
 }
 
 sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
@@ -358,6 +364,18 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[LazyEitherT[F, ?, ?
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: A => G[C], g: B => G[D]): G[LazyEitherT[F, C, D]] =
     Applicative[G].map(F.traverse(fab.run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
 }
+
+private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] {
+  implicit def B: BindRec[F]
+
+  final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
+    LazyEitherT(
+      B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
+        _.fold(e => \/.right(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
+      })(a)
+    )
+}
+
 
 private trait LazyEitherTMonadError[F[_], E] extends MonadError[LazyEitherT[F, ?, ?], E] with LazyEitherTMonad[F, E] {
   def raiseError[A](e: E): LazyEitherT[F, E, A] = LazyEitherT.lazyLeftT(e)
