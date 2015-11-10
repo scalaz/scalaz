@@ -18,7 +18,7 @@ trait BindRec[F[_]] extends Bind[F] { self =>
 
   def tailrecM[A, B](f: A => F[A \/ B])(a: A): F[B]
 
-  def foreverRec[A, B](fa: F[A]): F[B] =
+  override def forever[A, B](fa: F[A]): F[B] =
     tailrecM[Unit, B](u => map(fa)(_ => \/.left(u)))(())
 
   trait BindRecLaw extends BindLaw {
