@@ -14,9 +14,9 @@ object EitherTTest extends SpecLite {
   checkAll(equal.laws[EitherTListInt[Int]])
   checkAll(bindRec.laws[EitherTListInt])
   checkAll(monadPlus.laws[EitherTListInt])
+  checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
-  checkAll(monadError.laws[EitherTList, Int])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
@@ -67,7 +67,7 @@ object EitherTTest extends SpecLite {
     def foldable[F[_] : Traverse, A] = Foldable[EitherT[F, A, ?]]
     def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[F, ?, ?]]
     def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[F, ?, ?]]
-    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, ?, ?], A]
+    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, A, ?], A]
   }
 
   def compilationTests() = {
