@@ -188,7 +188,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     }
 
   ////
-  val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
+  @transient lazy val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
 }
 
 object Nondeterminism {

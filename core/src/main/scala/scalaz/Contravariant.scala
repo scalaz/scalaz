@@ -69,7 +69,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   def contravariantLaw = new ContravariantLaw {}
 
   ////
-  val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] { def F = Contravariant.this }
+  @transient lazy val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] { def F = Contravariant.this }
 }
 
 object Contravariant {

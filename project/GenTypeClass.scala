@@ -251,9 +251,9 @@ object GenTypeClass {
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember = if(tc.createSyntax) {
       if (kind == Kind.*^*->*->*) {
-        s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
+        s"@transient lazy val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
       } else {
-        s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
+        s"@transient lazy val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
       }
     } else ""
 

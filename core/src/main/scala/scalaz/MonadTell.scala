@@ -12,7 +12,7 @@ trait MonadTell[F[_, _], S] extends Monad[F[S, ?]] { self =>
   def tell(w: S): F[S, Unit] = writer(w, ())
 
   ////
-  val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def F = MonadTell.this }
+  @transient lazy val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def F = MonadTell.this }
 }
 
 object MonadTell {

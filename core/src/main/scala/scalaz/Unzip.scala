@@ -60,7 +60,7 @@ trait Unzip[F[_]]  { self =>
   }
 
   ////
-  val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
+  @transient lazy val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
 }
 
 object Unzip {
