@@ -144,16 +144,16 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     F.map(run)(_ valueOr x)
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse(x: => EitherT[F, A, B])(implicit F: Bind[F]): EitherT[F, A, B] = {
+  def orElse(x: => EitherT[F, A, B])(implicit F: Monad[F]): EitherT[F, A, B] = {
     val g = run
     EitherT(F.bind(g) {
-      case -\/(_) => x.run
-      case \/-(_) => g
+      case    -\/(_)  => x.run
+      case r@(\/-(_)) => F.point(r)
     })
   }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||(x: => EitherT[F, A, B])(implicit F: Bind[F]): EitherT[F, A, B] =
+  def |||(x: => EitherT[F, A, B])(implicit F: Monad[F]): EitherT[F, A, B] =
     orElse(x)
 
   /**

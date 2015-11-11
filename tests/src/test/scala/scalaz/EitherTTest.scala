@@ -1,5 +1,7 @@
 package scalaz
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
@@ -10,6 +12,7 @@ object EitherTTest extends SpecLite {
   type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
+  type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
 
   checkAll(equal.laws[EitherTListInt[Int]])
   checkAll(bindRec.laws[EitherTListInt])
@@ -43,6 +46,15 @@ object EitherTTest extends SpecLite {
 
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
+  }
+
+  "orElse only executes the left hand monad once" should {
+    val counter = new AtomicInteger(0)
+    val inc: EitherTComputation[Int] = EitherT.right(() => counter.incrementAndGet())
+    val other: EitherTComputation[Int] = EitherT.right(() => 0) // does nothing
+
+    (inc orElse other).run.apply() must_== \/-(1)
+    counter.get() must_== 1
   }
 
   object instances {
