@@ -204,8 +204,8 @@ sealed abstract class WriterTInstances4 extends WriterTInstance5 {
     }
   implicit def writerEqual[W, A](implicit E: Equal[(W, A)]): Equal[Writer[W, A]] = E.contramap((_: Writer[W, A]).run)
 
-  implicit def writerTMonadError[F[_, _], E, W](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[Lambda[(E0, A) => WriterT[F[E0, ?], W, A]], E] =
-    new WriterTMonadError[F, E, W]{
+  implicit def writerTMonadError[F[_], E, W](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[WriterT[F, W, ?], E] =
+    new WriterTMonadError[F, E, W] {
       override def F = F0
       override def W = W0
     }
@@ -366,14 +366,14 @@ private trait WriterTMonadPlus[F[_], W] extends MonadPlus[WriterT[F, W, ?]] with
   def F: MonadPlus[F]
 }
 
-private trait WriterTMonadError[F[_, _], E, W] extends MonadError[Lambda[(E0, A) => WriterT[F[E0, ?], W, A]], E] with WriterTMonad[F[E, ?], W] {
+private trait WriterTMonadError[F[_], E, W] extends MonadError[WriterT[F, W, ?], E] with WriterTMonad[F, W] {
   implicit def F: MonadError[F, E]
 
-  override def handleError[A](fa: WriterT[F[E, ?], W, A])(f: E => WriterT[F[E, ?], W, A]) =
-    WriterT[F[E, ?], W, A](F.handleError(fa.run)(f(_).run))
+  override def handleError[A](fa: WriterT[F, W, A])(f: E => WriterT[F, W, A]) =
+    WriterT[F, W, A](F.handleError(fa.run)(f(_).run))
 
   override def raiseError[A](e: E) =
-    WriterT[F[E, ?], W, A](F.raiseError[(W, A)](e))
+    WriterT[F, W, A](F.raiseError[(W, A)](e))
 }
 
 private trait WriterTFoldable[F[_], W] extends Foldable.FromFoldr[WriterT[F, W, ?]] {

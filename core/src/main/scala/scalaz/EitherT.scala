@@ -287,7 +287,7 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, ?, ?], E] =
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] = 
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -477,7 +477,7 @@ private[scalaz] trait EitherTMonadListen[F[_, _], W, A] extends MonadListen[λ[(
   }
 }
 
-private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, ?, ?], E] with EitherTMonad[F, E] {
+private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E] with EitherTMonad[F, E] {
   implicit def F: Monad[F]
   def raiseError[A](e: E): EitherT[F, E, A] = EitherT(F.point(-\/(e)))
   def handleError[A](fa: EitherT[F, E, A])(f: E => EitherT[F, E, A]): EitherT[F, E, A] =

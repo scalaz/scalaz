@@ -19,7 +19,7 @@ object LazyEitherTTest extends SpecLite {
   checkAll(traverse.laws[LazyEitherTListInt])
   checkAll(bitraverse.laws[LazyEitherTList])
   checkAll(bindRec.laws[LazyEitherTListInt])
-  checkAll(monadError.laws[LazyEitherTList, Int])
+  checkAll(monadError.laws[LazyEitherTListInt, Int])
 
   "tail recursive tailrecM" in {
     import Scalaz.Id
@@ -58,10 +58,10 @@ object LazyEitherTTest extends SpecLite {
     def functor[F[_] : Monad, A: Monoid] = Functor[LazyEitherT[F, A, ?]]
     def bind[F[_] : Monad : BindRec, A] = Bind[LazyEitherT[F, A, ?]]
     def monad[F[_] : Monad, A: Monoid] = Monad[LazyEitherT[F, A, ?]]
+    def monadError[F[_] : Monad, A] = MonadError[LazyEitherT[F, A, ?], A]
     def foldable[F[_] : Traverse, A] = Foldable[LazyEitherT[F, A, ?]]
     def bifunctor[F[_] : Traverse] = Bifunctor[LazyEitherT[F, ?, ?]]
     def bifoldable[F[_] : Traverse] = Bifoldable[LazyEitherT[F, ?, ?]]
-    def monadError[F[_] : Monad, A] = MonadError[LazyEitherT[F, ?, ?], A]
   }
 
 }

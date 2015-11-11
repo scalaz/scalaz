@@ -88,7 +88,7 @@ sealed abstract class MaybeTInstances3 {
 }
 
 sealed abstract class MaybeTInstances2 extends MaybeTInstances3 {
-  implicit def maybeTMonadError[F[_, _], E](implicit F0: MonadError[F, E]): MonadError[λ[(E0, A) => MaybeT[F[E0, ?], A]], E] =
+  implicit def maybeTMonadError[F[_], E](implicit F0: MonadError[F, E]): MonadError[MaybeT[F, ?], E] =
     new MaybeTMonadError[F, E] {
       def F = F0
     }
@@ -210,14 +210,14 @@ private trait MaybeTMonadPlus[F[_]] extends MonadPlus[MaybeT[F, ?]] with MaybeTM
   def plus[A](a: MaybeT[F, A], b: => MaybeT[F, A]): MaybeT[F, A] = a orElse b
 }
 
-private trait MaybeTMonadError[F[_, _], E] extends MonadError[λ[(E0, A) => MaybeT[F[E0, ?], A]], E] with MaybeTMonad[F[E, ?]] {
+private trait MaybeTMonadError[F[_], E] extends MonadError[MaybeT[F, ?], E] with MaybeTMonad[F] {
   override def F: MonadError[F, E]
 
   override def raiseError[A](e: E) =
-    MaybeT[F[E, ?], A](F.map(F.raiseError[A](e))(Maybe.just))
+    MaybeT[F, A](F.map(F.raiseError[A](e))(Maybe.just))
 
-  override def handleError[A](fa: MaybeT[F[E, ?], A])(f: E => MaybeT[F[E, ?], A]) =
-    MaybeT[F[E, ?], A](F.handleError(fa.run)(f(_).run))
+  override def handleError[A](fa: MaybeT[F, A])(f: E => MaybeT[F, A]) =
+    MaybeT[F, A](F.handleError(fa.run)(f(_).run))
 }
 
 private trait MaybeTMonadTell[F[_, _], W] extends MonadTell[λ[(α, β) => MaybeT[F[α, ?], β]], W] with MaybeTMonad[F[W, ?]] with MaybeTHoist {

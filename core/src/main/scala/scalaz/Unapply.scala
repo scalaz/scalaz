@@ -274,6 +274,17 @@ object Unapply extends Unapply_0 {
       def leibniz = refl
     }
 
+  /** Turns a MonadTrans-like instance that has two params and turns it into an M[A] */
+  implicit def unapplyMTMAB[TC[_[_]], MT[_[_], _], MAB[_, _], A0, A1](implicit TC0: TC[MT[MAB[A0,?], ?]]):
+    Unapply[TC, MT[MAB[A0, ?], A1]] {
+      type M[X] = MT[MAB[A0, ?], X]
+      type A = A1
+    } = new Unapply[TC, MT[MAB[A0, ?], A1]] {
+      type M[X] = MT[MAB[A0, ?], X]
+      type A = A1
+      def TC = TC0
+      def leibniz = Leibniz.refl
+    }  
   // TODO More!
 }
 

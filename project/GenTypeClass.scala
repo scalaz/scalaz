@@ -73,7 +73,7 @@ object TypeClass {
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
   lazy val monadState = TypeClass("MonadState", *^*->*->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", *^*->*->*, extendsList = Seq(monad))
+  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
   lazy val monadTell = TypeClass("MonadTell", *^*->*->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", *^*->*->*, extendsList = Seq(monad), createSyntax = false)
 
@@ -134,17 +134,19 @@ object TypeClass {
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
 }
 
-sealed abstract class Kind
+sealed abstract class Kind(val multipleParam: Boolean)
 
 object Kind {
 
-  case object * extends Kind
+  case object * extends Kind(false)
 
-  case object *->* extends Kind
+  case object *->* extends Kind(false)
 
-  case object *^*->* extends Kind
+  case object |*->*|->* extends Kind(true)
 
-  case object *^*->*->* extends Kind
+  case object *^*->* extends Kind(false)
+
+  case object *^*->*->* extends Kind(true)
 }
 
 sealed trait FileStatus
@@ -219,6 +221,7 @@ object GenTypeClass {
       case Kind.*      => ""
       case Kind.*->*   => "[_]"
       case Kind.*^*->* => "[_, _]"
+      case Kind.|*->*|->* => "[_], S"
       case Kind.*^*->*->* => "[_, _], S"
     }
     val classifiedType = classifiedTypeIdent +  typeShape
@@ -250,14 +253,14 @@ object GenTypeClass {
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember = if(tc.createSyntax) {
-      if (kind == Kind.*^*->*->*) {
+      if (kind.multipleParam) {
         s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
       } else {
         s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
       }
     } else ""
 
-    val applyMethod = if(kind == Kind.*^*->*->*) {
+    val applyMethod = if(kind.multipleParam) {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F, S]): $typeClassName[F, S] = F"""
     } else {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
@@ -399,6 +402,40 @@ trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
+  ////
+
+  ////
+}
+"""
+      case Kind.|*->*|->* =>
+
+        val ToOps =
+  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: ${typeClassName}[F, S]) =
+    new ${typeClassName}Ops[F, S, A](v)"""
+
+
+    s"""$syntaxPackString
+
+/** Wraps a value `self` and provides methods related to `${typeClassName}` */
+final class ${typeClassName}Ops[F[_], S, A] private[syntax](self: F[A])(implicit val F: ${typeClassName}[F, S]) {
+  ////
+
+  ////
+}
+
+trait To${typeClassName}Ops ${extendsToSyntaxListText} {
+  $ToOps
+
+  ////
+
+  ////
+}
+
+trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
+  implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, S, A] =
+    new ${typeClassName}Ops[F, S, A](v)(${typeClassName}Syntax.this.F)
+
+  def F: ${typeClassName}[F, S]
   ////
 
   ////
