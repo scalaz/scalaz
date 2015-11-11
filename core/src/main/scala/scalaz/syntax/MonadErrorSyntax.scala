@@ -2,17 +2,17 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `MonadError` */
-final class MonadErrorOps[F[_], E, A] private[syntax](self: F[A])(implicit val F: MonadError[F, E]) {
+final class MonadErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit val F: MonadError[F, S]) {
   ////
-  final def handleError(f: E => F[A]): F[A] =
+  final def handleError(f: S => F[A]): F[A] =
     F.handleError(self)(f)
 
   ////
 }
 
 trait ToMonadErrorOps extends ToMonadOps {
-  implicit def ToMonadErrorOps[F[_], E, A](v: F[A])(implicit F0: MonadError[F, E]) =
-    new MonadErrorOps[F, E, A](v)
+  implicit def ToMonadErrorOps[F[_], S, A](v: F[A])(implicit F0: MonadError[F, S]) =
+    new MonadErrorOps[F, S, A](v)
 
   ////
 
@@ -22,11 +22,11 @@ trait ToMonadErrorOps extends ToMonadOps {
   ////
 }
 
-trait MonadErrorSyntax[F[_], E] extends MonadSyntax[F] {
-  implicit def ToMonadErrorOps[A](v: F[A]): MonadErrorOps[F, E, A] =
-    new MonadErrorOps[F, E, A](v)(MonadErrorSyntax.this.F)
+trait MonadErrorSyntax[F[_], S] extends MonadSyntax[F] {
+  implicit def ToMonadErrorOps[A](v: F[A]): MonadErrorOps[F, S, A] =
+    new MonadErrorOps[F, S, A](v)(MonadErrorSyntax.this.F)
 
-  def F: MonadError[F, E]
+  def F: MonadError[F, S]
   ////
 
   ////
