@@ -1,11 +1,9 @@
 package scalaz
 
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 import scala.util.Random
 
 object ISetTest extends SpecLite {
-  import org.scalacheck.Arbitrary
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import syntax.std.option._
