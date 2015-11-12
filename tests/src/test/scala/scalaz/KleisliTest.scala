@@ -72,6 +72,7 @@ object KleisliTest extends SpecLite {
     def applicative[F[_] : Monad, A] = Applicative[({type f[a] = Kleisli[F, A, a]})#f]
     def plus[F[_] : PlusEmpty, A] = Plus[({type f[a] = Kleisli[F, A, a]})#f]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[({type f[a] = Kleisli[F, A, a]})#f]
+    def profunctor[F[_]: Applicative] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def profunctor[F[_]: Monad] = Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def proChoice[F[_]: Monad] = ProChoice[({type λ[α, β]=Kleisli[F, α, β]})#λ]
     def compose[F[_]: Monad] = Compose[({type λ[α, β]=Kleisli[F, α, β]})#λ]

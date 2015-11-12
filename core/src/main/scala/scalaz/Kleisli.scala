@@ -148,7 +148,7 @@ sealed abstract class KleisliInstances1 extends KleisliInstances2 {
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
 
-  implicit def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+  def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
     implicit def F = F0
   }
 
@@ -211,6 +211,10 @@ object Kleisli extends KleisliInstances with KleisliFunctions {
     new KleisliMonadError[F, E, R] {
       def F = F0
     }
+
+  implicit override def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+    def F = F0
+  }
 }
 
 //
