@@ -84,6 +84,7 @@ object KleisliTest extends SpecLite {
     def bind[F[_] : Monad: BindRec, A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
+    def profunctor[F[_]: Applicative] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]

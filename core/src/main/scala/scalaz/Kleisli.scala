@@ -187,24 +187,14 @@ sealed abstract class KleisliInstances1 extends KleisliInstances2 {
   implicit def kleisliIdApplicative[R]: Applicative[Kleisli[Id, R, ?]] =
     kleisliApplicative[Id, R]
 
-  implicit def kleisliProfunctor[F[_]: Functor]: Profunctor[Kleisli[F, ?, ?]] =
-    new Profunctor[Kleisli[F, ?, ?]] {
-      def mapfst[A, B, C](fab: Kleisli[F, A, B])(f: C => A) =
-        fab local f
-      def mapsnd[A, B, C](fab: Kleisli[F, A, B])(f: B => C) =
-        fab map f
-      override def dimap[A, B, C, D](fab: Kleisli[F, A, B])(f: C => A)(g: B => D) =
-        fab.dimap(f, g)
+  implicit def kleisliStrong[F[_]: Functor]: Strong[Kleisli[F, ?, ?]] =
+    new KleisliStrong[F] {
+      def F = implicitly
     }
 }
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[Kleisli[Id, R, ?]] =
     kleisliApply[Id, R]
-
-  implicit def kleisliStrong[F[_]](implicit F0: Functor[F]): Strong[Kleisli[F, ?, ?]] =
-    new KleisliStrong[F] {
-      implicit def F = F0
-    }
 
   implicit def kleisliProChoice[F[_]](implicit F0: Applicative[F]): ProChoice[Kleisli[F, ?, ?]] =
     new KleisliProChoice[F] {
