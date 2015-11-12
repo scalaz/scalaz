@@ -19,7 +19,7 @@ object FreeT extends FreeTInstances {
     }
 
   def liftM[S[_], M[_], A](value: M[A])(implicit M: Functor[M]): FreeT[S, M, A] =
-    Suspend(M.map(value)(-\/(_)))
+    Suspend(M.map(value)(\/.left))
 
   /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
   def liftF[S[_], M[_], A](value: S[A])(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, A] =
@@ -29,7 +29,7 @@ object FreeT extends FreeTInstances {
 sealed abstract class FreeT[S[_], M[_], A] {
   final def map[B](f: A => B)(implicit S: Functor[S], M: Functor[M]): FreeT[S, M, B] =
     this match {
-      case Suspend(m) => Suspend(M.map(m)(_.bimap(f, S.map(_)(_.map(f)))))
+      case Suspend(m) => Suspend(M.map(m)(_.bimap(f, S.lift(_.map(f)))))
       case Gosub(a, k) => Gosub(a, (x: Any) => k(x).map(f))
     }
 
@@ -44,7 +44,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
       ft match {
-        case Suspend(f) => M0.map(f)(\/-(_))
+        case Suspend(f) => M0.map(f)(\/.right)
         case Gosub(m0, f0) => m0 match {
           case Suspend(m1) => M0.map(m1) {
             case -\/(a) => -\/(f0(a))
@@ -64,7 +64,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
     def runM2(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
       M0.bind(ft.resume) {
         case -\/(a) => M1.point(\/-(a))
-        case \/-(fc) => M0.map(interp(fc))(-\/(_))
+        case \/-(fc) => M0.map(interp(fc))(\/.left)
       }
 
     M0.tailrecM(runM2)(this)
