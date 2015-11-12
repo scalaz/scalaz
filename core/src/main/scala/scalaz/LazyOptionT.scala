@@ -80,16 +80,16 @@ sealed abstract class LazyOptionTInstances1 {
 sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] =
     Equal.equalBy((_: LazyOptionT[F, A]).run)
-}
-
-sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
-  implicit val lazyOptionTMonadTrans: Hoist[LazyOptionT] =
-    new LazyOptionTHoist {}
 
   implicit def lazyOptionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[LazyOptionT[F, ?]] =
     new LazyOptionTMonad[F] {
       implicit def F: Monad[F] = F0
     }
+}
+
+sealed abstract class LazyOptionTInstances extends LazyOptionTInstances0 {
+  implicit val lazyOptionTMonadTrans: Hoist[LazyOptionT] =
+    new LazyOptionTHoist {}
 
   implicit def lazyOptionTBindRec[F[_]](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyOptionT[F, ?]] =
     new LazyOptionTBindRec[F] {

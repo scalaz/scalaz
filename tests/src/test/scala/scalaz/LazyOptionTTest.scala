@@ -33,6 +33,8 @@ object LazyOptionTTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[F[_] : Monad] = Functor[LazyOptionT[F, ?]]
+    def functor[F[_] : Monad: BindRec] = Functor[LazyOptionT[F, ?]]
     def apply[F[_] : Monad] = Apply[LazyOptionT[F, ?]]
+    def bind[F[_] : Monad: BindRec] = Bind[LazyOptionT[F, ?]]
   }
 }
