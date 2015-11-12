@@ -601,6 +601,12 @@ sealed abstract class ISetInstances {
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
 
+    override def toIList[A](fa: ISet[A]) =
+      fa.foldRight(IList.empty[A])(_ :: _)
+
+    override def toList[A](fa: ISet[A]) =
+      fa.toList
+
     override def length[A](fa: ISet[A]) =
       fa.size
 

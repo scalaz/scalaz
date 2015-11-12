@@ -28,6 +28,11 @@ object ISetTest extends SpecLite {
     al must_===(al.sorted)(Order[A].toScalaOrdering)
   }
 
+  "toIList" ! forAll { a: ISet[Int] =>
+    val b = Foldable[ISet].toIList(a)
+    b.sorted must_=== b
+  }
+
   "equals/hashCode" ! forAll { a: ISet[Int] =>
     val b = ISet.fromList(Random.shuffle(a.toList))
     a must_== b
