@@ -31,6 +31,7 @@ object OptionTTest extends SpecLite {
 
   object instances {
     def functor[F[_] : Functor] = Functor[OptionT[F, ?]]
+    def bindRec[F[_] : Monad: BindRec] = BindRec[OptionT[F, ?]]
     def monad[F[_] : Monad] = MonadPlus[OptionT[F, ?]]
     def monadError[F[_], E](implicit F: MonadError[F, E]) = MonadError[OptionT[F, ?], E]
     def foldable[F[_] : Foldable] = Foldable[OptionT[F, ?]]
@@ -38,8 +39,10 @@ object OptionTTest extends SpecLite {
 
     // checking absence of ambiguity
     def functor[F[_] : Monad] = Functor[OptionT[F, ?]]
+    def functor[F[_] : Monad: BindRec] = Functor[OptionT[F, ?]]
     def functor[F[_] : Monad : Traverse] = Functor[OptionT[F, ?]]
     def functor[F[_], E](implicit F1: MonadError[F, E], F2: Traverse[F]) = Functor[OptionT[F, ?]]
+    def bind[F[_] : Monad: BindRec] = Bind[OptionT[F, ?]]
     def apply[F[_] : Monad] = Apply[OptionT[F, ?]]
     def foldable[F[_] : Traverse] = Foldable[OptionT[F, ?]]
   }
