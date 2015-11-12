@@ -11,11 +11,11 @@ object DisjunctionTest extends SpecLite {
   checkAll(monoid.laws[Int \/ Int])
   checkAll(bindRec.laws[Int \/ ?])
   checkAll(monad.laws[Int \/ ?])
+  checkAll(monadError.laws[Int \/ ?, Int])
   checkAll(plus.laws[Int \/ ?])
   checkAll(traverse.laws[Int \/ ?])
   checkAll(bitraverse.laws[\/])
   checkAll(associative.laws[\/])
-  checkAll(monadError.laws[\/, Int])
 
   "fromTryCatchThrowable" in {
     class Foo extends Throwable

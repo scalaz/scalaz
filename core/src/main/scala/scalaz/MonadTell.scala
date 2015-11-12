@@ -5,18 +5,18 @@ package scalaz
  *
  */
 ////
-trait MonadTell[F[_, _], S] extends Monad[F[S, ?]] { self =>
+trait MonadTell[F[_], S] extends Monad[F] { self =>
   ////
-  def writer[A](w: S, v: A): F[S, A]
+  def writer[A](w: S, v: A): F[A]
 
-  def tell(w: S): F[S, Unit] = writer(w, ())
+  def tell(w: S): F[Unit] = writer(w, ())
 
   ////
   val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def F = MonadTell.this }
 }
 
 object MonadTell {
-  @inline def apply[F[_, _], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
+  @inline def apply[F[_], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
 
   ////
 

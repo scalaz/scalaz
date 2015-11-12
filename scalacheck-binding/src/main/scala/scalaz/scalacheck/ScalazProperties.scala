@@ -556,16 +556,16 @@ object ScalazProperties {
   }
 
   object monadError {
-    def raisedErrorsHandled[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], afea: Arbitrary[E => F[E,A]]) =
+    def raisedErrorsHandled[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], afea: Arbitrary[E => F[A]]) =
       forAll(me.monadErrorLaw.raisedErrorsHandled[A] _)
-    def errorsRaised[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
+    def errorsRaised[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsRaised[A] _)
-    def errorsStopComputation[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
+    def errorsStopComputation[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E]) =
+    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E]) =
       new Properties("monad error") {
-        include(monad.laws[F[E, ?]])
+        include(monad.laws[F])
         property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
         property("errorsRaised") = errorsRaised[F, E, Int]
         property("errorsStopComputation") = errorsStopComputation[F, E, Int]

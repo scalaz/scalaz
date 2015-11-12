@@ -11,6 +11,8 @@ object KleisliTest extends SpecLite {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
+  type IntOr[A] = Int \/ A
+  type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
     Arbitrary(Gen.frequency[Int => Option[Int]](
@@ -27,11 +29,6 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  // Needed because scalac inference has trouble with \/
-  implicit def KleisliDisjunctionArbitrary[E : Arbitrary, R : Arbitrary, A : Arbitrary]: Arbitrary[Kleisli[\/[E, ?], R, A]] = KleisliArbitrary[\/[E, +?], R, A]
-
-  implicit def KleisliDisjunctionEqual[E : Equal] = KleisliEqual[\/[E, ?]]
-
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
@@ -40,8 +37,8 @@ object KleisliTest extends SpecLite {
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
-  checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
@@ -54,7 +51,7 @@ object KleisliTest extends SpecLite {
     def plus[F[_] : Plus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[Kleisli[F, A, ?]]
     def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, ?]]
-    def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, ?, ?], A]
+    def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, A, ?], A]
     def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
@@ -96,7 +93,7 @@ object KleisliTest extends SpecLite {
       // F = Id
       def readerFunctor[A] = Functor[Reader[A, ?]]
       def readerApply[A] = Apply[Reader[A, ?]]
-      def readerMonadReader[A] = MonadReader[Reader[?, ?], A]
+      def readerMonadReader[A] = MonadReader[Reader[A, ?], A]
       def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 

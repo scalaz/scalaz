@@ -31,7 +31,7 @@ object EitherTest extends SpecLite {
   checkAll("Either.RightProjection @@ Last", monad.laws[λ[α => Either.RightProjection[Int, α] @@ Last]])
 
   checkAll("Either", bindRec.laws[Either[Int, ?]])
-  checkAll("Either", monadError.laws[Either, Int])
+  checkAll("Either", monadError.laws[Either[Int, ?], Int])
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[Either[Int, ?]])
   checkAll("Either", bitraverse.laws[Either])

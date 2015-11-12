@@ -189,7 +189,7 @@ sealed abstract class LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, ?, ?], L] =
+  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] =
     new LazyEitherTMonadError[F, L] {
       implicit def F = F0
     }
@@ -376,8 +376,7 @@ private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] 
     )
 }
 
-
-private trait LazyEitherTMonadError[F[_], E] extends MonadError[LazyEitherT[F, ?, ?], E] with LazyEitherTMonad[F, E] {
+private trait LazyEitherTMonadError[F[_], E] extends MonadError[LazyEitherT[F, E, ?], E] with LazyEitherTMonad[F, E] {
   def raiseError[A](e: E): LazyEitherT[F, E, A] = LazyEitherT.lazyLeftT(e)
   def handleError[A](fa: LazyEitherT[F, E, A])(f: E => LazyEitherT[F, E, A]): LazyEitherT[F, E, A] = fa.left.flatMap(e => f(e))
 }
