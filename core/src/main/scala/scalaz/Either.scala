@@ -444,9 +444,9 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
         f(a) match {
-          case -\/(l) => -\/(l)
+          case l @ -\/(_) => l
           case \/-(-\/(a0)) => tailrecM(f)(a0)
-          case \/-(rb @ \/-(b)) => rb
+          case \/-(rb @ \/-(_)) => rb
         }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =

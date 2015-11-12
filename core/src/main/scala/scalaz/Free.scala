@@ -172,7 +172,7 @@ sealed abstract class Free[S[_], A] {
     def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
       e match {
         case -\/(sf) => M.map(f(sf))(\/.left)
-        case \/-(a) => M.point(\/-(a))
+        case a @ \/-(_) => M.point(a)
       }
 
     B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
