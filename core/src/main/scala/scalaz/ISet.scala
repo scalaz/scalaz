@@ -616,6 +616,29 @@ sealed abstract class ISetInstances {
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
 
+    override def index[A](fa: ISet[A], i: Int): Option[A] = {
+      import std.anyVal._
+      @tailrec def loop(a: ISet[A], b: Int): Option[A] =
+        a match {
+          case Bin(x, l, r) =>
+            Order[Int].order(b, l.size) match {
+              case Ordering.LT =>
+                loop(l, b)
+              case Ordering.GT =>
+                loop(r, b - l.size - 1)
+              case Ordering.EQ =>
+                Some(x)
+            }
+          case Tip() =>
+            None
+        }
+
+      if (i < 0 || fa.size <= i)
+        None
+      else
+        loop(fa, i)
+    }
+
     override def toIList[A](fa: ISet[A]) =
       fa.foldRight(IList.empty[A])(_ :: _)
 

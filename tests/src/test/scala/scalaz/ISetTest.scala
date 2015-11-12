@@ -28,6 +28,15 @@ object ISetTest extends SpecLite {
     al must_===(al.sorted)(Order[A].toScalaOrdering)
   }
 
+  "index" ! forAll { (a: ISet[Int], i: Byte) =>
+    val F = Foldable[ISet]
+    F.index(a, i) must_=== a.toList.lift(i)
+    F.index(a, -1) must_=== None
+    F.index(a, 0) must_=== a.findMin
+    F.index(a, a.size - 1) must_=== a.findMax
+    F.index(a, a.size) must_=== None
+  }
+
   "toIList" ! forAll { a: ISet[Int] =>
     val b = Foldable[ISet].toIList(a)
     b.sorted must_=== b
