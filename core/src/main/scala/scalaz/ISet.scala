@@ -4,8 +4,10 @@ import annotation.tailrec
 import Ordering._
 import std.option._
 
-// http://www.haskell.org/ghc/docs/latest/html/libraries/containers-0.5.0.0/src/Data-Set-Base.html#Set
-
+/**
+ * @see [[http://hackage.haskell.org/package/containers-0.5.0.0/docs/Data-Set.html]]
+ * @see [[https://github.com/haskell/containers/blob/v0.5.0.0/Data/Set/Base.hs]]
+ */
 sealed abstract class ISet[A] {
   import ISet._
 
