@@ -1038,6 +1038,9 @@ sealed abstract class MapInstances extends MapInstances0 {
       override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
 
+      override def index[A](fa: S ==>> A, i: Int) =
+        fa.elemAt(i).map(_._2)
+
       def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
         fa match {
           case Tip() =>

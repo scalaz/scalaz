@@ -22,6 +22,15 @@ object MapTest extends SpecLite {
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
   }
 
+  "index" ! forAll { (a: Int ==>> Int, i: Byte) =>
+    val F = Foldable[({type l[a] = Int ==>> a})#l]
+    F.index(a, i) must_=== a.toList.lift(i).map(_._2)
+    F.index(a, -1) must_=== None
+    F.index(a, 0) must_=== a.findMin.map(_._2)
+    F.index(a, a.size - 1) must_=== a.findMax.map(_._2)
+    F.index(a, a.size) must_=== None
+  }
+
   "equals/hashCode" ! forAll { a: Int ==>> Int =>
     val b = ==>>.fromList(Random.shuffle(a.toList))
     a must_== b
