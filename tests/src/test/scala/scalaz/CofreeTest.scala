@@ -81,7 +81,7 @@ object CofreeTest extends SpecLite {
     Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to)
 
 
-  implicit def CoffreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
+  implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
     import org.scalacheck.Arbitrary._
     import org.scalacheck.Gen
     val arb = Arbitrary { Gen.listOfN(5000, implicitly[Arbitrary[A]].arbitrary ) }   
