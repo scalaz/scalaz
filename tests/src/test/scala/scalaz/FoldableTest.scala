@@ -148,6 +148,14 @@ object FoldableTest extends SpecLite {
     "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
       (xs: List[Int]) => xs.findMapM[StateInt, Int](_ => notfound).run(0) must_== (xs.length -> None)
     }
+
+    "findLeft" ! forAll {
+      (x: Int, xs: List[Int]) => (x :: xs).findLeft(_ == x) must_== Some(x)
+    }
+
+    "findRight" ! forAll {
+      (x: Int, xs: List[Int]) => (xs ++ List(x)).findRight(_ == x) must_== Some(x)
+    }
   }
 
   private val L = Foldable[List]
