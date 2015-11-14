@@ -19,13 +19,13 @@ object CofreeTest extends SpecLite {
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
 
-  implicit val lazyOptionEqualNat = new (Equal ~> λ[α => Equal[LazyOption[α]]]) {
-    def apply[A](a: Equal[A]) = LazyOption.lazyOptionEqual(a)
-  }
+  implicit def cofreeEqual[F[_], A](implicit F: Eq1[F], A: Equal[A]): Equal[Cofree[F, A]] =
+    Equal.equal{ (a, b) =>
+      A.equal(a.head, b.head) && F.eq1(cofreeEqual[F, A]).equal(a.tail, b.tail)
+    }
 
-  implicit val streamEqualNat = new (Equal ~> λ[α => Equal[Stream[α]]]) {
-    def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
-  }
+  implicit def cofreeZipEqual[F[_]: Eq1, A: Equal]: Equal[CofreeZip[F, A]] =
+    Tag.subst(cofreeEqual[F, A])
 
   //needed to prevent SOE for testing wiht equality
   implicit def cofreeOptEquals[A](implicit e: Equal[A]): Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
