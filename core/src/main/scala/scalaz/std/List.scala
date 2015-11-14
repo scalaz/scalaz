@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import annotation.tailrec
 import scala.annotation.tailrec
 
 trait ListInstances0 {
