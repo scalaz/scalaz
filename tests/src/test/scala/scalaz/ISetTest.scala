@@ -26,6 +26,22 @@ object ISetTest extends SpecLite {
     al must_===(al.sorted)(Order[A].toScalaOrdering)
   }
 
+  "findLeft/findRight" in {
+    val a = ISet.fromList(List(1, 2, 3, 4, 5))
+    Foldable[ISet].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[ISet].findRight(a)(_ % 2 == 0) must_=== Some(4)
+  }
+
+  "findLeft" ! forAll{ a: ISet[Int] =>
+    val f = (_: Int) % 3 == 0
+    Foldable[ISet].findLeft(a)(f) must_=== Foldable[List].findLeft(a.toList)(f)
+  }
+
+  "findRight" ! forAll { a: ISet[Int] =>
+    val f = (_: Int) % 3 == 0
+    Foldable[ISet].findRight(a)(f) must_=== Foldable[List].findRight(a.toList)(f)
+  }
+
   "index" ! forAll { (a: ISet[Int], i: Byte) =>
     val F = Foldable[ISet]
     F.index(a, i) must_=== a.toList.lift(i)

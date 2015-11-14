@@ -144,6 +144,22 @@ private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, ?]] {
 
   implicit def F: Foldable[F]
 
+  override final def findLeft[A](fa: OneOr[F, A])(f: A => Boolean) =
+    fa.run match {
+      case \/-(a) =>
+        if(f(a)) Some(a) else None
+      case -\/(a) =>
+        F.findLeft(a)(f)
+    }
+
+  override final def findRight[A](fa: OneOr[F, A])(f: A => Boolean) =
+    fa.run match {
+      case \/-(a) =>
+        if(f(a)) Some(a) else None
+      case -\/(a) =>
+        F.findRight(a)(f)
+    }
+
   override final def foldMap[A, B](fa: OneOr[F, A])(f: A => B)(implicit M: Monoid[B]) =
     fa.foldMap(f)
 

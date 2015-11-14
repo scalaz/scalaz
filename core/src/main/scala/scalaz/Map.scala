@@ -1009,6 +1009,38 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   implicit def mapCovariant[S]: Traverse[S ==>> ?] =
     new Traverse[S ==>> ?] {
+      override def findLeft[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Bin(_, x, l, r) =>
+            findLeft(l)(f) match {
+              case a @ Some(_) =>
+                a
+              case None =>
+                if (f(x))
+                  Some(x)
+                else
+                  findLeft(r)(f)
+            }
+          case Tip() =>
+            None
+        }
+
+      override def findRight[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Bin(_, x, l, r) =>
+            findRight(r)(f) match {
+              case a @ Some(_) =>
+                a
+              case None =>
+                if (f(x))
+                  Some(x)
+                else
+                  findRight(l)(f)
+            }
+          case Tip() =>
+            None
+        }
+
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 

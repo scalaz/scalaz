@@ -527,6 +527,19 @@ sealed abstract class IListInstances extends IListInstance0 {
   implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
     new Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+      override def findLeft[A](fa: IList[A])(f: A => Boolean) =
+        fa.find(f)
+
+      override def findRight[A](fa: IList[A])(f: A => Boolean) = {
+        @tailrec def loop(a: IList[A], x: Option[A]): Option[A] =
+          a match {
+            case ICons(h, t) =>
+              loop(t, if(f(h)) Some(h) else x)
+            case INil() =>
+              x
+          }
+        loop(fa, None)
+      }
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] =
         fa map f

@@ -98,6 +98,17 @@ private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, ?]] with OneAndBi
 private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
   def F: Foldable[F]
 
+  override def findLeft[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    if(f(fa.head)) Some(fa.head) else F.findLeft(fa.tail)(f)
+
+  override def findRight[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    F.findRight(fa.tail)(f) match {
+      case a @ Some(_) =>
+        a
+      case None =>
+        if(f(fa.head)) Some(fa.head) else None
+    }
+
   override def foldMap1[A, B: Semigroup](fa: OneAnd[F, A])(f: A => B) =
     foldMap(fa)(a => some(f(a))) getOrElse f(fa.head)
 

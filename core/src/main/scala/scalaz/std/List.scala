@@ -12,6 +12,17 @@ trait ListInstances0 {
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] = 
     new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
+      override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
+      override def findRight[A](fa: List[A])(f: A => Boolean) = {
+        @tailrec def loop(a: List[A], x: Option[A]): Option[A] =
+          a match {
+            case h :: t =>
+              loop(t, if(f(h)) Some(h) else x)
+            case Nil =>
+              x
+          }
+        loop(fa, None)
+      }
       override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
       override def length[A](fa: List[A]) = fa.length
       def point[A](a: => A) = a :: Nil

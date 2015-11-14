@@ -19,6 +19,22 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
+  "findLeft/findRight" in {
+    val a = NonEmptyList(1, 2, 3, 4, 5)
+    Foldable[NonEmptyList].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[NonEmptyList].findRight(a)(_ % 2 == 0) must_=== Some(4)
+  }
+
+  "findLeft" ! forAll{ a: NonEmptyList[Int] =>
+    val f = (_: Int) % 3 == 0
+    Foldable[NonEmptyList].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.list)(f)
+  }
+
+  "findRight" ! forAll { a: NonEmptyList[Int] =>
+    val f = (_: Int) % 3 == 0
+    Foldable[NonEmptyList].findRight(a)(f) must_=== Foldable[IList].findRight(a.list)(f)
+  }
+
   "distinct" ! forAll { xs: NonEmptyList[Int] =>
     Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }

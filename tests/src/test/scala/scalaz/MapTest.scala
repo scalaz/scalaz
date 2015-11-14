@@ -22,6 +22,22 @@ object MapTest extends SpecLite {
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
   }
 
+  "findLeft/findRight" in {
+    val a = ==>>.fromFoldable((1 to 5).map(n => n -> n).toList)
+    Foldable[Int ==>> ?].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[Int ==>> ?].findRight(a)(_ % 2 == 0) must_=== Some(4)
+  }
+
+  "findLeft" ! forAll{ (a: Int ==>> Int) =>
+    val f = (_: Int) % 3 == 0
+    Foldable[Int ==>> ?].findLeft(a)(f) must_=== Foldable[List].findLeft(a.values)(f)
+  }
+
+  "findRight" ! forAll{ (a: Int ==>> Int) =>
+    val f = (_: Int) % 3 == 0
+    Foldable[Int ==>> ?].findRight(a)(f) must_=== Foldable[List].findRight(a.values)(f)
+  }
+
   "index" ! forAll { (a: Int ==>> Int, i: Byte) =>
     val F = Foldable[Int ==>> ?]
     F.index(a, i) must_=== a.toList.lift(i).map(_._2)
