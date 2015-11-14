@@ -127,6 +127,12 @@ trait Foldable[F[_]]  { self =>
   final def findMapM[M[_]: Monad, A, B](fa: F[A])(f: A => M[Option[B]]): M[Option[B]] =
     toEphemeralStream(fa) findMapM f
 
+  def findLeft[A](fa: F[A])(f: A => Boolean): Option[A] =
+    foldLeft[A, Option[A]](fa, None)((b, a) => b.orElse(if(f(a)) Some(a) else None))
+
+  def findRight[A](fa: F[A])(f: A => Boolean): Option[A] =
+    foldRight[A, Option[A]](fa, None)((a, b) => b.orElse(if(f(a)) Some(a) else None))
+
   /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
 
