@@ -249,6 +249,12 @@ trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B] = iso.from(G.bind(iso.to(fa))(f.andThen(iso.to.apply)))
 }
 
+trait IsomorphismBindRec[F[_], G[_]] extends BindRec[F] with IsomorphismBind[F, G] {
+  implicit def G: BindRec[G]
+
+  def tailrecM[A, B](f: A => F[A \/ B])(a: A): F[B] = iso.from(G.tailrecM(f andThen iso.unlift[A \/ B].to)(a))
+}
+
 trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G] {
   implicit def G: Monad[G]
 }
