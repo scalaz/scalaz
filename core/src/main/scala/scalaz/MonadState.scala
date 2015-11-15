@@ -18,7 +18,7 @@ trait MonadState[F[_], S] extends Monad[F] { self =>
   def modify(f: S => S): F[Unit] = bind(init)(s => put(f(s)))
 
   ////
-  
+
 }
 
 object MonadState {

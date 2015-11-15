@@ -247,9 +247,9 @@ object GenTypeClass {
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember = if(tc.createSyntax) {
       if (kind.multipleParam) {
-        s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
+        s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
       } else {
-        s"val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
+        s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
       }
     } else ""
 
@@ -270,7 +270,7 @@ trait $typeClassName[$classifiedType] $extendsLikeList { self =>
   ////
 
   ////
-  $syntaxMember
+$syntaxMember
 }
 
 object $typeClassName {
