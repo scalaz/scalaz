@@ -22,7 +22,6 @@ object WriterTTest extends SpecLite {
   checkAll(bindRec.laws[WriterTOptInt])
   checkAll(monadPlus.strongLaws[WriterTOptInt])
   checkAll(bifunctor.laws[WriterTOpt])
-  checkAll(functor.laws[NonEmptyList])
   checkAll(functor.laws[WriterT[NonEmptyList, Int, ?]])
   checkAll(bitraverse.laws[WriterTOpt])
 
