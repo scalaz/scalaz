@@ -76,6 +76,7 @@ object TypeClass {
   lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
+  lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
 
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
 
@@ -128,6 +129,7 @@ object TypeClass {
     monadError,
     monadTell,
     monadReader,
+    comonadStore,
     bindRec
   )
   lazy val concurrent = Seq[TypeClass]()

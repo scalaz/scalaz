@@ -130,7 +130,7 @@ sealed abstract class StoreTInstances1 extends StoreTInstances2 {
     }
 }
 sealed abstract class StoreTInstances0 extends StoreTInstances1 {
-  implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]): ComonadStore[StoreT[F, ?, ?], A] =
+  implicit def storeTComonadStore[F[_], A](implicit F0: Comonad[F]): ComonadStore[StoreT[F, A, ?], A] =
     new StoreTComonadStore[F, A] {
       implicit def F: Comonad[F] = F0
     }
@@ -170,7 +170,7 @@ private trait StoreTComonad[F[_], A0] extends Comonad[StoreT[F, A0, ?]] with Sto
   def copoint[A](p: StoreT[F, A0, A]) = p.copoint
 }
 
-private trait StoreTComonadStore[F[_], S] extends ComonadStore[StoreT[F, ?, ?], S] with StoreTComonad[F, S] {
+private trait StoreTComonadStore[F[_], S] extends ComonadStore[StoreT[F, S, ?], S] with StoreTComonad[F, S] {
   def pos[A](w: StoreT[F, S, A]): S = w.pos
   def peek[A](s: S, w: StoreT[F, S, A]): A = w peek s
   override def peeks[A](s: S => S, w: StoreT[F, S, A]): A = w peeks s
