@@ -27,7 +27,7 @@ final case class TracedT[W[_], A, B](run: W[A => B]) {
     TracedT(W.map(run)(f.andThen))
 }
 
-sealed abstract class TracedTInstances4 {
+sealed abstract class TracedTInstances5 {
   implicit final def tracedTFunctor[W[_]: Functor, C]: Functor[TracedT[W, C, ?]] =
     new TracedTFunctor[W, C]{
       def W = implicitly
@@ -40,28 +40,28 @@ sealed abstract class TracedTInstances4 {
     }
 }
 
-sealed abstract class TracedTInstances3 extends TracedTInstances4 {
+sealed abstract class TracedTInstances4 extends TracedTInstances5 {
   implicit final def tracedTDistributive[W[_]: Distributive, C]: Distributive[TracedT[W, C, ?]] =
     new TracedTDistributive[W, C] {
       def W = implicitly
     }
 }
 
-sealed abstract class TracedTInstances2 extends TracedTInstances3 {
+sealed abstract class TracedTInstances3 extends TracedTInstances4 {
   implicit final def tracedTApply[W[_]: Apply, C]: Apply[TracedT[W, C, ?]] =
     new TracedTApply[W, C]{
       def W = implicitly
     }
 }
 
-sealed abstract class TracedTInstances1 extends TracedTInstances2 {
+sealed abstract class TracedTInstances2 extends TracedTInstances3 {
   implicit final def tracedTApplicative[W[_]: Applicative, C]: Applicative[TracedT[W, C, ?]] =
     new TracedTApplicative[W, C]{
       def W = implicitly
     }
 }
 
-sealed abstract class TracedTInstances0 extends TracedTInstances1 {
+sealed abstract class TracedTInstances1 extends TracedTInstances2 {
   implicit final def tracedTCobind[W[_]: Cobind, C: Semigroup]: Cobind[TracedT[W, C, ?]] =
     new TracedTCobind[W, C]{
       def W = implicitly
@@ -69,7 +69,7 @@ sealed abstract class TracedTInstances0 extends TracedTInstances1 {
     }
 }
 
-sealed abstract class TracedTInstances extends TracedTInstances0 {
+sealed abstract class TracedTInstances0 extends TracedTInstances1 {
 
   implicit final def tracedTComonad[W[_]: Comonad, C: Monoid]: Comonad[TracedT[W, C, ?]] =
     new TracedTComonad[W, C]{
@@ -89,6 +89,20 @@ sealed abstract class TracedTInstances extends TracedTInstances0 {
 
   implicit final def tracedTEqual[W[_], A, B](implicit W: Equal[W[A => B]]): Equal[TracedT[W, A, B]] =
     W.contramap(_.run)
+
+}
+
+sealed abstract class TracedTInstances extends TracedTInstances0 {
+
+  implicit final def tracedTComonadStore[W[_], S, C: Monoid](implicit W0: ComonadStore[W, S]): ComonadStore[TracedT[W, C, ?], S] =
+    new ComonadStore[TracedT[W, C, ?], S] with TracedTComonad[W, C] {
+      def W = W0
+      def C = implicitly
+      override def pos[A](w: TracedT[W, C, A]) =
+        W0.pos(TracedT.tracedTCohoist[C].lower(w))
+      override def peek[A](s: S, w: TracedT[W, C, A]) =
+        W0.peek(s, TracedT.tracedTCohoist[C].lower(w))
+    }
 
 }
 
