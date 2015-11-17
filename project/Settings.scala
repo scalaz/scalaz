@@ -13,7 +13,7 @@ object Settings {
   , "-Xfuture"
   , "-Xlint"
   , "-Yno-adapted-args"
-  , "-Yno-predef"
+  , "-Yno-imports"
   , "-Ywarn-dead-code"
   , "-Ywarn-numeric-widen"
   , "-Ywarn-value-discard"
