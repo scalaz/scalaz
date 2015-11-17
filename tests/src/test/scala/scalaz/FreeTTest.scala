@@ -53,6 +53,11 @@ object FreeTTest extends SpecLite {
     }
   }
 
+  private def compilationTest = {
+    val a: String \/ Int = \/-(42)
+    val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU(a)
+  }
+
   object instances {
     def monad[S[_]: Functor, F[_]: Applicative] = Monad[FreeT[S, F, ?]]
 
