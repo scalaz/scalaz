@@ -348,7 +348,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
   implicit def tuple7Cozip[A1, A2, A3, A4, A5, A6]: Cozip[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Cozip[A1, A2, A3, A4, A5, A6] {}
   implicit def tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]: Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7] {}
 
-  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] with BindRec[(A1, ?)] =
+  implicit def tuple2Monad[A1](implicit A1: Monoid[A1]): Monad[(A1, ?)] =
     new Tuple2Monad[A1] {
       implicit def _1 = A1
     }
