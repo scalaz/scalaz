@@ -96,7 +96,7 @@ object TupleTest extends SpecLite {
       def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[(B, ?)]
-      def bindRec[A: Monoid] = BindRec[(A, ?)]
+      def bindRec[A: Semigroup] = BindRec[(A, ?)]
       def monad[A: Monoid] = Monad[(A, ?)]
       def cozip = Cozip[(A, ?)]
 

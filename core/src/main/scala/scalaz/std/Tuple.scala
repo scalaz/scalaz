@@ -2,6 +2,15 @@ package scalaz
 package std
 
 sealed trait TupleInstances0 {
+  /** Product functor and comonad */
+  implicit def tuple2Instance[A1]: Traverse[(A1, ?)] with Comonad[(A1, ?)] = new Tuple2Functor[A1] with Comonad[(A1, ?)] {
+    override def cojoin[A](a: (A1, A)) = (a._1, a)
+    def copoint[A](p: (A1, A)) = p._2
+    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  }
+}
+
+sealed trait TupleInstances1 extends TupleInstances0 {
   implicit val tuple2Bitraverse: Bitraverse[Tuple2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
@@ -73,11 +82,9 @@ sealed trait TupleInstances0 {
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
-  /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Traverse[(A1, ?)] with Comonad[(A1, ?)] = new Tuple2Functor[A1] with Comonad[(A1, ?)] {
-    override def cojoin[A](a: (A1, A)) = (a._1, a)
-    def copoint[A](p: (A1, A)) = p._2
-    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  /** Product BindRec */
+  implicit def tuple2BindRec[A1](implicit A1: Semigroup[A1]): BindRec[(A1, ?)] = new Tuple2BindRec[A1] {
+    implicit def _1 = A1
   }
 
   implicit def tuple3Functor[A1, A2]: Traverse[(A1, A2, ?)] = new Tuple3Functor[A1, A2] {}
@@ -148,7 +155,7 @@ sealed trait TupleInstances0 {
       implicit def _8 = A8
     }
 }
-sealed trait TupleInstances1 extends TupleInstances0 {
+sealed trait TupleInstances2 extends TupleInstances1 {
 
   implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = 
     new Tuple1Show[A1] {
@@ -393,7 +400,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
 
 }
 
-trait TupleInstances extends TupleInstances1
+trait TupleInstances extends TupleInstances2
 
 object tuple extends TupleInstances {
   object tupleSyntax extends scalaz.syntax.std.ToTupleOps
@@ -937,15 +944,14 @@ private trait Tuple1Monad extends Monad[Tuple1] {
 
 // TupleN forms a Monad if the element types other than the last are Monoids.
 
+private trait Tuple2BindRec[A1] extends BindRec[(A1, ?)] with Tuple2Functor[A1] {
+  implicit def _1 : Semigroup[A1]
 
-private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with BindRec[(A1, ?)] with Tuple2Functor[A1] {
-  implicit def _1 : Monoid[A1]
   def bind[A, B](fa: (A1, A))(f: A => (A1, B)) = {
     val t = f(fa._2)
 
     (_1.append(fa._1, t._1), t._2)
   }
-  def point[A](a: => A) = (_1.zero, a)
 
   final def tailrecM[A, B](f: A => (A1, A \/ B))(a: A): (A1, B) = {
     @annotation.tailrec
@@ -959,8 +965,16 @@ private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with BindRec[(A1, ?)] with 
           }
       }
 
-    go(_1.zero)(a)
+    val (z, e) = f(a)
+    e match {
+      case -\/(a0) => go(z)(a0)
+      case \/-(b) => (z, b)
+    }
   }
+}
+private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with Tuple2BindRec[A1] {
+  implicit def _1 : Monoid[A1]
+  def point[A](a: => A) = (_1.zero, a)
 }
 private trait Tuple3Monad[A1, A2] extends Monad[(A1, A2, ?)] with Tuple3Functor[A1, A2] {
   implicit def _1 : Monoid[A1]
