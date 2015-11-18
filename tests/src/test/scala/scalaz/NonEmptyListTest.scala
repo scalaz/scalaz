@@ -19,6 +19,20 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
+  "scanLeft1" ! forAll { fa: NonEmptyList[List[Int]] =>
+    def f[A]: (List[A], List[A]) => List[A] = _ ::: _
+    val a = Foldable1[NonEmptyList].scanLeft1(fa)(f)
+    a.list must_=== fa.tail.scanLeft(fa.head)(f)
+    a.size must_=== fa.size
+  }
+
+  "scanRight1" ! forAll { fa: NonEmptyList[List[Int]] =>
+    def f[A]: (List[A], List[A]) => List[A] = _ ::: _
+    val a = Foldable1[NonEmptyList].scanRight1(fa)(f)
+    a.list must_=== fa.init.scanRight(fa.last)(f)
+    a.size must_=== fa.size
+  }
+
   "findLeft/findRight" in {
     val a = NonEmptyList(1, 2, 3, 4, 5)
     Foldable[NonEmptyList].findLeft(a)(_ % 2 == 0) must_=== Some(2)
