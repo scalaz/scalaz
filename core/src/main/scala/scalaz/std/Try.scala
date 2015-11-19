@@ -16,6 +16,15 @@ trait TryFunctions {
 
   def fromDisjunction[T <: Throwable, A](d: T \/ A): Try[A] =
     d.fold(Failure.apply, Success.apply)
+
+  def toValidation[A](t: Try[A]): Validation[Throwable, A] =
+    cata(t)(Validation.success, Validation.failure)
+
+  def toValidationNel[A](t: Try[A]) : ValidationNel[Throwable, A] =
+    cata(t)(Validation.success, Validation.failureNel)
+
+  def fromValidation[T <: Throwable, A](v: Validation[T, A]) : Try[A] =
+    v.fold(Failure.apply, Success.apply)
 }
 
 trait TryInstances {
@@ -25,6 +34,12 @@ trait TryInstances {
     new IsoFunctorTemplate[Try, Throwable \/ ?] {
       def to[A](fa: Try[A]) = t.toDisjunction(fa)
       def from[A](ga: Throwable \/ A) = t.fromDisjunction(ga)
+    }
+
+  val tryValidationIso: Try <~> λ[α => Validation[Throwable, α]] =
+    new IsoFunctorTemplate[Try, Validation[Throwable, ?]] {
+      def to[A](fa: Try[A]) = t.toValidation(fa)
+      def from[A](v: Validation[Throwable, A]) = t.fromValidation(v)
     }
 }
 
