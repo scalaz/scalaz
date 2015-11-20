@@ -12,6 +12,10 @@ final class TryOps[A](val self: Try[A]) extends AnyVal {
     t.cata(self)(success, failure)
 
   final def toDisjunction: Throwable \/ A = t.toDisjunction(self)
+
+  final def toValidation: Validation[Throwable, A] = t.toValidation(self)
+
+  final def toValidationNel: ValidationNel[Throwable, A] = t.toValidationNel(self)
 }
 
 trait ToTryOps {
