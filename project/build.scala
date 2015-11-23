@@ -191,7 +191,7 @@ object build extends Build {
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
-        dir => Seq(GenerateTupleW(dir))
+        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       },
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
