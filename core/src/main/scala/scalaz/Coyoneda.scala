@@ -117,6 +117,12 @@ sealed abstract class CoyonedaInstances extends CoyonedaInstances0 {
       def G = A
       def iso = Coyoneda.iso[F].unlift
     }
+
+  implicit def coyonedaBindRec[F[_]: BindRec]: BindRec[Coyoneda[F, ?]] =
+    new IsomorphismBindRec[Coyoneda[F, ?], F] {
+      def G = implicitly
+      def iso = Coyoneda.iso
+    }
 }
 
 sealed abstract class CoyonedaInstances0 extends CoyonedaInstances1 {
