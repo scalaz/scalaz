@@ -42,7 +42,7 @@ object ConcurrentTaskTest extends SpecLite {
         _ <- now(enqueue(6))
         _ <- fork(delay(enqueue(7)))(es)
 
-      } yield ()).runAsync(_ => {
+      } yield ()).unsafePerformAsync(_ => {
         enqueue(8)
         sync.put(true)
       })
@@ -67,7 +67,7 @@ object ConcurrentTaskTest extends SpecLite {
     "complete even when interrupted" in {
       val t = Task.fork(Task.delay(Thread.sleep(3000)))
       val sync = new SyncVar[Throwable\/Unit]
-      val interrupt = t.runAsyncInterruptibly(sync.put)
+      val interrupt = t.unsafePerformAsyncInterruptibly(sync.put)
       Thread.sleep(1000)
       interrupt()
       sync.get(3000) == Some(left(Task.TaskInterrupted))
