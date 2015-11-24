@@ -14,6 +14,11 @@ object ProductTest extends SpecLite {
   implicit val optionListZip = Zip[Option].product[List]
   implicit val oneAndOptionPairTraverse1 = Traverse1[OneAndOption].product[OneAndOption]
 
+  {
+    implicit val optionListBindRec = BindRec[Option].product[List]
+    checkAll(bindRec.laws[OptionList])
+  }
+
   checkAll(monadPlus.strongLaws[OptionList])
   checkAll(zip.laws[OptionList])
   checkAll(traverse1.laws[OneAndOptionPair])
