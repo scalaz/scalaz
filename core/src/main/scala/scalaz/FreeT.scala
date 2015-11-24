@@ -138,8 +138,12 @@ sealed abstract class FreeTInstances2 {
       implicit def M: Functor[M] = M0
     }
 
-  implicit def freeTMonadTrans[S[_]: Functor]: MonadTrans[FreeT[S, ?[_], ?]] =
-    new MonadTrans[FreeT[S, ?[_], ?]] {
+  implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, ?[_], ?]] =
+    new Hoist[FreeT[S, ?[_], ?]] {
+      def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+        new (FreeT[S, M, ?] ~> FreeT[S, N, ?]) {
+          def apply[A](fa: FreeT[S, M, A]) = fa.hoistM(f)
+        }
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
       def apply[G[_]: Monad] =
