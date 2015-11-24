@@ -7,7 +7,18 @@ object FreeT extends FreeTInstances {
   private case class Suspend[S[_], M[_], A](a: M[A \/ S[FreeT[S, M, A]]]) extends FreeT[S, M, A]
 
   /** Call a subroutine and continue with the given function. */
-  private case class Gosub[S[_], M[_], B, C](a: FreeT[S, M, C], f: C => FreeT[S, M, B]) extends FreeT[S, M, B]
+  private sealed abstract case class Gosub[S[_], M[_], B]() extends FreeT[S, M, B] {
+    type C
+    val a: FreeT[S, M, C]
+    val f: C => FreeT[S, M, B]
+  }
+
+  def gosub[S[_], M[_], B, C0](a0: FreeT[S, M, C0])(f0: C0 => FreeT[S, M, B]): FreeT[S, M, B] =
+    new Gosub[S, M, B] {
+      override type C = C0
+      override val a = a0
+      override val f = f0
+    }
 
   /** Return the given value in the free monad. */
   def point[S[_], M[_], A](value: A)(implicit M: Applicative[M]): FreeT[S, M, A] = Suspend(M.point(-\/(value)))
@@ -39,14 +50,14 @@ sealed abstract class FreeT[S[_], M[_], A] {
   final def map[B](f: A => B)(implicit S: Functor[S], M: Functor[M]): FreeT[S, M, B] =
     this match {
       case Suspend(m) => Suspend(M.map(m)(_.bimap(f, S.lift(_.map(f)))))
-      case Gosub(a, k) => Gosub(a, (x: Any) => k(x).map(f))
+      case g @ Gosub() => gosub(g.a)(g.f.andThen(_.map(f)))
     }
 
   /** Binds the given continuation to the result of this computation. */
   final def flatMap[B](f: A => FreeT[S, M, B]): FreeT[S, M, B] =
     this match {
-      case Gosub(a, k) => Gosub(a, (x: Any) => Gosub(k(x), f))
-      case a => Gosub(a, f)
+      case g @ Gosub() => gosub(g.a)(x => gosub(g.f(x))(f))
+      case a => gosub(a)(f)
     }
 
   /** Evaluates a single layer of the free monad **/
@@ -54,12 +65,12 @@ sealed abstract class FreeT[S[_], M[_], A] {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
       ft match {
         case Suspend(f) => M0.map(f)(\/.right)
-        case Gosub(m0, f0) => m0 match {
+        case g1 @ Gosub() => g1.a match {
           case Suspend(m1) => M0.map(m1) {
-            case -\/(a) => -\/(f0(a))
-            case \/-(fc) => \/-(\/-(S.map(fc)(_.flatMap(f0))))
+            case -\/(a) => -\/(g1.f(a))
+            case \/-(fc) => \/-(\/-(S.map(fc)(_.flatMap(g1.f))))
           }
-          case Gosub(m1, f1) => M1.point(-\/(m1.flatMap(f1(_).flatMap(f0))))
+          case g2 @ Gosub() => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
         }
       }
 
