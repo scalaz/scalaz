@@ -6,7 +6,6 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import java.util.concurrent._
 import ConcurrentTest._
-import org.scalacheck.Prop.forAll
 
 object FutureTest extends SpecLite {
   implicit def FutureEqual[A: Equal] =

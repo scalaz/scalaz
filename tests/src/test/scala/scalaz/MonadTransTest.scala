@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import std.option.some
 import syntax.either._
-import org.scalacheck.Prop.forAll
 
 object MonadTransTest extends SpecLite {
 

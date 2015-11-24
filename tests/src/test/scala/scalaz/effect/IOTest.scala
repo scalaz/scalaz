@@ -3,7 +3,6 @@ package effect
 
 import syntax.foldable._
 import std.stream._
-import org.scalacheck.Prop.forAll
 
 object IOTest extends SpecLite {
   "IO" should {

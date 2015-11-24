@@ -5,7 +5,6 @@ import syntax.apply._
 import std.option.some
 import scalaz.scalacheck.ScalazProperties.applicative
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object ApplyTest extends SpecLite {
   checkAll("List applyApplicative", {

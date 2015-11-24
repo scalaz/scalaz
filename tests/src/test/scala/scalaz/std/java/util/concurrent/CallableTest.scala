@@ -8,7 +8,6 @@ import _root_.java.util.concurrent.Callable
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object CallableTest extends SpecLite {
   checkAll("Callable", order.laws[Callable[Int]])

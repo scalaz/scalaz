@@ -4,7 +4,6 @@ package concurrent
 import collection.mutable
 import java.util.concurrent._
 import ConcurrentTest._
-import org.scalacheck.Prop.forAll
 
 object ActorTest extends SpecLite {
   val NumOfMessages = 1000

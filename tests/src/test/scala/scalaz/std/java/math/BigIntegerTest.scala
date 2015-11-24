@@ -8,7 +8,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
-import org.scalacheck.Prop.forAll
 
 object BigIntegerTest extends SpecLite {
   checkAll("BigInteger", enum.laws[BigInteger])

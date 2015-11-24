@@ -4,7 +4,6 @@ package example
 import syntax.validation._
 import syntax.either._
 import syntax.bifunctor._
-import syntax.id._
 import syntax.equal._
 import std.tuple._
 import std.list._

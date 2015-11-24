@@ -2,7 +2,7 @@ package scalaz
 package std
 
 import std.AllInstances._
-import org.scalacheck.{Prop, Arbitrary}, Arbitrary.arbitrary
+import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
 import scala.collection.immutable.{Map => SMap, MapLike}
 import scala.math.{Ordering => SOrdering}

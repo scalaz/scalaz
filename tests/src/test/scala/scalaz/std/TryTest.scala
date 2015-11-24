@@ -4,8 +4,7 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
-import org.scalacheck.Arbitrary
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 object TryTest extends SpecLite {
 

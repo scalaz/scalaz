@@ -1,6 +1,5 @@
 package scalaz
 
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 import scala.util.Random
 
@@ -317,7 +316,6 @@ object MapTest extends SpecLite {
 
   "==>> union operations" should {
     "be sound" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      import std.set._
       val c = a union b
       structurallySound(c)
       (a.keySet union b.keySet) must_=== c.keySet
@@ -654,8 +652,6 @@ object MapTest extends SpecLite {
     }
 
     "keySet" in {
-      import std.set._
-
       fromList(List(5 -> "a", 3 -> "b")).keySet must_===(ISet.fromList(List(3, 5)))
       empty[Int, String].keySet must_===(ISet.empty[Int])
     }
@@ -708,7 +704,7 @@ object MapTest extends SpecLite {
   }
 
   "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
-    import std.set._, \&/._
+    import \&/._
     val F = Align[Int ==>> ?]
     val x = F.align(a, b)
     val keysA = a.keySet

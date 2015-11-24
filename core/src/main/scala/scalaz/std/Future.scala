@@ -3,7 +3,7 @@ package std
 
 import _root_.java.util.concurrent.atomic.AtomicInteger
 
-import scala.concurrent.{Await, CanAwait, ExecutionContext, Future, Promise}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration.Duration
 import scala.util.{ Try, Success => TSuccess }
 

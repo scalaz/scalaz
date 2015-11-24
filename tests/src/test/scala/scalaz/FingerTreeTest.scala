@@ -10,7 +10,6 @@ import std.tuple._
 import std.option._
 import syntax.equal._
 import WriterT._
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object FingerTreeTest extends SpecLite {

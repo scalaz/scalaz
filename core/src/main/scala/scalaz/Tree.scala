@@ -1,7 +1,6 @@
 package scalaz
 
 import std.stream.{streamInstance, streamMonoid}
-import std.string.stringInstance
 import Free.Trampoline
 
 /**

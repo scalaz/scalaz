@@ -1,7 +1,6 @@
 package scalaz
 package effect
 
-import org.scalacheck.Prop.forAll
 import java.io.{ StringReader, IOException }
 
 object MonadCatchIOTest extends SpecLite {

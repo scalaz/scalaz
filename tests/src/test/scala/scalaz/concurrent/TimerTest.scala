@@ -3,7 +3,6 @@ package concurrent
 
 import ConcurrentTest._
 import scalaz.syntax.either._
-import org.scalacheck.Prop.forAll
 
 object TimerTest extends SpecLite {
   def withTimer[T](expression: Timer => T): T = {

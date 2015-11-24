@@ -3,7 +3,6 @@ package effect
 
 import std.AllInstances._
 import ST._
-import org.scalacheck.Prop.forAll
 
 object STTest extends SpecLite {
   type ForallST[A] = Forall[ST[?, A]]

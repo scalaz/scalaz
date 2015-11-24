@@ -2,7 +2,6 @@ package scalaz
 
 import Scalaz.Id
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
 
 object OptionalTest extends SpecLite {
 

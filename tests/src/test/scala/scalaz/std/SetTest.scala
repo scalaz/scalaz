@@ -4,7 +4,6 @@ package std
 import syntax.foldable._
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import org.scalacheck.Prop.forAll
 
 object SetTest extends SpecLite {
 

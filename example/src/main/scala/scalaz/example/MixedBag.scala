@@ -78,7 +78,6 @@ object MixedBag extends App {
     import syntax.monad._
     import syntax.writer._
     import WriterT._
-    import Free._
 
     type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]

@@ -3,7 +3,6 @@ package scalaz
 import scalaz.std.AllInstances.{tuple2Instance => _, _}
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object BitraverseTest extends SpecLite {
 

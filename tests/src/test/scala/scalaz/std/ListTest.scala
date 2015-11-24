@@ -4,7 +4,6 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object ListTest extends SpecLite {

@@ -9,9 +9,7 @@ import org.scalacheck.Prop.forAll
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.std.AllInstances._
-import scalaz.syntax.functor._
 import scalaz.Tags._
 
 import scala.concurrent._

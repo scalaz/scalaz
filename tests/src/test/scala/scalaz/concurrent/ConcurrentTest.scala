@@ -3,7 +3,6 @@ package concurrent
 
 import java.util.concurrent._
 import org.scalacheck.Prop
-import org.scalacheck.Prop.forAll
 
 object ConcurrentTest extends SpecLite{
 

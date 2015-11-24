@@ -1,6 +1,5 @@
 package scalaz
 
-import scala.annotation.tailrec
 import scala.util.control.NonFatal
 import scala.reflect.ClassTag
 import Liskov.<~<

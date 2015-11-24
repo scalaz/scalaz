@@ -3,7 +3,6 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
 import org.scalacheck.{Gen, Arbitrary}
-import org.scalacheck.Prop.forAll
 
 object ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]

@@ -4,7 +4,6 @@ package concurrent
 
 import scalaz.concurrent.MVar.newEmptyMVar
 import scalaz.effect.IO
-import org.scalacheck.Prop.forAll
 
 object MVarTest extends SpecLite {
 
