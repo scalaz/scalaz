@@ -60,6 +60,46 @@ sealed abstract class FreeT[S[_], M[_], A] {
       case a => gosub(a)(f)
     }
 
+  /**
+   * Changes the underlying `Monad` for this `FreeT`, ie.
+   * turning this `FreeT[S, M, A]` into a `FreeT[S, N, A]`
+   * given Functors for `S` and `N`
+   */
+  def hoistN[N[_]](mn: M ~> N)(implicit S: Functor[S], N: Functor[N]): FreeT[S, N, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.hoistN(mn))(e.f.andThen(_.hoistN(mn)))
+      case Suspend(m) =>
+        Suspend(N.map(mn(m))(_.map(s => S.map(s)(_.hoistN(mn)))))
+    }
+
+  /** Same as `hoistN` but different constraints */
+  def hoistM[N[_]](mn: M ~> N)(implicit S: Functor[S], M: Functor[M]): FreeT[S, N, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.hoistM(mn))(e.f.andThen(_.hoistM(mn)))
+      case Suspend(m) =>
+        Suspend(mn(M.map(m)(_.map(s => S.map(s)(_.hoistM(mn))))))
+    }
+
+  /** Change the base functor `S` for a `FreeT` action. */
+  def interpretS[T[_]](st: S ~> T)(implicit S: Functor[S], M: Functor[M]): FreeT[T, M, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.interpretS(st))(e.f.andThen(_.interpretS(st)))
+      case Suspend(m) =>
+        Suspend(M.map(m)(_.map(s => st(S.map(s)(_.interpretS(st))))))
+    }
+
+  /** Same as `interpretS` but different constraints */
+  def interpretT[T[_]](st: S ~> T)(implicit T: Functor[T], M: Functor[M]): FreeT[T, M, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.interpretT(st))(e.f.andThen(_.interpretT(st)))
+      case Suspend(m) =>
+        Suspend(M.map(m)(_.map(s => T.map(st(s))(_.interpretT(st)))))
+    }
+
   /** Evaluates a single layer of the free monad **/
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =

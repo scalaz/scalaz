@@ -1,6 +1,7 @@
 package scalaz
 
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Prop.forAll
 import std.AllInstances._
 import FreeT._
 import scalaz.scalacheck.ScalazProperties._
@@ -63,6 +64,26 @@ object FreeTTest extends SpecLite {
         )(0)
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
+    }
+
+    "hoistM" ! forAll { a: FreeTListOption[Int] =>
+      val b = FreeTListOption(a.f.hoistM(NaturalTransformation.refl))
+      Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "hoistN" ! forAll { a: FreeTListOption[Int] =>
+      val b = FreeTListOption(a.f.hoistN(NaturalTransformation.refl))
+      Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "interpretS" ! forAll { a: FreeTListOption[Int] =>
+      val b = FreeTListOption(a.f.interpretS(NaturalTransformation.refl))
+      Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "interpretT" ! forAll { a: FreeTListOption[Int] =>
+      val b = FreeTListOption(a.f.interpretT(NaturalTransformation.refl))
+      Equal[FreeTListOption[Int]].equal(a, b)
     }
   }
 
