@@ -259,7 +259,7 @@ private trait KleisliMonadReader[F[_], R] extends MonadReader[({type f[s, a] = K
   implicit def F: Monad[F]
 
   def ask: Kleisli[F, R, R] = Kleisli[F, R, R](r => F.point(r))
-  def local[A](f: R => R)(fa: Kleisli[F, R, A]): Kleisli[F, R, A] = Kleisli[F, R, A](r => fa.run(f(r)))
+  def local[A](f: R => R)(fa: Kleisli[F, R, A]): Kleisli[F, R, A] = fa.local(f)
 }
 
 private trait KleisliHoist[R] extends Hoist[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] {
