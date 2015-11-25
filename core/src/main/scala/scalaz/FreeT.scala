@@ -7,7 +7,18 @@ object FreeT extends FreeTInstances {
   private case class Suspend[S[_], M[_], A](a: M[A \/ S[FreeT[S, M, A]]]) extends FreeT[S, M, A]
 
   /** Call a subroutine and continue with the given function. */
-  private case class Gosub[S[_], M[_], B, C](a: FreeT[S, M, C], f: C => FreeT[S, M, B]) extends FreeT[S, M, B]
+  private sealed abstract case class Gosub[S[_], M[_], B]() extends FreeT[S, M, B] {
+    type C
+    val a: FreeT[S, M, C]
+    val f: C => FreeT[S, M, B]
+  }
+
+  def gosub[S[_], M[_], B, C0](a0: FreeT[S, M, C0])(f0: C0 => FreeT[S, M, B]): FreeT[S, M, B] =
+    new Gosub[S, M, B] {
+      override type C = C0
+      override val a = a0
+      override val f = f0
+    }
 
   /** Return the given value in the free monad. */
   def point[S[_], M[_], A](value: A)(implicit M: Applicative[M]): FreeT[S, M, A] = Suspend(M.point(-\/(value)))
@@ -39,14 +50,54 @@ sealed abstract class FreeT[S[_], M[_], A] {
   final def map[B](f: A => B)(implicit S: Functor[S], M: Functor[M]): FreeT[S, M, B] =
     this match {
       case Suspend(m) => Suspend(M.map(m)(_.bimap(f, S.lift(_.map(f)))))
-      case Gosub(a, k) => Gosub(a, (x: Any) => k(x).map(f))
+      case g @ Gosub() => gosub(g.a)(g.f.andThen(_.map(f)))
     }
 
   /** Binds the given continuation to the result of this computation. */
   final def flatMap[B](f: A => FreeT[S, M, B]): FreeT[S, M, B] =
     this match {
-      case Gosub(a, k) => Gosub(a, (x: Any) => Gosub(k(x), f))
-      case a => Gosub(a, f)
+      case g @ Gosub() => gosub(g.a)(x => gosub(g.f(x))(f))
+      case a => gosub(a)(f)
+    }
+
+  /**
+   * Changes the underlying `Monad` for this `FreeT`, ie.
+   * turning this `FreeT[S, M, A]` into a `FreeT[S, N, A]`
+   * given Functors for `S` and `N`
+   */
+  def hoistN[N[_]](mn: M ~> N)(implicit S: Functor[S], N: Functor[N]): FreeT[S, N, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.hoistN(mn))(e.f.andThen(_.hoistN(mn)))
+      case Suspend(m) =>
+        Suspend(N.map(mn(m))(_.map(s => S.map(s)(_.hoistN(mn)))))
+    }
+
+  /** Same as `hoistN` but different constraints */
+  def hoistM[N[_]](mn: M ~> N)(implicit S: Functor[S], M: Functor[M]): FreeT[S, N, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.hoistM(mn))(e.f.andThen(_.hoistM(mn)))
+      case Suspend(m) =>
+        Suspend(mn(M.map(m)(_.map(s => S.map(s)(_.hoistM(mn))))))
+    }
+
+  /** Change the base functor `S` for a `FreeT` action. */
+  def interpretS[T[_]](st: S ~> T)(implicit S: Functor[S], M: Functor[M]): FreeT[T, M, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.interpretS(st))(e.f.andThen(_.interpretS(st)))
+      case Suspend(m) =>
+        Suspend(M.map(m)(_.map(s => st(S.map(s)(_.interpretS(st))))))
+    }
+
+  /** Same as `interpretS` but different constraints */
+  def interpretT[T[_]](st: S ~> T)(implicit T: Functor[T], M: Functor[M]): FreeT[T, M, A] =
+    this match {
+      case e @ Gosub() =>
+        gosub(e.a.interpretT(st))(e.f.andThen(_.interpretT(st)))
+      case Suspend(m) =>
+        Suspend(M.map(m)(_.map(s => T.map(st(s))(_.interpretT(st)))))
     }
 
   /** Evaluates a single layer of the free monad **/
@@ -54,12 +105,12 @@ sealed abstract class FreeT[S[_], M[_], A] {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
       ft match {
         case Suspend(f) => M0.map(f)(\/.right)
-        case Gosub(m0, f0) => m0 match {
+        case g1 @ Gosub() => g1.a match {
           case Suspend(m1) => M0.map(m1) {
-            case -\/(a) => -\/(f0(a))
-            case \/-(fc) => \/-(\/-(S.map(fc)(_.flatMap(f0))))
+            case -\/(a) => -\/(g1.f(a))
+            case \/-(fc) => \/-(\/-(S.map(fc)(_.flatMap(g1.f))))
           }
-          case Gosub(m1, f1) => M1.point(-\/(m1.flatMap(f1(_).flatMap(f0))))
+          case g2 @ Gosub() => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
         }
       }
 
@@ -87,8 +138,12 @@ sealed abstract class FreeTInstances2 {
       implicit def M: Functor[M] = M0
     }
 
-  implicit def freeTMonadTrans[S[_]: Functor]: MonadTrans[FreeT[S, ?[_], ?]] =
-    new MonadTrans[FreeT[S, ?[_], ?]] {
+  implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, ?[_], ?]] =
+    new Hoist[FreeT[S, ?[_], ?]] {
+      def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+        new (FreeT[S, M, ?] ~> FreeT[S, N, ?]) {
+          def apply[A](fa: FreeT[S, M, A]) = fa.hoistM(f)
+        }
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
       def apply[G[_]: Monad] =
