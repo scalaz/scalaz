@@ -138,6 +138,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def zipWithL[A,B,C](fa: F[A], fb: F[B])(f: (A,Option[B]) => C): F[C] = zipWith(fa, fb)(f)._2
   def zipWithR[A,B,C](fa: F[A], fb: F[B])(f: (Option[A],B) => C): F[C] = zipWith(fb, fa)((b,oa) => f(oa,b))._2
 
+  def indexed[A](fa: F[A]): F[(Int, A)] = mapAccumL(fa, 0) { case (s, a) => (s + 1, (s, a)) }._2
+
   def zipL[A,B](fa: F[A], fb: F[B]): F[(A, Option[B])] = zipWithL(fa, fb)((_,_))
   def zipR[A,B](fa: F[A], fb: F[B]): F[(Option[A], B)] = zipWithR(fa, fb)((_,_))
 
