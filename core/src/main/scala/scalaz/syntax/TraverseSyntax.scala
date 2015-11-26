@@ -58,6 +58,7 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def zipWith[B, C](fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) = F.zipWith(self, fb)(f)
   final def zipWithL[B, C](fb: F[B])(f: (A, Option[B]) => C): F[C] = F.zipWithL(self, fb)(f)
   final def zipWithR[B, C](fb: F[B])(f: (Option[A], B) => C): F[C] = F.zipWithR(self, fb)(f)
+  final def indexed: F[(Int, A)] = F.indexed(self)
   final def zipL[B](fb: F[B]): F[(A, Option[B])] = F.zipL(self, fb)
   final def zipR[B](fb: F[B]): F[(Option[A], B)] = F.zipR(self, fb)
   final def mapAccumL[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
