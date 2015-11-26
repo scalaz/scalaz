@@ -117,13 +117,13 @@ object LazyEitherT extends LazyEitherTInstances {
 
   import Isomorphism.{IsoFunctorTemplate, IsoBifunctorTemplate, <~>, <~~>}
 
-  implicit def lazyEitherTLeftProjectionEIso2[F[_], E]: LazyEitherT.LeftProjectionT[F, E, ?] <~> LazyEitherT[F, E, ?] =
+  def lazyEitherTLeftProjectionEIso2[F[_], E]: LazyEitherT.LeftProjectionT[F, E, ?] <~> LazyEitherT[F, E, ?] =
     new IsoFunctorTemplate[LazyEitherT.LeftProjectionT[F, E, ?], LazyEitherT[F, E, ?]] {
       def to[A](fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] = fa.lazyEitherT
       def from[A](ga: LazyEitherT[F, E, A]): LazyEitherT.LeftProjectionT[F, E, A] = ga.left
     }
 
-  implicit def lazyEitherTLeftProjectionIso2[F[_]]: LazyEitherT.LeftProjectionT[F, ?, ?] <~~> LazyEitherT[F, ?, ?] =
+  def lazyEitherTLeftProjectionIso2[F[_]]: LazyEitherT.LeftProjectionT[F, ?, ?] <~~> LazyEitherT[F, ?, ?] =
     new IsoBifunctorTemplate[LazyEitherT.LeftProjectionT[F, ?, ?], LazyEitherT[F, ?, ?]] {
       def to[A, B](fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] = fa.lazyEitherT
       def from[A, B](ga: LazyEitherT[F, A, B]): LazyEitherT.LeftProjectionT[F, A, B] = ga.left
