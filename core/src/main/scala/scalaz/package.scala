@@ -28,6 +28,8 @@
  *  - [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Functor]] extends [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Contravariant]] extends [[scalaz.InvariantFunctor]]
+ *  - [[scalaz.Divide]] extends [[scalaz.Contravariant]]
+ *  - [[scalaz.Divisible]] extends [[scalaz.Divide]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]]
  *  - [[scalaz.Align]] extends [[scalaz.Functor]]
@@ -35,6 +37,7 @@
  *  - [[scalaz.Unzip]]
  *  - [[scalaz.Cozip]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
+ *  - [[scalaz.BindRec]] extends [[scalaz.Bind]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
  *  - [[scalaz.Cobind]] extends [[scalaz.Functor]]
  *  - [[scalaz.Comonad]] extends [[scalaz.Cobind]]
@@ -45,6 +48,7 @@
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *  - [[scalaz.Traverse1]] extends [[scalaz.Traverse]] with [[scalaz.Foldable1]]
  *
+ *  - [[scalaz.Associative]]
  *  - [[scalaz.Bifunctor]]
  *  - [[scalaz.Bifoldable]]
  *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]] with [[scalaz.Bifoldable]]
@@ -58,6 +62,11 @@
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]
  *  - [[scalaz.Arrow]] extends [[scalaz.Split]] with [[scalaz.Strong]] with [[scalaz.Category]]
+ *  - [[scalaz.MonadState]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadError]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadTell]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadReader]] extends [[scalaz.Monad]]
+ *  - [[scalaz.ComonadStore]] extends [[scalaz.Comonad]]
  *
  *  '''Data Structures Index'''
  *  - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
