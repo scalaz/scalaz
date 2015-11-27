@@ -24,15 +24,6 @@ For Maven and other build tools, you can visit [search.maven.org](http://search.
 To get sample configurations, click on the version of the module you are interested in.
 You can also find direct download links at the bottom of that page. Choose the file ending in `7.1.5.jar`.
 
-Note: In some cases, Maven will warn about "multiple versions of scala libraries", e.g.
-
-```
-[WARNING]  Expected all dependencies to require Scala version: 2.10.1
-[WARNING]  org.scalaz:scalaz-core_2.10:7.1.5 requires scala version: 2.10.0
-```
-
-You can safely ignore this warning, as the Scala 2.10.x versions are compatible.
-
 ## Quick Start
 
 ```scala
