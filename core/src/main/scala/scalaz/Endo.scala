@@ -27,12 +27,12 @@ object Endo extends EndoInstances {
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 
-  implicit def IsoEndo[A] = new IsoSet[Endo[A], A => A] {
+  def IsoEndo[A] = new IsoSet[Endo[A], A => A] {
     def to: (Endo[A]) => A => A = _.run
     def from: (A => A) => Endo[A] = endo
   }
 
-  implicit val IsoFunctorEndo = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
+  val IsoFunctorEndo = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
     def to[A](fa: Endo[A]): A => A = fa.run
     def from[A](ga: A => A): Endo[A] = endo(ga)
   }
