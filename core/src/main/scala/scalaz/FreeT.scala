@@ -131,7 +131,33 @@ sealed abstract class FreeT[S[_], M[_], A] {
   }
 }
 
-sealed abstract class FreeTInstances2 {
+sealed abstract class FreeTInstances4 {
+  implicit def freeTMonadState[S[_]: Functor, M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
+    new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def init =
+        FreeT.liftM(M1.init)
+      override def get =
+        FreeT.liftM(M1.get)
+      override def put(s: E) =
+        FreeT.liftM(M1.put(s))
+    }
+}
+
+sealed abstract class FreeTInstances3 extends FreeTInstances4 {
+  implicit def freeTMonadError[S[_]: Functor, M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, ?], E] =
+    new MonadError[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def handleError[A](fa: FreeT[S, M, A])(f: E => FreeT[S, M, A]) =
+        FreeT.suspend(E.handleError(fa.resume)(f.andThen(_.resume)))
+      override def raiseError[A](e: E) =
+        FreeT.liftM(E.raiseError[A](e))(M)
+    }
+}
+
+sealed abstract class FreeTInstances2 extends FreeTInstances3 {
   implicit def freeTBind[S[_], M[_]](implicit S0: Functor[S], M0: Functor[M]): Bind[FreeT[S, M, ?]] =
     new FreeTBind[S, M] {
       implicit def S: Functor[S] = S0
