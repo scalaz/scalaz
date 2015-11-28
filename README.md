@@ -6,7 +6,7 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
-[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.2.x)](http://travis-ci.org/scalaz/scalaz)
+[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.3.x)](http://travis-ci.org/scalaz/scalaz)
 
 ## Getting Scalaz
 
@@ -72,7 +72,7 @@ res2: Option[Int] = Some(1)
 
 Let the types speak for themselves via the [Scalaz Scaladocs](http://scalaz.github.io/scalaz/#scaladoc)!
 
-The [examples module](https://github.com/scalaz/scalaz/tree/series/7.2.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
+The [examples module](https://github.com/scalaz/scalaz/tree/series/7.3.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
@@ -304,7 +304,7 @@ type Id[A] = A
 
 ## Contributing
 
-[Documentation for contributors](https://github.com/scalaz/scalaz/blob/series/7.2.x/CONTRIBUTING.md)
+[Documentation for contributors](https://github.com/scalaz/scalaz/blob/series/7.3.x/CONTRIBUTING.md)
 
 ## Credits
 
