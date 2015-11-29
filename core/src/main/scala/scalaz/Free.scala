@@ -294,6 +294,16 @@ sealed abstract class Free[S[_], A] {
 
   /** Extraction from `Free` as a comonad in the endofunctor category. */
   def extractF(implicit S: Monad[S]): S[A] = foldMap(NaturalTransformation.refl[S])
+
+  def toFreeT(implicit S: Functor[S]): FreeT[S, Id, A] =
+    this match {
+      case Return(a) =>
+        FreeT.point(a)
+      case Suspend(a) =>
+        FreeT.liftF(a)
+      case Gosub(a, f) =>
+        FreeT.gosub(a.toFreeT)(f.andThen(_.toFreeT))
+    }
 }
 
 object Trampoline extends TrampolineInstances {

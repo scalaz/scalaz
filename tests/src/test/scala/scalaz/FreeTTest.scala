@@ -87,6 +87,11 @@ object FreeTTest extends SpecLite {
     }
   }
 
+  "isoFree" ! forAll { a: FreeOption[Int] =>
+    val iso = FreeT.isoFree[Option]
+    Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
+  }
+
   private def compilationTest = {
     val a: String \/ Int = \/-(42)
     val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU(a)

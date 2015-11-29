@@ -44,6 +44,22 @@ object FreeT extends FreeTInstances {
 
   def roll[S[_], M[_], A](value: S[FreeT[S, M, A]])(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, A] =
     liftF[S, M, FreeT[S, M, A]](value).flatMap(identity)
+
+  import Isomorphism._
+
+  def isoFree[S[_]](implicit S: Functor[S]): FreeT[S, Id.Id, ?] <~> Free[S, ?] =
+    new IsoFunctorTemplate[FreeT[S, Id.Id, ?], Free[S, ?]] {
+      override def to[A](fa: FreeT[S, Id.Id, A]) = fa match {
+        case Suspend(\/-(a)) =>
+          Free.roll(S.map(a)(to(_)))
+        case Suspend(-\/(a)) =>
+          Free.point(a)
+        case a @ Gosub() =>
+          to(a.a).flatMap(a.f.andThen(to(_)))
+      }
+      override def from[A](ga: Free[S, A]) =
+        ga.toFreeT
+    }
 }
 
 sealed abstract class FreeT[S[_], M[_], A] {
