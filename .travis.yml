@@ -22,7 +22,7 @@ scala:
   - 2.11.7
   - 2.10.6
 jdk:
-  - openjdk7
+  - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
