@@ -104,6 +104,8 @@ object FreeTTest extends SpecLite {
     def monad[S[_]: Functor, F[_]: Applicative] = Monad[FreeT[S, F, ?]]
     def monadError[S[_]: Functor, F[_]: BindRec, E](implicit F: MonadError[F, E]) = MonadError[FreeT[S, F, ?], E]
     def monadState[S[_]: Functor, F[_], E](implicit F: MonadState[F, E]) = MonadState[FreeT[S, F, ?], E]
+    def monadReader[S[_]: Functor, F[_], E](implicit F: MonadReader[F, E]) = MonadReader[FreeT[S, F, ?], E]
+    def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, ?], E]
     def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, ?]]
     def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, ?]]
     def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, ?[_], ?]]

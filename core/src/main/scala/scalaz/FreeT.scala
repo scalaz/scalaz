@@ -147,7 +147,31 @@ sealed abstract class FreeT[S[_], M[_], A] {
   }
 }
 
-sealed abstract class FreeTInstances4 {
+sealed abstract class FreeTInstances6 {
+  implicit def freeTMonadTell[S[_]: Functor, M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] =
+    new MonadTell[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def writer[A](w: E, v: A) =
+        FreeT.liftM(M1.writer(w, v))
+    }
+}
+
+sealed abstract class FreeTInstances5 extends FreeTInstances6 {
+  implicit def freeTMonadReader[S[_]: Functor, M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
+    new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+      override def S = implicitly
+      override def M = implicitly
+      override def ask =
+        FreeT.liftM(M1.ask)
+      override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
+        fa.hoistM(new (M ~> M){
+          def apply[A](a: M[A]) = M1.local(f)(a)
+        })
+    }
+}
+
+sealed abstract class FreeTInstances4 extends FreeTInstances5 {
   implicit def freeTMonadState[S[_]: Functor, M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
     new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
       override def S = implicitly
