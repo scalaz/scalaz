@@ -193,12 +193,16 @@ sealed abstract class Free[S[_], A] {
    * Runs to completion, mapping the suspension with the given transformation at each step and
    * accumulating into the monad `M`.
    */
+  @annotation.tailrec
   final def foldMap[M[_]](f: S ~> M)(implicit M: Monad[M]): M[A] =
-    step match {
+    this match {
       case Return(a) => M.pure(a)
       case Suspend(s) => f(s)
-      // This is stack safe because `step` ensures right-associativity of Gosub
-      case Gosub(x, g) => M.bind(x foldMap f)(c => g(c) foldMap f)
+      case Gosub(x, g) => x match {
+        case Suspend(s) => g(f(s)).foldMap(f)
+        case Gosub(cSub, h) => cSub.flatMap(cc => h(cc).flatMap(g)).foldMap(f)
+        case Return(a) => g(a).foldMap(f)
+      }
     }
 
   import Id._
