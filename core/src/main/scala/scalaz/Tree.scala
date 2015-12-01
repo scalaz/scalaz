@@ -187,10 +187,6 @@ sealed abstract class TreeInstances {
 }
 
 object Tree extends TreeInstances {
-  /** Construct a tree node with no children. */
-  @deprecated(message = "Use Leaf.apply or Node.apply instead.", since = "7.2.0")
-  def apply[A](root: => A): Tree[A] = Leaf(root)
-
   /**
    * Node represents a tree node that may have children.
    *
@@ -228,14 +224,6 @@ object Tree extends TreeInstances {
       }
     }
   }
-
-  /** Construct a new Tree node. */
-  @deprecated(message = "Use Node.apply instead.", since = "7.2.0")
-  def node[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = Node(root, forest)
-
-  /** Construct a tree node with no children. */
-  @deprecated(message = "Use Leaf.apply instead.", since = "7.2.0")
-  def leaf[A](root: => A): Tree[A] = Leaf(root)
 
   def unfoldForest[A, B](s: Stream[A])(f: A => (B, () => Stream[A])): Stream[Tree[B]] =
     s.map(unfoldTree(_)(f))

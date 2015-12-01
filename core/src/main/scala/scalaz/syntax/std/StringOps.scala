@@ -22,12 +22,6 @@ final class StringOps(val self: String) extends AnyVal {
    */
   def charsNel(e: => NonEmptyList[Char]) : NonEmptyList[Char] = s.charsNel(self, e)
 
-  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
-  def charsNelErr(message: => String): NonEmptyList[Char] = s.charsNelErr(self, message)
-
-  @deprecated("Unsafe. Use `charsNel` instead", "7.2")
-  def unsafeCharsNel : NonEmptyList[Char] = s.unsafeCharsNel(self)
-
   // Parsing functions.
 
   def parseBoolean: Validation[IllegalArgumentException, Boolean] = s.parseBoolean(self)
