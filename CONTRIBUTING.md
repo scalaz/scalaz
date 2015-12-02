@@ -40,7 +40,7 @@ Use currying sparingly. Less indirection helps performance. Curried versions of 
     def fold[A, B](fa: F[A])(f: (A, B) => B): F[B] // good
     def fold[A, B](fa: F[A])(f: A => B => B): F[B] // bad
     def fold[A, B](fa: F[A]): A => B => B => F[B] // bad
-    final def foldCurried[A, B](f: F[A]): (A => B => B) => F[B] = f => fold(fa)((a, b) => f(a)(b)) // okay
+    final def foldCurried[A, B](fa: F[A]): (A => B => B) => F[B] = f => fold(fa)((a, b) => f(a)(b)) // okay
 
 Add general purpose derived methods directly to the type class. These may be left unfinalized, to allow a
 child type class or a type class instance to override them for efficiency.
