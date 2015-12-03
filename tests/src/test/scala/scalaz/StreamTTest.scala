@@ -50,6 +50,11 @@ object StreamTTest extends SpecLite {
 
   }
 
+  "foldMap" ! forAll {
+    (s: Stream[Int]) =>
+      StreamT.fromStream(Option(s)).foldMap(_.toString) must_=== Foldable[Stream].foldMap(s)(_.toString)
+  }
+
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
@@ -59,5 +64,6 @@ object StreamTTest extends SpecLite {
     def monoid[F[+_]: Applicative, A] = Monoid[StreamT[F, A]]
     def functor[F[+_]: Functor] = Functor[({type λ[α]=StreamT[F, α]})#λ]
     def monad[F[+_]: Monad] = Monad[({type λ[α]=StreamT[F, α]})#λ]
+    def foldable[F[+_]: Foldable] = Foldable[({type λ[α]=StreamT[F, α]})#λ]
   }
 }
