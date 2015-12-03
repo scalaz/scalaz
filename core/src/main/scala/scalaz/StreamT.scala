@@ -120,6 +120,14 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       _.foldLeft(z)((a, b) => f(b, a))
     }
 
+  def foldMap[B](f: A => B)(implicit M: Foldable[M], B: Monoid[B]): B =
+    M.foldMap(step) {
+      _( yieldd = (a, s) => B.append(f(a), s.foldMap(f))
+       , skip = s => s.foldMap(f)
+       , done = B.zero
+       )
+    }
+
   def length(implicit m: Monad[M]): M[Int] = {
     def addOne(c: => Int, a: => A) = 1 + c
     foldLeft(0)(addOne _)
@@ -175,6 +183,10 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
   implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
   implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
   implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
+  implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, ?]] =
+    new Foldable[StreamT[F, ?]] with Foldable.FromFoldMap[StreamT[F, ?]] {
+      override def foldMap[A, M: Monoid](s: StreamT[F, A])(f: A => M) = s.foldMap(f)
+    }
 }
 
 object StreamT extends StreamTInstances {
