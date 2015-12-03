@@ -47,12 +47,17 @@ object StreamTTest extends SpecLite {
         Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: 
         Traverse[Stream].traverse(s0)(i => l.map(_ + i))
       )
+  }
 
+  "foldMap" ! forAll {
+    (s: Stream[Int]) =>
+      StreamT.fromStream(Option(s)).foldMap(_.toString) must_=== Foldable[Stream].foldMap(s)(_.toString)
   }
 
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
+  checkAll(foldable.laws[StreamTOpt])
   
   object instances {
     def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
@@ -62,6 +67,7 @@ object StreamTTest extends SpecLite {
     def plus[F[_]: Functor] = Plus[({type λ[α]=StreamT[F, α]})#λ]
     def monad[F[_]: Applicative] = Monad[({type λ[α]=StreamT[F, α]})#λ]
     def monadPlus[F[_]: Applicative] = MonadPlus[({type λ[α]=StreamT[F, α]})#λ]
+    def foldable[F[_]: Foldable] = Foldable[({type λ[α]=StreamT[F, α]})#λ]
 
     // checking absence of ambiguity
     def semigroup[F[_]: Applicative, A] = Semigroup[StreamT[F, A]]
