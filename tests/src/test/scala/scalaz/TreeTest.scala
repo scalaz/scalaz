@@ -18,6 +18,13 @@ object TreeTest extends SpecLite {
 
   checkAll(FoldableTests.anyAndAllLazy[Tree])
 
+  "indexed" ! forAll { xs: Tree[Byte] =>
+    val F = Traverse[Tree]
+    val a = F.indexed(xs)
+    Equal[Tree[Byte]].equal(a.map(_._2), xs) must_=== true
+    F.toList(a) must_=== F.toList(xs).zipWithIndex.map{case (a, b) => (b, a)}
+  }
+
   "ScalazArbitrary.treeGenSized" ! forAll(Gen.choose(1, 200)){ size =>
     val gen = treeGenSized[Unit](size)
     Stream.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
