@@ -28,6 +28,11 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def sequence1[A, G[_]: Traverse1](as: G[F[A]]): F[G[A]] =
     traverse1(as)(a => a)
 
+  /**
+   * Repeats an applicative action infinitely
+   */
+  def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
+
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] = 
     new CompositionApply[F, G] {
@@ -121,6 +126,12 @@ trait Apply[F[_]] extends Functor[F] { self =>
     apply11(_, _, _, _, _, _, _, _, _, _, _)(f)
   def lift12[A, B, C, D, E, FF, G, H, I, J, K, L, R](f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): (F[A], F[B], F[C], F[D], F[E], F[FF], F[G], F[H], F[I], F[J], F[K], F[L]) => F[R] =
     apply12(_, _, _, _, _, _, _, _, _, _, _, _)(f)
+
+  /** Combine `fa` and `fb` according to `Apply[F]` with a function that discards the `A`(s) */
+  def discardLeft[A, B](fa: => F[A], fb: => F[B]): F[B] = apply2(fa,fb)((_,b) => b)
+
+  /** Combine `fa` and `fb` according to `Apply[F]` with a function that discards the `B`(s) */
+  def discardRight[A, B](fa: => F[A], fb: => F[B]): F[A] = apply2(fa,fb)((a,_) => a)
 
   /** Add a unit to any Apply to form an Applicative. */
   def applyApplicative: Applicative[λ[α => F[α] \/ α]] =
