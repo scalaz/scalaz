@@ -8,11 +8,11 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
   final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
   final def tuple[B](f: F[B]): F[(A,B)] = F.tuple2(self,f)
 
-  /** Combine `self` and `fb` according to `Apply[F]` with a function that discards the `A`s */
-  final def *>[B](fb: F[B]): F[B] = F.apply2(self,fb)((_,b) => b)
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `A`(s) */
+  final def *>[B](fb: F[B]): F[B] = F.discardLeft(self,fb)
 
-  /** Combine `self` and `fb` according to `Apply[F]` with a function that discards the `B`s */
-  final def <*[B](fb: F[B]): F[A] = F.apply2(self,fb)((a,_) => a)
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `B`(s) */
+  final def <*[B](fb: F[B]): F[A] = F.discardRight(self,fb)
 
   /**
    * DSL for constructing Applicative expressions.
@@ -31,6 +31,12 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
   /** Alias for `|@|` */
   final def ⊛[B](fb: F[B]) = |@|(fb)
 
+  /**
+   * Repeats this applicative action infinitely.
+   */
+  final def forever[B]: F[B] = F.forever(self)
+
+  // Do not remove this comment; used as delimiter by `genTypeClasses` sbt task.
   ////
 }
 
