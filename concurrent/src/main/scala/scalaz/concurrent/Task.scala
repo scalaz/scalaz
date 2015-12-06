@@ -13,15 +13,15 @@ import scalaz.\/._
 import collection.JavaConversions._
 import scala.concurrent.duration._
 
-/*
- * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
+/**
+ * `Task[A]` wraps a `scalaz.concurrent.Future[Throwable \/ A]`,
  * with some convenience functions for handling exceptions. Its
- * `Monad` and `Nondeterminism` instances are derived from `Future`.
+ * `Monad` and `Nondeterminism` instances are derived from [[Future]].
  *
  * `Task` (and `Future`) differ in several key ways from
  * `scalaz.concurrent.Promise` and the `Future` implementation in
  * Scala 2.10 , and have a number of advantages. See the documentation
- * for `scalaz.concurrent.Future` for more information.
+ * for [[scalaz.concurrent.Future]] for more information.
  *
  * `Task` is exception-safe when constructed using the primitives
  * in the companion object, but when calling the constructor, you
