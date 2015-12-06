@@ -56,7 +56,18 @@ object Free extends FreeInstances {
   private case class Suspend[S[_], A](a: S[A]) extends Free[S, A]
 
   /** Call a subroutine and continue with the given function. */
-  private case class Gosub[S[_], B, C](a: Free[S, C], f: C => Free[S, B]) extends Free[S, B]
+  private sealed abstract case class Gosub[S[_], B]() extends Free[S, B] {
+    type C
+    val a: Free[S, C]
+    val f: C => Free[S, B]
+  }
+
+  private def gosub[S[_], B, C0](a0: Free[S, C0])(f0: C0 => Free[S, B]): Free[S, B] =
+    new Gosub[S, B] {
+      type C = C0
+      val a = a0
+      val f = f0
+    }
 
   /** A computation that can be stepped through, suspended, and paused */
   type Trampoline[A] = Free[Function0, A]
@@ -90,7 +101,7 @@ sealed abstract class Free[S[_], A] {
   final def >>=[B](f: A => Free[S, B]): Free[S, B] = this flatMap f
 
   /** Binds the given continuation to the result of this computation. */
-  final def flatMap[B](f: A => Free[S, B]): Free[S, B] = Gosub(this, f)
+  final def flatMap[B](f: A => Free[S, B]): Free[S, B] = gosub(this)(f)
 
   /** Catamorphism. Run the first given function if Return, otherwise, the second given function. */
   final def fold[B](r: A => B, s: S[Free[S, A]] => B)(implicit S: Functor[S]): B =
@@ -101,10 +112,10 @@ sealed abstract class Free[S[_], A] {
     this match {
       case Return(a) => \/-(a)
       case Suspend(t) => -\/(S.map(t)(Return(_)))
-      case Gosub(x, f) => x match {
-        case Return(a) => f(a).resume
-        case Suspend(t) => -\/(S.map(t)(f))
-        case Gosub(y, g) => y.flatMap(z => g(z).flatMap(f)).resume
+      case b @ Gosub() => b.a match {
+        case Return(a) => b.f(a).resume
+        case Suspend(t) => -\/(S.map(t)(b.f))
+        case c @ Gosub() => c.a.flatMap(z => c.f(z).flatMap(b.f)).resume
       }
     }
 
@@ -118,8 +129,10 @@ sealed abstract class Free[S[_], A] {
   final def mapFirstSuspension(f: S ~> S): Free[S, A] =
     step match {
       case Suspend(s) => Suspend(f(s))
-      case Gosub(Suspend(s), g) => Suspend(f(s)).flatMap(g)
-      case Gosub(y, g) => y.mapFirstSuspension(f).flatMap(g)
+      case a@Gosub() => a.a match {
+        case Suspend(s) => Suspend(f(s)).flatMap(a.f)
+        case _ => a.a.mapFirstSuspension(f).flatMap(a.f)
+      }
       case x => x
     }
 
@@ -183,8 +196,14 @@ sealed abstract class Free[S[_], A] {
    * and pulling the first suspension to the top.
    */
   @annotation.tailrec final def step: Free[S, A] = this match {
-    case Gosub(Gosub(x, f), g) => x.flatMap(a => f(a).flatMap(g)).step
-    case Gosub(Return(a), f) => f(a).step
+    case x@Gosub() => x.a match {
+      case b@Gosub() =>
+        b.a.flatMap(a => b.f(a).flatMap(x.f)).step
+      case Return(b)=>
+        x.f(b).step
+      case _ =>
+        x
+    }
     case x => x
   }
 
@@ -198,7 +217,7 @@ sealed abstract class Free[S[_], A] {
       case Return(a) => M.pure(a)
       case Suspend(s) => f(s)
       // This is stack safe because `step` ensures right-associativity of Gosub
-      case Gosub(x, g) => M.bind(x foldMap f)(c => g(c) foldMap f)
+      case a@Gosub() => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
     }
 
   import Id._
@@ -234,10 +253,10 @@ sealed abstract class Free[S[_], A] {
       case (a@Suspend(_), Return(b)) => a.flatMap(x => Return(f(x, b)))
       case (Return(a), b@Suspend(_)) => b.flatMap(x => Return(f(a, x)))
       case (a@Suspend(_), b@Suspend(_)) => a.flatMap(x => b.map(y => f(x, y)))
-      case (Gosub(a, g), Return(b)) => a.flatMap(x => g(x).map(f(_, b)))
-      case (Gosub(a, g), b@Suspend(_)) => a.flatMap(x => b.flatMap(y => g(x).map(f(_, y))))
-      case (Gosub(a, g), Gosub(b, h)) => a.zipWith(b)((x, y) => g(x).zipWith(h(y))(f)).flatMap(x => x)
-      case (a, Gosub(b, g)) => a.flatMap(x => b.flatMap(y => g(y).map(f(x, _))))
+      case (a@Gosub(), Return(b)) => a.a.flatMap(x => a.f(x).map(f(_, b)))
+      case (a@Gosub(), b@Suspend(_)) => a.a.flatMap(x => b.flatMap(y => a.f(x).map(f(_, y))))
+      case (a@Gosub(), b@Gosub()) => a.a.zipWith(b.a)((x, y) => a.f(x).zipWith(b.f(y))(f)).flatMap(x => x)
+      case (a, b@Gosub()) => a.flatMap(x => b.a.flatMap(y => b.f(y).map(f(x, _))))
     }
   }
 
@@ -301,8 +320,8 @@ sealed abstract class Free[S[_], A] {
         FreeT.point(a)
       case Suspend(a) =>
         FreeT.liftF(a)
-      case Gosub(a, f) =>
-        FreeT.gosub(a.toFreeT)(f.andThen(_.toFreeT))
+      case a @ Gosub() =>
+        FreeT.gosub(a.a.toFreeT)(a.f.andThen(_.toFreeT))
     }
 }
 
