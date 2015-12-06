@@ -151,7 +151,7 @@ Here's how to organize the type class instances and implicits for `Tuple2`. See 
     trait TupleInstances extends TupleInstances0 {
       // In a subtype of tuple2Monoid. The order doesn't matter, but by convention we follow the subtyping
       // relationship of the type classes.
-      implicit def tuple2Monoid[A1, A2](implicit A1: Monoid[A1], A2: Monoid[A2]): Monoid[(A1, A2)] = new Tuple2Monoid[A1, A2] {
+      implicit def tuple2Monoid[A1, A2](implicit A1_ : Monoid[A1], A2_ : Monoid[A2]): Monoid[(A1, A2)] = new Tuple2Monoid[A1, A2] {
         implicit def A1: Monoid[A1] = A1_
         implicit def A2: Monoid[A2] = A2_
       }
