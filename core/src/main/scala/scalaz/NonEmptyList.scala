@@ -92,7 +92,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     case ICons(x, xs) => nel(x, xs)
   }
 
-  def size: Int = 1 + tail.count(a => true)
+  def size: Int = 1 + tail.length
 
   def zip[B](b: => NonEmptyList[B]): NonEmptyList[(A, B)] = {
     val _b = b
