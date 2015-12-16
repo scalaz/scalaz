@@ -72,7 +72,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
     for (ltr <- split(Stream.Empty, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
   }
 
-  /**Select the first descendant node of the current node that satisfies the given predicate. */
+  /** Select the first descendant node of the current node that satisfies the given predicate. */
   def find(p: TreeLoc[A] => Boolean): Option[TreeLoc[A]] =
     Cobind[TreeLoc].cojoin(this).tree.flatten.find(p)
 
