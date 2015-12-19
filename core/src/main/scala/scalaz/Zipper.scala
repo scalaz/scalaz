@@ -340,19 +340,23 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   }
 }
 
-object Zipper extends ZipperInstances with ZipperFunctions
+object Zipper extends ZipperInstances {
+  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
+    Zipper(ls, a, rs)
+}
 
 sealed abstract class ZipperInstances {
   import Zipper._
 
-  implicit val zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
+  implicit val zipperInstance: Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] = new Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
+    import std.stream._
     override def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
     def cobind[A, B](fa: Zipper[A])(f: Zipper[A] => B): Zipper[B] =
       map(cojoin(fa))(f)
     def copoint[A](p: Zipper[A]): A =
       p.focus
-    def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
+    override def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
       za traverse f
     override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
@@ -370,6 +374,56 @@ sealed abstract class ZipperInstances {
       fa.lefts.forall(f) && f(fa.focus) && fa.rights.forall(f)
     override def any[A](fa: Zipper[A])(f: A => Boolean) =
       fa.lefts.exists(f) || f(fa.focus) || fa.rights.exists(f)
+    override def foldMap1[A, B](fa: Zipper[A])(f: A => B)(implicit F: Semigroup[B]) =
+      fa.rights.foldLeft(
+        Foldable[Stream].foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
+          case Some(b) => F.append(b, f(fa.focus))
+          case None => f(fa.focus)
+        }
+      )((b, a) => F.append(b, f(a)))
+    override def foldMapRight1[A, B](fa: Zipper[A])(z: A => B)(f: (A, => B) => B) =
+      Foldable[Stream].foldLeft(
+        fa.lefts,
+        Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
+          case Some(b) => f(fa.focus, b)
+          case None => z(fa.focus)
+        }
+      )((b, a) => f(a, b))
+    override def foldMapLeft1[A, B](fa: Zipper[A])(z: A => B)(f: (B, A) => B) =
+      fa.rights.foldLeft(
+        Foldable[Stream].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
+          case Some(b) => f(b, fa.focus)
+          case None => z(fa.focus)
+        }
+      )(f)
+    override def traverse1Impl[G[_], A, B](fa: Zipper[A])(f: A => G[B])(implicit G: Apply[G]) = {
+      val F = Traverse1[OneAnd[Stream, ?]]
+      fa.lefts.reverse match {
+        case h1 #:: t1 =>
+          val x = G.map(F.traverse1(OneAnd(h1, t1))(f)) { s => (s.head #:: s.tail).reverse }
+          fa.rights match {
+            case h2 #:: t2 =>
+              G.apply3(x, f(fa.focus), F.traverse1(OneAnd(h2, t2))(f)) { (l, z, r) =>
+                Zipper(l, z, r.head #:: r.tail)
+              }
+            case Stream.Empty =>
+              G.apply2(x, f(fa.focus)) { (l, z) =>
+                Zipper(l, z, Stream.Empty)
+              }
+          }
+        case Stream.Empty =>
+          fa.rights match {
+            case h2 #:: t2 =>
+              G.apply2(f(fa.focus), F.traverse1(OneAnd(h2, t2))(f)) { (z, r) =>
+                Zipper(Stream.Empty, z, r.head #:: r.tail)
+              }
+            case Stream.Empty =>
+              G.map(f(fa.focus)) { z =>
+                Zipper(Stream.Empty, z, Stream.Empty)
+              }
+          }
+      }
+    }
   }
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
@@ -387,9 +441,4 @@ sealed abstract class ZipperInstances {
         Show[A].show(f.focus), ", ",
         Show[Stream[A]].show(f.rights), ")")
   }
-}
-
-trait ZipperFunctions {
-  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
-    Zipper(ls, a, rs)
 }

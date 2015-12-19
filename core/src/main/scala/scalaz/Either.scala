@@ -217,14 +217,14 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
+  def orElse[C, BB >: B](x: => C \/ BB): C \/ BB =
     this match {
       case -\/(_) => x
-      case \/-(_) => this
+      case right@ \/-(_) => right
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||[AA >: A, BB >: B](x: => AA \/ BB): AA \/ BB =
+  def |||[C, BB >: B](x: => C \/ BB): C \/ BB =
     orElse(x)
 
   /**
@@ -299,10 +299,17 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
     }
 
-  /** Convert to a validation. */
+  /** Convert to a Validation. */
   def validation: Validation[A, B] =
     this match {
       case -\/(a) => Failure(a)
+      case \/-(b) => Success(b)
+    }
+  
+  /** Convert to a ValidationNel. */
+  def validationNel[AA>:A] : ValidationNel[AA,B] = 
+    this match {
+      case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
     }
 
@@ -342,7 +349,31 @@ final case class -\/[+A](a: A) extends (A \/ Nothing)
  */
 final case class \/-[+B](b: B) extends (Nothing \/ B)
 
-object \/ extends DisjunctionInstances with DisjunctionFunctions {
+object \/ extends DisjunctionInstances {
+
+  /** Construct a left disjunction value. */
+  def left[A, B]: A => A \/ B =
+    -\/(_)
+
+  /** Construct a right disjunction value. */
+  def right[A, B]: B => A \/ B =
+    \/-(_)
+
+  /** Construct a disjunction value from a standard `scala.Either`. */
+  def fromEither[A, B](e: Either[A, B]): A \/ B =
+    e fold (left, right)
+
+  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
+    \/-(a)
+  } catch {
+    case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
+  }
+
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
+    \/-(a)
+  } catch {
+    case NonFatal(t) => -\/(t)
+  }
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec
@@ -404,10 +435,18 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] =
-    new Traverse[L \/ ?] with Monad[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[\/, L] {
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
+    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
+
+      @scala.annotation.tailrec
+      def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
+        f(a) match {
+          case l @ -\/(_) => l
+          case \/-(-\/(a0)) => tailrecM(f)(a0)
+          case \/-(rb @ \/-(_)) => rb
+        }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
         fa flatMap f
@@ -476,31 +515,5 @@ sealed abstract class DisjunctionInstances2 {
         ),
         c => \/.right(\/.right(c))
       )
-  }
-}
-
-trait DisjunctionFunctions {
-  /** Construct a left disjunction value. */
-  def left[A, B]: A => A \/ B =
-    -\/(_)
-
-  /** Construct a right disjunction value. */
-  def right[A, B]: B => A \/ B =
-    \/-(_)
-
-  /** Construct a disjunction value from a standard `scala.Either`. */
-  def fromEither[A, B](e: Either[A, B]): A \/ B =
-    e fold (left, right)
-
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
-    \/-(a)
-  } catch {
-    case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
-  }
-
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
-    \/-(a)
-  } catch {
-    case NonFatal(t) => -\/(t)
   }
 }

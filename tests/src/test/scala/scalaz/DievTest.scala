@@ -4,7 +4,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scala.util.Random
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object DievTest extends SpecLite {

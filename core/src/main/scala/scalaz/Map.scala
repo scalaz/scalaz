@@ -220,8 +220,10 @@ sealed abstract class ==>>[A, B] {
   def keys: List[A] =
     foldrWithKey(List.empty[A])((x, _, xs) => x :: xs)
 
-  def keySet =
-    Set(keys: _*)
+  def keySet: ISet[A] = this match {
+    case Tip()        => ISet.Tip[A]
+    case Bin(k,v,l,r) => ISet.Bin(k,l.keySet,r.keySet)
+  }
 
   def toList =
     toAscList
@@ -928,20 +930,6 @@ sealed abstract class ==>>[A, B] {
     }
 }
 
-object ==>> extends MapInstances with MapFunctions {
-  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
-    val size = 0
-
-    def unapply[A, B](a: A ==>> B): Boolean = a eq this
-
-    def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
-  }
-
-  private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {
-    val size = l.size + r.size + 1
-  }
-}
-
 sealed abstract class MapInstances0 {
 
   implicit def scalazMapInstance[S: Order]: Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
@@ -1021,6 +1009,38 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   implicit def mapCovariant[S]: Traverse[S ==>> ?] =
     new Traverse[S ==>> ?] {
+      override def findLeft[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Bin(_, x, l, r) =>
+            findLeft(l)(f) match {
+              case a @ Some(_) =>
+                a
+              case None =>
+                if (f(x))
+                  Some(x)
+                else
+                  findLeft(r)(f)
+            }
+          case Tip() =>
+            None
+        }
+
+      override def findRight[A](fa: S ==>> A)(f: A => Boolean) =
+        fa match {
+          case Bin(_, x, l, r) =>
+            findRight(r)(f) match {
+              case a @ Some(_) =>
+                a
+              case None =>
+                if (f(x))
+                  Some(x)
+                else
+                  findRight(l)(f)
+            }
+          case Tip() =>
+            None
+        }
+
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
@@ -1037,6 +1057,9 @@ sealed abstract class MapInstances extends MapInstances0 {
 
       override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
+
+      override def index[A](fa: S ==>> A, i: Int) =
+        fa.elemAt(i).map(_._2)
 
       def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
         fa match {
@@ -1095,8 +1118,18 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
     Equal[Int].equal(a1.size, a2.size) && Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
 }
 
-trait MapFunctions {
-  import ==>>._
+object ==>> extends MapInstances {
+  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
+    val size = 0
+
+    def unapply[A, B](a: A ==>> B): Boolean = a eq this
+
+    def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
+  }
+
+  private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {
+    val size = l.size + r.size + 1
+  }
 
   final def apply[A: Order, B](x: (A, B)*): A ==>> B =
     x.foldLeft(empty[A, B])((a, c) => a.insert(c._1, c._2))

@@ -26,15 +26,15 @@ object TaskTest extends SpecLite {
   val combinations = (options tuple options)
 
   "left associated binds" ! check {
-    combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).run == correct }
+    combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).unsafePerformSync == correct }
   }
 
   "traverse-based map == sequential map" ! forAll { (xs: List[Int]) =>
-    xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).run
+    xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).unsafePerformSync
   }
 
   "gather-based map == sequential map" ! forAll { (xs: List[Int]) =>
-    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).run
+    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
   }
 
   case object FailWhale extends RuntimeException {
@@ -50,79 +50,79 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches errors" ! {
-    Task { Thread.sleep(10); throw FailTurkey; 42 }.map(_ + 1).attemptRun ==
+    Task { Thread.sleep(10); throw FailTurkey; 42 }.map(_ + 1).unsafePerformSyncAttempt ==
     -\/(FailTurkey)
   }
 
   "catches exceptions in a mapped function" ! {
-    Task { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    Task { Thread.sleep(10); 42 }.map(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in a mapped function, created by delay" ! {
-    Task.delay { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    Task.delay { Thread.sleep(10); 42 }.map(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in a mapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }.map(_ => throw FailWhale).attemptRun ==
+    Task.now { Thread.sleep(10); 42 }.map(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in a flatMapped function" ! {
-    Task { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    Task { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in a flatMapped function, created with delay" ! {
-    Task.delay { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    Task.delay { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in a flatMapped function, created with now" ! {
-    Task.now { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).attemptRun ==
+    Task.now { Thread.sleep(10); 42 }.flatMap(_ => throw FailWhale).unsafePerformSyncAttempt ==
     -\/(FailWhale)
   }
 
   "catches exceptions in parallel execution" ! forAll { (x: Int, y: Int) =>
     val t1 = Task { Thread.sleep(10); throw FailWhale; 42 }
     val t2 = Task { 43 }
-    Nondeterminism[Task].both(t1, t2).attemptRun == -\/(FailWhale)
+    Nondeterminism[Task].both(t1, t2).unsafePerformSyncAttempt == -\/(FailWhale)
   }
 
   "handles exceptions in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => 84 }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => 84 }.unsafePerformSyncAttempt ==
       \/-(84)
   }
 
   "leaves unhandled exceptions alone in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case SadTrombone => 84 }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case SadTrombone => 84 }.unsafePerformSyncAttempt ==
       -\/(FailWhale)
   }
 
   "catches exceptions thrown in handle" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => throw SadTrombone }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handle { case FailWhale => throw SadTrombone }.unsafePerformSyncAttempt ==
       -\/(SadTrombone)
   }
 
   "handles exceptions in handleWith" ! {
     val foo =
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(84) }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(84) }.unsafePerformSyncAttempt ==
       \/-(84)
   }
 
   "leaves unhandled exceptions alone in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case SadTrombone => Task.delay(84) }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case SadTrombone => Task.delay(84) }.unsafePerformSyncAttempt ==
       -\/(FailWhale)
   }
 
   "catches exceptions thrown in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.attemptRun ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.unsafePerformSyncAttempt ==
       -\/(SadTrombone)
   }
   
@@ -145,7 +145,7 @@ object TaskTest extends SpecLite {
       val t3 = fork(now(3))(es)
       val t = fork(Task.reduceUnordered(Seq(t1,t2,t3))(intSetReducer))(es)
 
-      t.run must_== Set(1,2,3)
+      t.unsafePerformSync must_== Set(1,2,3)
     }
 
 
@@ -154,13 +154,13 @@ object TaskTest extends SpecLite {
 
       val t = fork(Task.reduceUnordered(Seq(t1))(intSetReducer))(es)
 
-      t.run must_== Set(1)
+      t.unsafePerformSync must_== Set(1)
     }
 
     "correctly process reduceUnordered for empty seq of tasks in non-blocking way" in {
       val t = fork(Task.reduceUnordered(Seq())(intSetReducer))(es)
 
-      t.run must_== Set()
+      t.unsafePerformSync must_== Set()
     }
 
     "early terminate once any of the tasks failed" in {
@@ -179,7 +179,7 @@ object TaskTest extends SpecLite {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun mustMatch {
+      t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
       }
 
@@ -203,7 +203,7 @@ object TaskTest extends SpecLite {
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
 
-      t.attemptRun mustMatch {
+      t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
       }
 
@@ -235,7 +235,7 @@ object TaskTest extends SpecLite {
 
       val r = Nondeterminism[Task].nmap6(t(0), t(1), t(2), t(3), t(4), t(5))(List(_,_,_,_,_,_))
       val chars = List('a','b','c','d','e','f')
-      r.run must_== chars
+      r.unsafePerformSync must_== chars
       //Ensure we saw 6 distinct threads.
       seenThreadNames.size must_== 6
     }
@@ -246,7 +246,7 @@ object TaskTest extends SpecLite {
 
       val t =  fork { Thread.sleep(3000); now(1) }(es)
 
-       t.attemptRunFor(100) mustMatch {
+       t.unsafePerformSyncAttemptFor(100) mustMatch {
          case -\/(ex:TimeoutException) => true
        }
 
@@ -260,7 +260,7 @@ object TaskTest extends SpecLite {
 
       val t =  fork { Thread.sleep(1000); now(1) }(es).map(_=> bool = true)
 
-      t.attemptRunFor(100) mustMatch {
+      t.unsafePerformSyncAttemptFor(100) mustMatch {
         case -\/(ex:TimeoutException) => true
       }
 
@@ -275,20 +275,20 @@ object TaskTest extends SpecLite {
   "retries a retriable task n times" ! forAll { xs: List[Byte] =>
     import scala.concurrent.duration._
     var x = 0
-    Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.run
+    Task.delay {x += 1; sys.error("oops")}.unsafePerformRetry(xs.map(_ => 0.milliseconds)).attempt.unsafePerformSync
     x == (xs.length + 1)
   }
 
   "fromMaybe empty fails" ! forAll { t: Throwable =>
-    Task.fromMaybe(Maybe.empty)(t).attemptRun.isLeft
+    Task.fromMaybe(Maybe.empty)(t).unsafePerformSyncAttempt.isLeft
   }
 
   "fromMaybe just succeeds" ! forAll { (n: Int, t: Throwable) =>
-    Task.fromMaybe(Maybe.just(n))(t).attemptRun.isRight
+    Task.fromMaybe(Maybe.just(n))(t).unsafePerformSyncAttempt.isRight
   }
 
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
-    Task.fromDisjunction(x).attemptRun must_== x
+    Task.fromDisjunction(x).unsafePerformSyncAttempt must_== x
   }
 }
 

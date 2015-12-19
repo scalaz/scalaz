@@ -1,5 +1,4 @@
 package scalaz
-import org.scalacheck.Prop.forAll
 
 object SyntaxTest extends SpecLite {
   "functor syntax" in {

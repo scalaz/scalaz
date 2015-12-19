@@ -42,7 +42,7 @@ sealed abstract class ZapInstances {
     }
 
   /** A free monad and a cofree comonad annihilate each other */
-  implicit def monadComonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]): Zap[Free[F, ?], Cofree[G, ?]] =
+  implicit def monadComonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F]): Zap[Free[F, ?], Cofree[G, ?]] =
     new Zap[Free[F, ?], Cofree[G, ?]] {
       def zapWith[A, B, C](ma: Free[F, A], wb: Cofree[G, B])(f: (A, B) => C): C =
         ma.resume match {
@@ -52,7 +52,7 @@ sealed abstract class ZapInstances {
     }
 
   /** A cofree comonad and a free monad annihilate each other */
-  implicit def comonadMonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F], G: Functor[G]): Zap[Cofree[F, ?], Free[G, ?]] =
+  implicit def comonadMonadZap[F[_], G[_]](implicit d: Zap[F, G], G: Functor[G]): Zap[Cofree[F, ?], Free[G, ?]] =
     new Zap[Cofree[F, ?], Free[G, ?]] {
       def zapWith[A, B, C](wa: Cofree[F, A], mb: Free[G, B])(f: (A, B) => C): C =
         mb.resume match {

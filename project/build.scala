@@ -20,6 +20,8 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
+import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifacts
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
@@ -42,6 +44,13 @@ object build extends Build {
     enableCrossBuild = true
   )
 
+  lazy val setMimaVersion: ReleaseStep = { st: State =>
+    val extracted = Project.extract(st)
+    val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
+    IO.write(extracted get releaseVersionFile, "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
+  }
+
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -52,10 +61,11 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M2"),
+    scalaVersion := "2.10.6",
+    crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
-    scalaCheckVersion := "1.12.4",
+    fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
+    scalaCheckVersion := "1.12.5",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -122,6 +132,7 @@ object build extends Build {
       tagRelease,
       publishSignedArtifacts,
       setNextVersion,
+      setMimaVersion,
       commitNextVersion,
       pushChanges
     ),
@@ -167,16 +178,21 @@ object build extends Build {
         </developers>
       ),
     // kind-projector plugin
-    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.6.1" cross CrossVersion.binary)
+    resolvers += Resolver.sonatypeRepo("releases"),
+    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.7.1" cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
+  ) ++ mimaDefaultSettings ++ Seq[Sett](
+    previousArtifacts := scalazMimaBasis.?.value.map { bas =>
+      organization.value % (name.value + "_" + scalaBinaryVersion.value) % bas
+    }.toSet
   )
 
   lazy val scalaz = Project(
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+      previousArtifacts := Set.empty,
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
@@ -190,7 +206,7 @@ object build extends Build {
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
-        dir => Seq(GenerateTupleW(dir))
+        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       },
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
@@ -238,6 +254,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
+      previousArtifacts := Set.empty,
       publishArtifact := false
     )
   )
@@ -259,6 +276,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
+      previousArtifacts := Set.empty,
       publishArtifact := false,
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
     )
@@ -281,6 +299,8 @@ object build extends Build {
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
+
+  lazy val scalazMimaBasis = SettingKey[String]("scalazMimaBasis", "Version of scalaz against which to run MIMA.")
 
   lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
 

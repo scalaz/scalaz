@@ -87,12 +87,10 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
 
 }
 
-object NullArgument extends NullArgumentInstances with NullArgumentFunctions {
+object NullArgument extends NullArgumentInstances {
   def apply[A, B](f: Option[A] => B): A ?=> B =
     new (A ?=> B)(f)
-}
 
-trait NullArgumentFunctions {
   type ?=>[A, B] = NullArgument[A, B]
 
   def always[A, B](b: => B): A ?=> B =
@@ -149,8 +147,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         r map f
     }
 
-  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] =
-    new Monad[NullArgument[X, ?]] {
+  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =
+    new Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] {
       override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
         a ap f
       override def map[A, B](a: NullArgument[X, A])(f: A => B) =
@@ -159,6 +157,16 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         NullArgument.always(a)
       override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
         a flatMap f
+      override def tailrecM[A, B](f: A => NullArgument[X, A \/ B])(a: A) =
+        NullArgument{ t =>
+          @annotation.tailrec
+          def go(a0: A): B =
+            f(a0)(t) match {
+              case \/-(b) => b
+              case -\/(a1) => go(a1)
+            }
+          go(a)
+        }
     }
 
   implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[?, X]] =

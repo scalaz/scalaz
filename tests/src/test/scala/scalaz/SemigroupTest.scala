@@ -1,7 +1,6 @@
 package scalaz
 
 import std.AllInstances._
-import org.scalacheck.Arbitrary
 
 object SemigroupTest extends SpecLite {
   "invariant functor" in {

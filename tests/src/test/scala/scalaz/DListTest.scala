@@ -13,7 +13,9 @@ object DListTest extends SpecLite {
   checkAll(zip.laws[DList])
   checkAll(traverse.laws[DList])
   checkAll(isEmpty.laws[DList])
+  checkAll(bindRec.laws[DList])
   checkAll(monadPlus.strongLaws[DList])
+
   "DList append" ! ((0 to 100000).foldLeft(DList[Int]())(_ :+ _).toList must_== (0 to 100000).toList)
 
   "headOption, tailOption" ! forAll { (n: Int, d: DList[Int]) =>
@@ -30,4 +32,13 @@ object DListTest extends SpecLite {
     
   }
 
+  object instances {
+    def equal[A: Equal] = Equal[DList[A]]
+    def monoid[A] = Monoid[DList[A]]
+    def monadPlus = MonadPlus[DList]
+    def bindrec = BindRec[DList]
+    def traverse = Traverse[DList]
+    def zip = Zip[DList]
+    def isEmpty = IsEmpty[DList]
+  }
 }

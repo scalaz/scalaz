@@ -32,7 +32,9 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
     Endomorphic[Cokleisli[F, ?, ?], A](ev.subst[Cokleisli[F, A, ?]](this))
 }
 
-object Cokleisli extends CokleisliInstances with CokleisliFunctions
+object Cokleisli extends CokleisliInstances {
+
+}
 
 sealed abstract class CokleisliInstances0 {
   implicit def cokleisliCompose[F[_]](implicit F0: Cobind[F]): Compose[Cokleisli[F, ?, ?]] =
@@ -46,7 +48,7 @@ sealed abstract class CokleisliInstances0 {
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] =
+  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] =
     new CokleisliMonad[F, R] {}
 
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, ?, ?]] with ProChoice[Cokleisli[F, ?, ?]] =
@@ -55,12 +57,21 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
     }
 }
 
-trait CokleisliFunctions
-
-private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] {
+private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] {
+  override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa map f
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) = fa flatMap f
+  def tailrecM[A, B](f: A => Cokleisli[F, R, A \/ B])(a: A): Cokleisli[F, R, B] = {
+    @annotation.tailrec
+    def go(a0: A)(r: F[R]): B =
+      f(a0).run(r) match {
+        case -\/(a1) => go(a1)(r)
+        case \/-(b) => b
+      }
+
+    Cokleisli(go(a))
+  }
 }
 
 private trait CokleisliCompose[F[_]] extends Compose[Cokleisli[F, ?, ?]] {

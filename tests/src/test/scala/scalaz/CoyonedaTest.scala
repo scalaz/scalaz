@@ -15,12 +15,14 @@ object CoyonedaTest extends SpecLite {
   type CoyonedaNel[A] = Coyoneda[NonEmptyList, A]
 
   checkAll(monadPlus.strongLaws[CoyonedaOption])
+  checkAll(bindRec.laws[CoyonedaOption])
   checkAll(cobind.laws[CoyonedaOption])
   checkAll(traverse.laws[CoyonedaOption])
   checkAll(order.laws[Coyoneda[Option, Int]])
   checkAll(foldable.laws[CoyonedaOption](implicitly, Coyoneda.coyonedaFoldable, implicitly))
 
   checkAll(monad.laws[CoyonedaNel])
+  checkAll(bindRec.laws[CoyonedaNel])
   checkAll(plus.laws[CoyonedaNel])
   checkAll(comonad.laws[CoyonedaNel])
   checkAll(traverse1.laws[CoyonedaNel])
@@ -38,6 +40,7 @@ object CoyonedaTest extends SpecLite {
     def applicative[F[_]: Applicative] = Applicative[Coyoneda[F, ?]]
     def applicativePlus[F[_]: ApplicativePlus] = ApplicativePlus[Coyoneda[F, ?]]
     def bind[F[_]: Bind] = Bind[Coyoneda[F, ?]]
+    def bindRec[F[_]: BindRec] = BindRec[Coyoneda[F, ?]]
     def monad[F[_]: Monad] = Monad[Coyoneda[F, ?]]
     def monadPlus[F[_]: MonadPlus] = MonadPlus[Coyoneda[F, ?]]
     def plus[F[_]: Functor: Plus] = Plus[Coyoneda[F, ?]]

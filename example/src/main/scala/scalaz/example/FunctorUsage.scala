@@ -117,7 +117,7 @@ object FunctorUsage extends App {
   val voidTask2: Task[Unit] = delTask.void
 
   // Running the task returns a Unit.
-  assert(voidTask.run === (()))
+  assert(voidTask.unsafePerformSync === (()))
 
   // And now our database is smaller
   assert(database.size === 1)

@@ -127,12 +127,23 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     list.hashCode
 }
 
-object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
+object NonEmptyList extends NonEmptyListInstances {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
-  def unapplySeq[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
+  def unapply[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
     Some((v.head, v.tail))
+
+  def nel[A](h: A, t: IList[A]): NonEmptyList[A] =
+    new NonEmptyList(h, t)
+
+  def nels[A](h: A, t: A*): NonEmptyList[A] =
+    nel(h, IList(t: _*))
+
+  def lift[A, B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
+    case INil() ⇒ None
+    case ICons(h, t) ⇒ Some(f(NonEmptyList.nel(h, t)))
+  }
 }
 
 sealed abstract class NonEmptyListInstances0 {
@@ -140,8 +151,11 @@ sealed abstract class NonEmptyListInstances0 {
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
-  implicit val nonEmptyList =
-    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
+  implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
+      override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
+        if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -192,6 +206,11 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       override def any[A](fa: NonEmptyList[A])(f: A => Boolean) =
         f(fa.head) || Foldable[IList].any(fa.tail)(f)
+
+      def tailrecM[A, B](f: A => NonEmptyList[A \/ B])(a: A): NonEmptyList[B] =
+        (BindRec[IList].tailrecM[A, B](a => f(a).list)(a): @unchecked) match {
+          case ICons(h, t) => NonEmptyList.nel(h, t)
+        }
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
@@ -203,12 +222,4 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
-}
-
-trait NonEmptyListFunctions {
-  def nel[A](h: A, t: IList[A]): NonEmptyList[A] =
-    new NonEmptyList(h, t)
-
-  def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, IList(t: _*))
 }

@@ -7,7 +7,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   import Coproduct._
 
   def map[B](f: A => B)(implicit F: Functor[F], G: Functor[G]): Coproduct[F, G, B] =
-    Coproduct(run.bimap(F.map(_)(f), G.map(_)(f)))
+    Coproduct(run.bimap(F.lift(f), G.lift(f)))
 
   def cobind[B](f: Coproduct[F, G, A] => B)(implicit F: Cobind[F], G: Cobind[G]): Coproduct[F, G, B] =
     Coproduct(
@@ -64,7 +64,7 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
 
 }
 
-object Coproduct extends CoproductInstances with CoproductFunctions {
+object Coproduct extends CoproductInstances {
   implicit def coproductTraverse1[F[_], G[_]](implicit F0: Traverse1[F], G0: Traverse1[G]): Traverse1[Coproduct[F, G, ?]] =
     new CoproductTraverse1[F, G] {
       override def F = F0
@@ -78,20 +78,18 @@ object Coproduct extends CoproductInstances with CoproductFunctions {
       def from[A](ga: F[A] \/ G[A]) = Coproduct(ga)
       def to[A](fa: Coproduct[F, G, A]) = fa.run
     }
-}
 
-trait CoproductFunctions {
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =
     Coproduct(-\/(x))
 
   def rightc[F[_], G[_], A](x: G[A]): Coproduct[F, G, A] =
     Coproduct(\/-(x))
 
-  final class CoproductLeft[G[_]] private[CoproductFunctions]{
+  final class CoproductLeft[G[_]] private[Coproduct]{
     def apply[F[_], A](fa: F[A]): Coproduct[F, G, A] = Coproduct(-\/(fa))
   }
 
-  final class CoproductRight[F[_]] private[CoproductFunctions]{
+  final class CoproductRight[F[_]] private[Coproduct]{
     def apply[G[_], A](ga: G[A]): Coproduct[F, G, A] = Coproduct(\/-(ga))
   }
 

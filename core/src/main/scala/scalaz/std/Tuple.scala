@@ -2,6 +2,22 @@ package scalaz
 package std
 
 sealed trait TupleInstances0 {
+  /** Product functor and comonad */
+  implicit def tuple2Instance[A1]: Traverse[(A1, ?)] with Comonad[(A1, ?)] = new Tuple2Functor[A1] with Comonad[(A1, ?)] {
+    override def cojoin[A](a: (A1, A)) = (a._1, a)
+    def copoint[A](p: (A1, A)) = p._2
+    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  }
+
+  implicit def tuple3Functor[A1, A2]: Traverse[(A1, A2, ?)] = new Tuple3Functor[A1, A2] {}
+  implicit def tuple4Functor[A1, A2, A3]: Traverse[(A1, A2, A3, ?)] = new Tuple4Functor[A1, A2, A3] {}
+  implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[(A1, A2, A3, A4, ?)] = new Tuple5Functor[A1, A2, A3, A4] {}
+  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[(A1, A2, A3, A4, A5, ?)] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
+  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
+  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
+}
+
+sealed trait TupleInstances1 extends TupleInstances0 {
   implicit val tuple2Bitraverse: Bitraverse[Tuple2] = new Bitraverse[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
@@ -73,19 +89,49 @@ sealed trait TupleInstances0 {
     def cobind[A, B](fa: Tuple1[A])(f: Tuple1[A] => B) = Tuple1(f(fa))
   }
 
-  /** Product functor and comonad */
-  implicit def tuple2Instance[A1]: Traverse[(A1, ?)] with Comonad[(A1, ?)] = new Tuple2Functor[A1] with Comonad[(A1, ?)] {
-    override def cojoin[A](a: (A1, A)) = (a._1, a)
-    def copoint[A](p: (A1, A)) = p._2
-    def cobind[A, B](fa: (A1, A))(f: ((A1, A)) => B) = (fa._1, f(fa))
+  /** Product BindRec */
+  implicit def tuple2BindRec[A1: Semigroup]: BindRec[(A1, ?)] = new Tuple2BindRec[A1] {
+    def _1 = implicitly
   }
-
-  implicit def tuple3Functor[A1, A2]: Traverse[(A1, A2, ?)] = new Tuple3Functor[A1, A2] {}
-  implicit def tuple4Functor[A1, A2, A3]: Traverse[(A1, A2, A3, ?)] = new Tuple4Functor[A1, A2, A3] {}
-  implicit def tuple5Functor[A1, A2, A3, A4]: Traverse[(A1, A2, A3, A4, ?)] = new Tuple5Functor[A1, A2, A3, A4] {}
-  implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[(A1, A2, A3, A4, A5, ?)] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
-  implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
-  implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
+  implicit def tuple3BindRec[A1: Semigroup, A2: Semigroup]: BindRec[(A1, A2, ?)] = new Tuple3BindRec[A1, A2] {
+    def _1 = implicitly
+    def _2 = implicitly
+  }
+  implicit def tuple4BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup]: BindRec[(A1, A2, A3, ?)] = new Tuple4BindRec[A1, A2, A3] {
+    def _1 = implicitly
+    def _2 = implicitly
+    def _3 = implicitly
+  }
+  implicit def tuple5BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup, A4: Semigroup]: BindRec[(A1, A2, A3, A4, ?)] = new Tuple5BindRec[A1, A2, A3, A4] {
+    def _1 = implicitly
+    def _2 = implicitly
+    def _3 = implicitly
+    def _4 = implicitly
+  }
+  implicit def tuple6BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup, A4: Semigroup, A5: Semigroup]: BindRec[(A1, A2, A3, A4, A5, ?)] = new Tuple6BindRec[A1, A2, A3, A4, A5] {
+    def _1 = implicitly
+    def _2 = implicitly
+    def _3 = implicitly
+    def _4 = implicitly
+    def _5 = implicitly
+  }
+  implicit def tuple7BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup, A4: Semigroup, A5: Semigroup, A6: Semigroup]: BindRec[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7BindRec[A1, A2, A3, A4, A5, A6] {
+    def _1 = implicitly
+    def _2 = implicitly
+    def _3 = implicitly
+    def _4 = implicitly
+    def _5 = implicitly
+    def _6 = implicitly
+  }
+  implicit def tuple8BindRec[A1: Semigroup, A2: Semigroup, A3: Semigroup, A4: Semigroup, A5: Semigroup, A6: Semigroup, A7: Semigroup]: BindRec[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8BindRec[A1, A2, A3, A4, A5, A6, A7] {
+    def _1 = implicitly
+    def _2 = implicitly
+    def _3 = implicitly
+    def _4 = implicitly
+    def _5 = implicitly
+    def _6 = implicitly
+    def _7 = implicitly
+  }
 
   implicit def tuple1Equal[A1](implicit A1: Equal[A1]): Equal[Tuple1[A1]] =
     new Tuple1Equal[A1] {
@@ -148,7 +194,7 @@ sealed trait TupleInstances0 {
       implicit def _8 = A8
     }
 }
-sealed trait TupleInstances1 extends TupleInstances0 {
+sealed trait TupleInstances2 extends TupleInstances1 {
 
   implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = 
     new Tuple1Show[A1] {
@@ -393,7 +439,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
 
 }
 
-trait TupleInstances extends TupleInstances1
+trait TupleInstances extends TupleInstances2
 
 object tuple extends TupleInstances {
   object tupleSyntax extends scalaz.syntax.std.ToTupleOps
@@ -530,48 +576,6 @@ private trait Tuple1Functor extends Traverse[Tuple1] {
     Tuple1(f(fa._1))
   def traverseImpl[G[_], A, B](fa: Tuple1[A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(f(fa._1))(Tuple1.apply)
-}
-private trait Tuple2Functor[A1] extends Traverse[(A1, ?)] {
-  override def map[A, B](fa: (A1, A))(f: A => B) =
-    (fa._1, f(fa._2))
-  def traverseImpl[G[_], A, B](fa: (A1, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._2))((fa._1, _))
-}
-private trait Tuple3Functor[A1, A2] extends Traverse[(A1, A2, ?)] {
-  override def map[A, B](fa: (A1, A2, A))(f: A => B) =
-    (fa._1, fa._2, f(fa._3))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._3))((fa._1, fa._2, _))
-}
-private trait Tuple4Functor[A1, A2, A3] extends Traverse[(A1, A2, A3, ?)] {
-  override def map[A, B](fa: (A1, A2, A3, A))(f: A => B) =
-    (fa._1, fa._2, fa._3, f(fa._4))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._4))((fa._1, fa._2, fa._3, _))
-}
-private trait Tuple5Functor[A1, A2, A3, A4] extends Traverse[(A1, A2, A3, A4, ?)] {
-  override def map[A, B](fa: (A1, A2, A3, A4, A))(f: A => B) =
-    (fa._1, fa._2, fa._3, fa._4, f(fa._5))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._5))((fa._1, fa._2, fa._3, fa._4, _))
-}
-private trait Tuple6Functor[A1, A2, A3, A4, A5] extends Traverse[(A1, A2, A3, A4, A5, ?)] {
-  override def map[A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => B) =
-    (fa._1, fa._2, fa._3, fa._4, fa._5, f(fa._6))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._6))((fa._1, fa._2, fa._3, fa._4, fa._5, _))
-}
-private trait Tuple7Functor[A1, A2, A3, A4, A5, A6] extends Traverse[(A1, A2, A3, A4, A5, A6, ?)] {
-  override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => B) =
-    (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, f(fa._7))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._7))((fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, _))
-}
-private trait Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] extends Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] {
-  override def map[A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => B) =
-    (fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, f(fa._8))
-  def traverseImpl[G[_], A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => G[B])(implicit G: Applicative[G]) =
-    G.map(f(fa._8))((fa._1, fa._2, fa._3, fa._4, fa._5, fa._6, fa._7, _))
 }
 
 private trait Tuple1Cozip extends Cozip[Tuple1] {
@@ -932,96 +936,4 @@ private trait Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] extends Monoid[(A1, A
 private trait Tuple1Monad extends Monad[Tuple1] {
   def bind[A, B](fa: Tuple1[A])(f: A => Tuple1[B]) = f(fa._1)
   def point[A](a: => A) = Tuple1(a)
-}
-
-
-// TupleN forms a Monad if the element types other than the last are Monoids.
-
-
-private trait Tuple2Monad[A1] extends Monad[(A1, ?)] with Tuple2Functor[A1] {
-  implicit def _1 : Monoid[A1]
-  def bind[A, B](fa: (A1, A))(f: A => (A1, B)) = {
-    val t = f(fa._2)
-
-    (_1.append(fa._1, t._1), t._2)
-  }
-  def point[A](a: => A) = (_1.zero, a)
-}
-private trait Tuple3Monad[A1, A2] extends Monad[(A1, A2, ?)] with Tuple3Functor[A1, A2] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  def bind[A, B](fa: (A1, A2, A))(f: A => (A1, A2, B)) = {
-    val t = f(fa._3)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), t._3)
-  }
-
-  def point[A](a: => A) = (_1.zero, _2.zero, a)
-}
-private trait Tuple4Monad[A1, A2, A3] extends Monad[(A1, A2, A3, ?)] with Tuple4Functor[A1, A2, A3] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  implicit def _3 : Monoid[A3]
-  def bind[A, B](fa: (A1, A2, A3, A))(f: A => (A1, A2, A3, B)) = {
-    val t = f(fa._4)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), _3.append(fa._3, t._3), t._4)
-  }
-  def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, a)
-}
-private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[(A1, A2, A3, A4, ?)] with Tuple5Functor[A1, A2, A3, A4] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  implicit def _3 : Monoid[A3]
-  implicit def _4 : Monoid[A4]
-  def bind[A, B](fa: (A1, A2, A3, A4, A))(f: A => (A1, A2, A3, A4, B)) = {
-    val t = f(fa._5)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), _3.append(fa._3, t._3), _4.append(fa._4, t._4), t._5)
-  }
-  def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, a)
-}
-private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[(A1, A2, A3, A4, A5, ?)] with Tuple6Functor[A1, A2, A3, A4, A5] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  implicit def _3 : Monoid[A3]
-  implicit def _4 : Monoid[A4]
-  implicit def _5 : Monoid[A5]
-  def bind[A, B](fa: (A1, A2, A3, A4, A5, A))(f: A => (A1, A2, A3, A4, A5, B)) = {
-    val t = f(fa._6)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), _3.append(fa._3, t._3), _4.append(fa._4, t._4), _5.append(fa._5, t._5), t._6)
-  }
-  def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, a)
-}
-private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[(A1, A2, A3, A4, A5, A6, ?)] with Tuple7Functor[A1, A2, A3, A4, A5, A6] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  implicit def _3 : Monoid[A3]
-  implicit def _4 : Monoid[A4]
-  implicit def _5 : Monoid[A5]
-  implicit def _6 : Monoid[A6]
-  def bind[A, B](fa: (A1, A2, A3, A4, A5, A6, A))(f: A => (A1, A2, A3, A4, A5, A6, B)) = {
-    val t = f(fa._7)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), _3.append(fa._3, t._3), _4.append(fa._4, t._4), _5.append(fa._5, t._5), _6.append(fa._6, t._6), t._7)
-  }
-
-  def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, a)
-}
-private trait Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends Monad[(A1, A2, A3, A4, A5, A6, A7, ?)] with Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {
-  implicit def _1 : Monoid[A1]
-  implicit def _2 : Monoid[A2]
-  implicit def _3 : Monoid[A3]
-  implicit def _4 : Monoid[A4]
-  implicit def _5 : Monoid[A5]
-  implicit def _6 : Monoid[A6]
-  implicit def _7 : Monoid[A7]
-  def bind[A, B](fa: (A1, A2, A3, A4, A5, A6, A7, A))(f: A => (A1, A2, A3, A4, A5, A6, A7, B)) = {
-    val t = f(fa._8)
-
-    (_1.append(fa._1, t._1), _2.append(fa._2, t._2), _3.append(fa._3, t._3), _4.append(fa._4, t._4), _5.append(fa._5, t._5), _6.append(fa._6, t._6), _7.append(fa._7, t._7), t._8)
-  }
-
-  def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, _7.zero, a)
 }

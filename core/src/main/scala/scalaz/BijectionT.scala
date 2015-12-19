@@ -29,8 +29,8 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
 
   def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(
-      F.bimap(_)(to(_), g.to(_)): Id[X[B, D]]
-    , F.bimap(_)(from(_), g.from(_)): Id[X[A, C]]
+      F.bimap(_)(_to andThen evF, g.to(_)): Id[X[B, D]]
+    , F.bimap(_)(_from andThen evG, g.from(_)): Id[X[A, C]]
     )
 
   def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
@@ -41,8 +41,8 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
 
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =
     bijection(
-      (toK <=< g.toK) run _
-    , (fromK >=> g.fromK) run _
+      (toK <=< g.toK).run
+    , (fromK >=> g.fromK).run
     )
 
   /** alias for `compose` */
@@ -55,9 +55,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def >=>[C](that: BijectionT[F, G, B, C])(implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
 
 }
-object BijectionT extends BijectionTInstances with BijectionTFunctions
-
-trait BijectionTFunctions {
+object BijectionT extends BijectionTInstances {
   def bijection[F[_], G[_], A, B](t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B](t, f)
 

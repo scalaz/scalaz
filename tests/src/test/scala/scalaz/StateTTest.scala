@@ -3,7 +3,6 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
 
 object StateTTest extends SpecLite {
 
@@ -15,19 +14,23 @@ object StateTTest extends SpecLite {
   implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 
   checkAll(equal.laws[StateTListInt[Int]])
+  checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
-    def monadState[S, F[_] : Monad] = MonadState[StateT[F, ?, ?], S]
+    def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
+    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[F, S, ?]]
+    def monadState[S, F[_] : Monad] = MonadState[StateT[F, S, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
 
     // F = Id
     def functor[S] = Functor[State[S, ?]]
-    def monadState[S] = MonadState[State[?, ?], S]
+    def monadState[S] = MonadState[State[S, ?], S]
 
     // checking absence of ambiguity
     def functor[S, F[_] : Monad] = Functor[StateT[F, S, ?]]
+    def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
   }
 
   "monadState.state" in {
@@ -62,5 +65,12 @@ object StateTTest extends SpecLite {
     val a = StateT[List, Int, Boolean](s => List((s, false)))
     val b = StateT[List, Int, Boolean](s => List((s, true)))
     instances.monadPlus[Int, List].plus(a, b).run(0) must_===(List((0, false), (0, true)))
+  }
+
+  "StateT can be trampolined without stack overflow" in {
+    import scalaz.Free._
+    val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
+      .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
+    4000 must_=== result(0).run._1
   }
 }

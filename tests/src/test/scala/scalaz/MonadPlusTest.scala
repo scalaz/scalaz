@@ -2,7 +2,6 @@ package scalaz
 
 import std.AllInstances._
 import std.option.{some, none}
-import org.scalacheck.Prop.forAll
 
 object MonadPlusTest extends SpecLite {
 

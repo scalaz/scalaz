@@ -6,11 +6,10 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import java.util.concurrent._
 import ConcurrentTest._
-import org.scalacheck.Prop.forAll
 
 object FutureTest extends SpecLite {
   implicit def FutureEqual[A: Equal] =
-    Equal[A].contramap((_: Future[A]).run)
+    Equal[A].contramap((_: Future[A]).unsafePerformSync)
 
   checkAll(monad.laws[Future])
 
@@ -19,28 +18,28 @@ object FutureTest extends SpecLite {
   "Future" should {
     "not deadlock when using Nondeterminism#chooseAny" in {
       withTimeout(2000) {
-        deadlocks(3).run.length must_== 4
+        deadlocks(3).unsafePerformSync.length must_== 4
       }
     }
     "have a run method that returns" in {
       "when constructed from Future.now" in prop{(n: Int) =>
-        Future.now(n).run must_== n
+        Future.now(n).unsafePerformSync must_== n
       }
       "when constructed from Future.delay" in prop{(n: Int) =>
-        Future.delay(n).run must_== n
+        Future.delay(n).unsafePerformSync must_== n
       }
       "when constructed from Future.fork" in prop{(n: Int) =>
-        Future.fork(Future.now(n)).run must_== n
+        Future.fork(Future.now(n)).unsafePerformSync must_== n
       }
       "when constructed from Future.suspend" ! prop{(n: Int) =>
-        Future.suspend(Future.now(n)).run must_== n
+        Future.suspend(Future.now(n)).unsafePerformSync must_== n
       }
       "when constructed from Future.async" ! prop{(n: Int) =>
         def callback(call: Int => Unit): Unit = call(n)
-        Future.async(callback).run must_== n
+        Future.async(callback).unsafePerformSync must_== n
       }
       "when constructed from Future.apply" ! prop{(n: Int) =>
-        Future.apply(n).run must_== n
+        Future.apply(n).unsafePerformSync must_== n
       }
     }
   }
@@ -57,7 +56,7 @@ object FutureTest extends SpecLite {
       
       val f = fork(Future.reduceUnordered(Seq(f1,f2,f3))(intSetReducer))(es)
       
-      f.run must_== Set(1,2,3)
+      f.unsafePerformSync must_== Set(1,2,3)
     }
 
 
@@ -66,13 +65,13 @@ object FutureTest extends SpecLite {
 
       val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
 
-      f.run must_== Set(1)
+      f.unsafePerformSync must_== Set(1)
     }
 
     "correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
       val f = fork(Future.reduceUnordered(Seq())(intSetReducer))(es)
 
-      f.run must_== Set()
+      f.unsafePerformSync must_== Set()
     }
   }
   
@@ -86,7 +85,7 @@ object FutureTest extends SpecLite {
           Thread.sleep(time)
           Future.now(time)
         }
-      })).run
+      })).unsafePerformSync
       val duration = System.currentTimeMillis() - start
 
       result.length must_== times.size and duration.toInt mustBe_< times.fold(0)(_ + _)

@@ -3,14 +3,15 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Prop, Gen, Arbitrary}
-import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
+  type IntOr[A] = Int \/ A
+  type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
     Arbitrary(Gen.frequency[Int => Option[Int]](
@@ -27,19 +28,16 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  // Needed because scalac inference has trouble with \/
-  implicit def KleisliDisjunctionArbitrary[E : Arbitrary, R : Arbitrary, A : Arbitrary]: Arbitrary[Kleisli[\/[E, ?], R, A]] = KleisliArbitrary[\/[E, +?], R, A]
-
-  implicit def KleisliDisjunctionEqual[E : Equal] = KleisliEqual[\/[E, ?]]
-
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
   }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
+  checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
-  checkAll(monadError.laws[Lambda[(E0, A) => Kleisli[\/[E0, ?], Int, A]], Int])
+  checkAll(monadError.laws[KleisliEither, Int])
+  checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
@@ -51,7 +49,9 @@ object KleisliTest extends SpecLite {
     def bind[F[_] : Bind , A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : Plus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : PlusEmpty, A] = PlusEmpty[Kleisli[F, A, ?]]
-    def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, ?, ?], A]
+    def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, ?]]
+    def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, A, ?], A]
+    def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Functor] = Strong[Kleisli[F, ?, ?]]
@@ -67,12 +67,23 @@ object KleisliTest extends SpecLite {
     def functor[F[_] : Bind, A] = Functor[Kleisli[F, A, ?]]
     def functor[F[_] : Apply, A] = Functor[Kleisli[F, A, ?]]
     def functor[F[_] : Applicative, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : BindRec, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : Monad: BindRec, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : Applicative: BindRec, A] = Functor[Kleisli[F, A, ?]]
+    def functor[F[_] : ApplicativePlus: BindRec, A] = Functor[Kleisli[F, A, ?]]
     def apply[F[_] : Monad, A] = Apply[Kleisli[F, A, ?]]
     def apply[F[_] : Bind, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : BindRec, A] = Apply[Kleisli[F, A, ?]]
     def apply[F[_] : Applicative, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : Monad: BindRec, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : Applicative: BindRec, A] = Apply[Kleisli[F, A, ?]]
+    def apply[F[_] : ApplicativePlus: BindRec, A] = Apply[Kleisli[F, A, ?]]
     def applicative[F[_] : Monad, A] = Applicative[Kleisli[F, A, ?]]
+    def bind[F[_] : BindRec, A] = Bind[Kleisli[F, A, ?]]
+    def bind[F[_] : Monad: BindRec, A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
+    def profunctor[F[_]: Applicative] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
@@ -82,7 +93,7 @@ object KleisliTest extends SpecLite {
       // F = Id
       def readerFunctor[A] = Functor[Reader[A, ?]]
       def readerApply[A] = Apply[Reader[A, ?]]
-      def readerMonadReader[A] = MonadReader[Reader[?, ?], A]
+      def readerMonadReader[A] = MonadReader[Reader[A, ?], A]
       def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 

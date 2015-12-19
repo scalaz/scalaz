@@ -9,6 +9,7 @@ import org.scalacheck.Prop.forAll
 object EphemeralStreamTest extends SpecLite {
 
   checkAll(equal.laws[EphemeralStream[Int]])
+  checkAll(bindRec.laws[EphemeralStream])
   checkAll(monadPlus.strongLaws[EphemeralStream])
   checkAll(isEmpty.laws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])

@@ -74,6 +74,10 @@ final class OptionOps[A](self: Option[A]) {
 
   final def toFailure[B](b: => B): Validation[A, B] = o.toFailure(self)(b)
 
+  final def toSuccessNel[E](e: => E): ValidationNel[E, A] = o.toSuccessNel(self)(e)
+
+  final def toFailureNel[B](b: => B): ValidationNel[A, B] = o.toFailureNel(self)(b)
+
   final def toRightDisjunction[E](e: => E): E \/ A = o.toRight(self)(e)
 
   final def toLeftDisjunction[B](b: => B): A \/ B = o.toLeft(self)(b)

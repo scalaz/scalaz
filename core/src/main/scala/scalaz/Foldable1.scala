@@ -103,6 +103,24 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(minimumOf1(fa)(f))
   override def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(minimumBy1(fa)(f))
 
+  /** ``O(n log n)`` complexity */
+  def distinct1[A](fa: F[A])(implicit A: Order[A]): NonEmptyList[A] =
+    foldMapLeft1[A,(ISet[A],NonEmptyList[A])](fa)(a => (ISet.singleton(a), NonEmptyList(a))) {
+      case ((seen, acc), a) =>
+        if (seen.notMember(a))
+          (seen.insert(a), a <:: acc)
+        else (seen, acc)
+    }._2.reverse
+
+  /** ``O(n^2^)`` complexity */
+  def distinctE1[A](fa: F[A])(implicit A: Equal[A]): NonEmptyList[A] =
+    foldMapLeft1[A,NonEmptyList[A]](fa)(a => NonEmptyList(a)) {
+      case (seen, a) =>
+        if (!NonEmptyList.nonEmptyList.element(seen,a))
+          a <:: seen
+        else seen
+    }.reverse
+
   def sumr1[A](fa: F[A])(implicit A: Semigroup[A]): A =
     foldRight1(fa)(A.append)
 
@@ -122,7 +140,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
     a.map(foldMap1(fa)(f))(_ => ())
 
-  def sequence1_[M[_], A, B](fa: F[M[A]])(implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
+  def sequence1_[M[_], A](fa: F[M[A]])(implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
     traverse1_(fa)(x => x)
 
   /** always return `false` */
@@ -137,6 +155,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   def toNel[A](fa: F[A]): NonEmptyList[A] =
     foldMapRight1(fa)(NonEmptyList.nel(_, INil()))(_ <:: _)
+
+  def scanLeft1[A](fa: F[A])(f: (A, A) => A): NonEmptyList[A] =
+    foldMapLeft1(fa)(NonEmptyList(_))((xs, x) => f(xs.head, x) <:: xs).reverse
+
+  def scanRight1[A](fa: F[A])(f: (A, A) => A): NonEmptyList[A] =
+    foldMapRight1(fa)(NonEmptyList(_))((x, xs) => f(x, xs.head) <:: xs)
 
   trait Foldable1Law extends FoldableLaw {
     import std.vector._

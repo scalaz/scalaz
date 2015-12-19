@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.{Prop, Gen}
+import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
 object ApplicativeTest extends SpecLite {

@@ -2,7 +2,6 @@ package scalaz
 
 import syntax.all._
 import Inject._
-import org.scalacheck.Prop.forAll
 
 object InjectTest extends SpecLite {
   import std.AllInstances._

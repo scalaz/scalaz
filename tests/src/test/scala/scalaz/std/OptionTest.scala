@@ -17,6 +17,7 @@ object OptionTest extends SpecLite {
   checkAll("Option @@ Max", order.laws[MaxOption[Int]])
 
   checkAll("Option", monoid.laws[Option[Int]])
+  checkAll("Option", bindRec.laws[Option])
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", zip.laws[Option])
@@ -50,6 +51,7 @@ object OptionTest extends SpecLite {
     def equal[A: Equal] = Equal[Option[A]]
     def order[A: Order] = Order[Option[A]]
     def semigroup[A: Semigroup] = Monoid[Option[A]]
+    def bindRec[A] = BindRec[Option]
     def monad[A] = Monad[Option]
 
     def monoidFirst[A] = Monoid[Option[A] @@ First]

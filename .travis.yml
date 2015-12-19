@@ -20,12 +20,12 @@ cache:
 language: scala
 scala:
   - 2.11.7
-  - 2.10.5
+  - 2.10.6
 jdk:
   - openjdk7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mimaReportBinaryIssues
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
@@ -33,5 +33,10 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.0-M2
+    - scala: 2.12.0-M3
       jdk: oraclejdk8
+
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer

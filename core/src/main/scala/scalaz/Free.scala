@@ -6,9 +6,44 @@ import Free._
 import std.function.{function1Covariant => _, function1CovariantByName, _}
 import std.tuple._
 
-// TODO report compiler bug when this appears just above FreeInstances:
-//      "java.lang.Error: typeConstructor inapplicable for <none>"
-object Free extends FreeInstances with FreeFunctions {
+object Free extends FreeInstances {
+
+  /** Collapse a trampoline to a single step. */
+  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
+
+  /** Suspend the given computation in a single step. */
+  def return_[S[_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
+    liftF[S, A](S.point(value))
+
+  /** Alias for `point` */
+  def pure[S[_], A](value: A): Free[S, A] = point(value)
+
+  /** Absorb a step into the free monad. */
+  def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
+    liftF(value).flatMap(x => x)
+
+  /** Suspend a computation in a pure step of the applicative functor `S` */
+  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
+    liftF(S.pure(())).flatMap(_ => value)
+
+  /** A version of `liftF` that infers the nested type constructor. */
+  def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
+    liftF(MA(value))
+
+  /** Monadic join for the higher-order monad `Free` */
+  def joinF[S[_], A](value: Free[Free[S, ?], A]): Free[S, A] =
+    value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
+
+  /** A trampoline step that doesn't do anything. */
+  def pause: Trampoline[Unit] =
+    return_(())
+
+  /** A source that produces the given value. */
+  def produce[A](a: A): Source[A, Unit] =
+    liftF[(A, ?), Unit](a -> point[(A, ?), Unit](()))
+
+  /** A sink that waits for a single value and returns it. */
+  def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
 
   /** Absorb a step in `S` into the free monad for `S` */
   def apply[S[_], A](s: S[Free[S, A]]): Free[S, A] =
@@ -96,11 +131,11 @@ sealed abstract class Free[S[_], A] {
     foldMap[Free[T,?]](f)(freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], d: Zap[S, G]): C =
     Zap.monadComonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
-  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], G: Functor[G], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
@@ -128,6 +163,19 @@ sealed abstract class Free[S[_], A] {
       case \/-(r) => Monad[M].pure(r)
     }
     runM2(this)
+  }
+
+  /**
+    * Run Free using constant stack.
+    */
+  final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
+    def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
+      e match {
+        case -\/(sf) => M.map(f(sf))(\/.left)
+        case a @ \/-(_) => M.point(a)
+      }
+
+    B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
   }
 
   /**
@@ -235,6 +283,27 @@ sealed abstract class Free[S[_], A] {
     }
     go(source, ev(this))
   }
+
+  /** Duplication in `Free` as a comonad in the endofunctor category. */
+  def duplicateF: Free[Free[S, ?], A] = extendF[Free[S,?]](NaturalTransformation.refl[Free[S,?]])
+
+  /** Extension in `Free` as a comonad in the endofunctor category. */
+  def extendF[T[_]](f: Free[S, ?] ~> T): Free[T, A] = mapSuspension(new (S ~> T) {
+    def apply[X](x: S[X]) = f(liftF(x))
+  })
+
+  /** Extraction from `Free` as a comonad in the endofunctor category. */
+  def extractF(implicit S: Monad[S]): S[A] = foldMap(NaturalTransformation.refl[S])
+
+  def toFreeT(implicit S: Functor[S]): FreeT[S, Id, A] =
+    this match {
+      case Return(a) =>
+        FreeT.point(a)
+      case Suspend(a) =>
+        FreeT.liftF(a)
+      case Gosub(a, f) =>
+        FreeT.gosub(a.toFreeT)(f.andThen(_.toFreeT))
+    }
 }
 
 object Trampoline extends TrampolineInstances {
@@ -250,13 +319,15 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] =
-    new Monad[Trampoline] with Comonad[Trampoline] {
+  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
+    new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
+      def tailrecM[A, B](f: A => Trampoline[A \/ B])(a: A): Trampoline[B] =
+        f(a).flatMap(_.fold(tailrecM(f), point(_)))
     }
 }
 
@@ -316,54 +387,34 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
-  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] =
-    new Monad[Free[S, ?]] {
-      def point[A](a: => A) = Free.point(a)
+  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
+    new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
+      def point[A](a: => A) = Free.point(a)
+      // Free trampolines, should be alright to just perform binds.
+      def tailrecM[A, B](f: A => Free[S, A \/ B])(a: A): Free[S, B] =
+        f(a).flatMap(_.fold(tailrecM(f), point(_)))
+    }
+
+  implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
+    new Zip[Free[S, ?]] {
+      override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
+        (aa.resume, bb.resume) match {
+          case (-\/(a), -\/(b)) => roll(Z.zipWith(a, b)(zip(_, _)))
+          case (-\/(a), \/-(b)) => roll(F.map(a)(zip(_, point(b))))
+          case (\/-(a), -\/(b)) => roll(F.map(b)(zip(point(a), _)))
+          case (\/-(a), \/-(b)) => point((a, b))
+        }
     }
 
   implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[Free[S, ?], A]
 }
 
-trait FreeFunctions {
-  /** Collapse a trampoline to a single step. */
-  def reset[A](r: Trampoline[A]): Trampoline[A] = { val a = r.run; return_(a) }
-
-  /** Suspend the given computation in a single step. */
-  def return_[S[_], A](value: => A)(implicit S: Applicative[S]): Free[S, A] =
-    liftF[S, A](S.point(value))
-
-  /** Alias for `point` */
-  def pure[S[_], A](value: A): Free[S, A] = point(value)
-
-  /** Absorb a step into the free monad. */
-  def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
-    liftF(value).flatMap(x => x)
-
-  /** Suspend a computation in a pure step of the applicative functor `S` */
-  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
-    liftF(S.pure(())).flatMap(_ => value)
-
-  /** A version of `liftF` that infers the nested type constructor. */
-  def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
-    liftF(MA(value))
-
-  /** Monadic join for the higher-order monad `Free` */
-  def joinF[S[_], A](value: Free[Free[S, ?], A]): Free[S, A] =
-    value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
-
-  /** A trampoline step that doesn't do anything. */
-  def pause: Trampoline[Unit] =
-    return_(())
-
-  /** A source that produces the given value. */
-  def produce[A](a: A): Source[A, Unit] =
-    liftF[(A, ?), Unit](a -> point[(A, ?), Unit](()))
-
-  /** A sink that waits for a single value and returns it. */
-  def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
+private sealed trait FreeBind[F[_]] extends Bind[Free[F, ?]] {
+  override def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
+  def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
 }
 
 private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {

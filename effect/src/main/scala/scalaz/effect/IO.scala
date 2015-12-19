@@ -131,18 +131,13 @@ sealed abstract class IO[A] {
     bracket(resource.close)(f)
 }
 
-object IO extends IOInstances with IOFunctions {
-  def apply[A](a: => A): IO[A] =
-    io(rw => return_(rw -> a))
-}
-
 sealed abstract class IOInstances1 {
   implicit def IOSemigroup[A](implicit A: Semigroup[A]): Semigroup[IO[A]] =
       Semigroup.liftSemigroup[IO, A](IO.ioMonad, A)
 
   implicit val iOLiftIO: LiftIO[IO] = new IOLiftIO {}
 
-  implicit val ioMonad: Monad[IO] = new IOMonad {}
+  implicit val ioMonad: Monad[IO] with BindRec[IO] = new IOMonad {}
 }
 
 sealed abstract class IOInstances0 extends IOInstances1 {
@@ -163,10 +158,11 @@ sealed abstract class IOInstances extends IOInstances0 {
 
 }
 
-private trait IOMonad extends Monad[IO] {
+private trait IOMonad extends Monad[IO] with BindRec[IO] {
   def point[A](a: => A): IO[A] = IO(a)
   override def map[A, B](fa: IO[A])(f: A => B) = fa map f
   def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f
+  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] = IO.tailrecM(f)(a)
 }
 
 private trait IOLiftIO extends LiftIO[IO] {
@@ -177,9 +173,9 @@ private trait IOMonadCatchIO extends MonadCatchIO[IO] {
   def except[A](io: IO[A])(h: Throwable => IO[A]): IO[A] = io.except(h)
 }
 
-/** IO Actions for writing to standard output and and reading from standard input */
-trait IOStd {
-  import IO.io
+object IO extends IOInstances {
+  def apply[A](a: => A): IO[A] =
+    io(rw => return_(rw -> a))
 
   /** Reads a character from standard input. */
   def getChar: IO[Char] = IO(readChar())
@@ -217,9 +213,6 @@ trait IOStd {
       ()
     }))
 
-}
-
-trait IOFunctions extends IOStd {
   type RunInBase[M[_], Base[_]] =
   Forall[λ[α => M[α] => Base[M[α]]]]
 
@@ -276,6 +269,17 @@ trait IOFunctions extends IOStd {
     } yield ()
     newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
+
+  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] =
+    io(rw =>
+      BindRec[Trampoline].tailrecM[(Tower[IvoryTower], A), (Tower[IvoryTower], B)] {
+        case (nw0, x) =>
+          f(x)(nw0).map {
+            case (nw1, e) =>
+              e.bimap((nw1, _), (nw1, _))
+          }
+      }((rw, a))
+    )
 
   /** An IO action is an ST action. */
   implicit def IOToST[A](io: IO[A]): ST[IvoryTower, A] =

@@ -4,8 +4,10 @@ import annotation.tailrec
 import Ordering._
 import std.option._
 
-// http://www.haskell.org/ghc/docs/latest/html/libraries/containers-0.5.0.0/src/Data-Set-Base.html#Set
-
+/**
+ * @see [[http://hackage.haskell.org/package/containers-0.5.0.0/docs/Data-Set.html]]
+ * @see [[https://github.com/haskell/containers/blob/v0.5.0.0/Data/Set/Base.hs]]
+ */
 sealed abstract class ISet[A] {
   import ISet._
 
@@ -558,19 +560,6 @@ sealed abstract class ISet[A] {
     toAscList.hashCode
 }
 
-object ISet extends ISetInstances with ISetFunctions {
-  private[scalaz] abstract case class Tip[A] private() extends ISet[A] {
-    val size = 0
-  }
-  private[scalaz] object Tip extends Tip[Nothing] {
-    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
-  }
-
-  private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {
-    val size = l.size + r.size + 1
-  }
-}
-
 sealed abstract class ISetInstances {
   import ISet._
 
@@ -600,6 +589,38 @@ sealed abstract class ISetInstances {
   }
 
   implicit val setFoldable: Foldable[ISet] = new Foldable[ISet] {
+    override def findLeft[A](fa: ISet[A])(f: A => Boolean) =
+      fa match {
+        case Bin(x, l, r) =>
+          findLeft(l)(f) match {
+            case a @ Some(_) =>
+              a
+            case None =>
+              if(f(x))
+                Some(x)
+              else
+                findLeft(r)(f)
+          }
+        case Tip() =>
+          None
+      }
+
+    override def findRight[A](fa: ISet[A])(f: A => Boolean) =
+      fa match {
+        case Bin(x, l, r) =>
+          findRight(r)(f) match {
+            case a @ Some(_) =>
+              a
+            case None =>
+              if(f(x))
+                Some(x)
+              else
+                findRight(l)(f)
+          }
+        case Tip() =>
+          None
+      }
+
     def foldMap[A, B](fa: ISet[A])(f: A => B)(implicit F: Monoid[B]): B =
       fa match {
         case Tip() =>
@@ -613,6 +634,35 @@ sealed abstract class ISetInstances {
 
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
+
+    override def index[A](fa: ISet[A], i: Int): Option[A] = {
+      import std.anyVal._
+      @tailrec def loop(a: ISet[A], b: Int): Option[A] =
+        a match {
+          case Bin(x, l, r) =>
+            Order[Int].order(b, l.size) match {
+              case Ordering.LT =>
+                loop(l, b)
+              case Ordering.GT =>
+                loop(r, b - l.size - 1)
+              case Ordering.EQ =>
+                Some(x)
+            }
+          case Tip() =>
+            None
+        }
+
+      if (i < 0 || fa.size <= i)
+        None
+      else
+        loop(fa, i)
+    }
+
+    override def toIList[A](fa: ISet[A]) =
+      fa.foldRight(IList.empty[A])(_ :: _)
+
+    override def toList[A](fa: ISet[A]) =
+      fa.toList
 
     override def length[A](fa: ISet[A]) =
       fa.size
@@ -642,9 +692,7 @@ sealed abstract class ISetInstances {
   }
 }
 
-sealed trait ISetFunctions {
-  import ISet._
-
+object ISet extends ISetInstances {
   final def empty[A]: ISet[A] =
     Tip()
 
@@ -726,6 +774,17 @@ sealed trait ISetFunctions {
             } else Bin(x, l, r)
         }
     }
+
+  private[scalaz] abstract case class Tip[A] private() extends ISet[A] {
+    val size = 0
+  }
+  private[scalaz] object Tip extends Tip[Nothing] {
+    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
+  }
+
+  private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {
+    val size = l.size + r.size + 1
+  }
 }
 
 private sealed trait ISetEqual[A] extends Equal[ISet[A]] {

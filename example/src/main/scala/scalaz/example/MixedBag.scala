@@ -69,7 +69,7 @@ object MixedBag extends App {
     val f = kleisli((i: Int) => some(i))
     f map (i => i * 2) map (x => println(x)) run 3
 
-    val K = Arrow[({type λ[α, β]=Kleisli[Option, α, β]})#λ]
+    val K = Arrow[λ[(α,β)=>Kleisli[Option,α,β]]]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
@@ -78,7 +78,6 @@ object MixedBag extends App {
     import syntax.monad._
     import syntax.writer._
     import WriterT._
-    import Free._
 
     type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]

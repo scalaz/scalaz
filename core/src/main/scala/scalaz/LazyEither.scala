@@ -95,7 +95,29 @@ private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
 
 private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
-object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
+object LazyEither extends LazyEitherInstances {
+
+  /**
+   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
+   * `LazyRight`
+   */
+  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
+
+  sealed abstract class LazyLeftConstruct[B] {
+    def apply[A](a: => A): LazyEither[A, B]
+  }
+
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
+    def apply[A](a: => A) = LazyLeft(() => a)
+  }
+
+  sealed abstract class LazyRightConstruct[A] {
+    def apply[B](b: => B): LazyEither[A, B]
+  }
+
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
+    def apply[B](b: => B) = LazyRight(() => b)
+  }
 
   final case class LeftProjection[+A, +B](e: LazyEither[A, B]) {
     import LazyOption._
@@ -138,8 +160,9 @@ object LazyEither extends LazyEitherInstances with LazyEitherFunctions {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E] =
-    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither, E] {
+  implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] =
+    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] {
+
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
 
@@ -172,6 +195,16 @@ sealed abstract class LazyEitherInstances {
 
       def handleError[A](fa: LazyEither[E, A])(f: E => LazyEither[E, A]): LazyEither[E, A] =
         fa.left.flatMap(e => f(e))
+
+      @annotation.tailrec
+      def tailrecM[A, B](f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
+        f(a) match {
+          case LazyLeft(l) => LazyLeft(l)
+          case LazyRight(r) => r() match {
+            case \/-(b) => LazyEither.lazyRight(b)
+            case -\/(a0) => tailrecM(f)(a0)
+          }
+        }
     }
 
   implicit val lazyEitherAssociative: Associative[LazyEither] = new Associative[LazyEither] {
@@ -204,30 +237,5 @@ sealed abstract class LazyEitherInstances {
         a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
         b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
       )
-  }
-}
-
-trait LazyEitherFunctions {
-
-  /**
-   * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
-   * `LazyRight`
-   */
-  def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
-
-  sealed abstract class LazyLeftConstruct[B] {
-    def apply[A](a: => A): LazyEither[A, B]
-  }
-
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
-    def apply[A](a: => A) = LazyLeft(() => a)
-  }
-
-  sealed abstract class LazyRightConstruct[A] {
-    def apply[B](b: => B): LazyEither[A, B]
-  }
-
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
-    def apply[B](b: => B) = LazyRight(() => b)
   }
 }

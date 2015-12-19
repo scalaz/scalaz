@@ -12,7 +12,23 @@ object Tag {
   /** `unsubst` specialized to `Id`. */
   @inline def unwrap[@specialized A, T](a: A @@ T): A = unsubst[A, Id, T](a)
 
-  /** Add a tag `T` to `A`. */
+  /** Add a tag `T` to `A`.
+    *
+    * NB: It is unsafe to `subst` or `unsubst` a tag in an `F` that is
+    * sensitive to the `A` type within.  For example, if `F` is a
+    * GADT, rather than a normal ADT, it is probably unsafe.  For
+    * "normal" types like `List` and function types, it is safe.  More
+    * broadly, if it is possible to write a ''legal''
+    * [[scalaz.InvariantFunctor]] over the parameter, `subst` of that
+    * parameter is safe.
+    * 
+    * We do not have a
+    * <a href="https://ghc.haskell.org/trac/ghc/wiki/Roles">type role</a>
+    * system in Scala with which to declare the exact situations under
+    * which `subst` is safe.  If we did, we would declare that `subst`
+    * is safe if and only if the parameter has "representational" or
+    * "phantom" role.
+    */
   def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
 
   /** Add a tag `T` to `G[_]` */
@@ -52,6 +68,9 @@ object Tag {
 
     /** Like `Tag.unsubst`, but specify only the `T`. */
     def unsubst[F[_], A](fa: F[A @@ T]): F[A] = Tag.unsubst(fa)
+
+    /** Pattern match on a tagged value */
+    def unapply[A](a: A @@ T): Option[A] = Some(unwrap(a))
   }
 
   /** Variants of `apply`, `subst`, and `unsubst` that require

@@ -3,13 +3,13 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object StreamTest extends SpecLite {
-  checkAll(equal.laws[Stream[Int]])
+  checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
+  checkAll(bindRec.laws[Stream])
   checkAll(traverse.laws[Stream])
   checkAll(cobind.laws[Stream])
   checkAll(isEmpty.laws[Stream])
@@ -18,6 +18,20 @@ object StreamTest extends SpecLite {
 
   import std.stream.streamSyntax._
   import syntax.foldable._
+
+  "Order[Stream[Int]] is consistent with Order[List[Int]]" ! forAll {
+    (a: Stream[Int], b: Stream[Int]) =>
+      Order[Stream[Int]].order(a, b) must_=== Order[List[Int]].order(a.toList, b.toList)
+  }
+
+  "Order[Stream[Int]] is lazy" ! {
+    var evaluated = false
+    val a = 1 #:: {evaluated = true; 2} #:: Stream.empty[Int]
+    val b = 0 #:: Stream.empty[Int]
+    Order[Stream[Int]].order(a, b) must_=== Ordering.GT
+    Order[Stream[Int]].order(b, a) must_=== Ordering.LT
+    evaluated must_=== false
+  }
 
   "intercalate empty stream is flatten" ! forAll((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must_===(a.flatten))
 
@@ -81,5 +95,19 @@ object StreamTest extends SpecLite {
 
   "filter" ! forAll {
     (xs: Stream[Int], p: Int => Boolean) => MonadPlus[Stream].filter(xs)(p) must_=== xs.filter(p)
+  }
+
+  object instances {
+    def equal[A: Equal] = Equal[Stream[A]]
+    def order[A: Order] = Order[Stream[A]]
+    def monoid[A] = Monoid[Stream[A]]
+    def bindRec = BindRec[Stream]
+    def monadPlus = MonadPlus[Stream]
+    def traverse = Traverse[Stream]
+    def zip = Zip[Stream]
+    def unzip = Unzip[Stream]
+    def align = Align[Stream]
+    def isEmpty = IsEmpty[Stream]
+    def cobind = Cobind[Stream]
   }
 }

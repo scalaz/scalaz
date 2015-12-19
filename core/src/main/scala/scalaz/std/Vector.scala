@@ -11,7 +11,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = empty :+ a
@@ -54,6 +54,24 @@ trait VectorInstances extends VectorInstances0 {
         r = f(fa(i), w)
       }
       r
+    }
+
+    def tailrecM[A, B](f: A => Vector[A \/ B])(a: A): Vector[B] = {
+      val bs = Vector.newBuilder[B]
+      @scala.annotation.tailrec
+      def go(xs: List[Vector[A \/ B]]): Unit =
+        xs match {
+          case Vector(\/-(b), tail @ _*) :: rest =>
+            bs += b
+            go(tail.toVector :: rest)
+          case Vector(-\/(a0), tail @ _*) :: rest =>
+            go(f(a0) :: tail.toVector :: rest)
+          case Vector() :: rest =>
+            go(rest)
+          case Nil =>
+        }
+      go(List(f(a)))
+      bs.result
     }
 
     def alignWith[A, B, C](f: A \&/ B => C): (Vector[A], Vector[B]) => Vector[C] = { (as, bs) =>

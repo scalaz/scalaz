@@ -2,7 +2,6 @@ package scalaz
 
 import std.AllInstances._
 import syntax.bind._
-import org.scalacheck.Prop.forAll
 
 object BindTest extends SpecLite {
 

@@ -98,10 +98,17 @@ trait IndexedContsTFunctions {
     }
 }
 
-sealed abstract class IndexedContsTInstances0 {
+sealed abstract class IndexedContsTInstances1 {
   implicit def IndexedContsTFunctorRight[W[_], M[_], R, O](implicit W0: Functor[W]): Functor[IndexedContsT[W, M, R, O, ?]] =
     new IndexedContsTFunctorRight[W, M, R, O] {
       implicit val W: Functor[W] = W0
+    }
+}
+
+sealed abstract class IndexedContsTInstances0 extends IndexedContsTInstances1 {
+  implicit def ContsTBind[W[_], M[_], R](implicit W0: Cobind[W]): Bind[ContsT[W, M, R, ?]] =
+    new ContsTBind[W, M, R] {
+      val W = W0
     }
 }
 
@@ -163,12 +170,16 @@ private sealed trait IndexedContsTBifunctor[W[_], M[_], O] extends Bifunctor[Ind
   override def rightMap[A, B, D](fa: IndexedContsT[W, M, A, O, B])(f: B => D): IndexedContsT[W, M, A, O, D] = fa.map(f)
 }
 
-private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[ContsT[W, M, R, ?]] with IndexedContsTFunctorRight[W, M, R, R] {
+private sealed trait ContsTBind[W[_], M[_], R] extends Bind[ContsT[W, M, R, ?]] with IndexedContsTFunctorRight[W, M, R, R] {
+  implicit val W: Cobind[W]
+
+  override def bind[A, B](fa: ContsT[W, M, R, A])(f: A => ContsT[W, M, R, B]) = fa.flatMap(f)
+
+  override def join[A](ffa: ContsT[W, M, R, ContsT[W, M, R, A]]) = ffa.flatten
+}
+
+private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[ContsT[W, M, R, ?]] with ContsTBind[W, M, R] {
   implicit val W: Comonad[W]
 
-  def point[A](a: => A): ContsT[W, M, R, A] = IndexedContsT.point(a)
-
-  def bind[A, B](fa: ContsT[W, M, R, A])(f: A => ContsT[W, M, R, B]): ContsT[W, M, R, B] = fa.flatMap(f)
-
-  override def join[A](ffa: ContsT[W, M, R, ContsT[W, M, R, A]]): ContsT[W, M, R, A] = ffa.flatten
+  override def point[A](a: => A) = IndexedContsT.point(a)
 }

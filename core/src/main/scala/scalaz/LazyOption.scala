@@ -105,48 +105,51 @@ private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
 private case object LazyNone extends LazyOption[Nothing]
 
-object LazyOption extends LazyOptionInstances with LazyOptionFunctions
-
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
-    def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
-    override def cojoin[A](a: LazyOption[A]) = a match {
-      case LazyNone => LazyNone
-      case o @ LazySome(_) => LazySome(() => o)
+  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] = 
+    new Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
+      def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
+      override def cojoin[A](a: LazyOption[A]) = a match {
+        case LazyNone => LazyNone
+        case o @ LazySome(_) => LazySome(() => o)
+      }
+      def traverseImpl[G[_]: Applicative, A, B](fa: LazyOption[A])(f: A => G[B]): G[LazyOption[B]] = fa traverse (a => f(a))
+      override def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
+      override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f
+      def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = a orElse b
+      def bind[A, B](fa: LazyOption[A])(f: A => LazyOption[B]): LazyOption[B] = fa flatMap (a => f(a))
+      def point[A](a: => A): LazyOption[A] = lazySome(a)
+      def empty[A]: LazyOption[A] = lazyNone
+      def cozip[A, B](a: LazyOption[A \/ B]) =
+        a.fold({
+          case -\/(a) => -\/(lazySome(a))
+          case \/-(b) => \/-(lazySome(b))
+        }, -\/(lazyNone))
+      def zip[A, B](a: => LazyOption[A], b: => LazyOption[B]) = a zip b
+      def unzip[A, B](a: LazyOption[(A, B)]) = a.unzip
+
+      def alignWith[A, B, C](f: A \&/ B => C) = (a, b) =>
+        a.fold(
+          aa => lazySome(f(b.fold(
+            bb => \&/.Both(aa, bb), \&/.This(aa)))), b.fold(
+            bb => lazySome(f(\&/.That(bb))), lazyNone))
+
+      def pextract[B, A](fa: LazyOption[A]): LazyOption[B] \/ A =
+        fa.fold(a => \/-(a), -\/(lazyNone))
+      override def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
+
+      @scala.annotation.tailrec
+      def tailrecM[A, B](f: A => LazyOption[A \/ B])(a: A): LazyOption[B] =
+        f(a) match {
+          case LazyNone => LazyNone
+          case LazySome(t) => t() match {
+            case \/-(b) => lazySome(b)
+            case -\/(a0) => tailrecM(f)(a0)
+          }
+        }
     }
-    def traverseImpl[G[_]: Applicative, A, B](fa: LazyOption[A])(f: A => G[B]): G[LazyOption[B]] =  fa traverse (a => f(a))
-    override def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-    override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f
-    def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = a orElse b
-    def bind[A, B](fa: LazyOption[A])(f: A => LazyOption[B]): LazyOption[B] = fa flatMap (a => f(a))
-    def point[A](a: => A): LazyOption[A] = lazySome(a)
-    def empty[A]: LazyOption[A] = lazyNone
-    def cozip[A, B](a: LazyOption[A \/ B]) =
-      a.fold({
-        case -\/(a) => -\/(lazySome(a))
-        case \/-(b) => \/-(lazySome(b))
-      }, -\/(lazyNone))
-    def zip[A, B](a: => LazyOption[A], b: => LazyOption[B]) = a zip b
-    def unzip[A, B](a: LazyOption[(A, B)]) = a.unzip
-
-    def alignWith[A, B, C](f: A \&/ B => C) = (a, b) =>
-      a.fold(
-        aa => lazySome(f(b.fold(
-          bb => \&/.Both(aa, bb)
-        , \&/.This(aa))
-        ))
-      , b.fold(
-          bb => lazySome(f(\&/.That(bb)))
-        , lazyNone
-        )
-      )
-
-    def pextract[B, A](fa: LazyOption[A]): LazyOption[B] \/ A =
-      fa.fold(a => \/-(a), -\/(lazyNone))
-    override def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
-  }
 
   implicit def lazyOptionEqual[A: Equal]: Equal[LazyOption[A]] = {
     import std.option._
@@ -173,7 +176,7 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
   Order.orderBy(_.toOption)*/
 }
 
-trait LazyOptionFunctions {
+object LazyOption extends LazyOptionInstances {
   def lazySome[A](a: => A): LazyOption[A] =
     LazySome(() => a)
 

@@ -39,6 +39,7 @@ object CokleisliTest extends SpecLite {
       a(None) == b(None) && Iterator.fill(20)(util.Random.nextInt).map(Option(_)).forall(n => a(n) == b(n))
     }
 
+  checkAll(bindRec.laws[Cokleisli[Option, Int, ?]])
   checkAll(bind.laws[Cokleisli[Option, Int, ?]])
 
   "compose" in {
@@ -51,6 +52,7 @@ object CokleisliTest extends SpecLite {
   }
 
   object instances {
+    def bindRec[F[_], W] = BindRec[Cokleisli[F, W, ?]]
     def monad[F[_], W] = Monad[Cokleisli[F, W, ?]]
     def compose[F[_]](implicit F: Cobind[F]) = Compose[Cokleisli[F, ?, ?]]
     def profunctor[F[_]: Functor] = Profunctor[Cokleisli[F, ?, ?]]

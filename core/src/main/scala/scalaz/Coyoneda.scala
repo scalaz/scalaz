@@ -47,6 +47,14 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
     val v = fi
     def f(i: I) = k(i)
   }
+
+  /** `Coyoneda` is a monad in an endofunctor category */
+  def flatMap[G[_]](f: F ~> Coyoneda[G,?]): Coyoneda[G,A] =
+    f(fi).map(k)
+
+  /** `Coyoneda` is a comonad in an endofunctor category */
+  def extend[G[_]](f: Coyoneda[F,?] ~> G): Coyoneda[G,A] =
+    Coyoneda.lift(f(this))
 }
 
 object Coyoneda extends CoyonedaInstances {
@@ -108,6 +116,12 @@ sealed abstract class CoyonedaInstances extends CoyonedaInstances0 {
     new IsomorphismOrder[Coyoneda[F, A], F[A]] {
       def G = A
       def iso = Coyoneda.iso[F].unlift
+    }
+
+  implicit def coyonedaBindRec[F[_]: BindRec]: BindRec[Coyoneda[F, ?]] =
+    new IsomorphismBindRec[Coyoneda[F, ?], F] {
+      def G = implicitly
+      def iso = Coyoneda.iso
     }
 }
 

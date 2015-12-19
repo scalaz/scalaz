@@ -6,7 +6,6 @@ import collection.immutable.IndexedSeq
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object TupleTest extends SpecLite {
 
@@ -39,6 +38,14 @@ object TupleTest extends SpecLite {
   checkAll("Tuple6", monoid.laws[(A, B, C, D, E, F)])
   checkAll("Tuple7", monoid.laws[(A, B, C, D, E, F, G)])
   checkAll("Tuple8", monoid.laws[(A, B, C, D, E, F, G, H)])
+
+  checkAll("Tuple2", bindRec.laws[(B, ?)])
+  checkAll("Tuple3", bindRec.laws[(B, C, ?)])
+  checkAll("Tuple4", bindRec.laws[(B, C, D, ?)])
+  checkAll("Tuple5", bindRec.laws[(B, C, D, E, ?)])
+  checkAll("Tuple6", bindRec.laws[(B, C, D, E, F, ?)])
+  checkAll("Tuple7", bindRec.laws[(B, C, D, E, F, G, ?)])
+  checkAll("Tuple8", bindRec.laws[(B, C, D, E, F, G, H, ?)])
 
   checkAll("Tuple1", monad.laws[Tuple1])
   checkAll("Tuple2", monad.laws[(B, ?)])
@@ -94,7 +101,8 @@ object TupleTest extends SpecLite {
       def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[(B, ?)]
-      def monad[A: Monoid] = Functor[(A, ?)]
+      def bindRec[A: Semigroup] = BindRec[(A, ?)]
+      def monad[A: Monoid] = Monad[(A, ?)]
       def cozip = Cozip[(A, ?)]
 
       // checking absence of ambiguity

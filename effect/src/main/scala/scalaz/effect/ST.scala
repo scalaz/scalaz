@@ -42,13 +42,10 @@ sealed abstract class STRef[S, A] {
   } yield ()
 }
 
-object STRef extends STRefInstances with STRefFunctions {
+object STRef extends STRefInstances {
 
   def apply[S]: (Id ~> STRef[S, ?]) =
     stRef[S]
-}
-
-trait STRefFunctions {
 
   def stRef[S]: (Id ~> STRef[S, ?]) = new (Id ~> STRef[S, ?]) {
     def apply[A](a: A) = new STRef[S, A] {
@@ -102,11 +99,9 @@ sealed abstract class STArray[S, A] {
   } yield ()
 }
 
-object STArray extends STArrayFunctions {
+object STArray {
   def apply[S, A : ClassTag](s: Int, a: A): STArray[S, A] = stArray(s, a)
-}
 
-trait STArrayFunctions {
   def stArray[S, A](s: Int, a: A)(implicit t: ClassTag[A]): STArray[S, A] = new STArray[S, A] {
     val size = s
     val z = a
@@ -134,12 +129,10 @@ sealed abstract class ST[S, A] {
     })
 }
 
-object ST extends STInstances with STFunctions {
+object ST extends STInstances {
   def apply[S, A](a: => A): ST[S, A] =
     returnST(a)
-}
 
-trait STFunctions {
   def st[S, A](f: Tower[S] => (Tower[S], A)): ST[S, A] = new ST[S, A] {
     private[effect] def apply(s: Tower[S]) = f(s)
   }

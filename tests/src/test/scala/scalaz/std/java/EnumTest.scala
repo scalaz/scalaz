@@ -1,6 +1,5 @@
 package scalaz
 package std.java
-import org.scalacheck.Prop.forAll
 
 
 object EnumTest extends SpecLite {

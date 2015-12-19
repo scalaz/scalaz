@@ -19,13 +19,13 @@ object CofreeTest extends SpecLite {
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
 
-  implicit val lazyOptionEqualNat = new (Equal ~> λ[α => Equal[LazyOption[α]]]) {
-    def apply[A](a: Equal[A]) = LazyOption.lazyOptionEqual(a)
-  }
+  implicit def cofreeEqual[F[_], A](implicit F: Eq1[F], A: Equal[A]): Equal[Cofree[F, A]] =
+    Equal.equal{ (a, b) =>
+      A.equal(a.head, b.head) && F.eq1(cofreeEqual[F, A]).equal(a.tail, b.tail)
+    }
 
-  implicit val streamEqualNat = new (Equal ~> λ[α => Equal[Stream[α]]]) {
-    def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
-  }
+  implicit def cofreeZipEqual[F[_]: Eq1, A: Equal]: Equal[CofreeZip[F, A]] =
+    Tag.subst(cofreeEqual[F, A])
 
   //needed to prevent SOE for testing wiht equality
   implicit def cofreeOptEquals[A](implicit e: Equal[A]): Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
@@ -71,7 +71,7 @@ object CofreeTest extends SpecLite {
       def to[A](tree: Tree[A]): CofreeStream[A] =
         Cofree(tree.rootLabel, tree.subForest.map(to))
       def from[A](c: CofreeStream[A]): Tree[A] =
-        Tree.node(c.head, c.tail.map(from(_)))
+        Tree.Node(c.head, c.tail.map(from(_)))
     }
 
   implicit def CofreeLazyOptionArb[A: Arbitrary]: Arbitrary[CofreeLazyOption[A]] =
@@ -81,7 +81,7 @@ object CofreeTest extends SpecLite {
     Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to)
 
 
-  implicit def CoffreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
+  implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
     import org.scalacheck.Arbitrary._
     import org.scalacheck.Gen
     val arb = Arbitrary { Gen.listOfN(5000, implicitly[Arbitrary[A]].arbitrary ) }   
@@ -127,6 +127,13 @@ object CofreeTest extends SpecLite {
       Tags.Zip.subst(CofreeStreamArb[A])
 
     checkAll("CofreeZipStream", ScalazProperties.apply.laws[CofreeZipStream])
+  }
+
+  "no stack overflow Applicative[CofreeZip[IList, ?]]#point" in {
+    val a = 1
+    val b = Applicative[CofreeZip[IList, ?]].point(a)
+    val size = 10
+    Foldable[Cofree[IList, ?]].toStream(Tag.unwrap(b)).take(size) must_=== Stream.fill(size)(a)
   }
 
   "Applicative[λ[α => CofreeZip[LazyOption, α]]] is Applicative[λ[α => Stream[α] @@ Zip]]" ! forAll{

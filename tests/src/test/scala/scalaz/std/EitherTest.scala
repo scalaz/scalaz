@@ -5,7 +5,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
-import org.scalacheck.Prop.forAll
 
 object EitherTest extends SpecLite {
   checkAll("Either", order.laws[Either[Int, Int]])
@@ -30,9 +29,18 @@ object EitherTest extends SpecLite {
   checkAll("Either.LeftProjection @@ Last", monad.laws[λ[α => Either.LeftProjection[α, Int] @@ Last]])
   checkAll("Either.RightProjection @@ Last", monad.laws[λ[α => Either.RightProjection[Int, α] @@ Last]])
 
-  checkAll("Either", monadError.laws[Either, Int])
+  checkAll("Either", bindRec.laws[Either[Int, ?]])
+  checkAll("Either", monadError.laws[Either[Int, ?], Int])
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[Either[Int, ?]])
   checkAll("Either", bitraverse.laws[Either])
   checkAll("Either", associative.laws[Either])
+
+  "show" in {
+    import syntax.show._
+    val left : Either[String, Int] = Left("leftside")
+    val right : Either[String, Int] = Right(0)
+    left.shows must_===("Left(\"leftside\")")
+    right.shows must_===("Right(0)")
+  }
 }

@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object ProductTest extends SpecLite {
   type OptionList[α] = (Option[α], List[α])
@@ -13,6 +12,11 @@ object ProductTest extends SpecLite {
   implicit val optionListMonadPlus = MonadPlus[Option].product[List]
   implicit val optionListZip = Zip[Option].product[List]
   implicit val oneAndOptionPairTraverse1 = Traverse1[OneAndOption].product[OneAndOption]
+
+  {
+    implicit val optionListBindRec = BindRec[Option].product[List]
+    checkAll(bindRec.laws[OptionList])
+  }
 
   checkAll(monadPlus.strongLaws[OptionList])
   checkAll(zip.laws[OptionList])

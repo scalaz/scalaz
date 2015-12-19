@@ -28,6 +28,8 @@
  *  - [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Functor]] extends [[scalaz.InvariantFunctor]]
  *  - [[scalaz.Contravariant]] extends [[scalaz.InvariantFunctor]]
+ *  - [[scalaz.Divide]] extends [[scalaz.Contravariant]]
+ *  - [[scalaz.Divisible]] extends [[scalaz.Divide]]
  *  - [[scalaz.Apply]] extends [[scalaz.Functor]]
  *  - [[scalaz.Applicative]] extends [[scalaz.Apply]]
  *  - [[scalaz.Align]] extends [[scalaz.Functor]]
@@ -35,6 +37,7 @@
  *  - [[scalaz.Unzip]]
  *  - [[scalaz.Cozip]]
  *  - [[scalaz.Bind]] extends [[scalaz.Apply]]
+ *  - [[scalaz.BindRec]] extends [[scalaz.Bind]]
  *  - [[scalaz.Monad]] extends [[scalaz.Applicative]] with [[scalaz.Bind]]
  *  - [[scalaz.Cobind]] extends [[scalaz.Functor]]
  *  - [[scalaz.Comonad]] extends [[scalaz.Cobind]]
@@ -45,6 +48,7 @@
  *  - [[scalaz.Traverse]] extends [[scalaz.Functor]] with [[scalaz.Foldable]]
  *  - [[scalaz.Traverse1]] extends [[scalaz.Traverse]] with [[scalaz.Foldable1]]
  *
+ *  - [[scalaz.Associative]]
  *  - [[scalaz.Bifunctor]]
  *  - [[scalaz.Bifoldable]]
  *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]] with [[scalaz.Bifoldable]]
@@ -58,6 +62,11 @@
  *  - [[scalaz.Choice]] extends [[scalaz.Category]]
  *  - [[scalaz.Split]] extends [[scalaz.Compose]]
  *  - [[scalaz.Arrow]] extends [[scalaz.Split]] with [[scalaz.Strong]] with [[scalaz.Category]]
+ *  - [[scalaz.MonadState]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadError]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadTell]] extends [[scalaz.Monad]]
+ *  - [[scalaz.MonadReader]] extends [[scalaz.Monad]]
+ *  - [[scalaz.ComonadStore]] extends [[scalaz.Comonad]]
  *
  *  '''Data Structures Index'''
  *  - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
@@ -85,7 +94,7 @@ package object scalaz {
 
   import Id._
 
-  implicit val idInstance: Traverse1[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
+  implicit val idInstance: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
 
   private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
 
@@ -139,19 +148,13 @@ package object scalaz {
   type State[S, A] = StateT[Id, S, A]
 
   object StateT extends StateTInstances with StateTFunctions {
-    def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = new StateT[F, S, A] {
-      def apply(s: S) = f(s)
-    }
+    def apply[F[_], S, A](f: S => F[(S, A)])(implicit F: Monad[F]): StateT[F, S, A] = IndexedStateT[F, S, S, A](f)
   }
   object IndexedState extends StateFunctions {
-    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = new IndexedState[S1, S2, A] {
-      def apply(s: S1) = f(s)
-    }
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[Id, S1, S2, A](f)
   }
   object State extends StateFunctions {
-    def apply[S, A](f: S => (S, A)): State[S, A] = new StateT[Id, S, A] {
-      def apply(s: S) = f(s)
-    }
+    def apply[S, A](f: S => (S, A)): State[S, A] = StateT[Id, S, A](f)
   }
 
   type StoreT[F[_], A, B] = IndexedStoreT[F, A, A, B]
@@ -170,6 +173,8 @@ package object scalaz {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }
 
+  type Traced[A, B] = TracedT[Id, A, B]
+  def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
   type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
   object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
@@ -221,27 +226,43 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  /** A lens that doesn't transform the type of the record. */
+  /**
+   * A lens that doesn't transform the type of the record.
+   *
+   * @see [[scalaz.@>]]
+   */
   type Lens[A, B] = LensFamily[A, A, B, B]
 
+  /**
+   * @see [[scalaz.Lens]]
+   */
   object Lens extends LensInstances with LensFunctions {
     def apply[A, B](r: A => Store[B, A]): Lens[A, B] =
       lens(r)
   }
 
+  /** @see [[scalaz.Lens]] */
   type @>[A, B] = Lens[A, B]
 
   //
   // Partial Lens type aliases
   //
-  /** A partial lens that doesn't transform the type of the record. */
+  /**
+   * A partial lens that doesn't transform the type of the record.
+   *
+   * @see [[scalaz.@?>]]
+   */
   type PLens[A, B] = PLensFamily[A, A, B, B]
 
+  /**
+   * @see [[scalaz.PLens]]
+   */
   object PLens extends PLensInstances with PLensFunctions {
     def apply[A, B](r: A => Option[Store[B, A]]): PLens[A, B] =
       plens(r)
   }
 
+  /** @see [[scalaz.PLens]] */
   type @?>[A, B] = PLens[A, B]
 
   type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[F, S1, S2, Option[A]]

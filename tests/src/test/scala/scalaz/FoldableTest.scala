@@ -59,6 +59,19 @@ object FoldableTest extends SpecLite {
         (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
   }
 
+  "distinct" ! forAll {
+    (xs: List[Int]) =>
+      val F = implicitly[Foldable[List]]
+      F.distinct(xs).toList must_== xs.distinct
+      if (xs.length > 0) F.distinct(xs)(Order.order((_,_) => Ordering.EQ)).length must_== 1
+  }
+
+  "distinctE" ! forAll {
+    (xs: List[Int]) =>
+      xs.distinctE.toList must_== xs.distinct
+      if (xs.length > 0) xs.distinctE(Equal.equal((_,_) => true)).length must_== 1
+  }
+
   "sumr1Opt" ! forAll {
     (xs: List[String]) => xs match {
       case Nil => xs.sumr1Opt must_== None
@@ -147,6 +160,14 @@ object FoldableTest extends SpecLite {
 
     "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
       (xs: List[Int]) => xs.findMapM[StateInt, Int](_ => notfound).run(0) must_== (xs.length -> None)
+    }
+
+    "findLeft" ! forAll {
+      (x: Int, xs: List[Int]) => (x :: xs).findLeft(_ == x) must_== Some(x)
+    }
+
+    "findRight" ! forAll {
+      (x: Int, xs: List[Int]) => (xs ++ List(x)).findRight(_ == x) must_== Some(x)
     }
   }
 

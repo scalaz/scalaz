@@ -4,7 +4,32 @@ import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
 import scalaz.std.option.{optionMonoid, none, some}
 import scalaz.Ordering.orderingInstance
 
-/** @since 7.0.3 */
+/** A generalization of `NonEmptyList` to non-`List` things.  For
+  * example, `OneAnd[Vector, A]` is a non-empty `Vector` of `A`.
+  *
+  * Only `head` and `tail` are provided as direct methods, because
+  * there's little you can do with a `OneAnd` without knowing a bit
+  * about `F`.  So useful functions are provided in the form of
+  * typeclass instances on `OneAnd`'s companion; in combination with
+  * syntax extensions provided by `scalaz.syntax`, `OneAnd` has a
+  * large possible set of methods available by importing.  For
+  * example, `Applicative` on this requires `ApplicativePlus[F]`, and
+  * `Traverse1` on this requires `Traverse[F]`.  See the companion
+  * documentation for a complete list of instances.
+  *
+  * Additionally, unlike `λ[α => (α, F[α])]`, the behavior of typeclass
+  * operations on `OneAnd` should be preserved across the natural
+  * transformation to [[scalaz.NonEmptyList]] where one exists.  That
+  * is it should "be like" a nonempty structure.  For example,
+  * `ap`-ing two `OneAnd[Vector, ?]`s or `NonEmptyList`s of lengths
+  * *a* and *b* yields a sequence of same type of length *a*×*b*, but
+  * two `λ[α => (α, Vector[α])]`s of length *c* and *d* `ap` to one of
+  * length 1+(*c*–1)×(*d*–1).  For another example, `point` of the
+  * former two yield a one-element sequence, but `point` of the latter
+  * yields a two-element sequence.
+  *
+  * @since 7.0.3
+  */
 final case class OneAnd[F[_], A](head: A, tail: F[A])
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
@@ -73,6 +98,17 @@ private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, ?]] with OneAndBi
 private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
   def F: Foldable[F]
 
+  override def findLeft[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    if(f(fa.head)) Some(fa.head) else F.findLeft(fa.tail)(f)
+
+  override def findRight[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    F.findRight(fa.tail)(f) match {
+      case a @ Some(_) =>
+        a
+      case None =>
+        if(f(fa.head)) Some(fa.head) else None
+    }
+
   override def foldMap1[A, B: Semigroup](fa: OneAnd[F, A])(f: A => B) =
     foldMap(fa)(a => some(f(a))) getOrElse f(fa.head)
 
@@ -91,6 +127,38 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
 
   override def foldLeft[A, B](fa: OneAnd[F, A], z: B)(f: (B, A) => B) =
     F.foldLeft(fa.tail, f(z, fa.head))(f)
+
+  override def traverseS_[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
+    State{s: S => F.traverseS_(fa.tail)(f)(f(fa.head)(s)._1)}
+
+  override def length[A](fa: OneAnd[F, A]) = 1 + F.length(fa.tail)
+
+  override def index[A](fa: OneAnd[F, A], i: Int) =
+    if (i == 0) Some(fa.head) else F.index(fa.tail, i - 1)
+
+  override def toVector[A](fa: OneAnd[F, A]) =
+    fa.head +: F.toVector(fa.tail)
+
+  override def toList[A](fa: OneAnd[F, A]) =
+    fa.head :: F.toList(fa.tail)
+
+  override def toIList[A](fa: OneAnd[F, A]) =
+    fa.head :: F.toIList(fa.tail)
+
+  override def toSet[A](fa: OneAnd[F, A]) =
+    F.toSet(fa.tail) + fa.head
+
+  override def toStream[A](fa: OneAnd[F, A]) =
+    fa.head #:: F.toStream(fa.tail)
+
+  override def toEphemeralStream[A](fa: OneAnd[F, A]) =
+    EphemeralStream.cons(fa.head, F.toEphemeralStream(fa.tail))
+
+  override def all[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    f(fa.head) && F.all(fa.tail)(f)
+
+  override def any[A](fa: OneAnd[F, A])(f: A => Boolean) =
+    f(fa.head) || F.any(fa.tail)(f)
 }
 
 private sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
@@ -113,6 +181,13 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, ?]] with O
 
   override def traverseImpl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
+
+  override def traverseS[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
+    State{s: S =>
+      val (s2, b) = f(fa.head)(s)
+      val (s3, bs) = F.traverseS(fa.tail)(f)(s2)
+      (s3, OneAnd(b, bs))
+    }
 }
 
 private sealed trait OneAndTraverse1[F[_]] extends OneAndTraverse[F] with OneAndFoldable1[F] {
@@ -250,9 +325,7 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
     }
 }
 
-object OneAnd extends OneAndInstances with OneAndFunctions
-
-trait OneAndFunctions {
+object OneAnd extends OneAndInstances {
   def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =

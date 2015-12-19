@@ -52,12 +52,12 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
     }
 }
 
-sealed trait MonadPartialOrderFunctions1 {
+sealed abstract class MonadPartialOrderFunctions1 {
   implicit def transitive[G[_], F[_], E[_]](implicit e1: MonadPartialOrder[G, F], e2: MonadPartialOrder[F, E]): MonadPartialOrder[G, E] = 
      e2 compose e1
 }
 
-trait MonadPartialOrderFunctions extends MonadPartialOrderFunctions1 {
+sealed abstract class MonadPartialOrderFunctions extends MonadPartialOrderFunctions1 {
   // the identity ordering
   implicit def id[M[_]: Monad]: MonadPartialOrder[M, M] = 
     new MonadPartialOrder[M, M] {

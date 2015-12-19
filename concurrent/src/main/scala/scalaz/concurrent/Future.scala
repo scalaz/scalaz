@@ -1,6 +1,6 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, CountDownLatch, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit, Executors}
+import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import collection.JavaConversions._
@@ -69,23 +69,28 @@ sealed abstract class Future[+A] {
 
   /**
    * Run this computation to obtain an `A`, then invoke the given callback.
-   * Also see `runAsync`.
+   * Also see `unsafePerformAsync`.
    */
-  def listen(cb: A => Trampoline[Unit]): Unit =
+  def unsafePerformListen(cb: A => Trampoline[Unit]): Unit =
     (this.step: @unchecked) match {
       case Now(a) => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) =>
-        onFinish(x => Trampoline.delay(g(x)) map (_ listen cb))
+        onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
     }
 
+  
+  @deprecated("use unsafePerformListen", "7.2")
+  def listen(cb: A => Trampoline[Unit]): Unit =
+    unsafePerformListen(cb)
+  
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
    * Because of trampolining, we get frequent opportunities to cancel
    * while stepping through the trampoline, so this should provide a fairly
    * robust means of cancellation.
    */
-  def listenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+  def unsafePerformListenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
     this.stepInterruptibly(cancel) match {
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
@@ -94,11 +99,15 @@ sealed abstract class Future[+A] {
           else Trampoline.done(()))
       case BindAsync(onFinish, g) if !cancel.get =>
         onFinish(x =>
-          if (!cancel.get) Trampoline.delay(g(x)) map (_ listenInterruptibly (cb, cancel))
+          if (!cancel.get) Trampoline.delay(g(x)) map (_ unsafePerformListenInterruptibly (cb, cancel))
           else Trampoline.done(()))
       case _ if cancel.get => ()
     }
 
+  @deprecated("use unsafePerformListenInterruptibly", "7.2")
+  def listenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+    unsafePerformListenInterruptibly(cb, cancel)
+  
   /**
    * Evaluate this `Future` to a result, or another asynchronous computation.
    * This has the effect of stripping off any 'pure' trampolined computation at
@@ -123,14 +132,22 @@ sealed abstract class Future[+A] {
 
   /**
    * Begins running this `Future` and returns a new future that blocks
-   * waiting for the result. Note that this results
+   * waiting for the result. Note that this will start executing side effects 
+   * immediately, and is thus morally equivalent to `unsafePerformIO`. The 
+   * resulting `Future` cannot be rerun to repeat the effects.
+   * 
+   * Use with care.
    */
-  def start: Future[A] = {
+  def unsafeStart: Future[A] = {
     val latch = new java.util.concurrent.CountDownLatch(1)
     @volatile var result: Option[A] = None
-    runAsync { a => result = Some(a); latch.countDown }
+    unsafePerformAsync { a => result = Some(a); latch.countDown }
     delay { latch.await; result.get }
   }
+  
+  @deprecated("use unsafeStart", "7.2")
+  def start: Future[A] =
+    unsafeStart
 
   /**
    * Run this `Future`, passing the result to the given callback once available.
@@ -138,62 +155,94 @@ sealed abstract class Future[+A] {
    * be forced in the calling thread. At the first `Async` encountered, control
    * switches to whatever thread backs the `Async` and this function returns.
    */
-  def runAsync(cb: A => Unit): Unit =
-    listen(a => Trampoline.done(cb(a)))
+  def unsafePerformAsync(cb: A => Unit): Unit =
+    unsafePerformListen(a => Trampoline.done(cb(a)))
 
+  @deprecated("use unsafePerformAsync", "7.2")
+  def runAsync(cb: A => Unit): Unit =
+    unsafePerformAsync(cb)
+    
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
    * Because of trampolining, we get frequent opportunities to cancel
    * while stepping through the trampoline, this should provide a fairly
    * robust means of cancellation.
    */
-  def runAsyncInterruptibly(cb: A => Unit, cancel: AtomicBoolean): Unit =
-    listenInterruptibly(a => Trampoline.done(cb(a)), cancel)
+  def unsafePerformAsyncInterruptibly(cb: A => Unit, cancel: AtomicBoolean): Unit =
+    unsafePerformListenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
+  @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
+  def runAsyncInterruptibly(cb: A => Unit, cancel: AtomicBoolean): Unit =
+    unsafePerformAsyncInterruptibly(cb, cancel)
+    
   /** Run this `Future` and block awaiting its result. */
-  def run: A = this match {
+  def unsafePerformSync: A = this match {
     case Now(a) => a
     case _ => {
       val latch = new java.util.concurrent.CountDownLatch(1)
       @volatile var result: Option[A] = None
-      runAsync { a => result = Some(a); latch.countDown }
+      unsafePerformAsync { a => result = Some(a); latch.countDown }
       latch.await
       result.get
     }
   }
 
+  @deprecated("use unsafePerformSync", "7.2")
+  def run: A =
+    unsafePerformSync
+  
   /**
    * Run this `Future` and block until its result is available, or until
    * `timeoutInMillis` milliseconds have elapsed, at which point a `TimeoutException`
    * will be thrown and the `Future` will attempt to be canceled.
    */
-  def runFor(timeoutInMillis: Long): A = attemptRunFor(timeoutInMillis) match {
-    case -\/(e) => throw e
-    case \/-(a) => a
-  }
+  def unsafePerformSyncFor(timeoutInMillis: Long): A = 
+    unsafePerformSyncAttemptFor(timeoutInMillis) match {
+      case -\/(e) => throw e
+      case \/-(a) => a
+    }
 
-  def runFor(timeout: Duration): A = runFor(timeout.toMillis)
+  def unsafePerformSyncFor(timeout: Duration): A = 
+    unsafePerformSyncFor(timeout.toMillis)
 
-  /** Like `runFor`, but returns `TimeoutException` as left value. 
+  @deprecated("use unsafePerformSyncFor", "7.2")
+  def runFor(timeoutInMillis: Long): A =
+    unsafePerformSyncFor(timeoutInMillis)
+
+  @deprecated("use unsafePerformSyncFor", "7.2")
+  def runFor(timeout: Duration): A =
+    unsafePerformSyncFor(timeout)
+
+    
+  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
     * Will not report any other exceptions that may be raised during computation of `A`*/
-  def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = {
+  def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
     val interrupt = new AtomicBoolean(false)
-    runAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
+    unsafePerformAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
       -\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
-  def attemptRunFor(timeout: Duration): Throwable \/ A = attemptRunFor(timeout.toMillis)
+  def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A = 
+    unsafePerformSyncAttemptFor(timeout.toMillis)
 
+  @deprecated("use unsafePerformSyncAttemptFor", "7.2")
+  def attemptRunFor(timeoutInMillis: Long): Throwable \/ A =
+    unsafePerformSyncAttemptFor(timeoutInMillis)
+
+  @deprecated("use unsafePerformSyncAttemptFor", "7.2")
+  def attemptRunFor(timeout: Duration): Throwable \/ A =
+    unsafePerformSyncAttemptFor(timeout)
+  
   /**
    * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    * This implementation will not block the future's execution thread
    */
-  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
+  def unsafePerformTimed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
     //instead of run this though chooseAny, it is run through simple primitive, 
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
@@ -209,13 +258,20 @@ sealed abstract class Future[+A] {
       }
       , timeoutInMillis, TimeUnit.MILLISECONDS)
       
-      runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
+      unsafePerformAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
     }
-    
+
+  def unsafePerformTimed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = 
+    unsafePerformTimed(timeout.toMillis)
+
+  @deprecated("use unsafePerformTimed", "7.2")
+  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
+    unsafePerformTimed(timeoutInMillis)
     
 
-  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
-      Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = timed(timeout.toMillis)
+  @deprecated("use unsafePerformTimed", "7.2")
+  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = 
+    unsafePerformTimed(timeout)
 
   /**
    * Returns a `Future` that delays the execution of this `Future` by the duration `t`.
@@ -265,13 +321,13 @@ object Future {
                else cb(ref.get).run // the running task has completed, use its result
              }
              else // residual value used up, revert to original Future
-               f.listen(cb)
+               f.unsafePerformListen(cb)
           }
           (ind, f, residual, listener, ref)
         }.toIndexedSeq
 
         fs.foreach { case (ind, f, residual, listener, ref) =>
-          f.listen { a =>
+          f.unsafePerformListen { a =>
             ref.set(a)
             val notifyWinner =
               // If we're the first to finish, invoke `cb`, passing residuals
@@ -306,7 +362,7 @@ object Future {
         val c = new AtomicInteger(fs.size)
 
         fs.foreach { f =>
-          f.listen { a =>
+          f.unsafePerformListen { a =>
             // Try to reduce number of values in the queue
             val front = results.poll()
             if (front == null)

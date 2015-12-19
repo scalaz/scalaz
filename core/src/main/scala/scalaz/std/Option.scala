@@ -8,69 +8,78 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
-    def point[A](a: => A) = Some(a)
-    override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
-    override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
-    override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
-      case Some(f) => fa match {
-        case Some(x) => Some(f(x))
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] = 
+    new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+      def point[A](a: => A) = Some(a)
+      override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
+      override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
+      override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
+        case Some(f) => fa match {
+          case Some(x) => Some(f(x))
+          case None    => None
+        }
         case None    => None
       }
-      case None    => None
-    }
-    def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa flatMap f
-    override def map[A, B](fa: Option[A])(f: A => B) = fa map f
-    def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
-      fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
-    def empty[A]: Option[A] = None
-    def plus[A](a: Option[A], b: => Option[A]) = a orElse b
-    override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
-      case Some(a) => f(a, z)
-      case None    => z
-    }
-    def cozip[A, B](a: Option[A \/ B]) =
-      a match {
-        case None => -\/(None)
-        case Some(e) => e match {
-          case -\/(a) => -\/(Some(a))
-          case \/-(b) => \/-(Some(b))
+      def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa flatMap f
+      override def map[A, B](fa: Option[A])(f: A => B) = fa map f
+      def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
+        fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
+      def empty[A]: Option[A] = None
+      def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+      override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
+        case Some(a) => f(a, z)
+        case None    => z
+      }
+      def cozip[A, B](a: Option[A \/ B]) =
+        a match {
+          case None => -\/(None)
+          case Some(e) => e match {
+            case -\/(a) => -\/(Some(a))
+            case \/-(b) => \/-(Some(b))
+          }
         }
+      def zip[A, B](a: => Option[A], b: => Option[B]) =
+        for {
+          x <- a
+          y <- b
+        } yield (x, y)
+      def unzip[A, B](a: Option[(A, B)]) =
+        a match {
+          case None => (None, None)
+          case Some((a, b)) => (Some(a), Some(b))
+        }
+  
+      def alignWith[A, B, C](f: A \&/ B => C) = {
+        case (None, None) =>
+          None
+        case (Some(a), None) =>
+          Some(f(\&/.This(a)))
+        case (None, Some(b)) =>
+          Some(f(\&/.That(b)))
+        case (Some(a), Some(b)) =>
+          Some(f(\&/.Both(a, b)))
       }
-    def zip[A, B](a: => Option[A], b: => Option[B]) =
-      for {
-        x <- a
-        y <- b
-      } yield (x, y)
-    def unzip[A, B](a: Option[(A, B)]) =
-      a match {
-        case None => (None, None)
-        case Some((a, b)) => (Some(a), Some(b))
-      }
+  
+      def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
+        fa map (a => f(Some(a)))
+  
+      override def cojoin[A](a: Option[A]) =
+        a map (Some(_))
+  
+      def pextract[B, A](fa: Option[A]): Option[B] \/ A =
+        fa map \/.right getOrElse -\/(None)
+      override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
+      override def toOption[A](fa: Option[A]): Option[A] = fa
+      override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
 
-    def alignWith[A, B, C](f: A \&/ B => C) = {
-      case (None, None) =>
-        None
-      case (Some(a), None) =>
-        Some(f(\&/.This(a)))
-      case (None, Some(b)) =>
-        Some(f(\&/.That(b)))
-      case (Some(a), Some(b)) =>
-        Some(f(\&/.Both(a, b)))
+      @scala.annotation.tailrec
+      def tailrecM[A, B](f: A => Option[A \/ B])(a: A): Option[B] =
+        f(a) match {
+          case None => None
+          case Some(-\/(a)) => tailrecM(f)(a)
+          case Some(\/-(b)) => Some(b)
+        }
     }
-
-    def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
-      fa map (a => f(Some(a)))
-
-    override def cojoin[A](a: Option[A]) =
-      a map (Some(_))
-
-    def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-      fa map \/.right getOrElse -\/(None)
-    override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
-    override def toOption[A](fa: Option[A]): Option[A] = fa
-    override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
-  }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
     def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
@@ -180,6 +189,16 @@ trait OptionFunctions {
 
   final def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] = oa match {
     case Some(e) => Failure(e)
+    case None    => Success(b)
+  }
+
+  final def toSuccessNel[A,E](oa: Option[A])(e: => E) : ValidationNel[E,A] = oa match {
+    case Some(a) => Success(a)
+    case None    => Failure(NonEmptyList(e))
+  }
+
+  final def toFailureNel[A,B](oa: Option[A])(b: => B) : ValidationNel[A,B] = oa match {
+    case Some(a) => Failure(NonEmptyList(a))
     case None    => Success(b)
   }
 

@@ -9,7 +9,6 @@ package scalaz
 trait Foldable[F[_]]  { self =>
   ////
   import collection.generic.CanBuildFrom
-  import collection.immutable.IndexedSeq
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -81,7 +80,9 @@ trait Foldable[F[_]]  { self =>
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
-    traverse_[State[S, ?], A, B](fa)(f)
+    State{s: S =>
+      (foldLeft(fa, s)((s, a) => f(a)(s)._1), ())
+    }
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
@@ -124,6 +125,12 @@ trait Foldable[F[_]]  { self =>
   /** map elements in a Foldable with a monadic function and return the first element that is mapped successfully */
   final def findMapM[M[_]: Monad, A, B](fa: F[A])(f: A => M[Option[B]]): M[Option[B]] =
     toEphemeralStream(fa) findMapM f
+
+  def findLeft[A](fa: F[A])(f: A => Boolean): Option[A] =
+    foldLeft[A, Option[A]](fa, None)((b, a) => b.orElse(if(f(a)) Some(a) else None))
+
+  def findRight[A](fa: F[A])(f: A => Boolean): Option[A] =
+    foldRight[A, Option[A]](fa, None)((a, b) => b.orElse(if(f(a)) Some(a) else None))
 
   /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
@@ -268,6 +275,24 @@ trait Foldable[F[_]]  { self =>
         else x, pa)
       }
     })._1
+
+  /** ``O(n log n)`` complexity */
+  def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =
+    foldLeft(fa, (ISet.empty[A],IList.empty[A])) {
+      case ((seen, acc), a) =>
+        if (seen.notMember(a))
+          (seen.insert(a), a :: acc)
+        else (seen, acc)
+    }._2.reverse
+
+  /** ``O(n^2^)`` complexity */
+  def distinctE[A](fa: F[A])(implicit A: Equal[A]): IList[A] =
+    foldLeft(fa, IList.empty[A]) {
+      case (seen, a) =>
+        if (!IList.instances.element(seen,a))
+          a :: seen
+        else seen
+    }.reverse
 
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))

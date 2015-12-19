@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{Monoid, StateT, Applicative}
+import scalaz.{Monoid, StateT}
 
 
 /**
@@ -22,7 +22,7 @@ object WordCount {
 
     // To count words, we need to detect transitions from whitespace to non-whitespace.
     // atWordStart_{i} = heaviside( test(isSpace(c_{i}) - test(isSpace(c_{i-1})) )
-    def atWordStart(c: Char): State[Boolean, Int] = State { (prev: Boolean) => 
+    def atWordStart(c: Char): State[Boolean, Int] = State { (prev: Boolean) =>
       val cur = c != ' '
       (cur, test(cur && !prev))
     }
@@ -32,12 +32,12 @@ object WordCount {
     val Count = Monoid[Int].applicative
 
     // Compose the applicative instance for [a]State[Boolean,a] with the Count applicative
-    val WordCount = StateT.stateMonad[Boolean].compose[({type λ[α] = Int})#λ](Count)
+    val WordCount = StateT.stateMonad[Boolean].compose[λ[α=>Int]](Count)
 
     // Fuse the three applicatives together in parallel...
     val A = Count
-      .product[({type λ[α] = Int})#λ](Count)
-      .product[({type λ[α] = State[Boolean, Int]})#λ](WordCount)
+      .product[λ[α=>Int]](Count)
+      .product[λ[α=>State[Boolean,Int]]](WordCount)
 
     // ... and execute them in a single traversal
     val ((charCount, lineCount), wordCountState) = A.traverse(text)((c: Char) => ((1, test(c == '\n')), atWordStart(c)))

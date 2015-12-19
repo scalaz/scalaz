@@ -1,7 +1,6 @@
 package scalaz
 
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
 
 object IdSyntaxTest extends SpecLite {
   "smorgasbord" in {

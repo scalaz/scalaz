@@ -3,7 +3,7 @@ package scalaz
 /** @since 7.0.3 */
 final case class OneOr[F[_], A](run: F[A] \/ A) {
   def map[B](f: A => B)(implicit F: Functor[F]): OneOr[F, B] =
-    OneOr(run.bimap(F.map(_)(f), f))
+    OneOr(run.bimap(F.lift(f), f))
 
   def ap[B](f: OneOr[F, A => B])(implicit F: Apply[F]): OneOr[F, B] =
     OneOr(f.run match {
@@ -144,6 +144,22 @@ private sealed trait OneOrFoldable[F[_]] extends Foldable[OneOr[F, ?]] {
 
   implicit def F: Foldable[F]
 
+  override final def findLeft[A](fa: OneOr[F, A])(f: A => Boolean) =
+    fa.run match {
+      case \/-(a) =>
+        if(f(a)) Some(a) else None
+      case -\/(a) =>
+        F.findLeft(a)(f)
+    }
+
+  override final def findRight[A](fa: OneOr[F, A])(f: A => Boolean) =
+    fa.run match {
+      case \/-(a) =>
+        if(f(a)) Some(a) else None
+      case -\/(a) =>
+        F.findRight(a)(f)
+    }
+
   override final def foldMap[A, B](fa: OneOr[F, A])(f: A => B)(implicit M: Monoid[B]) =
     fa.foldMap(f)
 
@@ -212,9 +228,7 @@ private sealed trait OneOrShow[F[_], A] extends Show[OneOr[F, A]] {
     a.run.show
 }
 
-object OneOr extends OneOrInstances with OneOrFunctions
-
-trait OneOrFunctions {
+object OneOr extends OneOrInstances {
   type OneOrList[A] = OneOr[List, A]
   type OneOrNel[A] = OneOr[NonEmptyList, A]
   type OneOrOption[A] = OneOr[Option, A]

@@ -7,7 +7,7 @@ sealed abstract class Alpha extends Product with Serializable {
   def toUpperChar: Char = toChar.toUpper
 }
 
-object Alpha extends AlphaInstances with AlphaFunctions {
+object Alpha extends AlphaInstances {
 
   case object A extends Alpha {
     val toChar = 'a'
@@ -112,16 +112,13 @@ object Alpha extends AlphaInstances with AlphaFunctions {
   case object Z extends Alpha {
     val toChar = 'z'
   }
-}
-
-sealed abstract class AlphaInstances {
-  // TODO
-}
-
-trait AlphaFunctions {
-  import Alpha._
 
   val alphas: List[Alpha] = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
 
   implicit def ToCharFromAlpha(a: Alpha): Char = a.toChar
+
+}
+
+sealed abstract class AlphaInstances {
+  // TODO
 }

@@ -13,5 +13,5 @@ trait TaskApp {
   def runc: Task[Unit] = Task.now(())
 
   final def main(args: Array[String]): Unit =
-    run(ImmutableArray.fromArray(args)).run
+    run(ImmutableArray.fromArray(args)).unsafePerformSync
 }

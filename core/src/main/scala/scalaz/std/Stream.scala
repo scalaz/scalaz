@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -72,6 +72,19 @@ trait StreamInstances {
           b.map(x => f(\&/.That(x)))
         else
           f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
+
+    def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
+      def go(s: Stream[A \/ B]): Stream[B] = {
+        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] = 
+          abs match {
+            case \/-(b) #:: tail => b #:: go(tail)
+            case -\/(a) #:: tail => rec(f(a) #::: tail)
+            case Stream.Empty => Stream.Empty
+          }
+        rec(s)
+      }
+      go(f(a))
+    }
   }
 
   import Tags.Zip
@@ -100,9 +113,26 @@ trait StreamInstances {
     def zero: Stream[A] = scala.Stream.empty
   }
 
-  implicit def streamEqual[A](implicit A0: Equal[A]) =
-    new Equal[Stream[A]] {
-      def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A0.equal)
+  implicit def streamEqual[A](implicit A0: Equal[A]): Equal[Stream[A]] =
+    new StreamEqual[A] { def A = A0 }
+  implicit def streamOrder[A](implicit A0: Order[A]): Order[Stream[A]] =
+    new Order[Stream[A]] with StreamEqual[A] {
+      def A = A0
+      import Ordering._
+      @annotation.tailrec
+      override final def order(a: Stream[A], b: Stream[A]): Ordering =
+        if(a.isEmpty) {
+          if(b.isEmpty) EQ
+          else LT
+        } else {
+          if(b.isEmpty) GT
+          else {
+            A.order(a.head, b.head) match {
+              case EQ => order(a.tail, b.tail)
+              case x => x
+            }
+          }
+        }
     }
   implicit def streamShow[A](implicit A0: Show[A]) =
     new Show[Stream[A]] {
@@ -110,7 +140,6 @@ trait StreamInstances {
     }
 
 
-  // TODO order, ...
 }
 
 trait StreamFunctions {
@@ -159,7 +188,7 @@ trait StreamFunctions {
     as.map(a => {
       def unfoldTree(x: A): Tree[B] =
         f(x) match {
-          case (b, bs) => Tree.node(b, unfoldForest(bs())(f))
+          case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
         }
 
       unfoldTree(a)
@@ -174,7 +203,7 @@ trait StreamFunctions {
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
         Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: Stream[Tree[B]]) =>
-          Tree.node(abs._1, ts)))
+          Tree.Node(abs._1, ts)))
 
     mapM(as, unfoldTreeM)
   }
@@ -206,4 +235,9 @@ trait StreamFunctions {
 
 object stream extends StreamInstances with StreamFunctions {
   object streamSyntax extends scalaz.syntax.std.ToStreamOps
+}
+
+private trait StreamEqual[A] extends Equal[Stream[A]] {
+  def A: Equal[A]
+  override final def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A.equal)
 }

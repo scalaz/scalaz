@@ -1,5 +1,7 @@
 package scalaz
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
@@ -10,12 +12,14 @@ object EitherTTest extends SpecLite {
   type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
+  type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
 
   checkAll(equal.laws[EitherTListInt[Int]])
+  checkAll(bindRec.laws[EitherTListInt])
   checkAll(monadPlus.laws[EitherTListInt])
+  checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
-  checkAll(monadError.laws[EitherTList, Int])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
@@ -44,8 +48,18 @@ object EitherTTest extends SpecLite {
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }
 
+  "orElse only executes the left hand monad once" should {
+    val counter = new AtomicInteger(0)
+    val inc: EitherTComputation[Int] = EitherT.right(() => counter.incrementAndGet())
+    val other: EitherTComputation[Int] = EitherT.right(() => 0) // does nothing
+
+    (inc orElse other).run.apply() must_== \/-(1)
+    counter.get() must_== 1
+  }
+
   object instances {
     def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
+    def bindRec[F[_] : Monad: BindRec, A] = BindRec[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
     def plus[F[_] : Monad, A: Semigroup] = Plus[EitherT[F, A, ?]]
     def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[EitherT[F, A, ?]]
@@ -56,14 +70,16 @@ object EitherTTest extends SpecLite {
     def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
 
     // checking absence of ambiguity
+    def functor[F[_] : BindRec, A] = Functor[EitherT[F, A, ?]]
     def functor[F[_] : Monad, A: Monoid] = Functor[EitherT[F, A, ?]]
+    def functor[F[_] : Monad : BindRec, A: Monoid] = Functor[EitherT[F, A, ?]]
     def apply[F[_] : Monad, A: Monoid] = Apply[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A: Monoid] = Monad[EitherT[F, A, ?]]
     def plus[F[_] : Monad, A: Monoid] = Plus[EitherT[F, A, ?]]
     def foldable[F[_] : Traverse, A] = Foldable[EitherT[F, A, ?]]
     def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[F, ?, ?]]
     def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[F, ?, ?]]
-    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, ?, ?], A]
+    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, A, ?], A]
   }
 
   def compilationTests() = {

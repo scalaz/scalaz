@@ -36,6 +36,15 @@ private trait ProductBind[F[_], G[_]] extends Bind[λ[α => (F[α], G[α])]] wit
     (F.bind(fa._1)(f.andThen(_._1)), G.bind(fa._2)(f.andThen(_._2)))
 }
 
+private trait ProductBindRec[F[_], G[_]] extends BindRec[λ[α => (F[α], G[α])]] with ProductBind[F, G] {
+  implicit def F: BindRec[F]
+
+  implicit def G: BindRec[G]
+
+  override def tailrecM[A, B](f: A => (F[A \/ B], G[A \/ B]))(a: A) =
+    (F.tailrecM(f.andThen(_._1))(a), G.tailrecM(f.andThen(_._2))(a))
+}
+
 private trait ProductMonad[F[_], G[_]] extends Monad[λ[α => (F[α], G[α])]] with ProductBind[F, G] with ProductApplicative[F, G] {
   implicit def F: Monad[F]
 

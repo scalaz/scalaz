@@ -2,7 +2,6 @@ package scalaz
 
 import Scalaz.Id
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
 
 object OptionalTest extends SpecLite {
 
@@ -64,8 +63,18 @@ object OptionalTest extends SpecLite {
     def success(a: Int): VString[Int] = Validation.success(a)
     def failure(s: String): VString[Int] = Validation.failure(s)
 
-    definedTests(success(1), 1, 0, success(0))
-    undefinedTests(failure("oO"), 0, success(0))
+    definedTests[VString, Int](success(1), 1, 0, success(0))
+    undefinedTests[VString, Int](failure("oO"), 0, success(0))
+  }
+
+  """ValidationNel instance tests""" in {
+    type VStringNel[A] = ValidationNel[String, A]
+
+    def successNel(a: Int): VStringNel[Int] = Validation.success(a)
+    def failureNel(s: String): VStringNel[Int] = Validation.failureNel(s)
+
+    definedTests[VStringNel, Int](successNel(1), 1, 0, successNel(0))
+    undefinedTests[VStringNel, Int](failureNel("oO"), 0, successNel(0))
   }
 
   "Id instance tests" in {

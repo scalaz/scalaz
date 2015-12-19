@@ -3,18 +3,18 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
 object DisjunctionTest extends SpecLite {
 
   checkAll(order.laws[Int \/ Int])
   checkAll(monoid.laws[Int \/ Int])
+  checkAll(bindRec.laws[Int \/ ?])
   checkAll(monad.laws[Int \/ ?])
+  checkAll(monadError.laws[Int \/ ?, Int])
   checkAll(plus.laws[Int \/ ?])
   checkAll(traverse.laws[Int \/ ?])
   checkAll(bitraverse.laws[\/])
   checkAll(associative.laws[\/])
-  checkAll(monadError.laws[\/, Int])
 
   "fromTryCatchThrowable" in {
     class Foo extends Throwable
@@ -65,5 +65,23 @@ object DisjunctionTest extends SpecLite {
     -\/[Foo](Bar).recoverWith(barToBaz) must_=== -\/(Baz)
     -\/[Foo](Bar).recoverWith(bazToInt) must_=== -\/(Bar)
     \/.right[Foo, Int](1).recoverWith(barToBaz) must_=== \/-(1)
+  }
+
+  "validation" in {
+    import syntax.either._
+    import syntax.validation._
+
+    3.right[String].validation must_=== 3.success[String]
+    "Hello".left[Int].validation must_=== "Hello".failure[Int]
+  }
+
+  "validationNel" in {
+    import syntax.either._
+    import syntax.validation._
+    import syntax.apply._
+
+    3.right[String].validationNel must_=== 3.successNel[String]
+    ("hello".left[Int].validationNel |@| "world".left[Int].validationNel).tupled must_===
+      ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
   }
 }

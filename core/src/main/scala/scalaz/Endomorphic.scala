@@ -14,9 +14,7 @@ final case class Endomorphic[=>:[_, _], A](run: A =>: A) {
 
 }
 
-object Endomorphic extends EndomorphicInstances with EndomorphicFunctions
-
-trait EndomorphicFunctions {
+object Endomorphic extends EndomorphicInstances {
 
   /** Endomorphic Kleisli arrow */
   final def endoKleisli[F[_]: Monad, A](f: A => F[A]): Endomorphic[Kleisli[F, ?, ?], A] =

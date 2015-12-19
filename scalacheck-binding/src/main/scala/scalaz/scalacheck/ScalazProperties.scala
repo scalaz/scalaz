@@ -192,6 +192,17 @@ object ScalazProperties {
     }
   }
 
+  object bindRec {
+    def tailrecBindConsistency[M[_], X](implicit M: BindRec[M], ax: Arbitrary[X], af: Arbitrary[X => M[X]],
+                                        emx: Equal[M[X]]) =
+      forAll(M.bindRecLaw.tailrecBindConsistency[X] _)
+
+    def laws[M[_]](implicit a: BindRec[M], am: Arbitrary[M[Int]],
+                   af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("bindRec") {
+      property("tailrecM is consistent with bind") = bindRec.tailrecBindConsistency[M, Int]
+    }
+  }
+
   object monad {
     def rightIdentity[M[_], X](implicit M: Monad[M], e: Equal[M[X]], a: Arbitrary[M[X]]) =
       forAll(M.monadLaw.rightIdentity[X] _)
@@ -457,6 +468,32 @@ object ScalazProperties {
     }
   }
 
+  object divide {
+    def composition[F[_], A](implicit F: Divide[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divideLaw.composition[A] _)
+
+    def laws[F[_]](implicit F: Divide[F], af: Arbitrary[F[Int]], axy: Arbitrary[Int => Int],
+                   ef: Equal[F[Int]]) = new Properties("divide") {
+      include(contravariant.laws[F])
+      property("composition") = composition[F, Int]
+    }
+  }
+
+  object divisible {
+    def rightIdentity[F[_], A](implicit F: Divisible[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divisibleLaw.rightIdentity[A] _)
+
+    def leftIdentity[F[_], A](implicit F: Divisible[F], A: Arbitrary[F[A]], E: Equal[F[A]]) =
+      forAll(F.divisibleLaw.leftIdentity[A] _)
+
+    def laws[F[_]](implicit F: Divisible[F], af: Arbitrary[F[Int]], axy: Arbitrary[Int => Int],
+                   ef: Equal[F[Int]]) = new Properties("divisible") {
+      include(divide.laws[F])
+      property("right identity") = rightIdentity[F, Int]
+      property("left identity") = leftIdentity[F, Int]
+    }
+  }
+
   object compose {
     def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]) =
@@ -519,16 +556,16 @@ object ScalazProperties {
   }
 
   object monadError {
-    def raisedErrorsHandled[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], afea: Arbitrary[E => F[E,A]]) =
+    def raisedErrorsHandled[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], afea: Arbitrary[E => F[A]]) =
       forAll(me.monadErrorLaw.raisedErrorsHandled[A] _)
-    def errorsRaised[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
+    def errorsRaised[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsRaised[A] _)
-    def errorsStopComputation[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
+    def errorsStopComputation[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E]) =
+    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E]) =
       new Properties("monad error") {
-        include(monad.laws[F[E, ?]])
+        include(monad.laws[F])
         property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
         property("errorsRaised") = errorsRaised[F, E, Int]
         property("errorsStopComputation") = errorsStopComputation[F, E, Int]

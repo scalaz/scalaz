@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Prop, Gen}
 import org.scalacheck.Prop.forAll
 
 object DequeueTest extends SpecLite {

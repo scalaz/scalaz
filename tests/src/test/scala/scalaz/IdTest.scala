@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
-import org.scalacheck.Prop.forAll
 
 object IdTest extends SpecLite {
   checkAll(monad.laws[Id])

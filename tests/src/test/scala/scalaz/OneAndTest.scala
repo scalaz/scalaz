@@ -6,7 +6,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import OneAnd.oneAndNelIso
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object OneAndTest extends SpecLite {
@@ -28,6 +27,26 @@ object OneAndTest extends SpecLite {
   checkAll("OneAnd List", semigroup.laws[OneAnd[List, Int]])
   checkAll("OneAnd Nel", semigroup.laws[OneAnd[NonEmptyList, Int]])
   checkAll("OneAnd Option", semigroup.laws[OneAnd[Option, Int]])
+
+  checkAll(FoldableTests.anyAndAllLazy[OneAndList])
+
+  "findLeft/findRight" in {
+    val a = OneAnd(1, List(2, 3, 4, 5))
+    Foldable[OneAnd[List, ?]].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[OneAnd[List, ?]].findRight(a)(_ % 2 == 0) must_=== Some(4)
+  }
+
+  "findLeft" ! forAll{ a: OneAnd[List, Int] =>
+    val f = (_: Int) % 3 == 0
+    val F = Foldable[OneAnd[List, ?]]
+    F.findLeft(a)(f) must_=== Foldable[IList].findLeft(F.toIList(a))(f)
+  }
+
+  "findRight" ! forAll { a: OneAnd[List, Int] =>
+    val f = (_: Int) % 3 == 0
+    val F = Foldable[OneAnd[List, ?]]
+    F.findRight(a)(f) must_=== Foldable[IList].findRight(F.toIList(a))(f)
+  }
 
   "oneAndNelIso is iso" ! forAll {(nel: NonEmptyList[Int]) =>
     oneAndNelIso.from(oneAndNelIso.to(nel)) must_===(nel)

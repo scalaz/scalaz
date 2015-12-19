@@ -418,7 +418,6 @@ abstract class LensInstances extends LensInstances0 {
   import LensFamily._
   import BijectionT._
   import collection.SeqLike
-  import collection.immutable.Stack
   import collection.immutable.Queue
 
   implicit val lensCategory: LensCategory = new LensCategory {
