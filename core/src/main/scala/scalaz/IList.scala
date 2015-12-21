@@ -17,7 +17,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   // Operations, in alphabetic order
 
-  /* alias for `concat` */
+  /** alias for `concat` */
   def ++(as: IList[A]): IList[A] =
     concat(as)
 
@@ -27,7 +27,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def +:(a: A): IList[A] =
     ::(a)
 
-  /* alias for `foldLeft` */
+  /** alias for `foldLeft` */
   def /:[B](b: B)(f: (B, A) => B): B =
     foldLeft(b)(f)
 
@@ -40,7 +40,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def :::(as: IList[A]): IList[A] =
     ++:(as)
 
-  /* alias for `foldRight` */
+  /** alias for `foldRight` */
   def :\[B](b: B)(f: (A, B) => B): B =
     foldRight(b)(f)
 
