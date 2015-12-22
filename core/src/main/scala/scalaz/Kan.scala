@@ -88,27 +88,17 @@ trait Lan[G[_], H[_], A] { lan =>
 
 }
 
-object Lan {
+object Lan extends LanInstances {
   import Id._
 
-  implicit def lanFunctor[F[_], G[_]]: Functor[Lan[F, G, ?]] =
-    new Functor[Lan[F, G, ?]] {
-      def map[A,B](lan: Lan[F,G,A])(g: A => B) = lan map g
-    }
-
   implicit def lanApplicative[G[_]:Functor, H[_]:Applicative]: Applicative[Lan[G, H, ?]] =
-    new Applicative[Lan[G, H, ?]] {
+    new Applicative[Lan[G, H, ?]] with LanApply[G, H] {
+      def G = implicitly
+      def H = implicitly
       def point[A](a: => A) = new Lan[G,H,A] {
         type I = Unit
         val v = Applicative[H].point(())
         def f(gi: G[I]) = a
-      }
-      def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
-        lazy val xfp = xf
-        lazy val xp = x
-        type I = (xfp.I, xp.I)
-        lazy val v = Applicative[H].tuple2(xfp.v, xp.v)
-        def f(gi: G[I]) = xfp.f(Functor[G].map(gi)(_._1))(xp.f(Functor[G].map(gi)(_._2)))
       }
     }
 
@@ -142,4 +132,34 @@ object Lan {
       val v = h
       def f(fi: F[I]) = A.counit(fi)
     }
+}
+
+sealed abstract class LanInstances0 {
+  implicit def lanFunctor[F[_], G[_]]: Functor[Lan[F, G, ?]] =
+    new LanFunctor[F, G] { }
+}
+
+sealed abstract class LanInstances extends LanInstances0 {
+  implicit def lanApply[F[_]: Functor, G[_]: Apply]: Apply[Lan[F, G, ?]] =
+    new LanApply[F, G] {
+      def G = implicitly
+      def H = implicitly
+    }
+}
+
+private trait LanFunctor[G[_], H[_]] extends Functor[Lan[G, H, ?]] {
+  override final def map[A, B](lan: Lan[G, H, A])(g: A => B) = lan map g
+}
+
+private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, ?]] with LanFunctor[G, H] {
+  def G: Functor[G]
+  def H: Apply[H]
+
+  def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
+    lazy val xfp = xf
+    lazy val xp = x
+    type I = (xfp.I, xp.I)
+    lazy val v = H.tuple2(xfp.v, xp.v)
+    def f(gi: G[I]) = xfp.f(G.map(gi)(_._1))(xp.f(G.map(gi)(_._2)))
+  }
 }
