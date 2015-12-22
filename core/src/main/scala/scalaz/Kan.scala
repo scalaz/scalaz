@@ -87,32 +87,17 @@ trait Lan[G[_], H[_], A] { lan =>
 
 }
 
-object Lan {
+object Lan extends LanInstances {
   import Id._
 
-  implicit def lanFunctor[F[_], G[_]]: Functor[({type λ[α] = Lan[F,G,α]})#λ] =
-    new Functor[({type λ[α] = Lan[F,G,α]})#λ] {
-      def map[A,B](lan: Lan[F,G,A])(g: A => B) = lan map g
-    }
-
   implicit def lanApplicative[G[_]:Functor, H[_]:Applicative]: Applicative[({type λ[α]=Lan[G,H,α]})#λ] =
-    new Applicative[({type λ[α] = Lan[G,H,α]})#λ] {
+    new Applicative[({type λ[α] = Lan[G, H, α]})#λ] with LanApply[G, H] {
+      def G = implicitly
+      def H = implicitly
       def point[A](a: => A) = new Lan[G,H,A] {
         type I = Unit
         val v = Applicative[H].point(())
         def f(gi: G[I]) = a
-      }
-      def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]):
-        Lan[G, H, B] {
-          // TODO remove this structural type, needed only for 2.9.3
-          val xp: Lan[G, H, A]
-          val xfp: Lan[G, H, A => B]
-        } = new Lan[G, H, B] {
-        lazy val xfp = xf
-        lazy val xp = x
-        type I = (xfp.I, xp.I)
-        lazy val v = Applicative[H].tuple2(xfp.v, xp.v)
-        def f(gi: G[I]) = xfp.f(Functor[G].map(gi)(_._1))(xp.f(Functor[G].map(gi)(_._2)))
       }
     }
 
@@ -145,4 +130,37 @@ object Lan {
       val v = h
       def f(fi: F[I]) = A.counit(fi)
     }
+}
+
+sealed abstract class LanInstances0 {
+  implicit def lanFunctor[F[_], G[_]]: Functor[({type l[a] = Lan[F, G, a]})#l] =
+    new LanFunctor[F, G] { }
+}
+
+sealed abstract class LanInstances extends LanInstances0 {
+  implicit def lanApply[F[_]: Functor, G[_]: Apply]: Apply[({type l[a] = Lan[F, G, a]})#l] =
+    new LanApply[F, G] {
+      def G = implicitly
+      def H = implicitly
+    }
+}
+
+private trait LanFunctor[G[_], H[_]] extends Functor[({type l[a] = Lan[G, H, a]})#l] {
+  override final def map[A, B](lan: Lan[G, H, A])(g: A => B) = lan map g
+}
+
+private trait LanApply[G[_], H[_]] extends Apply[({type l[a] = Lan[G, H, a]})#l] with LanFunctor[G, H] {
+  def G: Functor[G]
+  def H: Apply[H]
+
+  def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]): Lan[G, H, B] {
+    val xp: Lan[G, H, A]
+    val xfp: Lan[G, H, A => B]
+  } = new Lan[G, H, B] {
+    lazy val xfp = xf
+    lazy val xp = x
+    type I = (xfp.I, xp.I)
+    lazy val v = H.tuple2(xfp.v, xp.v)
+    def f(gi: G[I]) = xfp.f(G.map(gi)(_._1))(xp.f(G.map(gi)(_._2)))
+  }
 }
