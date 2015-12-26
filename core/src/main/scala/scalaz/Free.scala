@@ -220,6 +220,17 @@ sealed abstract class Free[S[_], A] {
       case a@Gosub() => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
     }
 
+  final def foldMapRec[M[_]](f: S ~> M)(implicit M: Applicative[M], B: BindRec[M]): M[A] =
+    B.tailrecM[Free[S, A], A]{
+      _.step match {
+        case Return(a) => M.point(\/-(a))
+        case Suspend(t) => M.map(f(t))(\/.right)
+        case b @ Gosub() => (b.a: @unchecked) match {
+          case Suspend(t) => M.map(f(t))(a => -\/(b.f(a)))
+        }
+      }
+    }(this)
+
   import Id._
 
   /**
