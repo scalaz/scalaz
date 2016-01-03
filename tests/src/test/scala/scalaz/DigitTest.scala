@@ -4,5 +4,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
 object DigitTest extends SpecLite {
-  checkAll(order.laws[Digit])
+  checkAll(enum.laws[Digit])
+  checkAll(monoid.laws[Digit])
 }
