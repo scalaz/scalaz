@@ -339,6 +339,10 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
       case _          => this
     }
   }
+  
+  /** Run the given function on each value of the left NonEmptyList. */
+  def leftMapNel[EE, C](f: EE => C)(implicit ev: E <:< NonEmptyList[EE]) : ValidationNel[C, A] =
+    leftMap(_.map(f))
 
 }
 
