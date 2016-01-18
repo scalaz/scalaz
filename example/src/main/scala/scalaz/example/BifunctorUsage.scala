@@ -46,6 +46,9 @@ object BifunctorUsage extends App {
   // There is syntax for bimap:
   assert(("asdf",1).bimap(_.length, _+1) === (4,2))
 
+  // Bifunctors are covariant in both their type parameters, which is expressed by widen
+  assert(("asdf", 1).widen[Any, Any].isInstanceOf[(Any, Any)])
+
   //
   // leftMap / rightMap
   //
