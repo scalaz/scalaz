@@ -15,6 +15,7 @@ final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
   final def leftMap[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
   final def rightAs[C](c: => C): F[A, C] = F.bimap(self)(a => a, _ => c)
   final def leftAs[C](c: => C): F[C, B] = F.bimap(self)(_ => c, b => b)
+  final def widen[C >: A, D >: B]: F[C, D] = F.widen(self)
   ////
 }
 

@@ -62,6 +62,10 @@ trait Bifunctor[F[_, _]]  { self =>
   def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[λ[(α, β) => F[α,H[β]]]] = 
     embed[Id.Id,H]
 
+  /** Bifunctors are covariant by nature */
+  def widen[A, B, C >: A, D >: B](fab: F[A, B]): F[C, D] =
+    bimap(fab)(identity[C], identity[D])
+
   ////
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
