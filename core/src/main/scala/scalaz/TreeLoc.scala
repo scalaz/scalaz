@@ -439,8 +439,9 @@ object TreeLoc extends TreeLocInstances {
   def loc[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
     TreeLoc(t, l, r, p)
 
-  def fromForest[A](ts: TreeForest[A]) = ts match {
+  def fromForest[A](ts: TreeForest[A]): Option[TreeLoc[A]] = ts match {
     case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))
+    case _ => None
   }
 }
 

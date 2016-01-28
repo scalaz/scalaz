@@ -29,6 +29,12 @@ object TreeLocTest extends SpecLite {
     checkAll("TreeLoc", comonad.laws[TreeLoc])
   }
 
+  "TreeLoc from empty forest does not throw an exception" ! {
+    import scalaz.std.option._
+    val result: Option[TreeLoc[Int]] = TreeLoc.fromForest(Stream.empty[Tree[Int]])
+    result must_==(none[TreeLoc[Int]])
+  }
+
   object instances {
     def equal[A: Equal] = Equal[TreeLoc[A]]
     def order[A: Order] = Order[TreeLoc[A]]
