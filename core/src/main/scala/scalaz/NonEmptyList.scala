@@ -85,6 +85,9 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
   /** @since 7.0.2 */
   def init: List[A] = if(tail.isEmpty) Nil else (head :: tail.init)
 
+  def inits: NonEmptyList[NonEmptyList[A]] =
+    reverse.tails.map(_.reverse)
+
   /** @since 7.0.2 */
   def last: A = if(tail.isEmpty) head else tail.last
 
