@@ -66,10 +66,15 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   /** @since 7.0.2 */
   def last: A = tail.lastOption.getOrElse(head)
 
-  def tails: NonEmptyList[NonEmptyList[A]] = nel(this, tail match {
-    case INil()    => INil()
-    case ICons(h, t) => nel(h, t).tails.list
-  })
+  def tails: NonEmptyList[NonEmptyList[A]] = {
+    @annotation.tailrec
+    def tails0(as: NonEmptyList[A], accum: IList[NonEmptyList[A]]): NonEmptyList[NonEmptyList[A]] =
+      as.tail match {
+        case INil() => nel(as, accum).reverse
+        case ICons(h, t) => tails0(nel(h, t), as :: accum)
+      }
+    tails0(this, IList.empty)
+  }
 
   def reverse: NonEmptyList[A] = (list.reverse: @unchecked) match {
     case ICons(x, xs) => nel(x, xs)

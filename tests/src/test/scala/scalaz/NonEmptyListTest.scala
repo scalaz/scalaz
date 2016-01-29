@@ -85,6 +85,17 @@ object NonEmptyListTest extends SpecLite {
     val largeNel = NonEmptyList.nel(0, IList.fromList((1 to 100000).toList))
     (largeNel map Option.apply).sequence must_===(Option(largeNel))
   }
+  "correctness of tails" ! forAll { xs: NonEmptyList[Int] =>
+    import NonEmptyList._
+    xs.tails must_=== nel(xs, xs.tail match {
+      case INil() => INil()
+      case ICons(h, t) => nel(h, t).tails.list
+    })
+  }
+  "stack-safety of tails" in {
+    val largeNel = NonEmptyList.nel(0, IList.fill(1000000)(0))
+    largeNel.tails.size must_== 1000001
+  }
   "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
     Foldable1[NonEmptyList].toNel(xs) must_=== xs
   }
