@@ -240,6 +240,9 @@ sealed abstract class IList[A] extends Product with Serializable {
   def map[B](f: A => B): IList[B] =
     foldRight(IList.empty[B])(f(_) :: _)
 
+  def foreach(f: A => Unit): Unit =
+    toList.foreach(f)
+
   // private helper for mapAccumLeft/Right below
   private[this] def mapAccum[B, C](as: IList[A])(c: C, f: (C, A) => (C, B)): (C, IList[B]) =
     as.foldLeft((c, IList.empty[B])) { case ((c, bs), a) => BFT.rightMap(f(c, a))(_ :: bs) }
