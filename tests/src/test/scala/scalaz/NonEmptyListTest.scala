@@ -75,6 +75,13 @@ object NonEmptyListTest extends SpecLite {
   "NonEmptyList.init size is correct" ! forAll { xs:NonEmptyList[Int] =>
     xs.init.count(a => true) must_===(xs.tail.count(a => true))
   }
+  "correctness of tails" ! forAll { xs: NonEmptyList[Int] =>
+    import NonEmptyList._
+    xs.tails must_=== nel(xs, xs.tail match {
+      case INil() => INil()
+      case ICons(h, t) => nel(h, t).tails.list
+    })
+  }
   "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
     Foldable1[NonEmptyList].toNel(xs) must_=== xs
   }

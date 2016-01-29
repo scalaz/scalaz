@@ -14,5 +14,9 @@ object NonEmptyListTestJVM extends SpecLite {
     val largeNel = NonEmptyList.nel(0, IList.fromList((1 to 100000).toList))
     (largeNel map Option.apply).sequence must_===(Option(largeNel))
   }
+  "stack-safety of tails" in {
+    val largeNel = NonEmptyList.nel(0, IList.fill(1000000)(0))
+    largeNel.tails.size must_== 1000001
+  }
 
 }
