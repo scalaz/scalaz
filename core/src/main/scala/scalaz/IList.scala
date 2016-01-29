@@ -359,12 +359,12 @@ sealed abstract class IList[A] extends Product with Serializable {
   // no sum, use Foldable#fold
 
   def tails: IList[IList[A]] = {
-    @tailrec def inits0(as: IList[A], accum: IList[IList[A]]): IList[IList[A]] =
+    @tailrec def tails0(as: IList[A], accum: IList[IList[A]]): IList[IList[A]] =
       as match {
         case INil() => (as :: accum).reverse
-        case ICons(_, t) => inits0(t, as :: accum)
+        case ICons(_, t) => tails0(t, as :: accum)
       }
-    inits0(this, empty)
+    tails0(this, empty)
   }
 
   def tailOption: Option[IList[A]] =
