@@ -64,24 +64,24 @@ object Memo extends MemoInstances {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
-  def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
-    memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
+  import collection.mutable
+
+  def mutableMapMemo[K, V](a: mutable.Map[K, V]): Memo[K, V] = memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
   /** Cache results in a [[scala.collection.mutable.HashMap]].
     * Nonsensical if `K` lacks a meaningful `hashCode` and
     * `java.lang.Object.equals`.
     */
-  def mutableHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.HashMap[K, V])
+  def mutableHashMapMemo[K, V]: Memo[K, V] = mutableMapMemo(new mutable.HashMap[K, V])
 
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
-  def weakHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
+  def weakHashMapMemo[K, V]: Memo[K, V] = mutableMapMemo(new mutable.WeakHashMap[K, V])
 
+  import collection.immutable
 
-  def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
+  def immutableMapMemo[K, V](m: immutable.Map[K, V]): Memo[K, V] = {
     var a = m
 
     memo[K, V](f =>
@@ -94,19 +94,17 @@ object Memo extends MemoInstances {
       })
   }
 
-  import collection.immutable.{HashMap, ListMap, TreeMap}
-
   /** Cache results in a hash map.  Nonsensical unless `K` has
     * a meaningful `hashCode` and `java.lang.Object.equals`.
     * $immuMapNote
     */
-  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new HashMap[K, V])
+  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new immutable.HashMap[K, V])
 
   /** Cache results in a list map.  Nonsensical unless `K` has
     * a meaningful `java.lang.Object.equals`.  $immuMapNote
     */
-  def immutableListMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new ListMap[K, V])
+  def immutableListMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new immutable.ListMap[K, V])
 
   /** Cache results in a tree map. $immuMapNote */
-  def immutableTreeMapMemo[K: scala.Ordering, V]: Memo[K, V] = immutableMapMemo(new TreeMap[K, V])
+  def immutableTreeMapMemo[K: scala.Ordering, V]: Memo[K, V] = immutableMapMemo(new immutable.TreeMap[K, V])
 }
