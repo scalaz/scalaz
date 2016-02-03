@@ -177,6 +177,9 @@ trait Foldable[F[_]]  { self =>
   def anyM[G[_], A](fa: F[A])(p: A => G[Boolean])(implicit G: Monad[G]): G[Boolean] =
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
 
+  def filterLength[A](fa: F[A])(f: A => Boolean): Int =
+    foldLeft(fa, 0)((b, a) => (if (f(a)) 1 else 0) + b)
+
   import Ordering.{GT, LT}
   import std.option.{some, none}
 
