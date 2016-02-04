@@ -1,10 +1,16 @@
 package scalaz
 
-import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
+import org.scalacheck.Cogen
+
 import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.std.AllInstances._
 
 object StoreTTest extends SpecLite {
+
+  // https://github.com/rickynils/scalacheck/issues/190
+  private[this] implicit def storeTCogen[F[_], A, B, I: Cogen]: Cogen[IndexedStoreT[F, I, A, B]] =
+    Cogen[I].contramap(_.run._2)
 
   implicit def storeTuple1IntEqual = new Equal[StoreT[Tuple1, Int, Int]] {
     def equal(a1: StoreT[Tuple1, Int, Int], a2: StoreT[Tuple1, Int, Int]) = (a1.run, a2.run) match {
