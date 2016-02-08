@@ -301,10 +301,6 @@ object IListTest extends SpecLite {
     ns.reduceRightOption(f) must_=== (try Some(ns.toList.reduceRight(f)) catch { case e:Exception => None })
   }
 
-  "prefixLength" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
-    ns.prefixLength(f) must_=== ns.toList.prefixLength(f)
-  }
-
   "reverse" ! forAll { ns: IList[Int] =>
     ns.reverse.toList must_=== ns.toList.reverse
   }
