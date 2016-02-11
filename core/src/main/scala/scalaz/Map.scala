@@ -496,26 +496,30 @@ sealed abstract class ==>>[A, B] {
     foldlWithKey(empty[C, B])((xs, k, x) => xs.insert(f(k), x))
 
   def mapKeysWith[C](f: A => C, f2: (B, B) => B)(implicit o: Order[C]): C ==>> B =
-    fromListWith[C, B](toList.map(x => (f(x._1), x._2)))(f2)
+    fromEphemeralStreamWith[C, B](toAscEphemeralStream.map(x => (f(x._1), x._2)))(f2)
 
   /* Folds */
   def fold[C](z: C)(f: (A, B, C) => C): C =
     foldrWithKey(z)(f)
 
-  def foldlWithKey[C](z: C)(f:  (C, A, B) => C): C =
+  def foldlWithKey[C](z: C)(f:  (C, A, B) => C): C = foldlWithKeyLazy(z)((c, a, b) => f(c, a, b))
+
+  def foldlWithKeyLazy[C](z: => C)(f:  (=> C, A, B) => C): C =
     this match {
       case Tip() =>
         z
       case Bin(kx, x, l, r) =>
-        r.foldlWithKey(f(l.foldlWithKey(z)(f), kx, x))(f)
+        r.foldlWithKeyLazy(f(l.foldlWithKeyLazy(z)(f), kx, x))(f)
     }
 
-  def foldrWithKey[C](z: C)(f: (A, B, C) => C): C =
+  def foldrWithKey[C](z: C)(f: (A, B, C) => C): C = foldrWithKeyLazy(z)((a, b, c) => f(a, b, c))
+
+  def foldrWithKeyLazy[C](z: => C)(f: (A, B, => C) => C): C =
     this match {
       case Tip() =>
         z
       case Bin(kx, x, l, r) =>
-        l.foldrWithKey(f(kx, x, r.foldrWithKey(z)(f)))(f)
+        l.foldrWithKeyLazy(f(kx, x, r.foldrWithKeyLazy(z)(f)))(f)
     }
 
   /* Unions */
