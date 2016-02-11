@@ -350,20 +350,24 @@ sealed abstract class ISet[A] {
     fromList(toList.map(f))
 
   // -- * Folds
-  final def foldRight[B](z: B)(f: (A, B) => B): B =
+  final def foldRight[B](z: B)(f: (A, B) => B): B = foldRightLazy(z)((a, b) => f(a, b))
+
+  final def foldRightLazy[B](z: => B)(f: (A, => B) => B): B =
     this match {
       case Tip() => z
-      case Bin(x, l ,r) => l.foldRight(f(x, r.foldRight(z)(f)))(f)
+      case Bin(x, l ,r) => l.foldRightLazy(f(x, r.foldRightLazy(z)(f)))(f)
     }
 
   final def foldr[B](z: B)(f: (A, B) => B): B =
     foldRight(z)(f)
 
-  final def foldLeft[B](z: B)(f: (B, A) => B): B =
+  final def foldLeft[B](z: B)(f: (B, A) => B): B =  foldLeftLazy(z)((b, a) => f(b, a))
+
+  final def foldLeftLazy[B](z: => B)(f: (=> B, A) => B): B =
     this match {
       case Tip() => z
       case Bin(x, l, r) =>
-        r.foldLeft(f(l.foldLeft(z)(f), x))(f)
+        r.foldLeftLazy(f(l.foldLeftLazy(z)(f), x))(f)
     }
 
   final def foldl[B](z: B)(f: (B, A) => B): B =
