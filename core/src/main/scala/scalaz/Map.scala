@@ -234,6 +234,12 @@ sealed abstract class ==>>[A, B] {
   def toDescList: List[(A, B)] =
     foldlWithKey(List.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
 
+  def toAscEphemeralStream: EphemeralStream[(A, B)] =
+    foldrWithKeyLazy(EphemeralStream[(A, B)]())((k, x, xs) => (k, x) ##:: xs)
+
+  def toDescEphemeralStream: EphemeralStream[(A, B)] =
+    foldlWithKeyLazy(EphemeralStream[(A, B)]())((xs, k, x) => (k, x) ##:: xs)
+
   def member(k: A)(implicit n: Order[A]) =
     lookup(k)(n).isDefined
 
@@ -871,8 +877,10 @@ sealed abstract class ==>>[A, B] {
         false
     }
 
-  override final def hashCode: Int =
-    toAscList.hashCode
+  override final def hashCode: Int = {
+    val stm = toAscEphemeralStream
+    scala.util.hashing.MurmurHash3.orderedHash(EphemeralStream.toIterable(stm).iterator)
+  }
 
   // filters on keys
   private def filterGt(f: A => Ordering)(implicit o: Order[A]): A ==>> B =
@@ -990,7 +998,7 @@ sealed abstract class MapInstances extends MapInstances0 {
   import std.tuple._
 
   implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
-    Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
+    Contravariant[Show].contramap(Show[EphemeralStream[(A, B)]])(_.toAscEphemeralStream)
 
   implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] =
     new MapEqual[A, B] {def A = implicitly; def B = implicitly}
@@ -1000,7 +1008,7 @@ sealed abstract class MapInstances extends MapInstances0 {
       def A = implicitly
       def B = implicitly
       def order(o1: A ==>> B, o2: A ==>> B) =
-        Order[List[(A,B)]].order(o1.toAscList, o2.toAscList)
+        Order[EphemeralStream[(A,B)]].order(o1.toAscEphemeralStream, o2.toAscEphemeralStream)
     }
 
   implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
@@ -1119,7 +1127,7 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
   implicit def A: Equal[A]
   implicit def B: Equal[B]
   final override def equal(a1: A ==>> B, a2: A ==>> B) =
-    Equal[Int].equal(a1.size, a2.size) && Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
+    Equal[Int].equal(a1.size, a2.size) && Equal[EphemeralStream[(A, B)]].equal(a1.toAscEphemeralStream, a2.toAscEphemeralStream)
 }
 
 object ==>> extends MapInstances {
@@ -1163,6 +1171,16 @@ object ==>> extends MapInstances {
 
   final def fromFoldableWithKey[F[_]: Foldable, A: Order, B](fa: F[(A, B)])(f: (A, B, B) => B): A ==>> B =
     Foldable[F].foldLeft(fa, empty[A, B])((a, c) => a.insertWithKey(f, c._1, c._2))
+
+  /* EphemeralStream operations */
+  final def fromEphemeralStream[A: Order, B](s: EphemeralStream[(A, B)]): A ==>> B =
+    s.foldLeft(empty[A, B]) { t => x => t.insert(x._1, x._2) }
+
+  final def fromEphemeralStreamWith[A: Order, B](s: EphemeralStream[(A, B)])(f: (B, B) => B): A ==>> B =
+    fromEphemeralStreamWithKey(s)((_, x, y) => f(x, y))
+
+  final def fromEphemeralStreamWithKey[A: Order, B](s: EphemeralStream[(A, B)])(f: (A, B, B) => B): A ==>> B =
+    s.foldLeft(empty[A, B])(a => c => a.insertWithKey(f, c._1, c._2))
 
   final def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.union(c))
