@@ -1045,7 +1045,7 @@ sealed abstract class MapInstances extends MapInstances0 {
         }
 
       override def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B) =
-        fa.foldrWithKey(z)((_, b, acc) => f(b, acc))
+        fa.foldrWithKeyLazy(z)((_, b, acc) => f(b, acc))
 
       override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
@@ -1093,7 +1093,7 @@ sealed abstract class MapInstances extends MapInstances0 {
       }
 
     def bifoldRight[A,B,C](fa: A ==>> B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
-      fa.foldrWithKey(z)((a, b, c) => f(a, g(b, c)))
+      fa.foldrWithKeyLazy(z)((a, b, c) => f(a, g(b, c)))
 
     override def bifoldLeft[A,B,C](fa: A ==>> B, z: C)(f: (C, A) => C)(g: (C, B) => C): C =
       fa.foldlWithKey(z)((c, a, b) => g(f(c, a), b))
