@@ -10,6 +10,7 @@ object EphemeralStreamTest extends SpecLite {
 
   checkAll(equal.laws[EphemeralStream[Int]])
   checkAll(bindRec.laws[EphemeralStream])
+  checkAll(order.laws[EphemeralStream[Int]])
   checkAll(monadPlus.strongLaws[EphemeralStream])
   checkAll(isEmpty.laws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])
@@ -17,8 +18,12 @@ object EphemeralStreamTest extends SpecLite {
   checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
 
-  implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
+  def ephemeralStreamSlowShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
+
+  "show" ! forAll{ e: EphemeralStream[Int] =>
+    implicitly[Show[EphemeralStream[Int]]].show(e) must_===(ephemeralStreamSlowShow[Int].show(e))
+  }
 
   "reverse" ! forAll{ e: EphemeralStream[Int] =>
     e.reverse.toList must_===(e.toList.reverse)
@@ -40,8 +45,17 @@ object EphemeralStreamTest extends SpecLite {
     (firsts zip seconds) must_===(xs)
   }
 
+  "unzip zipLongest" ! forAll { xs: EphemeralStream[(Int, Int)] =>
+    val (firsts, seconds) = xs.unzip
+    (firsts zipLongest seconds).map { case a \&/ b => (a, b) } must_===(xs)
+  }
+
   "zip has right length" ! forAll {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
     (xs zip ys).length must_===(xs.length min ys.length)
+  }
+
+  "zipLongest has right length" ! forAll {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
+    (xs zipLongest ys).length must_===(xs.length max ys.length)
   }
 
   "interleave has right length" ! forAll {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
