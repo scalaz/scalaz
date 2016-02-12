@@ -622,7 +622,7 @@ sealed abstract class ISetInstances {
       }
 
     def foldRight[A, B](fa: ISet[A], z: => B)(f: (A, => B) => B): B =
-      fa.foldRight(z)((a, b) => f(a, b))
+      fa.foldRightLazy(z)(f)
 
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
