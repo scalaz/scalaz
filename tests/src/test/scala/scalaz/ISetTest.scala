@@ -40,6 +40,11 @@ object ISetTest extends SpecLite {
     b.sorted must_=== b
   }
 
+  "toAscEphemeralStream" ! forAll { a: ISet[Int] =>
+    val b = a.toAscEphemeralStream.toList
+    b.sorted must_=== b
+  }
+
   "equals/hashCode" ! forAll { a: ISet[Int] =>
     val b = ISet.fromList(Random.shuffle(a.toList))
     a must_== b
