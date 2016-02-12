@@ -644,6 +644,8 @@ object MapTest extends SpecLite {
       empty[Int, String].keySet must_===(Set.empty[Int])
     }
 
+    // From / to List
+
     "fromList" in {
       fromList(List.empty[(Int, String)]) must_===(empty[Int, String])
       fromList(List(5 -> "a", 3 -> "b", 5 -> "c")) must_===(fromList(List(5 -> "c", 3 -> "b")))
@@ -667,6 +669,33 @@ object MapTest extends SpecLite {
       fromList(List(5 -> "a", 3 -> "b")).toList must_===(List(3 -> "b", 5 -> "a"))
       empty[Int, String].toList must_===(List.empty[(Int, String)])
     }
+
+    // From / to EphemeralStream
+
+    "fromEphemeralStream" in {
+      fromEphemeralStream(EphemeralStream[(Int, String)]()) must_===(empty[Int, String])
+      fromEphemeralStream(EphemeralStream(5 -> "a", 3 -> "b", 5 -> "c")) must_===(fromEphemeralStream(EphemeralStream(5 -> "c", 3 -> "b")))
+      fromEphemeralStream(EphemeralStream(5 -> "c", 3 -> "b", 5 -> "a")) must_===(fromEphemeralStream(EphemeralStream(5 -> "a", 3 -> "b")))
+    }
+
+    "fromEphemeralStreamWith" in {
+      fromEphemeralStreamWith(EphemeralStream(5 -> "a", 5 -> "b", 3 -> "b", 3 -> "a", 5 -> "a"))(_ + _) must_===(fromEphemeralStream(EphemeralStream(3 -> "ab", 5 -> "aba")))
+      fromEphemeralStreamWith(EphemeralStream[(Int, String)]())(_ + _) must_===(empty[Int, String])
+    }
+
+    "fromEphemeralStreamWithKey" in {
+      val f = (k: Int, a1: String, a2: String) => k.toString + a1 + a2
+
+      fromEphemeralStreamWithKey(EphemeralStream(5 -> "a", 5 -> "b", 3 -> "b", 3 -> "a", 5 -> "a"))(f) must_===(fromEphemeralStream(EphemeralStream(3 -> "3ab", 5 -> "5a5ba")))
+      fromEphemeralStreamWithKey(EphemeralStream[(Int, String)]())(f) must_===(empty[Int, String])
+    }
+
+    "toAscEphemeralStream" in {
+      import std.tuple._
+      fromEphemeralStream(EphemeralStream(5 -> "a", 3 -> "b")).toAscEphemeralStream must_===(EphemeralStream(3 -> "b", 5 -> "a"))
+      empty[Int, String].toAscEphemeralStream must_===(EphemeralStream[(Int, String)]())
+    }
+
   }
 
   /*"==>> validity" should {

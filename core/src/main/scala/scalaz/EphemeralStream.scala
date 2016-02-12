@@ -2,6 +2,8 @@ package scalaz
 
 import java.lang.ref.WeakReference
 
+import scala.annotation.tailrec
+
 /** Like [[scala.collection.immutable.Stream]], but doesn't save
   * computed values.  As such, it can be used to represent similar
   * things, but without the space leak problem frequently encountered
@@ -102,6 +104,14 @@ sealed abstract class EphemeralStream[A] {
       emptyEphemeralStream
     else
       cons((head(), b.head()), tail() zip b.tail())
+
+  def zipLongest[B](b: => EphemeralStream[B]): EphemeralStream[A \&/ B] =
+    if (isEmpty)
+      b.map(\&/.That(_))
+    else if (b.isEmpty)
+      map(\&/.This(_))
+    else
+      cons(\&/.Both(head(), b.head()), tail() zipLongest b.tail())
 
   def unzip[X, Y](implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
     foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
@@ -204,7 +214,7 @@ sealed abstract class EphemeralStreamInstances {
     override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
       if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
-      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+      this.foldLeft(fa, M.zero)((b, a) => M.append(b, f(a)))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(b => a => f(b, a))
     override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
@@ -239,9 +249,44 @@ sealed abstract class EphemeralStreamInstances {
     }
   }
 
-  import std.list._
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal.equal { (a, b) =>
+    val E = Equal[A]
+    (a zipLongest b).foldLeft(true) {
+      case false => _ => false   // short circuit.
+      case true  => {
+        case \&/.Both(x, y) => E.equal(x, y)
+        case _              => false
+      }
+    }
+  }
 
-  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+  implicit def ephemeralStreamOrder[A: Order]: Order[EphemeralStream[A]] = Order.order { (a, b) =>
+    val O = Order[A]
+    import scalaz.Ordering._
+    (a zipLongest b).foldLeft(EQ: Ordering) {
+      case EQ    => {
+        case \&/.Both(x, y) => O.order(x, y)
+        case \&/.This(x)    => GT
+        case \&/.That(x)    => LT
+      }
+      case other => _ => other   // short circuit.
+    }
+  }
+
+  implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] = Show.show { stm =>
+    val A = Show[A]
+
+    @tailrec
+    def commaSep(rest: EphemeralStream[A], acc: Cord): Cord =
+      rest.headOption match {
+        case None    => acc
+        case Some(x) => commaSep(rest.tail(), (acc :+ ",") ++ A.show(x))
+      }
+    "[" +: (stm.headOption match {
+      case None    => Cord()
+      case Some(x) => commaSep(stm.tail(), A.show(x))
+    }) :+ "]"
+  }
 }
 
 trait EphemeralStreamFunctions {
