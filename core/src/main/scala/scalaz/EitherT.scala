@@ -71,6 +71,12 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
     EitherT(F.map(run)(_.map(f)))
 
+  /** Map on the right of this disjunction. */
+  def mapF[C](f: B => F[C])(implicit M: Monad[F]): EitherT[F, A, C] =
+    flatMapF {
+      f andThen (mb => M.map(mb)(b => \/-(b)))
+    }
+
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[A \/ ?].traverse(o)(f)))(EitherT(_))

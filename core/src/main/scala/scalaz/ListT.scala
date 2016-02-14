@@ -42,7 +42,7 @@ final case class ListT[M[_], A](run: M[List[A]]){
     }
   })
 
-  def flatMap[B](f: A => ListT[M, B])(implicit M: Monad[M]) : ListT[M, B] = new ListT(M.bind(run){list =>
+  def flatMap[B](f: A => ListT[M, B])(implicit M: Monad[M]): ListT[M, B] = new ListT(M.bind(run) { list =>
     list match {
       case Nil => M.point(Nil)
       case nonEmpty => nonEmpty.map(f).reduce(_ ++ _).run
@@ -51,7 +51,15 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def flatMapF[B](f: A => M[List[B]])(implicit M: Monad[M]) : ListT[M, B] = flatMap(f andThen ListT.apply)
 
-  def map[B](f: A => B)(implicit M: Functor[M]) : ListT[M, B] = new ListT(M.map(run)(_.map(f)))
+  def map[B](f: A => B)(implicit M: Functor[M]): ListT[M, B] = new ListT(
+    M.map(run)(_.map(f))
+  )
+
+  def mapF[B](f: A => M[B])(implicit M: Monad[M]): ListT[M, B] = {
+    flatMapF {
+      f andThen (mb => M.map(mb)(b => List(b)))
+    }
+  }
 
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tail))
