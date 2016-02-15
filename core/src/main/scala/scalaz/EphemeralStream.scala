@@ -1,6 +1,7 @@
 package scalaz
 
 import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicReference
 
 /** Like [[scala.collection.immutable.Stream]], but doesn't save
   * computed values.  As such, it can be used to represent similar
@@ -277,17 +278,20 @@ object EphemeralStream extends EphemeralStreamInstances {
   }
 
   def weakMemo[V](f: => V): () => V = {
-    val latch = new Object
-    // TODO I don't think this annotation does anything, as `v` isn't a class member.
-    @volatile var v: Option[WeakReference[V]] = None
+    val ref: AtomicReference[WeakReference[V]] = new AtomicReference()
     () => {
-      val a = v.map(x => x.get)
-      if (a.isDefined && a.get != null) a.get
-      else latch.synchronized {
+      def genNew(old: WeakReference[V]) = {
         val x = f
-        v = Some(new WeakReference(x))
+        ref.compareAndSet(old, new WeakReference(x))
         x
       }
+      val v = ref.get()
+      if (v != null) {
+        val crt = v.get()
+        if (crt == null) {
+          genNew(v)
+        } else crt
+      } else genNew(v)
     }
   }
 
