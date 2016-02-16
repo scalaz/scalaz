@@ -280,8 +280,8 @@ object EphemeralStream extends EphemeralStreamInstances {
   def weakMemo[V](f: => V): () => V = {
     val ref: AtomicReference[WeakReference[V]] = new AtomicReference()
     () => {
-      def genNew(old: WeakReference[V]) = {
-        val x = f
+      @inline
+      def genNew(x: V, old: WeakReference[V]) = {
         ref.compareAndSet(old, new WeakReference(x))
         x
       }
@@ -289,9 +289,9 @@ object EphemeralStream extends EphemeralStreamInstances {
       if (v != null) {
         val crt = v.get()
         if (crt == null) {
-          genNew(v)
+          genNew(f, v)
         } else crt
-      } else genNew(v)
+      } else genNew(f, v)
     }
   }
 
