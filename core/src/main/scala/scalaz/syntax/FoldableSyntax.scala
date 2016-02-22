@@ -63,6 +63,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def empty: Boolean = F.empty(self)
   final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)
   final def splitWith(p: A => Boolean): List[NonEmptyList[A]] = F.splitWith(self)(p)
+  final def splitBy[B: Equal](f: A => B): IList[(B, NonEmptyList[A])] = F.splitBy(self)(f)
   final def selectSplit(p: A => Boolean): List[NonEmptyList[A]] = F.selectSplit(self)(p)
   final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)

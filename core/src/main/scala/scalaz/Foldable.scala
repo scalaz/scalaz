@@ -263,6 +263,17 @@ trait Foldable[F[_]]  { self =>
       }, Some(pa))
     })._1
 
+  /**
+    * Splits the elements into groups that produce the same result by a function f.
+    */
+  def splitBy[A, B: Equal](fa: F[A])(f: A => B): IList[(B, NonEmptyList[A])] =
+    foldRight(fa, IList[(B, NonEmptyList[A])]())((a, bas) => {
+      val fa = f(a)
+      bas match {
+        case INil() => IList.single((fa, NonEmptyList(a)))
+        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList(a)), bas)
+      }
+    })
 
   /**
    * Selects groups of elements that satisfy p and discards others.
