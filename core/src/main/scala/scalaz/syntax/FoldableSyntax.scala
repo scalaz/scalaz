@@ -74,6 +74,16 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
           else ICons((fa, NonEmptyList.nel(a, IList.empty)), bas)
       }
     }
+  final def splitByRelation(r: (A, A) => Boolean): IList[NonEmptyList[A]] =
+    F.foldRight(self, IList.empty[NonEmptyList[A]]){ (a, neas) =>
+      neas match {
+        case INil() =>
+          IList.single(NonEmptyList.nel(a, IList.empty))
+        case ICons(nea, tail) =>
+          if (r(a, nea.head)) ICons(a <:: nea, tail)
+          else ICons(NonEmptyList.nel(a, IList.empty), neas)
+      }
+    }
   final def selectSplit(p: A => Boolean): List[NonEmptyList[A]] = F.selectSplit(self)(p)
   final def collapse[X[_]](implicit A: ApplicativePlus[X]): X[A] = F.collapse(self)
   final def concatenate(implicit A: Monoid[A]): A = F.fold(self)
