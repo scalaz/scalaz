@@ -270,8 +270,19 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, IList[(B, NonEmptyList[A])]())((a, bas) => {
       val fa = f(a)
       bas match {
-        case INil() => IList.single((fa, NonEmptyList(a)))
-        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList(a)), bas)
+        case INil() => IList.single((fa, NonEmptyList.nel(a, INil())))
+        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList.nel(a, INil())), bas)
+      }
+    })
+
+  /**
+    * Splits into groups of elements that are transitively dependant by a relation r.
+    */
+  def splitByRelation[A](fa: F[A])(r: (A, A) => Boolean): IList[NonEmptyList[A]] =
+    foldRight(fa, IList[NonEmptyList[A]]())((a, neas) => {
+      neas match {
+        case INil() => IList.single(NonEmptyList.nel(a, INil()))
+        case ICons(nea, tail) => if (r(a, nea.head)) ICons(a <:: nea, tail) else ICons(NonEmptyList.nel(a, INil()), neas)
       }
     })
 
