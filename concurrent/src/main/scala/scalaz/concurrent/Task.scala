@@ -218,19 +218,19 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    */
-  def unsafePerformTimed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
-    new Task(get.unsafePerformTimed(timeoutInMillis).map(_.join))
-
-  def unsafePerformTimed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] = 
-    unsafePerformTimed(timeout.toMillis)
-
-  @deprecated("use unsafePerformTimed", "7.2")
   def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
-    unsafePerformTimed(timeoutInMillis)
+    new Task(get.timed(timeoutInMillis).map(_.join))
 
-  @deprecated("use unsafePerformTimed", "7.2")
-  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] = 
-    unsafePerformTimed(timeout)
+  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
+    timed(timeout.toMillis)
+
+  @deprecated("use timed", "7.2")
+  def unsafePerformTimed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
+    timed(timeout)
+
+  @deprecated("use timed", "7.2")
+  def unsafePerformTimed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
+    timed(timeoutInMillis)
 
   /**
    * Retries this task if it fails, once for each element in `delays`,
@@ -238,26 +238,26 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * errors into a list.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def unsafePerformRetryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
-    unsafeRetryInternal(delays, p, true)
-
-  @deprecated("use unsafePerformRetryAccumulating", "7.2")
   def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
-    unsafePerformRetryAccumulating(delays, p)
+    retryInternal(delays, p, true)
+
+  @deprecated("use retryAccumulating", "7.2")
+  def unsafePerformRetryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
+    retryAccumulating(delays, p)
     
   /**
    * Retries this task if it fails, once for each element in `delays`,
    * each retry delayed by the corresponding duration.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def unsafePerformRetry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
-    unsafeRetryInternal(delays, p, false).map(_._1)
-
-  @deprecated("use unsafePerformRetry", "7.2")
   def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
-    unsafePerformRetry(delays, p)
+    retryInternal(delays, p, false).map(_._1)
 
-  private def unsafeRetryInternal(delays: Seq[Duration],
+  @deprecated("use retry", "7.2")
+  def unsafePerformRetry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
+    retry(delays, p)
+
+  private def retryInternal(delays: Seq[Duration],
                             p: (Throwable => Boolean),
                             accumulateErrors: Boolean): Task[(A, List[Throwable])] = {
       def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, List[Throwable])] = {
