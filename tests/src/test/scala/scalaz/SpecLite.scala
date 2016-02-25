@@ -3,15 +3,8 @@ package scalaz
 import reflect.ClassTag
 
 import org.scalacheck._
-import org.scalacheck.Prop.Result
-import org.scalacheck.Gen.Parameters
 
-abstract class SpecLite extends Properties("") {
-  def updateName: Unit = {
-    val f = classOf[Properties].getDeclaredField("name")
-    f.setAccessible(true)
-    f.set(this, getClass.getName.stripSuffix("$"))
-  }
+abstract class SpecLite extends Properties("") with SpecLitePlatform {
   updateName
 
   def checkAll(name: String, props: Properties) {
@@ -27,9 +20,11 @@ abstract class SpecLite extends Properties("") {
   }
 
   class PropertyOps(props: Properties) {
-    def withProp(propName: String, prop: Prop) = new Properties(props.name) {
-      for {(name, p) <- props.properties} property(name) = p
-      property(propName) = prop
+    def withProp(propName: String, prop: Prop): Properties = {
+      val p = new Properties(props.name)
+      for {(name, x) <- props.properties} p.property(name) = x
+      p.property(propName) = prop
+      p
     }
   }
 
@@ -42,9 +37,9 @@ abstract class SpecLite extends Properties("") {
       context = s; try a finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
-    def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = new Prop {
-      def apply(prms: Parameters): Result = ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
-    }
+
+    def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
+      property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
   }
 
   implicit def enrichString(s: String) = new StringOps(s)

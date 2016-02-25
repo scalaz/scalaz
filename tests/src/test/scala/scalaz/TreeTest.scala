@@ -4,7 +4,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tree._
-import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
 object TreeTest extends SpecLite {
@@ -25,20 +24,9 @@ object TreeTest extends SpecLite {
     F.toList(a) must_=== F.toList(xs).zipWithIndex.map{case (a, b) => (b, a)}
   }
 
-  "ScalazArbitrary.treeGenSized" ! forAll(Gen.choose(1, 200)){ size =>
-    val gen = treeGenSized[Unit](size)
-    Stream.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
-  }
-
   "infinite Tree flatten" ! {
     Node(0, Stream.from(1).map(Leaf(_))).flatten
     true
-  }
-
-  "deep Tree flatten should not cause a stack overflow" ! {
-    val size = 1000000
-    val tree = (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, Stream(x)))
-    tree.flatten must_== (size to 0 by -1).toStream
   }
 
   "A tree must can be rendered as an ASCII string" ! {
