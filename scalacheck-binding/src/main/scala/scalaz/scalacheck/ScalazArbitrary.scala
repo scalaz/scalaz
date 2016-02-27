@@ -2,7 +2,7 @@ package scalaz
 package scalacheck
 
 import java.math.BigInteger
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.{Cogen, Gen, Arbitrary}
 import collection.mutable.ArraySeq
 import reflect.ClassTag
 
@@ -17,6 +17,79 @@ object ScalazArbitrary {
   import ScalaCheckBinding._
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
+
+  implicit def cogenStream[A: Cogen]: Cogen[Stream[A]] =
+    Cogen[List[A]].contramap(_.toList)
+
+  implicit def cogenTreeLoc[A: Cogen]: Cogen[TreeLoc[A]] =
+    Divide[Cogen].deriving4(Function.unlift(TreeLoc.unapply))
+
+  implicit def cogenThese[A: Cogen, B: Cogen]: Cogen[A \&/ B] =
+    Cogen[Either[Either[A, B], (A, B)]].contramap{
+      case \&/.Both(a, b) =>
+        Right((a, b))
+      case \&/.This(a) =>
+        Left(Left(a))
+      case \&/.That(b) =>
+        Left(Right(b))
+    }
+
+  implicit def cogenName[A: Cogen]: Cogen[Name[A]] =
+    Cogen[A].contramap(_.value)
+
+  implicit def cogenNeed[A: Cogen]: Cogen[Need[A]] =
+    Cogen[A].contramap(_.value)
+
+  implicit def cogenValue[A: Cogen]: Cogen[Value[A]] =
+    Cogen[A].contramap(_.value)
+
+  implicit def cogenNel[A: Cogen]: Cogen[NonEmptyList[A]] =
+    Cogen.cogenList[A].contramap(_.toList)
+
+  implicit def cogenIList[A: Cogen]: Cogen[IList[A]] =
+    Cogen.cogenList[A].contramap(_.toList)
+
+  implicit def cogenEpehemralStream[A: Cogen]: Cogen[EphemeralStream[A]] =
+    Cogen.cogenList[A].contramap(_.toList)
+
+  implicit def cogenTree[A: Cogen]: Cogen[Tree[A]] =
+    Cogen.cogenList[A].contramap(_.toList)
+
+  implicit def cogenWriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[F, A, B]] =
+    F.contramap(_.run)
+
+  implicit def cogenUnwriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[UnwriterT[F, A, B]] =
+    F.contramap(_.run)
+
+  implicit def cogenIndexedStoreT[F[_], A, B, C](implicit F: Cogen[(F[A => B], C)]): Cogen[IndexedStoreT[F, C, A, B]] =
+    F.contramap(_.run)
+
+  implicit def cogenMaybe[A: Cogen]: Cogen[Maybe[A]] =
+    Cogen[Option[A]].contramap(_.toOption)
+
+  implicit def cogenLazyOption[A: Cogen]: Cogen[LazyOption[A]] =
+    Cogen[Option[A]].contramap(_.toOption)
+
+  implicit def cogenLazyEither[A: Cogen, B: Cogen]: Cogen[LazyEither[A, B]] =
+    Cogen[Either[A, B]].contramap(_.toEither)
+
+  implicit def cogenDisjunction[A: Cogen, B: Cogen]: Cogen[A \/ B] =
+    Cogen[Either[A, B]].contramap(_.toEither)
+
+  implicit def cogenCoproduct[F[_], G[_], A](implicit F: Cogen[F[A] \/ G[A]]): Cogen[Coproduct[F, G, A]] =
+    F.contramap(_.run)
+
+  implicit def cogenZipper[A: Cogen]: Cogen[Zipper[A]] =
+    Cogen[(Stream[A], A, Stream[A])].contramap{z => (z.lefts, z.focus, z.rights)}
+
+  implicit def cogenOneOr[F[_], A](implicit A: Cogen[F[A] \/ A]): Cogen[OneOr[F, A]] =
+    A.contramap(_.run)
+
+  implicit def cogenOneAnd[F[_], A](implicit A: Cogen[(A, F[A])]): Cogen[OneAnd[F, A]] =
+    A.contramap(a => (a.head, a.tail))
+
+  implicit def cogenCoyoneda[F[_], A](implicit A: Cogen[F[A]], F: Functor[F]): Cogen[Coyoneda[F, A]] =
+    A.contramap(_.run)
 
   implicit def monoidCoproductArbitrary[M: Arbitrary, N: Arbitrary]: Arbitrary[M :+: N] =
     Functor[Arbitrary].map(arb[Vector[M \/ N]])(new :+:(_))

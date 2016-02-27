@@ -5,6 +5,7 @@ import org.scalacheck.{Arbitrary, Gen}
 
 object CokleisliTest extends SpecLite {
 
+  // TODO https://github.com/rickynils/scalacheck/issues/190
   implicit val cokleisliArb1: Arbitrary[Cokleisli[Option, Int, Int]] = {
     def arb(f: (Option[Int], Int, Int) => Int): Gen[Cokleisli[Option, Int, Int]] =
       for{
@@ -20,6 +21,7 @@ object CokleisliTest extends SpecLite {
     ))
   }
 
+  // TODO https://github.com/rickynils/scalacheck/issues/190
   implicit val cokleisliArb2: Arbitrary[Cokleisli[Option, Int, Int => Int]] = {
     def arb(f: (Option[Int], Int) => (Int => Int)): Gen[Cokleisli[Option, Int, Int => Int]] =
       implicitly[Arbitrary[Int]].arbitrary.map(a => Cokleisli[Option, Int, Int => Int](f(_, a)))
