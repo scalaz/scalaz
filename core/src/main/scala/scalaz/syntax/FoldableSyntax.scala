@@ -49,6 +49,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def anyM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.anyM(self)(p)
   final def any(p: A => Boolean): Boolean = F.any(self)(p)
   final def ∃(p: A => Boolean): Boolean = F.any(self)(p)
+  final def filterLength(p: A => Boolean): Int = F.foldLeft(self, 0)((b, a) => (if (p(a)) 1 else 0) + b)
   final def count: Int = F.count(self)
   final def maximum(implicit A: Order[A]): Option[A] = F.maximum(self)
   final def maximumOf[B: Order](f: A => B): Option[B] = F.maximumOf(self)(f)
