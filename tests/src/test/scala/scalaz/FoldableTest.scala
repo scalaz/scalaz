@@ -216,11 +216,12 @@ object FoldableTests {
       F.all(fa)(f) === F.toList(fa).forall(f)
     }
 
-  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) =
-    new Properties("foldable") {
-      property("consistent any") = anyConsistent[F, Int](_ > 0)
-      property("consistent all") = allConsistent[F, Int](_ > 0)
-      property("any is lazy") = anyIsLazy[F, Int]
-      property("all is lazy") = allIsLazy[F, Int]
-    }
+  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) = {
+    val p = new Properties("foldable")
+    p.property("consistent any") = anyConsistent[F, Int](_ > 0)
+    p.property("consistent all") = allConsistent[F, Int](_ > 0)
+    p.property("any is lazy") = anyIsLazy[F, Int]
+    p.property("all is lazy") = allIsLazy[F, Int]
+    p
+  }
 }

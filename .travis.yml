@@ -25,7 +25,8 @@ jdk:
   - openjdk7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mimaReportBinaryIssues
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" publishLocal
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
@@ -35,6 +36,15 @@ matrix:
   include:
     - scala: 2.12.0-M3
       jdk: oraclejdk8
+      env: TEST_PROJECT="rootJVM"
+    - scala: 2.12.0-M3
+      jdk: oraclejdk8
+      env: TEST_PROJECT="rootJS"
+
+env:
+  matrix:
+  - TEST_PROJECT="rootJVM"
+  - TEST_PROJECT="rootJS"
 
 addons:
   apt:

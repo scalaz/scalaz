@@ -75,16 +75,6 @@ object NonEmptyListTest extends SpecLite {
   "NonEmptyList.init size is correct" ! forAll { xs:NonEmptyList[Int] =>
     xs.init.count(a => true) must_===(xs.tail.count(a => true))
   }
-  "NonEmptyList.foldRight1 large list" in {
-    import NonEmptyList._
-    import syntax.foldable1._
-    nel(0, IList.fromList(List.fill(10000000)(1))).foldRight1(_ + _) must_== 10000000
-  }
-  "no stack overflow large list traverse" in {
-    import syntax.traverse._
-    val largeNel = NonEmptyList.nel(0, IList.fromList((1 to 100000).toList))
-    (largeNel map Option.apply).sequence must_===(Option(largeNel))
-  }
   "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
     Foldable1[NonEmptyList].toNel(xs) must_=== xs
   }

@@ -3,19 +3,12 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Gen
-import org.scalacheck.Prop.forAll
 
 object TreeLocTest extends SpecLite {
 
   checkAll("TreeLoc", order.laws[TreeLoc[Int]])
   checkAll("TreeLoc", traverse1.laws[TreeLoc])
   checkAll(FoldableTests.anyAndAllLazy[TreeLoc])
-
-  "ScalazArbitrary.treeLocGenSized" ! forAll(Gen.choose(1, 200)){ size =>
-    val gen = treeLocGenSized[Unit](size)
-    Stream.continually(gen.sample).flatten.take(10).map(Foldable[TreeLoc].length(_)).forall(_ == size)
-  }
 
   {
     def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {

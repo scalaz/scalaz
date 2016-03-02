@@ -25,12 +25,6 @@ object EphemeralStreamTest extends SpecLite {
     e.reverse.reverse must_===(e)
   }
 
-  "foldLeft large stream" in {
-    val list = List.fill(10000000)(1)
-    val xs = EphemeralStream(list : _*)
-    Foldable[EphemeralStream].foldLeft(xs, 0)(_ + _) must_===(list.sum)
-  }
-
   "foldLeft" ! forAll{ xs: List[List[Int]] =>
     Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
