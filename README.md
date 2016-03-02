@@ -10,7 +10,7 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.2.0, which is cross-built against Scala 2.9.3, 2.10.x and 2.11.x.
+The current stable version is 7.2.0, which is cross-built against Scala 2.10.x and 2.11.x.
 
 If you're using SBT, add the following line to your build file:
 
