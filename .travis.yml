@@ -26,7 +26,7 @@ jdk:
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" publishLocal
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
