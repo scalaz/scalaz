@@ -199,7 +199,6 @@ trait IterateeTInstances extends IterateeTInstances0 {
   implicit def IterateeTMonadIO[E, F[_]](implicit M0: MonadIO[F]): MonadIO[({type λ[α] = IterateeT[E, F, α]})#λ] =
     new IterateeTMonadIO[E, F] {
       implicit def F = M0
-      implicit def G = M0
     }
 
   implicit def IterateeTContravariant[F[_]: Monad, A]: Contravariant[({ type λ[α] = IterateeT[α, F, A] })#λ] =
