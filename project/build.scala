@@ -103,7 +103,11 @@ object build extends Build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case _ => Nil
+      case _ => Seq(
+        "-Ybackend:GenBCode",
+        "-Ydelambdafy:method",
+        "-target:jvm-1.8"
+      )
     }),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -276,6 +280,9 @@ object build extends Build {
       ) : _*
     )
     .jvmSettings(
+      libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+      }.toList,
       typeClasses := TypeClass.core
     )
 
