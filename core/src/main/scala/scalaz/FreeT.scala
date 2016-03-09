@@ -63,18 +63,15 @@ object FreeT extends FreeTInstances {
 }
 
 sealed abstract class FreeT[S[_], M[_], A] {
-  final def map[B](f: A => B)(implicit S: Functor[S], M: Functor[M]): FreeT[S, M, B] =
+  final def map[B](f: A => B)(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, B] =
     this match {
       case Suspend(m) => Suspend(M.map(m)(_.bimap(f, S.lift(_.map(f)))))
-      case g @ Gosub() => gosub(g.a)(g.f.andThen(_.map(f)))
+      case g @ Gosub() => gosub(g)(x => point(f(x)))
     }
 
   /** Binds the given continuation to the result of this computation. */
   final def flatMap[B](f: A => FreeT[S, M, B]): FreeT[S, M, B] =
-    this match {
-      case g @ Gosub() => gosub(g.a)(x => gosub(g.f(x))(f))
-      case a => gosub(a)(f)
-    }
+    gosub(this)(f)
 
   /**
    * Changes the underlying `Monad` for this `FreeT`, ie.
@@ -198,10 +195,10 @@ sealed abstract class FreeTInstances3 extends FreeTInstances4 {
 }
 
 sealed abstract class FreeTInstances2 extends FreeTInstances3 {
-  implicit def freeTBind[S[_], M[_]](implicit S0: Functor[S], M0: Functor[M]): Bind[FreeT[S, M, ?]] =
+  implicit def freeTBind[S[_], M[_]](implicit S0: Functor[S], M0: Applicative[M]): Bind[FreeT[S, M, ?]] =
     new FreeTBind[S, M] {
       implicit def S: Functor[S] = S0
-      implicit def M: Functor[M] = M0
+      implicit def M: Applicative[M] = M0
     }
 
   implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, ?[_], ?]] =
@@ -266,7 +263,7 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
 
 private trait FreeTBind[S[_], M[_]] extends Bind[FreeT[S, M, ?]] {
   implicit def S: Functor[S]
-  implicit def M: Functor[M]
+  implicit def M: Applicative[M]
 
   override final def map[A, B](fa: FreeT[S, M, A])(f: A => B): FreeT[S, M, B] = fa.map(f)
   def bind[A, B](fa: FreeT[S, M, A])(f: A => FreeT[S, M, B]): FreeT[S, M, B] = fa.flatMap(f)
