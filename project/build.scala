@@ -50,17 +50,23 @@ object build extends Build {
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
 
-  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
 
+  private[this] val tagName = Def.setting{
+    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+  }
+  private[this] val tagOrHash = Def.setting{
+    if(isSnapshot.value) gitHash() else tagName.value
+  }
+
   val scalajsProjectSettings = Seq[Sett](
     isJSProject := true,
     scalacOptions += {
-      val tagOrBranch = if(isSnapshot.value) gitHash else ("v" + version.value)
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
-      val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrBranch
+      val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
     }
   )
@@ -110,9 +116,9 @@ object build extends Build {
       )
     }),
 
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
-      val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
+    scalacOptions in (Compile, doc) ++= {
+      val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
+      Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
@@ -176,7 +182,7 @@ object build extends Build {
       commitNextVersion,
       pushChanges
     ),
-
+    releaseTagName := tagName.value,
     pomIncludeRepository := {
       x => false
     },
