@@ -90,7 +90,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
+    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.12.5",
@@ -103,7 +103,11 @@ object build extends Build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case _ => Nil
+      case _ => Seq(
+        "-Ybackend:GenBCode",
+        "-Ydelambdafy:method",
+        "-target:jvm-1.8"
+      )
     }),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
@@ -276,6 +280,9 @@ object build extends Build {
       ) : _*
     )
     .jvmSettings(
+      libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+      }.toList,
       typeClasses := TypeClass.core
     )
 
