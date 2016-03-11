@@ -4,7 +4,7 @@ import FreeT._
 
 object FreeT extends FreeTInstances {
   /** Suspend the computation with the given suspension. */
-  private case class Suspend[S[_], M[_], A](a: M[A \/ S[FreeT[S, M, A]]]) extends FreeT[S, M, A]
+  private case class Suspend[S[_], M[_], A](a: M[A \/ S[A]]) extends FreeT[S, M, A]
 
   /** Call a subroutine and continue with the given function. */
   private sealed abstract case class Gosub[S[_], M[_], B]() extends FreeT[S, M, B] {
@@ -23,7 +23,11 @@ object FreeT extends FreeTInstances {
   /** Return the given value in the free monad. */
   def point[S[_], M[_], A](value: A)(implicit M: Applicative[M]): FreeT[S, M, A] = Suspend(M.point(-\/(value)))
 
-  def suspend[S[_], M[_], A](a: M[A \/ S[FreeT[S, M, A]]]): FreeT[S, M, A] = Suspend(a)
+  def suspend[S[_], M[_], A](a: M[A \/ S[FreeT[S, M, A]]])(implicit M: Applicative[M]): FreeT[S, M, A] =
+    liftM(a).flatMap({
+      case -\/(a) => point(a)
+      case \/-(s) => roll(s)
+    })
 
   def tailrecM[S[_], M[_]: Applicative, A, B](f: A => FreeT[S, M, A \/ B])(a: A): FreeT[S, M, B] =
     f(a).flatMap {
@@ -39,19 +43,19 @@ object FreeT extends FreeTInstances {
     liftM[S, M.M, M.A](M(value))(M.TC)
 
   /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
-  def liftF[S[_], M[_], A](value: S[A])(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, A] =
-    Suspend(M.point(\/-(S.map(value)(point[S, M, A]))))
+  def liftF[S[_], M[_], A](value: S[A])(implicit M: Applicative[M]): FreeT[S, M, A] =
+    Suspend(M.point(\/-(value)))
 
-  def roll[S[_], M[_], A](value: S[FreeT[S, M, A]])(implicit S: Functor[S], M: Applicative[M]): FreeT[S, M, A] =
+  def roll[S[_], M[_], A](value: S[FreeT[S, M, A]])(implicit M: Applicative[M]): FreeT[S, M, A] =
     liftF[S, M, FreeT[S, M, A]](value).flatMap(identity)
 
   import Isomorphism._
 
-  def isoFree[S[_]](implicit S: Functor[S]): FreeT[S, Id.Id, ?] <~> Free[S, ?] =
+  def isoFree[S[_]]: FreeT[S, Id.Id, ?] <~> Free[S, ?] =
     new IsoFunctorTemplate[FreeT[S, Id.Id, ?], Free[S, ?]] {
       override def to[A](fa: FreeT[S, Id.Id, A]) = fa match {
         case Suspend(\/-(a)) =>
-          Free.roll(S.map(a)(to(_)))
+          Free.liftF(a)
         case Suspend(-\/(a)) =>
           Free.point(a)
         case a @ Gosub() =>
@@ -72,53 +76,46 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
   /**
    * Changes the underlying `Monad` for this `FreeT`, ie.
-   * turning this `FreeT[S, M, A]` into a `FreeT[S, N, A]`
-   * given Functors for `S` and `N`
+   * turning this `FreeT[S, M, A]` into a `FreeT[S, N, A]`.
    */
-  def hoistN[N[_]](mn: M ~> N)(implicit S: Functor[S], N: Functor[N]): FreeT[S, N, A] =
+  def hoist[N[_]](mn: M ~> N): FreeT[S, N, A] =
     this match {
       case e @ Gosub() =>
-        gosub(e.a.hoistN(mn))(e.f.andThen(_.hoistN(mn)))
+        gosub(e.a.hoist(mn))(e.f.andThen(_.hoist(mn)))
       case Suspend(m) =>
-        Suspend(N.map(mn(m))(_.map(s => S.map(s)(_.hoistN(mn)))))
+        Suspend(mn(m))
     }
 
-  /** Same as `hoistN` but different constraints */
-  def hoistM[N[_]](mn: M ~> N)(implicit S: Functor[S], M: Functor[M]): FreeT[S, N, A] =
-    this match {
-      case e @ Gosub() =>
-        gosub(e.a.hoistM(mn))(e.f.andThen(_.hoistM(mn)))
-      case Suspend(m) =>
-        Suspend(mn(M.map(m)(_.map(s => S.map(s)(_.hoistM(mn))))))
-    }
+  @deprecated("Alias for `hoist`", "7.3")
+  def hoistN[N[_]](mn: M ~> N): FreeT[S, N, A] = hoist(mn)
+
+  @deprecated("Alias for `hoist`", "7.3")
+  def hoistM[N[_]](mn: M ~> N): FreeT[S, N, A] = hoist(mn)
 
   /** Change the base functor `S` for a `FreeT` action. */
-  def interpretS[T[_]](st: S ~> T)(implicit S: Functor[S], M: Functor[M]): FreeT[T, M, A] =
+  def interpret[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] =
     this match {
       case e @ Gosub() =>
-        gosub(e.a.interpretS(st))(e.f.andThen(_.interpretS(st)))
+        gosub(e.a.interpret(st))(e.f.andThen(_.interpret(st)))
       case Suspend(m) =>
-        Suspend(M.map(m)(_.map(s => st(S.map(s)(_.interpretS(st))))))
+        Suspend(M.map(m)(_.map(s => st(s))))
     }
 
-  /** Same as `interpretS` but different constraints */
-  def interpretT[T[_]](st: S ~> T)(implicit T: Functor[T], M: Functor[M]): FreeT[T, M, A] =
-    this match {
-      case e @ Gosub() =>
-        gosub(e.a.interpretT(st))(e.f.andThen(_.interpretT(st)))
-      case Suspend(m) =>
-        Suspend(M.map(m)(_.map(s => T.map(st(s))(_.interpretT(st)))))
-    }
+  @deprecated("Alias for `interpret`", "7.3")
+  def interpretS[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] = interpret(st)
+
+  @deprecated("Alias for `interpret`", "7.3")
+  def interpretT[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] = interpret(st)
 
   /** Evaluates a single layer of the free monad **/
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
       ft match {
-        case Suspend(f) => M0.map(f)(\/.right)
+        case Suspend(f) => M0.map(f)(as => \/.right(as.map(S.map(_)(point(_)))))
         case g1 @ Gosub() => g1.a match {
           case Suspend(m1) => M0.map(m1) {
             case -\/(a) => -\/(g1.f(a))
-            case \/-(fc) => \/-(\/-(S.map(fc)(_.flatMap(g1.f))))
+            case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
           }
           case g2 @ Gosub() => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
         }
@@ -151,13 +148,13 @@ sealed abstract class FreeTInstances6 {
 }
 
 sealed abstract class FreeTInstances5 extends FreeTInstances6 {
-  implicit def freeTMonadReader[S[_]: Functor, M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
+  implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
     new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def ask =
         FreeT.liftM(M1.ask)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
-        fa.hoistM(new (M ~> M){
+        fa.hoist(new (M ~> M){
           def apply[A](a: M[A]) = M1.local(f)(a)
         })
     }
@@ -188,16 +185,16 @@ sealed abstract class FreeTInstances3 extends FreeTInstances4 {
 }
 
 sealed abstract class FreeTInstances2 extends FreeTInstances3 {
-  implicit def freeTBind[S[_], M[_]](implicit S0: Functor[S], M0: Applicative[M]): Bind[FreeT[S, M, ?]] =
+  implicit def freeTBind[S[_], M[_]](implicit M0: Applicative[M]): Bind[FreeT[S, M, ?]] =
     new FreeTBind[S, M] {
       implicit def M: Applicative[M] = M0
     }
 
-  implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, ?[_], ?]] =
+  implicit def freeTHoist[S[_]]: Hoist[FreeT[S, ?[_], ?]] =
     new Hoist[FreeT[S, ?[_], ?]] {
       def hoist[M[_]: Monad, N[_]](f: M ~> N) =
         new (FreeT[S, M, ?] ~> FreeT[S, N, ?]) {
-          def apply[A](fa: FreeT[S, M, A]) = fa.hoistM(f)
+          def apply[A](fa: FreeT[S, M, A]) = fa.hoist(f)
         }
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
@@ -304,7 +301,7 @@ private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with Fr
     G.map(
       M2.traverseImpl(fa.resume){
         case \/-(a) =>
-          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(S, M))
+          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
         case -\/(a) =>
           G.map(f(a))(FreeT.point[S, M, B])
       }
