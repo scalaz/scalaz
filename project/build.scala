@@ -21,8 +21,8 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifact
-import com.typesafe.tools.mima.plugin.MimaKeys.binaryIssueFilters
+import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.mimaBinaryIssueFilters
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
@@ -182,7 +182,7 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    binaryIssueFilters ++= {
+    mimaBinaryIssueFilters ++= {
       import com.typesafe.tools.mima.core._
       import com.typesafe.tools.mima.core.ProblemFilters._
       Seq(
@@ -215,12 +215,12 @@ object build extends Build {
       ).map(exclude[MissingClassProblem])
     }
   ) ++ Seq[Sett](
-    previousArtifact <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
+    mimaPreviousArtifacts <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
       basOpt match {
         case Some(bas) =>
-          Some(o % (n + "_" + sbv) % bas)
+          Set(o % (n + "_" + sbv) % bas)
         case _ =>
-          None
+          Set()
       }
     }
   )
@@ -229,7 +229,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      previousArtifact := None,
+      mimaPreviousArtifacts := Set(),
       // <https://github.com/scalaz/scalaz/issues/261>
       unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
@@ -346,7 +346,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
-      previousArtifact := None,
+      mimaPreviousArtifacts := Set(),
       publishArtifact := false,
       sources in Compile := {
         val fs = (sources in Compile).value
@@ -375,7 +375,7 @@ object build extends Build {
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      previousArtifact := None,
+      mimaPreviousArtifacts := Set(),
       sources in Test := {
         val fs = (sources in Test).value
         CrossVersion.partialVersion(scalaVersion.value) match {
