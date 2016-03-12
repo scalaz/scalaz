@@ -91,6 +91,49 @@ object ISetTest extends SpecLite {
     }
   }
 
+  "splitRoot" ! forAll { a: ISet[Int] =>
+    a match {
+      case Tip() =>
+        a.splitRoot must_=== List.empty[ISet[Int]]
+      case s@Bin(_, _, _) =>
+        val List(l, x, r) = s.splitRoot
+        structurallySound(l)
+        structurallySound(r)
+        l must_=== s.l
+        r must_=== s.r
+        x must_=== singleton(s.a)
+        l.union(r).union(x) must_=== s
+    }
+  }
+
+  "lookupIndex" ! forAll { a: ISet[Int] =>
+    val l = a.toList
+    (0 until a.size) foreach { i =>
+      a.lookupIndex(l(i)) must_=== Some(i)
+    }
+    (0 until 5) foreach { _ =>
+      val r = Random.nextInt()
+      if(a.member(r))
+        a.lookupIndex(r) must_=== Some(l.indexOf(r))
+      else
+        a.lookupIndex(r) must_=== None
+    }
+  }
+
+  "deleteAt" ! forAll { a: ISet[Int] =>
+    val l = a.toList
+    (0 until a.size) foreach { i =>
+      val e = l(i)
+      val b = a.deleteAt(i)
+      structurallySound(b)
+      b.notMember(e) must_=== true
+      b.size must_=== (a.size - 1)
+      b.insert(e) must_=== a
+    }
+    a.deleteAt(-1) must_=== a
+    a.deleteAt(a.size) must_=== a
+  }
+
   "lookupLT" ! forAll { (a: ISet[Int], i: Int) =>
     a.lookupLT(i) match {
       case Some(b) =>
