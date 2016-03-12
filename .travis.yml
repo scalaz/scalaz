@@ -27,7 +27,7 @@ jdk:
   - openjdk6
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mima-report-binary-issues
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mimaReportBinaryIssues
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm

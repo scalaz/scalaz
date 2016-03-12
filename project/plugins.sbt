@@ -10,7 +10,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.3.2")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.3")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.8")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.9")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}

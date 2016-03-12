@@ -21,7 +21,7 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.Plugin._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
@@ -191,7 +191,7 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    previousArtifacts := scalazMimaBasis.?.value.map { bas =>
+    mimaPreviousArtifacts := scalazMimaBasis.?.value.map { bas =>
       organization.value % (name.value + "_" + scalaBinaryVersion.value) % bas
     }.toSet
   )
@@ -200,7 +200,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       // <https://github.com/scalaz/scalaz/issues/261>
       unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
@@ -307,7 +307,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       publishArtifact := false
     )
   )
@@ -330,7 +330,7 @@ object build extends Build {
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value % "test"
     )
   )
