@@ -5,8 +5,8 @@ import Ordering._
 import std.option._
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.0.0/docs/Data-Set.html]]
- * @see [[https://github.com/haskell/containers/blob/v0.5.0.0/Data/Set/Base.hs]]
+ * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
+ * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Set/Base.hs]]
  */
 sealed abstract class ISet[A] {
   import ISet._
@@ -326,6 +326,55 @@ sealed abstract class ISet[A] {
             (join(y, l, lt), found, gt)
           case EQ =>
             (l, true, r)
+        }
+    }
+
+  final def splitRoot: List[ISet[A]] =
+    this match {
+      case Tip()        => List.empty[ISet[A]]
+      case Bin(x, l, r) => List(l, singleton(x), r)
+    }
+
+  // -- * Index
+  /** Alias for Foldable[ISet].index */
+  final def elemAt(i: Int): Option[A] =
+    Foldable[ISet].index(this, i)
+
+  final def lookupIndex(x: A)(implicit o: Order[A]): Option[Int] = {
+    @tailrec
+    def loop(s: ISet[A], i: Int): Option[Int] =
+      s match {
+        case Tip() =>
+          none
+        case Bin(y, l, r) =>
+          val sizeL = l.size
+          o.order(y, x) match {
+            case LT =>
+              loop(r, i + sizeL + 1)
+            case GT =>
+              loop(l, i)
+            case EQ =>
+              some(i + sizeL)
+          }
+      }
+
+    loop(this, 0)
+  }
+
+  final def deleteAt(i: Int): ISet[A] =
+    this match {
+      case Tip() =>
+        Tip()
+      case Bin(x, l, r) =>
+        import std.anyVal._
+        val sizeL = l.size
+        Order[Int].order(i, sizeL) match {
+          case LT =>
+            balanceR(x, l.deleteAt(i), r)
+          case GT =>
+            balanceL(x, l, r.deleteAt(i - sizeL - 1))
+          case EQ =>
+            glue(l, r)
         }
     }
 
