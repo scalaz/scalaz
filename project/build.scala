@@ -21,7 +21,7 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
@@ -229,7 +229,7 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    previousArtifacts := {
+    mimaPreviousArtifacts := {
       if(isJSProject.value) {
         if(scalazMimaBasis.?.value == Some("7.2.0")) {
           Set.empty
@@ -258,7 +258,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile)),
       unidocProjectFilter in (ScalaUnidoc, unidoc) := {
@@ -274,7 +274,7 @@ object build extends Build {
   ).settings(
     standardSettings,
     notPublish,
-    previousArtifacts := Set.empty
+    mimaPreviousArtifacts := Set.empty
   ).aggregate(jsProjects: _*)
 
   lazy val rootJVM = Project(
@@ -283,7 +283,7 @@ object build extends Build {
   ).settings(
     standardSettings,
     notPublish,
-    previousArtifacts := Set.empty
+    mimaPreviousArtifacts := Set.empty
   ).aggregate(jvmProjects: _*)
 
   lazy val core = crossProject.crossType(ScalazCrossType)
@@ -351,7 +351,7 @@ object build extends Build {
     dependencies = Seq(coreJVM, iterateeJVM, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       publishArtifact := false
     )
   )
@@ -374,7 +374,7 @@ object build extends Build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-tests",
-      previousArtifacts := Set.empty,
+      mimaPreviousArtifacts := Set.empty,
       publishArtifact := false,
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
