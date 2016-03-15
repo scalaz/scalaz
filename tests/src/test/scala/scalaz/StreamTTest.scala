@@ -78,6 +78,20 @@ object StreamTTest extends SpecLite {
       StreamT.fromStream(Option(s)).foldMap(_.toString) must_=== Foldable[Stream].foldMap(s)(_.toString)
   }
 
+  "trampolined StreamT" should {
+    import Free.Trampoline
+
+    val n = 100000L
+    val s = StreamT.unfoldM[Trampoline, Long, Long](n)(i =>
+      Trampoline.done(if(i > 0) Some((i, i-1)) else None))
+
+    val expected = n*(n+1)/2
+
+    "not stack overflow on foldRight" in {
+      s.foldRight(0L)((x, y) => x + y).run must_=== expected
+    }
+  }
+
   checkAll(equal.laws[StreamTOpt[Int]])
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
