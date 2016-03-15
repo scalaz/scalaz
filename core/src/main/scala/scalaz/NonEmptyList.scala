@@ -63,6 +63,9 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   /** @since 7.0.2 */
   def init: IList[A] = tail.initOption.fold[IList[A]](INil())(il => head :: il)
 
+  def inits: NonEmptyList[NonEmptyList[A]] =
+    reverse.tails.map(_.reverse)
+
   /** @since 7.0.2 */
   def last: A = tail.lastOption.getOrElse(head)
 
