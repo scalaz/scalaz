@@ -141,6 +141,17 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       _.foldLeft(z)((a, b) => f(b, a))
     }
 
+  /**
+   * `foldRight` with potential to terminate early, e.g. on an infinite stream.
+   */
+  def foldRightM[B](z: => M[B])(f: (=> A, => M[B]) => M[B])(implicit M: Monad[M]): M[B] =
+    M.bind(step) {
+      _( yieldd = (a, s) => f(a, s.foldRightM(z)(f))
+       , skip = s => s.foldRightM(z)(f)
+       , done = z
+       )
+    }
+
   def foldMap[B](f: A => B)(implicit M: Foldable[M], B: Monoid[B]): B =
     M.foldMap(step) {
       _( yieldd = (a, s) => B.append(f(a), s.foldMap(f))

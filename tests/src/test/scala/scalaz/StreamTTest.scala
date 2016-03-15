@@ -79,6 +79,19 @@ object StreamTTest extends SpecLite {
       StreamT.fromStream(s.some).foldMap(_.toString) must_==(s.foldMap(_.toString))
   }
 
+  "foldRightM" should {
+    "be able to terminate early" in {
+      val s = StreamT.fromIterable((1 to 100))
+      var highestRead: Int = 0
+      val res = s.foldRightM(false)((a, acc) => {
+        highestRead = math.max(a, highestRead)
+        a >= 5 || acc
+      })
+      res must_=== true
+      highestRead must_=== 5
+    }
+  }
+
   "trampolined StreamT" should {
     import Free.Trampoline
 
@@ -90,6 +103,20 @@ object StreamTTest extends SpecLite {
 
     "not stack overflow on foldRight" in {
       s.foldRight(0L)((x, y) => x + y).run must_=== expected
+    }
+
+    "not stack overflow on foldRightM" in {
+      s.foldRightM(Trampoline.done(0L))((x, y) => y.map(x + _)).run must_=== expected
+    }
+
+    "not stack overflow and terminate early on foldRightM" in {
+      var lowestRead = n + 1
+      val res = s.foldRightM(Trampoline.done(false))((a, acc) => {
+        lowestRead = math.min(a, lowestRead)
+        if(a <= n/2) Trampoline.done(true) else acc
+      })
+      res.run must_=== true
+      lowestRead must_=== n/2
     }
   }
 
