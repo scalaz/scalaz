@@ -24,14 +24,17 @@ final class IdOps[A](val self: A) extends AnyVal {
    * which allows you to "tap into" a method call chain, in order to perform operations on intermediate
    * results within the chain.  `unsafe` because it enables side effects.
    */
+  @deprecated("will be removed in 7.4", "7.3")
   final def unsafeTap(f: A => Any): A = {
     f(self); self
   }
 
   /** Alias for `unsafeTap`. */
+  @deprecated("will be removed in 7.4", "7.3")
   final def <|(f: A => Any): A = unsafeTap(f)
 
   /** Alias for `unsafeTap`. */
+  @deprecated("will be removed in 7.4", "7.3")
   final def ◃(f: A => Any): A = unsafeTap(f)
 
   final def squared: (A, A) =
