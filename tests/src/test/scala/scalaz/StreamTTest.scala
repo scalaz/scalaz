@@ -88,6 +88,10 @@ object StreamTTest extends SpecLite {
 
     val expected = n*(n+1)/2
 
+    "not stack overflow on foldLeft" in {
+      s.foldLeft(0L)((x, y) => x + y).run must_=== expected
+    }
+
     "not stack overflow on foldRight" in {
       s.foldRight(0L)((x, y) => x + y).run must_=== expected
     }
