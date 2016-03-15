@@ -13,6 +13,30 @@ object StreamTTest extends SpecLite {
       StreamT.fromStream(ass).toStream must_===(ass)
   }
 
+  "fromStream / asStream" ! forAll {
+    import Id._
+    (as: Stream[Int]) =>
+      StreamT.fromStream[Id, Int](as).asStream must_===(as)
+  }
+
+  "asStream" should {
+    "be lazy" in {
+      var highestTouched = 0
+
+      val s1 = StreamT.unfold(1)(i => {
+        highestTouched = math.max(i, highestTouched)
+        if(i < 100) Some((i, i+1)) else None
+      })
+
+      val s2 = s1.asStream
+
+      // test that at most 2 elements were evaluated in the conversion
+      // (the fact that 2 are actually evaluated is a consequence of
+      // how Stream.cons and StreamT.unfold are implemented)
+      highestTouched mustBe_< 3
+    }
+  }
+
   "filter all" ! forAll {
     (ass: StreamT[Stream, Int]) =>
       ass.filter(_ => true) must_===(ass)
