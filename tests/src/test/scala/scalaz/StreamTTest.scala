@@ -124,6 +124,67 @@ object StreamTTest extends SpecLite {
   checkAll(monoid.laws[StreamTOpt[Int]])
   checkAll(monadPlus.laws[StreamTOpt])
   checkAll(foldable.laws[StreamTOpt])
+
+  "StreamT[Id, _] with 100,000 initial skips" should {
+    import Id.Id
+
+    val s = {
+      def nastyStream(n: Int, value: String): StreamT[Id, String] =
+        if(n > 0) StreamT[Id, String](StreamT.Skip(nastyStream(n-1, value)))
+        else value :: StreamT.empty[Id, String]
+
+      nastyStream(100000, "foo")
+    }
+
+    "not stack-overflow on unconsRec" in {
+      s.unconsRec.get._1 must_=== "foo"
+    }
+
+    "not stack-overflow on isEmptyRec" in {
+      s.isEmptyRec must_=== false
+    }
+
+    "not stack-overflow on headRec" in {
+      s.headRec must_=== "foo"
+    }
+
+    "not stack-overflow on headOptionRec" in {
+      s.headOptionRec must_=== Some("foo")
+    }
+
+    "not stack-overflow on tailMRec" in {
+      s.tailMRec.step match {
+        case StreamT.Done() =>
+        case other => sys.error("unexpected " + other)
+      }
+    }
+
+    "not stack-overflow on foreachRec" in {
+      var acc = ""
+      s.foreachRec(a => acc += a)
+      acc must_=== "foo"
+    }
+
+    "not stack-overflow on foldRightRec" in {
+      s.foldRightRec("")((a, b) => a + b) must_=== "foo"
+    }
+
+    "not stack-overflow on foldLeftRec" in {
+      s.foldLeftRec("")((b, a) => b + a) must_=== "foo"
+    }
+
+    "not stack-overflow on lengthRec" in {
+      s.lengthRec must_=== 1
+    }
+
+    "not stack-overflow on toStreamRec" in {
+      s.toStreamRec.toList must_=== List("foo")
+    }
+
+    "not stack-overflow on asStream" in {
+      s.asStream.toList must_=== List("foo")
+    }
+  }
   
   object instances {
     def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
