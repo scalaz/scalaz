@@ -105,7 +105,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      )
   }
 
-  def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Monad[M]): M[B] =
+  def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
     M.bind(step) {
       _( yieldd = (a, s) => s.foldLeft(f(z, a))(f)
        , skip = s => s.foldLeft(z)(f)
@@ -128,10 +128,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        )
     }
 
-  def length(implicit m: Monad[M]): M[Int] = {
-    def addOne(c: => Int, a: => A) = 1 + c
-    foldLeft(0)(addOne _)
-  }
+  def length(implicit m: Monad[M]): M[Int] =
+    foldLeft(0)((c, a) => 1 + c)
 
   def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step) {
     case Yield(a,s) => M.bind(f(a))(_ => s().foreach(f))
