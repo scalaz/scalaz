@@ -163,7 +163,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
    * this stream, up to two elements might be evaluated.
    */
   def asStream(implicit ev: M[Step[A, StreamT[M, A]]] =:= Id[Step[A, StreamT[Id, A]]]): Stream[A] = {
-    def go(s: StreamT[Id, A]): Stream[A] = s.uncons match {
+    def go(s: StreamT[Id, A]): Stream[A] = s.unconsRec match {
       case None => Stream.empty[A]
       case Some((a, s1)) => Stream.cons(a, go(s1))
     }

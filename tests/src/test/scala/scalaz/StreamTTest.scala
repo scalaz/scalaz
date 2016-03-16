@@ -178,6 +178,10 @@ object StreamTTest extends SpecLite {
     "stack-overflow on toStream" in {
       (s.toStream).mustThrowA[StackOverflowError]
     }
+
+    "not stack-overflow on asStream" in {
+      s.asStream.toList must_=== List("foo")
+    }
   }
   
   object instances {
