@@ -424,8 +424,8 @@ sealed abstract class ==>>[A, B] {
       case (l, Tip()) =>
         l
       case (l @ Bin(kx, x, lx, rx), r @ Bin(ky, y, ly, ry)) =>
-        if (delta * l.size <= r.size) balance(ky, y, l.merge(ly), ry)
-        else if (delta * r.size <= l.size) balance(kx, x, lx, rx.merge(r))
+        if (delta * l.size < r.size) balance(ky, y, l.merge(ly), ry)
+        else if (delta * r.size < l.size) balance(kx, x, lx, rx.merge(r))
         else glue(l, r)
     }
 
@@ -908,8 +908,8 @@ sealed abstract class ==>>[A, B] {
       case (l, Tip()) =>
         l.insertMax(kx, x)
       case (l @ Bin(ky, y, ly, ry), r @ Bin(kz, z, lz, rz)) =>
-        if (delta * l.size <= r.size) balance(kz, z, l.join(kx, x, lz), rz)
-        else if (delta * r.size <= l.size) balance(ky, y, ly, ry.join(kx, x, r))
+        if (delta * l.size < r.size) balance(kz, z, l.join(kx, x, lz), rz)
+        else if (delta * r.size < l.size) balance(ky, y, ly, ry.join(kx, x, r))
         else Bin(kx, x, l, r)
     }
 
@@ -1172,9 +1172,9 @@ object ==>> extends MapInstances {
   private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
     if (l.size + r.size <= 1)
       Bin(k, x, l, r)
-    else if (r.size >= delta * l.size)
+    else if (r.size > delta * l.size)
       rotateL(k, x, l, r)
-    else if (l.size >= delta * r.size)
+    else if (l.size > delta * r.size)
       rotateR(k, x, l, r)
     else
       Bin(k, x, l, r)
