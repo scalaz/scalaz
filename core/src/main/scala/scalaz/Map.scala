@@ -1167,7 +1167,7 @@ object ==>> extends MapInstances {
     xs.foldLeft(empty[A, B])((a, c) => a.unionWith(c)(f))
 
   private[scalaz] final val ratio = 2
-  private[scalaz] final val delta = 4
+  private[scalaz] final val delta = 3
 
   private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
     if (l.size + r.size <= 1)
