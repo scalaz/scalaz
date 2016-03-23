@@ -17,8 +17,33 @@ object MapTest extends SpecLite {
   import ==>>._
 
   def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
+    isSortedByKey(m)
+    isBalanced(m)
+  }
+
+  private def isSortedByKey[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
     val al = m.toAscList
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
+
+  private def isBalanced[A, B](m: A ==>> B) = {
+    def isWeightsValid(l: A ==>> B, r: A ==>> B): Boolean = {
+      val sizeL = if (l.size == 0) 1 else l.size
+      val sizeR = if (r.size == 0) 1 else r.size
+
+      (sizeL <= sizeR * delta) && (sizeR <= sizeL * delta)
+    }
+
+    def go(mab: A ==>> B): Boolean =
+      mab match {
+        case Tip() =>
+          true
+        case Bin(_, _, l, r) =>
+          if (isWeightsValid(l, r)) go(l) && go(r)
+          else false
+      }
+
+    go(m) must_=== true
   }
 
   "findLeft/findRight" in {
