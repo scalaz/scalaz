@@ -76,7 +76,7 @@ sealed abstract class ==>>[A, B] {
     }
 
   /** alias for [[delete]] */
-  def -(k: A)(implicit o: Order[A]) =
+  def -(k: A)(implicit o: Order[A]): A ==>> B =
     delete(k)
 
   /** removes a key/value pair - O(log n) */
@@ -225,7 +225,7 @@ sealed abstract class ==>>[A, B] {
     case Bin(k,v,l,r) => ISet.Bin(k,l.keySet,r.keySet)
   }
 
-  def toList =
+  def toList: List[(A, B)] =
     toAscList
 
   def toAscList: List[(A, B)] =
@@ -234,10 +234,10 @@ sealed abstract class ==>>[A, B] {
   def toDescList: List[(A, B)] =
     foldlWithKey(List.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
 
-  def member(k: A)(implicit n: Order[A]) =
+  def member(k: A)(implicit n: Order[A]): Boolean =
     lookup(k)(n).isDefined
 
-  def notMember(k: A)(implicit n: Order[A]) =
+  def notMember(k: A)(implicit n: Order[A]): Boolean =
     !member(k)
 
   def lookupIndex(k: A)(implicit o: Order[A]): Option[Int] = {
@@ -295,7 +295,7 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def deleteAt(i: Int) =
+  def deleteAt(i: Int): A ==>> B =
     updateAt(i, (A, B) => None)
 
   @tailrec
@@ -358,7 +358,7 @@ sealed abstract class ==>>[A, B] {
         empty
     }
 
-  def updateMax(f: B => Option[B]) =
+  def updateMax(f: B => Option[B]): A ==>> B =
     updateMaxWithKey((_: A, b) => f(b))
 
   def updateMaxWithKey(f: (A, B) => Option[B]): A ==>> B =
@@ -380,7 +380,7 @@ sealed abstract class ==>>[A, B] {
     * insert v into the map at k. If there is already a value for k,
     * append to the existing value using the Semigroup
     */
-  def updateAppend(k: A, v: B)(implicit o: Order[A], bsg: Semigroup[B]) =
+  def updateAppend(k: A, v: B)(implicit o: Order[A], bsg: Semigroup[B]): A ==>> B =
     alter(k, old ⇒ Some(old.map(bsg.append(_, v)).getOrElse(v)))
 
   def minViewWithKey: Option[((A, B), A ==>> B)] =
@@ -527,10 +527,10 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
-  def unionWith(other: A ==>> B)(f: (B, B) => B)(implicit o: Order[A]) =
+  def unionWith(other: A ==>> B)(f: (B, B) => B)(implicit o: Order[A]): A ==>> B =
     unionWithKey(other)((_: A, b: B, c: B) => f(b, c))
 
-  def unionWithKey(other: A ==>> B)(f: (A, B, B) => B)(implicit o: Order[A]) = {
+  def unionWithKey(other: A ==>> B)(f: (A, B, B) => B)(implicit o: Order[A]): A ==>> B = {
     def hedgeUnionWithKey(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> B): A ==>> B =
       (a, b) match {
         case (t1, Tip()) =>
@@ -1009,7 +1009,7 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   implicit def mapCovariant[S]: Traverse[S ==>> ?] =
     new Traverse[S ==>> ?] {
-      override def findLeft[A](fa: S ==>> A)(f: A => Boolean) =
+      override def findLeft[A](fa: S ==>> A)(f: A => Boolean): Option[A] =
         fa match {
           case Bin(_, x, l, r) =>
             findLeft(l)(f) match {
@@ -1025,7 +1025,7 @@ sealed abstract class MapInstances extends MapInstances0 {
             None
         }
 
-      override def findRight[A](fa: S ==>> A)(f: A => Boolean) =
+      override def findRight[A](fa: S ==>> A)(f: A => Boolean): Option[A] =
         fa match {
           case Bin(_, x, l, r) =>
             findRight(r)(f) match {
@@ -1041,7 +1041,7 @@ sealed abstract class MapInstances extends MapInstances0 {
             None
         }
 
-      override def map[A, B](fa: S ==>> A)(f: A => B) =
+      override def map[A, B](fa: S ==>> A)(f: A => B): S ==>> B =
         fa map f
 
       override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]): B =
@@ -1052,13 +1052,13 @@ sealed abstract class MapInstances extends MapInstances0 {
             F.append(foldMap(l)(f), F.append(f(x), foldMap(r)(f)))
         }
 
-      override def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B) =
+      override def foldRight[A, B](fa: S ==>> A, z: => B)(f: (A, => B) => B): B =
         fa.foldrWithKey(z)((_, b, acc) => f(b, acc))
 
-      override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B) =
+      override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B): B =
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
 
-      override def index[A](fa: S ==>> A, i: Int) =
+      override def index[A](fa: S ==>> A, i: Int): Option[A] =
         fa.elemAt(i).map(_._2)
 
       def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
@@ -1071,17 +1071,17 @@ sealed abstract class MapInstances extends MapInstances0 {
             }
         }
 
-      override def length[A](fa: S ==>> A) =
+      override def length[A](fa: S ==>> A): Int =
         fa.size
 
-      override def any[A](fa: S ==>> A)(f: A => Boolean) =
+      override def any[A](fa: S ==>> A)(f: A => Boolean): Boolean =
         fa match {
           case Tip() => false
           case Bin(_, x, l, r) =>
             any(l)(f) || f(x) || any(r)(f)
         }
 
-      override def all[A](fa: S ==>> A)(f: A => Boolean) =
+      override def all[A](fa: S ==>> A)(f: A => Boolean): Boolean =
         fa match {
           case Tip() => true
           case Bin(_, x, l, r) =>
@@ -1114,7 +1114,7 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
 
   implicit def A: Equal[A]
   implicit def B: Equal[B]
-  final override def equal(a1: A ==>> B, a2: A ==>> B) =
+  final override def equal(a1: A ==>> B, a2: A ==>> B): Boolean =
     Equal[Int].equal(a1.size, a2.size) && Equal[List[(A, B)]].equal(a1.toAscList, a2.toAscList)
 }
 
