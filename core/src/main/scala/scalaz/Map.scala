@@ -1169,62 +1169,55 @@ object ==>> extends MapInstances {
   private[scalaz] final val ratio = 2
   private[scalaz] final val delta = 3
 
-  private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B = {
-    if (l.size + r.size <= 1)
-      Bin(k, x, l, r)
-    else if (r.size > delta * l.size)
-      rotateL(k, x, l, r)
-    else if (l.size > delta * r.size)
-      rotateR(k, x, l, r)
-    else
-      Bin(k, x, l, r)
-  }
-
-  // Left rotations
-  private def rotateL[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
-    r match {
-      case r @ Bin(_, _, ly, ry) =>
-        if (ly.size < ratio * ry.size) singleL(k, x, l, r)
-        else doubleL(k, x, l, r)
+  private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
+    l match {
       case Tip() =>
-        sys.error("rotateL Tip")
-    }
-
-  private def singleL[A, B](k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
-    r match {
-      case Bin(k2, x2, t2, t3) =>
-        Bin(k2, x2, Bin(k1, x1, t1, t2), t3)
-    }
-
-  private def doubleL[A, B](k1: A, x1: B, t1: A ==>> B, r: Bin[A, B]): A ==>> B =
-    r match {
-      case Bin(k2, x2, Bin(k3, x3, t2, t3), t4) =>
-        Bin(k3, x3, Bin(k1, x1, t1, t2), Bin(k2, x2, t3, t4))
-      case _ =>
-        sys.error("doubleL")
-    }
-
-  // Right rotations
-  private def rotateR[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
-    l match {
-      case l @ Bin(_, _, ly, ry) =>
-        if (ry.size < ratio * ly.size) singleR(k, x, l, r)
-        else doubleR(k, x, l, r)
-      case Tip() =>
-        sys.error("rotateR Tip")
-    }
-
-  private def singleR[A, B](k1: A, x1: B, l: Bin[A, B], t3: A ==>> B): A ==>> B =
-    l match {
-      case Bin(k2, x2, t1, t2) =>
-        Bin(k2, x2, t1, Bin(k1, x1, t2, t3))
-    }
-
-  private def doubleR[A, B](k1: A, x1: B, l: Bin[A, B], t4: A ==>> B): A ==>> B =
-    l match {
-      case Bin(k2, x2, t1, Bin(k3, x3, t2, t3)) =>
-        Bin(k3, x3, Bin(k2, x2, t1, t2), Bin(k1, x1, t3, t4))
-      case _ =>
-        sys.error("doubleR")
+        r match {
+          case Tip() =>
+            singleton(k, x)
+          case Bin(_, _, Tip(), Tip()) =>
+            Bin(k, x, Tip(), r)
+          case Bin(rk, rx, Tip(), rr@Bin(_, _, _, _)) =>
+            Bin(rk, rx, singleton(k, x), rr)
+          case Bin(rk, rx, Bin(rlk, rlx, _, _), Tip()) =>
+            Bin(rlk, rlx, singleton(k, x), singleton(rk, rx))
+          case Bin(rk, rx, rl@Bin(rlk, rlx, rll, rlr), rr@Bin(_, _, _, _)) =>
+            if (rl.size < ratio*rr.size) Bin(rk, rx, Bin(k, x, Tip(), rl), rr)
+            else Bin(rlk, rlx, Bin(k, x, Tip(), rll), Bin(rk, rx, rlr, rr))
+        }
+      case Bin(lk, lx, ll, lr) =>
+        r match {
+          case Tip() => (ll, lr) match {
+            case (Tip(), Tip()) =>
+              Bin(k, x, l, Tip())
+            case (Tip(), Bin(lrk, lrx, _, _)) =>
+              Bin(lrk, lrx, singleton(lk, lx), singleton(k, x))
+            case (Bin(_, _, _, _), Tip()) =>
+              Bin(lk, lx, ll, singleton(k, x))
+            case (Bin(_, _, _, _), Bin(lrk, lrx, lrl, lrr)) =>
+              if (lr.size < ratio*ll.size) Bin(lk, lx, ll, Bin(k, x, lr, Tip()))
+              else Bin(lrk, lrx, Bin(lk, lx, ll, lrl), Bin(k, x, lrr, Tip()))
+          }
+          case Bin(rk, rx, rl, rr) =>
+            if (r.size > delta*l.size) {
+              (rl, rr) match {
+                case (Bin(rlk, rlx, rll, rlr), Bin(_, _, _, _)) =>
+                  if (rl.size < ratio*rr.size) Bin(rk, rx, Bin(k, x, l, rl), rr)
+                  else Bin(rlk, rlx, Bin(k, x, l, rll), Bin(rk, rx, rlr, rr))
+                case _ =>
+                  sys.error("Failure in Map.balance")
+              }
+            }
+            else if (l.size > delta*r.size) {
+              (ll, lr) match {
+                case (Bin(_, _, _, _), Bin(lrk, lrx, lrl, lrr)) =>
+                  if (lr.size < ratio*ll.size) Bin(lk, lx, ll, Bin(k, x, lr, r))
+                  else Bin(lrk, lrx, Bin(lk, lx, ll, lrl), Bin(k, x, lrr, r))
+                case _ =>
+                  sys.error("Failure in Map.balance")
+              }
+            }
+            else Bin(k, x, l, r)
+        }
     }
 }
