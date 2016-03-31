@@ -37,9 +37,9 @@ sealed abstract class ==>>[A, B] {
       case Bin(ky, y, l, r) =>
         n.order(kx, ky) match {
           case LT =>
-            balance(ky, y, l.insert(kx, x), r)
+            balanceL(ky, y, l.insert(kx, x), r)
           case GT =>
-            balance(ky, y, l, r.insert(kx, x))
+            balanceR(ky, y, l, r.insert(kx, x))
           case EQ =>
             Bin(kx, x, l, r)
         }
@@ -67,9 +67,9 @@ sealed abstract class ==>>[A, B] {
       case Bin(ky, y, l, r) =>
         o.order(kx, ky) match {
           case LT =>
-            balance(ky, y, l.insertWithKey(f, kx, x), r)
+            balanceL(ky, y, l.insertWithKey(f, kx, x), r)
           case GT =>
-            balance(ky, y, l, r.insertWithKey(f, kx, x))
+            balanceR(ky, y, l, r.insertWithKey(f, kx, x))
           case EQ =>
             Bin(kx, f(kx, x, y), l, r)
         }
@@ -87,11 +87,11 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         n.order(k, kx) match {
           case LT =>
-            balance(kx, x, l.delete(k), r)
+            balanceR(kx, x, l.delete(k), r)
           case EQ =>
             glue(l, r)
           case GT =>
-            balance(kx, x, l, r.delete(k))
+            balanceL(kx, x, l, r.delete(k))
         }
     }
 
@@ -117,9 +117,9 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
-            balance(kx, x, l.updateWithKey(k, f), r)
+            balanceR(kx, x, l.updateWithKey(k, f), r)
           case GT =>
-            balance(kx, x, l, r.updateWithKey(k, f))
+            balanceL(kx, x, l, r.updateWithKey(k, f))
           case EQ =>
             f(kx, x) match {
               case Some(v) =>
@@ -142,10 +142,10 @@ sealed abstract class ==>>[A, B] {
         o.order(k, kx) match {
           case LT =>
             val (found, ll) = l.updateLookupWithKey(k, f)
-            (found, balance(kx, x, ll, r))
+            (found, balanceR(kx, x, ll, r))
           case GT =>
             val (found, rr) = r.updateLookupWithKey(k, f)
-            (found, balance(kx, x, l, rr))
+            (found, balanceL(kx, x, l, rr))
           case EQ =>
             f(kx, x) match {
               case Some(xx) =>
@@ -284,9 +284,9 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         implicitly[Order[Int]].order(i, l.size) match {
           case LT =>
-            balance(kx, x, l.updateAt(i, f), r)
+            balanceR(kx, x, l.updateAt(i, f), r)
           case GT =>
-            balance(kx, x, l, r.updateAt(i - l.size - 1, f))
+            balanceL(kx, x, l, r.updateAt(i - l.size - 1, f))
           case EQ =>
             f(kx, x) match {
               case Some(y) => Bin(kx, y, l, r)
@@ -325,7 +325,7 @@ sealed abstract class ==>>[A, B] {
       case Bin(_, _, Tip(), r) =>
         r
       case Bin(kx, x, l, r) =>
-        balance(kx, x, l.deleteMin, r)
+        balanceR(kx, x, l.deleteMin, r)
       case Tip() =>
         empty
     }
@@ -335,7 +335,7 @@ sealed abstract class ==>>[A, B] {
       case Bin(_, _, l, Tip()) =>
         l
       case Bin(kx, x, l, r) =>
-        balance(kx, x, l, r.deleteMax)
+        balanceL(kx, x, l, r.deleteMax)
       case Tip() =>
         empty
     }
@@ -353,7 +353,7 @@ sealed abstract class ==>>[A, B] {
             Bin(kx, s, Tip(), r)
         }
       case Bin(kx, x, l, r) =>
-        balance(kx, x, l.updateMinWithKey(f), r)
+        balanceR(kx, x, l.updateMinWithKey(f), r)
       case Tip() =>
         empty
     }
@@ -371,7 +371,7 @@ sealed abstract class ==>>[A, B] {
             Bin(kx, s, l, Tip())
         }
       case Bin(kx, x, l, r) =>
-        balance(kx, x, l, r.updateMaxWithKey(f))
+        balanceL(kx, x, l, r.updateMaxWithKey(f))
       case Tip() =>
         empty
     }
@@ -424,8 +424,8 @@ sealed abstract class ==>>[A, B] {
       case (l, Tip()) =>
         l
       case (l @ Bin(kx, x, lx, rx), r @ Bin(ky, y, ly, ry)) =>
-        if (delta * l.size < r.size) balance(ky, y, l.merge(ly), ry)
-        else if (delta * r.size < l.size) balance(kx, x, lx, rx.merge(r))
+        if (delta * l.size < r.size) balanceL(ky, y, l.merge(ly), ry)
+        else if (delta * r.size < l.size) balanceR(kx, x, lx, rx.merge(r))
         else glue(l, r)
     }
 
@@ -435,11 +435,11 @@ sealed abstract class ==>>[A, B] {
       case (l, Tip()) => l
       case (l @ Bin(_, _, _, _), r @ Bin(_, _, _, _)) => if (l.size > r.size) {
         val ((km, m), l2) = deleteFindMax(l)
-        balance(km, m, l2, r)
+        balanceR(km, m, l2, r)
       }
       else {
         val ((km, m), r2) = deleteFindMin(r)
-        balance(km, m, l, r2)
+        balanceL(km, m, l, r2)
       }
     }
 
@@ -449,7 +449,7 @@ sealed abstract class ==>>[A, B] {
         ((k,x), l)
       case Bin(k, x, l, r @ Bin(_, _, _, _)) =>
         val (km, r2) = deleteFindMax(r)
-        (km, balance(k, x, l, r2))
+        (km, balanceL(k, x, l, r2))
     }
 
   private def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
@@ -458,7 +458,7 @@ sealed abstract class ==>>[A, B] {
         ((k, x), r)
       case Bin(k, x, l @ Bin(_, _, _, _), r) =>
         val (km, l2) = deleteFindMin(l)
-        (km, balance(k, x, l2, r))
+        (km, balanceR(k, x, l2, r))
     }
 
   /* Mappings */
@@ -908,8 +908,8 @@ sealed abstract class ==>>[A, B] {
       case (l, Tip()) =>
         l.insertMax(kx, x)
       case (l @ Bin(ky, y, ly, ry), r @ Bin(kz, z, lz, rz)) =>
-        if (delta * l.size < r.size) balance(kz, z, l.join(kx, x, lz), rz)
-        else if (delta * r.size < l.size) balance(ky, y, ly, ry.join(kx, x, r))
+        if (delta * l.size < r.size) balanceL(kz, z, l.join(kx, x, lz), rz)
+        else if (delta * r.size < l.size) balanceR(ky, y, ly, ry.join(kx, x, r))
         else Bin(kx, x, l, r)
     }
 
@@ -918,7 +918,7 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         singleton(kx, x)
       case Bin(ky, y, l, r) =>
-        balance(ky, y, l, r.insertMax(kx, x))
+        balanceR(ky, y, l, r.insertMax(kx, x))
     }
 
   private def insertMin(kx: A, x: B): A ==>> B =
@@ -926,7 +926,7 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         singleton(kx, x)
       case Bin(ky, y, l, r) =>
-        balance(ky, y, l.insertMin(kx, x), r)
+        balanceL(ky, y, l.insertMin(kx, x), r)
     }
 }
 
@@ -1169,6 +1169,8 @@ object ==>> extends MapInstances {
   private[scalaz] final val ratio = 2
   private[scalaz] final val delta = 3
 
+  // Even though we have balanceL and balanceR, we need balance function
+  // as alter function still needs it.
   private[scalaz] def balance[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
     l match {
       case Tip() =>
@@ -1218,6 +1220,75 @@ object ==>> extends MapInstances {
               }
             }
             else Bin(k, x, l, r)
+        }
+    }
+
+  // balanceL is used to balance a tree when an element might have been inserted to
+  // a left subtree, or when an element might have been deleted from a right subtree.
+  private[scalaz] def balanceL[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
+    r match {
+      case Tip() =>
+        l match {
+          case Tip() =>
+            singleton(k, x)
+          case Bin(_, _, Tip(), Tip()) =>
+            Bin(k, x, l, Tip())
+          case Bin(lk, lx, Tip(), Bin(lrk, lrx, _, _)) =>
+            Bin(lrk, lrx, singleton(lk, lx), singleton(k, x))
+          case Bin(lk, lx, ll@Bin(_, _, _, _), Tip()) =>
+            Bin(lk, lx, ll, singleton(k, x))
+          case Bin(lk, lx, ll@Bin(_, _, _, _), lr@Bin(lrk, lrx, lrl, lrr)) =>
+            if (lr.size < ratio*ll.size) Bin(lk, lx, ll, Bin(k, x, lr, Tip()))
+            else Bin(lrk, lrx, Bin(lk, lx, ll, lrl), Bin(k, x, lrr, Tip()))
+        }
+
+      case Bin(_, _, _, _) =>
+        l match {
+          case Tip() =>
+            Bin(k, x, Tip(), r)
+          case Bin(lk, lx, ll, lr) =>
+            if (l.size > delta*r.size) {
+              (ll, lr) match {
+                case (Bin(_, _, _, _), Bin(lrk, lrx, lrl, lrr)) =>
+                  if (lr.size < ratio*ll.size) Bin(lk, lx, ll, Bin(k, x, lr, r))
+                  else Bin(lrk, lrx, Bin(lk, lx, ll, lrl), Bin(k, x, lrr, r))
+                case _ => sys.error("Failure in Map.balanceL")
+              }
+            } else Bin(k, x, l, r)
+        }
+    }
+
+  // balanceR is used to balance a tree when a key-value might have been inserted to
+  // a right subtree, or when a key-value might have been deleted from a left subtree.
+  private[scalaz] def balanceR[A, B](k: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
+    l match {
+      case Tip() =>
+        r match {
+          case Tip() =>
+            singleton(k, x)
+          case Bin(_, _, Tip(), Tip()) =>
+            Bin(k, x, Tip(), r)
+          case Bin(rk, rx, Tip(), rr@Bin(_, _, _, _)) =>
+            Bin(rk, rx, singleton(k, x), rr)
+          case Bin(rk, rx, Bin(rlk, rlx, _, _), Tip()) =>
+            Bin(rlk, rlx, singleton(k, x), singleton(rk, rx))
+          case Bin(rk, rx, rl@Bin(rlk, rlx, rll, rlr), rr@Bin(_, _, _, _)) =>
+            if (rl.size < ratio*rr.size) Bin(rk, rx, Bin(k, x, Tip(), rl), rr)
+            else Bin(rlk, rlx, Bin(k, x, Tip(), rll), Bin(rk, rx, rlr, rr))
+        }
+      case Bin(_, _, _, _) =>
+        r match {
+          case Tip() =>
+            Bin(k, x, l, Tip())
+          case Bin(rk, rx, rl, rr) =>
+            if (r.size > delta*l.size) {
+              (rl, rr) match {
+                case (Bin(rlk, rlx, rll, rlr), Bin(_, _, _, _)) =>
+                  if (rl.size < ratio*rr.size) Bin(rk, rx, Bin(k, x, l, rl), rr)
+                  else Bin(rlk, rlx, Bin(k, x, l, rll), Bin(rk, rx, rlr, rr))
+                case _ => sys.error("Failure in Map.balanceR")
+              }
+            } else Bin(k, x, l, r)
         }
     }
 }
