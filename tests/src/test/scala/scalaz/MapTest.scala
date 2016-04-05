@@ -667,6 +667,60 @@ object MapTest extends SpecLite {
     }
   }
 
+  "==>> trim" should {
+    "trim sound" ! forAll { a: Int ==>> Int =>
+      def checkValidity(a: Int ==>> Int, lo: Option[Int], hi: Option[Int], result: Int ==>> Int) = {
+        val m = trim(lo, hi, a)
+        structurallySound(m)
+        m must_=== result
+      }
+
+      a match {
+        case Tip() =>
+          val lo = Random.nextInt()
+          val hi = lo + 1
+          checkValidity(a, Some(lo), Some(hi), Tip())
+          checkValidity(a, Some(lo), None    , Tip())
+          checkValidity(a, None    , Some(hi), Tip())
+          checkValidity(a, None    , None    , Tip())
+
+        case Bin(_, _, _, _) =>
+          def rec(m: Int ==>> Int): Unit = {
+            m match {
+              case Tip() =>
+                ()
+              case Bin(k, x, l, r) =>
+                checkValidity(m, Some(k), None   , r)
+                checkValidity(m, None   , Some(k), l)
+                checkValidity(m, None   , None   , m)
+
+                if (k == Int.MinValue) {
+                  checkValidity(m, Some(k), Some(k+1), Tip())
+                  checkValidity(m, None   , Some(k+1), m)
+
+                  rec(r)
+                }
+                else if (k == Int.MaxValue) {
+                  checkValidity(m, Some(k-1), Some(k), Tip())
+                  checkValidity(m, Some(k-1), None   , m)
+
+                  rec(l)
+                }
+                else {
+                  checkValidity(m, Some(k-1), Some(k+1), m)
+                  checkValidity(m, Some(k-1), None     , m)
+                  checkValidity(m, None     , Some(k+1), m)
+
+                  rec(l)
+                  rec(r)
+                }
+            }
+          }
+        rec(a)
+      }
+    }
+  }
+
   "==>> list operations" should {
     "values" in {
       fromList(List(5 -> "a", 3 -> "b")).values must_===(List("b", "a"))

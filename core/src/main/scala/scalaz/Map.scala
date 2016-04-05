@@ -823,6 +823,7 @@ sealed abstract class ==>>[A, B] {
     }
 
   // Utility functions
+  @deprecated("trim is no longer a public function", "7.3")
   @tailrec
   final def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
     this match {
@@ -1304,5 +1305,42 @@ object ==>> extends MapInstances {
         singleton(kx, x)
       case Bin(ky, y, l, r) =>
         balanceL(ky, y, insertMin(kx, x, l), r)
+    }
+
+  private[scalaz] def trim[A, B](lo: Option[A], hi: Option[A], t: A ==>> B)(implicit o: Order[A]): A ==>> B =
+    (lo, hi) match {
+      case (None, None) =>
+        t
+      case (Some(lk), None) =>
+        @tailrec
+        def greater(lo: A, m: A ==>> B): A ==>> B =
+          m match {
+            case Bin(kx, _, _, r) if o.lessThanOrEqual(kx, lo) =>
+              greater(lo, r)
+            case _ =>
+              m
+          }
+        greater(lk, t)
+      case (None, Some(hk)) =>
+        @tailrec
+        def lesser(hi: A, m: A ==>> B): A ==>> B =
+          m match {
+            case Bin(kx, _, l, _) if o.greaterThanOrEqual(kx, hi) =>
+              lesser(hi, l)
+            case _ =>
+              m
+          }
+        lesser(hk, t)
+      case (Some(lk), Some(hk)) =>
+        @tailrec
+        def middle(lo: A, hi: A, m: A ==>> B): A ==>> B =
+          m match {
+            case Bin(kx, _, _, r) if o.lessThanOrEqual(kx, lo) =>
+              middle(lo, hi, r)
+            case Bin(kx, _, l, _) if o.greaterThanOrEqual(kx, hi) =>
+              middle(lo, hi, l)
+            case _ => m
+          }
+        middle(lk, hk, t)
     }
 }
