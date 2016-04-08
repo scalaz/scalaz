@@ -536,7 +536,7 @@ sealed abstract class ==>>[A, B] {
         case (t1, Tip()) =>
           t1
         case (Tip(), Bin(kx, x, l, r)) =>
-          (l filterGt cmplo).join(kx, x, (r filterLt cmphi))
+          link(kx, x, l filterGt cmplo, r filterLt cmphi)
         case (Bin(kx, x, l, r), t2) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val (found, gt) = t2.trimLookupLo(kx, cmphi)
@@ -546,7 +546,7 @@ sealed abstract class ==>>[A, B] {
           }
           val aa = hedgeUnionWithKey(cmplo, cmpkx, l, t2.trim(cmplo, cmpkx))
           val bb = hedgeUnionWithKey(cmpkx, cmphi, r, gt)
-          aa.join(kx, newx, bb)
+          link(kx, newx, aa, bb)
       }
 
     (this, other) match {
@@ -564,12 +564,12 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (Tip(), Bin(kx, x, l, r)) =>
-        (l filterGt cmpLo).join(kx, x, r filterLt cmpHi)
+        link(kx, x, l filterGt cmpLo, r filterLt cmpHi)
       case (Bin(kx, x, l, r), t2) =>
         val cmpkx = (k: A) =>  o.order(kx, k)
         val a = l.hedgeUnionL(cmpLo, cmpkx, t2.trim(cmpLo, cmpkx))
         val b = r.hedgeUnionL(cmpkx, cmpHi, t2.trim(cmpkx, cmpHi))
-        a.join(kx, x, b)
+        link(kx, x, a, b)
     }
 
 
@@ -583,7 +583,7 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          (l filterGt cmplo).join(kx, x, (r filterLt cmphi))
+          link(kx, x, l filterGt cmplo, r filterLt cmphi)
         case (t, Bin(kx, _, l, r)) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val aa = hedgeDiff(cmplo, cmpkx, t.trim(cmplo, cmpkx), l)
@@ -610,7 +610,7 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          (l filterGt cmplo).join(kx, x, r filterLt cmphi)
+          link(kx, x, l filterGt cmplo, r filterLt cmphi)
         case (t, Bin(kx, x, l, r)) =>
           val cmpkx = (k: A) => o.order(kx, k)
           val (found, gt) = t.trimLookupLo(kx, cmphi)
@@ -626,7 +626,7 @@ sealed abstract class ==>>[A, B] {
                 case None =>
                   tl merge tr
                 case Some(z) =>
-                  tl.join(kx, z, tr)
+                  link(kx, z, tl, tr)
               }
           }
       }
@@ -663,7 +663,7 @@ sealed abstract class ==>>[A, B] {
             case None =>
               tl merge tr
             case Some((k, x)) =>
-              tl.join(k, f(k, x, x2), tr)
+              link(k, f(k, x, x2), tl, tr)
           }
         }
         else {
@@ -674,7 +674,7 @@ sealed abstract class ==>>[A, B] {
             case None =>
               tl merge tr
             case Some(x) =>
-              tl.join(k1, f(k1, x1, x), tr)
+              link(k1, f(k1, x1, x), tl, tr)
           }
         }
     }
@@ -712,7 +712,7 @@ sealed abstract class ==>>[A, B] {
         empty
       case Bin(kx, x, l, r) =>
         if (p(kx, x))
-          l.filterWithKey(p).join(kx, x, r.filterWithKey(p))
+          link(kx, x, l.filterWithKey(p), r.filterWithKey(p))
         else
           l.filterWithKey(p) merge r.filterWithKey(p)
     }
@@ -730,9 +730,9 @@ sealed abstract class ==>>[A, B] {
         val (r1, r2) = r partitionWithKey p
 
         if (p(kx, x))
-          (l1.join(kx, x, r1), l2 merge r2)
+          (link(kx, x, l1, r1), l2 merge r2)
         else
-          (l1 merge r1, l2.join(kx, x, r2))
+          (l1 merge r1, link(kx, x, l2, r2))
     }
 
   def mapOption[C](f: B => Option[C])(implicit o: Order[A]): A ==>> C =
@@ -745,7 +745,7 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         f(kx, x) match {
           case Some(y) =>
-            l.mapOptionWithKey(f).join(kx, y, r.mapOptionWithKey(f))
+            link(kx, y, l.mapOptionWithKey(f), r.mapOptionWithKey(f))
           case None =>
             l.mapOptionWithKey(f).merge(r.mapOptionWithKey(f))
         }
@@ -764,9 +764,9 @@ sealed abstract class ==>>[A, B] {
 
         f(kx, x) match {
           case -\/(y) =>
-            (l1.join(kx, y, r1), l2 merge r2)
+            (link(kx, y, l1, r1), l2 merge r2)
           case \/-(z) =>
-            (l1 merge r1, l2.join(kx, z, r2))
+            (l1 merge r1, link(kx, z, l2, r2))
         }
     }
 
@@ -779,10 +779,10 @@ sealed abstract class ==>>[A, B] {
         o.order(k, kx) match {
           case LT =>
             val (lt, gt) = l.split(k)
-            (lt, gt.join(kx, x, r))
+            (lt, link(kx, x, gt, r))
           case GT =>
             val (lt, gt) = r.split(k)
-            (l.join(kx, x, lt), gt)
+            (link(kx, x, l, lt), gt)
           case EQ =>
             (l, r)
         }
@@ -796,10 +796,10 @@ sealed abstract class ==>>[A, B] {
         o.order(k, kx) match {
           case LT =>
             val (lt, z, gt) = l splitLookup k
-            (lt, z, gt.join(kx, x,r))
+            (lt, z, link(kx, x, gt, r))
           case GT =>
             val (lt, z, gt) = r splitLookup k
-            (l.join(kx, x, lt), z, gt)
+            (link(kx, x, l, lt), z, gt)
           case EQ =>
             (l, some(x), r)
         }
@@ -813,10 +813,10 @@ sealed abstract class ==>>[A, B] {
         o.order(k, kx) match {
           case LT =>
             val (lt, z, gt) = l splitLookupWithKey k
-            (lt, z, gt.join(kx, x, r))
+            (lt, z, link(kx, x, gt, r))
           case GT =>
             val (lt, z, gt) = r splitLookupWithKey k
-            (l.join(kx, x, lt), z, gt)
+            (link(kx, x, l, lt), z, gt)
           case EQ =>
             (l, some((kx, x)), r)
         }
@@ -878,7 +878,7 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         f(kx) match {
           case LT =>
-            l.filterGt(f).join(kx, x, r)
+            link(kx, x, l filterGt f, r)
           case GT =>
             r filterGt f
           case EQ =>
@@ -895,38 +895,23 @@ sealed abstract class ==>>[A, B] {
           case LT =>
             l filterLt f
           case GT =>
-            l.join(kx, x, r filterLt f)
+            link(kx, x, l, r filterLt f)
           case EQ =>
             l
         }
     }
 
+  @deprecated("join is no longer a protected function", "7.3")
   protected def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (this, other) match {
       case (Tip(), r) =>
-        r.insertMin(kx, x)
+        insertMin(kx, x, r)
       case (l, Tip()) =>
-        l.insertMax(kx, x)
+        insertMax(kx, x, l)
       case (l @ Bin(ky, y, ly, ry), r @ Bin(kz, z, lz, rz)) =>
-        if (delta * l.size < r.size) balanceL(kz, z, l.join(kx, x, lz), rz)
-        else if (delta * r.size < l.size) balanceR(ky, y, ly, ry.join(kx, x, r))
+        if (delta * l.size < r.size) balanceL(kz, z, link(kx, x, l, lz), rz)
+        else if (delta * r.size < l.size) balanceR(ky, y, ly, link(kx, x, ry, r))
         else Bin(kx, x, l, r)
-    }
-
-  private def insertMax(kx: A, x: B): A ==>> B =
-    this match {
-      case Tip() =>
-        singleton(kx, x)
-      case Bin(ky, y, l, r) =>
-        balanceR(ky, y, l, r.insertMax(kx, x))
-    }
-
-  private def insertMin(kx: A, x: B): A ==>> B =
-    this match {
-      case Tip() =>
-        singleton(kx, x)
-      case Bin(ky, y, l, r) =>
-        balanceL(ky, y, l.insertMin(kx, x), r)
     }
 }
 
@@ -1290,5 +1275,34 @@ object ==>> extends MapInstances {
               }
             } else Bin(k, x, l, r)
         }
+    }
+
+  private[scalaz] def link[A, B](kx: A, x: B, l: A ==>> B, r: A ==>> B): A ==>> B =
+    (l, r) match {
+      case (Tip(), r) =>
+        insertMin(kx, x, r)
+      case (l, Tip()) =>
+        insertMax(kx, x, l)
+      case (Bin(ky, y, ly, ry), Bin(kz, z, lz, rz)) =>
+        if (delta * l.size < r.size) balanceL(kz, z, link(kx, x, l, lz), rz)
+        else if (delta * r.size < l.size) balanceR(ky, y, ly, link(kx, x, ry, r))
+        else Bin(kx, x, l, r)
+    }
+
+  // insertMax and insertMin are only used for link(...)
+  private def insertMax[A, B](kx: A, x: B, t: A ==>> B): A ==>> B =
+    t match {
+      case Tip() =>
+        singleton(kx, x)
+      case Bin(ky, y, l, r) =>
+        balanceR(ky, y, l, insertMax(kx, x, r))
+    }
+
+  private def insertMin[A, B](kx: A, x: B, t: A ==>> B): A ==>> B =
+    t match {
+      case Tip() =>
+        singleton(kx, x)
+      case Bin(ky, y, l, r) =>
+        balanceL(ky, y, insertMin(kx, x, l), r)
     }
 }
