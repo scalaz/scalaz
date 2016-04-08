@@ -239,15 +239,8 @@ object build extends Build {
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
-  val coreModuleDependencies211 = List[(String, String => String)] (
-    "scala-parser-combinators" -> {
-      case _ => "1.0.4"
-    }
-    ,
-    "scala-xml"                -> {
-      case _ => "1.0.5"
-    }
-  )
+  val scalaParserCombinatorsVersion = SettingKey[String]("scalaParserCombinatorsVersion")
+  val scalaXmlVersion = SettingKey[String]("scalaXmlVersion")
 
   lazy val core = Project(
     id = "core",
@@ -258,12 +251,15 @@ object build extends Build {
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
       },
+      scalaParserCombinatorsVersion := "1.0.4",
+      scalaXmlVersion := "1.0.5",
       libraryDependencies ++= {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-            coreModuleDependencies211 map {
-              case (a, v) => "org.scala-lang.modules" %% a % v(scalaVersion.value) intransitive()
-            }
+            Seq(
+              "org.scala-lang.modules" %% "scala-parser-combinators" % scalaParserCombinatorsVersion.value,
+              "org.scala-lang.modules" %% "scala-xml" % scalaXmlVersion.value
+            )
           case _ =>
             Nil
         }
