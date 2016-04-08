@@ -494,10 +494,39 @@ sealed abstract class ==>>[A, B] {
 
   /* Unions */
   def union(other: A ==>> B)(implicit k: Order[A]): A ==>> B = {
+    def hedgeUnion(blo: Option[A], bhi: Option[A], m1: A ==>> B, m2: A ==>> B): A ==>> B =
+      (m1, m2) match {
+        case (t1, Tip()) =>
+          t1
+        case (Tip(), Bin(kx, x, l, r)) =>
+          link(kx, x, l filterGt blo, r filterLt bhi)
+        case (t1, Bin(kx, x, Tip(), Tip())) =>
+          insertR(kx, x, t1)
+        case (Bin(kx, x, l, r), t2) =>
+          val bmi = Some(kx)
+          val nm1 = hedgeUnion(blo, bmi, l, ==>>.trim(blo, bmi, t2))
+          val nm2 = hedgeUnion(bmi, bhi, r, ==>>.trim(bmi, bhi, t2))
+          link(kx, x, nm1, nm2)
+      }
+
+    def insertR(kx: A, x: B, t: A ==>> B)(implicit o: Order[A]): A ==>> B = {
+      def go(kx: A, x: B, m: A ==>> B): A ==>> B =
+        m match {
+          case Tip() => singleton(kx, x)
+          case Bin(ky, y, l, r) =>
+            o.order(kx, ky) match {
+              case LT => balanceL(ky, y, go(kx, x, l), r)
+              case GT => balanceR(ky, y, l, go(kx, x, r))
+              case EQ => m
+            }
+        }
+      go(kx, x, t)
+    }
+
     (this, other) match {
       case (Tip(), t2) => t2
       case (t1, Tip()) => t1
-      case (t1, t2) => t1.hedgeUnionL(Function const LT, Function const GT, t2)
+      case (t1, t2)    => hedgeUnion(None, None, t1, t2)
     }
   }
 
@@ -532,20 +561,6 @@ sealed abstract class ==>>[A, B] {
         hedgeUnionWithKey(Function const LT, Function const GT, t1, t2)
     }
   }
-
-  private def hedgeUnionL(cmpLo: A => Ordering, cmpHi: A => Ordering, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
-    (this, other) match {
-      case (t1, Tip()) =>
-        t1
-      case (Tip(), Bin(kx, x, l, r)) =>
-        link(kx, x, l filterGt cmpLo, r filterLt cmpHi)
-      case (Bin(kx, x, l, r), t2) =>
-        val cmpkx = (k: A) =>  o.order(kx, k)
-        val a = l.hedgeUnionL(cmpLo, cmpkx, t2.trim(cmpLo, cmpkx))
-        val b = r.hedgeUnionL(cmpkx, cmpHi, t2.trim(cmpkx, cmpHi))
-        link(kx, x, a, b)
-    }
-
 
   // Difference functions
   def \\(other: A ==>> B)(implicit o: Order[A]): A ==>> B =
