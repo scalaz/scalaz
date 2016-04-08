@@ -877,35 +877,37 @@ sealed abstract class ==>>[A, B] {
     toAscList.hashCode
 
   // filters on keys
-  private def filterGt(f: A => Ordering)(implicit o: Order[A]): A ==>> B =
-    this match {
-      case Tip() =>
-        empty
-      case Bin(kx, x, l, r) =>
-        f(kx) match {
-          case LT =>
-            link(kx, x, l filterGt f, r)
-          case GT =>
-            r filterGt f
-          case EQ =>
-            r
-        }
-    }
+  private def filterGt(a: Option[A])(implicit o: Order[A]): A ==>> B = {
+    def filter(filteringKey: A, m: A ==>> B): A ==>> B =
+      m match {
+        case Tip() =>
+          empty
+        case Bin(kx, x, l, r) =>
+          o.order(filteringKey, kx) match {
+            case LT => link(kx, x, filter(filteringKey, l), r)
+            case EQ => r
+            case GT => filter(filteringKey, r)
+          }
+      }
 
-  private def filterLt(f: A => Ordering)(implicit o: Order[A]): A ==>> B =
-    this match {
-      case Tip() =>
-        empty
-      case Bin(kx, x, l, r) =>
-        f(kx) match {
-          case LT =>
-            l filterLt f
-          case GT =>
-            link(kx, x, l, r filterLt f)
-          case EQ =>
-            l
-        }
-    }
+    cata(a)(filter(_, this), this)
+  }
+
+  private def filterLt(a: Option[A])(implicit o: Order[A]): A ==>> B = {
+    def filter(filteringKey: A, m: A ==>> B): A ==>> B =
+      m match {
+        case Tip() =>
+          empty
+        case Bin(kx, x, l, r) =>
+          o.order(kx, filteringKey) match {
+            case LT => link(kx, x, l, filter(filteringKey, r))
+            case EQ => l
+            case GT => filter(filteringKey, l)
+          }
+      }
+
+    cata(a)(filter(_, this), this)
+  }
 
   @deprecated("join is no longer a protected function", "7.3")
   protected def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
