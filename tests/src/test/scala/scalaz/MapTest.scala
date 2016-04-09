@@ -719,6 +719,55 @@ object MapTest extends SpecLite {
         rec(a)
       }
     }
+
+    "trimLookupLo sound" ! forAll { a: Int ==>> Int =>
+      def checkValidity(a: Int ==>> Int, lk: Int, hk: Option[Int]) = {
+        val (x, m) = trimLookupLo(lk, hk, a)
+        structurallySound(m)
+
+        val t1 = a.lookup(lk)
+        val t2 = trim(Some(lk), hk, a)
+        (x, m) must_=== (t1, t2)
+      }
+
+      a match {
+        case Tip() =>
+          val lk = Random.nextInt()
+          val hk = lk + 1
+          checkValidity(a, lk, Some(hk))
+          checkValidity(a, lk, None)
+
+        case Bin(_, _, _, _) =>
+          def rec(m: Int ==>> Int): Unit = {
+            m match {
+              case Tip() =>
+                ()
+              case Bin(k, x, l, r) =>
+                checkValidity(m, k, None)
+
+                if (k == Int.MinValue) {
+                  checkValidity(m, k, Some(k+1))
+
+                  rec(r)
+                }
+                else if (k == Int.MaxValue) {
+                  checkValidity(m, k-1, Some(k))
+                  checkValidity(m, k-1, None)
+
+                  rec(l)
+                }
+                else {
+                  checkValidity(m, k-1, Some(k+1))
+                  checkValidity(m, k-1, None)
+
+                  rec(l)
+                  rec(r)
+                }
+            }
+          }
+        rec(a)
+      }
+    }
   }
 
   "==>> list operations" should {

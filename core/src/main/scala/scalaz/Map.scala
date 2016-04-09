@@ -839,6 +839,7 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  @deprecated("trimLookupLo is no longer a public function", "7.3")
   @tailrec
   final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Option[(A, B)], A ==>> B) =
     this match {
@@ -1340,6 +1341,54 @@ object ==>> extends MapInstances {
             case Bin(kx, _, l, _) if o.greaterThanOrEqual(kx, hi) =>
               middle(lo, hi, l)
             case _ => m
+          }
+        middle(lk, hk, t)
+    }
+
+  private[scalaz] def trimLookupLo[A, B](lk: A, hkOption: Option[A], t: A ==>> B)(implicit o: Order[A]): (Option[B], A ==>> B) =
+    hkOption match {
+      case None =>
+        @tailrec
+        def greater(lo: A, m: A ==>> B): (Option[B], A ==>> B) =
+          m match {
+            case Tip() =>
+              (none, Tip())
+            case Bin(kx, x, l, r) =>
+              o.order(lo, kx) match {
+                case LT =>
+                  (l.lookup(lo), m)
+                case EQ =>
+                  (some(x), r)
+                case GT =>
+                  greater(lo, r)
+              }
+          }
+        greater(lk, t)
+      case Some(hk) =>
+        @tailrec
+        def middle(lo: A, hi: A, m: A ==>> B): (Option[B], A ==>> B) =
+          m match {
+            case Tip() =>
+              (none, Tip())
+            case Bin(kx, x, l, r) =>
+              o.order(lo, kx) match {
+                case LT if o.order(kx, hi) == LT =>
+                  (l.lookup(lo), m)
+                case LT =>
+                  middle(lo, hi, l)
+                case EQ =>
+                  (some(x), lesser(hi, r))
+                case GT =>
+                  middle(lo, hi, r)
+              }
+          }
+        @tailrec
+        def lesser(hi: A, m: A ==>> B): A ==>> B =
+          m match {
+            case Bin(k, _, l, _) if o.greaterThanOrEqual(k, hi) =>
+              lesser(hi, l)
+            case _ =>
+              m
           }
         middle(lk, hk, t)
     }
