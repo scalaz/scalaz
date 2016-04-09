@@ -443,7 +443,7 @@ sealed abstract class ==>>[A, B] {
       }
     }
 
-  private def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
+  def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, l, Tip()) =>
         ((k,x), l)
@@ -452,7 +452,7 @@ sealed abstract class ==>>[A, B] {
         (km, balanceL(k, x, l, r2))
     }
 
-  private def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
+  def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, Tip(), r) =>
         ((k, x), r)
