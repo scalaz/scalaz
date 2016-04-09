@@ -1413,4 +1413,76 @@ object ==>> extends MapInstances {
           }
         middle(lk, hk, t)
     }
+
+ /*
+  * The documentation below is partially copied from haskell/containers Map.
+  * Please refer to the full documentation if necessary.
+  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Map/Base.hs#L1402-L1440]]
+  *
+  -- | /O(n+m)/. A high-performance universal combining function. This function
+  -- is used to define 'unionWith', 'unionWithKey', 'differenceWith',
+  -- 'differenceWithKey', 'intersectionWith', 'intersectionWithKey' and can be
+  -- used to define other custom combine functions.
+
+  -- When calling mergeWithKey(a, b)(f)(g1, g2), a function combining two
+  -- 'Map's is created, such that
+  --
+  -- * if a key is present in both maps, it is passed with both corresponding
+  --   values to the combine @f@ function. Depending on the result, the key is either
+  --   present in the result with specified value, or is left out;
+  --
+  -- * a nonempty subtree present only in the first map is passed to @g1@ and
+  --   the output is added to the result;
+  --
+  -- * a nonempty subtree present only in the second map is passed to @g2@ and
+  --   the output is added to the result.
+  *
+  *  @param  a   first map
+  *  @param  b   second map
+  *  @param  f   combine function used to define `XxxWithKey`
+  *  @param  g1  function applied to a nonempty subtree present only in the first map a
+  *  @param  g2  function applied to a nonempty subtree present only in the second map b
+  */
+  def mergeWithKey[A: Order, B, C, D](a: A ==>> B, b: A ==>> C)
+                                     (f: (A, B, C) => Option[D])
+                                     (g1: (A ==>> B) => (A ==>> D), g2: (A ==>> C) => (A ==>> D))
+                                     (implicit o: Order[A]): A ==>> D = {
+    def hedgeMerge(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> D = {
+      (a, b) match {
+        case (t1, Tip()) => g1(t1)
+        case (Tip(), Bin(kx, x, l, r)) =>
+          val t2 = link(kx, x, l.filterGt(blo)(o), r.filterLt(bhi)(o))
+          g2(t2)
+        case (Bin(kx, x, l, r), t2) =>
+          val bmi = some(kx)
+          val l2 = hedgeMerge(blo, bmi, l, trim(blo, bmi, t2)(o))
+          val (found, trim_t2) = trimLookupLo(kx, bhi, t2)(o)
+          val r2 = hedgeMerge(bmi, bhi, r, trim_t2)
+          found match {
+            case None =>
+              g1(singleton(kx, x)) match {
+                case Tip() =>
+                  l2 merge r2
+                case Bin(_, x2, Tip(), Tip()) =>
+                  link(kx, x2, l2, r2)
+                case _ =>
+                  sys.error("mergeWithKey: Given function g1 does not fulfil required conditions (see documentation)")
+              }
+            case Some(x2) =>
+              f(kx, x, x2) match {
+                case None =>
+                  l2 merge r2
+                case Some(xx) =>
+                  link(kx, xx, l2, r2)
+              }
+          }
+      }
+    }
+
+    (a, b) match {
+      case (Tip(), t2) => g2(t2)
+      case (t1, Tip()) => g1(t1)
+      case (t1, t2)    => hedgeMerge(None, None, t1, t2)
+    }
+  }
 }
