@@ -417,32 +417,6 @@ sealed abstract class ==>>[A, B] {
         some((r._1._2, r._2))
     }
 
-  protected def merge(other: A ==>> B): A ==>> B =
-    (this, other) match {
-      case (Tip(), r) =>
-        r
-      case (l, Tip()) =>
-        l
-      case (l @ Bin(kx, x, lx, rx), r @ Bin(ky, y, ly, ry)) =>
-        if (delta * l.size < r.size) balanceL(ky, y, l.merge(ly), ry)
-        else if (delta * r.size < l.size) balanceR(kx, x, lx, rx.merge(r))
-        else glue(l, r)
-    }
-
-  private def glue(l: A ==>> B, r: A ==>> B): A ==>> B =
-    (l, r) match {
-      case (Tip(), r) => r
-      case (l, Tip()) => l
-      case (l @ Bin(_, _, _, _), r @ Bin(_, _, _, _)) => if (l.size > r.size) {
-        val ((km, m), l2) = deleteFindMax(l)
-        balanceR(km, m, l2, r)
-      }
-      else {
-        val ((km, m), r2) = deleteFindMin(r)
-        balanceL(km, m, l, r2)
-      }
-    }
-
   def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, l, Tip()) =>
@@ -823,6 +797,36 @@ sealed abstract class ==>>[A, B] {
     }
 
   // Utility functions
+  // Because the following functions depend on some public interface, such as deleteFindMax,
+  // they can't be moved to object ==>> unlike other utility functions, balance(...) for example.
+
+  // TODO: merge should be private as it's a utility function but not a public interface.
+  protected def merge(other: A ==>> B): A ==>> B =
+    (this, other) match {
+      case (Tip(), r) =>
+        r
+      case (l, Tip()) =>
+        l
+      case (l @ Bin(kx, x, lx, rx), r @ Bin(ky, y, ly, ry)) =>
+        if (delta * l.size < r.size) balanceL(ky, y, l.merge(ly), ry)
+        else if (delta * r.size < l.size) balanceR(kx, x, lx, rx.merge(r))
+        else glue(l, r)
+    }
+
+  private def glue(l: A ==>> B, r: A ==>> B): A ==>> B =
+    (l, r) match {
+      case (Tip(), r) => r
+      case (l, Tip()) => l
+      case (l @ Bin(_, _, _, _), r @ Bin(_, _, _, _)) => if (l.size > r.size) {
+        val ((km, m), l2) = deleteFindMax(l)
+        balanceR(km, m, l2, r)
+      }
+      else {
+        val ((km, m), r2) = deleteFindMin(r)
+        balanceL(km, m, l, r2)
+      }
+    }
+
   @deprecated("trim is no longer a public function", "7.3")
   @tailrec
   final def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
