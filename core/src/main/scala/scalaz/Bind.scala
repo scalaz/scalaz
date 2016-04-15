@@ -16,8 +16,8 @@ trait Bind[F[_]] extends Apply[F] { self =>
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = {
-    lazy val fa0 = fa
-    bind(f)(map(fa0))
+    val fa0 = Need(fa)
+    bind(f)(x => map(fa0.value)(x))
   }
 
   /** Sequence the inner `F` of `FFA` after the outer `F`, forming a
@@ -32,9 +32,9 @@ trait Bind[F[_]] extends Apply[F] { self =>
    * and `ifFalse`, not the other.
    */
   def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] = {
-    lazy val t = ifTrue
-    lazy val f = ifFalse
-    bind(value)(if(_) t else f)
+    val t = Need(ifTrue)
+    val f = Need(ifFalse)
+    bind(value)(if(_) t.value else f.value)
   }
 
   /**

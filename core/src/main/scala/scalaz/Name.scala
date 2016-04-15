@@ -52,13 +52,31 @@ object Name {
   }
 }
 
-object Need {
+/** Synchronized, thread-safe version of `Need` */
+object ThreadSafeNeed {
   def apply[A](a: => A): Need[A] = {
     new Need[A] {
-      private[this] lazy val value0: A = a
-      def value = value0
+      lazy val value: A = a
     }
   }
+}
+
+object Need {
+  def apply[A](can: => A): Need[A] = {
+    new Need[A] {
+      private[this] var a: A = _
+      private[this] var haz: Boolean = _
+      def value = {
+        if (!haz) {
+          a = can
+          haz = true
+        }
+
+        a
+      }
+    }
+  }
+
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
