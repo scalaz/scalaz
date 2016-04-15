@@ -16,24 +16,6 @@ final class IdOps[A](val self: A) extends AnyVal {
   final def ▹[B](f: A => B): B =
     f(self)
 
-  /**Applies `self` to the provide function for its side effect, and returns `self`. The Kestrel combinator.
-   * Mostly for use with dodgy libraries that give you values that need additional initialization or
-   * mutation before they're valid to use.
-   *
-   * The name `tap` comes from the Ruby method: [[http://ruby-doc.org/core-2.0.0/Object.html#method-i-tap]]
-   * which allows you to "tap into" a method call chain, in order to perform operations on intermediate
-   * results within the chain.  `unsafe` because it enables side effects.
-   */
-  final def unsafeTap(f: A => Any): A = {
-    f(self); self
-  }
-
-  /** Alias for `unsafeTap`. */
-  final def <|(f: A => Any): A = unsafeTap(f)
-
-  /** Alias for `unsafeTap`. */
-  final def ◃(f: A => Any): A = unsafeTap(f)
-
   final def squared: (A, A) =
     (self, self)
 

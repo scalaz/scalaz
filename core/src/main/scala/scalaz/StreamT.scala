@@ -15,16 +15,31 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        , skip = s => s.uncons
        , done = M.point(None)
        ))
+
+  def unconsRec(implicit M: BindRec[M]): M[Option[(A, StreamT[M, A])]] = {
+    def proceed(s: StreamT[M, A]): M[StreamT[M, A] \/ Option[(A, StreamT[M, A])]] =
+      M.map(s.step) (
+        _( yieldd = (a, s) => \/-(Some((a, s)))
+         , skip = s => -\/(s)
+         , done = \/-(None)
+         ))
+
+    M.tailrecM(proceed)(this)
+  }
   
   def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
     
   def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(!_.isDefined)
+  def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.map(unconsRec)(!_.isDefined)
 
   def head(implicit M: Monad[M]): M[A] = M.map(uncons)(_.getOrElse(sys.error("head: empty StreamT"))._1)
+  def headRec(implicit M: BindRec[M]): M[A] = M.map(unconsRec)(_.getOrElse(sys.error("head: empty StreamT"))._1)
     
   def headOption(implicit M: Monad[M]): M[Option[A]] = M.map(uncons)(_.map(_._1))
+  def headOptionRec(implicit M: BindRec[M]): M[Option[A]] = M.map(unconsRec)(_.map(_._1))
   
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
+  def tailMRec(implicit M: BindRec[M]): M[StreamT[M, A]] = M.map(unconsRec)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
   def trans[N[_]](t: M ~> N)(implicit M: Functor[M], N: Functor[N]): StreamT[N, A] =
     StreamT(t(M.map(this.step)(
@@ -105,19 +120,76 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      )
   }
 
-  def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Monad[M]): M[B] =
+  def foldLeft[B](z: B)(f: (B, A) => B)(implicit M: Monad[M]): M[B] =
     M.bind(step) {
       _( yieldd = (a, s) => s.foldLeft(f(z, a))(f)
        , skip = s => s.foldLeft(z)(f)
        , done = M.point(z)
        )
     }
-  
+
+  def foldLeftRec[B](z: B)(f: (B, A) => B)(implicit M: BindRec[M]): M[B] = {
+    def proceed(sb: (StreamT[M, A], B)): M[(StreamT[M, A], B) \/ B] =
+      M.map(sb._1.step) {
+        _( yieldd = (a, s) => -\/((s, f(sb._2, a)))
+         , skip = s => -\/((s, sb._2))
+         , done = \/-(sb._2)
+         )
+      }
+
+    M.tailrecM(proceed)((this, z))
+  }
+
+  /**
+   * **Warning:** Requires evaluation of the whole stream. Depending on
+   * the monad `M`, the evaluation will happen either immediately, or
+   * will be deferred until the resulting `Stream` is extracted from the
+   * returned `M`.
+   */
   def toStream(implicit M: Monad[M]): M[Stream[A]] = M.map(rev)(_.reverse)
-    
+
+  /**
+   * **Warning:** Requires evaluation of the whole stream. Depending on
+   * the monad `M`, the evaluation will happen either immediately, or
+   * will be deferred until the resulting `Stream` is extracted from the
+   * returned `M`.
+   */
+  def toStreamRec(implicit M: BindRec[M]): M[Stream[A]] = M.map(revRec)(_.reverse)
+
+  /**
+   * Converts this `StreamT` to a lazy `Stream`, i.e. without forcing
+   * evaluation of all elements. Note, however, that at least one element
+   * of this stream will be evaluated, and depending on the structure of
+   * this stream, up to two elements might be evaluated.
+   */
+  def asStream(implicit ev: M[Step[A, StreamT[M, A]]] =:= Id[Step[A, StreamT[Id, A]]]): Stream[A] = {
+    def go(s: StreamT[Id, A]): Stream[A] = s.unconsRec match {
+      case None => Stream.empty[A]
+      case Some((a, s1)) => Stream.cons(a, go(s1))
+    }
+
+    go(StreamT(ev(step)))
+  }
+
   def foldRight[B](z: => B)(f: (=> A, => B) => B)(implicit M: Monad[M]): M[B] =
     M.map(rev) {
       _.foldLeft(z)((a, b) => f(b, a))
+    }
+
+  def foldRightRec[B](z: => B)(f: (=> A, => B) => B)(implicit M: BindRec[M]): M[B] =
+    M.map(revRec) {
+      _.foldLeft(z)((a, b) => f(b, a))
+    }
+
+  /**
+   * `foldRight` with potential to terminate early, e.g. on an infinite stream.
+   */
+  def foldRightM[B](z: => M[B])(f: (=> A, => M[B]) => M[B])(implicit M: Monad[M]): M[B] =
+    M.bind(step) {
+      _( yieldd = (a, s) => f(a, s.foldRightM(z)(f))
+       , skip = s => s.foldRightM(z)(f)
+       , done = z
+       )
     }
 
   def foldMap[B](f: A => B)(implicit M: Foldable[M], B: Monoid[B]): B =
@@ -128,15 +200,26 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        )
     }
 
-  def length(implicit m: Monad[M]): M[Int] = {
-    def addOne(c: => Int, a: => A) = 1 + c
-    foldLeft(0)(addOne _)
-  }
+  def length(implicit m: Monad[M]): M[Int] =
+    foldLeft(0)((c, a) => 1 + c)
+
+  def lengthRec(implicit M: BindRec[M]): M[Int] =
+    foldLeftRec(0)((c, a) => 1 + c)
 
   def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step) {
     case Yield(a,s) => M.bind(f(a))(_ => s().foreach(f))
     case Skip(s) => s().foreach(f)
     case Done => M.pure(())
+  }
+
+  def foreachRec(f: A => M[Unit])(implicit M: Monad[M], B: BindRec[M]): M[Unit] = {
+    def proceed(s: StreamT[M, A]): M[StreamT[M, A] \/ Unit] = M.bind(s.step) {
+      case Yield(a, s1) => M.map(f(a))(_ => -\/(s1()))
+      case Skip(s1) => M.pure(-\/(s1()))
+      case Done => M.pure(\/-(()))
+    }
+
+    B.tailrecM(proceed)(this)
   }
   
   private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
@@ -152,6 +235,20 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
          )
       }
     loop(this, Stream.Empty)
+  }
+
+  private def revRec(implicit M: BindRec[M]): M[Stream[A]] = {
+    def loop(ss: (StreamT[M, A], Stream[A])): M[(StreamT[M, A], Stream[A]) \/ Stream[A]] = {
+      val (xs, ys) = ss
+      M.map(xs.step) {
+        _( yieldd = (a, s) => -\/((s, a #:: ys))
+         , skip = s => -\/((s, ys))
+         , done = \/-(ys)
+         )
+      }
+    }
+
+    M.tailrecM(loop)((this, Stream.Empty))
   }
 }
 

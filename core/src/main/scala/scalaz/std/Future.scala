@@ -3,8 +3,7 @@ package std
 
 import _root_.java.util.concurrent.atomic.AtomicInteger
 
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{ Try, Success => TSuccess }
 
 trait FutureInstances1 {
@@ -13,18 +12,6 @@ trait FutureInstances1 {
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
     Semigroup.liftSemigroup[Future, A]
-}
-
-trait FutureInstances extends FutureInstances1 {
-  /**
-   * Requires explicit usage as the use of `Await.result`. Can throw an exception, which is inherently bad.
-   */
-  def futureComonad(duration: Duration)(implicit executionContext: ExecutionContext): Comonad[Future] = new FutureInstance with Comonad[Future] {
-    def copoint[A](f: Future[A]): A = Await.result(f, duration)
-  }
-
-  implicit def futureMonoid[A](implicit g: Monoid[A], ec: ExecutionContext): Monoid[Future[A]] =
-    Monoid.liftMonoid[Future, A]
 }
 
 private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with Catchable[Future] {

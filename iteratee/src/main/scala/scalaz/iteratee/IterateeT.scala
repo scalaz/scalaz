@@ -203,7 +203,6 @@ sealed abstract class IterateeTInstances extends IterateeTInstances0 {
   implicit def IterateeTMonadIO[E, F[_]](implicit M0: MonadIO[F]): MonadIO[IterateeT[E, F, ?]] =
     new IterateeTMonadIO[E, F] {
       implicit def F = M0
-      implicit def G = M0
     }
 
   implicit def IterateeTContravariant[F[_]: Monad, A]: Contravariant[IterateeT[?, F, A]] =

@@ -19,22 +19,23 @@ cache:
 
 language: scala
 scala:
-  - 2.11.7
+  - 2.12.0-M3
+  - 2.11.8
   - 2.10.6
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
-
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
-matrix:
-  include:
-    - scala: 2.12.0-M3
-      jdk: oraclejdk8
+env:
+  matrix:
+  - TEST_PROJECT="rootJVM"
+  - TEST_PROJECT="rootJS"
 
 addons:
   apt:

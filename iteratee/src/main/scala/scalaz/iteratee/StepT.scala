@@ -82,7 +82,6 @@ sealed abstract class StepT[E, F[_], A] {
 
 // object StepT is in the implicit scope for EnumeratorT, so we mix in EnumeratorTInstances here.
 object StepT extends StepTFunctions with EnumeratorTInstances {
-  private[this] val ToNone: ((=> Any) => None.type) = x => None
   private[this] val ToNone1: (Any => None.type) = x => None
   private[this] val ToNone2: ((=> Any, => Any) => None.type) = (x, y) => None
 
