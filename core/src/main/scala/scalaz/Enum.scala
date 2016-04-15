@@ -152,16 +152,17 @@ trait Enum[F] extends Order[F] { self =>
   }
 
   def fromStepTo(n: Int, a: F, z: F): EphemeralStream[F] = {
-    lazy val cmp =
+    val cmp = Need {
       if(n > 0)
         greaterThan(_, _)
       else if(n < 0)
         lessThan(_, _)
       else
         (_: F, _: F) => false
+    }
     EphemeralStream.cons(a, {
       val k = succn(n, a)
-      if(cmp(k, z))
+      if (cmp.value(k, z))
         EphemeralStream.emptyEphemeralStream
       else
         fromStepTo(n, k, z)
@@ -170,15 +171,16 @@ trait Enum[F] extends Order[F] { self =>
 
   def fromStepToL(n: Int, a: F, z: F): List[F] = {
     def fromStepToLT(n: Int, a: F, z: F): Trampoline[List[F]] = {
-      lazy val cmp =
-       if(n > 0)
-         greaterThan(_, _)
-       else if(n < 0)
-         lessThan(_, _)
-       else
-         (_: F, _: F) => false
+      val cmp = Need {
+        if(n > 0)
+          greaterThan(_, _)
+        else if(n < 0)
+          lessThan(_, _)
+        else
+          (_: F, _: F) => false
+      }
       val k = succn(n, a)
-      if(cmp(k, z))
+      if (cmp.value(k, z))
         return_(a :: Nil)
       else
         suspend(fromStepToLT(n, k, z) map (a :: _))
