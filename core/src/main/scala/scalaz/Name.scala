@@ -8,10 +8,16 @@ sealed abstract class Name[+A] {
 }
 
 /** Call by need */
-sealed abstract class Need[+A] extends Name[A]
+final class Need[+A] private(private[this] var eval: () => A) extends Name[A] {
+  lazy val value: A = {
+    val value0 = eval()
+    eval = null
+    value0
+  }
+}
 
 /** Call by value */
-final case class Value[+A](value: A) extends Need[A]
+final case class Value[+A](value: A) extends Name[A]
 
 object Name {
   def apply[A](a: => A) = new Name[A] {
@@ -52,30 +58,8 @@ object Name {
   }
 }
 
-/** Synchronized, thread-safe version of `Need` */
-object ThreadSafeNeed {
-  def apply[A](a: => A): Need[A] = {
-    new Need[A] {
-      lazy val value: A = a
-    }
-  }
-}
-
 object Need {
-  def apply[A](can: => A): Need[A] = {
-    new Need[A] {
-      private[this] var a: A = _
-      private[this] var haz: Boolean = _
-      def value = {
-        if (!haz) {
-          a = can
-          haz = true
-        }
-
-        a
-      }
-    }
-  }
+  def apply[A](a: => A): Need[A] = new Need(() => a)
 
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
