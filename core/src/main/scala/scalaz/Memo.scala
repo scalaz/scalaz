@@ -24,12 +24,12 @@ object Memo extends MemoInstances {
 
   private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
-      lazy val a = new Array[V](n)
+      val a = Need(new Array[V](n))
       k => {
-        val t = a(k)
+        val t = a.value(k)
         if (t == null) {
           val v = f(k)
-          a(k) = v
+          a.value(k) = v
           v
         } else t
       }
@@ -38,7 +38,7 @@ object Memo extends MemoInstances {
 
   private class DoubleArrayMemo(n: Int, sentinel: Double) extends Memo[Int, Double] {
     override def apply(f: (Int) => Double) = {
-      lazy val a = {
+      val a = Need {
         if (sentinel == 0d) {
           new Array[Double](n)
         } else {
@@ -46,10 +46,10 @@ object Memo extends MemoInstances {
         }
       }
       k => {
-        val t = a(k)
+        val t = a.value(k)
         if (t == sentinel) {
           val v = f(k)
-          a(k) = v
+          a.value(k) = v
           v
         } else t
       }

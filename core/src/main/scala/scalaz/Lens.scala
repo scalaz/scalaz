@@ -369,10 +369,10 @@ trait LensFunctions extends LensFamilyFunctions {
 
   def applyLens[A, B](k: B => A)(implicit e: Equal[A]): Store[A, B] @> B =
     lens(q => {
-      lazy val x = q.pos
-      lazy val y = q put x
+      val x = Need(q.pos)
+      val y = Need(q put x.value)
       Store(b =>
-        Store(w => if(e equal (x, w)) b else y, x), y)
+        Store(w => if(e equal (x.value, w)) b else y.value, x.value), y.value)
     })
 
   def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =

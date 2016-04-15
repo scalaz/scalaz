@@ -244,8 +244,8 @@ private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] w
   implicit def F: Monad[F]
 
   def point[A](a: => A): StateT[F, S, A] = {
-    lazy val aa = a
-    StateT(s => F.point(s, aa))
+    val aa = Need(a)
+    StateT(s => F.point(s, aa.value))
   }
 
   def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
