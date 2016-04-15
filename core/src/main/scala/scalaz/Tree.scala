@@ -28,8 +28,8 @@ sealed abstract class Tree[A] {
     val reversedLines = draw.run
     val first = new StringBuilder(reversedLines.head.toString.reverse)
     val rest = reversedLines.tail
-    rest.foldLeft(first) { (acc, elem) => 
-      acc.append("\n").append(elem.toString.reverse) 
+    rest.foldLeft(first) { (acc, elem) =>
+      acc.append("\n").append(elem.toString.reverse)
     }.append("\n").toString
   }
 
@@ -38,11 +38,11 @@ sealed abstract class Tree[A] {
    * and the histomorphic transform of its children.
    **/
   def scanr[B](g: (A, Stream[Tree[B]]) => B): Tree[B] = {
-    lazy val c = subForest.map(_.scanr(g))
-    Node(g(rootLabel, c), c)
+    val c = Need(subForest.map(_.scanr(g)))
+    Node(g(rootLabel, c.value), c.value)
   }
 
-  /** A 2D String representation of this Tree, separated into lines. 
+  /** A 2D String representation of this Tree, separated into lines.
     * Uses reversed StringBuilders for performance, because they are
     * prepended to.
     **/
@@ -70,8 +70,8 @@ sealed abstract class Tree[A] {
       }
       s
     }
-    
-    drawSubTrees(subForest).map { subtrees => 
+
+    drawSubTrees(subForest).map { subtrees =>
       new StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
     }
   }
@@ -100,10 +100,10 @@ sealed abstract class Tree[A] {
 
   /** Turns a tree of pairs into a pair of trees. */
   def unzip[A1, A2](implicit p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
-    lazy val uz = subForest.map(_.unzip)
-    lazy val fst = uz map (_._1)
-    lazy val snd = uz map (_._2)
-    (Node(rootLabel._1, fst), Node(rootLabel._2, snd))
+    val uz = Need(subForest.map(_.unzip))
+    val fst = Need(uz.value map (_._1))
+    val snd = Need(uz.value map (_._2))
+    (Node(rootLabel._1, fst.value), Node(rootLabel._2, snd.value))
   }
 
   def foldNode[Z](f: A => Stream[Tree[A]] => Z): Z =
@@ -147,7 +147,7 @@ sealed abstract class TreeInstances {
       case h #:: t => t.foldLeft(z(h))(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
-    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = { 
+    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = {
       def align(ta: Tree[A], tb: Tree[B]): Tree[C] =
         Tree.Node(f(\&/(ta.rootLabel, tb.rootLabel)), Align[Stream].alignWith[Tree[A], Tree[B], Tree[C]]({
           case \&/.This(sta) ⇒ sta map {a ⇒ f(\&/.This(a))}
@@ -199,8 +199,10 @@ object Tree extends TreeInstances {
   object Node {
     def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
       new Tree[A] {
-        lazy val rootLabel = root
-        lazy val subForest = forest
+        val rootc = Need(root)
+        val forestc = Need(forest)
+        def rootLabel = rootc.value
+        def subForest = forestc.value
 
         override def toString = "<tree>"
       }

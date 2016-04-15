@@ -5,9 +5,9 @@ object NeedTestJVM extends SpecLite {
   "Need" should {
     "clear the Function0 reference" in {
       @volatile var flag = false
-      val method = Need.getClass.getMethod("apply", classOf[Function0[_]])
+      val method = ThreadSafeNeed.getClass.getMethod("apply", classOf[Function0[_]])
       val need = method.invoke(
-        Need,
+        ThreadSafeNeed,
         new runtime.AbstractFunction0[String]{
           override def finalize = {flag = true}
           override def apply = ""
