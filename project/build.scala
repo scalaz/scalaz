@@ -148,6 +148,10 @@ object build extends Build {
       else
         "1.11.4"
     },
+    autoAPIMappings := PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+      case Some((2, v)) if v < 10 => false
+    }.getOrElse(true),
+    apiMappings := Map.empty,
     pomIncludeRepository := {
       x => false
     },
