@@ -137,25 +137,25 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     new Tuple1Equal[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] = 
+  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] =
     new Tuple2Equal[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
     }
-  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] = 
+  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] =
     new Tuple3Equal[A1, A2, A3] {
       implicit def _1 = A1
       implicit def _2 = A2
       implicit def _3 = A3
     }
-  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] = 
+  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] =
     new Tuple4Equal[A1, A2, A3, A4] {
       implicit def _1 = A1
       implicit def _2 = A2
       implicit def _3 = A3
       implicit def _4 = A4
     }
-  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] = 
+  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] =
     new Tuple5Equal[A1, A2, A3, A4, A5] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -196,7 +196,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
 }
 sealed trait TupleInstances2 extends TupleInstances1 {
 
-  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = 
+  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] =
     new Tuple1Show[A1] {
       implicit def _1 = A1
     }
@@ -287,7 +287,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
       implicit def _4 = A4
       implicit def _5 = A5
     }
-  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] = 
+  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] =
     new Tuple6Order[A1, A2, A3, A4, A5, A6] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -456,10 +456,10 @@ private trait Tuple2Semigroup[A1, A2] extends Semigroup[(A1, A2)] {
   implicit def _1 : Semigroup[A1]
   implicit def _2 : Semigroup[A2]
   def append(f1: (A1, A2), _f2: => (A1, A2)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2)
     )
   }
 }
@@ -468,11 +468,11 @@ private trait Tuple3Semigroup[A1, A2, A3] extends Semigroup[(A1, A2, A3)] {
   implicit def _2 : Semigroup[A2]
   implicit def _3 : Semigroup[A3]
   def append(f1: (A1, A2, A3), _f2: => (A1, A2, A3)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3)
     )
   }
 }
@@ -482,12 +482,12 @@ private trait Tuple4Semigroup[A1, A2, A3, A4] extends Semigroup[(A1, A2, A3, A4)
   implicit def _3 : Semigroup[A3]
   implicit def _4 : Semigroup[A4]
   def append(f1: (A1, A2, A3, A4), _f2: => (A1, A2, A3, A4)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3),
-    _4.append(f1._4, f2._4)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3),
+    _4.append(f1._4, f2.value._4)
     )
   }
 }
@@ -498,13 +498,13 @@ private trait Tuple5Semigroup[A1, A2, A3, A4, A5] extends Semigroup[(A1, A2, A3,
   implicit def _4 : Semigroup[A4]
   implicit def _5 : Semigroup[A5]
   def append(f1: (A1, A2, A3, A4, A5), _f2: => (A1, A2, A3, A4, A5)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3),
-    _4.append(f1._4, f2._4),
-    _5.append(f1._5, f2._5)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3),
+    _4.append(f1._4, f2.value._4),
+    _5.append(f1._5, f2.value._5)
     )
   }
 }
@@ -516,14 +516,14 @@ private trait Tuple6Semigroup[A1, A2, A3, A4, A5, A6] extends Semigroup[(A1, A2,
   implicit def _5 : Semigroup[A5]
   implicit def _6 : Semigroup[A6]
   def append(f1: (A1, A2, A3, A4, A5, A6), _f2: => (A1, A2, A3, A4, A5, A6)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3),
-    _4.append(f1._4, f2._4),
-    _5.append(f1._5, f2._5),
-    _6.append(f1._6, f2._6)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3),
+    _4.append(f1._4, f2.value._4),
+    _5.append(f1._5, f2.value._5),
+    _6.append(f1._6, f2.value._6)
     )
   }
 }
@@ -536,15 +536,15 @@ private trait Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] extends Semigroup[(A1,
   implicit def _6 : Semigroup[A6]
   implicit def _7 : Semigroup[A7]
   def append(f1: (A1, A2, A3, A4, A5, A6, A7), _f2: => (A1, A2, A3, A4, A5, A6, A7)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3),
-    _4.append(f1._4, f2._4),
-    _5.append(f1._5, f2._5),
-    _6.append(f1._6, f2._6),
-    _7.append(f1._7, f2._7)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3),
+    _4.append(f1._4, f2.value._4),
+    _5.append(f1._5, f2.value._5),
+    _6.append(f1._6, f2.value._6),
+    _7.append(f1._7, f2.value._7)
     )
   }
 }
@@ -558,16 +558,16 @@ private trait Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] extends Semigroup[
   implicit def _7 : Semigroup[A7]
   implicit def _8 : Semigroup[A8]
   def append(f1: (A1, A2, A3, A4, A5, A6, A7, A8), _f2: => (A1, A2, A3, A4, A5, A6, A7, A8)) = {
-    lazy val f2 = _f2
+    val f2 = Need(_f2)
     (
-    _1.append(f1._1, f2._1),
-    _2.append(f1._2, f2._2),
-    _3.append(f1._3, f2._3),
-    _4.append(f1._4, f2._4),
-    _5.append(f1._5, f2._5),
-    _6.append(f1._6, f2._6),
-    _7.append(f1._7, f2._7),
-    _8.append(f1._8, f2._8)
+    _1.append(f1._1, f2.value._1),
+    _2.append(f1._2, f2.value._2),
+    _3.append(f1._3, f2.value._3),
+    _4.append(f1._4, f2.value._4),
+    _5.append(f1._5, f2.value._5),
+    _6.append(f1._6, f2.value._6),
+    _7.append(f1._7, f2.value._7),
+    _8.append(f1._8, f2.value._8)
     )
   }
 }

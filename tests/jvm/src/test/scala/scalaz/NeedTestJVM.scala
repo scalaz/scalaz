@@ -23,3 +23,4 @@ object NeedTestJVM extends SpecLite {
   }
 
 }
+
