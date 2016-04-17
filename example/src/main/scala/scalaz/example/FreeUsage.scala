@@ -25,9 +25,8 @@ object FreeUsage extends App {
     case class  SetSeed(seed: Long)      extends RngOp[Unit]
   }
 
-  // Free monad over the free functor of RngOp. The instance is not inferrable.
+  // Free monad over the free functor of RngOp.
   type Rng[A] = Free[RngOp, A]
-  implicit val MonadRng: Monad[Rng] = Free.freeMonad[RngOp]
 
   // Smart constructors for Rng[A]
   val nextBoolean              = Free.liftF(RngOp.NextBoolean)
