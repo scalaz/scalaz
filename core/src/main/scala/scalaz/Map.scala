@@ -571,8 +571,28 @@ sealed abstract class ==>>[A, B] {
     mergeWithKey(this, other)(f)(x => x, _ => empty)
 
   // Intersections
-  def intersection[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B =
-    intersectionWithKey(other)((_, x, _: C) => x)
+  def intersection[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B = {
+    def hedgeInt(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> B =
+      (a, b) match {
+        case (_, Tip()) =>
+          empty
+        case (Tip(), _) =>
+          empty
+        case (Bin(kx, x, l, r), t2) =>
+          val bmi = some(kx)
+          val l2 = hedgeInt(blo, bmi, l, ==>>.trim(blo, bmi, t2))
+          val r2 = hedgeInt(bmi, bhi, r, ==>>.trim(bmi, bhi, t2))
+
+          if (t2 member kx) link(kx, x, l2, r2)
+          else l2 merge r2
+      }
+
+    (this, other) match {
+      case (Tip(), _) => empty
+      case (_, Tip()) => empty
+      case (t1, t2)   => hedgeInt(None, None, t1, t2)
+    }
+  }
 
   def intersectionWith[C, D](other: A ==>> C)(f: (B, C) => D)(implicit o: Order[A]): A ==>> D =
     intersectionWithKey(other)((_, x, y) => f(x, y))
