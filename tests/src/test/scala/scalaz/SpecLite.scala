@@ -4,8 +4,8 @@ import reflect.ClassTag
 
 import org.scalacheck._
 
-abstract class SpecLite extends Properties("") with SpecLitePlatform {
-  updateName
+abstract class SpecLite extends Properties("") {
+  override val name = this.getClass.getName.stripSuffix("$")
 
   def checkAll(name: String, props: Properties) {
     for ((name2, prop) <- props.properties) yield {
