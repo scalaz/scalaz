@@ -26,6 +26,9 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   def contramap[B](f: B => A)(implicit F: Contravariant[F], G: Contravariant[G]): Coproduct[F, G, B] =
     Coproduct(run.bimap(F.contramap(_)(f), G.contramap(_)(f)))
 
+  def fold[H[_]](f: F ~> H, g: G ~> H): H[A] =
+    run.fold(f, g)
+
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F], G: Foldable[G]): Z =
     run.fold(a => F.foldRight(a, z)(f), a => G.foldRight(a, z)(f))
 
