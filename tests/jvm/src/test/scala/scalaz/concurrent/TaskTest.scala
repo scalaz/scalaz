@@ -280,7 +280,7 @@ object TaskTest extends SpecLite {
   "retries a retriable task n times" ! forAll { xs: List[Byte] =>
     import scala.concurrent.duration._
     var x = 0
-    Task.delay {x += 1; sys.error("oops")}.unsafePerformRetry(xs.map(_ => 0.milliseconds)).attempt.unsafePerformSync
+    Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.unsafePerformSync
     x == (xs.length + 1)
   }
 
