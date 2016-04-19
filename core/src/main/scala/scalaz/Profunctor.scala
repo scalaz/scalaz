@@ -36,6 +36,16 @@ trait Profunctor[=>:[_, _]]  { self =>
         mapfst(fa)(f)
     }
 
+  trait ProfunctorLaw {
+    def identity[A, B](gab: (A =>: B))(implicit E: Equal[A =>: B]): Boolean = E.equal(dimap(gab)((a: A) => a)((b: B) => b), gab)
+    
+    def composite[A, B, C, D, E, F](gad: (A =>: D), fac: C => B, fba: B => A, fde: D => E, fef: E => F)(implicit E: Equal[C =>: F]): Boolean = {
+      E.equal(dimap(dimap(gad)(fba)(fde))(fac)(fef), dimap(gad)(fba compose fac)(fef compose fde))
+    }
+  }
+  
+  def profunctorLaw = new ProfunctorLaw {}
+
   ////
   val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
 }
