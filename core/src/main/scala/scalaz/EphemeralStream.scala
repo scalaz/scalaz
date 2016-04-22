@@ -36,13 +36,11 @@ sealed abstract class EphemeralStream[A] {
     if (isEmpty) z else f(head())(tail().foldRight(z)(f))
 
   def foldLeft[B](z: => B)(f: (=> B) => (=> A) => B): B = {
-    var t = this
-    var acc = z
-    while (!t.isEmpty) {
-      acc = f(acc)(t.head())
-      t = t.tail()
-    }
-    acc
+    @annotation.tailrec
+    def loop(t: EphemeralStream[A], acc: B): B =
+      if (t.isEmpty) acc
+      else loop(t.tail(), f(acc)(t.head()))
+    loop(this, z)
   }
 
   def filter(p: A => Boolean): EphemeralStream[A] = {
