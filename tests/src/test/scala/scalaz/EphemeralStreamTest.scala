@@ -29,6 +29,31 @@ object EphemeralStreamTest extends SpecLite {
     Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
 
+  // https://github.com/scalaz/scalaz/pull/1151
+  "issue 1151" ! {
+    def oldFoldLeft[A, B](a: EphemeralStream[A])(z: => B)(f: (=> B) => (=> A) => B): B = {
+      var t = a
+      var acc = z
+      while (!t.isEmpty) {
+        acc = f(acc)(t.head())
+        t = t.tail()
+      }
+      acc
+    }
+
+    val es = EphemeralStream.unfold(0)(n => if (n <= 10) Some((n, n + 1)) else None)
+
+    try {
+      oldFoldLeft(es)(Need(0))(x => y => Need(y)).value
+      throw new Throwable("fail")
+    } catch {
+      case ex: RuntimeException =>
+        ex.getMessage must_=== "head of empty stream"
+    }
+
+    es.foldLeft(Need(0))(x => y => Need(y)).value must_=== 10
+  }
+
   "unzip zip" ! forAll { xs: EphemeralStream[(Int, Int)] =>
     val (firsts, seconds) = xs.unzip
     (firsts zip seconds) must_===(xs)
