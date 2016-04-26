@@ -8,10 +8,16 @@ sealed abstract class Name[+A] {
 }
 
 /** Call by need */
-sealed abstract class Need[+A] extends Name[A]
+final class Need[+A] private(private[this] var eval: () => A) extends Name[A] {
+  lazy val value: A = {
+    val value0 = eval()
+    eval = null
+    value0
+  }
+}
 
 /** Call by value */
-final case class Value[+A](value: A) extends Need[A]
+final case class Value[+A](value: A) extends Name[A]
 
 object Name {
   def apply[A](a: => A) = new Name[A] {
@@ -53,12 +59,8 @@ object Name {
 }
 
 object Need {
-  def apply[A](a: => A): Need[A] = {
-    new Need[A] {
-      private[this] lazy val value0: A = a
-      def value = value0
-    }
-  }
+  def apply[A](a: => A): Need[A] = new Need(() => a)
+
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
