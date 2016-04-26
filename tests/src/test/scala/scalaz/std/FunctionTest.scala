@@ -48,6 +48,8 @@ object FunctionTest extends SpecLite {
 
   checkAll("Function1", zip.laws[Int => ?])
 
+  checkAll("Function1", profunctor.laws[? => ?])
+
   // Likely could be made to cover all the FunctionN types.
   "Function0 map eagerness" ! forAll{(number: Int) =>
     var modifiableNumber: Int = number

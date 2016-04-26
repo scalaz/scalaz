@@ -39,7 +39,8 @@ object KleisliTest extends SpecLite {
   checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
-
+  checkAll(profunctor.laws[KleisliOpt])
+  
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]
     def monoid[F[_], A, B](implicit FB: Monoid[F[B]]) = Monoid[Kleisli[F, A, B]]

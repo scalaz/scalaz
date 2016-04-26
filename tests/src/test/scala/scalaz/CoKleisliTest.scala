@@ -2,6 +2,7 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.{Arbitrary, Gen}
+import scalaz.std.option._
 
 object CokleisliTest extends SpecLite {
 
@@ -19,6 +20,7 @@ object CokleisliTest extends SpecLite {
       arb((a, b, c) => a.map(_ - b) getOrElse c)
     ))
   }
+
 
   implicit val cokleisliArb2: Arbitrary[Cokleisli[Option, Int, Int => Int]] = {
     def arb(f: (Option[Int], Int) => (Int => Int)): Gen[Cokleisli[Option, Int, Int => Int]] =
@@ -41,6 +43,7 @@ object CokleisliTest extends SpecLite {
 
   checkAll(bindRec.laws[Cokleisli[Option, Int, ?]])
   checkAll(bind.laws[Cokleisli[Option, Int, ?]])
+  checkAll(profunctor.laws[Cokleisli[Option, ?, ?]])
 
   "compose" in {
     import std.AllInstances._
