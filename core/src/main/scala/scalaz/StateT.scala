@@ -111,7 +111,16 @@ object IndexedStateT extends StateTInstances with StateTFunctions {
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class IndexedStateTInstances2 {
+sealed abstract class IndexedStateTInstances3 {
+  implicit def indexedStateProfunctor[S2, F[_]](implicit F0: Functor[F]): Profunctor[IndexedStateT[F, ?, S2, ?]] =
+    new Profunctor[IndexedStateT[F, ?, S2, ?]] {
+      def mapfst[S1, B, S3](fab: IndexedStateT[F, S1, S2, B])(f: S3 => S1): IndexedStateT[F, S3, S2, B] = fab.contramap(f)
+       
+      def mapsnd[S1, B, D](fab: IndexedStateT[F, S1, S2, B])(f: B => D): IndexedStateT[F, S1, S2, D] = fab.map(f)
+    }
+}
+
+sealed abstract class IndexedStateTInstances2 extends IndexedStateTInstances3 {
   implicit def indexedStateTContravariant[S2, A0, F[_]]: Contravariant[IndexedStateT[F, ?, S2, A0]] =
     new IndexedStateTContravariant[S2, A0, F] {}
 }
