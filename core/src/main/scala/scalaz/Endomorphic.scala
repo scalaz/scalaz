@@ -31,25 +31,34 @@ sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
       def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
     }
 
-  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
-    endomorphicMonoid[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
-
-  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
-    endomorphicMonoid[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
 }
 
-sealed abstract class EndomorphicInstances0 {
+sealed abstract class EndomorphicInstances0 extends EndomorphicInstances1 {
+
+  implicit def kleisliEndoInstance[F[_]: Monad, A]: Monoid[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
+    Endomorphic.endomorphicMonoid[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
+
+  implicit def cokleisliEndoInstance[F[_]: Comonad, A]: Monoid[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
+    Endomorphic.endomorphicMonoid[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
+
+}
+
+sealed abstract class EndomorphicInstances1 extends EndomorphicInstances2 {
 
   implicit def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
     new EndomorphicSemigroup[=>:, A] {
       val F = G
     }
 
+}
+
+sealed abstract class EndomorphicInstances2 {
+
   implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
-    endomorphicSemigroup[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
+    Endomorphic.endomorphicSemigroup[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
 
   implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
-    endomorphicSemigroup[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
+    Endomorphic.endomorphicSemigroup[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
 
 }
 
