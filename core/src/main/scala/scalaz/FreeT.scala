@@ -107,6 +107,29 @@ sealed abstract class FreeT[S[_], M[_], A] {
   @deprecated("Alias for `interpret`", "7.3")
   def interpretT[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] = interpret(st)
 
+  /**
+    * Runs to completion, mapping the suspension with the given transformation
+    * at each step and accumulating into the monad `M`.
+    */
+  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] = {
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
+      ft match {
+        case Suspend(ma) => M0.bind(ma) {
+          case -\/(a) => M1.point(\/-(a))
+          case \/-(sa) => M0.map(f(sa))(\/.right)
+        }
+        case g @ Gosub() => g.a match {
+          case Suspend(mx) => M0.bind(mx) {
+            case -\/(x) => M1.point(-\/(g.f(x)))
+            case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+          }
+          case g0 @ Gosub() => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
+        }
+      }
+
+    M0.tailrecM(go)(this)
+  }
+
   /** Evaluates a single layer of the free monad **/
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =

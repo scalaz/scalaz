@@ -53,6 +53,11 @@ object FreeTTest extends SpecLite {
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)
     )
+
+  object headOption extends (List ~> Option) {
+    def apply[A](l: List[A]): Option[A] = l.headOption
+  }
+
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
@@ -98,6 +103,12 @@ object FreeTTest extends SpecLite {
     "interpret" ! forAll { a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpret(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "foldMap should be consistent with runM" ! forAll { a: FreeTListOption[Int] =>
+      val x = a.f.runM(_.headOption)
+      val y = a.f.foldMap(headOption)
+      Equal[Option[Int]].equal(x, y)
     }
   }
 
