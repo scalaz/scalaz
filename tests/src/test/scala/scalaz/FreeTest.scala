@@ -113,6 +113,12 @@ object FreeTest extends SpecLite {
     checkAll(zip.laws[FreeList])
   }
 
+  "#1156: equals should not return true for obviously unequal instances" in {
+    val a = Free.point[List, Int](1).flatMap(x => Free.point(2))
+    val b = Free.point[List, Int](3).flatMap(x => Free.point(4))
+    a != b
+  }
+
   object instances {
     def bindRec[F[_]] = BindRec[Free[F, ?]]
     def monad[F[_]] = Monad[Free[F, ?]]
