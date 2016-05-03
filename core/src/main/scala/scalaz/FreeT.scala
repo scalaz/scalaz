@@ -1,5 +1,6 @@
 package scalaz
 
+import annotation.tailrec
 import FreeT._
 
 object FreeT extends FreeTInstances {
@@ -82,7 +83,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
    * given Functors for `S` and `N`
    */
   def hoistN[N[_]](mn: M ~> N)(implicit S: Functor[S], N: Functor[N]): FreeT[S, N, A] =
-    this match {
+    step match {
       case e @ Gosub() =>
         gosub(e.a.hoistN(mn))(e.f.andThen(_.hoistN(mn)))
       case Suspend(m) =>
@@ -91,7 +92,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
   /** Same as `hoistN` but different constraints */
   def hoistM[N[_]](mn: M ~> N)(implicit S: Functor[S], M: Functor[M]): FreeT[S, N, A] =
-    this match {
+    step match {
       case e @ Gosub() =>
         gosub(e.a.hoistM(mn))(e.f.andThen(_.hoistM(mn)))
       case Suspend(m) =>
@@ -100,7 +101,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
   /** Change the base functor `S` for a `FreeT` action. */
   def interpretS[T[_]](st: S ~> T)(implicit S: Functor[S], M: Functor[M]): FreeT[T, M, A] =
-    this match {
+    step match {
       case e @ Gosub() =>
         gosub(e.a.interpretS(st))(e.f.andThen(_.interpretS(st)))
       case Suspend(m) =>
@@ -109,7 +110,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
   /** Same as `interpretS` but different constraints */
   def interpretT[T[_]](st: S ~> T)(implicit T: Functor[T], M: Functor[M]): FreeT[T, M, A] =
-    this match {
+    step match {
       case e @ Gosub() =>
         gosub(e.a.interpretT(st))(e.f.andThen(_.interpretT(st)))
       case Suspend(m) =>
@@ -145,6 +146,16 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
     M0.tailrecM(runM2)(this)
   }
+
+  @tailrec
+  private def step: FreeT[S, M, A] =
+    this match {
+      case g @ Gosub() => g.a match {
+        case g0 @ Gosub() => g0.a.flatMap(a => g0.f(a).flatMap(g.f)).step
+        case _ => g
+      }
+      case x => x
+    }
 }
 
 sealed abstract class FreeTInstances6 {

@@ -6,6 +6,7 @@ import std.AllInstances._
 import FreeT._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.syntax.bind._
 
 case class FreeTListOption[A](f: FreeT[List, Option, A])
 
@@ -76,6 +77,16 @@ object FreeTTest extends SpecLite {
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
+    "hoist stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      a.f.hoistM(NaturalTransformation.refl)
+      a.f.hoistN(NaturalTransformation.refl)
+      ()
+    }
+
     "interpretS" ! forAll { a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpretS(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
@@ -84,6 +95,16 @@ object FreeTTest extends SpecLite {
     "interpretT" ! forAll { a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpretT(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "interpret stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      a.f.interpretS(NaturalTransformation.refl)
+      a.f.interpretT(NaturalTransformation.refl)
+      ()
     }
   }
 
