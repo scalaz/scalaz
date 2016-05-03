@@ -1,5 +1,6 @@
 package scalaz
 
+import annotation.tailrec
 import FreeT._
 
 object FreeT extends FreeTInstances {
@@ -72,7 +73,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
    * turning this `FreeT[S, M, A]` into a `FreeT[S, N, A]`.
    */
   def hoist[N[_]](mn: M ~> N): FreeT[S, N, A] =
-    this match {
+    step match {
       case e @ Gosub(_, _) =>
         Gosub(e.a.hoist(mn), e.f.andThen(_.hoist(mn)))
       case Suspend(m) =>
@@ -87,7 +88,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
 
   /** Change the base functor `S` for a `FreeT` action. */
   def interpret[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] =
-    this match {
+    step match {
       case e @ Gosub(_, _) =>
         Gosub(e.a.interpret(st), e.f.andThen(_.interpret(st)))
       case Suspend(m) =>
@@ -158,7 +159,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
    * of the computation. Since only `map` is used on `m`, its structure
    * is preserved.
    */
-  @annotation.tailrec
+  @tailrec
   private[scalaz] final def toM(implicit M: Applicative[M]): M[FreeT[S, M, A]] =
     this match {
       case Suspend(m) => M.map(m) {
@@ -172,6 +173,16 @@ sealed abstract class FreeT[S[_], M[_], A] {
         }
         case g0 @ Gosub(_, _) => g0.a.flatMap(g0.f(_).flatMap(g1.f)).toM
       }
+    }
+
+  @tailrec
+  private def step: FreeT[S, M, A] =
+    this match {
+      case g @ Gosub(_, _) => g.a match {
+        case g0 @ Gosub(_, _) => g0.a.flatMap(a => g0.f(a).flatMap(g.f)).step
+        case _ => g
+      }
+      case x => x
     }
 }
 
