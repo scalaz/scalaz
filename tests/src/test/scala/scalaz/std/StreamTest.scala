@@ -81,6 +81,24 @@ object StreamTest extends SpecLite {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===(true)
   }
 
+  "foldMapLeft1Opt identity" ! forAll {
+    (xs: Stream[Int]) =>
+    Foldable[Stream].foldMapLeft1Opt(xs.reverse)(Stream(_))((xs, x) => x #:: xs) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt identity" ! forAll {
+    (xs: Stream[Int]) =>
+    Foldable[Stream].foldMapRight1Opt(xs)(Stream(_))(_ #:: _) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt evaluates lazily" in {
+    Foldable[Stream].foldMapRight1Opt(Stream.continually(true))(identity)(_ || _) must_===(Some(true))
+  }
+
   "zipL" in {
     val size = 100
     val infinite = Stream.from(1)
