@@ -231,6 +231,11 @@ object MapTest extends SpecLite {
       fromList(List((3,"a"), (5,"b"))).lookupLT(4) must_=== Some((3, "a"))
     }
 
+    "value lookupGT" in {
+      fromList(List((3,"a"), (5,"b"))).lookupGT(5) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupGT(3) must_=== Some((5, "b"))
+    }
+
     "lookup" ! forAll { (a: Byte ==>> Int, n: Byte) =>
       a.lookup(n) must_=== a.toList.find(_._1 == n).map(_._2)
     }
@@ -259,6 +264,23 @@ object MapTest extends SpecLite {
           a.lookupLT(k) must_=== a.elemAt(i-1)
           if (k != Int.MaxValue) {
             a.lookupLT(k+1) must_=== Some((k, v))
+          }
+        }
+      }
+    }
+
+    "lookupGT" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupGT(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupGT(k) must_=== a.elemAt(i+1)
+          if (k != Int.MinValue) {
+            a.lookupGT(k-1) must_=== Some((k, v))
           }
         }
       }

@@ -233,6 +233,25 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
+  @tailrec
+  final def lookupGT(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+    @tailrec
+    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+      t match {
+        case Tip() =>
+          some((kx, x))
+        case Bin(ky, y, l, r) =>
+          if (o.greaterThanOrEqual(k, ky)) goSome(kx, x, r) else goSome(ky, y, l)
+      }
+
+    this match {
+      case Tip() =>
+        none
+      case Bin(kx, x, l, r) =>
+        if (o.greaterThanOrEqual(k, kx)) r.lookupGT(k) else goSome(kx, x, l)
+    }
+  }
+
   def values: List[B] =
     foldrWithKey(List.empty[B])((_, x, xs) => x :: xs)
 
