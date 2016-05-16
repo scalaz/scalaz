@@ -304,7 +304,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
 
-  implicit def theseTArb[F[+_], A, B](implicit A: Arbitrary[F[A \&/ B]]): Arbitrary[TheseT[F, A, B]] =
+  implicit def theseTArb[F[_], A, B](implicit A: Arbitrary[F[A \&/ B]]): Arbitrary[TheseT[F, A, B]] =
       Functor[Arbitrary].map(A)(TheseT[F, A, B](_))
 
   implicit def constArbitrary[A: Arbitrary, B]: Arbitrary[Const[A, B]] =
