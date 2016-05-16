@@ -236,6 +236,12 @@ object MapTest extends SpecLite {
       fromList(List((3,"a"), (5,"b"))).lookupGT(3) must_=== Some((5, "b"))
     }
 
+    "value lookupLE" in {
+      fromList(List((3,"a"), (5,"b"))).lookupLE(2) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupLE(3) must_=== Some((3, "a"))
+      fromList(List((3,"a"), (5,"b"))).lookupLE(4) must_=== Some((3, "a"))
+    }
+
     "value lookupGE" in {
       fromList(List((3,"a"), (5,"b"))).lookupGE(6) must_=== None
       fromList(List((3,"a"), (5,"b"))).lookupGE(5) must_=== Some((5, "b"))
@@ -287,6 +293,23 @@ object MapTest extends SpecLite {
           a.lookupGT(k) must_=== a.elemAt(i+1)
           if (k != Int.MinValue) {
             a.lookupGT(k-1) must_=== Some((k, v))
+          }
+        }
+      }
+    }
+
+    "lookupLE" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupLE(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupLE(k) must_=== Some((k, v))
+          if (k != Int.MinValue) {
+            a.lookupLE(k-1) must_=== a.elemAt(i-1)
           }
         }
       }

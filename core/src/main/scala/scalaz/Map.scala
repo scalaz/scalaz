@@ -253,6 +253,39 @@ sealed abstract class ==>>[A, B] {
   }
 
   @tailrec
+  final def lookupLE(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+    @tailrec
+    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+      t match {
+        case Tip() =>
+          some((kx, x))
+        case Bin(ky, y, l, r) =>
+          o.order(k, ky) match {
+            case LT =>
+              goSome(kx, x, l)
+            case EQ =>
+              some((ky, y))
+            case GT =>
+              goSome(ky, y, r)
+          }
+      }
+
+    this match {
+      case Tip() =>
+        none
+      case Bin(kx, x, l, r) =>
+        o.order(k, kx) match {
+          case LT =>
+            l.lookupLE(k)
+          case EQ =>
+            some((kx, x))
+          case GT =>
+            goSome(kx, x, r)
+        }
+    }
+  }
+
+  @tailrec
   final def lookupGE(k: A)(implicit o: Order[A]): Option[(A, B)] = {
     @tailrec
     def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
