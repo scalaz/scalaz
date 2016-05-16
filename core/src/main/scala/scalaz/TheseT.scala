@@ -136,13 +136,12 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
 }
 sealed abstract class TheseTInstances extends TheseTInstances0
 
-trait TheseTFunctions {
+object TheseT extends TheseTInstances {
   def theseT[F[_], A, B](a: F[A \&/ B]): TheseT[F, A, B] = TheseT(a)
 
   def `this`[F[_]:Functor, A, B](a: F[A]): TheseT[F, A, B] = TheseT(Functor[F].map(a)(x => \&/.This(x)))
   def that[F[_]: Functor, A, B](b: F[B]): TheseT[F, A, B] = TheseT(Functor[F].map(b)(x => \&/.That(x)))
   def both[F[_]: Functor, A, B](ab: F[(A, B)]): TheseT[F, A, B] = TheseT(Functor[F].map(ab) { case (a, b) => \&/.Both(a, b)})
-}
 
-object TheseT extends TheseTInstances with TheseTFunctions
+}
 
