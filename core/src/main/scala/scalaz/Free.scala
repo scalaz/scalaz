@@ -374,6 +374,25 @@ sealed trait SinkInstances {
 object Source extends SourceInstances
 
 sealed trait SourceInstances {
+
+  implicit object UnitSourceInstance extends MonadPlus[Source[?, Unit]] {
+    private type F[A] = Source[A, Unit]
+    override def bind[A, B](fa: F[A])(f: (A) => F[B]): F[B] = {
+      fa.resume match {
+        case -\/((head, tailSource)) => {
+          f(head).flatMap { _: Unit =>
+            bind(tailSource)(f)
+          }
+        }
+        case \/-(a) =>
+          Free.point[(B, ?), Unit](())
+      }
+    }
+    override def empty[A]: F[A] = Free.point[(A, ?), Unit](())
+    override def plus[A](a: F[A], b: => F[A]): F[A] =  a.flatMap { _: Unit => b }
+    override def point[A](a: => A): F[A] = Free.produce(a)
+  }
+
   implicit def sourceMonad[S]: Monad[Source[S, ?]] =
     new Monad[Source[S, ?]] {
       override def point[A](a: => A) = Free.point[(S, ?), A](a)
