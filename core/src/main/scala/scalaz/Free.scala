@@ -379,6 +379,25 @@ sealed trait SourceInstances {
       override def point[A](a: => A) = Free.point[(S, ?), A](a)
       def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f
     }
+
+  implicit def sourceTraverse[A0]: Traverse[Source[?, A0]] = {
+    type F[A] = Source[A, A0]
+    new Traverse[F] {
+      def traverseImpl[G[_] : Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]] = {
+        fa.resume match {
+          case -\/((head, tailSource)) => {
+            implicitly[Applicative[G]].apply2(f(head), traverseImpl[G, A, B](tailSource)(f)) { (mappedHead: B, mappedTail: F[B]) =>
+              Free.produce(mappedHead).flatMap { _: Unit =>
+                mappedTail
+              }
+            }
+          }
+          case \/-(a) =>
+            implicitly[Applicative[G]].point(Free.point[(B, ?), A0](a))
+        }
+      }
+    }
+  }
 }
 
 sealed abstract class FreeInstances3 {
