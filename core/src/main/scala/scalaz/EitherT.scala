@@ -115,6 +115,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.fold(_ => Nil, _ :: Nil))
 
+  /** Return a `this` on the left-side or a `that` on the right-side of this disjunction  */
+  def toThese(implicit F: Functor[F]): TheseT[F, A, B] = TheseT(F.map(run)(_.toThese))
+
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
     F.map(run)((_: (A \/ B)).fold(_ => Stream(), Stream(_)))
