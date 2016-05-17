@@ -97,8 +97,7 @@ sealed abstract class TheseTInstances1 {
 
   }
 
-  /* cannot use kind projector */
-  implicit def TheseTHoist[A: Semigroup]: Hoist[({type l[a[_], b] = TheseT[a, A, b]})#l] = new Hoist[({type l[a[_], b] = TheseT[a, A, b]})#l] {
+  implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[?[_], A, ?]] = new Hoist[TheseT[?[_], A, ?]] {
     override def hoist[M[_]: Monad, N[_]](f: M ~> N) = {
       new (TheseT[M, A, ?] ~> TheseT[N, A, ?]) {
         override def apply[B](fa: TheseT[M, A, B]): TheseT[N, A, B] = TheseT(f.apply(fa.run))
