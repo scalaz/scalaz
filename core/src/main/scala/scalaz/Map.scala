@@ -551,6 +551,20 @@ sealed abstract class ==>>[A, B] {
         Bin(kx, f(kx, x), l.mapWithKey(f), r.mapWithKey(f))
     }
 
+  def traverseWithKey[F[_], C](f: (A, B) => F[C])(implicit G: Applicative[F]): F[A ==>> C] =
+    this match {
+      case Tip() =>
+        G.point(Tip())
+      case Bin(kx, x, Tip(), Tip()) =>
+        G.apply(f(kx, x)) { x2 =>
+          Bin(kx, x2, Tip(), Tip())
+        }
+      case Bin(kx, x, l, r) =>
+        G.apply3(l.traverseWithKey(f), f(kx, x), r.traverseWithKey(f)) {
+          (l2, x2, r2) => Bin(kx, x2, l2, r2)
+        }
+    }
+
   def mapAccum[C](z: C)(f: (C, B) => (C, B)): (C, A ==>> B) =
     mapAccumWithKey(z)((a2, _, x2) => f(a2, x2))
 

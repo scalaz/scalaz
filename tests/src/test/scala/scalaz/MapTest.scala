@@ -745,6 +745,28 @@ object MapTest extends SpecLite {
     }
   }
 
+  "==>> traverse" should {
+    "traverseWithKey" in {
+      val f = (k: Int, v: Char) => if (k%2 == 1) Some((v + 1).toChar) else None
+
+      empty.traverseWithKey(f) must_=== Some(empty)
+      fromList(List(1 -> 'a', 5 -> 'e')).traverseWithKey(f) must_=== Some(fromList(List(1 -> 'b', 5 -> 'f')))
+      fromList(List(2 -> 'a')).traverseWithKey(f) must_=== None
+    }
+
+    "traverseWithKey" ! forAll { (a: Int ==>> Char, b: Byte) =>
+      val fSome = (k: Int, v: Char) => some((v + b).toChar)
+      def fNone(key: Int) = (k: Int, v: Char) => if (k == key) None else some((v + b).toChar)
+
+      val li = a.toList.map(kv => (kv._1, fSome(kv._1, kv._2).get))
+      a.traverseWithKey(fSome) must_=== Some(fromList(li))
+
+      a.toList.foreach { kv =>
+        a.traverseWithKey(fNone(kv._1)) must_=== None
+      }
+    }
+  }
+
   "==>> fold" should {
     "fold" in {
       val f = (a: Int, b: String) => a + b.length
