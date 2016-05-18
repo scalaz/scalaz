@@ -871,6 +871,12 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  def splitRoot: List[A ==>> B] =
+    this match {
+      case Tip()           => List.empty[A ==>> B]
+      case Bin(k, x, l, r) => List(l, singleton(k, x), r)
+    }
+
   // Utility functions
   // Because the following functions depend on some public interface, such as deleteFindMax,
   // they can't be moved to object ==>> unlike other utility functions, balance(...) for example.

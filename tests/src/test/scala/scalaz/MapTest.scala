@@ -333,6 +333,23 @@ object MapTest extends SpecLite {
     }
   }
 
+  "split" should {
+    "splitRoot" ! forAll { a: Int ==>> Int =>
+      a match {
+        case Tip() =>
+          a.splitRoot must_=== List.empty[Int ==>> Int]
+        case Bin(k, x, l, r) =>
+          val List(l2, kv, r2) = a.splitRoot
+          structurallySound(l2)
+          structurallySound(r2)
+          l2 must_=== l
+          r2 must_=== r
+          kv must_=== singleton(k, x)
+          l2.union(r2).union(kv) must_=== a
+      }
+    }
+  }
+
   "updateAt" should {
     "succeed" in {
       // TODO: This is a problem as the function 'updateAt' is not total - any thoughts?
