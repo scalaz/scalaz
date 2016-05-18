@@ -777,6 +777,13 @@ object MapTest extends SpecLite {
       val f = (k: Int, a: String, result: String) => result + "(" + k.toString + ":" + a + ")"
       fromList(List(5 -> "a", 3 -> "b")).foldrWithKey("Map: ")(f) must_== "Map: (5:a)(3:b)"
     }
+
+    "foldMapWithKey" ! forAll { a: Byte ==>> Byte =>
+      val f = (i: Byte, j: Byte) => i.toInt + j.toInt
+      val res = a.toList.foldLeft(0: Int)((acc, kv) => acc + kv._1.toInt + kv._2.toInt)
+
+      a.foldMapWithKey(f)(intInstance) must_=== res
+    }
   }
 
   "==>> trim" should {

@@ -610,6 +610,16 @@ sealed abstract class ==>>[A, B] {
         l.foldrWithKey(f(kx, x, r.foldrWithKey(z)(f)))(f)
     }
 
+  def foldMapWithKey[C](f: (A, B) => C)(implicit F: Monoid[C]): C =
+    this match {
+      case Tip() =>
+        F.zero
+      case Bin(k, x, Tip(), Tip()) =>
+        f(k, x)
+      case Bin(k, x, l, r) =>
+        F.append(l.foldMapWithKey(f), F.append(f(k, x), r.foldMapWithKey(f)))
+    }
+
   /* Unions */
   def union(other: A ==>> B)(implicit k: Order[A]): A ==>> B = {
     def hedgeUnion(blo: Option[A], bhi: Option[A], m1: A ==>> B, m2: A ==>> B): A ==>> B =
