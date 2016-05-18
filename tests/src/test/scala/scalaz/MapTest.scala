@@ -928,6 +928,18 @@ object MapTest extends SpecLite {
     }
   }
 
+  "==>> fromSet" should {
+    "fromSet" in {
+      fromSet(ISet.fromList(List[Int](3, 5))){ i: Int => List.fill(i)('a').mkString } must_=== fromList(List(5 -> "aaaaa", 3 -> "aaa"))
+      fromSet(ISet.fromList(List[Int]())){ i: Int => i } must_=== empty
+    }
+
+    "fromSet" ! forAll { (a: ISet[Int]) =>
+      val li = a.toList.map(i => (i, i))
+      fromSet(a)(i => i) must_=== fromList(li)
+    }
+  }
+
   /*"==>> validity" should {
     "valid" in {
       fromList(List(3 -> "b", 5 -> "a")).isValid must_== true
