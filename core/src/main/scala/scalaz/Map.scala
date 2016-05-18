@@ -1,7 +1,9 @@
 package scalaz
 
-// http://www.haskell.org/ghc/docs/7.0.2/html/libraries/containers-0.4.0.0/src/Data-Map.html
-
+/**
+ * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
+ * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Map/Base.hs]]
+ */
 import Ordering.{ EQ, LT, GT }
 
 import std.anyVal._
@@ -1223,6 +1225,13 @@ object ==>> extends MapInstances {
 
   final def fromListWithKey[A: Order, B](l: List[(A, B)])(f: (A, B, B) => B): A ==>> B =
     l.foldLeft(empty[A, B])((a, c) => a.insertWithKey(f, c._1, c._2))
+
+  /* TODO: Ordered lists
+    , fromAscList
+    , fromAscListWith
+    , fromAscListWithKey
+    , fromDistinctAscList
+  */
 
   /* Foldable operations */
   final def fromFoldable[F[_]: Foldable, A: Order, B](fa: F[(A, B)]): A ==>> B =
