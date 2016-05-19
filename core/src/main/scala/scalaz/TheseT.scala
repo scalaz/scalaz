@@ -76,9 +76,6 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def &&&[AA >: A, C](t: TheseT[F, AA, C])(implicit M: Semigroup[AA], F: Apply[F]): TheseT[F, AA, (B, C)]
   = TheseT(F.apply2(run, t.run)(_ &&& _))
 
-  def ===[AA >: A, BB >: B](x: TheseT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean]
-  = F.apply2(this.run, x.run)(_ === _)
-
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord]
   = F.map(run)(_.show)
 
@@ -131,6 +128,8 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
   implicit def theseTSemigroup[F[_]: Apply, A: Semigroup, B: Semigroup]: Semigroup[TheseT[F, A, B]] = new Semigroup[TheseT[F, A, B]] {
     override def append(f1: TheseT[F, A, B], f2: => TheseT[F, A, B]) = TheseT(Apply[F].apply2(f1.run, f2.run)(_ append _))
   }
+  implicit def theseTEqual[F[_], A, B](implicit F0: Equal[F[A \&/ B]]): Equal[TheseT[F, A, B]] =
+    F0.contramap((_: TheseT[F, A, B]).run)
 
 }
 sealed abstract class TheseTInstances extends TheseTInstances0
