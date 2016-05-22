@@ -63,7 +63,7 @@ object ScalazProperties {
 
     def minmaxsucc[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxsucc
 
-    private val smallInt = Gen.choose(-100, 100)
+    private[this] val smallInt = Gen.choose(-100, 100)
 
     def succn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.succn(x, _)))
 

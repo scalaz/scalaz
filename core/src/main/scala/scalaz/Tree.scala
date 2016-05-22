@@ -195,8 +195,8 @@ object Tree extends TreeInstances {
   object Node {
     def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
       new Tree[A] {
-        val rootc = Need(root)
-        val forestc = Need(forest)
+        private[this] val rootc = Need(root)
+        private[this] val forestc = Need(forest)
         def rootLabel = rootc.value
         def subForest = forestc.value
 

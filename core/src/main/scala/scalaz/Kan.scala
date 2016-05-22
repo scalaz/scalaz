@@ -82,7 +82,7 @@ trait Lan[G[_], H[_], A] { lan =>
 
   def map[B](g: A => B): Lan[G, H, B] = new Lan[G, H, B] {
     type I = lan.I
-    val vc = Need(lan.v)
+    private[this] val vc = Need(lan.v)
     def v = vc.value
     def f(gi: G[I]) = g(lan f gi)
   }
@@ -156,7 +156,7 @@ private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, ?]] with LanFunctor[G
   def G: Functor[G]
   def H: Apply[H]
 
-  private abstract class Internal[A] {
+  private[this] abstract class Internal[A] {
     type T
     def value: A
   }
@@ -171,7 +171,7 @@ private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, ?]] with LanFunctor[G
       type T = value.I
     }
     type I = (xfp.T, xp.T)
-    val vc = Need(H.tuple2(xfp.value.v, xp.value.v))
+    private[this] val vc = Need(H.tuple2(xfp.value.v, xp.value.v))
     def v = vc.value
     def f(gi: G[I]) = xfp.value.f(G.map(gi)(_._1))(xp.value.f(G.map(gi)(_._2)))
   }
