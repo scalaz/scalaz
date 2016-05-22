@@ -224,11 +224,11 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
     timed(timeout.toMillis)
 
-  @deprecated("use unsafePerformTimed", "7.2")
+  @deprecated("use timed", "7.2")
   def unsafePerformTimed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
     timed(timeout)
   
-  @deprecated("use unsafePerformTimed", "7.2")
+  @deprecated("use timed", "7.2")
   def unsafePerformTimed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
     timed(timeoutInMillis)
  
@@ -241,7 +241,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
     retryInternal(delays, p, true)
 
-  @deprecated("use unsafePerformRetryAccumulating", "7.2")
+  @deprecated("use retryAccumulating", "7.2")
   def unsafePerformRetryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
     retryAccumulating(delays, p)
     
@@ -253,7 +253,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
     retryInternal(delays, p, false).map(_._1)
 
-  @deprecated("use unsafePerformRetry", "7.2")
+  @deprecated("use retry", "7.2")
   def unsafePerformRetry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
     retry(delays, p)
 
