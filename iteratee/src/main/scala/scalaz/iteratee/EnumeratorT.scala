@@ -187,7 +187,7 @@ trait EnumeratorTFunctions {
 
   def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      private val limit = max.map(_ min (a.length)).getOrElse(a.length)
+      private[this] val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
         def loop(pos : Int): StepT[E, F, A] => IterateeT[E, F, A] = {
           s => 

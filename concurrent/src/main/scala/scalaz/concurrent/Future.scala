@@ -347,7 +347,7 @@ object Future {
       }
     }
 
-    private val finishedCallback: Any => Trampoline[Unit] =
+    private[this] val finishedCallback: Any => Trampoline[Unit] =
       _ => sys.error("impossible, since there can only be one runner of chooseAny")
 
     // implementation runs all threads, dumping to a shared queue
