@@ -567,16 +567,16 @@ sealed abstract class ==>>[A, B] {
     difference(other)
 
   def difference[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B = {
-    def hedgeDiff(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> C): A ==>> B =
+    def hedgeDiff(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> B =
       (a, b) match {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          link(kx, x, l filterGt cmplo, r filterLt cmphi)
+          link(kx, x, l filterGt blo, r filterLt bhi)
         case (t, Bin(kx, _, l, r)) =>
-          val cmpkx = (k: A) => o.order(kx, k)
-          val aa = hedgeDiff(cmplo, cmpkx, t.trim(cmplo, cmpkx), l)
-          val bb = hedgeDiff(cmpkx, cmphi, t.trim(cmpkx, cmphi), r)
+          val bmi = some(kx)
+          val aa = hedgeDiff(blo, bmi, ==>>.trim(blo, bmi, t), l)
+          val bb = hedgeDiff(bmi, bhi, ==>>.trim(bmi, bhi, t), r)
           aa merge bb
       }
 
@@ -586,7 +586,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiff(Function const LT, Function const GT, t1, t2)
+        hedgeDiff(None, None, t1, t2)
     }
   }
 
