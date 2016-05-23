@@ -563,11 +563,11 @@ sealed abstract class ==>>[A, B] {
   }
 
   // Difference functions
-  def \\(other: A ==>> B)(implicit o: Order[A]): A ==>> B =
+  def \\[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B =
     difference(other)
 
-  def difference(other: A ==>> B)(implicit o: Order[A]): A ==>> B = {
-    def hedgeDiff(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> B): A ==>> B =
+  def difference[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B = {
+    def hedgeDiff(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> C): A ==>> B =
       (a, b) match {
         case (Tip(), _) =>
           empty
