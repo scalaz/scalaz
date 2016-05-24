@@ -43,6 +43,10 @@ final class StringOps(val self: String) extends AnyVal {
   def parseFloat: Validation[NumberFormatException, Float] = s.parseFloat(self)
 
   def parseDouble: Validation[NumberFormatException, Double] = s.parseDouble(self)
+
+  def parseBigInt: Validation[NumberFormatException, BigInt] = s.parseBigInt(self)
+
+  def parseBigDecimal: Validation[NumberFormatException, BigDecimal] = s.parseBigDecimal(self)
 }
 
 trait ToStringOps {
