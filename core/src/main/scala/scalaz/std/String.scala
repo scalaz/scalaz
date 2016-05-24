@@ -44,59 +44,32 @@ trait StringFunctions {
 
   // Parsing functions.
 
-  def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] = try {
-    Success(s.toBoolean)
-  } catch {
-    case e: IllegalArgumentException => Failure(e)
-  }
+  def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] =
+    \/.fromTryCatchThrowable[Boolean, IllegalArgumentException](s.toBoolean).validation
 
-  def parseByte(s:String): Validation[NumberFormatException, Byte] = try {
-    Success(s.toByte)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseByte(s:String): Validation[NumberFormatException, Byte] =
+    \/.fromTryCatchThrowable[Byte, NumberFormatException](s.toByte).validation
 
-  def parseShort(s:String): Validation[NumberFormatException, Short] = try {
-    Success(s.toShort)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseShort(s:String): Validation[NumberFormatException, Short] =
+    \/.fromTryCatchThrowable[Short, NumberFormatException](s.toShort).validation
 
-  def parseInt(s:String): Validation[NumberFormatException, Int] = try {
-    Success(s.toInt)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseInt(s:String): Validation[NumberFormatException, Int] =
+    \/.fromTryCatchThrowable[Int, NumberFormatException](s.toInt).validation
 
-  def parseLong(s:String): Validation[NumberFormatException, Long] = try {
-    Success(s.toLong)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseLong(s:String): Validation[NumberFormatException, Long] =
+    \/.fromTryCatchThrowable[Long, NumberFormatException](s.toLong).validation
 
-  def parseFloat(s:String): Validation[NumberFormatException, Float] = try {
-    Success(s.toFloat)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseFloat(s:String): Validation[NumberFormatException, Float] =
+    \/.fromTryCatchThrowable[Float, NumberFormatException](s.toFloat).validation
 
-  def parseDouble(s:String): Validation[NumberFormatException, Double] = try {
-    Success(s.toDouble)
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseDouble(s:String): Validation[NumberFormatException, Double] =
+    \/.fromTryCatchThrowable[Double, NumberFormatException](s.toDouble).validation
 
-  def parseBigInt(s:String): Validation[NumberFormatException, BigInt] = try {
-    Success(BigInt(s))
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseBigInt(s:String): Validation[NumberFormatException, BigInt] =
+    \/.fromTryCatchThrowable[BigInt, NumberFormatException](BigInt(s)).validation
 
-  def parseBigDecimal(s:String): Validation[NumberFormatException, BigDecimal] = try {
-    Success(BigDecimal(s))
-  } catch {
-    case e: NumberFormatException => Failure(e)
-  }
+  def parseBigDecimal(s:String): Validation[NumberFormatException, BigDecimal] =
+    \/.fromTryCatchThrowable[BigDecimal, NumberFormatException](BigDecimal(s)).validation
 }
 
 object string extends StringInstances with StringFunctions {
