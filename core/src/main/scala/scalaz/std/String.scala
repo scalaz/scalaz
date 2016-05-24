@@ -89,4 +89,16 @@ trait StringFunctions {
 
 object string extends StringInstances with StringFunctions {
   object stringSyntax extends scalaz.syntax.std.ToStringOps
+
+  def parseBigInt(s:String): Validation[NumberFormatException, BigInt] = try {
+    Success(BigInt(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
+
+  def parseBigDecimal(s:String): Validation[NumberFormatException, BigDecimal] = try {
+    Success(BigDecimal(s))
+  } catch {
+    case e: NumberFormatException => Failure(e)
+  }
 }
