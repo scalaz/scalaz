@@ -171,6 +171,19 @@ sealed abstract class EphemeralStreamInstances {
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(b => a => f(b, a))
+
+    override def foldMapRight1Opt[A, B](fa: EphemeralStream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+      def rec(tortoise: EphemeralStream[A], hare: EphemeralStream[A]): B =
+        if (hare.isEmpty) z(tortoise.head())
+        else f(tortoise.head(), rec(hare, hare.tail()))
+      if (fa.isEmpty) None
+      else Some(rec(fa, fa.tail()))
+    }
+
+    override def foldMapLeft1Opt[A, B](fa: EphemeralStream[A])(z: A => B)(f: (B, A) => B): Option[B] =
+      if (fa.isEmpty) None
+      else Some(foldLeft(fa.tail(), z(fa.head()))(f))
+
     override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
       if(fa.isEmpty) emptyEphemeralStream
       else {
