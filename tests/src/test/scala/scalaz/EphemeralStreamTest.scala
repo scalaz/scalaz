@@ -129,6 +129,25 @@ object EphemeralStreamTest extends SpecLite {
     Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must_===(true)
   }
 
+  "foldMapLeft1Opt identity" ! forAll {
+    (xs: EphemeralStream[Int]) =>
+    Foldable[EphemeralStream].foldMapLeft1Opt(xs.reverse)(EphemeralStream(_))((xs, x) => x ##:: xs) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt identity" ! forAll {
+    (xs: EphemeralStream[Int]) =>
+    Foldable[EphemeralStream].foldMapRight1Opt(xs)(EphemeralStream(_))(_ ##:: _) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt evaluates lazily" in {
+    val infiniteStream = EphemeralStream.iterate(true)(identity)
+    Foldable[EphemeralStream].foldMapRight1Opt(infiniteStream)(identity)(_ || _) must_===(Some(true))
+  }
+
   "zipL" in {
     val size = 100
     val infinite = EphemeralStream.iterate(0)(_ + 1)
