@@ -1,6 +1,36 @@
 package scalaz
 
+import org.scalacheck.{Arbitrary, Gen}
+import scalaz.scalacheck.ScalaCheckBinding._
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.std.list._
+import scalaz.std.string._
+
 object IndexedContsTTest extends SpecLite {
+
+  type ContTListString[A] = ContT[List, String, A]
+  type ContTListStringInt = ContTListString[Int]
+
+  def contTListStringGen[A](implicit A: Arbitrary[A]): Gen[ContTListString[A]] = Gen.frequency(
+    (1, Functor[Gen].map(Gen.containerOf[List, String](Gen.alphaStr))(l => ContT(f => l))),
+    (1, Functor[Gen].map(A.arbitrary)(ContT.point(_))),
+    (1, Functor[Gen].map(A.arbitrary)(i => ContT(f => {
+      val l = f(i)
+      val (a, b) = l.splitAt((l.size + 1) % 3)
+      a ::: List("foo") ::: b
+    })))
+  )
+
+  implicit def contTListStringIntArb: Arbitrary[ContTListStringInt] = Arbitrary(contTListStringGen[Int])
+  implicit def contTListStringInt2Arb: Arbitrary[ContTListString[Int => Int]] = Arbitrary(contTListStringGen[Int => Int])
+  implicit def contTListStringIntEqual: Equal[ContTListStringInt] = new Equal[ContTListStringInt] {
+    def equal(a: ContTListStringInt, b: ContTListStringInt): Boolean = {
+      val f: Int => List[String] = _.toString.toList.map(_.toString)
+      Equal[List[String]].equal(a(f), b(f))
+    }
+  }
+
+  checkAll(monadPlus.laws[ContTListString])
 
   object instances {
     def functorRight[W[_]: Functor, M[_], R, O] = Functor[IndexedContsT[W, M, R, O, ?]]
