@@ -39,7 +39,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
     tail match {
-      case INil() => F.map(f(head))(nel(_, INil()))
+      case INil() => F.map(f(head))(nel(_, IList.empty))
       case ICons(b, bs) => F.apply2(f(head), OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
         case (h, t) => nel(h, t.head :: t.tail)
       }
@@ -61,7 +61,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   /** @since 7.0.2 */
-  def init: IList[A] = tail.initOption.fold[IList[A]](INil())(il => head :: il)
+  def init: IList[A] = tail.initOption.fold[IList[A]](IList.empty)(il => head :: il)
 
   def inits: NonEmptyList[NonEmptyList[A]] =
     reverse.tails.map(_.reverse)
