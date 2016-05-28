@@ -34,7 +34,7 @@ sealed abstract class Dequeue[A] {
     case FullDequeue(OneAnd(f, INil()), 1, OneAnd(single,INil()), 1) => Just((f, SingletonDequeue(single)))
     case FullDequeue(OneAnd(f, INil()), 1, OneAnd(x, ICons(xx, xs)), bs) => {
       val xsr = reverseNEL(OneAnd(xx, xs))
-      Just((f, FullDequeue(xsr, bs-1, OneAnd(x, INil()), 1)))
+      Just((f, FullDequeue(xsr, bs-1, OneAnd(x, IList.empty), 1)))
     }
     case FullDequeue(OneAnd(f, ICons(ff, fs)), s, back, bs) => Just(f, FullDequeue(OneAnd(ff, fs), s-1, back, bs))
   }
@@ -48,7 +48,7 @@ sealed abstract class Dequeue[A] {
     case FullDequeue(OneAnd(single, INil()), 1, OneAnd(b, INil()), 1) => Just((b, SingletonDequeue(single)))
     case FullDequeue(OneAnd(x, ICons(xx,xs)), fs, OneAnd(b, INil()), 1) => {
       val xsr = reverseNEL(OneAnd(xx, xs))
-      Just((b, FullDequeue(OneAnd(x, INil()), 1, xsr, fs-1)))
+      Just((b, FullDequeue(OneAnd(x, IList.empty), 1, xsr, fs-1)))
     }
 
     case FullDequeue(front, fs, OneAnd(b, ICons(bb,bs)), s) => Just((b, FullDequeue(front, fs, OneAnd(bb,bs), s-1)))
@@ -60,7 +60,7 @@ sealed abstract class Dequeue[A] {
     */
   def cons(a: A): Dequeue[A] = this match {
     case EmptyDequeue() => SingletonDequeue(a)
-    case SingletonDequeue(single) => FullDequeue(OneAnd(a, INil()), 1, OneAnd(single, INil()), 1 )
+    case SingletonDequeue(single) => FullDequeue(OneAnd(a, IList.empty), 1, OneAnd(single, IList.empty), 1 )
     case FullDequeue(front, fs, back, bs) => FullDequeue(OneAnd(a, ICons(front.head, front.tail)), fs+1, back, bs)
   }
 
@@ -97,18 +97,18 @@ sealed abstract class Dequeue[A] {
     * convert this queue to a list of elements from front to back
     */
   def toIList: IList[A] = this match {
-    case EmptyDequeue() => INil()
-    case SingletonDequeue(a) => ICons(a, INil())
-    case FullDequeue(front, fs, back, bs) => front.head +: (front.tail ++ (back.tail reverse_::: ICons(back.head, INil())))
+    case EmptyDequeue() => IList.empty
+    case SingletonDequeue(a) => ICons(a, IList.empty)
+    case FullDequeue(front, fs, back, bs) => front.head +: (front.tail ++ (back.tail reverse_::: ICons(back.head, IList.empty)))
   }
 
   /**
     * convert this queue to a list of elements from back to front
     */
   def toBackIList: IList[A] = this match {
-    case EmptyDequeue() => INil()
-    case SingletonDequeue(a) => ICons(a, INil())
-    case FullDequeue(front, fs, back, bs) => back.head +: (back.tail ++ (front.tail ++ (ICons(front.head, INil()))))
+    case EmptyDequeue() => IList.empty
+    case SingletonDequeue(a) => ICons(a, IList.empty)
+    case FullDequeue(front, fs, back, bs) => back.head +: (back.tail ++ (front.tail ++ (ICons(front.head, IList.empty))))
   }
 
   /**
@@ -191,7 +191,7 @@ object Dequeue extends DequeueInstances {
         case ICons(h, t) =>
           loop(t, h :: acc)
       }
-    loop(fa.head :: fa.tail, INil())
+    loop(fa.head :: fa.tail, IList.empty)
   }
 }
 
