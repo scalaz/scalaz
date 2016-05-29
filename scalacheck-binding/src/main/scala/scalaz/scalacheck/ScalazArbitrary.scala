@@ -31,6 +31,9 @@ object ScalazArbitrary {
   implicit def EphemeralStreamArbitrary[A : Arbitrary] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
+  implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
+    Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
+
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassManifest] =
     Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
