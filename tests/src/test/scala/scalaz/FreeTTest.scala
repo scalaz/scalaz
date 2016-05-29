@@ -112,6 +112,12 @@ object FreeTTest extends SpecLite {
     }
   }
 
+  "#1156: equals should not return true for obviously unequal instances" in {
+    val a = FreeT.point[List, Option, Int](1).flatMap(x => FreeT.point(2))
+    val b = FreeT.point[List, Option, Int](3).flatMap(x => FreeT.point(4))
+    a != b
+  }
+
   "isoFree" ! forAll { a: FreeOption[Int] =>
     val iso = FreeT.isoFree[Option]
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
