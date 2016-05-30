@@ -100,9 +100,25 @@ object FreeTTest extends SpecLite {
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
+    "hoist stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.f.hoist(NaturalTransformation.refl) // used to overflow
+    }
+
     "interpret" ! forAll { a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpret(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
+    }
+
+    "interpret stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.f.interpret(NaturalTransformation.refl) // used to overflow
     }
 
     "foldMap should be consistent with runM" ! forAll { a: FreeTListOption[Int] =>
