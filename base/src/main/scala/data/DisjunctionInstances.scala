@@ -10,7 +10,7 @@ trait DisjunctionInstances {
     override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
       ma.fold[L \/ B](l => -\/(l))(r => \/-(f(r)))
 
-    override def ap[A, B](ma: L \/ A)(mf: L \/ (A => B)): L \/ B =
+    override def ap[A, B](ma: => L \/ A)(mf: L \/ (A => B)): L \/ B =
       ma.fold[L \/ B](l => -\/(l))(a => map[(A => B), B](mf)(f => f(a)))
 
     override def pure[A](a: A): L \/ A =
