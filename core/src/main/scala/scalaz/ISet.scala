@@ -396,23 +396,27 @@ sealed abstract class ISet[A] {
     }}}
     */
   def map[B: Order](f: A => B) =
-    fromList(toList.map(f))
+    fromEphemeralStream(toAscEphemeralStream.map(f))
 
   // -- * Folds
-  final def foldRight[B](z: B)(f: (A, B) => B): B =
+  final def foldRight[B](z: B)(f: (A, B) => B): B = foldRightLazy(z)((a, b) => f(a, b))
+
+  final def foldRightLazy[B](z: => B)(f: (A, => B) => B): B =
     this match {
       case Tip() => z
-      case Bin(x, l ,r) => l.foldRight(f(x, r.foldRight(z)(f)))(f)
+      case Bin(x, l ,r) => l.foldRightLazy(f(x, r.foldRightLazy(z)(f)))(f)
     }
 
   final def foldr[B](z: B)(f: (A, B) => B): B =
     foldRight(z)(f)
 
-  final def foldLeft[B](z: B)(f: (B, A) => B): B =
+  final def foldLeft[B](z: B)(f: (B, A) => B): B =  foldLeftLazy(z)((b, a) => f(b, a))
+
+  final def foldLeftLazy[B](z: => B)(f: (=> B, A) => B): B =
     this match {
       case Tip() => z
       case Bin(x, l, r) =>
-        r.foldLeft(f(l.foldLeft(z)(f), x))(f)
+        r.foldLeftLazy(f(l.foldLeftLazy(z)(f), x))(f)
     }
 
   final def foldl[B](z: B)(f: (B, A) => B): B =
@@ -494,6 +498,13 @@ sealed abstract class ISet[A] {
 
   final def toDescList =
     foldLeft(List.empty[A])((a, b) => b :: a)
+
+  // -- ** EphemeralStream
+  def toAscEphemeralStream: EphemeralStream[A] =
+    foldRightLazy(EphemeralStream[A]())((x, xs) => x ##:: xs)
+
+  def toDescEphemeralStream: EphemeralStream[A] =
+    foldLeftLazy(EphemeralStream[A]())((xs, x) => x ##:: xs)
 
   private def glue[A](l: ISet[A], r: ISet[A]): ISet[A] =
     (l, r) match {
@@ -605,8 +616,10 @@ sealed abstract class ISet[A] {
         false
     }
 
-  override final def hashCode: Int =
-    toAscList.hashCode
+  override final def hashCode: Int = {
+    val stm = toAscEphemeralStream
+    scala.util.hashing.MurmurHash3.orderedHash(EphemeralStream.toIterable(stm).iterator)
+  }
 }
 
 sealed abstract class ISetInstances {
@@ -621,13 +634,11 @@ sealed abstract class ISetInstances {
     def A = implicitly
 
     def order(x: ISet[A], y: ISet[A]) =
-      Order[List[A]].order(x.toAscList, y.toAscList)
+      Order[EphemeralStream[A]].order(x.toAscEphemeralStream, y.toAscEphemeralStream)
   }
 
-  implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
-    override def shows(f: ISet[A]) =
-      f.toAscList.mkString("ISet(", ",", ")")
-  }
+  implicit def setShow[A: Show]: Show[ISet[A]] =
+    Contravariant[Show].contramap(Show[EphemeralStream[A]])(_.toAscEphemeralStream)
 
   implicit def setMonoid[A: Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
     def zero: ISet[A] =
@@ -679,7 +690,7 @@ sealed abstract class ISetInstances {
       }
 
     def foldRight[A, B](fa: ISet[A], z: => B)(f: (A, => B) => B): B =
-      fa.foldRight(z)((a, b) => f(a, b))
+      fa.foldRightLazy(z)(f)
 
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
@@ -753,6 +764,9 @@ object ISet extends ISetInstances {
 
   final def fromFoldable[F[_], A](xs: F[A])(implicit F: Foldable[F], o: Order[A]): ISet[A] =
     F.foldLeft(xs, empty[A])((a, b) => a insert b)
+
+  final def fromEphemeralStream[A](xs: EphemeralStream[A])(implicit o: Order[A]): ISet[A] =
+    xs.foldLeft(empty[A])(a => b => a insert b)
 
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(ISet.empty[A])(_ union _)
@@ -841,5 +855,5 @@ private sealed trait ISetEqual[A] extends Equal[ISet[A]] {
   implicit def A: Equal[A]
 
   override final def equal(a1: ISet[A], a2: ISet[A]) =
-    (a1.size == a2.size) && Equal[List[A]].equal(a1.toAscList, a2.toAscList)
+    (a1.size == a2.size) && Equal[EphemeralStream[A]].equal(a1.toAscEphemeralStream, a2.toAscEphemeralStream)
 }
