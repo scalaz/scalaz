@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.annotation.tailrec
+import Maybe.{Empty, Just}
 
 sealed abstract class CorecursiveList[A] {
   type S
@@ -17,13 +18,59 @@ object CorecursiveList extends CorecursiveListInstances {
   def apply[S, A](init: S)(step: S => Maybe[(S, A)]): CorecursiveList[A] =
     CorecursiveListImpl(init, step)
 
-  implicit val covariantInstance: Functor[CorecursiveList] with Foldable[CorecursiveList] with PlusEmpty[CorecursiveList] with Zip[CorecursiveList] =
-    new Functor[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
-        with PlusEmpty[CorecursiveList] with Zip[CorecursiveList] {
+  def fromStream[A](s: Stream[A]): CorecursiveList[A] =
+    CorecursiveList(s){
+      case Stream.Empty => Empty()
+      case x #:: xs => Just((xs, x))
+    }
+
+  implicit val covariantInstance: MonadPlus[CorecursiveList] with Foldable[CorecursiveList] with Zip[CorecursiveList] =
+    new MonadPlus[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
+        with Zip[CorecursiveList] {
       override def map[A, B](fa: CorecursiveList[A])(f: A => B) =
         CorecursiveList(fa.init)(fa.step andThen (_ map {
           case (s, a) => (s, f(a))
         }))
+
+      override def ap[A, B](fa0: => CorecursiveList[A])(ff0: => CorecursiveList[A => B]) = {
+        val fa = fa0
+        val ff = ff0
+        def bstep(sa: fa.S, ffs: Maybe[(ff.S, A => B)])
+            : Maybe[((fa.S, Maybe[(ff.S, A => B)]), B)] =
+          ffs.flatMap{case (sf, f) =>
+            (fa.step(sa) map {case (sa, a) => ((sa, ffs), f(a))}
+              orElse bstep(fa.init, ff.step(sf)))
+          }
+        CorecursiveList((fa.init, ff.step(ff.init)))((bstep _).tupled)
+      }
+
+      override def bind[A, B](fa: CorecursiveList[A])(f: A => CorecursiveList[B]) = {
+        def bstep(sa: fa.S, mfb: Maybe[CorecursiveList[B]])
+            : Maybe[((fa.S, Maybe[CorecursiveList[B]]), B)] = mfb match {
+          case Empty() => fa.step(sa) flatMap {case (sa, a) =>
+            bstep(sa, Just(f(a)))
+          }
+          case Just(fb) => fb.step(fb.init) map {
+            case (sb, b) => ((sa, CorecursiveList(sb)(fb.step)), b)
+          } orElse bstep(sa, Empty())
+        }
+        CorecursiveList((fa.init, Empty()))((bstep _).tupled)
+      }
+
+      override def filter[A](fa: CorecursiveList[A])(f: A => Boolean) =
+        CorecursiveList(fa.init){
+          @tailrec def step(s: fa.S): Maybe[(fa.S, A)] = fa.step(s) match {
+            case Empty() => Empty()
+            case j@Just((s, a)) =>
+              if (f(a)) j else step(s)
+          }
+          step
+        }
+
+      override def point[A](a: => A) =
+        CorecursiveList(false){b =>
+          if (b) Empty() else Just((true, a))
+        }
 
       override def foldRight[A, B](fa: CorecursiveList[A], z: => B)(f: (A, => B) => B) = {
         def rec(s: fa.S): B =
@@ -33,25 +80,26 @@ object CorecursiveList extends CorecursiveListInstances {
 
       override def foldLeft[A, B](fa: CorecursiveList[A], z: B)(f: (B, A) => B) = {
         @tailrec def rec(z: B, s: fa.S): B = fa.step(s) match {
-          case Maybe.Empty() => z
-          case Maybe.Just((s, a)) => rec(f(z, a), s)
+          case Empty() => z
+          case Just((s, a)) => rec(f(z, a), s)
         }
         rec(z, fa.init)
       }
 
       override def empty[A] =
-        CorecursiveList(())(Function const Maybe.Empty())
+        CorecursiveList(())(Function const Empty())
 
-      override def plus[A](la: CorecursiveList[A], ra: => CorecursiveList[A]) = {
-        val ra1 = Need(ra)
-        type SS = la.S \/ ra1.value.S
+      override def plus[A](la: CorecursiveList[A], ra0: => CorecursiveList[A]) = {
+        val ra = Need(ra0)
+        type SS = la.S \/ ra.value.S
+        def rightStep(rs: ra.value.S) =
+          ra.value.step(rs) map {case (rs, a) => (\/-(rs): SS, a)}
         CorecursiveList(-\/(la.init): SS){
           case -\/(ls) =>
             (la.step(ls) map {case (ls, a) => (-\/(ls): SS, a)}
-              orElse (ra1.value.step(ra1.value.init)
-                        map {case (rs, a) => (\/-(rs), a)}))
+              orElse rightStep(ra.value.init))
           case \/-(rs) =>
-            ra1.value.step(rs) map {case (rs, a) => (\/-(rs), a)}
+            rightStep(rs)
         }
       }
 
@@ -76,11 +124,11 @@ object CorecursiveList extends CorecursiveListInstances {
       def order(l: CorecursiveList[A], r: CorecursiveList[A]) = {
         @tailrec def rec(ls: l.S, rs: r.S): Ordering =
           (l.step(ls), r.step(rs)) match {
-            case (Maybe.Empty(), right) => right match {
-              case Maybe.Empty() => Ordering.EQ
+            case (Empty(), right) => right match {
+              case Empty() => Ordering.EQ
               case _ => Ordering.LT
             }
-            case (Maybe.Just((ls2, la)), Maybe.Just((rs2, ra))) =>
+            case (Just((ls2, la)), Just((rs2, ra))) =>
               A.order(la, ra) match {
                 case Ordering.EQ => rec(ls2, rs2)
                 case o => o
