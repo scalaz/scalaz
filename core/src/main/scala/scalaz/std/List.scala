@@ -2,6 +2,7 @@ package scalaz
 package std
 
 import scala.annotation.tailrec
+import Free.Trampoline
 
 trait ListInstances0 {
   implicit def listEqual[A](implicit A0: Equal[A]): Equal[List[A]] = new ListEqual[A] {
@@ -51,21 +52,18 @@ trait ListInstances extends ListInstances0 {
         (a, b) => loop(a, b, Nil)
       }
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-        // implementation with `foldRight` leads to SOE in:
-        //
-        //  def wc(c: Char) = State[Boolean, Int]{(inWord) =>
-        //    val s = c != ' '
-        //    (test(!(inWord && s)), s)
-        //  }
-        //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
-  
-        // foldRight(l, F.point(List[B]())) {
-        //   (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
-        // }
-  
-        DList.fromList(l).foldr(F.point(List[B]())) {
-           (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
-        }
+        def loop(as: List[A]): Trampoline[F[List[B]]] =
+          as match {
+            case Nil =>
+              Trampoline.done(F.point(Nil))
+            case h :: t =>
+              Trampoline.suspend(
+                loop(t).flatMap{ x =>
+                  Trampoline.delay(F.apply2(f(h), x)(_ :: _))
+                }
+              )
+          }
+        loop(l).run
       }
 
       override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
