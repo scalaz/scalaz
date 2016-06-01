@@ -16,7 +16,7 @@ trait DisjunctionInstances {
     override def pure[A](a: A): L \/ A =
       \/-[A](a)
 
-    override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
+    override def flatMap[A, B](oa: => L \/ A)(f: A => L \/ B): L \/ B =
       oa.fold[L \/ B](l => -\/(l))(a => f(a))
   }
 
