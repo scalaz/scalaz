@@ -10,6 +10,9 @@ object BaseHierarchy {
     implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M] = M.applicative
     implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M] = M.applicative.apply
     implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M] = M.applicative.apply.functor
+
+    implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P] = P.profunctor
+    implicit def strongProfunctor[P[_, _]](implicit P: Strong[P]): Profunctor[P] = P.profunctor
   }
 
   trait BH1 extends BH2 {
