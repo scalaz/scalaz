@@ -59,7 +59,7 @@ object TraverseTest extends SpecLite {
         ys ::= x
         x
       }
-      ys must_=== List(Option(1), Option(2))
+      ys must_=== List(None, Option(2), Option(1))
     }
   }
 

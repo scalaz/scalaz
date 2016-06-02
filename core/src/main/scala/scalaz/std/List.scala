@@ -57,11 +57,7 @@ trait ListInstances extends ListInstances0 {
             case Nil =>
               Trampoline.done(F.point(Nil))
             case h :: t =>
-              Trampoline.suspend(
-                loop(t).flatMap{ x =>
-                  Trampoline.delay(F.apply2(f(h), x)(_ :: _))
-                }
-              )
+              F.apM(Trampoline.suspend(loop(t)))(F.map(f(h))(b => (bs: List[B]) => b :: bs))
           }
         loop(l).run
       }
