@@ -590,10 +590,10 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
-  def differenceWith[C](other: A ==>> C, f: (B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
-    differenceWithKey(other, (_: A, b: B, c: C) => f(b, c))
+  def differenceWith[C](other: A ==>> C)(f: (B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
+    differenceWithKey(other)((_: A, b: B, c: C) => f(b, c))
 
-  def differenceWithKey[C](other: A ==>> C, f: (A, B, C) => Option[B])(implicit o: Order[A]): A ==>> B = {
+  def differenceWithKey[C](other: A ==>> C)(f: (A, B, C) => Option[B])(implicit o: Order[A]): A ==>> B = {
     def hedgeDiffWithKey(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> C): A ==>> B =
       (a, b) match {
         case (Tip(), _) =>

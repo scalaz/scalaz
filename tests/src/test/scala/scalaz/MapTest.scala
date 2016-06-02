@@ -419,12 +419,12 @@ object MapTest extends SpecLite {
 
     "differenceWith" in {
       val f = (al: String, ar: String) => if (al == "b") Some(al + ":" + ar) else None
-      fromList(List(5 -> "a", 3 -> "b")).differenceWith(fromList(List(5 -> "A", 3 -> "B", 7 -> "C")), f) must_===(singleton(3, "b:B"))
+      fromList(List(5 -> "a", 3 -> "b")).differenceWith(fromList(List(5 -> "A", 3 -> "B", 7 -> "C")))(f) must_===(singleton(3, "b:B"))
     }
 
     "differenceWithKey" in {
       val f = (k: Int, al: String, ar: String) => if (al == "b") Some(k.toString + ":" + al + "|" + ar) else None
-      fromList(List(5 -> "a", 3 -> "b")).differenceWithKey(fromList(List(5 -> "A", 3 -> "B", 10 -> "C")), f) must_===(singleton(3, "3:b|B"))
+      fromList(List(5 -> "a", 3 -> "b")).differenceWithKey(fromList(List(5 -> "A", 3 -> "B", 10 -> "C")))(f) must_===(singleton(3, "3:b|B"))
     }
   }
 
