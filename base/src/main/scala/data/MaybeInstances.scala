@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import clazz._
+import typeclass._
 import Maybe.{Just, Empty}
 
 trait MaybeInstances extends MonadClass[Maybe] {

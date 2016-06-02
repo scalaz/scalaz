@@ -1,6 +1,6 @@
 package scalaz
 
-import clazz._
+import typeclass._
 
 class BaseHierarchy extends BaseHierarchy.BH0
 

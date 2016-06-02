@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import clazz.{Functor, Profunctor}
+import typeclass.{Functor, Profunctor}
 
 trait UpStarInstances {
   implicit def function[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] = new Profunctor[UpStar[F, ?, ?]] {

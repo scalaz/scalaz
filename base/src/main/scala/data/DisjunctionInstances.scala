@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import clazz._
+import typeclass._
 import Disjunction.{\/, -\/, \/-}
 
 trait DisjunctionInstances {

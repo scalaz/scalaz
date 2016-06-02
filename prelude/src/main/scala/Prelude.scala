@@ -1,6 +1,6 @@
 package scalaz
 
-import clazz._
+import typeclass._
 import data._
 
 import scala.language.implicitConversions
@@ -8,13 +8,13 @@ import scala.language.implicitConversions
 trait Prelude extends data.DisjunctionFunctions {
   // Core Class
   // ==========
-  type Applicative[F[_]] = clazz.Applicative[F]
-  type Apply[F[_]] = clazz.Apply[F]
-  type Bind[M[_]] = clazz.Bind[M]
-  type Foldable[T[_]] = clazz.Foldable[T]
-  type Functor[F[_]] = clazz.Functor[F]
-  type Monad[M[_]] = clazz.Monad[M]
-  type Traversable[T[_]] = clazz.Traversable[T]
+  type Applicative[F[_]] = typeclass.Applicative[F]
+  type Apply[F[_]] = typeclass.Apply[F]
+  type Bind[M[_]] = typeclass.Bind[M]
+  type Foldable[T[_]] = typeclass.Foldable[T]
+  type Functor[F[_]] = typeclass.Functor[F]
+  type Monad[M[_]] = typeclass.Monad[M]
+  type Traversable[T[_]] = typeclass.Traversable[T]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
