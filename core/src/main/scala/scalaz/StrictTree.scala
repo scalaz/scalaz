@@ -107,7 +107,7 @@ case class StrictTree[A](
   }
 
   /** Binds the given function across all the subtrees of this tree. */
-  def cobind[B](f: StrictTree[A] => B): StrictTree[B] = unfoldTree(this)(t => (f(t), () => t.subForest))
+  def cobind[B](f: StrictTree[A] => B): StrictTree[B] = unfoldTree(this)(t => (f(t), t.subForest))
 
   def foldNode[Z](f: A => Vector[StrictTree[A]] => Z): Z =
     f(rootLabel)(subForest)
@@ -241,7 +241,6 @@ sealed abstract class StrictTreeInstances {
    */
 }
 
-
 object StrictTree extends StrictTreeInstances {
   /**
    * Node represents a tree node that may have children.
@@ -276,12 +275,12 @@ object StrictTree extends StrictTreeInstances {
     }
   }
 
-  def unfoldForest[A, B](s: Vector[A])(f: A => (B, () => Vector[A])): Vector[StrictTree[B]] =
+  def unfoldForest[A, B](s: Vector[A])(f: A => (B, Vector[A])): Vector[StrictTree[B]] =
     s.map(unfoldTree(_)(f))
 
-  def unfoldTree[A, B](v: A)(f: A => (B, () => Vector[A])): StrictTree[B] =
+  def unfoldTree[A, B](v: A)(f: A => (B, Vector[A])): StrictTree[B] =
     f(v) match {
-      case (a, bs) => Node(a, unfoldForest(bs.apply())(f))
+      case (a, bs) => Node(a, unfoldForest(bs)(f))
     }
 
   //Only used for .equals.
