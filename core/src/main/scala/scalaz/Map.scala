@@ -533,34 +533,8 @@ sealed abstract class ==>>[A, B] {
   def unionWith(other: A ==>> B)(f: (B, B) => B)(implicit o: Order[A]): A ==>> B =
     unionWithKey(other)((_: A, b: B, c: B) => f(b, c))
 
-  def unionWithKey(other: A ==>> B)(f: (A, B, B) => B)(implicit o: Order[A]): A ==>> B = {
-    def hedgeUnionWithKey(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> B): A ==>> B =
-      (a, b) match {
-        case (t1, Tip()) =>
-          t1
-        case (Tip(), Bin(kx, x, l, r)) =>
-          link(kx, x, l filterGt cmplo, r filterLt cmphi)
-        case (Bin(kx, x, l, r), t2) =>
-          val cmpkx = (k: A) => o.order(kx, k)
-          val (found, gt) = t2.trimLookupLo(kx, cmphi)
-          val newx = found match {
-            case None => x
-            case Some((_, y)) => f(kx, x, y)
-          }
-          val aa = hedgeUnionWithKey(cmplo, cmpkx, l, t2.trim(cmplo, cmpkx))
-          val bb = hedgeUnionWithKey(cmpkx, cmphi, r, gt)
-          link(kx, newx, aa, bb)
-      }
-
-    (this, other) match {
-      case (Tip(), t2) =>
-        t2
-      case (t1, Tip()) =>
-        t1
-      case (t1, t2) =>
-        hedgeUnionWithKey(Function const LT, Function const GT, t1, t2)
-    }
-  }
+  def unionWithKey(other: A ==>> B)(f: (A, B, B) => B)(implicit o: Order[A]): A ==>> B =
+    mergeWithKey(this, other)((a, b, c) => some(f(a, b, c)))(x => x, x => x)
 
   // Difference functions
   def \\[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B =
@@ -593,42 +567,8 @@ sealed abstract class ==>>[A, B] {
   def differenceWith[C](other: A ==>> C)(f: (B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
     differenceWithKey(other)((_: A, b: B, c: C) => f(b, c))
 
-  def differenceWithKey[C](other: A ==>> C)(f: (A, B, C) => Option[B])(implicit o: Order[A]): A ==>> B = {
-    def hedgeDiffWithKey(cmplo: A => Ordering, cmphi: A => Ordering, a: A ==>> B, b: A ==>> C): A ==>> B =
-      (a, b) match {
-        case (Tip(), _) =>
-          empty
-        case (Bin(kx, x, l, r), Tip()) =>
-          link(kx, x, l filterGt cmplo, r filterLt cmphi)
-        case (t, Bin(kx, x, l, r)) =>
-          val cmpkx = (k: A) => o.order(kx, k)
-          val (found, gt) = t.trimLookupLo(kx, cmphi)
-          val lt = t.trim(cmplo, cmpkx)
-          val tl = hedgeDiffWithKey(cmplo, cmpkx, lt, l)
-          val tr = hedgeDiffWithKey(cmpkx, cmphi, gt, r)
-
-          found match {
-            case None =>
-              tl merge tr
-            case Some((ky, y)) =>
-              f(ky, y, x) match {
-                case None =>
-                  tl merge tr
-                case Some(z) =>
-                  link(kx, z, tl, tr)
-              }
-          }
-      }
-
-    (this, other) match {
-      case (Tip(), _) =>
-        empty
-      case (t1, Tip()) =>
-        t1
-      case (t1, t2) =>
-        hedgeDiffWithKey(Function const LT, Function const GT, t1, t2)
-    }
-  }
+  def differenceWithKey[C](other: A ==>> C)(f: (A, B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
+    mergeWithKey(this, other)(f)(x => x, _ => empty)
 
   // Intersections
   def intersection[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B =
@@ -638,35 +578,7 @@ sealed abstract class ==>>[A, B] {
     intersectionWithKey(other)((_, x, y: C) => f(x, y))
 
   def intersectionWithKey[C, D](other: A ==>> C)(f: (A, B, C) => D)(implicit o: Order[A]): A ==>> D =
-    (this, other) match {
-      case (Tip(), _) =>
-        empty
-      case (_, Tip()) =>
-        empty
-      case (t1 @ Bin(k1, x1, l1, r1), t2 @ Bin(k2, x2, l2, r2)) =>
-        if (t1.size >= t2.size) {
-          val (lt, found, gt) = t1 splitLookupWithKey k2
-          val tl = lt.intersectionWithKey(l2)(f)
-          val tr = gt.intersectionWithKey(r2)(f)
-          found match {
-            case None =>
-              tl merge tr
-            case Some((k, x)) =>
-              link(k, f(k, x, x2), tl, tr)
-          }
-        }
-        else {
-          val (lt, found, gt) = t2 splitLookup k1
-          val tl = l1.intersectionWithKey(lt)(f)
-          val tr = r1.intersectionWithKey(gt)(f)
-          found match {
-            case None =>
-              tl merge tr
-            case Some(x) =>
-              link(k1, f(k1, x1, x), tl, tr)
-          }
-        }
-    }
+    mergeWithKey(this, other)((a, b, c) => some(f(a, b, c)))(_ => empty, _ => empty)
 
   // Submap
   def isSubmapOf(a: A ==>> B)(implicit o: Order[A], e: Equal[B]): Boolean =
