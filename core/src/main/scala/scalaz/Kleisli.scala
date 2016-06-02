@@ -83,6 +83,10 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 
   def liftF(implicit F: Functor[Kleisli[M, A, ?]]) =
     Free.liftF[Kleisli[M, A, ?], B](self)
+
+  def tap(implicit F: Applicative[M]): Kleisli[M, A, A] =
+    Kleisli(a => F.apply2(run(a), F.point(a))((_, b) => b))
+
 }
 
 //

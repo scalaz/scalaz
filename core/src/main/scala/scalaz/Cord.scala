@@ -148,15 +148,17 @@ object Cord {
     else
       Cord()
 
-  implicit lazy val CordShow: Show[Cord] = new Show[Cord] {
+  implicit val CordShow: Show[Cord] = new Show[Cord] {
     override def show(x: Cord) = x
     override def shows(x: Cord) = x.toString
   }
-  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+
+  implicit val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
     def zero = empty
     def append(x: Cord, y: => Cord) = x ++ y
   }
-  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
+
+  implicit val CordEqual: Equal[Cord] = new Equal[Cord] {
     def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
   }
 }

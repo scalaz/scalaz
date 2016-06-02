@@ -82,7 +82,8 @@ trait Lan[G[_], H[_], A] { lan =>
 
   def map[B](g: A => B): Lan[G, H, B] = new Lan[G, H, B] {
     type I = lan.I
-    lazy val v = lan.v
+    private[this] val vc = Need(lan.v)
+    def v = vc.value
     def f(gi: G[I]) = g(lan f gi)
   }
 
@@ -119,7 +120,7 @@ object Lan extends LanInstances {
   def adjointToLan[F[_], G[_], A](ga: G[A])(implicit A: Adjunction[F, G]): Lan[F, Id, A] =
     new Lan[F, Id, A] {
       type I = G[A]
-      lazy val v = ga
+      val v = ga
       def f(gi: F[I]) = A.counit(gi)
     }
 
@@ -155,11 +156,23 @@ private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, ?]] with LanFunctor[G
   def G: Functor[G]
   def H: Apply[H]
 
+  private[this] abstract class Internal[A] {
+    type T
+    def value: A
+  }
+
   def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
-    lazy val xfp = xf
-    lazy val xp = x
-    type I = (xfp.I, xp.I)
-    lazy val v = H.tuple2(xfp.v, xp.v)
-    def f(gi: G[I]) = xfp.f(G.map(gi)(_._1))(xp.f(G.map(gi)(_._2)))
+    val xfp = new Internal[Lan[G, H, A => B]] {
+      lazy val value = xf
+      type T = value.I
+    }
+    val xp = new Internal[Lan[G,H,A]] {
+      lazy val value = x
+      type T = value.I
+    }
+    type I = (xfp.T, xp.T)
+    private[this] val vc = Need(H.tuple2(xfp.value.v, xp.value.v))
+    def v = vc.value
+    def f(gi: G[I]) = xfp.value.f(G.map(gi)(_._1))(xp.value.f(G.map(gi)(_._2)))
   }
 }

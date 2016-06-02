@@ -67,7 +67,9 @@ sealed abstract class STArray[S, A] {
   def z: A
   implicit def tag: ClassTag[A]
 
-  private lazy val value: Array[A] = Array.fill(size)(z)
+  private[this] val arr = Need(Array.fill(size)(z))
+
+  private def value: Array[A] = arr.value
 
   import ST._
 
