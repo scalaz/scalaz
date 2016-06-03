@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-trait MonadInstancesStdLib {
+trait MonadInstances {
   implicit val option: Monad[Option] = new MonadClass[Option] {
     override def ap[A, B](oa: Option[A])(f: Option[A => B]): Option[B] = oa.flatMap(a => f.map(_(a)))
     override def flatMap[A, B](oa: Option[A])(f: A => Option[B]): Option[B] = oa.flatMap(f)
