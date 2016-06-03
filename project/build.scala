@@ -49,6 +49,7 @@ object build extends Build {
   )
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
+  val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
@@ -226,7 +227,8 @@ object build extends Build {
       ),
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.7.1" cross CrossVersion.binary)
+    kindProjectorVersion := "0.8.0",
+    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )

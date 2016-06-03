@@ -26,8 +26,6 @@ jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
-  # https://github.com/non/kind-projector/issues/25
-  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.12.0-M4" ]]; then git clone https://github.com/non/kind-projector.git && cd kind-projector && git checkout v0.7.1 && echo "sbt.version=0.13.11" > project/build.properties && sbt '++ 2.12.0-M4' publishLocal && cd .. ; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile
   - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
   # Tricks to avoid unnecessary cache updates
