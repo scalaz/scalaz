@@ -173,7 +173,7 @@ private trait MaybeTBindRec[F[_]] extends BindRec[MaybeT[F, ?]] with MaybeTMonad
   final def tailrecM[A, B](f: A => MaybeT[F, A \/ B])(a: A): MaybeT[F, B] =
     MaybeT(
       B.tailrecM[A, Maybe[B]](a => F.map(f(a).run) {
-        _.cata(_.map(Maybe.just), \/.right(Maybe.empty))
+        _.cata(_.map(Maybe.just), \/-(Maybe.empty))
       })(a)
     )
 }

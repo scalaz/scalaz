@@ -500,9 +500,9 @@ sealed abstract class DisjunctionInstances2 {
   implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
     def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
       f.fold(
-        a => \/.left(\/.left(a)),
+        a => -\/(-\/(a)),
         _.fold(
-          b => \/.left(\/.right(b)),
+          b => -\/(\/-(b)),
           \/.right
         )
       )
@@ -511,9 +511,9 @@ sealed abstract class DisjunctionInstances2 {
       f.fold(
         _.fold(
           \/.left,
-          b => \/.right(\/.left(b))
+          b => \/-(-\/(b))
         ),
-        c => \/.right(\/.right(c))
+        c => \/-(\/-(c))
       )
   }
 }

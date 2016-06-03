@@ -13,13 +13,11 @@ object MonadCatchIO extends MonadCatchIOFunctions {
     val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
     override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) = TheseT[M, E, A] {
       val M = MonadCatchIO[M]
-      import scalaz.syntax.functor._
-      val a: M[Throwable \/ (E \&/ A)] = M.except(ma.run.map(a => \/.right(a): Throwable \/ (E \&/ A)))( t => M.point(\/.left(t)))
-      val b: M[E \&/ A] = M.bind(a) {
+      val a: M[Throwable \/ (E \&/ A)] = M.except(M.map(ma.run)(\/.right[Throwable, (E \&/ A)]))(t => M.point(-\/(t)))
+      M.bind(a) {
         case -\/(t)    => handler(t).run
         case \/-(r)    => M.point(r)
       }
-      b
     }
 
     override def point[A](a: => A) = TheseTMonadIO.point(a)

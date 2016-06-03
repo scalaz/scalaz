@@ -19,7 +19,7 @@ trait BindRec[F[_]] extends Bind[F] { self =>
   def tailrecM[A, B](f: A => F[A \/ B])(a: A): F[B]
 
   override def forever[A, B](fa: F[A]): F[B] =
-    tailrecM[Unit, B](u => map(fa)(_ => \/.left(u)))(())
+    tailrecM[Unit, B](u => map(fa)(_ => -\/(u)))(())
 
   /**The product of BindRec `F` and `G`, `[x](F[x], G[x]])`, is a BindRec */
   def product[G[_]](implicit G0: BindRec[G]): BindRec[λ[α => (F[α], G[α])]] =
@@ -33,7 +33,7 @@ trait BindRec[F[_]] extends Bind[F] { self =>
       val bounce = tailrecM[(Boolean, A), A] {
         case (bounced, a0) =>
           if (!bounced)
-            map(f(a0))(a1 => \/.left((true, a1)))
+            map(f(a0))(a1 => -\/((true, a1)))
           else
             map(f(a0))(\/.right)
       }((false, a))

@@ -152,7 +152,7 @@ private trait LazyOptionTBindRec[F[_]] extends BindRec[LazyOptionT[F, ?]] with L
   final def tailrecM[A, B](f: A => LazyOptionT[F, A \/ B])(a: A): LazyOptionT[F, B] =
     LazyOptionT(
       B.tailrecM[A, LazyOption[B]](a => F.map(f(a).run) {
-        _.fold(_.map(b => LazyOption.lazySome(b)), \/.right(LazyOption.lazyNone))
+        _.fold(_.map(b => LazyOption.lazySome(b)), \/-(LazyOption.lazyNone))
       })(a)
     )
 }
