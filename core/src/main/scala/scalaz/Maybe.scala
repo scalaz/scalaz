@@ -48,7 +48,7 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a left disjunction if present, otherwise
    * return a right disjunction with the provided fallback value */
   final def toLeft[B](b: => B): A \/ B =
-    cata(\/.left, \/.right(b))
+    cata(\/.left, \/-(b))
 
   /** alias for [[toLeft]] */
   final def <\/[B](b: => B): A \/ B =
@@ -57,7 +57,7 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a right disjunction if present, otherwise
    * return a left disjunction with the provided fallback value */
   final def toRight[B](b: => B): B \/ A =
-    cata(\/.right, \/.left(b))
+    cata(\/.right, -\/(b))
 
   /** alias for [[toRight]] */
   final def \/>[B](b: => B): B \/ A =
@@ -297,7 +297,7 @@ sealed abstract class MaybeInstances {
       fa.cata(f(_, z), z)
 
     def cozip[A, B](fa: Maybe[A \/ B]) =
-      fa.cata(_.leftMap(just).map(just), \/.left(empty))
+      fa.cata(_.leftMap(just).map(just), -\/(empty))
 
     def zip[A, B](a: => Maybe[A], b: => Maybe[B]) = a.zip(b)
 
@@ -320,7 +320,7 @@ sealed abstract class MaybeInstances {
       a.cojoin
 
     def pextract[B, A](fa: Maybe[A]): Maybe[B] \/ A =
-      fa.cata(\/.right, \/.left(empty))
+      fa.cata(\/.right, -\/(empty))
 
     override def isDefined[A](fa: Maybe[A]): Boolean = fa.isJust
 
