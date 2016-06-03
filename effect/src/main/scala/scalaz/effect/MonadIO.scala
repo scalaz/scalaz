@@ -48,6 +48,8 @@ object MonadIO {
 
   implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
 
+  implicit def theseTMonadIO[F[_]: MonadIO, E: Semigroup] = fromLiftIO[TheseT[F, E, ?]]
+
   implicit def streamTMonadIO[F[_]: MonadIO: Applicative] = fromLiftIO[StreamT[F, ?]]
 
   implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]

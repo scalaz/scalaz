@@ -8,6 +8,23 @@ trait MonadCatchIO[M[_]] extends MonadIO[M] {
 
 object MonadCatchIO extends MonadCatchIOFunctions {
   @inline def apply[M[_]](implicit M: MonadCatchIO[M]): MonadCatchIO[M] = M
+
+  implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup] = new MonadCatchIO[TheseT[M, E, ?]] {
+    val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
+    override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) = TheseT[M, E, A] {
+      val M = MonadCatchIO[M]
+      val a: M[Throwable \/ (E \&/ A)] = M.except(M.map(ma.run)(\/.right[Throwable, (E \&/ A)]))(t => M.point(-\/(t)))
+      M.bind(a) {
+        case -\/(t)    => handler(t).run
+        case \/-(r)    => M.point(r)
+      }
+    }
+
+    override def point[A](a: => A) = TheseTMonadIO.point(a)
+    override def bind[A, B](fa: TheseT[M, E, A])(f: A => TheseT[M, E, B]) = TheseTMonadIO.bind(fa)(f)
+    override def liftIO[A](ioa: IO[A]) = TheseTMonadIO.liftIO(ioa)
+  }
+
 }
 
 sealed abstract class MonadCatchIOFunctions {
