@@ -19,9 +19,4 @@ trait DisjunctionInstances {
     override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
       oa.fold[L \/ B](l => -\/(l))(a => f(a))
   }
-
-  implicit def applicative[L]: Applicative[L \/ ?] = monad[L].applicative
-  implicit def apply[L]: Apply[L \/ ?] = monad[L].applicative.apply
-  implicit def functor[L]: Functor[L \/ ?] = monad[L].applicative.apply.functor
-  implicit def bind[L]: Bind[L \/ ?] = monad[L].bind
 }

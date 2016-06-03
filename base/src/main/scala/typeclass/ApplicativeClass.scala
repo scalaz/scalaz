@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait ApplicativeClass[F[_]] extends Applicative[F] with ApplyClass[F] {
-  implicit final def applicative: Applicative[F] = this
+  final def applicative: Applicative[F] = this
 }
 
 object ApplicativeClass {

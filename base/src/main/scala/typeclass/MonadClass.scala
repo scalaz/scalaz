@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait MonadClass[F[_]] extends Monad[F] with BindClass[F] with ApplicativeClass[F] {
-  implicit final def monad: Monad[F] = this
+  final def monad: Monad[F] = this
 }
 
 object MonadClass {
