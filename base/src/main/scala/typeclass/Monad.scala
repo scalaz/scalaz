@@ -6,7 +6,7 @@ trait Monad[M[_]] {
   def bind: Bind[M]
 }
 
-object Monad extends MonadInstances with MonadInstancesStdLib {
+object Monad extends MonadInstances {
   def apply[M[_]](implicit M: Monad[M]): Monad[M] = M
 }
 
