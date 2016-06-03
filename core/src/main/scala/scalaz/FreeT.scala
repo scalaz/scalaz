@@ -128,7 +128,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
     def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
       ft match {
-        case Suspend(f) => M0.map(f)(as => \/.right(as.map(S.map(_)(point(_)))))
+        case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
         case g1 @ Gosub(_, _) => g1.a match {
           case Suspend(m1) => M0.map(m1) {
             case -\/(a) => -\/(g1.f(a))

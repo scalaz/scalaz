@@ -371,7 +371,7 @@ private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] 
   final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
     LazyEitherT(
       B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
-        _.fold(e => \/.right(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
+        _.fold(e => \/-(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
       })(a)
     )
 }
