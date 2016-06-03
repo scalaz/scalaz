@@ -11,18 +11,28 @@ object BaseHierarchy {
     implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M] = M.applicative.apply
     implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M] = M.applicative.apply.functor
 
+    implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
+
     implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P] = P.profunctor
-    implicit def strongProfunctor[P[_, _]](implicit P: Strong[P]): Profunctor[P] = P.profunctor
   }
 
   trait BH1 extends BH2 {
+    implicit def bindApply[M[_]](implicit M: Bind[M]): Apply[M] = M.apply
+    implicit def bindFunctor[M[_]](implicit M: Bind[M]): Functor[M] = M.apply.functor
+
+    implicit def strongProfunctor[P[_, _]](implicit P: Strong[P]): Profunctor[P] = P.profunctor
+  }
+
+  trait BH2 extends BH3 {
     implicit def applicativeApply[M[_]](implicit M: Applicative[M]): Apply[M] = M.apply
     implicit def applicativeFunctor[M[_]](implicit M: Applicative[M]): Functor[M] = M.apply.functor
   }
 
-  trait BH2 {
+  trait BH3 extends BH4 {
     implicit def applyFunctor[M[_]](implicit M: Apply[M]): Functor[M] = M.functor
+  }
+
+  trait BH4 {
     implicit def traversableFunctor[T[_]](implicit T: Traversable[T]): Functor[T] = T.functor
-    implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
   }
 }
