@@ -61,6 +61,23 @@ object MixedBag extends App {
     m assert_=== "12345"
   }
 
+  def strictTree() {
+    import std.string._
+    import syntax.semigroup._
+    import syntax.equal._
+    import syntax.strictTree._
+    import syntax.traverse._
+    import std.vector._
+
+    val tree: StrictTree[Int] = 1.strictNode(2.strictNode(3.strictLeaf), 4.strictLeaf, 5.strictLeaf)
+    val r = tree.foldRight(".")((i, s) => i.toString |+| s)
+    r assert_=== "12345."
+    val f = tree.flatten.foldMap(_.toString)
+    f assert_=== "12345"
+    val m = tree.foldMap(_.toString)
+    m assert_=== "12345"
+  }
+
   def kleisiArrow() {
     import Kleisli._
     import std.option._

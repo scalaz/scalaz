@@ -143,6 +143,32 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
       Gen.choose(1, n).flatMap(treeGenSized[A])
     ))
 
+  private[scalaz] def strictTreeGenSized[A: NotNothing](size: Int)(implicit A: Arbitrary[A]): Gen[StrictTree[A]] =
+    size match {
+      case n if n <= 1 =>
+        A.arbitrary.map(a => StrictTree.Leaf(a))
+      case 2 =>
+        arb[(A, A)].arbitrary.map{ case (a1, a2) =>
+          StrictTree(a1, Vector(StrictTree.Leaf(a2)))
+        }
+      case 3 =>
+        arb[(A, A, A)].arbitrary.flatMap{ case (a1, a2, a3) =>
+          Gen.oneOf(
+            StrictTree(a1, Vector(StrictTree.Leaf(a2), StrictTree.Leaf(a3))),
+            StrictTree(a1, Vector(StrictTree(a2, Vector(StrictTree.Leaf(a3)))))
+          )
+        }
+      case _ =>
+        withSize(size - 1)(strictTreeGenSized[A]).flatMap{ as =>
+          A.arbitrary.map(a => StrictTree(a, as.toVector))
+        }
+    }
+
+  implicit def StrictTreeArbitrary[A: Arbitrary]: Arbitrary[StrictTree[A]] =
+    Arbitrary(Gen.sized(n =>
+      Gen.choose(1, n).flatMap(strictTreeGenSized[A])
+    ))
+  
   private[scalaz] def treeLocGenSized[A: NotNothing](size: Int)(implicit A: Arbitrary[A]): Gen[TreeLoc[A]] = {
     def forest(n: Int): Gen[TreeLoc.TreeForest[A]] =
       withSize(n)(treeGenSized[A])
