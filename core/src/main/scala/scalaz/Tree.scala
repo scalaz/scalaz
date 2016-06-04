@@ -1,5 +1,6 @@
 package scalaz
 
+import scalaz.Trampoline._
 import std.stream.{streamInstance, streamMonoid}
 import Free.Trampoline
 
@@ -16,9 +17,16 @@ sealed abstract class Tree[A] {
   /** The child nodes of this tree. */
   def subForest: Stream[Tree[A]]
 
+  def foldMapTrampoline[B: Monoid](f: A => B): Trampoline[B] = {
+    for {
+      root <- delay(f(rootLabel))
+      subForests <- Foldable[Stream].foldMap[Tree[A], Trampoline[B]](subForest)(_.foldMapTrampoline(f))
+    } yield Monoid[B].append(root, subForests)
+  }
+
   /** Maps the elements of the Tree into a Monoid and folds the resulting Tree. */
   def foldMap[B: Monoid](f: A => B): B =
-    Monoid[B].append(f(rootLabel), Foldable[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
+    foldMapTrampoline[B](f).run
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     Foldable[Stream].foldRight(flatten, z)(f)
@@ -90,6 +98,23 @@ sealed abstract class Tree[A] {
       Foldable[Stream].foldMap(s)((_: Tree[A]).subForest)
     }
     Stream.iterate(Stream(this))(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
+  }
+
+  def toStrictTree: StrictTree[A] = {
+    import std.vector.vectorInstance
+
+    def trampolined(t: Tree[A]): Trampoline[StrictTree[A]] = {
+      t match {
+        case Tree.Leaf(root) =>
+          Trampoline.done(StrictTree.Leaf(root))
+        case Tree.Node(root, forest) =>
+          for {
+            strictForest <- Applicative[Trampoline].traverse(forest.toVector)(trampolined)
+          } yield StrictTree(root, strictForest)
+      }
+    }
+
+    trampolined(this).run
   }
 
   /** Binds the given function across all the subtrees of this tree. */
@@ -250,6 +275,28 @@ object Tree extends TreeInstances {
 
 private trait TreeEqual[A] extends Equal[Tree[A]] {
   def A: Equal[A]
-  override final def equal(a1: Tree[A], a2: Tree[A]) =
-    A.equal(a1.rootLabel, a2.rootLabel) && a1.subForest.corresponds(a2.subForest)(equal _)
+
+  override final def equal(a1: Tree[A], a2: Tree[A]) = {
+    def corresponds[B](a1: Stream[Tree[A]], a2: Stream[Tree[A]]): Trampoline[Boolean] = {
+      (a1.isEmpty, a2.isEmpty) match {
+        case (true, true) => Trampoline.done(true)
+        case (_, true) | (true, _) => Trampoline.done(false)
+        case _ =>
+          for {
+            heads <- trampolined(a1.head, a2.head)
+            tails <- corresponds(a1.tail, a2.tail)
+          } yield heads && tails
+      }
+    }
+
+    def trampolined(a1: Tree[A], a2: Tree[A]): Trampoline[Boolean] = {
+      for {
+        roots <- Trampoline.done(A.equal(a1.rootLabel, a2.rootLabel))
+        subForests <- corresponds(a1.subForest, a2.subForest)
+      } yield roots && subForests
+    }
+
+    trampolined(a1, a2).run
+  }
+
 }

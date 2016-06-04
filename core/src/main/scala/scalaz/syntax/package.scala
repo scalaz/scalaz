@@ -6,5 +6,6 @@ package scalaz
  *
  * Non-trivial code should *not* be defined in this package; instead delegate.
  */
-package object syntax extends Syntaxes
-
+package object syntax extends Syntaxes {
+  object strictTree extends ToStrictTreeOps
+}
