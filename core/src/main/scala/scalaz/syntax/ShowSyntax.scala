@@ -22,7 +22,7 @@ trait ToShowOps  {
 
 trait ShowSyntax[F]  {
   implicit def ToShowOps(v: F): ShowOps[F] = new ShowOps[F](v)(ShowSyntax.this.F)
-  
+
   def F: Show[F]
   ////
 

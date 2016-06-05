@@ -3,13 +3,13 @@ package scalaz
 /**
   * A Double-ended queue, based on the Bankers Double Ended Queue as
   * described by C. Okasaki in "Purely Functional Data Structures"
-  *  
+  *
   * A queue that allows items to be put onto either the front (cons)
   * or the back (snoc) of the queue in constant time, and constant
   * time access to the element at the very front or the very back of
   * the queue.  Dequeueing an element from either end is constant time
   * when amortized over a number of dequeues.
-  * 
+  *
   * This queue maintains an invariant that whenever there are at least
   * two elements in the queue, neither the front list nor back list
   * are empty.  In order to maintain this invariant, a dequeue from

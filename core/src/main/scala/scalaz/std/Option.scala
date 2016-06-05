@@ -8,7 +8,7 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] = 
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -48,7 +48,7 @@ trait OptionInstances extends OptionInstances0 {
           case None => (None, None)
           case Some((a, b)) => (Some(a), Some(b))
         }
-  
+
       def alignWith[A, B, C](f: A \&/ B => C) = {
         case (None, None) =>
           None
@@ -59,13 +59,13 @@ trait OptionInstances extends OptionInstances0 {
         case (Some(a), Some(b)) =>
           Some(f(\&/.Both(a, b)))
       }
-  
+
       def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
         fa map (a => f(Some(a)))
-  
+
       override def cojoin[A](a: Option[A]) =
         a map (Some(_))
-  
+
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
         fa map \/.right getOrElse -\/(None)
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined

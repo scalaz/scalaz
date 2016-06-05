@@ -63,7 +63,7 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L]: Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] = 
+  implicit def eitherMonad[L]: Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] =
     new Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] {
       def bind[A, B](fa: Either[L, A])(f: A => Either[L, B]) = fa match {
         case Left(a)  => Left(a)
@@ -75,22 +75,22 @@ trait EitherInstances extends EitherInstances0 {
           case a @ Right(_) => a
           case Left(a) => f(a)
         }
-  
+
       def raiseError[A](e: L) =
         Left(e)
-  
+
       def point[A](a: => A) = Right(a)
-  
+
       def traverseImpl[G[_] : Applicative, A, B](fa: Either[L, A])(f: A => G[B]) = fa match {
         case Left(x)  => Applicative[G].point(Left(x))
         case Right(x) => Applicative[G].map(f(x))(Right(_))
       }
-  
+
       override def foldRight[A, B](fa: Either[L, A], z: => B)(f: (A, => B) => B) = fa match {
         case Left(_)  => z
         case Right(a) => f(a, z)
       }
-  
+
       def cozip[A, B](a: Either[L, A \/ B]) =
         a match {
           case Left(l) => -\/(Left(l))
@@ -99,7 +99,7 @@ trait EitherInstances extends EitherInstances0 {
             case \/-(b) => \/-(Right(b))
           }
         }
-  
+
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => Either[L, A \/ B])(a: A): Either[L, B] =
         f(a) match {

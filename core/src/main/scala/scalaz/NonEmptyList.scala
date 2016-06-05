@@ -5,7 +5,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   import NonEmptyList._
   import Zipper._
   import scalaz.Liskov._
-  
+
 
   def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
 
@@ -84,13 +84,13 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   /** @since 7.0.2 */
-  
+
   def sortBy[B](f: A => B)(implicit o: Order[B]): NonEmptyList[A] = (list.sortBy(f): @unchecked) match {
     case ICons(x, xs) => nel(x, xs)
   }
 
   /** @since 7.0.2 */
-  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] = 
+  def sortWith(lt: (A, A) => Boolean): NonEmptyList[A] =
     (list.toList.sortWith(lt): @unchecked) match {
       case x :: xs => nel(x, IList.fromList(xs))
     }
@@ -108,7 +108,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   def unzip[X, Y](implicit ev: A <~< (X, Y)): (NonEmptyList[X], NonEmptyList[Y]) = {
-    val (a, b) = ev(head) 
+    val (a, b) = ev(head)
     val (aa, bb) = tail.unzip: (IList[X], IList[Y])
     (nel(a, aa), nel(b, bb))
  }

@@ -30,10 +30,10 @@ trait EnumeratorT[E, F[_]] { self =>
   def bindM[B, G[_]](f: E => G[EnumeratorT[B, F]])(implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[B, F]]] = {
     import scalaz.syntax.semigroup._
     val iter = fold[G[EnumeratorT[B, F]], F, G[EnumeratorT[B, F]]](G.point(EnumeratorT.empty[B, F])) {
-      case (acc, concat) => G.bind(acc) { en => 
-                              G.map(concat) { append => en |+| append } 
+      case (acc, concat) => G.bind(acc) { en =>
+                              G.map(concat) { append => en |+| append }
                             }
-    }   
+    }
 
     (iter &= self.map(f)).run
   }
@@ -63,7 +63,7 @@ trait EnumeratorT[E, F[_]] { self =>
         iterateeT(M.bind((IterateeT.fold[E, F, B](b)(f) &= self).value) { s => check(s).value })
       }
     }
-    
+
   def cross[E2](e2: EnumeratorT[E2, F])(implicit M: Monad[F]): EnumeratorT[(E, E2), F] =
     EnumerateeT.cross[E, E2, F](e2) run self
 }
@@ -86,7 +86,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
       implicit def M = M0
     }
 
-  implicit val enumeratorTMonadTrans: MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] = 
+  implicit val enumeratorTMonadTrans: MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] =
     new MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] {
       def liftM[G[_]: Monad, E](ga: G[E]): EnumeratorT[E, G] =
         new EnumeratorT[E, G] {
@@ -105,7 +105,7 @@ trait EnumeratorTFunctions {
       def apply[A] = _.pointI
     }
 
-  /** 
+  /**
    * An EnumeratorT that is at EOF
    */
   def enumEofT[E, F[_] : Applicative]: EnumeratorT[E, F] =
@@ -149,7 +149,7 @@ trait EnumeratorTFunctions {
         def go(xs: Iterator[E])(s: StepT[E, F, A]): IterateeT[E, F, A] =
           if(xs.isEmpty) s.pointI
           else {
-            s mapCont { k => 
+            s mapCont { k =>
               val next = xs.next
               k(elInput(next)) >>== go(xs)
             }
@@ -190,11 +190,11 @@ trait EnumeratorTFunctions {
       private[this] val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
         def loop(pos : Int): StepT[E, F, A] => IterateeT[E, F, A] = {
-          s => 
+          s =>
             s.mapCont(
               k => if (limit > pos) k(elInput(a(pos))) >>== loop(pos + 1)
                    else             s.pointI
-            )   
+            )
         }
         loop(min)
       }

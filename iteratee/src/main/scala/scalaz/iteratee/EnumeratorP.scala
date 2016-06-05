@@ -29,7 +29,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
       }
     }
 
-  def collect[B](pf: PartialFunction[E, B]) = 
+  def collect[B](pf: PartialFunction[E, B]) =
     new EnumeratorP[B, F] {
       def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[B, G] = {
         import MO._
@@ -37,7 +37,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
       }
     }
 
-  def uniq(implicit ord: Order[E]) = 
+  def uniq(implicit ord: Order[E]) =
     new EnumeratorP[E, F] {
       def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[E, G] = {
         import MO._
@@ -45,7 +45,7 @@ abstract class EnumeratorP[E, F[_]] { self =>
       }
     }
 
-  def zipWithIndex = 
+  def zipWithIndex =
     new EnumeratorP[(E, Long), F] {
       def apply[G[_]](implicit MO: G |>=| F): EnumeratorT[(E, Long), G] = {
         import MO._
@@ -134,14 +134,14 @@ trait EnumeratorPFunctions {
 
   def mergeAll[E: Order, F[_]: Monad](enumerators: EnumeratorP[E, F]*): EnumeratorP[E, F] = {
     @tailrec def mergeOne(e: EnumeratorP[E, F], es: List[EnumeratorP[E, F]]): EnumeratorP[E, F] = es match {
-      case x :: xs => mergeOne(e merge x, xs) 
+      case x :: xs => mergeOne(e merge x, xs)
       case Nil => e
-    }   
+    }
 
     enumerators.toList match {
-      case x :: xs => mergeOne(x, xs) 
+      case x :: xs => mergeOne(x, xs)
       case Nil => empty[E, F]
-    }   
+    }
   }
 }
 

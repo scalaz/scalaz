@@ -29,7 +29,7 @@ object DListTest extends SpecLite {
     val d0 = n +: d
     check(d0.headOption === Some(n)) // no Show instance, can't use must_===
     check(d0.tailOption === Some(d))
-    
+
   }
 
   object instances {

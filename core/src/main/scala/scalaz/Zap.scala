@@ -16,7 +16,7 @@ trait Zap[F[_], G[_]] { self =>
 sealed abstract class ZapInstances {
 
   /** The identity functor annihilates itself. */
-  implicit val identityZap: Zap[Id, Id] = 
+  implicit val identityZap: Zap[Id, Id] =
     new Zap[Id, Id] {
       def zapWith[A, B, C](a: A, b: B)(f: (A, B) => C): C = f(a, b)
     }
@@ -62,4 +62,4 @@ sealed abstract class ZapInstances {
     }
 }
 
-object Zap extends ZapInstances 
+object Zap extends ZapInstances

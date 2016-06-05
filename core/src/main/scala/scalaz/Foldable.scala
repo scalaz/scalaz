@@ -239,7 +239,7 @@ trait Foldable[F[_]]  { self =>
 
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldLeft(fa, G.empty[A])(G.plus[A](_, _))
-  
+
   def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
     msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
 

@@ -90,7 +90,7 @@ object Semigroup {
 
   ////
   /** Make an associative binary function into an instance. */
-  def instance[A](f: (A, => A) => A): Semigroup[A] = 
+  def instance[A](f: (A, => A) => A): Semigroup[A] =
     new Semigroup[A] {
       def append(f1: A, f2: => A): A = f(f1,f2)
     }
@@ -147,7 +147,7 @@ object Semigroup {
     m.append(F.point(a), iterate[F, A](f(a))(f))
 
   /** Semigroup is an invariant functor. */
-  implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = 
+  implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] =
     new InvariantFunctor[Semigroup] {
       def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] =
         new Semigroup[B] {

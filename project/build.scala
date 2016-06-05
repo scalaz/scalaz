@@ -85,13 +85,13 @@ object build extends Build {
   object ScalazCrossType extends CrossType {
     override def projectDir(crossBase: File, projectType: String) =
       crossBase / projectType
-      
+
     def shared(projectBase: File, conf: String) =
       projectBase.getParentFile / "src" / conf / "scala"
 
     override def sharedSrcDir(projectBase: File, conf: String) =
       Some(shared(projectBase, conf))
-  } 
+  }
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",

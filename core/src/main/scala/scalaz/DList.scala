@@ -20,7 +20,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 
   /** Convert to an IList. */
   def toIList: IList[A] = apply(IList()).run
-  
+
   /** Convert to a normal list. */
   def toList: List[A] = toIList.toList
 
@@ -110,7 +110,7 @@ sealed abstract class DListInstances {
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
 
-    def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] = 
+    def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] =
       DList.fromIList(BindRec[IList].tailrecM[A, B](f(_).toIList)(a))
   }
   implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {

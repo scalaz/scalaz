@@ -148,10 +148,10 @@ object ScalazProperties {
 
     def compose[M[_,_], A, B, C, D, E, F](implicit M: Profunctor[M], mab: Arbitrary[M[A, D]], fba: Arbitrary[(B => A)], fcb: Arbitrary[(C => B)], fde: Arbitrary[(D => E)], fef: Arbitrary[(E => F)], e: Equal[M[C, F]]) =
       forAll(M.profunctorLaw.composite[A, B, C, D, E, F] _ )
-  
+
     def laws[M[_,_]](implicit F: Profunctor[M], af: Arbitrary[M[Int, Int]], itf: Arbitrary[(Int => Int)], e: Equal[M[Int, Int]]): Properties =
-      newProperties("profunctor") { p => 
-        p.property("identity") = identity[M, Int, Int] 
+      newProperties("profunctor") { p =>
+        p.property("identity") = identity[M, Int, Int]
         p.property("composite") = compose[M, Int, Int, Int, Int, Int, Int]
       }
   }

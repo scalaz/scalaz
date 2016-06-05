@@ -54,7 +54,7 @@ trait ToEnumOps extends ToOrderOps {
 
 trait EnumSyntax[F] extends OrderSyntax[F] {
   implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F](v)(EnumSyntax.this.F)
-  
+
   def F: Enum[F]
   ////
 

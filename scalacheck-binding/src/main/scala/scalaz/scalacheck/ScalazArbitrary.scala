@@ -168,7 +168,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Arbitrary(Gen.sized(n =>
       Gen.choose(1, n).flatMap(strictTreeGenSized[A])
     ))
-  
+
   private[scalaz] def treeLocGenSized[A: NotNothing](size: Int)(implicit A: Arbitrary[A]): Gen[TreeLoc[A]] = {
     def forest(n: Int): Gen[TreeLoc.TreeForest[A]] =
       withSize(n)(treeGenSized[A])

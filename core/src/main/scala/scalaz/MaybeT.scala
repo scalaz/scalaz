@@ -127,7 +127,7 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
 }
 
 object MaybeT extends MaybeTInstances {
-  def maybeT[M[_]] = 
+  def maybeT[M[_]] =
     new (λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]) {
       def apply[A](a: M[Maybe[A]]) = new MaybeT[M, A](a)
     }

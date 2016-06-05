@@ -114,13 +114,13 @@ sealed abstract class CoproductInstances3 {
   implicit def coproductEqual[F[_], G[_], A](implicit E: Equal[F[A] \/ G[A]]): Equal[Coproduct[F, G, A]] =
     Equal.equalBy(_.run)
 
-  implicit def coproductFunctor[F[_], G[_]](implicit F0: Functor[F], G0: Functor[G]): Functor[Coproduct[F, G, ?]] = 
+  implicit def coproductFunctor[F[_], G[_]](implicit F0: Functor[F], G0: Functor[G]): Functor[Coproduct[F, G, ?]] =
     new CoproductFunctor[F, G] {
       implicit def F: Functor[F] = F0
       implicit def G: Functor[G] = G0
     }
 
-  implicit def coproductFoldable[F[_], G[_]](implicit F0: Foldable[F], G0: Foldable[G]): Foldable[Coproduct[F, G, ?]] = 
+  implicit def coproductFoldable[F[_], G[_]](implicit F0: Foldable[F], G0: Foldable[G]): Foldable[Coproduct[F, G, ?]] =
     new CoproductFoldable[F, G] {
       implicit def F: Foldable[F] = F0
       implicit def G: Foldable[G] = G0
@@ -128,7 +128,7 @@ sealed abstract class CoproductInstances3 {
 }
 
 sealed abstract class CoproductInstances2 extends CoproductInstances3 {
-  implicit def coproductContravariant[F[_], G[_]](implicit F0: Contravariant[F], G0: Contravariant[G]): Contravariant[Coproduct[F, G, ?]] = 
+  implicit def coproductContravariant[F[_], G[_]](implicit F0: Contravariant[F], G0: Contravariant[G]): Contravariant[Coproduct[F, G, ?]] =
     new CoproductContravariant[F, G] {
       implicit def F: Contravariant[F] = F0
       implicit def G: Contravariant[G] = G0
@@ -142,7 +142,7 @@ sealed abstract class CoproductInstances2 extends CoproductInstances3 {
 }
 
 sealed abstract class CoproductInstances1 extends CoproductInstances2 {
-  implicit def coproductCobind[F[_], G[_]](implicit F0: Cobind[F], G0: Cobind[G]): Cobind[Coproduct[F, G, ?]] = 
+  implicit def coproductCobind[F[_], G[_]](implicit F0: Cobind[F], G0: Cobind[G]): Cobind[Coproduct[F, G, ?]] =
     new CoproductCobind[F, G] {
       implicit def F: Cobind[F] = F0
       implicit def G: Cobind[G] = G0
