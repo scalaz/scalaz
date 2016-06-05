@@ -20,6 +20,18 @@ trait Apply[F[_]] extends Functor[F] { self =>
     */
   def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B]
 
+  /** Version of `ap` that takes one parameter, the one whose `F`-action
+    * should be performed later, in an additional context `M`.
+    *
+    * The default implementation `map`s over `mfa`, so it always accesses
+    * the value inside `mfa`. However, when the effects of `f` fully
+    * determine the result, the value inside `mfa` does not need to be
+    * accessed at all. This allows for implementations that, when `M`
+    * represents lazy evaluation, never evaluate `mfa`.
+    */
+  def apM[M[_], A, B](mfa: => M[F[A]])(f: => F[A => B])(implicit M: Applicative[M]): M[F[B]] =
+    M.map(mfa)(ap(_)(f))
+
   // derived functions
 
   def traverse1[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse1[G]): F[G[B]] =

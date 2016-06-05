@@ -20,6 +20,11 @@ trait OptionInstances extends OptionInstances0 {
         }
         case None    => None
       }
+      override def apM[M[_], A, B](mfa: => M[Option[A]])(f: => Option[A => B])(implicit M: Applicative[M]) =
+        f match {
+          case Some(f) => M.map(mfa)(map(_)(f))
+          case None => M.point(None)
+        }
       def bind[A, B](fa: Option[A])(f: A => Option[B]) = fa flatMap f
       override def map[A, B](fa: Option[A])(f: A => B) = fa map f
       def traverseImpl[F[_], A, B](fa: Option[A])(f: A => F[B])(implicit F: Applicative[F]) =
