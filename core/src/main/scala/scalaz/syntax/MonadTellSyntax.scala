@@ -10,12 +10,12 @@ final class MonadTellOps[F[_, _], W, A](self: F[W, A])(implicit MT: MonadTell[F,
 }
 
 sealed trait ToMonadTellOps0 {
-  implicit def ToMonadTellOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadTell, FA]) = 
+  implicit def ToMonadTellOpsUnapply[FA](v: FA)(implicit F0: Unapply21[MonadTell, FA]) =
     new MonadTellOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 }
 
 trait ToMonadTellOps extends ToMonadTellOps0 {
-  implicit def ToMonadTellOps[F[_, _], A, W](v: F[W, A])(implicit F0: MonadTell[F, W]) = 
+  implicit def ToMonadTellOps[F[_, _], A, W](v: F[W, A])(implicit F0: MonadTell[F, W]) =
     new MonadTellOps[F, W, A](v)(F0)
 }
 

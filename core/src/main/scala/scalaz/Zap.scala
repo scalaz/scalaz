@@ -65,4 +65,4 @@ sealed abstract class ZapInstances {
       }
 }
 
-object Zap extends ZapInstances 
+object Zap extends ZapInstances

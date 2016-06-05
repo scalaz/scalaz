@@ -51,14 +51,14 @@ object ConcurrentTaskTest extends SpecLite {
       sync.get(5000) must_== Some(true)
 
       val runned = q.toList
-      
+
       //trampoline should be evaluated at the head before anything else gets evaluated
       runned(0) must_== (1,current)
       runned(1) must_== (2,current)
-      
+
       //the after async must not be the last ever
       (runned.last._1 != 9) must_==(true)
-      
+
       //the rest of tasks must be run off the forked thread
       runned.filter(_._2 == forked).map(_._1) must_== List(3,4,5,6,7,8)
 

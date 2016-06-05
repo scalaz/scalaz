@@ -28,7 +28,7 @@ object NonEmptyListTest extends SpecLite {
   }
 
   "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>
-    xs.size must_===(1 + xs.tail.size) 
+    xs.size must_===(1 + xs.tail.size)
   }
 
   "foldl1 is reduceLeft" ! forAll {(rnge: NonEmptyList[List[Int]]) =>

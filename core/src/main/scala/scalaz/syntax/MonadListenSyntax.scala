@@ -14,7 +14,7 @@ sealed trait ToMonadListenOps0 {
 }
 
 trait ToMonadListenOps extends ToMonadListenOps0 with ToMonadTellOps {
-  implicit def ToMonadListenOps[F[_, _], A, W](v: F[W, A])(implicit F0: MonadListen[F, W]) = 
+  implicit def ToMonadListenOps[F[_, _], A, W](v: F[W, A])(implicit F0: MonadListen[F, W]) =
     new MonadListenOps[F, W, A](v)(F0)
 }
 

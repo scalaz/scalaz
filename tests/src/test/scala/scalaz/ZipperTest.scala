@@ -239,7 +239,7 @@ object ZipperTest extends SpecLite {
         yield zn.lefts.length must_===(z.lefts.length - 1)
     ) getOrElse (xs.length mustBe_<(2))
   }
- 
+
   "deleteLeftC moves the focus to the left or if not possible to the last element" ! forAll { z: Zipper[Int] =>
     (
       for {
@@ -305,7 +305,7 @@ object ZipperTest extends SpecLite {
   }
 
   "Move" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
-    
+
     zipper(xs, f, ys).move(n) map { (z: Zipper[Int]) =>
       z.lefts.length must_===(xs.length + n)
       z.rights.length must_===(ys.length - n)
@@ -322,14 +322,14 @@ object ZipperTest extends SpecLite {
   }
 
   "move should not cause a stackoverflow error" in {
-    val size = 32 * 1024 
+    val size = 32 * 1024
     val n = size - 1
 
     val f = for {
       z <- Stream.from(1).take(size).toZipper
       zm <- z.move(n)
     } yield zm.focus
-    
+
     f must_===(Some(size))
   }
 
@@ -390,8 +390,8 @@ object ZipperTest extends SpecLite {
 
   "findZ shouldn't change elements" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
-    zipper(xs, f, ys).findZ(p).map { 
-      z => z.toStream == zipper(xs, f, ys).toStream 
+    zipper(xs, f, ys).findZ(p).map {
+      z => z.toStream == zipper(xs, f, ys).toStream
     } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
   }
 

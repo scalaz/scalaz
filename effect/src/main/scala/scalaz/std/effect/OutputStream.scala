@@ -7,7 +7,7 @@ import java.io.OutputStream
 
 @deprecated("Use CloseableInstances", "7.1")
 trait OutputStreamInstances {
-  implicit val outputStreamResource: Resource[OutputStream] = 
+  implicit val outputStreamResource: Resource[OutputStream] =
     Resource.resourceFromCloseable
 }
 

@@ -91,7 +91,7 @@ abstract class ReaderWriterStateTInstances extends IndexedReaderWriterStateTInst
       implicit def W = W0
     }
 
-  implicit def rwstHoist[R, W, S](implicit W0: Monoid[W]): Hoist[({type λ[α[_], β] = ReaderWriterStateT[α, R, W, S, β]})#λ] = 
+  implicit def rwstHoist[R, W, S](implicit W0: Monoid[W]): Hoist[({type λ[α[_], β] = ReaderWriterStateT[α, R, W, S, β]})#λ] =
     new ReaderWriterStateTHoist[R, W, S] {
       implicit def W = W0
     }
@@ -164,7 +164,7 @@ private trait ReaderWriterStateTMonad[F[_], R, W, S]
 
 private trait ReaderWriterStateTHoist[R, W, S] extends Hoist[({type λ[α[_], β] = ReaderWriterStateT[α, R, W, S, β]})#λ] {
   implicit def W: Monoid[W]
-  
+
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = ReaderWriterStateT[M, R, W, S, α]})#λ ~> ({type λ[α] = ReaderWriterStateT[N, R, W, S, α]})#λ) {
     def apply[A](ma: ReaderWriterStateT[M, R, W, S, A]): ReaderWriterStateT[N, R, W, S, A] = ReaderWriterStateT {
       case (r,s) => f.apply(ma.run(r,s))

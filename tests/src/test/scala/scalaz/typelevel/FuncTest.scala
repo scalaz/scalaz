@@ -49,7 +49,7 @@ object FuncTest extends SpecLite {
   }
 
   "hlistfunc" in {
-    val test = List(1, 2, 3).:\(AppFunc.HNil[Int, Int]: HListFunc[scalaz.Applicative, Int, Int]) ({ (n, acc) => 
+    val test = List(1, 2, 3).:\(AppFunc.HNil[Int, Int]: HListFunc[scalaz.Applicative, Int, Int]) ({ (n, acc) =>
       AppFuncU { (x: Int) => (Some(x + n): Option[Int]) } :: acc })
     val result = test.runA(1)
     result match {
@@ -61,7 +61,7 @@ object FuncTest extends SpecLite {
   }
 
   "traverse" in {
-    val test = List(1, 2, 3).:\(AppFunc.HNil[Int, Int]: HListFunc[scalaz.Applicative, Int, Int]) ({ (n, acc) => 
+    val test = List(1, 2, 3).:\(AppFunc.HNil[Int, Int]: HListFunc[scalaz.Applicative, Int, Int]) ({ (n, acc) =>
       AppFuncU { (x: Int) => (Some(x + n): Option[Int]) } :: acc })
     val result = test traverse List(1, 2)
     result match {

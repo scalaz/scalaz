@@ -4,7 +4,7 @@ import scala.util.control.NonFatal
 import Liskov.<~<
 
 /** Represents a disjunction: a result that is either an `A` or a `B`.
- * 
+ *
  * An instance of `A` [[\/]] B is either a [[-\/]]`[A]` (aka a "left") or a [[\/-]]`[B]` (aka a "right").
  *
  * A common use of a disjunction is to explicitly represent the possibility of failure in a result as opposed to
@@ -504,7 +504,7 @@ trait DisjunctionFunctions {
   } catch {
     case e: Throwable => left(e)
   }
-  
+
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassManifest[E]): E \/ T = try {
     \/-(a)
   } catch {

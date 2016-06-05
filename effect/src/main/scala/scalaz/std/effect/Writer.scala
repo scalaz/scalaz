@@ -7,7 +7,7 @@ import java.io.Writer
 
 @deprecated("Use CloseableInstances", "7.1")
 trait WriterInstances {
-  implicit val writerResource: Resource[Writer] = 
+  implicit val writerResource: Resource[Writer] =
     Resource.resourceFromCloseable
 }
 

@@ -18,11 +18,11 @@ sealed abstract class StateTEffectInstances extends StateTEffectInstances0 {
       implicit def F = M0
       implicit def M = M0
     }
-  }  
+  }
 }
 
 trait StateTLiftIO[M[_], S] extends LiftIO[({type λ[α] = StateT[M, S, α]})#λ] {
   implicit def M: MonadIO[M]
-    
+
   def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = StateT[α, S, β]})#λ].liftM(M.liftIO(ioa))
 }

@@ -56,7 +56,7 @@ trait STRefFunctions {
 }
 
 sealed abstract class STRefInstances {
-  
+
   /**Equality for STRefs is reference equality */
   implicit def STRefEqual[S, A]: Equal[STRef[S, A]] =
     Equal.equalA // todo reference equality?

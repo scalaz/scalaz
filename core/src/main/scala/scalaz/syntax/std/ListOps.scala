@@ -37,13 +37,13 @@ final class ListOps[A](self: List[A]) {
   @deprecated("use groupWhenM", "7.1")
   final def groupByM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = l.groupWhenM(self)(p)
   final def groupWhenM[M[_] : Monad](p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = l.groupWhenM(self)(p)
-  
+
   final def groupBy1[B](f: A => B): Map[B, NonEmptyList[A]] = l.groupBy1(self)(f)
 
   final def groupWhen(p: (A, A) => Boolean): List[NonEmptyList[A]] = l.groupWhen(self)(p)
 
   final def lookup[B, C](key: B)(implicit eq: Equal[B], ev: A =:= (B, C)): Option[C] = self.find((x: A) => eq.equal(ev(x)._1, key)).map(_._2)
-  
+
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumLeft(self)(c, f)
 
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumRight(self)(c, f)

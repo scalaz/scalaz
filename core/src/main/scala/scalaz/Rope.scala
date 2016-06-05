@@ -110,7 +110,7 @@ sealed class Rope[A : ClassManifest](val self: Rope.FingerTreeIntPlus[ImmutableA
 
   def chunks: Stream[ImmutableArray[A]] = self.toStream
 }
-    
+
 @deprecated("Rope is deprecated. Use `Cord` instead", "7.1")
 sealed class WrappedRope[A : ClassManifest](val self: Rope[A])
     extends Ops[Rope[A]] with IndexedSeq[A] with IndexedSeqLike[A, WrappedRope[A]] {

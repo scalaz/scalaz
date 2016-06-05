@@ -29,7 +29,7 @@ object ResourceTest extends SpecLite {
         fail("should have thrown")
       } catch {
         case ioe: IOException => // ok
-      }    
+      }
     }
 
   }

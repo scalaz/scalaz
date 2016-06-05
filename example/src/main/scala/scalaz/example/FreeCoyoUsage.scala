@@ -27,7 +27,7 @@ object FreeCoyoUsage extends App {
 
   // Free monad over the free functor of RngOp. The instance is not inferrable.
   type Rng[A] = Free.FreeC[RngOp, A]
-  implicit val MonadRng: Monad[Rng] = 
+  implicit val MonadRng: Monad[Rng] =
     Free.freeMonad[({type λ[α] = Coyoneda[RngOp, α]})#λ]
 
   // Smart constructors for Rng[A]
@@ -48,7 +48,7 @@ object FreeCoyoUsage extends App {
 
   // Natural transformation to (Random => A)
   type RandomReader[A] = Random => A
-  val toState: RngOp ~> RandomReader = 
+  val toState: RngOp ~> RandomReader =
     new (RngOp ~> RandomReader) {
       def apply[A](fa: RngOp[A]) =
         fa match {

@@ -31,7 +31,7 @@ object BigDocument {
       val d =
         // Make element names upper-case.
         c usingElem (_ withName (_ map (_.toUpper)))
-        
+
       d.current
     }
 

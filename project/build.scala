@@ -48,7 +48,7 @@ object build extends Build {
     val extracted = Project.extract(st)
 
     val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
-    IO.write(extracted get releaseVersionFile, "\n\nscalazMimaBasis in ThisBuild := \"%s\"" format releaseV, append = true)
+    IO.write(extracted get releaseVersionFile, s"""\nscalazMimaBasis in ThisBuild := "${releaseV}"\n""", append = true)
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 

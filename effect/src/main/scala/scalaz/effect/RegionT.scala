@@ -53,7 +53,7 @@ trait RegionTMonad[S, M[_]] extends Monad[({type λ[α] = RegionT[S, M, α]})#λ
 
 trait RegionTLiftIO[S, M[_]] extends LiftIO[({type λ[α] = RegionT[S, M, α]})#λ] {
   implicit def L: LiftIO[M]
-  
+
   def liftIO[A](ioa: IO[A]) = RegionT.regionT(kleisli(_ => L.liftIO(ioa)))
 }
 

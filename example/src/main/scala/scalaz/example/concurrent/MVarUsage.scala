@@ -21,12 +21,12 @@ object MVarUsage extends App {
         mvar <- newEmptyMVar[Int]
         _ <- forkIO(calc(mvar))
         a <- mvar.take
-      } yield a 
+      } yield a
     assert(io.unsafePerformIO === 42)
   }
 
   def inout() {
-    def calc(in: MVar[Int], out: MVar[Int]): IO[Unit] = 
+    def calc(in: MVar[Int], out: MVar[Int]): IO[Unit] =
       for {
         a <- in.take
         b <- in.take
@@ -53,7 +53,7 @@ object MVarUsage extends App {
         _ <- p.put("pong")
       } yield ()
 
-    def io = 
+    def io =
       for {
         c <- newMVar("ping")
         p <- newEmptyMVar[String]

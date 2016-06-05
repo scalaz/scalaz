@@ -98,7 +98,7 @@ trait Shifts {
   // * parent
   def remove: Shift =
     shift(c => Remove +++ c.remove.map(_._2))
-  
+
   def removeLeft: Shift =
     shift(c => RemoveLeft +++ c.removeLeft.map(_._2))
 

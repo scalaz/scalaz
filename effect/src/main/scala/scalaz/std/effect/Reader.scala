@@ -7,7 +7,7 @@ import java.io.Reader
 
 @deprecated("Use CloseableInstances", "7.1")
 trait ReaderInstances {
-  implicit val readerResource: Resource[Reader] = 
+  implicit val readerResource: Resource[Reader] =
     Resource.resourceFromCloseable
 }
 

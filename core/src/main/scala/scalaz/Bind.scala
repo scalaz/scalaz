@@ -36,7 +36,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
     lazy val f = ifFalse
     bind(value)(if(_) t else f)
   }
-    
+
   /**
    * Repeats a monadic action infinitely
    */

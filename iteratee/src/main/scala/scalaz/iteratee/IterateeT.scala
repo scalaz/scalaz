@@ -98,7 +98,7 @@ sealed trait IterateeT[E, F[_], A] {
     (this >>== e[A]).joinI[E, A]
 
   def &=(e: EnumeratorT[E, F])(implicit F: Bind[F]): IterateeT[E, F, A] =
-    this >>== e[A] 
+    this >>== e[A]
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[E, G, A] = {
     def step: StepT[E, F, A] => StepT[E, G, A] =
@@ -129,7 +129,7 @@ sealed trait IterateeT[E, F[_], A] {
   }
 
   /**
-   * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
+   * Feeds input elements to this iteratee until it is done, feeds the produced value to the
    * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
    */
   def sequenceI(implicit m: Monad[F]): EnumerateeT[E, A, F] =
@@ -217,7 +217,7 @@ trait IterateeTFunctions {
 
   def done[E, F[_] : Applicative, A](d: => A, r: => Input[E]): IterateeT[E, F, A] =
     StepT.sdone(d, r).pointI
-    
+
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
    */
@@ -235,7 +235,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) <+> a)
         , eof = done(PlusEmpty[A].empty, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -246,7 +246,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) |+| a)
         , eof = done(Monoid[A[E]].zero, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -369,7 +369,7 @@ private trait IterateeTHoist[E] extends Hoist[({type λ[β[_], α] = IterateeT[E
 
 private trait IterateeTMonadIO[E, F[_]] extends MonadIO[({type λ[α] = IterateeT[E, F, α]})#λ] with IterateeTMonad[E, F] {
   implicit def F: MonadIO[F]
-  
+
   def liftIO[A](ioa: IO[A]) = MonadTrans[({type λ[α[_], β] = IterateeT[E, α, β]})#λ].liftM(F.liftIO(ioa))
 }
 

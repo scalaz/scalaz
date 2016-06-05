@@ -33,7 +33,7 @@ trait Func[F[_], TC[F[_]] <: Functor[F], A, B] { self =>
   def @&&&[G[_]](g: Func[G, TC, A, B]) = productA(g)
 
   def &&&@[G[_]](g: Func[G, TC, A, B]) = g.productA(self)
-  
+
   /** compose `A => F[B]` and `A => G[B]` into `A => F[B] :: G[B] :: HNil` */
   def productA[G[_]](g: Func[G, TC, A, B]) = consA(g consA hnilfunc[TC, A, B])
 
@@ -90,7 +90,7 @@ case class HNilFunc[TC[F[_]] <: Functor[F], A, B](
   override type L = TCNil
   def TC = TC0
   def Product: KTypeClass.WrappedProduct[TC, TCNil] = TC0.emptyProduct
-  def runA(a: A) = HNil  
+  def runA(a: A) = HNil
 }
 
 //
@@ -123,7 +123,7 @@ trait FuncFunctions {
     def F = F0
     def runA(a: A) = f(a)
   }
-  def functorfunc[M[_], A, B](f: A => M[B])(implicit F0: Functor[M]): Func[M, Functor, A, B] = func[M, Functor, A, B](f)  
+  def functorfunc[M[_], A, B](f: A => M[B])(implicit F0: Functor[M]): Func[M, Functor, A, B] = func[M, Functor, A, B](f)
   def functorfuncU[A, R](f: A => R)(implicit F0: Unapply[Functor, R]): Func[F0.M, Functor, A, F0.A] = new Func[F0.M, Functor, A, F0.A] {
     def TC = KTypeClass[Functor]
     def F = F0.TC

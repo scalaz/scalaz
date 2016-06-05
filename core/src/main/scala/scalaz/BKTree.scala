@@ -79,7 +79,7 @@ sealed abstract class BKTree[A] extends Product with Serializable {
     for (v <- t.values)
       k = k - v
     k
-  }  
+  }
 
   def values: List[A] =
     this match {

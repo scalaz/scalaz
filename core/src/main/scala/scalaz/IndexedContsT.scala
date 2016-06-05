@@ -18,7 +18,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R
       f(a).run(wk)
     } })
   }
-  
+
   def contramap[I](f: I => O)(implicit M: Functor[M], W: Functor[W]): IndexedContsT[W, M, R, I, A] = IndexedContsT { wami =>
     run(W.map(wami) { ami => { a => M.map(ami(a))(f) } })
   }

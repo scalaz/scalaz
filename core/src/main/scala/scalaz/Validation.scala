@@ -369,7 +369,7 @@ object Validation extends ValidationInstances with ValidationFunctions {
     }
 
   @deprecated("""flatMap does not accumulate errors, use `scalaz.\/` or `import scalaz.Validation.FlatMap._` instead""", "7.1")
-  @inline implicit def ValidationFlatMapDeprecated[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] = 
+  @inline implicit def ValidationFlatMapDeprecated[E, A](d: Validation[E, A]): ValidationFlatMap[E, A] =
     new ValidationFlatMap(d)
 
   /** Import this if you wish to use `flatMap` without a deprecation

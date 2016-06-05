@@ -75,7 +75,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 
   def endo(implicit M: Functor[M], ev: A >~> B): Endomorphic[({type λ[α, β] = Kleisli[M, α, β]})#λ, A] =
     Endomorphic[({type λ[α, β] = Kleisli[M, α, β]})#λ, A](map(ev.apply))
-  
+
   def liftF(implicit F: Functor[({ type l[a] = Kleisli[M, A, a]})#l]) = Free.liftF[({ type l[a] = Kleisli[M, A,a]})#l,B](self)
 
 }
@@ -378,7 +378,7 @@ private trait KleisliPlusEmpty[F[_], A] extends PlusEmpty[({type λ[α]=Kleisli[
 
 private trait KleisliCatchable[F[_], A] extends Catchable[({type λ[α]=Kleisli[F, A, α]})#λ] {
   implicit def F: Catchable[F]
-  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] = 
+  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] =
     Kleisli(a => F.attempt(try f.run(a) catch { case t: Throwable => F.fail(t) }))
   def fail[B](err: Throwable): Kleisli[F, A, B] = Kleisli(_ => F.fail(err))
 }

@@ -3,7 +3,7 @@ package scalaz.example
 import scalaz.UnionTypes._
 
 object UnionUsage {
-  
+
   type MyUnion = t[Float]#t[Int]#t[String]
 
   implicitly[Contains[Float, MyUnion]]

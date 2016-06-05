@@ -149,7 +149,7 @@ trait XSources {
       case Nil =>
         Return(Nil)
     }
-  
+
   /// special
   private[xml] def specialT(c: LChar, s: LStr): Trampoline[List[Token]] =
     s match {

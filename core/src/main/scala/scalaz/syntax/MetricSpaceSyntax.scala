@@ -23,7 +23,7 @@ trait ToMetricSpaceOps  {
 @deprecated("MetricSpace is deprecated", "7.0.1")
 trait MetricSpaceSyntax[F]  {
   implicit def ToMetricSpaceOps(v: F): MetricSpaceOps[F] = new MetricSpaceOps[F] { def self = v; implicit def F: MetricSpace[F] = MetricSpaceSyntax.this.F }
-  
+
   def F: MetricSpace[F]
   ////
 

@@ -68,7 +68,7 @@ object ListTest extends SpecLite {
       val strlen = (_ : String).length
       (a groupBy strlen) must_===((a groupBy1 strlen) mapValues (_.list))
   }
-  
+
   "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).map(_.list).flatten must_===(a)

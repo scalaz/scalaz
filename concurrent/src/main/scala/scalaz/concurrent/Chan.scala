@@ -23,16 +23,16 @@ object Chan {
 import Chan._
 private[this] case class ChItem[A](a: A, end: ChStream[A])
 private[this] class ChanImpl[A](readVar: MVar[ChStream[A]], writeVar: MVar[ChStream[A]]) extends Chan[A] {
-  def read = 
-    readVar.modify(readEnd => 
+  def read =
+    readVar.modify(readEnd =>
       for {
         item <- readEnd.read
       } yield (item.end, item.a))
 
-  def write(a: A) = 
+  def write(a: A) =
     for {
       newHole <- newEmptyMVar[ChItem[A]]
-      _       <- 
+      _       <-
         for {
           oldHole <- writeVar.take
           _       <- oldHole.put(ChItem(a, newHole))

@@ -125,7 +125,7 @@ sealed trait GenericList[+M[_]] {
     }
     transform(t)
   }
- 
+
   /**
    * Prepends a value to this list.
    */

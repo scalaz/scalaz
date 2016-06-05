@@ -40,7 +40,7 @@ object Enumeratee2TTest extends SpecLite {
       val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id].apply[E3LI])(mpo)
       val outer2 = outer &= enum
       val inner = outer2.run &= enum2
-      
+
       inner.run.pointI.run must_== List[Either3[Int, (Int, Int), Int]](
         left3(1),
         right3(2),
@@ -65,7 +65,7 @@ object Enumeratee2TTest extends SpecLite {
 
     val outer = mergeI[Int, Id].apply(consume[Int, Id, List].value) &= enum
     val inner = outer.run &= enum2
-    
+
     inner.run.pointI.run must_===(List(1, 2, 3, 3, 3, 4, 5, 5, 6))
   }
 

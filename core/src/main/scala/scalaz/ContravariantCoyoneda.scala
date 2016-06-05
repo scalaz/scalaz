@@ -4,7 +4,7 @@ package scalaz
   * frequently convenient to apply `k` separately from sorting or
   * whatever process with `fi`, even when `B` is unknown, which is
   * very common.
-  * 
+  *
   * This is isomorphic to `F` as long as `F` itself is a contravariant
   * functor.  The homomorphism from `F[A]` to
   * `ContravariantCoyoneda[F,A]` exists even when `F` is not a

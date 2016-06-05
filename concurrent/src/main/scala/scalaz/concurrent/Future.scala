@@ -174,7 +174,7 @@ sealed abstract class Future[+A] {
 
   def runFor(timeout: Duration): A = runFor(timeout.toMillis)
 
-  /** Like `runFor`, but returns `TimeoutException` as left value. 
+  /** Like `runFor`, but returns `TimeoutException` as left value.
     * Will not report any other exceptions that may be raised during computation of `A`*/
   def attemptRunFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -193,26 +193,26 @@ sealed abstract class Future[+A] {
    * and attempts to cancel the running computation.
    * This implementation will not block the future's execution thread
    */
-  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
-    //instead of run this though chooseAny, it is run through simple primitive, 
+  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =
+    //instead of run this though chooseAny, it is run through simple primitive,
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
       scheduler.schedule(new Runnable {
-        def run() { 
+        def run() {
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
             cb(-\/(new TimeoutException()))
-          } 
+          }
         }
       }
       , timeoutInMillis, TimeUnit.MILLISECONDS)
-      
-      runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
+
+      runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel)
     }
-    
-    
+
+
 
   def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
       Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = timed(timeout.toMillis)

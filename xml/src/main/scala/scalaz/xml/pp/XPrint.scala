@@ -146,7 +146,7 @@ trait XPrints {
                 case None => (Nil, Nil)
                 case Some(s) => ("\n".toList, s)
               }
-            
+
             '>' :: nl ::: (t.reverse.foldLeft((i, i ::: tag_end(e.name))) {
               case ((ii, r), h) => (ii, pp_content(sp ::: ii, h)(c) ::: nl ::: r)
             })._2
@@ -166,7 +166,7 @@ trait XPrints {
         }
       })
     }
-  
+
   /// ppCDataS
   private def pp_content(i: Str, t: Content): Config => Str =
     c => t.fold(

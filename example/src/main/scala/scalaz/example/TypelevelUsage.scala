@@ -14,7 +14,7 @@ object TypelevelUsage extends App {
 
     val hlist1 = 3 :: HNil
     val hlist2 = "foo" :: hlist1
-    
+
     typed[Int :: HNil](hlist1)
     typed[String :: Int :: HNil](hlist2)
 
@@ -37,7 +37,7 @@ object TypelevelUsage extends App {
         typed[Option[Int]](optionInt2)
         typed[Some[String]](someString)
     }
-    
+
     val klist3 = klist1.fold[Option, GenericList[Option], HFold.Append[Option, klist1.type]](new HFold.Append[Option, klist1.type](klist1))
 
     typed[GenericCons[Option, Nothing, GenericCons[Option, Int, GenericCons[Some, String, GenericNil[Nothing]]]]](klist1)
@@ -79,7 +79,7 @@ object TypelevelUsage extends App {
       def init = 0
 
       type Apply[E, A <: Int] = Int
-      def apply[E, A <: Int](elem: Option[E], acc: A) = 
+      def apply[E, A <: Int](elem: Option[E], acc: A) =
         if (elem.isDefined) acc + 1
         else acc
     }

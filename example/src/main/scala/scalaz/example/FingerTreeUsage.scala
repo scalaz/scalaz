@@ -22,7 +22,7 @@ object FingerTreeUsage extends App{
 
   //prepending
   assert((2 +: 3 +: 4 +: emptyTree).toList == List(2, 3, 4))
-  
+
   //appending
   assert((emptyTree :+ 2 :+ 3 :+ 4).toList == List(2, 3, 4))
 
