@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.annotation.tailrec
-import Maybe.{Empty, Just}
+import Maybe.{Empty, Just, just}
 
 sealed abstract class CorecursiveList[A] {
   type S
@@ -21,7 +21,7 @@ object CorecursiveList extends CorecursiveListInstances {
   def fromStream[A](s: Stream[A]): CorecursiveList[A] =
     CorecursiveList(s){
       case Stream.Empty => Empty()
-      case x #:: xs => Just((xs, x))
+      case x #:: xs => just((xs, x))
     }
 
   implicit val covariantInstance: MonadPlus[CorecursiveList] with Foldable[CorecursiveList] with Zip[CorecursiveList] =
@@ -48,28 +48,29 @@ object CorecursiveList extends CorecursiveListInstances {
         def bstep(sa: fa.S, mfb: Maybe[CorecursiveList[B]])
             : Maybe[((fa.S, Maybe[CorecursiveList[B]]), B)] = mfb match {
           case Empty() => fa.step(sa) flatMap {case (sa, a) =>
-            bstep(sa, Just(f(a)))
+            bstep(sa, just(f(a)))
           }
           case Just(fb) => fb.step(fb.init) map {
-            case (sb, b) => ((sa, CorecursiveList(sb)(fb.step)), b)
+            case (sb, b) => ((sa, just(CorecursiveList(sb)(fb.step))), b)
           } orElse bstep(sa, Empty())
         }
-        CorecursiveList((fa.init, Empty()))((bstep _).tupled)
+        CorecursiveList((fa.init, Empty(): Maybe[CorecursiveList[B]])){
+          case (sa, mfb) => bstep(sa, mfb)
+        }
       }
 
-      override def filter[A](fa: CorecursiveList[A])(f: A => Boolean) =
-        CorecursiveList(fa.init){
-          @tailrec def step(s: fa.S): Maybe[(fa.S, A)] = fa.step(s) match {
-            case Empty() => Empty()
-            case j@Just((s, a)) =>
-              if (f(a)) j else step(s)
-          }
-          step
+      override def filter[A](fa: CorecursiveList[A])(f: A => Boolean) = {
+        @tailrec def step(s: fa.S): Maybe[(fa.S, A)] = fa.step(s) match {
+          case Empty() => Empty()
+          case j@Just((s, a)) =>
+            if (f(a)) j else step(s)
         }
+        CorecursiveList(fa.init)(step(_))
+      }
 
       override def point[A](a: => A) =
         CorecursiveList(false){b =>
-          if (b) Empty() else Just((true, a))
+          if (b) Empty() else just((true, a))
         }
 
       override def foldRight[A, B](fa: CorecursiveList[A], z: => B)(f: (A, => B) => B) = {
@@ -153,8 +154,8 @@ private sealed trait CorecursiveListEqual[A] extends Equal[CorecursiveList[A]] {
   override def equal(l: CorecursiveList[A], r: CorecursiveList[A]): Boolean = {
     @tailrec def rec(ls: l.S, rs: r.S): Boolean =
       (l.step(ls), r.step(rs)) match {
-        case (Maybe.Empty(), Maybe.Empty()) => true
-        case (Maybe.Just((ls2, la)), Maybe.Just((rs2, ra))) =>
+        case (Empty(), Empty()) => true
+        case (Just((ls2, la)), Just((rs2, ra))) =>
           A.equal(la, ra) && rec(ls2, rs2)
         case _ => false
       }
