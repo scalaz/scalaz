@@ -1,0 +1,5 @@
+package typeclass
+
+trait MonoidInstances {
+
+}
