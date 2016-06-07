@@ -35,13 +35,16 @@ object CorecursiveList extends CorecursiveListInstances {
       override def ap[A, B](fa0: => CorecursiveList[A])(ff0: => CorecursiveList[A => B]) = {
         val fa = fa0
         val ff = ff0
-        def bstep(sa: fa.S, ffs: Maybe[(ff.S, A => B)])
-            : Maybe[((fa.S, Maybe[(ff.S, A => B)]), B)] =
-          ffs.flatMap{case (sf, f) =>
+        def bstep(sa: fa.S, ffs: Boolean \/ (ff.S, A => B))
+            : Maybe[((fa.S, Boolean \/ (ff.S, A => B)), B)] = ffs match {
+          case -\/(false) => bstep(sa, ff.step(ff.init) toRight true)
+          case \/-((sf, f)) =>
             (fa.step(sa) map {case (sa, a) => ((sa, ffs), f(a))}
-              orElse bstep(fa.init, ff.step(sf)))
-          }
-        CorecursiveList((fa.init, ff.step(ff.init)))((bstep _).tupled)
+              orElse bstep(fa.init, ff.step(sf) toRight true))
+          case -\/(true) => Empty()
+        }
+        CorecursiveList((fa.init, -\/(false): Boolean \/ (ff.S, A => B))
+                      )((bstep _).tupled)
       }
 
       override def bind[A, B](fa: CorecursiveList[A])(f: A => CorecursiveList[B]) = {
