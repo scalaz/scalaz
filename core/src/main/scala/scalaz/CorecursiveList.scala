@@ -3,6 +3,18 @@ package scalaz
 import scala.annotation.tailrec
 import Maybe.{Empty, Just, just}
 
+/** The corecursive list; i.e. the arguments to `unfold` saved off to
+  * a data structure.  Generally does not have methods itself; as with
+  * [[scalaz.NonEmptyList]], it provides typeclass instances instead,
+  * and you typically import typeclass syntax to get methods.
+  *
+  * Operations are generally designed to preserve the isomorphism with
+  * [[scalaz.EphemeralStream]]; for example, `ap` could be a "zipping"
+  * `ap`, but instead is a less efficient "combination" style.  This
+  * means that the [[scalaz.Monad]] has the same behavior as that of
+  * [[scalaz.EphemeralStream]] and more traditional strict list
+  * structures.
+  */
 sealed abstract class CorecursiveList[A] {
   type S
   val init: S
@@ -18,11 +30,36 @@ object CorecursiveList extends CorecursiveListInstances {
   def apply[S, A](init: S)(step: S => Maybe[(S, A)]): CorecursiveList[A] =
     CorecursiveListImpl(init, step)
 
-  def fromStream[A](s: Stream[A]): CorecursiveList[A] =
-    CorecursiveList(s){
-      case Stream.Empty => Empty()
-      case x #:: xs => just((xs, x))
+  import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
+
+  val ephemeralStreamIso: EphemeralStream <~> CorecursiveList =
+    new IsoFunctorTemplate[EphemeralStream, CorecursiveList] {
+      def to[A](fa: EphemeralStream[A]) =
+        CorecursiveList(fa)(fa =>
+          if (fa.isEmpty) just((fa.tail(), fa.head())) else Empty())
+
+      def from[A](ga: CorecursiveList[A]) =
+        EphemeralStream.unfold(ga.init)(s =>
+          ga.step(s).map{case (s, a) => (a, s)}.toOption)
     }
+
+  val streamIso: Stream <~> CorecursiveList =
+    new IsoFunctorTemplate[Stream, CorecursiveList] {
+      def to[A](fa: Stream[A]) =
+        CorecursiveList(fa){
+          case Stream.Empty => Empty()
+          case x #:: xs => just((xs, x))
+        }
+
+      def from[A](ga: CorecursiveList[A]) = {
+        def rec(s: ga.S): Stream[A] =
+          ga.step(s) cata ({case (s, a) => a #:: rec(s)}, Stream())
+        rec(ga.init)
+      }
+    }
+
+  def fromStream[A](s: Stream[A]): CorecursiveList[A] =
+    streamIso.to(s)
 
   implicit val covariantInstance: MonadPlus[CorecursiveList] with Foldable[CorecursiveList] with Zip[CorecursiveList] =
     new MonadPlus[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
