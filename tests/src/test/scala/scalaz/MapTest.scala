@@ -955,6 +955,10 @@ object MapTest extends SpecLite {
       val li = a.toList.map(i => (i, i))
       fromSet(a)(i => i) must_=== fromList(li)
     }
+
+    "consistent keySet" ! forAll { a: Byte ==>> Byte =>
+      fromSet(a.keySet)(_ => ()) must_=== a.map(_ => ())
+    }
   }
 
   /*"==>> validity" should {
