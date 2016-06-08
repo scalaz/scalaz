@@ -14,7 +14,7 @@ sealed abstract class ISet[A] {
   val size: Int
 
   // -- * Query
-  final def isEmpty =
+  final def isEmpty: Boolean =
     this match {
       case Tip() => true
       case Bin(_, _, _) => false
@@ -33,10 +33,10 @@ sealed abstract class ISet[A] {
     }
 
   /** Alias for member */
-  final def contains(x: A)(implicit o: Order[A]) =
+  final def contains(x: A)(implicit o: Order[A]): Boolean =
     member(x)
 
-  final def notMember(x: A)(implicit o: Order[A]) =
+  final def notMember(x: A)(implicit o: Order[A]): Boolean =
     !member(x)
 
   @tailrec
@@ -143,7 +143,7 @@ sealed abstract class ISet[A] {
     }
   }
 
-  final def isSubsetOf(other: ISet[A])(implicit o: Order[A]) =
+  final def isSubsetOf(other: ISet[A])(implicit o: Order[A]): Boolean =
     (this.size <= other.size) && this.isSubsetOfX(other)
 
   private def isSubsetOfX(other: ISet[A])(implicit o: Order[A]): Boolean =
@@ -157,7 +157,7 @@ sealed abstract class ISet[A] {
         found && l.isSubsetOfX(lt) && r.isSubsetOfX(gt)
     }
 
-  final def isProperSubsetOf(other: ISet[A])(implicit o: Order[A]) =
+  final def isProperSubsetOf(other: ISet[A])(implicit o: Order[A]): Boolean =
     (this.size < other.size) && this.isSubsetOf(other)
 
   // -- * Construction
@@ -250,10 +250,10 @@ sealed abstract class ISet[A] {
   }
 
   // -- * Operators
-  final def \\ (other: ISet[A])(implicit o: Order[A]) =
+  final def \\ (other: ISet[A])(implicit o: Order[A]): ISet[A] =
     difference(other)
 
-  final def intersection(other: ISet[A])(implicit o: Order[A]) = {
+  final def intersection(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
     def hedgeInt(blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (_, Tip()) =>
@@ -395,7 +395,7 @@ sealed abstract class ISet[A] {
     -- for some @(x,y)@, @x \/= y && f x == f y@
     }}}
     */
-  def map[B: Order](f: A => B) =
+  def map[B: Order](f: A => B): ISet[B] =
     fromList(toList.map(f))
 
   // -- * Folds
@@ -482,17 +482,17 @@ sealed abstract class ISet[A] {
     }
 
   // -- ** List
-  final def elems =
+  final def elems: List[A] =
     toAscList
 
-  final def toList =
+  final def toList: List[A] =
     toAscList
 
   // -- ** Ordered list
-  final def toAscList =
+  final def toAscList: List[A] =
     foldRight(List.empty[A])(_ :: _)
 
-  final def toDescList =
+  final def toDescList: List[A] =
     foldLeft(List.empty[A])((a, b) => b :: a)
 
   private def glue[A](l: ISet[A], r: ISet[A]): ISet[A] =
