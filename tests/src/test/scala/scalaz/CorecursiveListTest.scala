@@ -14,6 +14,7 @@ import syntax.contravariant._
 
 object CorecursiveListTest extends SpecLite {
   type CL[A] = CorecursiveList[A]
+  val CL = CorecursiveList
   checkAll(monadPlus.laws[CL])
   checkAll(foldable.laws[CL])
   checkAll(zip.laws[CL])
@@ -29,7 +30,7 @@ object CorecursiveListTest extends SpecLite {
   import EphemeralStreamTest.ephemeralStreamShow
 
   implicit def corecursiveListShow[A: Show]: Show[CL[A]] =
-    Show[Stream[A]] contramap (CorecursiveList.streamIso.from(_))
+    Show[Stream[A]] contramap (CL.streamIso.from(_))
 
   def isoTest[F[_], G[_]](iso: F <~> G)(
     implicit AF: Arbitrary[F[Int]], AG: Arbitrary[G[Int]],
@@ -46,16 +47,16 @@ object CorecursiveListTest extends SpecLite {
     p
   }
 
-  "stream to corec iso" ! isoTest(CorecursiveList.streamIso)
+  "stream to corec iso" ! isoTest(CL.streamIso)
 
-  "eph stream to corec iso" ! isoTest(CorecursiveList.ephemeralStreamIso)
+  "eph stream to corec iso" ! isoTest(CL.ephemeralStreamIso)
 
-  def justDie[A](msg: String = "too strict!"): CorecursiveList[A] =
-    CorecursiveList(()){_ => throw new TooStrictException(msg)}
+  def justDie[A](msg: String = "too strict!"): CL[A] =
+    CL(()){_ => throw new TooStrictException(msg)}
 
   /** Emit one element, then blow up on the next one. */
-  def oneAndDie[A](a: A, msg: String = "too strict!"): CorecursiveList[A] =
-    CorecursiveList(true){s =>
+  def oneAndDie[A](a: A, msg: String = "too strict!"): CL[A] =
+    CL(true){s =>
       if (s) just((false, a)) else throw new TooStrictException(msg)
     }
 
@@ -93,6 +94,10 @@ object CorecursiveListTest extends SpecLite {
 
   "filter empty" ! forAll {a: CL[Int] =>
     MonadPlus[CL].filter(a)(_ => false) must_===(PlusEmpty[CL].empty)
+  }
+
+  "cons naturality" ! forAll {(x: Int, xs: CL[Int]) =>
+    CL.streamIso.from(CL.cons(x, xs)) must_===(x #:: CL.streamIso.from(xs))
   }
 
   object instances {
