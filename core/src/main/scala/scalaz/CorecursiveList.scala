@@ -36,7 +36,7 @@ object CorecursiveList extends CorecursiveListInstances {
     new IsoFunctorTemplate[EphemeralStream, CorecursiveList] {
       def to[A](fa: EphemeralStream[A]) =
         CorecursiveList(fa)(fa =>
-          if (fa.isEmpty) just((fa.tail(), fa.head())) else Empty())
+          if (fa.isEmpty) Empty() else just((fa.tail(), fa.head())))
 
       def from[A](ga: CorecursiveList[A]) =
         EphemeralStream.unfold(ga.init)(s =>
