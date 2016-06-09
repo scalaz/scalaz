@@ -53,6 +53,14 @@ object CorecursiveListTest extends SpecLite {
 
   "eph stream to corec iso" ! isoTest(CL.ephemeralStreamIso)
 
+  "fromList" ! forAll {xs: List[Int] =>
+    CL.fromList(xs) must_===(CL.fromStream(xs.toStream))
+  }
+
+  "fromVector" ! forAll {xs: Vector[Int] =>
+    CL.fromVector(xs) must_===(CL.fromStream(xs.toStream))
+  }
+
   def justDie[A](msg: String = "too strict!"): CL[A] =
     CL(()){_ => throw new TooStrictException(msg)}
 
