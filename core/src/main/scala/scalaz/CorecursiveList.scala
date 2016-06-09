@@ -215,20 +215,14 @@ object CorecursiveList extends CorecursiveListInstances {
 
       override def alignWith[A, B, C](f: A \&/ B => C) = (fa, fb) => {
         import \&/.{Both, This, That}
-        CorecursiveList(Both(fa.init, fb.init): fa.S \&/ fb.S){tab =>
-          tab.bimap(fa.step, fb.step) match {
-            case Both(Just((sa, a)), Just((sb, b))) =>
-              just((Both(sa, sb), f(Both(a, b))))
-            case Both(Just((sa, a)), _) =>
-              just((This(sa), f(This(a))))
-            case This(Just((sa, a))) =>
-              just((This(sa), f(This(a))))
-            case Both(_, Just((sb, b))) =>
-              just((That(sb), f(That(b))))
-            case That(Just((sb, b))) =>
-              just((That(sb), f(That(b))))
-            case _ => Empty()
-          }
+        CorecursiveList(Both(fa.init, fb.init): fa.S \&/ fb.S){
+          case Both(sa, sb) =>
+            Align[Maybe].align(fa.step(sa), fb.step(sb)).map(sasb =>
+              (sasb bimap (_._1, _._1), f(sasb bimap (_._2, _._2))))
+          case This(sa) =>
+            fa.step(sa) map {case (sa, a) => (This(sa), f(This(a)))}
+          case That(sb) =>
+            fb.step(sb) map {case (sb, b) => (That(sb), f(That(b)))}
         }
       }
 
