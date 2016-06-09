@@ -126,9 +126,11 @@ object CorecursiveList extends CorecursiveListInstances {
 
   implicit val covariantInstance:
       MonadPlus[CorecursiveList] with Foldable[CorecursiveList]
-      with IsEmpty[CorecursiveList] with Zip[CorecursiveList] =
+      with IsEmpty[CorecursiveList] with Align[CorecursiveList]
+      with Zip[CorecursiveList] =
     new MonadPlus[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
-        with IsEmpty[CorecursiveList] with Zip[CorecursiveList] {
+        with IsEmpty[CorecursiveList] with Align[CorecursiveList]
+        with Zip[CorecursiveList] {
       override def map[A, B](fa: CorecursiveList[A])(f: A => B) =
         CorecursiveList(fa.init)(fa.step andThen (_ map {
           case (s, a) => (s, f(a))
@@ -210,6 +212,25 @@ object CorecursiveList extends CorecursiveListInstances {
 
       override def isEmpty[A](fa: CorecursiveList[A]) =
         fa.step(fa.init).isEmpty
+
+      override def alignWith[A, B, C](f: A \&/ B => C) = (fa, fb) => {
+        import \&/.{Both, This, That}
+        CorecursiveList(Both(fa.init, fb.init): fa.S \&/ fb.S){tab =>
+          tab.bimap(fa.step, fb.step) match {
+            case Both(Just((sa, a)), Just((sb, b))) =>
+              just((Both(sa, sb), f(Both(a, b))))
+            case Both(Just((sa, a)), _) =>
+              just((This(sa), f(This(a))))
+            case This(Just((sa, a))) =>
+              just((This(sa), f(This(a))))
+            case Both(_, Just((sb, b))) =>
+              just((That(sb), f(That(b))))
+            case That(Just((sb, b))) =>
+              just((That(sb), f(That(b))))
+            case _ => Empty()
+          }
+        }
+      }
 
       override def zip[A, B](l: => CorecursiveList[A], r: => CorecursiveList[B]) = {
         val l1 = l

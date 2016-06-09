@@ -18,6 +18,7 @@ object CorecursiveListTest extends SpecLite {
   checkAll(monadPlus.laws[CL])
   checkAll(foldable.laws[CL])
   checkAll(isEmpty.laws[CL])
+  checkAll(align.laws[CL])
   checkAll(zip.laws[CL])
   checkAll(monoid.laws[CL[Int]])
   checkAll(order.laws[CL[Int]])
