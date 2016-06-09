@@ -6,8 +6,10 @@ import org.scalacheck.{Arbitrary, Prop, Properties, Shrink}
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Isomorphism.<~>
+import Maybe.just
 import std.anyVal._
 import std.stream._
+import std.tuple._
 import syntax.contravariant._
 
 object CorecursiveListTest extends SpecLite {
@@ -48,7 +50,55 @@ object CorecursiveListTest extends SpecLite {
 
   "eph stream to corec iso" ! isoTest(CorecursiveList.ephemeralStreamIso)
 
+  def justDie[A](msg: String = "too strict!"): CorecursiveList[A] =
+    CorecursiveList(()){_ => throw new TooStrictException(msg)}
+
+  /** Emit one element, then blow up on the next one. */
+  def oneAndDie[A](a: A, msg: String = "too strict!"): CorecursiveList[A] =
+    CorecursiveList(true){s =>
+      if (s) just((false, a)) else throw new TooStrictException(msg)
+    }
+
+  "ap is nonstrict" in {
+    val sa = justDie[Unit]()
+    val sb = justDie[Unit]()
+    val sab = Apply[CL].tuple2(sa, sb)
+    sab.step(sab.init).mustThrowA[TooStrictException]
+  }
+
+  "ap doesn't get ahead of itself" ! forAll {(a: Int, b: Int) =>
+    val sa = oneAndDie(a, "sa too strict")
+    val sb = oneAndDie(b, "sb too strict")
+    val sab = Apply[CL].tuple2(sa, sb)
+    sab.step(sab.init).map(_._2) must_===(just(a, b))
+  }
+
+  "bind is nonstrict" in {
+    val sa = justDie[Unit]()
+    val sb = justDie[Unit]()
+    val sab = Bind[CL].bind(sa){a => sb}
+    sab.step(sab.init).mustThrowA[TooStrictException]
+  }
+
+  "bind doesn't get ahead of itself" ! forAll {(a: Int, b: Int) =>
+    val sa = oneAndDie(a)
+    val sb = oneAndDie(b)
+    val sab = Bind[CL].bind(sa){a => Functor[CL].map(sb)((a, _))}
+    sab.step(sab.init).map(_._2) must_===(just(a, b))
+  }
+
+  "filter identity" ! forAll {a: CL[Int] =>
+    MonadPlus[CL].filter(a)(_ => true) must_===(a)
+  }
+
+  "filter empty" ! forAll {a: CL[Int] =>
+    MonadPlus[CL].filter(a)(_ => false) must_===(PlusEmpty[CL].empty)
+  }
+
   object instances {
     def equalAmbiguous[A: Order] = Equal[CL[A]]
   }
 }
+
+private final class TooStrictException(msg: String)
+    extends RuntimeException(msg)
