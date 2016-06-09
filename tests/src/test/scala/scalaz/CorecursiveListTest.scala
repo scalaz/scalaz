@@ -17,6 +17,7 @@ object CorecursiveListTest extends SpecLite {
   val CL = CorecursiveList
   checkAll(monadPlus.laws[CL])
   checkAll(foldable.laws[CL])
+  checkAll(isEmpty.laws[CL])
   checkAll(zip.laws[CL])
   checkAll(monoid.laws[CL[Int]])
   checkAll(order.laws[CL[Int]])
