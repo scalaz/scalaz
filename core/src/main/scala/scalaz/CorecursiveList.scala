@@ -8,6 +8,15 @@ import Maybe.{Empty, Just, just}
   * [[scalaz.NonEmptyList]], it provides typeclass instances instead,
   * and you typically import typeclass syntax to get methods.
   *
+  * The corecursive list can be a very efficient way to represent
+  * "listlike" things in some cases; because it is so unlike "normal"
+  * collections, though, it's important to understand how its
+  * operations are implemented and what their performance
+  * characteristics are going to be.  For example, using `cons`
+  * iteratively to add a bunch of elements to the beginning of a
+  * [[scala.collection.immutable.List]] is very efficient; it's very
+  * ''inefficient'' for corecursive list.
+  *
   * Operations are generally designed to preserve the isomorphism with
   * [[scalaz.EphemeralStream]]; for example, `ap` could be a "zipping"
   * `ap`, but instead is a less efficient "combination" style.  This
@@ -58,10 +67,66 @@ object CorecursiveList extends CorecursiveListInstances {
       }
     }
 
+  import scala.collection.immutable.{IndexedSeq, LinearSeq}
+  import Maybe.optionMaybeIso.{to => optionTo}
+
+  /** Any `LinearSeq` converts to a `CorecursiveList` efficiently.  No
+    * natural transformation from `CorecursiveList` to `List` exists,
+    * because representation of infinite lists is not guaranteed.  Use
+    * `streamIso` for such cases instead.
+    */
+  val fromList: LinearSeq ~> CorecursiveList =
+    new (LinearSeq ~> CorecursiveList) {
+      def apply[A](fa: LinearSeq[A]) =
+        CorecursiveList(fa){
+          case a +: fa => just((fa, a))
+          case _ => Empty()
+        }
+    }
+
+  /** Any `IndexedSeq` converts to a `CorecursiveList` efficiently.  No
+    * natural transformation from `CorecursiveList` to `Vector`
+    * exists, because representation of infinite lists is not
+    * guaranteed.  Use `streamIso` for such cases instead.
+    */
+  val fromVector: IndexedSeq ~> CorecursiveList =
+    new (IndexedSeq ~> CorecursiveList) {
+      def apply[A](fa: IndexedSeq[A]) =
+        CorecursiveList(0){ix =>
+          if (ix < fa.length) just((ix + 1, fa(ix)))
+          else Empty()
+        }
+    }
+
   def fromStream[A](s: Stream[A]): CorecursiveList[A] =
     streamIso.to(s)
 
-  implicit val covariantInstance: MonadPlus[CorecursiveList] with Foldable[CorecursiveList] with Zip[CorecursiveList] =
+  /** A frightfully inefficient way to add elements to the beginning of
+    * a corecursive list.  It is correct, and reasonable enough for
+    * one-or-two-time use on a particular list, but be warned that
+    * iterative cons is necessarily a very inefficient way to build up
+    * a `CorecursiveList`.
+    *
+    * You can see why by taking a look at its choice of state.  `cons`
+    * adds a `Maybe` to the state of the tail list, so if you cons
+    * four elements onto `someCList`, its state will be
+    * `Maybe[Maybe[Maybe[Maybe[someCList.S]]]]`, and so on.  This is
+    * utterly unsustainable for iterative consing.
+    * 
+    * Instead, try `apply`, or another more wholemeal-style
+    * combinator.  You might also cons up a different structure, then
+    * transform that to a `CorecursiveList` wholesale and `append` or
+    * `plus` it on; that's reasonably efficient, too.
+    */
+  def cons[A](a: A, fa: CorecursiveList[A]): CorecursiveList[A] =
+    CorecursiveList(Empty(): Maybe[fa.S]){ms =>
+      ms cata (s => fa.step(s) map {case (fas, a) => (just(fas), a)},
+               just((just(fa.init), a)))
+    }
+
+  implicit val covariantInstance:
+      MonadPlus[CorecursiveList] with Foldable[CorecursiveList]
+      with Zip[CorecursiveList] =
     new MonadPlus[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
         with Zip[CorecursiveList] {
       override def map[A, B](fa: CorecursiveList[A])(f: A => B) =
