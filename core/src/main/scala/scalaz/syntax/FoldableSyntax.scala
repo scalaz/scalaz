@@ -24,6 +24,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def findLeft(f: A => Boolean): Option[A] = F.foldLeft[A, Option[A]](self, None)((b, a) => b.orElse(if(f(a)) Some(a) else None))
   final def findRight(f: A => Boolean): Option[A] = F.foldRight[A, Option[A]](self, None)((a, b) => b.orElse(if(f(a)) Some(a) else None))
   final def fold(implicit A: Monoid[A]): A = F.fold(self)(A)
+  final def fold1Opt(implicit A: Semigroup[A]): Option[A] = foldMap1Opt[A]()
   final def foldr[B](z: => B)(f: A => (=> B) => B): B = F.foldr(self, z)(f)
   final def foldr1Opt(f: A => (=> A) => A): Option[A] = F.foldr1Opt(self)(f)
   final def foldl[B](z: B)(f: B => A => B): B = F.foldl(self, z)(f)
