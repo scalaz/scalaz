@@ -105,33 +105,43 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * Runs to completion, mapping the suspension with the given transformation
     * at each step and accumulating into the monad `M`.
     */
-  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] =
-    M0.tailrecM(this){
-      case Suspend(ma) => M0.bind(ma) {
-        case -\/(a) => M1.point(\/-(a))
-        case \/-(sa) => M0.map(f(sa))(\/.right)
-      }
-      case g @ Gosub(_, _) => g.a match {
-        case Suspend(mx) => M0.bind(mx) {
-          case -\/(x) => M1.point(-\/(g.f(x)))
-          case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] = {
+    @tailrec
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
+      ft match {
+        case Suspend(ma) => M0.bind(ma) {
+          case -\/(a) => M1.point(\/-(a))
+          case \/-(sa) => M0.map(f(sa))(\/.right)
         }
-        case g0 @ Gosub(_, _) => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
+        case g @ Gosub(_, _) => g.a match {
+          case Suspend(mx) => M0.bind(mx) {
+            case -\/(x) => M1.point(-\/(g.f(x)))
+            case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+          }
+          case g0 @ Gosub(_, _) => go(g0.a.flatMap(g0.f(_).flatMap(g.f)))
+        }
       }
-    }
+
+    M0.tailrecM(this)(go)
+  }
 
   /** Evaluates a single layer of the free monad **/
-  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] =
-    M0.tailrecM(this){
-      case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
-      case g1 @ Gosub(_, _) => g1.a match {
-        case Suspend(m1) => M0.map(m1) {
-          case -\/(a) => -\/(g1.f(a))
-          case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
+  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
+    @tailrec
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
+      ft match {
+        case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
+        case g1 @ Gosub(_, _) => g1.a match {
+          case Suspend(m1) => M0.map(m1) {
+            case -\/(a) => -\/(g1.f(a))
+            case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
+          }
+          case g2 @ Gosub(_, _) => go(g2.a.flatMap(g2.f(_).flatMap(g1.f)))
         }
-        case g2 @ Gosub(_, _) => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
       }
-    }
+
+    M0.tailrecM(this)(go)
+  }
 
   /**
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
