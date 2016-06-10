@@ -18,7 +18,7 @@ object TreeTestJVM extends SpecLite {
   def genTree(size: Int): Tree[Int] =
     (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, Stream(x)))
 
-  val size = 1000000
+  val size = 100000
 
   val deepTree = genTree(size)
 
