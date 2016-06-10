@@ -126,15 +126,18 @@ sealed abstract class FreeT[S[_], M[_], A] {
   }
 
   /** Evaluates a single layer of the free monad **/
-  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
+  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[S[FreeT[S, M, A]] \/ A] = {
     @tailrec
-    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (S[FreeT[S, M, A]] \/ A)] =
       ft match {
-        case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
+        case Suspend(f) => M0.map(f) {
+          case -\/(a) => \/-(\/-(a))
+          case \/-(sa) => \/-(-\/(S.map(sa)(point(_))))
+        }
         case g1 @ Gosub(_, _) => g1.a match {
           case Suspend(m1) => M0.map(m1) {
             case -\/(a) => -\/(g1.f(a))
-            case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
+            case \/-(fc) => \/-(-\/(S.map(fc)(g1.f(_))))
           }
           case g2 @ Gosub(_, _) => go(g2.a.flatMap(g2.f(_).flatMap(g1.f)))
         }
@@ -148,8 +151,8 @@ sealed abstract class FreeT[S[_], M[_], A] {
     */
   def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] =
     M0.tailrecM(this)(ft => M0.bind(ft.resume) {
-      case -\/(a) => M1.point(\/-(a))
-      case \/-(fc) => M0.map(interp(fc))(\/.left)
+      case \/-(a) => M1.point(\/-(a))
+      case -\/(fc) => M0.map(interp(fc))(\/.left)
     })
 
   /**
@@ -320,9 +323,9 @@ private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, ?]] with Fo
 
   override final def foldMap[A, B: Monoid](fa: FreeT[S, M, A])(f: A => B): B =
     M2.foldMap(fa.resume){
-      case \/-(a) =>
-        F.foldMap(a)(foldMap(_)(f))
       case -\/(a) =>
+        F.foldMap(a)(foldMap(_)(f))
+      case \/-(a) =>
         f(a)
     }
 }
@@ -337,9 +340,9 @@ private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with Fr
   override final def traverseImpl[G[_], A, B](fa: FreeT[S, M, A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(
       M2.traverseImpl(fa.resume){
-        case \/-(a) =>
-          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
         case -\/(a) =>
+          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
+        case \/-(a) =>
           G.map(f(a))(FreeT.point[S, M, B])
       }
     )(FreeT.liftM(_)(M).flatMap(identity))
