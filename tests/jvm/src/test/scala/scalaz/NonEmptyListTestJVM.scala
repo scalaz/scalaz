@@ -7,7 +7,7 @@ object NonEmptyListTestJVM extends SpecLite {
   "NonEmptyList.foldRight1 large list" in {
     import NonEmptyList._
     import syntax.foldable1._
-    nel(0, IList.fromList(List.fill(10000000)(1))).foldRight1(_ + _) must_== 10000000
+    nel(0, IList.fromList(List.fill(100000)(1))).foldRight1(_ + _) must_== 100000
   }
   "no stack overflow large list traverse" in {
     import syntax.traverse._
@@ -15,8 +15,8 @@ object NonEmptyListTestJVM extends SpecLite {
     (largeNel map Option.apply).sequence must_===(Option(largeNel))
   }
   "stack-safety of tails" in {
-    val largeNel = NonEmptyList.nel(0, IList.fill(1000000)(0))
-    largeNel.tails.size must_== 1000001
+    val largeNel = NonEmptyList.nel(0, IList.fill(100000)(0))
+    largeNel.tails.size must_== 100001
   }
 
 }
