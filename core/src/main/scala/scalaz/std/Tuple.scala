@@ -137,25 +137,25 @@ sealed trait TupleInstances1 extends TupleInstances0 {
     new Tuple1Equal[A1] {
       implicit def _1 = A1
     }
-  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] = 
+  implicit def tuple2Equal[A1, A2](implicit A1: Equal[A1], A2: Equal[A2]): Equal[(A1, A2)] =
     new Tuple2Equal[A1, A2] {
       implicit def _1 = A1
       implicit def _2 = A2
     }
-  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] = 
+  implicit def tuple3Equal[A1, A2, A3](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3]): Equal[(A1, A2, A3)] =
     new Tuple3Equal[A1, A2, A3] {
       implicit def _1 = A1
       implicit def _2 = A2
       implicit def _3 = A3
     }
-  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] = 
+  implicit def tuple4Equal[A1, A2, A3, A4](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4]): Equal[(A1, A2, A3, A4)] =
     new Tuple4Equal[A1, A2, A3, A4] {
       implicit def _1 = A1
       implicit def _2 = A2
       implicit def _3 = A3
       implicit def _4 = A4
     }
-  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] = 
+  implicit def tuple5Equal[A1, A2, A3, A4, A5](implicit A1: Equal[A1], A2: Equal[A2], A3: Equal[A3], A4: Equal[A4], A5: Equal[A5]): Equal[(A1, A2, A3, A4, A5)] =
     new Tuple5Equal[A1, A2, A3, A4, A5] {
       implicit def _1 = A1
       implicit def _2 = A2
@@ -196,7 +196,7 @@ sealed trait TupleInstances1 extends TupleInstances0 {
 }
 sealed trait TupleInstances2 extends TupleInstances1 {
 
-  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] = 
+  implicit def tuple1Show[A1](implicit A1: Show[A1]): Show[Tuple1[A1]] =
     new Tuple1Show[A1] {
       implicit def _1 = A1
     }
@@ -287,7 +287,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
       implicit def _4 = A4
       implicit def _5 = A5
     }
-  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] = 
+  implicit def tuple6Order[A1, A2, A3, A4, A5, A6](implicit A1: Order[A1], A2: Order[A2], A3: Order[A3], A4: Order[A4], A5: Order[A5], A6: Order[A6]): Order[(A1, A2, A3, A4, A5, A6)] =
     new Tuple6Order[A1, A2, A3, A4, A5, A6] {
       implicit def _1 = A1
       implicit def _2 = A2

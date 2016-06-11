@@ -30,7 +30,7 @@ trait NaturalTransformations {
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id = 
+  def id =
     new (Id ~> Id) {
       def apply[A](a: A) = a
     }

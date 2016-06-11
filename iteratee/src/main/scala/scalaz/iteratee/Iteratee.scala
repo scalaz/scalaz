@@ -7,7 +7,7 @@ import Id._
 trait IterateeFunctions {
   def iteratee[E, A](s: Step[E, A]): Iteratee[E, A] =
     iterateeT[E, Id, A](s)
-  
+
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */

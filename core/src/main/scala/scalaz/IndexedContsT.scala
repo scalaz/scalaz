@@ -1,13 +1,13 @@
 package scalaz
 
 final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R]) {
-  def run(wamo: W[A => M[O]]): M[R] = 
+  def run(wamo: W[A => M[O]]): M[R] =
     _run(wamo)
 
-  def apply(wamo: W[A => M[O]]): M[R] = 
+  def apply(wamo: W[A => M[O]]): M[R] =
     run(wamo)
 
-  def run_(implicit W: Applicative[W], M: Applicative[M], ev: A =:= O): M[R] = 
+  def run_(implicit W: Applicative[W], M: Applicative[M], ev: A =:= O): M[R] =
     run(W.point(x => M.point(x)))
 
   def map[B](f: A => B)(implicit W: Functor[W]): IndexedContsT[W, M, R, O, B] =
@@ -23,7 +23,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R
         f(a).run(wk)
       } })
     }
-  
+
   def contramap[I](f: I => O)(implicit M: Functor[M], W: Functor[W]): IndexedContsT[W, M, R, I, A] =
     IndexedContsT { wami =>
       run(W.map(wami) { ami => { a => M.map(ami(a))(f) } })
@@ -77,7 +77,7 @@ trait IndexedContsTFunctions {
       def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[W, N, R, O, A] = IndexedContsT { wk => f(fa.run(W.map(wk) { k => { x => g(k(x)) } })) }
     }
 
-  def contracohoist[W[_], V[_], M[_], R, O](f: V ~> W): (IndexedContsT[W, M, R, O, ?] ~> IndexedContsT[V, M, R, O, ?]) = 
+  def contracohoist[W[_], V[_], M[_], R, O](f: V ~> W): (IndexedContsT[W, M, R, O, ?] ~> IndexedContsT[V, M, R, O, ?]) =
     new (IndexedContsT[W, M, R, O, ?] ~> IndexedContsT[V, M, R, O, ?]) {
       def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[V, M, R, O, A] = IndexedContsT { k => fa.run(f(k)) }
     }

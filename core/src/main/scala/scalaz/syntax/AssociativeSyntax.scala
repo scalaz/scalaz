@@ -16,18 +16,17 @@ final class AssociativeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impl
 }
 
 sealed trait ToAssociativeOps0 {
-    implicit def ToAssociativeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Associative, FA]) =
-      new AssociativeOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  
+  implicit def ToAssociativeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Associative, FA]) =
+    new AssociativeOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+
 }
 
 trait ToAssociativeOps extends ToAssociativeOps0 {
-  
+
   implicit def ToAssociativeOps[F[_, _],A, B](v: F[A, B])(implicit F0: Associative[F]) =
     new AssociativeOps[F,A, B](v)
-  
 
-  
+
   implicit def ToAssociativeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Associative[F[G, ?, ?]]) =
     new AssociativeOps[F[G, ?, ?], A, B](v)(F0)
 

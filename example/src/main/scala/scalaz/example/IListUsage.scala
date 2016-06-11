@@ -4,7 +4,7 @@ package example
 import Scalaz._
 
 object IListUsage extends App {
-  
+
   // Construct using elements
   val ns = IList(1, 2, 3)
 
@@ -16,16 +16,16 @@ object IListUsage extends App {
   val ns4 = IList.fromList(List(1,3,4))
   val ns5 = IList.fromOption(Some(2))
 
-  // Empty IList 
+  // Empty IList
   val e1 = INil[String]()
   val e2 = IList.empty[String]
 
   // IList is invariant; these won't compile
-  // "abc" :: ns 
+  // "abc" :: ns
   // e1 ++ ns
 
   // You can widen explicitly if you want to accomplish the above
-  val any = "abc" :: ns.widen[Any] 
+  val any = "abc" :: ns.widen[Any]
 
   // List operations are generally the same as stdlib List
   val rev = ns.reverse

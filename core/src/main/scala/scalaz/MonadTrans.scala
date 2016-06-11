@@ -27,7 +27,7 @@ object Hoist {
 
 /**
  * This trait establishes a partial order among monads. A "bigger" monad
- * is one that does all of the effects of the "smaller" as part of its 
+ * is one that does all of the effects of the "smaller" as part of its
  * execution.
  */
 trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =>
@@ -37,14 +37,14 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
   def apply[A](m2: F[A]) = promote(m2)
   def promote[A](m2: F[A]): G[A]
 
-  def compose[M[_]](mo: MonadPartialOrder[M, G]): MonadPartialOrder[M, F] = 
+  def compose[M[_]](mo: MonadPartialOrder[M, G]): MonadPartialOrder[M, F] =
     new MonadPartialOrder[M, F] {
       val MG = mo.MG
       val MF = self.MF
       def promote[A](m2: F[A]) = mo.promote(self.promote(m2))
     }
 
-  def transform[T[_[_], _]: MonadTrans]: MonadPartialOrder[T[G, ?], F] = 
+  def transform[T[_[_], _]: MonadTrans]: MonadPartialOrder[T[G, ?], F] =
     new MonadPartialOrder[T[G, ?], F] {
       val MG = MonadTrans[T].apply[G](self.MG)
       val MF = self.MF
@@ -53,20 +53,20 @@ trait MonadPartialOrder[G[_], F[_]] extends NaturalTransformation[F, G] { self =
 }
 
 sealed abstract class MonadPartialOrderFunctions1 {
-  implicit def transitive[G[_], F[_], E[_]](implicit e1: MonadPartialOrder[G, F], e2: MonadPartialOrder[F, E]): MonadPartialOrder[G, E] = 
+  implicit def transitive[G[_], F[_], E[_]](implicit e1: MonadPartialOrder[G, F], e2: MonadPartialOrder[F, E]): MonadPartialOrder[G, E] =
      e2 compose e1
 }
 
 sealed abstract class MonadPartialOrderFunctions extends MonadPartialOrderFunctions1 {
   // the identity ordering
-  implicit def id[M[_]: Monad]: MonadPartialOrder[M, M] = 
+  implicit def id[M[_]: Monad]: MonadPartialOrder[M, M] =
     new MonadPartialOrder[M, M] {
       val MG = Monad[M]
       val MF = Monad[M]
       def promote[A](m: M[A]) = m
     }
-  
-  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[F[M, ?], M] = 
+
+  implicit def transformer[M[_]: Monad, F[_[_], _]: MonadTrans]: MonadPartialOrder[F[M, ?], M] =
     id[M].transform[F]
 }
 

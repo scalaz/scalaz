@@ -94,7 +94,7 @@ trait StreamInstances {
 
     def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
       def go(s: Stream[A \/ B]): Stream[B] = {
-        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] = 
+        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] =
           abs match {
             case \/-(b) #:: tail => b #:: go(tail)
             case -\/(a) #:: tail => rec(f(a) #::: tail)
@@ -183,14 +183,14 @@ trait StreamFunctions {
     }
 
   /** `[as take 1, as take 2, ..., as]` */
-  final def heads[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def heads[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
       case _       => empty
     }
 
   /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
-  final def tails[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def tails[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => as #:: tails(t)
       case _       => empty

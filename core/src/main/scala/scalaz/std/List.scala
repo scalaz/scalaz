@@ -10,7 +10,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] = 
+  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
@@ -58,11 +58,11 @@ trait ListInstances extends ListInstances0 {
         //    (test(!(inWord && s)), s)
         //  }
         //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
-  
+
         // foldRight(l, F.point(List[B]())) {
         //   (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
         // }
-  
+
         DList.fromList(l).foldr(F.point(List[B]())) {
            (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
         }
@@ -122,7 +122,7 @@ trait ListInstances extends ListInstances0 {
             case (\/-(b) :: tail) :: rest =>
               bs += b
               go(tail :: rest)
-            case (-\/(a0) :: tail) :: rest => 
+            case (-\/(a0) :: tail) :: rest =>
               go(f(a0) :: tail :: rest)
             case Nil :: rest =>
               go(rest)

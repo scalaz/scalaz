@@ -129,8 +129,8 @@ object TaskTest extends SpecLite {
   "catches exceptions thrown by onFinish argument function" ! {
     Task { Thread.sleep(10); 42 }.onFinish { _ => throw SadTrombone; Task.now(()) }.unsafePerformSyncAttemptFor(1000) ==
       -\/(SadTrombone)
-  }  
-  
+  }
+
   "evaluates Monad[Task].point lazily" in {
     val M = implicitly[Monad[Task]]
     var x = 0

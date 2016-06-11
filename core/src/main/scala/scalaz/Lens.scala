@@ -358,7 +358,7 @@ trait LensFunctions extends LensFamilyFunctions {
       case None => m - k
       case Some(v) => m.updated(k, v)
     }: Option[V] => Map[K, V]), _ get k)
-    
+
   /** Access the value at a particular key of a Map.WithDefault */
   def mapWithDefaultLens[K,V](k: K): Map.WithDefault[K,V] @> V =
     lensg(m => v => m.updated(k,v), m => m(k))

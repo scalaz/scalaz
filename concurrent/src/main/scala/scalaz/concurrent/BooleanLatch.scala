@@ -13,16 +13,16 @@ object BooleanLatch {
     val sync = new AbstractQueuedSynchronizer {
       val RELEASED = 0
       val UNAVAILABLE = -1
-    
+
       setState(UNAVAILABLE)
-    
+
       def released = getState == RELEASED
       def unavailable = getState == UNAVAILABLE
-    
-      override def tryAcquire(ignore: Int) = 
-        if (!released) false 
+
+      override def tryAcquire(ignore: Int) =
+        if (!released) false
         else compareAndSetState(RELEASED, UNAVAILABLE)
-  
+
       override def tryRelease(ignore: Int) = {
         if (unavailable) setState(RELEASED)
         true

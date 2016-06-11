@@ -36,8 +36,8 @@ sealed abstract class Tree[A] {
     val reversedLines = draw.run
     val first = new StringBuilder(reversedLines.head.toString.reverse)
     val rest = reversedLines.tail
-    rest.foldLeft(first) { (acc, elem) => 
-      acc.append("\n").append(elem.toString.reverse) 
+    rest.foldLeft(first) { (acc, elem) =>
+      acc.append("\n").append(elem.toString.reverse)
     }.append("\n").toString
   }
 
@@ -50,7 +50,7 @@ sealed abstract class Tree[A] {
     Node(g(rootLabel, c.value), c.value)
   }
 
-  /** A 2D String representation of this Tree, separated into lines. 
+  /** A 2D String representation of this Tree, separated into lines.
     * Uses reversed StringBuilders for performance, because they are
     * prepended to.
     **/
@@ -78,8 +78,8 @@ sealed abstract class Tree[A] {
       }
       s
     }
-    
-    drawSubTrees(subForest).map { subtrees => 
+
+    drawSubTrees(subForest).map { subtrees =>
       new StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
     }
   }
@@ -172,7 +172,7 @@ sealed abstract class TreeInstances {
       case h #:: t => t.foldLeft(z(h))(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
-    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = { 
+    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = {
       def align(ta: Tree[A], tb: Tree[B]): Tree[C] =
         Tree.Node(f(\&/(ta.rootLabel, tb.rootLabel)), Align[Stream].alignWith[Tree[A], Tree[B], Tree[C]]({
           case \&/.This(sta) ⇒ sta map {a ⇒ f(\&/.This(a))}

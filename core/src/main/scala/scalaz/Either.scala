@@ -305,9 +305,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case -\/(a) => Failure(a)
       case \/-(b) => Success(b)
     }
-  
+
   /** Convert to a ValidationNel. */
-  def validationNel[AA>:A] : ValidationNel[AA,B] = 
+  def validationNel[AA>:A] : ValidationNel[AA,B] =
     this match {
       case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)

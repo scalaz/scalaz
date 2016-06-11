@@ -48,11 +48,11 @@ trait PhasedLatches {
      */
     class QueuedSynchronizer extends AbstractQueuedSynchronizer {
       def currentPhase = getState
-  
+
       override def tryAcquireShared(waitingFor: Int) =
         if (phaseOrder.lessThan(currentPhase, waitingFor)) 1
         else -1
-  
+
       @annotation.tailrec
       override final def tryReleaseShared(ignore: Int) = {
         val phase = currentPhase
@@ -62,19 +62,19 @@ trait PhasedLatches {
     }
 
     val sync = new QueuedSynchronizer
-  
+
     /** Release the current phase. */
     def release = IO { sync releaseShared 1 }
-  
+
     /** Await for the specified phase.*/
     @throws(classOf[InterruptedException])
     def awaitPhase(phase: Int) = IO { sync acquireSharedInterruptibly phase }
-  
+
     @throws(classOf[InterruptedException])
     def awaitPhaseFor(phase: Int, period: Long, unit: TimeUnit) = IO {
       sync.tryAcquireSharedNanos(phase, unit.toNanos(period))
     }
-  
+
     def currentPhase = IO(sync.currentPhase)
   })
 }

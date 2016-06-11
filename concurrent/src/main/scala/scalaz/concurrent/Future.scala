@@ -79,11 +79,11 @@ sealed abstract class Future[+A] {
         onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
     }
 
-  
+
   @deprecated("use unsafePerformListen", "7.2")
   def listen(cb: A => Trampoline[Unit]): Unit =
     unsafePerformListen(cb)
-  
+
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
    * Because of trampolining, we get frequent opportunities to cancel
@@ -107,7 +107,7 @@ sealed abstract class Future[+A] {
   @deprecated("use unsafePerformListenInterruptibly", "7.2")
   def listenInterruptibly(cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(cb, cancel)
-  
+
   /**
    * Evaluate this `Future` to a result, or another asynchronous computation.
    * This has the effect of stripping off any 'pure' trampolined computation at
@@ -132,10 +132,10 @@ sealed abstract class Future[+A] {
 
   /**
    * Begins running this `Future` and returns a new future that blocks
-   * waiting for the result. Note that this will start executing side effects 
-   * immediately, and is thus morally equivalent to `unsafePerformIO`. The 
+   * waiting for the result. Note that this will start executing side effects
+   * immediately, and is thus morally equivalent to `unsafePerformIO`. The
    * resulting `Future` cannot be rerun to repeat the effects.
-   * 
+   *
    * Use with care.
    */
   def unsafeStart: Future[A] = {
@@ -144,7 +144,7 @@ sealed abstract class Future[+A] {
     unsafePerformAsync { a => result = Some(a); latch.countDown }
     delay { latch.await; result.get }
   }
-  
+
   @deprecated("use unsafeStart", "7.2")
   def start: Future[A] =
     unsafeStart
@@ -161,7 +161,7 @@ sealed abstract class Future[+A] {
   @deprecated("use unsafePerformAsync", "7.2")
   def runAsync(cb: A => Unit): Unit =
     unsafePerformAsync(cb)
-    
+
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
    * Because of trampolining, we get frequent opportunities to cancel
@@ -174,7 +174,7 @@ sealed abstract class Future[+A] {
   @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
   def runAsyncInterruptibly(cb: A => Unit, cancel: AtomicBoolean): Unit =
     unsafePerformAsyncInterruptibly(cb, cancel)
-    
+
   /** Run this `Future` and block awaiting its result. */
   def unsafePerformSync: A = this match {
     case Now(a) => a
@@ -190,19 +190,19 @@ sealed abstract class Future[+A] {
   @deprecated("use unsafePerformSync", "7.2")
   def run: A =
     unsafePerformSync
-  
+
   /**
    * Run this `Future` and block until its result is available, or until
    * `timeoutInMillis` milliseconds have elapsed, at which point a `TimeoutException`
    * will be thrown and the `Future` will attempt to be canceled.
    */
-  def unsafePerformSyncFor(timeoutInMillis: Long): A = 
+  def unsafePerformSyncFor(timeoutInMillis: Long): A =
     unsafePerformSyncAttemptFor(timeoutInMillis) match {
       case -\/(e) => throw e
       case \/-(a) => a
     }
 
-  def unsafePerformSyncFor(timeout: Duration): A = 
+  def unsafePerformSyncFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout.toMillis)
 
   @deprecated("use unsafePerformSyncFor", "7.2")
@@ -213,8 +213,8 @@ sealed abstract class Future[+A] {
   def runFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout)
 
-    
-  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
+
+  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value.
     * Will not report any other exceptions that may be raised during computation of `A`*/
   def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -226,7 +226,7 @@ sealed abstract class Future[+A] {
     }
   }
 
-  def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A = 
+  def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A =
     unsafePerformSyncAttemptFor(timeout.toMillis)
 
   @deprecated("use unsafePerformSyncAttemptFor", "7.2")
@@ -236,29 +236,29 @@ sealed abstract class Future[+A] {
   @deprecated("use unsafePerformSyncAttemptFor", "7.2")
   def attemptRunFor(timeout: Duration): Throwable \/ A =
     unsafePerformSyncAttemptFor(timeout)
-  
+
   /**
    * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    * This implementation will not block the future's execution thread
    */
   def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =
-    //instead of run this though chooseAny, it is run through simple primitive, 
+    //instead of run this though chooseAny, it is run through simple primitive,
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
       scheduler.schedule(new Runnable {
-        def run() { 
+        def run() {
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
             cb(-\/(new TimeoutException(s"Timed out after $timeoutInMillis milliseconds")))
-          } 
+          }
         }
       }
       , timeoutInMillis, TimeUnit.MILLISECONDS)
-      
-      unsafePerformAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
+
+      unsafePerformAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel)
     }
 
   def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =

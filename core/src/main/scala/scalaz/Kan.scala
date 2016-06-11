@@ -110,7 +110,7 @@ object Lan extends LanInstances {
     s(glan(h))
 
   /** The natural transformation that defines a left Kan extension */
-  def glan[G[_], H[_], A](h: H[A]): Lan[G, H, G[A]] = 
+  def glan[G[_], H[_], A](h: H[A]): Lan[G, H, G[A]] =
     new Lan[G, H, G[A]] {
       type I = A
       val v = h

@@ -7,7 +7,7 @@ import scalaz.effect.LiftIO
 /** Wraps a value `self` and provides methods related to `LiftIO` */
 final class LiftIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: LiftIO[F]) extends Ops[F[A]] {
   ////
-  
+
   ////
 }
 

@@ -53,22 +53,22 @@ object StreamTTest extends SpecLite {
       val isEmpty = filtered.isEmpty
       isEmpty.forall(_ == true)
   }
-  
+
   "drop" ! forAll {
     (ass: Option[Stream[Int]], x: Int) =>
       StreamT.fromStream(ass).drop(x).toStream must_===(ass.map(_.drop(x)))
   }
-  
+
   "take" ! forAll {
     (ass: Option[Stream[Int]], x: Int) =>
       StreamT.fromStream(ass).take(x).toStream must_===(ass.map(_.take(x)))
   }
 
   "mapM" ! forAll {
-    (s: Stream[Int], l: List[Int]) => 
+    (s: Stream[Int], l: List[Int]) =>
       val s0 = s map (_ + 1)
       StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must_==(
-        Traverse[Stream].traverse(s)(i => l.map(_ + i)) ::: 
+        Traverse[Stream].traverse(s)(i => l.map(_ + i)) :::
         Traverse[Stream].traverse(s0)(i => l.map(_ + i))
       )
   }
@@ -185,7 +185,7 @@ object StreamTTest extends SpecLite {
       s.asStream.toList must_=== List("foo")
     }
   }
-  
+
   object instances {
     def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
     def monoid[F[_]: Applicative, A] = Monoid[StreamT[F, A]]

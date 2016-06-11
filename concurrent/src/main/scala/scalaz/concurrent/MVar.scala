@@ -11,7 +11,7 @@ sealed abstract class MVar[A] {
   def put(a: => A): IO[Unit]
   def take: IO[A]
 
-  final def read: IO[A] = 
+  final def read: IO[A] =
     for {
       a <- take
       _ <- put(a)
@@ -49,17 +49,17 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
       _ <- writeLatch.release()
     } yield a
   )
-     
+
   def put(a: => A) = write(a, value.get)
 
   def read(reader: => IO[Option[A]]) = {
-    def read_ : IO[A] = 
+    def read_ : IO[A] =
       for {
         p <- readLatch.currentPhase
         r <- reader
         a <- r match {
           case Some(a) => IO(a)
-          case None => 
+          case None =>
             for {
               _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
               a <- read_    // someone has put a value so now we try to read it
@@ -68,15 +68,15 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
       } yield a
     read_
   }
-      
+
   def write(a: => A, read: => IO[Option[A]]): IO[Unit] = writeLatch.currentPhase flatMap { p =>
     read flatMap(v => v match {
-      case Some(_) => 
+      case Some(_) =>
         for {
           _ <- writeLatch awaitPhase p // if there is a value, wait until someone takes it
           _ <- write(a, read)           // someone has taken the value, try and write it again
         } yield ()
-      case None => 
+      case None =>
         value.compareAndSet(v, Some(a)) flatMap { set => // There is no value, so it's time to try and write one.
           if (!set) write(a, read)  // If the value has changed, the write will fail so we'll need to try it again.
           else readLatch.release  // If the write succeeded, release a thread waiting for a value.

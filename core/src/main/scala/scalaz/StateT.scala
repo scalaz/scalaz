@@ -152,7 +152,7 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
-  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] = 
+  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] =
     new StateTMonadState[S, F] {
       implicit def F: Monad[F] = F0
     }

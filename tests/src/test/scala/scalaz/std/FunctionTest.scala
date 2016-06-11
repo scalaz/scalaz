@@ -76,10 +76,10 @@ object FunctionTest extends SpecLite {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]
     def monad0 = Monad[() => ?]
-    def traverse0 = Traverse[Function0] 
+    def traverse0 = Traverse[Function0]
     def bindRec0 = BindRec[Function0]
-    def comonad0 = Comonad[Function0] 
-    def distributive0 = Distributive[Function0]    
+    def comonad0 = Comonad[Function0]
+    def distributive0 = Distributive[Function0]
 
     // these aren't working atm.
     //    def monadByName[A] = Monad[(=> A) => ?]

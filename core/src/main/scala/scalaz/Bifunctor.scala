@@ -12,14 +12,14 @@ trait Bifunctor[F[_, _]]  { self =>
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
 
   /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
-  def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => F[G[α, β], G[α, β]]]] = 
+  def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => F[G[α, β], G[α, β]]]] =
     new CompositionBifunctor[F, G] {
       implicit def F = self
       implicit def G = G0
     }
 
   /**The product of Bifunctors `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifunctor */
-  def product[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => (F[α, β], G[α, β])]] = 
+  def product[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => (F[α, β], G[α, β])]] =
     new ProductBifunctor[F, G] {
       implicit def F = self
       implicit def G = G0
@@ -37,7 +37,7 @@ trait Bifunctor[F[_, _]]  { self =>
     new RightFunctor[F, X] {val F = self}
 
   /** Unify the functor over both params. */
-  def uFunctor: Functor[λ[α => F[α, α]]] = 
+  def uFunctor: Functor[λ[α => F[α, α]]] =
     new UFunctor[F] {val F = self}
 
   def rightMap[A, B, D](fab: F[A, B])(g: B => D): F[A, D] =
@@ -55,11 +55,11 @@ trait Bifunctor[F[_, _]]  { self =>
     }
 
   /** Embed one Functor to the left */
-  def embedLeft[G[_]](implicit G0: Functor[G]): Bifunctor[λ[(α, β) => F[G[α],β]]] = 
+  def embedLeft[G[_]](implicit G0: Functor[G]): Bifunctor[λ[(α, β) => F[G[α],β]]] =
     embed[G,Id.Id]
 
   /** Embed one Functor to the right */
-  def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[λ[(α, β) => F[α,H[β]]]] = 
+  def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[λ[(α, β) => F[α,H[β]]]] =
     embed[Id.Id,H]
 
   ////

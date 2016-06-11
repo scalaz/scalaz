@@ -92,7 +92,7 @@ sealed abstract class AdjunctionInstances {
       override def rightAdjunct[A, B](a: (S, A))(f: A => S => B): B = f(a._2)(a._1)
     }
 
-  implicit val identityAdjunction: Id -| Id = 
+  implicit val identityAdjunction: Id -| Id =
     new Adjunction[Id, Id] {
       override def leftAdjunct[A, B](a: => A)(f: A => B): B = f(a)
       override def rightAdjunct[A, B](a: A)(f: A => B): B = f(a)
@@ -104,19 +104,19 @@ sealed abstract class AdjunctionInstances {
       override def rightAdjunct[A, B](a: () => A)(f: A => () => B): B = f(a())()
     }
 
-  implicit val idF0Adjunction: Id -| Function0 = 
+  implicit val idF0Adjunction: Id -| Function0 =
     new Adjunction[Id, Function0] {
       override def leftAdjunct[A, B](a: => A)(f: A => B): () => B = () => f(a)
       override def rightAdjunct[A, B](a: A)(f: A => () => B): B = f(a)()
     }
 
-  implicit val f0IdAdjunction: Function0 -| Id = 
+  implicit val f0IdAdjunction: Function0 -| Id =
     new Adjunction[Function0, Id] {
       override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): B = f(() => a)
       override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
     }
 
-  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] = 
+  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] =
     new Adjunction[Writer[E, ?], Reader[E, ?]] {
       override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
         Reader(e => f(Writer(e, a)))

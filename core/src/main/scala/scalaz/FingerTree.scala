@@ -961,7 +961,7 @@ object FingerTree extends FingerTreeInstances {
       def fold[B](b: => B, f: (=> S[A], => A) => B) = f(sa, a)
     }
 
-  def EmptyL[S[_], A]: ViewL[S, A] = 
+  def EmptyL[S[_], A]: ViewL[S, A] =
     new ViewL[S, A] {
       def fold[B](b: => B, f: (=> A, => S[A]) => B) = b
     }
@@ -971,7 +971,7 @@ object FingerTree extends FingerTreeInstances {
       def fold[B](b: => B, f: (=> A, => S[A]) => B) = f(a, sa)
     }
 
-  def one[V, A](a: A)(implicit measure: Reducer[A, V]) = 
+  def one[V, A](a: A)(implicit measure: Reducer[A, V]) =
     One(measure.unit(a), a)
 
   def two[V, A](a1: A, a2: A)(implicit measure: Reducer[A, V]) =
@@ -989,7 +989,7 @@ object FingerTree extends FingerTreeInstances {
   def node3[V, A](a: A, b: A, c: A)(implicit measure: Reducer[A, V]) =
     Node3[V, A](measure.snoc(measure.snoc(measure.unit(a), b), c), a, b, c)
 
-  def mappendVal[V, A](v: V, t: FingerTree[V, A])(implicit measure: Reducer[A, V]) = 
+  def mappendVal[V, A](v: V, t: FingerTree[V, A])(implicit measure: Reducer[A, V]) =
     t.fold(x => v, (x, y) => fingerTreeMeasure[A, V].snoc(v, t), (x, p, m, s) => fingerTreeMeasure[A, V].snoc(v, t))
 
   def empty[V, A](implicit ms: Reducer[A, V]) =
