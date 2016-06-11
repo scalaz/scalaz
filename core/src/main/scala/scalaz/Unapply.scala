@@ -285,6 +285,18 @@ object Unapply extends Unapply_0 {
       def TC = TC0
       def leibniz = Leibniz.refl
     }  
+    
+  /** Enable type classes at type parameter position 0 for Free.Source */
+  implicit def unapplyMTMAB0[TC[_[_]], MT[_[_], _], MAB[_, _], A0, A1](implicit TC0: TC[({ type λ[α] = MT[MAB[α, ?], A1] })#λ]):
+    Unapply[TC, MT[MAB[A0, ?], A1]] {
+      type M[X] = MT[MAB[X, ?], A1]
+      type A = A0
+    } = new Unapply[TC, MT[MAB[A0, ?], A1]] {
+      type M[X] = MT[MAB[X, ?], A1]
+      type A = A0
+      def TC = TC0
+      def leibniz = Leibniz.refl
+    }
   // TODO More!
 }
 
