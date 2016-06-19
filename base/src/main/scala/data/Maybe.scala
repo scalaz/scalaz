@@ -11,4 +11,6 @@ sealed abstract class Maybe[A] {
 object Maybe extends MaybeFunctions with MaybeInstances with MaybeSyntax {
   final case class Empty[A]() extends Maybe[A]
   final case class Just[A](a: A) extends Maybe[A]
+
+  object Optics extends MaybeOptics
 }
