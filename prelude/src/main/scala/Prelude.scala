@@ -5,7 +5,7 @@ import data._
 
 import scala.language.implicitConversions
 
-trait Prelude extends data.DisjunctionFunctions {
+trait Prelude extends data.DisjunctionFunctions with data.MaybeFunctions {
   // Core Class
   // ==========
   type Applicative[F[_]] = typeclass.Applicative[F]
