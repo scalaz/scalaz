@@ -6,6 +6,12 @@ sealed abstract class Maybe[A] {
     case Maybe.Just(a)  => f(a)
     case Maybe.Empty()  => b
   }
+
+  final def map[B](f: A => B): Maybe[B] =
+    fold(f andThen Maybe.Just[B], Maybe.Empty[B])
+
+  final def flatMap[B](f: A => Maybe[B]): Maybe[B] =
+    fold(f, Maybe.Empty[B])
 }
 
 object Maybe extends MaybeInstances with MaybeSyntax {
