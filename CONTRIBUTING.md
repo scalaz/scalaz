@@ -1,6 +1,13 @@
 Contributing guidelines
 ==
 
+General
+--
+- Variance annotations are prohibited on both type classes and data structures, they may cause ambiguity.
+
+Data types
+--
+
 Type classes
 --
 
