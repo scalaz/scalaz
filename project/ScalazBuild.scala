@@ -26,12 +26,12 @@ object Scalaz extends Build {
   ).settings(
     scalaVersion := "2.11.8"
   ).aggregate ( baze
+              , meta
               , prelude
               , benchmarks )
 
   lazy val baze         = module("base")
-
-  lazy val prelude      = module("prelude").dependsOn(baze)
+    .dependsOn( meta )
 
   lazy val benchmarks   = module("benchmarks")
     .dependsOn( baze
@@ -44,4 +44,13 @@ object Scalaz extends Build {
             , "org.scalaz" %% "scalaz-core" % "7.2.1"
             , "org.typelevel" %% "cats" % "0.5.0" )
     )
+
+  lazy val meta         = module("meta")
+    .settings(
+      libraryDependencies ++=
+        Seq ( "org.scala-lang" % "scala-reflect" % scalaVersion.value
+            , "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided" )
+    )
+
+  lazy val prelude      = module("prelude").dependsOn(baze)
 }
