@@ -7,6 +7,7 @@ import scala.language.implicitConversions
 
 trait Prelude  extends data.DisjunctionFunctions
                   with data.MaybeFunctions
+                  with typeclass.BindFunctions
                   with typeclass.FunctorFunctions {
   // Core Class
   // ==========
