@@ -5,8 +5,6 @@ import scala.language.implicitConversions
 import scala.language.experimental.macros
 
 trait FunctorSyntax {
-  def map[F[_], A, B](fa: F[A])(f: A => B)(implicit F: Functor[F]): F[B] = F.map(fa)(f)
-
   implicit def functorOps[F[_], A](fa: F[A])(implicit F: Functor[F]): FunctorSyntax.Ops[F, A] =
     new FunctorSyntax.Ops(fa)
 }
