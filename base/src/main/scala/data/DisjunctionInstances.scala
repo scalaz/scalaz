@@ -14,7 +14,7 @@ trait DisjunctionInstances {
       ma.fold[L \/ B](l => -\/(l))(a => map[(A => B), B](mf)(f => f(a)))
 
     override def pure[A](a: A): L \/ A =
-      \/-[A](a)
+      \/-[L, A](a)
 
     override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
       oa.fold[L \/ B](l => -\/(l))(a => f(a))

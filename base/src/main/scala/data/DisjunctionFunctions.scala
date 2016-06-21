@@ -1,10 +1,14 @@
 package scalaz
 package data
 
-trait DisjunctionFunctions {
-  @inline def -\/[L](value: L): Disjunction[L, Nothing] = Disjunction.-\/(value)
-  @inline def \/-[R](value: R): Disjunction[Nothing, R] = Disjunction.\/-(value)
+import Disjunction.{\/, \/-, -\/}
 
-  @inline def left[L](value: L): Disjunction[L, Nothing] = Disjunction.-\/(value)
-  @inline def right[R](value: R): Disjunction[Nothing, R] = Disjunction.\/-(value)
+trait DisjunctionFunctions {
+  @inline def left[L, R](value: L): Disjunction[L, R] = -\/(value)
+  @inline def right[L, R](value: R): Disjunction[L, R] = \/-(value)
+
+  def either[A, B, C](ac: A => C)(bc: B => C): A \/ B => C = _ match {
+    case -\/(l)  => ac(l)
+    case \/-(r) => bc(r)
+  }
 }
