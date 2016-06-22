@@ -8,7 +8,8 @@ import scala.language.implicitConversions
 trait Prelude  extends data.DisjunctionFunctions
                   with data.MaybeFunctions
                   with typeclass.BindFunctions
-                  with typeclass.FunctorFunctions {
+                  with typeclass.FunctorFunctions
+                  with typeclass.TraversableFunctions {
   // Core Class
   // ==========
   type Applicative[F[_]] = typeclass.Applicative[F]
