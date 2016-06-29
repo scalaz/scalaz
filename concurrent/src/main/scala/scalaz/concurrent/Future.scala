@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
-import collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scalaz.Tags.Parallel
 
 import scalaz._
@@ -371,7 +371,7 @@ object Future {
 
             // only last completed f will hit the 0 here.
             if (c.decrementAndGet() == 0)
-              cb(results.toList.foldLeft(R.zero)((a, b) => R.append(a, b)))
+              cb(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b)))
             else Trampoline.done(())
           }
         }

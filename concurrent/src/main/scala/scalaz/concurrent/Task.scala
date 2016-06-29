@@ -10,7 +10,7 @@ import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.\/._
 
-import collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 /**
@@ -413,7 +413,7 @@ object Task {
 
               // only last completed f will hit the 0 here.
               if (togo.decrementAndGet() == 0)
-                cb(\/-(results.toList.foldLeft(R.zero)((a, b) => R.append(a, b))))
+                cb(\/-(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b))))
               else
                 Trampoline.done(())
             case e@(-\/(failure)) =>
