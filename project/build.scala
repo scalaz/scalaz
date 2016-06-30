@@ -106,7 +106,7 @@ object build extends Build {
     organization := "org.scalaz",
 
     scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M4"),
+    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M5"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.12.5",
