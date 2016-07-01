@@ -285,7 +285,7 @@ object build extends Build {
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
       scalajsProjectSettings ++ Seq(
-        libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.1.0"
+        libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.0"
       ) : _*
     )
     .jvmSettings(
