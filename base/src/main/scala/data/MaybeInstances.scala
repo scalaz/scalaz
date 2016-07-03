@@ -4,7 +4,7 @@ package data
 import typeclass._
 import Maybe.{Just, Empty}
 
-trait MaybeInstances extends MonadClass[Maybe] {
+trait MaybeInstances extends MonadClass.Template[Maybe] {
 
   implicit def monadInstance: Monad[Maybe] = this
 

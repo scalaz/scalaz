@@ -16,6 +16,8 @@ trait ConstInstances {
     def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
 
     def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
+
+    def toList[A](fa: Const[R, A]): List[A] = Nil
   }
 
   implicit def apply[R](implicit R: Semigroup[R]): Apply[Const[R, ?]] = new Apply[Const[R, ?]] {

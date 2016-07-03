@@ -6,9 +6,12 @@ trait BindClass[F[_]] extends Bind[F] with ApplyClass[F] {
 }
 
 object BindClass {
-  trait Template[F[_]] extends BindClass[F] with Ap[F]
+  trait Template[F[_]] extends BindClass[F] with Ap[F] with Bind.Flatten[F]
 
-  trait Ap[F[_]] extends Apply[F] { self: Bind[F] =>
-    override final def ap[A, B](fa: F[A])(f: F[A => B]): F[B] = flatMap(f)(functor.map(fa))
+  trait AltTemplate[F[_]] extends BindClass[F] with Ap[F] with Bind.FlatMap[F]
+
+  trait Ap[F[_]] { self: BindClass[F] =>
+    override def ap[A, B](fa: F[A])(f: F[A => B]): F[B] = flatMap(f)(functor.map(fa))
   }
+
 }
