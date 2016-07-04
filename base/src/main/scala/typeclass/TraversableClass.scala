@@ -7,7 +7,9 @@ trait TraversableClass[T[_]] extends Traversable[T] with FunctorClass[T] with Fo
 
 object TraversableClass {
 
-  trait Template[T[_]] extends TraversableClass[T] with FoldableClass.ToList[T] with Traversable.Sequence[T]
+  trait Template[T[_]] extends TraversableClass[T] with Foldable.FoldMap[T] with Traversable.Sequence[T]
 
-  trait AltTemplate[T[_]] extends TraversableClass[T] with FoldableClass.ToList[T] with Traversable.Traverse[T]
+  trait AltTemplate[T[_]] extends TraversableClass[T] with Foldable.FoldMap[T] with Traversable.Traverse[T]
+
+  //TODO: add trait for derived method implementation of Foldable foldMap and foldRight
 }

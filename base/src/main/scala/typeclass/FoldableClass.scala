@@ -6,9 +6,8 @@ trait FoldableClass[F[_]] extends Foldable[F]{
 }
 
 object FoldableClass {
-  trait Template[F[_]] extends FoldableClass[F]
+  trait Template[F[_]] extends FoldableClass[F] with Foldable.FoldRight[F]
 
-  trait ToList[F[_]] { self: FoldableClass[F] =>
-    override def toList[A](fa: F[A]): List[A] = foldLeft(fa, List[A]())((t, h) => h :: t).reverse
-  }
+  trait AltTemplate[F[_]] extends FoldableClass[F] with Foldable.FoldMap[F]
+
 }

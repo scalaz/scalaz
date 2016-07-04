@@ -6,7 +6,7 @@ import Apply.syntax._
 import Applicative.syntax._
 
 trait TraversableInstances {
-  implicit val list: Traversable[List] = new TraversableClass[List] {
+  implicit val list: Traversable[List] = new TraversableClass.Template[List] {
     
     override def traverse[F[_], A, B](ta: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] =
       ta.foldLeft[F[List[B]]](List.empty[B].pure[F]) { (flb, a) => flb.ap(f(a).map(b => (xs: List[B]) => b::xs)) }
