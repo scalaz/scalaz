@@ -21,6 +21,6 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.0-M4
+    - scala: 2.12.0-M5
       jdk: oraclejdk8
       script: sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test && rm -rf $HOME/.ivy2/cache
