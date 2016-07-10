@@ -17,8 +17,33 @@ object MapTest extends SpecLite {
   import ==>>._
 
   def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
+    isSortedByKey(m)
+    isBalanced(m)
+  }
+
+  private def isSortedByKey[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
     val al = m.toAscList
     al must_===(al.sortBy(_._1)(Order[A].toScalaOrdering))
+  }
+
+  private def isBalanced[A, B](m: A ==>> B) = {
+    def isWeightsValid(l: A ==>> B, r: A ==>> B): Boolean = {
+      val sizeL = if (l.size == 0) 1 else l.size
+      val sizeR = if (r.size == 0) 1 else r.size
+
+      (sizeL <= sizeR * delta) && (sizeR <= sizeL * delta)
+    }
+
+    def go(mab: A ==>> B): Boolean =
+      mab match {
+        case Tip() =>
+          true
+        case Bin(_, _, l, r) =>
+          if (isWeightsValid(l, r)) go(l) && go(r)
+          else false
+      }
+
+    go(m) must_=== true
   }
 
   "findLeft/findRight" in {
@@ -201,6 +226,28 @@ object MapTest extends SpecLite {
       d.lookupIndex(6).isDefined must_== false
     }
 
+    "value lookupLT" in {
+      fromList(List((3,"a"), (5,"b"))).lookupLT(3) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupLT(4) must_=== Some((3, "a"))
+    }
+
+    "value lookupGT" in {
+      fromList(List((3,"a"), (5,"b"))).lookupGT(5) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupGT(3) must_=== Some((5, "b"))
+    }
+
+    "value lookupLE" in {
+      fromList(List((3,"a"), (5,"b"))).lookupLE(2) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupLE(3) must_=== Some((3, "a"))
+      fromList(List((3,"a"), (5,"b"))).lookupLE(4) must_=== Some((3, "a"))
+    }
+
+    "value lookupGE" in {
+      fromList(List((3,"a"), (5,"b"))).lookupGE(6) must_=== None
+      fromList(List((3,"a"), (5,"b"))).lookupGE(5) must_=== Some((5, "b"))
+      fromList(List((3,"a"), (5,"b"))).lookupGE(4) must_=== Some((5, "b"))
+    }
+
     "lookup" ! forAll { (a: Byte ==>> Int, n: Byte) =>
       a.lookup(n) must_=== a.toList.find(_._1 == n).map(_._2)
     }
@@ -214,6 +261,91 @@ object MapTest extends SpecLite {
       a.lookupIndex(n) must_=== (if(x < 0) None else Some(x))
       a.lookupIndex(n).foreach{ b =>
         a.elemAt(b).map(_._1) must_=== Some(n)
+      }
+    }
+
+    "lookupLT" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupLT(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupLT(k) must_=== a.elemAt(i-1)
+          if (k != Int.MaxValue) {
+            a.lookupLT(k+1) must_=== Some((k, v))
+          }
+        }
+      }
+    }
+
+    "lookupGT" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupGT(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupGT(k) must_=== a.elemAt(i+1)
+          if (k != Int.MinValue) {
+            a.lookupGT(k-1) must_=== Some((k, v))
+          }
+        }
+      }
+    }
+
+    "lookupLE" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupLE(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupLE(k) must_=== Some((k, v))
+          if (k != Int.MinValue) {
+            a.lookupLE(k-1) must_=== a.elemAt(i-1)
+          }
+        }
+      }
+    }
+
+    "lookupGE" ! forAll { (a: Int ==>> Int) =>
+      if (a.size == 0) {
+        val r = Random.nextInt()
+        a.lookupGE(r) must_=== None
+      }
+      else {
+        (0 until a.keys.size).foreach { i =>
+          val (k, v) = a.elemAt(i).get
+
+          a.lookupGE(k) must_=== Some((k, v))
+          if (k != Int.MaxValue) {
+            a.lookupGE(k+1) must_=== a.elemAt(i+1)
+          }
+        }
+      }
+    }
+  }
+
+  "split" should {
+    "splitRoot" ! forAll { a: Int ==>> Int =>
+      a match {
+        case Tip() =>
+          a.splitRoot must_=== List.empty[Int ==>> Int]
+        case Bin(k, x, l, r) =>
+          val List(l2, kv, r2) = a.splitRoot
+          structurallySound(l2)
+          structurallySound(r2)
+          l2 must_=== l
+          r2 must_=== r
+          kv must_=== singleton(k, x)
+          l2.union(r2).union(kv) must_=== a
       }
     }
   }
@@ -394,12 +526,12 @@ object MapTest extends SpecLite {
 
     "differenceWith" in {
       val f = (al: String, ar: String) => if (al == "b") Some(al + ":" + ar) else None
-      fromList(List(5 -> "a", 3 -> "b")).differenceWith(fromList(List(5 -> "A", 3 -> "B", 7 -> "C")), f) must_===(singleton(3, "b:B"))
+      fromList(List(5 -> "a", 3 -> "b")).differenceWith(fromList(List(5 -> "A", 3 -> "B", 7 -> "C")))(f) must_===(singleton(3, "b:B"))
     }
 
     "differenceWithKey" in {
       val f = (k: Int, al: String, ar: String) => if (al == "b") Some(k.toString + ":" + al + "|" + ar) else None
-      fromList(List(5 -> "a", 3 -> "b")).differenceWithKey(fromList(List(5 -> "A", 3 -> "B", 10 -> "C")), f) must_===(singleton(3, "3:b|B"))
+      fromList(List(5 -> "a", 3 -> "b")).differenceWithKey(fromList(List(5 -> "A", 3 -> "B", 10 -> "C")))(f) must_===(singleton(3, "3:b|B"))
     }
   }
 
@@ -630,6 +762,28 @@ object MapTest extends SpecLite {
     }
   }
 
+  "==>> traverse" should {
+    "traverseWithKey" in {
+      val f = (k: Int, v: Char) => if (k%2 == 1) Some((v + 1).toChar) else None
+
+      empty.traverseWithKey(f) must_=== Some(empty)
+      fromList(List(1 -> 'a', 5 -> 'e')).traverseWithKey(f) must_=== Some(fromList(List(1 -> 'b', 5 -> 'f')))
+      fromList(List(2 -> 'a')).traverseWithKey(f) must_=== None
+    }
+
+    "traverseWithKey" ! forAll { (a: Int ==>> Char, b: Byte) =>
+      val fSome = (k: Int, v: Char) => some((v + b).toChar)
+      def fNone(key: Int) = (k: Int, v: Char) => if (k == key) None else some((v + b).toChar)
+
+      val li = a.toList.map(kv => (kv._1, fSome(kv._1, kv._2).get))
+      a.traverseWithKey(fSome) must_=== Some(fromList(li))
+
+      a.toList.foreach { kv =>
+        a.traverseWithKey(fNone(kv._1)) must_=== None
+      }
+    }
+  }
+
   "==>> fold" should {
     "fold" in {
       val f = (a: Int, b: String) => a + b.length
@@ -639,6 +793,116 @@ object MapTest extends SpecLite {
     "foldrWithKey" in {
       val f = (k: Int, a: String, result: String) => result + "(" + k.toString + ":" + a + ")"
       fromList(List(5 -> "a", 3 -> "b")).foldrWithKey("Map: ")(f) must_== "Map: (5:a)(3:b)"
+    }
+
+    "foldMapWithKey" ! forAll { a: Byte ==>> Byte =>
+      val f = (i: Byte, j: Byte) => i.toInt + j.toInt
+      val res = a.toList.foldLeft(0: Int)((acc, kv) => acc + kv._1.toInt + kv._2.toInt)
+
+      a.foldMapWithKey(f)(intInstance) must_=== res
+    }
+  }
+
+  "==>> trim" should {
+    "trim sound" ! forAll { a: Int ==>> Int =>
+      def checkValidity(a: Int ==>> Int, lo: Option[Int], hi: Option[Int], result: Int ==>> Int) = {
+        val m = trim(lo, hi, a)
+        structurallySound(m)
+        m must_=== result
+      }
+
+      a match {
+        case Tip() =>
+          val lo = Random.nextInt()
+          val hi = lo + 1
+          checkValidity(a, Some(lo), Some(hi), Tip())
+          checkValidity(a, Some(lo), None    , Tip())
+          checkValidity(a, None    , Some(hi), Tip())
+          checkValidity(a, None    , None    , Tip())
+
+        case Bin(_, _, _, _) =>
+          def rec(m: Int ==>> Int): Unit = {
+            m match {
+              case Tip() =>
+                ()
+              case Bin(k, x, l, r) =>
+                checkValidity(m, Some(k), None   , r)
+                checkValidity(m, None   , Some(k), l)
+                checkValidity(m, None   , None   , m)
+
+                if (k == Int.MinValue) {
+                  checkValidity(m, Some(k), Some(k+1), Tip())
+                  checkValidity(m, None   , Some(k+1), m)
+
+                  rec(r)
+                }
+                else if (k == Int.MaxValue) {
+                  checkValidity(m, Some(k-1), Some(k), Tip())
+                  checkValidity(m, Some(k-1), None   , m)
+
+                  rec(l)
+                }
+                else {
+                  checkValidity(m, Some(k-1), Some(k+1), m)
+                  checkValidity(m, Some(k-1), None     , m)
+                  checkValidity(m, None     , Some(k+1), m)
+
+                  rec(l)
+                  rec(r)
+                }
+            }
+          }
+        rec(a)
+      }
+    }
+
+    "trimLookupLo sound" ! forAll { a: Int ==>> Int =>
+      def checkValidity(a: Int ==>> Int, lk: Int, hk: Option[Int]) = {
+        val (x, m) = trimLookupLo(lk, hk, a)
+        structurallySound(m)
+
+        val t1 = a.lookup(lk)
+        val t2 = trim(Some(lk), hk, a)
+        (x, m) must_=== (t1, t2)
+      }
+
+      a match {
+        case Tip() =>
+          val lk = Random.nextInt()
+          val hk = lk + 1
+          checkValidity(a, lk, Some(hk))
+          checkValidity(a, lk, None)
+
+        case Bin(_, _, _, _) =>
+          def rec(m: Int ==>> Int): Unit = {
+            m match {
+              case Tip() =>
+                ()
+              case Bin(k, x, l, r) =>
+                checkValidity(m, k, None)
+
+                if (k == Int.MinValue) {
+                  checkValidity(m, k, Some(k+1))
+
+                  rec(r)
+                }
+                else if (k == Int.MaxValue) {
+                  checkValidity(m, k-1, Some(k))
+                  checkValidity(m, k-1, None)
+
+                  rec(l)
+                }
+                else {
+                  checkValidity(m, k-1, Some(k+1))
+                  checkValidity(m, k-1, None)
+
+                  rec(l)
+                  rec(r)
+                }
+            }
+          }
+        rec(a)
+      }
     }
   }
 
@@ -678,6 +942,22 @@ object MapTest extends SpecLite {
       import std.tuple._
       fromList(List(5 -> "a", 3 -> "b")).toList must_===(List(3 -> "b", 5 -> "a"))
       empty[Int, String].toList must_===(List.empty[(Int, String)])
+    }
+  }
+
+  "==>> fromSet" should {
+    "fromSet" in {
+      fromSet(ISet.fromList(List[Int](3, 5))){ i: Int => List.fill(i)('a').mkString } must_=== fromList(List(5 -> "aaaaa", 3 -> "aaa"))
+      fromSet(ISet.fromList(List[Int]())){ i: Int => i } must_=== empty
+    }
+
+    "fromSet" ! forAll { (a: ISet[Int]) =>
+      val li = a.toList.map(i => (i, i))
+      fromSet(a)(i => i) must_=== fromList(li)
+    }
+
+    "consistent keySet" ! forAll { a: Byte ==>> Byte =>
+      fromSet(a.keySet)(_ => ()) must_=== a.map(_ => ())
     }
   }
 

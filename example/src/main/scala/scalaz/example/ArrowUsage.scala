@@ -4,7 +4,7 @@ import scalaz._
 
 object ArrowUsage extends App {
 
-  import Scalaz._ 
+  import Scalaz._
 
   val plus1 = (_: Int) + 1
   val times2 = (_: Int) * 2
@@ -26,5 +26,5 @@ object ArrowUsage extends App {
 
   // Perform plus1 on a pair using the Function1 arrow
   (plus1.product apply (9, 99)) assert_=== (10, 100)
-  
+
 }

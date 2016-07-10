@@ -5,6 +5,7 @@ import std.AllInstances._
 import std.AllFunctions.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Cogen
 import org.scalacheck.Prop.forAll
 
 object FunctionTest extends SpecLite {
@@ -28,6 +29,10 @@ object FunctionTest extends SpecLite {
   implicit def EqualFunction3 = Equal.equalBy[(Int, Int, Int) => Int, Int](_.apply(0, 0, 0))
   implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
   implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
+
+  // https://github.com/rickynils/scalacheck/issues/190
+  private[this] implicit def function1Cogen[A, B]: Cogen[A => B] =
+    Cogen(_ => 0)
 
   checkAll("Function1", monoid.laws[Int => Int])
 
@@ -78,10 +83,10 @@ object FunctionTest extends SpecLite {
     def equal[A, R: Equal] = Equal[() => R]
     def semigroup[A, R: Semigroup] = Semigroup[A => R]
     def monad0 = Monad[() => ?]
-    def traverse0 = Traverse[Function0] 
+    def traverse0 = Traverse[Function0]
     def bindRec0 = BindRec[Function0]
-    def comonad0 = Comonad[Function0] 
-    def distributive0 = Distributive[Function0]    
+    def comonad0 = Comonad[Function0]
+    def distributive0 = Distributive[Function0]
 
     // these aren't working atm.
     //    def monadByName[A] = Monad[(=> A) => ?]

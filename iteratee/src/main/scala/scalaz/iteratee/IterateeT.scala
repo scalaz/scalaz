@@ -98,7 +98,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     (this >>== e[A]).joinI[E, A]
 
   def &=(e: EnumeratorT[E, F])(implicit F: Bind[F]): IterateeT[E, F, A] =
-    this >>== e[A] 
+    this >>== e[A]
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[E, G, A] = {
     def step: StepT[E, F, A] => StepT[E, G, A] =
@@ -129,7 +129,7 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   /**
-   * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
+   * Feeds input elements to this iteratee until it is done, feeds the produced value to the
    * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
    */
   def sequenceI(implicit m: Monad[F]): EnumerateeT[E, A, F] =
@@ -192,7 +192,7 @@ sealed abstract class IterateeTInstances0 {
 }
 
 sealed abstract class IterateeTInstances extends IterateeTInstances0 {
-  implicit def IterateeTMonadTrans[E]: Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] = 
+  implicit def IterateeTMonadTrans[E]: Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] =
     new IterateeTHoist[E] { }
 
   implicit def IterateeTHoistT[E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] =
@@ -221,7 +221,7 @@ trait IterateeTFunctions {
 
   def done[E, F[_] : Applicative, A](d: => A, r: => Input[E]): IterateeT[E, F, A] =
     StepT.sdone(d, r).pointI
-    
+
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
    */
@@ -239,7 +239,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) <+> a)
         , eof = done(PlusEmpty[A].empty, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -250,7 +250,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) |+| a)
         , eof = done(Monoid[A[E]].zero, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -373,7 +373,7 @@ private trait IterateeTHoist[E] extends Hoist[λ[(β[_], α) => IterateeT[E, β,
 
 private trait IterateeTMonadIO[E, F[_]] extends MonadIO[IterateeT[E, F, ?]] with IterateeTMonad[E, F] {
   implicit def F: MonadIO[F]
-  
+
   def liftIO[A](ioa: IO[A]) = MonadTrans[λ[(α[_], β) => IterateeT[E, α, β]]].liftM(F.liftIO(ioa))
 }
 

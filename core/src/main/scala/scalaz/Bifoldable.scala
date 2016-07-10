@@ -25,7 +25,7 @@ trait Bifoldable[F[_, _]]  { self =>
   }
 
   /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
-  def compose[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[λ[(α, β) => F[G[α, β], G[α, β]]]] = 
+  def compose[G[_, _]](implicit G0: Bifoldable[G]): Bifoldable[λ[(α, β) => F[G[α, β], G[α, β]]]] =
     new CompositionBifoldable[F, G] {
       implicit def F = self
       implicit def G = G0
@@ -61,11 +61,11 @@ trait Bifoldable[F[_, _]]  { self =>
     new RightFoldable[F, X] {val F = self}
 
   /** Unify the foldable over both params. */
-  def uFoldable: Foldable[λ[α => F[α, α]]] = 
+  def uFoldable: Foldable[λ[α => F[α, α]]] =
     new UFoldable[F] {val F = self}
 
   /** Embed one Foldable at each side of this Bifoldable */
-  def embed[G[_],H[_]](implicit G0: Foldable[G], H0: Foldable[H]): Bifoldable[λ[(α, β) => F[G[α],H[β]]]] = 
+  def embed[G[_],H[_]](implicit G0: Foldable[G], H0: Foldable[H]): Bifoldable[λ[(α, β) => F[G[α],H[β]]]] =
     new CompositionBifoldableFoldables[F,G,H] {
       def F = self
       def G = G0
@@ -73,7 +73,7 @@ trait Bifoldable[F[_, _]]  { self =>
     }
 
   /** Embed one Foldable to the left of this Bifoldable .*/
-  def embedLeft[G[_]](implicit G0: Foldable[G]): Bifoldable[λ[(α, β) => F[G[α],β]]] = 
+  def embedLeft[G[_]](implicit G0: Foldable[G]): Bifoldable[λ[(α, β) => F[G[α],β]]] =
     embed[G,Id.Id]
 
   /** Embed one Foldable to the right of this Bifoldable .*/

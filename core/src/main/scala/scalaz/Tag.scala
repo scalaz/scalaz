@@ -21,7 +21,7 @@ object Tag {
     * broadly, if it is possible to write a ''legal''
     * [[scalaz.InvariantFunctor]] over the parameter, `subst` of that
     * parameter is safe.
-    * 
+    *
     * We do not have a
     * <a href="https://ghc.haskell.org/trac/ghc/wiki/Roles">type role</a>
     * system in Scala with which to declare the exact situations under

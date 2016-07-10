@@ -66,7 +66,7 @@ sealed abstract class ConstInstances1 {
 }
 
 sealed abstract class ConstInstances0 extends ConstInstances1 {
-  implicit def constEqual[A : Equal, B]: Equal[Const[A, B]] = 
+  implicit def constEqual[A : Equal, B]: Equal[Const[A, B]] =
     new ConstEqual[A, B] {
       val OA: Equal[A] = implicitly
     }
@@ -83,7 +83,7 @@ sealed abstract class ConstInstances0 extends ConstInstances1 {
 }
 
 sealed abstract class ConstInstances extends ConstInstances0 {
-  implicit def constOrder[A : Order, B]: Order[Const[A, B]] = 
+  implicit def constOrder[A : Order, B]: Order[Const[A, B]] =
     new ConstOrder[A, B]{
       val OA: Order[A] = implicitly
     }

@@ -18,13 +18,13 @@ object LazyOptionTTest extends SpecLite {
 
     val times = 10000
 
-    val result = 
-      BindRec[LazyOptionId].tailrecM[Int, Int] { 
-        i => LazyOptionT[Id, Int \/ Int](LazyOption.lazySome(if (i < 10000) \/.left(i + 1) else \/.right(i))) 
+    val result =
+      BindRec[LazyOptionId].tailrecM[Int, Int] {
+        i => LazyOptionT[Id, Int \/ Int](LazyOption.lazySome(if (i < 10000) \/.left(i + 1) else \/.right(i)))
       }(0)
     result.getOrElse(0) must_=== times
   }
-  
+
   object instances {
     def functor[F[_] : Functor] = Functor[LazyOptionT[F, ?]]
     def monad[F[_] : Monad] = Monad[LazyOptionT[F, ?]]

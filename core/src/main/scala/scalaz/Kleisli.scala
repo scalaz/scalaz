@@ -86,7 +86,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 
   def tap(implicit F: Applicative[M]): Kleisli[M, A, A] =
     Kleisli(a => F.discardLeft(run(a), F.point(a)))
-  
+
 }
 
 //

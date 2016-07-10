@@ -2,9 +2,9 @@ package scalaz.example
 
 object NameNeedValueUsage extends App {
   import scalaz._
-  
+
   def undefined = sys.error("!!")
-  
+
   class Inc {
     var i = 0
 

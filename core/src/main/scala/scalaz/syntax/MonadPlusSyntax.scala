@@ -8,7 +8,7 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 
   def filter(f: A => Boolean) =
     F.filter(self)(f)
-  
+
   def withFilter(f: A => Boolean) =
     filter(f)
 

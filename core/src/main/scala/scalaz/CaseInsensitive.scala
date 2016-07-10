@@ -11,7 +11,7 @@ sealed abstract class CaseInsensitive[A] {
     case _ => false
   }
 
-  private val hash = Need(foldedCase.hashCode)
+  private[this] val hash = Need(foldedCase.hashCode)
 
   final override def hashCode: Int = hash.value
 }
@@ -21,7 +21,7 @@ object CaseInsensitive extends CaseInsensitiveInstances {
 
   private[scalaz] def mk[A](a: A, fc: => A): CaseInsensitive[A] = new CaseInsensitive[A] {
     val original = a
-    val fcCache = Need(fc)
+    private[this] val fcCache = Need(fc)
     def foldedCase = fcCache.value
   }
 }

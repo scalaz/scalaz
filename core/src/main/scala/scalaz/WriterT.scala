@@ -230,7 +230,7 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
 }
 
 sealed abstract class WriterTInstances2 extends WriterTInstances3 {
-  implicit def writerComonad[W]: Comonad[Writer[W, ?]] = 
+  implicit def writerComonad[W]: Comonad[Writer[W, ?]] =
     new WriterComonad[W] {
       implicit def F = implicitly
     }
@@ -241,7 +241,7 @@ sealed abstract class WriterTInstances1 extends WriterTInstances2 {
     new WriterTBitraverse[Id] {
       implicit def F = idInstance
     }
-  implicit def writerTraverse[W]: Traverse[Writer[W, ?]] = 
+  implicit def writerTraverse[W]: Traverse[Writer[W, ?]] =
     new WriterTTraverse[Id, W] {
       implicit def F = idInstance
     }
@@ -252,7 +252,7 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
     new WriterTBitraverse[F] {
       implicit def F = F0
     }
-  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, ?]] = 
+  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, ?]] =
     new WriterTTraverse[F, W] {
       implicit def F = F0
     }

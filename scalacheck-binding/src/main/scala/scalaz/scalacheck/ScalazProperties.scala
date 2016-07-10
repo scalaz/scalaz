@@ -1,7 +1,7 @@
 package scalaz
 package scalacheck
 
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck._
 import Prop.forAll
 import Scalaz._
 
@@ -63,7 +63,7 @@ object ScalazProperties {
 
     def minmaxsucc[A](implicit A: Enum[A]): Prop = A.enumLaw.minmaxsucc
 
-    private val smallInt = Gen.choose(-100, 100)
+    private[this] val smallInt = Gen.choose(-100, 100)
 
     def succn[A](implicit A: Enum[A], arb: Arbitrary[A]) = forAll((x: A) => forAll(smallInt)(A.enumLaw.succn(x, _)))
 
@@ -148,10 +148,10 @@ object ScalazProperties {
 
     def compose[M[_,_], A, B, C, D, E, F](implicit M: Profunctor[M], mab: Arbitrary[M[A, D]], fba: Arbitrary[(B => A)], fcb: Arbitrary[(C => B)], fde: Arbitrary[(D => E)], fef: Arbitrary[(E => F)], e: Equal[M[C, F]]) =
       forAll(M.profunctorLaw.composite[A, B, C, D, E, F] _ )
-  
+
     def laws[M[_,_]](implicit F: Profunctor[M], af: Arbitrary[M[Int, Int]], itf: Arbitrary[(Int => Int)], e: Equal[M[Int, Int]]): Properties =
-      newProperties("profunctor") { p => 
-        p.property("identity") = identity[M, Int, Int] 
+      newProperties("profunctor") { p =>
+        p.property("identity") = identity[M, Int, Int]
         p.property("composite") = compose[M, Int, Int, Int, Int, Int, Int]
       }
   }
@@ -256,7 +256,7 @@ object ScalazProperties {
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
       forAll(F.cobindLaw.cobindAssociative[A, B, C, D] _)
 
-    def laws[F[_]](implicit a: Cobind[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]): Properties =
+    def laws[F[_]](implicit a: Cobind[F], f: Arbitrary[F[Int] => Int], am: Arbitrary[F[Int]], e: Equal[F[Int]]) =
       newProperties("cobind") { p =>
         p.include(functor.laws[F])
         p.property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
@@ -279,8 +279,9 @@ object ScalazProperties {
       }
   }
 
-  private def resizeProp(p: Prop, max: Int): Prop =
-    Prop(params => p(params.withSize(params.size % (max + 1))))
+  private def resizeProp(p: Prop, max: Int): Prop = new PropFromFun(
+    params => p(params.withSize(params.size % (max + 1)))
+  )
 
   object traverse {
     def identityTraverse[F[_], X, Y](implicit f: Traverse[F], afx: Arbitrary[F[X]], axy: Arbitrary[X => Y], ef: Equal[F[Y]]) =
@@ -606,7 +607,7 @@ object ScalazProperties {
     def errorsStopComputation[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E]): Properties =
+    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]) =
       newProperties("monad error"){ p =>
         p.include(monad.laws[F])
         p.property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]

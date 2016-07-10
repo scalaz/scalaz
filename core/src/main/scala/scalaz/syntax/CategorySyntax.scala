@@ -9,18 +9,17 @@ final class CategoryOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implici
 }
 
 sealed trait ToCategoryOps0 {
-    implicit def ToCategoryOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
-      new CategoryOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  
+  implicit def ToCategoryOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Category, FA]) =
+    new CategoryOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+
 }
 
 trait ToCategoryOps extends ToCategoryOps0 with ToComposeOps {
-  
+
   implicit def ToCategoryOps[F[_, _],A, B](v: F[A, B])(implicit F0: Category[F]) =
     new CategoryOps[F,A, B](v)
-  
 
-  
+
   implicit def ToCategoryVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Category[F[G, ?, ?]]) =
     new CategoryOps[F[G, ?, ?], A, B](v)(F0)
 

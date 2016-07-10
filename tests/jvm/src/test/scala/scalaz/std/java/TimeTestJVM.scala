@@ -28,9 +28,6 @@ object TimeTestJVM extends SpecLite {
       Gen.choose(0, 999999999)
     )(LocalDateTime.of(_, _, _, _, _, _, _)))
 
-  implicit val InstantArbitrary: Arbitrary[Instant] =
-    arb[Long].map { Instant.ofEpochMilli(_)}
-
   implicit val zonedOffsetArbitrary: Arbitrary[ZoneOffset] =
     Arbitrary(
       Apply[Gen].apply3(Gen.choose(0, 17), Gen.choose(0, 59), Gen.choose(0, 59))(
@@ -59,7 +56,6 @@ object TimeTestJVM extends SpecLite {
     )
 
   checkAll("DayOfWeek", ScalazProperties.enum.laws[DayOfWeek])
-  checkAll("Instant", order.laws[Instant])
   checkAll("LocalDateTime", order.laws[LocalDateTime])
   checkAll("OffsetDateTime", order.laws[OffsetDateTime])
   checkAll("OffsetTime", order.laws[OffsetTime])

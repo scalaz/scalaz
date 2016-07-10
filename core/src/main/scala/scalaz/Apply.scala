@@ -34,18 +34,29 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
-  def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] = 
+  def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
     new CompositionApply[F, G] {
       implicit def F = self
       implicit def G = G0
     }
 
   /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
-  def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] = 
+  def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] =
     new ProductApply[F, G] {
       implicit def F = self
       implicit def G = G0
     }
+
+  /** An `Apply` for `F` in which effects happen in the opposite order. */
+  def flip: Apply[F] = new FlippedApply {}
+
+  protected[this] trait FlippedApply extends Apply[F] {
+    override def map[A, B](fa: F[A])(f: A => B): F[B] =
+      self.map(fa)(f)
+    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
+      self.ap(f)(self.map(fa)(a => (f: A => B) => f(a)))
+    override def flip: self.type = self
+  }
 
   /** Flipped variant of `ap`. */
   def apF[A,B](f: => F[A => B]): F[A] => F[B] = ap(_)(f)

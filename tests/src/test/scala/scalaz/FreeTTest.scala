@@ -53,6 +53,11 @@ object FreeTTest extends SpecLite {
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)
     )
+
+  object headOption extends (List ~> Option) {
+    def apply[A](l: List[A]): Option[A] = l.headOption
+  }
+
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
@@ -95,10 +100,38 @@ object FreeTTest extends SpecLite {
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
+    "hoist stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.f.hoist(NaturalTransformation.refl) // used to overflow
+    }
+
     "interpret" ! forAll { a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpret(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
     }
+
+    "interpret stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.f.interpret(NaturalTransformation.refl) // used to overflow
+    }
+
+    "foldMap should be consistent with runM" ! forAll { a: FreeTListOption[Int] =>
+      val x = a.f.runM(_.headOption)
+      val y = a.f.foldMap(headOption)
+      Equal[Option[Int]].equal(x, y)
+    }
+  }
+
+  "#1156: equals should not return true for obviously unequal instances" in {
+    val a = FreeT.point[List, Option, Int](1).flatMap(x => FreeT.point(2))
+    val b = FreeT.point[List, Option, Int](3).flatMap(x => FreeT.point(4))
+    a != b
   }
 
   "isoFree" ! forAll { a: FreeOption[Int] =>

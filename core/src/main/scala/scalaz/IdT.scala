@@ -10,7 +10,7 @@ final case class IdT[F[_], A](run: F[A]) {
   def flatMapF[B](f: A => F[B])(implicit F: Bind[F]) =
     new IdT[F, B](F.bind(run)(f))
 
-  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = 
+  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A, Z](run, z)(f)
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] =

@@ -1014,7 +1014,7 @@ object FingerTree extends FingerTreeInstances {
              (implicit ms: Reducer[A, V]): FingerTree[V, A] =
     new FingerTree[V, A] {
       implicit val nMeasure = nodeMeasure[A, V]
-      val mz = Need(m)
+      private[this] val mz = Need(m)
       def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz.value, sf)
     }

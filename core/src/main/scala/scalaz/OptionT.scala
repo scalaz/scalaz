@@ -187,18 +187,18 @@ private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
 
 private trait OptionTApply[F[_]] extends Apply[OptionT[F, ?]] with OptionTFunctor[F]{
   implicit def F: Monad[F]
-  
+
   override final def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
 }
 
 private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[F]{
   implicit def F: Monad[F]
-  
+
   final def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
 }
 
 private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBind[F] {
-  implicit def F: Monad[F] 
+  implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
   final def tailrecM[A, B](f: A => OptionT[F, A \/ B])(a: A): OptionT[F, B] =

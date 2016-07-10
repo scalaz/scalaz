@@ -22,7 +22,7 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
       implicit def G = G0
     }
 
-  private class Mutual[A](a: F[A]) {
+  private[this] class Mutual[A](a: F[A]) {
     lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
     lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
   }

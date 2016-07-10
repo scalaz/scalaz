@@ -260,7 +260,7 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTLeftProjectionBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[LazyEitherT.LeftProjectionT[F, ?, ?]] =
     new IsomorphismBitraverse[LazyEitherT.LeftProjectionT[F, ?, ?], LazyEitherT[F, ?, ?]] {
       implicit def G = lazyEitherTBitraverse[F]
-  
+
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
     }
 
@@ -371,7 +371,7 @@ private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] 
   final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
     LazyEitherT(
       B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
-        _.fold(e => \/.right(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
+        _.fold(e => \/-(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
       })(a)
     )
 }

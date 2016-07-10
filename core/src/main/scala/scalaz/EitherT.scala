@@ -115,6 +115,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.fold(_ => Nil, _ :: Nil))
 
+  /** Return a `this` on the left-side or a `that` on the right-side of this disjunction  */
+  def toThese(implicit F: Functor[F]): TheseT[F, A, B] = TheseT(F.map(run)(_.toThese))
+
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
     F.map(run)((_: (A \/ B)).fold(_ => Stream(), Stream(_)))
@@ -287,7 +290,7 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] = 
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -366,14 +369,14 @@ private trait EitherTBind[F[_], E] extends Bind[EitherT[F, E, ?]] with EitherTFu
 }
 
 private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] with EitherTBind[F, E] {
-  implicit def F: Monad[F] 
+  implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
   final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
     EitherT(
-      B.tailrecM[A, E \/ B](a => F.map(f(a).run) { 
+      B.tailrecM[A, E \/ B](a => F.map(f(a).run) {
         // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
-        _.fold(e => \/.right(\/.left(e)), _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
+        _.fold(e => \/-(-\/(e)), _.fold(\/.left, b => \/-(\/-(b))))
       })(a)
     )
 }

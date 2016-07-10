@@ -10,6 +10,8 @@ trait TimeInstances extends TimeInstances0 {
     def order(x: A, y: A) = Ordering.fromInt(f(x, y))
   }
 
+  implicit val instantInstance: Order[Instant] = orderFromInt[Instant](_ compareTo _)
+
   implicit val durationInstance: Monoid[Duration] with Order[Duration] =
     new Monoid[Duration] with Order[Duration] {
       override def zero = Duration.ZERO
