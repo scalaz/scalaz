@@ -15,6 +15,7 @@ object MaybeTTest extends SpecLite {
   checkAll(monadPlus.laws[MaybeTList])
   checkAll(traverse.laws[MaybeTList])
   checkAll(monadError.laws[MaybeTEither, Int])
+  checkAll(monadTrans.laws[MaybeT, List])
 
   object instances {
     def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]

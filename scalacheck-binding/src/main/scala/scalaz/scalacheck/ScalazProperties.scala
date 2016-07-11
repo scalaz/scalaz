@@ -615,4 +615,17 @@ object ScalazProperties {
         p.property("errorsStopComputation") = errorsStopComputation[F, E, Int]
       }
   }
+
+  object monadTrans {
+    def identity[F[_[_], _], G[_], A](implicit F: MonadTrans[F], G: Monad[G], A: Arbitrary[A], Eq: Equal[F[G, A]]) =
+      forAll(F.monadTransLaw.identity[G, A] _)
+    def composition[F[_[_], _], G[_], A, B](implicit F: MonadTrans[F], G: Monad[G], GA: Arbitrary[G[A]], AGB: Arbitrary[A => G[B]], Eq: Equal[F[G, B]]) =
+      forAll(F.monadTransLaw.composition[G, A, B] _)
+
+    def laws[F[_[_], _], G[_]](implicit F: MonadTrans[F], G: Monad[G], AGI: Arbitrary[G[Int]], Eq: Equal[F[G, Int]]) =
+      newProperties("monadTrans") { p =>
+        p.property("identity") = identity[F, G, Int]
+        p.property("composition") = composition[F, G, Int, Int]
+      }
+  }
 }

@@ -26,6 +26,7 @@ object ReaderWriterStateTTest extends SpecLite {
 
   checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
+  checkAll(monadTrans.laws[ReaderWriterStateT[?[_], Int, Int, Int, ?], Option])
 
   "ReaderWriterStateT can be trampolined without stack overflow" in {
     import scalaz.Free._
