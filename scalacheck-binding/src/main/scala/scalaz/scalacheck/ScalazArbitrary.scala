@@ -59,10 +59,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenOneAnd[F[_], A: Cogen](implicit F: Cogen[F[A]]): Cogen[OneAnd[F, A]] =
     Cogen[(A, F[A])].contramap(a => (a.head, a.tail))
 
-  // TODO remove https://github.com/rickynils/scalacheck/pull/249
-  private[scalaz] implicit def cogenStream[A: Cogen]: Cogen[Stream[A]] =
-    Cogen[List[A]].contramap(_.toList)
-
   implicit def cogenISet[A: Cogen]: Cogen[ISet[A]] =
     Cogen[List[A]].contramap(_.toList)
 
