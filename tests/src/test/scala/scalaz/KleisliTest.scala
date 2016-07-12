@@ -40,6 +40,7 @@ object KleisliTest extends SpecLite {
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
   checkAll(profunctor.laws[KleisliOpt])
+  checkAll(monadTrans.laws[Kleisli[?[_], Int, ?], List])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]

@@ -15,5 +15,6 @@ object TheseTTest extends SpecLite {
   checkAll(monad.laws[TheseTListInt])
   checkAll(traverse.laws[TheseTListInt])
   checkAll(bitraverse.laws[TheseTList])
+  checkAll(monadTrans.laws[TheseT[?[_], Int, ?], List])
 
 }

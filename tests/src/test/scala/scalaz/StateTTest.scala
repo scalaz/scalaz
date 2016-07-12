@@ -16,6 +16,7 @@ object StateTTest extends SpecLite {
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
+  checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]

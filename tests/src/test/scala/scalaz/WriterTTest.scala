@@ -24,6 +24,7 @@ object WriterTTest extends SpecLite {
   checkAll(bifunctor.laws[WriterTOpt])
   checkAll(functor.laws[WriterT[NonEmptyList, Int, ?]])
   checkAll(bitraverse.laws[WriterTOpt])
+  checkAll(monadTrans.laws[WriterT[?[_], Int, ?], List])
 
   implicit def writerArb[W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))

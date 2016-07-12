@@ -68,6 +68,7 @@ object ListTTest extends SpecLite {
   checkAll(plusEmpty.laws[ListTOpt])
   checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
+  checkAll(monadTrans.laws[ListT, Option])
 
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]

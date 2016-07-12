@@ -11,6 +11,17 @@ trait MonadTrans[F[_[_], _]] {
 
   /** The [[scalaz.Monad]] implied by this transformer. */
   implicit def apply[G[_] : Monad]: Monad[F[G, ?]]
+
+  trait MonadTransLaw {
+    /** Lifted `point` is `point` of this transformer's monad. */
+    def identity[G[_], A](a: A)(implicit G: Monad[G], FA: Equal[F[G, A]]): Boolean =
+      FA.equal(liftM(G.point(a)), Monad[F[G, ?]].point(a))
+
+    /** `bind` and then `liftM` is the same as `liftM` and then `bind` */
+    def composition[G[_], A, B](ga: G[A], f: A => G[B])(implicit G: Monad[G], FB: Equal[F[G, B]]): Boolean =
+      FB.equal(liftM(Monad[G].bind(ga)(f)), Monad[F[G, ?]].bind(liftM(ga))(a => liftM(f(a))))
+  }
+  def monadTransLaw = new MonadTransLaw {}
 }
 
 object MonadTrans {
