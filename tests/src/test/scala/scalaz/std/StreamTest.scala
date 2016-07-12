@@ -2,7 +2,6 @@ package scalaz
 package std
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
 

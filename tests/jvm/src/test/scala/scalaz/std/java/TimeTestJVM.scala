@@ -3,7 +3,6 @@ package scalaz.std.java
 import scalaz.{SpecLite, Apply}
 import java.time._
 import org.scalacheck._
-import scalaz.syntax.functor._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._

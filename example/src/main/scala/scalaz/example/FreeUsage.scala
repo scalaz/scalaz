@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{ Free, Monad, ~> }
+import scalaz.{ Free, ~> }
 import scalaz.std.function._
 import scalaz.syntax.monad._
 import scalaz.effect.IO
