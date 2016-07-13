@@ -1,9 +1,7 @@
 package scalaz
 package typeclass
 
-import Functor._
-import Apply.syntax._
-import Applicative.syntax._
+import Prelude._
 
 trait TraversableInstances {
   implicit val list: Traversable[List] = new TraversableClass[List] {

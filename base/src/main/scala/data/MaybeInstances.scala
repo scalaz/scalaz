@@ -1,10 +1,8 @@
 package scalaz
 package data
 
-import typeclass._
-import Applicative.Class._
-
-import Maybe.{just, empty}
+import typeclass.{MonadClass, TraversableClass}
+import Prelude._
 
 // TODO Rework lazyness
 trait MaybeInstances extends MonadClass[Maybe] with TraversableClass[Maybe] {
