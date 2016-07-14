@@ -4,13 +4,10 @@ package data
 import scalaz.typeclass._
 
 trait ConstInstances {
-  implicit def traverse[R]: Traversable[Const[R, ?]] = new TraversableClass.Template[Const[R, ?]] {
+  implicit def traverse[R]: Traversable[Const[R, ?]] = new TraversableClass[Const[R, ?]] with Foldable.FoldMap[Const[R, ?]] with Traversable.Sequence[Const[R, ?]] {
     def map[A, B](ma: Const[R, A])(f: A => B): Const[R, B] = ma.retag
 
     def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
-      F.pure(ta.retag)
-
-    override def sequence[F[_], A](ta: Const[R, F[A]])(implicit F: Applicative[F]): F[Const[R, A]] =
       F.pure(ta.retag)
 
     def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
