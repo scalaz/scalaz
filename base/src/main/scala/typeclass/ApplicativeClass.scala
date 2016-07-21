@@ -9,6 +9,6 @@ object ApplicativeClass {
   trait Template[F[_]] extends ApplicativeClass[F] with Map[F]
 
   trait Map[F[_]] { self: ApplicativeClass[F] =>
-    override def map[A, B](ma: F[A])(f: (A) => B): F[B] = apply.ap(ma)(pure(f))
+    override def map[A, B](ma: F[A])(f: (A) => B): F[B] = ap(ma)(pure(f))
   }
 }

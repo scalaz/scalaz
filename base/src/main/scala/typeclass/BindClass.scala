@@ -1,15 +1,15 @@
 package scalaz
 package typeclass
 
-trait BindClass[F[_]] extends Bind[F] with ApplyClass[F] {
-  final def bind: Bind[F] = this
+trait BindClass[M[_]] extends Bind[M] with ApplyClass[M] {
+  final def bind: Bind[M] = this
 }
 
 object BindClass {
-  trait Template[F[_]] extends BindClass[F] with Ap[F]
+  trait Template[M[_]] extends BindClass[M] with Ap[M]
 
-  trait Ap[F[_]] { self: BindClass[F] =>
-    override def ap[A, B](fa: F[A])(f: F[A => B]): F[B] = flatMap(f)(functor.map(fa))
+  trait Ap[M[_]] { self: BindClass[M] =>
+    override def ap[A, B](fa: M[A])(f: M[A => B]): M[B] = flatMap(f)(map(fa))
   }
 
 }

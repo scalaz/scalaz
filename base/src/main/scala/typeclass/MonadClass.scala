@@ -1,14 +1,14 @@
 package scalaz
 package typeclass
 
-trait MonadClass[F[_]] extends Monad[F] with BindClass[F] with ApplicativeClass[F] {
-  final def monad: Monad[F] = this
+trait MonadClass[M[_]] extends Monad[M] with BindClass[M] with ApplicativeClass[M] {
+  final def monad: Monad[M] = this
 }
 
 object MonadClass {
-  trait Template[F[_]] extends MonadClass[F] with Map[F]
+  trait Template[M[_]] extends MonadClass[M] with Map[M]
 
-  trait Map[F[_]] { self: MonadClass[F] =>
-    override def map[A, B](ma: F[A])(f: (A) => B): F[B] = flatMap(ma)(a => pure(f(a)))
+  trait Map[M[_]] extends Bind.FlatMap[M] { self: MonadClass[M] =>
+    override def map[A, B](ma: M[A])(f: (A) => B): M[B] = flatMap(ma)(a => pure(f(a)))
   }
 }

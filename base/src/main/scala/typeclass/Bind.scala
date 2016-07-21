@@ -9,15 +9,17 @@ trait Bind[M[_]] {
 
 object Bind extends BindInstances with BindFunctions {
 
-  trait FlatMap[F[_]] extends Alt[FlatMap[F]] { self: Bind[F] =>
-    override def flatMap[A, B](ma: F[A])(f: (A) => F[B]): F[B] = flatten(apply.functor.map(ma)(f))
+  trait FlatMap[M[_]] extends Alt[FlatMap[M]] { self: Bind[M] =>
+    override def flatMap[A, B](ma: M[A])(f: A => M[B]): M[B]
+    override def flatten[A](ma: M[M[A]]): M[A] = flatMap(ma)(identity)
   }
-  trait Flatten[F[_]] extends Alt[Flatten[F]] { self: Bind[F] =>
-    override def flatten[A](ma: F[F[A]]): F[A] = flatMap(ma)(identity)
+  trait Flatten[M[_]] extends Alt[Flatten[M]] { self: Bind[M] =>
+    override def flatten[A](ma: M[M[A]]): M[A]
+    override def flatMap[A, B](ma: M[A])(f: (A) => M[B]): M[B] = flatten(apply.functor.map(ma)(f))
   }
   trait Alt[D <: Alt[D]] { self: D => }
 
-  def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
+  def apply[M[_]](implicit M: Bind[M]): Bind[M] = M
 
   object syntax extends BindSyntax
 }
