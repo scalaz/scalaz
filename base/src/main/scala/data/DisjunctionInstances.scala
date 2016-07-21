@@ -5,7 +5,7 @@ import typeclass._
 import Disjunction.{\/, -\/, \/-}
 
 trait DisjunctionInstances {
-  implicit def monad[L]: Monad[L \/ ?] = new MonadClass[L \/ ?] {
+  implicit def monad[L]: Monad[L \/ ?] = new MonadClass.Template[L \/ ?] {
 
     override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
       ma.fold[L \/ B](l => -\/(l))(r => \/-(f(r)))
