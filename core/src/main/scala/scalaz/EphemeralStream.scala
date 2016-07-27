@@ -138,6 +138,10 @@ sealed abstract class EphemeralStream[A] {
 
   def zipWithIndex: EphemeralStream[(A, Int)] =
     zip(iterate(0)(_ + 1))
+
+  def memoized: EphemeralStream[A] =
+    if (isEmpty) this
+    else cons(weakMemo(head())(), weakMemo(tail().memoized)())
 }
 
 object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
@@ -271,8 +275,8 @@ trait EphemeralStreamFunctions {
   def cons[A](a: => A, as: => EphemeralStream[A]) = new EphemeralStream[A] {
     def isEmpty = false
 
-    val head = weakMemo(a)
-    val tail = weakMemo(as)
+    val head = () => a
+    val tail = () => as
   }
 
   def unfold[A, B](b: => B)(f: B => Option[(A, B)]): EphemeralStream[A] =
