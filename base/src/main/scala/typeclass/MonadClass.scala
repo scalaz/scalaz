@@ -6,9 +6,5 @@ trait MonadClass[M[_]] extends Monad[M] with BindClass[M] with ApplicativeClass[
 }
 
 object MonadClass {
-  trait Template[M[_]] extends MonadClass[M] with Map[M]
-
-  trait Map[M[_]] extends Bind.FlatMap[M] { self: MonadClass[M] =>
-    override def map[A, B](ma: M[A])(f: (A) => B): M[B] = flatMap(ma)(a => pure(f(a)))
-  }
+  trait Template[M[_]] extends MonadClass[M] with Monad.Map[M]
 }
