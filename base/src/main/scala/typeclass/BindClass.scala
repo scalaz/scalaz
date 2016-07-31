@@ -12,4 +12,14 @@ object BindClass {
     override def ap[A, B](fa: M[A])(f: M[A => B]): M[B] = flatMap(f)(map(fa))
   }
 
+  trait FlatMap[M[_]] extends Alt[FlatMap[M]] { self: Bind[M] =>
+    override def flatMap[A, B](ma: M[A])(f: A => M[B]): M[B]
+    override def flatten[A](ma: M[M[A]]): M[A] = flatMap(ma)(identity)
+  }
+  trait Flatten[M[_]] extends Alt[Flatten[M]] { self: Bind[M] =>
+    override def flatten[A](ma: M[M[A]]): M[A]
+    override def flatMap[A, B](ma: M[A])(f: (A) => M[B]): M[B] = flatten(apply.functor.map(ma)(f))
+  }
+
+  trait Alt[D <: Alt[D]] { self: D => }
 }

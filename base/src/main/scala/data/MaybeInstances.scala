@@ -2,10 +2,11 @@ package scalaz
 package data
 
 import Prelude._
-import typeclass.{Foldable, MonadClass, TraversableClass}
+import typeclass.{MonadClass, TraversableClass}
+import typeclass.FoldableClass._
 
 // TODO Rework lazyness
-trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with Foldable.FoldRight[Maybe] {
+trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] {
 
   implicit def monadInstance: Monad[Maybe] = this
 
