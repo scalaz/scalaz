@@ -3,6 +3,7 @@ Contributing guidelines
 
 General
 --
+- Modules are defined according to the degree of compromise with the language.
 - Variance annotations are prohibited on both type classes and data structures, they may cause ambiguity.
 
 Data types

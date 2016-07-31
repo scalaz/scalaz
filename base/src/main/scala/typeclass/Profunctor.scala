@@ -9,8 +9,6 @@ abstract class Profunctor[F[_, _]] {
   def dimap[A, B, C, D](fab: F[A, B])(ca: C => A)(bd: B => D): F[C, D] = rmap(lmap(fab)(ca))(bd)
 }
 
-object Profunctor extends ProfunctorInstances {
+object Profunctor extends ProfunctorInstances with ProfunctorSyntax {
   def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
-
-  object syntax extends ProfunctorSyntax
 }
