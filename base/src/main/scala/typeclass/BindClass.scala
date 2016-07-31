@@ -8,7 +8,7 @@ trait BindClass[M[_]] extends Bind[M] with ApplyClass[M] {
 object BindClass {
   trait Template[M[_]] extends BindClass[M] with Ap[M]
 
-  trait Ap[M[_]] { self: BindClass[M] =>
+  trait Ap[M[_]] { self: Bind[M] with Apply[M] with Functor[M] =>
     override def ap[A, B](fa: M[A])(f: M[A => B]): M[B] = flatMap(f)(map(fa))
   }
 
