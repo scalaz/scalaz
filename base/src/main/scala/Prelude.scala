@@ -59,6 +59,7 @@ trait Prelude  extends data.DisjunctionFunctions
   // =========
 
   type \/[L, R] = data.Disjunction.\/[L, R]
+  type ===[A, B] = data.===[A, B]
   type Identity[A] = data.Identity[A]
   type Maybe[A] = data.Maybe[A]
 }
