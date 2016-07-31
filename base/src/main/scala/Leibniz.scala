@@ -1,6 +1,6 @@
 package scalaz
 
-import Identity.Id
+import data.Identity.Id
 
 object Leibniz {
   trait ===[A, B] {

@@ -1,12 +1,9 @@
 package scalaz
+package data
 
-import scalaz.typeclass._
+import typeclass._
 
-case class Identity[A](run: A) extends AnyVal
-
-object Identity {
-  type Id[X] = X
-
+trait IdentityInstances {
   implicit val monad: Monad[Identity] = new MonadClass[Identity] {
     override def map[A, B](fa: Identity[A])(f: A => B): Identity[B] = Identity(f(fa.run))
     override def ap[A, B](fa: Identity[A])(f: Identity[A => B]): Identity[B] = Identity(f.run.apply(fa.run))
