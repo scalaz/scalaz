@@ -9,6 +9,7 @@ trait LiskovFunctions {
   def isa[A, B >: A]: A <~< B = Liskov.refl
 
   /** http://typelevel.org/blog/2014/03/09/liskov_lifting.html **/
+  def liftCtf[F[_]: Contravariant, A, B](a: A <~< B): F[B] <~< F[A] = a.asInstanceOf[F[B] <~< F[A]]
   def liftCvf[A, B, F[_]: Functor](a: A <~< B): F[A] <~< F[B] = a.asInstanceOf[F[A] <~< F[B]]
 
   /**Subtyping is antisymmetric */
