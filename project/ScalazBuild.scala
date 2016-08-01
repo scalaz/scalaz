@@ -40,6 +40,7 @@ object Scalaz extends Build {
         Seq ( "org.scala-lang" % "scala-reflect" % scalaVersion.value
             , "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
             , "org.scalaz" %% "scalaz-core" % "7.2.1"
+            , "com.github.julien-truffaut"  %%  "monocle-core" % "1.2.2"
             , "org.typelevel" %% "cats" % "0.5.0" )
     )
 
