@@ -6,11 +6,12 @@ import data._
 import scala.language.implicitConversions
 
 trait Prelude  extends data.DisjunctionFunctions
+                  with data.IdentityTypes
                   with data.MaybeFunctions
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
                   with typeclass.TraversableFunctions {
-  // Core Class
+  // Base Class
   // ==========
   type Applicative[F[_]] = typeclass.Applicative[F]
   type Apply[F[_]] = typeclass.Apply[F]
@@ -54,10 +55,12 @@ trait Prelude  extends data.DisjunctionFunctions
   implicit def PtraversableOps[T[_], A](ta: T[A])(implicit T: Traversable[T]): TraversableSyntax.Ops[T, A] =
     new TraversableSyntax.Ops(ta)
 
-  // Core Data
+  // Base Data
   // =========
 
   type \/[L, R] = data.Disjunction.\/[L, R]
+  type ===[A, B] = data.===[A, B]
+  type Identity[A] = data.Identity[A]
   type Maybe[A] = data.Maybe[A]
 }
 
