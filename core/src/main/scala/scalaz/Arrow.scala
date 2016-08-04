@@ -30,7 +30,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
     compose(fbc, fab)
 
   /** Swaps a pair. */
-  def swap[X, Y] = arr[(X, Y), (Y, X)] {
+  def swap[X, Y]: ((X, Y) =>: (Y, X)) = arr[(X, Y), (Y, X)] {
     case (x, y) => (y, x)
   }
 
