@@ -108,7 +108,7 @@ sealed abstract class Dequeue[A] {
   def toBackIList: IList[A] = this match {
     case EmptyDequeue() => IList.empty
     case SingletonDequeue(a) => ICons(a, IList.empty)
-    case FullDequeue(front, fs, back, bs) => back.head +: (back.tail ++ (front.tail ++ (ICons(front.head, IList.empty))))
+    case FullDequeue(front, fs, back, bs) => back.head +: (back.tail ++ (front.tail reverse_::: ICons(front.head, IList.empty)))
   }
 
   /**
