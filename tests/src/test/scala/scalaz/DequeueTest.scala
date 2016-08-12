@@ -36,6 +36,11 @@ object DequeueTest extends SpecLite {
     Dequeue.fromFoldable(l).toBackIList must_===(IList.fromFoldable(l.reverse))
   }
 
+  "toBackIList.reverse is toIList" ! forAll{ (l: List[Int]) ⇒
+    val q = l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) ⇒ q cons a)
+    q.toBackIList.reverse must_===(q.toIList)
+  }
+
   "snoc works" ! forAll{ (l: List[Int]) ⇒
     (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) ⇒ q snoc a)).toStream must_=== l.toStream
   }
