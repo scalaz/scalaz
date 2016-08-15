@@ -1,6 +1,7 @@
 package scalaz
 
 import Id._
+import scala.collection.immutable
 
 /**
  * A Lens Family, offering a purely functional means to access and retrieve
@@ -549,6 +550,9 @@ abstract class LensInstances extends LensInstances0 {
   case class QueueLensFamily[S1, S2, A](lens: LensFamily[S1, S2, Queue[A], Queue[A]]) {
     def enqueue(elem: A): IndexedState[S1, S2, Unit] =
       lens %== (_ enqueue elem)
+
+    def enqueue(iter: immutable.Iterable[A]): IndexedState[S1, S2, Unit] =
+      lens %== (_ enqueue iter)
 
     def dequeue: IndexedState[S1, S2, A] =
       lens %%= State[Queue[A], A](_.dequeue.swap)
