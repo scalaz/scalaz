@@ -279,7 +279,8 @@ object EitherT extends EitherTInstances with EitherTFunctions {
 }
 
 sealed abstract class EitherTInstances3 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[({type λ[α, β] = EitherT[F, α, β]})#λ, E] = new EitherTMonadError[F, E] {
+  // non-implicit defintion left here for binary backwards compatibility
+  protected def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[({type λ[α, β] = EitherT[F, α, β]})#λ, E] = new EitherTMonadError[F, E] {
     implicit def F = F0
   }
 }
@@ -316,7 +317,11 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
   }
 }
 
-sealed abstract class EitherTInstances extends EitherTInstances0 {
+sealed abstract class EitherTInstances00 extends EitherTInstances0 {
+   override implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[({type λ[α, β] = EitherT[F, α, β]})#λ, E] = super.eitherTMonadError[F, E]
+}
+
+sealed abstract class EitherTInstances extends EitherTInstances00 {
   implicit def eitherTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=EitherT[F, α, β]})#λ] = new EitherTBitraverse[F] {
     implicit def F = F0
   }
