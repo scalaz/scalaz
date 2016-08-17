@@ -216,6 +216,14 @@ object IO extends IOInstances {
   type RunInBase[M[_], Base[_]] =
   Forall[λ[α => M[α] => Base[M[α]]]]
 
+  import scalaz.Isomorphism.<~>
+
+  /** Hoist RunInBase given a natural isomorphism between the two functors */
+  def hoistRunInBase[F[_], G[_]](r: RunInBase[G, IO])(implicit iso: F <~> G): RunInBase[F, IO] =
+    new RunInBase[F, IO] {
+      def apply[B] = (x: F[B]) => r.apply(iso.to(x)).map(iso.from(_))
+    }
+
   /** Construct an IO action from a world-transition function. */
   def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] =
     new IO[A] {
