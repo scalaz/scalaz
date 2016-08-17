@@ -134,6 +134,14 @@ sealed trait IO[A] {
 object IO extends IOInstances with IOFunctions {
   def apply[A](a: => A): IO[A] =
     io(rw => return_(rw -> a))
+
+  import scalaz.Isomorphism.<~>
+
+  /** Hoist RunInBase given a natural isomorphism between the two functors */
+  def hoistRunInBase[F[_], G[_]](r: RunInBase[G, IO])(implicit iso: F <~> G): RunInBase[F, IO] =
+    new RunInBase[F, IO] {
+      def apply[B] = (x: F[B]) => r.apply(iso.to(x)).map(iso.from(_))
+    }
 }
 
 sealed abstract class IOInstances1 {
