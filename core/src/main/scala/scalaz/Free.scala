@@ -10,6 +10,7 @@ import std.tuple._
 //      "java.lang.Error: typeConstructor inapplicable for <none>"
 object Free extends FreeInstances with FreeFunctions {
 
+
   /** Return from the computation with the given value. */
   private[scalaz] case class Return[S[_], A](a: A) extends Free[S, A]
 
@@ -252,6 +253,7 @@ sealed abstract class Free[S[_], A] {
 }
 
 object Trampoline extends TrampolineInstances {
+  implicit override val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] = super.trampolineInstance
 
   def done[A](a: A): Trampoline[A] =
     Free.Return[Function0,A](a)
@@ -264,7 +266,7 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] =
+  protected def trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] =
     new Monad[Trampoline] with Comonad[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
@@ -274,10 +276,12 @@ sealed trait TrampolineInstances {
     }
 }
 
-object Sink extends SinkInstances
+object Sink extends SinkInstances {
+  override implicit def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] = super.sinkMonad[S]
+}
 
 sealed trait SinkInstances {
-  implicit def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] =
+  protected def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] =
     new Monad[({type f[x] = Sink[S, x]})#f] {
       def point[A](a: => A) =
         Suspend[({type f[x] = (=> S) => x})#f, A](s =>
@@ -286,10 +290,12 @@ sealed trait SinkInstances {
     }
 }
 
-object Source extends SourceInstances
+object Source extends SourceInstances {
+  override implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] = super.sourceMonad[S]
+}
 
 sealed trait SourceInstances {
-  implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] =
+  protected def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] =
     new Monad[({type f[x] = Source[S, x]})#f] {
       override def point[A](a: => A) = Return[({type f[x] = (S, x)})#f, A](a)
       def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f
@@ -329,15 +335,22 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
     Semigroup.liftSemigroup[({type λ[α] = Free[S, α]})#λ, A]
 }
 
-// Trampoline, Sink, and Source are type aliases. We need to add their type class instances
-// to Free to be part of the implicit scope.
-sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
+sealed abstract class FreeInstances00 extends FreeInstances0 {
   implicit def freeMonad[S[_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
     new Monad[({type f[x] = Free[S, x]})#f] {
       def point[A](a: => A) = Return(a)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
+}
+
+// Trampoline, Sink, and Source are type aliases. We need to add their type class instances
+// to Free to be part of the implicit scope.
+sealed abstract class FreeInstances extends FreeInstances00 with TrampolineInstances with SinkInstances with SourceInstances {
+  override implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] = super.trampolineInstance
+  override implicit def sinkMonad[S]: Monad[({type f[x] = Sink[S, x]})#f] = super.sinkMonad[S]
+  override implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] = super.sourceMonad[S]
+
 
   implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[({type λ[α] = Free[S, α]})#λ, A]
