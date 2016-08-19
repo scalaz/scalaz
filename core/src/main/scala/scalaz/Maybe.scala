@@ -275,7 +275,8 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit val maybeInstance = new Traverse[Maybe] with MonadPlus[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
+  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
+    new Traverse[Maybe] with MonadPlus[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 
     def point[A](a: => A) = just(a)
 
