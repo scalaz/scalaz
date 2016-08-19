@@ -34,6 +34,21 @@ sealed abstract class RegionTInstances1 {
   implicit def RegionTMonad[S, M[_]](implicit M0: Monad[M]): Monad[({type λ[α] = RegionT[S, M, α]})#λ] = new RegionTMonad[S, M] {
     implicit def M = M0
   }
+
+  implicit def RegionTHoist[S]: Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] = new Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] {
+    def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+      new (({type l[a] = RegionT[S, M, a]})#l ~> ({type l[a] = RegionT[S, N, a]})#l) {
+        override def apply[B](fa: RegionT[S, M, B]) =
+          RegionT(Kleisli(r => f.apply(fa.runT(r))))
+      }
+
+    override def liftM[M[_]: Monad, B](a: M[B]) =
+      RegionT(Kleisli(r => a))
+
+    override implicit def apply[M[_]: Monad] =
+      RegionTMonad[S, M]
+  }
+
 }
 
 sealed abstract class RegionTInstances extends RegionTInstances1 {
