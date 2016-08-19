@@ -37,8 +37,12 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def map[C](f: B => C)(implicit M: Functor[M]): Kleisli[M, A, C] =
     kleisli(a => M.map(run(a))(f))
 
-  def mapK[N[_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
+  def mapT[N[_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
     kleisli(run andThen f)
+
+  /** alias for mapT */
+  def mapK[N[_], C](f: M[B] => N[C]): Kleisli[N, A, C] =
+    mapT(f)
 
   def flatMapK[C](f: B => M[C])(implicit M: Bind[M]): Kleisli[M, A, C] =
     kleisli(a => M.bind(run(a))(f))
@@ -333,7 +337,8 @@ private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, ?], 
 private trait KleisliHoist[R] extends Hoist[Kleisli[?[_], R, ?]] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): Kleisli[M, R, ?] ~> Kleisli[N, R, ?] =
     new (Kleisli[M, R, ?] ~> Kleisli[N, R, ?]) {
-      def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] = Kleisli[N, R, A](r => f(m(r)))
+      def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] =
+        m.mapT(f)
     }
 
   def liftM[G[_] : Monad, A](a: G[A]): Kleisli[G, R, A] =

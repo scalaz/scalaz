@@ -11,14 +11,9 @@ object MonadCatchIO extends MonadCatchIOFunctions {
 
   implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup] = new MonadCatchIO[TheseT[M, E, ?]] {
     val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
-    override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) = TheseT[M, E, A] {
-      val M = MonadCatchIO[M]
-      val a: M[Throwable \/ (E \&/ A)] = M.except(M.map(ma.run)(\/.right[Throwable, (E \&/ A)]))(t => M.point(-\/(t)))
-      M.bind(a) {
-        case -\/(t)    => handler(t).run
-        case \/-(r)    => M.point(r)
-      }
-    }
+    val M = MonadCatchIO[M]
+    override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) =
+      ma.mapT(M.except(_)(handler(_).run))
 
     override def point[A](a: => A) = TheseTMonadIO.point(a)
     override def bind[A, B](fa: TheseT[M, E, A])(f: (A) => TheseT[M, E, B]) = TheseTMonadIO.bind(fa)(f)

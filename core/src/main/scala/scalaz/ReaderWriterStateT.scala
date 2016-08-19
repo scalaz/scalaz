@@ -15,6 +15,9 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
       case (w, a, s1) => (s1, a)
     })
 
+  def mapT[G[_], B, WU, S2U](f: F[(W, A, S2)] => G[(WU, B, S2U)])(implicit F: Monad[F]): IndexedReaderWriterStateT[G, R, WU, S1, S2U, B] =
+    IndexedReaderWriterStateT { case (r, s) => f(run(r, s)) }
+
   /** Calls `run` using `Monoid[S].zero` as the initial state */
   def runZero[S <: S1](r: R)(implicit F: Monad[F], S: Monoid[S]): F[(W, A, S2)] =
     run(r, S.zero)
@@ -217,9 +220,8 @@ private trait ReaderWriterStateTHoist[R, W, S] extends Hoist[λ[(α[_], β) => R
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
     new (ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N, R, W, S, ?]) {
-      def apply[A](ma: ReaderWriterStateT[M, R, W, S, A]): ReaderWriterStateT[N, R, W, S, A] = ReaderWriterStateT {
-        case (r,s) => f.apply(ma.run(r,s))
-      }
+      def apply[A](ma: ReaderWriterStateT[M, R, W, S, A]): ReaderWriterStateT[N, R, W, S, A] =
+        ma.mapT(f)
     }
 
   def liftM[M[_], A](ma: M[A])(implicit M: Monad[M]): ReaderWriterStateT[M, R, W, S, A] =
