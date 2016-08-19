@@ -18,6 +18,9 @@ sealed abstract class RegionT[S, P[_], A] {
 
   def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =
     value.run(r)
+
+  def mapT[Q[_], B](f: P[A] => Q[B]): RegionT[S, Q, B] =
+    RegionT(Kleisli(f compose runT))
 }
 
 object RegionT extends RegionTInstances {
@@ -26,6 +29,7 @@ object RegionT extends RegionTInstances {
   }
 
   def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
+
 }
 
 sealed abstract class RegionTInstances1 {

@@ -10,6 +10,9 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](mapO(_ map f))
 
+  def mapT[G[_], B](f: F[Option[A]] => G[Option[B]]): OptionT[G, B] =
+    OptionT(f(run))
+
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
     F.bind(self.run) {
       case None    => F.point(None: Option[B])
@@ -243,7 +246,8 @@ private trait OptionTHoist extends Hoist[OptionT] {
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
     new (OptionT[M, ?] ~> OptionT[N, ?]) {
-      def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.run))
+      def apply[A](fa: OptionT[M, A]): OptionT[N, A] =
+        fa.mapT(f)
     }
 
   implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G]

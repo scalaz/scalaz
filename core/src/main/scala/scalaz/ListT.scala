@@ -53,6 +53,9 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def map[B](f: A => B)(implicit M: Functor[M]) : ListT[M, B] = new ListT(M.map(run)(_.map(f)))
 
+  def mapT[F[_], B](f: M[List[A]] => F[List[B]]): ListT[F, B] =
+    ListT(f(run))
+
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tail))
 
@@ -160,6 +163,7 @@ private trait ListTHoist extends Hoist[ListT] {
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
     new (ListT[M, ?] ~> ListT[N, ?]) {
-      def apply[A](a: ListT[M, A]): ListT[N, A] = fromList(f(a.run))
+      def apply[A](a: ListT[M, A]): ListT[N, A] =
+        a.mapT(f)
     }
 }

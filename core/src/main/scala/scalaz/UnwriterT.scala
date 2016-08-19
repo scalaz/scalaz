@@ -36,6 +36,8 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): UnwriterT[F, U, B] =
     unwriterT(F.map(run)(wa => (wa._1, f(wa._2))))
 
+  def mapT[G[_], V, B](f: F[(U, A)] => G[(V, B)]): UnwriterT[G, V, B] =
+    UnwriterT(f(run))
 
   def ap[B](f: => UnwriterT[F, U, A => B])(implicit F: Apply[F]): UnwriterT[F, U, B] =
     unwriterT {
