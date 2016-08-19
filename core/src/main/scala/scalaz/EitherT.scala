@@ -70,6 +70,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
     EitherT(F.map(run)(_.map(f)))
 
+  def mapT[G[_], C, D](f: F[A \/ B] => G[C \/ D]): EitherT[G, C, D] =
+    EitherT(f(run))
+
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[({type λ[α] = (A \/ α)})#λ].traverse(o)(f)))(EitherT(_))
@@ -421,7 +424,8 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[({type λ[α, β] = Eit
 
 private trait EitherTHoist[A] extends Hoist[({type λ[α[_], β] = EitherT[α, A, β]})#λ] {
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
-    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
+    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] =
+      mb.mapT(f)
   }
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))

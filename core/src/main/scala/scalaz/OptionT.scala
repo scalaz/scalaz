@@ -13,6 +13,9 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
   @deprecated("Each/foreach is deprecated", "7.1")
   def foreach(f: A => Unit)(implicit E: Each[F]): Unit = E.each(run)(_ foreach f)
 
+  def mapT[G[_], B](f: F[Option[A]] => G[Option[B]]): OptionT[G, B] =
+    OptionT(f(run))
+
   def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
     F.bind(self.run) {
       case None    => F.point(None: Option[B])
@@ -211,7 +214,8 @@ private trait OptionTHoist extends Hoist[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {
-    def apply[A](fa: OptionT[M, A]): OptionT[N, A] = OptionT(f.apply(fa.run))
+    def apply[A](fa: OptionT[M, A]): OptionT[N, A] =
+      fa.mapT(f)
   }
 
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = OptionT[G, α]})#λ] = OptionT.optionTMonadPlus[G]

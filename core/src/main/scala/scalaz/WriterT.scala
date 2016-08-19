@@ -18,6 +18,9 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def mapWritten[X](f: W => X)(implicit F: Functor[F]): WriterT[F, X, A] =
     mapValue(wa => (f(wa._1), wa._2))
 
+  def mapT[G[_], W2, B](f: F[(W, A)] => G[(W2, B)]): WriterT[G, W2, B] =
+    WriterT(f(run))
+
   def written(implicit F: Functor[F]): F[W] =
     F.map(run)(_._1)
 
@@ -385,7 +388,8 @@ private trait WriterTHoist[W] extends Hoist[({type λ[α[_], β] = WriterT[α, W
   implicit def apply[M[_]: Monad]: Monad[({type λ[α]=WriterT[M, W, α]})#λ] = WriterT.writerTMonad
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type λ[α]=WriterT[M, W, α]})#λ ~> ({type λ[α]=WriterT[N, W, α]})#λ) {
-    def apply[A](fa: WriterT[M, W, A]) = WriterT(f(fa.run))
+    def apply[A](fa: WriterT[M, W, A]) =
+      fa.mapT(f)
   }
 }
 
