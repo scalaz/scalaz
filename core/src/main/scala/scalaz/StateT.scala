@@ -40,9 +40,12 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   )
 
   /** Map both the return value and final state using the given function. */
-  def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[G, S1, S, B] = IndexedStateT.createState(
+  def mapT[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[G, S1, S, B] = IndexedStateT.createState(
     (m: Monad[G]) => (s: S1) => f(apply(s)(M))
   )
+
+  /** Alias for mapT */
+  def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[G, S1, S, B] = mapT(f)
 
   import BijectionT._
   def bmap[X, S >: S2 <: S1](b: Bijection[S, X]): StateT[F, X, A] =
@@ -269,9 +272,8 @@ private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
     StateT(s => G.map(ga)(a => (s, a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
-    def apply[A](action: StateT[M, S, A]) = IndexedStateT.createState(
-      (n: Monad[N]) => (s: S) => f(action.run(s))
-    )
+    def apply[A](action: StateT[M, S, A]) =
+      action.mapT(f)
   }
 
   implicit def apply[G[_] : Monad]: Monad[StateT[G, S, ?]] = StateT.stateTMonadState[S, G]

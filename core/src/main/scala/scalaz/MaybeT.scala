@@ -9,6 +9,9 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): MaybeT[F, B] = new MaybeT[F, B](mapO(_ map f))
 
+  def mapT[G[_], B](f: F[Maybe[A]] => G[Maybe[B]]): MaybeT[G, B] =
+    MaybeT(f(run))
+
   def flatMap[B](f: A => MaybeT[F, B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
     F.bind(self.run)(_.cata(f(_).run, F.point(empty)))
   )
@@ -196,7 +199,8 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
     new (MaybeT[M, ?] ~> MaybeT[N, ?]) {
-      def apply[A](fa: MaybeT[M, A]): MaybeT[N, A] = MaybeT(f.apply(fa.run))
+      def apply[A](fa: MaybeT[M, A]): MaybeT[N, A] =
+        fa.mapT(f)
     }
 
   implicit def apply[G[_] : Monad]: Monad[MaybeT[G, ?]] =
