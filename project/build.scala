@@ -54,7 +54,9 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
-
+    mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
+      (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
+    },
     scalaVersion := "2.10.6",
     crossScalaVersions := Seq("2.9.3", "2.10.6", "2.11.8"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
