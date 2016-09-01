@@ -158,7 +158,7 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWri
   implicit def F: BindRec[F]
   implicit def A: Monad[F]
 
-  def tailrecM[A, B](f: A => ReaderWriterStateT[F, R, W, S, A \/ B])(a: A): ReaderWriterStateT[F, R, W, S, B] = {
+  def tailrecM[A, B](a: A)(f: A => ReaderWriterStateT[F, R, W, S, A \/ B]): ReaderWriterStateT[F, R, W, S, B] = {
     def go(r: R)(t: (W, A, S)): F[(W, A, S) \/ (W, B, S)] =
       F.map(f(t._2).run(r, t._3)) {
         case (w0, e, s0) =>
@@ -167,7 +167,7 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWri
       }
 
     ReaderWriterStateT((r, s) => F.bind(f(a).run(r, s)) {
-      case (w, -\/(a0), s0) => F.tailrecM(go(r))(w, a0, s0)
+      case (w, -\/(a0), s0) => F.tailrecM((w, a0, s0))(go(r))
       case (w, \/-(b), s0) => A.point((w, b, s0))
     })
   }

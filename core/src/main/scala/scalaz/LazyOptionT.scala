@@ -149,11 +149,11 @@ private trait LazyOptionTMonad[F[_]] extends MonadPlus[LazyOptionT[F, ?]] with L
 private trait LazyOptionTBindRec[F[_]] extends BindRec[LazyOptionT[F, ?]] with LazyOptionTMonad[F] {
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => LazyOptionT[F, A \/ B])(a: A): LazyOptionT[F, B] =
+  final def tailrecM[A, B](a: A)(f: A => LazyOptionT[F, A \/ B]): LazyOptionT[F, B] =
     LazyOptionT(
-      B.tailrecM[A, LazyOption[B]](a => F.map(f(a).run) {
+      B.tailrecM[A, LazyOption[B]](a)(a => F.map(f(a).run) {
         _.fold(_.map(b => LazyOption.lazySome(b)), \/-(LazyOption.lazyNone))
-      })(a)
+      })
     )
 }
 

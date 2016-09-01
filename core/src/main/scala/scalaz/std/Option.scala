@@ -73,10 +73,10 @@ trait OptionInstances extends OptionInstances0 {
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => Option[A \/ B])(a: A): Option[B] =
+      def tailrecM[A, B](a: A)(f: A => Option[A \/ B]): Option[B] =
         f(a) match {
           case None => None
-          case Some(-\/(a)) => tailrecM(f)(a)
+          case Some(-\/(a)) => tailrecM(a)(f)
           case Some(\/-(b)) => Some(b)
         }
     }

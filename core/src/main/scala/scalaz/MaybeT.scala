@@ -173,11 +173,11 @@ private trait MaybeTMonad[F[_]] extends Monad[MaybeT[F, ?]] {
 private trait MaybeTBindRec[F[_]] extends BindRec[MaybeT[F, ?]] with MaybeTMonad[F] {
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => MaybeT[F, A \/ B])(a: A): MaybeT[F, B] =
+  final def tailrecM[A, B](a: A)(f: A => MaybeT[F, A \/ B]): MaybeT[F, B] =
     MaybeT(
-      B.tailrecM[A, Maybe[B]](a => F.map(f(a).run) {
+      B.tailrecM[A, Maybe[B]](a)(a => F.map(f(a).run) {
         _.cata(_.map(Maybe.just), \/-(Maybe.empty))
-      })(a)
+      })
     )
 }
 

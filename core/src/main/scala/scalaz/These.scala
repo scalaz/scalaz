@@ -322,7 +322,7 @@ object \&/ extends TheseInstances {
     }
 
   @annotation.tailrec
-  def tailrecM[L, A, B](f: A => L \&/ (A \/ B))(a: A)(implicit L: Semigroup[L]): L \&/ B = {
+  def tailrecM[L, A, B](a: A)(f: A => L \&/ (A \/ B))(implicit L: Semigroup[L]): L \&/ B = {
     def go(l0: L)(a0: A): L \&/ (A \/ B) =
       f(a0) match {
         case This(l1) => \&/.This(L.append(l0, l1))
@@ -332,9 +332,9 @@ object \&/ extends TheseInstances {
 
     f(a) match {
       case t @ This(l) => t
-      case That(-\/(a0)) => tailrecM(f)(a0)
+      case That(-\/(a0)) => tailrecM(a0)(f)
       case That(\/-(b)) => \&/.That(b)
-      case Both(l, -\/(a0)) => tailrecM(go(l))(a0)
+      case Both(l, -\/(a0)) => tailrecM(a0)(go(l))
       case Both(l, \/-(b)) => \&/.Both(l, b)
     }
   }
@@ -349,8 +349,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
   implicit def TheseInstance0[L: Semigroup]: Monad[L \&/ ?] with BindRec[L \&/ ?] =
     new Monad[L \&/ ?] with BindRec[L \&/ ?] {
-      def tailrecM[A, B](f: A => L \&/ (A \/ B))(a: A): L \&/ B =
-        \&/.tailrecM(f)(a)
+      def tailrecM[A, B](a: A)(f: A => L \&/ (A \/ B)): L \&/ B =
+        \&/.tailrecM(a)(f)
 
       override def map[A, B](x: L \&/ A)(f: A => B) =
         x map f

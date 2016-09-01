@@ -304,7 +304,7 @@ object Task {
       }
       def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
       def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
-      def tailrecM[A, B](f: A => Task[A \/ B])(a: A): Task[B] = Task.tailrecM(f)(a)
+      def tailrecM[A, B](a: A)(f: A => Task[A \/ B]): Task[B] = Task.tailrecM(a)(f)
       def raiseError[A](e: Throwable): Task[A] = fail(e)
       def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
         fa.handleWith { case t => f(t) }
@@ -453,9 +453,9 @@ object Task {
   def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
     x.fold(Task.fail, Task.now)
 
-  def tailrecM[A, B](f: A => Task[A \/ B])(a: A): Task[B] =
+  def tailrecM[A, B](a: A)(f: A => Task[A \/ B]): Task[B] =
     f(a).flatMap {
-      case -\/(a0) => tailrecM(f)(a0)
+      case -\/(a0) => tailrecM(a0)(f)
       case \/-(b) => point(b)
     }
 

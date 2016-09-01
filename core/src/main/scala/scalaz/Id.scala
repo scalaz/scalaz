@@ -68,9 +68,9 @@ trait IdInstances {
       override def toMaybe[A](a: Id[A])           : Maybe[A]   = Maybe.Just(a)
 
       @tailrec
-      def tailrecM[A, B](f: A => A \/ B)(a: A): B =
+      def tailrecM[A, B](a: A)(f: A => A \/ B): B =
         f(a) match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => b
         }
     }

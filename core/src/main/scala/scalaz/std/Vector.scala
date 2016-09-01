@@ -56,7 +56,7 @@ trait VectorInstances extends VectorInstances0 {
       r
     }
 
-    def tailrecM[A, B](f: A => Vector[A \/ B])(a: A): Vector[B] = {
+    def tailrecM[A, B](a: A)(f: A => Vector[A \/ B]): Vector[B] = {
       val bs = Vector.newBuilder[B]
       @scala.annotation.tailrec
       def go(xs: List[Vector[A \/ B]]): Unit =

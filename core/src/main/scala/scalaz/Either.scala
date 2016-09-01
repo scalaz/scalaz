@@ -441,10 +441,10 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         fa map f
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
+      def tailrecM[A, B](a: A)(f: A => L \/ (A \/ B)): L \/ B =
         f(a) match {
           case l @ -\/(_) => l
-          case \/-(-\/(a0)) => tailrecM(f)(a0)
+          case \/-(-\/(a0)) => tailrecM(a0)(f)
           case \/-(rb @ \/-(_)) => rb
         }
 

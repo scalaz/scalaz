@@ -175,13 +175,10 @@ sealed abstract class Free[S[_], A] {
     * Run Free using constant stack.
     */
   final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
-    def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
-      e match {
-        case -\/(sf) => M.map(f(sf))(\/.left)
-        case a @ \/-(_) => M.point(a)
-      }
-
-    B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
+    B.tailrecM(this)(_.resume match {
+      case -\/(sf) => M.map(f(sf))(\/.left)
+      case a @ \/-(_) => M.point(a)
+    })
   }
 
   /**
@@ -214,7 +211,7 @@ sealed abstract class Free[S[_], A] {
     }
 
   final def foldMapRec[M[_]](f: S ~> M)(implicit M: Applicative[M], B: BindRec[M]): M[A] =
-    B.tailrecM[Free[S, A], A]{
+    B.tailrecM(this){
       _.step match {
         case Return(a) => M.point(\/-(a))
         case Suspend(t) => M.map(f(t))(\/.right)
@@ -222,7 +219,7 @@ sealed abstract class Free[S[_], A] {
           case Suspend(t) => M.map(f(t))(a => -\/(b.f(a)))
         }
       }
-    }(this)
+    }
 
   import Id._
 
@@ -349,8 +346,8 @@ sealed trait TrampolineInstances {
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
-      def tailrecM[A, B](f: A => Trampoline[A \/ B])(a: A): Trampoline[B] =
-        f(a).flatMap(_.fold(tailrecM(f), point(_)))
+      def tailrecM[A, B](a: A)(f: A => Trampoline[A \/ B]): Trampoline[B] =
+        f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 }
 
@@ -416,8 +413,8 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
       def point[A](a: => A) = Free.point(a)
       // Free trampolines, should be alright to just perform binds.
-      def tailrecM[A, B](f: A => Free[S, A \/ B])(a: A): Free[S, B] =
-        f(a).flatMap(_.fold(tailrecM(f), point(_)))
+      def tailrecM[A, B](a: A)(f: A => Free[S, A \/ B]): Free[S, B] =
+        f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 
   implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =

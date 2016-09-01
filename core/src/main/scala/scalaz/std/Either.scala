@@ -101,10 +101,10 @@ trait EitherInstances extends EitherInstances0 {
         }
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => Either[L, A \/ B])(a: A): Either[L, B] =
+      def tailrecM[A, B](a: A)(f: A => Either[L, A \/ B]): Either[L, B] =
         f(a) match {
           case Left(l) => Left(l)
-          case Right(-\/(a)) => tailrecM(f)(a)
+          case Right(-\/(a)) => tailrecM(a)(f)
           case Right(\/-(b)) => Right(b)
         }
     }

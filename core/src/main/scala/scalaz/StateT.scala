@@ -229,18 +229,15 @@ private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[State
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  def tailrecM[A, B](f: A => StateT[F, S, A \/ B])(a: A): StateT[F, S, B] = {
-    def go(t: (S, A)): F[(S, A) \/ (S, B)] = {
+  def tailrecM[A, B](a: A)(f: A => StateT[F, S, A \/ B]): StateT[F, S, B] =
+    IndexedStateT(s => B.tailrecM((s, a))(t => {
       F.map(f(t._2)(t._1)) { case (s, m) =>
         m match {
           case -\/(a0) => -\/((s, a0))
           case \/-(b) => \/-((s, b))
         }
       }
-    }
-
-    IndexedStateT(s => B.tailrecM(go)((s, a)))
-  }
+    }))
 }
 
 private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with StateTBind[S, F] {

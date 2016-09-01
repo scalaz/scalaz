@@ -114,7 +114,7 @@ trait ListInstances extends ListInstances0 {
       override def all[A](fa: List[A])(p: A => Boolean): Boolean =
         fa.forall(p)
 
-      def tailrecM[A, B](f: A => List[A \/ B])(a: A): List[B] = {
+      def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
         val bs = List.newBuilder[B]
         @scala.annotation.tailrec
         def go(xs: List[List[A \/ B]]): Unit =

@@ -216,7 +216,7 @@ sealed abstract class EphemeralStreamInstances {
         if (these.isEmpty) None else Some(these.head())
       }
     }
-    def tailrecM[A, B](f: A => EphemeralStream[A \/ B])(a: A): EphemeralStream[B] = {
+    def tailrecM[A, B](a: A)(f: A => EphemeralStream[A \/ B]): EphemeralStream[B] = {
       def go(s: EphemeralStream[A \/ B]): EphemeralStream[B] = {
         @annotation.tailrec
         def rec(abs: EphemeralStream[A \/ B]): EphemeralStream[B] =

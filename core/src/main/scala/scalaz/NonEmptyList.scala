@@ -215,8 +215,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def any[A](fa: NonEmptyList[A])(f: A => Boolean) =
         f(fa.head) || Foldable[IList].any(fa.tail)(f)
 
-      def tailrecM[A, B](f: A => NonEmptyList[A \/ B])(a: A): NonEmptyList[B] =
-        (BindRec[IList].tailrecM[A, B](a => f(a).list)(a): @unchecked) match {
+      def tailrecM[A, B](a: A)(f: A => NonEmptyList[A \/ B]): NonEmptyList[B] =
+        (BindRec[IList].tailrecM[A, B](a)(a => f(a).list): @unchecked) match {
           case ICons(h, t) => NonEmptyList.nel(h, t)
         }
     }

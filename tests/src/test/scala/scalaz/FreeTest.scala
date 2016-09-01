@@ -30,8 +30,8 @@ object FreeList extends FreeListInstances {
     def bind[A, B](fa: FreeList[A])(f: A => FreeList[B]): FreeList[B] =
       FreeList(Monad[Free[List, ?]].bind(fa.f) { a => f(a).f })
 
-    def tailrecM[A, B](f: A => FreeList[A \/ B])(a: A): FreeList[B] =
-      FreeList(BindRec[Free[List, ?]].tailrecM((x: A) => f(x).f)(a))
+    def tailrecM[A, B](a: A)(f: A => FreeList[A \/ B]): FreeList[B] =
+      FreeList(BindRec[Free[List, ?]].tailrecM(a)(f(_).f))
   }
 
   implicit def freeListArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeList[A]] =
@@ -63,8 +63,8 @@ object FreeOption {
     def map[A, B](fa: FreeOption[A])(f: A => B): FreeOption[B] =
       FreeOption(Functor[Free[Option, ?]].map(fa.f)(f))
 
-    def tailrecM[A, B](f: A => FreeOption[A \/ B])(a: A): FreeOption[B] =
-      FreeOption(BindRec[Free[Option, ?]].tailrecM[A, B] { a => f(a).f }(a))
+    def tailrecM[A, B](a: A)(f: A => FreeOption[A \/ B]): FreeOption[B] =
+      FreeOption(BindRec[Free[Option, ?]].tailrecM(a) { f(_).f })
 
     def bind[A, B](fa: FreeOption[A])(f: A => FreeOption[B]): FreeOption[B] =
       FreeOption(Bind[Free[Option, ?]].bind(fa.f) { a => f(a).f })
@@ -95,12 +95,12 @@ object FreeTest extends SpecLite {
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeList].point(())
       val result =
-        BindRec[FreeList].tailrecM((i: Int) =>
+        BindRec[FreeList].tailrecM(0)(i =>
           if (i < 50000)
             Applicative[FreeList].point(\/.left[Int, Unit](i + 1))
           else
             Applicative[FreeList].point(\/.right[Int, Unit](()))
-        )(0)
+        )
 
       Equal[FreeList[Unit]].equal(expected, result)
     }

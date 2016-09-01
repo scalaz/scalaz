@@ -92,7 +92,7 @@ trait StreamInstances {
         else
           f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
 
-    def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
+    def tailrecM[A, B](a: A)(f: A => Stream[A \/ B]): Stream[B] = {
       def go(s: Stream[A \/ B]): Stream[B] = {
         @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] =
           abs match {

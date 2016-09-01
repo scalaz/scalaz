@@ -368,11 +368,11 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[LazyEitherT[F, ?, ?
 private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] {
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
+  final def tailrecM[A, B](a: A)(f: A => LazyEitherT[F, E, A \/ B]): LazyEitherT[F, E, B] =
     LazyEitherT(
-      B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
+      B.tailrecM[A, LazyEither[E, B]](a)(a => F.map(f(a).run) {
         _.fold(e => \/-(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
-      })(a)
+      })
     )
 }
 

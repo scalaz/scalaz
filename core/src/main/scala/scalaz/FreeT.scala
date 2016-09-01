@@ -23,9 +23,9 @@ object FreeT extends FreeTInstances {
       case \/-(s) => roll(s)
     })
 
-  def tailrecM[S[_], M[_]: Applicative, A, B](f: A => FreeT[S, M, A \/ B])(a: A): FreeT[S, M, B] =
+  def tailrecM[S[_], M[_]: Applicative, A, B](a: A)(f: A => FreeT[S, M, A \/ B]): FreeT[S, M, B] =
     f(a).flatMap {
-      case -\/(a0) => tailrecM(f)(a0)
+      case -\/(a0) => tailrecM(a0)(f)
       case \/-(b) => point[S, M, B](b)
     }
 
@@ -105,54 +105,42 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * Runs to completion, mapping the suspension with the given transformation
     * at each step and accumulating into the monad `M`.
     */
-  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] = {
-    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
-      ft match {
-        case Suspend(ma) => M0.bind(ma) {
-          case -\/(a) => M1.point(\/-(a))
-          case \/-(sa) => M0.map(f(sa))(\/.right)
-        }
-        case g @ Gosub(_, _) => g.a match {
-          case Suspend(mx) => M0.bind(mx) {
-            case -\/(x) => M1.point(-\/(g.f(x)))
-            case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
-          }
-          case g0 @ Gosub(_, _) => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
-        }
+  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] =
+    M0.tailrecM(this)(_ match {
+      case Suspend(ma) => M0.bind(ma) {
+        case -\/(a) => M1.point(\/-(a))
+        case \/-(sa) => M0.map(f(sa))(\/.right)
       }
-
-    M0.tailrecM(go)(this)
-  }
+      case g @ Gosub(_, _) => g.a match {
+        case Suspend(mx) => M0.bind(mx) {
+          case -\/(x) => M1.point(-\/(g.f(x)))
+          case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+        }
+        case g0 @ Gosub(_, _) => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
+      }
+    })
 
   /** Evaluates a single layer of the free monad **/
-  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] = {
-    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (A \/ S[FreeT[S, M, A]])] =
-      ft match {
-        case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
-        case g1 @ Gosub(_, _) => g1.a match {
-          case Suspend(m1) => M0.map(m1) {
-            case -\/(a) => -\/(g1.f(a))
-            case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
-          }
-          case g2 @ Gosub(_, _) => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
+  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] =
+    M0.tailrecM(this)(_ match {
+      case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
+      case g1 @ Gosub(_, _) => g1.a match {
+        case Suspend(m1) => M0.map(m1) {
+          case -\/(a) => -\/(g1.f(a))
+          case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
         }
+        case g2 @ Gosub(_, _) => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
       }
-
-    M0.tailrecM(go)(this)
-  }
+    })
 
   /**
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
     */
-  def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] = {
-    def runM2(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
-      M0.bind(ft.resume) {
-        case -\/(a) => M1.point(\/-(a))
-        case \/-(fc) => M0.map(interp(fc))(\/.left)
-      }
-
-    M0.tailrecM(runM2)(this)
-  }
+  def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] =
+    M0.tailrecM(this)(ft => M0.bind(ft.resume) {
+      case -\/(a) => M1.point(\/-(a))
+      case \/-(fc) => M0.map(interp(fc))(\/.left)
+    })
 
   /**
    * Finds the first `M` instance, `m`, and maps it to contain the rest
@@ -307,8 +295,8 @@ private trait FreeTMonad[S[_], M[_]] extends Monad[FreeT[S, M, ?]] with BindRec[
 
   override final def point[A](a: => A) =
     FreeT.point[S, M, A](a)
-  override final def tailrecM[A, B](f: A => FreeT[S, M, A \/ B])(a: A) =
-    FreeT.tailrecM(f)(a)
+  override final def tailrecM[A, B](a: A)(f: A => FreeT[S, M, A \/ B]) =
+    FreeT.tailrecM(a)(f)
 }
 
 private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, ?]] {
