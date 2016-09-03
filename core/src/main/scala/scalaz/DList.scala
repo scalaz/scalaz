@@ -110,8 +110,8 @@ sealed abstract class DListInstances {
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
 
-    def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] =
-      DList.fromIList(BindRec[IList].tailrecM[A, B](f(_).toIList)(a))
+    def tailrecM[A, B](a: A)(f: A => DList[A \/ B]): DList[B] =
+      DList.fromIList(BindRec[IList].tailrecM[A, B](a)(f(_).toIList))
   }
   implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
     import std.list._

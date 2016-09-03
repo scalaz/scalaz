@@ -283,10 +283,10 @@ sealed abstract class MaybeInstances {
       def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => Maybe[A \/ B])(a: A): Maybe[B] =
+      def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
         f(a) match {
           case Empty() => Empty()
-          case Just(-\/(a)) => tailrecM(f)(a)
+          case Just(-\/(a)) => tailrecM(a)(f)
           case Just(\/-(b)) => Just(b)
         }
 

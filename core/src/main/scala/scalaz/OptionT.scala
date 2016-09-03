@@ -204,11 +204,11 @@ private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBi
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => OptionT[F, A \/ B])(a: A): OptionT[F, B] =
+  final def tailrecM[A, B](a: A)(f: A => OptionT[F, A \/ B]): OptionT[F, B] =
     OptionT(
-      B.tailrecM[A, Option[B]](a0 => F.map(f(a0).run) {
+      B.tailrecM[A, Option[B]](a)(a0 => F.map(f(a0).run) {
         _.fold(\/.right[A, Option[B]](None: Option[B]))(_.map(Some.apply))
-      })(a)
+      })
     )
 }
 

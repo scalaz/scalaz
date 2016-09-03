@@ -650,7 +650,7 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def widen[A, B](fa: IList[A])(implicit ev: A <~< B): IList[B] =
         fa.widen[B]
 
-      def tailrecM[A, B](f: A => IList[A \/ B])(a: A): IList[B] = {
+      def tailrecM[A, B](a: A)(f: A => IList[A \/ B]): IList[B] = {
         @tailrec
         def go(xs: IList[IList[A \/ B]], bs: IList[B]): IList[B] =
           xs match {

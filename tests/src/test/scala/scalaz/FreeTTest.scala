@@ -39,12 +39,12 @@ object FreeTTest extends SpecLite {
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
       val result =
-        BindRec[FreeTListOption].tailrecM((i: Int) =>
+        BindRec[FreeTListOption].tailrecM(0)(i =>
           if (i < 50000)
             Applicative[FreeTListOption].point(\/.left[Int, Unit](i + 1))
           else
             Applicative[FreeTListOption].point(\/.right[Int, Unit](()))
-        )(0)
+        )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
     }

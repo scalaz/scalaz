@@ -47,9 +47,9 @@ object Name {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Name[B])(implicit G: Functor[G]) =
         Name(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Name[A \/ B])(a: A): Name[B] =
+      def tailrecM[A, B](a: A)(f: A => Name[A \/ B]): Name[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Name(b)
         }
     }
@@ -85,9 +85,9 @@ object Need {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Need[B])(implicit G: Functor[G]) =
         Need(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Need[A \/ B])(a: A): Need[B] =
+      def tailrecM[A, B](a: A)(f: A => Need[A \/ B]): Need[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Need(b)
         }
     }
@@ -116,9 +116,9 @@ object Value {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Value[B])(implicit G: Functor[G]) =
         Value(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Value[A \/ B])(a: A): Value[B] =
+      def tailrecM[A, B](a: A)(f: A => Value[A \/ B]): Value[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Value(b)
         }
     }

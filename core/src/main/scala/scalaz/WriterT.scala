@@ -346,7 +346,7 @@ private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] with Wri
   implicit def F: BindRec[F]
   implicit def A: Applicative[F]
 
-  def tailrecM[A, B](f: A => WriterT[F, W, A \/ B])(a: A): WriterT[F, W, B] = {
+  def tailrecM[A, B](a: A)(f: A => WriterT[F, W, A \/ B]): WriterT[F, W, B] = {
     def go(t: (W, A)): F[(W, A) \/ (W, B)] =
       F.map(f(t._2).run) {
         case (w0, e) =>
@@ -355,7 +355,7 @@ private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] with Wri
       }
 
     WriterT(F.bind(f(a).run) {
-      case (w, -\/(a0)) => F.tailrecM(go)((w, a0))
+      case (w, -\/(a0)) => F.tailrecM((w, a0))(go)
       case (w, \/-(b)) => A.point((w, b))
     })
   }

@@ -316,8 +316,8 @@ private trait KleisliApplicative[F[_], R] extends Applicative[Kleisli[F, R, ?]] 
 private trait KleisliBindRec[F[_], R] extends BindRec[Kleisli[F, R, ?]] with KleisliBind[F, R] {
   implicit def F: BindRec[F]
 
-  def tailrecM[A, B](f: A => Kleisli[F, R, A \/ B])(a: A): Kleisli[F, R, B] =
-    Kleisli(r => F.tailrecM(f(_: A).run(r))(a))
+  def tailrecM[A, B](a: A)(f: A => Kleisli[F, R, A \/ B]): Kleisli[F, R, B] =
+    Kleisli(r => F.tailrecM(a)(f(_).run(r)))
 }
 
 private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, ?]] with KleisliApplicative[F, R] with KleisliBind[F, R] {

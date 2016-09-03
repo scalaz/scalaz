@@ -141,12 +141,12 @@ sealed abstract class LazyOptionInstances {
       override def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => LazyOption[A \/ B])(a: A): LazyOption[B] =
+      def tailrecM[A, B](a: A)(f: A => LazyOption[A \/ B]): LazyOption[B] =
         f(a) match {
           case LazyNone => LazyNone
           case LazySome(t) => t() match {
             case \/-(b) => lazySome(b)
-            case -\/(a0) => tailrecM(f)(a0)
+            case -\/(a0) => tailrecM(a0)(f)
           }
         }
     }
