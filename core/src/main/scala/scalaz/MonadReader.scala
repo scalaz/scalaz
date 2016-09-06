@@ -5,8 +5,9 @@ package scalaz
  *
  */
 ////
-trait MonadReader[F[_], S] extends Monad[F] { self =>
+trait MonadReader[F[_], S] { self: Monad[F] =>
   ////
+  val instance: Monad[F] = self
 
   def ask: F[S]
   def local[A](f: S => S)(fa: F[A]): F[A]

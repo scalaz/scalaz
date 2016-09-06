@@ -189,7 +189,7 @@ sealed abstract class LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] =
+  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] with Monad[LazyEitherT[F, L, ?]] =
     new LazyEitherTMonadError[F, L] {
       implicit def F = F0
     }

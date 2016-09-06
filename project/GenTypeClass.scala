@@ -48,8 +48,8 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
-  lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
+  // lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
+  // lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val associative = TypeClass("Associative", *^*->*)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
@@ -72,13 +72,13 @@ object TypeClass {
   lazy val monadControlIO = TypeClass("MonadControlIO", *->*, extendsList = Seq(liftControlIO, monad), pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
-  lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
-  lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
-  lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
+  // lazy val monadState = TypeClass("MonadState", |*->*|->*, createSyntax = false)
+  // lazy val monadError = TypeClass("MonadError", |*->*|->*)
+  // lazy val monadTell = TypeClass("MonadTell", |*->*|->*)
+  // lazy val monadReader = TypeClass("MonadReader", |*->*|->*, createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
 
-  lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
+  // lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
 
   def core: List[TypeClass] = List(semigroup,
     monoid,
@@ -105,8 +105,8 @@ object TypeClass {
     cobind,
     comonad,
     plus,
-    applicativePlus,
-    monadPlus,
+    // applicativePlus,
+    // monadPlus,
     foldable,
     foldable1,
     traverse,
@@ -125,12 +125,12 @@ object TypeClass {
     strong,
     proChoice,
     arrow,
-    monadState,
-    monadError,
-    monadTell,
-    monadReader,
-    comonadStore,
-    bindRec
+    // monadState,
+    // monadError,
+    // monadTell,
+    // monadReader,
+    comonadStore
+    // bindRec
   )
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)

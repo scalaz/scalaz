@@ -52,7 +52,10 @@ object MonadIO {
 
   implicit def streamTMonadIO[F[_]: MonadIO: Applicative] = fromLiftIO[StreamT[F, ?]]
 
-  implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
+  implicit def kleisliMonadIO[F[_]: MonadIO, E] = {
+    implicit val instance: Monad[Kleisli[F, E, ?]] = MonadReader[Kleisli[F, E, ?], E].instance
+    fromLiftIO[Kleisli[F, E, ?]]
+  }
 
   implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
 

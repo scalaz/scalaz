@@ -4,7 +4,7 @@ package syntax
 final class MonadListenOps[F[_], W, A] private[syntax](self: F[A])(implicit ML: MonadListen[F, W]) {
 
   final def written: F[W] =
-    ML.map(ML.listen(self)){ case (_, w) => w }
+    ML.instance.map(ML.listen(self)){ case (_, w) => w }
 
   final def listen: F[(A, W)] =
     ML.listen[A](self)

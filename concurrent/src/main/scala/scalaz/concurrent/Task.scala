@@ -287,8 +287,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
 object Task {
 
-  implicit val taskInstance: Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task,Throwable] =
-    new Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task, Throwable] {
+  implicit val taskInstance: Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task,Throwable] with Monad[Task] =
+    new Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task, Throwable] with Monad[Task] {
       val F = Nondeterminism[Future]
       def point[A](a: => A) = Task.point(a)
       def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =

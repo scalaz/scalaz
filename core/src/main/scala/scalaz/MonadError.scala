@@ -5,8 +5,9 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_], S] extends Monad[F] { self =>
+trait MonadError[F[_], S] { self: Monad[F] =>
   ////
+  val instance: Monad[F] = self
 
   def raiseError[A](e: S): F[A]
   def handleError[A](fa: F[A])(f: S => F[A]): F[A]
@@ -22,7 +23,7 @@ trait MonadError[F[_], S] extends Monad[F] { self =>
   def monadErrorLaw = new MonadErrorLaw {}
 
   ////
-  val monadErrorSyntax = new scalaz.syntax.MonadErrorSyntax[F, S] { def F = MonadError.this }
+  val monadErrorSyntax = new scalaz.syntax.MonadErrorSyntax[F, S] { def FS = MonadError.this }
 }
 
 object MonadError {
