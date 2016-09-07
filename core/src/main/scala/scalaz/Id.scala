@@ -8,7 +8,7 @@ trait IdInstances {
   /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
    *  runtime representation.
    */
-  type Id[+X] = X
+  type Id[X] = X
 
   // TODO Review!
   type Identity[+X] = Need[X]
