@@ -16,8 +16,6 @@ case class Injective5[T[_,_,_,_,_]]()
 object Injectivity {
   implicit def DisjunctionInjective     = Injective2[\/]()
   implicit def EitherInjective     = Injective2[Either]()
-  implicit def EitherRightProjectionInjective = Injective2[Either.RightProjection]()
-  implicit def EitherLeftProjectionInjective = Injective2[Either.LeftProjection]()
   implicit def FractionalInjective = Injective[Fractional]()
   implicit def Function0Injective  = Injective[Function0]()
   implicit def Function1Injective  = Injective2[Function1]()
