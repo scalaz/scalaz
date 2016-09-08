@@ -30,7 +30,7 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   # https://github.com/typesafehub/migration-manager/issues/114
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-M5" ]]; then echo "mimaReportBinaryIssues"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-RC1" ]]; then echo "mimaReportBinaryIssues"; fi)
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
@@ -38,7 +38,7 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.0-M5
+    - scala: 2.12.0-RC1
       jdk: oraclejdk8
 
 addons:
