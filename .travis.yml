@@ -27,10 +27,8 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  # https://github.com/non/kind-projector/issues/28
-  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.12.0-M5" ]]; then git clone https://github.com/non/kind-projector.git && cd kind-projector && git checkout v0.8.0 && echo "sbt.version=0.13.12" > project/build.properties && sbt '++ 2.12.0-M5' publishLocal && cd .. ; fi
   # https://github.com/typesafehub/migration-manager/issues/114
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-M5" ]]; then echo "mimaReportBinaryIssues"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-RC1" ]]; then echo "mimaReportBinaryIssues"; fi)
   - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
   # Tricks to avoid unnecessary cache updates
@@ -39,10 +37,10 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.0-M5
+    - scala: 2.12.0-RC1
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.0-M5
+    - scala: 2.12.0-RC1
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
 
