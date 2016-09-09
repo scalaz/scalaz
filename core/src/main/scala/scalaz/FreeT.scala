@@ -106,7 +106,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * at each step and accumulating into the monad `M`.
     */
   def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] =
-    M0.tailrecM(this)(_ match {
+    M0.tailrecM(this){
       case Suspend(ma) => M0.bind(ma) {
         case -\/(a) => M1.point(\/-(a))
         case \/-(sa) => M0.map(f(sa))(\/.right)
@@ -118,11 +118,11 @@ sealed abstract class FreeT[S[_], M[_], A] {
         }
         case g0 @ Gosub(_, _) => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
       }
-    })
+    }
 
   /** Evaluates a single layer of the free monad **/
   def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] =
-    M0.tailrecM(this)(_ match {
+    M0.tailrecM(this){
       case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
       case g1 @ Gosub(_, _) => g1.a match {
         case Suspend(m1) => M0.map(m1) {
@@ -131,7 +131,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
         }
         case g2 @ Gosub(_, _) => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
       }
-    })
+    }
 
   /**
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
