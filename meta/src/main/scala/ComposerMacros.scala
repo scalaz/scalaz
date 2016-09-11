@@ -8,7 +8,7 @@ import scala.reflect.macros.whitebox.Context
 object ComposerMacros {
   import Composer.{formatError, Ops}
 
-  val composers: List[Composer] = Nil
+  val composers: List[Composer] = List(ComposerFunctions)
 
   def unpack(c: Context)(tpe: c.Type): Either[String, Vector[c.Type]] = {
     import c.universe._
