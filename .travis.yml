@@ -3,3 +3,4 @@ scala:
    - 2.11.8
 jdk:
   - oraclejdk8
+script: sbt ++$TRAVIS_SCALA_VERSION test:compile tutorial/tut test
