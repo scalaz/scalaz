@@ -162,9 +162,9 @@ private trait LazyOptionTHoist extends Hoist[LazyOptionT] {
     LazyOptionT[G, A](G.map[A, LazyOption[A]](a)((a: A) => LazyOption.lazySome(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (LazyOptionT[M, ?] ~> LazyOptionT[N, ?]) {
-      def apply[A](fa: LazyOptionT[M, A]): LazyOptionT[N, A] = LazyOptionT(f.apply(fa.run))
-    }
+    λ[LazyOptionT[M, ?] ~> LazyOptionT[N, ?]](
+      fa => LazyOptionT(f.apply(fa.run))
+    )
 
   implicit def apply[G[_] : Monad]: Monad[LazyOptionT[G, ?]] =
     LazyOptionT.lazyOptionTMonadPlus[G]

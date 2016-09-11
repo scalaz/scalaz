@@ -15,9 +15,9 @@ trait NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
 
-  def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G) {
-    def apply[A](ea: E[A]) = self(f(ea))
-  }
+  def compose[E[_]](f: E ~> F): E ~> G = λ[E ~> G](
+    ea => self(f(ea))
+  )
 
   def andThen[H[_]](f: G ~> H): F ~> H =
     f compose self
@@ -31,15 +31,11 @@ trait NaturalTransformations {
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
   def id =
-    new (Id ~> Id) {
-      def apply[A](a: A) = a
-    }
+    λ[Id ~> Id](a => a)
 
   /** A universally quantified identity function */
   def refl[F[_]] =
-    new (F ~> F) {
-      def apply[A](fa: F[A]) = fa
-    }
+    λ[F ~> F](fa => fa)
 
   /** Reify a `NaturalTransformation`. */
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
