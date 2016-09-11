@@ -1,5 +1,5 @@
 package scalaz
-package meta
+package system
 
 import scala.reflect.macros.whitebox.Context
 

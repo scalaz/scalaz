@@ -13,7 +13,7 @@ class FunctionsCompose {
   @Benchmark def scalaz     = run(_composer)
 }
 
-object FunctionsCompose extends meta.ComposerSyntax {
+object FunctionsCompose extends system.ComposerSyntax {
   val f: Int => Double = _ + 0.5
   val g: Double => String = _.toString
   val h: String => Int = _.toDouble.toInt + 10

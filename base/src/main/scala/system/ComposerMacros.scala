@@ -1,5 +1,5 @@
 package scalaz
-package meta
+package system
 
 import scala.reflect.macros.whitebox.Context
 
@@ -49,7 +49,7 @@ object ComposerMacros {
             // it will provide a nice error by failing at the next phase.
             typeOf[Null]
         }
-        c.Expr[Ops[XS, O]](q"new scalaz.meta.Composer.Ops[$tpe, $o]")
+        c.Expr[Ops[XS, O]](q"new scalaz.system.Composer.Ops[$tpe, $o]")
     }
   }
 

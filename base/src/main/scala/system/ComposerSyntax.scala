@@ -1,5 +1,5 @@
 package scalaz
-package meta
+package system
 
 import scala.language.implicitConversions
 import Composer._
