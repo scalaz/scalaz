@@ -49,4 +49,8 @@ object Scalaz extends Build {
         Seq ( "org.scala-lang" % "scala-reflect" % scalaVersion.value
             , "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided" )
     )
+
+  lazy val tutorial     = module("tutorial")
+    .dependsOn( baze )
+    .settings(tut.Plugin.tutSettings)
 }
