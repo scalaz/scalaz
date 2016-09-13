@@ -141,7 +141,7 @@ sealed abstract class EphemeralStream[A] {
 
   def memoized: EphemeralStream[A] =
     if (isEmpty) this
-    else cons(weakMemo(head())(), weakMemo(tail().memoized)())
+    else consImpl(weakMemo(head()), weakMemo(tail().memoized))
 }
 
 object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunctions {
@@ -157,6 +157,13 @@ object EphemeralStream extends EphemeralStreamInstances with EphemeralStreamFunc
     unfold(0)(b =>
       if (b < size) Some((as0(b), b + 1))
       else None)
+  }
+
+  private[scalaz] def consImpl[A](a: () => A, as: () => EphemeralStream[A]): EphemeralStream[A] = new EphemeralStream[A] {
+    def isEmpty = false
+
+    val head = a
+    val tail = as
   }
 
   class ConsWrap[A](e: => EphemeralStream[A]) {
@@ -272,12 +279,8 @@ trait EphemeralStreamFunctions {
     def tail: () => Nothing = () => sys.error("tail of empty stream")
   }
 
-  def cons[A](a: => A, as: => EphemeralStream[A]) = new EphemeralStream[A] {
-    def isEmpty = false
-
-    val head = () => a
-    val tail = () => as
-  }
+  def cons[A](a: => A, as: => EphemeralStream[A]): EphemeralStream[A] =
+    EphemeralStream.consImpl(() => a, () => as)
 
   def unfold[A, B](b: => B)(f: B => Option[(A, B)]): EphemeralStream[A] =
     f(b) match {
