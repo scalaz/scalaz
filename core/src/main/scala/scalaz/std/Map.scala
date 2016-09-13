@@ -92,7 +92,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
       def plus[V](a: XMap[K, V], b: => XMap[K, V]) = a ++ b
       def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
       def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
-      override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
+      override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.transform{case (_, v) => f(v)}
       def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
       import \&/._
@@ -185,8 +185,8 @@ trait MapSubFunctions extends MapSub {
   /** Like `unionWith`, but telling `f` about the key. */
   final def unionWithKey[K:BuildKeyConstraint,A](m1: XMap[K, A], m2: XMap[K, A])(f: (K, A, A) => A): XMap[K, A] = {
     val diff = m2 -- m1.keySet
-    val aug = m1 map {
-      case (k, v) => if (m2 contains k) k -> f(k, v, m2(k)) else (k, v)
+    val aug = m1 transform {
+      case (k, v) => if (m2 contains k) f(k, v, m2(k)) else v
     }
     aug ++ diff
   }
