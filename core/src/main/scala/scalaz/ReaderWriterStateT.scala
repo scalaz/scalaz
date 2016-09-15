@@ -219,10 +219,7 @@ private trait ReaderWriterStateTHoist[R, W, S] extends Hoist[λ[(α[_], β) => R
   implicit def W: Monoid[W]
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    new (ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N, R, W, S, ?]) {
-      def apply[A](ma: ReaderWriterStateT[M, R, W, S, A]): ReaderWriterStateT[N, R, W, S, A] =
-        ma.mapT(f)
-    }
+    λ[ReaderWriterStateT[M, R, W, S, ?] ~> ReaderWriterStateT[N, R, W, S, ?]](_ mapT f)
 
   def liftM[M[_], A](ma: M[A])(implicit M: Monad[M]): ReaderWriterStateT[M, R, W, S, A] =
     ReaderWriterStateT( (r,s) => M.map(ma)((W.zero, _, s)))

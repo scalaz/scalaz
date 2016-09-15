@@ -103,7 +103,5 @@ object Const extends ConstInstances {
 
   /** A properly universally quantified constant function. */
   def const[A](a: A): Function0 ~> λ[α => A] =
-    new (Function0 ~> λ[α => A]) {
-      override def apply[B](fa: Function0[B]): A = a
-    }
+    λ[Function0 ~> λ[α => A]](_ => a)
 }

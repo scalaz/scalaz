@@ -132,10 +132,7 @@ private object IdTHoist extends Hoist[IdT] {
     new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (IdT[M, ?] ~> IdT[N, ?]) {
-      def apply[A](fa: IdT[M, A]): IdT[N, A] =
-        new IdT[N, A](f(fa.run))
-    }
+    λ[IdT[M, ?] ~> IdT[N, ?]](fa => new IdT(f(fa.run)))
 
   implicit def apply[G[_] : Monad]: Monad[IdT[G, ?]] =
     IdT.idTMonad[G]

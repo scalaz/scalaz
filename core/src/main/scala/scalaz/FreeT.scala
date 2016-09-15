@@ -190,9 +190,7 @@ sealed abstract class FreeTInstances5 extends FreeTInstances6 {
       override def ask =
         FreeT.liftM(M1.ask)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
-        fa.hoist(new (M ~> M){
-          def apply[A](a: M[A]) = M1.local(f)(a)
-        })
+        fa.hoist(λ[M ~> M](M1.local(f)(_)))
     }
 }
 
@@ -229,9 +227,7 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
   implicit def freeTHoist[S[_]]: Hoist[FreeT[S, ?[_], ?]] =
     new Hoist[FreeT[S, ?[_], ?]] {
       def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-        new (FreeT[S, M, ?] ~> FreeT[S, N, ?]) {
-          def apply[A](fa: FreeT[S, M, A]) = fa.hoist(f)
-        }
+        λ[FreeT[S, M, ?] ~> FreeT[S, N, ?]](_ hoist f)
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
       def apply[G[_]: Monad] =
