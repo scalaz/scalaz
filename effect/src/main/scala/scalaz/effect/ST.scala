@@ -153,9 +153,9 @@ object ST extends STInstances {
 
   /**Allocates a fresh mutable reference. */
   def newVar[S]: Id ~> λ[α => ST[S, STRef[S, α]]] =
-    new (Id ~> λ[α => ST[S, STRef[S, α]]]) {
-      def apply[A](a: A) = returnST(stRef[S](a))
-    }
+    λ[Id ~> λ[α => ST[S, STRef[S, α]]]](
+      a => returnST(stRef[S](a))
+    )
 
   /**Allocates a fresh mutable array. */
   def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =

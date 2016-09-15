@@ -228,8 +228,14 @@ object build {
         </developers>
       ),
     // kind-projector plugin
+    libraryDependencies ++= (scalaBinaryVersion.value match {
+      case "2.10" =>
+        compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full) :: Nil
+      case _ =>
+        Nil
+    }),
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.8.2",
+    kindProjectorVersion := "0.9.0",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")

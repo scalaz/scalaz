@@ -98,12 +98,8 @@ sealed abstract class TheseTInstances1 {
   }
 
   implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[?[_], A, ?]] = new Hoist[TheseT[?[_], A, ?]] {
-    override def hoist[M[_]: Monad, N[_]](f: M ~> N) = {
-      new (TheseT[M, A, ?] ~> TheseT[N, A, ?]) {
-        override def apply[B](fa: TheseT[M, A, B]): TheseT[N, A, B] =
-          fa.mapT(f)
-      }
-    }
+    override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
+      λ[TheseT[M, A, ?] ~> TheseT[N, A, ?]](_ mapT f)
 
     override def liftM[G[_]: Monad, B](a: G[B]): TheseT[G, A, B] = TheseT(Monad[G].map(a)(x => \&/.That(x)))
 

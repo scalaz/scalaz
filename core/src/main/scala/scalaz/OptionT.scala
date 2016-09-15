@@ -157,9 +157,9 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
 
 object OptionT extends OptionTInstances {
   def optionT[M[_]] =
-    new (λ[α => M[Option[α]]] ~> OptionT[M, ?]) {
-      def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
-    }
+    λ[λ[α => M[Option[α]]] ~> OptionT[M, ?]](
+      new OptionT(_)
+    )
 
   def some[M[_], A](v: => A)(implicit M: Applicative[M]): OptionT[M, A] =
     OptionT.optionT[M].apply[A](M.point(Some(v)))
@@ -245,10 +245,7 @@ private trait OptionTHoist extends Hoist[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (OptionT[M, ?] ~> OptionT[N, ?]) {
-      def apply[A](fa: OptionT[M, A]): OptionT[N, A] =
-        fa.mapT(f)
-    }
+    λ[OptionT[M, ?] ~> OptionT[N, ?]](_ mapT f)
 
   implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G]
 }

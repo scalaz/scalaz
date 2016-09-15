@@ -63,9 +63,9 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
       }
 
     def %~(f: G ~> G)(implicit FG: Arr[F, G] <~< (F ~> G), GF: Arr[G, F] <~< (G ~> F)): F ~> F =
-      new (F ~> F) {
-        def apply[A](a: F[A]): F[A] = GF(self.from)(f(FG(self.to)(a)))
-      }
+      λ[F ~> F](
+        a => GF(self.from)(f(FG(self.to)(a)))
+      )
   }
 
   /**Isomorphism for arrows of kind (* -> * -> *) -> (* -> * -> *) -> * */

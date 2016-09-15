@@ -131,9 +131,9 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
 
 object MaybeT extends MaybeTInstances {
   def maybeT[M[_]] =
-    new (λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]) {
-      def apply[A](a: M[Maybe[A]]) = new MaybeT[M, A](a)
-    }
+    λ[λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]](
+      new MaybeT(_)
+    )
 
   def just[M[_], A](v: => A)(implicit M: Applicative[M]): MaybeT[M, A] =
     MaybeT.maybeT[M].apply[A](M.point(Maybe.just(v)))
@@ -198,10 +198,7 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
     MaybeT[G, A](G.map[A, Maybe[A]](a)((a: A) => Maybe.just(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (MaybeT[M, ?] ~> MaybeT[N, ?]) {
-      def apply[A](fa: MaybeT[M, A]): MaybeT[N, A] =
-        fa.mapT(f)
-    }
+    λ[MaybeT[M, ?] ~> MaybeT[N, ?]](_ mapT f)
 
   implicit def apply[G[_] : Monad]: Monad[MaybeT[G, ?]] =
     MaybeT.maybeTMonadPlus[G]

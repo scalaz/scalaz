@@ -42,10 +42,9 @@ sealed abstract class RegionTInstances1 {
 
   implicit def RegionTHoist[S]: Hoist[λ[(α[_], β) => RegionT[S, α, β]]] = new Hoist[λ[(α[_], β) => RegionT[S, α, β]]] {
     def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-      new (RegionT[S, M, ?] ~> RegionT[S, N, ?]) {
-        override def apply[B](fa: RegionT[S, M, B]) =
-          RegionT(Kleisli(r => f.apply(fa.runT(r))))
-      }
+      λ[RegionT[S, M, ?] ~> RegionT[S, N, ?]](fa =>
+        RegionT(Kleisli(r => f.apply(fa.runT(r))))
+      )
 
     override def liftM[M[_]: Monad, B](a: M[B]) =
       RegionT(Kleisli(r => a))
