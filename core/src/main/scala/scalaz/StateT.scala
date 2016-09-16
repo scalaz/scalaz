@@ -155,7 +155,7 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
-  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] =
+  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] with Monad[StateT[F, S, ?]] =
     new StateTMonadState[S, F] {
       implicit def F: Monad[F] = F0
     }
@@ -174,7 +174,7 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
 }
 
 abstract class StateTInstances extends StateTInstances0 {
-  implicit def stateMonad[S]: MonadState[State[S, ?], S] =
+  implicit def stateMonad[S]: MonadState[State[S, ?], S] with Monad[State[S, ?]] =
       StateT.stateTMonadState[S, Id](Id.id)
 }
 
@@ -240,7 +240,7 @@ private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[State
     }))
 }
 
-private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with StateTBind[S, F] {
+private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with Monad[StateT[F, S, ?]] with StateTBind[S, F] {
   implicit def F: Monad[F]
 
   def point[A](a: => A): StateT[F, S, A] = {

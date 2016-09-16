@@ -175,44 +175,44 @@ sealed abstract class FreeT[S[_], M[_], A] {
 }
 
 sealed abstract class FreeTInstances6 {
-  implicit def freeTMonadTell[S[_], M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] =
+  implicit def freeTMonadTell[S[_], M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] with Monad[FreeT[S, M, ?]] =
     new MonadTell[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = implicitly
+      override def M = M1.instance
       override def writer[A](w: E, v: A) =
-        FreeT.liftM(M1.writer(w, v))
+        FreeT.liftM(M1.writer(w, v))(M)
     }
 }
 
 sealed abstract class FreeTInstances5 extends FreeTInstances6 {
-  implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
+  implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] with Monad[FreeT[S, M, ?]] =
     new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = implicitly
+      override def M = M1.instance
       override def ask =
-        FreeT.liftM(M1.ask)
+        FreeT.liftM(M1.ask)(M)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
         fa.hoist(λ[M ~> M](M1.local(f)(_)))
     }
 }
 
 sealed abstract class FreeTInstances4 extends FreeTInstances5 {
-  implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
+  implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] with Monad[FreeT[S, M, ?]] =
     new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = implicitly
+      override def M = M1.instance
       override def init =
-        FreeT.liftM(M1.init)
+        FreeT.liftM(M1.init)(M)
       override def get =
-        FreeT.liftM(M1.get)
+        FreeT.liftM(M1.get)(M)
       override def put(s: E) =
-        FreeT.liftM(M1.put(s))
+        FreeT.liftM(M1.put(s))(M)
     }
 }
 
 sealed abstract class FreeTInstances3 extends FreeTInstances4 {
-  implicit def freeTMonadError[S[_], M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, ?], E] =
+  implicit def freeTMonadError[S[_], M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, ?], E] with Monad[FreeT[S, M, ?]] =
     new MonadError[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = implicitly
+      override def M = E.instance
       override def handleError[A](fa: FreeT[S, M, A])(f: E => FreeT[S, M, A]) =
-        FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM)(f.andThen(_.toM)))(M).flatMap(identity)
+        FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM(M))(f.andThen(_.toM(M))))(M).flatMap(identity)
       override def raiseError[A](e: E) =
         FreeT.liftM(E.raiseError[A](e))(M)
     }

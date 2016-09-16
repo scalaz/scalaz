@@ -226,13 +226,15 @@ object EitherT extends EitherTInstances {
     implicit u1: Unapply[Functor, FAB]{type A = AB}, u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0}, l: Leibniz.===[AB, A0 \/ B0])
       : EitherT[u1.M, A0, B0] = eitherT(l.subst[u1.M](u1(fab)))
 
-  def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): EitherTMonadTell[F, W, A] = new EitherTMonadTell[F, W, A]{
-    def MT = MT0
-  }
+  def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): MonadTell[EitherT[F, A, ?], W] with Monad[EitherT[F, A, ?]] =
+    new EitherTMonadTell[F, W, A] {
+      def MT = MT0
+    }
 
-  def monadListen[F[_], W, A](implicit ML0: MonadListen[F, W]): EitherTMonadListen[F, W, A] = new EitherTMonadListen[F, W, A]{
-    def MT = ML0
-  }
+  def monadListen[F[_], W, A](implicit ML0: MonadListen[F, W]): MonadListen[EitherT[F, A, ?], W] with Monad[EitherT[F, A, ?]] =
+    new EitherTMonadListen[F, W, A] {
+      def MT = ML0
+    }
 
   /** Construct a left disjunction value. */
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
@@ -293,7 +295,7 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] with Monad[EitherT[F, E, ?]] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -457,25 +459,25 @@ private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]
 private[scalaz] trait EitherTMonadTell[F[_], W, A] extends MonadTell[EitherT[F, A, ?], W] with EitherTMonad[F, A] with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
-  implicit def F = MT
+  implicit def F = MT.instance
 
   def writer[B](w: W, v: B): EitherT[F, A, B] =
     liftM[F, B](MT.writer(w, v))
 
   def left[B](v: => A): EitherT[F, A, B] =
-    EitherT.left[F, A, B](MT.point(v))
+    EitherT.left[F, A, B](F.point(v))
 
   def right[B](v: => B): EitherT[F, A, B] =
-    EitherT.right[F, A, B](MT.point(v))
+    EitherT.right[F, A, B](F.point(v))
 }
 
 private[scalaz] trait EitherTMonadListen[F[_], W, A] extends MonadListen[EitherT[F, A, ?], W] with EitherTMonadTell[F, W, A] {
   implicit def MT: MonadListen[F, W]
 
   def listen[B](ma: EitherT[F, A, B]): EitherT[F, A, (B, W)] = {
-    val tmp = MT.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
-      case (-\/(a), _) => MT.point(-\/(a))
-      case (\/-(b), w) => MT.point(\/-((b, w)))
+    val tmp = MT.instance.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
+      case (-\/(a), _) => MT.instance.point(-\/(a))
+      case (\/-(b), w) => MT.instance.point(\/-((b, w)))
     }
 
     EitherT[F, A, (B, W)](tmp)

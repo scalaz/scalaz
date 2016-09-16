@@ -89,7 +89,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
-    implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
+    implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].instance.compose(Applicative[G])
     Kleisli[G, S, F[B]](s => {
       val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run

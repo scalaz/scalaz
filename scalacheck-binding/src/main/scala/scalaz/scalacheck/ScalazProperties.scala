@@ -607,13 +607,15 @@ object ScalazProperties {
     def errorsStopComputation[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]) =
+    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]) = {
+      implicit val monadInstance: Monad[F] = me.instance
       newProperties("monad error"){ p =>
         p.include(monad.laws[F])
         p.property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
         p.property("errorsRaised") = errorsRaised[F, E, Int]
         p.property("errorsStopComputation") = errorsStopComputation[F, E, Int]
       }
+    }
   }
 
   object monadTrans {
