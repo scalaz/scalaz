@@ -1087,13 +1087,21 @@ object IndSeq extends IndSeqInstances {
   def fromSeq[A](as: Seq[A]) = indSeq(as.foldLeft(empty[Int, A](UnitReducer(a => 1)))((x, y) => x :+ y))
 }
 
-sealed abstract class IndSeqInstances {
+sealed abstract class IndSeqInstances extends IndSeqInstances0 {
+  implicit val indSeqMonadPlus: MonadPlus[IndSeq] = new MonadPlus[IndSeq] {
+    val monad = indSeqInstance
+    def empty[A]: IndSeq[A] = monad.empty[A]
+    def plus[A](a: IndSeq[A], b: => IndSeq[A]) = monad.plus(a, b)
+  }
+}
+
+sealed abstract class IndSeqInstances0 {
 
   implicit def indSeqEqual[A: Equal]: Equal[IndSeq[A]] =
     Equal.equalBy(_.self)
 
-  implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
-    new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
+  implicit val indSeqInstance: Monad[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
+    new Monad[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
       def G = implicitly
       override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {

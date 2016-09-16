@@ -149,6 +149,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
 
   implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =
     new Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] {
+      val bind_ = this
+      override def forever[A, B](fa: NullArgument[X, A]): NullArgument[X, B] = super[BindRec].forever(fa)
       override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
         a ap f
       override def map[A, B](a: NullArgument[X, A])(f: A => B) =

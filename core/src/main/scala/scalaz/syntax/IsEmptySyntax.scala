@@ -26,9 +26,9 @@ trait ToIsEmptyOps extends ToIsEmptyOps0 with ToPlusEmptyOps {
 }
 
 trait IsEmptySyntax[F[_]] extends PlusEmptySyntax[F] {
-  implicit def ToIsEmptyOps[A](v: F[A]): IsEmptyOps[F, A] = new IsEmptyOps[F,A](v)(IsEmptySyntax.this.F)
+  implicit def ToIsEmptyOps[A](v: F[A]): IsEmptyOps[F, A] = new IsEmptyOps[F,A](v)(IsEmptySyntax.this.FE)
 
-  def F: IsEmpty[F]
+  def FE: IsEmpty[F]
   ////
 
   ////

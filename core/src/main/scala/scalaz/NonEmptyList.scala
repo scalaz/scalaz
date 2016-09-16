@@ -161,6 +161,10 @@ sealed abstract class NonEmptyListInstances0 {
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
+      val bind_ = this
+
+      override def forever[A, B](fa: NonEmptyList[A]): NonEmptyList[B] = super[BindRec].forever(fa)
+
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
 

@@ -34,7 +34,7 @@ trait Plus[F[_]]  { self =>
   def plusLaw =
     new PlusLaw {}
   ////
-  val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def F = Plus.this }
+  val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def FE = Plus.this }
 }
 
 object Plus {

@@ -337,6 +337,8 @@ object Trampoline extends TrampolineInstances {
 sealed trait TrampolineInstances {
   implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
     new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
+      val bind_ = this
+      override def forever[A, B](fa: Trampoline[A]): Trampoline[B] = super[BindRec].forever(fa)
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
       def copoint[A](fa: Trampoline[A]) = fa.run
@@ -405,6 +407,8 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
     new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
+      val bind_ = this
+      override def forever[A, B](fa: Free[S, A]): Free[S, B] = super[BindRec].forever(fa)
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
       def point[A](a: => A) = Free.point(a)

@@ -147,8 +147,8 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
 
   implicit def ContsTMonadPlus[W[_], M[_], R](implicit W0: Comonad[W], M0: PlusEmpty[M]): MonadPlus[ContsT[W, M, R, ?]] =
     new ContsTMonadPlus[W, M, R] {
-      implicit val W: Comonad[W] = W0
       implicit val M: PlusEmpty[M] = M0
+      implicit val W = W0
     }
 }
 
@@ -200,8 +200,11 @@ private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[ContsT[W, M, R, ?]
   override def point[A](a: => A) = IndexedContsT.point(a)
 }
 
-private sealed trait ContsTMonadPlus[W[_], M[_], R] extends MonadPlus[ContsT[W, M, R, ?]] with ContsTMonad[W, M, R] {
+private sealed trait ContsTMonadPlus[W[_], M[_], R] extends MonadPlus[ContsT[W, M, R, ?]] { outer =>
   implicit val M: PlusEmpty[M]
+  implicit val W: Comonad[W]
+
+  def monad = new ContsTMonad[W, M, R] { implicit val W = outer.W }
 
   override def empty[A]: ContsT[W, M, R, A] = IndexedContsT.empty
 

@@ -36,10 +36,15 @@ private trait ProductBind[F[_], G[_]] extends Bind[λ[α => (F[α], G[α])]] wit
     (F.bind(fa._1)(f.andThen(_._1)), G.bind(fa._2)(f.andThen(_._2)))
 }
 
-private trait ProductBindRec[F[_], G[_]] extends BindRec[λ[α => (F[α], G[α])]] with ProductBind[F, G] {
+private trait ProductBindRec[F[_], G[_]] extends BindRec[λ[α => (F[α], G[α])]] { outer =>
   implicit def F: BindRec[F]
 
   implicit def G: BindRec[G]
+
+  def bind_ : Bind[λ[α => (F[α], G[α])]] = new ProductBind[F, G] {
+    implicit def F = outer.F.bind_
+    implicit def G = outer.G.bind_
+  }
 
   override def tailrecM[A, B](a: A)(f: A => (F[A \/ B], G[A \/ B])) =
     (F.tailrecM(a)(f.andThen(_._1)), G.tailrecM(a)(f.andThen(_._2)))
@@ -68,16 +73,28 @@ private trait ProductPlusEmpty[F[_], G[_]] extends PlusEmpty[λ[α => (F[α], G[
   def empty[A]: (F[A], G[A]) = (F.empty[A], G.empty[A])
 }
 
-private trait ProductApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[α => (F[α], G[α])]] with ProductApplicative[F, G] with ProductPlusEmpty[F, G] {
+private trait ProductApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[α => (F[α], G[α])]] with ProductPlusEmpty[F, G] { outer =>
   implicit def F: ApplicativePlus[F]
 
   implicit def G: ApplicativePlus[G]
+
+  def applicative: Applicative[λ[α => (F[α], G[α])]] = new ProductApplicative[F, G] {
+    implicit val F = outer.F.applicative
+    implicit val G = outer.G.applicative
+  }
 }
 
-private trait ProductMonadPlus[F[_], G[_]] extends MonadPlus[λ[α => (F[α], G[α])]] with ProductApplicativePlus[F, G] with ProductMonad[F, G] {
+private trait ProductMonadPlus[F[_], G[_]] extends MonadPlus[λ[α => (F[α], G[α])]] with ProductApplicativePlus[F, G] { outer =>
   implicit def F: MonadPlus[F]
 
   implicit def G: MonadPlus[G]
+
+  override def applicative: Applicative[λ[α => (F[α], G[α])]] = monad
+
+  def monad: Monad[λ[α => (F[α], G[α])]] = new ProductMonad[F, G] {
+    implicit val F = outer.F.monad
+    implicit val G = outer.G.monad
+  }
 }
 
 private trait ProductFoldable[F[_], G[_]] extends Foldable[λ[α => (F[α], G[α])]] {

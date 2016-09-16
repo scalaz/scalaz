@@ -160,7 +160,6 @@ sealed abstract class NullResultInstances0 {
       override def dimap[A, B, C, D](fab: NullResult[A, B])(f: C => A)(g: B => D) =
         fab.dimap(f, g)
     }
-
 }
 
 sealed abstract class NullResultInstances extends NullResultInstances0 {
@@ -197,9 +196,17 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         }
     }
 
-  implicit def nullResultMonadPlus[X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
-    new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
+  implicit def nullResultMonadPlus[X]: MonadPlus[NullResult[X, ?]] = new MonadPlus[NullResult[X, ?]] {
+    val monad = nullResultMonad[X]
+    def empty[A] = NullResult.never[X, A]
+    def plus[A](a: NullResult[X, A], b: => NullResult[X, A]) = NullResult[X, A](x => a(x) orElse b(x))
+  }
+
+  implicit def nullResultMonad[X]: Monad[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
+    new Monad[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
+      val bind_ = this
+      override def forever[A, B](fa: NullResult[X, A]): NullResult[X, B] = super[BindRec].forever(fa)
       override def tailrecM[A, B](a: A)(f: A => NullResult[X, A \/ B]) =
         NullResult(r => BindRec[Option].tailrecM(a)(f(_)(r)))
       override def map[A, B](a: NullResult[X, A])(f: A => B) =
@@ -210,10 +217,6 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         NullResult.always(a)
       override def bind[A, B](a: NullResult[X, A])(f: A => NullResult[X, B]) =
         a flatMap f
-      override def empty[A] =
-        NullResult.never[X, A]
-      override def plus[A](a: NullResult[X, A], b: => NullResult[X, A]) =
-        NullResult[X, A](x => a(x) orElse b(x))
     }
 
   implicit def nullResultContravariant[X]: Contravariant[NullResult[?, X]] =

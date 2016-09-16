@@ -2,8 +2,10 @@ package scalaz
 package std
 
 
-trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+sealed trait StreamInstances0 {
+  implicit val streamInstance: Traverse[Stream] with Monad[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with Monad[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+    val bind_ = this
+    override def forever[A, B](fa: Stream[A]): Stream[B] = super[BindRec].forever(fa)
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -68,8 +70,6 @@ trait StreamInstances {
 
     override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
-
-    override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
 
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
@@ -159,6 +159,15 @@ trait StreamInstances {
     }
 
 
+}
+
+trait StreamInstances extends StreamInstances0 {
+  implicit def streamMonadPlus: MonadPlus[Stream] = new MonadPlus[Stream] {
+    val monad = streamInstance
+    def empty[A]: Stream[A] = monad.empty[A]
+    def plus[A](a: Stream[A], b: => Stream[A]) = monad.plus(a, b)
+    override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
+  }
 }
 
 trait StreamFunctions {

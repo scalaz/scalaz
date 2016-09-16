@@ -25,9 +25,9 @@ trait ToPlusEmptyOps extends ToPlusEmptyOps0 with ToPlusOps {
 }
 
 trait PlusEmptySyntax[F[_]] extends PlusSyntax[F] {
-  implicit def ToPlusEmptyOps[A](v: F[A]): PlusEmptyOps[F, A] = new PlusEmptyOps[F,A](v)(PlusEmptySyntax.this.F)
+  implicit def ToPlusEmptyOps[A](v: F[A]): PlusEmptyOps[F, A] = new PlusEmptyOps[F,A](v)(PlusEmptySyntax.this.FE)
 
-  def F: PlusEmpty[F]
+  def FE: PlusEmpty[F]
   ////
 
   ////

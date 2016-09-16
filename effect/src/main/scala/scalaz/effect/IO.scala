@@ -159,6 +159,8 @@ sealed abstract class IOInstances extends IOInstances0 {
 }
 
 private trait IOMonad extends Monad[IO] with BindRec[IO] {
+  val bind_ = this
+  override def forever[A, B](fa: IO[A]): IO[B] = super[BindRec].forever(fa)
   def point[A](a: => A): IO[A] = IO(a)
   override def map[A, B](fa: IO[A])(f: A => B) = fa map f
   def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f

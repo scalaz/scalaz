@@ -5,11 +5,12 @@ package scalaz
  * [[scalaz.Applicative]] combined with [[scalaz.PlusEmpty]].
  */
 ////
-trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
+trait ApplicativePlus[F[_]] extends PlusEmpty[F] { self =>
   ////
+  def applicative: Applicative[F]
 
   /**The composition of ApplicativePlus `F` and Applicative `G`, `[x]F[G[x]]`, is a ApplicativePlus */
-  override def compose[G[_]](implicit G0: Applicative[G]): ApplicativePlus[λ[α => F[G[α]]]] =
+  def compose[G[_]](implicit G0: Applicative[G]): ApplicativePlus[λ[α => F[G[α]]]] =
     new CompositionApplicativePlus[F, G] {
       implicit def F = self
       implicit def G = G0
@@ -23,8 +24,8 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     }
 
   private[this] class Mutual[A](a: F[A]) {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
+    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, applicative.point(Nil)))
+    lazy val z: Free.Trampoline[F[List[A]]] = y map (applicative.apply2(a, _)(_ :: _))
   }
 
   /** `empty` or a non-empty list of results acquired by repeating `a`. */
@@ -36,7 +37,11 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
   def many[A](a: F[A]): F[List[A]] = new Mutual(a).y.run
 
   ////
-  val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
+  val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] {
+    def F: Applicative[F] = ApplicativePlus.this.applicative
+    def FE: PlusEmpty[F] = ApplicativePlus.this
+    def FP = ApplicativePlus.this
+  }
 }
 
 object ApplicativePlus {

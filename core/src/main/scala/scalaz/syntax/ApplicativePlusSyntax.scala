@@ -24,9 +24,9 @@ trait ToApplicativePlusOps extends ToApplicativePlusOps0 with ToApplicativeOps w
 }
 
 trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusEmptySyntax[F] {
-  implicit def ToApplicativePlusOps[A](v: F[A]): ApplicativePlusOps[F, A] = new ApplicativePlusOps[F,A](v)(ApplicativePlusSyntax.this.F)
+  implicit def ToApplicativePlusOps[A](v: F[A]): ApplicativePlusOps[F, A] = new ApplicativePlusOps[F,A](v)(ApplicativePlusSyntax.this.FP)
 
-  def F: ApplicativePlus[F]
+  def FP: ApplicativePlus[F]
   ////
 
   ////

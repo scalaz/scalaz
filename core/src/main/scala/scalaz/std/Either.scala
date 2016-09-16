@@ -27,8 +27,13 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L]: Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] =
-    new Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] {
+  implicit def eitherMonad[L]: Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with Monad[Either[L, ?]] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] =
+    new Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with Monad[Either[L, ?]] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] {
+      val monad = this
+      val bind_ = monad
+
+      override def forever[A, B](fa: Either[L, A]): Either[L, B] = super[BindRec].forever(fa)
+
       def bind[A, B](fa: Either[L, A])(f: A => Either[L, B]) = fa match {
         case Left(a)  => Left(a)
         case Right(b) => f(b)

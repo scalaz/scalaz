@@ -513,20 +513,20 @@ object IList extends IListInstances {
     }
 }
 
-sealed abstract class IListInstance0 {
-
+sealed abstract class IListInstance1 {
   implicit def equal[A](implicit A0: Equal[A]): Equal[IList[A]] =
     new IListEqual[A] {
       val A = A0
     }
-
 }
 
-sealed abstract class IListInstances extends IListInstance0 {
+sealed abstract class IListInstances0 extends IListInstance1 {
 
-  implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
+  implicit val instances: Traverse[IList] with Monad[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
-    new Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with Monad[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+      val bind_ = this
+      override def forever[A, B](fa: IList[A]): IList[B] = super[BindRec].forever(fa)
       override def findLeft[A](fa: IList[A])(f: A => Boolean) =
         fa.find(f)
 
@@ -692,6 +692,15 @@ sealed abstract class IListInstances extends IListInstance0 {
 
 }
 
+sealed abstract class IListInstances extends IListInstances0 {
+  implicit def monadPlus: MonadPlus[IList] = new MonadPlus[IList] {
+    val monad = instances
+
+    def plus[A](a: IList[A],b: => IList[A]): IList[A] = monad.plus(a, b)
+
+    def empty[A]: IList[A] = monad.empty[A]
+  }
+}
 
 private trait IListEqual[A] extends Equal[IList[A]] {
   implicit def A: Equal[A]

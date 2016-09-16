@@ -437,6 +437,11 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
     new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
+      val monad = this
+      val bind_ = monad
+
+      override def forever[A, B](fa: L \/ A): L \/ B = super[BindRec].forever(fa)
+
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
 

@@ -182,7 +182,20 @@ object Maybe extends MaybeInstances {
   }
 }
 
-sealed abstract class MaybeInstances {
+sealed abstract class MaybeInstances extends MaybeInstances0 {
+  implicit def maybeMonadPlus: MonadPlus[Maybe] = new MonadPlus[Maybe] {
+    val monad = maybeInstance
+
+    def empty[A]: Maybe[A] = monad.empty[A]
+
+    def plus[A](a: Maybe[A], b: => Maybe[A]) = monad.plus(a, b)
+
+    override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
+      fa.filter(f)
+  }
+}
+
+sealed abstract class MaybeInstances0 {
   import Maybe._
 
   implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
@@ -272,8 +285,12 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
-    new Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
+  implicit val maybeInstance: Traverse[Maybe] with Monad[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
+    new Traverse[Maybe] with Monad[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
+      val bind_ = this
+      val monad = this
+
+      override def forever[A, B](fa: Maybe[A]): Maybe[B] = super[BindRec].forever(fa)
 
       def point[A](a: => A) = just(a)
 
@@ -333,9 +350,6 @@ sealed abstract class MaybeInstances {
       override def toOption[A](fa: Maybe[A]): Option[A] = fa.toOption
 
       override def toMaybe[A](fa: Maybe[A]) = fa
-
-      override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
-        fa.filter(f)
     }
 }
 

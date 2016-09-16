@@ -22,9 +22,7 @@ object IdTTest extends SpecLite {
     def functor[F[_] : Applicative: BindRec] = Functor[IdT[F, ?]]
     def functor[F[_] : Monad : BindRec] = Functor[IdT[F, ?]]
     def apply[F[_] : Monad] = Apply[IdT[F, ?]]
-    def apply[F[_] : BindRec] = Apply[IdT[F, ?]]
     def apply[F[_] : Applicative: BindRec] = Apply[IdT[F, ?]]
-    def apply[F[_] : ApplicativePlus: BindRec] = Apply[IdT[F, ?]]
     def apply[F[_] : Monad: BindRec] = Apply[IdT[F, ?]]
     def foldable[F[_] : Traverse] = Foldable[IdT[F, ?]]
   }

@@ -5,14 +5,16 @@ package scalaz
  *
  */
 ////
-trait MonadTell[F[_], S] extends Monad[F] { self =>
+trait MonadTell[F[_], S] {
   ////
+  def monad: Monad[F]
+
   def writer[A](w: S, v: A): F[A]
 
   def tell(w: S): F[Unit] = writer(w, ())
 
   ////
-  val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def F = MonadTell.this }
+  val monadTellSyntax = new scalaz.syntax.MonadTellSyntax[F, S] { def FS = MonadTell.this }
 }
 
 object MonadTell {

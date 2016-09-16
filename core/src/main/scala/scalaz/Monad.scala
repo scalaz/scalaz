@@ -20,7 +20,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    */
   def whileM[G[_], A](p: F[Boolean], body: => F[A])(implicit G: MonadPlus[G]): F[G[A]] = {
     val f = Need(body)
-    ifM(p, bind(f.value)(x => map(whileM(p, f.value))(xs => G.plus(G.point(x), xs))), point(G.empty))
+    ifM(p, bind(f.value)(x => map(whileM(p, f.value))(xs => G.plus(G.monad.point(x), xs))), point(G.empty))
   }
 
   /**
@@ -40,7 +40,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    */
   def untilM[G[_], A](f: F[A], cond: => F[Boolean])(implicit G: MonadPlus[G]): F[G[A]] = {
     val p = Need(cond)
-    bind(f)(x => map(whileM(map(p.value)(!_), f))(xs => G.plus(G.point(x), xs)))
+    bind(f)(x => map(whileM(map(p.value)(!_), f))(xs => G.plus(G.monad.point(x), xs)))
   }
 
   /**
@@ -86,11 +86,4 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 
 object Monad {
   @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
-
-  ////
-
-  implicit def monadMTMAB[MT[_[_], _], MAB[_, _], A](implicit t: MonadTrans[MT], m: Monad[MAB[A, ?]]): Monad[MT[MAB[A, ?], ?]] =
-    t.apply[MAB[A, ?]]
-
-  ////
 }

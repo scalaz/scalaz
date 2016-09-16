@@ -116,7 +116,8 @@ sealed abstract class AdjunctionInstances {
       override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
     }
 
-  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] =
+  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] = {
+    implicit val instance: Apply[Reader[E, ?]] = Kleisli.kleisliIdApply[E]
     new Adjunction[Writer[E, ?], Reader[E, ?]] {
       override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
         Reader(e => f(Writer(e, a)))
@@ -125,5 +126,6 @@ sealed abstract class AdjunctionInstances {
         f(a)(e)
       }
     }
+  }
 }
 

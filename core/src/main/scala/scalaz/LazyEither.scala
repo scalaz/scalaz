@@ -162,6 +162,10 @@ object LazyEither extends LazyEitherInstances {
 sealed abstract class LazyEitherInstances {
   implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] =
     new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] {
+      val monad = this
+      val bind_ = monad
+
+      override def forever[A, B](fa: LazyEither[E, A]): LazyEither[E, B] = super[BindRec].forever(fa)
 
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
