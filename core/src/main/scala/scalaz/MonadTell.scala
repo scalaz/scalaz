@@ -7,7 +7,7 @@ package scalaz
 ////
 trait MonadTell[F[_], S] {
   ////
-  def monad: Monad[F]
+  def monadInstance: Monad[F]
 
   def writer[A](w: S, v: A): F[A]
 

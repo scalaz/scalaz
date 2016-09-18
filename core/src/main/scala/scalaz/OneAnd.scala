@@ -219,7 +219,7 @@ sealed abstract class OneAndInstances4 extends OneAndInstances5 {
 sealed abstract class OneAndInstances3 extends OneAndInstances4 {
   implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[OneAnd[F, ?]] =
     new OneAndApplicative[F] {
-      def F = ApplicativePlus[F].applicative
+      def F = ApplicativePlus[F].applicativeInstance
       def G = implicitly
     }
 }
@@ -235,7 +235,7 @@ sealed abstract class OneAndInstances2 extends OneAndInstances3 {
 sealed abstract class OneAndInstances1 extends OneAndInstances2 {
   implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, ?]] =
     new OneAndMonad[F] {
-      def F = MonadPlus[F].monad
+      def F = MonadPlus[F].monadInstance
       def G = implicitly
     }
 

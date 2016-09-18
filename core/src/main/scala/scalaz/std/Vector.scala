@@ -12,7 +12,7 @@ sealed trait VectorInstances1 {
 
 sealed trait VectorInstances0 extends VectorInstances1 {
   implicit val vectorInstance: Traverse[Vector] with Monad[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with Monad[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
-    val bind_ = this
+    val bindInstance = this
     override def forever[A, B](fa: Vector[A]): Vector[B] = super[BindRec].forever(fa)
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
@@ -116,7 +116,7 @@ sealed trait VectorInstances0 extends VectorInstances1 {
 
 trait VectorInstances extends VectorInstances0 {
   implicit def vectorMonadPlus: MonadPlus[Vector] = new MonadPlus[Vector] {
-    val monad = vectorInstance
+    val monadInstance = vectorInstance
     def empty[A] = Vector.empty[A]
     def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
     override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p

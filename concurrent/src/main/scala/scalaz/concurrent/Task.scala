@@ -290,8 +290,8 @@ object Task {
   implicit val taskInstance: Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task,Throwable] with Monad[Task] =
     new Nondeterminism[Task] with BindRec[Task] with Catchable[Task] with MonadError[Task, Throwable] with Monad[Task] {
       val F = Nondeterminism[Future]
-      val monad = this
-      val bind_ = monad
+      val monadInstance = this
+      val bindInstance = monadInstance
       override def forever[A, B](fa: Task[A]): Task[B] = super[BindRec].forever(fa)
       def point[A](a: => A) = Task.point(a)
       def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =

@@ -26,7 +26,7 @@ trait MonadErrorSyntax[F[_], S] extends MonadSyntax[F] {
   implicit def ToMonadErrorOps[A](v: F[A]): MonadErrorOps[F, S, A] =
     new MonadErrorOps[F, S, A](v)(MonadErrorSyntax.this.FS)
 
-  def F = FS.monad
+  def F = FS.monadInstance
   def FS: MonadError[F, S]
   ////
 

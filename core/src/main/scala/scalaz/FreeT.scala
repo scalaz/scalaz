@@ -107,12 +107,12 @@ sealed abstract class FreeT[S[_], M[_], A] {
     */
   def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] =
     M0.tailrecM(this){
-      case Suspend(ma) => M0.bind_.bind(ma) {
+      case Suspend(ma) => M0.bindInstance.bind(ma) {
         case -\/(a) => M1.point(\/-(a))
         case \/-(sa) => M1.map(f(sa))(\/.right)
       }
       case g @ Gosub(_, _) => g.a match {
-        case Suspend(mx) => M0.bind_.bind(mx) {
+        case Suspend(mx) => M0.bindInstance.bind(mx) {
           case -\/(x) => M1.point(-\/(g.f(x)))
           case \/-(sx) => M1.map(f(sx))(g.f andThen \/.left)
         }
@@ -137,7 +137,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
     */
   def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] =
-    M0.tailrecM(this)(ft => M0.bind_.bind(ft.resume) {
+    M0.tailrecM(this)(ft => M0.bindInstance.bind(ft.resume) {
       case -\/(a) => M1.point(\/-(a))
       case \/-(fc) => M1.map(interp(fc))(\/.left)
     })
@@ -232,8 +232,8 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
 
   implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, ?]] =
     new MonadPlus[FreeT[S, M, ?]] with FreeTPlus[S, M] {
-      val monad = freeTMonad[S, M](ApplicativePlus[M].applicative)
-      override def M = ApplicativePlus[M].applicative
+      val monadInstance = freeTMonad[S, M](ApplicativePlus[M].applicativeInstance)
+      override def M = ApplicativePlus[M].applicativeInstance
       override def M1 = implicitly
       override def M2 = implicitly
 
@@ -242,8 +242,8 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
 
   implicit def freeTMonadError[S[_], M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, ?], E] =
     new MonadError[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      implicit val instance = E.monad
-      val monad = this
+      implicit val eMonad = E.monadInstance
+      val monadInstance = this
       override def M = implicitly
       override def handleError[A](fa: FreeT[S, M, A])(f: E => FreeT[S, M, A]) =
         FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM)(f.andThen(_.toM)))(M).flatMap(identity)
@@ -253,16 +253,16 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
 
   implicit def freeTMonadTell[S[_], M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] =
     new MonadTell[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      val monad = this
-      override def M = M1.monad
+      val monadInstance = this
+      override def M = M1.monadInstance
       override def writer[A](w: E, v: A) =
         FreeT.liftM(M1.writer(w, v))(M)
     }
 
   implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
     new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = M1.monad
-      val monad = this
+      override def M = M1.monadInstance
+      val monadInstance = this
       override def ask =
         FreeT.liftM(M1.ask)(M)
       override def local[A](f: E => E)(fa: FreeT[S, M, A]) =
@@ -271,8 +271,8 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
 
   implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
     new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
-      override def M = M1.monad
-      val monad = this
+      override def M = M1.monadInstance
+      val monadInstance = this
       override def init =
         FreeT.liftM(M1.init)(M)
       override def get =
@@ -291,7 +291,7 @@ private trait FreeTBind[S[_], M[_]] extends Bind[FreeT[S, M, ?]] {
 
 private trait FreeTMonad[S[_], M[_]] extends Monad[FreeT[S, M, ?]] with BindRec[FreeT[S, M, ?]] with FreeTBind[S, M] {
   implicit def M: Applicative[M]
-  val bind_ = this
+  val bindInstance = this
 
   override final def point[A](a: => A) =
     FreeT.point[S, M, A](a)

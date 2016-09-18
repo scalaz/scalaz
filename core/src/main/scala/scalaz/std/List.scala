@@ -12,7 +12,7 @@ trait ListInstances1 {
 sealed trait ListInstances0 extends ListInstances1 {
   implicit val listInstance: Traverse[List] with Monad[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with Monad[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
-      val bind_ = this
+      val bindInstance = this
       override def forever[A, B](fa: List[A]): List[B] = super[BindRec].forever(fa)
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
@@ -160,9 +160,9 @@ sealed trait ListInstances0 extends ListInstances1 {
 
 trait ListInstances extends ListInstances0 {
   implicit def listMonadPlus: MonadPlus[List] = new MonadPlus[List] {
-    val monad = listInstance
-    def empty[A] = monad.empty[A]
-    def plus[A](a: List[A], b: => List[A]) = monad.plus(a, b)
+    val monadInstance = listInstance
+    def empty[A] = monadInstance.empty[A]
+    def plus[A](a: List[A], b: => List[A]) = monadInstance.plus(a, b)
     override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
   }
 }

@@ -43,9 +43,9 @@ private trait CompositionApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[
 
   implicit def G: Applicative[G]
 
-  def applicative: Applicative[λ[α => F[G[α]]]] = new CompositionApplicative[F, G] {
-    implicit val F = outer.F.applicative
-    implicit val G = outer.G
+  val applicativeInstance: Applicative[λ[α => F[G[α]]]] = new CompositionApplicative[F, G] {
+    implicit def F = outer.F.applicativeInstance
+    implicit def G = outer.G
   }
 }
 

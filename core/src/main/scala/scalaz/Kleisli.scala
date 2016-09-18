@@ -156,8 +156,8 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
 sealed abstract class KleisliInstances6 extends KleisliInstances7 {
   implicit def kleisliApplicativePlus[F[_], R](implicit F0: ApplicativePlus[F]): ApplicativePlus[Kleisli[F, R, ?]] =
     new ApplicativePlus[Kleisli[F, R, ?]] with KleisliPlusEmpty[F, R] {
-      val applicative = kleisliApplicative[F, R](F0.applicative)
-      implicit def F = F0.applicative
+      val applicativeInstance = kleisliApplicative[F, R](F0.applicativeInstance)
+      implicit def F = F0.applicativeInstance
       implicit def FP = F0
     }
 
@@ -177,7 +177,7 @@ sealed abstract class KleisliInstances5 extends KleisliInstances6 {
 sealed abstract class KleisliInstances4 extends KleisliInstances5 {
   implicit def kleisliMonadPlus[F[_], A](implicit F0: MonadPlus[F]): MonadPlus[Kleisli[F, A, ?]] =
     new KleisliMonadPlus[F, A] {
-      implicit def F = F0.monad
+      implicit def F = F0.monadInstance
       implicit def FP = F0
     }
 }
@@ -327,7 +327,7 @@ private trait KleisliApplicative[F[_], R] extends Applicative[Kleisli[F, R, ?]] 
 private trait KleisliBindRec[F[_], R] extends BindRec[Kleisli[F, R, ?]] { outer =>
   implicit def F: BindRec[F]
 
-  def bind_ = new KleisliBind[F, R] { implicit val F = outer.F.bind_ }
+  val bindInstance = new KleisliBind[F, R] { implicit def F = outer.F.bindInstance }
 
   def tailrecM[A, B](a: A)(f: A => Kleisli[F, R, A \/ B]): Kleisli[F, R, B] =
     Kleisli(r => F.tailrecM(a)(f(_).run(r)))
@@ -340,7 +340,7 @@ private trait KleisliMonad[F[_], R] extends Monad[Kleisli[F, R, ?]] with Kleisli
 private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, ?], R] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new KleisliMonad[F, R] { implicit val F = outer.F }
+  val monadInstance = new KleisliMonad[F, R] { implicit def F = outer.F }
 
   def ask: Kleisli[F, R, R] =
     Kleisli[F, R, R](r => F.point(r))
@@ -357,18 +357,18 @@ private trait KleisliHoist[R] extends Hoist[Kleisli[?[_], R, ?]] {
     Kleisli(_ => a)
 
   implicit def apply[G[_] : Monad]: Monad[Kleisli[G, R, ?]] =
-    Kleisli.kleisliMonadReader[G, R].monad
+    Kleisli.kleisliMonadReader[G, R].monadInstance
 }
 
 private trait KleisliMonadPlus[F[_], R] extends MonadPlus[Kleisli[F, R, ?]] with KleisliPlusEmpty[F, R] { outer =>
   implicit def F: Monad[F]
-  def monad = new KleisliMonad[F, R] { implicit def F = outer.F }
+  val monadInstance = new KleisliMonad[F, R] { implicit def F = outer.F }
 }
 
 private trait KleisliMonadError[F[_], E, R] extends MonadError[Kleisli[F, R, ?], E] { outer =>
   implicit def F: MonadError[F, E]
 
-  def monad = new KleisliMonad[F, R] { implicit val F = outer.F.monad }
+  val monadInstance = new KleisliMonad[F, R] { implicit def F = outer.F.monadInstance }
 
   def handleError[A](fa: Kleisli[F, R, A])(f: E => Kleisli[F, R, A]): Kleisli[F, R, A] =
     Kleisli.kleisli[F, R, A](r => F.handleError(fa.run(r))(e => f(e).run(r)))

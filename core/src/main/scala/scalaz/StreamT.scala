@@ -18,7 +18,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   def unconsRec(implicit M: BindRec[M]): M[Option[(A, StreamT[M, A])]] =
     M.tailrecM(this)(s =>
-      M.bind_.map(s.step) (
+      M.bindInstance.map(s.step) (
         _( yieldd = (a, s) => \/-(Some((a, s)))
          , skip = s => -\/(s)
          , done = \/-(None)
@@ -28,16 +28,16 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
 
   def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(!_.isDefined)
-  def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.bind_.map(unconsRec)(!_.isDefined)
+  def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.bindInstance.map(unconsRec)(!_.isDefined)
 
   def head(implicit M: Monad[M]): M[A] = M.map(uncons)(_.getOrElse(sys.error("head: empty StreamT"))._1)
-  def headRec(implicit M: BindRec[M]): M[A] = M.bind_.map(unconsRec)(_.getOrElse(sys.error("head: empty StreamT"))._1)
+  def headRec(implicit M: BindRec[M]): M[A] = M.bindInstance.map(unconsRec)(_.getOrElse(sys.error("head: empty StreamT"))._1)
 
   def headOption(implicit M: Monad[M]): M[Option[A]] = M.map(uncons)(_.map(_._1))
-  def headOptionRec(implicit M: BindRec[M]): M[Option[A]] = M.bind_.map(unconsRec)(_.map(_._1))
+  def headOptionRec(implicit M: BindRec[M]): M[Option[A]] = M.bindInstance.map(unconsRec)(_.map(_._1))
 
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
-  def tailMRec(implicit M: BindRec[M]): M[StreamT[M, A]] = M.bind_.map(unconsRec)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
+  def tailMRec(implicit M: BindRec[M]): M[StreamT[M, A]] = M.bindInstance.map(unconsRec)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
   def trans[N[_]](t: M ~> N)(implicit M: Functor[M], N: Functor[N]): StreamT[N, A] =
     StreamT(t(M.map(this.step)(
@@ -127,7 +127,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     }
 
   def foldLeftRec[B](z: B)(f: (B, A) => B)(implicit M: BindRec[M]): M[B] =
-    M.tailrecM((this, z))(sb => M.bind_.map(sb._1.step) {
+    M.tailrecM((this, z))(sb => M.bindInstance.map(sb._1.step) {
       _( yieldd = (a, s) => -\/((s, f(sb._2, a)))
        , skip = s => -\/((s, sb._2))
        , done = \/-(sb._2)
@@ -148,7 +148,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
    * will be deferred until the resulting `Stream` is extracted from the
    * returned `M`.
    */
-  def toStreamRec(implicit M: BindRec[M]): M[Stream[A]] = M.bind_.map(revRec)(_.reverse)
+  def toStreamRec(implicit M: BindRec[M]): M[Stream[A]] = M.bindInstance.map(revRec)(_.reverse)
 
   /**
    * Converts this `StreamT` to a lazy `Stream`, i.e. without forcing
@@ -171,7 +171,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     }
 
   def foldRightRec[B](z: => B)(f: (=> A, => B) => B)(implicit M: BindRec[M]): M[B] =
-    M.bind_.map(revRec) {
+    M.bindInstance.map(revRec) {
       _.foldLeft(z)((a, b) => f(b, a))
     }
 
@@ -230,7 +230,7 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   private def revRec(implicit M: BindRec[M]): M[Stream[A]] =
     M.tailrecM((this, Stream.empty[A])){ case (xs, ys) =>
-      M.bind_.map(xs.step) {
+      M.bindInstance.map(xs.step) {
         _( yieldd = (a, s) => -\/((s, a #:: ys))
          , skip = s => -\/((s, ys))
          , done = \/-(ys)
@@ -381,17 +381,17 @@ private trait StreamTMonoid[F[_], A] extends Monoid[StreamT[F, A]] with StreamTS
 private trait StreamTMonadPlus[F[_]] extends MonadPlus[StreamT[F, ?]] { outer =>
   implicit def F: Applicative[F]
 
-  def monad = new StreamTMonad[F] { implicit val F = outer.F }
+  val monadInstance = new StreamTMonad[F] { implicit def F = outer.F }
 
   def empty[A]: StreamT[F, A] = StreamT.empty
 
-  def plus[A](a: StreamT[F, A], b: => StreamT[F, A]) = monad.plus(a, b)
+  def plus[A](a: StreamT[F, A], b: => StreamT[F, A]) = monadInstance.plus(a, b)
 }
 
 private trait StreamTHoist extends Hoist[StreamT] {
   import StreamT._
 
-  implicit def apply[G[_] : Monad]: Monad[StreamT[G, ?]] = StreamTMonadPlus[G].monad
+  implicit def apply[G[_] : Monad]: Monad[StreamT[G, ?]] = StreamTMonadPlus[G].monadInstance
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
 

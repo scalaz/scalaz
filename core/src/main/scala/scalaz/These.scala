@@ -277,13 +277,13 @@ object \&/ extends TheseInstances {
     concatThis[EphemeralStream, A, B](x)
 
   def concatThis[F[_], A, B](x: F[A \&/ B])(implicit M: MonadPlus[F]): F[A] =
-    M.monad.bind(x) {
+    M.monadInstance.bind(x) {
       case This(a) =>
-        M.monad.point(a)
+        M.monadInstance.point(a)
       case That(_) =>
         M.empty
       case Both(a, _) =>
-        M.monad.point(a)
+        M.monadInstance.point(a)
     }
 
   def concatThatList[A, B](x: List[A \&/ B]): List[B] =
@@ -293,13 +293,13 @@ object \&/ extends TheseInstances {
     concatThat[EphemeralStream, A, B](x)
 
   def concatThat[F[_], A, B](x: F[A \&/ B])(implicit M: MonadPlus[F]): F[B] =
-    M.monad.bind(x) {
+    M.monadInstance.bind(x) {
       case This(_) =>
         M.empty
       case That(b) =>
-        M.monad.point(b)
+        M.monadInstance.point(b)
       case Both(_, b) =>
-        M.monad.point(b)
+        M.monadInstance.point(b)
     }
 
   def unalignList[A, B](x: List[A \&/ B]): (List[A], List[B]) =
@@ -349,7 +349,7 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
   implicit def TheseInstance0[L: Semigroup]: Monad[L \&/ ?] with BindRec[L \&/ ?] =
     new Monad[L \&/ ?] with BindRec[L \&/ ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: L \&/ A): L \&/ B = super[BindRec].forever(fa)
 

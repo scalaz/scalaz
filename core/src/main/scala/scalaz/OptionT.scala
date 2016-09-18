@@ -209,7 +209,7 @@ private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBi
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  val bind_ = this
+  val bindInstance = this
 
   override def forever[A, B](fa: OptionT[F, A]): OptionT[F, B] = super[BindRec].forever(fa)
 
@@ -230,10 +230,10 @@ private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F
 private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, ?], E] { outer =>
   def F: MonadError[F, E]
 
-  def monad = new OptionTMonad[F] { val F = outer.F.monad }
+  val monadInstance = new OptionTMonad[F] { def F = outer.F.monadInstance }
 
   override def raiseError[A](e: E) =
-    OptionT[F, A](F.monad.map(F.raiseError[A](e))(Some(_)))
+    OptionT[F, A](F.monadInstance.map(F.raiseError[A](e))(Some(_)))
 
   override def handleError[A](fa: OptionT[F, A])(f: E => OptionT[F, A]) =
     OptionT[F, A](F.handleError(fa.run)(f(_).run))
@@ -258,13 +258,13 @@ private trait OptionTHoist extends Hoist[OptionT] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
     λ[OptionT[M, ?] ~> OptionT[N, ?]](_ mapT f)
 
-  implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G].monad
+  implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G].monadInstance
 }
 
 private trait OptionTMonadPlus[F[_]] extends MonadPlus[OptionT[F, ?]] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new OptionTMonad[F] { implicit def F = outer.F }
+  val monadInstance = new OptionTMonad[F] { implicit def F = outer.F }
 
   def empty[A]: OptionT[F, A] = OptionT(F point none[A])
   def plus[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
@@ -273,19 +273,19 @@ private trait OptionTMonadPlus[F[_]] extends MonadPlus[OptionT[F, ?]] { outer =>
 private trait OptionTMonadTell[F[_], W] extends MonadTell[OptionT[F, ?], W] with OptionTHoist { outer =>
   implicit def F: MonadTell[F, W]
 
-  def monad = new OptionTMonad[F] { val F = outer.F.monad }
+  val monadInstance = new OptionTMonad[F] { def F = outer.F.monadInstance }
 
   def writer[A](w: W, v: A): OptionT[F, A] =
-    liftM[F, A](F.writer(w, v))(F.monad)
+    liftM[F, A](F.writer(w, v))(F.monadInstance)
 }
 
 private trait OptionTMonadListen[F[_], W] extends MonadListen[OptionT[F, ?], W] with OptionTMonadTell[F, W] {
   implicit def F: MonadListen[F, W]
 
   def listen[A](ma: OptionT[F, A]): OptionT[F, (A, W)] = {
-    val tmp = F.monad.bind[(Option[A], W), Option[(A, W)]](F.listen(ma.run)) {
-      case (None, _) => F.monad.point(None)
-      case (Some(a), w) => F.monad.point(Some(a, w))
+    val tmp = F.monadInstance.bind[(Option[A], W), Option[(A, W)]](F.listen(ma.run)) {
+      case (None, _) => F.monadInstance.point(None)
+      case (Some(a), w) => F.monadInstance.point(Some(a, w))
     }
 
     OptionT.optionT[F].apply[(A, W)](tmp)

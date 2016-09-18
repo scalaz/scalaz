@@ -4,18 +4,23 @@ package example
 import scalaz.syntax.monad._
 
 object MTLUsage extends App {
-  def app[F[_]](implicit M: Monad[F], R: MonadReader[F, Int], S: MonadError[F, String]): F[Int] = {
-    for {
-      a <- R.ask
-      b <- S.raiseError[Int]("error")
-    } yield a + b
+  def app[F[_], E, R, S, W](implicit
+    F0: Monad[F],
+    F1: MonadPlus[F],
+    F2: BindRec[F],
+    F3: MonadError[F, E],
+    F4: MonadReader[F, R],
+    F5: MonadState[F, S],
+    F6: MonadListen[F, W]
+  ): F[Unit] = {
+    val x = F4.ask
+
+    /** monads work */
+    val a = for {
+      _ <- x
+      _ <- x
+    } yield 42
+
+    ().pure[F]
   }
-
-  type App[A] = Kleisli[String \/ ?, Int, A]
-  // Hello SI-2712
-  implicit val readerMonadReader = Kleisli.kleisliMonadReader[String \/ ?, Int]
-  implicit val readerMonad = Kleisli.kleisliMonad[String \/ ?, Int]
-  implicit val errorInstance = Kleisli.kleisliMonadError[String \/ ?, String, Int]
-
-  val application: App[Int] = app[App]
 }

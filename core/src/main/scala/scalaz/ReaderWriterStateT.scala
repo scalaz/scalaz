@@ -160,9 +160,9 @@ private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWri
   implicit def A: Monad[F]
   implicit def W: Semigroup[W]
 
-  def bind_ = new ReaderWriterStateTBind[F, R, W, S] {
-    implicit val F = outer.A
-    implicit val W = outer.W
+  val bindInstance = new ReaderWriterStateTBind[F, R, W, S] {
+    implicit def F = outer.A
+    implicit def W = outer.W
   }
 
   def tailrecM[A, B](a: A)(f: A => ReaderWriterStateT[F, R, W, S, A \/ B]): ReaderWriterStateT[F, R, W, S, B] = {
@@ -185,8 +185,8 @@ private abstract class ReaderWriterStateTMonadPlus[F[_], R, W, S]
   with IndexedReaderWriterStateTPlusEmpty[F, R, W, S, S] { outer =>
   override def F: MonadPlus[F]
   implicit def W: Monoid[W]
-  def monad = new ReaderWriterStateTMonad[F, R, W, S] {
-    implicit def F = outer.F.monad
+  val monadInstance = new ReaderWriterStateTMonad[F, R, W, S] {
+    implicit def F = outer.F.monadInstance
     implicit def W = outer.W
   }
 }
@@ -200,7 +200,7 @@ private trait ReaderWriterStateTMonad[F[_], R, W, S]
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 
-  val monad = this
+  val monadInstance = this
 
   def point[A](a: => A): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((_, s) => F.point((W.zero, a, s)))

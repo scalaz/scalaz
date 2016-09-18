@@ -10,7 +10,7 @@ sealed trait OptionInstances1 {
 sealed trait OptionInstances0 extends OptionInstances1 {
   implicit val optionInstance: Traverse[Option] with Monad[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with Monad[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
-      val bind_ = this
+      val bindInstance = this
       override def forever[A, B](fa: Option[A]): Option[B] = super[BindRec].forever(fa)
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -167,9 +167,9 @@ sealed trait OptionInstances0 extends OptionInstances1 {
 
 trait OptionInstances extends OptionInstances0 {
   implicit val optionMonadPlus: MonadPlus[Option] = new MonadPlus[Option] {
-    val monad = optionInstance
-    def empty[A]: Option[A] = monad.empty[A]
-    def plus[A](a: Option[A], b: => Option[A]) = monad.plus(a, b)
+    val monadInstance = optionInstance
+    def empty[A]: Option[A] = monadInstance.empty[A]
+    def plus[A](a: Option[A], b: => Option[A]) = monadInstance.plus(a, b)
   }
 }
 

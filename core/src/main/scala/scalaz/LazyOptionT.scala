@@ -149,7 +149,7 @@ private trait LazyOptionTMonad[F[_]] extends Monad[LazyOptionT[F, ?]] with LazyO
 private trait LazyOptionTMonadPlus[F[_]] extends MonadPlus[LazyOptionT[F, ?]] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new LazyOptionTMonad[F] { implicit val F = outer.F }
+  val monadInstance = new LazyOptionTMonad[F] { implicit def F = outer.F }
 
   override def plus[A](a: LazyOptionT[F, A], b: => LazyOptionT[F, A]) =
     a orElse b
@@ -160,13 +160,13 @@ private trait LazyOptionTMonadPlus[F[_]] extends MonadPlus[LazyOptionT[F, ?]] { 
 
 private trait LazyOptionTBindRec[F[_]] extends BindRec[LazyOptionT[F, ?]] with LazyOptionTMonad[F] { outer =>
   implicit def B: BindRec[F]
-  val bind_ = this
+  val bindInstance = this
 
   override def forever[A, B](fa: LazyOptionT[F, A]): LazyOptionT[F, B] = super[BindRec].forever(fa)
 
   final def tailrecM[A, B](a: A)(f: A => LazyOptionT[F, A \/ B]): LazyOptionT[F, B] =
     LazyOptionT(
-      B.tailrecM[A, LazyOption[B]](a)(a => B.bind_.map(f(a).run) {
+      B.tailrecM[A, LazyOption[B]](a)(a => B.bindInstance.map(f(a).run) {
         _.fold(_.map(b => LazyOption.lazySome(b)), \/-(LazyOption.lazyNone))
       })
     )
@@ -182,5 +182,5 @@ private trait LazyOptionTHoist extends Hoist[LazyOptionT] {
     )
 
   implicit def apply[G[_] : Monad]: Monad[LazyOptionT[G, ?]] =
-    LazyOptionT.lazyOptionTMonadPlus[G].monad
+    LazyOptionT.lazyOptionTMonadPlus[G].monadInstance
 }

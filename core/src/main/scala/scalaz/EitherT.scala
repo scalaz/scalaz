@@ -372,7 +372,7 @@ private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] { outer 
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  def bind_ = new EitherTBind[F, E] { val F = outer.F }
+  val bindInstance = new EitherTBind[F, E] { def F = outer.F }
 
   final def tailrecM[A, B](a: A)(f: A => EitherT[F, E, A \/ B]): EitherT[F, E, B] =
     EitherT(
@@ -408,7 +408,7 @@ private trait EitherTPlus[F[_], E] extends Plus[EitherT[F, E, ?]] {
 private trait EitherTMonadPlus[F[_], E] extends MonadPlus[EitherT[F, E, ?]] with EitherTPlus[F, E] { outer =>
   def G: Monoid[E]
 
-  def monad = new EitherTMonad[F, E] { val F = outer.F }
+  val monadInstance = new EitherTMonad[F, E] { def F = outer.F }
 
   def empty[A]: EitherT[F, E, A] = EitherT(F.point(-\/(G.zero)))
 }
@@ -457,9 +457,9 @@ private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]
 
 private[scalaz] trait EitherTMonadTell[F[_], W, A] extends MonadTell[EitherT[F, A, ?], W] with EitherTHoist[A] { outer =>
   implicit def F: MonadTell[F, W]
-  implicit def monadF: Monad[F] = F.monad
+  implicit def monadF: Monad[F] = F.monadInstance
 
-  def monad = new EitherTMonad[F, A] { implicit val F = outer.F.monad }
+  val monadInstance = new EitherTMonad[F, A] { implicit def F = outer.F.monadInstance }
 
   def writer[B](w: W, v: B): EitherT[F, A, B] =
     liftM[F, B](F.writer(w, v))
@@ -487,7 +487,7 @@ private[scalaz] trait EitherTMonadListen[F[_], W, A] extends MonadListen[EitherT
 private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new EitherTMonad[F, E] { implicit val F = outer.F }
+  val monadInstance = new EitherTMonad[F, E] { implicit def F = outer.F }
 
   def raiseError[A](e: E): EitherT[F, E, A] = EitherT(F.point(-\/(e)))
   def handleError[A](fa: EitherT[F, E, A])(f: E => EitherT[F, E, A]): EitherT[F, E, A] =

@@ -43,9 +43,9 @@ object TypeClass {
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
 
-  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
-  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
-  lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
+  // lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
+  // lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  // lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
   // lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
@@ -86,8 +86,8 @@ object TypeClass {
     show,
     order,
     enum,
-    plusEmpty,
-    isEmpty,
+    // plusEmpty,
+    // isEmpty,
     optional,
     invariantFunctor,
     functor,
@@ -104,7 +104,7 @@ object TypeClass {
     monad,
     cobind,
     comonad,
-    plus,
+    // plus,
     // applicativePlus,
     // monadPlus,
     foldable,

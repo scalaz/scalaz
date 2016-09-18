@@ -61,7 +61,7 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 }
 
 private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] {
-  val bind_ = this
+  val bindInstance = this
   override def forever[A, B](fa: Cokleisli[F, R, A]): Cokleisli[F, R, B] = super[BindRec].forever(fa)
   override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa map f
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)

@@ -36,7 +36,7 @@ s"""
 private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] with Bind[($tparams, ?)] with Tuple${n}Functor[$tparams] {
   ${(1 until n).map(i => s"def _$i : Semigroup[A$i]").mkString("; ")}
 
-  val bind_ = this
+  val bindInstance = this
 
   override def forever[A, B](fa: ($tparams, A)): ($tparams, B) = super[BindRec].forever(fa)
 

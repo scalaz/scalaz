@@ -41,9 +41,9 @@ private trait ProductBindRec[F[_], G[_]] extends BindRec[λ[α => (F[α], G[α])
 
   implicit def G: BindRec[G]
 
-  def bind_ : Bind[λ[α => (F[α], G[α])]] = new ProductBind[F, G] {
-    implicit def F = outer.F.bind_
-    implicit def G = outer.G.bind_
+  val bindInstance: Bind[λ[α => (F[α], G[α])]] = new ProductBind[F, G] {
+    implicit def F = outer.F.bindInstance
+    implicit def G = outer.G.bindInstance
   }
 
   override def tailrecM[A, B](a: A)(f: A => (F[A \/ B], G[A \/ B])) =
@@ -78,9 +78,9 @@ private trait ProductApplicativePlus[F[_], G[_]] extends ApplicativePlus[λ[α =
 
   implicit def G: ApplicativePlus[G]
 
-  def applicative: Applicative[λ[α => (F[α], G[α])]] = new ProductApplicative[F, G] {
-    implicit val F = outer.F.applicative
-    implicit val G = outer.G.applicative
+  val applicativeInstance: Applicative[λ[α => (F[α], G[α])]] = new ProductApplicative[F, G] {
+    implicit def F = outer.F.applicativeInstance
+    implicit def G = outer.G.applicativeInstance
   }
 }
 
@@ -89,12 +89,12 @@ private trait ProductMonadPlus[F[_], G[_]] extends MonadPlus[λ[α => (F[α], G[
 
   implicit def G: MonadPlus[G]
 
-  override def applicative: Applicative[λ[α => (F[α], G[α])]] = monad
-
-  def monad: Monad[λ[α => (F[α], G[α])]] = new ProductMonad[F, G] {
-    implicit val F = outer.F.monad
-    implicit val G = outer.G.monad
+  val monadInstance: Monad[λ[α => (F[α], G[α])]] = new ProductMonad[F, G] {
+    implicit def F = outer.F.monadInstance
+    implicit def G = outer.G.monadInstance
   }
+
+  override val applicativeInstance: Applicative[λ[α => (F[α], G[α])]] = monadInstance
 }
 
 private trait ProductFoldable[F[_], G[_]] extends Foldable[λ[α => (F[α], G[α])]] {

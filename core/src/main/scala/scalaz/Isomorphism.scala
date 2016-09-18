@@ -297,9 +297,9 @@ trait IsomorphismBindRec[F[_], G[_]] extends BindRec[F] { outer =>
   implicit def G: BindRec[G]
   def iso: F <~> G
 
-  def bind_ = new IsomorphismBind[F, G] {
-    val iso = outer.iso
-    val G = outer.G.bind_
+  val bindInstance = new IsomorphismBind[F, G] {
+    def iso = outer.iso
+    def G = outer.G.bindInstance
   }
 
   override def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = iso.from(G.tailrecM(a)(f andThen iso.unlift[A \/ B].to))
@@ -313,9 +313,9 @@ trait IsomorphismMonadReader[F[_], G[_], E] extends MonadReader[F, E] { outer =>
   implicit def G: MonadReader[G, E]
   def iso: F <~> G
 
-  def monad = new IsomorphismMonad[F, G] {
-    val iso = outer.iso
-    val G = outer.G.monad
+  val monadInstance = new IsomorphismMonad[F, G] {
+    def iso = outer.iso
+    def G = outer.G.monadInstance
   }
 
   override def ask: F[E] = iso.from(G.ask)
@@ -328,9 +328,9 @@ trait IsomorphismMonadState[F[_], G[_], S] extends MonadState[F, S] { outer =>
   implicit def G: MonadState[G, S]
   def iso: F <~> G
 
-  def monad = new IsomorphismMonad[F, G] {
-    val iso = outer.iso
-    val G = outer.G.monad
+  val monadInstance = new IsomorphismMonad[F, G] {
+    def iso = outer.iso
+    def G = outer.G.monadInstance
   }
 
   override def init: F[S] = iso.from(G.init)
@@ -345,9 +345,9 @@ trait IsomorphismMonadTell[F[_], G[_], S] extends MonadTell[F, S] { outer =>
   implicit def G: MonadTell[G, S]
   def iso: F <~> G
 
-  def monad = new IsomorphismMonad[F, G] {
-    val iso = outer.iso
-    val G = outer.G.monad
+  val monadInstance = new IsomorphismMonad[F, G] {
+    def iso = outer.iso
+    def G = outer.G.monadInstance
   }
 
   override def writer[A](w: S, v: A): F[A] = iso.from(G.writer(w, v))
@@ -357,9 +357,9 @@ trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] { outer =>
   implicit def G: MonadError[G, S]
   def iso: F <~> G
 
-  def monad = new IsomorphismMonad[F, G] {
-    val iso = outer.iso
-    val G = outer.G.monad
+  val monadInstance = new IsomorphismMonad[F, G] {
+    def iso = outer.iso
+    def G = outer.G.monadInstance
   }
 
   override def raiseError[A](e: S): F[A] =
@@ -427,9 +427,9 @@ trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with Iso
   implicit def G: ApplicativePlus[G]
   def iso: F <~> G
 
-  def applicative = new IsomorphismApplicative[F, G] {
-    val iso = outer.iso
-    val G = outer.G.applicative
+  val applicativeInstance = new IsomorphismApplicative[F, G] {
+    def iso = outer.iso
+    def G = outer.G.applicativeInstance
   }
 }
 
@@ -437,9 +437,9 @@ trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismEmpt
   implicit def G: MonadPlus[G]
   def iso: F <~> G
 
-  def monad = new IsomorphismMonad[F, G] {
-    val iso = outer.iso
-    val G = outer.G.monad
+  val monadInstance = new IsomorphismMonad[F, G] {
+    def iso = outer.iso
+    def G = outer.G.monadInstance
   }
 }
 

@@ -7,7 +7,7 @@ package scalaz
 ////
 trait MonadError[F[_], S] {
   ////
-  def monad: Monad[F]
+  def monadInstance: Monad[F]
 
   def raiseError[A](e: S): F[A]
   def handleError[A](fa: F[A])(f: S => F[A]): F[A]
@@ -16,9 +16,9 @@ trait MonadError[F[_], S] {
     def raisedErrorsHandled[A](e: S, f: S => F[A])(implicit FEA: Equal[F[A]]): Boolean =
       FEA.equal(handleError(raiseError(e))(f), f(e))
     def errorsRaised[A](a: A, e: S)(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(monad.bind(monad.point(a))(_ => raiseError(e)), raiseError(e))
+      FEA.equal(monadInstance.bind(monadInstance.point(a))(_ => raiseError(e)), raiseError(e))
     def errorsStopComputation[A](e: S, a: A)(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(monad.bind(raiseError(e))(_ => monad.point(a)), raiseError(e))
+      FEA.equal(monadInstance.bind(raiseError(e))(_ => monadInstance.point(a)), raiseError(e))
   }
   def monadErrorLaw = new MonadErrorLaw {}
 

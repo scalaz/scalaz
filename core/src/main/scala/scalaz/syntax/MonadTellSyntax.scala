@@ -5,10 +5,10 @@ package syntax
 final class MonadTellOps[F[_], S, A] private[syntax](self: F[A])(implicit val F: MonadTell[F, S]) {
   ////
 
-  final def :++>(w: => S): F[A] = F.monad.bind(self)(a => F.monad.map(F.tell(w))(_ => a))
+  final def :++>(w: => S): F[A] = F.monadInstance.bind(self)(a => F.monadInstance.map(F.tell(w))(_ => a))
 
   final def :++>>(f: A => S): F[A] =
-    F.monad.bind(self)(a => F.monad.map(F.tell(f(a)))(_ => a))
+    F.monadInstance.bind(self)(a => F.monadInstance.map(F.tell(f(a)))(_ => a))
 
   ////
 }
@@ -26,7 +26,7 @@ trait MonadTellSyntax[F[_], S] extends MonadSyntax[F] {
   implicit def ToMonadTellOps[A](v: F[A]): MonadTellOps[F, S, A] =
     new MonadTellOps[F, S, A](v)(MonadTellSyntax.this.FS)
 
-  def F = FS.monad
+  def F = FS.monadInstance
   def FS: MonadTell[F, S]
   ////
 

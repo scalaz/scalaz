@@ -1089,9 +1089,9 @@ object IndSeq extends IndSeqInstances {
 
 sealed abstract class IndSeqInstances extends IndSeqInstances0 {
   implicit val indSeqMonadPlus: MonadPlus[IndSeq] = new MonadPlus[IndSeq] {
-    val monad = indSeqInstance
-    def empty[A]: IndSeq[A] = monad.empty[A]
-    def plus[A](a: IndSeq[A], b: => IndSeq[A]) = monad.plus(a, b)
+    val monadInstance = indSeqInstance
+    def empty[A]: IndSeq[A] = monadInstance.empty[A]
+    def plus[A](a: IndSeq[A], b: => IndSeq[A]) = monadInstance.plus(a, b)
   }
 }
 

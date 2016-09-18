@@ -112,10 +112,10 @@ private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
 private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] { outer =>
   implicit def F: BindRec[F]
 
-  def bind_ = new IdTBind[F] { implicit val F = outer.F.bind_ }
+  val bindInstance = new IdTBind[F] { implicit def F = outer.F.bindInstance }
 
   final def tailrecM[A, B](a: A)(f: A => IdT[F, A \/ B]): IdT[F, B] =
-    IdT(F.tailrecM[A, B](a)(a => F.bind_.map(f(a).run)(identity)))
+    IdT(F.tailrecM[A, B](a)(a => F.bindInstance.map(f(a).run)(identity)))
 }
 
 private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {

@@ -110,7 +110,7 @@ sealed abstract class LazyOptionInstances0 {
 
   implicit val lazyOptionInstance: Traverse[LazyOption] with Monad[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
     new Traverse[LazyOption] with Monad[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
-      val bind_ = this
+      val bindInstance = this
       override def forever[A, B](fa: LazyOption[A]): LazyOption[B] = super[BindRec].forever(fa)
       def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
       override def cojoin[A](a: LazyOption[A]) = a match {
@@ -180,9 +180,9 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
 
 sealed abstract class LazyOptionInstances extends LazyOptionInstances0 {
   implicit val lazyOptionMonadPlus: MonadPlus[LazyOption] = new MonadPlus[LazyOption] {
-    val monad = lazyOptionInstance
-    def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = monad.plus(a, b)
-    def empty[A]: LazyOption[A] = monad.empty[A]
+    val monadInstance = lazyOptionInstance
+    def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = monadInstance.plus(a, b)
+    def empty[A]: LazyOption[A] = monadInstance.empty[A]
   }
 }
 

@@ -176,7 +176,7 @@ private trait MaybeTMonad[F[_]] extends Monad[MaybeT[F, ?]] {
 private trait MaybeTBindRec[F[_]] extends BindRec[MaybeT[F, ?]] with MaybeTMonad[F] {
   implicit def B: BindRec[F]
 
-  val bind_ = this
+  val bindInstance = this
 
   override def forever[A, B](fa: MaybeT[F, A]): MaybeT[F, B] = super[BindRec].forever(fa)
 
@@ -208,13 +208,13 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
     λ[MaybeT[M, ?] ~> MaybeT[N, ?]](_ mapT f)
 
   implicit def apply[G[_] : Monad]: Monad[MaybeT[G, ?]] =
-    MaybeT.maybeTMonadPlus[G].monad
+    MaybeT.maybeTMonadPlus[G].monadInstance
 }
 
 private trait MaybeTMonadPlus[F[_]] extends MonadPlus[MaybeT[F, ?]] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new MaybeTMonad[F] { implicit def F = outer.F }
+  val monadInstance = new MaybeTMonad[F] { implicit def F = outer.F }
 
   def empty[A]: MaybeT[F, A] = MaybeT(F point Maybe.empty)
   def plus[A](a: MaybeT[F, A], b: => MaybeT[F, A]): MaybeT[F, A] = a orElse b
@@ -223,10 +223,10 @@ private trait MaybeTMonadPlus[F[_]] extends MonadPlus[MaybeT[F, ?]] { outer =>
 private trait MaybeTMonadError[F[_], E] extends MonadError[MaybeT[F, ?], E] { outer =>
   def F: MonadError[F, E]
 
-  def monad = new MaybeTMonad[F] { val F = outer.F.monad }
+  val monadInstance = new MaybeTMonad[F] { def F = outer.F.monadInstance }
 
   override def raiseError[A](e: E) =
-    MaybeT[F, A](F.monad.map(F.raiseError[A](e))(Maybe.just))
+    MaybeT[F, A](F.monadInstance.map(F.raiseError[A](e))(Maybe.just))
 
   override def handleError[A](fa: MaybeT[F, A])(f: E => MaybeT[F, A]) =
     MaybeT[F, A](F.handleError(fa.run)(f(_).run))
@@ -235,18 +235,18 @@ private trait MaybeTMonadError[F[_], E] extends MonadError[MaybeT[F, ?], E] { ou
 private trait MaybeTMonadTell[F[_], W] extends MonadTell[MaybeT[F, ?], W] with MaybeTHoist { outer =>
   implicit def F: MonadTell[F, W]
 
-  def monad = new MaybeTMonad[F] { val F = outer.F.monad }
+  val monadInstance = new MaybeTMonad[F] { def F = outer.F.monadInstance }
 
   def writer[A](w: W, v: A): MaybeT[F, A] =
-    liftM[F, A](F.writer(w, v))(F.monad)
+    liftM[F, A](F.writer(w, v))(F.monadInstance)
 }
 
 private trait MaybeTMonadListen[F[_], W] extends MonadListen[MaybeT[F, ?], W] with MaybeTMonadTell[F, W] {
   implicit def F: MonadListen[F, W]
 
   def listen[A](ma: MaybeT[F, A]): MaybeT[F, (A, W)] = {
-    val tmp = F.monad.bind[(Maybe[A], W), Maybe[(A, W)]](F.listen(ma.run)) {
-      case (m, w) => m.cata(j => F.monad.point(Maybe.just((j, w))), F.monad.point(Maybe.empty))
+    val tmp = F.monadInstance.bind[(Maybe[A], W), Maybe[(A, W)]](F.listen(ma.run)) {
+      case (m, w) => m.cata(j => F.monadInstance.point(Maybe.just((j, w))), F.monadInstance.point(Maybe.empty))
     }
 
     MaybeT.maybeT[F].apply[(A, W)](tmp)

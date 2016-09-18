@@ -101,15 +101,15 @@ sealed abstract class DListInstances extends DListInstances0 {
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
   implicit val dlistMonadPlus: MonadPlus[DList] = new MonadPlus[DList] {
-    val monad = dlistMonad
-    def plus[A](a: DList[A], b: => DList[A]) = monad.plus(a, b)
-    def empty[A] = monad.empty[A]
+    val monadInstance = dlistMonad
+    def plus[A](a: DList[A], b: => DList[A]) = monadInstance.plus(a, b)
+    def empty[A] = monadInstance.empty[A]
   }
 }
 
 sealed abstract class DListInstances0 {
   implicit val dlistMonad: Monad[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] = new Monad[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
-    val bind_ = this
+    val bindInstance = this
     override def forever[A, B](fa: DList[A]): DList[B] = super[BindRec].forever(fa)
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f

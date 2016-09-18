@@ -184,11 +184,11 @@ object Maybe extends MaybeInstances {
 
 sealed abstract class MaybeInstances extends MaybeInstances0 {
   implicit def maybeMonadPlus: MonadPlus[Maybe] = new MonadPlus[Maybe] {
-    val monad = maybeInstance
+    val monadInstance = maybeInstance
 
-    def empty[A]: Maybe[A] = monad.empty[A]
+    def empty[A]: Maybe[A] = monadInstance.empty[A]
 
-    def plus[A](a: Maybe[A], b: => Maybe[A]) = monad.plus(a, b)
+    def plus[A](a: Maybe[A], b: => Maybe[A]) = monadInstance.plus(a, b)
 
     override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
       fa.filter(f)
@@ -287,8 +287,8 @@ sealed abstract class MaybeInstances0 {
 
   implicit val maybeInstance: Traverse[Maybe] with Monad[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
     new Traverse[Maybe] with Monad[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
-      val bind_ = this
-      val monad = this
+      val monadInstance = this
+      val bindInstance = monadInstance
 
       override def forever[A, B](fa: Maybe[A]): Maybe[B] = super[BindRec].forever(fa)
 

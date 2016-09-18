@@ -29,7 +29,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
   // behaviour based on Scala version.
   implicit def function1CovariantByName[T]: Monad[(=> T) => ?] with BindRec[(=> T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[(=> T) => ?] =
     new Monad[(=> T) => ?] with BindRec[(=> T) => ?] with Zip[(=> T) => ?] with Unzip[(=> T) => ?] with Distributive[(=> T) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (=> T) => A): (=> T) => B = super[BindRec].forever(fa)
 
@@ -62,7 +62,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
 trait FunctionInstances extends FunctionInstances0 {
   implicit val function0Instance =
     new Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: Function0[A]): Function0[B] = super[BindRec].forever(fa)
 
@@ -136,7 +136,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function1Covariant[T]: Monad[T => ?] with BindRec[T => ?] with Zip[T => ?] with Unzip[T => ?] with Distributive[T => ?] =
     new Monad[T => ?] with BindRec[T => ?] with Zip[T => ?] with Unzip[T => ?] with Distributive[T => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: T => A): T => B = super[BindRec].forever(fa)
 
@@ -174,7 +174,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function2Instance[T1, T2]: Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] =
     new Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2) => A): (T1, T2) => B = super[BindRec].forever(fa)
 
@@ -198,7 +198,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function3Instance[T1, T2, T3]: Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] =
     new Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3) => A): (T1, T2, T3) => B = super[BindRec].forever(fa)
 
@@ -222,7 +222,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function4Instance[T1, T2, T3, T4]: Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] =
     new Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3, T4) => A): (T1, T2, T3, T4) => B =
         super[BindRec].forever(fa)
@@ -247,7 +247,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function5Instance[T1, T2, T3, T4, T5]: Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] =
     new Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3, T4, T5) => A): (T1, T2, T3, T4, T5) => B =
         super[BindRec].forever(fa)
@@ -272,7 +272,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function6Instance[T1, T2, T3, T4, T5, T6]: Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3, T4, T5, T6) => A): (T1, T2, T3, T4, T5, T6) => B =
         super[BindRec].forever(fa)
@@ -297,7 +297,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function7Instance[T1, T2, T3, T4, T5, T6, T7]: Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3, T4, T5, T6, T7) => A): (T1, T2, T3, T4, T5, T6, T7) => B =
         super[BindRec].forever(fa)
@@ -322,7 +322,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   implicit def function8Instance[T1, T2, T3, T4, T5, T6, T7, T8]: Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] =
     new Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] {
-      val bind_ = this
+      val bindInstance = this
 
       override def forever[A, B](fa: (T1, T2, T3, T4, T5, T6, T7, T8) => A): (T1, T2, T3, T4, T5, T6, T7, T8) => B =
         super[BindRec].forever(fa)

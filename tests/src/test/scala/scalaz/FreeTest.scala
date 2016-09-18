@@ -24,7 +24,7 @@ object FreeList extends FreeListInstances {
   }
 
   implicit def freeListMonad = new Monad[FreeList] with BindRec[FreeList] {
-    val bind_ = this
+    val bindInstance = this
 
     override def forever[A, B](fa: FreeList[A]): FreeList[B] = super[BindRec].forever(fa)
 
@@ -64,7 +64,7 @@ case class FreeOption[A](f: Free[Option, A])
 
 object FreeOption {
   implicit def freeOptionBindRec: BindRec[FreeOption] with Bind[FreeOption] = new BindRec[FreeOption] with Bind[FreeOption] {
-    val bind_ = this
+    val bindInstance = this
 
     override def forever[A, B](fa: FreeOption[A]): FreeOption[B] = super[BindRec].forever(fa)
 

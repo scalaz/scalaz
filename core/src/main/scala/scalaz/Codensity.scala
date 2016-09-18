@@ -47,7 +47,7 @@ sealed abstract class CodensityInstances {
     */
   implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, ?]] =
     new MonadPlus[Codensity[F, ?]] {
-      val monad = codensityMonad[F]
+      val monadInstance = codensityMonad[F]
 
       def empty[A] =
         new Codensity[F, A] {

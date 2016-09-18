@@ -197,7 +197,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
     }
 
   implicit def nullResultMonadPlus[X]: MonadPlus[NullResult[X, ?]] = new MonadPlus[NullResult[X, ?]] {
-    val monad = nullResultMonad[X]
+    val monadInstance = nullResultMonad[X]
     def empty[A] = NullResult.never[X, A]
     def plus[A](a: NullResult[X, A], b: => NullResult[X, A]) = NullResult[X, A](x => a(x) orElse b(x))
   }
@@ -205,7 +205,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
   implicit def nullResultMonad[X]: Monad[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
     new Monad[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
-      val bind_ = this
+      val bindInstance = this
       override def forever[A, B](fa: NullResult[X, A]): NullResult[X, B] = super[BindRec].forever(fa)
       override def tailrecM[A, B](a: A)(f: A => NullResult[X, A \/ B]) =
         NullResult(r => BindRec[Option].tailrecM(a)(f(_)(r)))

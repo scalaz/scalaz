@@ -156,7 +156,7 @@ private trait ListTMonad[F[_]] extends Monad[ListT[F, ?]] with ListTFunctor[F] {
 private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] { outer =>
   implicit def F: Monad[F]
 
-  def monad = new ListTMonad[F] { implicit def F = outer.F }
+  val monadInstance = new ListTMonad[F] { implicit def F = outer.F }
 
   def empty[A]: ListT[F, A] = ListT.empty[F, A]
 
@@ -167,7 +167,7 @@ private trait ListTHoist extends Hoist[ListT] {
   import ListT._
 
   implicit def apply[G[_] : Monad]: Monad[ListT[G, ?]] =
-    listTMonadPlus[G].monad
+    listTMonadPlus[G].monadInstance
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromList(G.map(a)(entry => entry :: Nil))

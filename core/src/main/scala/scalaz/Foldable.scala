@@ -326,7 +326,7 @@ trait Foldable[F[_]]  { self =>
     }.reverse
 
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
-    foldRight(x, A.empty[A])((a, b) => A.plus(A.applicative.point(a), b))
+    foldRight(x, A.empty[A])((a, b) => A.plus(A.applicativeInstance.point(a), b))
 
   trait FoldableLaw {
     import std.vector._

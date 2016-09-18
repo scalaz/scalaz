@@ -26,7 +26,7 @@ trait ToBindRecOps extends ToBindRecOps0 with ToBindOps {
 trait BindRecSyntax[F[_]] extends BindSyntax[F] {
   implicit def ToBindRecOps[A](v: F[A]): BindRecOps[F, A] = new BindRecOps[F,A](v)(BindRecSyntax.this.FB)
 
-  def F = FB.bind_
+  def F = FB.bindInstance
   def FB: BindRec[F]
   ////
 

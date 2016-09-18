@@ -353,9 +353,9 @@ private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] { outer 
   implicit def A: Applicative[F]
   implicit def W: Semigroup[W]
 
-  def bind_ = new WriterTBind[F, W] {
-    implicit val F = outer.F.bind_
-    implicit val W = outer.W
+  val bindInstance = new WriterTBind[F, W] {
+    implicit def F = outer.F.bindInstance
+    implicit def W = outer.W
   }
 
   def tailrecM[A, B](a: A)(f: A => WriterT[F, W, A \/ B]): WriterT[F, W, B] = {
@@ -366,7 +366,7 @@ private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] { outer 
           e.bimap((w1, _), (w1, _))
       }
 
-    WriterT(F.bind_.bind(f(a).run) {
+    WriterT(F.bindInstance.bind(f(a).run) {
       case (w, -\/(a0)) => F.tailrecM((w, a0))(go)
       case (w, \/-(b)) => A.point((w, b))
     })
@@ -380,9 +380,9 @@ private trait WriterTMonad[F[_], W] extends Monad[WriterT[F, W, ?]] with WriterT
 private trait WriterTMonadPlus[F[_], W] extends MonadPlus[WriterT[F, W, ?]] with WriterTPlusEmpty[F, W] { outer =>
   def F: MonadPlus[F]
   def W: Monoid[W]
-  def monad = new WriterTMonad[F, W] {
-    implicit val F = outer.F.monad
-    implicit val W = outer.W
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F.monadInstance
+    implicit def W = outer.W
   }
 }
 
@@ -390,9 +390,9 @@ private trait WriterTMonadError[F[_], E, W] extends MonadError[WriterT[F, W, ?],
   implicit def F: MonadError[F, E]
   implicit def W: Monoid[W]
 
-  def monad = new WriterTMonad[F, W] {
-    implicit val F = outer.F.monad
-    implicit val W = outer.W
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F.monadInstance
+    implicit def W = outer.W
   }
 
   override def handleError[A](fa: WriterT[F, W, A])(f: E => WriterT[F, W, A]) =
@@ -454,9 +454,9 @@ private trait WriterTMonadListen[F[_], W] extends MonadListen[WriterT[F, W, ?], 
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 
-  def monad = new WriterTMonad[F, W] {
-    implicit val F = outer.F
-    implicit val W = outer.W
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F
+    implicit def W = outer.W
   }
 
   def writer[A](w: W, v: A): WriterT[F, W, A] = WriterT.writerT(F.point((w, v)))
