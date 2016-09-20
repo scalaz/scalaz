@@ -18,8 +18,8 @@ lazy val scalaz = Project(
   base = file("."),
   settings = standardSettings ++ unidocSettings ++ Seq[Sett](
     mimaPreviousArtifacts := Set.empty,
-    artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
-    packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile)),
+    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile)).value,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := {
       jsProjects.foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
     }

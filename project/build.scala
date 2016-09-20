@@ -156,22 +156,25 @@ object build {
         typeclassSource(tc).sources.map(_.createOrUpdate(dir, streams.value.log))
       }
     },
-    checkGenTypeClasses <<= genTypeClasses.map{ classes =>
+    checkGenTypeClasses := {
+      val classes = genTypeClasses.value
       if(classes.exists(_._1 != FileStatus.NoChange))
         sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
     },
     typeClasses := Seq(),
-    genToSyntax <<= typeClasses map {
-      (tcs: Seq[TypeClass]) =>
+    genToSyntax := {
+      val tcs = typeClasses.value
       val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
       val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
       objects + "\n\n" + all
     },
-    typeClassTree <<= typeClasses map {
-      tcs => tcs.map(_.doc).mkString("\n")
+    typeClassTree := {
+      typeClasses.value.map(_.doc).mkString("\n")
     },
 
-    showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
+    showDoc in Compile := {
+      val _ = (doc in Compile).value
+      val out = (target in doc in Compile).value
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
@@ -267,9 +270,9 @@ object build {
     .settings(standardSettings)
     .settings(
       name := "scalaz-core",
-      sourceGenerators in Compile <+= (sourceManaged in Compile) map {
+      sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      },
+      }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
@@ -301,13 +304,12 @@ object build {
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings)
 
-  lazy val publishSetting = publishTo <<= (version).apply{
-    v =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  lazy val publishSetting = publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (version.value.trim.endsWith("SNAPSHOT"))
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {
