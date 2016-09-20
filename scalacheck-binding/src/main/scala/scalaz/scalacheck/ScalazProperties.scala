@@ -399,14 +399,14 @@ object ScalazProperties {
     def rightZero[F[_], X](implicit F: MonadPlus[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.strongMonadPlusLaw.rightZero[X] _)
 
-    def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]): Properties =
+    def laws[F[_]](implicit F: MonadPlus[F], M: Monad[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]): Properties =
       newProperties("monad plus") { p =>
         p.include(monad.laws[F])
         p.include(plusEmpty.laws[F])
         p.property("empty map") = emptyMap[F, Int]
         p.property("left zero") = leftZero[F, Int]
       }
-    def strongLaws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) =
+    def strongLaws[F[_]](implicit F: MonadPlus[F], M: Monad[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) =
       newProperties("monad plus") { p =>
         p.include(laws[F])
         p.property("right zero") = rightZero[F, Int]
@@ -607,7 +607,7 @@ object ScalazProperties {
     def errorsStopComputation[F[_], E, A](implicit me: MonadError[F, E], eq: Equal[F[A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]) =
+    def laws[F[_], E](implicit me: MonadError[F, E], m: Monad[F], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]) =
       newProperties("monad error"){ p =>
         p.include(monad.laws[F])
         p.property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]

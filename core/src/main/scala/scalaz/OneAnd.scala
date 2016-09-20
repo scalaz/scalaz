@@ -61,9 +61,9 @@ private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, ?]] with OneAndFu
 }
 
 private sealed trait OneAndApplicative[F[_]] extends Applicative[OneAnd[F, ?]] with OneAndApply[F] {
-  def F: ApplicativePlus[F]
+  def G: ApplicativePlus[F]
 
-  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, F.empty)
+  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, G.empty)
 }
 
 private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, ?]] with OneAndApply[F] {
@@ -91,8 +91,7 @@ private sealed trait OneAndPlus[F[_]] extends Plus[OneAnd[F, ?]] {
 }
 
 private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, ?]] with OneAndBind[F] with OneAndApplicative[F] {
-  def F: MonadPlus[F]
-  def G = F
+  def G: MonadPlus[F]
 }
 
 private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
@@ -220,7 +219,7 @@ sealed abstract class OneAndInstances4 extends OneAndInstances5 {
 sealed abstract class OneAndInstances3 extends OneAndInstances4 {
   implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[OneAnd[F, ?]] =
     new OneAndApplicative[F] {
-      def F = implicitly
+      def F = ApplicativePlus[F].applicativeInstance
       def G = implicitly
     }
 }
@@ -236,7 +235,8 @@ sealed abstract class OneAndInstances2 extends OneAndInstances3 {
 sealed abstract class OneAndInstances1 extends OneAndInstances2 {
   implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, ?]] =
     new OneAndMonad[F] {
-      def F = implicitly
+      def F = MonadPlus[F].monadInstance
+      def G = implicitly
     }
 
   implicit def oneAndFoldable[F[_]: Foldable]: Foldable1[OneAnd[F, ?]] =

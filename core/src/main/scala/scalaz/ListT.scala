@@ -97,6 +97,11 @@ sealed abstract class ListTInstances extends ListTInstances1 {
       implicit def F: Monad[F] = F0
     }
 
+  implicit def listTMonad[F[_]](implicit F0: Monad[F]): Monad[ListT[F, ?]] =
+    new ListTMonad[F] {
+      implicit def F: Monad[F] = F0
+    }
+
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]]): Equal[ListT[F, A]] =
     E.contramap((_: ListT[F, A]).toList)
 
@@ -140,12 +145,18 @@ private trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with ListTSemigro
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
-private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] with ListTFunctor[F] {
+private trait ListTMonad[F[_]] extends Monad[ListT[F, ?]] with ListTFunctor[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
 
   def point[A](a: => A): ListT[F, A] = a :: ListT.empty[F, A]
+}
+
+private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] { outer =>
+  implicit def F: Monad[F]
+
+  val monadInstance = new ListTMonad[F] { implicit def F = outer.F }
 
   def empty[A]: ListT[F, A] = ListT.empty[F, A]
 
@@ -156,7 +167,7 @@ private trait ListTHoist extends Hoist[ListT] {
   import ListT._
 
   implicit def apply[G[_] : Monad]: Monad[ListT[G, ?]] =
-    listTMonadPlus[G]
+    listTMonadPlus[G].monadInstance
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromList(G.map(a)(entry => entry :: Nil))

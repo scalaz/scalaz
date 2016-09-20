@@ -155,6 +155,11 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
+  implicit def stateTMonad[S, F[_]](implicit F0: Monad[F]): Monad[StateT[F, S, ?]] =
+    new StateTMonadState[S, F] {
+      implicit def F: Monad[F] = F0
+    }
+
   implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] =
     new StateTMonadState[S, F] {
       implicit def F: Monad[F] = F0
@@ -163,8 +168,9 @@ sealed abstract class StateTInstances2 extends StateTInstances3 {
 
 sealed abstract class StateTInstances1 extends StateTInstances2 {
   implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[StateT[F, S, ?]] =
-    new StateTMonadStateMonadPlus[S, F] {
-      implicit def F: MonadPlus[F] = F0
+    new StateTMonadPlus[S, F] {
+      implicit def F = F0.monadInstance
+      implicit def G = F0
     }
 }
 
@@ -174,7 +180,10 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
 }
 
 abstract class StateTInstances extends StateTInstances0 {
-  implicit def stateMonad[S]: MonadState[State[S, ?], S] =
+  implicit def stateMonad[S]: Monad[State[S, ?]] =
+      StateT.stateTMonad[S, Id](Id.id)
+
+  implicit def stateMonadState[S]: MonadState[State[S, ?], S] =
       StateT.stateTMonadState[S, Id](Id.id)
 }
 
@@ -229,6 +238,10 @@ private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[State
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
+  val bindInstance = this
+
+  override def forever[A, B](fa: StateT[F, S, A]): StateT[F, S, B] = super[BindRec].forever(fa)
+
   def tailrecM[A, B](a: A)(f: A => StateT[F, S, A \/ B]): StateT[F, S, B] =
     IndexedStateT(s => B.tailrecM((s, a))(t => {
       F.map(f(t._2)(t._1)) { case (s, m) =>
@@ -240,8 +253,10 @@ private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[State
     }))
 }
 
-private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with StateTBind[S, F] {
+private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with Monad[StateT[F, S, ?]] with StateTBind[S, F] {
   implicit def F: Monad[F]
+
+  val monadInstance = this
 
   def point[A](a: => A): StateT[F, S, A] = {
     val aa = Need(a)
@@ -270,7 +285,7 @@ private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateTF[M, S]#f ~> StateTF[N, S]#f](_ mapT f)
 
-  implicit def apply[G[_] : Monad]: Monad[StateT[G, S, ?]] = StateT.stateTMonadState[S, G]
+  implicit def apply[G[_] : Monad]: Monad[StateT[G, S, ?]] = StateT.stateTMonad[S, G]
 }
 
 private trait IndexedStateTPlus[F[_], S1, S2] extends Plus[IndexedStateT[F, S1, S2, ?]] {
@@ -280,9 +295,10 @@ private trait IndexedStateTPlus[F[_], S1, S2] extends Plus[IndexedStateT[F, S1, 
     IndexedStateT(s => G.plus(a.run(s), b.run(s)))
 }
 
-private trait StateTMonadStateMonadPlus[S, F[_]] extends StateTMonadState[S, F] with StateTHoist[S] with MonadPlus[StateT[F, S, ?]] with IndexedStateTPlus[F, S, S] {
-  implicit def F: MonadPlus[F]
-  override final def G = F
+private trait StateTMonadPlus[S, F[_]] extends MonadPlus[StateT[F, S, ?]] with IndexedStateTPlus[F, S, S] with StateTHoist[S] { outer =>
+  implicit def G: MonadPlus[F]
 
-  def empty[A]: StateT[F, S, A] = liftM[F, A](F.empty[A])
+  val monadInstance = new StateTMonadState[S, F] { implicit def F = outer.F }
+
+  def empty[A]: StateT[F, S, A] = liftM[F, A](G.empty[A])
 }

@@ -95,12 +95,22 @@ object DList extends DListInstances {
   }
 }
 
-sealed abstract class DListInstances {
+sealed abstract class DListInstances extends DListInstances0 {
   implicit def dlistMonoid[A]: Monoid[DList[A]] = new Monoid[DList[A]] {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
+  implicit val dlistMonadPlus: MonadPlus[DList] = new MonadPlus[DList] {
+    val monadInstance = dlistMonad
+    def plus[A](a: DList[A], b: => DList[A]) = monadInstance.plus(a, b)
+    def empty[A] = monadInstance.empty[A]
+  }
+}
+
+sealed abstract class DListInstances0 {
+  implicit val dlistMonad: Monad[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] = new Monad[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
+    val bindInstance = this
+    override def forever[A, B](fa: DList[A]): DList[B] = super[BindRec].forever(fa)
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
@@ -117,5 +127,4 @@ sealed abstract class DListInstances {
     import std.list._
     Equal[List[A]].contramap((_: DList[A]).toList)
   }
-
 }

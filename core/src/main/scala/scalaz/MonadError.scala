@@ -5,8 +5,9 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_], S] extends Monad[F] { self =>
+trait MonadError[F[_], S] {
   ////
+  def monadInstance: Monad[F]
 
   def raiseError[A](e: S): F[A]
   def handleError[A](fa: F[A])(f: S => F[A]): F[A]
@@ -15,14 +16,14 @@ trait MonadError[F[_], S] extends Monad[F] { self =>
     def raisedErrorsHandled[A](e: S, f: S => F[A])(implicit FEA: Equal[F[A]]): Boolean =
       FEA.equal(handleError(raiseError(e))(f), f(e))
     def errorsRaised[A](a: A, e: S)(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(bind(point(a))(_ => raiseError(e)), raiseError(e))
+      FEA.equal(monadInstance.bind(monadInstance.point(a))(_ => raiseError(e)), raiseError(e))
     def errorsStopComputation[A](e: S, a: A)(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(bind(raiseError(e))(_ => point(a)), raiseError(e))
+      FEA.equal(monadInstance.bind(raiseError(e))(_ => monadInstance.point(a)), raiseError(e))
   }
   def monadErrorLaw = new MonadErrorLaw {}
 
   ////
-  val monadErrorSyntax = new scalaz.syntax.MonadErrorSyntax[F, S] { def F = MonadError.this }
+  val monadErrorSyntax = new scalaz.syntax.MonadErrorSyntax[F, S] { def FS = MonadError.this }
 }
 
 object MonadError {

@@ -46,9 +46,9 @@ sealed abstract class IdTInstances1 extends IdTInstances2 {
     new IdTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
-  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
-    new IdTBindRec[F] {
-      implicit def F: BindRec[F] = F0
+  implicit def idTBind[F[_]](implicit F0: Bind[F]): Bind[IdT[F, ?]] =
+    new IdTBind[F] {
+      implicit def F: Bind[F] = F0
     }
 }
 
@@ -63,6 +63,11 @@ sealed abstract class IdTInstances0 extends IdTInstances1 {
 }
 
 sealed abstract class IdTInstances extends IdTInstances0 {
+  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
+    new IdTBindRec[F] {
+      implicit def F: BindRec[F] = F0
+    }
+
   implicit val idTHoist: Hoist[IdT] = IdTHoist
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, ?]] =
@@ -104,11 +109,13 @@ private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
   final def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
 }
 
-private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
+private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] { outer =>
   implicit def F: BindRec[F]
 
+  val bindInstance = new IdTBind[F] { implicit def F = outer.F.bindInstance }
+
   final def tailrecM[A, B](a: A)(f: A => IdT[F, A \/ B]): IdT[F, B] =
-    IdT(F.tailrecM[A, B](a)(a => F.map(f(a).run)(identity)))
+    IdT(F.tailrecM[A, B](a)(a => F.bindInstance.map(f(a).run)(identity)))
 }
 
 private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {

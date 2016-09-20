@@ -6,16 +6,17 @@ package scalaz
  *
  */
 ////
-trait MonadState[F[_], S] extends Monad[F] { self =>
+trait MonadState[F[_], S] {
   ////
+  def monadInstance: Monad[F]
 
-  def state[A](a: A): F[A] = bind(init)(s => point(a))
-  def constantState[A](a: A, s: => S): F[A] = bind(put(s))(_ => point(a))
+  def state[A](a: A): F[A] = monadInstance.bind(init)(s => monadInstance.point(a))
+  def constantState[A](a: A, s: => S): F[A] = monadInstance.bind(put(s))(_ => monadInstance.point(a))
   def init: F[S]
   def get: F[S]
-  def gets[A](f: S => A): F[A] = bind(init)(s => point(f(s)))
+  def gets[A](f: S => A): F[A] = monadInstance.bind(init)(s => monadInstance.point(f(s)))
   def put(s: S): F[Unit]
-  def modify(f: S => S): F[Unit] = bind(init)(s => put(f(s)))
+  def modify(f: S => S): F[Unit] = monadInstance.bind(init)(s => put(f(s)))
 
   ////
 

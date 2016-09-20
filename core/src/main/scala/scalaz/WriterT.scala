@@ -262,6 +262,12 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
 }
 
 sealed abstract class WriterTInstances extends WriterTInstances0 {
+  implicit def writerTMonad[F[_], W](implicit F0: Monad[F], W0: Monoid[W]): Monad[WriterT[F, W, ?]] =
+    new WriterTMonad[F, W] {
+      implicit def F = F0
+      implicit def W = W0
+    }
+
   implicit def writerTMonadListen[F[_], W](implicit F0: Monad[F], W0: Monoid[W]): MonadListen[WriterT[F, W, ?], W] =
     new WriterTMonadListen[F, W] {
       implicit def F = F0
@@ -342,19 +348,25 @@ private trait WriterTBind[F[_], W] extends Bind[WriterT[F, W, ?]] with WriterTAp
   override final def bind[A, B](fa: WriterT[F, W, A])(f: A => WriterT[F, W, B]) = fa flatMap f
 }
 
-private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] with WriterTBind[F, W] {
+private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[F, W, ?]] { outer =>
   implicit def F: BindRec[F]
   implicit def A: Applicative[F]
+  implicit def W: Semigroup[W]
+
+  val bindInstance = new WriterTBind[F, W] {
+    implicit def F = outer.F.bindInstance
+    implicit def W = outer.W
+  }
 
   def tailrecM[A, B](a: A)(f: A => WriterT[F, W, A \/ B]): WriterT[F, W, B] = {
     def go(t: (W, A)): F[(W, A) \/ (W, B)] =
-      F.map(f(t._2).run) {
+      A.map(f(t._2).run) {
         case (w0, e) =>
           val w1 = W.append(t._1, w0)
           e.bimap((w1, _), (w1, _))
       }
 
-    WriterT(F.bind(f(a).run) {
+    WriterT(F.bindInstance.bind(f(a).run) {
       case (w, -\/(a0)) => F.tailrecM((w, a0))(go)
       case (w, \/-(b)) => A.point((w, b))
     })
@@ -365,12 +377,23 @@ private trait WriterTMonad[F[_], W] extends Monad[WriterT[F, W, ?]] with WriterT
   implicit def F: Monad[F]
 }
 
-private trait WriterTMonadPlus[F[_], W] extends MonadPlus[WriterT[F, W, ?]] with WriterTMonad[F, W] with WriterTPlusEmpty[F, W] {
+private trait WriterTMonadPlus[F[_], W] extends MonadPlus[WriterT[F, W, ?]] with WriterTPlusEmpty[F, W] { outer =>
   def F: MonadPlus[F]
+  def W: Monoid[W]
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F.monadInstance
+    implicit def W = outer.W
+  }
 }
 
-private trait WriterTMonadError[F[_], E, W] extends MonadError[WriterT[F, W, ?], E] with WriterTMonad[F, W] {
+private trait WriterTMonadError[F[_], E, W] extends MonadError[WriterT[F, W, ?], E] { outer =>
   implicit def F: MonadError[F, E]
+  implicit def W: Monoid[W]
+
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F.monadInstance
+    implicit def W = outer.W
+  }
 
   override def handleError[A](fa: WriterT[F, W, A])(f: E => WriterT[F, W, A]) =
     WriterT[F, W, A](F.handleError(fa.run)(f(_).run))
@@ -427,9 +450,14 @@ private trait WriterTHoist[W] extends Hoist[λ[(α[_], β) => WriterT[α, W, β]
     λ[WriterT[M, W, ?] ~> WriterT[N, W, ?]](_ mapT f)
 }
 
-private trait WriterTMonadListen[F[_], W] extends MonadListen[WriterT[F, W, ?], W] with WriterTMonad[F, W] {
+private trait WriterTMonadListen[F[_], W] extends MonadListen[WriterT[F, W, ?], W] { outer =>
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
+
+  val monadInstance = new WriterTMonad[F, W] {
+    implicit def F = outer.F
+    implicit def W = outer.W
+  }
 
   def writer[A](w: W, v: A): WriterT[F, W, A] = WriterT.writerT(F.point((w, v)))
 

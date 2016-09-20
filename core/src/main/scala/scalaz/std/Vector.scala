@@ -4,14 +4,16 @@ package std
 import vector._
 import annotation.tailrec
 
-sealed trait VectorInstances0 {
+sealed trait VectorInstances1 {
   implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new VectorEqual[A] {
     implicit def A = A0
   }
 }
 
-trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
+sealed trait VectorInstances0 extends VectorInstances1 {
+  implicit val vectorInstance: Traverse[Vector] with Monad[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with Monad[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
+    val bindInstance = this
+    override def forever[A, B](fa: Vector[A]): Vector[B] = super[BindRec].forever(fa)
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = empty :+ a
@@ -20,7 +22,6 @@ trait VectorInstances extends VectorInstances0 {
     def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
     def isEmpty[A](a: Vector[A]) = a.isEmpty
     override def map[A, B](v: Vector[A])(f: A => B) = v map f
-    override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p
 
     def zip[A, B](a: => Vector[A], b: => Vector[B]): Vector[(A, B)] = {
       val _a = a
@@ -110,6 +111,15 @@ trait VectorInstances extends VectorInstances0 {
 
   implicit def vectorOrder[A](implicit A0: Order[A]): Order[Vector[A]] = new VectorOrder[A] {
     implicit def A = A0
+  }
+}
+
+trait VectorInstances extends VectorInstances0 {
+  implicit def vectorMonadPlus: MonadPlus[Vector] = new MonadPlus[Vector] {
+    val monadInstance = vectorInstance
+    def empty[A] = Vector.empty[A]
+    def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
+    override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p
   }
 }
 

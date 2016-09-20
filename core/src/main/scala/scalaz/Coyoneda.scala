@@ -119,7 +119,7 @@ sealed abstract class CoyonedaInstances extends CoyonedaInstances0 {
   implicit def coyonedaBindRec[F[_]: BindRec]: BindRec[Coyoneda[F, ?]] =
     new IsomorphismBindRec[Coyoneda[F, ?], F] {
       def G = implicitly
-      def iso = Coyoneda.iso
+      def iso = Coyoneda.iso(BindRec[F].bindInstance)
     }
 }
 
@@ -157,7 +157,7 @@ sealed abstract class CoyonedaInstances3 extends CoyonedaInstances4 {
   implicit def coyonedaMonadPlus[F[_]: MonadPlus]: MonadPlus[Coyoneda[F, ?]] =
     new IsomorphismMonadPlus[Coyoneda[F, ?], F] {
       def G = implicitly
-      def iso = Coyoneda.iso
+      def iso = Coyoneda.iso(MonadPlus[F].monadInstance)
     }
 }
 
@@ -165,7 +165,7 @@ sealed abstract class CoyonedaInstances4 extends CoyonedaInstances5 {
   implicit def coyonedaApplicativePlus[F[_]: ApplicativePlus]: ApplicativePlus[Coyoneda[F, ?]] =
     new IsomorphismApplicativePlus[Coyoneda[F, ?], F] {
       def G = implicitly
-      def iso = Coyoneda.iso
+      def iso = Coyoneda.iso(ApplicativePlus[F].applicativeInstance)
     }
 }
 

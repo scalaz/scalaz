@@ -71,7 +71,6 @@ object EitherTTest extends SpecLite {
     def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : BindRec, A] = Functor[EitherT[F, A, ?]]
     def functor[F[_] : Monad, A: Monoid] = Functor[EitherT[F, A, ?]]
     def functor[F[_] : Monad : BindRec, A: Monoid] = Functor[EitherT[F, A, ?]]
     def apply[F[_] : Monad, A: Monoid] = Apply[EitherT[F, A, ?]]

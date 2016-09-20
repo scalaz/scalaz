@@ -1,15 +1,17 @@
 package scalaz
 package std
 
-sealed trait OptionInstances0 {
+sealed trait OptionInstances1 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
 }
 
-trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
-    new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+sealed trait OptionInstances0 extends OptionInstances1 {
+  implicit val optionInstance: Traverse[Option] with Monad[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+    new Traverse[Option] with Monad[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+      val bindInstance = this
+      override def forever[A, B](fa: Option[A]): Option[B] = super[BindRec].forever(fa)
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
@@ -161,6 +163,14 @@ trait OptionInstances extends OptionInstances0 {
   implicit def optionMaxOrder[A: Order]: Order[MaxOption[A]] = Tag.subst(Order[Option[A]])
 
   implicit def optionMaxMonad: Monad[MaxOption] = Tags.Max.subst1[Monad, Option](Monad[Option])
+}
+
+trait OptionInstances extends OptionInstances0 {
+  implicit val optionMonadPlus: MonadPlus[Option] = new MonadPlus[Option] {
+    val monadInstance = optionInstance
+    def empty[A]: Option[A] = monadInstance.empty[A]
+    def plus[A](a: Option[A], b: => Option[A]) = monadInstance.plus(a, b)
+  }
 }
 
 trait OptionFunctions {

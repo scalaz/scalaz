@@ -89,9 +89,9 @@ object Digit extends DigitInstances {
     F.map(chars)(a => digitFromChar(a) getOrElse d)
 
   def digitsCollapse[F[_]](chars: F[Char])(implicit F: MonadPlus[F]): F[Digit] =
-    F.bind(chars)(a => Digit.digitFromChar(a) match {
+    F.monadInstance.bind(chars)(a => Digit.digitFromChar(a) match {
       case None    => F.empty[Digit]
-      case Some(d) => F.point(d)
+      case Some(d) => F.monadInstance.point(d)
     })
 
   def traverseDigits[F[_]](chars: F[Char])(implicit F: Traverse[F]): Option[F[Digit]] = {

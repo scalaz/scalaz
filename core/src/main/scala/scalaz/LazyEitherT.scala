@@ -326,8 +326,11 @@ private trait LazyEitherTPlus[F[_], E] extends Plus[LazyEitherT[F, E, ?]] {
     })
 }
 
-private trait LazyEitherTMonadPlus[F[_], E] extends MonadPlus[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] with LazyEitherTPlus[F, E] {
+private trait LazyEitherTMonadPlus[F[_], E] extends MonadPlus[LazyEitherT[F, E, ?]] with LazyEitherTPlus[F, E] { outer =>
+  implicit def F: Monad[F]
   override def E: Monoid[E]
+
+  val monadInstance = new LazyEitherTMonad[F, E] { implicit def F = outer.F }
 
   override def empty[A] = LazyEitherT.lazyLeftT(E.zero)
 }
@@ -368,6 +371,10 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[LazyEitherT[F, ?, ?
 private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] {
   implicit def B: BindRec[F]
 
+  val bindInstance = this
+
+  override def forever[A, B](fa: LazyEitherT[F, E, A]): LazyEitherT[F, E, B] = super[BindRec].forever(fa)
+
   final def tailrecM[A, B](a: A)(f: A => LazyEitherT[F, E, A \/ B]): LazyEitherT[F, E, B] =
     LazyEitherT(
       B.tailrecM[A, LazyEither[E, B]](a)(a => F.map(f(a).run) {
@@ -376,7 +383,9 @@ private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] 
     )
 }
 
-private trait LazyEitherTMonadError[F[_], E] extends MonadError[LazyEitherT[F, E, ?], E] with LazyEitherTMonad[F, E] {
+private trait LazyEitherTMonadError[F[_], E] extends MonadError[LazyEitherT[F, E, ?], E] { outer =>
+  implicit def F: Monad[F]
+  val monadInstance = new LazyEitherTMonad[F, E] { implicit def F = outer.F }
   def raiseError[A](e: E): LazyEitherT[F, E, A] = LazyEitherT.lazyLeftT(e)
   def handleError[A](fa: LazyEitherT[F, E, A])(f: E => LazyEitherT[F, E, A]): LazyEitherT[F, E, A] = fa.left.flatMap(e => f(e))
 }

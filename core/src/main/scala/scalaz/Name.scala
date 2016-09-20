@@ -27,6 +27,8 @@ object Name {
 
   implicit val name: Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] =
     new Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] {
+      val bindInstance = this
+      override def forever[A, B](fa: Name[A]): Name[B] = super[BindRec].forever(fa)
       override def foldMap1[A, B: Semigroup](fa: Name[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Name[A], z: B)(f: (B, A) => B) = f(z, fa.value)
       override def foldRight[A, B](fa: Name[A], z: => B)(f: (A, => B) => B) = f(fa.value, z)
@@ -65,6 +67,8 @@ object Need {
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
     new Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] {
+      val bindInstance = this
+      override def forever[A, B](fa: Need[A]): Need[B] = super[BindRec].forever(fa)
       override def foldMap1[A, B: Semigroup](fa: Need[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Need[A], z: B)(f: (B, A) => B) = f(z, fa.value)
       override def foldRight[A, B](fa: Need[A], z: => B)(f: (A, => B) => B) = f(fa.value, z)
@@ -99,6 +103,8 @@ object Need {
 object Value {
   implicit val value: Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] =
     new Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] {
+      val bindInstance = this
+      override def forever[A, B](fa: Value[A]): Value[B] = super[BindRec].forever(fa)
       override def foldMap1[A, B: Semigroup](fa: Value[A])(f: A => B) = f(fa.value)
       override def foldLeft[A, B](fa: Value[A], z: B)(f: (B, A) => B) = f(z, fa.value)
       override def foldRight[A, B](fa: Value[A], z: => B)(f: (A, => B) => B) = f(fa.value, z)

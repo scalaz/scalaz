@@ -49,12 +49,9 @@ object ReaderWriterStateTTest extends SpecLite {
     // checking absence of ambiguity
     def functor[F[_]: Monad, R, W: Monoid, S] = Functor[RWST[F, R, W, S, ?]]
     def functor[F[_]: Bind, R, W: Semigroup, S] = Functor[RWST[F, R, W, S, ?]]
-    def functor[F[_]: MonadPlus, R, W: Monoid, S] = Functor[RWST[F, R, W, S, ?]]
     def plus[F[_]: PlusEmpty, R, W, S] = Plus[RWST[F, R, W, S, ?]]
     def plus[F[_]: MonadPlus, R, W, S] = Plus[RWST[F, R, W, S, ?]]
     def plusEmpty[F[_]: MonadPlus, R, W, S] = PlusEmpty[RWST[F, R, W, S, ?]]
     def bind[F[_]: Monad, R, W: Monoid, S] = Bind[RWST[F, R, W, S, ?]]
-    def bind[F[_]: MonadPlus, R, W: Monoid, S] = Bind[RWST[F, R, W, S, ?]]
-    def monad[F[_]: MonadPlus, R, W: Monoid, S] = Monad[RWST[F, R, W, S, ?]]
   }
 }

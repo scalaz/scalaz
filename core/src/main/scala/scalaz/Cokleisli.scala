@@ -48,7 +48,10 @@ sealed abstract class CokleisliInstances0 {
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] =
+  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] =
+    new CokleisliMonad[F, R] {}
+
+  implicit def cokleisliBindRec[F[_], R]: BindRec[Cokleisli[F, R, ?]] =
     new CokleisliMonad[F, R] {}
 
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, ?, ?]] with ProChoice[Cokleisli[F, ?, ?]] =
@@ -58,6 +61,8 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 }
 
 private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] {
+  val bindInstance = this
+  override def forever[A, B](fa: Cokleisli[F, R, A]): Cokleisli[F, R, B] = super[BindRec].forever(fa)
   override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa map f
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)

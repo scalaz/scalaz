@@ -30,23 +30,6 @@ object Codensity extends CodensityInstances {
       def apply[B](f: A => F[B]): F[B] = f(a)
     }
 
-  /** Supposing we have the guarantees of consistency between
-    * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
-    * [[scalaz.MonadPlus]] laws should hold.
-    */
-  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, ?]] =
-    new CodensityMonad[F] with MonadPlus[Codensity[F, ?]] {
-      def empty[A] =
-        new Codensity[F, A] {
-          def apply[B](f: A => F[B]) = F.empty[B]
-        }
-
-      def plus[A](a: Codensity[F, A], b: => Codensity[F, A]) =
-        new Codensity[F, A] {
-          def apply[B](f: A => F[B]) = F.plus(a(f), b(f))
-        }
-    }
-
   implicit val codensityTrans: MonadTrans[Codensity] =
     new MonadTrans[Codensity] {
       def liftM[G[_]: Monad, A](a: G[A]) = Codensity.rep(a)
@@ -57,6 +40,25 @@ object Codensity extends CodensityInstances {
 sealed abstract class CodensityInstances {
   implicit def codensityMonad[F[_]]: Monad[Codensity[F, ?]] =
     new CodensityMonad[F]
+
+  /** Supposing we have the guarantees of consistency between
+    * [[scalaz.Applicative]] and [[scalaz.PlusEmpty]] for `F`, the
+    * [[scalaz.MonadPlus]] laws should hold.
+    */
+  implicit def codensityMonadPlus[F[_]](implicit F: ApplicativePlus[F]): MonadPlus[Codensity[F, ?]] =
+    new MonadPlus[Codensity[F, ?]] {
+      val monadInstance = codensityMonad[F]
+
+      def empty[A] =
+        new Codensity[F, A] {
+          def apply[B](f: A => F[B]) = F.empty[B]
+        }
+
+      def plus[A](a: Codensity[F, A], b: => Codensity[F, A]) =
+        new Codensity[F, A] {
+          def apply[B](f: A => F[B]) = F.plus(a(f), b(f))
+        }
+    }
 }
 
 private[scalaz] sealed class CodensityMonad[F[_]] extends Monad[Codensity[F, ?]] {

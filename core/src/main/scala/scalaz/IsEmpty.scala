@@ -22,7 +22,7 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
   def isEmptyLaw = new IsEmptyLaw {}
 
   ////
-  val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] { def F = IsEmpty.this }
+  val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] { def FE = IsEmpty.this }
 }
 
 object IsEmpty {

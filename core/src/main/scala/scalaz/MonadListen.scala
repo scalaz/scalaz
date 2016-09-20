@@ -4,9 +4,9 @@ trait MonadListen[F[_], W] extends MonadTell[F, W] {
   def listen[A](ma: F[A]): F[(A, W)]
 
   def pass[A](ma: F[(A, W => W)]): F[A] =
-    bind(listen(ma)){ case ((a, f), w) => writer(f(w), a) }
+    monadInstance.bind(listen(ma)){ case ((a, f), w) => writer(f(w), a) }
 
-  val monadListenSyntax = new scalaz.syntax.MonadListenSyntax[F, W]{def F = MonadListen.this}
+  val monadListenSyntax = new scalaz.syntax.MonadListenSyntax[F, W]{ def FS = MonadListen.this }
 }
 
 object MonadListen {

@@ -33,8 +33,12 @@ private[std] trait Tuple${n}Functor[$tparams] extends Traverse[($tparams, ?)] {
     val zs = (1 until n).map("z" + _).mkString(", ")
 
 s"""
-private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] with Tuple${n}Functor[$tparams] {
+private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] with Bind[($tparams, ?)] with Tuple${n}Functor[$tparams] {
   ${(1 until n).map(i => s"def _$i : Semigroup[A$i]").mkString("; ")}
+
+  val bindInstance = this
+
+  override def forever[A, B](fa: ($tparams, A)): ($tparams, B) = super[BindRec].forever(fa)
 
   override def bind[A, B](fa: ($tparams, A))(f: A => ($tparams, B)) = {
     val t = f(fa._$n)
