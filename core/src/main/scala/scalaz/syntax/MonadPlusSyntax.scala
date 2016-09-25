@@ -20,6 +20,12 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
     F.unite[T, B](ftb)
   }
 
+  final def lefts[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): F[B] =
+    F.bind(ev.subst(self))(b => G.leftFoldable.foldMap(b)(F.point(_))(F.monoid[B]))
+
+  final def rights[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): F[C] =
+    F.bind(ev.subst(self))(c => G.rightFoldable.foldMap(c)(F.point(_))(F.monoid[C]))
+
   final def separate[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))
 
