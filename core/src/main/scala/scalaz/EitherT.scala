@@ -31,6 +31,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
     F.map(run)(_.fold(l, r))
 
+  def foldM[X](l: A => F[X], r: B => F[X])(implicit F: Bind[F]): F[X] =
+    F.join(fold(l, r))
+
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isLeft)
