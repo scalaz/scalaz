@@ -227,6 +227,15 @@ trait OptionFunctions {
   }
 
   /**
+   * Returns the item contained in the Option wrapped in type F if the Option is defined,
+   * otherwise, returns the supplied action.
+   */
+  final def getOrElseF[A, F[_] : Applicative](oa: Option[A])(fa: => F[A]): F[A] = oa match {
+    case Some(a) => Applicative[F].point(a)
+    case None    => fa
+  }
+
+  /**
    * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
    */
   final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(implicit p: Applicative[F]): B = oa match {
