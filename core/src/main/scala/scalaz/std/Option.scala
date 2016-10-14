@@ -245,6 +245,15 @@ trait OptionFunctions {
 
 object option extends OptionInstances with OptionFunctions {
   object optionSyntax extends scalaz.syntax.std.ToOptionOps with scalaz.syntax.std.ToOptionIdOps
+
+  /**
+   * Returns the item contained in the Option wrapped in type F if the Option is defined,
+   * otherwise, returns the supplied action.
+   */
+  final def getOrElseF[A, F[_]](oa: Option[A])(fa: => F[A])(implicit F: Applicative[F]): F[A] = oa match {
+    case Some(a) => F.point(a)
+    case None    => fa
+  }
 }
 
 //
