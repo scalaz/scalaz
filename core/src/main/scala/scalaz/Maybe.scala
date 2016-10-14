@@ -86,6 +86,9 @@ sealed abstract class Maybe[A] {
   final def orElse(oa: => Maybe[A]): Maybe[A] =
     cata(_ => this, oa)
 
+  final def getOrElseF[F[_]: Applicative](fa: => F[A]): F[A] =
+    cata(Applicative[F].point[A](_), fa)
+
   /** Tag with [[Tags.First]] */
   final def first: FirstMaybe[A] = Tag(this)
 
