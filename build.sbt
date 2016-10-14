@@ -102,8 +102,7 @@ lazy val tests = crossProject.crossType(ScalazCrossType)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings : _*)
   .jsSettings(
-    jsEnv := NodeJSEnv().value,
-    scalaJSUseRhino in Global := false
+    jsEnv := NodeJSEnv().value
   )
 
 lazy val testsJVM = tests.jvm
