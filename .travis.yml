@@ -27,6 +27,7 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
+  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.12.0-RC2" ]]; then git clone https://github.com/non/kind-projector.git && cd kind-projector && git checkout v0.9.0 && sbt '++ 2.12.0-RC2' publishLocal && cd .. ; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
   - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
@@ -36,10 +37,10 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.0-RC1
+    - scala: 2.12.0-RC2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.0-RC1
+    - scala: 2.12.0-RC2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
 
