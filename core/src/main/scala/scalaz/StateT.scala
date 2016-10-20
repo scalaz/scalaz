@@ -162,7 +162,7 @@ sealed abstract class StateTInstances2 extends StateTInstances3 {
 }
 
 sealed abstract class StateTInstances1 extends StateTInstances2 {
-  implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[StateT[F, S, ?]] =
+  implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[StateT[F, S, ?]] with MonadState[StateT[F, S, ?], S] =
     new StateTMonadStateMonadPlus[S, F] {
       implicit def F: MonadPlus[F] = F0
     }
