@@ -369,10 +369,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     }
 
     for{
-      a <- Gen.choose(1, size)
+      a <- Gen.choose(1, size max 1)
       b = size - a
       aa <- Gen.choose(1, a)
-      ba <- Gen.choose(0, b)
+      ba <- Gen.choose(0, b max 0)
       t <- Apply[Gen].apply4(
         treeGenSized[A](aa),
         forest(a - aa),
@@ -464,6 +464,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def KleisliArbitrary[M[_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
     Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))
+
+  implicit def CokleisliArbitrary[M[_], A, B](implicit a: Arbitrary[M[A] => B]): Arbitrary[Cokleisli[M, A, B]] =
+    Functor[Arbitrary].map(a)(Cokleisli[M, A, B](_))
 
   implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
     Functor[Arbitrary].map(a)(Coproduct(_))
