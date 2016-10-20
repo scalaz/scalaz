@@ -231,15 +231,17 @@ sealed abstract class Free[S[_], A] {
     }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
-  final def foldRun[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {
-    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resume match {
-      case -\/(s) =>
-        val (b1, s1) = f(z, s)
-        foldRun2(s1, b1)
-      case \/-(r) => (z, r)
+  @tailrec final def foldRun[B](b: B)(f: λ[α => (B, S[α])] ~> (B, ?)): (B, A) =
+    step match {
+      case Return(a) => (b, a)
+      case Suspend(sa) => f((b, sa))
+      case g @ Gosub(_, _) => g.a match {
+        case Suspend(sz) =>
+          val (b1, z) = f((b, sz))
+          g.f(z).foldRun(b1)(f)
+        case _ => sys.error("Unreachable code: `Gosub` returned from `step` must have `Suspend` on the left")
+      }
     }
-    foldRun2(this, b)
-  }
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
   final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =

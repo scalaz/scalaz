@@ -80,6 +80,30 @@ object FreeOption {
   }
 }
 
+object FreeState {
+  /** stack-safe state monad */
+  type FreeState[S, A] = Free[λ[α => S => (S, α)], A]
+
+  def apply[S, A](f: S => (S, A)): FreeState[S, A] = Free.liftF[λ[α => S => (S, α)], A](f)
+
+  implicit def monadState[S]: MonadState[FreeState[S, ?], S] = new MonadState[FreeState[S, ?], S] {
+    type F[A] = S => (S, A)
+
+    def point[A](a: => A): FreeState[S, A] = Free.liftF[F, A](s => (s, a))
+    def bind[A, B](fa: FreeState[S, A])(f: A => FreeState[S, B]): FreeState[S, B] = fa.flatMap(f)
+
+    def get: FreeState[S, S] = Free.liftF[F, S](s => (s, s))
+    def init: FreeState[S, S] = get
+    def put(s: S): FreeState[S, Unit] = Free.liftF[F, Unit](_ => (s, ()))
+
+  }
+
+  def run[S, A](fs: FreeState[S, A])(s: S): (S, A) = {
+    type F[X] = (S, S => (S, X))
+    fs.foldRun(s)(λ[F ~> (S, ?)] { case (s, f) => f(s) })
+  }
+}
+
 object FreeTest extends SpecLite {
   def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
     Gen.frequency(
@@ -111,6 +135,28 @@ object FreeTest extends SpecLite {
     checkAll(monoid.laws[FreeList[Int]])
     checkAll(semigroup.laws[FreeList[Int]])
     checkAll(zip.laws[FreeList])
+  }
+
+  "FreeState" should {
+    import FreeState._
+
+    "be stack-safe on left-associated binds" in {
+      val ms: MonadState[FreeState[Int, ?], Int] = FreeState.monadState
+
+      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => FreeState[Int, Int](i => (i+1, i+1))))
+
+      10000 must_=== FreeState.run(go)(0)._1
+    }
+
+    "be stack-safe on right-associated (i.e. recursive) binds" in {
+      def go: FreeState[Int, Int] =
+        FreeState[Int, Int](n => (n-1, n-1)).flatMap(i =>
+          if(i > 0) go
+          else FreeState[Int, Int](n => (n, n))
+        )
+
+      0 must_=== FreeState.run(go)(10000)._2
+    }
   }
 
   "#1156: equals should not return true for obviously unequal instances" in {
