@@ -244,6 +244,20 @@ sealed abstract class Free[S[_], A] {
     foldRun2(this, b)
   }
 
+  /** Variant of `foldRun` that allows to interleave effect `M` at each step. */
+  final def foldRunM[M[_], B](b: B)(f: λ[α => (B, S[α])] ~> λ[α => M[(B, α)]])(implicit M0: Applicative[M], M1: BindRec[M]): M[(B, A)] =
+    M1.tailrecM[(B, Free[S, A]), (B, A)]{ case (b, fa) =>
+      fa.step match {
+        case Return(a) => M0.point(\/-((b, a)))
+        case Suspend(sa) => M0.map(f((b, sa)))(\/.right)
+        case g @ Gosub(_, _) => g.a match {
+          case Suspend(sz) =>
+            M0.map(f((b, sz))) { case (b, z) => -\/((b, g.f(z))) }
+          case _ => sys.error("Unreachable code: `Gosub` returned from `step` must have `Suspend` on the left")
+        }
+      }
+    }((b, this))
+
   /** Runs a trampoline all the way to the end, tail-recursively. */
   final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
     ev(this).go(_())
