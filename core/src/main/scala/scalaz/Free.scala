@@ -231,15 +231,31 @@ sealed abstract class Free[S[_], A] {
     }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
-  final def foldRun[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {
-    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resume match {
-      case -\/(s) =>
-        val (b1, s1) = f(z, s)
-        foldRun2(s1, b1)
-      case \/-(r) => (z, r)
+  @tailrec final def foldRun[B](b: B)(f: λ[α => (B, S[α])] ~> (B, ?)): (B, A) =
+    step match {
+      case Return(a) => (b, a)
+      case Suspend(sa) => f((b, sa))
+      case g @ Gosub(_, _) => g.a match {
+        case Suspend(sz) =>
+          val (b1, z) = f((b, sz))
+          g.f(z).foldRun(b1)(f)
+        case _ => sys.error("Unreachable code: `Gosub` returned from `step` must have `Suspend` on the left")
+      }
     }
-    foldRun2(this, b)
-  }
+
+  /** Variant of `foldRun` that allows to interleave effect `M` at each step. */
+  final def foldRunM[M[_], B](b: B)(f: λ[α => (B, S[α])] ~> λ[α => M[(B, α)]])(implicit M0: Applicative[M], M1: BindRec[M]): M[(B, A)] =
+    M1.tailrecM((b, this)) { case (b, fa) =>
+      fa.step match {
+        case Return(a) => M0.point(\/-((b, a)))
+        case Suspend(sa) => M0.map(f((b, sa)))(\/.right)
+        case g @ Gosub(_, _) => g.a match {
+          case Suspend(sz) =>
+            M0.map(f((b, sz))) { case (b, z) => -\/((b, g.f(z))) }
+          case _ => sys.error("Unreachable code: `Gosub` returned from `step` must have `Suspend` on the left")
+        }
+      }
+    }
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
   final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
