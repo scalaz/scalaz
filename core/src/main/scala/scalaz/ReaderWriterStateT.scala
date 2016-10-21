@@ -198,9 +198,8 @@ private trait ReaderWriterStateTMonad[F[_], R, W, S]
     ReaderWriterStateT((_, s) => fa.run(k, s))
   override def asks[A](f: R => A): ReaderWriterStateT[F, R, W, S, A] =
     ReaderWriterStateT((r, s) => F.point((W.zero, f(r), s)))
-  def init: ReaderWriterStateT[F, R, W, S, S] =
+  def get: ReaderWriterStateT[F, R, W, S, S] =
     ReaderWriterStateT((_, s) => F.point((W.zero, s, s)))
-  def get = init
   def put(s: S): ReaderWriterStateT[F, R, W, S, Unit] =
     ReaderWriterStateT((r, _) => F.point((W.zero, (), s)))
   override def modify(f: S => S): ReaderWriterStateT[F, R, W, S, Unit] =

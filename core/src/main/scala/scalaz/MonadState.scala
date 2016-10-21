@@ -9,12 +9,13 @@ package scalaz
 trait MonadState[F[_], S] extends Monad[F] { self =>
   ////
 
-  def state[A](a: A): F[A] = bind(init)(s => point(a))
-  def constantState[A](a: A, s: => S): F[A] = bind(put(s))(_ => point(a))
-  def init: F[S]
   def get: F[S]
-  def gets[A](f: S => A): F[A] = bind(init)(s => point(f(s)))
   def put(s: S): F[Unit]
+
+  def state[A](f: S => (S, A)): F[A] = bind(init)(s => f(s) match { case (s, a) => bind(put(s))(_ => point(a)) })
+  def constantState[A](a: A, s: => S): F[A] = bind(put(s))(_ => point(a))
+  def init: F[S] = get
+  def gets[A](f: S => A): F[A] = bind(init)(s => point(f(s)))
   def modify(f: S => S): F[Unit] = bind(init)(s => put(f(s)))
 
   ////

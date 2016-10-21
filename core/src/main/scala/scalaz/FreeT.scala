@@ -198,8 +198,6 @@ sealed abstract class FreeTInstances4 extends FreeTInstances5 {
   implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
     new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
       override def M = implicitly
-      override def init =
-        FreeT.liftM(M1.init)
       override def get =
         FreeT.liftM(M1.get)
       override def put(s: E) =
