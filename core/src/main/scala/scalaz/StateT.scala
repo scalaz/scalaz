@@ -248,9 +248,7 @@ private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] w
     StateT(s => F.point(s, aa.value))
   }
 
-  def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
-
-  def get = init
+  def get: StateT[F, S, S] = StateT(s => F.point((s, s)))
 
   def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, ())))
 

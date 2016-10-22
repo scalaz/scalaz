@@ -93,7 +93,6 @@ object FreeState {
     def bind[A, B](fa: FreeState[S, A])(f: A => FreeState[S, B]): FreeState[S, B] = fa.flatMap(f)
 
     def get: FreeState[S, S] = Free.liftF[F, S](s => (s, s))
-    def init: FreeState[S, S] = get
     def put(s: S): FreeState[S, Unit] = Free.liftF[F, Unit](_ => (s, ()))
   }
 
@@ -117,7 +116,6 @@ object FreeStateT {
       def bind[A, B](fa: FreeStateT[M, S, A])(f: A => FreeStateT[M, S, B]): FreeStateT[M, S, B] = fa.flatMap(f)
 
       def get: FreeStateT[M, S, S] = Free.liftF[F, S](s => M.point((s, s)))
-      def init: FreeStateT[M, S, S] = get
       def put(s: S): FreeStateT[M, S, Unit] = Free.liftF[F, Unit](_ => M.point((s, ())))
     }
 
@@ -164,19 +162,19 @@ object FreeTest extends SpecLite {
   "FreeState" should {
     import FreeState._
 
-    "be stack-safe on left-associated binds" in {
-      val ms: MonadState[FreeState[Int, ?], Int] = FreeState.monadState
+    val ms: MonadState[FreeState[Int, ?], Int] = FreeState.monadState
 
-      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => FreeState[Int, Int](i => (i+1, i+1))))
+    "be stack-safe on left-associated binds" in {
+      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
 
       10000 must_=== FreeState.run(go)(0)._1
     }
 
     "be stack-safe on right-associated (i.e. recursive) binds" in {
       def go: FreeState[Int, Int] =
-        FreeState[Int, Int](n => (n-1, n-1)).flatMap(i =>
+        ms.state(n => (n-1, n-1)).flatMap(i =>
           if(i > 0) go
-          else FreeState[Int, Int](n => (n, n))
+          else ms.state(n => (n, n))
         )
 
       0 must_=== FreeState.run(go)(10000)._2
@@ -186,19 +184,19 @@ object FreeTest extends SpecLite {
   "FreeStateT" should {
     import FreeStateT._
 
-    "be stack-safe on left-associated binds" in {
-      val ms: MonadState[FreeStateT[Option, Int, ?], Int] = FreeStateT.monadState
+    val ms: MonadState[FreeStateT[Option, Int, ?], Int] = FreeStateT.monadState
 
-      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => FreeStateT[Option, Int, Int](i => Some((i+1, i+1)))))
+    "be stack-safe on left-associated binds" in {
+      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
 
       Option((10000, 10000)) must_=== FreeStateT.run(go)(0)
     }
 
     "be stack-safe on right-associated (i.e. recursive) binds" in {
       def go: FreeStateT[Option, Int, Int] =
-        FreeStateT[Option, Int, Int](n => Some((n-1, n-1))).flatMap(i =>
+        ms.state(n => (n-1, n-1)).flatMap(i =>
           if(i > 0) go
-          else FreeStateT[Option, Int, Int](n => Some((n, n)))
+          else ms.state(n => (n, n))
         )
 
       Option((0, 0)) must_=== FreeStateT.run(go)(10000)

@@ -315,8 +315,6 @@ trait IsomorphismMonadReader[F[_], G[_], E] extends MonadReader[F, E] with Isomo
 trait IsomorphismMonadState[F[_], G[_], S] extends MonadState[F, S] with IsomorphismMonad[F, G] {
   implicit def G: MonadState[G, S]
 
-  override def init: F[S] = iso.from(G.init)
-
   override def get: F[S] = iso.from(G.get)
 
   override def put(s: S): F[Unit] = iso.from(G.put(s))
