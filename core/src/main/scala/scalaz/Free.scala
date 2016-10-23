@@ -183,7 +183,7 @@ sealed abstract class Free[S[_], A] {
    * Evaluate one layer in the free monad, re-associating any left-nested binds to the right
    * and pulling the first suspension to the top.
    */
-  @annotation.tailrec final def step: Free[S, A] = this match {
+  @tailrec final def step: Free[S, A] = this match {
     case x@Gosub(_, _) => x.a match {
       case b@Gosub(_, _) =>
         b.a.flatMap(a => b.f(a).flatMap(x.f)).step
@@ -193,6 +193,24 @@ sealed abstract class Free[S[_], A] {
         x
     }
     case x => x
+  }
+
+  /**
+   * Re-associate any left-nested binds to the right, pull the first suspension to the top
+   * and then pass the result to one of the callbacks.
+   */
+  @tailrec private[scalaz] final def foldStep[B](
+    onReturn: A => B,
+    onSuspend: S[A] => B,
+    onGosub: ((S[X], X => Free[S, A]) forSome { type X }) => B
+  ): B = this match {
+    case Gosub(fz, f) => fz match {
+      case Gosub(fy, g) => fy.flatMap(y => g(y).flatMap(f)).foldStep(onReturn, onSuspend, onGosub)
+      case Suspend(sz) => onGosub((sz, f))
+      case Return(z) => f(z).foldStep(onReturn, onSuspend, onGosub)
+    }
+    case Suspend(sa) => onSuspend(sa)
+    case Return(a) => onReturn(a)
   }
 
   /**
@@ -384,18 +402,16 @@ sealed trait SourceInstances {
 }
 
 sealed abstract class FreeInstances3 {
-  implicit def freeFoldable[F[_]: Foldable: Functor]: Foldable[Free[F, ?]] =
+  implicit def freeFoldable[F[_]: Foldable]: Foldable[Free[F, ?]] =
     new FreeFoldable[F] {
       def F = implicitly
-      def F0 = implicitly
     }
 }
 
 sealed abstract class FreeInstances2 extends FreeInstances3 {
-  implicit def freeFoldable1[F[_]: Foldable1: Functor]: Foldable1[Free[F, ?]] =
+  implicit def freeFoldable1[F[_]: Foldable1]: Foldable1[Free[F, ?]] =
     new FreeFoldable1[F] {
       def F = implicitly
-      def F0 = implicitly
     }
 }
 
@@ -451,53 +467,56 @@ private sealed trait FreeBind[F[_]] extends Bind[Free[F, ?]] {
 
 private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {
   def F: Foldable[F]
-  implicit def F0: Functor[F]
 
   override final def foldMap[A, B: Monoid](fa: Free[F, A])(f: A => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldMap(s)(foldMap(_)(f))
-      case \/-(r) => f(r)
-    }
+    fa.foldStep(
+      f,
+      fa => F.foldMap(fa)(f),
+      { case (fx, g) => F.foldMap(fx)(x => foldMap(g(x))(f)) }
+    )
 
   override final def foldLeft[A, B](fa: Free[F, A], z: B)(f: (B, A) => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldLeft(s, z)((b, a) => foldLeft(a, b)(f))
-      case \/-(r) => f(z, r)
-    }
+    fa.foldStep(
+      a => f(z, a),
+      fa => F.foldLeft(fa, z)(f),
+      { case (fx, g) => F.foldLeft(fx, z)((b, x) => foldLeft(g(x), b)(f)) }
+    )
 
   override final def foldRight[A, B](fa: Free[F, A], z: => B)(f: (A, => B) => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldRight(s, z)(foldRight(_, _)(f))
-      case \/-(r) => f(r, z)
-    }
+    fa.foldStep(
+      a => f(a, z),
+      fa => F.foldRight(fa, z)(f),
+      { case (fx, g) => F.foldRight(fx, z)((x, b) => foldRight(g(x), b)(f)) }
+    )
 }
 
 private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, ?]] {
   def F: Foldable1[F]
-  implicit def F0: Functor[F]
 
   override final def foldMap1[A, B: Semigroup](fa: Free[F, A])(f: A => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldMap1(s)(foldMap1(_)(f))
-      case \/-(r) => f(r)
-    }
+    fa.foldStep(
+      f,
+      fa => F.foldMap1(fa)(f),
+      { case (fx, g) => F.foldMap1(fx)(x => foldMap1(g(x))(f)) }
+    )
 
   override final def foldMapRight1[A, B](fa: Free[F, A])(z: A => B)(f: (A, => B) => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldMapRight1(s)(foldMapRight1(_)(z)(f))(foldRight(_, _)(f))
-      case \/-(r) => z(r)
-    }
+    fa.foldStep(
+      z,
+      fa => F.foldMapRight1(fa)(z)(f),
+      { case (fx, g) => F.foldMapRight1(fx)(x => foldMapRight1(g(x))(z)(f))((x, b) => foldRight(g(x), b)(f)) }
+    )
 
   override final def foldMapLeft1[A, B](fa: Free[F, A])(z: A => B)(f: (B, A) => B): B =
-    fa.resume match {
-      case -\/(s) => F.foldMapLeft1(s)(foldMapLeft1(_)(z)(f))((b, a) => foldLeft(a, b)(f))
-      case \/-(r) => z(r)
-    }
+    fa.foldStep(
+      z,
+      fa => F.foldMapLeft1(fa)(z)(f),
+      { case (fx, g) => F.foldMapLeft1(fx)(x => foldMapLeft1(g(x))(z)(f))((b, x) => foldLeft(g(x), b)(f)) }
+    )
 }
 
 private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFoldable[F]{
   implicit def F: Traverse[F]
-  override final def F0 = F
 
   override final def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
 
