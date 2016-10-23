@@ -386,7 +386,10 @@ object Task {
    * @since 7.0.3
    */
   def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] =
-    reduceUnordered[A, List[A]](tasks, exceptionCancels)
+    if (!exceptionCancels)
+      Nondeterminism[Task].gatherUnordered(tasks)
+    else
+      reduceUnordered[A, List[A]](tasks, exceptionCancels)
 
   def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
     if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
