@@ -258,7 +258,7 @@ object build {
   )
 
   lazy val core = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(standardSettings)
     .settings(
       name := "scalaz-core",
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -269,7 +269,7 @@ object build {
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
     .jvmSettings(
       typeClasses := TypeClass.core
     )
@@ -277,23 +277,23 @@ object build {
   final val ConcurrentName = "scalaz-concurrent"
 
   lazy val effect = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(standardSettings)
     .settings(
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
     .jvmSettings(
       typeClasses := TypeClass.effect
     )
 
   lazy val iteratee = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(standardSettings)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>

@@ -79,20 +79,20 @@ lazy val example = Project(
 
 lazy val scalacheckBinding =
   CrossProject("scalacheck-binding", file("scalacheck-binding"), ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
-    .jsSettings(scalajsProjectSettings : _*)
+    .jsSettings(scalajsProjectSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
 
 lazy val tests = crossProject.crossType(ScalazCrossType)
-  .settings(standardSettings: _*)
+  .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
     mimaPreviousArtifacts := Set.empty,
@@ -100,7 +100,7 @@ lazy val tests = crossProject.crossType(ScalazCrossType)
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
-  .jsSettings(scalajsProjectSettings : _*)
+  .jsSettings(scalajsProjectSettings)
   .jsSettings(
     jsEnv := NodeJSEnv().value
   )
