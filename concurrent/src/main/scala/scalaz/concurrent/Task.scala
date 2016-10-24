@@ -246,6 +246,17 @@ object Task {
         Traverse[List].sequenceU(eithers)
       ))
     }
+    private[this] val AE = Apply[({type l[a] = Throwable \/ a})#l]
+    override def reduceUnordered[A, M](fs: Seq[Task[A]])(implicit R: Reducer[A, M]): Task[M] = {
+      import R.monoid
+      val RR: Reducer[Throwable \/ A, Throwable \/ M] =
+        Reducer[Throwable \/ A, Throwable \/ M](
+          _.map(R.unit),
+          c => AE.apply2(c, _)(R.cons(_, _)),
+          m => AE.apply2(m, _)(R.snoc(_, _))
+        )(Monoid.liftMonoid[({type l[a] = Throwable \/ a})#l, M])
+      new Task(F.reduceUnordered(fs.map(_.get))(RR))
+    }
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
     def raiseError[A](e: Throwable): Task[A] = fail(e)
