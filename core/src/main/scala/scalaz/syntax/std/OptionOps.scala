@@ -92,6 +92,8 @@ final class OptionOps[A](self: Option[A]) {
 
   final def orEmpty[M[_] : Applicative : PlusEmpty]: M[A] = o.orEmpty[A, M](self)
 
+  final def getOrElseF[F[_]: Applicative](fa: => F[A]): F[A] = o.getOrElseF[A, F](self)(fa)
+
   final def foldLift[F[_] : Applicative, B](b: => B, k: F[A] => B): B = o.foldLift(self)(b, k)
 
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
