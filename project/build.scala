@@ -52,7 +52,8 @@ object build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
+  val scalaCheckVersion_1_12 = SettingKey[String]("scalaCheckVersion_1_12")
+  val scalaCheckVersion_1_13 = SettingKey[String]("scalaCheckVersion_1_13")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -106,7 +107,8 @@ object build {
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.12.5",
+    scalaCheckVersion_1_12 := "1.12.5",
+    scalaCheckVersion_1_13 := "1.13.3",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
