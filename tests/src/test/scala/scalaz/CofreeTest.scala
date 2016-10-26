@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Cogen}
 import org.scalacheck.Prop.forAll
 import Cofree._
 import Cofree.CofreeZip
@@ -40,14 +40,21 @@ object CofreeTest extends SpecLite {
     }
   }
 
-  val oneAndListNat: OneAndList ~> CofreeOption =
-    new (OneAndList ~> CofreeOption) {
-      def apply[A](fa: OneAndList[A]): CofreeOption[A] =
+  val oneAndListCofreeOptionIso: OneAndList <~> CofreeOption =
+    new IsoFunctorTemplate[OneAndList, CofreeOption] {
+      def to[A](fa: OneAndList[A]) =
         Cofree.unfold(fa) {
           case OneAnd(a, h :: t) =>
             (a, Some(OneAnd(h, t)))
           case OneAnd(a, _) => (a, None)
         }
+      def from[A](ga: CofreeOption[A]) =
+        OneAnd(
+          ga.head,
+          ga.tail.map(s =>
+            Foldable[CofreeOption].foldRight(s, List.empty[A])(_ :: _)
+          ).getOrElse(Nil)
+        )
     }
 
   val oneAndStreamCofreeLazyOptionIso: OneAndStream <~> CofreeLazyOption =
@@ -80,14 +87,22 @@ object CofreeTest extends SpecLite {
   implicit def CofreeStreamArb[A: Arbitrary]: Arbitrary[CofreeStream[A]] =
     Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to)
 
+  implicit def CofreeLazyOptionCogen[A: Cogen]: Cogen[CofreeLazyOption[A]] =
+    implicitly[Cogen[OneAndStream[A]]].contramap(oneAndStreamCofreeLazyOptionIso.from)
+
+  implicit def CofreeStreamCogen[A: Cogen]: Cogen[CofreeStream[A]] =
+    implicitly[Cogen[Tree[A]]].contramap(treeCofreeStreamIso.from)
+
+  implicit def CofreeOptionCogen[A: Cogen]: Cogen[CofreeOption[A]] =
+    implicitly[Cogen[OneAndList[A]]].contramap(oneAndListCofreeOptionIso.from)
 
   implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
     import org.scalacheck.Arbitrary._
     import org.scalacheck.Gen
-    val arb = Arbitrary { Gen.listOfN(5000, implicitly[Arbitrary[A]].arbitrary ) }
+    val arb = Arbitrary { Gen.listOfN(20, implicitly[Arbitrary[A]].arbitrary ) }
     Functor[Arbitrary].map(arb){
-      case h :: Nil => oneAndListNat( OneAnd(h, Nil))
-      case h :: t => oneAndListNat( OneAnd(h, t) )
+      case h :: Nil => oneAndListCofreeOptionIso.to( OneAnd(h, Nil))
+      case h :: t => oneAndListCofreeOptionIso.to( OneAnd(h, t) )
     }
   }
 

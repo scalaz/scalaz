@@ -4,7 +4,7 @@ package scalacheck
 /**
  * Type class instances for types from [[https://github.com/rickynils/scalacheck Scalacheck]]
  */
-object ScalaCheckBinding {
+object ScalaCheckBinding extends ScalaCheckBinding1 {
   import org.scalacheck.{Gen, Arbitrary, Shrink}
   import Gen.{sized, const}
 
