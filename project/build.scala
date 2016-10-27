@@ -243,19 +243,16 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
-      if(isJSProject.value) {
-        if(scalazMimaBasis.?.value == Some("7.2.0")) {
-          Set.empty
+      val artifactId =
+        if(isJSProject.value) {
+          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
         } else {
-          scalazMimaBasis.?.value.map {
-            organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % _
-          }.toSet
+          s"${name.value}_${scalaBinaryVersion.value}"
         }
-      } else {
-        scalazMimaBasis.?.value.map {
-          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-        }.toSet
-      }
+
+      scalazMimaBasis.?.value.map {
+        organization.value % artifactId % _
+      }.toSet
     }
   )
 

@@ -120,19 +120,16 @@ lazy val scalacheckBinding_1_13 = {
       }
     },
     mimaPreviousArtifacts := {
-      if(scalazMimaBasis.?.value == Some("7.2.6")) {
-        Set.empty
-      } else {
+      val artifactId =
         if(isJSProject.value) {
-          scalazMimaBasis.?.value.map { v =>
-            organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
-          }.toSet
+          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
         } else {
-          scalazMimaBasis.?.value.map { v =>
-            organization.value % s"${name.value}_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
-          }.toSet
+          s"${name.value}_${scalaBinaryVersion.value}"
         }
-      }
+
+      scalazMimaBasis.?.value.map { v =>
+        organization.value % artifactId % scalacheckBinding_1_13Version(v)
+      }.toSet
     }
   )
 }
