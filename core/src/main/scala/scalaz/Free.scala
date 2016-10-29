@@ -40,7 +40,7 @@ object Free extends FreeInstances {
 
   /** A source that produces the given value. */
   def produce[A](a: A): Source[A, Unit] =
-    liftF[(A, ?), Unit](a -> point[(A, ?), Unit](()))
+    liftF[(A, ?), Unit]((a, ()))
 
   /** A sink that waits for a single value and returns it. */
   def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
