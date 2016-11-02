@@ -104,11 +104,18 @@ object build {
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
     scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
+    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_12 := "1.12.5",
-    scalaCheckVersion_1_13 := "1.13.3",
+    scalaCheckVersion_1_12 := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v <= 11 =>
+          "1.12.5"
+        case _ =>
+          "1.12.6"
+      }
+    },
+    scalaCheckVersion_1_13 := "1.13.4",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -237,7 +244,7 @@ object build {
         Nil
     }),
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.2",
+    kindProjectorVersion := "0.9.3",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
