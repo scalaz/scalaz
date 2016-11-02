@@ -20,8 +20,13 @@ trait ConstInstances {
     override def toList[A](fa: Const[R, A]): List[A] = Nil
   }
 
+  implicit def functor[R]: Functor[Const[R, ?]] = new Functor[Const[R, ?]] {
+    def map[A, B](fa: Const[R, A])(f: A => B): Const[R, B] =
+      fa.retag[B]
+  }
+
   implicit def apply[R](implicit R: Semigroup[R]): Apply[Const[R, ?]] = new Apply[Const[R, ?]] {
-    def functor: Functor[Const[R, ?]] = implicitly
+    def functor: Functor[Const[R, ?]] = Const.functor[R]
     def ap[A, B](fa: Const[R, A])(f: Const[R, A => B]): Const[R, B] =
       Const(R.append(fa.getConst, f.getConst))
   }
