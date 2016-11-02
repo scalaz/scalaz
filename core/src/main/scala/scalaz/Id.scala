@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.annotation.unchecked.{uncheckedVariance => uv}
+
 /** Mixed into object `Id` in the package object [[scalaz]]. */
 trait IdInstances {
 
@@ -13,7 +15,7 @@ trait IdInstances {
   // TODO Review!
   type Identity[+X] = Need[X]
 
-  val id: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] =
+  val id: Traverse1[Id @uv] with Each[Id @uv] with Monad[Id @uv] with Comonad[Id @uv] with Cojoin[Id @uv] with Distributive[Id @uv] with Zip[Id @uv] with Unzip[Id @uv] with Cozip[Id @uv] =
     new Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Cobind.FromCojoin[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Cozip[Id] {
       def point[A](a: => A): A = a
 
