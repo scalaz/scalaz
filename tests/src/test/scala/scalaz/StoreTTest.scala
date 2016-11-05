@@ -1,5 +1,6 @@
 package scalaz
 
+import org.scalacheck.Cogen
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._

@@ -8,7 +8,7 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] = 
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
@@ -48,7 +48,7 @@ trait OptionInstances extends OptionInstances0 {
           case None => (None, None)
           case Some((a, b)) => (Some(a), Some(b))
         }
-  
+
       def alignWith[A, B, C](f: A \&/ B => C) = {
         case (None, None) =>
           None
@@ -59,13 +59,13 @@ trait OptionInstances extends OptionInstances0 {
         case (Some(a), Some(b)) =>
           Some(f(\&/.Both(a, b)))
       }
-  
+
       def cobind[A, B](fa: Option[A])(f: Option[A] => B) =
         fa map (a => f(Some(a)))
-  
+
       override def cojoin[A](a: Option[A]) =
         a map (Some(_))
-  
+
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
         fa map \/.right getOrElse -\/(None)
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
@@ -73,10 +73,10 @@ trait OptionInstances extends OptionInstances0 {
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => Option[A \/ B])(a: A): Option[B] =
+      def tailrecM[A, B](a: A)(f: A => Option[A \/ B]): Option[B] =
         f(a) match {
           case None => None
-          case Some(-\/(a)) => tailrecM(f)(a)
+          case Some(-\/(a)) => tailrecM(a)(f)
           case Some(\/-(b)) => Some(b)
         }
     }
@@ -224,6 +224,15 @@ trait OptionFunctions {
   final def orEmpty[A, M[_] : Applicative : PlusEmpty](oa: Option[A]): M[A] = oa match {
     case Some(a) => Applicative[M].point(a)
     case None    => PlusEmpty[M].empty
+  }
+
+  /**
+   * Returns the item contained in the Option wrapped in type F if the Option is defined,
+   * otherwise, returns the supplied action.
+   */
+  final def getOrElseF[A, F[_] : Applicative](oa: Option[A])(fa: => F[A]): F[A] = oa match {
+    case Some(a) => Applicative[F].point(a)
+    case None    => fa
   }
 
   /**

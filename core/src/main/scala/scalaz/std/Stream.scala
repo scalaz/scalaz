@@ -30,8 +30,27 @@ trait StreamInstances {
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
+    override def foldMapLeft1Opt[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Option[B] = fa match {
+      case Stream.Empty => None
+      case hd #:: tl => Some(tl.foldLeft(z(hd))(f))
+    }
+
     override def foldMap[A, B](fa: Stream[A])(f: A => B)(implicit M: Monoid[B]) =
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+
+    override def foldMap1Opt[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
+      foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))
+
+    override def foldMapRight1Opt[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+      def rec(hd: A, tl: Stream[A]): B = tl match {
+        case Stream.Empty => z(hd)
+        case h #:: t => f(hd, rec(h, t))
+      }
+      fa match {
+        case Stream.Empty => None
+        case hd #:: tl => Some(rec(hd, tl))
+      }
+    }
 
     override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
@@ -73,9 +92,9 @@ trait StreamInstances {
         else
           f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
 
-    def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
+    def tailrecM[A, B](a: A)(f: A => Stream[A \/ B]): Stream[B] = {
       def go(s: Stream[A \/ B]): Stream[B] = {
-        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] = 
+        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] =
           abs match {
             case \/-(b) #:: tail => b #:: go(tail)
             case -\/(a) #:: tail => rec(f(a) #::: tail)
@@ -164,14 +183,14 @@ trait StreamFunctions {
     }
 
   /** `[as take 1, as take 2, ..., as]` */
-  final def heads[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def heads[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
       case _       => empty
     }
 
   /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
-  final def tails[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def tails[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => as #:: tails(t)
       case _       => empty

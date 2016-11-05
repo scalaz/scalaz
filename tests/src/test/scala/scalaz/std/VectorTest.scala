@@ -115,11 +115,11 @@ object VectorTest extends SpecLite {
     def order[A: Order] = Order[Vector[A]]
     def semigroup[A: Semigroup] = Monoid[Vector[A]]
     def bindRec = BindRec[Vector]
-    def monadPlus = MonadPlus[Vector] 
-    def traverse = Traverse[Vector] 
+    def monadPlus = MonadPlus[Vector]
+    def traverse = Traverse[Vector]
     def zip = Zip[Vector]
     def unzip = Unzip[Vector]
-    def align = Align[Vector] 
-    def isEmpty = IsEmpty[Vector] 
+    def align = Align[Vector]
+    def isEmpty = IsEmpty[Vector]
   }
 }

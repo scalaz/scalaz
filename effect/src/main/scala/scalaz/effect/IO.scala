@@ -162,7 +162,7 @@ private trait IOMonad extends Monad[IO] with BindRec[IO] {
   def point[A](a: => A): IO[A] = IO(a)
   override def map[A, B](fa: IO[A])(f: A => B) = fa map f
   def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f
-  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] = IO.tailrecM(f)(a)
+  def tailrecM[A, B](a: A)(f: A => IO[A \/ B]): IO[B] = IO.tailrecM(a)(f)
 }
 
 private trait IOLiftIO extends LiftIO[IO] {
@@ -215,6 +215,14 @@ object IO extends IOInstances {
 
   type RunInBase[M[_], Base[_]] =
   Forall[λ[α => M[α] => Base[M[α]]]]
+
+  import scalaz.Isomorphism.<~>
+
+  /** Hoist RunInBase given a natural isomorphism between the two functors */
+  def hoistRunInBase[F[_], G[_]](r: RunInBase[G, IO])(implicit iso: F <~> G): RunInBase[F, IO] =
+    new RunInBase[F, IO] {
+      def apply[B] = (x: F[B]) => r.apply(iso.to(x)).map(iso.from(_))
+    }
 
   /** Construct an IO action from a world-transition function. */
   def io[A](f: Tower[IvoryTower] => Trampoline[(Tower[IvoryTower], A)]): IO[A] =
@@ -270,15 +278,15 @@ object IO extends IOInstances {
     newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
 
-  def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] =
+  def tailrecM[A, B](a: A)(f: A => IO[A \/ B]): IO[B] =
     io(rw =>
-      BindRec[Trampoline].tailrecM[(Tower[IvoryTower], A), (Tower[IvoryTower], B)] {
+      BindRec[Trampoline].tailrecM[(Tower[IvoryTower], A), (Tower[IvoryTower], B)]((rw, a)) {
         case (nw0, x) =>
           f(x)(nw0).map {
             case (nw1, e) =>
               e.bimap((nw1, _), (nw1, _))
           }
-      }((rw, a))
+      }
     )
 
   /** An IO action is an ST action. */

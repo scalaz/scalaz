@@ -157,7 +157,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         NullArgument.always(a)
       override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
         a flatMap f
-      override def tailrecM[A, B](f: A => NullArgument[X, A \/ B])(a: A) =
+      override def tailrecM[A, B](a: A)(f: A => NullArgument[X, A \/ B]) =
         NullArgument{ t =>
           @annotation.tailrec
           def go(a0: A): B =

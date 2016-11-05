@@ -3,12 +3,11 @@ package scalaz.std.java
 import scalaz.{SpecLite, Apply}
 import java.time._
 import org.scalacheck._
-import scalaz.syntax.functor._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.java.time._
-import scala.collection.convert.decorateAsScala._
+import scala.collection.JavaConverters._
 import TimeTest._
 
 object TimeTestJVM extends SpecLite {
@@ -27,9 +26,6 @@ object TimeTestJVM extends SpecLite {
       Gen.choose(0, 59),
       Gen.choose(0, 999999999)
     )(LocalDateTime.of(_, _, _, _, _, _, _)))
-
-  implicit val InstantArbitrary: Arbitrary[Instant] =
-    arb[Long].map { Instant.ofEpochMilli(_)}
 
   implicit val zonedOffsetArbitrary: Arbitrary[ZoneOffset] =
     Arbitrary(
@@ -59,7 +55,6 @@ object TimeTestJVM extends SpecLite {
     )
 
   checkAll("DayOfWeek", ScalazProperties.enum.laws[DayOfWeek])
-  checkAll("Instant", order.laws[Instant])
   checkAll("LocalDateTime", order.laws[LocalDateTime])
   checkAll("OffsetDateTime", order.laws[OffsetDateTime])
   checkAll("OffsetTime", order.laws[OffsetTime])

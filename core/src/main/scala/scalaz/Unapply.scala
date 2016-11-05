@@ -284,7 +284,7 @@ object Unapply extends Unapply_0 {
       type A = A1
       def TC = TC0
       def leibniz = Leibniz.refl
-    }  
+    }
   // TODO More!
 }
 

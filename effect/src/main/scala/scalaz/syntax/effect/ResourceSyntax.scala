@@ -9,7 +9,7 @@ final class ResourceOps[F] private[syntax](val self: F)(implicit val F: Resource
   ////
 
   def close = F.close(self)
-  
+
   ////
 }
 
@@ -24,7 +24,7 @@ trait ToResourceOps  {
 
 trait ResourceSyntax[F]  {
   implicit def ToResourceOps(v: F): ResourceOps[F] = new ResourceOps[F](v)(ResourceSyntax.this.F)
-  
+
   def F: Resource[F]
   ////
 

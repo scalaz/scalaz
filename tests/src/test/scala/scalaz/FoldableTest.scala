@@ -135,6 +135,10 @@ object FoldableTest extends SpecLite {
         }
     }
 
+    "fold1Opt" ! forAll {
+      (xs: List[Int]) => xs.fold1Opt must_== xs.suml1Opt
+    }
+
     "foldMapM" ! forAll {
       (xs: List[String]) => xs.foldMapM(x => Some(x): Option[String]) must_== Some(xs.mkString)
     }

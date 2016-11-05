@@ -3,7 +3,7 @@ package std
 
 import _root_.java.util.concurrent.Executors
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Cogen, Arbitrary}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop.forAll
 
@@ -18,6 +18,9 @@ import scala.concurrent.duration._
 class FutureTest extends SpecLite {
 
   val duration: Duration = 1.seconds
+
+  private[this] implicit def cogenFuture[A: Cogen]: Cogen[Future[A]] =
+    Cogen[A].contramap(scala.concurrent.Await.result(_, duration))
 
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
@@ -41,17 +44,26 @@ class FutureTest extends SpecLite {
 
   implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(arbitrary[Int].map(SomeFailure))
 
+  implicit val cogenThrowable: Cogen[Throwable] =
+    Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
+
   checkAll(monoid.laws[Future[Int]])
   checkAll(monoid.laws[Future[Int @@ Multiplication]])
 
+  def futureArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
+    Arbitrary(A.arbitrary.map(Future.successful))
+
+  val `Arbitrary[Throwable => Future[Int]]` : Arbitrary[Throwable => Future[Int]] =
+    Arbitrary.arbFunction1(futureArb, implicitly)
+
   // For some reason ArbitraryThrowable isn't being chosen by scalac, so we give it explicitly.
-  checkAll(monadError.laws[Future, Throwable](implicitly, implicitly, implicitly, implicitly, ArbitraryThrowable))
+  checkAll(monadError.laws[Future, Throwable](implicitly, futureArb, futureArb, futureEqual, ArbitraryThrowable, `Arbitrary[Throwable => Future[Int]]`))
 
   // Scope these away from the rest as Comonad[Future] is a little evil.
   // Should fail to compile by default: implicitly[Comonad[Future]]
   {
     implicit val cm: Comonad[Future] = futureComonad(duration)
-    checkAll(comonad.laws[Future])
+    checkAll(comonad.laws[Future](implicitly, futureArb, implicitly, implicitly))
   }
 
   "issues 964" ! {

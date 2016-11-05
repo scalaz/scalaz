@@ -157,10 +157,9 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
 
   /** Contravariantly mapping the state of a state monad through a lens is a natural transformation */
   def liftsNT: IndexedState[B1, B2, ?] ~> IndexedState[A1, A2, ?] =
-    new (IndexedState[B1, B2, ?] ~> IndexedState[A1, A2, ?]) {
-      def apply[C](s : IndexedState[B1, B2, C]): IndexedState[A1, A2, C] =
-        IndexedState[A1, A2, C](a => modp(s(_), a))
-    }
+    λ[IndexedState[B1, B2, ?] ~> IndexedState[A1, A2, ?]](
+      s => IndexedState(a => modp(s(_), a))
+    )
 
   /** Lenses can be composed */
   def compose[C1, C2](that: LensFamily[C1, C2, A1, A2]): LensFamily[C1, C2, B1, B2] =

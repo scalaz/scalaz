@@ -62,7 +62,7 @@ private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] with Bin
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) = fa flatMap f
-  def tailrecM[A, B](f: A => Cokleisli[F, R, A \/ B])(a: A): Cokleisli[F, R, B] = {
+  def tailrecM[A, B](a: A)(f: A => Cokleisli[F, R, A \/ B]): Cokleisli[F, R, B] = {
     @annotation.tailrec
     def go(a0: A)(r: F[R]): B =
       f(a0).run(r) match {

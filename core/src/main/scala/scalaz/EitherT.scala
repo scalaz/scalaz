@@ -31,6 +31,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
     F.map(run)(_.fold(l, r))
 
+  def foldM[X](l: A => F[X], r: B => F[X])(implicit F: Bind[F]): F[X] =
+    F.join(fold(l, r))
+
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isLeft)
@@ -70,6 +73,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Map on the right of this disjunction. */
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
     EitherT(F.map(run)(_.map(f)))
+
+  def mapT[G[_], C, D](f: F[A \/ B] => G[C \/ D]): EitherT[G, C, D] =
+    EitherT(f(run))
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
@@ -114,6 +120,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.fold(_ => Nil, _ :: Nil))
+
+  /** Return a `this` on the left-side or a `that` on the right-side of this disjunction  */
+  def toThese(implicit F: Functor[F]): TheseT[F, A, B] = TheseT(F.map(run)(_.toThese))
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
@@ -287,7 +296,7 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] = 
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -366,15 +375,15 @@ private trait EitherTBind[F[_], E] extends Bind[EitherT[F, E, ?]] with EitherTFu
 }
 
 private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] with EitherTBind[F, E] {
-  implicit def F: Monad[F] 
+  implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
+  final def tailrecM[A, B](a: A)(f: A => EitherT[F, E, A \/ B]): EitherT[F, E, B] =
     EitherT(
-      B.tailrecM[A, E \/ B](a => F.map(f(a).run) { 
+      B.tailrecM[A, E \/ B](a)(a => F.map(f(a).run) {
         // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
-        _.fold(e => \/.right(\/.left(e)), _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
-      })(a)
+        _.fold(e => \/-(-\/(e)), _.fold(\/.left, b => \/-(\/-(b))))
+      })
     )
 }
 
@@ -440,9 +449,8 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[F, ?, ?]] with 
 }
 
 private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]]] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (EitherT[M, A, ?] ~> EitherT[N, A, ?]) {
-    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
-  }
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
+    λ[EitherT[M, A, ?] ~> EitherT[N, A, ?]](_ mapT f)
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 

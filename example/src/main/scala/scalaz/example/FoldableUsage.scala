@@ -49,7 +49,7 @@ object FoldableUsage extends App {
   val FoldListOfOptions = Foldable[List] compose Foldable[Option]
 
   val listOfOptions: List[Option[Int]] = List(1.some, 2.some, none[Int], 3.some, 4.some)
-  assert(FoldListOfOptions.fold(listOfOptions) === 10) 
+  assert(FoldListOfOptions.fold(listOfOptions) === 10)
 
   // with this you get a collapse function which is perhaps like the
   // flatten method in the standard library, however it is more versatile
@@ -68,7 +68,7 @@ object FoldableUsage extends App {
   assert(deepFolder.foldLeft(deep, "")(_ + _.toString) === "123")
 
   // Monadic Folds: we can fold over a structure with a function
-  // which returns its value in a Monad, 
+  // which returns its value in a Monad,
   val sumEvens: (Int,Int) => Option[Int] = { (x, y) =>
     // if the right int is even, add it to the left
     // otherwise return None

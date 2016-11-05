@@ -18,6 +18,7 @@ object StateTTest extends SpecLite {
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
   checkAll(profunctor.laws[IStateTList])
+  checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
@@ -35,8 +36,12 @@ object StateTTest extends SpecLite {
     def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
   }
 
+  "monadState.point" in {
+    instances.monadState[Boolean].point(42).run(true) must_===((true, 42))
+  }
+
   "monadState.state" in {
-    instances.monadState[Boolean].state(42).run(true) must_===((true, 42))
+    instances.monadState[Int].state(i => (i+1, i%2 == 0)).run(42) must_===((43, true))
   }
 
   "monadState.constantState" in {

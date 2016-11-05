@@ -305,9 +305,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case -\/(a) => Failure(a)
       case \/-(b) => Success(b)
     }
-  
+
   /** Convert to a ValidationNel. */
-  def validationNel[AA>:A] : ValidationNel[AA,B] = 
+  def validationNel[AA>:A] : ValidationNel[AA,B] =
     this match {
       case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
@@ -441,10 +441,10 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         fa map f
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
+      def tailrecM[A, B](a: A)(f: A => L \/ (A \/ B)): L \/ B =
         f(a) match {
           case l @ -\/(_) => l
-          case \/-(-\/(a0)) => tailrecM(f)(a0)
+          case \/-(-\/(a0)) => tailrecM(a0)(f)
           case \/-(rb @ \/-(_)) => rb
         }
 
@@ -500,9 +500,9 @@ sealed abstract class DisjunctionInstances2 {
   implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
     def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
       f.fold(
-        a => \/.left(\/.left(a)),
+        a => -\/(-\/(a)),
         _.fold(
-          b => \/.left(\/.right(b)),
+          b => -\/(\/-(b)),
           \/.right
         )
       )
@@ -511,9 +511,9 @@ sealed abstract class DisjunctionInstances2 {
       f.fold(
         _.fold(
           \/.left,
-          b => \/.right(\/.left(b))
+          b => \/-(-\/(b))
         ),
-        c => \/.right(\/.right(c))
+        c => \/-(\/-(c))
       )
   }
 }

@@ -8,64 +8,43 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.syntax.monad._
 
-case class FreeTListOption[A](f: FreeT[List, Option, A])
-
-object FreeTListOption {
-  implicit def freeTListOptionMonad = new MonadPlus[FreeTListOption] with Traverse[FreeTListOption] with BindRec[FreeTListOption] {
-    def point[A](a: => A): FreeTListOption[A] =
-      FreeTListOption(Monad[FreeT[List, Option, ?]].point(a))
-
-    def bind[A, B](fa: FreeTListOption[A])(f: A => FreeTListOption[B]): FreeTListOption[B] =
-      FreeTListOption(Monad[FreeT[List, Option, ?]].bind(fa.f) { a => f(a).f })
-
-    def tailrecM[A, B](f: A => FreeTListOption[A \/ B])(a: A): FreeTListOption[B] =
-      FreeTListOption(BindRec[FreeT[List, Option, ?]].tailrecM((x: A) => f(x).f)(a))
-
-    def plus[A](a: FreeTListOption[A], b: => FreeTListOption[A]) =
-      FreeTListOption(Plus[FreeT[List, Option, ?]].plus(a.f, b.f))
-
-    def empty[A] =
-      FreeTListOption(PlusEmpty[FreeT[List, Option, ?]].empty[A])
-
-    def traverseImpl[G[_]: Applicative, A, B](fa: FreeTListOption[A])(f: A => G[B]) =
-      Functor[G].map(Traverse[FreeT[List, Option, ?]].traverseImpl(fa.f)(f))(FreeTListOption.apply)
-
-    override def map[A, B](fa: FreeTListOption[A])(f: A => B) =
-      FreeTListOption(Monad[FreeT[List, Option, ?]].map(fa.f)(f))
-
-    override def foldMap[A, B: Monoid](fa: FreeTListOption[A])(f: A => B) =
-      Foldable[FreeT[List, Option, ?]].foldMap(fa.f)(f)
-  }
+object FreeTTest extends SpecLite {
+  type FreeTList[M[_], A] = FreeT[List, M, A]
+  type FreeTListOption[A] = FreeTList[Option, A]
 
   implicit def freeTListOptionArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeTListOption[A]] =
     Arbitrary(FreeTTest.freeTGen[List, Option, A](
-      Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f)))
-    ).map(FreeTListOption.apply))
+      Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeTListOptionArb[A].arbitrary))
+    ))
 
   implicit def freeTListOptionEq[A](implicit A: Equal[A]): Equal[FreeTListOption[A]] = new Equal[FreeTListOption[A]] {
-    def equal(a: FreeTListOption[A], b: FreeTListOption[A]) = Equal[Option[A]].equal(a.f.runM(_.headOption), b.f.runM(_.headOption))
+    def equal(a: FreeTListOption[A], b: FreeTListOption[A]) = Equal[Option[A]].equal(a.runM(_.headOption), b.runM(_.headOption))
   }
-}
 
-object FreeTTest extends SpecLite {
   def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F], G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)
     )
+
+  object headOption extends (List ~> Option) {
+    def apply[A](l: List[A]): Option[A] = l.headOption
+  }
+
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
+    checkAll(monadTrans.laws[FreeTList, Option])
 
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
       val result =
-        BindRec[FreeTListOption].tailrecM((i: Int) =>
+        BindRec[FreeTListOption].tailrecM(0)(i =>
           if (i < 50000)
             Applicative[FreeTListOption].point(\/.left[Int, Unit](i + 1))
           else
             Applicative[FreeTListOption].point(\/.right[Int, Unit](()))
-        )(0)
+        )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
     }
@@ -91,14 +70,42 @@ object FreeTTest extends SpecLite {
     }
 
     "hoist" ! forAll { a: FreeTListOption[Int] =>
-      val b = FreeTListOption(a.f.hoist(NaturalTransformation.refl))
+      val b = a.hoist(NaturalTransformation.refl)
       Equal[FreeTListOption[Int]].equal(a, b)
     }
 
+    "hoist stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.hoist(NaturalTransformation.refl) // used to overflow
+    }
+
     "interpret" ! forAll { a: FreeTListOption[Int] =>
-      val b = FreeTListOption(a.f.interpret(NaturalTransformation.refl))
+      val b = a.interpret(NaturalTransformation.refl)
       Equal[FreeTListOption[Int]].equal(a, b)
     }
+
+    "interpret stack-safety" in {
+      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
+      )
+
+      val b = a.interpret(NaturalTransformation.refl) // used to overflow
+    }
+
+    "foldMap should be consistent with runM" ! forAll { a: FreeTListOption[Int] =>
+      val x = a.runM(_.headOption)
+      val y = a.foldMap(headOption)
+      Equal[Option[Int]].equal(x, y)
+    }
+  }
+
+  "#1156: equals should not return true for obviously unequal instances" in {
+    val a = FreeT.point[List, Option, Int](1).flatMap(x => FreeT.point(2))
+    val b = FreeT.point[List, Option, Int](3).flatMap(x => FreeT.point(4))
+    a != b
   }
 
   "isoFree" ! forAll { a: FreeOption[Int] =>

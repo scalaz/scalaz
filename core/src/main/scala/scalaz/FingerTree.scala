@@ -1014,7 +1014,7 @@ object FingerTree extends FingerTreeInstances {
              (implicit ms: Reducer[A, V]): FingerTree[V, A] =
     new FingerTree[V, A] {
       implicit val nMeasure = nodeMeasure[A, V]
-      val mz = Need(m)
+      private[this] val mz = Need(m)
       def fold[B](b: V => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz.value, sf)
     }
@@ -1095,10 +1095,7 @@ sealed abstract class IndSeqInstances {
   implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
     new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
       def G = implicitly
-      override val naturalTrans = new (IndSeq ~> FingerTree[Int, ?]) {
-        def apply[A](a: IndSeq[A]) =
-          a.self
-      }
+      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
         implicit val r = UnitReducer((_: B) => 1)

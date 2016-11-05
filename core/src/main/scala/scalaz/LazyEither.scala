@@ -197,12 +197,12 @@ sealed abstract class LazyEitherInstances {
         fa.left.flatMap(e => f(e))
 
       @annotation.tailrec
-      def tailrecM[A, B](f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
+      def tailrecM[A, B](a: A)(f: A => LazyEither[E, A \/ B]): LazyEither[E, B] =
         f(a) match {
           case LazyLeft(l) => LazyLeft(l)
           case LazyRight(r) => r() match {
             case \/-(b) => LazyEither.lazyRight(b)
-            case -\/(a0) => tailrecM(f)(a0)
+            case -\/(a0) => tailrecM(a0)(f)
           }
         }
     }
