@@ -23,17 +23,25 @@ private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
     G.point(Const(fa.getConst))
 }
 
-private sealed trait ConstApply[C] extends Apply[Const[C, ?]] with ConstTraverse[C] {
+private sealed trait ConstApplyDivide[C] extends Apply[Const[C, ?]] with ConstTraverse[C] with ConstContravariant[C] with Divide[Const[C, ?]] {
   def C: Semigroup[C]
+
+  override def xmap[A, B](fa: Const[C, A], f: A => B, g: B => A) =
+    Const(fa.getConst)
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
     Const(C.append(f.getConst, fa.getConst))
+
+  override def divide[A, B, Z](fa: Const[C, A], fb: Const[C, B])(f: Z => (A, B)) =
+    Const(C.append(fa.getConst, fb.getConst))
 }
 
-private sealed trait ConstApplicative[C] extends Applicative[Const[C, ?]] with ConstApply[C] {
+private sealed trait ConstApplicativeDivisible[C] extends Applicative[Const[C, ?]] with ConstApplyDivide[C] with Divisible[Const[C, ?]] {
   def C: Monoid[C]
 
   override def point[A](a: => A): Const[C, A] = Const(C.zero)
+
+  override def conquer[A] = Const(C.zero)
 }
 
 private sealed trait ConstEqual[A, B] extends Equal[Const[A, B]] {
@@ -52,7 +60,7 @@ private sealed trait ConstOrder[A, B] extends Order[Const[A, B]] with ConstEqual
     OA.order(a1.getConst, a2.getConst)
 }
 
-private class ConstContravariant[C] extends Contravariant[Const[C, ?]] {
+private trait ConstContravariant[C] extends Contravariant[Const[C, ?]] {
   def contramap[A, B](r: Const[C, A])(f: B => A) =
     Const(r.getConst)
 }
@@ -62,7 +70,7 @@ sealed abstract class ConstInstances1 {
     new ConstTraverse[C] {}
 
   implicit def constContravariant[C]: Contravariant[Const[C, ?]] =
-    new ConstContravariant[C]
+    new ConstContravariant[C]{}
 }
 
 sealed abstract class ConstInstances0 extends ConstInstances1 {
@@ -76,8 +84,8 @@ sealed abstract class ConstInstances0 extends ConstInstances1 {
       val A: Semigroup[A] = implicitly
     }
 
-  implicit def constApply[C: Semigroup]: Apply[Const[C, ?]] =
-    new ConstApply[C] {
+  implicit def constInstance1[C: Semigroup]: Apply[Const[C, ?]] with Divide[Const[C, ?]] =
+    new ConstApplyDivide[C] {
       val C: Semigroup[C] = implicitly
     }
 }
@@ -93,8 +101,8 @@ sealed abstract class ConstInstances extends ConstInstances0 {
       val A: Monoid[A] = implicitly
     }
 
-  implicit def constApplicative[C: Monoid]: Applicative[Const[C, ?]] =
-    new ConstApplicative[C] {
+  implicit def constInstance2[C: Monoid]: Applicative[Const[C, ?]] with Divisible[Const[C, ?]] =
+    new ConstApplicativeDivisible[C] {
       val C: Monoid[C] = implicitly
     }
 }
