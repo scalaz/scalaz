@@ -8,6 +8,7 @@ object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
+  type IStateTList[S, A] = IndexedStateT[List, S, Int, A]
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
   implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
@@ -16,6 +17,7 @@ object StateTTest extends SpecLite {
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
+  checkAll(profunctor.laws[IStateTList])
   checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
 
   object instances {
