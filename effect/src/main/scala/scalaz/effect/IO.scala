@@ -178,7 +178,13 @@ object IO extends IOInstances {
     io(rw => return_(rw -> a))
 
   /** Reads a character from standard input. */
-  def getChar: IO[Char] = IO(readChar())
+  def getChar: IO[Char] = IO{
+    val s = scala.Console.in.readLine()
+    if (s == null)
+      throw new java.io.EOFException("Console has reached end of input")
+    else
+      s charAt 0
+  }
 
   /** Writes a character to standard output. */
   def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
@@ -199,7 +205,7 @@ object IO extends IOInstances {
   }))
 
   /** Reads a line of standard input. */
-  def readLn: IO[String] = IO(readLine())
+  def readLn: IO[String] = IO(scala.Console.in.readLine())
 
   def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
     io(rw => return_(rw -> {
