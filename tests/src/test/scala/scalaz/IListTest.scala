@@ -23,18 +23,6 @@ object IListTest extends SpecLite {
 
   // These tests hold for List, so they had better hold for IList
 
-  implicit val intBooleanArb: Arbitrary[Int => Boolean] = {
-    val intGen = implicitly[Arbitrary[Int]].arbitrary
-    Arbitrary(Gen.oneOf(
-      Gen.const((_: Int) => true),
-      Gen.const((_: Int) => false),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
-      intGen.map(n => (_: Int) > n),
-      intGen.map(n => (_: Int) < n)
-    ))
-  }
-
   "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) =>
     a.intercalate(IList[Int]()) must_===(a.flatten)
   }
