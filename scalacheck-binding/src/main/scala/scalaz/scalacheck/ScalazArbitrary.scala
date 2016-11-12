@@ -329,6 +329,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]], F: Monad[F]): Arbitrary[StateT[F, S, A]] =
     indexedStateTArb[F, S, S, A](A, F)
 
+  implicit def indexedReaderWriterStateTArb[F[_], R, W, S1, S2, A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
+    Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[F, R, W, S1, S2, A](_))
+
   implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]], F: Monad[F]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
     Functor[Arbitrary].map(A)(IndexedStateT[F, S1, S2, A](_))
 
