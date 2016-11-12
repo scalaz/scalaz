@@ -2,6 +2,7 @@ package scalaz
 package typeclass
 
 import scala.language.implicitConversions
+import scala.language.experimental.macros
 
 trait SemigroupSyntax {
   implicit def equalOpsA[A: Semigroup](a: A): SemigroupSyntax.OpsA[A] = new SemigroupSyntax.OpsA(a)
@@ -9,6 +10,6 @@ trait SemigroupSyntax {
 
 object SemigroupSyntax {
   class OpsA[A](a: A)(implicit A: Semigroup[A]) {
-    def append(other: => A): A = A.append(a, other)
+    def append(f: => A): A = macro meta.Ops._f[A, A]
   }
 }
