@@ -13,13 +13,6 @@ object KleisliTest extends SpecLite {
   type IntOr[A] = Int \/ A
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
-  implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
-    Arbitrary(Gen.frequency[Int => Option[Int]](
-      (1, Gen.const((x: Int) => Some(x))),
-      (1, Gen.const((x: Int) => Some(x + 1))),
-      (3, A.arbitrary.map(a => (_: Int) => a))
-    ))
-
   implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
     def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
       val mb1: M[Int] = a1.run(0)
