@@ -29,6 +29,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
       arbitrary[B].map(\&/.That(_))
     ))
 
+  implicit def endoArb[A](implicit A: Arbitrary[A => A]): Arbitrary[Endo[A]] =
+    Functor[Arbitrary].map(A)(Endo.endo)
+
   implicit def EphemeralStreamArbitrary[A : Arbitrary] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
