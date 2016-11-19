@@ -3,8 +3,6 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import Tags._
 
 object EitherTest extends SpecLite {
   checkAll("Either", order.laws[Either[Int, Int]])

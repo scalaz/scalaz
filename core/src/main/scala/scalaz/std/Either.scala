@@ -1,9 +1,6 @@
 package scalaz
 package std
 
-import scalaz.Isomorphism._
-import scalaz.Tags.{First, Last}
-
 sealed trait EitherInstances0 {
   implicit def eitherEqual[A, B](implicit A0: Equal[A], B0: Equal[B]): Equal[Either[A, B]] = new EitherEqual[A, B] {
     implicit def A = A0

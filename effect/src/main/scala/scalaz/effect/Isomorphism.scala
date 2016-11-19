@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-import scalaz.{IsomorphismFunctor, IsomorphismMonad}
+import scalaz.IsomorphismMonad
 import scalaz.Isomorphism.{<~>, <=>}
 
 //

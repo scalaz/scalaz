@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {

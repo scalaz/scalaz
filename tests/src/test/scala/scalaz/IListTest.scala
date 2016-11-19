@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
 

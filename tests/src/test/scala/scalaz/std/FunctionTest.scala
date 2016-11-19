@@ -5,7 +5,6 @@ import std.AllInstances._
 import std.AllFunctions.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Cogen
 import org.scalacheck.Prop.forAll
 
 object FunctionTest extends SpecLite {

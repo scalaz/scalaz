@@ -1,16 +1,13 @@
 package scalaz
 
-import org.scalacheck.{Arbitrary, Gen}
-import scalaz.Id._
+import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.anyVal._
 
 object IndexedContsTTest extends SpecLite {
 
   type ContTMaybeBoolean[A] = ContT[Maybe, Boolean, A]
-  type ContTMaybeBooleanInt = ContTMaybeBoolean[Int]
 
   private[this] implicit def contTEqual[F[_], A, B](implicit
     A: Arbitrary[A => F[B]],
