@@ -19,6 +19,8 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def ::(a: A)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(list => a :: list))
 
+  def collect[B](pf: PartialFunction[A,B])(implicit M: Functor[M]): ListT[M, B] = new ListT(M.map(run)(_.collect(pf)))
+
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(run)(_.isEmpty)
 
   @deprecated("Head is deprecated. Use ListT#headOption instead", "7.1")
