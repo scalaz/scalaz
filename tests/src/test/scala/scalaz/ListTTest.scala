@@ -45,6 +45,12 @@ object ListTTest extends SpecLite {
       ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
   }
 
+  "collect" ! forAll {
+    (ass: List[List[Int]]) =>
+      val pf : PartialFunction[Int, String] = { case (i : Int) if i > 2 => i.toString }
+      ListT.fromList(ass).collect(pf).toList must_===(ass.map(_.collect(pf)))
+  }
+
   "flatMap" ! forAll {
     (ass: List[List[Int]]) =>
       (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
