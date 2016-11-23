@@ -45,23 +45,22 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   def set(a: A1, b: B2): A2 =
     run(a).put(b)
 
+  def setf[X[_]](a: A1, b: X[B2])(implicit XF: Functor[X]): X[A2] =
+    run(a).putf(b)
+
   def st: State[A1, B1] =
     State(s => (s, get(s)))
 
   /** Modify the value viewed through the lens */
-  def mod(f: B1 => B2, a: A1): A2 = {
-    val (p, q) = run(a).run
-    p(f(q))
-  }
+  def mod(f: B1 => B2, a: A1): A2 =
+    run(a).puts(f)
 
   def =>=(f: B1 => B2): A1 => A2 =
     mod(f, _)
 
   /** Modify the value viewed through the lens, returning a functor `X` full of results. */
-  def modf[X[_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] = {
-    val c = run(a)
-    XF.map(f(c.pos))(c put _)
-  }
+  def modf[X[_]](f: B1 => X[B2], a: A1)(implicit XF: Functor[X]): X[A2] =
+    run(a).putsf(f)
 
   def =>>=[X[_]](f: B1 => X[B2])(implicit XF: Functor[X]): A1 => X[A2] =
     modf(f, _)
