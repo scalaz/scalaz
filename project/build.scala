@@ -49,7 +49,7 @@ object build {
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
-  def scalac210Options = Seq("-Yno-generic-signatures")
+  def scalac210Options = Seq("-Yno-generic-signatures", "-target:jvm-1.7")
 
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
