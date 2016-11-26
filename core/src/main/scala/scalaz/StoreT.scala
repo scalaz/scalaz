@@ -33,6 +33,12 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def puts(f: I => A)(implicit F: Functor[F]): F[B] =
     put(f(pos))
 
+  def putf[G[_]](a: G[A])(implicit F: Functor[F], G: Functor[G]): G[F[B]] =
+    G.map(a)(put(_))
+
+  def putsf[G[_]](f: I => G[A])(implicit F: Functor[F], G: Functor[G]): G[F[B]] =
+    putf(f(pos))
+
   def set: F[A => B] =
     run._1
 
