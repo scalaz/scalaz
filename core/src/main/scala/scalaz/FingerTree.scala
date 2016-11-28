@@ -338,7 +338,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
  * Ralf Hinze and Ross Paterson.
  * A gentle introduction is presented in the blog post "Monoids and Finger Trees" by Heinrich Apfelmus.
  *
- * This is done by choosing a a suitable type to annotate the nodes. For example,
+ * This is done by choosing a suitable type to annotate the nodes. For example,
  * a binary tree can be implemented by annotating each node with the size of its subtree,
  * while a priority queue can be implemented by labelling the nodes by the minimum priority of its children.
  *
