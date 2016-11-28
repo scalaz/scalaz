@@ -234,7 +234,7 @@ object Tree extends TreeInstances {
   }
 
   /**
-   *  Leaf represents a a tree node with no children.
+   *  Leaf represents a tree node with no children.
    *
    *  You can use Leaf for tree construction or pattern matching.
    */
