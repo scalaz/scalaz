@@ -100,17 +100,9 @@ class Task[+A](val get: Future[Throwable \/ A]) {
       case \/-(a) => a
     }
 
-  @deprecated("use unsafePerformSync", "7.2")
-  def run: A =
-    unsafePerformSync
-
   /** Like `unsafePerformSync`, but returns exceptions as values. */
   def unsafePerformSyncAttempt: Throwable \/ A =
     try get.unsafePerformSync catch { case t: Throwable => -\/(t) }
-
-  @deprecated("use unsafePerformSyncAttempt", "7.2")
-  def attemptRun: Throwable \/ A =
-    unsafePerformSyncAttempt
 
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
@@ -120,10 +112,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def unsafePerformAsyncInterruptibly(f: (Throwable \/ A) => Unit, cancel: AtomicBoolean): Unit =
     get.unsafePerformAsyncInterruptibly(f, cancel)
-
-  @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
-  def runAsyncInterruptibly(f: (Throwable \/ A) => Unit, cancel: AtomicBoolean): Unit =
-    unsafePerformAsyncInterruptibly(f, cancel)
 
   /**
    * Similar to `unsafePerformAsyncInterruptibly(f,cancel)` except instead of interrupting by setting cancel to true,
@@ -155,10 +143,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     () => { a ! None }
   }
 
-  @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
-  def runAsyncInterruptibly(f: (Throwable \/ A) => Unit) : () => Unit =
-    unsafePerformAsyncInterruptibly(f)
-
   /**
    * Run this computation to obtain either a result or an exception, then
    * invoke the given callback. Any pure, non-asynchronous computation at the
@@ -168,10 +152,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def unsafePerformAsync(f: (Throwable \/ A) => Unit): Unit =
     get.unsafePerformAsync(f)
-
-  @deprecated("use unsafePerformAsync", "7.2")
-  def runAsync(f: (Throwable \/ A) => Unit): Unit =
-    unsafePerformAsync(f)
 
   /**
    * Run this `Task` and block until its result is available, or until
@@ -187,14 +167,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def unsafePerformSyncFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout.toMillis)
 
-  @deprecated("use unsafePerformSyncFor", "7.2")
-  def runFor(timeoutInMillis: Long): A =
-    unsafePerformSyncFor(timeoutInMillis)
-
-  @deprecated("use unsafePerformSyncFor", "7.2")
-  def runFor(timeout: Duration): A =
-    unsafePerformSyncFor(timeout)
-
   /**
    * Like `unsafePerformSyncFor`, but returns exceptions as values. Both `TimeoutException`
    * and other exceptions will be folded into the same `Throwable`.
@@ -202,16 +174,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A =
     get.unsafePerformSyncAttemptFor(timeoutInMillis).join
 
-  @deprecated("use unsafePerformSyncAttemptFor", "7.2")
-  def attemptRunFor(timeoutInMillis: Long): Throwable \/ A =
-    unsafePerformSyncAttemptFor(timeoutInMillis)
-
   def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A =
     unsafePerformSyncAttemptFor(timeout.toMillis)
-
-  @deprecated("use unsafePerformSyncAttemptFor", "7.2")
-  def attemptRunFor(timeout: Duration): Throwable \/ A =
-    unsafePerformSyncAttemptFor(timeout)
 
   /**
    * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
@@ -223,14 +187,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
     timed(timeout.toMillis)
 
-  @deprecated("use timed", "7.2")
-  def unsafePerformTimed(timeout: Duration)(implicit scheduler:ScheduledExecutorService = Strategy.DefaultTimeoutScheduler): Task[A] =
-    timed(timeout)
-
-  @deprecated("use timed", "7.2")
-  def unsafePerformTimed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
-    timed(timeoutInMillis)
-
   /**
    * Retries this task if it fails, once for each element in `delays`,
    * each retry delayed by the corresponding duration, accumulating
@@ -240,10 +196,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
   def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
     retryInternal(delays, p, true)
 
-  @deprecated("use retryAccumulating", "7.2")
-  def unsafePerformRetryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
-    retryAccumulating(delays, p)
-
   /**
    * Retries this task if it fails, once for each element in `delays`,
    * each retry delayed by the corresponding duration.
@@ -251,10 +203,6 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    */
   def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
     retryInternal(delays, p, false).map(_._1)
-
-  @deprecated("use retry", "7.2")
-  def unsafePerformRetry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
-    retry(delays, p)
 
   private def retryInternal(delays: Seq[Duration],
                             p: (Throwable => Boolean),
