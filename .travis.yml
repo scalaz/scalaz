@@ -19,7 +19,7 @@ cache:
 
 language: scala
 scala:
-  - 2.12.0
+  - 2.12.1
   - 2.11.8
   - 2.10.6
 jdk:
