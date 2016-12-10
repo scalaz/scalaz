@@ -29,4 +29,19 @@ object OrderTest extends SpecLite {
       import syntax.foldable1._
       ((xs map MaxVal).suml1: Int) must_===(F maximum1 xs)
   }
+  
+  "semigroups min" ! prop {
+    (xs: NonEmptyList[Int]) =>
+	  val F = Foldable1[NonEmptyList]
+	  import Tags._
+	  import syntax.foldable1._
+	  (xs map MinVal).suml1 must be_===(F minimum1 xs)
+  }
+  "semigroups max" ! prop {
+    (xs: NonEmptyList[Int]) =>
+	  val F = Foldable1[NonEmptyList]
+	  import Tags._
+	  import syntax.foldable1._
+	  (xs map MaxVal).suml1 must be_===(F maximum1 xs)
+  }
 }
