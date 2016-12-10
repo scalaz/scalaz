@@ -244,6 +244,10 @@ object Task {
     def handleError[A](fa: Task[A])(f: Throwable => Task[A]): Task[A] =
       fa.handleWith { case t => f(t) }
   }
+  
+  implicit val taskLiftTask: LiftTask[Task] = new LiftTask[Task] {
+    def liftTask[A](task: Task[A]): Task[A] = task
+  }
 
   /** signals task was interrupted **/
   case object TaskInterrupted extends InterruptedException {
