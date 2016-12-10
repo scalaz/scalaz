@@ -2,11 +2,14 @@ package scalaz
 package std
 
 trait SetInstances {
-  implicit val setInstance: Foldable[Set] with IsEmpty[Set] with Length[Set] = new Foldable[Set] with IsEmpty[Set] with Length[Set] with Foldable.FromFoldr[Set] {
+  implicit val setInstance: Foldable[Set] with IsEmpty[Set] with Length[Set] with MonadPlus[Set] = new Foldable[Set] with IsEmpty[Set] with Length[Set] with Foldable.FromFoldr[Set] with MonadPlus[Set] {
     override def length[A](fa: Set[A]) = fa.size
     def empty[A] = Set()
     def plus[A](a: Set[A], b: => Set[A]) = a ++ b
     def isEmpty[A](fa: Set[A]) = fa.isEmpty
+    override def point[A](a: => A): Set[A] = Set(a)
+    override def map[A, B](fa: Set[A])(f: A => B): Set[B] = fa map f
+    override def bind[A, B](fa: Set[A])(f: A => Set[B]) = fa flatMap f
 
     override def toSet[A](fa: Set[A]) = fa
 
