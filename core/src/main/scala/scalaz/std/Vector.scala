@@ -19,7 +19,14 @@ trait VectorInstances extends VectorInstances0 {
 
   implicit val vectorInstance = generic.ixSqInstance
 
-  implicit def vectorMonoid[A]: Monoid[Vector[A]] = generic.ixSqMonoid
+  implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
+    def zero: Vector[A] = Vector.empty[A]
+    def append(as: Vector[A], bs0: => Vector[A]) = {
+      val bs = bs0
+      if (as.size < bs.size) as.reverseIterator.foldLeft(bs) { (acc, a) => a +: acc }
+      else bs.foldLeft(as)(_ :+ _)
+    }
+  }
 
   implicit def vectorShow[A: Show]: Show[Vector[A]] = generic.ixSqShow
 
