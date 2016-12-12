@@ -69,7 +69,7 @@ object build {
         else
           // does not contain -deprecation (because of ClassManifest)
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
+          Seq("-feature", "-Xfuture", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
 
       Seq("-unchecked") ++ versionDepOpts
     } ++ (CrossVersion.partialVersion(scalaVersion.value) match {

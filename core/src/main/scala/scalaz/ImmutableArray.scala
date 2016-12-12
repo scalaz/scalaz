@@ -22,7 +22,7 @@ sealed abstract class ImmutableArray[+A] {
   def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassManifest]: Array[B]
-  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
+  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
   def slice(from: Int, until: Int): ImmutableArray[A]
 
   def ++[B >: A: ClassManifest](other: ImmutableArray[B]): ImmutableArray[B]
@@ -163,7 +163,7 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
 
     def length = arr.length
     def toArray[B >: A : ClassManifest] = arr.clone.asInstanceOf[Array[B]]
-    def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) { arr.copyToArray(xs, start, len) }
+    def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) = { arr.copyToArray(xs, start, len) }
 
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
@@ -227,7 +227,7 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
 
     def length = str.length
     def toArray[B >: Char : ClassManifest] = str.toArray
-    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int) { str.copyToArray(xs, start, len) }
+    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int) = { str.copyToArray(xs, start, len) }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 

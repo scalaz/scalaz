@@ -8,67 +8,67 @@ import Formatter.all._
 
 object FormatterUsage extends App {
 
-  def test1() {
+  def test1(): Unit = {
     println (("test" :: subs(3))("abcdef" :: HNil))
   }
 
-  def test2() {
+  def test2(): Unit = {
     println (subs(3)("abcdef" :: HNil))
   }
 
-  def test3() {
+  def test3(): Unit = {
     println ((subs(3) :: "test")("abcdef" :: HNil))
   }
 
-  def test4() {
+  def test4(): Unit = {
     println((subs(1) :: " " :: subs(2) :: " " :: subs(3))("abcdef" :: "abcdef" :: "abcdef" :: HNil))
   }
 
-  def test5() {
+  def test5(): Unit = {
     println ((subs(1) :<: subs(2)) format ("abcdef" :: HNil))
   }
 
-  def test6() {
+  def test6(): Unit = {
     println ((subs(1) :<: " " :: subs(2) :: " " :: subs(3)) format ("abcdef" :: "uvwxyz" :: HNil))
   }
 
-  def test7() {
+  def test7(): Unit = {
     println (("test" :: subs(3) :: FNil)("abcdef" :: HNil))
   }
 
-  def test8() {
+  def test8(): Unit = {
     println ((subs(3) :: FNil)("abcdef" :: HNil))
   }
 
-  def test9() {
+  def test9(): Unit = {
     println ((subs(3) :: "test" :: FNil)("abcdef" :: HNil))
   }
 
-  def test10() {
+  def test10(): Unit = {
     println ((char() :: FNil)('c'.union[char#T] :: HNil))
   }
 
-  def test11() {
+  def test11(): Unit = {
     println ((char() :: char() :: FNil)('c'.union[char#T] :: 's'.union[char#T] :: HNil))
   }
 
-  def test12() {
+  def test12(): Unit = {
     println ((char() :: "#" :: char() :: "#" :: char() :: FNil)('c'.union[char#T] :: (65.toByte).union[char#T] :: (68.toShort).union[char#T] :: HNil))
   }
 
-  def test13() {
+  def test13(): Unit = {
     println (("#" :: bool() :: "#" :: hex() :: "#" :: str() :: "#" :: FNil)(null :: System.out :: null :: HNil))
   }
 
-  def test14() {
+  def test14(): Unit = {
     println (("#" :: bool(width = 10, left = true) :: "#" :: hex(width = 10) :: "#" :: str(width = 10, left = true) :: "#" :: FNil)(null :: System.out :: null :: HNil))
   }
 
-  def test15() {
+  def test15(): Unit = {
     println ((char().of[Char] :: char().of[Char] :: FNil)('c' :: 's' :: HNil))
   }
 
-  def test16() {
+  def test16(): Unit = {
     println (("#" :: octal(width = 10, left = true, indicator = true).of[Int] :: "#" :: uHexDeci(width = 10, padding = true).of[Long] :: "#" :: uScientific(width = 10, magnitude = 2, padding = true, separators = true, sign = true, space = false, brackets = true).of[Float] :: "#" :: FNil)(5783 :: (4873.toLong) :: 6847.5897f :: HNil))
   }
 

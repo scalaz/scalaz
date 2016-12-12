@@ -3,7 +3,7 @@ package xml
 package cursor
 
 object Walk {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     import scalaz.xml._, cursor._, Xml._
 

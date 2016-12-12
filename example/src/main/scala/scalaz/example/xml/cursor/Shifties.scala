@@ -3,7 +3,7 @@ package xml
 package cursor
 
 object Shifties {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     import scalaz._, Scalaz._
     import scalaz.xml._, cursor._, Xml._

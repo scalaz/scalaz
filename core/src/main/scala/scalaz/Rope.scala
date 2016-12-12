@@ -152,7 +152,7 @@ sealed class RopeCharW(val self: Rope[Char]) extends Ops[Rope[Char]] {
     stringBuilder.toString
   }
 
-  def appendTo(stringBuilder: StringBuilder) {
+  def appendTo(stringBuilder: StringBuilder): Unit = {
     self.chunks.foreach(ia => stringBuilder.append(ia.asString))
   }
 }
@@ -168,7 +168,7 @@ final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
   private var tailBuilder: Builder[A, ImmutableArray[A]] = IA.newBuilder[A]
   private var tailLength = 0
 
-  def clear() {
+  def clear(): Unit = {
     startRope = Rope.empty[A]
     tailBuilder = IA.newBuilder[A]
     tailLength = 0
@@ -215,7 +215,7 @@ final class RopeBuilder[A : ClassManifest] extends Builder[A, Rope[A]] {
 //      }
 //    }
 
-  private def cleanTail {
+  private def cleanTail: Unit = {
     startRope ::+= tailBuilder.result
     tailBuilder.clear()
   }

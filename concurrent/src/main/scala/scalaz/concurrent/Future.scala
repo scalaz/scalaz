@@ -200,7 +200,7 @@ sealed abstract class Future[+A] {
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
       scheduler.schedule(new Runnable {
-        def run() {
+        def run(): Unit = {
           if (done.compareAndSet(false,true)) {
             cancel.set(true)
             cb(-\/(new TimeoutException()))

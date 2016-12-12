@@ -24,7 +24,7 @@ object Tidy {
 
   import scalaz.xml.Xml._
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val r = in.parseXml
     r foreach (_ xprint config())
   }

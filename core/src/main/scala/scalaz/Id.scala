@@ -54,7 +54,7 @@ trait IdInstances {
 
       override def ap[A, B](fa: => Id[A])(f: => Id[A => B]): Id[B] = f(fa)
 
-      def each[A](fa: Id[A])(f: A => Unit) {
+      def each[A](fa: Id[A])(f: A => Unit) = {
         f(fa)
       }
 

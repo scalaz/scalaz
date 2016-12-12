@@ -24,7 +24,7 @@ object Simple {
 
   import scalaz._, Scalaz._, xml.Xml._
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     // Parse the document into a tree
     val r = data.parseXml
 

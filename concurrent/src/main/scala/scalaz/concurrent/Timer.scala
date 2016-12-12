@@ -20,9 +20,9 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   private[this] val lock = new ReentrantReadWriteLock()
   private[this] var futures: SortedMap[Long, List[() => Unit]] = SortedMap()
   private[this] val workerRunnable = new Runnable() {
-    def run() {
+    def run(): Unit = {
       @tailrec
-      def innerRun() {
+      def innerRun(): Unit = {
         lastNow = alignTimeResolution(System.currentTimeMillis)
         // Deal with stuff to expire.
         futures.headOption match {
@@ -48,11 +48,11 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   private[this] val workerThread = new Thread(workerRunnable, workerName)
   workerThread.start()
 
-  private[this] def expireFutures(futures: SortedMap[Long, List[() => Unit]]) {
+  private[this] def expireFutures(futures: SortedMap[Long, List[() => Unit]]): Unit = {
     futures.foreach(vector => vector._2.foreach(call => call()))
   }
 
-  def stop(expireImmediately: Boolean = false) {
+  def stop(expireImmediately: Boolean = false): Unit = {
     withWrite{
       continueRunning = false
       if (expireImmediately) {

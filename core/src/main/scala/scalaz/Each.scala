@@ -8,7 +8,7 @@ package scalaz
 @deprecated("Each is deprecated", "7.1")
 trait Each[F[_]]  { self =>
   ////
-  def each[A](fa: F[A])(f: A => Unit)
+  def each[A](fa: F[A])(f: A => Unit): Unit
 
   // derived functions
 

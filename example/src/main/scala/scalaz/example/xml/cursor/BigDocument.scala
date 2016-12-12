@@ -4,7 +4,7 @@ package cursor
 
 
 object BigDocument {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     import scalaz.xml._, cursor._, Xml._
 

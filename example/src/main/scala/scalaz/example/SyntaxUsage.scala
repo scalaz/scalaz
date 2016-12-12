@@ -17,7 +17,7 @@ object SyntaxUsage extends App {
 
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
-  def syntax1() {
+  def syntax1(): Unit = {
     import scalaz._
 
     // Import type class instances for Option, and the
@@ -34,7 +34,7 @@ object SyntaxUsage extends App {
   }
 
   // Use two different instances, and the syntax for all Monads
-  def syntax2() {
+  def syntax2(): Unit = {
     import scalaz._
 
     // Import type class instances for Option and List
@@ -51,7 +51,7 @@ object SyntaxUsage extends App {
     1.point[Option]
   }
 
-  def syntax3() {
+  def syntax3(): Unit = {
     import scalaz._
 
     // Import all type class instances
@@ -64,7 +64,7 @@ object SyntaxUsage extends App {
     o2.tuple(o2)
   }
 
-  def stdSyntax() {
+  def stdSyntax(): Unit = {
     import scalaz.Tags.Last
     import scalaz.std.anyVal._
     import scalaz.std.stream.streamSyntax._
@@ -81,7 +81,7 @@ object SyntaxUsage extends App {
     Last.unwrap((some(1).last |+| some(2).last)) assert_=== some(2)
   }
 
-  def stdSyntaxUeber() {
+  def stdSyntaxUeber(): Unit = {
     // Scalaz 6 Style: import everything: type class instances, implicit conversions
     // to the syntax wrappers, general functions.
     import scalaz._

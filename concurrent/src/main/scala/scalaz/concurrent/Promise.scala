@@ -39,7 +39,7 @@ sealed trait Promise[A] {
   def broken = borked
 
   // out of band signal
-  def break {
+  def break: Unit = {
     borked = true
     e ! new Break(this)
   }
@@ -96,7 +96,7 @@ object Promise extends PromiseInstances with PromiseFunctions {
   protected case class Thrown(e: Throwable) extends State[Nothing] {
     def get: Nothing = throw e
 
-    def fulfill[B](a: => B, promise: Promise[B]) {
+    def fulfill[B](a: => B, promise: Promise[B]): Unit = {
       // we could allow users to manually fulfill a thrown promise,
       // but this would violate referential transparency. DENIED
       // Unfulfilled.fulfill(a, promise)
@@ -105,23 +105,23 @@ object Promise extends PromiseInstances with PromiseFunctions {
     val fulfilled = true
     val threw = true
 
-    def break(promise: Promise[_]) {}
+    def break(promise: Promise[_]): Unit = {}
   }
 
   protected case class Fulfilled[A](val get: A) extends State[A] {
-    def fulfill[B >: A](a: => B, promise: Promise[B]) {}
+    def fulfill[B >: A](a: => B, promise: Promise[B]): Unit = {}
 
     val fulfilled = true
     val threw = false
 
-    def break(promise: Promise[_]) {}
+    def break(promise: Promise[_]): Unit = {}
   }
 
   protected case object Unfulfilled extends State[Nothing] {
     // the only way get gets here is if the promise is broken
     def get: Nothing = throw new BrokenException
 
-    def fulfill[B](a: => B, promise: Promise[B]) {
+    def fulfill[B](a: => B, promise: Promise[B]): Unit = {
       if (!promise.borked) {
         try {
           promise.state = new Fulfilled(a)
@@ -139,7 +139,7 @@ object Promise extends PromiseInstances with PromiseFunctions {
     val fulfilled = false
     val threw = false
 
-    def break(promise: Promise[_]) {
+    def break(promise: Promise[_]): Unit = {
       promise.latch.countDown() // free the hordes
     }
   }
@@ -151,13 +151,13 @@ object Promise extends PromiseInstances with PromiseFunctions {
   }
 
   protected[concurrent] class Done[A](a: => A, promise: Promise[A]) extends Signal[A] {
-    def eval {
+    def eval: Unit = {
       promise.state.fulfill(a, promise)
     }
   }
 
   protected[concurrent] class Cont[A](k: A => Unit, err: Throwable => Unit, promise: Promise[A]) extends Signal[A] {
-    def eval {
+    def eval: Unit = {
       promise.state match {
         case Fulfilled(a) => k(a)
         case Unfulfilled => promise.waiting.offer(Waiting(k, err))
@@ -167,7 +167,7 @@ object Promise extends PromiseInstances with PromiseFunctions {
   }
 
   protected[concurrent] class Break[A](promise: Promise[_]) extends Signal[A] {
-    def eval {
+    def eval: Unit = {
       promise.state.break(promise)
     }
   }
