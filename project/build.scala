@@ -121,6 +121,7 @@ object build {
       "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
+      "-Xfuture",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
