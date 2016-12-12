@@ -30,7 +30,7 @@ object Run {
 
       def strategy: Strategy = r.strategy
 
-      def run(a: B) {
+      def run(a: B): Unit = {
         r.run(f(a))
       }
     }

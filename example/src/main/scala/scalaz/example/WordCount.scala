@@ -13,7 +13,7 @@ object WordCount {
     wordCount
   }
 
-  def wordCount {
+  def wordCount: Unit = {
     import scalaz.State
 
     val text = "the cat in the hat\n sat on the mat\n".toList

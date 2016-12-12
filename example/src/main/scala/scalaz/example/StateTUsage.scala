@@ -5,17 +5,17 @@ import scalaz._
 object StateTUsage extends App {
   import StateT._
 
-  def f[M[_]: Functor] {
+  def f[M[_]: Functor] = {
     Functor[StateT[M, Int, ?]]
   }
 
-  def m[M[_]: Monad] {
+  def m[M[_]: Monad] = {
     Applicative[StateT[M, Int, ?]]
     Monad[StateT[M, Int, ?]]
     MonadState[StateT[M, Int, ?], Int]
   }
 
-  def state() {
+  def state(): Unit = {
     val state: State[String, Int] = State((x: String) => (x + 1, 0))
     val eval: Int = state.eval("")
     state.flatMap(_ => state)

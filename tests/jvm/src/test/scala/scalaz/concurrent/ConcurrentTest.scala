@@ -40,9 +40,9 @@ object ConcurrentTest extends SpecLite{
     else sys.error("Failed to count down within " + timeout + " millis: " + hint)
   }
 
-  def fork(f: => Unit) {
+  def fork(f: => Unit): Unit = {
     new Thread {
-      override def run() {
+      override def run() = {
         f
       }
     }.start()

@@ -14,7 +14,7 @@ object DirectTypeClassUsage extends App {
   direct2()
 
   // Direct use of type class for one type, Option
-  def direct1() {
+  def direct1(): Unit = {
     import scalaz._
 
     // Import the members of the type class instance for Option.
@@ -26,7 +26,7 @@ object DirectTypeClassUsage extends App {
 
 
   // Direct use of type class for multiple types
-  def direct2() {
+  def direct2(): Unit = {
     import scalaz._
 
     // Import the type class instances for Option and List.

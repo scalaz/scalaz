@@ -22,7 +22,7 @@ object LiskovTest extends SpecLite {
   }
 
   "lift" in {
-    def foo[A, B](implicit ev: A <~< B) {
+    def foo[A, B](implicit ev: A <~< B): Unit = {
       Liskov.co[Co1, A, B](ev)
       Liskov.contra[Contra1, A, B](ev)
 

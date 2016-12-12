@@ -7,13 +7,13 @@ import org.scalacheck._
 abstract class SpecLite extends Properties("") {
   override val name = this.getClass.getName.stripSuffix("$")
 
-  def checkAll(name: String, props: Properties) {
+  def checkAll(name: String, props: Properties): Unit = {
     for ((name2, prop) <- props.properties) yield {
       property(name + ":" + name2) = prop
     }
   }
 
-  def checkAll(props: Properties) {
+  def checkAll(props: Properties): Unit = {
     for ((name, prop) <- props.properties) yield {
       property(name) = prop
     }
