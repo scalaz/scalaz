@@ -96,8 +96,6 @@ package object scalaz {
 
   implicit val idInstance: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
 
-  private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
-
   /**
    * Tag a type `T` with `Tag`.
    *
@@ -107,7 +105,7 @@ package object scalaz {
    *
    * Credit to Miles Sabin for the idea.
    */
-  type @@[T, Tag] = Tagged[T, Tag]
+  type @@[T, Tag] = scalaz.Tag.k.@@[T, Tag]
 
   /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]

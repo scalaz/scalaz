@@ -7,6 +7,14 @@ import Tags.{Multiplication => Mult}
 import org.scalacheck.Prop.forAll
 
 object TagTest extends SpecLite {
+  "k.@@" should {
+    "be abstract" in {
+      val r = (List[Int](42) ++ List[Int @@ Mult]()).toSet
+      r: Set[Any]
+      true
+    }
+  }
+
   "of.subst" should {
     "substitute" ! forAll {xs: List[Int] =>
       (Tag unwrap Foldable[List].fold(Tag.of[Mult].subst(xs))
