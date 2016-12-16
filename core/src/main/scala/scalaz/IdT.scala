@@ -72,6 +72,9 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 
   implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
     F.contramap(_.run)
+
+  implicit def idTSemigroup[F[_]: Plus, A]: Semigroup[IdT[F, A]] =
+    Semigroup.semigroupInvariantFunctor.xmap(Plus[F].semigroup[A], IdT.apply, _.run)
 }
 
 object IdT extends IdTInstances
