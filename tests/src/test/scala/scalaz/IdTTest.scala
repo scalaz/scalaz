@@ -13,6 +13,7 @@ object IdTTest extends SpecLite {
     def foldable[F[_] : Foldable] = Foldable[IdT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[IdT[F, ?]]
     def semigroup[F[_] : Plus, A] = Semigroup[IdT[F, A]]
+    def monoid[F[_] : PlusEmpty, A] = Monoid[IdT[F, A]]
 
     // checking absence of ambiguity
     def equal[F[_], A](implicit F: Order[F[A]]) = Equal[IdT[F, A]]

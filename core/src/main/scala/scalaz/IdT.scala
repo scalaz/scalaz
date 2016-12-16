@@ -60,6 +60,9 @@ sealed abstract class IdTInstances0 extends IdTInstances1 {
 
   implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
     F.contramap(_.run)
+
+  implicit def idTMonoid[F[_]: PlusEmpty, A]: Semigroup[IdT[F, A]] =
+    Monoid.monoidInvariantFunctor.xmap(PlusEmpty[F].monoid[A], IdT.apply, _.run)
 }
 
 sealed abstract class IdTInstances extends IdTInstances0 {
