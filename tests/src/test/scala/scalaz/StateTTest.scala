@@ -85,6 +85,11 @@ object StateTTest extends SpecLite {
     type StateStack[A] = State[Int, A]
     type ListStack[A] = ListT[StateStack, A]
 
-    MonadState[ListStack, Int].get.run.eval(1) must_=== List(1)
+    // `promotedMonadState` implicit instance had to be reverted (see #1308).
+    // Call `promotedMonadState` explicitly for now.
+    //val ms = MonadState[ListStack, Int]
+    val ms = MonadState.promotedMonadState[ListStack, StateStack, Int]
+
+    ms.get.run.eval(1) must_=== List(1)
   }
 }

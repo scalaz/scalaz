@@ -136,5 +136,11 @@ object FreeTTest extends SpecLite {
     def foldable[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Foldable[FreeT[S, F, ?]]
     def monad[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Monad[FreeT[S, F, ?]]
     def plus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Plus[FreeT[S, F, ?]]
+
+    object issue_1308 {
+      type G[A] = State[Byte, A]
+      type F[A] = FreeT[Id.Id, G, A]
+      MonadState[F, Byte]
+    }
   }
 }
