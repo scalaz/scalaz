@@ -27,7 +27,7 @@ object MonadState {
 
   ////
 
-  implicit def promotedMonadState[G[_], F[_], S](
+  def promotedMonadState[G[_], F[_], S](
     implicit
     mpo: MonadPartialOrder[G, F],
     ms: MonadState[F, S]
