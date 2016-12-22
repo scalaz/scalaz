@@ -11,6 +11,7 @@ import Free.Suspend
  */
 sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
   def apply[A](fa: F[A]): G[A] = inj(fa)
+  def unapply[A](ga: G[A]): Option[F[A]] = prj(ga)
   def inj[A](fa: F[A]): G[A]
   def prj[A](ga: G[A]): Option[F[A]]
 }
