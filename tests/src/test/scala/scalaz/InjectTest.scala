@@ -114,4 +114,24 @@ object InjectTest extends SpecLite {
     val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
     (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must_===(true)
   }
+
+  "unapply from left" in {
+    val fa = Test1(Seq("a"), Free.pure[Test1Algebra, Int](_))
+    val T1A = Inject[Test1Algebra, C0]
+
+    T1A(fa) match {
+      case T1A(check) => check must_== fa
+      case _          => fail("Wrong coproduct")
+    }
+  }
+
+  "unapply from right" in {
+    val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
+    val T2A = Inject[Test2Algebra, C0]
+
+    T2A(fa) match {
+      case T2A(check) => check must_== fa
+      case _          => fail("Wrong coproduct")
+    }
+  }
 }
