@@ -32,7 +32,7 @@ lazy val core = Project(
     sourceGenerators in Compile <+= (sourceManaged in Compile) map {
       dir => Seq(GenerateTupleW(dir))
     },
-    scalaParserCombinatorsVersion := "1.0.4",
+    scalaParserCombinatorsVersion := "1.0.5",
     scalaXmlVersion := "1.0.5",
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
