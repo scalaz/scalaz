@@ -54,15 +54,19 @@ import scala.concurrent.duration._
 sealed abstract class Future[+A] {
   import Future._
 
-  def flatMap[B](f: A => Future[B]): Future[B] = this match {
-    case Now(a) => Suspend(() => f(a))
-    case Suspend(thunk) => BindSuspend(thunk, f)
+ def flatMap[B](f: A => Future[B]): Future[B] = this match {
+    case Now(a) => Suspend(() => f(a), None)
+    case Suspend(thunk, Some(andFinally)) =>
+      Suspend(() => BindSuspend(thunk, f), Some(andFinally))
+    case Suspend(thunk, None) =>
+      BindSuspend(thunk, f)
     case Async(listen) => BindAsync(listen, f)
     case BindSuspend(thunk, g) =>
-      Suspend(() => BindSuspend(thunk, g andThen (_ flatMap f)))
+      Suspend(() => BindSuspend(thunk, g andThen (_ flatMap f)), None)
     case BindAsync(listen, g) =>
-      Suspend(() => BindAsync(listen, g andThen (_ flatMap f)))
+      Suspend(() => BindAsync(listen, g andThen (_ flatMap f)), None)
   }
+
 
   def map[B](f: A => B): Future[B] =
     flatMap(f andThen (b => Future.now(b)))
@@ -78,6 +82,7 @@ sealed abstract class Future[+A] {
       case BindAsync(onFinish, g) =>
         onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
     }
+
 
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
@@ -106,21 +111,45 @@ sealed abstract class Future[+A] {
    */
   @annotation.tailrec
   final def step: Future[A] = this match {
-    case Suspend(thunk) => thunk().step
+    case Suspend(thunk, _) => thunk().step
     case BindSuspend(thunk, f) => (thunk() flatMap f).step
     case _ => this
   }
 
-  /** Like `step`, but may be interrupted by setting `cancel` to true. */
+  /** Like `step`, but may be interrupted by setting `cancel` to true.*/
   @annotation.tailrec
   final def stepInterruptibly(cancel: AtomicBoolean): Future[A] =
     if (!cancel.get) this match {
-      case Suspend(thunk) => thunk().stepInterruptibly(cancel)
+      case Suspend(thunk, _) => thunk().stepInterruptibly(cancel)
       case BindSuspend(thunk, f) => (thunk() flatMap f).stepInterruptibly(cancel)
       case _ => this
     }
     else this
 
+  /* To support Task's onFinish functionality in a safe and reliable way even if the cancel is set to true*/
+  @annotation.tailrec
+  final def stepInterruptiblyOnFinish(cancel: AtomicBoolean, future: Option[Option[Throwable] => Future[Unit]]): (Future[A], Option[Option[Throwable] => Future[Unit]]) =
+    this match {
+      case Suspend(thunk, andFinally) =>
+        val o = (future, andFinally) match {
+          case (None, af) => af
+          case (f, None) => f
+          case (Some(f), Some(af)) => Some(Kleisli(f).flatMap(_ => Kleisli(af)).run)
+        }
+        if (!cancel.get)
+          thunk().stepInterruptiblyOnFinish(cancel, o)
+        else
+          (this, o)
+      case BindSuspend(thunk, f) if (!cancel.get) => (thunk() flatMap f).stepInterruptiblyOnFinish(cancel, future)
+      case _ => (this, future)
+    }
+  
+  @annotation.tailrec
+  final def stepOnFinish(onFin: Option[Option[Throwable] => Future[Unit]]): (Future[A], Option[Option[Throwable] => Future[Unit]]) = this match {
+    case Suspend(thunk, onFinish) => thunk().stepOnFinish(onFinish)
+    case BindSuspend(thunk, f) => (thunk() flatMap f).stepOnFinish(onFin)
+    case _ => (this, onFin)
+  } 
   /**
    * Begins running this `Future` and returns a new future that blocks
    * waiting for the result. Note that this will start executing side effects
@@ -136,7 +165,7 @@ sealed abstract class Future[+A] {
     delay { latch.await; result.get }
   }
 
-   /**
+ /**
    * Run this `Future`, passing the result to the given callback once available.
    * Any pure, non-asynchronous computation at the head of this `Future` will
    * be forced in the calling thread. At the first `Async` encountered, control
@@ -195,7 +224,7 @@ sealed abstract class Future[+A] {
   def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A =
     unsafePerformSyncAttemptFor(timeout.toMillis)
 
-  /**
+   /**
    * Returns a `Future` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    * This implementation will not block the future's execution thread
@@ -235,7 +264,7 @@ sealed abstract class Future[+A] {
 object Future {
   case class Now[+A](a: A) extends Future[A]
   case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
-  case class Suspend[+A](thunk: () => Future[A]) extends Future[A]
+  case class Suspend[+A](thunk: () => Future[A], andFinally: Option[Option[Throwable] => Future[Unit]]) extends Future[A]
   case class BindSuspend[A,B](thunk: () => Future[A], f: A => Future[B]) extends Future[B]
   case class BindAsync[A,B](onFinish: (A => Trampoline[Unit]) => Unit,
                             f: A => Future[B]) extends Future[B]
@@ -349,7 +378,7 @@ object Future {
    * larger computation. Memoize `a` with a lazy value before calling this
    * function if memoization is desired.
    */
-  def delay[A](a: => A): Future[A] = Suspend(() => Now(a))
+  def delay[A](a: => A): Future[A] = Suspend(() => Now(a), None)
 
   /**
    * Returns a `Future` that produces the same result as the given `Future`,
@@ -365,7 +394,7 @@ object Future {
    * call stack. The standard trampolining primitive, useful for avoiding
    * stack overflows.
    */
-  def suspend[A](f: => Future[A]): Future[A] = Suspend(() => f)
+  def suspend[A](f: => Future[A]): Future[A] = Suspend(() => f, None)
 
   /**
    * Create a `Future` from an asynchronous computation, which takes the form

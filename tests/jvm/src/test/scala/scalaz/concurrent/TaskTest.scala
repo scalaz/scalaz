@@ -16,6 +16,7 @@ object TaskTest extends SpecLite {
   val LM = Monad[List]; import LM.monadSyntax._;
   val LT = Traverse[List]; import LT.traverseSyntax._
 
+  
   // standard worst case scenario for trampolining -
   // huge series of left associated binds
   def leftAssociatedBinds(seed: (=> Int) => Task[Int],
@@ -24,6 +25,8 @@ object TaskTest extends SpecLite {
 
   val options = List[(=> Int) => Task[Int]](n => Task.now(n), Task.delay _ , Task.apply _)
   val combinations = (options tuple options)
+
+
 
   "left associated binds" ! check {
     combinations.forall { case (seed, cur) => leftAssociatedBinds(seed, cur).unsafePerformSync == correct }
@@ -36,7 +39,7 @@ object TaskTest extends SpecLite {
   "gather-based map == sequential map" ! forAll { (xs: List[Int]) =>
     xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
   }
-
+  
   case object FailWhale extends RuntimeException {
     override def fillInStackTrace = this
   }
@@ -48,7 +51,7 @@ object TaskTest extends SpecLite {
   case object FailTurkey extends Error {
     override def fillInStackTrace = this
   }
-
+  
   "catches exceptions" ! {
     Task { Thread.sleep(10); throw FailWhale; 42 }.map(_ + 1).unsafePerformSyncAttempt ==
     -\/(FailWhale)
@@ -125,7 +128,7 @@ object TaskTest extends SpecLite {
     Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.unsafePerformSyncAttempt ==
       -\/(SadTrombone)
   }
-
+  
   "catches exceptions thrown by onFinish argument function" ! {
     Task { Thread.sleep(10); 42 }.onFinish { _ => throw SadTrombone; Task.now(()) }.unsafePerformSyncAttemptFor(1000) ==
       -\/(SadTrombone)
@@ -295,6 +298,47 @@ object TaskTest extends SpecLite {
 
   "fromDisjunction matches attemptRun" ! forAll { x: Throwable \/ Int =>
     Task.fromDisjunction(x).unsafePerformSyncAttempt must_== x
+  }
+
+  "Task onFinsih should work after flatMaped Task throws an Error" in {
+    implicit val schex = Strategy.DefaultTimeoutScheduler
+    var a = 0 
+    Task { 5 }.flatMap(e => Task { if ( true ) throw SadTrombone else 4}.onFinish(t => Task.delay { a = 1})).unsafePerformSyncAttempt
+    assert(a > 0)
+  }
+  
+  "Task onFinish should happen even after a timeout" in {
+    implicit val schex = java.util.concurrent.Executors.newScheduledThreadPool(3)
+    var a = 0
+    val res = Task { Thread.sleep(1000) }.onFinish(t => Task.delay { a = 1} ).timed(1).unsafePerformSyncAttempt
+    res mustMatch {
+         case -\/(ex:TimeoutException) => true
+       }
+    assert(a == 1)
+  }
+  
+  "Task onFinish should happen even after a timeout in runFor" in {
+    implicit val schex = java.util.concurrent.Executors.newScheduledThreadPool(3)
+    val l = new java.util.concurrent.CountDownLatch(1)
+    val res = Task { Thread.sleep(1000) }.onFinish(t => Task.delay { l.countDown() } ).unsafePerformSyncAttemptFor(1)
+    res mustMatch {
+         case -\/(ex:TimeoutException) => true
+       }
+    assert(l.await(1000, TimeUnit.MILLISECONDS))
+  }
+
+  "Nested Task onFinish should happen even after a timeout" in {
+    implicit val schex = java.util.concurrent.Executors.newScheduledThreadPool(4)
+    var a = 0
+    val y = Task { Thread.sleep(1000) }.onFinish(t => Task.delay{ Thread.sleep(1000) }.timed(1).onFinish(_ => Task.delay { a = 1 } )).timed(1).unsafePerformSyncAttempt
+    assert(a == 1)
+  }
+
+  "Nested OnFinish can still timeout" in {
+    implicit val schex = java.util.concurrent.Executors.newScheduledThreadPool(4)
+    var a = 0
+    val y = Task.delay { Thread.sleep(1000) }.onFinish(t => Task { Thread.sleep(1000) }.flatMap(_ => Task.delay { a = 1}).timed(1)).timed(1).unsafePerformSyncAttempt
+    assert(a == 0)
   }
 }
 
