@@ -114,7 +114,7 @@ object Applicative {
 
   ////
 
-  implicit def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
+  def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
 
   ////
 }

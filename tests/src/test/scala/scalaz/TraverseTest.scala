@@ -31,8 +31,8 @@ object TraverseTest extends SpecLite {
     }
 
     "traverse int function as monoidal applicative" in {
-      val s: Int = List(1, 2, 3) traverseU {_ + 1}
-      s must_===(9)
+      val s: Const[Int, _] = List(1, 2, 3) traverseU {a => Const(a + 1)}
+      s.getConst must_===(9)
     }
 
     "not blow the stack" in {
