@@ -5,17 +5,42 @@ import Prelude.{<~<, ===}
 import scalaz.typeclass.{Contravariant, Functor}
 import Liskov.refl
 
+/**
+  * Liskov substitutability: A better `<:<`.
+  *
+  * `Liskov[A, B]` witnesses that `A` can be used in any negative context
+  * that expects a `B`. (e.g. if you could pass an `A` into any function
+  * that expects a `B`.)
+  *
+  * @see [[<~<]] `A <~< B` is a type synonym to `Liskov[A, B]`
+  */
 sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
   def subst[F[-_]](fb: F[B]): F[A]
 
+  /**
+    * Substitution into a contravariant context.
+    *
+    * @see [[substCo]]
+    */
   final def substCt[F[-_]](fb: F[B]): F[A] =
     subst[F](fb)
 
+  /**
+    * Substitution into a covariant context.
+    *
+    * @see [[substCt]]
+    */
   final def substCo[F[+_]](fa: F[A]): F[B] = {
     type f[-α] = F[α] => F[B]
     substCt[f](identity[F[B]]).apply(fa)
   }
 
+  /**
+    * Substitution on identity brings about a direct coercion function
+    * of the same form that [[<:<]] provides.
+    *
+    * @see [[coerce]]
+    */
   final def apply(a: A): B =
     coerce(a)
 
@@ -46,11 +71,23 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
   final def coerce(a: A): B =
     substCo[λ[`+α` => α]](a)
 
+  /**
+    * Given `A <~< B` we can prove that `F[A] <~< F[B]` for any
+    * covariant `F[+_]`.
+    *
+    * @see [[liftCt]]
+    */
   final def liftCo[F[+_]]: F[A] <~< F[B] = {
     type f[-α] = F[α] <~< F[B]
     substCt[f](refl)
   }
 
+  /**
+    * Given `A <~< B` we can prove that `F[B] <~< F[B]` for any
+    * contravariant `F[-_]`.
+    *
+    * @see [[liftCo]]
+    */
   final def liftCt[F[-_]]: F[B] <~< F[A] = {
     type f[+α] = F[α] <~< F[A]
     substCo[f](refl)
@@ -87,15 +124,27 @@ object Liskov {
   def reify[A, B >: A]: A <~< B = refl
 
   /**
+    * Given `A <~< B` and a contravariant functor `F[_]`, we can prove that
+    * `F[B] <~< F[A]`. Notice that `F[B] <:< F[A]` may not hold in Scala, yet
+    * such a substitution is always valid assuming that `F[_]` is a lawful
+    * contravariant functor.
     *
-    * @see http://typelevel.org/blog/2014/03/09/liskov_lifting.html
+    * @see [[http://typelevel.org/blog/2014/03/09/liskov_lifting.html
+    *        When can Liskov be lifted?]]
+    * @see [[liftCoF]]
     */
   def liftCtF[F[_]: Contravariant, A, B](ab: A <~< B): F[B] <~< F[A] =
     ab.asInstanceOf[F[B] <~< F[A]]
 
   /**
+    * Given `A <~< B` and a covariant functor `F[_]`, we can prove that
+    * `F[A] <~< F[B]`. Notice that `F[A] <:< F[B]` may not hold in Scala, yet
+    * such a substitution is always valid assuming that `F[_]` is a lawful
+    * covariant functor.
     *
-    * @see http://typelevel.org/blog/2014/03/09/liskov_lifting.html
+    * @see [[http://typelevel.org/blog/2014/03/09/liskov_lifting.html
+    *        When can Liskov be lifted?]]
+    * @see [[liftCtF]]
     */
   def liftCoF[F[_]: Functor, A, B](ab: A <~< B): F[A] <~< F[B] =
     ab.asInstanceOf[F[A] <~< F[B]]
