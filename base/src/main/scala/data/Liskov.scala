@@ -1,30 +1,29 @@
 package scalaz
 package data
 
-import Prelude.{>~>, <~<, ===}
-import scala.annotation.unchecked.{uncheckedVariance => uV }
+import Prelude.{<~<, ===}
 import scalaz.typeclass.{Contravariant, Functor}
 import Liskov.refl
 
 sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
   def subst[F[-_]](fb: F[B]): F[A]
 
-  def substCt[F[-_]](fb: F[B]): F[A] =
+  final def substCt[F[-_]](fb: F[B]): F[A] =
     subst[F](fb)
 
-  def substCo[F[+_]](fa: F[A]): F[B] = {
+  final def substCo[F[+_]](fa: F[A]): F[B] = {
     type f[-α] = F[α] => F[B]
     substCt[f](identity[F[B]]).apply(fa)
   }
 
-  def apply(a: A): B =
+  final def apply(a: A): B =
     coerce(a)
 
   /**
     * Subtyping is transitive and its witnesses can be composed in a
     * chain much like functions.
     */
-  def andThen[C](bc: B <~< C): A <~< C = {
+  final def andThen[C](bc: B <~< C): A <~< C = {
     type f[-α] = α <~< C
     ab.substCt[f](bc)
   }
@@ -35,7 +34,7 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
     *
     * @see [[andThen]]
     */
-  def compose[Z](za: Z <~< A): Z <~< B =
+  final def compose[Z](za: Z <~< A): Z <~< B =
     za.andThen(ab)
 
   /**
@@ -44,15 +43,15 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
     *
     * @see [[apply]]
     */
-  def coerce(a: A): B =
+  final def coerce(a: A): B =
     substCo[λ[`+α` => α]](a)
 
-  def liftCo[F[+_]]: F[A] <~< F[B] = {
+  final def liftCo[F[+_]]: F[A] <~< F[B] = {
     type f[-α] = F[α] <~< F[B]
     substCt[f](refl)
   }
 
-  def liftCt[F[-_]]: F[B] <~< F[A] = {
+  final def liftCt[F[-_]]: F[B] <~< F[A] = {
     type f[+α] = F[α] <~< F[A]
     substCo[f](refl)
   }
@@ -61,7 +60,7 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
     * A value of `A <~< B` is always sufficient to produce a similar [[<:<]]
     * value.
     */
-  def toPredef: A <:< B = {
+  final def toPredef: A <:< B = {
     type f[-α] = α <:< B
     substCt[f](implicitly[B <:< B])
   }
@@ -78,9 +77,9 @@ object Liskov {
   def refl[A]: A <~< A = Refl[A]()
 
   /**
-    * Lift Scala's subtyping relationship
+    * Reify Scala's subtyping relationship into an evidence value.
     */
-  def isa[A, B >: A]: A <~< B = refl
+  def reify[A, B >: A]: A <~< B = refl
 
   /**
     *

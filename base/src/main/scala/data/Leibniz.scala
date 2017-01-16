@@ -5,11 +5,17 @@ import Prelude.===
 import Leibniz.refl
 
 /**
+  * Leibnizian equality: a better `=:=`.
+  *
   * A value of `Leibniz[A, B]` is proof that the types `A` and `B` are the same.
   * More powerfully, it asserts that they have the same meaning in all type
   * contexts. This can be a more powerful assertion than `A =:= B` and is more
   * easily used in manipulation of types while avoiding (potentially
   * erroneous) coercions.
+  *
+  * This technique was first used in
+  * [[http://portal.acm.org/citation.cfm?id=583852.581494
+  * Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
   *
   * @see [[===]] `A === B` is a type synonym to `Leibniz[A, B]`
   */
@@ -28,14 +34,16 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
     *
     * @see [[coerce]]
     */
-  def apply(a: A): B =
+  final def apply(a: A): B =
     coerce(a)
 
   /**
     * Equality is transitive and its witnesses can be composed in a
     * chain much like functions.
+    *
+    * @see [[compose]]
     */
-  def andThen[C](bc: B === C): A === C =
+  final def andThen[C](bc: B === C): A === C =
     bc.subst[A === ?](ab)
 
   /**
@@ -44,14 +52,14 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
     *
     * @see [[andThen]]
     */
-  def compose[Z](za: Z === A): Z === B =
+  final def compose[Z](za: Z === A): Z === B =
     za.andThen(ab)
 
   /**
     * Equality is symmetric and therefore can be flipped around.
     * Flipping is its own inverse, so `x.flip.flip == x`.
     */
-  def flip: B === A =
+  final def flip: B === A =
     subst[? === A](refl)
 
   /**
@@ -60,16 +68,16 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
     *
     * @see [[apply]]
     */
-  def coerce(a: A): B =
+  final def coerce(a: A): B =
     subst[λ[α => α]](a)
 
-  def onF[X](fa: X => A): X => B =
+  final def onF[X](fa: X => A): X => B =
     subst[X => ?](fa)
 
-  def lift[F[_]]: F[A] === F[B] =
+  final def lift[F[_]]: F[A] === F[B] =
     Leibniz.lift(ab)
 
-  def lift2[F[_, _]]: PartiallyAppliedLift2[F] =
+  final def lift2[F[_, _]]: PartiallyAppliedLift2[F] =
     new PartiallyAppliedLift2[F]
   final class PartiallyAppliedLift2[F[_, _]] {
     def apply[I, J](ij: I === J): F[A, I] === F[B, J] =
@@ -80,7 +88,7 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
     * A value `Leibniz[A, B]` is always sufficient to produce a similar [[=:=]]
     * value.
     */
-  def toPredef: A =:= B =
+  final def toPredef: A =:= B =
     subst[A =:= ?](implicitly[A =:= A])
 }
 
