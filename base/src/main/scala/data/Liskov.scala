@@ -121,7 +121,7 @@ object Liskov {
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  def reify[A, B >: A]: A <~< B = refl
+  def isa[A, B >: A]: A <~< B = refl
 
   /**
     * Given `A <~< B` and a contravariant functor `F[_]`, we can prove that
