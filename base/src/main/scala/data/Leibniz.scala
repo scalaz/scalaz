@@ -5,13 +5,30 @@ import Prelude.===
 import Leibniz.refl
 
 /**
-  * Leibnizian equality: a better `=:=`.
+  * The data type `Leibniz` is the encoding of Leibnitz’ law which states that
+  * if `a` and `b` are identical then they must have identical properties.
+  * Leibnitz’ original definition reads as follows:
+  *   a ≡ b = ∀ f .f a ⇔ f b
+  * and can be proven to be equivalent to:
+  *   a ≡ b = ∀ f .f a → f b
   *
-  * A value of `Leibniz[A, B]` is proof that the types `A` and `B` are the same.
-  * More powerfully, it asserts that they have the same meaning in all type
-  * contexts. This can be a more powerful assertion than `A =:= B` and is more
-  * easily used in manipulation of types while avoiding (potentially
-  * erroneous) coercions.
+  * The `Leibniz` data type encodes true type equality, since the identity
+  * function is the only non-diverging conversion function that can be used
+  * as an implementation of the `subst` method assuming that we do not break
+  * parametricity. As the substitution function has to work for any `F[_]`, it
+  * cannot make assumptions about the structure of `F[_]`, making it impossible
+  * to construct a value of type `F[A]` or to access values of type `A` that
+  * may be stored inside a value of type `F[A]`. Hence it is impossible for
+  * a substitution function to alter the value it takes as argument.
+  *
+  * Not taking into account the partial functions that never terminate
+  * (infinite loops), functions returning `null`, or throwing exceptions,
+  * the identity function is the only function that can be used in place of
+  * `subst` to construct a value of type `Leibniz[A, B]`.
+  *
+  * The existence of a value of type `Leibniz[A, B]` now implies that a ≡ b,
+  * since the conversion function, that converts an `A` into a `B`, must be
+  * the identity function.
   *
   * This technique was first used in
   * [[http://portal.acm.org/citation.cfm?id=583852.581494
@@ -24,9 +41,7 @@ import Leibniz.refl
 sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
   /**
     * To create an instance of `Leibniz[A, B]` you must show that for every
-    * choice of `F[_]` you can convert `F[A]` to `F[B]`. Loosely, this reads
-    * as saying that `B` must have the same effect as `A` in all contexts
-    * therefore allowing type substitution.
+    * choice of `F[_]` you can convert `F[A]` to `F[B]`.
     */
   def subst[F[_]](fa: F[A]): F[B]
 
