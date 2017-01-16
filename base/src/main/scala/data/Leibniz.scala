@@ -24,11 +24,13 @@ import Leibniz.refl
   * Not taking into account the partial functions that never terminate
   * (infinite loops), functions returning `null`, or throwing exceptions,
   * the identity function is the only function that can be used in place of
-  * `subst` to construct a value of type `Leibniz[A, B]`.
+  * `subst` to construct a value of type `Leibniz[L, H, A, B]`.
   *
-  * The existence of a value of type `Leibniz[A, B]` now implies that a ≡ b,
-  * since the conversion function, that converts an `A` into a `B`, must be
-  * the identity function.
+  * This particular version of Leibnitz’ equality has been generalized to
+  * handle subtyping so that it can be used with constrained type constructors
+  * such as `F[_ <: AnyRef]`. `Leibniz[L, H, A, B]` says that `A` = `B`, and
+  * that both of them are between `L` and `H`. Subtyping lets you loosen
+  * the bounds on `L` and `H`.
   *
   * This technique was first used in
   * [[http://portal.acm.org/citation.cfm?id=583852.581494
@@ -38,12 +40,12 @@ import Leibniz.refl
   * @see [[http://typelevel.org/blog/2014/09/20/higher_leibniz.html
   *        Higher Leibniz]]
   */
-sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Leibniz] () { ab =>
   /**
     * To create an instance of `Leibniz[A, B]` you must show that for every
     * choice of `F[_]` you can convert `F[A]` to `F[B]`.
     */
-  def subst[F[_]](fa: F[A]): F[B]
+  def subst[F[_ >: L <: H]](fa: F[A]): F[B]
 
   /**
     * Substitution on identity brings about a direct coercion function of the
@@ -55,31 +57,6 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
     coerce(a)
 
   /**
-    * Equality is transitive relation and its witnesses can be composed
-    * in a chain much like functions.
-    *
-    * @see [[compose]]
-    */
-  final def andThen[C](bc: B === C): A === C =
-    bc.subst[A === ?](ab)
-
-  /**
-    * Equality is transitive relation and its witnesses can be composed
-    * in a chain much like functions.
-    *
-    * @see [[andThen]]
-    */
-  final def compose[Z](za: Z === A): Z === B =
-    za.andThen(ab)
-
-  /**
-    * Equality is symmetric relation and therefore can be flipped around.
-    * Flipping is its own inverse, so `x.flip.flip == x`.
-    */
-  final def flip: B === A =
-    subst[? === A](refl)
-
-  /**
     * Substitution on identity brings about a direct coercion function of the
     * same form that [[=:=]] provides.
     *
@@ -88,37 +65,45 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
   final def coerce(a: A): B =
     subst[λ[α => α]](a)
 
-  final def onF[X](fa: X => A): X => B =
-    subst[X => ?](fa)
+  /**
+    * Equality is transitive relation and its witnesses can be composed
+    * in a chain much like functions.
+    *
+    * @see [[compose]]
+    */
+  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2]
+  (bc: Leibniz[L2, H2, B, C]): Leibniz[L2, H2, A, C] =
+    Leibniz.trans[L2, H2, A, B, C](bc, ab)
+
+  /**
+    * Equality is transitive relation and its witnesses can be composed
+    * in a chain much like functions.
+    *
+    * @see [[andThen]]
+    */
+  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2]
+  (za: Leibniz[L2, H2, Z, A]): Leibniz[L2, H2, Z, B] =
+    Leibniz.trans[L2, H2, Z, A, B](ab, za)
+
+  /**
+    * Equality is symmetric relation and therefore can be flipped around.
+    * Flipping is its own inverse, so `x.flip.flip == x`.
+    */
+  final def flip: Leibniz[L, H, B, A] =
+    Leibniz.symm(ab)
 
   /**
     * Given `A === B` we can prove that `F[A] === F[B]`.
     *
     * @see [[Leibniz.lift]]
     * @see [[Leibniz.lift2]]
+    * @see [[Leibniz.lift3]]
     */
-  final def lift[F[_]]: F[A] === F[B] =
-    Leibniz.lift(ab)
+  final def lift[LF, HF >: LF, F[_ >: L <: H] >: LF <: HF]: Leibniz[LF, HF, F[A], F[B]] =
+    Leibniz.lift[L, H, A, B, LF, HF, F](ab)
 
-  /**
-    * Given `A === B` and `I === J` we can prove that `F[A, I] === F[B, J]`.
-    *
-    * This method allows you to compose two `Leibniz` values in an infix
-    * manner:
-    * {{{
-    *   def either(ab: A === B, ij: I === J): Either[A, I] === Either[B, J] =
-    *     ab lift2[Either] ij
-    * }}}
-    *
-    * @see [[Leibniz.lift]]
-    * @see [[Leibniz.lift2]]
-    */
-  final def lift2[F[_, _]]: PartiallyAppliedLift2[F] =
-    new PartiallyAppliedLift2[F]
-  final class PartiallyAppliedLift2[F[_, _]] {
-    def apply[I, J](ij: I === J): F[A, I] === F[B, J] =
-      Leibniz.lift2(ab, ij)
-  }
+  final def onF[X](fa: X => A): X => B =
+    subst[X => ?](fa)
 
   /**
     * A value `Leibniz[A, B]` is always sufficient to produce a similar [[=:=]]
@@ -129,19 +114,37 @@ sealed abstract class Leibniz[A, B] private[Leibniz] () { ab =>
 }
 
 object Leibniz {
-  private[this] final case class Refl[A]() extends Leibniz[A, A] {
-    def subst[F[_]](fa: F[A]): F[A] = fa
+  private[this] final case class Refl[A]() extends Leibniz[A, A, A, A] {
+    def subst[F[_ >: A <: A]](fa: F[A]): F[A] = fa
   }
-  private[data] val anyRefl: Any === Any = Refl[Any]()
+  private[data] val anyRefl: Leibniz[Nothing, Any, Any, Any] = Refl[Any]()
 
   /**
     * Equality is reflexive relation.
     */
-  def refl[A]: A === A = {
-    // FIXME: This optimization is safe:
-    // anyRefl.asInstanceOf[A === A]
-    Refl[A]()
+  def refl[A]: Leibniz[A, A, A, A] = {
+    // This optimization is safe because of erasure.
+    anyRefl.asInstanceOf[Leibniz[A, A, A, A]]
   }
+
+  /**
+    * Equality is reflexive relation. Compared to [[refl]], this function
+    * can be used to specify bounds up front instead of relying on subtyping.
+    */
+  def refl_[L, H >: L, A >: L <: H]: Leibniz[L, H, A, A] = {
+    // This optimization is safe because of erasure.
+    anyRefl.asInstanceOf[Leibniz[L, H, A, A]]
+  }
+
+  /**
+    * Substitution on identity brings about a direct coercion function of the
+    * same form that `=:=` provides.
+    *
+    * @see [[Leibniz.apply]]
+    */
+  def coerce[L, H >: L, A >: L <: H, B >: L <: H]
+  (a: A, ab: Leibniz[L, H, A, B]): B =
+    ab.subst[λ[α => α]](a)
 
   /**
     * Equality is transitive relation and its witnesses can be composed
@@ -150,16 +153,18 @@ object Leibniz {
     * @see [[Leibniz.compose]]
     * @see [[Leibniz.andThen]]
     */
-  def trans[A, B, C](bc: B === C, ab: A === B): A === C =
-    ab.andThen(bc)
+  def trans[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H]
+  (bc: Leibniz[L, H, B, C], ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, C] =
+    bc.subst[λ[`α >: L <: H` => Leibniz[L, H, A, α]]](ab)
 
   /**
     * Equality is symmetric and therefore can be flipped around.
     *
     * @see [[Leibniz.flip]]
     */
-  def symm[A, B](ab: A === B): B === A =
-    ab.flip
+  def symm[L, H >: L, A >: L <: H, B >: L <: H]
+  (ab: Leibniz[L, H, A, B]): Leibniz[L, H, B, A] =
+    ab.subst[λ[`α >: L <: H` => Leibniz[L, H, α, A]]](refl)
 
   /**
     * Given `A === B` we can prove that `F[A] === F[B]`.
@@ -167,9 +172,15 @@ object Leibniz {
     * @see [[lift2]]
     * @see [[lift3]]
     */
-  def lift[F[_], A, B]
-  (ab: A === B): F[A] === F[B] =
-    ab.subst[λ[α => F[A] === F[α]]](refl)
+  def lift[
+    L, H >: L, A >: L <: H, B >: L <: H,
+    LF, HF >: LF, F[_ >: L <: H] >: LF <: HF
+  ] (
+    eq: Leibniz[L, H, A, B]
+  ): Leibniz[LF, HF, F[A], F[B]] = {
+    type f[α >: L <: H] = Leibniz[LF, HF, F[A], F[α]]
+    eq.subst[f](refl_[LF, HF, F[A]])
+  }
 
   /**
     * Given `A === B` and `I === J` we can prove that `F[A, I] === F[B, J]`.
@@ -177,11 +188,18 @@ object Leibniz {
     * @see [[lift]]
     * @see [[lift3]]
     */
-  def lift2[F[_, _], A, B, I, J]
-  (ab: A === B, ij: I === J): F[A, I] === F[B, J] =
-    ij.subst[λ[α => F[A, I] === F[B, α]]](
-      ab.subst[λ[α => F[A, I] === F[α, I]]](
-        refl[F[A, I]]))
+  def lift2[
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
+    LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF
+  ] (
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2]
+  ): Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
+    type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[α, A2]]
+    type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, α]]
+    eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2]]))
+  }
 
   /**
     * Given `A === B`, `I === J`, and `M === N` we can prove that
@@ -190,12 +208,21 @@ object Leibniz {
     * @see [[lift]]
     * @see [[lift2]]
     */
-  def lift3[F[_, _, _], A, B, I, J, M, N]
-  (ab: A === B, ij: I === J, mn: M === N): F[A, I, M] === F[B, J, N] =
-    mn.subst[λ[α => F[A, I, M] === F[B, J, α]]](
-      ij.subst[λ[α => F[A, I, M] === F[B, α, M]]](
-        ab.subst[λ[α => F[A, I, M] === F[α, I, M]]](
-          refl[F[A, I, M]])))
+  def lift3[
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
+    L3, H3 >: L3, A3 >: L3 <: H3, B3 >: L3 <: H3,
+    LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2, _ >: L3 <: H3] >: LF <: HF
+  ] (
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2],
+    eq3: Leibniz[L3, H3, A3, B3]
+  ): Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, B3]] = {
+    type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2, A3], F[α, A2, A3]]
+    type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, α, A3]]
+    type f3[α >: L3 <: H3] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, α]]
+    eq3.subst[f3](eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2, A3]])))
+  }
 
   /**
     * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
