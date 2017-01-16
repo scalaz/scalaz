@@ -157,9 +157,11 @@ object Liskov {
     ab.andThen(bc)
 
   /**
-    * Subtyping is antisymmetric.
+    * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
+    * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
+    * SI-7278]] is fixed, so this function is marked unsafe.
     */
-  def bracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
+  def unsafeBracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
     Leibniz.unsafeForce[A, B]
 
   /**
