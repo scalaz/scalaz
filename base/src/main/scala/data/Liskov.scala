@@ -72,9 +72,14 @@ object Liskov {
   }
   private[this] val anyRefl: Any <~< Any = Refl[Any]()
 
-  // FIXME: This optimization is safe:
-  // def refl[A]: A <~< A = reflAny.asInstanceOf[A <~< A]
-  def refl[A]: A <~< A = Refl[A]()
+  /**
+    * Subtyping relation is reflexive.
+    */
+  def refl[A]: A <~< A = {
+    // FIXME: This optimization is safe:
+    // reflAny.asInstanceOf[A <~< A]
+    Refl[A]()
+  }
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.
@@ -96,16 +101,17 @@ object Liskov {
     ab.asInstanceOf[F[A] <~< F[B]]
 
   /**
-    * Subtyping is transitive
+    * Subtyping is a transitive relation and its witnesses can be composed
+    * in a chain much like functions.
     */
-  def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
-    g.subst[λ[`-α` => α <~< C]](f)
+  def trans[A, B, C](bc: B <~< C, ab: A <~< B): A <~< C =
+    ab.andThen(bc)
 
   /**
     * Subtyping is antisymmetric.
     */
   def bracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
-    Leibniz.anyRefl.asInstanceOf[A === B]
+    Leibniz.unsafeForce[A, B]
 
   /**
     * It can be convenient to convert a [[<:<]] value into a `<~<` value.
