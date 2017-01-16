@@ -24,11 +24,11 @@ import Leibniz.refl
   * Not taking into account the partial functions that never terminate
   * (infinite loops), functions returning `null`, or throwing exceptions,
   * the identity function is the only function that can be used in place of
-  * `subst` to construct a value of type `Leibniz[L, H, A, B]`.
+  * `subst` to construct a value of type `Leibniz[..., A, B]`.
   *
   * This particular version of Leibnitz’ equality has been generalized to
   * handle subtyping so that it can be used with constrained type constructors
-  * such as `F[_ <: AnyRef]`. `Leibniz[L, H, A, B]` says that `A` = `B`, and
+  * such as `F[_ <: X]`. `Leibniz[L, H, A, B]` says that `A` = `B`, and
   * that both of them are between `L` and `H`. Subtyping lets you loosen
   * the bounds on `L` and `H`.
   *
