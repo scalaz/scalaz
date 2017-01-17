@@ -8,9 +8,11 @@ import scala.language.implicitConversions
 trait Prelude  extends data.DisjunctionFunctions
                   with data.IdentityTypes
                   with data.MaybeFunctions
+                  with system.ComposerSyntax
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
-                  with typeclass.TraversableFunctions {
+                  with typeclass.TraversableFunctions
+{
   // Base Class
   // ==========
   type Applicative[F[_]] = typeclass.Applicative[F]
