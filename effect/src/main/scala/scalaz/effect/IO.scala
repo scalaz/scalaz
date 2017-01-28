@@ -297,7 +297,7 @@ object IO extends IOInstances {
 
   /** An IO action is an ST action. */
   implicit def IOToST[A](io: IO[A]): ST[IvoryTower, A] =
-    st(io(_).run)
+    st(() => io(ivoryTower).run._2)
 
   /** An IO action that does nothing. */
   val ioUnit: IO[Unit] =
