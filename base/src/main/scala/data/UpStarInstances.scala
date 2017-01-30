@@ -4,7 +4,7 @@ package data
 import typeclass.{Functor, Profunctor}
 
 trait UpStarInstances {
-  implicit def function[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] = new Profunctor[UpStar[F, ?, ?]] {
+  implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] = new Profunctor[UpStar[F, ?, ?]] {
     override def lmap[A, B, C](fab: UpStar[F, A, B])(ca: C => A): UpStar[F, C, B] =
       UpStar(c => fab.run(ca(c)))
 
