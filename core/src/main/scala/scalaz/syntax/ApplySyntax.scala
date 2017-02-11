@@ -14,6 +14,12 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
   /** Combine `self` and `fb` according to `Apply[F]` with a function that discards the `B`s */
   final def <*[B](fb: F[B]): F[A] = F.apply2(self,fb)((a,_) => a)
 
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `A`(s), except 'fb' is non-strictly evaluated. */
+  final def `*>ByName`[B](fb: => F[B]): F[B] = F.apply2(self,fb)((_,b) => b)
+
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `B`(s), except 'fb' is non-strictly evaluated. */
+  final def `<*ByName`[B](fb: => F[B]): F[A] = F.apply2(self,fb)((a,_) => a)
+
   /**
    * DSL for constructing Applicative expressions.
    *
