@@ -36,6 +36,25 @@ object FreeTTest extends SpecLite {
     checkAll(traverse.laws[FreeTListOption])
     checkAll(monadTrans.laws[FreeTList, Option])
 
+    "lawful MonadPlus" in {
+      // give names to some expressions
+      val f: Unit => FreeTListOption[Unit] = _ => FreeT.liftM(MonadPlus[Option].empty)
+      val a = ()
+      val g = ().point[FreeTListOption]
+
+      // by the monad laws, f1 = f2
+      val f1 = a.point[FreeTListOption] flatMap f
+      val f2 = f(a)
+
+      // by the substitution property of equality,
+      // when f1 = f2, then also fg1 = fg2
+      val fg1 = MonadPlus[FreeTListOption].plus(f1, g)
+      val fg2 = MonadPlus[FreeTListOption].plus(f2, g)
+
+      // so let's check that
+      Equal[FreeTListOption[Unit]].equal(fg1, fg2)
+    }
+
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
       val result =

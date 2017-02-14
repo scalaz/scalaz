@@ -156,25 +156,22 @@ sealed abstract class FreeT[S[_], M[_], A] {
     })
 
   /**
-   * Finds the first `M` instance, `m`, and maps it to contain the rest
-   * of the computation. Since only `map` is used on `m`, its structure
-   * is preserved.
+   * Perform recursive binds on `M` until first suspension is reached.
    */
-  @tailrec
-  private[scalaz] final def toM(implicit M: Applicative[M]): M[FreeT[S, M, A]] =
-    this match {
+  private[scalaz] final def toM(implicit M0: BindRec[M], M: Applicative[M]): M[FreeT[S, M, A]] =
+    M0.tailrecM(this)(_.step match {
       case Suspend(m) => M.map(m) {
-        case -\/(a) => point(a)
-        case \/-(s) => liftF(s)
+        case -\/(a) => \/-(point(a))
+        case \/-(s) => \/-(liftF(s))
       }
       case g1 @ Gosub(_, _) => g1.a match {
         case Suspend(m) => M.map(m) {
-          case -\/(a) => g1.f(a)
-          case \/-(s) => liftF[S, M, g1.A](s).flatMap(g1.f)
+          case -\/(a) => -\/(g1.f(a))
+          case \/-(s) => \/-(liftF[S, M, g1.A](s).flatMap(g1.f))
         }
-        case g0 @ Gosub(_, _) => g0.a.flatMap(g0.f(_).flatMap(g1.f)).toM
+        case g0 @ Gosub(_, _) => sys.error("Unreachable code: `Gosub` returned from `step` has `Suspend` on the left")
       }
-    }
+    })
 
   @tailrec
   private def step: FreeT[S, M, A] =
