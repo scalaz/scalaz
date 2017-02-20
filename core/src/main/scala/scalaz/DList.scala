@@ -19,7 +19,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   def apply(xs: => IList[A]): Trampoline[IList[A]] = f(xs)
 
   /** Convert to an IList. */
-  def toIList: IList[A] = apply(IList()).run
+  def toIList: IList[A] = apply(IList.empty).run
 
   /** Convert to a normal list. */
   def toList: List[A] = toIList.toList
@@ -36,7 +36,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-   (apply(IList()) >>= {
+   (apply(IList.empty) >>= {
       case INil() => return_(z)
       case ICons(x, xs) =>
         val r = f(x, fromIList(xs))
