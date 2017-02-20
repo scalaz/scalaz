@@ -32,7 +32,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 
   /** Append one list to another in constant time. */
   def ++(as: => DList[A]): DList[A] =
-    mkDList(xs => suspend(as(xs) >>= (apply(_))))
+    mkDList(xs => suspend(as(xs) >>= f))
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
