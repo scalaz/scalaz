@@ -2,8 +2,8 @@ import build._
 
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
-import org.scalajs.sbtplugin.cross._
 import sbtunidoc.Plugin.UnidocKeys._
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val jsProjects = Seq[ProjectReference](
   coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_12, scalacheckBindingJS_1_13, testsJS
@@ -11,6 +11,10 @@ lazy val jsProjects = Seq[ProjectReference](
 
 lazy val jvmProjects = Seq[ProjectReference](
   coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_12, scalacheckBindingJVM_1_13, testsJVM, concurrent, example
+)
+
+lazy val nativeProjects = Seq[ProjectReference](
+  coreNative, effectNative, iterateeNative, nativeTest
 )
 
 lazy val scalaz = Project(
@@ -21,11 +25,19 @@ lazy val scalaz = Project(
     artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile)).value,
     packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile)).value,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-      jsProjects.foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
+      (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
     }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = jvmProjects ++ jsProjects
 )
+
+lazy val rootNative = Project(
+  rootNativeId,
+  file("rootNative")
+).settings(
+  standardSettings,
+  notPublish
+).aggregate(nativeProjects: _*)
 
 lazy val rootJS = Project(
   "rootJS",
@@ -47,6 +59,7 @@ lazy val rootJVM = Project(
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
+lazy val coreNative = core.native
 
 lazy val concurrent = Project(
   id = "concurrent",
@@ -62,9 +75,11 @@ lazy val concurrent = Project(
 
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
+lazy val effectNative = effect.native
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
+lazy val iterateeNative = iteratee.native
 
 lazy val example = Project(
   id = "example",
@@ -78,7 +93,7 @@ lazy val example = Project(
 )
 
 def scalacheckBindingProject(id: String, base: String, scalacheckVersion: SettingKey[String]) =
-  CrossProject(id, file(base), ScalazCrossType)
+  sbtcrossproject.CrossProject(id, file(base), ScalazCrossType, JVMPlatform, JSPlatform)
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
@@ -138,7 +153,7 @@ lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
 lazy val scalacheckBindingJS_1_13  = scalacheckBinding_1_13.js
 
 
-lazy val tests = crossProject.crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -154,3 +169,13 @@ lazy val tests = crossProject.crossType(ScalazCrossType)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+
+// can't use "sbt test"
+// https://github.com/scala-native/scala-native/issues/339
+lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
+  .settings(
+    standardSettings,
+    nativeSettings,
+    notPublish
+  )
+  .dependsOn(iterateeNative)
