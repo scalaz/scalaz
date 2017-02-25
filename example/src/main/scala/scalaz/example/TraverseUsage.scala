@@ -99,13 +99,4 @@ object TraverseUsage extends App {
 
   assert(Tag.unwrap(res1.foldMap(Tags.Disjunction(_))) === false)
   assert(Tag.unwrap(res2.foldMap(Tags.Disjunction(_))) === true)
-
-  // Here's a variation of above which might be a bit of a head
-  // scratcher, but this works because a Monoid gives rise to an
-  // Applicative Functor.  Because Boolean is not a * -> * type
-  // constructor, we need traverseU instead of traverse to find the
-  // Applicative.
-  import scalaz.Applicative.monoidApplicative
-  assert(Tag.unwrap(res1.traverseU(Tags.Disjunction(_))) === false)
-  assert(Tag.unwrap(res2.traverseU(Tags.Disjunction(_))) === true)
 }

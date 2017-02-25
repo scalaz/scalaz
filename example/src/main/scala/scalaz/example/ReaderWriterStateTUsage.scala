@@ -90,7 +90,7 @@ object CABRunLengthEncoder {
   /**
     *  read a token from the input
     */
-  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) => 
+  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) =>
     val (nextTok, newState) = oldState.uncons
     Applicative[Trampoline].point((Monoid[Cord].zero, nextTok, newState))
   }
@@ -106,11 +106,11 @@ object CABRunLengthEncoder {
   val rle = ReaderWriterStateT.rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
   import rle._
 
-  /** 
+  /**
     * with the above syntax imported, we can perform the same
     * computation as above, but use a for comprehension
     */
-  val readToken2: RunLength[Token] = 
+  val readToken2: RunLength[Token] =
     for {
       oldState <- get            // fetch the current state
 
@@ -157,13 +157,13 @@ object CABRunLengthEncoder {
 
   /**
     emit tokens if the next input token is different than the last
-    */ 
+    */
   def maybeEmit: RunLength[Unit] =
     for {
       state <- get
        next <- readToken
            _ <- { if(state.lastToken.map(_ == next) getOrElse(false))
-                 // Same token as last, so we just increment our counter 
+                 // Same token as last, so we just increment our counter
                  modify(_.incLength)
                else
                  // its a new token, so emit the previous, then change
@@ -183,7 +183,7 @@ object CABRunLengthEncoder {
 }
 
 object ReaderWriterStateTUsage extends App {
-  
+
   val inputTokens = List(A,B,C,A,A,B,B,B,B,C,A,A,A,C,C,C,C,B)
   val encoded = CABRunLengthEncoder.encode(2, inputTokens)
 

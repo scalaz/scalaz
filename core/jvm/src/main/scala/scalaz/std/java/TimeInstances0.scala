@@ -9,7 +9,6 @@ trait TimeInstances0 {
     def order(x: A, y: A) = Ordering.fromInt(f(x, y))
   }
 
-  implicit val instantInstance: Order[Instant] = orderFromInt[Instant](_ compareTo _)
   implicit val localDateTimeInstance: Order[LocalDateTime] = orderFromInt[LocalDateTime](_ compareTo _)
   implicit val offsetDateTimeInstance: Order[OffsetDateTime] = orderFromInt[OffsetDateTime](_ compareTo _)
   implicit val offsetTimeInstance: Order[OffsetTime] = orderFromInt[OffsetTime](_ compareTo _)

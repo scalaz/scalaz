@@ -1,36 +1,30 @@
 package scalaz
 
-import org.scalacheck.{Arbitrary, Gen}
-import scalaz.scalacheck.ScalaCheckBinding._
+import org.scalacheck.Arbitrary
+import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.std.list._
-import scalaz.std.string._
+import scalaz.std.anyVal._
 
 object IndexedContsTTest extends SpecLite {
 
-  type ContTListString[A] = ContT[List, String, A]
-  type ContTListStringInt = ContTListString[Int]
+  type ContTMaybeBoolean[A] = ContT[Maybe, Boolean, A]
 
-  def contTListStringGen[A](implicit A: Arbitrary[A]): Gen[ContTListString[A]] = Gen.frequency(
-    (1, Functor[Gen].map(Gen.containerOf[List, String](Gen.alphaStr))(l => ContT(f => l))),
-    (1, Functor[Gen].map(A.arbitrary)(ContT.point(_))),
-    (1, Functor[Gen].map(A.arbitrary)(i => ContT(f => {
-      val l = f(i)
-      val (a, b) = l.splitAt((l.size + 1) % 3)
-      a ::: List("foo") ::: b
-    })))
-  )
+  private[this] implicit def contTEqual[F[_], A, B](implicit
+    A: Arbitrary[A => F[B]],
+    B: Equal[F[B]]
+  ): Equal[ContT[F, B, A]] = {
+    val functions = Stream.continually(
+      A.arbitrary.sample
+    ).flatten.take(5).toList
 
-  implicit def contTListStringIntArb: Arbitrary[ContTListStringInt] = Arbitrary(contTListStringGen[Int])
-  implicit def contTListStringInt2Arb: Arbitrary[ContTListString[Int => Int]] = Arbitrary(contTListStringGen[Int => Int])
-  implicit def contTListStringIntEqual: Equal[ContTListStringInt] = new Equal[ContTListStringInt] {
-    def equal(a: ContTListStringInt, b: ContTListStringInt): Boolean = {
-      val f: Int => List[String] = _.toString.toList.map(_.toString)
-      Equal[List[String]].equal(a(f), b(f))
+    Equal.equal{ (a, b) =>
+      functions.forall{ f =>
+        B.equal(a(f), b(f))
+      }
     }
   }
 
-  checkAll(monadPlus.laws[ContTListString])
+  checkAll(monadPlus.laws[ContTMaybeBoolean])
 
   object instances {
     def functorRight[W[_]: Functor, M[_], R, O] = Functor[IndexedContsT[W, M, R, O, ?]]

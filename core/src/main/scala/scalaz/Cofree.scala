@@ -46,9 +46,13 @@ sealed abstract class Cofree[S[_], A] {
   /** Returns the components of this structure in a tuple. */
   final def toPair: (A, S[Cofree[S, A]]) = (head, tail)
 
-  /** Changes the branching functor by the given natural transformation. */
-  final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Cofree[T, A] =
+  /** Changes the branching functor with the given natural transformation, using the source branching functor's fmap. */
+  final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S]): Cofree[T, A] =
     Cofree.delay(head, f(S.map(tail)(_ mapBranching f)))
+
+  /** Changes the branching functor with the given natural transformation, using the target branching functor's fmap. */
+  final def mapBranchingT[T[_]](f: S ~> T)(implicit T: Functor[T]): Cofree[T, A] =
+    Cofree.delay(head, T.map(f(tail))(_ mapBranchingT f))
 
   /** Modifies the first branching with the given natural transformation. */
   final def mapFirstBranching(f: S ~> S): Cofree[S, A] =
@@ -222,7 +226,7 @@ private trait CofreeBind[F[_]] extends Bind[Cofree[F, ?]] with CofreeComonad[F]{
 
   def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] = {
     val c = f(fa.head)
-    Cofree.applyT(c.head, c.t.map(ct => G.plus(c.tail, F.map(fa.tail)(bind(_)(f))) ) )
+    Cofree.applyT(c.head, c.t.map(ct => G.plus(ct, F.map(fa.tail)(bind(_)(f))) ) )
   }
 }
 

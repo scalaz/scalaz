@@ -108,7 +108,7 @@ private case object LazyNone extends LazyOption[Nothing]
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] = 
+  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
     new Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
       def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
       override def cojoin[A](a: LazyOption[A]) = a match {
@@ -141,12 +141,12 @@ sealed abstract class LazyOptionInstances {
       override def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => LazyOption[A \/ B])(a: A): LazyOption[B] =
+      def tailrecM[A, B](a: A)(f: A => LazyOption[A \/ B]): LazyOption[B] =
         f(a) match {
           case LazyNone => LazyNone
           case LazySome(t) => t() match {
             case \/-(b) => lazySome(b)
-            case -\/(a0) => tailrecM(f)(a0)
+            case -\/(a0) => tailrecM(a0)(f)
           }
         }
     }

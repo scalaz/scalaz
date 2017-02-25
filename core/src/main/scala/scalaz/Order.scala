@@ -11,8 +11,8 @@ trait Order[F] extends Equal[F] { self =>
   ////
   def apply(x: F, y: F): Ordering = order(x, y)
 
-  def order(x: F, y: F): Ordering 
-  
+  def order(x: F, y: F): Ordering
+
   def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
 
   // derived functions

@@ -16,28 +16,26 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        , done = M.point(None)
        ))
 
-  def unconsRec(implicit M: BindRec[M]): M[Option[(A, StreamT[M, A])]] = {
-    def proceed(s: StreamT[M, A]): M[StreamT[M, A] \/ Option[(A, StreamT[M, A])]] =
+  def unconsRec(implicit M: BindRec[M]): M[Option[(A, StreamT[M, A])]] =
+    M.tailrecM(this)(s =>
       M.map(s.step) (
         _( yieldd = (a, s) => \/-(Some((a, s)))
          , skip = s => -\/(s)
          , done = \/-(None)
          ))
+    )
 
-    M.tailrecM(proceed)(this)
-  }
-  
   def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
-    
+
   def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(!_.isDefined)
   def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.map(unconsRec)(!_.isDefined)
 
   def head(implicit M: Monad[M]): M[A] = M.map(uncons)(_.getOrElse(sys.error("head: empty StreamT"))._1)
   def headRec(implicit M: BindRec[M]): M[A] = M.map(unconsRec)(_.getOrElse(sys.error("head: empty StreamT"))._1)
-    
+
   def headOption(implicit M: Monad[M]): M[Option[A]] = M.map(uncons)(_.map(_._1))
   def headOptionRec(implicit M: BindRec[M]): M[Option[A]] = M.map(unconsRec)(_.map(_._1))
-  
+
   def tailM(implicit M: Monad[M]): M[StreamT[M, A]] = M.map(uncons)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
   def tailMRec(implicit M: BindRec[M]): M[StreamT[M, A]] = M.map(unconsRec)(_.getOrElse(sys.error("tailM: empty StreamT"))._2)
 
@@ -61,28 +59,28 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      , done = Done
      )
   }
-  
+
   def dropWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => if (p(a)) Skip(as dropWhile p) else Yield(a, as)
      , skip = as => Skip(as dropWhile p)
      , done = Done
      )
   }
-  
+
   def take(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => if (n <= 0) Done else Yield(a, as take (n-1))
      , skip = as => Skip(as take n)
      , done = Done
      )
   }
-  
+
   def takeWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => if (p(a)) Yield(a, as takeWhile p) else Done
      , skip = as => Skip(as takeWhile p)
      , done = Done
      )
   }
-      
+
   def ++(bs: => StreamT[M, A])(implicit m: Functor[M]): StreamT[M, A] = stepMap {
     _( yieldd = (a, as) => Yield(a, as ++ bs)
      , skip = as => Skip(as ++ bs)
@@ -96,14 +94,14 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
      , done = Done
      )
   }
-      
+
   def map[B](f: A => B)(implicit m: Functor[M]): StreamT[M, B] = stepMap {
     _( yieldd = (a, s) => Yield(f(a), s map f)
      , skip = s => Skip(s map f)
      , done = Done
      )
   }
-      
+
   /** @since 7.0.1 */
   def mapM[B](f: A => M[B])(implicit m: Monad[M]): StreamT[M, B] = stepBind {
     _( yieldd = (a, s) => m.map(f(a)) { Yield(_, s mapM f) }
@@ -128,17 +126,13 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
        )
     }
 
-  def foldLeftRec[B](z: B)(f: (B, A) => B)(implicit M: BindRec[M]): M[B] = {
-    def proceed(sb: (StreamT[M, A], B)): M[(StreamT[M, A], B) \/ B] =
-      M.map(sb._1.step) {
-        _( yieldd = (a, s) => -\/((s, f(sb._2, a)))
-         , skip = s => -\/((s, sb._2))
-         , done = \/-(sb._2)
-         )
-      }
-
-    M.tailrecM(proceed)((this, z))
-  }
+  def foldLeftRec[B](z: B)(f: (B, A) => B)(implicit M: BindRec[M]): M[B] =
+    M.tailrecM((this, z))(sb => M.map(sb._1.step) {
+      _( yieldd = (a, s) => -\/((s, f(sb._2, a)))
+       , skip = s => -\/((s, sb._2))
+       , done = \/-(sb._2)
+       )
+    })
 
   /**
    * **Warning:** Requires evaluation of the whole stream. Depending on
@@ -212,16 +206,13 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     case Done => M.pure(())
   }
 
-  def foreachRec(f: A => M[Unit])(implicit M: Monad[M], B: BindRec[M]): M[Unit] = {
-    def proceed(s: StreamT[M, A]): M[StreamT[M, A] \/ Unit] = M.bind(s.step) {
+  def foreachRec(f: A => M[Unit])(implicit M: Monad[M], B: BindRec[M]): M[Unit] =
+    B.tailrecM(this)(s => M.bind(s.step) {
       case Yield(a, s1) => M.map(f(a))(_ => -\/(s1()))
       case Skip(s1) => M.pure(-\/(s1()))
       case Done => M.pure(\/-(()))
-    }
+    })
 
-    B.tailrecM(proceed)(this)
-  }
-  
   private def stepMap[B](f: Step[A, StreamT[M, A]] => Step[B, StreamT[M, B]])(implicit M: Functor[M]): StreamT[M, B] = StreamT(M.map(step)(f))
 
   private def stepBind[B](f: Step[A, StreamT[M, A]] => M[Step[B, StreamT[M, B]]])(implicit M: Monad[M]): StreamT[M, B] = StreamT(M.bind(step)(f))
@@ -237,9 +228,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
     loop(this, Stream.Empty)
   }
 
-  private def revRec(implicit M: BindRec[M]): M[Stream[A]] = {
-    def loop(ss: (StreamT[M, A], Stream[A])): M[(StreamT[M, A], Stream[A]) \/ Stream[A]] = {
-      val (xs, ys) = ss
+  private def revRec(implicit M: BindRec[M]): M[Stream[A]] =
+    M.tailrecM((this, Stream.empty[A])){ case (xs, ys) =>
       M.map(xs.step) {
         _( yieldd = (a, s) => -\/((s, a #:: ys))
          , skip = s => -\/((s, ys))
@@ -248,8 +238,6 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
       }
     }
 
-    M.tailrecM(loop)((this, Stream.Empty))
-  }
 }
 
 //
@@ -314,7 +302,7 @@ object StreamT extends StreamTInstances {
   }
 
   def wrapEffect[M[_]:Functor,A](m: M[StreamT[M,A]]): StreamT[M,A] = StreamT(Functor[M].map(m)(Skip(_)))
-  
+
   abstract sealed class Step[+A, +S] {
     def apply[Z](yieldd: (A, => S) => Z, skip: => S => Z, done: => Z): Z
   }
@@ -326,7 +314,7 @@ object StreamT extends StreamTInstances {
          as => Skip(runStreamT(as, s1)),
          Done)
     })
-  
+
   object Yield {
     def apply[A, S](a: A, s: => S): Step[A, S] =
       new Step[A, S] {
@@ -335,7 +323,7 @@ object StreamT extends StreamTInstances {
     def unapply[A, S](s: Step[A, S]): Option[(A, () => S)] =
       s((aa, sa) => Some((aa, () => sa)), _ => None, None)
   }
-  
+
   object Skip {
     def apply[S](s: => S): Step[Nothing, S] =
       new Step[Nothing, S] {
@@ -390,17 +378,17 @@ private trait StreamTMonadPlus[F[_]] extends MonadPlus[StreamT[F, ?]] with Strea
 
 private trait StreamTHoist extends Hoist[StreamT] {
   import StreamT._
-  
+
   implicit def apply[G[_] : Monad]: Monad[StreamT[G, ?]] = StreamTMonadPlus[G]
-  
+
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
-  
+
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
-    new (StreamT[M, ?] ~> StreamT[N, ?]) {
-      def apply[A](a: StreamT[M, A]): StreamT[N, A] = StreamT[N, A](f(M.map(a.step)(
+    λ[StreamT[M, ?] ~> StreamT[N, ?]](a =>
+      StreamT(f(M.map(a.step)(
         _( yieldd = (a, as) => Yield(a, hoist(f) apply as)
          , skip = as => Skip(hoist(f) apply as)
          , done = Done
          ))))
-    }
+    )
 }

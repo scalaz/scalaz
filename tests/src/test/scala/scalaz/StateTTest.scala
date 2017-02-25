@@ -8,6 +8,7 @@ object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
+  type IStateTList[S, A] = IndexedStateT[List, S, Int, A]
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
   implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
@@ -16,6 +17,8 @@ object StateTTest extends SpecLite {
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
+  checkAll(profunctor.laws[IStateTList])
+  checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
@@ -33,8 +36,12 @@ object StateTTest extends SpecLite {
     def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
   }
 
+  "monadState.point" in {
+    instances.monadState[Boolean].point(42).run(true) must_===((true, 42))
+  }
+
   "monadState.state" in {
-    instances.monadState[Boolean].state(42).run(true) must_===((true, 42))
+    instances.monadState[Int].state(i => (i+1, i%2 == 0)).run(42) must_===((43, true))
   }
 
   "monadState.constantState" in {
@@ -72,5 +79,17 @@ object StateTTest extends SpecLite {
     val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
       .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
     4000 must_=== result(0).run._1
+  }
+
+  "MonadState must be derived for any stack of Monads" in {
+    type StateStack[A] = State[Int, A]
+    type ListStack[A] = ListT[StateStack, A]
+
+    // `promotedMonadState` implicit instance had to be reverted (see #1308).
+    // Call `promotedMonadState` explicitly for now.
+    //val ms = MonadState[ListStack, Int]
+    val ms = MonadState.promotedMonadState[ListStack, StateStack, Int]
+
+    ms.get.run.eval(1) must_=== List(1)
   }
 }

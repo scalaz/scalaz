@@ -16,7 +16,7 @@ trait SafeApp {
 
   def runc: IO[Unit] = ioUnit
 
-  final def main(args: Array[String]) {
+  final def main(args: Array[String]): Unit = {
     run(ImmutableArray.fromArray(args)).unsafePerformIO()
   }
 

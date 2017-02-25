@@ -16,6 +16,8 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def ::(a: A)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(list => a :: list))
 
+  def collect[B](pf: PartialFunction[A,B])(implicit M: Functor[M]): ListT[M, B] = new ListT(M.map(run)(_.collect(pf)))
+
   def isEmpty(implicit M: Functor[M]) : M[Boolean] = M.map(run)(_.isEmpty)
 
   def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.headOption))
@@ -23,15 +25,15 @@ final case class ListT[M[_], A](run: M[List[A]]){
   def find(predicate: A => Boolean)(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.find(predicate)))
 
   def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(l => Maybe.fromOption(l.headOption)))
-  
+
   def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(run)(_.filter(p)))
-  
+
   def drop(n: Int)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.drop(n)))
 
   def dropWhile(p: A => Boolean)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.dropWhile(p)))
-  
+
   def take(n: Int)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.take(n)))
 
   def takeWhile(p: A => Boolean)(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.takeWhile(p)))
@@ -52,6 +54,9 @@ final case class ListT[M[_], A](run: M[List[A]]){
   def flatMapF[B](f: A => M[List[B]])(implicit M: Monad[M]) : ListT[M, B] = flatMap(f andThen ListT.apply)
 
   def map[B](f: A => B)(implicit M: Functor[M]) : ListT[M, B] = new ListT(M.map(run)(_.map(f)))
+
+  def mapT[F[_], B](f: M[List[A]] => F[List[B]]): ListT[F, B] =
+    ListT(f(run))
 
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tail))
@@ -106,10 +111,10 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 
 object ListT extends ListTInstances {
   def listT[M[_]]: (λ[α => M[List[α]]] ~> ListT[M, ?]) =
-    new (λ[α => M[List[α]]] ~> ListT[M, ?]) {
-      def apply[A](a: M[List[A]]) = new ListT[M, A](a)
-    }
-  
+    λ[λ[α => M[List[α]]] ~> ListT[M, ?]](
+      new ListT(_)
+    )
+
   def empty[M[_], A](implicit M: Applicative[M]): ListT[M, A] =
     new ListT[M, A](M.point(Nil))
 
@@ -151,15 +156,13 @@ private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] with ListTFunc
 
 private trait ListTHoist extends Hoist[ListT] {
   import ListT._
-  
+
   implicit def apply[G[_] : Monad]: Monad[ListT[G, ?]] =
     listTMonadPlus[G]
-  
+
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromList(G.map(a)(entry => entry :: Nil))
-  
+
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
-    new (ListT[M, ?] ~> ListT[N, ?]) {
-      def apply[A](a: ListT[M, A]): ListT[N, A] = fromList(f(a.run))
-    }
+    λ[ListT[M, ?] ~> ListT[N, ?]](_ mapT f)
 }

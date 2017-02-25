@@ -15,11 +15,11 @@ import syntax.functor._
   * A Functor is a ubiquitous typeclass involving type constructors of
   * kind * → *, which is another way of saying types that have a
   * single type variable. Examples might be Option, List, Future.
-  * 
+  *
   * The Functor category involves a single operation, named `map`:
-  * 
+  *
   * def map[A, B](fa: F[A])(f: A => B): F[B]
-  * 
+  *
   * This method takes a Function from A => B and turns an F[A] into an F[B]
   */
 object FunctorUsage extends App {
@@ -56,7 +56,7 @@ object FunctorUsage extends App {
   // that sound exciting? It's not that exciting, it means that we get
   // two additional derived functions which allow us to turn the
   // contained values into tuples:
-  assert(Functor[List].strengthL("a", List(1,2,3)) === List("a" -> 1, "a" -> 2, "a" -> 3)) 
+  assert(Functor[List].strengthL("a", List(1,2,3)) === List("a" -> 1, "a" -> 2, "a" -> 3))
   assert(Functor[List].strengthR(List(1,2,3), "a") === List(1 -> "a", 2 -> "a", 3 -> "a"))
 
   // there is syntax for the strength functions
@@ -78,7 +78,7 @@ object FunctorUsage extends App {
   //
   // void
   //
-  
+
   // We can "void" a functor, which will change any F[A] into a F[Unit]
   assert(Functor[Option].void(Some(1)) === Some(()))
 

@@ -129,8 +129,8 @@ object TaskTest extends SpecLite {
   "catches exceptions thrown by onFinish argument function" ! {
     Task { Thread.sleep(10); 42 }.onFinish { _ => throw SadTrombone; Task.now(()) }.unsafePerformSyncAttemptFor(1000) ==
       -\/(SadTrombone)
-  }  
-  
+  }
+
   "evaluates Monad[Task].point lazily" in {
     val M = implicitly[Monad[Task]]
     var x = 0
@@ -222,13 +222,14 @@ object TaskTest extends SpecLite {
       import Thread._
       import java.{util => ju}
       import ju.concurrent.CyclicBarrier
+      import scala.collection.JavaConverters._
 
       //Ensure at least 6 different threads are available.
       implicit val es6 =
         Executors.newFixedThreadPool(6)
       val barrier = new CyclicBarrier(6);
 
-      val seenThreadNames = scala.collection.JavaConversions.asScalaSet(ju.Collections.synchronizedSet(new ju.HashSet[String]()))
+      val seenThreadNames = ju.Collections.synchronizedSet(new ju.HashSet[String]()).asScala
       val t =
         for (i <- 0 to 5) yield fork {
           seenThreadNames += currentThread().getName()

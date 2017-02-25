@@ -48,20 +48,20 @@ object FutureTest extends SpecLite {
     import scalaz.concurrent.Future._
     implicit val es = Executors.newFixedThreadPool(1)
     val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
-   
+
     "correctly process reduceUnordered for >1 futures in non-blocking way" in {
       val f1 = fork(now(1))(es)
       val f2 = delay(7).flatMap(_=>fork(now(2))(es))
       val f3 = fork(now(3))(es)
-      
+
       val f = fork(Future.reduceUnordered(Seq(f1,f2,f3))(intSetReducer))(es)
-      
+
       f.unsafePerformSync must_== Set(1,2,3)
     }
 
 
     "correctly process reduceUnordered for 1 future in non-blocking way" in {
-      val f1 = fork(now(1))(es) 
+      val f1 = fork(now(1))(es)
 
       val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
 
@@ -74,7 +74,7 @@ object FutureTest extends SpecLite {
       f.unsafePerformSync must_== Set()
     }
   }
-  
+
   "Timed Future" should {
     "not run futures sequentially" in {
       val times = Stream.iterate(100)(_ + 100).take(10)

@@ -99,7 +99,7 @@ case class One[V, A](v: V, a1: A)(implicit r: Reducer[A, V]) extends Finger[V, A
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = one(f(a1))
 
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     f(a1)
   }
 
@@ -138,7 +138,7 @@ case class Two[V, A](v: V, a1: A, a2: A)(implicit r: Reducer[A, V]) extends Fing
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = two(f(a1), f(a2))
 
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     f(a1)
     f(a2)
   }
@@ -185,7 +185,7 @@ case class Three[V, A](v: V, a1: A, a2: A, a3: A)(implicit r: Reducer[A, V]) ext
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = three(f(a1), f(a2), f(a3))
 
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     f(a1)
     f(a2)
     f(a3)
@@ -238,7 +238,7 @@ case class Four[V, A](v: V, a1: A, a2: A, a3: A, a4: A)(implicit r: Reducer[A, V
 
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]) = four(f(a1), f(a2), f(a3), f(a4))
 
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     f(a1)
     f(a2)
     f(a3)
@@ -290,7 +290,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
     (v, a1, a2) => node2(f(a1), f(a2)),
     (v, a1, a2, a3) => node3(f(a1), f(a2), f(a3)))
 
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     fold(
       (_, a1, a2) => { f(a1); f(a2) },
       (_, a1, a2, a3) => { f(a1); f(a2); f(a3) }
@@ -338,7 +338,7 @@ sealed abstract class Node[V, A](implicit r: Reducer[A, V]) {
  * Ralf Hinze and Ross Paterson.
  * A gentle introduction is presented in the blog post "Monoids and Finger Trees" by Heinrich Apfelmus.
  *
- * This is done by choosing a a suitable type to annotate the nodes. For example,
+ * This is done by choosing a suitable type to annotate the nodes. For example,
  * a binary tree can be implemented by annotating each node with the size of its subtree,
  * while a priority queue can be implemented by labelling the nodes by the minimum priority of its children.
  *
@@ -823,7 +823,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 
   /** Execute the provided side effect for each element in the tree. */
-  def foreach(f: A => Unit) {
+  def foreach(f: A => Unit): Unit = {
     fold(
       _ => {},
       (_, x) => { f(x) },
@@ -1095,10 +1095,7 @@ sealed abstract class IndSeqInstances {
   implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
     new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
       def G = implicitly
-      override val naturalTrans = new (IndSeq ~> FingerTree[Int, ?]) {
-        def apply[A](a: IndSeq[A]) =
-          a.self
-      }
+      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
         implicit val r = UnitReducer((_: B) => 1)

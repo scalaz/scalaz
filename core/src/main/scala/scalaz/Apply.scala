@@ -34,14 +34,14 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
-  def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] = 
+  def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
     new CompositionApply[F, G] {
       implicit def F = self
       implicit def G = G0
     }
 
   /**The product of Applys `F` and `G`, `[x](F[x], G[x]])`, is a Apply */
-  def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] = 
+  def product[G[_]](implicit G0: Apply[G]): Apply[λ[α => (F[α], G[α])]] =
     new ProductApply[F, G] {
       implicit def F = self
       implicit def G = G0

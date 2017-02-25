@@ -15,7 +15,7 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   def id[A]: A =>: A
 
   /** `monoid`, but universally quantified. */
-  def empty: PlusEmpty[λ[α => α =>: α]] = 
+  def empty: PlusEmpty[λ[α => α =>: α]] =
     new PlusEmpty[λ[α => α =>: α]] with ComposePlus {
       def empty[A] = id
     }

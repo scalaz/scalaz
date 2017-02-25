@@ -8,7 +8,7 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 
   def filter(f: A => Boolean) =
     F.filter(self)(f)
-  
+
   def withFilter(f: A => Boolean) =
     filter(f)
 
@@ -19,6 +19,11 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
     val ftb: F[T[B]] = ev.subst(self)
     F.unite[T, B](ftb)
   }
+  final def lefts[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): F[B] =
+    F.lefts(ev.subst(self))
+
+  final def rights[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): F[C] =
+    F.rights(ev.subst(self))
 
   final def separate[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))

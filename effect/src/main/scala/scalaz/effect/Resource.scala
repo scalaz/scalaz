@@ -31,7 +31,7 @@ object Resource {
     new Resource[A] {
       def close(a: A): IO[Unit] = closeAction(a)
     }
- 
+
   def resourceFromCloseable[A <: Closeable]: Resource[A] =
     resource(a => IO(a.close))
 

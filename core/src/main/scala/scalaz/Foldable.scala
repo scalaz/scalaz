@@ -70,6 +70,9 @@ trait Foldable[F[_]]  { self =>
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
+  /** Like `fold` but returning `None` if the foldable is empty and `Some` otherwise */
+  def fold1Opt[A: Semigroup](fa: F[A]): Option[A] = foldMap1Opt(fa)(a => a)
+
   /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
@@ -239,7 +242,7 @@ trait Foldable[F[_]]  { self =>
 
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldLeft(fa, G.empty[A])(G.plus[A](_, _))
-  
+
   def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
     msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
 
@@ -273,8 +276,8 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, IList[(B, NonEmptyList[A])]())((a, bas) => {
       val fa = f(a)
       bas match {
-        case INil() => IList.single((fa, NonEmptyList.nel(a, INil())))
-        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList.nel(a, INil())), bas)
+        case INil() => IList.single((fa, NonEmptyList.nel(a, IList.empty)))
+        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList.nel(a, IList.empty)), bas)
       }
     })
 
@@ -284,8 +287,8 @@ trait Foldable[F[_]]  { self =>
   def splitByRelation[A](fa: F[A])(r: (A, A) => Boolean): IList[NonEmptyList[A]] =
     foldRight(fa, IList[NonEmptyList[A]]())((a, neas) => {
       neas match {
-        case INil() => IList.single(NonEmptyList.nel(a, INil()))
-        case ICons(nea, tail) => if (r(a, nea.head)) ICons(a <:: nea, tail) else ICons(NonEmptyList.nel(a, INil()), neas)
+        case INil() => IList.single(NonEmptyList.nel(a, IList.empty))
+        case ICons(nea, tail) => if (r(a, nea.head)) ICons(a <:: nea, tail) else ICons(NonEmptyList.nel(a, IList.empty), neas)
       }
     })
 

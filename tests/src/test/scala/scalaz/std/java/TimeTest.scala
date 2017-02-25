@@ -14,6 +14,9 @@ object TimeTest extends SpecLite {
 
   private[this] val smallIntArb = Arbitrary(Gen.choose(1, 100000))
 
+  implicit val InstantArbitrary: Arbitrary[Instant] =
+    Arbitrary(gen[Long].map { Instant.ofEpochMilli(_)})
+
   implicit val DurationArbitrary: Arbitrary[Duration] =
     Arbitrary(Gen.oneOf(
       gen[Long].map{Duration.ofNanos},
@@ -49,6 +52,8 @@ object TimeTest extends SpecLite {
 
   implicit val monthArbitrary: Arbitrary[Month] =
     Arbitrary(Gen.oneOf(Month.values))
+
+  checkAll("Instant", order.laws[Instant])
 
   checkAll("Duration", monoid.laws[Duration])
   checkAll("Duration", order.laws[Duration])

@@ -387,6 +387,12 @@ object Validation extends ValidationInstances {
   def failureNel[E, A](e: E): ValidationNel[E, A] =
     Failure(NonEmptyList(e))
 
+  def lift[E, A](a: A)(f : A => Boolean, fail: E) : Validation[E, A] =
+    if (f(a)) failure(fail) else success(a)
+
+  def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
+    lift(a)(f, fail).toValidationNel
+
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {

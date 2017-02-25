@@ -10,7 +10,7 @@ object MixedBag extends App {
   kleisiArrow()
   dListExample()
 
-  def monoid() {
+  def monoid(): Unit = {
     import std.anyVal._
     import std.option._
 
@@ -24,7 +24,7 @@ object MixedBag extends App {
     intInstance.semigroupSyntax.mappend(1, 2)
   }
 
-  def traverseBigList() {
+  def traverseBigList(): Unit = {
     import std.option._
     import std.list._
     import syntax.traverse._
@@ -34,7 +34,7 @@ object MixedBag extends App {
     ()
   }
 
-  def traverseBigStream() {
+  def traverseBigStream(): Unit = {
     import std.option._
     import std.stream._
     import syntax.traverse._
@@ -44,7 +44,7 @@ object MixedBag extends App {
     ()
   }
 
-  def tree() {
+  def tree(): Unit = {
     import std.string._
     import syntax.semigroup._
     import syntax.equal._
@@ -61,7 +61,24 @@ object MixedBag extends App {
     m assert_=== "12345"
   }
 
-  def kleisiArrow() {
+  def strictTree(): Unit = {
+    import std.string._
+    import syntax.semigroup._
+    import syntax.equal._
+    import syntax.strictTree._
+    import syntax.traverse._
+    import std.vector._
+
+    val tree: StrictTree[Int] = 1.strictNode(2.strictNode(3.strictLeaf), 4.strictLeaf, 5.strictLeaf)
+    val r = tree.foldRight(".")((i, s) => i.toString |+| s)
+    r assert_=== "12345."
+    val f = tree.flatten.foldMap(_.toString)
+    f assert_=== "12345"
+    val m = tree.foldMap(_.toString)
+    m assert_=== "12345"
+  }
+
+  def kleisiArrow(): Unit = {
     import Kleisli._
     import std.option._
     import syntax.compose._
@@ -73,7 +90,7 @@ object MixedBag extends App {
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
-  def dListExample() {
+  def dListExample(): Unit = {
     import DList._
     import syntax.monad._
     import syntax.writer._
@@ -101,7 +118,7 @@ object MixedBag extends App {
     flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
   }
 
-  def zipper() {
+  def zipper(): Unit = {
     import scalaz.std.list
 
     val fileName = "abc.txt"

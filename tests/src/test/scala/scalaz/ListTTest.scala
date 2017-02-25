@@ -29,12 +29,12 @@ object ListTTest extends SpecLite {
     (ass: ListTOpt[Int]) =>
       ass.find(_ > 0 ) must_===(OptionT.optionT(ass.run.map(_.find( _ > 0))))
   }
-  
+
   "drop" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).drop(x).toList must_===(ass.map(_.drop(x)))
   }
-  
+
   "take" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).take(x).toList must_===(ass.map(_.take(x)))
@@ -43,6 +43,12 @@ object ListTTest extends SpecLite {
   "map" ! forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
+  }
+
+  "collect" ! forAll {
+    (ass: List[List[Int]]) =>
+      val pf : PartialFunction[Int, String] = { case (i : Int) if i > 2 => i.toString }
+      ListT.fromList(ass).collect(pf).toList must_===(ass.map(_.collect(pf)))
   }
 
   "flatMap" ! forAll {
@@ -57,7 +63,7 @@ object ListTTest extends SpecLite {
     ListT.fromList(list).map(_ * 2).toList must_===(list.map(_.map(_ * 2)))
     ()
   }
-  
+
   "listT" ! forAll {
     (ass: Option[List[Int]]) =>
       ListT.listT(ass).run == ass
@@ -68,6 +74,7 @@ object ListTTest extends SpecLite {
   checkAll(plusEmpty.laws[ListTOpt])
   checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
+  checkAll(monadTrans.laws[ListT, Option])
 
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
