@@ -31,3 +31,19 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+
+matrix:
+  include:
+  - scala: 2.11.8
+    jdk: oraclejdk8
+    sudo: required
+    before_install:
+    - sudo apt-get -qq update
+    - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main' >> /etc/apt/sources.list"
+    - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise main' >> /etc/apt/sources.list"
+    - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+    - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    - sudo apt-get -qq update
+    - sudo apt-get install -y libgc-dev clang++-3.7 llvm-3.7 llvm-3.7-dev llvm-3.7-runtime llvm-3.7-tool libunwind7-dev
+    script:
+    - sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
