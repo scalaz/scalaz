@@ -18,12 +18,16 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import org.scalajs.sbtplugin.ScalaJSPlugin
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import org.scalajs.sbtplugin.cross._
+import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import sbtcrossproject.CrossPlugin.autoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 
 object build {
   type Sett = Def.Setting[_]
+
+  val rootNativeId = "rootNative"
+  val nativeTestId = "nativeTest"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -73,10 +77,18 @@ object build {
   )
 
   // avoid move files
-  // https://github.com/scala-js/scala-js/blob/v0.6.7/sbt-plugin/src/main/scala/scala/scalajs/sbtplugin/cross/CrossProject.scala#L193-L206
-  object ScalazCrossType extends CrossType {
+  object ScalazCrossType extends sbtcrossproject.CrossType {
     override def projectDir(crossBase: File, projectType: String) =
       crossBase / projectType
+
+    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
+      val dir = projectType match {
+        case JVMPlatform => "jvm"
+        case JSPlatform => "js"
+        case NativePlatform => "native"
+      }
+      crossBase / dir
+    }
 
     def shared(projectBase: File, conf: String) =
       projectBase.getParentFile / "src" / conf / "scala"
@@ -85,13 +97,23 @@ object build {
       Some(shared(projectBase, conf))
   }
 
+  private val Scala211_jvm_and_js_options = Seq(
+    "-Ybackend:GenBCode",
+    "-Ydelambdafy:method",
+    "-target:jvm-1.8"
+  )
+
+  private def Scala211 = "2.11.8"
+
+  private val SetScala211 = releaseStepCommand("++" + Scala211)
+
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
     scalaVersion := "2.12.1",
-    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.1"),
+    crossScalaVersions := Seq("2.10.6", Scala211, "2.12.1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.4",
@@ -105,11 +127,7 @@ object build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case Some((2,11)) => Seq(
-        "-Ybackend:GenBCode",
-        "-Ydelambdafy:method",
-        "-target:jvm-1.8"
-      )
+      case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Nil
     }),
 
@@ -173,10 +191,14 @@ object build {
       checkSnapshotDependencies,
       inquireVersions,
       runTest,
+      SetScala211,
+      releaseStepCommand(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       publishSignedArtifacts,
+      SetScala211,
+      releaseStepCommand(s"${rootNativeId}/publishSigned"),
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -236,7 +258,19 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
-  lazy val core = crossProject.crossType(ScalazCrossType)
+  private[this] val jvm_js_settings = Seq(
+    unmanagedSourceDirectories in Compile += {
+      baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
+    }
+  )
+
+  val nativeSettings = Seq(
+    scalacOptions --= Scala211_jvm_and_js_options,
+    scalaVersion := Scala211,
+    crossScalaVersions := Scala211 :: Nil
+  )
+
+  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
@@ -250,20 +284,24 @@ object build {
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
-      scalajsProjectSettings ++ Seq(
-        libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.0"
-      ) : _*
+      jvm_js_settings,
+      scalajsProjectSettings,
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.0"
     )
     .jvmSettings(
+      jvm_js_settings,
       libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
         case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
       }.toList,
       typeClasses := TypeClass.core
     )
+    .nativeSettings(
+      nativeSettings
+    )
 
   final val ConcurrentName = "scalaz-concurrent"
 
-  lazy val effect = crossProject.crossType(ScalazCrossType)
+  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
@@ -273,14 +311,20 @@ object build {
     .jvmSettings(
       typeClasses := TypeClass.effect
     )
+    .nativeSettings(
+      nativeSettings
+    )
 
-  lazy val iteratee = crossProject.crossType(ScalazCrossType)
+  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
+    .nativeSettings(
+      nativeSettings
+    )
 
   lazy val publishSetting = publishTo := {
     val nexus = "https://oss.sonatype.org/"
