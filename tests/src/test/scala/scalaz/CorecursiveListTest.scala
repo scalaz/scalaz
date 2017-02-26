@@ -49,9 +49,9 @@ object CorecursiveListTest extends SpecLite {
     p
   }
 
-  "stream to corec iso" ! isoTest(CL.streamIso)
+  checkAll("stream to corec iso", isoTest(CL.streamIso))
 
-  "eph stream to corec iso" ! isoTest(CL.ephemeralStreamIso)
+  checkAll("eph stream to corec iso", isoTest(CL.ephemeralStreamIso))
 
   "fromList" ! forAll {xs: List[Int] =>
     CL.fromList(xs) must_===(CL.fromStream(xs.toStream))
