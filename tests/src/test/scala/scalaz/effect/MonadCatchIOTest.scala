@@ -7,7 +7,7 @@ object MonadCatchIOTest extends SpecLite {
   import Kleisli.kleisli
   import syntax.monad._
   import syntax.effect.monadCatchIO._
-  import std.effect.closeable._
+  import std.effect.autoCloseable._
 
   // Some canned failures
   val err1 = new Exception("err1")
