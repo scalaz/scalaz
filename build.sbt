@@ -121,7 +121,7 @@ lazy val scalacheckBinding_1_13 = {
     },
     mimaPreviousArtifacts := {
       val artifactId =
-        if(isJSProject.value) {
+        if(isScalaJSProject.value) {
           s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
         } else {
           s"${name.value}_${scalaBinaryVersion.value}"
