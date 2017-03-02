@@ -24,6 +24,8 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     Leibniz.trans[L2, H2, C, A, B](this, that)
   def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](that: Leibniz[L2, H2, B, C]): Leibniz[L2, H2, A, C] =
     Leibniz.trans[L2, H2, A, B, C](that, this)
+  def flip: Leibniz[L, H, B, A] =
+    Leibniz.symm(this)
 
   def onF[X](fa: X => A): X => B = subst[X => ?](fa)
   def onCov[FA](fa: FA)(implicit U: Unapply.AuxA[Functor, FA, A]): U.M[B] =
