@@ -25,8 +25,6 @@ import org.scalajs.sbtplugin.cross._
 object build {
   type Sett = Def.Setting[_]
 
-  val isJSProject = SettingKey[Boolean]("isJSProject")
-
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
       val extracted = st.extract
@@ -59,7 +57,6 @@ object build {
   }
 
   val scalajsProjectSettings = Seq[Sett](
-    isJSProject := true,
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
@@ -125,14 +122,13 @@ object build {
     parallelExecution in Test := false,
     testOptions in Test += {
       val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isJSProject.value)
+        if(isScalaJSProject.value)
           Seq("-minSuccessfulTests", "10")
         else
           Seq("-minSuccessfulTests", "33")
       }
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    isJSProject := isJSProject.?.value.getOrElse(false),
     genTypeClasses := {
       typeClasses.value.flatMap { tc =>
         val dir = name.value match {
