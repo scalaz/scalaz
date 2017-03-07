@@ -32,6 +32,9 @@ object Resource {
       def close(a: A): IO[Unit] = closeAction(a)
     }
 
+  def resourceFromAutoCloseable[A <: java.lang.AutoCloseable]: Resource[A] =
+    resource(a => IO(a.close()))
+
   def resourceFromCloseable[A <: Closeable]: Resource[A] =
     resource(a => IO(a.close))
 
