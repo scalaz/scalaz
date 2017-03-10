@@ -247,7 +247,7 @@ object build {
     // kind-projector plugin
     libraryDependencies ++= (scalaBinaryVersion.value match {
       case "2.10" =>
-        compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full) :: Nil
+        compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch) :: Nil
       case _ =>
         Nil
     }),
