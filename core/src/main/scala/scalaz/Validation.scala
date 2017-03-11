@@ -481,7 +481,7 @@ trait ValidationFunctions {
 
   /** Evaluate the given value, which might throw an exception. */
   def fromTryCatch[T](a: => T): Validation[Throwable, T] = try {
-    success(a)
+    Success(a)
   } catch {
     case e => failure(e)
   }
