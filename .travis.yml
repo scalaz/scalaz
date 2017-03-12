@@ -43,6 +43,24 @@ matrix:
       - sudo apt-get install -y libgc-dev clang++-3.7 llvm-3.7 llvm-3.7-dev llvm-3.7-runtime llvm-3.7-tool libunwind7-dev
       script:
       - sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+    - dist: trusty
+      group: edge
+      sudo: required
+      scala: 2.12.1
+      jdk: oraclejdk9
+      script:
+      # https://github.com/sbt/sbt/pull/2951
+      - git clone https://github.com/retronym/java9-rt-export
+      - cd java9-rt-export/
+      - git checkout 1019a2873d057dd7214f4135e84283695728395d
+      - jdk_switcher use oraclejdk8
+      - sbt package
+      - jdk_switcher use oraclejdk9
+      - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
+      - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
+      - cd ..
+      - echo "sbt.version=0.13.14-RC1" > project/build.properties
+      - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes rootJVM/test rootJS/test
 
 env:
   matrix:
