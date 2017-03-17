@@ -12,5 +12,6 @@ package object syntax extends Syntaxes{
 
   object proChoice extends ToProChoiceOps
 
+  object contT extends ToContTOps
 }
 
