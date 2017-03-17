@@ -9,4 +9,5 @@ package scalaz
 package object syntax extends Syntaxes {
   object strictTree extends ToStrictTreeOps
   object contT extends ToContTOps
+  object monadTrans extends ToMonadTransOps
 }
