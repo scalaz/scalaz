@@ -19,7 +19,7 @@ final class DList[A] private[scalaz](f: List[A] => Trampoline[List[A]]) {
   def apply(xs: => List[A]): Trampoline[List[A]] = f(xs)
 
   /** Convert to a normal list. */
-  def toList: List[A] = apply(List()).run
+  def toList: List[A] = apply(Nil).run
 
   /** Prepend a single element in constant time. */
   def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
@@ -33,8 +33,8 @@ final class DList[A] private[scalaz](f: List[A] => Trampoline[List[A]]) {
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-    (apply(List()) >>= {
-      case List() => return_(z)
+    (apply(Nil) >>= {
+      case Nil => return_(z)
       case x :: xs => return_(f(x, fromList(xs)))
     }).run
 
