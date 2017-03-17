@@ -131,6 +131,8 @@ trait Syntaxes {
 
   object tag extends ToTagOps
 
+  object contT extends ToContTOps
+
   //
   // Mixed
   //
@@ -152,6 +154,7 @@ trait ToDataOps
   with ToNelOps
   with ToTheseOps
   with ToMaybeOps
+  with ToContTOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
