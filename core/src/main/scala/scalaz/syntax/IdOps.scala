@@ -52,6 +52,8 @@ sealed class IdOps[A](self: A) {
   final def squared: (A, A) =
     (self, self)
 
+  final def wrapList: List[A] = List(self)
+
   /**
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
    */

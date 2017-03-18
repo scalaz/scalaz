@@ -8,6 +8,8 @@ final class ShowOps[F] private[syntax](val self: F)(implicit val F: Show[F]) ext
   final def shows: String = F.shows(self)
   final def print: Unit = Console.print(shows)
   final def println: Unit = Console.println(shows)
+  final def eprint: Unit = Console.err.print(shows)
+  final def eprintln: Unit = Console.err.println(shows)
   ////
 }
 
