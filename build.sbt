@@ -33,7 +33,7 @@ lazy val core = Project(
       dir => Seq(GenerateTupleW(dir))
     },
     scalaParserCombinatorsVersion := "1.0.5",
-    scalaXmlVersion := "1.0.5",
+    scalaXmlVersion := "1.0.6",
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, scalaMajor)) if scalaMajor >= 11 =>
