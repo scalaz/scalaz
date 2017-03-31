@@ -159,6 +159,7 @@ object build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
+      case Some((2,v)) if v >= 12 => Seq("-opt:l:method")
       case _ => Nil
     }),
 
