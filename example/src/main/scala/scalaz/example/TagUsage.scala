@@ -11,7 +11,8 @@ package example
   one has to be very careful when using value classes, because there
   are a lot of instances in which using a value class will incur a
   runtime boxing/unboxing of your value, which incurs a runtime
-  cost. The scalaz tagged types will never cause boxing of a value.
+  cost. The scalaz tagged types will never cause boxing of a value
+  that is already `AnyRef`.
   */
 object TagUsage extends App {
   import Tags._
