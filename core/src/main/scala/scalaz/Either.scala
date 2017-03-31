@@ -14,10 +14,10 @@ import Liskov.<~<
  * `NumberFormatException` [[\/]] `Int`. However, since there is no need to actually throw an exception, the type (`A`)
  * chosen for the "left" could be any type representing an error and has no need to actually extend `Exception`.
  *
- * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased, so methods such as `map` and
- * `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more convenient to use
- * than `scala.Either` in a monadic context. Methods such as `swap`, `swapped`, and `leftMap` provide functionality
- * that `scala.Either` exposes through left projections.
+ * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased for all Scala versions, so methods
+ * such as `map` and `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more
+ * convenient to use than `scala.Either` in a monadic context in Scala versions <2.12. Methods such as `swap`,
+ * `swapped`, and `leftMap` provide functionality that `scala.Either` exposes through left projections.
  *
  * `A` [[\/]] `B` is also isomorphic to [[Validation]]`[A, B]`. The subtle but important difference is that [[Applicative]]
  * instances for [[Validation]] accumulates errors ("lefts") while [[Applicative]] instances for [[\/]] fail fast on the
