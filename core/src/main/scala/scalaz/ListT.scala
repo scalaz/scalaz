@@ -6,11 +6,9 @@ package scalaz
 
 final case class ListT[M[_], A](run: M[List[A]]){
   def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
-    M.map(run){list =>
-      list match {
-        case Nil => None
-        case listHead :: listTail => Some(listHead, new ListT(M.point(listTail)))
-      }
+    M.map(run) {
+      case Nil => None
+      case listHead :: listTail => Some(listHead, new ListT(M.point(listTail)))
     }
   }
 
@@ -44,11 +42,9 @@ final case class ListT[M[_], A](run: M[List[A]]){
     }
   })
 
-  def flatMap[B](f: A => ListT[M, B])(implicit M: Monad[M]) : ListT[M, B] = new ListT(M.bind(run){list =>
-    list match {
-      case Nil => M.point(Nil)
-      case nonEmpty => nonEmpty.map(f).reduce(_ ++ _).run
-    }
+  def flatMap[B](f: A => ListT[M, B])(implicit M: Monad[M]) : ListT[M, B] = new ListT(M.bind(run) {
+    case Nil => M.point(Nil)
+    case nonEmpty => nonEmpty.map(f).reduce(_ ++ _).run
   })
 
   def flatMapF[B](f: A => M[List[B]])(implicit M: Monad[M]) : ListT[M, B] = flatMap(f andThen ListT.apply)

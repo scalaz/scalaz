@@ -269,7 +269,7 @@ trait LensFamilyFunctions {
     lensFamily(z => IndexedStore(x => LazyTuple2(z._1, x), z._2))
 
   def predicateLensFamily[A1, A2]: LensFamily[Store[A1, Boolean], Store[A2, Boolean], (A1 \/ A1), (A2 \/ A2)] =
-    lensFamily(q => IndexedStore(_ match {
+    lensFamily(q => IndexedStore({
       case -\/(l) => Store(_ => true, l)
       case \/-(r) => Store(_ => false, r)
     }, {
@@ -374,7 +374,7 @@ trait LensFunctions extends LensFamilyFunctions {
     })
 
   def predicateLens[A]: Store[A, Boolean] @> (A \/ A) =
-    lens(q => Store(_ match {
+    lens(q => Store({
       case -\/(l) => Store(_ => true, l)
       case \/-(r) => Store(_ => false, r)
     }, {
