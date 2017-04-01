@@ -17,7 +17,7 @@ trait MapSub {
   protected def ab_+[K: BuildKeyConstraint, V
                    ](m: XMap[K, V], k: K, v: V): XMap[K, V]
 
-  /** As with `ab_+, but with `MapLike#-`. */
+  /** As with `ab_+`, but with `MapLike#-`. */
   protected def ab_-[K: BuildKeyConstraint, V
                    ](m: XMap[K, V], k: K): XMap[K, V]
 
