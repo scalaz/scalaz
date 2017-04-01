@@ -85,13 +85,11 @@ object Memo extends MemoInstances {
     var a = m
 
     memo[K, V](f =>
-      k => {
-        a get k getOrElse {
-          val v = f(k)
-          a = a updated (k, v)
-          v
-        }
-      })
+      k => a.getOrElse(k, {
+        val v = f(k)
+        a = a updated(k, v)
+        v
+      }))
   }
 
   /** Cache results in a hash map.  Nonsensical unless `K` has
