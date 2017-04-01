@@ -84,13 +84,11 @@ trait MemoFunctions {
     var a = m
 
     memo[K, V](f =>
-      k => {
-        a get k getOrElse {
-          val v = f(k)
-          a = a updated (k, v)
-          v
-        }
-      })
+      k => a.getOrElse(k, {
+        val v = f(k)
+        a = a updated(k, v)
+        v
+      }))
   }
 
   import collection.immutable.{HashMap, ListMap, TreeMap}
