@@ -80,7 +80,7 @@ trait BijectionTFunctions {
 
   // Left is true, Right is false
   def eitherB[A]: Bijection[A \/ A, (Boolean, A)] =
-    bijection[Id, Id, A \/ A, (Boolean, A)](_ match {
+    bijection[Id, Id, A \/ A, (Boolean, A)]({
       case -\/(a) => (true, a)
       case \/-(a) => (false, a)
     }, {
