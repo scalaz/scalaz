@@ -22,6 +22,7 @@ trait Prelude  extends data.DisjunctionFunctions
   type Monad[M[_]] = typeclass.Monad[M]
   type Traversable[T[_]] = typeclass.Traversable[T]
   type Profunctor[F[_,_]] = typeclass.Profunctor[F]
+  type Category[=>:[_,_]] = typeclass.Category[=>:]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -33,7 +34,7 @@ trait Prelude  extends data.DisjunctionFunctions
   def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
   def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
   def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
- 
+  def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P 
   
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
