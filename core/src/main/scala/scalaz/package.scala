@@ -151,8 +151,7 @@ package object scalaz {
   /** @template */
   type IndexedState[-S1, S2, A] = IndexedStateT[Id, S1, S2, A]
   
-  /**
-    * A state transition, representing a function `S => (S, A)`.
+  /** A state transition, representing a function `S => (S, A)`.
     *
     * @template
     */
@@ -224,12 +223,12 @@ package object scalaz {
   /** @template */
   type NonEmptyIList[A] = OneAnd[IList,A]
 
-  /**
-   * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
-   *
-   * @template
-   * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
-   */
+  /** An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
+    *
+    * @template
+    *
+    * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
+    */
   type ValidationNel[E, +X] = Validation[NonEmptyList[E], X]
 
   type FirstOf[A] = A @@ Tags.FirstVal
@@ -250,12 +249,11 @@ package object scalaz {
   //
   // Lens type aliases
   //
-  /**
-   * A lens that doesn't transform the type of the record.
-   *
-   * @template
-   * @see [[scalaz.@>]]
-   */
+  /** A lens that doesn't transform the type of the record.
+    *
+    * @template
+    * @see [[scalaz.@>]]
+    */
   type Lens[A, B] = LensFamily[A, A, B, B]
 
   /**
@@ -272,12 +270,11 @@ package object scalaz {
   //
   // Partial Lens type aliases
   //
-  /**
-   * A partial lens that doesn't transform the type of the record.
-   *
-   * @template
-   * @see [[scalaz.@?>]]
-   */
+  /** A partial lens that doesn't transform the type of the record.
+    *
+    * @template
+    * @see [[scalaz.@?>]]
+    */
   type PLens[A, B] = PLensFamily[A, A, B, B]
 
   /**
