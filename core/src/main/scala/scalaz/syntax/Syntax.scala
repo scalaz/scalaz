@@ -102,6 +102,12 @@ trait Syntaxes {
   object monadError extends ToMonadErrorOps
 
   //
+  // Type classes over (* -> *) -> * -> *
+  //
+
+  object monadTrans extends ToMonadTransOps
+
+  //
   // Data
   //
 
@@ -166,3 +172,4 @@ trait ToTypeClassOps
   with ToBitraverseOps with ToComposeOps with ToCategoryOps
   with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps with ToMonadErrorOps
   with ToFoldable1Ops with ToTraverse1Ops with ToOptionalOps with ToCatchableOps with ToAlignOps
+  with ToMonadTransOps

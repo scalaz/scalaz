@@ -383,6 +383,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
 
+  override def wrapEffect[G[_]: Monad, A](a: G[StreamT[G, A]]): StreamT[G, A] = StreamT.wrapEffect(a)
+
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
     λ[StreamT[M, ?] ~> StreamT[N, ?]](a =>
       StreamT(f(M.map(a.step)(

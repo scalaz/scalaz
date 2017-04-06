@@ -9,6 +9,9 @@ trait MonadTrans[F[_[_], _]] {
   final def liftMU[GA](a: GA)(implicit G: Unapply[Monad, GA]): F[G.M, G.A] =
     liftM[G.M, G.A](G(a))(G.TC)
 
+  def wrapEffect[G[_]: Monad, A](a: G[F[G, A]]): F[G, A] =
+    apply[G].join(liftM(a))
+
   /** The [[scalaz.Monad]] implied by this transformer. */
   implicit def apply[G[_] : Monad]: Monad[F[G, ?]]
 
