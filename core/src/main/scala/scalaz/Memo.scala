@@ -77,6 +77,8 @@ object Memo extends MemoInstances {
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
+  @deprecated("Keys are collected too quickly for weakHashMapMemo to be very useful",
+              since = "7.3.0")
   def weakHashMapMemo[K, V]: Memo[K, V] = mutableMapMemo(new mutable.WeakHashMap[K, V])
 
   import collection.immutable
