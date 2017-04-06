@@ -62,14 +62,22 @@ object Free extends FreeInstances {
     def f: A => Free[S, B] = f0
   }
 
-  /** A computation that can be stepped through, suspended, and paused */
+  /** A computation that can be stepped through, suspended, and paused
+    *
+    * @template
+    */
   type Trampoline[A] = Free[Function0, A]
 
-  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
+  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`.
+    *
+    * @template
+    */
   type Source[A, B] = Free[(A, ?), B]
 
   /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
     * Note the similarity to an [[scalaz.iteratee.Iteratee]].
+    *
+    * @template
     */
   type Sink[A, B] = Free[(=> A) => ?, B]
 
