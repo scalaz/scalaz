@@ -386,17 +386,16 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def fold[B](empty: V => B, single: (V, A) => B, deep: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B
 
   /** Prepends an element to the left of the tree. O(1). */
-  def +:(a: => A): FingerTree[V, A] = {
+  def +:(a: A): FingerTree[V, A] = {
     implicit val nm = nodeMeasure[A, V]
-    val az = Need(a)
     fold(
-      v => single(measurer.cons(az.value, v), az.value),
-      (v, b) => deep(measurer.cons(az.value, v), one(az.value), empty[V, Node[V, A]], one(b)),
+      v => single(measurer.cons(a, v), a),
+      (v, b) => deep(measurer.cons(a, v), one(a), empty[V, Node[V, A]], one(b)),
       (v, pr, m, sf) => {
         val mz = m
         pr match {
-          case Four(vf, b, c, d, e) => deep(measurer.cons(az.value, v), two(az.value, b), node3(c, d, e) +: mz, sf)
-          case _ => deep(measurer.cons(az.value, v), az.value +: pr, mz, sf)
+          case Four(vf, b, c, d, e) => deep(measurer.cons(a, v), two(a, b), node3(c, d, e) +: mz, sf)
+          case _ => deep(measurer.cons(a, v), a +: pr, mz, sf)
       }})
   }
 
@@ -416,13 +415,11 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   }
 
   /** Replace the first element of the tree with the given value. O(1) */
-  def |-:(a: => A): FingerTree[V, A] = {
-    val az = Need(a)
+  def |-:(a: A): FingerTree[V, A] =
     fold(
       v => sys.error("Replacing first element of an empty FingerTree"),
-      (v, b) => single(az.value),
-      (v, pr, m, sf) => deep(az.value |-: pr, m, sf))
-  }
+      (v, b) => single(a),
+      (v, pr, m, sf) => deep(a |-: pr, m, sf))
 
   /** Replace the last element of the tree with the given value. O(1) */
   def :-|(a: => A): FingerTree[V, A] = {
@@ -1065,7 +1062,7 @@ final class IndSeq[A](val self: FingerTree[Int, A]) {
   }
   def ++(xs: IndSeq[A]): IndSeq[A] = indSeq(self <++> xs.self)
   def :+(x: => A): IndSeq[A] = indSeq(self :+ x)
-  def +:(x: => A): IndSeq[A] = indSeq(x +: self)
+  def +:(x: A): IndSeq[A] = indSeq(x +: self)
   def length: Int = self.measure
   def tail: IndSeq[A] = indSeq(self.tail)
   def init: IndSeq[A] = indSeq(self.init)
