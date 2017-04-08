@@ -71,6 +71,11 @@ trait StreamInstances {
 
     override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
 
+    override def map[A, B](fa: Stream[A])(f: A => B): Stream[B] = fa map f
+
+    import Liskov.<~<
+    override def widen[A, B](fa: Stream[A])(implicit ev: A <~< B): Stream[B] = Liskov.co(ev)(fa)
+
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
