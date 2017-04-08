@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import Liskov.<~<
 import vector._
 import annotation.tailrec
 
@@ -20,6 +21,7 @@ trait VectorInstances extends VectorInstances0 {
     def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
     def isEmpty[A](a: Vector[A]) = a.isEmpty
     override def map[A, B](v: Vector[A])(f: A => B) = v map f
+    override def widen[A, B](fa: Vector[A])(implicit ev: A <~< B) = Liskov.co(ev)(fa)
     override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p
 
     def zip[A, B](a: => Vector[A], b: => Vector[B]): Vector[(A, B)] = {
