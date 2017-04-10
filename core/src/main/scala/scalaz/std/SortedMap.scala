@@ -5,7 +5,7 @@ import collection.immutable.SortedMap
 import collection.generic.CanBuildFrom
 
 sealed trait MapSubSortedMap {
-  type XMap[K, V] = SortedMap[K, V]
+  type XMap[K, +V] = SortedMap[K, V]
   type BuildKeyConstraint[K] = Order[K]
 
   protected final def buildXMap[K, V, K2: BuildKeyConstraint, V2]
