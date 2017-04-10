@@ -4,8 +4,6 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Functor` */
 final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) extends Ops[F[A]] {
   ////
-  import Leibniz.===
-
   final def map[B](f: A => B): F[B] = F.map(self)(f)
   final def distribute[G[_], B](f: A => G[B])(implicit D: Distributive[G]): G[F[B]] = D.distribute(self)(f)
   final def cosequence[G[_], B](implicit ev: A === G[B], D: Distributive[G]): G[F[B]] = D.distribute(self)(ev(_))

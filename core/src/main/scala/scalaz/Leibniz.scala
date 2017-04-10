@@ -34,11 +34,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     subst(U(fa))
 }
 
-object Leibniz extends LeibnizInstances with LeibnizFunctions{
-
-  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
-  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
-}
+object Leibniz extends LeibnizInstances with LeibnizFunctions
 
 sealed abstract class LeibnizInstances {
   import Leibniz._
@@ -70,9 +66,21 @@ sealed abstract class LeibnizInstances {
 
     implicit def leibnizGroupoid[L, H >: L]: LeibnizGroupoid[L, H] = new LeibnizGroupoid[L, H]*/
 
+  @inline def apply[A, B](implicit === : A === B): A === B = ===
 }
 
-trait LeibnizFunctions {
+trait LeibnizFunctions0 {
+  this: LeibnizFunctions =>
+  import Leibniz._
+
+  //This is safe by case analysis on the creator of lt — assuming lt is valid per se
+  //(e.g. it's not null or an exception or...
+  implicit def from_=:=[A, B](implicit eq: A =:= B): A === B =
+    force[⊥, ⊤, A, B]
+}
+
+
+trait LeibnizFunctions extends LeibnizFunctions0 {
   import Leibniz._
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */

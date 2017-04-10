@@ -35,23 +35,29 @@ sealed abstract class LiskovInstances {
 
 object Liskov extends LiskovInstances with LiskovFunctions {
 
-  /**A convenient type alias for Liskov */
-  type <~<[-A, +B] = Liskov[A, B]
+  @inline def apply[A, B](implicit <~< : A <~< B): A <~< B = <~<
+}
 
-  /**A flipped alias, for those used to their arrows running left to right */
-  type >~>[+B, -A] = Liskov[A, B]
+trait LiskovFunctions0 {
+  this: LiskovFunctions =>
+  import Liskov._
 
 }
 
-trait LiskovFunctions {
+trait LiskovFunctions extends LiskovFunctions0 {
   import Liskov._
+
+  //This is safe by case analysis on the creator of lt — assuming lt is valid per se
+  //(e.g. it's not null or an exception or...
+  implicit def from_<:<[A, B](implicit lt: A <:< B): A <~< B =
+    force
 
   /**Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
     def subst[F[-_]](p: F[B]): F[A] = p
   }
 
-  /**We can witness equality by using it to convert between types */
+  /**We can witness subtyping by using it to convert between types */
   implicit def witness[A, B](lt: A <~< B): A => B = {
     type f[-X] = X => B
     lt.subst[f](identity)

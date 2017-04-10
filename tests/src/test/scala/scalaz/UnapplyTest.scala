@@ -1,7 +1,5 @@
 package scalaz
 
-import Leibniz.===
-
 import org.scalacheck.{Prop, Gen}
 import org.scalacheck.Prop.forAll
 
