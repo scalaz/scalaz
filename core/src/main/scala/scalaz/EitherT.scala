@@ -17,14 +17,13 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   import OptionT._
 
   final class Switching_\/[X](r: => X) {
-    def <<?:(left: => X)(implicit F: Functor[F]): F[X] =
-      F.map(EitherT.this.run){
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X)(implicit F: Functor[F]): F[X] =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): Switching_\/[X] =
     new Switching_\/(right)
 
@@ -33,6 +32,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   def foldM[X](l: A => F[X], r: B => F[X])(implicit F: Bind[F]): F[X] =
     F.join(fold(l, r))
+
+  def foldConst[X](l: => X, r: => X)(implicit F: Functor[F]): F[X] =
+    F.map(run)(_.foldConst(l, r))
 
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =

@@ -36,7 +36,7 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def :++>>(f: A => W)(implicit F: Functor[F], W: Semigroup[W]): WriterT[F, W, A] =
     mapValue(wa => (W.append(wa._1, f(wa._2)), wa._2))
 
-  def <++:(w: => W)(implicit F: Functor[F], W: Semigroup[W]): WriterT[F, W, A] =
+  def <++:(w: W)(implicit F: Functor[F], W: Semigroup[W]): WriterT[F, W, A] =
     mapWritten(W.append(w, _))
 
   def <<++:(f: A => W)(implicit F: Functor[F], s: Semigroup[W]): WriterT[F, W, A] =

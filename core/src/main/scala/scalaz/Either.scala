@@ -26,14 +26,13 @@ import Liskov.<~<
  */
 sealed abstract class \/[+A, +B] extends Product with Serializable {
   final class SwitchingDisjunction[X](r: => X) {
-    def <<?:(left: => X): X =
-      \/.this match {
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X): X =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
     new SwitchingDisjunction[X](right)
 
@@ -56,6 +55,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     this match {
       case -\/(a) => l(a)
       case \/-(b) => r(b)
+    }
+
+  /** Evaluate `l` and return if left, otherwise, `r`. */
+  def foldConst[X](l: => X, r: => X): X =
+    this match {
+      case -\/(a) => l
+      case \/-(b) => r
     }
 
   /** Spin in tail-position on the right value of this disjunction. */
