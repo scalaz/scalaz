@@ -325,6 +325,9 @@ trait Foldable[F[_]]  { self =>
         else seen
     }.reverse
 
+  def distinctBy[A, B: Equal](fa: F[A])(f: A => B): IList[A] =
+    distinctE(fa)(Equal.equalBy(f))
+
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))
 
