@@ -64,5 +64,4 @@ matrix:
     - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
     - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
     - cd ..
-    - echo "sbt.version=0.13.14-RC1" > project/build.properties
     - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes rootJVM/test rootJS/test
