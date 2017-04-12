@@ -123,6 +123,15 @@ object build {
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
+    unmanagedSourceDirectories in Compile += {
+      val base = ScalazCrossType.shared(baseDirectory.value, "main").getParentFile
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 12 =>
+          base / "scala-2.12+"
+        case _ =>
+          base / "scala-2.12-"
+      }
+    },
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)

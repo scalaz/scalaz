@@ -5,7 +5,7 @@ package scalaz
  * A type giving rise to two unrelated [[scalaz.Functor]]s.
  */
 ////
-trait Bifunctor[F[_, _]]  { self =>
+trait Bifunctor[F[_, _]] extends BifunctorParent[F] { self =>
   ////
 
   /** `map` over both type parameters. */

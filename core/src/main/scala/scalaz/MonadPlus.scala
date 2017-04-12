@@ -6,7 +6,7 @@ package scalaz
  * @see [[scalaz.PlusEmpty]]
  */
 ////
-trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
+trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] with MonadPlusParent[F] { self =>
   ////
 
   /** Remove `f`-failing `A`s in `fa`, by which we mean: in the

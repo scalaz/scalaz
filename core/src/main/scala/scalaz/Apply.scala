@@ -7,7 +7,7 @@ package scalaz
  * @see [[scalaz.Apply.ApplyLaw]]
  */
 ////
-trait Apply[F[_]] extends Functor[F] { self =>
+trait Apply[F[_]] extends Functor[F] with ApplyParent[F] { self =>
   ////
   /** Sequence `f`, then `fa`, combining their results by function
     * application.
