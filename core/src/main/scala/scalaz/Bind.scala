@@ -9,7 +9,7 @@ package scalaz
  * @see [[scalaz.Bind.BindLaw]]
  */
 ////
-trait Bind[F[_]] extends Apply[F] { self =>
+trait Bind[F[_]] extends Apply[F] with BindParent[F] { self =>
   ////
 
   /** Equivalent to `join(map(fa)(f))`. */
@@ -40,7 +40,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
   /**
    * Repeats a monadic action infinitely
    */
-  def forever[A, B](fa: F[A]): F[B] = bind(fa)(_ => forever(fa))
+  override def forever[A, B](fa: F[A]): F[B] = bind(fa)(_ => forever(fa))
 
   trait BindLaw extends ApplyLaw {
     /**

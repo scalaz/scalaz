@@ -8,7 +8,7 @@ import scalaz.Id.Id
  * [[scalaz.Apply]]s.  That is, `toList` cannot return an empty list.
  */
 ////
-trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
+trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] with Traverse1Parent[F] { self =>
   ////
 
   /**The product of Traverse1 `F` and `G`, `[x](F[x], G[x]])`, is a Traverse1 */

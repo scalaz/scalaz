@@ -6,7 +6,7 @@ package scalaz
  * That is, `toList` cannot return an empty list.
  */
 ////
-trait Foldable1[F[_]] extends Foldable[F] { self =>
+trait Foldable1[F[_]] extends Foldable[F] with Foldable1Parent[F] { self =>
   ////
 
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */

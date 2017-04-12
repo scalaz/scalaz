@@ -6,7 +6,7 @@ package scalaz
  * values of that type.
  */
 ////
-trait Foldable[F[_]]  { self =>
+trait Foldable[F[_]] extends FoldableParent[F] { self =>
   ////
   import collection.generic.CanBuildFrom
   import collection.immutable.IndexedSeq

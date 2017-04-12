@@ -9,7 +9,7 @@ package scalaz
  * functions.
  */
 ////
-trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:] { self =>
+trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:] with ArrowParent[=>:] { self =>
   ////
 
   /** Lift an ordinary function. */
