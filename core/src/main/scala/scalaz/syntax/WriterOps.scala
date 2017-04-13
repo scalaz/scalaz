@@ -8,5 +8,5 @@ final class WriterOps[A](self: A) {
 }
 
 trait ToWriterOps {
-  implicit def ToWriterOps[A](a: A) = new WriterOps(a)
+  implicit def ToWriterOps[A](a: A): WriterOps[A] = new WriterOps(a)
 }

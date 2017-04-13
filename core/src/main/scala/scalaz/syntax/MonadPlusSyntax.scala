@@ -6,10 +6,10 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
   ////
   import Leibniz.===
 
-  def filter(f: A => Boolean) =
+  def filter(f: A => Boolean): F[A] =
     F.filter(self)(f)
 
-  def withFilter(f: A => Boolean) =
+  def withFilter(f: A => Boolean): F[A] =
     filter(f)
 
   final def uniteU[T](implicit T: Unapply[Foldable, A]): F[T.A] =

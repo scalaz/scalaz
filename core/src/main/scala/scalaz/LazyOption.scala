@@ -16,10 +16,10 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def ?[X](some: => X, none: => X): X =
     fold(_ => some, none)
 
-  def isDefined =
+  def isDefined: Boolean =
     fold(_ => true, false)
 
-  def isEmpty =
+  def isEmpty: Boolean =
     !isDefined
 
   def getOrElse[AA >: A](default: => AA): AA =

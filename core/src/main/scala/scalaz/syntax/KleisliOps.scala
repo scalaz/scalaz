@@ -25,6 +25,6 @@ sealed trait ToKleisliOps0 {
 }
 
 trait ToKleisliOps extends ToKleisliOps0 {
-  implicit def ToKleisliIdOps[A](a: A) = new KleisliIdOps(a)
-  implicit def ToKleisliFAOps[F[_], A](fa: F[A]) = new KleisliFAOps(fa)
+  implicit def ToKleisliIdOps[A](a: A): KleisliIdOps[A] = new KleisliIdOps(a)
+  implicit def ToKleisliFAOps[F[_], A](fa: F[A]): KleisliFAOps[F, A] = new KleisliFAOps(fa)
 }

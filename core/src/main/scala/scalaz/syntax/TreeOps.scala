@@ -8,5 +8,5 @@ final class TreeOps[A](self: A) {
 }
 
 trait ToTreeOps {
-  implicit def ToTreeOps[A](a: A) = new TreeOps(a)
+  implicit def ToTreeOps[A](a: A): TreeOps[A] = new TreeOps(a)
 }

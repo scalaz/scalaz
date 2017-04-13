@@ -602,7 +602,7 @@ abstract class PLensInstances {
       lens %= (num.times(_, that))
   }
 
-  implicit def numericPLens[S, N: Numeric](lens: S @?> N) =
+  implicit def numericPLens[S, N: Numeric](lens: S @?> N): NumericPLens[S, N] =
     NumericPLens[S, N](lens, implicitly[Numeric[N]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -611,7 +611,7 @@ abstract class PLensInstances {
       lens %= (frac.div(_, that))
   }
 
-  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F) =
+  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F): FractionalPLens[S, F] =
     FractionalPLens[S, F](lens, implicitly[Fractional[F]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -620,7 +620,7 @@ abstract class PLensInstances {
       lens %= (ig.quot(_, that))
   }
 
-  implicit def integralPLens[S, I: Integral](lens: S @?> I) =
+  implicit def integralPLens[S, I: Integral](lens: S @?> I): IntegralPLens[S, I] =
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 
 }

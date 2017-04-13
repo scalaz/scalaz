@@ -6,5 +6,5 @@ final class MaybeOps[A](self: A) {
 }
 
 trait ToMaybeOps {
-  implicit def ToMaybeOps[A](a: A) = new MaybeOps(a)
+  implicit def ToMaybeOps[A](a: A): MaybeOps[A] = new MaybeOps(a)
 }

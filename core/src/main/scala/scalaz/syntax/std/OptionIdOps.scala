@@ -6,5 +6,5 @@ final class OptionIdOps[A](self: A) {
 }
 
 trait ToOptionIdOps {
-  implicit def ToOptionIdOps[A](a: A) = new OptionIdOps(a)
+  implicit def ToOptionIdOps[A](a: A): OptionIdOps[A] = new OptionIdOps(a)
 }

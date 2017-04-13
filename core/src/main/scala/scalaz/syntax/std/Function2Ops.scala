@@ -15,5 +15,5 @@ final class Function2Ops[T1, T2, R](self: (T1, T2) => R) {
 }
 
 trait ToFunction2Ops {
-  implicit def ToFunction2Ops[T1, T2, R](f: (T1, T2) => R) = new Function2Ops(f)
+  implicit def ToFunction2Ops[T1, T2, R](f: (T1, T2) => R): Function2Ops[T1, T2, R] = new Function2Ops(f)
 }
