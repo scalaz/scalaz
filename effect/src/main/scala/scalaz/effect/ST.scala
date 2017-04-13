@@ -94,7 +94,7 @@ sealed abstract class STArray[S, A] {
   }
 
   /**Combine the given value with the value at the given index, using the given function. */
-  def update[B](f: (A, B) => A, i: Int, v: B) = for {
+  def update[B](f: (A, B) => A, i: Int, v: B): ST[S, Unit] = for {
     x <- read(i)
     _ <- write(i, f(x, v))
   } yield ()

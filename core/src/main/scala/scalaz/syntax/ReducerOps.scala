@@ -13,5 +13,5 @@ final class ReducerOps[A](val self: A) extends AnyVal {
 }
 
 trait ToReducerOps {
-  implicit def ToReducerOps[A](a: A) = new ReducerOps(a)
+  implicit def ToReducerOps[A](a: A): ReducerOps[A] = new ReducerOps(a)
 }

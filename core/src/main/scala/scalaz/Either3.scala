@@ -22,9 +22,9 @@ sealed abstract class Either3[+A, +B, +C] extends Product with Serializable {
     case Right3(c)  => \/-(\/-(c))
   }
 
-  def leftOr[Z](z: => Z)(f: A => Z)   = fold(f, _ => z, _ => z)
-  def middleOr[Z](z: => Z)(f: B => Z) = fold(_ => z, f, _ => z)
-  def rightOr[Z](z: => Z)(f: C => Z)  = fold(_ => z, _ => z, f)
+  def leftOr[Z](z: => Z)(f: A => Z): Z = fold(f, _ => z, _ => z)
+  def middleOr[Z](z: => Z)(f: B => Z): Z = fold(_ => z, f, _ => z)
+  def rightOr[Z](z: => Z)(f: C => Z): Z = fold(_ => z, _ => z, f)
 }
 
 final case class Left3[+A, +B, +C](a: A) extends Either3[A, B, C]

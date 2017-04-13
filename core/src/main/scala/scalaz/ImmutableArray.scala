@@ -153,7 +153,7 @@ object ImmutableArray extends ImmutableArrayInstances {
     // override def stringPrefix = "ImmutableArray"
     // override protected[this] def newBuilder = ImmutableArray.newBuilder[A](elemTag)
 
-    def componentType = arr.getClass().getComponentType
+    def componentType: Class[_] = arr.getClass().getComponentType
 
     def apply(idx: Int) = arr(idx)
 
@@ -324,7 +324,7 @@ object ImmutableArray extends ImmutableArrayInstances {
   }
 
   sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends Ops[ImmutableArray[Char]] {
-    def asString = self match {
+    def asString: String = self match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString
       case _ => sys.error("Unknown subtype of ImmutableArray[Char]")

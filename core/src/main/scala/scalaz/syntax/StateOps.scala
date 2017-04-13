@@ -7,5 +7,5 @@ final class StateOps[A](val self: A) extends AnyVal {
 }
 
 trait ToStateOps {
-  implicit def ToStateOps[A](a: A) = new StateOps(a)
+  implicit def ToStateOps[A](a: A): StateOps[A] = new StateOps(a)
 }

@@ -155,7 +155,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
-    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
+    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]): Boolean = {
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 

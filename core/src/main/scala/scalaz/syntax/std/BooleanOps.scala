@@ -31,7 +31,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def ∧(q: => Boolean) = b.conjunction(self, q)
+  final def ∧(q: => Boolean): Boolean = b.conjunction(self, q)
 
   /**
    * Conjunction. (AND)
@@ -44,7 +44,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def /\(q: => Boolean) =
+  final def /\(q: => Boolean): Boolean =
     ∧(q)
 
   /**
@@ -84,7 +84,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def !||(q: => Boolean) = b.nor(self, q)
+  final def !||(q: => Boolean): Boolean = b.nor(self, q)
 
 
   /**
@@ -98,7 +98,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def !&&(q: => Boolean) = b.nand(self, q)
+  final def !&&(q: => Boolean): Boolean = b.nand(self, q)
 
   /**
    * Conditional.
@@ -111,7 +111,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def -->(q: => Boolean) = b.conditional(self, q)
+  final def -->(q: => Boolean): Boolean = b.conditional(self, q)
 
   /**
    * Inverse Conditional.
@@ -124,7 +124,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def <--(q: => Boolean) = b.inverseConditional(self, q)
+  final def <--(q: => Boolean): Boolean = b.inverseConditional(self, q)
 
   /**
    * Bi-Conditional.
@@ -137,7 +137,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def <-->(q: => Boolean) = b.conditional(self, q) && b.inverseConditional(self, q)
+  final def <-->(q: => Boolean): Boolean = b.conditional(self, q) && b.inverseConditional(self, q)
 
   /**
    * Inverse Conditional.
@@ -150,7 +150,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  1
    * }}}
    */
-  final def ⇐(q: => Boolean) = b.inverseConditional(self, q)
+  final def ⇐(q: => Boolean): Boolean = b.inverseConditional(self, q)
 
   /**
    * Negation of Conditional.
@@ -163,7 +163,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def ⇏(q: => Boolean) = b.negConditional(self, q)
+  final def ⇏(q: => Boolean): Boolean = b.negConditional(self, q)
 
   /**
    * Negation of Conditional.
@@ -176,7 +176,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def -/>(q: => Boolean) = b.negConditional(self, q)
+  final def -/>(q: => Boolean): Boolean = b.negConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
@@ -189,7 +189,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def ⇍(q: => Boolean) = b.negInverseConditional(self, q)
+  final def ⇍(q: => Boolean): Boolean = b.negInverseConditional(self, q)
 
   /**
    * Negation of Inverse Conditional.
@@ -202,17 +202,17 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
    * 1 1  0
    * }}}
    */
-  final def <\-(q: => Boolean) = b.negInverseConditional(self, q)
+  final def <\-(q: => Boolean): Boolean = b.negInverseConditional(self, q)
 
   /**
    * Executes the given side-effect if this boolean value is `false`.
    */
-  final def unless(f: => Unit) = b.unless(self)(f)
+  final def unless(f: => Unit): Unit = b.unless(self)(f)
 
   /**
    * Executes the given side-effect if this boolean value is `true`.
    */
-  final def when(f: => Unit) = b.when(self)(f)
+  final def when(f: => Unit): Unit = b.when(self)(f)
 
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
@@ -261,7 +261,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
 final class BooleanOps2(self: Boolean) {
 
   final class Conditional[X] private[BooleanOps2] (t: => X) {
-    def |(f: => X) = if (self) t else f
+    def |(f: => X): X = if (self) t else f
   }
 
   /**

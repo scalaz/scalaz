@@ -8,5 +8,5 @@ final class WriterOps[A](val self: A) extends AnyVal {
 }
 
 trait ToWriterOps {
-  implicit def ToWriterOps[A](a: A) = new WriterOps(a)
+  implicit def ToWriterOps[A](a: A): WriterOps[A] = new WriterOps(a)
 }

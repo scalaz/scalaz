@@ -339,7 +339,7 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def conjunction(p: Boolean, q: => Boolean) = p && q
+  final def conjunction(p: Boolean, q: => Boolean): Boolean = p && q
 
   /**
    * Disjunction. (OR)
@@ -352,7 +352,7 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def disjunction(p: Boolean, q: => Boolean) = p || q
+  final def disjunction(p: Boolean, q: => Boolean): Boolean = p || q
 
   /**
    * Negation of Disjunction. (NOR)
@@ -365,7 +365,7 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def nor(p: Boolean, q: => Boolean) = !(p || q)
+  final def nor(p: Boolean, q: => Boolean): Boolean = !(p || q)
 
   /**
    * Negation of Conjunction. (NAND)
@@ -378,7 +378,7 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def nand(p: Boolean, q: => Boolean) = !(p && q)
+  final def nand(p: Boolean, q: => Boolean): Boolean = !(p && q)
 
   /**
    * Conditional.
@@ -391,7 +391,7 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def conditional(p: Boolean, q: => Boolean) = !p || q
+  final def conditional(p: Boolean, q: => Boolean): Boolean = !p || q
 
   /**
    * Inverse Conditional.
@@ -404,7 +404,7 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def inverseConditional(p: Boolean, q: => Boolean) = p || !q
+  final def inverseConditional(p: Boolean, q: => Boolean): Boolean = p || !q
 
   /**
    * Negational of Conditional.
@@ -417,7 +417,7 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def negConditional(p: Boolean, q: => Boolean) = p && !q
+  final def negConditional(p: Boolean, q: => Boolean): Boolean = p && !q
 
   /**
    * Negation of Inverse Conditional.
@@ -430,18 +430,18 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def negInverseConditional(p: Boolean, q: => Boolean) = !p && q
+  final def negInverseConditional(p: Boolean, q: => Boolean): Boolean = !p && q
 
 
   /**
    * Executes the given side-effect if `cond` is `false`
    */
-  final def unless(cond: Boolean)(f: => Unit) = if (!cond) f
+  final def unless(cond: Boolean)(f: => Unit): Unit = if (!cond) f
 
   /**
    * Executes the given side-effect if `cond` is `true`
    */
-  final def when(cond: Boolean)(f: => Unit) = if (cond) f
+  final def when(cond: Boolean)(f: => Unit): Unit = if (cond) f
 
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.

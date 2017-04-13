@@ -73,8 +73,8 @@ trait Monoid[F] extends Semigroup[F] { self =>
    *  - '''right identity''' : `forall a. append(a, zero) == a`
    */
   trait MonoidLaw extends SemigroupLaw {
-    def leftIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(zero, a))
-    def rightIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero))
+    def leftIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(zero, a))
+    def rightIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(a, zero))
   }
   def monoidLaw = new MonoidLaw {}
 
