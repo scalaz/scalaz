@@ -493,7 +493,7 @@ object IList extends IListInstances {
     Foldable[F].foldRight(as, empty[A])(ICons(_, _))
 
   def fromOption[A](a: Option[A]): IList[A] =
-    cata(a)(single(_), IList.empty[A])
+    cata(a)(single, IList.empty[A])
 
   def fill[A](n: Int)(a: A): IList[A] = {
     @tailrec def go(i: Int, list: IList[A]): IList[A] = {

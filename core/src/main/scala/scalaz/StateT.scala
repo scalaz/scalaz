@@ -49,7 +49,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
 
   import BijectionT._
   def bmap[X, S >: S2 <: S1](b: Bijection[S, X]): StateT[F, X, A] =
-    xmap(b to _)(b from _)
+    xmap(b to)(b from)
 
   def contramap[X](g: X => S1): IndexedStateT[F, X, S2, A] =
     mapsf(_ compose g)
