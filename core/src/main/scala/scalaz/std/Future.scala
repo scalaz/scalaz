@@ -19,7 +19,7 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
   def cobind[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
-  override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
+  override def cojoin[A](a: Future[A]): Future[Future[A]] = Future.successful(a)
 
   def chooseAny[A](head: Future[A], tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
     val fs = (head +: tail).iterator.zipWithIndex.toIndexedSeq
