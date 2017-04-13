@@ -160,7 +160,7 @@ sealed abstract class ReducerInstances {
     }
 
   def foldReduce[F[_], A, B](a: F[A])(implicit f: Foldable[F], r: Reducer[A, B]): B =
-    f.foldMap(a)(r.unit(_))(r.monoid)
+    f.foldMap(a)(r.unit)(r.monoid)
 
   /** Alias for [[scalaz.UnitReducer]]`.apply`. */
   def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =

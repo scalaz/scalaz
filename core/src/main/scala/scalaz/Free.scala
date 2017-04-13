@@ -530,8 +530,8 @@ private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFo
 
   override final def traverseImpl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Applicative[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }
 
@@ -540,7 +540,7 @@ private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[Free[F, ?]] 
 
   override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }
