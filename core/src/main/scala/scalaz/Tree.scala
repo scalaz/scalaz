@@ -140,7 +140,7 @@ sealed abstract class TreeInstances {
           case \&/.That(stb) ⇒ stb map {b ⇒ f(\&/.That(b))}
           case \&/.Both(sta, stb) ⇒ align(sta, stb)
         })(ta.subForest, tb.subForest))
-      align _
+      align
     }
     def zip[A, B](aa: => Tree[A], bb: => Tree[B]) = {
       val a = aa

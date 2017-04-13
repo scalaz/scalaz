@@ -11,19 +11,19 @@ trait Cozip[F[_]]  { self =>
 
   // derived functions
   def cozip3[A, B, C](x: F[A \/ (B \/ C)]): (F[A] \/ (F[B] \/ F[C])) =
-    cozip(x).map(cozip(_))
+    cozip(x).map(cozip)
 
   def cozip4[A, B, C, D](x: F[A \/ (B \/ (C \/ D))]): (F[A] \/ (F[B] \/ (F[C] \/ F[D]))) =
-    cozip(x).map(cozip(_) map (cozip(_)))
+    cozip(x).map(cozip(_) map cozip)
 
   def cozip5[A, B, C, D, E](x: F[(A \/ (B \/ (C \/ (D \/ E))))]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ F[E])))) =
-    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_))))
+    cozip(x).map(cozip(_) map (cozip(_) map cozip))
 
   def cozip6[A, B, C, D, E, G](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ G)))))]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ F[G]))))) =
-    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_)))))
+    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map cozip)))
 
   def cozip7[A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) =
-    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map(cozip(_))))))
+    cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map cozip))))
 
   ////
   val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
