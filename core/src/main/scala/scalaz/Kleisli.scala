@@ -85,7 +85,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def endo(implicit M: Functor[M], ev: A >~> B): Endomorphic[Kleisli[M, ?, ?], A] =
     Endomorphic[Kleisli[M, ?, ?], A](map(ev.apply))
 
-  def liftF(implicit F: Functor[Kleisli[M, A, ?]]) =
+  def liftF(implicit F: Functor[Kleisli[M, A, ?]]): Free[Kleisli[M, A, ?], B] =
     Free.liftF[Kleisli[M, A, ?], B](self)
 
   def tap(implicit F: Applicative[M]): Kleisli[M, A, A] =

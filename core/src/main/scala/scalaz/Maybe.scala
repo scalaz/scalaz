@@ -75,7 +75,7 @@ sealed abstract class Maybe[A] {
   final def map[B](f: A => B): Maybe[B] =
     cata(f andThen just[B], empty[B])
 
-  final def flatMap[B](f: A => Maybe[B]) =
+  final def flatMap[B](f: A => Maybe[B]): Maybe[B] =
     cata(f, empty[B])
 
   /** Convert to a standard library `Option` */

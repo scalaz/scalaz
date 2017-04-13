@@ -65,7 +65,7 @@ sealed abstract class EphemeralStream[A] {
   def map[B](f: A => B): EphemeralStream[B] =
     flatMap(x => EphemeralStream(f(x)))
 
-  def length = {
+  def length: Int = {
     def addOne(c: => Int)(a: => A) = 1 + c
     foldLeft(0)(addOne _)
   }

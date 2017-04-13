@@ -127,7 +127,7 @@ sealed abstract class IO[A] {
     controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
 
   /** An automatic resource management. */
-  def using[C](f: A => IO[C])(implicit resource: Resource[A]) =
+  def using[C](f: A => IO[C])(implicit resource: Resource[A]): IO[C] =
     bracket(resource.close)(f)
 }
 

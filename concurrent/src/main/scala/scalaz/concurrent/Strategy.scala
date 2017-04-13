@@ -22,7 +22,7 @@ trait Strategys extends StrategysLow {
   /**
    * Default thread factory to mark all threads as daemon
    */
-  val DefaultDaemonThreadFactory = new ThreadFactory {
+  val DefaultDaemonThreadFactory: ThreadFactory = new ThreadFactory {
     val defaultThreadFactory = Executors.defaultThreadFactory()
     def newThread(r: Runnable) = {
       val t = defaultThreadFactory.newThread(r)
