@@ -176,7 +176,8 @@ sealed abstract class FreeTInstances7 {
         type T[X] = FreeT[S, F, X]
         def rawAp(ta: T[A], tf: T[A => B]): T[B] = {
           val tail: F[T[B]] @@ Parallel =
-            parallelApplicativeF.apply2(Parallel(ta.resume), Parallel(tf.resume)) { (stepA, stepF) =>
+            parallelApplicativeF.apply2(Parallel[F[A \/ S[T[A]]]](ta.resume),
+                                        Parallel[F[(A => B) \/ S[T[A => B]]]](tf.resume)) { (stepA, stepF) =>
               stepA match {
                 case -\/(a) =>
                   stepF match {
