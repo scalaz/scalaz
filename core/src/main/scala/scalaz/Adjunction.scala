@@ -4,7 +4,7 @@ package scalaz
  * An adjunction formed by two functors `F` and `G` such that `F` is left-adjoint to `G`.
  * The composite functor GF is a monad and the composite functor FG is a comonad.
  *
- * The minimal defition is either (unit, counit) or (leftAdjunct, rightAdjunct)
+ * The minimal definition is either (unit, counit) or (leftAdjunct, rightAdjunct)
  */
 abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor[G]) { self =>
 
