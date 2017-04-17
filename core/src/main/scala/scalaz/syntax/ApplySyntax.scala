@@ -35,7 +35,7 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
     val b: F[B] = fb
   }
   /** Alias for `|@|` */
-  final def ⊛[B](fb: F[B]) = |@|(fb)
+  final def ⊛[B](fb: F[B]): ApplicativeBuilder[F, A, B] = |@|(fb)
 
   /**
    * Repeats this applicative action infinitely.

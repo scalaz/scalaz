@@ -10,5 +10,5 @@ final class EitherOps[A](val self: A) extends AnyVal {
 }
 
 trait ToEitherOps {
-  implicit def ToEitherOps[A](a: A) = new EitherOps(a)
+  implicit def ToEitherOps[A](a: A): EitherOps[A] = new EitherOps(a)
 }

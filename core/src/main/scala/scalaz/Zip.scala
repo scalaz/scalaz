@@ -35,7 +35,7 @@ trait Zip[F[_]]  { self =>
     zip(a, f(a))
 
   def apzipPL[A, B](f: => F[A] @?> F[B], a: => F[A])(implicit M: Monoid[F[B]]): F[(A, B)] =
-    apzip(f.getOrZ(_), a)
+    apzip(f.getOrZ, a)
 
   def ap(implicit F: Functor[F]): Apply[F] =
     new Apply[F] {
@@ -56,7 +56,7 @@ trait Zip[F[_]]  { self =>
       FA.equal(F.map(fab)(_._1), fa) && FA.equal(F.map(fab)(_._2), fa)
     }
 
-    def zipSymmetric[A, B](fa: F[A], fb: F[B])(implicit FA: Equal[F[A]], F: Functor[F]) =
+    def zipSymmetric[A, B](fa: F[A], fb: F[B])(implicit FA: Equal[F[A]], F: Functor[F]): Boolean =
       FA.equal(F.map(zip(fa, fb))(_._1), F.map(zip(fb, fa))(_._2))
   }
   def zipLaw = new ZipLaw {}

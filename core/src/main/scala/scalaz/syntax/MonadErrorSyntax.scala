@@ -16,7 +16,7 @@ trait ToMonadErrorOps extends ToMonadOps {
 
   ////
 
-  implicit def ToMonadErrorIdOps[E](v: E) =
+  implicit def ToMonadErrorIdOps[E](v: E): MonadErrorIdOps[E] =
     new MonadErrorIdOps[E](v)
 
   ////

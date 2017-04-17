@@ -13,7 +13,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     * expression `filter(filter(fa)(f))(g)`, `g` will never be invoked
     * for any `a` where `f(a)` returns false.
     */
-  def filter[A](fa: F[A])(f: A => Boolean) =
+  def filter[A](fa: F[A])(f: A => Boolean): F[A] =
     bind(fa)(a => if (f(a)) point(a) else empty[A])
 
   /** Generalized version of Haskell's `catMaybes` */

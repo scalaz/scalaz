@@ -30,11 +30,11 @@ trait NaturalTransformations {
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id =
+  def id: Id ~> Id =
     λ[Id ~> Id](a => a)
 
   /** A universally quantified identity function */
-  def refl[F[_]] =
+  def refl[F[_]]: F ~> F =
     λ[F ~> F](fa => fa)
 
   /** Reify a `NaturalTransformation`. */

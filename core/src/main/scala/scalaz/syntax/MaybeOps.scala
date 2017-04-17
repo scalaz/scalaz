@@ -6,5 +6,5 @@ final class MaybeOps[A](val self: A) extends AnyVal {
 }
 
 trait ToMaybeOps {
-  implicit def ToMaybeOps[A](a: A) = new MaybeOps(a)
+  implicit def ToMaybeOps[A](a: A): MaybeOps[A] = new MaybeOps(a)
 }

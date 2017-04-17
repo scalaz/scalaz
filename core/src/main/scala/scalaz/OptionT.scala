@@ -156,7 +156,7 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
 }
 
 object OptionT extends OptionTInstances {
-  def optionT[M[_]] =
+  def optionT[M[_]]: λ[α => M[Option[α]]] ~> OptionT[M, ?] =
     λ[λ[α => M[Option[α]]] ~> OptionT[M, ?]](
       new OptionT(_)
     )

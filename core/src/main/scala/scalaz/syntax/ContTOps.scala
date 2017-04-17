@@ -10,5 +10,5 @@ final class ContTOps[M[_], A](val self: M[A]) extends AnyVal {
 }
 
 trait ToContTOps {
-  implicit def ToContTOps[M[_], A](ma: M[A]) = new ContTOps(ma)
+  implicit def ToContTOps[M[_], A](ma: M[A]): ContTOps[M, A] = new ContTOps(ma)
 }

@@ -7,5 +7,5 @@ final class NelOps[A](val self: A) extends AnyVal {
 }
 
 trait ToNelOps {
-  implicit def ToNelOps[A](a: A) = new NelOps(a)
+  implicit def ToNelOps[A](a: A): NelOps[A] = new NelOps(a)
 }

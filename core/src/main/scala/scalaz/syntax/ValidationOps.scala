@@ -12,5 +12,5 @@ final class ValidationOps[A](val self: A) extends AnyVal {
 }
 
 trait ToValidationOps {
-  implicit def ToValidationOps[A](a: A) = new ValidationOps(a)
+  implicit def ToValidationOps[A](a: A): ValidationOps[A] = new ValidationOps(a)
 }
