@@ -4,9 +4,12 @@ package std
 import scala.concurrent.{Await, CanAwait, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
+import scalaFuture.newFutureInstance
+
 trait FutureInstances1 {
 
-  implicit def futureInstance(implicit ec: ExecutionContext): Cobind[Future] with MonadError[({type λ[α,β] = Future[β]})#λ, Throwable] with Catchable[Future] =
+  // for binary compatibility
+  def futureInstance(implicit ec: ExecutionContext): Monad[Future] with Cobind[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
@@ -25,7 +28,7 @@ trait FutureInstances extends FutureInstances1 {
     Monoid.liftMonoid[Future, A]
 }
 
-private class FutureInstance(implicit ec: ExecutionContext) extends Cobind[Future] with MonadError[({type λ[α,β] = Future[β]})#λ, Throwable] with Catchable[Future] {
+private[scalaz] class FutureInstance(implicit ec: ExecutionContext) extends Monad[Future] with Cobind[Future] with MonadError[({type λ[α,β] = Future[β]})#λ, Throwable] with Catchable[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
@@ -39,7 +42,7 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Cobind[Futur
   }
   
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
-    f.map(\/-(_)).recover { case e => -\/(e) }
+    f.map(\/.right).recover { case e => -\/(e) }
 
   def fail[A](e: Throwable): Future[A] =
     Future.failed(e)
@@ -48,7 +51,10 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Cobind[Futur
     fail(e)
 
   def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
-    fa.recoverWith(PartialFunction(f))
+    fa.recoverWith{ case e: Throwable => f(e) }
 }
 
-object scalaFuture extends FutureInstances
+object scalaFuture extends FutureInstances {
+  implicit def newFutureInstance(implicit ec: ExecutionContext): Cobind[Future] with MonadError[({type λ[α,β] = Future[β]})#λ, Throwable] with Catchable[Future] =
+    new FutureInstance
+}
