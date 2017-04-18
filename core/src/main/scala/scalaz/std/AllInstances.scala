@@ -1,4 +1,7 @@
-package scalaz.std
+package scalaz
+package std
+
+import scala.concurrent.Future
 
 trait AllInstances
   extends AnyValInstances with FunctionInstances with ListInstances with MapInstances
@@ -14,4 +17,7 @@ trait AllInstances
   with scalaz.std.java.util.concurrent.CallableInstances
   with NodeSeqInstances
 
-object AllInstances extends AllInstances
+object AllInstances extends AllInstances {
+  implicit def newFutureInstance(implicit ec: scala.concurrent.ExecutionContext): Cobind[Future] with MonadError[({type λ[α,β] = Future[β]})#λ, Throwable] with Catchable[Future] =
+    new FutureInstance
+}
