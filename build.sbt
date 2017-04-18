@@ -17,8 +17,8 @@ lazy val scalaz = Project(
     mimaPreviousArtifacts := Set.empty,
     // <https://github.com/scalaz/scalaz/issues/261>
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
-    artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
-    packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
+    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile)).value
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
 )
@@ -29,7 +29,7 @@ lazy val core = Project(
   settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
     name := "scalaz-core",
     typeClasses := TypeClass.core,
-    sourceGenerators in Compile <+= (sourceManaged in Compile) map {
+    sourceGenerators in Compile += (sourceManaged in Compile) map {
       dir => Seq(GenerateTupleW(dir))
     },
     scalaParserCombinatorsVersion := "1.0.5",
@@ -45,7 +45,7 @@ lazy val core = Project(
           Nil
       }
     },
-    sourceGenerators in Compile <+= buildInfo,
+    sourceGenerators in Compile += buildInfo,
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
     buildInfoPackage := "scalaz",
     osgiExport("scalaz"),
