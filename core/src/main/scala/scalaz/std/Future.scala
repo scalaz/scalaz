@@ -40,7 +40,7 @@ private[scalaz] class FutureInstance(implicit ec: ExecutionContext) extends Mona
     val fa0 = join(Future(fa))
     fa0 zip fab map { case (a, fa) => fa(a) }
   }
-  
+
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
     f.map(\/.right).recover { case e => -\/(e) }
 

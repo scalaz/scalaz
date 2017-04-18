@@ -41,7 +41,7 @@ class FutureTest extends SpecLite {
   // Scope these away from the rest as Comonad[Future] is a little evil.
   // Should fail to compile by default: implicitly[Comonad[Future]]
 
-  
+
   {
     implicit val cm: Comonad[Future] = futureComonad(duration)
     checkAll(comonad.laws[Future])
