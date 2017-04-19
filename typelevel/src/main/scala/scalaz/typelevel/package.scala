@@ -30,7 +30,7 @@ package object typelevel {
 
   type HNil = GenericNil[Id]
 
-  object HCons {
+  object HCons extends scala.Serializable {
 
     def apply[H, T <: HList](head: H, tail: T): HCons[H, T] = GenericCons[Id, H, T](head, tail)
 
