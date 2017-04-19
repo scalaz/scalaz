@@ -130,15 +130,15 @@ package object scalaz {
   type Writer[W, A] = WriterT[Id, W, A]
   type Unwriter[W, A] = UnwriterT[Id, W, A]
 
-  object Reader {
+  object Reader extends scala.Serializable {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
   }
 
-  object Writer {
+  object Writer extends scala.Serializable {
     def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
   }
 
-  object Unwriter {
+  object Unwriter extends scala.Serializable {
     def apply[U, A](u: U, a: A): UnwriterT[Id, U, A] = UnwriterT[Id, U, A]((u, a))
   }
 
@@ -162,14 +162,14 @@ package object scalaz {
   type Store[A, B] = StoreT[Id, A, B]
   // flipped
   type |-->[A, B] = Store[B, A]
-  object StoreT extends StoreTInstances with StoreTFunctions {
+  object StoreT extends StoreTInstances with StoreTFunctions with scala.Serializable {
     def apply[F[_], A, B](r: (F[A => B], A)): StoreT[F, A, B] =
       storeT(r)
   }
-  object IndexedStore {
+  object IndexedStore extends scala.Serializable {
     def apply[I, A, B](f: A => B, i: I): IndexedStore[I, A, B] = IndexedStoreT.indexedStore(i)(f)
   }
-  object Store {
+  object Store extends scala.Serializable {
     def apply[A, B](f: A => B, a: A): Store[A, B] = StoreT.store(a)(f)
   }
 
