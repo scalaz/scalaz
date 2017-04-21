@@ -289,7 +289,14 @@ object EitherT extends EitherTInstances {
 
 }
 
-sealed abstract class EitherTInstances4 {
+sealed abstract class EitherTInstances5 {
+  implicit def eitherTNondeterminism[F[_], E](implicit F0: Nondeterminism[F]): Nondeterminism[EitherT[F, E, ?]] =
+    new EitherTNondeterminism[F, E] {
+      implicit def F = F0
+    }
+}
+
+sealed abstract class EitherTInstances4 extends EitherTInstances5{
   implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
@@ -494,5 +501,15 @@ private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E]
     EitherT(F.bind(fa.run) {
       case -\/(e) => f(e).run
       case r => F.point(r)
+    })
+}
+
+private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[F, E, ?]] with EitherTMonad[F, E] {
+  implicit def F: Nondeterminism[F]
+
+  def chooseAny[A](head: EitherT[F, E, A], tail: Seq[EitherT[F, E, A]]): EitherT[F, E, (A, Seq[EitherT[F, E, A]])] =
+    EitherT(F.map(F.chooseAny(head.run, tail map (_.run))) {
+      case (a, residuals) =>
+        a.map((_, residuals.map(new EitherT(_))))
     })
 }
