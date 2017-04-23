@@ -13,13 +13,13 @@ trait EnumeratorT[E, F[_]] { self =>
   def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[B, F] =
     EnumerateeT.map[E, B, F](f) run self
 
-  def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
+  def #::(e: E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
     new EnumeratorT[E, F] {
       def apply[A] = _.mapCont(_(elInput(e))) &= self
     }
   }
 
-  def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]) =
+  def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]): EnumeratorT[B, F] =
     EnumerateeT.flatMap(f) run self
 
   def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[B, F] = {

@@ -7,7 +7,7 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
 
   import Leibniz.===
 
-  final def tmap[B](f: A => B) =
+  final def tmap[B](f: A => B): F[B] =
     F.map(self)(f)
 
   final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]): G[F[B]] =

@@ -9,7 +9,7 @@ trait BooleanLatch {
 }
 
 object BooleanLatch {
-  def apply() = new BooleanLatch {
+  def apply(): BooleanLatch = new BooleanLatch {
     val sync = new AbstractQueuedSynchronizer {
       val RELEASED = 0
       val UNAVAILABLE = -1

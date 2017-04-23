@@ -63,13 +63,13 @@ final case class Cord(self: FingerTree[Int, String]) {
    * Prepends a `String` to the beginning of this `Cord`.
    * Time complexity: O(1)
    */
-  def +:(x: => String): Cord = cord(x +: self)
+  def +:(x: String): Cord = cord(x +: self)
 
   /**
    * Prepends a `Char` to the beginning of this `Cord`.
    * Time complexity: O(1)
    */
-  def -:(x: => Char): Cord = cord(x.toString +: self)
+  def -:(x: Char): Cord = cord(x.toString +: self)
 
   /**
    * Appends a `Char` to the end of this `Cord`.

@@ -11,8 +11,14 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
   /** Combine `self` and `fb` according to `Apply[F]` and discard the `A`(s) */
   final def *>[B](fb: F[B]): F[B] = F.discardLeft(self,fb)
 
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `A`(s), except 'fb' is non-strictly evaluated. */
+  final def `*>ByName`[B](fb: => F[B]): F[B] = F.discardLeft(self,fb)
+
   /** Combine `self` and `fb` according to `Apply[F]` and discard the `B`(s) */
   final def <*[B](fb: F[B]): F[A] = F.discardRight(self,fb)
+
+  /** Combine `self` and `fb` according to `Apply[F]` and discard the `B`(s), except 'fb' is non-strictly evaluated. */
+  final def `<*ByName`[B](fb: => F[B]): F[A] = F.discardRight(self,fb)
 
   /**
    * DSL for constructing Applicative expressions.
@@ -29,7 +35,7 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
     val b: F[B] = fb
   }
   /** Alias for `|@|` */
-  final def ⊛[B](fb: F[B]) = |@|(fb)
+  final def ⊛[B](fb: F[B]): ApplicativeBuilder[F, A, B] = |@|(fb)
 
   /**
    * Repeats this applicative action infinitely.

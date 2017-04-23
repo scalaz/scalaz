@@ -13,16 +13,16 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
     indexedStoreT((F.map(set)(_ compose g), f(pos)))
 
   def bmap[X, Z >: I <: A](b: Bijection[Z, X])(implicit F: Functor[F]): StoreT[F, X, B] =
-    xmap(b to _)(b from _)
+    xmap(b to)(b from)
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     indexedStoreT((set, f(pos)))
 
-  def contramap[X](g: X => A)(implicit F: Functor[F]) =
+  def contramap[X](g: X => A)(implicit F: Functor[F]): IndexedStoreT[F, I, X, B] =
     indexedStoreT((F.map(set)(_ compose g), pos))
 
   def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
-    indexedStoreT((F.map(set)(g compose _), f(pos)))
+    indexedStoreT((F.map(set)(g compose), f(pos)))
 
   def leftMap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     imap(f)
@@ -34,7 +34,7 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
     put(f(pos))
 
   def putf[G[_]](a: G[A])(implicit F: Functor[F], G: Functor[G]): G[F[B]] =
-    G.map(a)(put(_))
+    G.map(a)(put)
 
   def putsf[G[_]](f: I => G[A])(implicit F: Functor[F], G: Functor[G]): G[F[B]] =
     putf(f(pos))

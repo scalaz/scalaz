@@ -26,25 +26,25 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   import PLensFamily._
 
   def kleisli: Kleisli[Option, A1, IndexedStore[B1, B2, A2]] =
-    Kleisli[Option, A1, IndexedStore[B1, B2, A2]](apply(_))
+    Kleisli[Option, A1, IndexedStore[B1, B2, A2]](apply)
 
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): PLensFamily[X1, X2, B1, B2] =
     plensFamily(x => apply(g(x)) map (_ map (f)))
 
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): PLensFamily[X, X, B1, B2] =
-    xmapA(b to _)(b from _)
+    xmapA(b to)(b from)
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): PLensFamily[A1, A2, X1, X2] =
     plensFamily(a => apply(a) map (_.xmap(f)(g)))
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): PLensFamily[A1, A2, X, X] =
-    xmapB(b to _)(b from _)
+    xmapB(b to)(b from)
 
   def get(a: A1): Option[B1] =
     run(a) map (_.pos)
 
   def getK: Kleisli[Option, A1, B1] =
-    Kleisli[Option, A1, B1](get(_))
+    Kleisli[Option, A1, B1](get)
 
   /** If the Partial Lens is null, then return the given default value. */
   def getOr(a: A1, b: => B1): B1 =
@@ -69,7 +69,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     run(a) map (c => c put _)
 
   def trySetK: Kleisli[Option, A1, B2 => A2] =
-    Kleisli[Option, A1, B2 => A2](trySet(_))
+    Kleisli[Option, A1, B2 => A2](trySet)
 
   def trySetOr(a: A1, d: => B2 => A2): B2 => A2 =
     trySet(a) getOrElse d
@@ -586,7 +586,7 @@ abstract class PLensInstances {
       lens %= (num.times(_, that))
   }
 
-  implicit def numericPLens[S, N: Numeric](lens: S @?> N) =
+  implicit def numericPLens[S, N: Numeric](lens: S @?> N): NumericPLens[S, N] =
     NumericPLens[S, N](lens, implicitly[Numeric[N]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -595,7 +595,7 @@ abstract class PLensInstances {
       lens %= (frac.div(_, that))
   }
 
-  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F) =
+  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F): FractionalPLens[S, F] =
     FractionalPLens[S, F](lens, implicitly[Fractional[F]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -604,7 +604,7 @@ abstract class PLensInstances {
       lens %= (ig.quot(_, that))
   }
 
-  implicit def integralPLens[S, I: Integral](lens: S @?> I) =
+  implicit def integralPLens[S, I: Integral](lens: S @?> I): IntegralPLens[S, I] =
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 
 }

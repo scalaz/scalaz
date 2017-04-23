@@ -7,7 +7,7 @@ cache:
 
 language: scala
 scala:
-  - 2.12.1
+  - 2.12.2
   - 2.11.8
   - 2.10.6
 jdk:
@@ -34,6 +34,17 @@ addons:
 
 matrix:
   include:
+  - scala: 2.13.0-M1
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJVM"
+    script:
+    # https://github.com/non/kind-projector/issues/50
+    - git clone https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - git checkout v0.9.3
+    - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
+    - cd ..
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
   - scala: 2.11.8
     jdk: oraclejdk8
     sudo: required
@@ -51,7 +62,7 @@ matrix:
   - dist: trusty
     group: edge
     sudo: required
-    scala: 2.12.1
+    scala: 2.12.2
     jdk: oraclejdk9
     script:
     # https://github.com/sbt/sbt/pull/2951
@@ -64,5 +75,4 @@ matrix:
     - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
     - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
     - cd ..
-    - echo "sbt.version=0.13.14-RC1" > project/build.properties
     - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes rootJVM/test rootJS/test

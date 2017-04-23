@@ -122,8 +122,8 @@ object build {
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
-    scalaVersion := "2.12.1",
-    crossScalaVersions := Seq("2.10.6", Scala211, "2.12.1"),
+    scalaVersion := "2.12.2",
+    crossScalaVersions := Seq("2.10.6", Scala211, "2.12.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.4",
@@ -274,7 +274,31 @@ object build {
     }
   )
 
+  // workaround for https://github.com/scala-native/scala-native/issues/562
+  private[this] def scalaNativeDiscoverOrDummy(binaryName: String, binaryVersions: Seq[(String, String)]): File = {
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L59
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L284-L289
+    try {
+      val clazz = scalanative.sbtplugin.ScalaNativePluginInternal.getClass
+      val instance = clazz.getField(scala.reflect.NameTransformer.MODULE_INSTANCE_NAME).get(null)
+      val method = clazz.getMethods.find(_.getName contains "discover").getOrElse(sys.error("could not found the discover method"))
+      method.invoke(instance, binaryName, binaryVersions).asInstanceOf[File]
+    } catch {
+      case e: Throwable =>
+        val e0 = e match {
+          case _: java.lang.reflect.InvocationTargetException if e.getCause != null =>
+            e.getCause
+          case _ =>
+            e
+        }
+        scala.Console.err.println(e0)
+        file("dummy")
+    }
+  }
+
   val nativeSettings = Seq(
+    nativeClang := scalaNativeDiscoverOrDummy("clang", Seq(("3", "8"), ("3", "7"))),
+    nativeClangPP := scalaNativeDiscoverOrDummy("clang++", Seq(("3", "8"), ("3", "7"))),
     scalacOptions --= Scala211_jvm_and_js_options,
     scalaVersion := Scala211,
     crossScalaVersions := Scala211 :: Nil

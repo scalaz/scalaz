@@ -6,11 +6,11 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
   ////
   import Liskov.<~<, Leibniz.===
 
-  def flatMap[B](f: A => F[B]) = F.bind(self)(f)
+  def flatMap[B](f: A => F[B]): F[B] = F.bind(self)(f)
 
-  def >>=[B](f: A => F[B]) = F.bind(self)(f)
+  def >>=[B](f: A => F[B]): F[B] = F.bind(self)(f)
 
-  def ∗[B](f: A => F[B]) = F.bind(self)(f)
+  def ∗[B](f: A => F[B]): F[B] = F.bind(self)(f)
 
   def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
 
@@ -25,7 +25,7 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
     F.ifM(value, ifTrue, ifFalse)
   }
 
-  def mproduct[B](f: A => F[B]) = F.mproduct(self)(f)
+  def mproduct[B](f: A => F[B]): F[(A, B)] = F.mproduct(self)(f)
 
   ////
 }

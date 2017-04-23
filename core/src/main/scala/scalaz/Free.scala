@@ -62,14 +62,22 @@ object Free extends FreeInstances {
     def f: A => Free[S, B] = f0
   }
 
-  /** A computation that can be stepped through, suspended, and paused */
+  /** A computation that can be stepped through, suspended, and paused
+    *
+    * @template
+    */
   type Trampoline[A] = Free[Function0, A]
 
-  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
+  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`.
+    *
+    * @template
+    */
   type Source[A, B] = Free[(A, ?), B]
 
   /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
     * Note the similarity to an [[scalaz.iteratee.Iteratee]].
+    *
+    * @template
     */
   type Sink[A, B] = Free[(=> A) => ?, B]
 
@@ -522,8 +530,8 @@ private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFo
 
   override final def traverseImpl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Applicative[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }
 
@@ -532,7 +540,7 @@ private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[Free[F, ?]] 
 
   override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }
