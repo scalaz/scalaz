@@ -148,11 +148,14 @@ object build {
     ),
 
     scalacheckVersion := {
-      val sv = scalaVersion.value
-      if (sv startsWith "2.12")
-        "1.11.6"
-      else
-        "1.11.4"
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          "1.12.6"
+        case Some((2, 12)) =>
+          "1.11.6"
+        case _ =>
+          "1.11.4"
+      }
     },
     autoAPIMappings := PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
       case Some((2, v)) if v < 10 => false
