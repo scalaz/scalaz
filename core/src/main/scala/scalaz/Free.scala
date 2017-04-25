@@ -109,14 +109,18 @@ sealed abstract class Free[S[_], A] {
     resume.fold(s, r)
 
   /** Evaluates a single layer of the free monad **/
-  @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) =
+  final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) =
+    resumeC.leftMap(_.run)
+
+  /** Evaluates a single layer of the free monad **/
+  @tailrec final def resumeC: (Coyoneda[S, Free[S,A]] \/ A) =
     this match {
       case Return(a) => \/-(a)
-      case Suspend(t) => -\/(S.map(t)(Return(_)))
+      case Suspend(t) => -\/(Coyoneda(t)(Return(_)))
       case b @ Gosub(_, _) => b.a match {
-        case Return(a) => b.f(a).resume
-        case Suspend(t) => -\/(S.map(t)(b.f))
-        case c @ Gosub(_, _) => c.a.flatMap(z => c.f(z).flatMap(b.f)).resume
+        case Return(a) => b.f(a).resumeC
+        case Suspend(t) => -\/(Coyoneda(t)(b.f))
+        case c @ Gosub(_, _) => c.a.flatMap(z => c.f(z).flatMap(b.f)).resumeC
       }
     }
 
@@ -143,11 +147,11 @@ sealed abstract class Free[S[_], A] {
     foldMap[Free[T,?]](f)(freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =
     Zap.monadComonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
-  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
@@ -453,13 +457,13 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
         f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 
-  implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
+  implicit def freeZip[S[_]](implicit Z: Zip[S]): Zip[Free[S, ?]] =
     new Zip[Free[S, ?]] {
       override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
-        (aa.resume, bb.resume) match {
-          case (-\/(a), -\/(b)) => roll(Z.zipWith(a, b)(zip(_, _)))
-          case (-\/(a), \/-(b)) => roll(F.map(a)(zip(_, point(b))))
-          case (\/-(a), -\/(b)) => roll(F.map(b)(zip(point(a), _)))
+        (aa.resumeC, bb.resumeC) match {
+          case (-\/(a), -\/(b)) => liftF(Z.zip(a.fi, b.fi)).flatMap(ab => zip(a.k(ab._1), b.k(ab._2)))
+          case (-\/(a), \/-(b)) => liftF(a.fi).flatMap(i => a.k(i).map((_, b)))
+          case (\/-(a), -\/(b)) => liftF(b.fi).flatMap(i => b.k(i).map((a, _)))
           case (\/-(a), \/-(b)) => point((a, b))
         }
     }
