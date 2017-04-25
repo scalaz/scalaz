@@ -36,12 +36,12 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-   (apply(IList.empty) >>= {
+   (apply(IList.empty) >>= ((_ : IList[A])() match {
       case INil() => return_(z)
       case ICons(x, xs) =>
         val r = f(x, fromIList(xs))
         return_(r)
-    }).run
+    })).run
 
   /** Get the first element of the list, if any. */
   def headOption: Option[A] = uncons(None, (x, _) => Some(x))

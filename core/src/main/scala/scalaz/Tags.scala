@@ -91,4 +91,9 @@ object Tags {
 
   val Parallel = Tag.of[Parallel]
 
+  /** Type tag to choose type classes instances with lazy semantic */
+  sealed trait Lazy
+
+  val Lazy = Tag.of[Lazy]
+
 }
