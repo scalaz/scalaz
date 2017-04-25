@@ -138,7 +138,7 @@ object build {
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
       case Some((2,11)) => Scala211_jvm_and_js_options
-      case _ => Nil
+      case _ => Seq("-opt:l:method")
     }),
 
     scalacOptions in (Compile, doc) ++= {
