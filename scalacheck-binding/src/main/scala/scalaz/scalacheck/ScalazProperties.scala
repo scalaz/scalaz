@@ -617,15 +617,34 @@ object ScalazProperties {
   }
 
   object monadTrans {
-    def identity[F[_[_], _], G[_], A](implicit F: MonadTrans[F], G: Monad[G], A: Arbitrary[A], Eq: Equal[F[G, A]]): Prop =
-      forAll(F.monadTransLaw.identity[G, A] _)
-    def composition[F[_[_], _], G[_], A, B](implicit F: MonadTrans[F], G: Monad[G], GA: Arbitrary[G[A]], AGB: Arbitrary[A => G[B]], Eq: Equal[F[G, B]]): Prop =
-      forAll(F.monadTransLaw.composition[G, A, B] _)
+    def pointPreserving[F[_[_], _], G[_], A](implicit F: MonadTrans[F], G: Monad[G], A: Arbitrary[A], Eq: Equal[F[G, A]]): Prop =
+      forAll(F.monadTransLaw.pointPreserving[G, A] _)
+    def bindPreserving[F[_[_], _], G[_], A, B](implicit F: MonadTrans[F], G: Monad[G], GA: Arbitrary[G[A]], AGB: Arbitrary[A => G[B]], Eq: Equal[F[G, B]]): Prop =
+      forAll(F.monadTransLaw.bindPreserving[G, A, B] _)
+    def injective[F[_[_], _], G[_], A](implicit F: MonadTrans[F], G: Monad[G], GA: Arbitrary[G[A]], EqG: Equal[G[A]], EqF: Equal[F[G, A]]): Prop =
+      forAll(F.monadTransLaw.injective[G, A] _)
 
-    def laws[F[_[_], _], G[_]](implicit F: MonadTrans[F], G: Monad[G], AGI: Arbitrary[G[Int]], Eq: Equal[F[G, Int]]): Properties =
+    def laws[F[_[_], _], G[_]](implicit F: MonadTrans[F], G: Monad[G], AGI: Arbitrary[G[Int]], EqG: Equal[G[Int]], EqF: Equal[F[G, Int]]): Properties =
       newProperties("monadTrans") { p =>
-        p.property("identity") = identity[F, G, Int]
-        p.property("composition") = composition[F, G, Int, Int]
+        p.property("pointPreserving") = pointPreserving[F, G, Int]
+        p.property("bindPreserving") = bindPreserving[F, G, Int, Int]
+        p.property("injective") = injective[F, G, Int]
+      }
+  }
+
+  object monadPartialOrder {
+    def pointPreserving[G[_], F[_], A](implicit GF: MonadPartialOrder[G, F], A: Arbitrary[A], Eq: Equal[G[A]]): Prop =
+      forAll(GF.monadPartialOrderLaw.pointPreserving[A] _)
+    def bindPreserving[G[_], F[_], A, B](implicit GF: MonadPartialOrder[G, F], FA: Arbitrary[F[A]], AGB: Arbitrary[A => F[B]], Eq: Equal[G[B]]): Prop =
+      forAll(GF.monadPartialOrderLaw.bindPreserving[A, B] _)
+    def injective[G[_], F[_], A](implicit GF: MonadPartialOrder[G, F], FA: Arbitrary[F[A]], EqF: Equal[F[A]], EqG: Equal[G[A]]): Prop =
+      forAll(GF.monadPartialOrderLaw.injective[A] _)
+
+    def laws[G[_], F[_]](implicit GF: MonadPartialOrder[G, F], AFI: Arbitrary[F[Int]], EqF: Equal[F[Int]], EqG: Equal[G[Int]]): Properties =
+      newProperties("monadPartialOrder") { p =>
+        p.property("pointPreserving") = pointPreserving[G, F, Int]
+        p.property("bindPreserving") = bindPreserving[G, F, Int, Int]
+        p.property("injective") = injective[G, F, Int]
       }
   }
 }
