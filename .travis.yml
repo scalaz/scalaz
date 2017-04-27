@@ -8,8 +8,7 @@ cache:
 language: scala
 scala:
   - 2.12.2
-  - 2.11.8
-  - 2.10.6
+  - 2.11.11
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -45,7 +44,7 @@ matrix:
     - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
     - cd ..
     - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
-  - scala: 2.11.8
+  - scala: 2.11.11
     jdk: oraclejdk8
     sudo: required
     before_install:
@@ -56,6 +55,17 @@ matrix:
     - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     - sudo apt-get -qq update
     - sudo apt-get install -y libgc-dev clang++-3.7 llvm-3.7 llvm-3.7-dev llvm-3.7-runtime llvm-3.7-tool libunwind7-dev
+    # Install re2
+    # https://github.com/scala-native/scala-native/commit/1d312519788534ff41477e4d7f758a6e7451be05#diff-354f30a63fb0907d4ad57269548329e3R28
+    - sudo apt-get install -y make
+    - export CXX=clang++-3.7
+    - git clone https://code.googlesource.com/re2
+    - pushd re2
+    - git checkout 2017-03-01
+    - make -j4 test
+    - sudo make install prefix=/usr
+    - make testinstall prefix=/usr
+    - popd
     script:
     - sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
 

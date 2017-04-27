@@ -15,11 +15,6 @@ object EndomorphicTest extends SpecLite {
   ): Equal[Endomorphic[G[F, ?, ?], A]] =
     Equal.equalBy(_.run)
 
-  implicit def endoArb[F[_], G[_[_], _, _], A](
-    implicit F: Arbitrary[G[F, A, A]]
-  ): Arbitrary[Endomorphic[G[F, ?, ?], A]] =
-    Functor[Arbitrary].map(F)(Endomorphic[G[F, ?, ?], A](_))
-
   checkAll(monoid.laws[Endomorphic[Kleisli[Option, ?, ?], Int]])
   checkAll(semigroup.laws[Endomorphic[Cokleisli[Option, ?, ?], Int]])
 
