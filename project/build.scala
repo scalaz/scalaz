@@ -118,7 +118,7 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  private def Scala211 = "2.11.8"
+  private def Scala211 = "2.11.11"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 

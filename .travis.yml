@@ -7,7 +7,7 @@ cache:
 
 language: scala
 scala:
-  - 2.11.8
+  - 2.11.11
   - 2.10.6
 jdk:
   - openjdk7
@@ -41,7 +41,7 @@ matrix:
     - scala: 2.12.2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
-    - scala: 2.11.8
+    - scala: 2.11.11
       jdk: oraclejdk8
       sudo: required
       before_install:
