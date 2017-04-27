@@ -79,6 +79,29 @@ sealed abstract class Future[+A] {
         onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
     }
 
+
+  /**
+    * Evaluate this `Future` to a [[Free.Trampoline]] result, or another asynchronous computation.
+    * This has the effect of stripping off any 'pure' trampolined computation at
+    * the start of this `Future`.
+    */
+  final def safeStep: Trampoline[_ <: Future[A]] = this match {
+    case Suspend(thunk) => Trampoline.suspend(thunk().safeStep)
+    case BindSuspend(thunk, f) => Trampoline.suspend((thunk() flatMap f).safeStep)
+    case _ => Trampoline.done(this)
+  }
+
+  /**
+    * Returns a [[Free.Trampoline]] that run this computation to obtain an `A`, then invoke the given callback.
+    */
+  def safePerformListen(cb: A => Trampoline[Unit]): Trampoline[Unit] =
+    this.safeStep.flatMap {
+      case Now(a) => Trampoline.suspend(cb(a))
+      case Async(onFinish) => Trampoline.delay(onFinish(cb))
+      case BindAsync(onFinish, g) =>
+        Trampoline.delay(onFinish(x => Trampoline.delay(g(x)) flatMap (_ safePerformListen cb)))
+    }
+  
   /**
    * Run this computation to obtain an `A`, so long as `cancel` remains false.
    * Because of trampolining, we get frequent opportunities to cancel
