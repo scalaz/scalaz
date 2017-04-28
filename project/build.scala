@@ -123,10 +123,6 @@ object build {
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
-    initialize := {
-      // https://github.com/scala-native/scala-native/blob/v0.2.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L112
-      // workaround for https://github.com/scala-native/scala-native/issues/673
-    },
     unmanagedSourceDirectories in Compile += {
       val base = ScalazCrossType.shared(baseDirectory.value, "main").getParentFile
       CrossVersion.partialVersion(scalaVersion.value) match {
