@@ -8,6 +8,7 @@ import scalaz.Tags.Parallel
 
 import scalaz._
 import scalaz.Free.Trampoline
+import scalaz.Isomorphism.<~>
 import scalaz.syntax.monad._
 
 import scala.concurrent.SyncVar
