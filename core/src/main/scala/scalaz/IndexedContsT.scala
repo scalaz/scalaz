@@ -106,7 +106,14 @@ trait IndexedContsTFunctions {
     }
 }
 
-sealed abstract class IndexedContsTInstances2 {
+sealed abstract class IndexedContsTInstances3 {
+  implicit def FreeContsTBindRec[W[_], S[_], R](implicit W0: Cobind[W]): BindRec[ContsT[W, Free[S, ?], R, ?]] =
+    new FreeContsTBindRec[W, S, R] {
+      val W = W0
+    }
+}
+
+sealed abstract class IndexedContsTInstances2 extends IndexedContsTInstances3 {
   implicit def IndexedContsTFunctorRight[W[_], M[_], R, O](implicit W0: Functor[W]): Functor[IndexedContsT[W, M, R, O, ?]] =
     new IndexedContsTFunctorRight[W, M, R, O] {
       implicit val W: Functor[W] = W0
@@ -192,6 +199,22 @@ private sealed trait ContsTBind[W[_], M[_], R] extends Bind[ContsT[W, M, R, ?]] 
   override def bind[A, B](fa: ContsT[W, M, R, A])(f: A => ContsT[W, M, R, B]) = fa.flatMap(f)
 
   override def join[A](ffa: ContsT[W, M, R, ContsT[W, M, R, A]]) = ffa.flatten
+}
+
+private sealed trait FreeContsTBindRec[W[_], S[_], R] extends BindRec[ContsT[W, Free[S, ?], R, ?]] with ContsTBind[W, Free[S, ?], R] {
+  override def tailrecM[A, B](a: A)(f: (A) => ContsT[W, Free[S, ?], R, A \/ B]): ContsT[W, Free[S, ?], R, B] = {
+    ContsT[W, Free[S, ?], R, B] { wcontinue: W[B => Free[S, R]] =>
+      def loop(a: A): Free[S, R] = {
+        f(a).run(W.map(wcontinue) { continue => {
+          case -\/(a) =>
+            Free.suspend(loop(a))
+          case \/-(b) =>
+            Free.suspend(continue(b))
+        }})
+      }
+      loop(a)
+    }
+  }
 }
 
 private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[ContsT[W, M, R, ?]] with ContsTBind[W, M, R] {
