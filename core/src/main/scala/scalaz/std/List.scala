@@ -174,7 +174,7 @@ trait ListFunctions {
 
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(List[A], List[A])] = as match {
-    case Nil    => F.point(Nil: List[A], Nil: List[A])
+    case Nil    => F.point((Nil: List[A], Nil: List[A]))
     case h :: t =>
       F.ap(partitionM(t)(p))(F.map(p(h))(b => {
           case (x, y) => if (b) (h :: x, y) else (x, h :: y)
@@ -184,11 +184,11 @@ trait ListFunctions {
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
-    case Nil    => Monad[M].point(Nil, Nil)
+    case Nil    => Monad[M].point((Nil, Nil))
     case h :: t =>
       Monad[M].bind(p(h))(b =>
         if (b) Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) => (h :: k._1, k._2))
-        else Monad[M].point(Nil, as))
+        else Monad[M].point((Nil, as)))
 
   }
 

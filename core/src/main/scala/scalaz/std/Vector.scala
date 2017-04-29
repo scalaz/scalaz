@@ -1,7 +1,6 @@
 package scalaz
 package std
 
-import Liskov.<~<
 import vector._
 import annotation.tailrec
 
@@ -125,7 +124,7 @@ trait VectorFunctions {
 
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_]](as: Vector[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(Vector[A], Vector[A])] =
-    lazyFoldRight(as, F.point(empty[A], empty[A]))((a, g) =>
+    lazyFoldRight(as, F.point((empty[A], empty[A])))((a, g) =>
       F.ap(g)(F.map(p(a))(b => {
         case (x, y) => if (b) (a +: x, y) else (x, a +: y)
       })))

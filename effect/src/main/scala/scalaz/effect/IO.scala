@@ -187,37 +187,32 @@ object IO extends IOInstances {
   }
 
   /** Writes a character to standard output. */
-  def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
+  def putChar(c: Char): IO[Unit] = io(rw => return_(rw ->
     print(c)
-    ()
-  }))
+  ))
 
   /** Writes a string to standard output. */
-  def putStr(s: String): IO[Unit] = io(rw => return_(rw -> {
+  def putStr(s: String): IO[Unit] = io(rw => return_(rw ->
     print(s)
-    ()
-  }))
+  ))
 
   /** Writes a string to standard output, followed by a newline.*/
-  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
+  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw ->
     println(s)
-    ()
-  }))
+  ))
 
   /** Reads a line of standard input. */
   def readLn: IO[String] = IO(scala.Console.in.readLine())
 
   def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
-    io(rw => return_(rw -> {
+    io(rw => return_(rw ->
       print(S shows a)
-      ()
-    }))
+    ))
 
   def putLn[A](a: A)(implicit S: Show[A]): IO[Unit] =
-    io(rw => return_(rw -> {
+    io(rw => return_(rw ->
       println(S shows a)
-      ()
-    }))
+    ))
 
   type RunInBase[M[_], Base[_]] =
   Forall[λ[α => M[α] => Base[M[α]]]]

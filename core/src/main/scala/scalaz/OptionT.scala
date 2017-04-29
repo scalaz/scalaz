@@ -279,7 +279,7 @@ private trait OptionTMonadListen[F[_], W] extends MonadListen[OptionT[F, ?], W] 
   def listen[A](ma: OptionT[F, A]): OptionT[F, (A, W)] = {
     val tmp = MT.bind[(Option[A], W), Option[(A, W)]](MT.listen(ma.run)) {
       case (None, _) => MT.point(None)
-      case (Some(a), w) => MT.point(Some(a, w))
+      case (Some(a), w) => MT.point(Some((a, w)))
     }
 
     OptionT.optionT[F].apply[(A, W)](tmp)

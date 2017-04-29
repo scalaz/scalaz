@@ -74,7 +74,7 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
 
   /** Two disjoint lenses can be paired */
   def product[J, C, D](that: IndexedStoreT[F, J, C, D])(implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] =
-    IndexedStoreT(M.bind(set) { s => M.map(that.set)(t => { (ac: (A, C)) => (s(ac._1), t(ac._2))})}, (pos, that.pos))
+    IndexedStoreT((M.bind(set) { s => M.map(that.set)(t => { (ac: (A, C)) => (s(ac._1), t(ac._2)) }) }, (pos, that.pos)))
 
   /** alias for `product` */
   def ***[J, C, D](that: IndexedStoreT[F, J, C, D])(implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] = product(that)

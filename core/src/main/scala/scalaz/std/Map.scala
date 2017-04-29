@@ -225,8 +225,8 @@ trait MapSubFunctions extends MapSub {
   /** Grab a value out of Map if it's present. Otherwise evaluate
     * a value to be placed at that key in the Map.
     */
-  final def getOrAdd[F[_],K,A](m: XMap[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F], K: BuildKeyConstraint[K]): F[(XMap[K, A], A)] =
-    (m get k).map(a => F.point(m, a)).getOrElse(F.map(fa)(a => (ab_+(m, k, a), a)))
+  final def getOrAdd[F[_],K: BuildKeyConstraint,A](m: XMap[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F]): F[(XMap[K, A], A)] =
+    (m get k).fold(F.map(fa)(a => (ab_+(m, k, a), a)))(a => F.point((m, a)))
 }
 
 trait MapInstances extends MapSubInstances with MapSubMap

@@ -233,9 +233,11 @@ object EitherT extends EitherTInstances {
       eitherT(F.point(a))
   }
 
-  def eitherTU[FAB, AB, A0, B0](fab: FAB)(
-    implicit u1: Unapply[Functor, FAB]{type A = AB}, u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0}, l: Leibniz.===[AB, A0 \/ B0])
-      : EitherT[u1.M, A0, B0] = eitherT(l.subst[u1.M](u1(fab)))
+  def eitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
+                                          u1: Unapply[Functor, FAB]{type A = AB},
+                                          @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+                                          l: Leibniz.===[AB, A0 \/ B0]
+  ): EitherT[u1.M, A0, B0] = eitherT(l.subst[u1.M](u1(fab)))
 
   def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): EitherTMonadTell[F, W, A] = new EitherTMonadTell[F, W, A]{
     def MT = MT0
@@ -279,7 +281,7 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
-  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
+  def fromTryCatchThrowable[F[_], A, B <: Throwable: NotNothing](a: => F[A])(implicit F: Applicative[F], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
       right(a)
     } catch {

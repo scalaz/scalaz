@@ -13,8 +13,8 @@ trait BigIntegerInstances {
 
     def succ(b: BigInteger) = b add BigInteger.ONE
     def pred(b: BigInteger) = b subtract BigInteger.ONE
-    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a)
-    override def predn(a: Int, b: BigInteger) = b subtract BigInteger.valueOf(a)
+    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a.toLong)
+    override def predn(a: Int, b: BigInteger) = b subtract BigInteger.valueOf(a.toLong)
     override def min = None
     override def max = None
 

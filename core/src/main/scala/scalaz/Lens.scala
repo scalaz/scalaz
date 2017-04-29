@@ -280,8 +280,8 @@ trait LensFamilyFunctions {
 
   def factorLensFamily[A1, A2, B1, B2, C1, C2]: LensFamily[((A1, B1) \/ (A1, C1)), ((A2, B2) \/ (A2, C2)), (A1, B1 \/ C1), (A2, B2 \/ C2)] =
     lensFamily(e => IndexedStore({
-      case (a, -\/(b)) => -\/(a, b)
-      case (a, \/-(c)) => \/-(a, c)
+      case (a, -\/(b)) => -\/((a, b))
+      case (a, \/-(c)) => \/-((a, c))
     }, e match {
       case -\/((a, b)) => (a, -\/(b))
       case \/-((a, c)) => (a, \/-(c))
@@ -293,8 +293,8 @@ trait LensFamilyFunctions {
         case -\/((aa, bb)) => (aa, -\/(bb))
         case \/-((aa, cc)) => (aa, \/-(cc))
       }, e match {
-        case -\/(b) => -\/(a, b)
-        case \/-(c) => \/-(a, c)
+        case -\/(b) => -\/((a, b))
+        case \/-(c) => \/-((a, c))
 
       })
     }
@@ -385,8 +385,8 @@ trait LensFunctions extends LensFamilyFunctions {
 
   def factorLens[A, B, C]: ((A, B) \/ (A, C)) @> (A, B \/ C) =
     lens(e => Store({
-      case (a, -\/(b)) => -\/(a, b)
-      case (a, \/-(c)) => \/-(a, c)
+      case (a, -\/(b)) => -\/((a, b))
+      case (a, \/-(c)) => \/-((a, c))
     }, e match {
       case -\/((a, b)) => (a, -\/(b))
       case \/-((a, c)) => (a, \/-(c))
@@ -398,8 +398,8 @@ trait LensFunctions extends LensFamilyFunctions {
         case -\/((aa, bb)) => (aa, -\/(bb))
         case \/-((aa, cc)) => (aa, \/-(cc))
       }, e match {
-        case -\/(b) => -\/(a, b)
-        case \/-(c) => \/-(a, c)
+        case -\/(b) => -\/((a, b))
+        case \/-(c) => \/-((a, c))
 
       })
     }

@@ -144,7 +144,7 @@ trait DievImplementation {
       }
     }
 
-    def +(value: A): Diev[A] = this + (value, value)
+    def +(value: A): Diev[A] = this + ((value, value))
 
     def -(interval: (A, A)): Diev[A] = {
       val orderedInterval = fixIntervalOrder(interval)
@@ -168,7 +168,7 @@ trait DievImplementation {
       }
     }
 
-    def -(value: A): Diev[A] = this - (value, value)
+    def -(value: A): Diev[A] = this - ((value, value))
 
     def ++(other: Diev[A]): Diev[A] = other.intervals.foldLeft(this: Diev[A])(_ + _)
 

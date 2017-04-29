@@ -574,7 +574,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 
-  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[IList[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
+  implicit def listTArb[F[_]: Applicative, A](implicit FA: Arbitrary[F[IList[A]]]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
 
   implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
 
