@@ -22,9 +22,12 @@ object Free extends FreeInstances {
   def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
     liftF(value).flatMap(x => x)
 
+
+  @inline private val pointUnitCache = Return(())
+
   /** Suspend a computation in a pure step of the applicative functor `S` */
   def suspend[S[_], A](value: => Free[S, A]): Free[S, A] =
-    point(()).flatMap(_ => value)
+    pointUnitCache.asInstanceOf[Return[S, Unit]].flatMap(_ => value)
 
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
