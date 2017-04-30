@@ -168,7 +168,7 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
     }
 
   implicit def FreeContsTMonad[W[_], S[_], R](implicit W0: Comonad[W]): Monad[ContsT[W, Free[S, ?], R, ?]] with BindRec[ContsT[W, Free[S, ?], R, ?]] =
-    new FreeContsTBindRec[W, S, R] with ContsTMonad[W, Free[S, ?], R] {
+    new ContsTMonad[W, Free[S, ?], R] with FreeContsTBindRec[W, S, R] {
       implicit val W: Comonad[W] = W0
     }
 }
@@ -224,7 +224,7 @@ private sealed trait FreeContsTFunctor[W[_], S[_], R] extends IndexedContsTFunct
   }
 }
 
-private sealed trait FreeContsTBindRec[W[_], S[_], R] extends BindRec[ContsT[W, Free[S, ?], R, ?]] with FreeContsTFunctor[W, S, R] with ContsTBind[W, Free[S, ?], R] {
+private sealed trait FreeContsTBindRec[W[_], S[_], R] extends BindRec[ContsT[W, Free[S, ?], R, ?]] with ContsTBind[W, Free[S, ?], R] with FreeContsTFunctor[W, S, R] {
   /** Equivalent to `join(map(fa)(f))`. */
   override def bind[A, B](fa: ContsT[W, Free[S, ?], R, A])(f: (A) => ContsT[W, Free[S, ?], R, B]): ContsT[W, Free[S, ?], R, B] = {
     ContsT[W, Free[S, ?], R, B] { wbme => Free.suspend {
