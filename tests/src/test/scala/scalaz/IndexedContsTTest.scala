@@ -36,8 +36,8 @@ object IndexedContsTTest extends SpecLite {
     cogenA.contramap(_.run)
   }
 
-  private[this] implicit def trampolineEqual[A](implicit equalA: Equal[A]): Equal[Trampoline[A]] = Equal.equal { (a, b) =>
-    equalA.equal(a.run, b.run)
+  private[this] implicit def trampolineEqual[A](implicit equalA: Equal[A]): Equal[Trampoline[A]] = {
+    equalA.contramap(_.run)
   }
 
   type ContTTrampolineBoolean[A] = ContT[Trampoline, Boolean, A]
