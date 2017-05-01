@@ -44,6 +44,26 @@ object IndexedContsTTest extends SpecLite {
 
   checkAll(monad.laws[ContTTrampolineBoolean])
 
+  "cont with trampoline" should {
+    "flatMap does not blow stack" in {
+      val N = 100000
+
+      type ContTTrampolineInt[A] = ContT[Trampoline, Int, A]
+
+      (0 until N)
+        .foldLeft(Monad[ContTTrampolineInt].point(())) { (a, _) =>
+          Monad[ContTTrampolineInt].bind(a)(_ => Monad[ContTTrampolineInt].point(()))
+        }
+        .run(_ => Trampoline.done(N)).run must_=== N // No stack overflow
+
+      def loop(i: Int): ContTTrampolineInt[Unit] =
+        if(i > 0) Monad[ContTTrampolineInt].bind(Monad[ContTTrampolineInt].point(()))(_ => loop(i-1))
+        else Monad[ContTTrampolineInt].point(())
+
+      loop(N).run(_ => Trampoline.done(N)).run must_=== N // No stack overflow
+    }
+  }
+
   object instances {
     def functorRight[W[_]: Functor, M[_], R, O] =
       Functor[IndexedContsT[W, M, R, O, ?]]
