@@ -76,7 +76,7 @@ The [examples module](https://github.com/scalaz/scalaz/tree/series/7.3.x/example
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
-Talk with us by joining [IRC: irc.freenode.net channel #scalaz](http://webchat.freenode.net/?channels=%23scalaz&uio=d4), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
+Talk with us by joining [IRC: irc.freenode.net channel #scalaz](irc://irc.freenode.net/#scalaz) (also available [via web bridge](http://webchat.freenode.net/?channels=%23scalaz&uio=d4)), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
 
 The [typelevel blog](http://typelevel.org/blog/) has some great posts such as [Towards Scalaz](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
 
