@@ -5,7 +5,7 @@ package std
 import scalaz.std.{stream => s}
 
 
-final class StreamOps[A](val self: Stream[A]) extends AnyVal {
+final class StreamOps[A](private val self: Stream[A]) extends AnyVal {
   final def interleave(other: Stream[A]): Stream[A] = s.interleave(self, other)
   final def toZipper: Option[Zipper[A]] = s.toZipper(self)
   final def zipperEnd: Option[Zipper[A]] = s.zipperEnd(self)
