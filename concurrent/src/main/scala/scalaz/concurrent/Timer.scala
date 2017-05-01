@@ -103,7 +103,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
     futureNondeterminism.choose(timeoutFuture, future).map(_.fold(_._1.left, _._2.right))
   }
 
-  def withTimeout[T](task: Task[T], timeout: Long, workaroundForDoubleDefinition: Unit = ()): Task[Timeout \/ T] = {
+  def withTimeout[T](task: Task[T], timeout: Long)(implicit workaroundForDoubleDefinition: DummyImplicit): Task[Timeout \/ T] = {
     val timeoutTask = new Task(valueWait(Timeout, timeout).map(_.right[Throwable]))
     taskNondeterminism.choose(timeoutTask, task).map(_.fold(_._1.left, _._2.right))
   }
