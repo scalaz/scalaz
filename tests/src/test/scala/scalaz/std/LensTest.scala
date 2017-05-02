@@ -11,7 +11,7 @@ import org.scalacheck.Prop.forAll
 object LensTest extends SpecLite {
 
   {
-    implicit def lensArb = Arbitrary(Gen.value(Lens.lensId[Int]))
+    implicit def lensArb = Arbitrary(Gen.const(Lens.lensId[Int]))
     implicit def lensEqual = new Equal[Lens[Int, Int]] {
       def equal(a1: Lens[Int, Int], a2: Lens[Int, Int]): Boolean = a1.get(0) == a2.get(0)
     }

@@ -14,7 +14,7 @@ object ProductTest extends SpecLite {
   // for testing purposes, natural equality is good enough
   implicit def HListEqual[L <: HList] = Equal.equalA[L]
 
-  implicit def HNilArbitrary = Arbitrary(Gen.value(HNil))
+  implicit def HNilArbitrary = Arbitrary(Gen.const(HNil))
 
   implicit def HConsArbitrary[H, T <: HList](implicit H: Arbitrary[H], T: Arbitrary[T]): Arbitrary[H :: T] =
     Applicative[Arbitrary].apply2(H, T)(_ :: _)

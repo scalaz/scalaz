@@ -119,8 +119,8 @@ abstract class SpecLite extends Properties("") {
    */
   implicit def Function1IntInt[A](implicit A: Arbitrary[Int]): Arbitrary[Int => Int] =
     Arbitrary(Gen.frequency[Int => Int](
-      (1, Gen.value((x: Int) => x)),
-      (1, Gen.value((x: Int) => x + 1)),
+      (1, Gen.const((x: Int) => x)),
+      (1, Gen.const((x: Int) => x + 1)),
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
 }

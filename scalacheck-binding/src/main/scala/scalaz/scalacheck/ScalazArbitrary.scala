@@ -41,7 +41,7 @@ object ScalazArbitrary {
   implicit def NameArbitrary[A: Arbitrary]: Arbitrary[Name[A]] = Functor[Arbitrary].map(arb[A])(a => Name(a))
   implicit def NeedArbitrary[A: Arbitrary]: Arbitrary[Need[A]] = Functor[Arbitrary].map(arb[A])(a => Need(a))
 
-  implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(value(()))
+  implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(Gen.const(()))
 
   implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
 
