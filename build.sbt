@@ -114,6 +114,17 @@ lazy val example = Project(
   settings = standardSettings ++ Seq[Sett](
     name := "scalaz-example",
     mimaPreviousArtifacts := Set.empty,
+    sources in Compile := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          // scala.Some#x removed
+          // https://github.com/scala/scala/commit/c057e9eef26b24a3b9a15307041314d0709d9f3d#diff-3898407940651a28b3eabdb604fffea7
+          // https://github.com/scalaz/scalaz/blob/v7.1.13/example/src/main/scala/scalaz/example/TypelevelUsage.scala#L181-L183
+          (sources in Compile).value.filterNot(_.getName == "TypelevelUsage.scala")
+        case _ =>
+          (sources in Compile).value
+      }
+    },
     publishArtifact := false
   )
 )
@@ -137,6 +148,14 @@ lazy val tests = Project(
     name := "scalaz-tests",
     publishArtifact := false,
     mimaPreviousArtifacts := Set.empty,
+    sources in Test := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          (sources in Test).value.filterNot(f => f.getName == "FutureTest.scala" && f.getAbsoluteFile.getParent.endsWith("std"))
+        case _ =>
+          (sources in Test).value
+      }
+    },
     libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value % "test"
   )
 )
