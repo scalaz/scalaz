@@ -12,7 +12,7 @@ import org.scalacheck.Prop.forAll
 
 object NodeSeqTest extends SpecLite {
   {
-    def nonEmptyAlphaStr: Gen[String] = for(cs <- Gen.listOf1(Gen.alphaChar)) yield cs.mkString
+    def nonEmptyAlphaStr: Gen[String] = for(cs <- Gen.nonEmptyListOf(Gen.alphaChar)) yield cs.mkString
 
     val genNode = ^ (
       nonEmptyAlphaStr, nonEmptyAlphaStr
