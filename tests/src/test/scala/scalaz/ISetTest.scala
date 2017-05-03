@@ -18,6 +18,7 @@ object ISetTest extends SpecLite {
   checkAll(equal.laws[ISet[Int]])
   checkAll(order.laws[ISet[Int]])
   checkAll(monoid.laws[ISet[Int]])
+  checkAll(band.laws[ISet[Int]])
   checkAll(foldable.laws[ISet])
   checkAll(FoldableTests.anyAndAllLazy[ISet])
 

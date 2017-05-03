@@ -658,13 +658,14 @@ sealed abstract class ISetInstances {
       f.toAscList.mkString("ISet(", ",", ")")
   }
 
-  implicit def setMonoid[A: Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
-    def zero: ISet[A] =
-      empty[A]
+  implicit def setMonoid[A: Order]: Monoid[ISet[A]] with Band[ISet[A]] =
+    new Monoid[ISet[A]] with Band[ISet[A]] {
+      def zero: ISet[A] =
+        empty[A]
 
-    def append(a: ISet[A], b: => ISet[A]): ISet[A] =
-      a union b
-  }
+      def append(a: ISet[A], b: => ISet[A]): ISet[A] =
+        a union b
+    }
 
   implicit val setFoldable: Foldable[ISet] = new Foldable[ISet] {
     def foldMap[A, B](fa: ISet[A])(f: A => B)(implicit F: Monoid[B]): B =
