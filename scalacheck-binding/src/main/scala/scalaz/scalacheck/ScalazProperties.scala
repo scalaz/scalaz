@@ -99,6 +99,17 @@ object ScalazProperties {
     }
   }
 
+  object band {
+    def idempotency[A](implicit e: Equal[A], a: Arbitrary[A], b: Band[A]): Prop =
+      forAll(b.bandLaw.idempotency _)
+
+    def laws[A](implicit e: Equal[A], a: Arbitrary[A], b: Band[A]): Properties =
+      new Properties("band") {
+        include(semigroup.laws[A])
+        property("idempotency") = idempotency[A]
+      }
+  }
+
   object invariantFunctor {
     def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.invariantFunctorLaw.invariantIdentity[X] _)
