@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class ContTOps[M[_], A](val self: M[A]) extends AnyVal {
+final class ContTOps[M[_], A](private val self: M[A]) extends AnyVal {
   final def cps[R](implicit M: Bind[M]): ContT[M, R, A] =
     ContT((f: A => M[R]) => M.bind(self)(f))
 

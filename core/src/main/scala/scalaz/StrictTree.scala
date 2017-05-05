@@ -451,7 +451,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
   }
 }
 
-final class StrictTreeUnzip[A1, A2](val root: StrictTree[(A1, A2)]) extends AnyVal {
+final class StrictTreeUnzip[A1, A2](private val root: StrictTree[(A1, A2)]) extends AnyVal {
   private def unzipCombiner(rootLabel: (A1, A2))(accumulator: Seq[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
     (StrictTree(rootLabel._1, accumulator.map(_._1).toVector), StrictTree(rootLabel._2, accumulator.map(_._2).toVector))
   }
