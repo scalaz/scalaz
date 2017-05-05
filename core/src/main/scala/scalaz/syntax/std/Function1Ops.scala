@@ -4,7 +4,7 @@ package std
 
 import Leibniz.===
 
-final class Function1Ops[T, R](val self: T => R) extends AnyVal {
+final class Function1Ops[T, R](private val self: T => R) extends AnyVal {
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 

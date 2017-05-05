@@ -6,7 +6,7 @@ import scala.util.Try
 
 import scalaz.std.{`try` => t}
 
-final class TryOps[A](val self: Try[A]) extends AnyVal {
+final class TryOps[A](private val self: Try[A]) extends AnyVal {
 
   final def cata[B](success: A => B, failure: Throwable => B): B =
     t.cata(self)(success, failure)
