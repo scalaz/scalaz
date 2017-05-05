@@ -63,7 +63,7 @@ matrix:
       - make testinstall prefix=/usr
       - popd
       script:
-      - sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+      - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
     - dist: trusty
       group: edge
       sudo: required
