@@ -4,7 +4,7 @@ package std
 import _root_.java.util.concurrent.atomic.AtomicInteger
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{ Try, Success => TSuccess }
+import scala.util.{Try, Success => TSuccess}
 
 trait FutureInstances1 {
   implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with Catchable[Future] =
