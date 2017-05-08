@@ -99,7 +99,7 @@ employ the implicit scope.
 * Type class instances have been organized to avoid ambiguity, a problem that arises when
   instances are dependent on other instances (for example, `Monoid[(A, B)]`)
 * Use of implicit views to provide access to Scalaz functionality as extension methods
-  has been been segregated to `scalaz.syntax`, and can be imported selectively, and need not
+  has been segregated to `scalaz.syntax`, and can be imported selectively, and need not
   be used at all.
 * Related functions are defined in the type class trait, to support standalone
   usage of the type class. In Scalaz 6, these were defined in `Identity`, `MA`, or `MAB`.
