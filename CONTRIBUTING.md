@@ -251,7 +251,7 @@ kind-projector syntax. Here's some inline syntax examples:
     F[X, ?]     ===  ({type l[a] = F[X, a]})#l
     F[X, ?, ?]  ===  ({type l[a, b] = F[X, a, b]})#l
 
-If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficent), use greek letters for
+If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficient), use greek letters for
 parameters.
 
     λ[α => (α, α)]  ===  ({type λ[α] = (α, α)})#λ
