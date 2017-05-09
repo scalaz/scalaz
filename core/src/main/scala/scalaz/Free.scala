@@ -25,7 +25,7 @@ object Free extends FreeInstances {
   private val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
 
   // Cache `point(())` to avoid frequent allocation
-  @inline private def pointUnit[S]: Free[S, Unit] = pointUnitCache.asInstanceOf[Free[S, Unit]]
+  @inline private def pointUnit[S[_]]: Free[S, Unit] = pointUnitCache.asInstanceOf[Free[S, Unit]]
 
   /** Suspend a computation in a pure step of the applicative functor `S` */
   def suspend[S[_], A](value: => Free[S, A]): Free[S, A] =
