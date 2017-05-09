@@ -106,24 +106,46 @@ trait IndexedContsTFunctions {
     }
 }
 
-sealed abstract class IndexedContsTInstances2 {
+sealed abstract class IndexedContsTInstances5 {
   implicit def IndexedContsTFunctorRight[W[_], M[_], R, O](implicit W0: Functor[W]): Functor[IndexedContsT[W, M, R, O, ?]] =
     new IndexedContsTFunctorRight[W, M, R, O] {
       implicit val W: Functor[W] = W0
     }
 }
 
-sealed abstract class IndexedContsTInstances1 extends IndexedContsTInstances2 {
+sealed abstract class IndexedContsTInstances4 extends IndexedContsTInstances5 {
   implicit def ContsTBind[W[_], M[_], R](implicit W0: Cobind[W]): Bind[ContsT[W, M, R, ?]] =
     new ContsTBind[W, M, R] {
       val W = W0
     }
 }
 
-sealed abstract class IndexedContsTInstances0 extends IndexedContsTInstances1 {
+sealed abstract class IndexedContsTInstances3 extends IndexedContsTInstances4 {
   implicit def ContsTMonad[W[_], M[_], R](implicit W0: Comonad[W]): Monad[ContsT[W, M, R, ?]] =
     new ContsTMonad[W, M, R] {
       implicit val W: Comonad[W] = W0
+    }
+}
+
+abstract class IndexedContsTInstances2 extends IndexedContsTInstances3 {
+  implicit def ContsTMonadPlus[W[_], M[_], R](implicit W0: Comonad[W], M0: PlusEmpty[M]): MonadPlus[ContsT[W, M, R, ?]] =
+    new ContsTMonadPlus[W, M, R] {
+      implicit val W: Comonad[W] = W0
+      implicit val M: PlusEmpty[M] = M0
+    }
+}
+
+sealed abstract class IndexedContsTInstances1 extends IndexedContsTInstances2 {
+  implicit def FreeContsTFunctor[W[_], S[_], R](implicit W0: Functor[W]): Functor[ContsT[W, Free[S, ?], R, ?]] =
+    new FreeContsTFunctor[W, S, R] {
+      val W = W0
+    }
+}
+
+sealed abstract class IndexedContsTInstances0 extends IndexedContsTInstances1 {
+  implicit def FreeContsTBindRec[W[_], S[_], R](implicit W0: Cobind[W]): BindRec[ContsT[W, Free[S, ?], R, ?]] =
+    new FreeContsTBindRec[W, S, R] {
+      val W = W0
     }
 }
 
@@ -145,10 +167,9 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
       implicit val M: Functor[M] = M0
     }
 
-  implicit def ContsTMonadPlus[W[_], M[_], R](implicit W0: Comonad[W], M0: PlusEmpty[M]): MonadPlus[ContsT[W, M, R, ?]] =
-    new ContsTMonadPlus[W, M, R] {
+  implicit def FreeContsTMonad[W[_], S[_], R](implicit W0: Comonad[W]): Monad[ContsT[W, Free[S, ?], R, ?]] with BindRec[ContsT[W, Free[S, ?], R, ?]] =
+    new ContsTMonad[W, Free[S, ?], R] with FreeContsTBindRec[W, S, R] {
       implicit val W: Comonad[W] = W0
-      implicit val M: PlusEmpty[M] = M0
     }
 }
 
@@ -192,6 +213,42 @@ private sealed trait ContsTBind[W[_], M[_], R] extends Bind[ContsT[W, M, R, ?]] 
   override def bind[A, B](fa: ContsT[W, M, R, A])(f: A => ContsT[W, M, R, B]) = fa.flatMap(f)
 
   override def join[A](ffa: ContsT[W, M, R, ContsT[W, M, R, A]]) = ffa.flatten
+}
+
+private sealed trait FreeContsTFunctor[W[_], S[_], R] extends IndexedContsTFunctorRight[W, Free[S, ?], R, R] {
+  /** Lift `f` into `F` and apply to `F[A]`. */
+  override def map[A, B](fa: ContsT[W, Free[S, ?], R, A])(f: (A) => B): ContsT[W, Free[S, ?], R, B] = {
+    ContsT[W, Free[S, ?], R, B] { wbmo =>
+      Free.suspend(fa.run(W.map(wbmo)(f andThen _)))
+    }
+  }
+}
+
+private sealed trait FreeContsTBindRec[W[_], S[_], R] extends BindRec[ContsT[W, Free[S, ?], R, ?]] with ContsTBind[W, Free[S, ?], R] with FreeContsTFunctor[W, S, R] {
+  /** Equivalent to `join(map(fa)(f))`. */
+  override def bind[A, B](fa: ContsT[W, Free[S, ?], R, A])(f: (A) => ContsT[W, Free[S, ?], R, B]): ContsT[W, Free[S, ?], R, B] = {
+    ContsT[W, Free[S, ?], R, B] { wbme => Free.suspend {
+      fa.run(W.cobind(wbme) { wk => { a =>
+        Free.suspend(f(a).run(wk))
+      } })
+    }}
+  }
+
+  override def join[A](ffa: ContsT[W, Free[S, ?], R, ContsT[W, Free[S, ?], R, A]]) = bind(ffa)(identity)
+
+  override def tailrecM[A, B](a: A)(f: (A) => ContsT[W, Free[S, ?], R, A \/ B]): ContsT[W, Free[S, ?], R, B] = {
+    ContsT[W, Free[S, ?], R, B] { wcontinue: W[B => Free[S, R]] =>
+      def loop(a: A): Free[S, R] = {
+        f(a).run(W.map(wcontinue) { continue => {
+          case -\/(a) =>
+            Free.suspend(loop(a))
+          case \/-(b) =>
+            Free.suspend(continue(b))
+        }})
+      }
+      Free.suspend(loop(a))
+    }
+  }
 }
 
 private sealed trait ContsTMonad[W[_], M[_], R] extends Monad[ContsT[W, M, R, ?]] with ContsTBind[W, M, R] {

@@ -23,8 +23,8 @@ object Free extends FreeInstances {
     liftF(value).flatMap(x => x)
 
   /** Suspend a computation in a pure step of the applicative functor `S` */
-  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
-    liftF(S.pure(())).flatMap(_ => value)
+  def suspend[S[_], A](value: => Free[S, A]): Free[S, A] =
+    point(()).flatMap(_ => value)
 
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
