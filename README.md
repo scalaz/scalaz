@@ -108,7 +108,7 @@ employ the implicit scope.
 
 ### Modularity
 
-Scalaz has been been modularised.
+Scalaz has been modularised.
 
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
