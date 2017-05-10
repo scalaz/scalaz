@@ -6,7 +6,7 @@ import scalaz.std.{boolean => b}
 import scalaz.Tags.{ Conjunction, Disjunction }
 
 
-final class BooleanOps(val self: Boolean) extends AnyVal {
+final class BooleanOps(private val self: Boolean) extends AnyVal {
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 

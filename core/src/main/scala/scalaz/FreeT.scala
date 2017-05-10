@@ -126,18 +126,21 @@ sealed abstract class FreeT[S[_], M[_], A] {
   }
 
   /** Evaluates a single layer of the free monad **/
-  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[S[FreeT[S, M, A]] \/ A] = {
+  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[S[FreeT[S, M, A]] \/ A] =
+    M0.map(resumeC)(_.leftMap(_.run))
+
+  def resumeC(implicit M0: BindRec[M], M1: Applicative[M]): M[Coyoneda[S, FreeT[S, M, A]] \/ A] = {
     @tailrec
-    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (S[FreeT[S, M, A]] \/ A)] =
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (Coyoneda[S, FreeT[S, M, A]] \/ A)] =
       ft match {
         case Suspend(f) => M0.map(f) {
           case -\/(a) => \/-(\/-(a))
-          case \/-(sa) => \/-(-\/(S.map(sa)(point(_))))
+          case \/-(sa) => \/-(-\/(Coyoneda(sa)(point(_))))
         }
         case g1 @ Gosub(_, _) => g1.a match {
           case Suspend(m1) => M0.map(m1) {
             case -\/(a) => -\/(g1.f(a))
-            case \/-(fc) => \/-(-\/(S.map(fc)(g1.f(_))))
+            case \/-(fc) => \/-(-\/(Coyoneda(fc)(g1.f(_))))
           }
           case g2 @ Gosub(_, _) => go(g2.a.flatMap(g2.f(_).flatMap(g1.f)))
         }
@@ -242,9 +245,8 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
         Monad[FreeT[S, G, ?]]
     }
 
-  implicit def freeTFoldable[S[_]: Foldable: Functor, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, ?]] =
+  implicit def freeTFoldable[S[_]: Foldable, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, ?]] =
     new FreeTFoldable[S, M] {
-      override def S = implicitly
       override def F = implicitly
       override def M = implicitly
       override def M1 = implicitly
@@ -312,23 +314,21 @@ private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, ?]] {
 }
 
 private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, ?]] with Foldable.FromFoldMap[FreeT[S, M, ?]] {
-  implicit def S: Functor[S]
   implicit def M: Applicative[M]
   implicit def M1: BindRec[M]
   def F: Foldable[S]
   def M2: Foldable[M]
 
   override final def foldMap[A, B: Monoid](fa: FreeT[S, M, A])(f: A => B): B =
-    M2.foldMap(fa.resume){
+    M2.foldMap(fa.resumeC){
       case -\/(a) =>
-        F.foldMap(a)(foldMap(_)(f))
+        F.foldMap(a.fi)(i => foldMap(a.k(i))(f))
       case \/-(a) =>
         f(a)
     }
 }
 
 private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with FreeTFoldable[S, M] with FreeTBind[S, M] {
-  override final def S: Functor[S] = F
   override implicit def F: Traverse[S]
   override def M2: Traverse[M]
   override implicit def M: Applicative[M]

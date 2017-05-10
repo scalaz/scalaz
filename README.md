@@ -76,6 +76,8 @@ The [examples module](https://github.com/scalaz/scalaz/tree/series/7.3.x/example
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
+Talk with us by joining [IRC: irc.freenode.net channel #scalaz](http://webchat.freenode.net/?channels=%23scalaz&uio=d4), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
+
 The [typelevel blog](http://typelevel.org/blog/) has some great posts such as [Towards Scalaz](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
 
 [Learning Scalaz](http://eed3si9n.com/learning-scalaz/index.html) is a great series of blog posts by [Eugene Yokota](https://twitter.com/eed3si9n). Thanks, Eugene!
@@ -97,7 +99,7 @@ employ the implicit scope.
 * Type class instances have been organized to avoid ambiguity, a problem that arises when
   instances are dependent on other instances (for example, `Monoid[(A, B)]`)
 * Use of implicit views to provide access to Scalaz functionality as extension methods
-  has been been segregated to `scalaz.syntax`, and can be imported selectively, and need not
+  has been segregated to `scalaz.syntax`, and can be imported selectively, and need not
   be used at all.
 * Related functions are defined in the type class trait, to support standalone
   usage of the type class. In Scalaz 6, these were defined in `Identity`, `MA`, or `MAB`.
@@ -106,7 +108,7 @@ employ the implicit scope.
 
 ### Modularity
 
-Scalaz has been been modularised.
+Scalaz has been modularised.
 
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
