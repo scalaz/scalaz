@@ -111,9 +111,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
-  .jsSettings(
-    jsEnv := NodeJSEnv().value
-  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
