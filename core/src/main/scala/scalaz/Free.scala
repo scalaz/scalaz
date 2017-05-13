@@ -352,6 +352,9 @@ sealed abstract class FreeInstances extends FreeInstances00 with TrampolineInsta
   override implicit def sourceMonad[S]: Monad[({type f[x] = Source[S, x]})#f] = super.sourceMonad[S]
 
 
+  implicit def freeMonadC[S[_]]: Monad[({type f[x] = FreeC[S, x]})#f] =
+    freeMonad[({type f[x] = Coyoneda[S, x]})#f]
+
   implicit def freeMonoid[S[_]:Functor, A:Monoid]: Monoid[Free[S, A]] =
     Monoid.liftMonoid[({type λ[α] = Free[S, α]})#λ, A]
 }
