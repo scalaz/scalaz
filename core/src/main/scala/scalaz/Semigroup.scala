@@ -96,30 +96,30 @@ object Semigroup {
     }
 
   /** A purely left-biased semigroup. */
-  def firstSemigroup[A] =
-    new Semigroup[A] {
+  def firstSemigroup[A]: Semigroup[A] =
+    new Band[A] {
       def append(f1: A, f2: => A): A = f1
     }
 
   @inline implicit def firstTaggedSemigroup[A]: Semigroup[A @@ Tags.FirstVal] = firstSemigroup[A @@ Tags.FirstVal]
 
   /** A purely right-biased semigroup. */
-  def lastSemigroup[A] =
-    new Semigroup[A] {
+  def lastSemigroup[A]: Semigroup[A] =
+    new Band[A] {
       def append(f1: A, f2: => A): A = f2
     }
 
   @inline implicit def lastTaggedSemigroup[A]: Semigroup[A @@ Tags.LastVal] = lastSemigroup[A @@ Tags.LastVal]
 
   def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] =
-    new Semigroup[A @@ Tags.MinVal] {
+    new Band[A @@ Tags.MinVal] {
       def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
   @inline implicit def minTaggedSemigroup[A : Order]: Semigroup[A @@ Tags.MinVal] = minSemigroup[A]
 
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] =
-    new Semigroup[A @@ Tags.MaxVal] {
+    new Band[A @@ Tags.MaxVal] {
       def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
