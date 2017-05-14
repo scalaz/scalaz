@@ -4,6 +4,7 @@ sudo: false
 cache:
   directories:
     - $HOME/.ivy2/cache
+    - $HOME/.sbt/launchers
 
 language: scala
 scala:
