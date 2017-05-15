@@ -39,4 +39,10 @@ object TreeTest extends SpecLite {
       "|",
       "`- 4").mkString("", "\n", "\n")
   }
+
+  "Issue #1001" ! {
+    val x = 100000 // Should be large enough to induce a stack overflow
+    Tree.node(0, (1 to x).toStream.map(i => Tree.leaf(i)))
+      .flatten must_== (0 to x).toStream
+  }
 }
