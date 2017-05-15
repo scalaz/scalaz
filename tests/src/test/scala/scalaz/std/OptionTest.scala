@@ -29,6 +29,11 @@ object OptionTest extends SpecLite {
   checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
   checkAll("Option @@ Max", monoid.laws[MaxOption[Int]])
 
+  checkAll("Band[Option @@ First]", band.laws[FirstOption[Int]])
+  checkAll("Band[Option @@ Last]", band.laws[LastOption[Int]])
+  checkAll("Band[Option @@ Min]", band.laws[MinOption[Int]])
+  checkAll("Band[Option @@ Max]", band.laws[MaxOption[Int]])
+
   checkAll("Option @@ First", monad.laws[FirstOption])
   checkAll("Option @@ Last", monad.laws[LastOption])
   checkAll("Option @@ Min", monad.laws[MinOption])
