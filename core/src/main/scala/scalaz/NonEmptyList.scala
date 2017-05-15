@@ -22,10 +22,8 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   def map[B](f: A => B): NonEmptyList[B] = nel(f(head), tail.map(f))
 
   /** @since 7.0.3 */
-  def foreach(f: A => Unit): Unit = {
-    f(head)
-    tail.toList.foreach(f)
-  }
+  def foreach(f: A => Unit): Unit =
+    list.foreach(f)
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
     val rev = reverse
