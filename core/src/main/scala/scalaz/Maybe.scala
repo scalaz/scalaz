@@ -217,7 +217,7 @@ sealed abstract class MaybeInstances {
     def zero = empty
   }
 
-  implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] {
+  implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] {
     val zero: FirstMaybe[A] = Tag(empty)
 
     def append(fa1: FirstMaybe[A], fa2: => FirstMaybe[A]): FirstMaybe[A] = Tag(Tag.unwrap(fa1).orElse(Tag.unwrap(fa2)))
@@ -229,7 +229,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeFirstMonad: Monad[FirstMaybe] = Tags.First.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] = new Monoid[LastMaybe[A]] {
+  implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] with Band[LastMaybe[A]] = new Monoid[LastMaybe[A]] with Band[LastMaybe[A]] {
     val zero: LastMaybe[A] = Tag(empty)
 
     def append(fa1: LastMaybe[A], fa2: => LastMaybe[A]): LastMaybe[A] = Tag(Tag.unwrap(fa2).orElse(Tag.unwrap(fa1)))
@@ -241,7 +241,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeLastMonad: Monad[LastMaybe] = Tags.Last.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeMin[A](implicit o: Order[A]) = new Monoid[MinMaybe[A]] {
+  implicit def maybeMin[A](implicit o: Order[A]): Monoid[MinMaybe[A]] with Band[MinMaybe[A]] = new Monoid[MinMaybe[A]] with Band[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
 
     def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -258,7 +258,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMinMonad: Monad[MinMaybe] = Tags.Min.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeMax[A](implicit o: Order[A]) = new Monoid[MaxMaybe[A]] {
+  implicit def maybeMax[A](implicit o: Order[A]): Monoid[MaxMaybe[A]] with Band[MaxMaybe[A]] = new Monoid[MaxMaybe[A]] with Band[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
 
     def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {

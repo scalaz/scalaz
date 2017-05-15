@@ -24,6 +24,11 @@ object MaybeTest extends SpecLite {
   checkAll("Maybe @@ Min", monoid.laws[MinMaybe[Int]])
   checkAll("Maybe @@ Max", monoid.laws[MaxMaybe[Int]])
 
+  checkAll("Band[Maybe @@ First]", band.laws[FirstMaybe[Int]])
+  checkAll("Band[Maybe @@ Last]", band.laws[LastMaybe[Int]])
+  checkAll("Band[Maybe @@ Min]", band.laws[MinMaybe[Int]])
+  checkAll("Band[Maybe @@ Max]", band.laws[MaxMaybe[Int]])
+
   checkAll("Maybe @@ First", monad.laws[FirstMaybe])
   checkAll("Maybe @@ Last", monad.laws[LastMaybe])
   checkAll("Maybe @@ Min", monad.laws[MinMaybe])
