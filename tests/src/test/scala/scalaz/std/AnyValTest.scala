@@ -2,13 +2,18 @@ package scalaz
 package std
 
 import std.AllInstances._
+import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Arbitrary
 import Tags._
 import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop.forAll
 
 object AnyValTest extends SpecLite {
+
+  private[this] implicit def tagArb[A, B](implicit A: Arbitrary[A]): Arbitrary[A @@ B] =
+    Functor[Arbitrary].map(A)(Tag.apply[A, B])
 
   checkAll("Unit", order.laws[Unit])
   checkAll("Boolean", order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))
@@ -25,6 +30,9 @@ object AnyValTest extends SpecLite {
   checkAll("Short @@ Multiplication", order.laws[Short @@ Multiplication])
 
   checkAll("Boolean @@ Conjunction", monoid.laws[Boolean @@ Conjunction])
+
+  checkAll("Band[Boolean @@ Conjunction]", band.laws[Boolean @@ Conjunction])
+  checkAll("Band[Boolean @@ Disjunction]", band.laws[Boolean @@ Disjunction])
 
   {
     implicit val B = std.anyVal.booleanInstance.conjunction
