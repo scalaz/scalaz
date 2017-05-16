@@ -153,8 +153,8 @@
       for(var j = 0; j < t.length; j++){
         var tag = t[j];
         var name = "scalaz_" + scalaVersions[i].version;
-        var sonatype = "https://oss.sonatype.org/service/local/repositories/releases/archive/org/scalaz/" + name + "/";
-        var url = sonatype + tag + "/" + name + "-" + tag + "-javadoc.jar/!/" + scalaVersions[i].suffix;
+        var javadocIo = "https://static.javadoc.io/org.scalaz/" + name;
+        var url = javadocIo + "/" + tag + "/" + scalaVersions[i].suffix;
         $("#scaladoc").append("<li><a target='_blank' href='" + url + "'>" + tag + "</a></li>");
       }
     }
