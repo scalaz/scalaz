@@ -17,8 +17,18 @@ lazy val scalaz = Project(
     mimaPreviousArtifacts := Set.empty,
     // <https://github.com/scalaz/scalaz/issues/261>
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
-    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile)).value,
-    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile)).value
+    description := "scalaz unidoc",
+    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+    pomPostProcess := { node =>
+      import scala.xml._
+      import scala.xml.transform._
+      val rule = new RewriteRule {
+        override def transform(n: Node) =
+          if (n.label == "dependencies") NodeSeq.Empty else n
+      }
+      new RuleTransformer(rule).transform(node)(0)
+    }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
 )
