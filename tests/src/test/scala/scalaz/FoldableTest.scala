@@ -1,6 +1,7 @@
 package scalaz
 
 import std.AllInstances._
+import syntax.apply._
 import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
@@ -57,6 +58,27 @@ object FoldableTest extends SpecLite {
         (xs minimumBy f) must_== None
       else
         (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
+  }
+  "extrema" ! forAll {
+    (xs: List[Int]) =>
+      (xs.extrema) must_== xs.minimum.tuple(xs.maximum)
+  }
+  "extremaOf" ! forAll {
+    (xs: List[Int]) =>
+      val f: Int => Double = 1D + _
+      (xs extremaOf f) must_== (xs minimumOf f).tuple(xs maximumOf f)
+  }
+  "extremaBy" ! forAll {
+    (xs: List[Int], f: Int => Int) =>
+      (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+  }
+  "extremaBy consistent with minimumBy/maximumBy" ! {
+    val xs = (1 to 6).toList
+    val f: Int => Int = _ % 3
+    (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+
+    val g: Int => Int = _ => 0
+    (xs extremaBy g) must_== (xs minimumBy g).tuple(xs maximumBy g)
   }
 
   "distinct" ! forAll {

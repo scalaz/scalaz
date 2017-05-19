@@ -28,5 +28,18 @@ trait FoldableParent[F[_]] { self: Foldable[F] =>
 
   def distinctBy[A, B: Equal](fa: F[A])(f: A => B): IList[A] =
     distinctE(fa)(Equal.equalBy(f))
+
+  /** The smallest and largest elements of `fa` or None if `fa` is empty */
+  def extrema[A: Order](fa: F[A]): Option[(A, A)] =
+    extremaBy(fa)(identity)
+
+  /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or None if `fa` is empty */
+  def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
+    syntax.foldable.ToFoldableOps(fa)(self).extremaOf(f)
+
+  /** The elements (amin, amax) of `fa` withc yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
+  def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
+    syntax.foldable.ToFoldableOps(fa)(self).extremaBy(f)
+
   ////
 }
