@@ -228,6 +228,40 @@ trait Foldable[F[_]]  { self =>
       case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
     } map (_._1)
 
+  /** The smallest and largest elements of `fa` or None if `fa` is empty */
+  def extrema[A: Order](fa: F[A]): Option[(A, A)] = 
+    extremaBy(fa)(identity)
+
+  /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or None if `fa` is empty */
+  def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
+    foldLeft(fa, none[(B, B)]) {
+      case (None, a) => 
+        val b = f(a)
+        some((b, b))
+      case (Some(x @ (bmin, bmax)), a) => 
+        val b = f(a) 
+        some(
+          if (Order[B].order(b, bmin) == LT) (b, bmax)
+          else if (Order[B].order(b, bmax) == GT) (bmin, b)
+          else x
+        )
+    } 
+
+  /** The elements (amin, amax) of `fa` withc yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
+  def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
+    foldLeft(fa, none[((A, A), (B, B))]) {
+      case (None, a) => 
+        val b = f(a)
+        some((a, a) -> (b, b))
+      case (Some(x @ ((amin, amax), (bmin, bmax))), a) => 
+        val b = f(a) 
+        some(
+          if (Order[B].order(b, bmin) == LT) (a, amax) -> (b, bmax)
+          else if (Order[B].order(b, bmax) == GT) (amin, a) -> (bmin, b)
+          else x
+        )
+    } map (_._1)
+
   def sumr[A](fa: F[A])(implicit A: Monoid[A]): A =
     foldRight(fa, A.zero)(A.append)
 
