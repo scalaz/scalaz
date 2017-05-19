@@ -45,5 +45,17 @@ trait FoldableParent[F[_]] { self: Foldable[F] =>
   /** Like `fold` but returning `None` if the foldable is empty and `Some` otherwise */
   def fold1Opt[A: Semigroup](fa: F[A]): Option[A] = foldMap1Opt(fa)(a => a)
 
+  /** The smallest and largest elements of `fa` or None if `fa` is empty */
+  def extrema[A: Order](fa: F[A]): Option[(A, A)] =
+    extremaBy(fa)(identity)
+
+  /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or None if `fa` is empty */
+  def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
+    syntax.foldable.ToFoldableOps(fa)(self).extremaOf(f)
+
+  /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
+  def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
+    syntax.foldable.ToFoldableOps(fa)(self).extremaBy(f)
+
   ////
 }

@@ -59,6 +59,43 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def minimum(implicit A: Order[A]): Option[A] = F.minimum(self)
   final def minimumOf[B: Order](f: A => B): Option[B] = F.minimumOf(self)(f)
   final def minimumBy[B: Order](f: A => B): Option[A] = F.minimumBy(self)(f)
+  final def extrema(implicit A: Order[A]): Option[(A, A)] =
+    extremaBy(identity)
+  def extremaOf[B: Order](f: A => B): Option[(B, B)] =
+    F.foldMapLeft1Opt(self) { a =>
+      val b = f(a)
+      (b, b)
+    } {
+      case (x @ (bmin, bmax), a) =>
+        val b = f(a)
+        if (Order[B].order(b, bmin) == Ordering.LT) (b, bmax)
+        else if (Order[B].order(b, bmax) == Ordering.GT) (bmin, b)
+        else x
+    }
+  def extremaBy[B: Order](f: A => B): Option[(A, A)] =
+    F.foldMapLeft1Opt(self) { a =>
+        val b = f(a)
+        (a, a, b, b)
+    } {
+      case (x @ ((amin, amax, bmin, bmax)), a) =>
+        val b = f(a)
+        val greaterThanOrEq = Order[B].greaterThanOrEqual(b, bmax)
+        if(Order[B].lessThanOrEqual(b, bmin)) {
+          if(greaterThanOrEq) {
+            (a, a, b, b)
+          } else {
+            (a, amax, b, bmax)
+          }
+        } else {
+          if(greaterThanOrEq) {
+            (amin, a, bmin, b)
+          } else {
+            x
+          }
+        }
+    } map {
+      case (amin, amax, _, _) => (amin, amax)
+    }
   final def longDigits(implicit d: A <:< Digit): Long = F.longDigits(self)
   final def empty: Boolean = F.empty(self)
   final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)
