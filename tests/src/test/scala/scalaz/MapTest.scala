@@ -1004,6 +1004,7 @@ object MapTest extends SpecLite {
   }
 
   type IntMap[A] = Int ==>> A
+   
   checkAll(traverse.laws[IntMap])
   checkAll(bind.laws[IntMap])
   checkAll(align.laws[IntMap])

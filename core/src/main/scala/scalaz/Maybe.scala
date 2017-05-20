@@ -185,7 +185,16 @@ object Maybe extends MaybeInstances {
   }
 }
 
-sealed abstract class MaybeInstances {
+sealed trait MaybeInstances0 {
+  implicit def maybeBand[A](implicit A: Band[A]): Band[Maybe[A]] = new Band[Maybe[A]] {
+    def append(fa1: Maybe[A], fa2: => Maybe[A]) =
+      fa1.cata(
+        a1 => fa2.cata(a2 => Maybe.just(A.append(a1, a2)), fa1),
+        fa2.cata(_ => fa2, Maybe.empty))
+  }
+}
+
+sealed abstract class MaybeInstances extends MaybeInstances0 {
   import Maybe._
 
   implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
@@ -216,7 +225,7 @@ sealed abstract class MaybeInstances {
 
     def zero = empty
   }
-
+  
   implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] {
     val zero: FirstMaybe[A] = Tag(empty)
 

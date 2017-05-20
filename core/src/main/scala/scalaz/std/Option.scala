@@ -5,6 +5,15 @@ sealed trait OptionInstances0 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
+
+  implicit def optionBand[A](implicit B: Band[A]): Band[Option[A]] = new Band[Option[A]] {
+    def append(a: Option[A], b: => Option[A]): Option[A] = (a, b) match {
+      case (Some(aa), Some(bb)) => Some(B.append(aa, bb))
+      case (Some(aa), None) => a
+      case (None, b2 @ Some(bb)) => b2
+      case (None, None) => None
+    }
+  }
 }
 
 trait OptionInstances extends OptionInstances0 {
