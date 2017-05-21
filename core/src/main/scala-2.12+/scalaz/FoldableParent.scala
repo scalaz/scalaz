@@ -26,5 +26,7 @@ trait FoldableParent[F[_]] { self: Foldable[F] =>
   /** Like `fold` but returning `None` if the foldable is empty and `Some` otherwise */
   def fold1Opt[A: Semigroup](fa: F[A]): Option[A] = foldMap1Opt(fa)(a => a)
 
+  def distinctBy[A, B: Equal](fa: F[A])(f: A => B): IList[A] =
+    distinctE(fa)(Equal.equalBy(f))
   ////
 }
