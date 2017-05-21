@@ -56,7 +56,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit val function0Instance =
+  implicit val function0Instance: Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] =
     new Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] {
       def point[A](a: => A) =
         () => a
@@ -97,7 +97,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function0Equal[R: Equal] =
+  implicit def function0Equal[R: Equal]: Equal[() => R] =
     new Equal[() => R] {
       def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
     }
