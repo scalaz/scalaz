@@ -106,7 +106,7 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
-  implicit def orderMonoid[A] = new Monoid[Order[A]] {
+  implicit def orderMonoid[A]: Monoid[Order[A]] = new Monoid[Order[A]] {
     def zero: Order[A] = new Order[A] {
       def order(x: A, y: A): Ordering = Monoid[Ordering].zero
     }
