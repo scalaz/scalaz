@@ -679,6 +679,7 @@ object MapTest extends SpecLite {
 
   checkAll(order.laws[Int ==>> Int])
   checkAll(monoid.laws[Int ==>> Int])
+  checkAll(band.laws[Int ==>> ISet[Int]])
 
   {
     implicit def equMapConj[A: Equal, B: Equal]: Equal[(A ==>> B) @@ Tags.Conjunction] =
