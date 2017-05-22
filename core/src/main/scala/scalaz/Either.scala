@@ -410,6 +410,12 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
+  implicit def DisjunctionBand[A: Band, B: Band]: Band[A \/ B] =
+    new Band[A \/ B] {
+      def append(a1: A \/ B, a2: => A \/ B) =
+        a1 +++ a2
+    }
+
   implicit def DisjunctionInstances1[L]: Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] = new Traverse[({type l[a] = L \/ a})#l] with Monad[({type l[a] = L \/ a})#l] with Cozip[({type l[a] = L \/ a})#l] with Plus[({type l[a] = L \/ a})#l] with Optional[({type l[a] = L \/ a})#l] with MonadError[\/, L] {
     override def map[A, B](fa: L \/ A)(f: A => B) =
       fa map f
