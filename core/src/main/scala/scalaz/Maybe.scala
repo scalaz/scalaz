@@ -185,7 +185,14 @@ object Maybe extends MaybeInstances {
   }
 }
 
-sealed abstract class MaybeInstances {
+sealed abstract class MaybeInstances0 {
+  implicit def maybeBand[A: Band]: Band[Maybe[A]] =
+    new MaybeMonoid[A] with Band[Maybe[A]] {
+      override def A = implicitly
+    }
+}
+
+sealed abstract class MaybeInstances extends MaybeInstances0 {
   import Maybe._
 
   implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
@@ -208,14 +215,10 @@ sealed abstract class MaybeInstances {
       a => Cord("Just(", A.show(a), ")"),
       "Empty"))
 
-  implicit def maybeMonoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] = new Monoid[Maybe[A]] {
-    def append(fa1: Maybe[A], fa2: => Maybe[A]) =
-      fa1.cata(
-        a1 => fa2.cata(a2 => just(A.append(a1, a2)), fa1),
-        fa2.cata(_ => fa2, empty))
-
-    def zero = empty
-  }
+  implicit def maybeMonoid[A: Semigroup]: Monoid[Maybe[A]] =
+    new MaybeMonoid[A] {
+      override def A = implicitly
+    }
 
   implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] {
     val zero: FirstMaybe[A] = Tag(empty)
@@ -349,4 +352,15 @@ private sealed trait MaybeEqual[A] extends Equal[Maybe[A]] {
     fa1.cata(
       a1 => fa2.cata(a2 => A.equal(a1, a2), false),
       fa2.cata(_ => false, true))
+}
+
+private sealed trait MaybeMonoid[A] extends Monoid[Maybe[A]] {
+  protected def A: Semigroup[A]
+
+  override def append(fa1: Maybe[A], fa2: => Maybe[A]) =
+    fa1.cata(
+      a1 => fa2.cata(a2 => Maybe.just(A.append(a1, a2)), fa1),
+      fa2.cata(_ => fa2, Maybe.empty))
+
+  override def zero = Maybe.empty
 }
