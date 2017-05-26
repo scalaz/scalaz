@@ -14,10 +14,12 @@ object ScalaCheckBinding {
     override def map[A, B](fa: Arbitrary[A])(f: A => B) = Arbitrary(fa.arbitrary.map(f))
   }
 
-  implicit val GenMonad: Monad[Gen] = new Monad[Gen] {
+  implicit val GenMonad: MonadPlus[Gen] = new MonadPlus[Gen] {
     def point[A](a: => A) = sized(_ => const(a))
     def bind[A, B](fa: Gen[A])(f: A => Gen[B]) = fa flatMap f
     override def map[A, B](fa: Gen[A])(f: A => B) = fa map f
+    override def empty[A]: Gen[A] = Gen.fail[A]
+    override def plus[A](a: Gen[A], b: => Gen[A]): Gen[A] = Gen.oneOf(a, b)
   }
 
   implicit val CogenInstance: Divisible[Cogen] = new Divisible[Cogen] {
