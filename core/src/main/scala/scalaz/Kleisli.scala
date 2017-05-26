@@ -244,6 +244,22 @@ abstract class KleisliInstances extends KleisliInstances0 {
     new KleisliCatchable[F, A] {
       implicit def F = F0
     }
+
+  implicit def kleisliNondeterminism[F[_]: Nondeterminism, E] = new Nondeterminism[Kleisli[F, E, ?]] {
+    val F = Nondeterminism[F]
+
+    def point[A](a: => A): Kleisli[F,E,A] = Kleisli( (x: E) => F.point(a) )
+    def bind[A, B](fa: Kleisli[F,E,A])(f: A => Kleisli[F,E,B]): Kleisli[F,E,B] = fa.flatMap(f)
+    def chooseAny[A](head: Kleisli[F,E,A],tail: Seq[Kleisli[F,E,A]]): Kleisli[F,E,(A, Seq[Kleisli[F,E,A]])] = {
+      Kleisli { (x: E) =>
+        val fa = head.run(x)
+        val sfa = tail.map(_.run(x))
+        F.map(F.chooseAny(fa, sfa)) { case (a, residuals) =>
+          (a, residuals.map(r => Kleisli { (x: E) => r } ) )
+        }
+      }
+    }
+  }
 }
 
 object Kleisli extends KleisliInstances {
