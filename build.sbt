@@ -168,7 +168,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(
     name := "scalaz-tests",
     mimaPreviousArtifacts := Set.empty,
-    publishArtifact := false
+    publishArtifact := false,
+    publishArtifact in Test := true
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding_1_13)
   .jvmConfigure(_ dependsOn concurrent)
