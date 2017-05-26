@@ -549,6 +549,9 @@ abstract class LensInstances extends LensInstances0 {
     def enqueue(elem: A): IndexedState[S1, S2, Unit] =
       lens %== (_ enqueue elem)
 
+    def enqueue(iter: immutable.Iterable[A]): IndexedState[S1, S2, Unit] =
+      lens %== (_ enqueue iter)
+
     def dequeue: IndexedState[S1, S2, A] =
       lens %%= State[Queue[A], A](_.dequeue.swap)
 
