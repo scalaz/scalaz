@@ -52,10 +52,6 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   override def gather[A](fs: Seq[Future[A]]): Future[List[A]] =
     Future.sequence(fs.toList)
 
-  // override for actual parallel execution
-  override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
-    fab zip fa map { case (fa, a) => fa(a) }
-
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
     f.map(\/.right).recover { case e => -\/(e) }
 
