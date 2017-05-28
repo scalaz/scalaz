@@ -1,6 +1,7 @@
 package scalaz
 
 import std.AllInstances._
+import Maybe._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
@@ -15,6 +16,7 @@ object DisjunctionTest extends SpecLite {
   checkAll(traverse.laws[Int \/ ?])
   checkAll(bitraverse.laws[\/])
   checkAll(associative.laws[\/])
+  checkAll(band.laws[ISet[Int] \/ MaxMaybe[Int]])
 
   "fromTryCatchThrowable" in {
     class Foo extends Throwable
@@ -83,5 +85,15 @@ object DisjunctionTest extends SpecLite {
     3.right[String].validationNel must_=== 3.successNel[String]
     ("hello".left[Int].validationNel |@| "world".left[Int].validationNel).tupled must_===
       ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
+  }
+
+  object instances {
+    def semigroup[A: Semigroup, B: Semigroup] = Semigroup[A \/ B]
+    def monoid[A: Semigroup, B: Monoid] = Monoid[A \/ B]
+    def band[A: Band, B: Band] = Band[A \/ B]
+
+    // checking absence of ambiguity
+    def semigroup[A: Semigroup, B: Monoid] = Semigroup[A \/ B]
+    def semigroup[A: Band, B: Band: Monoid] = Semigroup[A \/ B]
   }
 }
