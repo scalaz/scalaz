@@ -350,6 +350,14 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     }
   }
 
+  /** Run the given function on the success Functor. */
+  def nestedMap[F[_], B, C](f: B => C)(implicit ev: A <:< F[B], F0: Functor[F]) : Validation[E, F[C]] =
+    map(F0.map(_)(f))
+
+  /** Run the given function on the failure Functor. */
+  def leftNestedMap[F[_], B, C](f: B => C)(implicit ev: E <:< F[B], F0 : Functor[F]) : Validation[F[C], A] =
+    leftMap(F0.map(_)(f))
+
 }
 
 final case class Success[A](a: A) extends Validation[Nothing, A]
