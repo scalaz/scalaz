@@ -343,6 +343,12 @@ object \&/ extends TheseInstances {
 sealed abstract class TheseInstances extends TheseInstances0 {
   type These[A, B] =
   A \&/ B
+
+  implicit def TheseBand[A: Band, B: Band]: Band[A \&/ B] =
+    new Band[A \&/ B] {
+      def append(f1: A \&/ B, f2: => A \&/ B) =
+        f1 append f2
+    }
 }
 
 sealed abstract class TheseInstances0 extends TheseInstances1 {
