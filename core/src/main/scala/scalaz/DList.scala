@@ -19,8 +19,8 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   def apply(xs: => IList[A]): Trampoline[IList[A]] = f(xs)
 
   /** Convert to an IList. */
-  def toIList: IList[A] = apply(IList()).run
-  
+  def toIList: IList[A] = apply(IList.empty).run
+
   /** Convert to a normal list. */
   def toList: List[A] = toIList.toList
 
@@ -32,11 +32,11 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 
   /** Append one list to another in constant time. */
   def ++(as: => DList[A]): DList[A] =
-    mkDList(xs => suspend(as(xs) >>= (apply(_))))
+    mkDList(xs => suspend(as(xs) >>= f))
 
   /** List elimination of head and tail. */
   def uncons[B](z: => B, f: (A, DList[A]) => B): B =
-   (apply(IList()) >>= {
+   (apply(IList.empty) >>= {
       case INil() => return_(z)
       case ICons(x, xs) =>
         val r = f(x, fromIList(xs))
@@ -110,8 +110,8 @@ sealed abstract class DListInstances {
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList[B]()))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
 
-    def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] = 
-      DList.fromIList(BindRec[IList].tailrecM[A, B](f(_).toIList)(a))
+    def tailrecM[A, B](a: A)(f: A => DList[A \/ B]): DList[B] =
+      DList.fromIList(BindRec[IList].tailrecM[A, B](a)(f(_).toIList))
   }
   implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
     import std.list._

@@ -13,19 +13,23 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     * expression `filter(filter(fa)(f))(g)`, `g` will never be invoked
     * for any `a` where `f(a)` returns false.
     */
-  def filter[A](fa: F[A])(f: A => Boolean) =
+  def filter[A](fa: F[A])(f: A => Boolean): F[A] =
     bind(fa)(a => if (f(a)) point(a) else empty[A])
 
   /** Generalized version of Haskell's `catMaybes` */
   def unite[T[_], A](value: F[T[A]])(implicit T: Foldable[T]): F[A] =
     bind(value)((ta) => T.foldMap(ta)(a => point(a))(monoid[A]))
 
+  /** Generalized version of Haskell's `lefts` */
+  def lefts[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): F[A] =
+    bind(value)((aa) => G.leftFoldable.foldMap(aa)(a => point(a))(monoid[A]))
+
+  /** Generalized version of Haskell's `rights` */
+  def rights[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): F[B] =
+    bind(value)((bb) => G.rightFoldable.foldMap(bb)(b => point(b))(monoid[B]))
+
   /** Generalized version of Haskell's `partitionEithers` */
-  def separate[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): (F[A], F[B]) = {
-    val lefts  = bind(value)((aa) => G.leftFoldable.foldMap(aa)(a => point(a))(monoid[A]))
-    val rights = bind(value)((bb) => G.rightFoldable.foldMap(bb)(b => point(b))(monoid[B]))
-    (lefts, rights)
-  }
+  def separate[G[_, _], A, B](value: F[G[A, B]])(implicit G: Bifoldable[G]): (F[A], F[B]) = (lefts(value), rights(value))
 
   /** A version of `unite` that infers the type constructor `T`. */
   final def uniteU[T](value: F[T])(implicit T: Unapply[Foldable, T]): F[T.A] =

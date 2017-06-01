@@ -3,8 +3,7 @@ package std
 
 import _root_.java.util.concurrent.atomic.AtomicInteger
 
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{ Try, Success => TSuccess }
 
 trait FutureInstances1 {
@@ -15,24 +14,12 @@ trait FutureInstances1 {
     Semigroup.liftSemigroup[Future, A]
 }
 
-trait FutureInstances extends FutureInstances1 {
-  /**
-   * Requires explicit usage as the use of `Await.result`. Can throw an exception, which is inherently bad.
-   */
-  def futureComonad(duration: Duration)(implicit executionContext: ExecutionContext): Comonad[Future] = new FutureInstance with Comonad[Future] {
-    def copoint[A](f: Future[A]): A = Await.result(f, duration)
-  }
-
-  implicit def futureMonoid[A](implicit g: Monoid[A], ec: ExecutionContext): Monoid[Future[A]] =
-    Monoid.liftMonoid[Future, A]
-}
-
 private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with Catchable[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
   def cobind[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
-  override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
+  override def cojoin[A](a: Future[A]): Future[Future[A]] = Future.successful(a)
 
   def chooseAny[A](head: Future[A], tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
     val fs = (head +: tail).iterator.zipWithIndex.toIndexedSeq

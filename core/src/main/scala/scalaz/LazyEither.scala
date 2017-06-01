@@ -16,10 +16,10 @@ sealed abstract class LazyEither[+A, +B] {
   def ?[X](left: => X, right: => X): X =
     fold(_ => left, _ => right)
 
-  def isLeft =
+  def isLeft: Boolean =
     fold(_ => true, _ => false)
 
-  def isRight =
+  def isRight: Boolean =
     !isLeft
 
   def swap: LazyEither[B, A] =
@@ -178,7 +178,7 @@ sealed abstract class LazyEitherInstances {
       def point[A](a: => A): LazyEither[E, A] =
         LazyEither.lazyRight(a)
 
-      def cozip[A, B](a: LazyEither[E, A \/ B]) =
+      def cozip[A, B](a: LazyEither[E, A \/ B]): LazyEither[E, A] \/ LazyEither[E, B] =
         a.fold(
           e => -\/(LazyEither.lazyLeft(e))
         , {
@@ -197,12 +197,12 @@ sealed abstract class LazyEitherInstances {
         fa.left.flatMap(e => f(e))
 
       @annotation.tailrec
-      def tailrecM[A, B](f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
+      def tailrecM[A, B](a: A)(f: A => LazyEither[E, A \/ B]): LazyEither[E, B] =
         f(a) match {
           case LazyLeft(l) => LazyLeft(l)
           case LazyRight(r) => r() match {
             case \/-(b) => LazyEither.lazyRight(b)
-            case -\/(a0) => tailrecM(f)(a0)
+            case -\/(a0) => tailrecM(a0)(f)
           }
         }
     }

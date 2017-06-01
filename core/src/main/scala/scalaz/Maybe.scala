@@ -49,7 +49,7 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a left disjunction if present, otherwise
    * return a right disjunction with the provided fallback value */
   final def toLeft[B](b: => B): A \/ B =
-    cata(\/.left, \/.right(b))
+    cata(\/.left, \/-(b))
 
   /** alias for [[toLeft]] */
   final def <\/[B](b: => B): A \/ B =
@@ -58,7 +58,7 @@ sealed abstract class Maybe[A] {
   /** Turn the underlying value into a right disjunction if present, otherwise
    * return a left disjunction with the provided fallback value */
   final def toRight[B](b: => B): B \/ A =
-    cata(\/.right, \/.left(b))
+    cata(\/.right, -\/(b))
 
   /** alias for [[toRight]] */
   final def \/>[B](b: => B): B \/ A =
@@ -75,7 +75,7 @@ sealed abstract class Maybe[A] {
   final def map[B](f: A => B): Maybe[B] =
     cata(f andThen just[B], empty[B])
 
-  final def flatMap[B](f: A => Maybe[B]) =
+  final def flatMap[B](f: A => Maybe[B]): Maybe[B] =
     cata(f, empty[B])
 
   /** Convert to a standard library `Option` */
@@ -85,6 +85,9 @@ sealed abstract class Maybe[A] {
   /** Return this instance if it is a [[Maybe.Just]], otherwise the provided fallback */
   final def orElse(oa: => Maybe[A]): Maybe[A] =
     cata(_ => this, oa)
+
+  final def getOrElseF[F[_]: Applicative](fa: => F[A]): F[A] =
+    cata(Applicative[F].point[A](_), fa)
 
   /** Tag with [[Tags.First]] */
   final def first: FirstMaybe[A] = Tag(this)
@@ -182,7 +185,14 @@ object Maybe extends MaybeInstances {
   }
 }
 
-sealed abstract class MaybeInstances {
+sealed abstract class MaybeInstances0 {
+  implicit def maybeBand[A: Band]: Band[Maybe[A]] =
+    new MaybeMonoid[A] with Band[Maybe[A]] {
+      override def A = implicitly
+    }
+}
+
+sealed abstract class MaybeInstances extends MaybeInstances0 {
   import Maybe._
 
   implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
@@ -205,16 +215,12 @@ sealed abstract class MaybeInstances {
       a => Cord("Just(", A.show(a), ")"),
       "Empty"))
 
-  implicit def maybeMonoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] = new Monoid[Maybe[A]] {
-    def append(fa1: Maybe[A], fa2: => Maybe[A]) =
-      fa1.cata(
-        a1 => fa2.cata(a2 => just(A.append(a1, a2)), fa1),
-        fa2.cata(_ => fa2, empty))
+  implicit def maybeMonoid[A: Semigroup]: Monoid[Maybe[A]] =
+    new MaybeMonoid[A] {
+      override def A = implicitly
+    }
 
-    def zero = empty
-  }
-
-  implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] {
+  implicit def maybeFirstMonoid[A]: Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] = new Monoid[FirstMaybe[A]] with Band[FirstMaybe[A]] {
     val zero: FirstMaybe[A] = Tag(empty)
 
     def append(fa1: FirstMaybe[A], fa2: => FirstMaybe[A]): FirstMaybe[A] = Tag(Tag.unwrap(fa1).orElse(Tag.unwrap(fa2)))
@@ -226,7 +232,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeFirstMonad: Monad[FirstMaybe] = Tags.First.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] = new Monoid[LastMaybe[A]] {
+  implicit def maybeLastMonoid[A]: Monoid[LastMaybe[A]] with Band[LastMaybe[A]] = new Monoid[LastMaybe[A]] with Band[LastMaybe[A]] {
     val zero: LastMaybe[A] = Tag(empty)
 
     def append(fa1: LastMaybe[A], fa2: => LastMaybe[A]): LastMaybe[A] = Tag(Tag.unwrap(fa2).orElse(Tag.unwrap(fa1)))
@@ -238,7 +244,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeLastMonad: Monad[LastMaybe] = Tags.Last.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeMin[A](implicit o: Order[A]) = new Monoid[MinMaybe[A]] {
+  implicit def maybeMin[A](implicit o: Order[A]): Monoid[MinMaybe[A]] with Band[MinMaybe[A]] = new Monoid[MinMaybe[A]] with Band[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
 
     def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -255,7 +261,7 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMinMonad: Monad[MinMaybe] = Tags.Min.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit def maybeMax[A](implicit o: Order[A]) = new Monoid[MaxMaybe[A]] {
+  implicit def maybeMax[A](implicit o: Order[A]): Monoid[MaxMaybe[A]] with Band[MaxMaybe[A]] = new Monoid[MaxMaybe[A]] with Band[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
 
     def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -272,44 +278,44 @@ sealed abstract class MaybeInstances {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] = 
+  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
     new Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 
       def point[A](a: => A) = just(a)
-  
+
       override def ap[A, B](fa: => Maybe[A])(mf: => Maybe[A => B]) =
         mf.cata(f => fa.cata(f andThen just, empty), empty)
-  
+
       def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
-  
+
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => Maybe[A \/ B])(a: A): Maybe[B] =
+      def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
         f(a) match {
           case Empty() => Empty()
-          case Just(-\/(a)) => tailrecM(f)(a)
+          case Just(-\/(a)) => tailrecM(a)(f)
           case Just(\/-(b)) => Just(b)
         }
-  
+
       override def map[A, B](fa: Maybe[A])(f: A => B) = fa map f
-  
+
       def traverseImpl[F[_], A, B](fa: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]) =
         fa.cata(a => F.map(f(a))(just), F.point(empty))
-  
+
       def empty[A]: Maybe[A] = Maybe.empty
-  
+
       def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
-  
+
       override def foldRight[A, B](fa: Maybe[A], z: => B)(f: (A, => B) => B) =
         fa.cata(f(_, z), z)
-  
+
       def cozip[A, B](fa: Maybe[A \/ B]) =
-        fa.cata(_.leftMap(just).map(just), \/.left(empty))
-  
+        fa.cata(_.leftMap(just).map(just), -\/(empty))
+
       def zip[A, B](a: => Maybe[A], b: => Maybe[B]) = a.zip(b)
-  
+
       def unzip[A, B](a: Maybe[(A, B)]) =
         a.cata(ab => (just(ab._1), just(ab._2)), (empty, empty))
-  
+
       def alignWith[A, B, C](f: A \&/ B => C) = (fa, fb) =>
         fa.cata(
           a => fb.cata(
@@ -318,22 +324,22 @@ sealed abstract class MaybeInstances {
           fb.cata(
             b => just(f(\&/.That(b))),
             empty))
-  
+
       def cobind[A, B](fa: Maybe[A])(f: Maybe[A] => B) =
         fa.cobind(f)
-  
+
       override def cojoin[A](a: Maybe[A]) =
         a.cojoin
-  
+
       def pextract[B, A](fa: Maybe[A]): Maybe[B] \/ A =
-        fa.cata(\/.right, \/.left(empty))
-  
+        fa.cata(\/.right, -\/(empty))
+
       override def isDefined[A](fa: Maybe[A]): Boolean = fa.isJust
-  
+
       override def toOption[A](fa: Maybe[A]): Option[A] = fa.toOption
-  
+
       override def toMaybe[A](fa: Maybe[A]) = fa
-  
+
       override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
         fa.filter(f)
     }
@@ -346,4 +352,15 @@ private sealed trait MaybeEqual[A] extends Equal[Maybe[A]] {
     fa1.cata(
       a1 => fa2.cata(a2 => A.equal(a1, a2), false),
       fa2.cata(_ => false, true))
+}
+
+private sealed trait MaybeMonoid[A] extends Monoid[Maybe[A]] {
+  protected def A: Semigroup[A]
+
+  override def append(fa1: Maybe[A], fa2: => Maybe[A]) =
+    fa1.cata(
+      a1 => fa2.cata(a2 => Maybe.just(A.append(a1, a2)), fa1),
+      fa2.cata(_ => fa2, Maybe.empty))
+
+  override def zero = Maybe.empty
 }

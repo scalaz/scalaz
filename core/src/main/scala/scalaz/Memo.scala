@@ -24,12 +24,12 @@ object Memo extends MemoInstances {
 
   private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
-      lazy val a = new Array[V](n)
+      val a = Need(new Array[V](n))
       k => {
-        val t = a(k)
+        val t = a.value(k)
         if (t == null) {
           val v = f(k)
-          a(k) = v
+          a.value(k) = v
           v
         } else t
       }
@@ -38,7 +38,7 @@ object Memo extends MemoInstances {
 
   private class DoubleArrayMemo(n: Int, sentinel: Double) extends Memo[Int, Double] {
     override def apply(f: (Int) => Double) = {
-      lazy val a = {
+      val a = Need {
         if (sentinel == 0d) {
           new Array[Double](n)
         } else {
@@ -46,10 +46,10 @@ object Memo extends MemoInstances {
         }
       }
       k => {
-        val t = a(k)
+        val t = a.value(k)
         if (t == sentinel) {
           val v = f(k)
-          a(k) = v
+          a.value(k) = v
           v
         } else t
       }
@@ -77,6 +77,8 @@ object Memo extends MemoInstances {
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
+  @deprecated("Keys are collected too quickly for weakHashMapMemo to be very useful",
+              since = "7.3.0")
   def weakHashMapMemo[K, V]: Memo[K, V] = mutableMapMemo(new mutable.WeakHashMap[K, V])
 
   import collection.immutable
@@ -85,13 +87,11 @@ object Memo extends MemoInstances {
     var a = m
 
     memo[K, V](f =>
-      k => {
-        a get k getOrElse {
-          val v = f(k)
-          a = a updated (k, v)
-          v
-        }
-      })
+      k => a.getOrElse(k, {
+        val v = f(k)
+        a = a updated(k, v)
+        v
+      }))
   }
 
   /** Cache results in a hash map.  Nonsensical unless `K` has

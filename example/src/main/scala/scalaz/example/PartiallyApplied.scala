@@ -6,7 +6,7 @@ object PartiallyApplied extends App {
 
   function1()
 
-  def function1() {
+  def function1(): Unit = {
     import scalaz._
     import std.function._
     import syntax.monad._

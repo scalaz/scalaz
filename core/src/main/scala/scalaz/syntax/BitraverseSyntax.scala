@@ -21,18 +21,17 @@ final class BitraverseOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 }
 
 sealed trait ToBitraverseOps0 {
-    implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bitraverse, FA]) =
-      new BitraverseOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  
+  implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bitraverse, FA]) =
+    new BitraverseOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+
 }
 
 trait ToBitraverseOps extends ToBitraverseOps0 with ToBifunctorOps with ToBifoldableOps {
-  
+
   implicit def ToBitraverseOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bitraverse[F]) =
     new BitraverseOps[F,A, B](v)
-  
 
-  
+
   implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bitraverse[F[G, ?, ?]]) =
     new BitraverseOps[F[G, ?, ?], A, B](v)(F0)
 

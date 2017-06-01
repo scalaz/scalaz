@@ -10,8 +10,10 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] = 
+  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
+      import Liskov.<~<
+
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
         @tailrec def loop(a: List[A], x: Option[A]): Option[A] =
@@ -30,6 +32,7 @@ trait ListInstances extends ListInstances0 {
       def empty[A] = Nil
       def plus[A](a: List[A], b: => List[A]) = a ++ b
       override def map[A, B](l: List[A])(f: A => B) = l map f
+      override def widen[A, B](l: List[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
       override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
 
       def zip[A, B](a: => List[A], b: => List[B]) = {
@@ -58,13 +61,9 @@ trait ListInstances extends ListInstances0 {
         //    (test(!(inWord && s)), s)
         //  }
         //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
-  
-        // foldRight(l, F.point(List[B]())) {
-        //   (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
-        // }
-  
-        DList.fromList(l).foldr(F.point(List[B]())) {
-           (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
+
+        l.reverse.foldLeft(F.point(Nil: List[B])) { (flb: F[List[B]], a: A) =>
+          F.apply2(f(a), flb)(_ :: _)
         }
       }
 
@@ -114,7 +113,7 @@ trait ListInstances extends ListInstances0 {
       override def all[A](fa: List[A])(p: A => Boolean): Boolean =
         fa.forall(p)
 
-      def tailrecM[A, B](f: A => List[A \/ B])(a: A): List[B] = {
+      def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
         val bs = List.newBuilder[B]
         @scala.annotation.tailrec
         def go(xs: List[List[A \/ B]]): Unit =
@@ -122,7 +121,7 @@ trait ListInstances extends ListInstances0 {
             case (\/-(b) :: tail) :: rest =>
               bs += b
               go(tail :: rest)
-            case (-\/(a0) :: tail) :: rest => 
+            case (-\/(a0) :: tail) :: rest =>
               go(f(a0) :: tail :: rest)
             case Nil :: rest =>
               go(rest)

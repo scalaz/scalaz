@@ -493,7 +493,7 @@ object IList extends IListInstances {
     Foldable[F].foldRight(as, empty[A])(ICons(_, _))
 
   def fromOption[A](a: Option[A]): IList[A] =
-    cata(a)(single(_), IList.empty[A])
+    cata(a)(single, IList.empty[A])
 
   def fill[A](n: Int)(a: A): IList[A] = {
     @tailrec def go(i: Int, list: IList[A]): IList[A] = {
@@ -650,7 +650,7 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def widen[A, B](fa: IList[A])(implicit ev: A <~< B): IList[B] =
         fa.widen[B]
 
-      def tailrecM[A, B](f: A => IList[A \/ B])(a: A): IList[B] = {
+      def tailrecM[A, B](a: A)(f: A => IList[A \/ B]): IList[B] = {
         @tailrec
         def go(xs: IList[IList[A \/ B]], bs: IList[B]): IList[B] =
           xs match {

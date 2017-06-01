@@ -63,13 +63,13 @@ final case class Cord(self: FingerTree[Int, String]) {
    * Prepends a `String` to the beginning of this `Cord`.
    * Time complexity: O(1)
    */
-  def +:(x: => String): Cord = cord(x +: self)
+  def +:(x: String): Cord = cord(x +: self)
 
   /**
    * Prepends a `Char` to the beginning of this `Cord`.
    * Time complexity: O(1)
    */
-  def -:(x: => Char): Cord = cord(x.toString +: self)
+  def -:(x: Char): Cord = cord(x.toString +: self)
 
   /**
    * Appends a `Char` to the end of this `Cord`.
@@ -148,15 +148,17 @@ object Cord {
     else
       Cord()
 
-  implicit lazy val CordShow: Show[Cord] = new Show[Cord] {
+  implicit val CordShow: Show[Cord] = new Show[Cord] {
     override def show(x: Cord) = x
     override def shows(x: Cord) = x.toString
   }
-  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+
+  implicit val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
     def zero = empty
     def append(x: Cord, y: => Cord) = x ++ y
   }
-  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
+
+  implicit val CordEqual: Equal[Cord] = new Equal[Cord] {
     def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
   }
 }

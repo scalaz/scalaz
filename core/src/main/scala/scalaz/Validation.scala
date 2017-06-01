@@ -42,8 +42,18 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   }
 
   /** If this validation is success, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](success: => X): SwitchingValidation[X] =
     new SwitchingValidation[X](success)
+
+  /** If this validation is success, return `success`, otherwise, return
+    * `fail`.
+    */
+  def foldConst[X](fail: => X, success: => X): X = this match {
+    case Failure(_) => fail
+    case Success(_) => success
+  }
 
   /** Return `true` if this validation is success. */
   def isSuccess: Boolean = this match {
@@ -387,6 +397,12 @@ object Validation extends ValidationInstances {
   def failureNel[E, A](e: E): ValidationNel[E, A] =
     Failure(NonEmptyList(e))
 
+  def lift[E, A](a: A)(f : A => Boolean, fail: E) : Validation[E, A] =
+    if (f(a)) failure(fail) else success(a)
+
+  def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
+    lift(a)(f, fail).toValidationNel
+
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
@@ -449,7 +465,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   }
 }
 
-final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) extends AnyVal {
+final class ValidationFlatMap[E, A] private[scalaz](private val self: Validation[E, A]) extends AnyVal {
   /** Bind through the success of this validation. */
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     self match {

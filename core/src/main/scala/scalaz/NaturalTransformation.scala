@@ -15,12 +15,22 @@ trait NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
 
-  def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G) {
-    def apply[A](ea: E[A]) = self(f(ea))
-  }
+  def compose[E[_]](f: E ~> F): E ~> G = λ[E ~> G](
+    ea => self(f(ea))
+  )
 
   def andThen[H[_]](f: G ~> H): F ~> H =
     f compose self
+
+  /**
+    * Combines this [[scalaz.NaturalTransformation]] with another one to create one
+    * that can transform [[scalaz.Coproduct]].
+    *
+    * The current NaturalTransformation will be used to transform the Left (`F`) value of
+    * the [[scalaz.Coproduct]] while the other one will be used to transform the Right (`H`) value.
+    */
+  def or[H[_], F0[A] <: F[A], G0[A] >: G[A]](hg: H ~> G0): Coproduct[F0, H, ?] ~> G0 =
+    λ[Coproduct[F0, H, ?] ~> G0](_.fold(self, hg))
 }
 
 trait NaturalTransformations {
@@ -30,16 +40,12 @@ trait NaturalTransformations {
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id = 
-    new (Id ~> Id) {
-      def apply[A](a: A) = a
-    }
+  def id: Id ~> Id =
+    λ[Id ~> Id](a => a)
 
   /** A universally quantified identity function */
-  def refl[F[_]] =
-    new (F ~> F) {
-      def apply[A](fa: F[A]) = fa
-    }
+  def refl[F[_]]: F ~> F =
+    λ[F ~> F](fa => fa)
 
   /** Reify a `NaturalTransformation`. */
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)

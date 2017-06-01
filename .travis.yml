@@ -4,39 +4,98 @@ sudo: false
 cache:
   directories:
     - $HOME/.ivy2/cache
-
-    # At the moment, sbt 0.13.5 is preinstalled in Travis VM image,
-    # which fortunately corresponds to current scalaz settings.
-    # The line below can be used to cache a given sbt version.
-    # - $HOME/.sbt/launchers/0.13.x
-
-    # At the moment, Scala 2.11.2 and 2.10.4 are preinstalled in Travis VM
-    # image, which fortunately corresponds to current scalaz settings.
-    # The line below is used to cache the scala version used by the build
-    # job, as these versions might be replaced after a Travis CI build
-    # environment upgrade (e.g. scala 2.11.2 could be replaced by scala 2.11.4).
-    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
+    - $HOME/.sbt/launchers
 
 language: scala
 scala:
-  - 2.11.7
-  - 2.10.6
+  - 2.12.2
+  - 2.11.11
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
-
+  - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
+  - git show --oneline --check
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
-matrix:
-  include:
-    - scala: 2.12.0-M3
-      jdk: oraclejdk8
+env:
+  matrix:
+  - TEST_PROJECT="rootJVM"
+  - TEST_PROJECT="rootJS"
 
 addons:
   apt:
     packages:
       - oracle-java8-installer
+
+matrix:
+  include:
+  - scala: 2.13.0-M1
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJVM"
+    script:
+    # https://github.com/non/kind-projector/issues/50
+    - git clone https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - git checkout v0.9.3
+    - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
+    - cd ..
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
+  - scala: 2.13.0-M1
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJS"
+    script:
+    # https://github.com/non/kind-projector/issues/50
+    - git clone https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - git checkout v0.9.3
+    - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
+    - cd ..
+    # https://github.com/rickynils/scalacheck/issues/330
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes coreJS/compile effectJS/compile iterateeJS/compile
+  - scala: 2.11.11
+    jdk: oraclejdk8
+    sudo: required
+    before_install:
+    - sudo apt-get -qq update
+    - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main' >> /etc/apt/sources.list"
+    - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise main' >> /etc/apt/sources.list"
+    - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+    - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    - sudo apt-get -qq update
+    - sudo apt-get install -y libgc-dev clang++-3.7 llvm-3.7 llvm-3.7-dev llvm-3.7-runtime llvm-3.7-tool libunwind7-dev
+    # Install re2
+    # https://github.com/scala-native/scala-native/commit/1d312519788534ff41477e4d7f758a6e7451be05#diff-354f30a63fb0907d4ad57269548329e3R28
+    - sudo apt-get install -y make
+    - export CXX=clang++-3.7
+    - git clone https://code.googlesource.com/re2
+    - pushd re2
+    - git checkout 2017-03-01
+    - make -j4 test
+    - sudo make install prefix=/usr
+    - make testinstall prefix=/usr
+    - popd
+    script:
+    - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+
+  - dist: trusty
+    group: edge
+    sudo: required
+    scala: 2.12.2
+    jdk: oraclejdk9
+    script:
+    # https://github.com/sbt/sbt/pull/2951
+    - git clone https://github.com/retronym/java9-rt-export
+    - cd java9-rt-export/
+    - git checkout 1019a2873d057dd7214f4135e84283695728395d
+    - jdk_switcher use oraclejdk8
+    - sbt package
+    - jdk_switcher use oraclejdk9
+    - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
+    - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
+    - cd ..
+    - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes rootJVM/test rootJS/test

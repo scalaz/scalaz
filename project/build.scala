@@ -6,8 +6,6 @@ import GenTypeClass._
 
 import java.awt.Desktop
 
-import scala.collection.immutable.IndexedSeq
-
 import sbtrelease._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
@@ -20,11 +18,16 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import sbtunidoc.Plugin._
-import sbtunidoc.Plugin.UnidocKeys._
+import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import sbtcrossproject.CrossPlugin.autoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{isScalaJSProject, scalaJSOptimizerOptions}
 
-object build extends Build {
+object build {
   type Sett = Def.Setting[_]
+
+  val rootNativeId = "rootNative"
+  val nativeTestId = "nativeTest"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -43,67 +46,144 @@ object build extends Build {
   )
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
+  val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
-  def scalac210Options = Seq("-Yno-generic-signatures")
+  private[this] val tagName = Def.setting{
+    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+  }
+  private[this] val tagOrHash = Def.setting{
+    if(isSnapshot.value) gitHash() else tagName.value
+  }
+
+  val scalajsProjectSettings = Seq[Sett](
+    scalaJSOptimizerOptions ~= { options =>
+      // https://github.com/scala-js/scala-js/issues/2798
+      try {
+        scala.util.Properties.isJavaAtLeast("1.8")
+        options
+      } catch {
+        case _: NumberFormatException =>
+          options.withParallel(false)
+      }
+    },
+    scalacOptions += {
+      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
+      s"-P:scalajs:mapSourceURI:$a->$g/"
+    }
+  )
+
+  lazy val notPublish = Seq(
+    publishArtifact := false,
+    publish := {},
+    publishLocal := {},
+    publishSigned := {},
+    publishLocalSigned := {}
+  )
+
+  // avoid move files
+  object ScalazCrossType extends sbtcrossproject.CrossType {
+    override def projectDir(crossBase: File, projectType: String) =
+      crossBase / projectType
+
+    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
+      val dir = projectType match {
+        case JVMPlatform => "jvm"
+        case JSPlatform => "js"
+        case NativePlatform => "native"
+      }
+      crossBase / dir
+    }
+
+    def shared(projectBase: File, conf: String) =
+      projectBase.getParentFile / "src" / conf / "scala"
+
+    override def sharedSrcDir(projectBase: File, conf: String) =
+      Some(shared(projectBase, conf))
+  }
+
+  private val Scala211_jvm_and_js_options = Seq(
+    "-Ybackend:GenBCode",
+    "-Ydelambdafy:method",
+    "-target:jvm-1.8"
+  )
+
+  private def Scala211 = "2.11.11"
+
+  private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
-
-    scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
+    mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
+      (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
+    },
+    scalaVersion := "2.12.2",
+    crossScalaVersions := Seq(Scala211, "2.12.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.12.5",
+    scalaCheckVersion := "1.13.4",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
+      "-Xfuture",
+      "-Ypartial-unification",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,10)) => scalac210Options
-      case _ => Nil
+      case Some((2,11)) => Scala211_jvm_and_js_options
+      case _ => Seq("-opt:l:method")
     }),
 
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
-      val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
+    scalacOptions in (Compile, doc) ++= {
+      val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
+      Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1"),
-
-    (unmanagedClasspath in Compile) += Attributed.blank(file("dummy")),
-
-    genTypeClasses <<= (scalaSource in Compile, streams, typeClasses) map {
-      (scalaSource, streams, typeClasses) =>
-        typeClasses.flatMap {
-          tc =>
-            val typeClassSource0 = typeclassSource(tc)
-            typeClassSource0.sources.map(_.createOrUpdate(scalaSource, streams.log))
-        }
+    testOptions in Test += {
+      val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
+        if(isScalaJSProject.value)
+          Seq("-minSuccessfulTests", "10")
+        else
+          Seq("-minSuccessfulTests", "33")
+      }
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    checkGenTypeClasses <<= genTypeClasses.map{ classes =>
+    genTypeClasses := {
+      typeClasses.value.flatMap { tc =>
+        val dir = name.value match {
+          case ConcurrentName =>
+            (scalaSource in Compile).value
+          case _ =>
+            ScalazCrossType.shared(baseDirectory.value, "main")
+        }
+        typeclassSource(tc).sources.map(_.createOrUpdate(dir, streams.value.log))
+      }
+    },
+    checkGenTypeClasses := {
+      val classes = genTypeClasses.value
       if(classes.exists(_._1 != FileStatus.NoChange))
         sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
     },
     typeClasses := Seq(),
-    genToSyntax <<= typeClasses map {
-      (tcs: Seq[TypeClass]) =>
+    genToSyntax := {
+      val tcs = typeClasses.value
       val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
       val all = "object all extends " + tcs.map(tc => "To%sSyntax".format(tc.name)).mkString(" with ")
       objects + "\n\n" + all
     },
-    typeClassTree <<= typeClasses map {
-      tcs => tcs.map(_.doc).mkString("\n")
+    typeClassTree := {
+      typeClasses.value.map(_.doc).mkString("\n")
     },
 
-    showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
+    showDoc in Compile := {
+      val _ = (doc in Compile).value
+      val out = (target in doc in Compile).value
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
@@ -118,15 +198,19 @@ object build extends Build {
       checkSnapshotDependencies,
       inquireVersions,
       runTest,
+      SetScala211,
+      releaseStepCommand(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       publishSignedArtifacts,
+      SetScala211,
+      releaseStepCommand(s"${rootNativeId}/publishSigned"),
       setNextVersion,
       commitNextVersion,
       pushChanges
     ),
-
+    releaseTagName := tagName.value,
     pomIncludeRepository := {
       x => false
     },
@@ -169,109 +253,110 @@ object build extends Build {
       ),
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.7.1" cross CrossVersion.binary)
+    kindProjectorVersion := "0.9.3",
+    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
-  lazy val scalaz = Project(
-    id = "scalaz",
-    base = file("."),
-    settings = standardSettings ++ unidocSettings ++ Seq[Sett](
-      artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
-      packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
-    ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+  private[this] val jvm_js_settings = Seq(
+    unmanagedSourceDirectories in Compile += {
+      baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
+    }
   )
 
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
-    settings = standardSettings ++ Seq[Sett](
+  // workaround for https://github.com/scala-native/scala-native/issues/562
+  private[this] def scalaNativeDiscoverOrDummy(binaryName: String, binaryVersions: Seq[(String, String)]): File = {
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L59
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L284-L289
+    try {
+      val clazz = scalanative.sbtplugin.ScalaNativePluginInternal.getClass
+      val instance = clazz.getField(scala.reflect.NameTransformer.MODULE_INSTANCE_NAME).get(null)
+      val method = clazz.getMethods.find(_.getName contains "discover").getOrElse(sys.error("could not found the discover method"))
+      method.invoke(instance, binaryName, binaryVersions).asInstanceOf[File]
+    } catch {
+      case e: Throwable =>
+        val e0 = e match {
+          case _: java.lang.reflect.InvocationTargetException if e.getCause != null =>
+            e.getCause
+          case _ =>
+            e
+        }
+        scala.Console.err.println(e0)
+        file("dummy")
+    }
+  }
+
+  val nativeSettings = Seq(
+    nativeClang := scalaNativeDiscoverOrDummy("clang", Seq(("3", "8"), ("3", "7"))),
+    nativeClangPP := scalaNativeDiscoverOrDummy("clang++", Seq(("3", "8"), ("3", "7"))),
+    scalacOptions --= Scala211_jvm_and_js_options,
+    scalaVersion := Scala211,
+    crossScalaVersions := Scala211 :: Nil
+  )
+
+  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-core",
-      typeClasses := TypeClass.core,
-      sourceGenerators in Compile <+= (sourceManaged in Compile) map {
+      sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      },
+      }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
+      buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
+      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+    .jsSettings(
+      jvm_js_settings,
+      scalajsProjectSettings,
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.1"
     )
-  ).enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+    .jvmSettings(
+      jvm_js_settings,
+      libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+      }.toList,
+      typeClasses := TypeClass.core
+    )
+    .nativeSettings(
+      nativeSettings
+    )
 
-  lazy val concurrent = Project(
-    id = "concurrent",
-    base = file("concurrent"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-concurrent",
-      typeClasses := TypeClass.concurrent,
-      osgiExport("scalaz.concurrent"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    ),
-    dependencies = Seq(core, effect)
-  )
+  final val ConcurrentName = "scalaz-concurrent"
 
-  lazy val effect = Project(
-    id = "effect",
-    base = file("effect"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-effect",
-      typeClasses := TypeClass.effect,
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
-    ),
-    dependencies = Seq(core)
-  )
+      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+    .dependsOn(core)
+    .jsSettings(scalajsProjectSettings : _*)
+    .jvmSettings(
+      typeClasses := TypeClass.effect
+    )
+    .nativeSettings(
+      nativeSettings
+    )
 
-  lazy val iteratee = Project(
-    id = "iteratee",
-    base = file("iteratee"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+    .settings(standardSettings: _*)
+    .settings(
       name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee")
-    ),
-    dependencies = Seq(effect)
-  )
-
-  lazy val example = Project(
-    id = "example",
-    base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-example",
-      publishArtifact := false
+      osgiExport("scalaz.iteratee"))
+    .dependsOn(core, effect)
+    .jsSettings(scalajsProjectSettings : _*)
+    .nativeSettings(
+      nativeSettings
     )
-  )
 
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, iteratee),
-    settings     = standardSettings ++ Seq[Sett](
-      name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
-      osgiExport("scalaz.scalacheck")
-    )
-  )
-
-  lazy val tests = Project(
-    id = "tests",
-    base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
-      name := "scalaz-tests",
-      publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
-    )
-  )
-
-  lazy val publishSetting = publishTo <<= (version).apply{
-    v =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  lazy val publishSetting = publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (version.value.trim.endsWith("SNAPSHOT"))
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {

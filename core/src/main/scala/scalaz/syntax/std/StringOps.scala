@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{string => s}
 
-final class StringOps(val self: String) extends AnyVal {
+final class StringOps(private val self: String) extends AnyVal {
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
@@ -37,6 +37,10 @@ final class StringOps(val self: String) extends AnyVal {
   def parseFloat: Validation[NumberFormatException, Float] = s.parseFloat(self)
 
   def parseDouble: Validation[NumberFormatException, Double] = s.parseDouble(self)
+
+  def parseBigInt: Validation[NumberFormatException, BigInt] = s.parseBigInt(self)
+
+  def parseBigDecimal: Validation[NumberFormatException, BigDecimal] = s.parseBigDecimal(self)
 }
 
 trait ToStringOps {

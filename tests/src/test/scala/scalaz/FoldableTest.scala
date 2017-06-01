@@ -72,6 +72,13 @@ object FoldableTest extends SpecLite {
       if (xs.length > 0) xs.distinctE(Equal.equal((_,_) => true)).length must_== 1
   }
 
+  "distinctBy" ! {
+    case class Foo(a: Int, b: String)
+    val xs = IList(Foo(1, "x"), Foo(2, "x"), Foo(1, "y"))
+    xs.distinctBy(_.a) must_== IList(Foo(1, "x"), Foo(2, "x"))
+    xs.distinctBy(_.b) must_== IList(Foo(1, "x"), Foo(1, "y"))
+  }
+
   "sumr1Opt" ! forAll {
     (xs: List[String]) => xs match {
       case Nil => xs.sumr1Opt must_== None
@@ -133,6 +140,10 @@ object FoldableTest extends SpecLite {
           case None      => (xs foldMap1Opt strlen) must_== None
           case Some(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
         }
+    }
+
+    "fold1Opt" ! forAll {
+      (xs: List[Int]) => xs.fold1Opt must_== xs.suml1Opt
     }
 
     "foldMapM" ! forAll {
@@ -216,11 +227,12 @@ object FoldableTests {
       F.all(fa)(f) === F.toList(fa).forall(f)
     }
 
-  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) =
-    new Properties("foldable") {
-      property("consistent any") = anyConsistent[F, Int](_ > 0)
-      property("consistent all") = allConsistent[F, Int](_ > 0)
-      property("any is lazy") = anyIsLazy[F, Int]
-      property("all is lazy") = allIsLazy[F, Int]
-    }
+  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) = {
+    val p = new Properties("foldable")
+    p.property("consistent any") = anyConsistent[F, Int](_ > 0)
+    p.property("consistent all") = allConsistent[F, Int](_ > 0)
+    p.property("any is lazy") = anyIsLazy[F, Int]
+    p.property("all is lazy") = allIsLazy[F, Int]
+    p
+  }
 }

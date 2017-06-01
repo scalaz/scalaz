@@ -20,6 +20,7 @@ object EitherTTest extends SpecLite {
   checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
+  checkAll(monadTrans.laws[EitherT[?[_], Int, ?], List])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
@@ -85,6 +86,10 @@ object EitherTTest extends SpecLite {
     def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[F, ?, ?]]
     def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[F, ?, ?]]
     def monadError[F[_] : Monad, A] = MonadError[EitherT[F, A, ?], A]
+    def nondeterminism[F[_] : Nondeterminism, A] = Nondeterminism[EitherT[F, A, ?]]
+    def nondeterminismMonad[F[_] : Nondeterminism, A] = Monad[EitherT[F, A, ?]]
+    def nondeterminismFunctor[F[_] : Nondeterminism: BindRec: Traverse, A] = Functor[EitherT[F, A, ?]]
+    def nondeterminismMonad[F[_] : Nondeterminism: BindRec: Traverse, A] = Monad[EitherT[F, A, ?]]
   }
 
   def compilationTests() = {

@@ -21,7 +21,7 @@ object OptionTTest extends SpecLite {
   "show" ! forAll { a: OptionTList[Int] =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
   }
-  
+
   "optionT" ! forAll { ass: List[Option[Int]] =>
       OptionT.optionT(ass).run == ass
   }

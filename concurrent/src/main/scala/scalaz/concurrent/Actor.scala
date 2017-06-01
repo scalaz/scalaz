@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)
                          (implicit val strategy: Strategy) {
-  private val head = new AtomicReference[Node[A]]
+  private[this] val head = new AtomicReference[Node[A]]
 
   val toEffect: Run[A] = Run[A](a => this ! a)
 

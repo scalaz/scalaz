@@ -200,8 +200,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
   implicit def nullResultMonadPlus[X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
     new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
-      override def tailrecM[A, B](f: A => NullResult[X, A \/ B])(a: A) =
-        NullResult(r => BindRec[Option].tailrecM(f(_: A)(r))(a))
+      override def tailrecM[A, B](a: A)(f: A => NullResult[X, A \/ B]) =
+        NullResult(r => BindRec[Option].tailrecM(a)(f(_)(r)))
       override def map[A, B](a: NullResult[X, A])(f: A => B) =
         a map f
       override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =

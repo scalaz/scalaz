@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import Liskov.<~<
 import vector._
 import annotation.tailrec
 
@@ -20,6 +21,7 @@ trait VectorInstances extends VectorInstances0 {
     def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
     def isEmpty[A](a: Vector[A]) = a.isEmpty
     override def map[A, B](v: Vector[A])(f: A => B) = v map f
+    override def widen[A, B](fa: Vector[A])(implicit ev: A <~< B) = Liskov.co(ev)(fa)
     override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p
 
     def zip[A, B](a: => Vector[A], b: => Vector[B]): Vector[(A, B)] = {
@@ -30,8 +32,8 @@ trait VectorInstances extends VectorInstances0 {
     def unzip[A, B](a: Vector[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      DList.fromIList(IList.fromFoldable(v)).foldr(F.point(empty[B])) {
-         (a, fbs) => F.apply2(f(a), fbs)(_ +: _)
+      v.foldLeft(F.point(empty[B])) { (fvb, a) =>
+        F.apply2(fvb, f(a))(_ :+ _)
       }
     }
 
@@ -56,7 +58,7 @@ trait VectorInstances extends VectorInstances0 {
       r
     }
 
-    def tailrecM[A, B](f: A => Vector[A \/ B])(a: A): Vector[B] = {
+    def tailrecM[A, B](a: A)(f: A => Vector[A \/ B]): Vector[B] = {
       val bs = Vector.newBuilder[B]
       @scala.annotation.tailrec
       def go(xs: List[Vector[A \/ B]]): Unit =

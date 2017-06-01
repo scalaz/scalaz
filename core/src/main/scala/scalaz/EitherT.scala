@@ -17,19 +17,24 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   import OptionT._
 
   final class Switching_\/[X](r: => X) {
-    def <<?:(left: => X)(implicit F: Functor[F]): F[X] =
-      F.map(EitherT.this.run){
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X)(implicit F: Functor[F]): F[X] =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): Switching_\/[X] =
     new Switching_\/(right)
 
   def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
     F.map(run)(_.fold(l, r))
+
+  def foldM[X](l: A => F[X], r: B => F[X])(implicit F: Bind[F]): F[X] =
+    F.join(fold(l, r))
+
+  def foldConst[X](l: => X, r: => X)(implicit F: Functor[F]): F[X] =
+    F.map(run)(_.foldConst(l, r))
 
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
@@ -76,6 +81,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     flatMapF {
       f andThen (mb => M.map(mb)(b => \/-(b)))
     }
+  
+  def mapT[G[_], C, D](f: F[A \/ B] => G[C \/ D]): EitherT[G, C, D] =
+    EitherT(f(run))
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
@@ -120,6 +128,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.fold(_ => Nil, _ :: Nil))
+
+  /** Return a `this` on the left-side or a `that` on the right-side of this disjunction  */
+  def toThese(implicit F: Functor[F]): TheseT[F, A, B] = TheseT(F.map(run)(_.toThese))
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
@@ -254,12 +265,12 @@ object EitherT extends EitherTInstances {
   def rightU[A]: EitherTRight[A] =
     new EitherTRight[A](true)
 
-  private[scalaz] final class EitherTLeft[B](val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTLeft[B](private val dummy: Boolean) extends AnyVal {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
       left[F.M, F.A, B](F(fa))(F.TC)
   }
 
-  private[scalaz] final class EitherTRight[A](val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTRight[A](private val dummy: Boolean) extends AnyVal {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
       right[F.M, A, F.A](F(fb))(F.TC)
   }
@@ -284,7 +295,14 @@ object EitherT extends EitherTInstances {
 
 }
 
-sealed abstract class EitherTInstances4 {
+sealed abstract class EitherTInstances5 {
+  implicit def eitherTNondeterminism[F[_], E](implicit F0: Nondeterminism[F]): Nondeterminism[EitherT[F, E, ?]] =
+    new EitherTNondeterminism[F, E] {
+      implicit def F = F0
+    }
+}
+
+sealed abstract class EitherTInstances4 extends EitherTInstances5{
   implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
@@ -293,7 +311,7 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] = 
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -372,15 +390,15 @@ private trait EitherTBind[F[_], E] extends Bind[EitherT[F, E, ?]] with EitherTFu
 }
 
 private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] with EitherTBind[F, E] {
-  implicit def F: Monad[F] 
+  implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
+  final def tailrecM[A, B](a: A)(f: A => EitherT[F, E, A \/ B]): EitherT[F, E, B] =
     EitherT(
-      B.tailrecM[A, E \/ B](a => F.map(f(a).run) { 
+      B.tailrecM[A, E \/ B](a)(a => F.map(f(a).run) {
         // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
-        _.fold(e => \/.right(\/.left(e)), _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
-      })(a)
+        _.fold(e => \/-(-\/(e)), _.fold(\/.left, b => \/-(\/-(b))))
+      })
     )
 }
 
@@ -446,9 +464,8 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[F, ?, ?]] with 
 }
 
 private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]]] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (EitherT[M, A, ?] ~> EitherT[N, A, ?]) {
-    def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
-  }
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
+    λ[EitherT[M, A, ?] ~> EitherT[N, A, ?]](_ mapT f)
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 
@@ -490,5 +507,15 @@ private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E]
     EitherT(F.bind(fa.run) {
       case -\/(e) => f(e).run
       case r => F.point(r)
+    })
+}
+
+private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[F, E, ?]] with EitherTMonad[F, E] {
+  implicit def F: Nondeterminism[F]
+
+  def chooseAny[A](head: EitherT[F, E, A], tail: Seq[EitherT[F, E, A]]): EitherT[F, E, (A, Seq[EitherT[F, E, A]])] =
+    EitherT(F.map(F.chooseAny(head.run, tail map (_.run))) {
+      case (a, residuals) =>
+        a.map((_, residuals.map(new EitherT(_))))
     })
 }

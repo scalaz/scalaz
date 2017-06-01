@@ -14,10 +14,10 @@ import Liskov.<~<
  * `NumberFormatException` [[\/]] `Int`. However, since there is no need to actually throw an exception, the type (`A`)
  * chosen for the "left" could be any type representing an error and has no need to actually extend `Exception`.
  *
- * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased, so methods such as `map` and
- * `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more convenient to use
- * than `scala.Either` in a monadic context. Methods such as `swap`, `swapped`, and `leftMap` provide functionality
- * that `scala.Either` exposes through left projections.
+ * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased for all Scala versions, so methods
+ * such as `map` and `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more
+ * convenient to use than `scala.Either` in a monadic context in Scala versions <2.12. Methods such as `swap`,
+ * `swapped`, and `leftMap` provide functionality that `scala.Either` exposes through left projections.
  *
  * `A` [[\/]] `B` is also isomorphic to [[Validation]]`[A, B]`. The subtle but important difference is that [[Applicative]]
  * instances for [[Validation]] accumulates errors ("lefts") while [[Applicative]] instances for [[\/]] fail fast on the
@@ -26,14 +26,13 @@ import Liskov.<~<
  */
 sealed abstract class \/[+A, +B] extends Product with Serializable {
   final class SwitchingDisjunction[X](r: => X) {
-    def <<?:(left: => X): X =
-      \/.this match {
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X): X =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
     new SwitchingDisjunction[X](right)
 
@@ -56,6 +55,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     this match {
       case -\/(a) => l(a)
       case \/-(b) => r(b)
+    }
+
+  /** Evaluate `l` and return if left, otherwise, `r`. */
+  def foldConst[X](l: => X, r: => X): X =
+    this match {
+      case -\/(a) => l
+      case \/-(b) => r
     }
 
   /** Spin in tail-position on the right value of this disjunction. */
@@ -305,9 +311,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case -\/(a) => Failure(a)
       case \/-(b) => Success(b)
     }
-  
+
   /** Convert to a ValidationNel. */
-  def validationNel[AA>:A] : ValidationNel[AA,B] = 
+  def validationNel[AA>:A] : ValidationNel[AA,B] =
     this match {
       case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
@@ -435,16 +441,22 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
+  implicit def DisjunctionBand[A: Band, B: Band]: Band[A \/ B] =
+    new Band[A \/ B] {
+      def append(a1: A \/ B, a2: => A \/ B) =
+        a1 +++ a2
+    }
+
   implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
     new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
+      def tailrecM[A, B](a: A)(f: A => L \/ (A \/ B)): L \/ B =
         f(a) match {
           case l @ -\/(_) => l
-          case \/-(-\/(a0)) => tailrecM(f)(a0)
+          case \/-(-\/(a0)) => tailrecM(a0)(f)
           case \/-(rb @ \/-(_)) => rb
         }
 
@@ -500,9 +512,9 @@ sealed abstract class DisjunctionInstances2 {
   implicit val DisjunctionAssociative: Associative[\/] = new Associative[\/] {
     def reassociateLeft[A, B, C](f: \/[A, \/[B, C]]) =
       f.fold(
-        a => \/.left(\/.left(a)),
+        a => -\/(-\/(a)),
         _.fold(
-          b => \/.left(\/.right(b)),
+          b => -\/(\/-(b)),
           \/.right
         )
       )
@@ -511,9 +523,9 @@ sealed abstract class DisjunctionInstances2 {
       f.fold(
         _.fold(
           \/.left,
-          b => \/.right(\/.left(b))
+          b => \/-(-\/(b))
         ),
-        c => \/.right(\/.right(c))
+        c => \/-(\/-(c))
       )
   }
 }

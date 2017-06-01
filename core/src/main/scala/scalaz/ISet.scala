@@ -5,8 +5,8 @@ import Ordering._
 import std.option._
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.0.0/docs/Data-Set.html]]
- * @see [[https://github.com/haskell/containers/blob/v0.5.0.0/Data/Set/Base.hs]]
+ * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
+ * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Set/Base.hs]]
  */
 sealed abstract class ISet[A] {
   import ISet._
@@ -14,7 +14,7 @@ sealed abstract class ISet[A] {
   val size: Int
 
   // -- * Query
-  final def isEmpty =
+  final def isEmpty: Boolean =
     this match {
       case Tip() => true
       case Bin(_, _, _) => false
@@ -33,10 +33,10 @@ sealed abstract class ISet[A] {
     }
 
   /** Alias for member */
-  final def contains(x: A)(implicit o: Order[A]) =
+  final def contains(x: A)(implicit o: Order[A]): Boolean =
     member(x)
 
-  final def notMember(x: A)(implicit o: Order[A]) =
+  final def notMember(x: A)(implicit o: Order[A]): Boolean =
     !member(x)
 
   @tailrec
@@ -143,7 +143,7 @@ sealed abstract class ISet[A] {
     }
   }
 
-  final def isSubsetOf(other: ISet[A])(implicit o: Order[A]) =
+  final def isSubsetOf(other: ISet[A])(implicit o: Order[A]): Boolean =
     (this.size <= other.size) && this.isSubsetOfX(other)
 
   private def isSubsetOfX(other: ISet[A])(implicit o: Order[A]): Boolean =
@@ -157,7 +157,7 @@ sealed abstract class ISet[A] {
         found && l.isSubsetOfX(lt) && r.isSubsetOfX(gt)
     }
 
-  final def isProperSubsetOf(other: ISet[A])(implicit o: Order[A]) =
+  final def isProperSubsetOf(other: ISet[A])(implicit o: Order[A]): Boolean =
     (this.size < other.size) && this.isSubsetOf(other)
 
   // -- * Construction
@@ -250,10 +250,10 @@ sealed abstract class ISet[A] {
   }
 
   // -- * Operators
-  final def \\ (other: ISet[A])(implicit o: Order[A]) =
+  final def \\ (other: ISet[A])(implicit o: Order[A]): ISet[A] =
     difference(other)
 
-  final def intersection(other: ISet[A])(implicit o: Order[A]) = {
+  final def intersection(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
     def hedgeInt(blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (_, Tip()) =>
@@ -329,10 +329,75 @@ sealed abstract class ISet[A] {
         }
     }
 
+  final def splitRoot: List[ISet[A]] =
+    this match {
+      case Tip()        => List.empty[ISet[A]]
+      case Bin(x, l, r) => List(l, singleton(x), r)
+    }
+
+  // -- * Index
+  /** Alias for Foldable[ISet].index */
+  final def elemAt(i: Int): Option[A] =
+    Foldable[ISet].index(this, i)
+
+  final def lookupIndex(x: A)(implicit o: Order[A]): Option[Int] = {
+    @tailrec
+    def loop(s: ISet[A], i: Int): Option[Int] =
+      s match {
+        case Tip() =>
+          none
+        case Bin(y, l, r) =>
+          val sizeL = l.size
+          o.order(y, x) match {
+            case LT =>
+              loop(r, i + sizeL + 1)
+            case GT =>
+              loop(l, i)
+            case EQ =>
+              some(i + sizeL)
+          }
+      }
+
+    loop(this, 0)
+  }
+
+  final def deleteAt(i: Int): ISet[A] =
+    this match {
+      case Tip() =>
+        Tip()
+      case Bin(x, l, r) =>
+        import std.anyVal._
+        val sizeL = l.size
+        Order[Int].order(i, sizeL) match {
+          case LT =>
+            balanceR(x, l.deleteAt(i), r)
+          case GT =>
+            balanceL(x, l, r.deleteAt(i - sizeL - 1))
+          case EQ =>
+            glue(l, r)
+        }
+    }
+
   /**
-    * For the `Functor` composition law to hold it is important that the `Order[B]` is substitutive for the `Order[A]` –
-    * that is, that the `Order[B]` should be __no stronger__, it should not distinguish two `B` instances that would
-    * be considered as equal `A` instances.
+    * The `Functor` composition law only holds for functions that preserve
+    * equivalence, i.e. for functions `f` such that
+    *
+    *  -  ∀ a1, a2 ∈ A
+    *    -  `Order[A].equal(a1, a2)` ⇒ `Order[B].equal(f(a1), f(a2))`
+    *
+    * In the case when the equivalence implied by `Order[A]` is in fact
+    * _equality_, i.e. the finest equivalence, i.e. satisfying the
+    * _substitution property_ (which is the above property quantified over
+    * all `f`, see [[https://en.wikipedia.org/wiki/Equality_(mathematics)#Some_basic_logical_properties_of_equality Wikipedia page on Equality]]),
+    * the requirement holds for all `f` by definition.
+    *
+    * When `Order` instances are viewed as "mere" equivalences (as opposed
+    * to equalities), we can loosely say that `ISet` is an (endo-)functor
+    * in the category _Equiv_ of sets with an equivalence relation (where
+    * the morphishms are equivalence-preserving functions, i.e. exactly the
+    * functions satisfying the above requirement). By contrast, [[Functor]]
+    * instances are functors in the _Scala_ category, whose morphisms are
+    * arbitrary functions, including the ones that don't preserve equivalence.
     *
     * '''Note:''' this is not able to implement `Functor` due to the `Order` constraint on the destination type,
     * however it still is a functor in the mathematical sense.
@@ -346,7 +411,7 @@ sealed abstract class ISet[A] {
     -- for some @(x,y)@, @x \/= y && f x == f y@
     }}}
     */
-  def map[B: Order](f: A => B) =
+  def map[B: Order](f: A => B): ISet[B] =
     fromList(toList.map(f))
 
   // -- * Folds
@@ -433,17 +498,17 @@ sealed abstract class ISet[A] {
     }
 
   // -- ** List
-  final def elems =
+  final def elems: List[A] =
     toAscList
 
-  final def toList =
+  final def toList: List[A] =
     toAscList
 
   // -- ** Ordered list
-  final def toAscList =
+  final def toAscList: List[A] =
     foldRight(List.empty[A])(_ :: _)
 
-  final def toDescList =
+  final def toDescList: List[A] =
     foldLeft(List.empty[A])((a, b) => b :: a)
 
   private def glue[A](l: ISet[A], r: ISet[A]): ISet[A] =
@@ -580,13 +645,14 @@ sealed abstract class ISetInstances {
       f.toAscList.mkString("ISet(", ",", ")")
   }
 
-  implicit def setMonoid[A: Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
-    def zero: ISet[A] =
-      empty[A]
+  implicit def setMonoid[A: Order]: Monoid[ISet[A]] with Band[ISet[A]] =
+    new Monoid[ISet[A]] with Band[ISet[A]] {
+      def zero: ISet[A] =
+        empty[A]
 
-    def append(a: ISet[A], b: => ISet[A]): ISet[A] =
-      a union b
-  }
+      def append(a: ISet[A], b: => ISet[A]): ISet[A] =
+        a union b
+    }
 
   implicit val setFoldable: Foldable[ISet] = new Foldable[ISet] {
     override def findLeft[A](fa: ISet[A])(f: A => Boolean) =

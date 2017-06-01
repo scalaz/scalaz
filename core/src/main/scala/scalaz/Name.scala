@@ -8,10 +8,16 @@ sealed abstract class Name[+A] {
 }
 
 /** Call by need */
-sealed abstract class Need[+A] extends Name[A]
+final class Need[+A] private(private[this] var eval: () => A) extends Name[A] {
+  lazy val value: A = {
+    val value0 = eval()
+    eval = null
+    value0
+  }
+}
 
 /** Call by value */
-final case class Value[+A](value: A) extends Need[A]
+final case class Value[+A](value: A) extends Name[A]
 
 object Name {
   def apply[A](a: => A) = new Name[A] {
@@ -41,9 +47,9 @@ object Name {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Name[B])(implicit G: Functor[G]) =
         Name(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Name[A \/ B])(a: A): Name[B] =
+      def tailrecM[A, B](a: A)(f: A => Name[A \/ B]): Name[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Name(b)
         }
     }
@@ -53,12 +59,8 @@ object Name {
 }
 
 object Need {
-  def apply[A](a: => A): Need[A] = {
-    new Need[A] {
-      private[this] lazy val value0: A = a
-      def value = value0
-    }
-  }
+  def apply[A](a: => A): Need[A] = new Need(() => a)
+
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
@@ -83,9 +85,9 @@ object Need {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Need[B])(implicit G: Functor[G]) =
         Need(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Need[A \/ B])(a: A): Need[B] =
+      def tailrecM[A, B](a: A)(f: A => Need[A \/ B]): Need[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Need(b)
         }
     }
@@ -114,9 +116,9 @@ object Value {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Value[B])(implicit G: Functor[G]) =
         Value(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Value[A \/ B])(a: A): Value[B] =
+      def tailrecM[A, B](a: A)(f: A => Value[A \/ B]): Value[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Value(b)
         }
     }

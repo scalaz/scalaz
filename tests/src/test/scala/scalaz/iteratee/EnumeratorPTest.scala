@@ -33,7 +33,7 @@ object EnumeratorPTest extends SpecLite {
         middle3((8, 8))
       ))
     }
-  
+
     "compose" in {
       val enum  = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))
       val enum2 = enumPStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))

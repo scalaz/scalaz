@@ -103,7 +103,7 @@ trait Enumeratee2TFunctions {
                       a <- iterateeT[E, IterateeM, StepM[A]](contf(elInput(right)) >>== (step(_).value))
                     } yield a
 
-                  case (Some(left), _) => 
+                  case (Some(left), _) =>
                     for {
                       _ <- head[E, IterateeM]
                       a <- iterateeT[E, IterateeM, StepM[A]](contf(elInput(left)) >>== (step(_).value))

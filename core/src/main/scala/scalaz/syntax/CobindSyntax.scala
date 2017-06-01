@@ -6,8 +6,8 @@ final class CobindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Co
   ////
   final def cojoin: F[F[A]] = F.cojoin(self)
   final def coflatten: F[F[A]] = F.cojoin(self)
-  final def cobind[B](f: F[A] => B) = F.cobind(self)(f)
-  final def coflatMap[B](f: F[A] => B) = F.cobind(self)(f)
+  final def cobind[B](f: F[A] => B): F[B] = F.cobind(self)(f)
+  final def coflatMap[B](f: F[A] => B): F[B] = F.cobind(self)(f)
   ////
 }
 

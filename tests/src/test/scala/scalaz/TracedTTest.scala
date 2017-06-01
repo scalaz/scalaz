@@ -1,6 +1,26 @@
 package scalaz
 
+import org.scalacheck.Arbitrary
+import scalaz.scalacheck.ScalazArbitrary._
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.std.anyVal._
+
 object TracedTTest extends SpecLite {
+
+  private[this] implicit def tracedTNelEqual[A, B](implicit
+    A: Arbitrary[A],
+    B: Equal[B]
+  ): Equal[TracedT[NonEmptyList, A, B]] =
+    Equal.equal{ case (TracedT(xs), TracedT(ys)) =>
+      (xs.size == ys.size) && Foldable[NonEmptyList].all(xs.zip(ys)){
+        case (x, y) =>
+          Stream.continually(A.arbitrary.sample).flatten.take(3).forall(
+            a => B.equal(x(a), y(a))
+          )
+      }
+    }
+
+  checkAll(comonad.laws[TracedT[NonEmptyList, IList[Boolean], ?]])
 
   def compilationTestTracedTU: Unit = {
     import scalaz.syntax.either._

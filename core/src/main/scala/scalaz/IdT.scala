@@ -10,7 +10,7 @@ final case class IdT[F[_], A](run: F[A]) {
   def flatMapF[B](f: A => F[B])(implicit F: Bind[F]) =
     new IdT[F, B](F.bind(run)(f))
 
-  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = 
+  def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z =
     F.foldRight[A, Z](run, z)(f)
 
   def traverse[G[_], B](f: A => G[B])(implicit F: Traverse[F], G: Applicative[G]): G[IdT[F, B]] =
@@ -107,8 +107,8 @@ private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
 private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
   implicit def F: BindRec[F]
 
-  final def tailrecM[A, B](f: A => IdT[F, A \/ B])(a: A): IdT[F, B] =
-    IdT(F.tailrecM[A, B](a => F.map(f(a).run)(identity))(a))
+  final def tailrecM[A, B](a: A)(f: A => IdT[F, A \/ B]): IdT[F, B] =
+    IdT(F.tailrecM[A, B](a)(a => F.map(f(a).run)(identity)))
 }
 
 private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {
@@ -132,10 +132,7 @@ private object IdTHoist extends Hoist[IdT] {
     new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (IdT[M, ?] ~> IdT[N, ?]) {
-      def apply[A](fa: IdT[M, A]): IdT[N, A] =
-        new IdT[N, A](f(fa.run))
-    }
+    λ[IdT[M, ?] ~> IdT[N, ?]](fa => new IdT(f(fa.run)))
 
   implicit def apply[G[_] : Monad]: Monad[IdT[G, ?]] =
     IdT.idTMonad[G]

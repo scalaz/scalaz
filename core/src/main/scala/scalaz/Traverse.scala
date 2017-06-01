@@ -105,7 +105,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traverseS(fga)(x => x)
 
   /** A version of `sequence` that infers the nested type constructor. */
-  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = 
+  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ =
     G.TC.traverse(self)(x => G.apply(x))(this)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
@@ -155,7 +155,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
-    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
+    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]): Boolean = {
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 

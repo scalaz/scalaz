@@ -25,8 +25,9 @@ trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
     new ApplicativeOps[F,A](v)
 
   ////
-  implicit def ApplicativeIdV[A](v: => A) = new ApplicativeIdV[A] {
-    lazy val self = v
+  implicit def ApplicativeIdV[A](v: => A): ApplicativeIdV[A] = new ApplicativeIdV[A] {
+    private[this] val nv = Need(v)
+    def self = nv.value
   }
 
   trait ApplicativeIdV[A] extends Ops[A] {
@@ -47,8 +48,9 @@ trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
   def pure[A](a: => A)(implicit F: Applicative[F]): F[A] = F.point(a)
   def η[A](a: => A)(implicit F: Applicative[F]): F[A] = F.point(a)
 
-  implicit def ApplicativeIdV[A](v: => A) = new ApplicativeIdV[A] {
-    lazy val self = v
+  implicit def ApplicativeIdV[A](v: => A): ApplicativeIdV[A] = new ApplicativeIdV[A] {
+    private[this] val vc = Need(v)
+    def self = vc.value
   }
 
   trait ApplicativeIdV[A] extends Ops[A] {

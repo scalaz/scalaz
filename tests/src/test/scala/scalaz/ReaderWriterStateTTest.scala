@@ -1,24 +1,11 @@
 package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.{Gen, Arbitrary}
 
 object ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
-  implicit val RWSOptIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int]](
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((0, 0, 0)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((r, r, r)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((s, s, s))))
-  ))
-  implicit val RWSOptIntIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int => Int]](
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => None)),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((0, x => 0, 0)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((r, x => r, r)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => s, s)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => x, s))))
-  ))
 
   implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
@@ -26,14 +13,15 @@ object ReaderWriterStateTTest extends SpecLite {
 
   checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
-  
+  checkAll(monadTrans.laws[ReaderWriterStateT[?[_], Int, Int, Int, ?], Option])
+
   "ReaderWriterStateT can be trampolined without stack overflow" in {
     import scalaz.Free._
     val result = (0 to 10000).toList.map(ii => ReaderWriterStateT[Trampoline, Unit, String, Int, Int]((_, i: Int) => Trampoline.done(("", i, ii))))
       .foldLeft(ReaderWriterStateT[Trampoline, Unit, String, Int, Int]((_, i: Int) => Trampoline.done(("", i, i))))( (a, b) => a.flatMap(_ => b))
     10000 must_=== result.run((),0).run._3
   }
- 
+
   object instances {
     def functor[F[_]: Functor, R, W, S] = Functor[RWST[F, R, W, S, ?]]
     def plus[F[_]: Plus, R, W, S1, S2] = Plus[IRWST[F, R, W, S1, S2, ?]]

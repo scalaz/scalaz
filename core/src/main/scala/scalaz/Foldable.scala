@@ -70,6 +70,9 @@ trait Foldable[F[_]]  { self =>
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
+  /** Like `fold` but returning `None` if the foldable is empty and `Some` otherwise */
+  def fold1Opt[A: Semigroup](fa: F[A]): Option[A] = foldMap1Opt(fa)(a => a)
+
   /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
@@ -106,7 +109,7 @@ trait Foldable[F[_]]  { self =>
   def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = foldRight(fa, None: Option[A])((a, optA) => optA map (aa => f(a)(aa)) orElse Some(a))
 
   /**Curried version of `foldLeft` */
-  final def foldl[A, B](fa: F[A], z: B)(f: B => A => B) = foldLeft(fa, z)((b, a) => f(b)(a))
+  final def foldl[A, B](fa: F[A], z: B)(f: B => A => B): B = foldLeft(fa, z)((b, a) => f(b)(a))
   def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] =
     foldLeft(fa, None: Option[B])((optB, a) =>
       optB map (f(_, a)) orElse Some(z(a)))
@@ -240,6 +243,9 @@ trait Foldable[F[_]]  { self =>
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldLeft(fa, G.empty[A])(G.plus[A](_, _))
 
+  def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
+    msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
+
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
@@ -263,6 +269,28 @@ trait Foldable[F[_]]  { self =>
       }, Some(pa))
     })._1
 
+  /**
+    * Splits the elements into groups that produce the same result by a function f.
+    */
+  def splitBy[A, B: Equal](fa: F[A])(f: A => B): IList[(B, NonEmptyList[A])] =
+    foldRight(fa, IList[(B, NonEmptyList[A])]())((a, bas) => {
+      val fa = f(a)
+      bas match {
+        case INil() => IList.single((fa, NonEmptyList.nel(a, IList.empty)))
+        case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList.nel(a, IList.empty)), bas)
+      }
+    })
+
+  /**
+    * Splits into groups of elements that are transitively dependant by a relation r.
+    */
+  def splitByRelation[A](fa: F[A])(r: (A, A) => Boolean): IList[NonEmptyList[A]] =
+    foldRight(fa, IList[NonEmptyList[A]]())((a, neas) => {
+      neas match {
+        case INil() => IList.single(NonEmptyList.nel(a, IList.empty))
+        case ICons(nea, tail) => if (r(a, nea.head)) ICons(a <:: nea, tail) else ICons(NonEmptyList.nel(a, IList.empty), neas)
+      }
+    })
 
   /**
    * Selects groups of elements that satisfy p and discards others.
@@ -296,6 +324,9 @@ trait Foldable[F[_]]  { self =>
           a :: seen
         else seen
     }.reverse
+
+  def distinctBy[A, B: Equal](fa: F[A])(f: A => B): IList[A] =
+    distinctE(fa)(Equal.equalBy(f))
 
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))

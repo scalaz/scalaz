@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
 
@@ -22,18 +21,6 @@ object IListTest extends SpecLite {
   checkAll(order.laws[IList[Int]])
 
   // These tests hold for List, so they had better hold for IList
-
-  implicit val intBooleanArb: Arbitrary[Int => Boolean] = {
-    val intGen = implicitly[Arbitrary[Int]].arbitrary
-    Arbitrary(Gen.oneOf(
-      Gen.const((_: Int) => true),
-      Gen.const((_: Int) => false),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
-      intGen.map(n => (_: Int) > n),
-      intGen.map(n => (_: Int) < n)
-    ))
-  }
 
   "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) =>
     a.intercalate(IList[Int]()) must_===(a.flatten)
