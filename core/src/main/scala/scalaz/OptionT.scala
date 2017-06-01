@@ -20,10 +20,17 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
     }
   )
 
-  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
+  def mapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
     F.bind(self.run) {
       case None    => F.point(none[B])
       case Some(z) => F.map(f(z))(b => some(b))
+    }
+  )
+
+  def flatMapF[B](f: A => F[Option[B]])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
+    F.bind(self.run) {
+      case None    => F.point(none[B])
+      case Some(z) => f(z)
     }
   )
 

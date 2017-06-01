@@ -1,5 +1,7 @@
 package scalaz
 
+import org.scalacheck.Prop._
+
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
@@ -16,6 +18,18 @@ object MaybeTTest extends SpecLite {
   checkAll(traverse.laws[MaybeTList])
   checkAll(monadError.laws[MaybeTEither, Int])
   checkAll(monadTrans.laws[MaybeT, List])
+
+  "show" ! forAll { a: MaybeTList[Int] =>
+    Show[MaybeTList[Int]].show(a) must_=== Show[List[Maybe[Int]]].show(a.run)
+  }
+
+  "flatMapF consistent with flatMap" ! forAll { (fa: MaybeTList[Int], f: Int => List[Maybe[Int]]) =>
+    fa.flatMap(f andThen MaybeT.apply) must_=== fa.flatMapF(f)
+  }
+
+  "mapF consistent with map" ! forAll { (fa: MaybeTList[Int], f: Int => Int) =>
+    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[List].point(i)))
+  }
 
   object instances {
     def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]
