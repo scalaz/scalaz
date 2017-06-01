@@ -47,7 +47,8 @@ object ListTTest extends SpecLite {
 
   "mapF consistent with map" ! forAll { (fa: ListTOpt[Int], f: Int => Int) =>
     fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[Option].point(i)))
-  
+  }
+
   "collect" ! forAll {
     (ass: List[List[Int]]) =>
       val pf : PartialFunction[Int, String] = { case (i : Int) if i > 2 => i.toString }
