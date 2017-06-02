@@ -227,6 +227,7 @@ object ScalazProperties {
     def laws[M[_]](implicit a: BindRec[M], am: Arbitrary[M[Int]],
                    af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]): Properties =
       newProperties("bindRec") { p =>
+        p.include(bind.laws[M])
         p.property("tailrecM is consistent with bind") = bindRec.tailrecBindConsistency[M, Int]
       }
   }
