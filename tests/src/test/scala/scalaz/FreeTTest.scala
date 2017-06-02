@@ -21,7 +21,7 @@ object FreeTTest extends SpecLite {
     def equal(a: FreeTListOption[A], b: FreeTListOption[A]) = Equal[Option[A]].equal(a.runM(_.headOption), b.runM(_.headOption))
   }
 
-  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F], G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
+  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)

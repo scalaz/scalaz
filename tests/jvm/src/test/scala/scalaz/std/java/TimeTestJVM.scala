@@ -14,8 +14,6 @@ object TimeTestJVM extends SpecLite {
 
   private[this] def arb[A](implicit A: Arbitrary[A]): Arbitrary[A] = A
 
-  private[this] val smallIntArb = Arbitrary(Gen.choose(1, 100000))
-
   implicit val LocalDateTimeArbitrary: Arbitrary[LocalDateTime] =
     Arbitrary(Apply[Gen].apply7(
       Gen.choose(Year.MIN_VALUE, Year.MAX_VALUE),

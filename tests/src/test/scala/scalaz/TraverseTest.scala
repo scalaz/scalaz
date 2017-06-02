@@ -41,7 +41,7 @@ object TraverseTest extends SpecLite {
     }
 
     "state traverse agrees with regular traverse" in {
-      var N = 10
+      val N = 10
       List.range(0,N).traverseS(x => modify((x: Int) => x+1))(0) must_=== (
       List.range(0,N).traverseU(x => modify((x: Int) => x+1)).apply(0))
     }
