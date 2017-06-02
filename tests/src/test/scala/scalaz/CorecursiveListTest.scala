@@ -1,7 +1,7 @@
 package scalaz
 
 import org.scalacheck.Prop.{exists, forAll, propBoolean}
-import org.scalacheck.{Arbitrary, Prop, Properties, Shrink}
+import org.scalacheck.{Arbitrary, Properties, Shrink}
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._

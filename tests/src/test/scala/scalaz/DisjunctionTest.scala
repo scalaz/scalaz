@@ -26,8 +26,6 @@ object DisjunctionTest extends SpecLite {
 
     implicit val equalFoo = Equal.equalA[Foo]
     implicit val showFoo = Show.showA[Foo]
-    implicit val equalBar = Equal.equalA[Bar]
-    implicit val showBar = Show.showA[Bar]
 
     \/.fromTryCatchThrowable[Int, Foo](1) must_=== \/.right(1)
     \/.fromTryCatchThrowable[Int, Foo](throw foo) must_=== \/.left(foo)
