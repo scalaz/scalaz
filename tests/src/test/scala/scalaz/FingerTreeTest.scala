@@ -65,12 +65,10 @@ object FingerTreeTest extends SpecLite {
   }
 
   "head and tail work correctly"  ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
     !tree.isEmpty ==> ((tree.head === tree.toStream.head) && (tree.tail.toStream === tree.toStream.tail))
   }
 
   "last and init work correctly" ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
     !tree.isEmpty ==> ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
   }
 
