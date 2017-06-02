@@ -1,7 +1,7 @@
 package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
+import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
@@ -11,8 +11,6 @@ object StateTTest extends SpecLite {
   type StateTListInt[A] = StateTList[Int, A]
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
-  implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
-  implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(monad.laws[StateTListInt])
