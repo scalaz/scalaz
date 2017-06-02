@@ -376,7 +376,7 @@ object ScalazProperties {
     def rightPlusIdentity[F[_], X](implicit f: PlusEmpty[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]): Prop =
       forAll(f.plusEmptyLaw.rightPlusIdentity[X] _)
 
-    def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], af: Arbitrary[Int => Int], ef: Equal[F[Int]]): Properties =
+    def laws[F[_]](implicit F: PlusEmpty[F], afx: Arbitrary[F[Int]], ef: Equal[F[Int]]): Properties =
       newProperties("plusEmpty") { p =>
         p.include(plus.laws[F])
         p.include(monoid.laws[F[Int]](F.monoid[Int], implicitly, implicitly))
