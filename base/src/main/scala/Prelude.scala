@@ -25,6 +25,7 @@ trait Prelude  extends data.DisjunctionFunctions
   type Category[=>:[_,_]] = typeclass.Category[=>:]
   type Comonad[F[_]] = typeclass.Comonad[F]
   type Cobind[F[_]] = typeclass.Cobind[F]
+  type InvariantFunctor[F[_]] = typeclass.InvariantFunctor[F]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -40,6 +41,8 @@ trait Prelude  extends data.DisjunctionFunctions
   def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
   def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
 
+  def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
+  
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
 
@@ -81,6 +84,10 @@ trait Prelude  extends data.DisjunctionFunctions
   implicit def ComonadOps[F[_], A](fa: F[A])(implicit F: Comonad[F]): ComonadSyntax.Ops[F, A] =
     new ComonadSyntax.Ops(fa)
 
+  //InvariantFunctorSyntax
+  implicit def InvariantFunctorOps[F[_], A](fa: F[A])(implicit F: InvariantFunctor[F]): InvariantFunctorSyntax.Ops[F, A] =
+    new InvariantFunctorSyntax.Ops(fa)
+  
   // Base Data
   // =========
   
