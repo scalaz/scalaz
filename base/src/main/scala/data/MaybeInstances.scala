@@ -2,11 +2,11 @@ package scalaz
 package data
 
 import Prelude._
-import typeclass.{MonadClass, TraversableClass}
+import typeclass.{MonadClass, TraversableClass, CobindClass}
 import typeclass.FoldableClass._
 
 // TODO Rework lazyness
-trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] {
+trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] with CobindClass.Cobind[Maybe] {
 
   implicit def monadInstance: Monad[Maybe] = this
 
@@ -35,4 +35,7 @@ trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Ma
   override def foldRight[A, B](ma: Maybe[A], b: => B)(f: (A, => B) => B): B = ma.fold(a => f(a, b), b)
 
   override def toList[A](ma: Maybe[A]): List[A] = ma.fold(List(_), Nil)
+
+  override def cobind[A, B](fa: Maybe[A])(f: Maybe[A] => B): Maybe[B] =
+    just(f(fa))
 }
