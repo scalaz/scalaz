@@ -33,7 +33,8 @@ object Scalaz extends Build {
         case _ =>
           Nil
       }
-    }
+    },
+    incOptions ~= (_.withLogRecompileOnMacro(false))
   )
 
   lazy val root = Project(
