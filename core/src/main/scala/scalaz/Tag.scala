@@ -37,6 +37,9 @@ object Tag {
   /** Remove the tag `T`, leaving `A`. */
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
 
+  /** Remove the tag `T`, leaving `G` */
+  @inline def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G] = fa.asInstanceOf[F[G]]
+
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
       extends (Id.Id ~> (? @@ T)) {
@@ -51,6 +54,9 @@ object Tag {
 
     /** Like `Tag.subst1`, but specify only the `T`. */
     def subst1[F[_[_]], G[_]](fa: F[G]): F[λ[α => G[α] @@ T]] = Tag.subst1[G, F, T](fa)
+
+    /** Like `Tag.unsubst1`, but specify only the `T`. */
+    def unsubst1[G[_], F[_[_]]](fa: F[λ[α => G[α] @@ T]]): F[G] = Tag.unsubst1[G, F, T](fa)
 
     /** Tag `fa`'s return type.  Allows inference of `A` to "flow through" from
       * the enclosing context.
