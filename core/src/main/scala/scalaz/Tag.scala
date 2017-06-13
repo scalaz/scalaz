@@ -42,6 +42,9 @@ object Tag {
   /** Remove the tag `T`, leaving `A`. */
   @inline def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = k unsubst fa
 
+  /** Remove the tag `T`, leaving `G` */
+  @inline def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G] = k unsubst1 fa
+
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
       extends (Id.Id ~> (? @@ T)) {
@@ -56,6 +59,9 @@ object Tag {
 
     /** Like `Tag.subst1`, but specify only the `T`. */
     def subst1[F[_[_]], G[_]](fa: F[G]): F[λ[α => G[α] @@ T]] = Tag.subst1[G, F, T](fa)
+
+    /** Like `Tag.unsubst1`, but specify only the `T`. */
+    def unsubst1[G[_], F[_[_]]](fa: F[λ[α => G[α] @@ T]]): F[G] = Tag.unsubst1[G, F, T](fa)
 
     /** Tag `fa`'s return type.  Allows inference of `A` to "flow through" from
       * the enclosing context.
@@ -91,6 +97,7 @@ sealed abstract class TagKind {
   def subst[A, F[_], T](fa: F[A]): F[A @@ T]
   def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]]
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A]
+  def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G]
   def apply[@specialized A, T](a: A): A @@ T
   def unwrap[@specialized A, T](a: A @@ T): A
 }
@@ -101,6 +108,7 @@ private[scalaz] object IdTagKind extends TagKind {
   @inline override def subst[A, F[_], T](fa: F[A]): F[A] = fa
   @inline override def unsubst[A, F[_], T](fa: F[A]): F[A] = fa
   @inline override def subst1[G[_], F[_[_]], T](fa: F[G]): F[G] = fa
+  @inline override def unsubst1[G[_], F[_[_]], T](fa: F[G]): F[G] = fa
   @inline override def apply[@specialized A, T](a: A): A = a
   @inline override def unwrap[@specialized A, T](a: A): A = a
 }
