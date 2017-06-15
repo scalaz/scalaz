@@ -25,6 +25,8 @@ trait Prelude  extends data.DisjunctionFunctions
   type Traversable[T[_]] = typeclass.Traversable[T]
   type Profunctor[F[_,_]] = typeclass.Profunctor[F]
   type Category[=>:[_,_]] = typeclass.Category[=>:]
+  type Comonad[F[_]] = typeclass.Comonad[F]
+  type Cobind[F[_]] = typeclass.Cobind[F]
   type InvariantFunctor[F[_]] = typeclass.InvariantFunctor[F]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
@@ -38,7 +40,11 @@ trait Prelude  extends data.DisjunctionFunctions
   def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
   def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
   def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P 
+  def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
+  def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
+
   def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
+  
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
 
@@ -73,7 +79,13 @@ trait Prelude  extends data.DisjunctionFunctions
 
   implicit def PstrongOps[P[_,_], A, B](pab: P[A, B])(implicit P: Strong[P]): StrongSyntax.Ops[P, A, B] =
     new StrongSyntax.Ops(pab)
-   
+  
+  implicit def CobindOps[F[_], A](fa: F[A])(implicit F: Cobind[F]): CobindSyntax.Ops[F, A] =
+    new CobindSyntax.Ops(fa)
+
+  implicit def ComonadOps[F[_], A](fa: F[A])(implicit F: Comonad[F]): ComonadSyntax.Ops[F, A] =
+    new ComonadSyntax.Ops(fa)
+
   //InvariantFunctorSyntax
   implicit def InvariantFunctorOps[F[_], A](fa: F[A])(implicit F: InvariantFunctor[F]): InvariantFunctorSyntax.Ops[F, A] =
     new InvariantFunctorSyntax.Ops(fa)

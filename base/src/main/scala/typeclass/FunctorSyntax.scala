@@ -15,5 +15,3 @@ object FunctorSyntax {
     def void: F[Unit] = F.map[A, Unit](self)(_ => ())
   }
 }
-
-
