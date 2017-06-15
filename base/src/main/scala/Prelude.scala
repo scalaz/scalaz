@@ -10,6 +10,8 @@ trait Prelude  extends data.DisjunctionFunctions
                   with data.MaybeFunctions
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
+                  with typeclass.InvariantFunctorFunctions
+                  with typeclass.LiskovFunctions
                   with typeclass.TraversableFunctions {
 
   // Base Class
