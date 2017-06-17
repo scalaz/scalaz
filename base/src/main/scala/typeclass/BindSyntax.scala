@@ -12,6 +12,8 @@ trait BindSyntax {
 object BindSyntax {
   class Ops[M[_], A](ma: M[A])(implicit M: Bind[M]) {
     def flatMap[B](f: A => M[B]): M[B] = macro meta.Ops._f1[A => M[B], M[B]]
+    def tapM[B](f: A => M[B]): M[A] = macro meta.Ops._f1[A => M[B], M[A]]
+    def >>=|[B](f: A => M[B]): M[A] = macro meta.Ops._f1t[A => M[B], M[B], Bind.TapM]
   }
 }
 

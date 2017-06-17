@@ -7,20 +7,24 @@ import FoldableClass._
 import TraversableClass._
 
 trait ConstInstances {
-  implicit def traverse[R]: Traversable[Const[R, ?]] = new TraversableClass[Const[R, ?]] with FoldRight[Const[R, ?]] with Traverse[Const[R, ?]] {
-    def map[A, B](ma: Const[R, A])(f: A => B): Const[R, B] = ma.retag
+  implicit def traverse[R]: Traversable[Const[R, ?]] =
+    new TraversableClass[Const[R, ?]]
+      with FunctorClass.Map[Const[R, ?]]
+      with FoldRight[Const[R, ?]]
+      with Traverse[Const[R, ?]] {
+      def map[A, B](ma: Const[R, A])(f: A => B): Const[R, B] = ma.retag
 
-    def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
-      F.pure(ta.retag)
+      def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
+        F.pure(ta.retag)
 
-    def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
+      def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
 
-    def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
+      def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
 
-    override def toList[A](fa: Const[R, A]): List[A] = Nil
-  }
+      override def toList[A](fa: Const[R, A]): List[A] = Nil
+    }
 
-  implicit def functor[R]: Functor[Const[R, ?]] = new Functor[Const[R, ?]] {
+  implicit def functor[R]: Functor[Const[R, ?]] = new FunctorClass.Template[Const[R, ?]] {
     def map[A, B](fa: Const[R, A])(f: A => B): Const[R, B] =
       fa.retag[B]
   }
