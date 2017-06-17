@@ -69,9 +69,16 @@ object FoldableTest extends SpecLite {
       (xs extremaOf f) must_== (xs minimumOf f).tuple(xs maximumOf f)
   }
   "extremaBy" ! forAll {
-    (xs: List[Int]) => 
-      val f: Int => Double = 1D + _
+    (xs: List[Int], f: Int => Int) =>
       (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+  }
+  "extremaBy consistent with minimumBy/maximumBy" ! {
+    val xs = (1 to 6).toList
+    val f: Int => Int = _ % 3
+    (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+
+    val g: Int => Int = _ => 0
+    (xs extremaBy g) must_== (xs minimumBy g).tuple(xs maximumBy g)
   }
 
   "distinct" ! forAll {

@@ -253,9 +253,20 @@ trait Foldable[F[_]]  { self =>
     } { 
       case (x @ ((amin, amax, bmin, bmax)), a) => 
         val b = f(a) 
-        if (Order[B].order(b, bmin) == LT) (a, amax, b, bmax)
-        else if (Order[B].order(b, bmax) == GT) (amin, a, bmin, b)
-        else x
+        val greaterThanOrEq = Order[B].greaterThanOrEqual(b, bmax)
+        if(Order[B].lessThanOrEqual(b, bmin)) {
+          if(greaterThanOrEq) {
+            (a, a, b, b)
+          } else {
+            (a, amax, b, bmax)
+          }
+        } else {
+          if(greaterThanOrEq) {
+            (amin, a, bmin, b)
+          } else {
+            x
+          }
+        }
     } map {
       case (amin, amax, _, _) => (amin, amax)
     }
