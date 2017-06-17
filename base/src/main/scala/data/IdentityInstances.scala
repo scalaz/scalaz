@@ -10,5 +10,7 @@ trait IdentityInstances {
     override def pure[A](a: A): Identity[A] = Identity(a)
     override def flatMap[A, B](oa: Identity[A])(f: A => Identity[B]): Identity[B] = f(oa.run)
     override def flatten[A](ma: Identity[Identity[A]]): Identity[A] = ma.run
+    override def mapConst[A, B](ma: Identity[A])(c: B): Identity[B] = Identity(c)
+    override def tapM[A, B](ma: Identity[A])(f: (A) => Identity[B]): Identity[A] = ma
   }
 }

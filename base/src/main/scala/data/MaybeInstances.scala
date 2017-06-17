@@ -18,8 +18,14 @@ trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Ma
   override def flatMap[A, B](ma: Maybe[A])(f: A => Maybe[B]): Maybe[B] =
     ma.fold(a => f(a), empty)
 
+  override def tapM[A, B](ma: Maybe[A])(f: A => Maybe[B]): Maybe[A] =
+    ma.fold(a => f(a).fold(_ => ma, empty), empty)
+
   override def map[A, B](ma: Maybe[A])(f: A => B): Maybe[B] =
     ma.fold(a => just(f(a)), empty)
+
+  override def mapConst[A, B](ma: Maybe[A])(b: B): Maybe[B] =
+    ma.fold(_ => just(b), empty)
 
   override def pure[A](a: A): Maybe[A] =
     just(a)
