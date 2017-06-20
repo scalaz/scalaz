@@ -10,6 +10,8 @@ trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Ma
 
   implicit def monadInstance: Monad[Maybe] = this
 
+  implicit def traversableInstance: Traversable[Maybe] = this
+
   override def ap[A, B](ma: Maybe[A])(mf: Maybe[A => B]): Maybe[B] =
     ma.fold(a => map[A => B, B](mf)(f => f(a)), empty)
 

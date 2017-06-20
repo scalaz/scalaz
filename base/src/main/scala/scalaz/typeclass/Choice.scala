@@ -6,9 +6,9 @@ import data.Disjunction._
 trait Choice[P[_, _]] {
   def profunctor: Profunctor[P]
 
-  def left[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C]
+  def leftchoice[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C]
 
-  def right[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B]
+  def rightchoice[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B]
 }
 
 object Choice extends ChoiceInstances {

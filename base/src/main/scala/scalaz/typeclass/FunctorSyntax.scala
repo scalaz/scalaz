@@ -11,7 +11,7 @@ trait FunctorSyntax {
 
 object FunctorSyntax {
   class Ops[F[_], A](self: F[A])(implicit F: Functor[F]) {
-    def map[B](f: A => B): F[B] = macro meta.Ops._f[A => B, F[B]]
+    def map[B](f: A => B): F[B] = macro meta.Ops._f1[A => B, F[B]]
     def void: F[Unit] = F.map[A, Unit](self)(_ => ())
   }
 }

@@ -6,7 +6,8 @@ trait StrongClass[P[_, _]] extends Strong[P] with ProfunctorClass[P] {
 }
 
 object StrongClass {
-  trait First[P[_, _]] extends Alt[First[P]]{ self: Strong[P] =>
+
+  trait First[P[_, _]] extends Alt[First[P]] with StrongClass[P] { self: Strong[P] =>
     override def first[A, B, C](pab: P[A, B]): P[(A, C), (B, C)]
     override def second[A, B, C](pab: P[A, B]): P[(C, A), (C, B)] =
       profunctor.dimap[(A, C), (B, C), (C, A), (C, B)](first(pab))(_.swap)(_.swap)
