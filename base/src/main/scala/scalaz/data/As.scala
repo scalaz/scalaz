@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import Prelude.{<~<, ===}
-import scalaz.typeclass.{Contravariant, Functor}
+import typeclass.{ Functor, Contravariant }
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -17,21 +17,21 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
   import As._
 
   /**
-    * Substitution into a contravariant context.
-    *
-    * @see [[substCo]]
-    */
-  def substCt[F[-_]](fb: F[B]): F[A] = {
-    type f[+x] = F[x] => F[A]
-    substCo[f](identity[F[A]])(fb)
-  }
-
-  /**
     * Substitution into a covariant context.
     *
     * @see [[substCt]]
     */
   def substCo[F[+_]](fa: F[A]): F[B]
+
+  /**
+    * Substitution into a contravariant context.
+    *
+    * @see [[substCo]]
+    */
+  final def substCt[F[-_]](fb: F[B]): F[A] = {
+    type f[+x] = F[x] => F[A]
+    substCo[f](identity[F[A]])(fb)
+  }
 
   /**
     * Substitution on identity brings about a direct coercion function
@@ -46,9 +46,9 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     * Subtyping is transitive and its witnesses can be composed in a
     * chain much like functions.
     */
-  final def andThen[C](bc: B As C): A As C = {
-    type f[-α] = α As C
-    ab.substCt[f](bc)
+  final def andThen[C](bc: B <~< C): A <~< C = {
+    type f[+x] = A <~< x
+    bc.substCo[f](this)
   }
 
   /**
@@ -57,7 +57,7 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     *
     * @see [[andThen]]
     */
-  final def compose[Z](za: Z As A): Z As B =
+  final def compose[Z](za: Z <~< A): Z <~< B =
     za.andThen(ab)
 
   /**
@@ -66,8 +66,10 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     *
     * @see [[apply]]
     */
-  final def coerce(a: A): B =
-    substCo[λ[`+α` => α]](a)
+  final def coerce(a: A): B = {
+    type f[+x] = x
+    substCo[f](a)
+  }
 
   /**
     * Given `A <~< B` we can prove that `F[A] <~< F[B]` for any
@@ -75,9 +77,9 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     *
     * @see [[liftCt]]
     */
-  final def liftCo[F[+_]]: F[A] As F[B] = {
-    type f[-α] = F[α] As F[B]
-    substCt[f](refl)
+  final def liftCo[F[+_]]: F[A] <~< F[B] = {
+    type f[+x] = F[A] <~< F[x]
+    substCo[f](refl[F[A]])
   }
 
   /**
@@ -86,9 +88,17 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     *
     * @see [[liftCo]]
     */
-  final def liftCt[F[-_]]: F[B] As F[A] = {
-    type f[+α] = F[α] As F[A]
+  final def liftCt[F[-_]]: F[B] <~< F[A] = {
+    type f[+x] = F[x] <~< F[A]
     substCo[f](refl)
+  }
+
+  /**
+    * Given `A <~< B` we can convert `(X => A)` into `(X => B)`.
+    */
+  def onF[X](fa: X => A): X => B = {
+    type f[+a] = X => a
+    substCo[f](fa)
   }
 
   /**
@@ -96,43 +106,42 @@ sealed abstract class As[-A, +B] private[As]() { ab =>
     * value.
     */
   final def toPredef: A <:< B = {
-    type f[-α] = α <:< B
-    substCt[f](implicitly[B <:< B])
+    type f[+a] = A <:< a
+    substCo[f](implicitly[A <:< A])
   }
 }
 
 object As {
-  def apply[A, B](implicit ev: A As B): A As B = ev
+  def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 
-  final case class Refl[A]() extends (A As A) {
+  final case class Refl[A]() extends (A <~< A) {
     def substCo[F[+_]](fa: F[A]): F[A] = fa
   }
-  private[this] val reflAny: Any As Any = new Refl[Any]()
+  private[this] val reflAny: Any <~< Any = new Refl[Any]()
 
   /**
     * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
     * explicitly coerce types. It is unsafe.
     */
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-  def unsafeForce[A, B]: A As B =
-    reflAny.asInstanceOf[A As B]
+  def unsafeForce[A, B]: A <~< B =
+    reflAny.asInstanceOf[A <~< B]
 
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: A As A = unsafeForce[A, A]
+  implicit def refl[A]: A <~< A = unsafeForce[A, A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  implicit def reify[A, B >: A]: A As B = refl
+  implicit def reify[A, B >: A]: A <~< B = refl
 
   /**
     * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
     * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
     * SI-7278]] is fixed.
     */
-  def bracket[A, B, C](f: A As B, g: B As A): A === B =
+  def bracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
     Is.unsafeForce[A, B]
 
 
@@ -157,11 +166,11 @@ object As {
       liftCt[F].apply(value)
   }
 
-  implicit class AsOps1[B](val ab: As[Nothing, B]) extends AnyVal {
-    def liftCoF[F[_]](implicit F: Functor[F]): F[Nothing] As F[B] =
+  implicit class AsOps1[B](val ab: Nothing <~< B) extends AnyVal {
+    def liftCoF[F[_]](implicit F: Functor[F]): F[Nothing] <~< F[B] =
       unsafeForce[F[Nothing], F[B]]
 
-    def liftCtF[F[_]](implicit F: Contravariant[F]): F[B] As F[Nothing] =
+    def liftCtF[F[_]](implicit F: Contravariant[F]): F[B] <~< F[Nothing] =
       unsafeForce[F[B], F[Nothing]]
 
     def substCoF[F[_]](fa: F[Nothing])(implicit F: Functor[F]): F[B] =
@@ -171,11 +180,11 @@ object As {
       liftCtF[F].coerce(fb)
   }
 
-  implicit class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
-    def liftCoF[F[_]](implicit F: Functor[F]): F[A] As F[B] =
+  implicit class AsOps[A, B](val ab: A <~< B) extends AnyVal {
+    def liftCoF[F[_]](implicit F: Functor[F]): F[A] <~< F[B] =
       unsafeForce[F[A], F[B]]
 
-    def liftCtF[F[_]](implicit F: Contravariant[F]): F[B] As F[A] =
+    def liftCtF[F[_]](implicit F: Contravariant[F]): F[B] <~< F[A] =
       unsafeForce[F[B], F[A]]
 
     def substCoF[F[_]](fa: F[A])(implicit F: Functor[F]): F[B] =
@@ -191,6 +200,6 @@ object As {
     * `A <:< B` implies `A <~< B` it is not the case that you can create
     * evidence of `A <~< B` except via a coercion. Use responsibly.
     */
-  def fromPredef[A, B](eq: A <:< B): A As B =
+  def fromPredef[A, B](eq: A <:< B): A <~< B =
     unsafeForce[A, B]
 }

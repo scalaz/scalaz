@@ -1,28 +1,29 @@
 package scalaz
 package data
 
-import Prelude.===
-import Leibniz.refl
+import Prelude.{ ===, <~<, =~= }
 
 /**
   * This particular version of Leibnitz’ equality has been generalized to
   * handle subtyping so that it can be used with constrained type constructors,
-  * such as `F[_ <: X]`. `Leibniz[L, H, A, B]` says that `A` = `B`,
-  * and that both of them are between `L` and `H`. Subtyping lets you loosen
-  * the bounds on `L` and `H`.
+  * such as `F[_ >: L <: H]. `Leibniz[L, H, A, B]` witnesses both `A === B` and
+  * that [[A]] and [[B]] are between [[L]] and [[H]]. Subtyping lets you loosen
+  * the bounds on [[L]] and [[H]].
   *
   * @see [[Is]]
   */
 sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Leibniz]() { ab =>
+  import Leibniz._
+
   /**
-    * To create an instance of `Leibniz[A, B]` you must show that for every
-    * choice of `F[_ >: L <: H]` you can convert `F[A]` to `F[B]`.
+    * To create an instance of `Leibniz[L, H, A, B]` you must show that for
+    * every choice of `F[_ >: L <: H]` you can convert `F[A]` to `F[B]`.
     */
   def subst[F[_ >: L <: H]](fa: F[A]): F[B]
 
   /**
     * Substitution on identity brings about a direct coercion function of the
-    * same form that `=:=` provides.
+    * same form that [[=:=]] provides.
     *
     * @see [[coerce]]
     */
@@ -35,8 +36,10 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Lei
     *
     * @see [[apply]]
     */
-  final def coerce(a: A): B =
-    subst[λ[α => α]](a)
+  final def coerce(a: A): B = {
+    type f[a >: L <: H] = a
+    subst[f](a)
+  }
 
   /**
     * Equality is transitive relation and its witnesses can be composed
@@ -66,7 +69,8 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Lei
     Leibniz.symm(ab)
 
   /**
-    * Given `A === B` we can prove that `F[A] === F[B]`.
+    * Given `Leibniz[L, H, A, B]` we can prove `Leibniz[LF, HF, F[A], F[B]` for
+    * any `F[X >: L <: H] >: LF <: HF`.
     *
     * @see [[Leibniz.lift]]
     * @see [[Leibniz.lift2]]
@@ -75,39 +79,80 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Lei
   final def lift[LF, HF >: LF, F[_ >: L <: H] >: LF <: HF]: Leibniz[LF, HF, F[A], F[B]] =
     Leibniz.lift[L, H, A, B, LF, HF, F](ab)
 
-  final def onF[X](fa: X => A): X => B =
-    subst[X => ?](fa)
+  /**
+    * Given `Liskov[L, H, A, B]` we can convert `(X => A)` into `(X => B)`.
+    */
+  final def onF[X](fa: X => A): X => B = {
+    type f[a] = X => a
+    subst[f](fa)
+  }
 
   /**
-    * A value `Leibniz[A, B]` is always sufficient to produce a similar [[=:=]]
-    * value.
+    * Given `Leibniz[L, H, A, B]`, prove `A =:= B`.
     */
-  final def toPredef: A =:= B =
-    subst[A =:= ?](implicitly[A =:= A])
+  final def toPredef: A =:= B = {
+    type f[a >: L <: H] = A =:= a
+    subst[f](implicitly[A =:= A])
+  }
+
+  /**
+    * Given `Leibniz[L, H, A, B]`, prove `A === B`.
+    */
+  final def toIs: A === B = {
+    type f[a >: L <: H] = A === a
+    subst[f](Is.refl[A])
+  }
+
+  /**
+    * Given `Leibniz[L, H, A, B]`, prove `A <~< B`.
+    */
+  final def toAs: A <~< B = {
+    type f[a >: L <: H] = A <~< a
+    subst[f](As.refl[A])
+  }
+
+  /**
+    * Given `Leibniz[L, H, A, B]`, prove `Liskov[L, H, A, B]`.
+    */
+  final def toLiskov: Liskov[L, H, A, B] = {
+    type f[a >: L <: H] = Liskov[L, H, A, a]
+    subst[f](Liskov.refl[A])
+  }
 }
 
 object Leibniz {
-  private[this] final case class Refl[A]() extends Leibniz[A, A, A, A] {
+  def apply[L, H >: L, A >: L <: H, B >: L <: H]
+  (implicit ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, B] = ab
+
+  final case class Refl[A]() extends Leibniz[A, A, A, A] {
     def subst[F[_ >: A <: A]](fa: F[A]): F[A] = fa
   }
-  private[data] val anyRefl: Leibniz[Nothing, Any, Any, Any] = Refl[Any]()
+  private[this] val anyRefl: Leibniz[Nothing, Any, Any, Any] = Refl[Any]()
+
+  /**
+    * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
+    * explicitly coerce types. It is unsafe, but needed where Leibnizian
+    * equality isn't sufficient.
+    */
+  def unsafeForce[L, H >: L, A >: L <: H, B >: L <: H]: Leibniz[L, H, A, B] =
+  anyRefl.asInstanceOf[Leibniz[L, H, A, B]]
+
+  final def bound[L, H >: L, A >: L <: H, B >: L <: H]
+  (ab: Is[A, B]): Leibniz[L, H, A, B] =
+    unsafeForce[L, H, A, B]
 
   /**
     * Equality is reflexive relation.
     */
-  def refl[A]: Leibniz[A, A, A, A] = {
-    // This optimization is safe because of erasure.
-    anyRefl.asInstanceOf[Leibniz[A, A, A, A]]
-  }
+  implicit def refl[A]: Leibniz[A, A, A, A] =
+    unsafeForce[A, A, A, A]
 
   /**
     * Equality is reflexive relation. Compared to [[refl]], this function
     * can be used to specify bounds up front instead of relying on subtyping.
     */
-  def refl_[L, H >: L, A >: L <: H]: Leibniz[L, H, A, A] = {
-    // This optimization is safe because of erasure.
-    anyRefl.asInstanceOf[Leibniz[L, H, A, A]]
-  }
+  def refl_[L, H >: L, A >: L <: H]: Leibniz[L, H, A, A] =
+    unsafeForce[L, H, A, A]
 
   /**
     * Substitution on identity brings about a direct coercion function of the
@@ -161,6 +206,45 @@ object Leibniz {
     * @see [[lift]]
     * @see [[lift3]]
     */
+  def pair[
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
+  ] (
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2]
+  ) : Pair[L1, H1, A1, B1, L2, H2, A2, B2] = Pair(eq1, eq2)
+
+  final case class Pair[
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
+  ](eq1: Leibniz[L1, H1, A1, B1], eq2: Leibniz[L2, H2, A2, B2]) {
+    def bounded[
+      LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF
+    ]: Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
+      type f1[a1 >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[a1, A2]]
+      type f2[a2 >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, a2]]
+      eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2]]))
+    }
+
+    def subst[F[_ >: L1 <: H1, _ >: L2 <: H2]](f1: F[A1, A2]): F[B1, B2] = {
+      type f1[a1 >: L1 <: H1] = F[a1, A2]
+      type f2[a2 >: L2 <: H2] = F[B1, a2]
+      eq2.subst[f2](eq1.subst[f1](f1))
+    }
+
+    def unbounded[F[_ >: L1 <: H1, _ >: L2 <: H2]]: F[A1, A2] === F[B1, B2] = {
+      type f1[a1 >: L1 <: H1] = F[A1, A2] Is F[a1, A2]
+      type f2[a2 >: L2 <: H2] = F[A1, A2] Is F[B1, a2]
+      eq2.subst[f2](eq1.subst[f1](Is.refl[F[A1, A2]]))
+    }
+  }
+
+  /**
+    * Given `A === B` and `I === J` we can prove that `F[A, I] === F[B, J]`.
+    *
+    * @see [[lift]]
+    * @see [[lift3]]
+    */
   def lift2[
     L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
     L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
@@ -169,8 +253,8 @@ object Leibniz {
       eq1: Leibniz[L1, H1, A1, B1],
       eq2: Leibniz[L2, H2, A2, B2]
   ): Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
-    type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[α, A2]]
-    type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, α]]
+    type f1[a1 >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[a1, A2]]
+    type f2[a2 >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, a2]]
     eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2]]))
   }
 
@@ -191,26 +275,23 @@ object Leibniz {
       eq2: Leibniz[L2, H2, A2, B2],
       eq3: Leibniz[L3, H3, A3, B3]
   ): Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, B3]] = {
-    type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2, A3], F[α, A2, A3]]
-    type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, α, A3]]
-    type f3[α >: L3 <: H3] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, α]]
+    type f1[a1 >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2, A3], F[a1, A2, A3]]
+    type f2[a2 >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, a2, A3]]
+    type f3[a3 >: L3 <: H3] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, a3]]
     eq3.subst[f3](eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2, A3]])))
   }
 
   /**
-    * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
-    * explicitly coerce types. It is unsafe, but needed where Leibnizian
-    * equality isn't sufficient.
+    * It can be convenient to convert a [[=:=]] value into a `Leibniz` value.
     */
-  def unsafeForce[A, B]: A === B =
-    anyRefl.asInstanceOf[A === B]
+  def fromPredef[L, H >: L, A >: L <: H, B >: L <: H]
+  (eq: A =:= B): Leibniz[L, H, A, B] =
+    unsafeForce[L, H, A, B]
 
   /**
-    * It can be convenient to convert a [[=:=]] value into a `Leibniz` value.
-    * This is not strictly valid as while it is almost certainly true that
-    * `A =:= B` implies `A === B` it is not the case that you can create
-    * evidence of `A === B` except via a coercion. Use responsibly.
+    * It can be convenient to convert a [[===]] value into a `Leibniz` value.
     */
-  def fromPredef[A, B](eq: A =:= B): A === B =
-    unsafeForce[A, B]
+  def fromIs[L, H >: L, A >: L <: H, B >: L <: H]
+  (eq: A === B): Leibniz[L, H, A, B] =
+    unsafeForce[L, H, A, B]
 }

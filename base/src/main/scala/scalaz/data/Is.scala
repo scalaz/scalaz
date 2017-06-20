@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import Prelude._
+import Prelude.{===, <~<}
 
 /**
   * The data type `Is` is the encoding of Leibnitz’ law which states that
@@ -52,7 +52,8 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
     *
     * @see [[coerce]]
     */
-  def apply(a: A): B = coerce(a)
+  final def apply(a: A): B =
+    coerce(a)
 
   /**
     * Substitution on identity brings about a direct coercion function of the
@@ -60,8 +61,8 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
     *
     * @see [[apply]]
     */
-  def coerce(a: A): B = {
-    type f[x] = x
+  final def coerce(a: A): B = {
+    type f[a] = a
     subst[f](a)
   }
 
@@ -71,8 +72,10 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
     *
     * @see [[compose]]
     */
-  def andThen[C](bc: B === C): A === C =
-    bc.subst[A === ?](ab)
+  final def andThen[C](bc: B === C): A === C = {
+    type f[b] = A === b
+    bc.subst[f](ab)
+  }
 
   /**
     * Equality is transitive relation and its witnesses can be composed
@@ -80,15 +83,17 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
     *
     * @see [[andThen]]
     */
-  def compose[Z](za: Z === A): Z === B =
+  final def compose[Z](za: Z === A): Z === B =
     za.andThen(ab)
 
   /**
     * Equality is symmetric relation and therefore can be flipped around.
     * Flipping is its own inverse, so `x.flip.flip == x`.
     */
-  def flip: B === A =
-    subst[? === A](refl)
+  final def flip: B === A = {
+    type f[a] = a === A
+    subst[f](refl)
+  }
 
 
   /**
@@ -97,14 +102,13 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
     * @see [[Is.lift]]
     * @see [[Is.lift2]]
     */
-  def lift[F[_]]: F[A] === F[B] =
+  final def lift[F[_]]: F[A] === F[B] =
     Is.lift(ab)
 
   /**
     * Given `A === B` and `I === J` we can prove that `F[A, I] === F[B, J]`.
     *
-    * This method allows you to compose two `Leibniz` values in infix
-    * manner:
+    * This method allows you to compose two `===` values in infix manner:
     * {{{
     *   def either(ab: A === B, ij: I === J): Either[A, I] === Either[B, J] =
     *     ab lift2[Either] ij
@@ -124,22 +128,28 @@ sealed abstract class Is[A, B] private[Is]()  { ab =>
   /**
     * Given `A === B` we can convert `(X => A)` into `(X => B)`.
     */
-  def onF[X](fa: X => A): X => B =
-    subst[X => ?](fa)
+  def onF[X](fa: X => A): X => B = {
+    type f[a] = X => a
+    subst[f](fa)
+  }
 
   /**
     * A value `A === B` is always sufficient to produce a similar [[=:=]]
     * value.
     */
-  def toPredef: A =:= B =
-    subst[A =:= ?](implicitly[A =:= A])
+  def toPredef: A =:= B = {
+    type f[a] = A =:= a
+    subst[f](implicitly[A =:= A])
+  }
 
   /**
-    * A value `A === B` is always sufficient to produce a `Iso[A, B]`
+    * A value `A === B` is always sufficient to produce a `A <~< B`
     * value.
     */
-  def toAs: As[A, B] =
-    subst[As[A, ?]](As.refl[A])
+  def toAs: A <~< B = {
+    type f[a] = A <~< a
+    subst[f](As.refl[A])
+  }
 }
 
 object Is {
@@ -156,7 +166,6 @@ object Is {
     * explicitly coerce types. It is unsafe, but needed where Leibnizian
     * equality isn't sufficient.
     */
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def unsafeForce[A, B]: A === B =
     anyRefl.asInstanceOf[A === B]
 
@@ -174,7 +183,7 @@ object Is {
     */
   def lift[F[_], A, B]
   (ab: A === B): F[A] === F[B] = {
-    type f[α] = F[A] === F[α]
+    type f[a] = F[A] === F[a]
     ab.subst[f](refl)
   }
 
@@ -187,8 +196,8 @@ object Is {
     */
   def lift2[F[_, _], A, B, I, J]
   (ab: A === B, ij: I === J): F[A, I] === F[B, J] = {
-    type f1[α] = F[A, I] === F[α, I]
-    type f2[α] = F[A, I] === F[B, α]
+    type f1[a] = F[A, I] === F[a, I]
+    type f2[i] = F[A, I] === F[B, i]
     ij.subst[f2](ab.subst[f1](refl))
   }
 
@@ -201,9 +210,9 @@ object Is {
     */
   def lift3[F[_, _, _], A, B, I, J, M, N]
   (ab: A === B, ij: I === J, mn: M === N): F[A, I, M] === F[B, J, N] = {
-    type f1[α] = F[A, I, M] === F[α, I, M]
-    type f2[α] = F[A, I, M] === F[B, α, M]
-    type f3[α] = F[A, I, M] === F[B, J, α]
+    type f1[a] = F[A, I, M] === F[a, I, M]
+    type f2[i] = F[A, I, M] === F[B, i, M]
+    type f3[m] = F[A, I, M] === F[B, J, m]
     mn.subst[f3](ij.subst[f2](ab.subst[f1](refl)))
   }
 
