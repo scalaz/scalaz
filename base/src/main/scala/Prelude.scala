@@ -60,9 +60,10 @@ trait Prelude  extends data.DisjunctionFunctions
 
   type \/[L, R] = data.Disjunction.\/[L, R]
 
-  type ===[A, B] = data.Leibniz[Nothing, Any, A, B]
-  type <~<[-A, +B] = data.Liskov[A, B]
-  type >~>[+B, -A] = data.Liskov[A, B]
+  type ===[A, B]   = data.Is[A, B]
+  type <~<[-A, +B] = data.As[A, B]
+  type >~>[+B, -A] = data.As[A, B]
+  type =~=[A[_], B[_]] = data.IsK[A, B]
 
   type Identity[A] = data.Identity[A]
   type Maybe[A] = data.Maybe[A]

@@ -5,45 +5,18 @@ import Prelude.===
 import Leibniz.refl
 
 /**
-  * The data type `Leibniz` is the encoding of Leibnitz’ law which states that
-  * if `a` and `b` are identical then they must have identical properties.
-  * Leibnitz’ original definition reads as follows:
-  *   a ≡ b = ∀ f .f a ⇔ f b
-  * and can be proven to be equivalent to:
-  *   a ≡ b = ∀ f .f a → f b
-  *
-  * The `Leibniz` data type encodes true type equality, since the identity
-  * function is the only non-diverging conversion function that can be used
-  * as an implementation of the `subst` method assuming that we do not break
-  * parametricity. As the substitution function has to work for any `F[_]`, it
-  * cannot make assumptions about the structure of `F[_]`, making it impossible
-  * to construct a value of type `F[A]` or to access values of type `A` that
-  * may be stored inside a value of type `F[A]`. Hence it is impossible for
-  * a substitution function to alter the value it takes as argument.
-  *
-  * Not taking into account the partial functions that never terminate
-  * (infinite loops), functions returning `null`, or throwing exceptions,
-  * the identity function is the only function that can be used in place of
-  * `subst` to construct a value of type `Leibniz[..., A, B]`.
-  *
   * This particular version of Leibnitz’ equality has been generalized to
-  * handle subtyping so that it can be used with constrained type constructors
-  * such as `F[_ <: X]`. `Leibniz[L, H, A, B]` says that `A` = `B`, and
-  * that both of them are between `L` and `H`. Subtyping lets you loosen
+  * handle subtyping so that it can be used with constrained type constructors,
+  * such as `F[_ <: X]`. `Leibniz[L, H, A, B]` says that `A` = `B`,
+  * and that both of them are between `L` and `H`. Subtyping lets you loosen
   * the bounds on `L` and `H`.
   *
-  * This technique was first used in
-  * [[http://portal.acm.org/citation.cfm?id=583852.581494
-  * Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
-  *
-  * @see [[===]] `A === B` is a type synonym to `Leibniz[A, B]`
-  * @see [[http://typelevel.org/blog/2014/09/20/higher_leibniz.html
-  *        Higher Leibniz]]
+  * @see [[Is]]
   */
-sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Leibniz] () { ab =>
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Leibniz]() { ab =>
   /**
     * To create an instance of `Leibniz[A, B]` you must show that for every
-    * choice of `F[_]` you can convert `F[A]` to `F[B]`.
+    * choice of `F[_ >: L <: H]` you can convert `F[A]` to `F[B]`.
     */
   def subst[F[_ >: L <: H]](fa: F[A]): F[B]
 
@@ -193,8 +166,8 @@ object Leibniz {
     L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
     LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF
   ] (
-    eq1: Leibniz[L1, H1, A1, B1],
-    eq2: Leibniz[L2, H2, A2, B2]
+      eq1: Leibniz[L1, H1, A1, B1],
+      eq2: Leibniz[L2, H2, A2, B2]
   ): Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
     type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[α, A2]]
     type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, α]]
@@ -214,9 +187,9 @@ object Leibniz {
     L3, H3 >: L3, A3 >: L3 <: H3, B3 >: L3 <: H3,
     LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2, _ >: L3 <: H3] >: LF <: HF
   ] (
-    eq1: Leibniz[L1, H1, A1, B1],
-    eq2: Leibniz[L2, H2, A2, B2],
-    eq3: Leibniz[L3, H3, A3, B3]
+      eq1: Leibniz[L1, H1, A1, B1],
+      eq2: Leibniz[L2, H2, A2, B2],
+      eq3: Leibniz[L3, H3, A3, B3]
   ): Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, B3]] = {
     type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2, A3], F[α, A2, A3]]
     type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, α, A3]]
@@ -238,6 +211,6 @@ object Leibniz {
     * `A =:= B` implies `A === B` it is not the case that you can create
     * evidence of `A === B` except via a coercion. Use responsibly.
     */
-  def unsafeFromPredef[A, B](eq: A =:= B): A === B =
+  def fromPredef[A, B](eq: A =:= B): A === B =
     unsafeForce[A, B]
 }

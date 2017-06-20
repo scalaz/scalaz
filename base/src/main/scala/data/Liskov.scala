@@ -1,9 +1,7 @@
 package scalaz
 package data
 
-import Prelude.{<~<, ===}
-import scalaz.typeclass.{Contravariant, Functor}
-import Liskov.refl
+import Prelude._
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -14,26 +12,23 @@ import Liskov.refl
   *
   * @see [[<~<]] `A <~< B` is a type synonym to `Liskov[A, B]`
   */
-sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
-  def subst[F[-_]](fb: F[B]): F[A]
-
+sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] private[Liskov]() { ab =>
   /**
     * Substitution into a contravariant context.
     *
     * @see [[substCo]]
     */
-  final def substCt[F[-_]](fb: F[B]): F[A] =
-    subst[F](fb)
+  def substCt[F[-_ >: L <: H]](fb: F[B]): F[A] = {
+    type f[+x >: L <: H] = F[x] => F[A]
+    substCo[f](identity[F[A]])(fb)
+  }
 
   /**
     * Substitution into a covariant context.
     *
     * @see [[substCt]]
     */
-  final def substCo[F[+_]](fa: F[A]): F[B] = {
-    type f[-α] = F[α] => F[B]
-    substCt[f](identity[F[B]]).apply(fa)
-  }
+  def substCo[F[+_ >: L <: H]](fa: F[A]): F[B]
 
   /**
     * Substitution on identity brings about a direct coercion function
@@ -48,10 +43,9 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
     * Subtyping is transitive and its witnesses can be composed in a
     * chain much like functions.
     */
-  final def andThen[C](bc: B <~< C): A <~< C = {
-    type f[-α] = α <~< C
-    ab.substCt[f](bc)
-  }
+  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2]
+  (bc: Liskov[L2, H2, B, C]): Liskov[L2, H2, A, C] =
+    Liskov.compose[L2, H2, A, B, C](bc, ab)
 
   /**
     * Subtyping is transitive and its witnesses can be composed in a
@@ -59,7 +53,8 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
     *
     * @see [[andThen]]
     */
-  final def compose[Z](za: Z <~< A): Z <~< B =
+  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2]
+  (za: Liskov[L2, H2, Z, A]): Liskov[L2, H2, Z, B] =
     za.andThen(ab)
 
   /**
@@ -71,27 +66,27 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
   final def coerce(a: A): B =
     substCo[λ[`+α` => α]](a)
 
-  /**
-    * Given `A <~< B` we can prove that `F[A] <~< F[B]` for any
-    * covariant `F[+_]`.
-    *
-    * @see [[liftCt]]
-    */
-  final def liftCo[F[+_]]: F[A] <~< F[B] = {
-    type f[-α] = F[α] <~< F[B]
-    substCt[f](refl)
-  }
-
-  /**
-    * Given `A <~< B` we can prove that `F[B] <~< F[B]` for any
-    * contravariant `F[-_]`.
-    *
-    * @see [[liftCo]]
-    */
-  final def liftCt[F[-_]]: F[B] <~< F[A] = {
-    type f[+α] = F[α] <~< F[A]
-    substCo[f](refl)
-  }
+  //  /**
+  //    * Given `A <~< B` we can prove that `F[A] <~< F[B]` for any
+  //    * covariant `F[+_]`.
+  //    *
+  //    * @see [[liftCt]]
+  //    */
+  //  final def liftCo[F[+_]]: F[A] <~< F[B] = {
+  //    type f[-α] = Liskov[F[α], F[B]]
+  //    substCt[f](refl)
+  //  }
+  //
+  //  /**
+  //    * Given `A <~< B` we can prove that `F[B] <~< F[B]` for any
+  //    * contravariant `F[-_]`.
+  //    *
+  //    * @see [[liftCo]]
+  //    */
+  //  final def liftCt[F[-_]]: F[B] <~< F[A] = {
+  //    type f[+α] = F[α] <~< F[A]
+  //    substCo[f](refl)
+  //  }
 
   /**
     * A value of `A <~< B` is always sufficient to produce a similar [[<:<]]
@@ -104,65 +99,56 @@ sealed abstract class Liskov[-A, +B] private[Liskov] () { ab =>
 }
 
 object Liskov {
-  private[this] final case class Refl[A]() extends Liskov[A, A] {
-    def subst[F[-_]](fa: F[A]): F[A] = fa
+  def apply[L, H >: L, A >: L <: H, B >: L <: H](implicit ab: Liskov[L, H, A, B]): Liskov[L, H, A, B] = ab
+
+  final case class Refl[A]() extends Liskov[A, A, A, A] {
+//    def fix[L1 <: A, H1 >: A, A1 >: L1 <: A, B1 >: A <: H1]: Liskov1[L1, H1, A1, B1] =
+//      Liskov1.proved[L1, H1, A1, B1, A1, B1](Leibniz.refl[A1], Leibniz.refl[B1])
+
+    def substCo[F[+_ >: A <: A]](x: F[A]): F[A] = x
   }
-  private[this] val anyRefl: Any <~< Any = Refl[Any]()
+  private[this] val anyRefl: Liskov[Any, Any, Any, Any] = Refl[Any]()
+
+  /**
+    * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
+    * explicitly coerce types. It is unsafe.
+    */
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+  def unsafeForce[L, H >: L, A >: L <: H, B >: L <: H]: Liskov[L, H, A, B] =
+    anyRefl.asInstanceOf[Liskov[L, H, A, B]]
 
   /**
     * Subtyping relation is reflexive.
     */
-  def refl[A]: A <~< A = {
-    // FIXME: This optimization is safe:
-    // reflAny.asInstanceOf[A <~< A]
-    Refl[A]()
-  }
+  implicit def refl[A]: Liskov[A, A, A, A] = unsafeForce[A, A, A, A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  def isa[A, B >: A]: A <~< B = refl
+  implicit def reify[
+    L, H >: L,
+    A >: L <: (H with B),
+    B >: L <: H
+  ]: Liskov[L, H, A, B] = refl[A]
 
   /**
-    * Given `A <~< B` and a contravariant functor `F[_]`, we can prove that
-    * `F[B] <~< F[A]`. Notice that `F[B] <:< F[A]` may not hold in Scala, yet
-    * such a substitution is always valid assuming that `F[_]` is a lawful
-    * contravariant functor.
-    *
-    * @see [[http://typelevel.org/blog/2014/03/09/liskov_lifting.html
-    *        When can Liskov be lifted?]]
-    * @see [[liftCoF]]
-    */
-  def liftCtF[F[_]: Contravariant, A, B](ab: A <~< B): F[B] <~< F[A] =
-    ab.asInstanceOf[F[B] <~< F[A]]
-
-  /**
-    * Given `A <~< B` and a covariant functor `F[_]`, we can prove that
-    * `F[A] <~< F[B]`. Notice that `F[A] <:< F[B]` may not hold in Scala, yet
-    * such a substitution is always valid assuming that `F[_]` is a lawful
-    * covariant functor.
-    *
-    * @see [[http://typelevel.org/blog/2014/03/09/liskov_lifting.html
-    *        When can Liskov be lifted?]]
-    * @see [[liftCtF]]
-    */
-  def liftCoF[F[_]: Functor, A, B](ab: A <~< B): F[A] <~< F[B] =
-    ab.asInstanceOf[F[A] <~< F[B]]
-
-  /**
-    * Subtyping is a transitive relation and its witnesses can be composed
+    * Subtyping is transitive relation and its witnesses can be composed
     * in a chain much like functions.
+    *
+    * @see [[Liskov1.compose]]
+    * @see [[Liskov1.andThen]]
     */
-  def trans[A, B, C](bc: B <~< C, ab: A <~< B): A <~< C =
-    ab.andThen(bc)
+  def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H]
+  (bc: Liskov[L, H, B, C], ab: Liskov[L, H, A, B]): Liskov[L, H, A, C] =
+    bc.substCo[λ[`+α >: L <: H` => Liskov[L, H, A, α]]](ab)
 
   /**
     * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
     * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
     * SI-7278]] is fixed, so this function is marked unsafe.
     */
-  def unsafeBracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
-    Leibniz.unsafeForce[A, B]
+  def bracket[A, B, C](f: A <~< B, g: B <~< A): A === B =
+    Is.unsafeForce[A, B]
 
   /**
     * It can be convenient to convert a [[<:<]] value into a `<~<` value.
@@ -170,6 +156,6 @@ object Liskov {
     * `A <:< B` implies `A <~< B` it is not the case that you can create
     * evidence of `A <~< B` except via a coercion. Use responsibly.
     */
-  def unsafeFromPredef[A, B](eq: A <:< B): A <~< B =
-    anyRefl.asInstanceOf[A <~< B]
+  def fromPredef[L, H >: L, A >: L <: H, B >: L <: H](eq: A <:< B): Liskov[L, H, A, B] =
+    unsafeForce[L, H, A, B]
 }

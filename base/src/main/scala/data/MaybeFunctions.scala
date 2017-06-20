@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import Liskov._
+import As._
 
 import Maybe.{Empty, Just}
 
