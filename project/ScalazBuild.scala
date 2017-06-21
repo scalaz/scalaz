@@ -8,15 +8,15 @@ object Scalaz extends Build {
     id = prjName,
     base = file(prjName)).settings(
     name := s"scalaz-$prjName",
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.11.11",
     scalacOptions ++= Seq("-feature","-deprecation", "-Xlint", "-language:higherKinds",
-                          "-Ydelambdafy:method", "-target:jvm-1.8"),
+                          "-Ydelambdafy:method", "-Ypartial-unification", "-target:jvm-1.8"),
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 11)) =>
           Seq("-Ybackend:GenBCode")
         case _ =>
-          Seq("-Ypartial-unification")
+          Nil
       }
     },
     libraryDependencies ++= testDeps ++ Seq(
@@ -25,8 +25,7 @@ object Scalaz extends Build {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 11)) =>
           Seq(
-            "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0",
-            compilerPlugin("com.milessabin" % "si2712fix-plugin" % "1.1.0" cross CrossVersion.full)
+            "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
           )
         case _ =>
           Nil
