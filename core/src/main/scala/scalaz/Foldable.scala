@@ -245,7 +245,7 @@ trait Foldable[F[_]]  { self =>
         else x
     } 
 
-  /** The elements (amin, amax) of `fa` withc yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
+  /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
   def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
     foldMapLeft1Opt(fa) { a => 
         val b = f(a)
