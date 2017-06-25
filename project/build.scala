@@ -148,7 +148,7 @@ object build {
           "1.12.6"
       }
     },
-    scalaCheckVersion_1_13 := "1.13.4",
+    scalaCheckVersion_1_13 := "1.13.5",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
