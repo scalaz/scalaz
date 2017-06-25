@@ -37,7 +37,7 @@ trait FoldableParent[F[_]] { self: Foldable[F] =>
   def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
     syntax.foldable.ToFoldableOps(fa)(self).extremaOf(f)
 
-  /** The elements (amin, amax) of `fa` withc yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
+  /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
   def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
     syntax.foldable.ToFoldableOps(fa)(self).extremaBy(f)
 
