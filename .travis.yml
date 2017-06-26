@@ -34,8 +34,7 @@ matrix:
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
       script:
-      # https://github.com/rickynils/scalacheck/issues/330
-      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes coreJS/compile effectJS/compile iterateeJS/compile
+      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
     - scala: 2.12.2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
