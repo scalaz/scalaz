@@ -6,6 +6,7 @@ import data._
 import scala.language.implicitConversions
 
 trait Prelude  extends data.DisjunctionFunctions
+                  with data.ForallSyntax
                   with data.IdentityTypes
                   with data.MaybeFunctions
                   with typeclass.BindFunctions
@@ -97,6 +98,11 @@ trait Prelude  extends data.DisjunctionFunctions
   type Identity[A] = data.Identity[A]
   type Maybe[A] = data.Maybe[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
+
+  val forall = data.forall
+  type Forall[F[_]] = forall.Forall[F]
+  type ∀[F[_]] = Forall[F]
+
 }
 
 object Prelude extends Prelude

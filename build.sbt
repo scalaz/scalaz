@@ -47,3 +47,10 @@ lazy val meta         = crossProject.module
 lazy val metaJVM      = meta.jvm
 
 lazy val metaJS       = meta.js
+
+lazy val example      = crossProject.module
+  .dependsOn( base )
+
+lazy val exampleJVM   = example.jvm
+
+lazy val exampleJS    = example.js
