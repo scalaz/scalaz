@@ -2,7 +2,7 @@ lazy val root = Project(
   id = "root",
   base = file(".")
 ).settings(
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.11"
 ).aggregate ( baze
             , meta
             , benchmarks )
