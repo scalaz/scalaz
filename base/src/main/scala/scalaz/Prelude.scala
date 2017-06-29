@@ -26,6 +26,7 @@ trait Prelude  extends data.DisjunctionFunctions
   type Profunctor[F[_,_]] = typeclass.Profunctor[F]
   type Category[=>:[_,_]] = typeclass.Category[=>:]
   type InvariantFunctor[F[_]] = typeclass.InvariantFunctor[F]
+  type ~>[F[_], G[_]] = FunctionH[F, G]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -73,7 +74,7 @@ trait Prelude  extends data.DisjunctionFunctions
 
   implicit def PstrongOps[P[_,_], A, B](pab: P[A, B])(implicit P: Strong[P]): StrongSyntax.Ops[P, A, B] =
     new StrongSyntax.Ops(pab)
-   
+
   //InvariantFunctorSyntax
   implicit def InvariantFunctorOps[F[_], A](fa: F[A])(implicit F: InvariantFunctor[F]): InvariantFunctorSyntax.Ops[F, A] =
     new InvariantFunctorSyntax.Ops(fa)
