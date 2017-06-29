@@ -1,9 +1,11 @@
 package scalaz
 package data
-import typeclass.{Profunctor, Strong}
+import typeclass.{Profunctor, Strong, StrongClass}
 
 trait ForgetInstances { self =>
-  implicit def profunctor[A]: Profunctor[Forget[A, ?, ?]] = new Profunctor[Forget[A, ?, ?]] {
+
+ implicit def strong[A]: Strong[Forget[A, ?, ?]] = new StrongClass.First[Forget[A, ?, ?]] {
+
     override def dimap[B, C, D, E](fbc: Forget[A, B, C])(fdb: D => B)(fce: C => E): Forget[A, D, E] = 
       Forget[A, D, E](fdb andThen fbc.forget) 
 
@@ -12,10 +14,11 @@ trait ForgetInstances { self =>
       
     override def rmap[B, C, D](fbc: Forget[A, B, C])(fcd: C => D): Forget[A, B, D] =
       fbc.retag[D]
-  }
 
- implicit def strong[A]: Strong[Forget[A, ?, ?]] = new Strong[Forget[A, ?, ?]] {
-    override def profunctor: Profunctor[Forget[A, ?, ?]] = self.profunctor[A]
+    override def first[B, C, D](pab: Forget[A, B, C]): Forget[A, (B, D), (C, D)] = Forget[A, (B, D), (C, D)](bd => pab.forget(bd._1))
+
+    override def second[B, C, D](pab: Forget[A, B, C]): Forget[A, (D, B), (D, C)] = Forget[A, (D, B), (D, C)](bd => pab.forget(bd._2)) 
+
  }
 }
 
