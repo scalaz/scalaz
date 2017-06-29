@@ -26,7 +26,7 @@ import scala.concurrent.duration._
  * are responsible for ensuring the exception safety of the provided
  * `Future`.
  */
-class Task[+A](val get: Future[Throwable \/ A]) {
+final class Task[+A](val get: Future[Throwable \/ A]) extends AnyVal {
 
   def flatMap[B](f: A => Task[B]): Task[B] =
     new Task(get flatMap {
