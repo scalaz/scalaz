@@ -21,7 +21,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{isScalaJSProject, scalaJSOptimizerOptions}
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 
 object build {
   type Sett = Def.Setting[_]
@@ -58,16 +58,6 @@ object build {
   }
 
   val scalajsProjectSettings = Seq[Sett](
-    scalaJSOptimizerOptions ~= { options =>
-      // https://github.com/scala-js/scala-js/issues/2798
-      try {
-        scala.util.Properties.isJavaAtLeast("1.8")
-        options
-      } catch {
-        case _: NumberFormatException =>
-          options.withParallel(false)
-      }
-    },
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
