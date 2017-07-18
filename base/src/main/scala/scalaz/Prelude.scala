@@ -11,7 +11,6 @@ trait Prelude  extends data.DisjunctionFunctions
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
                   with typeclass.InvariantFunctorFunctions
-                  with typeclass.LiskovFunctions
                   with typeclass.TraversableFunctions {
 
   // Base Class
@@ -93,7 +92,12 @@ trait Prelude  extends data.DisjunctionFunctions
   // =========
   
   type \/[L, R] = data.Disjunction.\/[L, R]
-  type ===[A, B] = data.===[A, B]
+
+  type ===[A, B]   = data.Is[A, B]
+  type <~<[-A, +B] = data.As[A, B]
+  type >~>[+B, -A] = data.As[A, B]
+  type =~=[A[_], B[_]] = data.IsK[A, B]
+
   type Identity[A] = data.Identity[A]
   type Maybe[A] = data.Maybe[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
