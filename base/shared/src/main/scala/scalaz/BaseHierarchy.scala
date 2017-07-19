@@ -14,6 +14,7 @@ object BaseHierarchy {
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A] = A.semigroup
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
     implicit def categoryComposable[=>:[_,_]](implicit C: Category[=>:]): Compose[=>:] = C.compose 
+    implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F] = F.cobind
   }
 
   trait BH1 extends BH2 {
