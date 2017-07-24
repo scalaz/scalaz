@@ -4,7 +4,7 @@ package scalaz
  *
  * https://hackage.haskell.org/package/reducers-3.12.1/docs/Data-Semigroup-Applicative.html#t:Ap
  */
-case class Ap[F[_], A](f: F[A])
+final case class Ap[F[_], A](f: F[A])
 
 object Ap extends ApInstances
 
