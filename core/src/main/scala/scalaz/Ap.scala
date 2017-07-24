@@ -22,6 +22,9 @@ sealed abstract class ApInstances extends ApInstances0 {
       val F = F0
       val A = A0
     }
+
+  implicit def ApEqual[F[_], A](implicit E: Equal[F[A]]): Equal[Ap[F, A]] =
+    E.contramap(_.f)
 }
 
 private sealed trait ApSemigroup[F[_], A] extends Semigroup[Ap[F, A]] {
