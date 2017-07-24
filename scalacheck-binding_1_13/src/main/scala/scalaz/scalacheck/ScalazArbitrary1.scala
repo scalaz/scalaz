@@ -8,6 +8,9 @@ import scalaz.syntax.foldable._
 
 abstract class ScalazArbitrary1 {
 
+  implicit def cogenAp[F[_], A](implicit F: Cogen[F[A]]): Cogen[Ap[F, A]] =
+    F.contramap(_.f)
+
   implicit def cogenIList[A: Cogen]: Cogen[IList[A]] =
     Cogen[List[A]].contramap(_.toList)
 
