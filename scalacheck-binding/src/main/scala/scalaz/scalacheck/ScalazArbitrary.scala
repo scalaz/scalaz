@@ -209,6 +209,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def apArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Ap[F, A]] =
     Functor[Arbitrary].map(F)(Ap[F, A](_))
 
+  implicit def cogenAlter[F[_], A](implicit F: Cogen[F[A]]): Cogen[Alter[F, A]] =
+    F.contramap(_.f)
+
+  implicit def alterArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Alter[F, A]] =
+    Functor[Arbitrary].map(F)(Alter[F, A](_))
+
   implicit def monoidCoproductArbitrary[M: Arbitrary, N: Arbitrary]: Arbitrary[M :+: N] =
     Functor[Arbitrary].map(arb[Vector[M \/ N]])(new :+:(_))
 
