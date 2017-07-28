@@ -26,11 +26,15 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.13.0-M1
+    - scala: 2.13.0-M2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
       script:
-      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
+      - git clone -b v0.9.4 https://github.com/non/kind-projector.git
+      - cd kind-projector
+      - sbt ++${TRAVIS_SCALA_VERSION} 'set libraryDependencies ~= {_.filterNot(_.organization == "org.ensime")}' publishLocal
+      - cd ..
+      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile
     - scala: 2.13.0-M1
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
