@@ -1,13 +1,20 @@
 package scalaz
 package std
 
-sealed trait OptionInstances0 {
+sealed trait OptionInstances0 extends OptionInstances1 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
 
+  implicit def optionSemiLattice[A: SemiLattice]: SemiLattice[Option[A]] =
+    new OptionSemigroup[A] with SemiLattice[Option[A]] {
+      override def B = implicitly 
+    }
+}
+
+sealed trait OptionInstances1 {
   implicit def optionBand[A: Band]: Band[Option[A]] =
-    new OptionMonoid[A] with Band[Option[A]] {
+    new OptionSemigroup[A] with Band[Option[A]] {
       override def B = implicitly
     }
 }
@@ -87,8 +94,9 @@ trait OptionInstances extends OptionInstances0 {
     }
 
   implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
-    new OptionMonoid[A] {
+    new OptionSemigroup[A] with Monoid[Option[A]] {
       override def B = implicitly
+      override def zero = None
     }
 
   /** Add `None` as an element less than all `A`s. */
@@ -286,7 +294,7 @@ private trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
   }
 }
 
-private trait OptionMonoid[A] extends Monoid[Option[A]] {
+private trait OptionSemigroup[A] extends Semigroup[Option[A]] {
   def B: Semigroup[A]
 
   def append(a: Option[A], b: => Option[A]): Option[A] = (a, b) match {
@@ -295,6 +303,4 @@ private trait OptionMonoid[A] extends Monoid[Option[A]] {
     case (None, b2 @ Some(_)) => b2
     case (None, None) => None
   }
-
-  def zero: Option[A] = None
 }

@@ -1006,12 +1006,22 @@ sealed abstract class ==>>[A, B] {
     }
 }
 
-sealed abstract class MapInstances0 {
+sealed abstract class MapInstances2 {
   implicit def mapBand[A, B](implicit A: Order[A], B: Band[B]): Band[A ==>> B] = new Band[A ==>> B] {
     def append(a: A ==>> B, b: => A ==>> B): A ==>> B =
       (a unionWith b)(B.append(_, _))
   }
+}
 
+sealed abstract class MapInstances1 extends MapInstances2 {
+  implicit def mapLattice[A, B](implicit A: Order[A], B: SemiLattice[B]): SemiLattice[A ==>> B] = new SemiLattice[A ==>> B] {
+    def append(a: A ==>> B, b: => A ==>> B): A ==>> B =
+      (a unionWith b)(B.append(_, _))
+  }
+}
+
+sealed abstract class MapInstances0 extends MapInstances1 {
+  
   implicit def scalazMapInstance[S: Order]: Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
     new Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =

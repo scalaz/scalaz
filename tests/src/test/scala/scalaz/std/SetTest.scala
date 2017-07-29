@@ -9,10 +9,10 @@ object SetTest extends SpecLite {
 
   checkAll(order.laws[Set[Int]])
   checkAll(monoid.laws[Set[Int]])
-  checkAll(band.laws[Set[Int]])
   checkAll(isEmpty.laws[Set])
   checkAll(foldable.laws[Set])
   checkAll(FoldableTests.anyAndAllLazy[Set])
+  checkAll(semilattice.laws[Set[Int]])
 
   "foldLeftM" should {
 
