@@ -15,7 +15,7 @@ object EnumeratorPTest extends SpecLite {
       val enum  = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))
       val enum2 = enumPStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
-      val cf = cogroupE[Int, Int, Id]
+      val cf = cogroupE[Int, Int, Id](Order[Int].order)
       val enumR = cf(enum, enum2)
 
       (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id](id)).run must_===(List(
@@ -40,7 +40,7 @@ object EnumeratorPTest extends SpecLite {
       val enum2 = enumPStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
       val enum3 = enumPStream[Int, Id](Stream(3, 5, 8))
 
-      val cf = cogroupE[Int, Int, Id]
+      val cf = cogroupE[Int, Int, Id](Order[Int].order)
       val enumR = cf(cf(enum, enum2) map { _.fold(identity[Int], _._1, identity[Int]) }, enum3)
 
       (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id](id)).run must_===(List(

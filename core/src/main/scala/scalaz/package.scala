@@ -118,8 +118,6 @@ package object scalaz {
 
   type ∨[A, B] = A \/ B
 
-  type |>=|[G[_], F[_]] = MonadPartialOrder[G, F]
-
   type ReaderT[F[_], E, A] = Kleisli[F, E, A]
   val ReaderT = Kleisli
   type =?>[E, A] = Kleisli[Option, E, A]

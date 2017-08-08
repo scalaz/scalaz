@@ -27,19 +27,5 @@ object MonadState {
 
   ////
 
-  def promotedMonadState[G[_], F[_], S](
-    implicit
-    mpo: MonadPartialOrder[G, F],
-    ms: MonadState[F, S]
-  ): MonadState[G, S] = new MonadState[G, S] {
-
-    override def get: G[S] = mpo.promote(ms.get)
-    override def put(s: S): G[Unit] = mpo.promote(ms put s)
-
-    override def point[A](a: => A): G[A] = mpo.MG point a
-    override def bind[A, B](ga: G[A])(f: A => G[B]): G[B] = mpo.MG.bind(ga)(f)
-
-  }
-
   ////
 }

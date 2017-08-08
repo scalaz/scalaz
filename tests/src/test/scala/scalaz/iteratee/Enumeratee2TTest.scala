@@ -12,16 +12,21 @@ object Enumeratee2TTest extends SpecLite {
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
   implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]
-  implicit val intO = Order[Int].order _
+  val intO = Order[Int].order _
 
   type StepM[A] = StepT[Int, Id, A]
   type IterateeM[A] = IterateeT[Int, Id, A]
+
+  val vtLift = new (Id ~> IterateeM) {
+    def apply[A](a: Id[A]): IterateeM[A] =
+      vt.liftM(a)
+  }
 
   "join equal pairs" in {
     val enum  = enumStream[Int, IterateeM](Stream(1, 3, 5, 7))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 6))
 
-    val outer = joinI[Int, Int, Id].apply(consume[(Int, Int), Id, List].value) &= enum
+    val outer = joinI[Int, Int, Id](intO).apply(consume[(Int, Int), Id, List].value) &= enum
     val inner = outer.run &= enum2
 
     inner.run.pointI.run must_===(List((3, 3), (5, 5)))
@@ -35,7 +40,7 @@ object Enumeratee2TTest extends SpecLite {
       val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
       val consumer = consume[E3I, Id, List]
-      val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id].apply[E3LI])
+      val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id](intO).apply[E3LI], vtLift)
       val outer2 = outer &= enum
       val inner = outer2.run &= enum2
 
@@ -90,7 +95,7 @@ object Enumeratee2TTest extends SpecLite {
     }
 
     val consumer = consume[(Int, Int), Id, List]
-    val producer = joinE[Int, Int, Id].apply(enum1p, enum2p).apply[Id](id)
+    val producer = joinE[Int, Int, Id](intO).apply(enum1p, enum2p).apply[Id](id)
     (consumer &= producer).run must_===(List(
       (1, 1), (1, 1), (1, 1)
     ))
