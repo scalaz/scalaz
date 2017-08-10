@@ -5,14 +5,13 @@ import std.AllInstances._
 import Iteratee._
 import Enumeratee2T._
 import Either3._
-import MonadPartialOrder._
 import Id._
+import NaturalTransformation.id
 
 object Enumeratee2TTest extends SpecLite {
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
   implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]
-  implicit val mpo = MonadPartialOrder.transformer[Id, λ[(β[_], α) => IterateeT[Int, β, α]]]
   implicit val intO = Order[Int].order _
 
   type StepM[A] = StepT[Int, Id, A]
@@ -36,7 +35,7 @@ object Enumeratee2TTest extends SpecLite {
       val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
       val consumer = consume[E3I, Id, List]
-      val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id].apply[E3LI])(mpo)
+      val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id].apply[E3LI])
       val outer2 = outer &= enum
       val inner = outer2.run &= enum2
 
@@ -81,21 +80,17 @@ object Enumeratee2TTest extends SpecLite {
 
   "join the first element with all of the second iteratee's elements, which compare equal" in {
     val enum1p = new EnumeratorP[Int, Id] {
-      def apply[F[_]](implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] = {
-        import ord._
+      def apply[F[_]: Monad](trans: Id ~> F): EnumeratorT[Int, F] =
         enumStream[Int, F](Stream(1))
-      }
     }
 
     val enum2p = new EnumeratorP[Int, Id] {
-      def apply[F[_]](implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] = {
-        import ord._
+      def apply[F[_]: Monad](trans: Id ~> F): EnumeratorT[Int, F] =
         enumStream[Int, F](Stream(1, 1, 1))
-      }
     }
 
     val consumer = consume[(Int, Int), Id, List]
-    val producer = joinE[Int, Int, Id].apply(enum1p, enum2p).apply[Id]
+    val producer = joinE[Int, Int, Id].apply(enum1p, enum2p).apply[Id](id)
     (consumer &= producer).run must_===(List(
       (1, 1), (1, 1), (1, 1)
     ))
