@@ -41,10 +41,10 @@ trait IsomorphismLiftControlIO[F[_], G[_]] extends LiftControlIO[F] {
 
   implicit def G: LiftControlIO[G]
 
-  implicit def iso: F <~> G
+  def iso: F <~> G
 
   override def liftControlIO[A](f: RunInBase[F, IO] => IO[A]): F[A] =
-    iso.from(G.liftControlIO(f compose hoistRunInBase[F, G]))
+    iso.from(G.liftControlIO(f compose hoistRunInBase(iso)))
 }
 
 trait IsomorphismMonadControlIO[F[_], G[_]] extends MonadControlIO[F] with IsomorphismLiftControlIO[F, G] with IsomorphismMonad[F, G] {
