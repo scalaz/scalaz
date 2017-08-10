@@ -1,32 +1,6 @@
 package scalaz
 
-sealed abstract class IsomorphismsLow1 {
-  self: Isomorphisms =>
-
-  /**Set isomorphism is commutative */
-  implicit def isoCommutative[A, B](implicit i: A <=> B): B <=> A = i.flip
-
-  /**Natural isomorphism is commutative */
-  implicit def isoNaturalCommutative[F[_], G[_]](implicit i: F <~> G): G <~> F = i.flip
-}
-
-sealed abstract class IsomorphismsLow0 extends IsomorphismsLow1 {
-  self: Isomorphisms =>
-
-  /**Set isomorphism is reflexive */
-  implicit def isoRefl[A]: A <=> A = new (A <=> A) {
-    def to: A => A = a => a
-    def from: A => A = a => a
-  }
-
-  /**Natural isomorphism is reflexive */
-  implicit def isoNaturalRefl[F[_]]: F <~> F = new IsoFunctorTemplate[F, F] {
-    def to[A](fa: F[A]): F[A] = fa
-    def from[A](fa: F[A]): F[A] = fa
-  }
-}
-
-sealed abstract class Isomorphisms extends IsomorphismsLow0{
+sealed abstract class Isomorphisms {
 
   /**Isomorphism for arrows of kind * -> * -> * */
   trait Iso[Arr[_, _], A, B] {
@@ -162,6 +136,24 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
     def to[A, B](fa: F[A, B]): G[A, B]
     def from[A, B](ga: G[A, B]): F[A, B]
   }
+
+  /**Set isomorphism is commutative */
+  def commutative[A, B](i: A <=> B): B <=> A = i.flip
+
+  /**Set isomorphism is reflexive */
+  def refl[A]: A <=> A = new (A <=> A) {
+    def to: A => A = a => a
+    def from: A => A = a => a
+  }
+
+  /**Natural isomorphism is reflexive */
+  def naturalRefl[F[_]]: F <~> F = new IsoFunctorTemplate[F, F] {
+    def to[A](fa: F[A]): F[A] = fa
+    def from[A](fa: F[A]): F[A] = fa
+  }
+
+  /**Natural isomorphism is commutative */
+  def naturalCommutative[F[_], G[_]](i: F <~> G): G <~> F = i.flip
 
 }
 
