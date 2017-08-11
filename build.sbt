@@ -1,7 +1,6 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import org.scalajs.sbtplugin.cross._
-import sbtunidoc.Plugin.UnidocKeys._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val jsProjects = Seq[ProjectReference](
@@ -19,7 +18,7 @@ lazy val nativeProjects = Seq[ProjectReference](
 lazy val scalaz = Project(
   id = "scalaz",
   base = file("."),
-  settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+  settings = standardSettings ++ Seq[Sett](
     description := "scalaz unidoc",
     artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
     packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
@@ -37,7 +36,7 @@ lazy val scalaz = Project(
     }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = jvmProjects ++ jsProjects
-)
+).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
   rootNativeId,
