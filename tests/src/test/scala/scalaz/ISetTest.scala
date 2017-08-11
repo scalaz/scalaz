@@ -1,9 +1,11 @@
 package scalaz
 
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 import scala.util.Random
 
 object ISetTest extends SpecLite {
+  import scalaz.scalacheck.ScalaCheckBinding._
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import syntax.std.option._
@@ -11,6 +13,7 @@ object ISetTest extends SpecLite {
   import std.list._
   import std.option._
   import std.tuple._
+  import std.string._
 
   import ISet._
 
@@ -25,6 +28,20 @@ object ISetTest extends SpecLite {
   def structurallySound[A: Order: Show](s: ISet[A]) = {
     val al = s.toAscList
     al must_===(al.sorted)(Order[A].toScalaOrdering)
+  }
+
+  private[this] case class Foo(a: Int)
+  private[this] object Foo {
+    implicit val show: Show[Foo] =
+      Show.shows[Foo](_.a.toString)
+    implicit val order: Order[Foo] =
+      Order[Int].contramap(_.a)
+    implicit val arb: Arbitrary[Foo] =
+      Functor[Arbitrary].map(implicitly[Arbitrary[Int]])(Foo(_))
+  }
+
+  "show" ! forAll { a: ISet[Foo] =>
+    Show[ISet[Foo]].shows(a) must_=== a.toAscList.map(_.a).mkString("ISet(", ",", ")")
   }
 
   "findLeft/findRight" in {
