@@ -641,8 +641,26 @@ sealed abstract class ISetInstances {
   }
 
   implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
-    override def shows(f: ISet[A]) =
-      f.toAscList.mkString("ISet(", ",", ")")
+    override def shows(f: ISet[A]) = {
+      if(f.isEmpty) {
+        "ISet()"
+      } else {
+        val buf = new java.lang.StringBuilder("ISet(")
+        val A = Show[A]
+        @tailrec
+        def go(list: List[A]): Unit = (list: @unchecked) match {
+          case x :: Nil =>
+            buf.append(A.shows(x))
+            buf.append(')')
+          case x :: xs =>
+            buf.append(A.shows(x))
+            buf.append(',')
+            go(xs)
+        }
+        go(f.toAscList)
+        buf.toString
+      }
+    }
   }
 
   implicit def setMonoid[A: Order]: Monoid[ISet[A]] with Band[ISet[A]] =
