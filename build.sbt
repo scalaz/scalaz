@@ -6,14 +6,13 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.Plugin._
 
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
-import sbtunidoc.Plugin.UnidocKeys._
 
 import build._
 
 lazy val scalaz = Project(
   id = "scalaz",
   base = file("."),
-  settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+  settings = standardSettings ++ Seq[Sett](
     mimaPreviousArtifacts := Set.empty,
     // <https://github.com/scalaz/scalaz/issues/261>
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(typelevel),
@@ -31,7 +30,7 @@ lazy val scalaz = Project(
     }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
-)
+).enablePlugins(ScalaUnidocPlugin)
 
 lazy val core = Project(
   id = "core",
