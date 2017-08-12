@@ -16,7 +16,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.4.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.14")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.17")
 
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "1.1.0")
 
