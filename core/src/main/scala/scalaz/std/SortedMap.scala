@@ -24,4 +24,10 @@ sealed trait MapSubSortedMap {
 }
 
 object sortedMap extends MapSubInstances with MapSubFunctions
-    with MapSubSortedMap
+    with MapSubSortedMap {
+  implicit def sortedMapBand[K, V](implicit B: BuildKeyConstraint[K], S: Band[V]): Band[SortedMap[K, V]] =
+    new MapMonoid[K, V] with Band[SortedMap[K, V]] {
+      override def V = S
+      override def BK = B
+    }
+}

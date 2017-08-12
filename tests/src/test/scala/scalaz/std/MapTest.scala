@@ -3,13 +3,14 @@ package std
 
 import std.AllInstances._
 import org.scalacheck.Arbitrary, Arbitrary.arbitrary
+import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 import scala.collection.immutable.{Map => SMap, MapLike}
 import scala.math.{Ordering => SOrdering}
 import org.scalacheck.Prop.forAll
 
 abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], BKC[_]]
-  (dict: MapSubInstances with MapSubFunctions{
+  (protected val dict: MapSubInstances with MapSubFunctions{
      type XMap[A, B] = Map[A, B]
      type BuildKeyConstraint[A] = BKC[A]
    })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String]) extends SpecLite {
@@ -100,4 +101,7 @@ private object DIContravariant extends Contravariant[λ[α => DummyImplicit]] {
   def contramap[A, B](fa: DummyImplicit)(f: B => A) = fa
 }
 
-object MapTest extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant, implicitly, implicitly)
+object MapTest extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant, implicitly, implicitly) {
+  import std.map.mapBand
+  checkAll(band.laws[Map[String, ISet[Int]]])
+}

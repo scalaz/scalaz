@@ -24,6 +24,28 @@ trait MapSub {
   private[std]
   def fromSeq[K: BuildKeyConstraint, V](as: (K, V)*): XMap[K, V] =
     buildXMap[K, V, K, V].apply().++=(as).result()
+
+  import syntax.std.function2._
+  protected[this] trait MapMonoid[K, V] extends Monoid[XMap[K, V]] {
+    implicit def V: Semigroup[V]
+    implicit def BK: BuildKeyConstraint[K]
+
+    def zero = fromSeq[K, V]()
+    def append(m1: XMap[K, V], m2: => XMap[K, V]) = {
+      // Eagerly consume m2 as the value is used more than once.
+      val m2Instance: XMap[K, V] = m2
+      // semigroups are not commutative, so order may matter.
+      val (from, to, semigroup) = {
+        if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
+        else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
+      }
+
+      from.foldLeft(to) {
+        case (to, (k, v)) => ab_+(to, k, to.get(k).map(semigroup(_, v)).getOrElse(v))
+      }
+    }
+  }
+
 }
 
 sealed trait MapSubMap extends MapSub {
@@ -120,21 +142,9 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
 
   /** Map union monoid, unifying values with `V`'s `append`. */
   implicit def mapMonoid[K: BuildKeyConstraint, V: Semigroup]: Monoid[XMap[K, V]] =
-    new Monoid[XMap[K, V]] {
-      def zero = fromSeq[K, V]()
-      def append(m1: XMap[K, V], m2: => XMap[K, V]) = {
-        // Eagerly consume m2 as the value is used more than once.
-        val m2Instance: XMap[K, V] = m2
-        // semigroups are not commutative, so order may matter.
-        val (from, to, semigroup) = {
-          if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
-          else (m1, m2Instance, (Semigroup[V].append(_: V, _: V)).flip)
-        }
-
-        from.foldLeft(to) {
-          case (to, (k, v)) => ab_+(to, k, to.get(k).map(semigroup(_, v)).getOrElse(v))
-        }
-      }
+    new MapMonoid[K, V] {
+      override def V = implicitly[Semigroup[V]]
+      override def BK = implicitly[BuildKeyConstraint[K]]
     }
 
   implicit def mapShow[K, V](implicit K: Show[K], V: Show[V]): Show[XMap[K, V]] =
@@ -218,4 +228,10 @@ trait MapInstances extends MapSubInstances with MapSubMap
 
 trait MapFunctions extends MapSubFunctions with MapSubMap
 
-object map extends MapInstances with MapFunctions
+object map extends MapInstances with MapFunctions {
+  implicit def mapBand[K, V](implicit B: BuildKeyConstraint[K], S: Band[V]): Band[XMap[K, V]] =
+    new MapMonoid[K, V] with Band[XMap[K, V]] {
+      override def V = S
+      override def BK = B
+    }
+}
