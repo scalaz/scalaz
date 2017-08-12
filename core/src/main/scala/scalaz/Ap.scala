@@ -2,7 +2,7 @@ package scalaz
 
 /** Derive a Semigroup or Monoid instance from an Apply or Applicative.
  *
- * https://hackage.haskell.org/package/reducers-3.12.1/docs/Data-Semigroup-Applicative.html#t:Ap
+ * [[https://hackage.haskell.org/package/reducers-3.12.1/docs/Data-Semigroup-Applicative.html#t:Ap]]
  */
 final case class Ap[F[_], A](f: F[A])
 

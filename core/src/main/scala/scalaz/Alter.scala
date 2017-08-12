@@ -2,7 +2,7 @@ package scalaz
 
 /** Derive a Semigroup or Monoid instance from a Plus or PlusEmpty.
  *
- * https://hackage.haskell.org/package/reducers-3.12.1/docs/Data-Semigroup-Alt.html#t:Alter
+ * [[https://hackage.haskell.org/package/reducers-3.12.1/docs/Data-Semigroup-Alt.html#t:Alter]]
  */
 final case class Alter[F[_], A](f: F[A])
 
