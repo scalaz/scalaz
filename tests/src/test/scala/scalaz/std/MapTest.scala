@@ -23,7 +23,6 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   checkAll(align.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
-  checkAll(equal.laws[Map[Int,String]])
 
   "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
 
