@@ -44,10 +44,10 @@ matrix:
       - sbt ++${TRAVIS_SCALA_VERSION} 'set libraryDependencies ~= {_.filterNot(_.organization == "org.ensime")}' publishLocal
       - cd ..
       - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses coreJS/compile effectJS/compile iterateeJS/compile
-    - scala: 2.12.2
+    - scala: 2.12.3
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.2
+    - scala: 2.12.3
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.11
