@@ -2,8 +2,6 @@
 lazy val root = Project(
   id = "root",
   base = file(".")
-).settings(
-  scalaVersion := "2.12.2"
 ).aggregate ( bazeJVM
             , bazeJS
             , metaJVM

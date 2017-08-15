@@ -6,7 +6,7 @@ object Scalaz extends Build {
 
   def stdSettings(prjName: String) = Seq(
     name := s"scalaz-$prjName",
-    scalaVersion := "2.12.2",
+    // scalaVersion is defined in .travis.yml, via sbt-travisci
     scalacOptions ++= Seq("-feature","-deprecation", "-Xlint", "-language:higherKinds",
                           "-Ydelambdafy:method", "-Ypartial-unification", "-target:jvm-1.8", "-opt:l:project",
                           "-opt-warnings"),
