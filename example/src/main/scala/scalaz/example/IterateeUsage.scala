@@ -1,7 +1,7 @@
 package scalaz.example
 
 object IterateeUsage extends App {
-  import scalaz._, Scalaz._, MonadPartialOrder._
+  import scalaz._, Scalaz._
   import iteratee._, Iteratee._
   import effect._
 

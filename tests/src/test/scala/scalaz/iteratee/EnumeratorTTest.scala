@@ -23,7 +23,7 @@ object EnumeratorTTest extends SpecLite {
   "Issue #553" in {
     import std.list._
     val xs = (1 to 10).map(List(_)).toList
-    val e = enumIterator(xs.iterator)
+    val e = enumIterator[List[Int], IO](xs.iterator)
     (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
     (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
   }

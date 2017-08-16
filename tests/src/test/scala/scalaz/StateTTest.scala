@@ -78,16 +78,4 @@ object StateTTest extends SpecLite {
       .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
     4000 must_=== result(0).run._1
   }
-
-  "MonadState must be derived for any stack of Monads" in {
-    type StateStack[A] = State[Int, A]
-    type ListStack[A] = ListT[StateStack, A]
-
-    // `promotedMonadState` implicit instance had to be reverted (see #1308).
-    // Call `promotedMonadState` explicitly for now.
-    //val ms = MonadState[ListStack, Int]
-    val ms = MonadState.promotedMonadState[ListStack, StateStack, Int]
-
-    ms.get.run.eval(1) must_=== List(1)
-  }
 }
