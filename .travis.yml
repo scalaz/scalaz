@@ -34,7 +34,8 @@ matrix:
       - cd kind-projector
       - sbt ++${TRAVIS_SCALA_VERSION} 'set libraryDependencies ~= {_.filterNot(_.organization == "org.ensime")}' publishLocal
       - cd ..
-      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile
+      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
+      - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test
     - scala: 2.13.0-M2
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
@@ -43,7 +44,8 @@ matrix:
       - cd kind-projector
       - sbt ++${TRAVIS_SCALA_VERSION} 'set libraryDependencies ~= {_.filterNot(_.organization == "org.ensime")}' publishLocal
       - cd ..
-      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses coreJS/compile effectJS/compile iterateeJS/compile
+      - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
+      - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test
     - scala: 2.12.3
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
