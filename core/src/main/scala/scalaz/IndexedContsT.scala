@@ -1,6 +1,6 @@
 package scalaz
 
-final case class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R]) {
+final case class IndexedContsT[W[_], M[_], R, O, A](_run: W[A => M[O]] => M[R]) {
   def run(wamo: W[A => M[O]]): M[R] =
     _run(wamo)
 
