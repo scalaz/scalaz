@@ -12,7 +12,10 @@ object IsomorphismUsage extends App {
   def isoSet[A] = new IsoSet[Seq[A], List[A]] {
     def to: Seq[A] => List[A] = _.toList
     def from: List[A] => Seq[A] = _.toSeq
-  }
+  } // or simply:
+  def equivalentIsoSet[A] = IsoSet[Seq[A], List[A]](_.toList, _.toSeq)
+
+
   def isoFunctor = new IsoFunctorTemplate[Seq, List] {
     def to[A](sa: Seq[A]): List[A] = sa.toList
     def from[A](la: List[A]): Seq[A] = la.toSeq
