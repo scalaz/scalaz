@@ -1,12 +1,13 @@
 import sbt._
 import Keys._
+import org.scalajs.sbtplugin.cross.CrossProject
 
-object Scalaz extends Build {
+object Scalaz {
   val testDeps = Seq("org.scalacheck" %% "scalacheck" % "1.13.4" % "test")
 
   def stdSettings(prjName: String) = Seq(
     name := s"scalaz-$prjName",
-    scalaVersion := "2.12.2",
+
     scalacOptions ++= Seq("-feature","-deprecation", "-Xlint", "-language:higherKinds",
                           "-Ydelambdafy:method", "-Ypartial-unification", "-target:jvm-1.8", "-opt:l:project",
                           "-opt-warnings"),
@@ -19,7 +20,7 @@ object Scalaz extends Build {
       }
     },
     libraryDependencies ++= testDeps ++ Seq(
-      compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+      compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
     ) ++ {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 11)) =>
@@ -33,6 +34,12 @@ object Scalaz extends Build {
     incOptions ~= (_.withLogRecompileOnMacro(false))
   )
 
-  def module(prjName: String) =
-    Project(id = prjName, base = file(prjName)).settings(stdSettings(prjName))
+  implicit class ModuleHelper(p: Project) {
+    def module : Project = p.in(file(p.id)).settings(stdSettings(p.id))
+  }
+
+  implicit class CrossProjectModuleHelper(p: CrossProject.Builder) {
+    def module : CrossProject = p.in(file(p.jvm.id.stripSuffix("JVM"))).settings(stdSettings(p.jvm.id.stripSuffix("JVM")))
+  }
+
 }

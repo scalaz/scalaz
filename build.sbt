@@ -1,11 +1,8 @@
+import Scalaz._
 
-lazy val root = Project(
-  id = "root",
-  base = file(".")
-).settings(
-  scalaVersion := "2.12.2"
-).aggregate ( bazeJVM
-            , bazeJS
+lazy val root = project.in(file("."))
+  .aggregate (baseJVM
+            , baseJS
             , metaJVM
             , metaJS
             , effectJVM
@@ -13,24 +10,22 @@ lazy val root = Project(
             , benchmarks
 ).enablePlugins(ScalaJSPlugin)
 
-lazy val baze         = crossProject.in(file("base"))
-  .settings(stdSettings("base"))
+lazy val base         = crossProject.module
   .dependsOn( meta )
 
-lazy val bazeJVM      = baze.jvm
+lazy val baseJVM      = base.jvm
 
-lazy val bazeJS       = baze.js
+lazy val baseJS       = base.js
 
-lazy val effect       = crossProject.in(file("effect"))
-  .settings(stdSettings("effect"))
-  .dependsOn( baze )
+lazy val effect       = crossProject.module
+  .dependsOn( base )
 
 lazy val effectJVM    = effect.jvm
 
 lazy val effectJS     = effect.js
 
-lazy val benchmarks   = module("benchmarks")
-  .dependsOn( bazeJVM, effectJVM )
+lazy val benchmarks   = project.module
+  .dependsOn( baseJVM, effectJVM )
   .enablePlugins(JmhPlugin)
   .settings(
     libraryDependencies ++=
@@ -41,8 +36,7 @@ lazy val benchmarks   = module("benchmarks")
           , "org.typelevel"   %% "cats-effect"    % "0.3")
   )
 
-lazy val meta         = crossProject.in(file("meta"))
-  .settings(stdSettings("meta"))
+lazy val meta         = crossProject.module
   .settings(
     libraryDependencies ++=
       Seq ( "org.scala-lang" % "scala-reflect" % scalaVersion.value
