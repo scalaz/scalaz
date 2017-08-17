@@ -1,6 +1,6 @@
 package scalaz
 
-final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R]) {
+final case class IndexedContsT[W[_], M[_], R, O, A](_run: W[A => M[O]] => M[R]) {
   def run(wamo: W[A => M[O]]): M[R] =
     _run(wamo)
 
@@ -58,9 +58,6 @@ final class IndexedContsT[W[_], M[_], R, O, A] private(_run: W[A => M[O]] => M[R
 }
 
 object IndexedContsT extends IndexedContsTInstances with IndexedContsTFunctions {
-  def apply[W[_], M[_], R, O, A](f: W[A => M[O]] => M[R]): IndexedContsT[W, M, R, O, A] =
-    new IndexedContsT[W, M, R, O, A](f)
-
   def empty[W[_], M[_], R, A](implicit M: PlusEmpty[M]): ContsT[W, M, R, A] =
     ContsT { k => M.empty }
 }
