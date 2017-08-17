@@ -131,20 +131,44 @@ sealed abstract class Isomorphisms extends IsomorphismsLow0{
   /**Alias for IsoSet */
   type <=>[A, B] = IsoSet[A, B]
 
+  object IsoSet {
+    /**Convenience constructor to implement `A <=> B` from `A => B` and `B => A` */
+    def apply[A, B](to: A => B, from: B => A): A <=> B = {
+      val _to   = to
+      val _from = from
+      new Iso[Function1, A, B] {
+        override val to   = _to
+        override val from = _from
+      }
+    }
+  }
+
   /**Alias for IsoFunctor */
   type <~>[F[_], G[_]] = IsoFunctor[F, G]
 
   /**Convenience template trait to implement `<~>` */
   trait IsoFunctorTemplate[F[_], G[_]] extends IsoFunctor[F, G] {
-    final val to: NaturalTransformation[F, G] = new (F ~> G) {
+    override final val to: NaturalTransformation[F, G] = new (F ~> G) {
       def apply[A](fa: F[A]): G[A] = to[A](fa)
     }
-    final val from: NaturalTransformation[G, F] = new (G ~> F) {
+    override final val from: NaturalTransformation[G, F] = new (G ~> F) {
       def apply[A](ga: G[A]): F[A] = from[A](ga)
     }
 
     def to[A](fa: F[A]): G[A]
     def from[A](ga: G[A]): F[A]
+  }
+
+  object IsoFunctor {
+    /**Convenience constructor to implement `F <~> G` from F ~> G and G ~> F */
+    def apply[F[_], G[_]](to: F ~> G, from: G ~> F): F <~> G = {
+      val _to   = to
+      val _from = from
+      new (F <~> G) {
+        override val to = _to
+        override val from = _from
+      }
+    }
   }
 
   /**Alias for IsoBifunctor */
