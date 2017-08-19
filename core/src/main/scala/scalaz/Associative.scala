@@ -7,17 +7,13 @@ package scalaz
 ////
 trait Associative[=>:[_, _]]  { self =>
   ////
-  import Isomorphism.<=>
+  import Isomorphism.{<=>, IsoSet}
 
   def reassociateLeft[A, B, C](f: A =>: (B =>: C)): (A =>: B) =>: C
 
   def reassociateRight[A, B, C](f: (A =>: B) =>: C): A =>: (B =>: C)
 
-  def reassociateIso[A, B, C]: ((A =>: B) =>: C) <=> (A =>: (B =>: C)) =
-    new (((A =>: B) =>: C) <=> (A =>: (B =>: C))) {
-      def from = reassociateLeft
-      def to = reassociateRight
-    }
+  def reassociateIso[A, B, C]: ((A =>: B) =>: C) <=> (A =>: (B =>: C)) = IsoSet(reassociateRight, reassociateLeft)
 
   trait AssociativeLaw {
     /** Reassociating left and then right is a no-op. */
