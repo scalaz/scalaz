@@ -1,6 +1,5 @@
 package scalaz
 
-import Id._
 
 object Tag {
   @inline val k: TagKind = IdTagKind

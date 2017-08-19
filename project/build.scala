@@ -1,12 +1,10 @@
 import sbt._
-import Project.Setting
 import Keys._
 
 import GenTypeClass._
 
 import java.awt.Desktop
 
-import sbtrelease._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
