@@ -28,7 +28,7 @@ matrix:
   include:
     - scala: 2.12.2
       jdk: oraclejdk8
-    - scala: 2.13.0-M1
+    - scala: 2.13.0-M2
       jdk: oraclejdk8
       script:
       - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
