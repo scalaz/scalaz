@@ -5,7 +5,7 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/launchers
-
+dist: precise # trusty does not support java6 and java7 ?
 language: scala
 scala:
   - 2.11.11
