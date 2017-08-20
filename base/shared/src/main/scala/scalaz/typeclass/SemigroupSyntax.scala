@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import com.github.ghik.silencer.silent
+
 import scala.language.implicitConversions
 import scala.language.experimental.macros
 
@@ -9,7 +11,7 @@ trait SemigroupSyntax {
 }
 
 object SemigroupSyntax {
-  class OpsA[A](a: A)(implicit A: Semigroup[A]) {
+  class OpsA[A: Semigroup](@silent a: A) {
     def append(f: => A): A = macro meta.Ops._f1[A, A]
   }
 }

@@ -1,7 +1,6 @@
 package scalaz
 package typeclass
 
-import data.===
 import Liskov.<~<
 
 trait LiskovFunctions {
