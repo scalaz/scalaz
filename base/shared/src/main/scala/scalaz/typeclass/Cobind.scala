@@ -7,6 +7,6 @@ trait Cobind[F[_]] {
   def cojoin[A](fa: F[A]): F[F[A]]
 }
 
-object Cobind extends FunctorSyntax {
+object Cobind extends CobindInstances with CobindSyntax {
   def apply[F[_]](implicit F: Cobind[F]): Cobind[F] = F
 }
