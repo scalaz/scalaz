@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import scala.concurrent.{Await, CanAwait, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
 import scalaFuture.newFutureInstance

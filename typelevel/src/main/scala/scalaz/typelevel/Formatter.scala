@@ -1,8 +1,6 @@
 package scalaz
 package typelevel
 
-import java.{lang => jl, util => ju}
-
 import scalaz.syntax.semigroup._
 import UnionTypes._
 

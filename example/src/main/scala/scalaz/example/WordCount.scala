@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{Monoid, StateT, Applicative}
+import scalaz.{Monoid, StateT}
 
 
 /**

@@ -102,7 +102,7 @@ object ApplyUsage extends App {
   // writer is used to emit log messages along with the value being
   // computed.
 
-  import scalaz.{WriterT,Writer,DList,Id}
+  import scalaz.{Writer,DList}
   import scalaz.syntax.writer._
   type Logged[A] = Writer[DList[String], A]
 

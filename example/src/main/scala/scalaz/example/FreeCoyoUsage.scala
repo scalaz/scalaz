@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{ Free, Coyoneda, Monad, ~>, State, NonEmptyList }
+import scalaz.{ Free, Coyoneda, Monad, ~> }
 import scalaz.std.function._
 import scalaz.syntax.monad._
 import scalaz.effect.IO
