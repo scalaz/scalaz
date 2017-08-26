@@ -498,6 +498,74 @@ sealed trait TupleInstances2 extends TupleInstances1 {
       implicit def _6 = A6
       implicit def _7 = A7
     }
+  
+  implicit def tuple1SemiLattice[A1](implicit A1: SemiLattice[A1]): SemiLattice[Tuple1[A1]] =
+    new Tuple1Semigroup[A1] with SemiLattice[Tuple1[A1]] {
+      def _1 = A1
+    }
+
+  implicit def tuple2SemiLattice[A1, A2](implicit A1: SemiLattice[A1], A2: SemiLattice[A2]): SemiLattice[(A1, A2)] =
+    new Tuple2Semigroup[A1, A2] with SemiLattice[(A1, A2)] {
+      def _1 = A1
+      def _2 = A2
+    }
+   
+  implicit def tuple3SemiLattice[A1, A2, A3](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3]): SemiLattice[(A1, A2, A3)] =
+    new Tuple3Semigroup[A1, A2, A3] with SemiLattice[(A1, A2, A3)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+    }
+  
+  implicit def tuple4SemiLattice[A1, A2, A3, A4](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3], A4: SemiLattice[A4]): SemiLattice[(A1, A2, A3, A4)] =
+    new Tuple4Semigroup[A1, A2, A3, A4] with SemiLattice[(A1, A2, A3, A4)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+    }
+  
+  implicit def tuple5SemiLattice[A1, A2, A3, A4, A5](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3], A4: SemiLattice[A4], A5: SemiLattice[A5]): SemiLattice[(A1, A2, A3, A4, A5)] =
+    new Tuple5Semigroup[A1, A2, A3, A4, A5] with SemiLattice[(A1, A2, A3, A4, A5)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+    }
+
+  implicit def tuple6SemiLattice[A1, A2, A3, A4, A5, A6](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3], A4: SemiLattice[A4], A5: SemiLattice[A5], A6: SemiLattice[A6]): SemiLattice[(A1, A2, A3, A4, A5, A6)] =
+    new Tuple6Semigroup[A1, A2, A3, A4, A5, A6] with SemiLattice[(A1, A2, A3, A4, A5, A6)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+    }
+ 
+  implicit def tuple7SemiLattice[A1, A2, A3, A4, A5, A6, A7](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3], A4: SemiLattice[A4], A5: SemiLattice[A5], A6: SemiLattice[A6], A7: SemiLattice[A7]): SemiLattice[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] with SemiLattice[(A1, A2, A3, A4, A5, A6, A7)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+      def _7 = A7
+    } 
+  
+  implicit def tuple8SemiLattice[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: SemiLattice[A1], A2: SemiLattice[A2], A3: SemiLattice[A3], A4: SemiLattice[A4], A5: SemiLattice[A5], A6: SemiLattice[A6], A7: SemiLattice[A7], A8: SemiLattice[A8]): SemiLattice[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] with SemiLattice[(A1, A2, A3, A4, A5, A6, A7, A8)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+      def _7 = A7
+      def _8 = A8
+    }
 
 }
 

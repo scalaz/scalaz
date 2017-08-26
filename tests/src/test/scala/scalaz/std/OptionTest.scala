@@ -24,7 +24,7 @@ object OptionTest extends SpecLite {
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
-  checkAll("Option", band.laws[Option[ISet[Int]]])
+  checkAll("Option", semilattice.laws[Option[ISet[Int]]])
 
   checkAll("Option @@ First", monoid.laws[FirstOption[Int]])
   checkAll("Option @@ Last", monoid.laws[LastOption[Int]])
