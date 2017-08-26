@@ -17,7 +17,7 @@ trait SemiLattice[F] extends Band[F] { self =>
   }
 
   def semiLatticeLaw = new SemiLatticeLaw {}
-  
+
   ////
   val semiLatticeSyntax = new scalaz.syntax.SemiLatticeSyntax[F] { def F = SemiLattice.this }
 }

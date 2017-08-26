@@ -111,7 +111,7 @@ object CorecursiveList extends CorecursiveListInstances {
     * four elements onto `someCList`, its state will be
     * `Maybe[Maybe[Maybe[Maybe[someCList.S]]]]`, and so on.  This is
     * utterly unsustainable for iterative consing.
-    * 
+    *
     * Instead, try `apply`, or another more wholemeal-style
     * combinator.  You might also cons up a different structure, then
     * transform that to a `CorecursiveList` wholesale and `append` or

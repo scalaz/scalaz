@@ -229,30 +229,30 @@ trait Foldable[F[_]]  { self =>
     } map (_._1)
 
   /** The smallest and largest elements of `fa` or None if `fa` is empty */
-  def extrema[A: Order](fa: F[A]): Option[(A, A)] = 
+  def extrema[A: Order](fa: F[A]): Option[(A, A)] =
     extremaBy(fa)(identity)
 
   /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or None if `fa` is empty */
   def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
-    foldMapLeft1Opt(fa) { a => 
+    foldMapLeft1Opt(fa) { a =>
       val b = f(a)
       (b, b)
     } {
-      case (x @ (bmin, bmax), a) => 
-        val b = f(a) 
+      case (x @ (bmin, bmax), a) =>
+        val b = f(a)
         if (Order[B].order(b, bmin) == LT) (b, bmax)
         else if (Order[B].order(b, bmax) == GT) (bmin, b)
         else x
-    } 
+    }
 
   /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
   def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
-    foldMapLeft1Opt(fa) { a => 
+    foldMapLeft1Opt(fa) { a =>
         val b = f(a)
         (a, a, b, b)
-    } { 
-      case (x @ ((amin, amax, bmin, bmax)), a) => 
-        val b = f(a) 
+    } {
+      case (x @ ((amin, amax, bmin, bmax)), a) =>
+        val b = f(a)
         val greaterThanOrEq = Order[B].greaterThanOrEqual(b, bmax)
         if(Order[B].lessThanOrEqual(b, bmin)) {
           if(greaterThanOrEq) {

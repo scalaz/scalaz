@@ -194,7 +194,7 @@ sealed abstract class MaybeInstances1 {
 
 sealed abstract class MaybeInstances0 extends MaybeInstances1 {
   implicit def maybeSemiLattice[A](implicit A: SemiLattice[A]): SemiLattice[Maybe[A]] =
-    new SemiLattice[Maybe[A]] with Band[Maybe[A]] { 
+    new SemiLattice[Maybe[A]] with Band[Maybe[A]] {
       override def append(fa1: Maybe[A], fa2: => Maybe[A]) =
         fa1.cata(
           a1 => fa2.cata(a2 => Maybe.just(A.append(a1, a2)), fa1),

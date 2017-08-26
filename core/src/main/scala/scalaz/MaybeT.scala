@@ -16,7 +16,7 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
       case Just(z) => F.map(f(z))(b => just(b))
     }
   )
-  
+
   def mapT[G[_], B](f: F[Maybe[A]] => G[Maybe[B]]): MaybeT[G, B] =
     MaybeT(f(run))
 

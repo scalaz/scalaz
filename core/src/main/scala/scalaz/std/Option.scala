@@ -8,7 +8,7 @@ sealed trait OptionInstances0 extends OptionInstances1 {
 
   implicit def optionSemiLattice[A: SemiLattice]: SemiLattice[Option[A]] =
     new OptionSemigroup[A] with SemiLattice[Option[A]] {
-      override def B = implicitly 
+      override def B = implicitly
     }
 }
 

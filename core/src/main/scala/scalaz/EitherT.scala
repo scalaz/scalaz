@@ -81,7 +81,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     flatMapF {
       f andThen (mb => M.map(mb)(b => \/-(b)))
     }
-  
+
   def mapT[G[_], C, D](f: F[A \/ B] => G[C \/ D]): EitherT[G, C, D] =
     EitherT(f(run))
 

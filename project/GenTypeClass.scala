@@ -85,7 +85,7 @@ object TypeClass {
   def core: List[TypeClass] = List(semigroup,
     monoid,
     band,
-    semilattice, 
+    semilattice,
     equal,
     show,
     order,
