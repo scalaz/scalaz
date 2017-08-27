@@ -6,7 +6,7 @@ import Id._
 
 trait AnyValInstances {
 
-  implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] {
+  implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
     override def shows(f: Unit) = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
