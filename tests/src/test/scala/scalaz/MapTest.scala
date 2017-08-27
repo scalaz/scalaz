@@ -722,8 +722,12 @@ object MapTest extends SpecLite {
   object instances {
     def bind[A: Order] = Bind[({type λ[α] = A ==>> α})#λ]
     def traverse[A] = Traverse[({type λ[α] = A ==>> α})#λ]
+    def band[A: Order, B: Band] = Band[A ==>> B]
+    def semiLattice[A: Order, B: SemiLattice] = SemiLattice[A ==>> B]
+    def monoid[A: Order, B: Semigroup] = Monoid[A ==>> B]
 
     // checking absence of ambiguity
     def functor[A: Order] = Functor[({type λ[α] = A ==>> α})#λ]
+    def semigroup[A: Order, B: SemiLattice] = Semigroup[A ==>> B]
   }
 }
