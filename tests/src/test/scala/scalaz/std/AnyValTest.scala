@@ -42,6 +42,8 @@ object AnyValTest extends SpecLite {
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
 
+  checkAll("Unit", semilattice.laws[Unit])
+
   checkAll("Unit", monoid.laws[Unit])
   checkAll("Int", monoid.laws[Int])
   checkAll("Short", monoid.laws[Short])
