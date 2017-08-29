@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import CobindClass._
-
 trait ComonadClass[F[_]] extends Comonad[F] with CobindClass[F] with FunctorClass[F] {
   final def comonad: Comonad[F] = this
 }
