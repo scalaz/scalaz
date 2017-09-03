@@ -113,20 +113,20 @@ object Semigroup {
   @inline implicit def lastTaggedSemigroup[A]: Band[A @@ Tags.LastVal] =
     lastSemigroup[A @@ Tags.LastVal]
 
-  def minSemigroup[A](implicit o: Order[A]): Band[A @@ Tags.MinVal] =
-    new Band[A @@ Tags.MinVal] {
+  def minSemigroup[A](implicit o: Order[A]): SemiLattice[A @@ Tags.MinVal] =
+    new SemiLattice[A @@ Tags.MinVal] {
       def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def minTaggedSemigroup[A : Order]: Band[A @@ Tags.MinVal] =
+  @inline implicit def minTaggedSemigroup[A : Order]: SemiLattice[A @@ Tags.MinVal] =
     minSemigroup[A]
 
-  def maxSemigroup[A](implicit o: Order[A]): Band[A @@ Tags.MaxVal] =
-    new Band[A @@ Tags.MaxVal] {
+  def maxSemigroup[A](implicit o: Order[A]): SemiLattice[A @@ Tags.MaxVal] =
+    new SemiLattice[A @@ Tags.MaxVal] {
       def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def maxTaggedSemigroup[A : Order]: Band[A @@ Tags.MaxVal] =
+  @inline implicit def maxTaggedSemigroup[A : Order]: SemiLattice[A @@ Tags.MaxVal] =
     maxSemigroup[A]
 
   private[scalaz] trait ApplySemigroup[F[_], M] extends Semigroup[F[M]] {
