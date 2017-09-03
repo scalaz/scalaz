@@ -75,6 +75,9 @@ package object data {
   val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
 
+  val Maybe: MaybeModule = MaybeImpl
+  type Maybe[A] = Maybe.Maybe[A]
+
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 

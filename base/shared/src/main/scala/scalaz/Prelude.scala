@@ -9,7 +9,7 @@ trait Prelude  extends data.DisjunctionFunctions
                   with data.ForallSyntax
                   with data.Forall2Syntax
                   with data.IdentityTypes
-                  with data.MaybeFunctions
+                  with data.MaybePrelude
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
                   with typeclass.InvariantFunctorFunctions
@@ -102,7 +102,6 @@ trait Prelude  extends data.DisjunctionFunctions
   type \/[L, R] = data.Disjunction.\/[L, R]
   type ===[A, B] = data.===[A, B]
   type Identity[A] = data.Identity[A]
-  type Maybe[A] = data.Maybe[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
 
   val Forall : data.Forall.type = data.Forall
