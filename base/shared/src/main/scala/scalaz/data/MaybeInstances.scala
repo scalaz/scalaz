@@ -2,15 +2,18 @@ package scalaz
 package data
 
 import Prelude._
-import typeclass.{MonadClass, TraversableClass}
+import typeclass.{IsCovariantClass, Liskov, MonadClass, TraversableClass}
 import typeclass.FoldableClass._
+import Liskov.<~<
 
 // TODO Rework lazyness
-trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] {
+trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] with IsCovariantClass[Maybe] with IsCovariantClass.LiftLiskov[Maybe] {
 
   implicit def monadInstance: Monad[Maybe] = this
 
   implicit def traversableInstance: Traversable[Maybe] = this
+
+  implicit def isCovariantInstance: IsCovariant[Maybe] = this
 
   override def ap[A, B](ma: Maybe[A])(mf: Maybe[A => B]): Maybe[B] =
     ma.fold(a => map[A => B, B](mf)(f => f(a)), empty)
@@ -35,4 +38,7 @@ trait MaybeInstances extends MonadClass.Template[Maybe] with TraversableClass[Ma
   override def foldRight[A, B](ma: Maybe[A], b: => B)(f: (A, => B) => B): B = ma.fold(a => f(a, b), b)
 
   override def toList[A](ma: Maybe[A]): List[A] = ma.fold(List(_), Nil)
+
+  override def liftLiskov[A, B](implicit ev: A <~< B): Maybe[A] <~< Maybe[B] =
+    Liskov.unsafeForce[Maybe[A], Maybe[B]]
 }

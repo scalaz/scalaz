@@ -2,8 +2,17 @@ package scalaz
 package typeclass
 
 sealed abstract class Liskov[-A, +B] {
-  def apply(a: A): B = Liskov.witness(this)(a)
   def subst[F[-_]](p: F[B]): F[A]
+
+  def substCv[F[+_]](f: F[A]): F[B] = {
+    type f[-a] = F[a] => F[B]
+    subst[f](identity)(f)
+  }
+
+  def apply(a: A): B = {
+    type f[+a] = a
+    substCv[f](a)
+  }
 }
 
 object Liskov extends LiskovTypes with LiskovInstances with LiskovFunctions {
