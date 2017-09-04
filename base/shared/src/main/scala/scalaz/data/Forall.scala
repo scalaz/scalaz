@@ -53,7 +53,7 @@ trait ForallSyntax {
 
 object ForallSyntax {
   final class Ops[F[_]](val a: ∀[F]) extends AnyVal {
-    def of[A]: F[A] = forall.specialize(a)
+    def of[A]: F[A] = Forall.specialize(a)
     def apply[A]: F[A] = of[A]
   }
 }
