@@ -120,6 +120,16 @@ object ScalazProperties {
       }
   }
 
+  object semilattice {
+    def commutative[A](implicit A: SemiLattice[A], eq: Equal[A], arb: Arbitrary[A]): Prop = forAll(A.semiLatticeLaw.commutative _)
+
+    def laws[A: Equal: Arbitrary](implicit A: SemiLattice[A]): Properties =
+      newProperties("semilattice") { p =>
+        p.include(band.laws[A])
+        p.property("commutative") = commutative[A]
+    }
+  }
+
   object invariantFunctor {
     def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]): Prop =
       forAll(F.invariantFunctorLaw.invariantIdentity[X] _)

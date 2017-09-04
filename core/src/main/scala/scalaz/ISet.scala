@@ -663,8 +663,8 @@ sealed abstract class ISetInstances {
     }
   }
 
-  implicit def setMonoid[A: Order]: Monoid[ISet[A]] with Band[ISet[A]] =
-    new Monoid[ISet[A]] with Band[ISet[A]] {
+  implicit def setMonoid[A: Order]: Monoid[ISet[A]] with SemiLattice[ISet[A]] =
+    new Monoid[ISet[A]] with SemiLattice[ISet[A]] {
       def zero: ISet[A] =
         empty[A]
 

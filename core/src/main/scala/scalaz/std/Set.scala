@@ -61,8 +61,8 @@ trait SetInstances {
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
 
-  implicit def setMonoid[A]: Monoid[Set[A]] with Band[Set[A]] =
-    new Monoid[Set[A]] with Band[Set[A]] {
+  implicit def setMonoid[A]: Monoid[Set[A]] with SemiLattice[Set[A]] =
+    new Monoid[Set[A]] with SemiLattice[Set[A]] {
       def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
       def zero: Set[A] = Set[A]()
     }
