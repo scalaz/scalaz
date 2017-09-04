@@ -43,7 +43,7 @@ object MaybeTest extends SpecLite {
   checkAll(cobind.laws[Maybe])
   checkAll(align.laws[Maybe])
   checkAll(equal.laws[Maybe[Int]])
-  checkAll(band.laws[Maybe[ISet[Int]]])
+  checkAll(semilattice.laws[Maybe[ISet[Int]]])
 
   "Empty is less than anything else" ! forAll { x: Maybe[Int] => Order[Maybe[Int]].greaterThanOrEqual(x, Maybe.empty) }
 
