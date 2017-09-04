@@ -63,7 +63,7 @@ sealed abstract class IO[A] {
     })
 
   /** Lift this action to a given IO-like monad. */
-  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
+  def liftIO[M[_]](implicit m: LiftIO[M]): M[A] =
     m.liftIO(this)
 
   /** Executes the handler if an exception is raised. */
