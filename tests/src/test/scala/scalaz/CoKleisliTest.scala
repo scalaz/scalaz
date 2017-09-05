@@ -2,7 +2,6 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Gen}
 
 object CokleisliTest extends SpecLite {
 

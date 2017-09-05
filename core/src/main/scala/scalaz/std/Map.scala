@@ -104,7 +104,6 @@ trait MapSubInstances0 extends MapSub {
 
 trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
   import Liskov.<~<
-  import syntax.std.function2._
 
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.

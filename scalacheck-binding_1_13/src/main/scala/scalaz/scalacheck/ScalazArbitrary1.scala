@@ -3,7 +3,6 @@ package scalacheck
 
 import org.scalacheck.Cogen
 import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.std.AllInstances._
 import scalaz.syntax.foldable._
 
 abstract class ScalazArbitrary1 {

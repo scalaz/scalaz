@@ -68,7 +68,6 @@ object CorecursiveList extends CorecursiveListInstances {
     }
 
   import scala.collection.immutable.{IndexedSeq, LinearSeq}
-  import Maybe.optionMaybeIso.{to => optionTo}
 
   /** Any `LinearSeq` converts to a `CorecursiveList` efficiently.  No
     * natural transformation from `CorecursiveList` to `List` exists,

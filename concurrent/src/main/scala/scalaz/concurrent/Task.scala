@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import scalaz._
 import scalaz.Tags.Parallel
 import scalaz.syntax.monad._
-import scalaz.std.list._
 import scalaz.Free.Trampoline
 import scalaz.\/._
 
