@@ -9,6 +9,7 @@ sealed abstract class Maybe[A] {
 }
 
 object Maybe extends MaybeFunctions with MaybeInstances with MaybeSyntax {
-  final private[data] case object Empty extends Maybe[Nothing]
+  final private[data] class Empty[A] private[Maybe]() extends Maybe[A]
+  private[data] val Empty = ∀.of[Empty].from(new Empty)
   final case class Just[A](a: A) extends Maybe[A]
 }

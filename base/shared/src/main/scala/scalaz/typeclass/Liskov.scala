@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import Prelude._
+
 sealed abstract class Liskov[-A, +B] {
   def subst[F[-_]](p: F[B]): F[A]
 
@@ -16,8 +18,12 @@ sealed abstract class Liskov[-A, +B] {
 }
 
 object Liskov extends LiskovTypes with LiskovInstances with LiskovFunctions {
-  /**Subtyping is reflexive */
-  implicit def refl[A]: (A <~< A) = new (A <~< A) {
+  private def refl_[A]: (A <~< A) = new (A <~< A) {
     def subst[F[-_]](p: F[A]): F[A] = p
   }
+
+  private val Refl = ∀.of[λ[α => α <~< α]].from(refl_)
+
+  /**Subtyping is reflexive */
+  implicit def refl[A]: (A <~< A) = Refl[A]
 }
