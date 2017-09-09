@@ -51,7 +51,7 @@ object EphemeralStreamTest extends SpecLite {
         ex.getMessage must_=== "head of empty stream"
     }
 
-    es.foldLeft(Need(0))(x => y => Need(y)).value must_=== 10
+    es.foldLeft(Need(0))((x, y) => Need(y)).value must_=== 10
   }
 
   "unzip zip" ! forAll { xs: EphemeralStream[(Int, Int)] =>
