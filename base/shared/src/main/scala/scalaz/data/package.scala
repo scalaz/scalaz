@@ -72,7 +72,7 @@ package object data {
     }
   }
 
-  object Fix extends FixModule with FixImpl
+  val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
 
 }
