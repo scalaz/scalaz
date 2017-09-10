@@ -77,7 +77,7 @@ object NonEmptyListTest extends SpecLite {
   }
   "correctness of tails" ! forAll { xs: NonEmptyList[Int] =>
     import NonEmptyList._
-    xs.tails must_=== nel(xs, xs.tail match {
+    xs.tails must_=== nel(xs, xs.tail.value match {
       case INil() => INil()
       case ICons(h, t) => nel(h, t).tails.list
     })

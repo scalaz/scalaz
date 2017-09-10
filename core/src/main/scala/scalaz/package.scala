@@ -1,3 +1,5 @@
+import scalaz.Tags.Lazy
+
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *
@@ -196,6 +198,11 @@ package object scalaz {
   type Alternative[F[_]] = ApplicativePlus[F]
 
   type NonEmptyIList[A] = OneAnd[IList,A]
+
+  type LazyList[A] = IList[A] @@ Lazy
+  object LazyList extends LazyListInstances{
+    def apply[A](list: =>IList[A]): LazyList[A] = IList.byNeed(list).asLazyList
+  }
 
   /**
    * An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.

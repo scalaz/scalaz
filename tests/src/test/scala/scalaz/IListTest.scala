@@ -5,20 +5,27 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
+import LazyList._
 
 object IListTest extends SpecLite {
 
   // Same laws that hold for List
   checkAll(equal.laws[IList[Int]])
+  checkAll("LazyList", equal.laws[LazyList[Int]])
   checkAll(monoid.laws[IList[Int]])
+  checkAll("LazyList", monoid.laws[LazyList[Int]])
   checkAll(monadPlus.strongLaws[IList])
+  checkAll("LazyList", monadPlus.strongLaws[LazyList])
   checkAll(bindRec.laws[IList])
   checkAll(traverse.laws[IList])
+  checkAll("LazyList", traverse.laws[LazyList])
   checkAll(zip.laws[IList])
   checkAll(align.laws[IList])
   checkAll(isEmpty.laws[IList])
+  checkAll("LazyList", isEmpty.laws[LazyList])
   checkAll(cobind.laws[IList])
   checkAll(order.laws[IList[Int]])
+  checkAll("LazyList", order.laws[LazyList[Int]])
 
   // These tests hold for List, so they had better hold for IList
 
@@ -36,9 +43,9 @@ object IListTest extends SpecLite {
   }
 
   "intersperse vs benchmark" ! forAll { (a: IList[Int], b: Int) =>
-    def intersperse[A](value: IList[A], a: A): IList[A] = value match {
+    def intersperse[A](value: IList[A], a: A): IList[A] = value.value match {
       case INil() => INil()
-      case ICons(x, INil()) => x :: INil()
+      case ICons(x, IList(INil())) => x :: INil()
       case ICons(h, t) => h :: a :: intersperse(t, a)
     }
     a.intersperse(b) must_=== intersperse(a, b)

@@ -39,7 +39,7 @@ object IListUsage extends App {
   val s1 = ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))
 
   // Destructure with matching
-  val s2 = ns match {
+  val s2 = ns() match {
     case INil() => "empty"
     case ICons(h, t) => "head is %s and tail is %s".format(h, t)
   }

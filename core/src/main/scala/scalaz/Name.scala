@@ -126,3 +126,27 @@ object Value {
     def equal(a1: Value[A], a2: Value[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
 }
+
+/** For implementation artifact of lazy data type constructors. Not to be used/exposed directly as type. */
+abstract class Thunk[A, B](var eval: () => A) { self: A  =>
+  lazy val value: B = {
+    val value0 = Thunk.run(this)
+    eval = null
+    value0
+  }
+  def value(a: A): B
+}
+
+private object Thunk {
+  @tailrec
+  def run[A, B](byNeed: Thunk[A, B]): B = {
+    val e = byNeed.eval
+    if (e eq null)
+      byNeed.value
+    else
+      e() match {
+        case nested: Thunk[A, B] @unchecked => run(nested)
+        case a => byNeed.value(a)
+      }
+  }
+}

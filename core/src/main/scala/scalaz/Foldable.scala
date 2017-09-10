@@ -318,7 +318,7 @@ trait Foldable[F[_]]  { self =>
   def splitBy[A, B: Equal](fa: F[A])(f: A => B): IList[(B, NonEmptyList[A])] =
     foldRight(fa, IList[(B, NonEmptyList[A])]())((a, bas) => {
       val fa = f(a)
-      bas match {
+      bas() match {
         case INil() => IList.single((fa, NonEmptyList.nel(a, IList.empty)))
         case ICons((b, as), tail) => if (Equal[B].equal(fa, b)) ICons((b, a <:: as), tail) else ICons((fa, NonEmptyList.nel(a, IList.empty)), bas)
       }
@@ -329,7 +329,7 @@ trait Foldable[F[_]]  { self =>
     */
   def splitByRelation[A](fa: F[A])(r: (A, A) => Boolean): IList[NonEmptyList[A]] =
     foldRight(fa, IList[NonEmptyList[A]]())((a, neas) => {
-      neas match {
+      neas() match {
         case INil() => IList.single(NonEmptyList.nel(a, IList.empty))
         case ICons(nea, tail) => if (r(a, nea.head)) ICons(a <:: nea, tail) else ICons(NonEmptyList.nel(a, IList.empty), neas)
       }

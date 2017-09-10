@@ -31,12 +31,12 @@ sealed abstract class Dequeue[A] {
   def uncons: Maybe[(A, Dequeue[A])] = this match {
     case EmptyDequeue() => Maybe.empty
     case SingletonDequeue(a) => Just((a, EmptyDequeue()))
-    case FullDequeue(OneAnd(f, INil()), 1, OneAnd(single,INil()), 1) => Just((f, SingletonDequeue(single)))
-    case FullDequeue(OneAnd(f, INil()), 1, OneAnd(x, ICons(xx, xs)), bs) => {
+    case FullDequeue(OneAnd(f, IList(INil())), 1, OneAnd(single,IList(INil())), 1) => Just((f, SingletonDequeue(single)))
+    case FullDequeue(OneAnd(f, IList(INil())), 1, OneAnd(x, IList(ICons(xx, xs))), bs) => {
       val xsr = reverseNEL(OneAnd(xx, xs))
       Just((f, FullDequeue(xsr, bs-1, OneAnd(x, IList.empty), 1)))
     }
-    case FullDequeue(OneAnd(f, ICons(ff, fs)), s, back, bs) => Just(f, FullDequeue(OneAnd(ff, fs), s-1, back, bs))
+    case FullDequeue(OneAnd(f, IList(ICons(ff, fs))), s, back, bs) => Just(f, FullDequeue(OneAnd(ff, fs), s-1, back, bs))
   }
 
   /**
@@ -45,13 +45,13 @@ sealed abstract class Dequeue[A] {
   def unsnoc: Maybe[(A, Dequeue[A])] = this match {
     case EmptyDequeue() => Maybe.empty
     case SingletonDequeue(a) => Just((a, EmptyDequeue()))
-    case FullDequeue(OneAnd(single, INil()), 1, OneAnd(b, INil()), 1) => Just((b, SingletonDequeue(single)))
-    case FullDequeue(OneAnd(x, ICons(xx,xs)), fs, OneAnd(b, INil()), 1) => {
+    case FullDequeue(OneAnd(single, IList(INil())), 1, OneAnd(b, IList(INil())), 1) => Just((b, SingletonDequeue(single)))
+    case FullDequeue(OneAnd(x, IList(ICons(xx,xs))), fs, OneAnd(b, IList(INil())), 1) => {
       val xsr = reverseNEL(OneAnd(xx, xs))
       Just((b, FullDequeue(OneAnd(x, IList.empty), 1, xsr, fs-1)))
     }
 
-    case FullDequeue(front, fs, OneAnd(b, ICons(bb,bs)), s) => Just((b, FullDequeue(front, fs, OneAnd(bb,bs), s-1)))
+    case FullDequeue(front, fs, OneAnd(b, IList(ICons(bb,bs))), s) => Just((b, FullDequeue(front, fs, OneAnd(bb,bs), s-1)))
   }
 
 
@@ -185,8 +185,8 @@ object Dequeue extends DequeueInstances {
   private def reverseNEL[A](fa: NonEmptyIList[A]): NonEmptyIList[A] = {
     @annotation.tailrec
     def loop(xs: IList[A], acc: IList[A]): NonEmptyIList[A] =
-      (xs: @unchecked) match {
-        case ICons(h, INil()) =>
+      (xs(): @unchecked) match {
+        case ICons(h, IList(INil())) =>
           OneAnd(h, acc)
         case ICons(h, t) =>
           loop(t, h :: acc)

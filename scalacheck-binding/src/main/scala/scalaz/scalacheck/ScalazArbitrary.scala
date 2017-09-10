@@ -21,6 +21,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIList[A: Cogen]: Cogen[IList[A]] =
     Cogen[List[A]].contramap(_.toList)
 
+  implicit def cogenLazyList[A: Cogen]: Cogen[LazyList[A]] =
+    Cogen[IList[A]].contramap(Tag.unwrap[IList[A], Lazy])
+
   implicit def cogenMaybe[A: Cogen]: Cogen[Maybe[A]] =
     Cogen[Option[A]].contramap(_.toOption)
 
@@ -547,6 +550,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def dlistArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[DList[A]] = Functor[Arbitrary].map(A)(as => DList(as : _*))
 
   implicit def ilistArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[IList[A]] = Functor[Arbitrary].map(A)(IList.fromList)
+
+  implicit def lazyListArbitrary[A](implicit A: Arbitrary[IList[A]]): Arbitrary[LazyList[A]] =
+    Functor[Arbitrary].map(A)(_.asLazyList)
 
   implicit def dequeueArbitrary[A](implicit A: Arbitrary[List[A]]): Arbitrary[Dequeue[A]] = Functor[Arbitrary].map(A)(Dequeue.apply)
 
