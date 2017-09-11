@@ -61,6 +61,6 @@ matrix:
     sudo: required
     dist: trusty
     before_install:
-    - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.1/bin/travis_setup.sh | bash -
+    - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
     - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
