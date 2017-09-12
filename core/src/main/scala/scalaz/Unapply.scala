@@ -392,8 +392,6 @@ trait UnapplyProduct[TC[_[_]], MA, MB] {
 }
 
 object UnapplyProduct {
-  import Isomorphism.<~>
-
   /** Fetch a well-typed `UnapplyProduct` for the given typeclass and types. */
   def apply[TC[_[_]], MA, MB](implicit U: UnapplyProduct[TC, MA, MB]): U.type {
     type M[A] = U.M[A]
@@ -419,10 +417,12 @@ object UnapplyProduct {
       SingletonOf(t)
   }
 
+  import LeibnizF._
+
   implicit def unapply[TC[_[_]], MA0, MB0, U1 <: { type A; type M[_] }, U2 <: { type A; type M[_] }](implicit
     sU1: SingletonOf[Unapply[TC, MA0], U1],
     sU2: SingletonOf[Unapply[TC, MB0], U2],
-    iso: U1#M <~> U2#M
+    leibnizF: U2#M =~= U1#M
   ): UnapplyProduct[TC, MA0, MB0] {
     type M[x] = U1#M[x]
     type A = U1#A
@@ -433,6 +433,6 @@ object UnapplyProduct {
     type B = U2#A
     def TC = sU1.widen.TC
     def _1(ma: MA0) = sU1.widen(ma)
-    def _2(mb: MB0) = iso.from(sU2.widen(mb))
+    def _2(mb: MB0) = leibnizF(sU2.widen(mb))
   }
 }
