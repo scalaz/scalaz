@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import typeclass.Liskov
+import typeclass.Liskov.<~<
 import scala.language.implicitConversions
 
 trait ForallModule {
@@ -19,6 +21,18 @@ trait ForallModule {
   def of[F[_]]: MkForall[F]
 
   def mk[X](implicit u: Unapply[X]): MkForall[u.F] = of[u.F]
+
+  def instantiation[F[_], A]: ∀[F] <~< F[A]
+
+  def vacuous[A]: A <~< ∀[λ[α => A]]
+
+  /** The name monotonicity becomes more apparent if we define a type alias
+    * `type <~~<[F[_], G[_]] = ∀[λ[α => F[α] <~< G[α]]]`.
+    * Then the signature reads as
+    *
+    *   `F <~~< G` implies `∀[F] <~< ∀[G]`.
+    */
+  def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G]
 
   sealed trait MkForall[F[_]] extends Any {
     type T
@@ -70,6 +84,20 @@ private[data] object ForallImpl extends ForallModule with ForallSyntax {
   def specialize[F[_], A](f: ∀[F]): F[A] = f.asInstanceOf[F[A]]
 
   def of[F[_]]: MkForall[F] = new MkForallImpl[F]
+
+  def instantiation[F[_], A]: ∀[F] <~< F[A] = Liskov.unsafeForce
+
+  def vacuous[A]: A <~< ∀[λ[α => A]] = Liskov.refl[A]
+
+  // Justification:
+  // Having evidence `ev` that `F[α]` is a subtype of `G[α]` for all types `α`,
+  // by [[#instantiation]] and transitivity of subtyping ([[Liskov#trans]])
+  // we have that `∀[F]` is a subtype of `G[α]` for all types `α`.
+  // That means that any term `f: ∀[F]` can be used to create an instance of `∀[G]`,
+  // via `of[G].from(f): ∀[G]`, and this is identity on `f`.
+  // We have shown that any value `f: ∀[F]` can be used where `∀[G]` is required,
+  // which is the very idea of Liskov substitution principle.
+  def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G] = Liskov.unsafeForce
 }
 
 private[data] final class MkForallImpl[F[_]](val dummy: Boolean = false) extends AnyVal with ForallImpl.MkForall[F] {
