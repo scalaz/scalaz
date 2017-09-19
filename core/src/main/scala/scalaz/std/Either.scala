@@ -9,7 +9,7 @@ sealed trait EitherInstances0 {
 }
 
 trait EitherInstances extends EitherInstances0 {
-  implicit val eitherInstance = new Bitraverse[Either] {
+  implicit val eitherInstance: Bitraverse[Either] = new Bitraverse[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
                                   (f: A => C, g: B => D) = fab match {
       case Left(a)  => Left(f(a))
