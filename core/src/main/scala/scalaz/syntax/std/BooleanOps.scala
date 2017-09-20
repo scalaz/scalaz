@@ -205,16 +205,6 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   final def <\-(q: => Boolean): Boolean = b.negInverseConditional(self, q)
 
   /**
-   * Executes the given side-effect if this boolean value is `false`.
-   */
-  final def unless(f: => Unit): Unit = b.unless(self)(f)
-
-  /**
-   * Executes the given side-effect if this boolean value is `true`.
-   */
-  final def when(f: => Unit): Unit = b.when(self)(f)
-
-  /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
    */
   final def unlessM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.unlessM(self)(f)
