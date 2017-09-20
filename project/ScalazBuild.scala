@@ -42,6 +42,7 @@ object Scalaz {
       ),
     libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
       compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4"),
+      compilerPlugin("com.github.tomasmikula" %% "pascal" % "0.1"),
       compilerPlugin("com.github.ghik" %% "silencer-plugin" % "0.5")
     ),
     incOptions ~= (_.withLogRecompileOnMacro(false))
