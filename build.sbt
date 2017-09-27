@@ -7,6 +7,8 @@ lazy val root = project.in(file("."))
             , metaJS
             , effectJVM
             , effectJS
+            , exampleJVM
+            , exampleJS
             , benchmarks
 ).enablePlugins(ScalaJSPlugin)
 
