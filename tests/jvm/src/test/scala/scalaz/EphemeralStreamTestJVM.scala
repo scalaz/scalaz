@@ -18,6 +18,6 @@ object EphemeralStreamTestJVM extends SpecLite {
     // Ensure that we get back the right numbers, in the right order.
     val tsks = Task.gatherUnordered( List.fill(nthreads)(Task(stm.foldLeft(0)((prev, n) => { (prev + 1) must_=== n; n }))) )
     // And that the result contains the last number for each of the threads.
-    tsks.unsafePerformSync must_=== List.fill(nthreads)(limit)
+    tsks.unsafePerformSync must_=== IList.fill(nthreads)(limit)
   }
 }

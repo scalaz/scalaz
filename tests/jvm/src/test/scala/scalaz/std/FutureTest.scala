@@ -102,7 +102,7 @@ class FutureTest extends SpecLite {
       (promises zip xs).reverseIterator.foreach { case (p, x) =>
         p.complete(scala.util.Try(x))
       }
-      Await.result(f, duration) must_== xs
+      Await.result(f, duration) must_== IList(xs: _*)
     }
   }
 }
