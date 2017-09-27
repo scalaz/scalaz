@@ -71,4 +71,8 @@ package object data {
       def apply[A, B](f: F[A, B], g: G[B]): G[A] = action.apply(f, g)
     }
   }
+
+  val Fix: FixModule = FixImpl
+  type Fix[F[_]] = Fix.Fix[F]
+
 }
