@@ -12,6 +12,7 @@ trait ForallModule {
 
   trait Prototype[F[_]] {
     def apply[A]: F[A]
+    final def make: ∀[F] = from(this)
   }
 
   def specialize[F[_], A](f: ∀[F]): F[A]

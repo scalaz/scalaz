@@ -10,6 +10,7 @@ trait Forall2Module {
 
   trait Prototype[F[_, _]] {
     def apply[A, B]: F[A, B]
+    final def make: ∀∀[F] = from(this)
   }
 
   def specialize[F[_, _], A, B](f: ∀∀[F]): F[A, B]
