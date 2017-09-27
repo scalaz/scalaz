@@ -40,7 +40,7 @@ trait Zip[F[_]]  { self =>
   def ap(implicit F: Functor[F]): Apply[F] =
     new Apply[F] {
       def ap[A, B](fa: => F[A])(f: => F[A => B]) =
-        zipWith(fa, f)((a, g) => g(a))
+        zipWith(f, fa)((g, a) => g(a))
       def map[A, B](fa: F[A])(f: A => B) =
         F.map(fa)(f)
       override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C) =
