@@ -132,6 +132,17 @@ object NullResult extends NullResultInstances {
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
 
+  object ilist {
+    def head[A]: IList[A] =>? A =
+      NullResult(_.headOption)
+
+    def tail[A]: IList[A] =>? IList[A] =
+      NullResult {
+        case INil() => None
+        case ICons(_, t) => Some(t)
+      }
+  }
+
   object list {
     def head[A]: List[A] =>? A =
       NullResult(_.headOption)

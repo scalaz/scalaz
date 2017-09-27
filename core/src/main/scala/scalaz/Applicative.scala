@@ -56,6 +56,13 @@ trait Applicative[F[_]] extends Apply[F] { self =>
       case h :: t => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
     }
 
+  /** Filter `l` according to an applicative predicate. */
+  def filterM[A](l: IList[A])(f: A => F[Boolean]): F[IList[A]] =
+    l match {
+      case INil() => point(INil())
+      case ICons(h, t) => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
+    }
+
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into F.
    */

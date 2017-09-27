@@ -329,10 +329,10 @@ sealed abstract class ISet[A] {
         }
     }
 
-  final def splitRoot: List[ISet[A]] =
+  final def splitRoot: IList[ISet[A]] =
     this match {
-      case Tip()        => List.empty[ISet[A]]
-      case Bin(x, l, r) => List(l, singleton(x), r)
+      case Tip()        => IList.empty[ISet[A]]
+      case Bin(x, l, r) => IList(l, singleton(x), r)
     }
 
   // -- * Index
@@ -498,18 +498,27 @@ sealed abstract class ISet[A] {
     }
 
   // -- ** List
-  final def elems: List[A] =
-    toAscList
+  final def elems: IList[A] =
+    toAscIList
 
   final def toList: List[A] =
     toAscList
+
+  final def toIList: IList[A] =
+    toAscIList
 
   // -- ** Ordered list
   final def toAscList: List[A] =
     foldRight(List.empty[A])(_ :: _)
 
+  final def toAscIList: IList[A] =
+    foldRight(IList.empty[A])(_ :: _)
+
   final def toDescList: List[A] =
     foldLeft(List.empty[A])((a, b) => b :: a)
+
+  final def toDescIList: IList[A] =
+    foldLeft(IList.empty[A])((a, b) => b :: a)
 
   private def glue[A](l: ISet[A], r: ISet[A]): ISet[A] =
     (l, r) match {
@@ -637,7 +646,7 @@ sealed abstract class ISetInstances {
     def A = implicitly
 
     def order(x: ISet[A], y: ISet[A]) =
-      Order[List[A]].order(x.toAscList, y.toAscList)
+      Order[IList[A]].order(x.toAscIList, y.toAscIList)
   }
 
   implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
@@ -786,10 +795,16 @@ object ISet extends ISetInstances {
   final def fromList[A](xs: List[A])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(empty[A])((a, b) => a insert b)
 
+  final def fromIList[A](xs: IList[A])(implicit o: Order[A]): ISet[A] =
+    xs.foldLeft(empty[A])((a, b) => a insert b)
+
   final def fromFoldable[F[_], A](xs: F[A])(implicit F: Foldable[F], o: Order[A]): ISet[A] =
     F.foldLeft(xs, empty[A])((a, b) => a insert b)
 
   final def unions[A](xs: List[ISet[A]])(implicit o: Order[A]): ISet[A] =
+    xs.foldLeft(ISet.empty[A])(_ union _)
+
+  final def unions[A](xs: IList[ISet[A]])(implicit o: Order[A]): ISet[A] =
     xs.foldLeft(ISet.empty[A])(_ union _)
 
   private[scalaz] final val delta = 3

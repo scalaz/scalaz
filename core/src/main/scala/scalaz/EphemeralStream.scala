@@ -33,6 +33,11 @@ sealed abstract class EphemeralStream[A] {
     foldl(Nil: List[A])(lcons _).reverse
   }
 
+  def toIList: IList[A] = {
+    def lcons(xs: => IList[A])(x: => A) = x :: xs
+    foldl(INil(): IList[A])(lcons _).reverse
+  }
+
   def foldr[B](z: => B)(f: (=> A) => (=> B) => B): B =
     if (isEmpty) z else f(head())(tail().foldr(z)(f))
 

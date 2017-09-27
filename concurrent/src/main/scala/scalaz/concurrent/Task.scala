@@ -193,7 +193,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * errors into a list.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
+  def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, IList[Throwable])] =
     retryInternal(delays, p, true)
 
   /**
@@ -206,19 +206,21 @@ class Task[+A](val get: Future[Throwable \/ A]) {
 
   private def retryInternal(delays: Seq[Duration],
                             p: (Throwable => Boolean),
-                            accumulateErrors: Boolean): Task[(A, List[Throwable])] = {
-      def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, List[Throwable])] = {
-        def acc = if (accumulateErrors) es.toList else Nil
-          ds match {
-            case Seq() => get map (_. map(_ -> acc))
-            case Seq(t, ts @_*) => get flatMap {
-              case -\/(e) if p(e) =>
-                help(ts, e #:: es) after t
-              case x => Future.now(x.map(_ -> acc))
-            }
+                            accumulateErrors: Boolean): Task[(A, IList[Throwable])] = {
+      def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, Stream[Throwable])] = {
+        def acc: Stream[Throwable] = if (accumulateErrors) es else Stream.empty
+
+        ds match {
+          case Seq() => get map (_.map(_ -> acc))
+          case Seq(t, ts @_*) => get flatMap {
+            case -\/(e) if p(e) =>
+              help(ts, e #:: es) after t
+            case x => Future.now(x.map(_ -> acc))
+          }
         }
       }
-      Task.async { help(delays, Stream()).unsafePerformAsync }
+
+    Task.async { help(delays, Stream()).unsafePerformAsync }.map(tup => (tup._1, IList(tup._2: _*)))
     }
 
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
@@ -338,11 +340,11 @@ object Task {
    * before the error is returned.
    * @since 7.0.3
    */
-  def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] =
+  def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[IList[A]] =
     if (!exceptionCancels)
       Nondeterminism[Task].gatherUnordered(tasks)
     else
-      reduceUnordered[A, List[A]](tasks, exceptionCancels)
+      reduceUnordered[A, IList[A]](tasks, exceptionCancels)
 
   def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
     if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
@@ -425,4 +427,3 @@ object Task {
   implicit val taskParallelApplicativeInstance: Applicative[ParallelTask] =
     taskInstance.parallel
 }
-

@@ -49,8 +49,8 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   override def both[A,B](a: Future[A], b: Future[B]): Future[(A,B)] =
     a zip b
 
-  override def gather[A](fs: Seq[Future[A]]): Future[List[A]] =
-    Future.sequence(fs.toList)
+  override def gather[A](fs: Seq[Future[A]]): Future[IList[A]] =
+    sequence(IList(fs: _*))
 
   // override for actual parallel execution
   override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =

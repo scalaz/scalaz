@@ -91,6 +91,9 @@ object BijectionT extends BijectionTInstances {
   def zipListB[A, B]: Bijection[(List[A], List[B]), List[(A, B)]] =
     zipB[List, A, B]
 
+  def zipIListB[A, B]: Bijection[(IList[A], IList[B]), IList[(A, B)]] =
+    zipB[IList, A, B]
+
   def zipEndoB[A, B]: Bijection[(Endo[A], Endo[B]), Endo[(A, B)]] =
     zipB[Endo, A, B]
 
@@ -150,4 +153,3 @@ private trait BijectionTCategory[F[_], G[_]] extends Category[BijectionT[F, G, ?
 
   def id[A] = BijectionT.bijectionId
 }
-

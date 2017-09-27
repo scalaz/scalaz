@@ -247,7 +247,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(const(()))
 
-  implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
+  implicit val AlphaArbitrary: Arbitrary[Alpha] = {
+    val alphaList = Alpha.alphas.toList
+    Arbitrary(oneOf(alphaList))
+  }
 
   implicit val BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
 
@@ -274,7 +277,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
-  implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
+  implicit val DigitArbitrary: Arbitrary[Digit] = {
+    val digitList = Digit.digits.toList
+    Arbitrary(oneOf(digitList))
+  }
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, IList[A], NonEmptyList[A]](arb[A], ilistArbitrary)(nel(_, _))

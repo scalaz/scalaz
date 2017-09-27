@@ -176,6 +176,14 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => b :: Nil
     }
 
+  /** Return an empty list or list with one element on the right of this disjunction. */
+  def toIList[BB >: B]: IList[BB] =
+    this match {
+      case -\/(_) => INil()
+      case \/-(b) => b :: INil()
+    }
+
+
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream: Stream[B] =
     this match {
