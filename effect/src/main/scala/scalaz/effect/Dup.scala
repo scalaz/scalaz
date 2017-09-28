@@ -13,7 +13,7 @@ sealed abstract class DupInstances {
     new Dup[FinalizerHandle] {
       def dup[PP[_] : MonadIO, CS, PS]: FinalizerHandle[RegionT[CS, RegionT[PS, PP, ?], ?]] => RegionT[CS, RegionT[PS, PP, ?], FinalizerHandle[RegionT[PS, PP, ?]]] = h =>
         RegionT[CS, RegionT[PS, PP, ?], FinalizerHandle[RegionT[PS, PP, ?]]](
-          Kleisli[RegionT[PS, PP, ?], IORef[List[RefCountedFinalizer]],
+          Kleisli[RegionT[PS, PP, ?], IORef[IList[RefCountedFinalizer]],
               FinalizerHandle[RegionT[PS, PP, ?]]](hsIORef =>
             copy[PS, PP, RegionT[CS, RegionT[PS, PP, ?], ?]](h)))
     }

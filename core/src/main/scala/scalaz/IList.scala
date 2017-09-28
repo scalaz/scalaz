@@ -120,6 +120,12 @@ sealed abstract class IList[A] extends Product with Serializable {
   def filter(f: A => Boolean): IList[A] =
     foldRight(IList.empty[A])((a, as) => if (f(a)) a :: as else as)
 
+  def filterM[F[_]](f: A => F[Boolean])(implicit F: Applicative[F]): F[IList[A]] =
+    this match {
+      case INil() => F.point(INil())
+      case ICons(h, t) => F.ap(t.filterM(f))(F.map(f(h))(b => t => if (b) h :: t else t))
+    }
+
   def filterNot(f: A => Boolean): IList[A] =
     filter(a => !f(a))
 

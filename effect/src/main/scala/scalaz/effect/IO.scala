@@ -272,16 +272,16 @@ object IO extends IOInstances {
    * The Forall quantifier prevents resources from being returned by this function.
    */
   def runRegionT[P[_] : MonadControlIO, A](r: Forall[RegionT[?, P, A]]): P[A] = {
-    def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
+    def after(hsIORef: IORef[IList[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {
         case (r, o) => for {
           refCnt <- r.refcount.mod(_ - 1)
-          _ <- if (refCnt == 0) r.finalizer else IO.ioUnit
+
         } yield ()
       }
     } yield ()
-    newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
+    newIORef(IList[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
 
   def tailrecM[A, B](a: A)(f: A => IO[A \/ B]): IO[B] =

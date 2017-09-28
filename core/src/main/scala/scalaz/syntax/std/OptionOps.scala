@@ -65,6 +65,8 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
 
   final def toMaybe: Maybe[A] = o.toMaybe(self)
+
+  final def toIList: IList[A] = IList.fromOption(self)
 }
 
 final class OptionOps2[A](self: Option[A]) {

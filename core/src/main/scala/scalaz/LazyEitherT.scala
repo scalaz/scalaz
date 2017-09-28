@@ -56,6 +56,9 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.toList)
 
+  def toIList(implicit F: Functor[F]): F[IList[B]] =
+    F.map(run)(_.toIList)
+
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
     F.map(run)(_.toStream)
 

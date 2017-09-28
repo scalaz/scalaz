@@ -62,6 +62,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 
   def chooseAny[A](head: F[A], tail: Seq[F[A]]): F[(A, Seq[F[A]])]
 
+  // TODO: Reimplement chooseAny using a more general collections method and then get rid of the toList call here.
+  def chooseAny[A](head: F[A], tail: IList[F[A]]): F[(A, Seq[F[A]])] = chooseAny(head, tail.toList)
+
   // derived functions
 
   /**
@@ -122,6 +125,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def gatherUnordered[A](fs: Seq[F[A]]): F[IList[A]] =
     reduceUnordered[A, IList[A]](fs)
 
+  def gatherUnordered[A](fs: IList[F[A]]): F[IList[A]] =
+    reduceUnordered[A, IList[A]](fs)
+
   def gatherUnordered1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] = {
     val R = implicitly[Reducer[A, IList[A]]]
     bind(chooseAny(fs.head, fs.tail.toList)) { case (a, residuals) =>
@@ -135,9 +141,21 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * results come back in a sequence of calls to `chooseAny`.
    */
   def reduceUnordered[A, M](fs: Seq[F[A]])(implicit R: Reducer[A, M]): F[M] =
-    if (fs.isEmpty) point(R.zero)
-    else bind(chooseAny(fs.head, fs.tail)) { case (a, residuals) =>
-      map(reduceUnordered(residuals))(R.cons(a, _))
+    fs match {
+      case Seq() => point(R.zero)
+      case Seq(h, t @ _*) =>
+        bind(chooseAny(h, t)) { case (a, residuals) =>
+          map(reduceUnordered(residuals))(R.cons(a, _))
+        }
+    }
+
+  def reduceUnordered[A, M](fs: IList[F[A]])(implicit R: Reducer[A, M]): F[M] =
+    fs match {
+      case INil() => point(R.zero)
+      case ICons(h, t) =>
+        bind(chooseAny(h, t)) { case (a, residuals) =>
+          map(reduceUnordered(residuals))(R.cons(a, _))
+        }
     }
 
   /**
@@ -152,6 +170,10 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * matches the order of the input sequence. Also see `gatherUnordered`.
    */
   def gather[A](fs: Seq[F[A]]): F[IList[A]] =
+    map(gatherUnordered(fs.zipWithIndex.map { case (f,i) => strengthR(f,i) }))(
+      ais => ais.sortBy(_._2).map(_._1))
+
+  def gather[A](fs: IList[F[A]]): F[IList[A]] =
     map(gatherUnordered(fs.zipWithIndex.map { case (f,i) => strengthR(f,i) }))(
       ais => ais.sortBy(_._2).map(_._1))
 

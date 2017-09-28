@@ -23,17 +23,17 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     }
 
   private[this] class Mutual[A](a: F[A]) {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
+    lazy val y: Free.Trampoline[F[IList[A]]] = z map (plus(_, point(INil())))
+    lazy val z: Free.Trampoline[F[IList[A]]] = y map (apply2(a, _)(_ :: _))
   }
 
   /** `empty` or a non-empty list of results acquired by repeating `a`. */
-  def some[A](a: F[A]): F[List[A]] = new Mutual(a).z.run
+  def some[A](a: F[A]): F[IList[A]] = new Mutual(a).z.run
 
   /** A list of results acquired by repeating `a`.  Never `empty`;
     * initial failure is an empty list instead.
     */
-  def many[A](a: F[A]): F[List[A]] = new Mutual(a).y.run
+  def many[A](a: F[A]): F[IList[A]] = new Mutual(a).y.run
 
   ////
   val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }

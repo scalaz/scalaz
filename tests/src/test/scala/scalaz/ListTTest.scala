@@ -13,6 +13,11 @@ object ListTTest extends SpecLite {
       ListT.fromList(ass).toList must_===(ass)
   }
 
+  "fromIList / toIList" ! forAll {
+    (ass: IList[IList[Int]]) =>
+    ListT.fromIList(ass).toIList must_===(ass)
+  }
+
   "filter all" ! forAll {
     (ass: ListT[List, Int]) =>
       ass.filter(_ => true) must_===(ass)
@@ -61,7 +66,7 @@ object ListTTest extends SpecLite {
       must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
   }
 
-  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[List[String]]) =>
+  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[IList[String]]) =>
     fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
   }
 
@@ -73,7 +78,7 @@ object ListTTest extends SpecLite {
   }
 
   "listT" ! forAll {
-    (ass: Option[List[Int]]) =>
+    (ass: Option[IList[Int]]) =>
       ListT.listT(ass).run == ass
   }
 

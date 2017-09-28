@@ -55,6 +55,9 @@ sealed abstract class LazyEither[+A, +B] {
   def toList: List[B] =
     fold(_ => Nil, _ :: Nil)
 
+  def toIList[BB >: B]: IList[BB] =
+    fold(_ => INil(), ICons(_, INil()))
+
   def toStream: Stream[B] =
     fold(_ => Stream(), Stream(_))
 

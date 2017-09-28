@@ -28,7 +28,7 @@ object LiftIO {
 
   implicit def listTLiftIO[F[_]: LiftIO] =
     new LiftIO[ListT[F, ?]] {
-      def liftIO[A](ioa: IO[A]) = ListT(LiftIO[F].liftIO(ioa.map(_ :: Nil)))
+      def liftIO[A](ioa: IO[A]) = ListT(LiftIO[F].liftIO(ioa.map(_ :: INil())))
     }
 
   implicit def optionTLiftIO[F[_]: LiftIO] =

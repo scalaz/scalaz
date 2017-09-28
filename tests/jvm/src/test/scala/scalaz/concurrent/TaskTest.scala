@@ -33,7 +33,7 @@ object TaskTest extends SpecLite {
     xs.map(_ + 1) == xs.traverse(x => Task(x + 1)).unsafePerformSync
   }
 
-  "gather-based map == sequential map" ! forAll { (xs: List[Int]) =>
+  "gather-based map == sequential map" ! forAll { (xs: IList[Int]) =>
     xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
   }
 
@@ -297,4 +297,3 @@ object TaskTest extends SpecLite {
     Task.fromDisjunction(x).unsafePerformSyncAttempt must_== x
   }
 }
-
