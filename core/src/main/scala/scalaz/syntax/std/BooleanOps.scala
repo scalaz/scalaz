@@ -280,7 +280,7 @@ final class BooleanOps2(self: Boolean) {
    * Returns the first argument in `\/-` if this is `true`, otherwise the second argument in
    * `-\/`.
    */
-  final def either[A, B](a: => A): ConditionalEither[A] = new ConditionalEither(a)
+  final def either[A](a: => A): ConditionalEither[A] = new ConditionalEither(a)
 }
 
 trait ToBooleanOps {
