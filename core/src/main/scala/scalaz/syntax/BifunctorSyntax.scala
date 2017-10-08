@@ -19,25 +19,27 @@ final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
   ////
 }
 
-sealed trait ToBifunctorOps0 {
-  implicit def ToBifunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bifunctor, FA]) =
+sealed trait ToBifunctorOpsU[TC[F[_, _]] <: Bifunctor[F]] {
+  implicit def ToBifunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
     new BifunctorOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
 
 }
 
-trait ToBifunctorOps extends ToBifunctorOps0 {
+trait ToBifunctorOps0[TC[F[_, _]] <: Bifunctor[F]] extends ToBifunctorOpsU[TC] {
 
-  implicit def ToBifunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bifunctor[F]) =
+  implicit def ToBifunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
     new BifunctorOps[F,A, B](v)
 
 
-  implicit def ToBifunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Bifunctor[F[G, ?, ?]]) =
+  implicit def ToBifunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
     new BifunctorOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 
   ////
 }
+
+trait ToBifunctorOps[TC[F[_, _]] <: Bifunctor[F]] extends ToBifunctorOps0[TC]
 
 trait BifunctorSyntax[F[_, _]]  {
   implicit def ToBifunctorOps[A, B](v: F[A, B]): BifunctorOps[F, A, B] = new BifunctorOps[F, A, B](v)(BifunctorSyntax.this.F)

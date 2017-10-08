@@ -14,14 +14,14 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
   ////
 }
 
-sealed trait ToApplicativeOps0 {
-  implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
+sealed trait ToApplicativeOpsU[TC[F[_]] <: Applicative[F]] {
+  implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new ApplicativeOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
-  implicit def ToApplicativeOps[F[_],A](v: F[A])(implicit F0: Applicative[F]) =
+trait ToApplicativeOps0[TC[F[_]] <: Applicative[F]] extends ToApplicativeOpsU[TC] {
+  implicit def ToApplicativeOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new ApplicativeOps[F,A](v)
 
   ////
@@ -31,11 +31,13 @@ trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
   }
 
   trait ApplicativeIdV[A] extends Ops[A] {
-    def point[F[_] : Applicative]: F[A] = Applicative[F].point(self)
-    def pure[F[_] : Applicative]: F[A] = Applicative[F].point(self)
-    def η[F[_] : Applicative]: F[A] = Applicative[F].point(self)
+    def point[F[_] : TC]: F[A] = Applicative[F].point(self)
+    def pure[F[_] : TC]: F[A] = Applicative[F].point(self)
+    def η[F[_] : TC]: F[A] = Applicative[F].point(self)
   }  ////
 }
+
+trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC]
 
 trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
   implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A](v)(ApplicativeSyntax.this.F)

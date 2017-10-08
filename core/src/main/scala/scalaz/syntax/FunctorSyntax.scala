@@ -24,14 +24,14 @@ final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: F
   ////
 }
 
-sealed trait ToFunctorOps0 {
-  implicit def ToFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[Functor, FA]) =
+sealed trait ToFunctorOpsU[TC[F[_]] <: Functor[F]] {
+  implicit def ToFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new FunctorOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToFunctorOps extends ToFunctorOps0 with ToInvariantFunctorOps {
-  implicit def ToFunctorOps[F[_],A](v: F[A])(implicit F0: Functor[F]) =
+trait ToFunctorOps0[TC[F[_]] <: Functor[F]] extends ToFunctorOpsU[TC] {
+  implicit def ToFunctorOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new FunctorOps[F,A](v)
 
   ////
@@ -40,17 +40,19 @@ trait ToFunctorOps extends ToFunctorOps0 with ToInvariantFunctorOps {
 
   // TODO Duplication
   trait LiftV[F[_], A, B] extends Ops[A => B] {
-    def lift(implicit F: Functor[F]): F[A] => F[B] = F.lift(self)
+    def lift(implicit F: TC[F]): F[A] => F[B] = F.lift(self)
   }
 
   implicit def ToFunctorIdV[A](v: A): FunctorIdV[A] = new FunctorIdV[A] { def self = v }
 
   trait FunctorIdV[A] extends Ops[A] {
-    def mapply[F[_], B](f: F[A => B])(implicit F: Functor[F]): F[B] =
+    def mapply[F[_], B](f: F[A => B])(implicit F: TC[F]): F[B] =
       F.map(f)(fab => fab(self))
   }
   ////
 }
+
+trait ToFunctorOps[TC[F[_]] <: Functor[F]] extends ToFunctorOps0[TC] with ToInvariantFunctorOps[TC]
 
 trait FunctorSyntax[F[_]] extends InvariantFunctorSyntax[F] {
   implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A](v)(FunctorSyntax.this.F)

@@ -121,7 +121,7 @@ object FoldableTest extends SpecLite {
     val gt2: (Int, => Int) => Int = (i, j) => i - j
     val strlen = (_ : String).length
 
-    import syntax.foldable1._
+    import syntax.foldable10._
     import syntax.std.list._
 
     "foldLeft1Opt" ! forAll {
