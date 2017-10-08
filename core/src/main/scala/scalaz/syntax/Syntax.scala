@@ -87,9 +87,11 @@ trait Syntaxes {
   object unzip0 extends ToUnzipOps0[Unzip]
   object unzip extends ToUnzipOps[Unzip]
 
-  object optional extends ToOptionalOps
+  object optional0 extends ToOptionalOps0[Optional]
+  object optional extends ToOptionalOps[Optional]
 
-  object catchable extends ToCatchableOps
+  object catchable0 extends ToCatchableOps0[Catchable]
+  object catchable extends ToCatchableOps[Catchable]
 
   //
   // Type classes over * * -> *
@@ -211,5 +213,5 @@ trait ToTypeClassOps
   with ToBitraverseOps0[Bitraverse] with ToComposeOps0[Compose] with ToCategoryOps0[Category]
   with ToArrowOps0[Arrow] with ToProfunctorOps0[Profunctor] with ToStrongOps0[Strong]
   with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError]
-  with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps with ToCatchableOps with ToAlignOps0[Align]
+  with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps0[Optional] with ToCatchableOps0[Catchable] with ToAlignOps0[Align]
   with ToMonadTransOps

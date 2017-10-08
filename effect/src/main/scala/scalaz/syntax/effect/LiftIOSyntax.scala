@@ -17,7 +17,7 @@ sealed trait ToLiftIOOpsU[TC[F[_]] <: LiftIO[F]] {
 
 }
 
-trait ToLiftIOOps[TC[F[_]] <: LiftIO[F]] extends ToLiftIOOpsU[TC] {
+trait ToLiftIOOps0[TC[F[_]] <: LiftIO[F]] extends ToLiftIOOpsU[TC] {
   implicit def ToLiftIOOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new LiftIOOps[F,A](v)
 
@@ -25,6 +25,8 @@ trait ToLiftIOOps[TC[F[_]] <: LiftIO[F]] extends ToLiftIOOpsU[TC] {
 
   ////
 }
+
+trait ToLiftIOOps[TC[F[_]] <: LiftIO[F]] extends ToLiftIOOps0[TC]
 
 trait LiftIOSyntax[F[_]]  {
   implicit def ToLiftIOOps[A](v: F[A]): LiftIOOps[F, A] = new LiftIOOps[F,A](v)(LiftIOSyntax.this.F)
