@@ -27,25 +27,25 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
     Chain(Lift(f), this)
 
   final def foldLeft[F[_]](fa: F[A])(φ: RightAction[F, =>:]): F[B] = {
-    @inline def pair[X](fx: F[X], f: ACatenable1[=>:, X, B]) = APair[F, ACatenable1[=>:, ?, B], X](fx, f)
-    @tailrec def go(step: APair[F, ACatenable1[=>:, ?, B]]): F[B] =
-      step._2 match {
-        case Chain(Chain(f, g), h) => go(pair(step._1, f >>> (g >>> h)))
-        case Chain(Lift(f), g) => go(pair(φ.apply(step._1, f), g))
-        case Lift(f) => φ.apply(step._1, f)
+    @tailrec def go[X](fx: F[X], tail: ACatenable1[=>:, X, B]): F[B] =
+      tail match {
+        case Chain(Chain(f, g), h) => go(fx, f >>> (g >>> h))
+        case Chain(Lift(f), g) => go(φ.apply(fx, f), g)
+        case Lift(f) => φ.apply(fx, f)
       }
-    go(pair(fa, this))
+
+    go(fa, this)
   }
 
   def foldRight[F[_]](fb: F[B])(φ: LeftAction[F, =>:]): F[A] = {
-    @inline def pair[X](f: ACatenable1[=>:, A, X], fx: F[X]) = APair[ACatenable1[=>:, A, ?], F, X](f, fx)
-    @tailrec def go(step: APair[ACatenable1[=>:, A, ?], F]): F[A] =
-      step._1 match {
-        case Chain(f, Chain(g, h)) => go(pair((f >>> g) >>> h, step._2))
-        case Chain(f, Lift(g)) => go(pair(f, φ.apply(g, step._2)))
-        case Lift(f) => φ.apply(f, step._2)
+    @tailrec def go[X](init: ACatenable1[=>:, A, X], fx: F[X]): F[A] =
+      init match {
+        case Chain(f, Chain(g, h)) => go((f >>> g) >>> h, fx)
+        case Chain(f, Lift(g)) => go(f, φ.apply(g, fx))
+        case Lift(f) => φ.apply(f, fx)
       }
-    go(pair(this, fb))
+
+    go(this, fb)
   }
 
   /**
