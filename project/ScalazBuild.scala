@@ -19,6 +19,7 @@ object Scalaz {
     "-Yno-adapted-args",
     "-opt-warnings",
     "-Xlint:_,-type-parameter-shadow",
+    "-Xsource:2.13",
     "-Ywarn-dead-code",
     "-Ywarn-extra-implicit",
     "-Ywarn-inaccessible",
