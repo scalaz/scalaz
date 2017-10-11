@@ -11,20 +11,22 @@ final class CobindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Co
   ////
 }
 
-sealed trait ToCobindOps0 {
-  implicit def ToCobindOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cobind, FA]) =
+sealed trait ToCobindOpsU[TC[F[_]] <: Cobind[F]] {
+  implicit def ToCobindOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new CobindOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToCobindOps extends ToCobindOps0 with ToFunctorOps {
-  implicit def ToCobindOps[F[_],A](v: F[A])(implicit F0: Cobind[F]) =
+trait ToCobindOps0[TC[F[_]] <: Cobind[F]] extends ToCobindOpsU[TC] {
+  implicit def ToCobindOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new CobindOps[F,A](v)
 
   ////
 
   ////
 }
+
+trait ToCobindOps[TC[F[_]] <: Cobind[F]] extends ToCobindOps0[TC] with ToFunctorOps[TC]
 
 trait CobindSyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToCobindOps[A](v: F[A]): CobindOps[F, A] = new CobindOps[F,A](v)(CobindSyntax.this.F)

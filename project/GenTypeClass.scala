@@ -237,9 +237,16 @@ object GenTypeClass {
     }
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
-        "extends To" + typeClassName + "Ops0" + (extendsList match {
+        "extends To" + typeClassName + "Ops0[TC]" + (extendsList match {
           case Seq() => ""
-          case es    => es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
+          case es    => es.map(n => "To" + n + "Ops[TC]").mkString(" with ", " with ", "")
+        })
+      case Kind.|*->*|->* =>
+        "extends To" + typeClassName + "Ops0[TC]" + (extendsList match {
+          case Seq() => ""
+          case es    => es.map(n =>
+            "To" + n + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+          ).mkString(" with ", " with ", "")
         })
       case _    =>
         extendsList match {
@@ -320,11 +327,11 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
 """
     case Kind.*->* =>
       val ToVUnapply =
-s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[${typeClassName}, FA]) =
+s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new ${typeClassName}Ops[F0.M,F0.A](F0(v))(F0.TC)
 """
       val ToVMA =
-s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeClassName}[F]) =
+s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new ${typeClassName}Ops[F,A](v)
 """
 
@@ -337,16 +344,18 @@ final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit
   ////
 }
 
-sealed trait To${typeClassName}Ops0 {
+sealed trait To${typeClassName}OpsU[TC[F[_]] <: ${typeClassName}[F]] {
 $ToVUnapply
 }
 
-trait To${typeClassName}Ops $extendsToSyntaxListText {
+trait To${typeClassName}Ops0[TC[F[_]] <: ${typeClassName}[F]] extends To${typeClassName}OpsU[TC] {
 $ToVMA
   ////
 
   ////
 }
+
+trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] $extendsToSyntaxListText
 
 trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
@@ -360,15 +369,15 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
       case Kind.*^*->* =>
 
         val ToVUnapply =
-  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[${typeClassName}, FA]) =
+  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
     new ${typeClassName}Ops[F0.M,F0.A,F0.B](F0(v))(F0.TC)
 """
         val ToVKleisli =
-  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[F[G, ?, ?]]) =
+  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
     new ${typeClassName}Ops[F[G, ?, ?], A, B](v)(F0)
 """
        val ToVFAB =
-  s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: ${typeClassName}[F]) =
+  s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
     new ${typeClassName}Ops[F,A, B](v)
 """
 
@@ -382,11 +391,11 @@ final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])
   ////
 }
 
-sealed trait To${typeClassName}Ops0 {
+sealed trait To${typeClassName}OpsU[TC[F[_, _]] <: ${typeClassName}[F]] {
 $ToVUnapply
 }
 
-trait To${typeClassName}Ops ${extendsToSyntaxListText} {
+trait To${typeClassName}Ops0[TC[F[_, _]] <: ${typeClassName}[F]] extends To${typeClassName}OpsU[TC] {
 
   $ToVFAB
 
@@ -395,6 +404,8 @@ trait To${typeClassName}Ops ${extendsToSyntaxListText} {
 
   ////
 }
+
+trait To${typeClassName}Ops[TC[F[_, _]] <: ${typeClassName}[F]] ${extendsToSyntaxListText}
 
 trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
@@ -408,7 +419,7 @@ trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
       case Kind.|*->*|->* =>
 
         val ToOps =
-  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: ${typeClassName}[F, S]) =
+  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: TC[F, S]) =
     new ${typeClassName}Ops[F, S, A](v)"""
 
 
@@ -421,13 +432,15 @@ final class ${typeClassName}Ops[F[_], S, A] private[syntax](self: F[A])(implicit
   ////
 }
 
-trait To${typeClassName}Ops ${extendsToSyntaxListText} {
+trait To${typeClassName}Ops0[TC[F[_], S] <: ${typeClassName}[F, S]] {
   $ToOps
 
   ////
 
   ////
 }
+
+trait To${typeClassName}Ops[TC[F[_], S] <: ${typeClassName}[F, S]] ${extendsToSyntaxListText}
 
 trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, S, A] =
