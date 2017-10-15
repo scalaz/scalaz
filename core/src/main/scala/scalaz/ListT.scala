@@ -69,7 +69,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
 
   def toIList : M[IList[A]] = run
 
-  def toList(implicit M: Functor[M]): M[List[A]] = foldRight(List.empty[A])(_ :: _)
+  def toList(implicit M: Functor[M]): M[List[A]] = M.map(run)(_.toList)
 
   def foldRight[B](z: => B)(f: (=> A, => B) => B)(implicit M: Functor[M]) : M[B] = M.map(run)(_.foldRight(z){(right, left) => f(right, left)})
 

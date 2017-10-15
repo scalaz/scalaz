@@ -85,7 +85,6 @@ sealed abstract class ReducerInstances {
 
   /** Collect `C`s into an ilist, in order. */
   implicit def IListReducer[C]: Reducer[C, IList[C]] = {
-    import std.list._
     unitConsReducer(_ :: INil(), c => c :: _)
   }
 

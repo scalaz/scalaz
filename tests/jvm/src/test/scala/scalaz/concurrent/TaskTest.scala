@@ -34,7 +34,7 @@ object TaskTest extends SpecLite {
   }
 
   "gather-based map == sequential map" ! forAll { (xs: IList[Int]) =>
-    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
+    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1)).toList).unsafePerformSync
   }
 
   case object FailWhale extends RuntimeException {

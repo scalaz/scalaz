@@ -196,4 +196,3 @@ object CofreeTest extends SpecLite {
 
   }
 }
-
