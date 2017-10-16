@@ -247,7 +247,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(const(()))
 
-  implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
+  implicit val AlphaArbitrary: Arbitrary[Alpha] = {
+    val alphaList = Alpha.alphas.toList
+    Arbitrary(oneOf(alphaList))
+  }
 
   implicit val BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
 
@@ -274,7 +277,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
-  implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
+  implicit val DigitArbitrary: Arbitrary[Digit] = {
+    val digitList = Digit.digits.toList
+    Arbitrary(oneOf(digitList))
+  }
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, IList[A], NonEmptyList[A]](arb[A], ilistArbitrary)(nel(_, _))
@@ -568,7 +574,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 
-  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
+  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[IList[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
 
   implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
 

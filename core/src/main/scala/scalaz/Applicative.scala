@@ -42,8 +42,8 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   import std.list._
 
   /** Performs the action `n` times, returning the list of results. */
-  def replicateM[A](n: Int, fa: F[A]): F[List[A]] =
-    listInstance.sequence(List.fill(n)(fa))(this)
+  def replicateM[A](n: Int, fa: F[A]): F[IList[A]] =
+    Traverse[IList].sequence(IList.fill(n)(fa))(this)
 
   /** Performs the action `n` times, returning nothing. */
   def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
@@ -55,6 +55,9 @@ trait Applicative[F[_]] extends Apply[F] { self =>
       case Nil => point(List())
       case h :: t => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
     }
+
+  /** Filter `l` according to an applicative predicate. */
+  def filterM[A](l: IList[A])(f: A => F[Boolean]): F[IList[A]] = l.filterM(f)(this)
 
   /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into F.

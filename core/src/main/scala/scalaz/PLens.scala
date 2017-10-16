@@ -421,7 +421,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _     , Nil)       => None
-        case (l, x     , r::rs)     => lookupr(x::l, r, rs)
+        case (l, x     , r::rs)     => lookupr((x::l, r, rs))
       }
     plens {
       case Nil => None
@@ -433,6 +433,45 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
     listLookupByPLens(Equal[K].equal(k, _))
+
+  def iListHeadPLens[A]: IList[A] @?> A =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(_ :: t, h))
+    }
+
+  def iListTailPLens[A]: IList[A] @?> IList[A] =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(h :: _, t))
+    }
+
+  def iListNthPLens[A](n: Int): IList[A] @?> A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      iListHeadPLens
+    else
+      iListNthPLens(n - 1) compose iListTailPLens
+
+  def iListLookupByPLens[K, V](p: K => Boolean): IList[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (IList[(K, V)], (K, V), IList[(K, V)])): Option[(IList[(K, V)], (K, V), IList[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)   => Some(t)
+        case (_, _     , INil())      => None
+        case (l, x     , ICons(r, rs)) => lookupr((x::l, r, rs))
+      }
+    plens {
+      case INil() => None
+      case ICons(h, t) => lookupr(INil(), h, t) map {
+        case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
+      }
+    }
+  }
+
+  def iListLookupPLens[K: Equal, V](k: K): IList[(K, V)] @?> V =
+    iListLookupByPLens(Equal[K].equal(k, _))
 
   def vectorHeadPLens[A]: Vector[A] @?> A =
     vectorNthPLens(0)

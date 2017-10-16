@@ -3,6 +3,8 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import syntax.std.option._
+
 import org.scalacheck.Prop.forAll
 
 object OptionTTest extends SpecLite {
@@ -26,7 +28,7 @@ object OptionTTest extends SpecLite {
       OptionT.optionT(ass).run == ass
   }
 
-  "listT" ! forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toList)}
+  "listT" ! forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toIList)}
 
   "flatMapF consistent with flatMap" ! forAll { (fa: OptionTList[Int], f: Int => List[Option[Int]]) =>
     fa.flatMap(f andThen OptionT.apply) must_=== fa.flatMapF(f)

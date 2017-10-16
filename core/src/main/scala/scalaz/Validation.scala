@@ -169,11 +169,18 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
     case Failure(_) => true
   }
 
-  /** Return an empty list or list with one element on the success of this validation. */
+  /** Return an empty list or a list with one element on the success of this validation. */
   def toList: List[A] =
     this match {
       case Failure(_) => Nil
       case Success(a) => a :: Nil
+    }
+
+  /** Return an empty ilist or an ilist with one element on the success of this validation. */
+  def toIList[AA >: A]: IList[AA] =
+    this match {
+      case Failure(_) => INil()
+      case Success(a) => IList(a)
     }
 
   /** Return an empty stream or stream with one element on the success of this validation. */
@@ -545,4 +552,3 @@ sealed abstract class ValidationInstances3 {
     }
 
 }
-

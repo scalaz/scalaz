@@ -320,11 +320,11 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
-  def values: List[B] =
-    foldrWithKey(List.empty[B])((_, x, xs) => x :: xs)
+  def values: IList[B] =
+    foldrWithKey(IList.empty[B])((_, x, xs) => x :: xs)
 
-  def keys: List[A] =
-    foldrWithKey(List.empty[A])((x, _, xs) => x :: xs)
+  def keys: IList[A] =
+    foldrWithKey(IList.empty[A])((x, _, xs) => x :: xs)
 
   def keySet: ISet[A] = this match {
     case Tip()        => ISet.Tip[A]
@@ -334,11 +334,20 @@ sealed abstract class ==>>[A, B] {
   def toList: List[(A, B)] =
     toAscList
 
+  def toIList: IList[(A, B)] =
+    toAscIList
+
   def toAscList: List[(A, B)] =
     foldrWithKey(List.empty[(A, B)])((k, x, xs) => (k, x) :: xs)
 
+  def toAscIList: IList[(A, B)] =
+    foldrWithKey(IList.empty[(A, B)])((k, x, xs) => (k, x) :: xs)
+
   def toDescList: List[(A, B)] =
     foldlWithKey(List.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
+
+  def toDescIList: IList[(A, B)] =
+    foldlWithKey(IList.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
 
   def member(k: A)(implicit n: Order[A]): Boolean =
     lookup(k)(n).isDefined
@@ -873,10 +882,10 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def splitRoot: List[A ==>> B] =
+  def splitRoot: IList[A ==>> B] =
     this match {
-      case Tip()           => List.empty[A ==>> B]
-      case Bin(k, x, l, r) => List(l, singleton(k, x), r)
+      case Tip()           => IList.empty[A ==>> B]
+      case Bin(k, x, l, r) => IList(l, singleton(k, x), r)
     }
 
   // Utility functions
@@ -1234,10 +1243,19 @@ object ==>> extends MapInstances {
   final def fromList[A: Order, B](l: List[(A, B)]): A ==>> B =
     l.foldLeft(empty[A, B]) { (t, x) => t.insert(x._1, x._2) }
 
+  final def fromIList[A: Order, B](l: IList[(A, B)]): A ==>> B =
+    l.foldLeft(empty[A, B]) { (t, x) => t.insert(x._1, x._2) }
+
   final def fromListWith[A: Order, B](l: List[(A, B)])(f: (B, B) => B): A ==>> B =
     fromListWithKey(l)((_, x, y) => f(x, y))
 
+  final def fromIListWith[A: Order, B](l: IList[(A, B)])(f: (B, B) => B): A ==>> B =
+    fromIListWithKey(l)((_, x, y) => f(x, y))
+
   final def fromListWithKey[A: Order, B](l: List[(A, B)])(f: (A, B, B) => B): A ==>> B =
+    l.foldLeft(empty[A, B])((a, c) => a.insertWithKey(f, c._1, c._2))
+
+  final def fromIListWithKey[A: Order, B](l: IList[(A, B)])(f: (A, B, B) => B): A ==>> B =
     l.foldLeft(empty[A, B])((a, c) => a.insertWithKey(f, c._1, c._2))
 
   /* TODO: Ordered lists
@@ -1265,10 +1283,10 @@ object ==>> extends MapInstances {
         Bin(x, f(x), fromSet(l)(f), fromSet(r)(f))
     }
 
-  final def unions[A: Order, B](xs: List[A ==>> B]): A ==>> B =
+  final def unions[A: Order, B](xs: IList[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.union(c))
 
-  final def unionsWith[A: Order, B](f: (B, B) => B)(xs: List[A ==>> B]): A ==>> B =
+  final def unionsWith[A: Order, B](f: (B, B) => B)(xs: IList[A ==>> B]): A ==>> B =
     xs.foldLeft(empty[A, B])((a, c) => a.unionWith(c)(f))
 
   private[scalaz] final val ratio = 2

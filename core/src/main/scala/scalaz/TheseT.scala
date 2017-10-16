@@ -41,7 +41,9 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 
   def exists(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ exists p)
   def forall(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ forall p)
-  def toList(implicit F: Functor[F]): ListT[F, B] = ListT(F.map(run)(_.toList))
+  def toListT(implicit F: Functor[F]): ListT[F, B] = ListT(toIList)
+  def toIList(implicit F: Functor[F]): F[IList[B]] = F.map(run)(_.toIList)
+  def toList(implicit F: Functor[F]): F[List[B]] = F.map(run)(_.toList)
 
   def getOrElse(default: => B)(implicit F: Functor[F]): F[B]
   = this.b.getOrElse(default)

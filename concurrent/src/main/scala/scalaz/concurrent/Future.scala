@@ -394,7 +394,7 @@ object Future {
   /** Calls `Nondeterminism[Future].gatherUnordered`.
    * @since 7.0.3
    */
-  def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
+  def gatherUnordered[A](fs: Seq[Future[A]]): Future[IList[A]] =
     futureInstance.gatherUnordered(fs)
 
   def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =

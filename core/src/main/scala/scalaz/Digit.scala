@@ -51,7 +51,7 @@ object Digit extends DigitInstances {
     override val toInt = 9
   }
 
-  val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+  val digits: IList[Digit] = IList(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 

@@ -840,10 +840,19 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
 
   /** Convert the leaves of the tree to a `scala.Stream` */
-  def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
+  def toStream: Stream[A] = to[Stream]
 
   /** Convert the leaves of the tree to a `scala.List` */
-  def toList: List[A] = toStream.toList
+  def toList: List[A] = to[List]
+
+  /** Convert the leaves of the tree to a `scalaz.IList` */
+  def toIList: IList[A] = to[IList]
+
+  /** Convert the leaves of the tree to an `M` */
+  def reduceTo[M](implicit M: Reducer[A, M]): M = map(x => x)(M).measure
+
+  /** Convert the leaves of the tree to an `F[A]` */
+  def to[F[_]](implicit M: Reducer[A, F[A]]): F[A] = reduceTo[F[A]]
 
   /** Convert the tree to a `String`. Unsafe: this uses `Any#toString` for types `V` and `A` */
   override def toString = {

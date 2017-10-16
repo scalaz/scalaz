@@ -119,13 +119,13 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * To preserve the order of the output list while allowing nondetermininstic
    * ordering of effects, use `gather`.
    */
-  def gatherUnordered[A](fs: Seq[F[A]]): F[List[A]] =
-    reduceUnordered[A, List[A]](fs)
+  def gatherUnordered[A](fs: Seq[F[A]]): F[IList[A]] =
+    reduceUnordered[A, IList[A]](fs)
 
   def gatherUnordered1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] = {
-    val R = implicitly[Reducer[A, List[A]]]
+    val R = implicitly[Reducer[A, IList[A]]]
     bind(chooseAny(fs.head, fs.tail.toList)) { case (a, residuals) =>
-      map(reduceUnordered(residuals)(R))(list => NonEmptyList.nels(a, list: _*))
+      map(reduceUnordered(residuals)(R))(list => NonEmptyList.nel(a, list))
     }
   }
 
@@ -135,9 +135,12 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * results come back in a sequence of calls to `chooseAny`.
    */
   def reduceUnordered[A, M](fs: Seq[F[A]])(implicit R: Reducer[A, M]): F[M] =
-    if (fs.isEmpty) point(R.zero)
-    else bind(chooseAny(fs.head, fs.tail)) { case (a, residuals) =>
-      map(reduceUnordered(residuals))(R.cons(a, _))
+    fs match {
+      case Seq() => point(R.zero)
+      case Seq(h, t @ _*) =>
+        bind(chooseAny(h, t)) { case (a, residuals) =>
+          map(reduceUnordered(residuals))(R.cons(a, _))
+        }
     }
 
   /**
@@ -151,7 +154,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
    * Although the effects are unordered, we ensure the order of results
    * matches the order of the input sequence. Also see `gatherUnordered`.
    */
-  def gather[A](fs: Seq[F[A]]): F[List[A]] =
+  def gather[A](fs: Seq[F[A]]): F[IList[A]] =
     map(gatherUnordered(fs.zipWithIndex.map { case (f,i) => strengthR(f,i) }))(
       ais => ais.sortBy(_._2).map(_._1))
 

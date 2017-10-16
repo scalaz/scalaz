@@ -36,7 +36,6 @@ object ValidationTest extends SpecLite {
       import syntax.functor._
       val voi2: Validation[String, Option[Int]] = vi.fpoint[Option]
       voi2 must_===(Validation.success[String, Option[Int]](Some(0)))
-      println("hi")
     }
   }
 
