@@ -8,7 +8,7 @@ cache:
 
 language: scala
 scala:
-  - 2.12.3
+  - 2.12.4
   - 2.11.11
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
@@ -64,7 +64,7 @@ matrix:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
     - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
-  - scala: 2.12.3
+  - scala: 2.12.4
     jdk: oraclejdk9
     before_install:
     # https://github.com/sbt/sbt/pull/2951

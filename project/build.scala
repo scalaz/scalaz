@@ -99,7 +99,7 @@ object build {
   )
 
   private def Scala211 = "2.11.11"
-  private def Scala212 = "2.12.3"
+  private def Scala212 = "2.12.4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
