@@ -46,10 +46,10 @@ matrix:
       - cd ..
       - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
       - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test
-    - scala: 2.12.3
+    - scala: 2.12.4
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.3
+    - scala: 2.12.4
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.11
@@ -60,7 +60,7 @@ matrix:
       - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.2/bin/travis_setup.sh | bash -
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
-    - scala: 2.12.3
+    - scala: 2.12.4
       jdk: oraclejdk9
       before_install:
       # https://github.com/sbt/sbt/pull/2951
