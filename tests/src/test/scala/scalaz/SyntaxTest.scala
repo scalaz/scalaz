@@ -44,7 +44,7 @@ object SyntaxTest extends SpecLite {
     show"I'd like a $f" must_===(result)
   }
 
-  /**
+
   "show interpolator works for coproduct sealed traits" in {
     import syntax.show._
     import std.string._
@@ -63,5 +63,4 @@ object SyntaxTest extends SpecLite {
 
     show"We have a $r" must_===("We have a Result1T")
   }
-  **/
 }
