@@ -26,36 +26,33 @@ sealed abstract class AList[F[_, _], A, B] {
     that.reverse reverse_::: this
 
   def reverse: Composed[F, A, B] = {
-    @tailrec def go(p: APair[AList[F, ?, B], Composed[F, A, ?]]): Composed[F, A, B] = {
-      val (fs, acc) = (p._1, p._2)
+    @tailrec def go[X](fs: AList[F, X, B], acc: Composed[F, A, X]): Composed[F, A, B] =
       fs match {
-        case ACons(h, t)  => go(APair.of[AList[F, ?, B], Composed[F, A, ?]](t, h :: acc))
+        case ACons(h, t)  => go(t, h :: acc)
         case nil @ ANil() => nil.subst[Composed[F, A, ?]](acc)
       }
-    }
-    go(APair.of[AList[F, ?, B], Composed[F, A, ?]](this, empty[λ[(α, β) => F[β, α]], A]))
+
+    go(this, empty[λ[(α, β) => F[β, α]], A])
   }
 
   def reverse_:::[Z](that: Composed[F, Z, A]): AList[F, Z, B] = {
-    @tailrec def go[G[_, _]](p: APair[AList[G, ?, Z], Composed[G, B, ?]]): Composed[G, B, Z] = {
-      val (gs, acc) = (p._1, p._2)
+    @tailrec def go[G[_, _], X](gs: AList[G, X, Z], acc: Composed[G, B, X]): Composed[G, B, Z] =
       gs match {
-        case ACons(g, gs) => go(APair.of[AList[G, ?, Z], Composed[G, B, ?]](gs, g :: acc))
+        case ACons(g, gs) => go(gs, g :: acc)
         case nil @ ANil() => nil.subst[Composed[G, B, ?]](acc)
       }
-    }
-    go[λ[(α, β) => F[β, α]]](APair.of[AList[λ[(α, β) => F[β, α]], ?, Z], Composed[λ[(α, β) => F[β, α]], B, ?]](that, this))
+
+    go[λ[(α, β) => F[β, α]], A](that, this)
   }
 
   def foldLeft[G[_]](ga: G[A])(φ: RightAction[G, F]): G[B] = {
-    @tailrec def go(p: APair[G, AList[F, ?, B]]): G[B] = {
-      val (g, fs) = (p._1, p._2)
+    @tailrec def go[X](g: G[X], fs: AList[F, X, B]): G[B] =
       fs match {
-        case ACons(h, t)  => go(APair.of[G, AList[F, ?, B]](φ.apply(g, h), t))
+        case ACons(h, t)  => go(φ.apply(g, h), t)
         case nil @ ANil() => nil.subst(g)
       }
-    }
-    go(APair.of[G, AList[F, ?, B]](ga, this))
+
+    go(ga, this)
   }
 
   def foldRight[G[_]](gb: G[B])(φ: LeftAction[G, F]): G[A] =
