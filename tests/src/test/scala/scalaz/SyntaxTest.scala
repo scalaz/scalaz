@@ -25,21 +25,21 @@ object SyntaxTest extends SpecLite {
     import std.string._
 
     val x = "string"
-    val resultString = s"I've found a $x"
-    show"I've found a $x" must_===(x)
+    val resultString = s"""I've found a "$x""""
+    show"I've found a $x" must_===(resultString)
   }
 
   "show interpolator works with case classes" in {
     import syntax.show._
     import std.string._
 
-    case class Foo(x: String)
-    object Foo {
-      implicit val fooShow : Show[Foo] = Show.showFromToString[Foo]
+    case class TestFoo(x: String)
+    object TestFoo {
+      implicit val fooShow : Show[TestFoo] = Show.showFromToString[TestFoo]
     }
 
-    val f = Foo("bar")
-    val result = "I'd like a Foo(bar)"
+    val f = TestFoo("bar")
+    val result = "I'd like a TestFoo(bar)"
 
     show"I'd like a $f" must_===(result)
   }
@@ -63,5 +63,5 @@ object SyntaxTest extends SpecLite {
 
     show"We have a $r" must_===("We have a Result1T")
   }
-    **/
+  **/
 }
