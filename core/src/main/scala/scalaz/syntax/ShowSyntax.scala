@@ -15,9 +15,8 @@ trait ToShowOps  {
   implicit def ToShowOps[F](v: F)(implicit F0: Show[F]) =
     new ShowOps[F](v)
 
-  implicit final def showInterpolator(sc: StringContext): Show.ShowInterpolator = Show.ShowInterpolator(sc)
   ////
-
+  implicit final def showInterpolator(sc: StringContext): Show.ShowInterpolator = Show.ShowInterpolator(sc)
   ////
 }
 

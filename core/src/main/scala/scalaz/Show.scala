@@ -19,19 +19,6 @@ trait Show[F] extends Show.ContravariantShow[F]  { self =>
 object Show {
   @inline def apply[F](implicit F: Show[F]): Show[F] = F
 
-  trait ContravariantShow[-T] {
-    def shows(t: T): String
-  }
-
-  case class Shows(override val toString: String) extends AnyVal
-  object Shows {
-    implicit def mat[A](x: A)(implicit S: ContravariantShow[A]): Shows = Shows(S.shows(x))
-  }
-
-  final case class ShowInterpolator(sc: StringContext) extends AnyVal {
-    def show(args: Shows*): String = sc.s(args: _*)
-  }
-
   ////
 
   def showFromToString[A]: Show[A] = new Show[A] {
@@ -53,6 +40,19 @@ object Show {
     def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
       override def show(b: B): Cord = r.show(f(b))
     }
+  }
+
+  trait ContravariantShow[-T] {
+    def shows(t: T): String
+  }
+
+  final case class Shows(override val toString: String) extends AnyVal
+  object Shows {
+    implicit def mat[A](x: A)(implicit S: ContravariantShow[A]): Shows = Shows(S.shows(x))
+  }
+
+  final case class ShowInterpolator(sc: StringContext) extends AnyVal {
+    def show(args: Shows*): String = sc.s(args: _*)
   }
   ////
 
