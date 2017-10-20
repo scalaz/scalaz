@@ -35,15 +35,6 @@ trait Forall2Module {
   object Unapply {
     implicit def unapply[G[_, _]]: Unapply[∀∀[G]] { type F[A, B] = G[A, B] } =
       new Unapply[∀∀[G]] { type F[A, B] = G[A, B] }
-
-    implicit def unapply1[G[_], H[_, _]]: Unapply[∀∀[λ[(α, β) => G[H[α, β]]]]] { type F[A, B] = G[H[A, B]] } =
-      new Unapply[∀∀[λ[(α, β) => G[H[α, β]]]]] { type F[A, B] = G[H[A, B]] }
-
-    implicit def unapply2[P[_, _], G[_], H[_]]: Unapply[∀∀[λ[(α, β) => P[G[α], H[β]]]]] { type F[A, B] = P[G[A], H[B]] } =
-      new Unapply[∀∀[λ[(α, β) => P[G[α], H[β]]]]] { type F[A, B] = P[G[A], H[B]] }
-
-    implicit def unapply3[P[_, _], G[_, _], H[_, _]]: Unapply[∀∀[λ[(α, β) => P[G[α, β], H[α, β]]]]] { type F[A, B] = P[G[A, B], H[A, B]] } =
-      new Unapply[∀∀[λ[(α, β) => P[G[α, β], H[α, β]]]]] { type F[A, B] = P[G[A, B], H[A, B]] }
   }
 }
 
@@ -51,10 +42,6 @@ trait Forall2Syntax {
   import Forall2Syntax._
 
   implicit def toForall2Ops[F[_, _]](a: ∀∀[F]): Ops[F] = new Ops[F](a)
-  implicit def toForall2Ops1[F[_], G[_, _]](a: ∀∀[λ[(α, β) => F[G[α, β]]]]): Ops[λ[(α, β) => F[G[α, β]]]] = new Ops[λ[(α, β) => F[G[α, β]]]](a)
-  implicit def toForall2Ops2[F[_, _], G[_], H[_]](a: ∀∀[λ[(α, β) => F[G[α], H[β]]]]): Ops[λ[(α, β) => F[G[α], H[β]]]] = new Ops[λ[(α, β) => F[G[α], H[β]]]](a)
-  implicit def toForall2Ops3[F[_, _], G[_, _], H[_, _]](a: ∀∀[λ[(α, β) => F[G[α, β], H[α, β]]]]): Ops[λ[(α, β) => F[G[α, β], H[α, β]]]] = new Ops[λ[(α, β) => F[G[α, β], H[α, β]]]](a)
-  // add other shapes here as needed
 }
 
 object Forall2Syntax {
