@@ -6,7 +6,7 @@ package scalaz
  * [[scalaz.Cord]] for efficiency.
  */
 ////
-trait Show[F] extends Show.ContravariantShow[F]  { self =>
+trait Show[F]  { self =>
   ////
   def show(f: F): Cord = Cord(shows(f))
   def shows(f: F): String = show(f).toString
@@ -42,18 +42,13 @@ object Show {
     }
   }
 
-  trait ContravariantShow[-T] {
-    def shows(t: T): String
-  }
-
   final case class Shows(override val toString: String) extends AnyVal
   object Shows {
-    implicit def mat[A](x: A)(implicit S: ContravariantShow[A]): Shows = Shows(S.shows(x))
+    implicit def mat[A](x: A)(implicit S: Show[A]): Shows = Shows(S.shows(x))
   }
 
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
     def show(args: Shows*): String = sc.s(args: _*)
   }
   ////
-
 }

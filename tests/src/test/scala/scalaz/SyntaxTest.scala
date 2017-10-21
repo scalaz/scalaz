@@ -45,7 +45,7 @@ object SyntaxTest extends SpecLite {
   }
 
 
-  "show interpolator works for coproduct sealed traits" in {
+  "show interpolator works for coproduct sealed traits in their widened context" in {
     import syntax.show._
     import std.string._
 
@@ -59,7 +59,7 @@ object SyntaxTest extends SpecLite {
       }
     }
 
-    val r = Result1T
+    val r : CoproductT = Result1T
 
     show"We have a $r" must_===("We have a Result1T")
   }
