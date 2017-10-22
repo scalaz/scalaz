@@ -34,9 +34,7 @@ object SyntaxTest extends SpecLite {
     import std.string._
 
     case class TestFoo(x: String)
-    object TestFoo {
-      implicit val fooShow : Show[TestFoo] = Show.showFromToString[TestFoo]
-    }
+    implicit val fooShow : Show[TestFoo] = Show.showFromToString[TestFoo]
 
     val f = TestFoo("bar")
     val result = "I'd like a TestFoo(bar)"
