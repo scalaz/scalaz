@@ -19,4 +19,46 @@ object SyntaxTest extends SpecLite {
     //(1, 2) ∘ (1 +) // uncomment to see the type error for missing type class instances, based on the @implicitNotFound annotation on scalaz.Unapply.
     ()
   }
+
+  "show interpolator works with Strings" in {
+    import syntax.show._
+    import std.string._
+
+    val x = "string"
+    val resultString = s"""I've found a "$x""""
+    show"I've found a $x" must_===(resultString)
+  }
+
+  "show interpolator works with case classes" in {
+    import syntax.show._
+    import std.string._
+
+    case class TestFoo(x: String)
+    implicit val fooShow : Show[TestFoo] = Show.showFromToString[TestFoo]
+
+    val f = TestFoo("bar")
+    val result = "I'd like a TestFoo(bar)"
+
+    show"I'd like a $f" must_===(result)
+  }
+
+
+  "show interpolator works for coproduct sealed traits in their widened context" in {
+    import syntax.show._
+    import std.string._
+
+    sealed trait CoproductT
+    case object Result1T extends CoproductT
+    case object Result2T extends CoproductT
+    object CoproductT {
+      implicit val coproductTShow : Show[CoproductT] = Show.show[CoproductT]{
+        case Result1T => "Result1T"
+        case Result2T => "Result2T"
+      }
+    }
+
+    val r : CoproductT = Result1T
+
+    show"We have a $r" must_===("We have a Result1T")
+  }
 }
