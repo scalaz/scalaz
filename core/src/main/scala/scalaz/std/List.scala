@@ -12,8 +12,6 @@ trait ListInstances0 {
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] with StrictSeqSubtypeCovariant[List] {
-      import Liskov.<~<
-
       protected[this] override val Factory = List
       protected[this] override def canBuildFrom[A] = List.canBuildFrom
 

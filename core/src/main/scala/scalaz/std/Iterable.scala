@@ -102,7 +102,7 @@ private[std] trait StrictOrLazySeqSubtypeCovariant[F[+X] <: Seq[X] with GenericT
   override final def length[A](fa: F[A]) = fa.length
   override final def point[A](a: => A) = Factory(a)
   override final def bind[A, B](fa: F[A])(f: A => F[B]) = fa flatMap f
-  override final def empty[A] = Factory.empty
+  override final def empty[A] = Factory.empty[A]
   override final def isEmpty[A](fa: F[A]) = fa.isEmpty
   override final def map[A, B](l: F[A])(f: A => B) = l map f
   override final def widen[A, B](l: F[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
