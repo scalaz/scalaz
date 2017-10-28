@@ -24,7 +24,10 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   /** @since 7.0.3 */
   def foreach(f: A => Unit): Unit = {
     f(head)
-    tail.toList.foreach(f)
+    tail.foldLeft(()){(_, a) =>
+      f(a)
+      ()
+    }
   }
 
   def flatMap[B](f: A => NonEmptyList[B]): NonEmptyList[B] = {
