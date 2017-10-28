@@ -11,8 +11,11 @@ trait ListInstances0 {
 
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
+    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] with StrictSeqSubtypeCovariant[List] {
       import Liskov.<~<
+
+      protected[this] override val Factory = List
+      protected[this] override def canBuildFrom[A] = List.canBuildFrom
 
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
@@ -25,22 +28,7 @@ trait ListInstances extends ListInstances0 {
           }
         loop(fa, None)
       }
-      override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
-      override def length[A](fa: List[A]) = fa.length
-      def point[A](a: => A) = a :: Nil
-      def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
-      def empty[A] = Nil
-      def plus[A](a: List[A], b: => List[A]) = a ++ b
-      override def map[A, B](l: List[A])(f: A => B) = l map f
-      override def widen[A, B](l: List[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
-      override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
 
-      def zip[A, B](a: => List[A], b: => List[B]) = {
-        val _a = a
-        if(_a.isEmpty) Nil
-        else _a zip b
-      }
-      def unzip[A, B](a: List[(A, B)]) = a.unzip
       def alignWith[A, B, C](f: A \&/ B => C) = {
         @annotation.tailrec
         def loop(aa: List[A], bb: List[B], accum: List[C]): List[C] = (aa, bb) match {
@@ -67,15 +55,6 @@ trait ListInstances extends ListInstances0 {
         }
       }
 
-      override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
-        State((s: S) => {
-          val buf = new collection.mutable.ListBuffer[B]
-          var cur = s
-          l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
-          (cur, buf.toList)
-        })
-      }
-
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
         val s = new ArrayStack[A]
@@ -89,8 +68,6 @@ trait ListInstances extends ListInstances0 {
         r
       }
 
-      def isEmpty[A](fa: List[A]) = fa.isEmpty
-
       def cobind[A, B](fa: List[A])(f: List[A] => B) =
         fa match {
           case Nil => Nil
@@ -102,24 +79,6 @@ trait ListInstances extends ListInstances0 {
           case Nil => Nil
           case _::t => a :: cojoin(t)
         }
-
-      def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
-        val bs = List.newBuilder[B]
-        @scala.annotation.tailrec
-        def go(xs: List[List[A \/ B]]): Unit =
-          xs match {
-            case (\/-(b) :: tail) :: rest =>
-              bs += b
-              go(tail :: rest)
-            case (-\/(a0) :: tail) :: rest =>
-              go(f(a0) :: tail :: rest)
-            case Nil :: rest =>
-              go(rest)
-            case Nil =>
-          }
-        go(List(f(a)))
-        bs.result
-      }
     }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
