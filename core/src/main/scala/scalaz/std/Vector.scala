@@ -12,39 +12,15 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
-    override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
-    override def length[A](fa: Vector[A]) = fa.length
-    def point[A](a: => A) = empty :+ a
-    def bind[A, B](fa: Vector[A])(f: A => Vector[B]) = fa flatMap f
-    def empty[A] = Vector.empty[A]
-    def plus[A](a: Vector[A], b: => Vector[A]) = a ++ b
-    def isEmpty[A](a: Vector[A]) = a.isEmpty
-    override def map[A, B](v: Vector[A])(f: A => B) = v map f
-    override def widen[A, B](fa: Vector[A])(implicit ev: A <~< B) = Liskov.co(ev)(fa)
-    override def filter[A](fa: Vector[A])(p: A => Boolean): Vector[A] = fa filter p
-
-    def zip[A, B](a: => Vector[A], b: => Vector[B]): Vector[(A, B)] = {
-      val _a = a
-      if(_a.isEmpty) empty
-      else _a zip b
-    }
-    def unzip[A, B](a: Vector[(A, B)]) = a.unzip
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] with StrictSeqSubtypeCovariant[Vector] {
+    protected[this] override val Factory = Vector
+    protected[this] override def canBuildFrom[A] = Vector.canBuildFrom
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       v.foldLeft(F.point(empty[B])) { (fvb, a) =>
         F.apply2(fvb, f(a))(_ :+ _)
       }
     }
-
-    override def traverseS[S,A,B](v: Vector[A])(f: A => State[S,B]): State[S,Vector[B]] =
-      State((s: S) =>
-        v.foldLeft((s, empty[B]))((acc, a) => {
-          val bs = f(a)(acc._1)
-          (bs._1, acc._2 :+ bs._2)
-        }))
-
-    override def toVector[A](fa: Vector[A]) = fa
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
       var i = fa.length
@@ -58,24 +34,6 @@ trait VectorInstances extends VectorInstances0 {
       r
     }
 
-    def tailrecM[A, B](a: A)(f: A => Vector[A \/ B]): Vector[B] = {
-      val bs = Vector.newBuilder[B]
-      @scala.annotation.tailrec
-      def go(xs: List[Vector[A \/ B]]): Unit =
-        xs match {
-          case Vector(\/-(b), tail @ _*) :: rest =>
-            bs += b
-            go(tail.toVector :: rest)
-          case Vector(-\/(a0), tail @ _*) :: rest =>
-            go(f(a0) :: tail.toVector :: rest)
-          case Vector() :: rest =>
-            go(rest)
-          case Nil =>
-        }
-      go(List(f(a)))
-      bs.result
-    }
-
     def alignWith[A, B, C](f: A \&/ B => C): (Vector[A], Vector[B]) => Vector[C] = { (as, bs) =>
       val sizeA = as.size
       val sizeB = bs.size
@@ -86,24 +44,12 @@ trait VectorInstances extends VectorInstances0 {
           bs.drop(sizeA).map(b => f(\&/.That(b)))
       }
     }
-
-    override def all[A](fa: Vector[A])(f: A => Boolean) =
-      fa forall f
-
-    override def any[A](fa: Vector[A])(f: A => Boolean) =
-      fa exists f
   }
 
-  implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
-    // Vector concat is O(n^2) in Scala 2.10 - it's actually faster to do repeated appends
-    // https://issues.scala-lang.org/browse/SI-7725
-    //
-    // It was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
-    // https://issues.scala-lang.org/browse/SI-4442
-    def append(f1: Vector[A], f2: => Vector[A]) = f2.foldLeft(f1)(_ :+ _)
-    def zero: Vector[A] = Vector.empty
-  }
-
+  // Vector concat was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
+  // https://issues.scala-lang.org/browse/SI-4442
+  implicit def vectorMonoid[A]: Monoid[Vector[A]] = vectorInstance.monoid[A]
+ 
   implicit def vectorShow[A: Show]: Show[Vector[A]] = new Show[Vector[A]] {
     import Cord._
     override def show(as: Vector[A]) =
