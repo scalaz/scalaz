@@ -3,7 +3,10 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] with StrictOrLazySeqSubtypeCovariant[Stream] {
+    protected[this] override val Factory = Stream
+    protected[this] override def canBuildFrom[A] = Stream.canBuildFrom
+
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -14,7 +17,6 @@ trait StreamInstances {
       }
     }
 
-    override def length[A](fa: Stream[A]) = fa.length
     override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
@@ -57,8 +59,6 @@ trait StreamInstances {
     else
       f(fa.head, foldRight(fa.tail, z)(f))
 
-    override def toStream[A](fa: Stream[A]) = fa
-
     override def zipWithL[A, B, C](fa: Stream[A], fb: Stream[B])(f: (A, Option[B]) => C) =
       if(fa.isEmpty) Stream.Empty
       else {
@@ -69,24 +69,7 @@ trait StreamInstances {
     override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
-    override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
-
-    override def map[A, B](fa: Stream[A])(f: A => B): Stream[B] = fa map f
-
-    import Liskov.<~<
-    override def widen[A, B](fa: Stream[A])(implicit ev: A <~< B): Stream[B] = Liskov.co(ev)(fa)
-
-    def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
-    def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
-    def isEmpty[A](s: Stream[A]) = s.isEmpty
-    def point[A](a: => A) = scala.Stream(a)
-    def zip[A, B](a: => Stream[A], b: => Stream[B]) = {
-      val _a = a
-      if(_a.isEmpty) Stream.Empty
-      else _a zip b
-    }
-    def unzip[A, B](a: Stream[(A, B)]) = a.unzip
 
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
       (a, b) =>

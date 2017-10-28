@@ -98,7 +98,6 @@ private[std] trait StrictOrLazySeqSubtypeCovariant[F[+X] <: Seq[X] with GenericT
 
   protected[this] implicit def canBuildFrom[A]: CanBuildFrom[F[_], A, F[A]]
 
-  override final def index[A](fa: F[A], i: Int) = fa.lift.apply(i)
   override final def length[A](fa: F[A]) = fa.length
   override final def point[A](a: => A) = Factory(a)
   override final def bind[A, B](fa: F[A])(f: A => F[B]) = fa flatMap f
@@ -128,6 +127,7 @@ private[std] trait StrictOrLazySeqSubtypeCovariant[F[+X] <: Seq[X] with GenericT
 private[std] trait StrictSeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTemplate[X, F] with SeqLike[X, F[X]]]
     extends StrictOrLazySeqSubtypeCovariant[F] {
   override final def plus[A](a: F[A], b: => F[A]) = a ++ b
+  override final def index[A](fa: F[A], i: Int) = fa.lift.apply(i)
 
   override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
     val bs = canBuildFrom[B].apply()
