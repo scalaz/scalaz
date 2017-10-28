@@ -411,7 +411,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     uncons(EphemeralStream(), (h, t) => EphemeralStream.cons(h, t.toEphemeralStream))
 
   def toList: List[A] =
-    foldRight(Nil : List[A])(_ :: _)
+    Foldable[IList].toList(this)
 
   def toNel: Option[NonEmptyList[A]] =
     uncons(None, (h, t) => Some(NonEmptyList.nel(h, t)))
@@ -426,7 +426,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     IList.show(Show.showA).shows(this) // lame, but helpful for debugging
 
   def toVector: Vector[A] =
-    foldRight(Vector[A]())(_ +: _)
+    Foldable[IList].toVector(this)
 
   def toZipper: Option[Zipper[A]] =
     sToZipper(toStream)
@@ -594,6 +594,8 @@ sealed abstract class IListInstances extends IListInstance0 {
       }
 
       override def toIList[A](fa: IList[A]) = fa
+
+      override def toStream[A](fa: IList[A]) = fa.toStream
 
       override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)
