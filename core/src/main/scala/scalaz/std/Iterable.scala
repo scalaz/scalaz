@@ -1,6 +1,10 @@
 package scalaz
 package std
 
+import collection.SeqLike
+import collection.generic.{CanBuildFrom, SeqFactory, GenericTraversableTemplate}
+import collection.immutable.Seq
+
 trait IterableInstances {
 
   implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
@@ -84,6 +88,60 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
 
   override final def all[A](fa: I[A])(p: A => Boolean): Boolean =
     fa forall p
+}
+
+private[std] trait SeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTemplate[X, F] with SeqLike[X, F[X]]]
+    extends Traverse[F] with MonadPlus[F] with BindRec[F] with Zip[F] with Unzip[F] with IsEmpty[F] {
+  import Liskov.<~<
+
+  protected[this] val Factory: SeqFactory[F]
+
+  protected[this] implicit def canBuildFrom[A]: CanBuildFrom[F[_], A, F[A]]
+
+  override final def index[A](fa: F[A], i: Int) = fa.lift.apply(i)
+  override final def length[A](fa: F[A]) = fa.length
+  override final def point[A](a: => A) = Factory(a)
+  override final def bind[A, B](fa: F[A])(f: A => F[B]) = fa flatMap f
+  override final def empty[A] = Factory.empty
+  override final def plus[A](a: F[A], b: => F[A]) = a ++ b
+  override final def isEmpty[A](fa: F[A]) = fa.isEmpty
+  override final def map[A, B](l: F[A])(f: A => B) = l map f
+  override final def widen[A, B](l: F[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
+  override final def filter[A](fa: F[A])(p: A => Boolean): F[A] = fa filter p
+
+  override final def zip[A, B](a: => F[A], b: => F[B]) = {
+    val _a = a
+    if(_a.isEmpty) empty
+    else _a zip b
+  }
+  override final def unzip[A, B](a: F[(A, B)]) = a.unzip
+
+  override final def traverseS[S,A,B](l: F[A])(f: A => State[S,B]): State[S, F[B]] = {
+    State{s: S =>
+      val buf = canBuildFrom[B].apply(l)
+      var cur = s
+      l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
+      (cur, buf.result)
+    }
+  }
+
+  override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
+    val bs = canBuildFrom[B].apply()
+    @scala.annotation.tailrec
+    def go(xs: List[Seq[A \/ B]]): Unit =
+      xs match {
+        case (\/-(b) +: tail) :: rest =>
+          bs += b
+          go(tail.toVector :: rest)
+        case (-\/(a0) +: tail) :: rest =>
+          go(f(a0) :: tail :: rest)
+        case _ :: rest =>
+          go(rest)
+        case Nil =>
+      }
+    go(List(f(a)))
+    bs.result
+  }
 }
 
 object iterable extends IterableInstances
