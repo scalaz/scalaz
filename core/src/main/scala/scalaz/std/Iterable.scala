@@ -90,7 +90,7 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
     fa forall p
 }
 
-private[std] trait SeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTemplate[X, F] with SeqLike[X, F[X]]]
+private[std] trait StrictOrLazySeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTemplate[X, F] with SeqLike[X, F[X]]]
     extends Traverse[F] with MonadPlus[F] with BindRec[F] with Zip[F] with Unzip[F] with IsEmpty[F] {
   import Liskov.<~<
 
@@ -103,7 +103,6 @@ private[std] trait SeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTe
   override final def point[A](a: => A) = Factory(a)
   override final def bind[A, B](fa: F[A])(f: A => F[B]) = fa flatMap f
   override final def empty[A] = Factory.empty
-  override final def plus[A](a: F[A], b: => F[A]) = a ++ b
   override final def isEmpty[A](fa: F[A]) = fa.isEmpty
   override final def map[A, B](l: F[A])(f: A => B) = l map f
   override final def widen[A, B](l: F[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
@@ -124,6 +123,11 @@ private[std] trait SeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTe
       (cur, buf.result)
     }
   }
+}
+
+private[std] trait StrictSeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTemplate[X, F] with SeqLike[X, F[X]]]
+    extends StrictOrLazySeqSubtypeCovariant[F] {
+  override final def plus[A](a: F[A], b: => F[A]) = a ++ b
 
   override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
     val bs = canBuildFrom[B].apply()
@@ -132,7 +136,7 @@ private[std] trait SeqSubtypeCovariant[F[+X] <: Seq[X] with GenericTraversableTe
       xs match {
         case (\/-(b) +: tail) :: rest =>
           bs += b
-          go(tail.toVector :: rest)
+          go(tail :: rest)
         case (-\/(a0) +: tail) :: rest =>
           go(f(a0) :: tail :: rest)
         case _ :: rest =>
