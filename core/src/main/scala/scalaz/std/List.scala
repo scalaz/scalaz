@@ -11,7 +11,7 @@ trait ListInstances0 {
 
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
+    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
       import Liskov.<~<
 
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
@@ -76,8 +76,6 @@ trait ListInstances extends ListInstances0 {
         })
       }
 
-      override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
-
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
         val s = new ArrayStack[A]
@@ -90,8 +88,6 @@ trait ListInstances extends ListInstances0 {
         }
         r
       }
-
-      override def toList[A](fa: List[A]) = fa
 
       def isEmpty[A](fa: List[A]) = fa.isEmpty
 
@@ -106,12 +102,6 @@ trait ListInstances extends ListInstances0 {
           case Nil => Nil
           case _::t => a :: cojoin(t)
         }
-
-      override def any[A](fa: List[A])(p: A => Boolean): Boolean =
-        fa.exists(p)
-
-      override def all[A](fa: List[A])(p: A => Boolean): Boolean =
-        fa.forall(p)
 
       def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
         val bs = List.newBuilder[B]

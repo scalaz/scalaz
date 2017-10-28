@@ -46,29 +46,44 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
-    def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
+  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] =
+    new IterableSubtypeFoldable[I] {}
+}
 
-    def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
+private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable[I] {
+  import collection.generic.CanBuildFrom
 
-    override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+  override def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
 
-    override def length[A](a: I[A]) = {
-      var n = 0
-      val i = a.iterator
-      while (i.hasNext) {
-        n = n + 1
-        i.next
-      }
-      n
+  override def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
+
+  override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+  override def length[A](a: I[A]) = {
+    var n = 0
+    val i = a.iterator
+    while (i.hasNext) {
+      n = n + 1
+      i.next
     }
-
-    override def any[A](fa: I[A])(p: A => Boolean): Boolean =
-      fa.exists(p)
-
-    override def all[A](fa: I[A])(p: A => Boolean): Boolean =
-      fa.forall(p)
+    n
   }
+
+  override final def toList[A](fa: I[A]) = fa.toList
+  override final def toVector[A](fa: I[A]) = fa.toVector
+  override final def toSet[A](fa: I[A]) = fa.toSet
+  override final def toStream[A](fa: I[A]) = fa.toStream
+
+  override final def to[A, G[_]](fa: I[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
+    fa.to[G]
+
+  override final def empty[A](fa: I[A]) = fa.isEmpty
+
+  override final def any[A](fa: I[A])(p: A => Boolean): Boolean =
+    fa.exists(p)
+
+  override final def all[A](fa: I[A])(p: A => Boolean): Boolean =
+    fa.forall(p)
 }
 
 object iterable extends IterableInstances
