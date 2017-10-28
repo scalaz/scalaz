@@ -79,10 +79,7 @@ trait ListInstances extends ListInstances0 {
         }
     }
 
-  implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
-    def append(f1: List[A], f2: => List[A]) = f1 ::: f2
-    def zero: List[A] = Nil
-  }
+  implicit def listMonoid[A]: Monoid[List[A]] = listInstance.monoid[A]
 
   implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
     override def show(as: List[A]) = {

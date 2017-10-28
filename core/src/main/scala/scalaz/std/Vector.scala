@@ -46,16 +46,10 @@ trait VectorInstances extends VectorInstances0 {
     }
   }
 
-  implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
-    // Vector concat is O(n^2) in Scala 2.10 - it's actually faster to do repeated appends
-    // https://issues.scala-lang.org/browse/SI-7725
-    //
-    // It was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
-    // https://issues.scala-lang.org/browse/SI-4442
-    def append(f1: Vector[A], f2: => Vector[A]) = f2.foldLeft(f1)(_ :+ _)
-    def zero: Vector[A] = Vector.empty
-  }
-
+  // Vector concat was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
+  // https://issues.scala-lang.org/browse/SI-4442
+  implicit def vectorMonoid[A]: Monoid[Vector[A]] = vectorInstance.monoid[A]
+ 
   implicit def vectorShow[A: Show]: Show[Vector[A]] = new Show[Vector[A]] {
     import Cord._
     override def show(as: Vector[A]) =

@@ -115,10 +115,7 @@ trait StreamInstances {
       }
     }
 
-  implicit def streamMonoid[A]: Monoid[Stream[A]] = new Monoid[Stream[A]] {
-    def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
-    def zero: Stream[A] = scala.Stream.empty
-  }
+  implicit def streamMonoid[A]: Monoid[Stream[A]] = streamInstance.monoid[A]
 
   implicit def streamEqual[A](implicit A0: Equal[A]): Equal[Stream[A]] =
     new StreamEqual[A] { def A = A0 }
