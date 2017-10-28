@@ -12,7 +12,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
     override def index[A](fa: Vector[A], i: Int) = fa.lift.apply(i)
     override def length[A](fa: Vector[A]) = fa.length
     def point[A](a: => A) = empty :+ a
@@ -43,8 +43,6 @@ trait VectorInstances extends VectorInstances0 {
           val bs = f(a)(acc._1)
           (bs._1, acc._2 :+ bs._2)
         }))
-
-    override def toVector[A](fa: Vector[A]) = fa
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
       var i = fa.length
@@ -86,12 +84,6 @@ trait VectorInstances extends VectorInstances0 {
           bs.drop(sizeA).map(b => f(\&/.That(b)))
       }
     }
-
-    override def all[A](fa: Vector[A])(f: A => Boolean) =
-      fa forall f
-
-    override def any[A](fa: Vector[A])(f: A => Boolean) =
-      fa exists f
   }
 
   implicit def vectorMonoid[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {

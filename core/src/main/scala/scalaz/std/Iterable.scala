@@ -80,10 +80,10 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
   override final def empty[A](fa: I[A]) = fa.isEmpty
 
   override final def any[A](fa: I[A])(p: A => Boolean): Boolean =
-    fa.exists(p)
+    fa exists p
 
   override final def all[A](fa: I[A])(p: A => Boolean): Boolean =
-    fa.forall(p)
+    fa forall p
 }
 
 object iterable extends IterableInstances
