@@ -48,7 +48,7 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): WriterT[F, W, B] =
     writerT(F.map(run)(wa => (wa._1, f(wa._2))))
 
-  def mapF[B](f: A => F[B])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] = writerT {
+  def mapF[B](f: A => F[B])(implicit F: Bind[F]): WriterT[F, W, B] = writerT {
     F.bind(run)(wa => F.map(f(wa._2))(a => (wa._1, a)))
   }
 
@@ -285,9 +285,9 @@ trait WriterTFunctions {
   def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = WriterT(v)
 
   def writerTU[FAB, AB, A0, B0](fab: FAB)(implicit
-    u1: Unapply[Functor, FAB]{type A = AB},
-    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-    l: Leibniz.===[AB, (A0, B0)]
+                                          u1: Unapply[Functor, FAB]{type A = AB},
+                                          @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+                                          l: Leibniz.===[AB, (A0, B0)]
   ): WriterT[u1.M, A0, B0] = WriterT(l.subst[u1.M](u1(fab)))
 
   def writer[W, A](v: (W, A)): Writer[W, A] =

@@ -36,7 +36,7 @@ sealed abstract class Dequeue[A] {
       val xsr = reverseNEL(OneAnd(xx, xs))
       Just((f, FullDequeue(xsr, bs-1, OneAnd(x, IList.empty), 1)))
     }
-    case FullDequeue(OneAnd(f, ICons(ff, fs)), s, back, bs) => Just(f, FullDequeue(OneAnd(ff, fs), s-1, back, bs))
+    case FullDequeue(OneAnd(f, ICons(ff, fs)), s, back, bs) => Just((f, FullDequeue(OneAnd(ff, fs), s - 1, back, bs)))
   }
 
   /**

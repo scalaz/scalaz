@@ -41,7 +41,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
 
   def contramap[B](f: B => A): Actor[B] = new Actor[B](b => this ! f(b), onError)(strategy)
 
-  private def schedule(n: Node[A]): Unit = strategy(act(n))
+  private def schedule(n: Node[A]) = { val _ = strategy(act(n)) }
 
   @annotation.tailrec
   private def act(n: Node[A], i: Int = 1024): Unit = {
@@ -54,7 +54,7 @@ final case class Actor[A](handler: A => Unit, onError: Throwable => Unit = Actor
     else act(n2, i - 1)
   }
 
-  private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
+  private def scheduleLastTry(n: Node[A]) = { val _ = strategy(lastTry(n)) }
 
   private def lastTry(n: Node[A]): Unit = if (!head.compareAndSet(n, null)) act(next(n))
 

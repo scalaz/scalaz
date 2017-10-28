@@ -34,7 +34,7 @@ import scala.reflect.ClassTag
 sealed abstract class Validation[+E, +A] extends Product with Serializable {
 
   final class SwitchingValidation[X](s: => X){
-    def <<?:(fail: => X): X =
+    def <<?:(fail: X): X =
       Validation.this match {
         case Failure(_) => fail
         case Success(_) => s
@@ -131,7 +131,7 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   }
 
   /** Run the side-effect on the success of this validation. */
-  def foreach[U](f: A => U): Unit = this match {
+  def foreach(f: A => Unit): Unit = this match {
     case Success(a) => f(a)
     case Failure(_) =>
   }
@@ -410,7 +410,7 @@ object Validation extends ValidationInstances {
   def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
     lift(a)(f, fail).toValidationNel
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
+  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])

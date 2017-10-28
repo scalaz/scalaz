@@ -421,11 +421,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _     , Nil)       => None
-        case (l, x     , r::rs)     => lookupr((x::l, r, rs))
+        case (l, x     , r::rs)     => lookupr((x :: l, r, rs))
       }
     plens {
       case Nil => None
-      case h :: t => lookupr(Nil, h, t) map {
+      case h :: t => lookupr((Nil, h, t)) map {
         case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
       }
     }
@@ -464,7 +464,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       }
     plens {
       case INil() => None
-      case ICons(h, t) => lookupr(INil(), h, t) map {
+      case ICons(h, t) => lookupr((IList.empty, h, t)) map {
         case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
       }
     }
@@ -512,11 +512,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k)    => Some(t)
         case (_, _     , Stream.Empty) => None
-        case (l, x     , r #:: rs)     => lookupr(x #:: l, r, rs)
+        case (l, x     , r #:: rs)     => lookupr((x #:: l, r, rs))
       }
     plens {
       case Stream.Empty => None
-      case h #:: t => lookupr(Stream.empty, h, t) map {
+      case h #:: t => lookupr((Stream.empty, h, t)) map {
         case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
       }
     }

@@ -642,7 +642,6 @@ sealed abstract class ISetInstances {
   }
 
   implicit def setOrder[A: Order]: Order[ISet[A]] = new Order[ISet[A]] with ISetEqual[A] {
-    import std.list._
     def A = implicitly
 
     def order(x: ISet[A], y: ISet[A]) =
@@ -661,6 +660,7 @@ sealed abstract class ISetInstances {
           case x :: Nil =>
             buf.append(A.shows(x))
             buf.append(')')
+            ()
           case x :: xs =>
             buf.append(A.shows(x))
             buf.append(',')

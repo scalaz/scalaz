@@ -442,7 +442,7 @@ object ScalazProperties {
     def rightFMConsistent[F[_], A](implicit F: Foldable[F], afa: Arbitrary[F[A]], ea: Equal[A]): Prop =
       forAll(F.foldableLaw.rightFMConsistent[A] _)
 
-    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F], EA: Equal[Int]): Properties =
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]): Properties =
       newProperties("foldable") { p =>
         p.property("consistent left fold") = leftFMConsistent[F, Int]
         p.property("consistent right fold") = rightFMConsistent[F, Int]
@@ -459,7 +459,7 @@ object ScalazProperties {
       forAll(F.foldable1Law.rightFM1Consistent[A] _)
 
     def laws[F[_]](implicit fa: Arbitrary[F[Int]],
-                   F: Foldable1[F], EA: Equal[Int]): Properties =
+                   F: Foldable1[F]): Properties =
       newProperties("foldable1") { p =>
         p.include(foldable.laws[F])
         p.property("consistent left fold1") = leftFM1Consistent[F, Int]

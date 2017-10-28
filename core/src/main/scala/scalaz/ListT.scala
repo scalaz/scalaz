@@ -8,7 +8,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
   def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
     M.map(run) {
       case INil() => None
-      case ICons(listHead, listTail) => Some(listHead, new ListT(M.point(listTail)))
+      case ICons(listHead, listTail) => Some((listHead, new ListT(M.point(listTail))))
     }
   }
 
