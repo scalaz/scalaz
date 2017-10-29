@@ -64,7 +64,7 @@ sealed abstract class EphemeralStream[A] {
     foldRight[EphemeralStream[B]](emptyEphemeralStream)((h, t) => f(h) ++ t)
 
   def map[B](f: A => B): EphemeralStream[B] =
-    flatMap(x => EphemeralStream(f(x)))
+    foldRight[EphemeralStream[B]](emptyEphemeralStream)((h, t) => cons(f(h), t))
 
   def length =
     foldLeft(0)((c, _) => 1 + c)
