@@ -124,10 +124,19 @@ object build {
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
+  private[this] val buildInfoPackageName = "scalaz"
+
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
-      (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
+      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
+      val buildInfoDir = "sbt-buildinfo"
+      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
+        (file(buildInfoPackageName) / f.relativeTo((sourceManaged in Compile).value / buildInfoDir).get.getPath).getPath
+      } else {
+        f.relativeTo((sourceManaged in Compile).value).get.getPath
+      }
+      (f, path)
     },
     scalaVersion := Scala212,
     crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M2"),
@@ -283,7 +292,7 @@ object build {
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := "scalaz",
+      buildInfoPackage := buildInfoPackageName,
       buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
