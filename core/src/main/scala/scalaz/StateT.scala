@@ -152,6 +152,11 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
       implicit def F: Monad[F] = F0
       implicit def B: BindRec[F] = F1
     }
+
+  implicit def stateTMonadError[S, F[_], E](implicit F0: MonadError[F, E]): MonadError[StateT[F, S, ?], E] =
+    new StateTMonadError[S, F, E] {
+      implicit def F: MonadError[F, E] = F0
+    }
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
@@ -260,6 +265,22 @@ private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] w
   override def modify(f: S => S): StateT[F, S, Unit] = StateT(s => F.point((f(s), ())))
 
   override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
+}
+
+private trait StateTMonadError[S, F[_], E] extends MonadError[StateT[F, S, ?], E] {
+  implicit def F: MonadError[F, E]
+
+  override def raiseError[A](e: E): StateT[F, S, A] =
+    StateT(_ => F.raiseError(e))
+
+  override def handleError[A](fa: StateT[F, S, A])(f: (E) => StateT[F, S, A]): StateT[F, S, A] =
+    StateT(s => F.handleError(fa(s))(f(_)(s)))
+
+  override def bind[A, B](fa: StateT[F, S, A])(f: (A) => StateT[F, S, B]): StateT[F, S, B] =
+    fa flatMap f
+
+  override def point[A](a: => A): StateT[F, S, A] =
+    StateT(s => F.point((s, a)))
 }
 
 private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
