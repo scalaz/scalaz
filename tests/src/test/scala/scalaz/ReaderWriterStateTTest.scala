@@ -11,8 +11,21 @@ object ReaderWriterStateTTest extends SpecLite {
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
   }
 
+  private[this] implicit val RWSEitherIntEqual: Equal[RWST[Either[Int, ?], Int, Int, Int, Int]] =
+    Equal.equal[RWST[Either[Int, ?], Int, Int, Int, Int]] { (a1, a2) =>
+      (1 to 5).forall{ x =>
+        (1 to 5).forall{ y =>
+          Equal[Either[Int, (Int, Int, Int)]].equal(a1.run(x, y), a2.run(x, y))
+        }
+      }
+    }
+
+  private[this] type EitherInt[A] = Either[Int, A]
+  private[this] type RWSTEitherInt[A] = RWST[EitherInt, Int, Int, Int, A]
+
   checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
+  checkAll(monadError.laws[RWSTEitherInt, Int])
 
   "ReaderWriterStateT can be trampolined without stack overflow" in {
     import scalaz.Free._
