@@ -12,11 +12,17 @@ object StateTTest extends SpecLite {
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
 
+  private[this] implicit def stateTEitherEqual: Equal[StateT[Either[Int, ?], Int, Int]] =
+    Equal[List[Either[Int, (Int, Int)]]].contramap{ s: StateT[Either[Int, ?], Int, Int] =>
+      (1 to 10).map(s.run(_)).toList
+    }
+
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
   checkAll(profunctor.laws[IStateTList])
   checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
+  checkAll(monadError.laws[StateT[Either[Int, ?], Int, ?], Int])
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
