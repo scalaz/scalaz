@@ -1,5 +1,7 @@
 package scalaz
 package typeclass
+import com.github.ghik.silencer.silent
+
 import scala.language.implicitConversions
 import scala.language.experimental.macros
 
@@ -9,7 +11,7 @@ trait ComonadSyntax {
 }
 
 object ComonadSyntax {
-  class Ops[F[_], A](self: F[A])(implicit F: Comonad[F]) {
+  class Ops[F[_]: Comonad, A](@silent self: F[A]) {
     def copoint: A = macro meta.Ops._f0[A]
   }
 }

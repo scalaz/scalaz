@@ -6,8 +6,10 @@ import data._
 import scala.language.implicitConversions
 
 trait Prelude  extends data.DisjunctionFunctions
+                  with data.ForallSyntax
+                  with data.Forall2Syntax
                   with data.IdentityTypes
-                  with data.MaybeFunctions
+                  with data.MaybePrelude
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
                   with typeclass.InvariantFunctorFunctions
@@ -28,6 +30,8 @@ trait Prelude  extends data.DisjunctionFunctions
   type InvariantFunctor[F[_]] = typeclass.InvariantFunctor[F]
   type Comonad[F[_]] = typeclass.Comonad[F]
   type Cobind[F[_]] = typeclass.Cobind[F]
+  type IsCovariant[F[_]] = typeclass.IsCovariant[F]
+  type IsContravariant[F[_]] = typeclass.IsContravariant[F]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -43,6 +47,9 @@ trait Prelude  extends data.DisjunctionFunctions
   def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
   def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
   def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
+  def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
+  def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
+
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
 
@@ -95,8 +102,18 @@ trait Prelude  extends data.DisjunctionFunctions
   type \/[L, R] = data.Disjunction.\/[L, R]
   type ===[A, B] = data.===[A, B]
   type Identity[A] = data.Identity[A]
-  type Maybe[A] = data.Maybe[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
+
+  val Forall : data.Forall.type = data.Forall
+  val ∀      : data.Forall.type = data.Forall
+  type Forall[F[_]]             = Forall.Forall[F]
+  type ∀[F[_]]                  = Forall.Forall[F]
+
+  val Forall2 : data.Forall2.type = data.Forall2
+  val ∀∀      : data.Forall2.type = data.Forall2
+  type Forall2[F[_, _]]           = Forall2.Forall2[F]
+  type ∀∀[F[_, _]]                = Forall2.Forall2[F]
+
 }
 
 object Prelude extends Prelude

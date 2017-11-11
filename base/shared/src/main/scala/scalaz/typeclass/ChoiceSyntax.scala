@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import com.github.ghik.silencer.silent
+
 import scala.language.implicitConversions
 import scala.language.experimental.macros
 import data.Disjunction._
@@ -11,7 +13,7 @@ trait ChoiceSyntax {
 }
 
 object ChoiceSyntax {
-  class Ops[P[_, _], A, B](self: P[A, B])(implicit P: Choice[P]) {
+  class Ops[P[_, _]: Choice, A, B](@silent self: P[A, B]) {
    
     def leftchoice[C]: P[A \/ C, B \/ C] = macro meta.Ops._f0[P[A \/ C, B \/ C]]
 
