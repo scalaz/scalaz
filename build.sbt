@@ -23,6 +23,11 @@ lazy val bazeJS       = baze.js
 
 lazy val effect       = crossProject.in(file("effect"))
   .settings(stdSettings("effect"))
+  .settings(
+    libraryDependencies ++=
+      Seq ( "org.specs2" %%% "specs2-core"           % "4.0.0" % "test"
+          , "org.specs2" %%% "specs2-matcher-extra"  % "4.0.0" % "test"),
+      scalacOptions in Test ++= Seq("-Yrangepos"))
   .dependsOn( baze )
 
 lazy val effectJVM    = effect.jvm
@@ -37,8 +42,8 @@ lazy val benchmarks   = module("benchmarks")
       Seq ( "org.scala-lang"  %  "scala-reflect"  % scalaVersion.value
           , "org.scala-lang"  %  "scala-compiler" % scalaVersion.value % "provided"
           , "org.scalaz"      %% "scalaz-core"    % "7.2.7"
-          , "io.monix"        %% "monix"          % "2.3.0"
-          , "org.typelevel"   %% "cats-effect"    % "0.3")
+          , "io.monix"        %% "monix"          % "3.0.0-M1"
+          , "org.typelevel"   %% "cats-effect"    % "0.4")
   )
 
 lazy val meta         = crossProject.in(file("meta"))
