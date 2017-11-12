@@ -574,12 +574,12 @@ object MapTest extends SpecLite {
 
     "mapAccum" in {
       val f = (a: String, b: String) => (a + b, b + "X")
-      fromList(List(5 -> "a", 3 -> "b")).mapAccum("Everything: ")(f) must_===("Everything: ba", fromList(List(3 -> "bX", 5 -> "aX")))
+      fromList(List(5 -> "a", 3 -> "b")).mapAccum("Everything: ")(f) must_===("Everything: ba" -> fromList(List(3 -> "bX", 5 -> "aX")))
     }
 
     "mapAccumWithKey" in {
       val f = (a: String, k: Int, b: String) => (a + " " + k.toString + "-" + b, b + "X")
-      fromList(List(5 -> "a", 3 -> "b")).mapAccumWithKey("Everything:")(f) must_===("Everything: 3-b 5-a", fromList(List(3 -> "bX", 5 -> "aX")))
+      fromList(List(5 -> "a", 3 -> "b")).mapAccumWithKey("Everything:")(f) must_===("Everything: 3-b 5-a" -> fromList(List(3 -> "bX", 5 -> "aX")))
     }
 
     "mapKeys" in {
@@ -625,8 +625,8 @@ object MapTest extends SpecLite {
       val f = (k: Int, a: String) => if (k < 5) \/.left(k * 2) else \/.right(a + a)
       val lst = fromList(List(5 -> "a", 3 -> "b", 1 -> "x", 7 -> "z"))
 
-      lst.mapEitherWithKey(f) must_===(fromList(List(1 -> 2, 3 -> 6)), fromList(List(5 -> "aa", 7 -> "zz")))
-      lst.mapEitherWithKey((_: Int, a: String) => \/.right(a)) must_===(empty[Int, String], lst)
+      lst.mapEitherWithKey(f) must_===(fromList(List(1 -> 2, 3 -> 6)) -> fromList(List(5 -> "aa", 7 -> "zz")))
+      lst.mapEitherWithKey((_: Int, a: String) => \/.right(a)) must_===(empty[Int, String] -> lst)
     }
   }
 

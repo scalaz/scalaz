@@ -84,14 +84,14 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
     val mWithNew = m0 + (k -> vNew)
 
     // not already in map
-    getOrAdd[Id.Id, Int, Long](mWithout, k)(vNew) must_=== (mWithNew, vNew)
+    getOrAdd[Id.Id, Int, Long](mWithout, k)(vNew) must_=== (mWithNew -> vNew)
 
     // already in map
-    getOrAdd[Id.Id, Int, Long](mWithOld, k)(vNew) must_=== (mWithOld, vOld)
+    getOrAdd[Id.Id, Int, Long](mWithOld, k)(vNew) must_=== (mWithOld -> vOld)
 
     // lazy
     var evaluated = false
-    getOrAdd[Id.Id, Int, Long](mWithOld, k)({evaluated = true; vNew}) must_=== (mWithOld, vOld)
+    getOrAdd[Id.Id, Int, Long](mWithOld, k)({evaluated = true; vNew}) must_=== (mWithOld -> vOld)
     evaluated must_=== false
   }
 }
