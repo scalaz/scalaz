@@ -26,7 +26,7 @@ object MVarTest extends SpecLite {
         b <- in.take
       } yield (a, b)
 
-      run.unsafePerformIO must_== ("one", "two")
+      run.unsafePerformIO must_== ("one" -> "two")
     }
   }
 }
