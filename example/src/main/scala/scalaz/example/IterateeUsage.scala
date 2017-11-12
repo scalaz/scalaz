@@ -59,5 +59,5 @@ object IterateeUsage extends App {
   ((colc &= r).map(_ flatMap (_.toOption)).run unsafePerformIO()) assert_=== List('f', 'i', 'l', 'e')
 
   val take10And5ThenHead = take[Int, List](10) zip take[Int, List](5) flatMap (ab => head[Int, Id] map (h => (ab, h)))
-  (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_=== (((1 to 10).toList, (1 to 5).toList), Some(11))
+  (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_=== (((1 to 10).toList -> (1 to 5).toList) -> Some(11))
 }
