@@ -21,6 +21,12 @@ sealed abstract class ZapInstances {
       def zapWith[A, B, C](a: A, b: B)(f: (A, B) => C): C = f(a, b)
     }
 
+  implicit def functorPairsZap[F1[_], F2[_], G1[_], G2[_]](implicit zf: Zap[F1, F2], zg: Zap[G1, G2]): Zap[λ[α => F1[G1[α]]], λ[α => F2[G2[α]]]] =
+    new Zap[λ[α => F1[G1[α]]], λ[α => F2[G2[α]]]] {
+      override def zapWith[A, B, C](c1: F1[G1[A]], c2: F2[G2[B]])(f: (A, B) => C): C =
+        zf.zapWith(c1, c2)(zg.zapWith(_, _)(f))
+    }
+
   /** The product of two functors annihilates their coproduct. */
   implicit def productCoproductZap[F[_], FF[_], G[_], GG[_]](implicit d1: Zap[F, FF], d2: Zap[G, GG]): Zap[λ[α => (F[α] \/ G[α])], λ[α => (FF[α], GG[α])]] =
     new Zap[λ[α => (F[α] \/ G[α])], λ[α => (FF[α], GG[α])]] {
