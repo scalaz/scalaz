@@ -14,6 +14,7 @@ object DisjunctionTest extends SpecLite {
   checkAll(monadError.laws[Int \/ ?, Int])
   checkAll(plus.laws[Int \/ ?])
   checkAll(traverse.laws[Int \/ ?])
+  checkAll(zip.laws[String \/ ?])
   checkAll(bitraverse.laws[\/])
   checkAll(associative.laws[\/])
   checkAll(band.laws[ISet[Int] \/ MaxMaybe[Int]])
