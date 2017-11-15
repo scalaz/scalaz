@@ -28,8 +28,8 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
     def attemptComplete(t: Try[(A, Int)]): Unit = {
       val remaining = counter.decrementAndGet
       t match {
-        case TSuccess(_) => result tryComplete t
-        case _ if remaining == 0 => result tryComplete t
+        case TSuccess(_) => val _ = result tryComplete t
+        case _ if remaining == 0 => val _ = result tryComplete t
         case _ =>
       }
     }

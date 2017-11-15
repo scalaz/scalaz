@@ -148,14 +148,14 @@ object ListTest extends SpecLite {
     (xs: List[Int]) =>
       val f = (_: Int) + 1
       xs.mapAccumLeft(List[Int](), (c: List[Int], a) =>
-        (c :+ a, f(a))) must_===(xs, xs.map(f))
+        (c :+ a, f(a))) must_===(xs -> xs.map(f))
   }
 
   "mapAccumRight" ! forAll {
     (xs: List[Int]) =>
       val f = (_: Int) + 1
       xs.mapAccumRight(List[Int](), (c: List[Int], a) =>
-        (c :+ a, f(a))) must_===(xs.reverse, xs.map(f))
+        (c :+ a, f(a))) must_===(xs.reverse -> xs.map(f))
   }
 
   checkAll(FoldableTests.anyAndAllLazy[List])

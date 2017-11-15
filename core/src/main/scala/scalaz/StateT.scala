@@ -91,7 +91,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(implicit F: Functor[F]): IndexedStateT[F, S0, S3, A] =
     mapsf(sf => (s0:S0) => F.map(sf(l get s0))(t => (l.set(s0, t._1), t._2)))
 
-  def liftF[S <: S1](implicit F: Functor[IndexedStateT[F, S, S2, ?]]): Free[IndexedStateT[F, S, S2, ?], A] =
+  def liftF[S <: S1]: Free[IndexedStateT[F, S, S2, ?], A] =
     Free.liftF[IndexedStateT[F, S, S2, ?], A](self)
 
   def mapsf[X1, X2, B](f: (S1 => F[(S2, A)]) => (X1 => F[(X2, B)])): IndexedStateT[F, X1, X2, B] =
@@ -160,6 +160,11 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
     new StateTBindRec[S, F] {
       implicit def F: Monad[F] = F0
       implicit def B: BindRec[F] = F1
+    }
+
+  implicit def stateTMonadError[S, F[_], E](implicit F0: MonadError[F, E]): MonadError[StateT[F, S, ?], E] =
+    new StateTMonadError[S, F, E] {
+      implicit def F: MonadError[F, E] = F0
     }
 }
 
@@ -254,7 +259,7 @@ private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] w
 
   def point[A](a: => A): StateT[F, S, A] = {
     val aa = Need(a)
-    StateT(s => F.point(s, aa.value))
+    StateT(s => F.point((s, aa.value)))
   }
 
   def get: StateT[F, S, S] = StateT(s => F.point((s, s)))
@@ -266,16 +271,32 @@ private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] w
   override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
 }
 
+private trait StateTMonadError[S, F[_], E] extends MonadError[StateT[F, S, ?], E] {
+  implicit def F: MonadError[F, E]
+
+  override def raiseError[A](e: E): StateT[F, S, A] =
+    StateT(_ => F.raiseError(e))
+
+  override def handleError[A](fa: StateT[F, S, A])(f: (E) => StateT[F, S, A]): StateT[F, S, A] =
+    StateT(s => F.handleError(fa(s))(f(_)(s)))
+
+  override def bind[A, B](fa: StateT[F, S, A])(f: (A) => StateT[F, S, B]): StateT[F, S, B] =
+    fa flatMap f
+
+  override def point[A](a: => A): StateT[F, S, A] =
+    StateT(s => F.point((s, a)))
+}
+
 private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
 
-  type StateTF[G[_], S] = {
+  type StateTF[G[_]] = {
     type f[x] = StateT[G, S, x]
   }
 
   def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
     StateT(s => G.map(ga)(a => (s, a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateTF[M, S]#f ~> StateTF[N, S]#f](_ mapT f)
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateTF[M]#f ~> StateTF[N]#f](_ mapT f)
 
   implicit def apply[G[_] : Monad]: Monad[StateT[G, S, ?]] = StateT.stateTMonadState[S, G]
 }

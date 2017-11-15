@@ -173,7 +173,7 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
-  def fromTryCatchThrowable[T, E](a: => T)(implicit ev: E <~< Throwable, nn: NotNothing[E], ex: ClassTag[E]): Maybe[T] = try {
+  def fromTryCatchThrowable[T, E: NotNothing: ? <~< Throwable](a: => T)(implicit ex: ClassTag[E]): Maybe[T] = try {
     just(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => empty

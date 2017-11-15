@@ -31,7 +31,7 @@ object BifunctorUsage extends App {
   //
 
   // For a tuple, the result of bimap is obvious:
-  assert(Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _+1) === ("ASDF", 2))
+  assert(Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _+1) === ("ASDF" -> 2))
 
   // For sum types, which function is applied depends on what value is present:
   assert(Bifunctor[Either].bimap(Left("asdf") : Either[String,Int])(_.toUpperCase, _+1) === (Left("ASDF")))
@@ -44,7 +44,7 @@ object BifunctorUsage extends App {
   assert(Bifunctor[\/].bimap(1.right[String])(_.toUpperCase, _+1) === 2.right)
 
   // There is syntax for bimap:
-  assert(("asdf",1).bimap(_.length, _+1) === (4,2))
+  assert(("asdf",1).bimap(_.length, _+1) === (4 -> 2))
 
   // Bifunctors are covariant in both their type parameters, which is expressed by widen
   assert(("asdf", 1).widen[Any, Any].isInstanceOf[(Any, Any)])
@@ -54,12 +54,12 @@ object BifunctorUsage extends App {
   //
 
   // There are functions to only map the "right" or "left" value only:
-  assert(Bifunctor[Tuple2].leftMap(("asdf", 1))(_.substring(1)) === ("sdf", 1))
-  assert(Bifunctor[Tuple2].rightMap(("asdf", 1))(_ + 3) === ("asdf", 4))
+  assert(Bifunctor[Tuple2].leftMap(("asdf", 1))(_.substring(1)) === ("sdf" -> 1))
+  assert(Bifunctor[Tuple2].rightMap(("asdf", 1))(_ + 3) === ("asdf" -> 4))
 
   // These come with syntax.
   assert(1.success[String].rightMap(_ + 10) === 11.success)
-  assert(("a", 1).rightMap(_ + 10) === ("a",11))
+  assert(("a", 1).rightMap(_ + 10) === ("a" -> 11))
 
   // and some even fancier syntax
   val two = 1.success[String] :-> (_ + 1)
@@ -68,11 +68,11 @@ object BifunctorUsage extends App {
   // On the left side, the type inference can be bad, so that we are
   // forced to be explicit about the types on the function we leftMap.
   val strlen: String => Int = _.length
-  assert((strlen <-: ("asdf", 1)) === (4,1))
-  assert((((_:String).length) <-: ("asdf", 1)) === (4,1))
+  assert((strlen <-: ("asdf", 1)) === (4 -> 1))
+  assert((((_:String).length) <-: ("asdf", 1)) === (4 -> 1))
 
   val fourTwo = strlen <-: ("asdf", 1) :-> (_ + 1)
-  assert(fourTwo === (4,2))
+  assert(fourTwo === (4 -> 2))
 
   //
   // Functor composition
@@ -105,8 +105,8 @@ object BifunctorUsage extends App {
 
   // If we have an F[A,A] (instead of F[A,B] with A and B different)
   // we can extract a "unified functor" which is a functor,
-  assert(Bifunctor[Tuple2].uFunctor.map((2,3))(_ * 3) === (6,9))
+  assert(Bifunctor[Tuple2].uFunctor.map((2,3))(_ * 3) === (6 -> 9))
 
   // or skip the step of extracting the unified functor using the umap method.
-  assert(Bifunctor[Tuple2].umap((2,3))(_ * 3) === (6,9))
+  assert(Bifunctor[Tuple2].umap((2,3))(_ * 3) === (6 -> 9))
 }

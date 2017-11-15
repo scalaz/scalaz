@@ -31,12 +31,12 @@ sealed abstract class Dequeue[A] {
   def uncons: Maybe[(A, Dequeue[A])] = this match {
     case EmptyDequeue() => Maybe.empty
     case SingletonDequeue(a) => Just((a, EmptyDequeue()))
-    case FullDequeue(OneAnd(f, INil()), 1, OneAnd(single,INil()), 1) => Just((f, SingletonDequeue(single)))
-    case FullDequeue(OneAnd(f, INil()), 1, OneAnd(x, ICons(xx, xs)), bs) => {
-      val xsr = reverseNEL(OneAnd(xx, xs))
-      Just((f, FullDequeue(xsr, bs-1, OneAnd(x, IList.empty), 1)))
+    case FullDequeue(NonEmptyList(f, INil()), 1, NonEmptyList(single,INil()), 1) => Just((f, SingletonDequeue(single)))
+    case FullDequeue(NonEmptyList(f, INil()), 1, NonEmptyList(x, ICons(xx, xs)), bs) => {
+      val xsr = reverseNEL(NonEmptyList.nel(xx, xs))
+      Just((f, FullDequeue(xsr, bs-1, NonEmptyList.nel(x, IList.empty), 1)))
     }
-    case FullDequeue(OneAnd(f, ICons(ff, fs)), s, back, bs) => Just(f, FullDequeue(OneAnd(ff, fs), s-1, back, bs))
+    case FullDequeue(NonEmptyList(f, ICons(ff, fs)), s, back, bs) => Just((f, FullDequeue(NonEmptyList.nel(ff, fs), s - 1, back, bs)))
   }
 
   /**
@@ -45,13 +45,13 @@ sealed abstract class Dequeue[A] {
   def unsnoc: Maybe[(A, Dequeue[A])] = this match {
     case EmptyDequeue() => Maybe.empty
     case SingletonDequeue(a) => Just((a, EmptyDequeue()))
-    case FullDequeue(OneAnd(single, INil()), 1, OneAnd(b, INil()), 1) => Just((b, SingletonDequeue(single)))
-    case FullDequeue(OneAnd(x, ICons(xx,xs)), fs, OneAnd(b, INil()), 1) => {
-      val xsr = reverseNEL(OneAnd(xx, xs))
-      Just((b, FullDequeue(OneAnd(x, IList.empty), 1, xsr, fs-1)))
+    case FullDequeue(NonEmptyList(single, INil()), 1, NonEmptyList(b, INil()), 1) => Just((b, SingletonDequeue(single)))
+    case FullDequeue(NonEmptyList(x, ICons(xx,xs)), fs, NonEmptyList(b, INil()), 1) => {
+      val xsr = reverseNEL(NonEmptyList.nel(xx, xs))
+      Just((b, FullDequeue(NonEmptyList.nel(x, IList.empty), 1, xsr, fs-1)))
     }
 
-    case FullDequeue(front, fs, OneAnd(b, ICons(bb,bs)), s) => Just((b, FullDequeue(front, fs, OneAnd(bb,bs), s-1)))
+    case FullDequeue(front, fs, NonEmptyList(b, ICons(bb,bs)), s) => Just((b, FullDequeue(front, fs, NonEmptyList.nel(bb,bs), s-1)))
   }
 
 
@@ -60,8 +60,8 @@ sealed abstract class Dequeue[A] {
     */
   def cons(a: A): Dequeue[A] = this match {
     case EmptyDequeue() => SingletonDequeue(a)
-    case SingletonDequeue(single) => FullDequeue(OneAnd(a, IList.empty), 1, OneAnd(single, IList.empty), 1 )
-    case FullDequeue(front, fs, back, bs) => FullDequeue(OneAnd(a, ICons(front.head, front.tail)), fs+1, back, bs)
+    case SingletonDequeue(single) => FullDequeue(NonEmptyList.nel(a, IList.empty), 1, NonEmptyList.nel(single, IList.empty), 1 )
+    case FullDequeue(front, fs, back, bs) => FullDequeue(NonEmptyList.nel(a, ICons(front.head, front.tail)), fs+1, back, bs)
   }
 
   /**
@@ -69,8 +69,8 @@ sealed abstract class Dequeue[A] {
     */
   def snoc(a: A): Dequeue[A] = this match {
     case EmptyDequeue() => SingletonDequeue(a)
-    case SingletonDequeue(single) => FullDequeue(OneAnd(single, INil[A]()), 1, OneAnd(a, INil[A]()), 1 )
-    case FullDequeue(front, fs, back, bs) => FullDequeue(front, fs, OneAnd(a, ICons(back.head, back.tail)), bs+1)
+    case SingletonDequeue(single) => FullDequeue(NonEmptyList.nel(single, INil[A]()), 1, NonEmptyList.nel(a, INil[A]()), 1 )
+    case FullDequeue(front, fs, back, bs) => FullDequeue(front, fs, NonEmptyList.nel(a, ICons(back.head, back.tail)), bs+1)
   }
 
   /**
@@ -121,12 +121,12 @@ sealed abstract class Dequeue[A] {
       case EmptyDequeue() => this
       case SingletonDequeue(a) => this :+ a
       case FullDequeue(of,ofs,ob,obs) =>
-        FullDequeue(OneAnd(f.head, (f.tail ++
-                                      ((b.head +: b.tail) reverse_:::
-                                      ICons(of.head, of.tail)))),
-                                    fs + bs + ofs,
-                                    ob,
-                                    obs)
+        FullDequeue(NonEmptyList.nel(f.head, (f.tail ++
+                                                ((b.head +: b.tail) reverse_:::
+                                                   ICons(of.head, of.tail)))),
+                                              fs + bs + ofs,
+                                              ob,
+                                              obs)
     }
   }
 
@@ -156,7 +156,7 @@ sealed abstract class Dequeue[A] {
       case EmptyDequeue() => EmptyDequeue()
       case SingletonDequeue(a) => SingletonDequeue(f(a))
       case FullDequeue(front, fs, back, bs) => {
-        val F = Functor[NonEmptyIList]
+        val F = Functor[NonEmptyList]
         FullDequeue(F.map(front)(f), fs, F.map(back)(f), bs)
       }
     }
@@ -182,12 +182,12 @@ object Dequeue extends DequeueInstances {
 
   def empty[A]: Dequeue[A] = EmptyDequeue()
 
-  private def reverseNEL[A](fa: NonEmptyIList[A]): NonEmptyIList[A] = {
+  private def reverseNEL[A](fa: NonEmptyList[A]): NonEmptyList[A] = {
     @annotation.tailrec
-    def loop(xs: IList[A], acc: IList[A]): NonEmptyIList[A] =
+    def loop(xs: IList[A], acc: IList[A]): NonEmptyList[A] =
       (xs: @unchecked) match {
         case ICons(h, INil()) =>
-          OneAnd(h, acc)
+          NonEmptyList.nel(h, acc)
         case ICons(h, t) =>
           loop(t, h :: acc)
       }
@@ -209,7 +209,7 @@ private[scalaz] final case class SingletonDequeue[A](single: A) extends Dequeue[
   * a queue which has at least two elements, it is guaranteed that the
   * front list and back lists cannot be empty
   */
-private[scalaz] final case class FullDequeue[A](front: NonEmptyIList[A], fsize: Int, back: NonEmptyIList[A], backSize: Int) extends Dequeue[A]  {
+private[scalaz] final case class FullDequeue[A](front: NonEmptyList[A], fsize: Int, back: NonEmptyList[A], backSize: Int) extends Dequeue[A]  {
   override def isEmpty = false
   override def frontMaybe = Maybe.just(front.head)
   override def backMaybe = Maybe.just(back.head)

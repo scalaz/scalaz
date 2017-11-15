@@ -252,8 +252,8 @@ object Task {
         val RR: Reducer[Throwable \/ A, Throwable \/ M] =
           Reducer[Throwable \/ A, Throwable \/ M](
             _.map(R.unit),
-            c => AE.apply2(c, _)(R.cons(_, _)),
-            m => AE.apply2(m, _)(R.snoc(_, _))
+            AE.apply2(_, _)(R.cons(_, _)),
+            AE.apply2(_, _)(R.snoc(_, _))
           )(Monoid.liftMonoid[Throwable \/ ?, M])
         new Task(F.reduceUnordered(fs.map(_.get))(RR))
       }
@@ -392,7 +392,7 @@ object Task {
                 // food for thought - might be safe to set the interrupt first
                 // but, this may also kill `cb(e)`
                 // could have separate AtomicBooleans for each task
-                cb(e) *> Trampoline.delay { interrupt.set(true); () }
+                cb(e) *> Trampoline.delay { interrupt.set(true) }
               else
                 Trampoline.done(())
           }

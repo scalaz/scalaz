@@ -92,40 +92,63 @@ object build {
       Some(shared(projectBase, conf))
   }
 
+  private val stdOptions = Seq(
+    // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
+    "-deprecation",
+    "-encoding", "UTF-8",
+    "-feature",
+    "-Xfuture",
+    "-Xsource:2.12",
+    "-Ypartial-unification",
+    "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+    "-unchecked"
+  )
+
   private val Scala211_jvm_and_js_options = Seq(
     "-Ybackend:GenBCode",
     "-Ydelambdafy:method",
     "-target:jvm-1.8"
   )
 
+  val lintOptions = Seq(
+    "-Xlint:_,-type-parameter-shadow",
+    "-Ywarn-dead-code",
+    "-Ywarn-unused-import",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard",
+    "-Yrangepos"
+  )
+
   private def Scala211 = "2.11.11"
-  private def Scala212 = "2.12.3"
+  private def Scala212 = "2.12.4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
+
+  private[this] val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
-      (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
+      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
+      val buildInfoDir = "sbt-buildinfo"
+      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
+        (file(buildInfoPackageName) / f.relativeTo((sourceManaged in Compile).value / buildInfoDir).get.getPath).getPath
+      } else {
+        f.relativeTo((sourceManaged in Compile).value).get.getPath
+      }
+      (f, path)
     },
     scalaVersion := Scala212,
     crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.5",
-    scalacOptions ++= Seq(
-      // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-      "-deprecation",
-      "-encoding", "UTF-8",
-      "-feature",
-      "-Xfuture",
-      "-Ypartial-unification",
-      "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
-      "-unchecked"
-    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
     }),
+    scalacOptions in (Compile, compile) ++= "-Yno-adapted-args" +: lintOptions,
+    scalacOptions in (Test, compile) ++= lintOptions,
 
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
@@ -264,11 +287,12 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
+      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := "scalaz",
+      buildInfoPackage := buildInfoPackageName,
       buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
@@ -281,7 +305,7 @@ object build {
     .jvmSettings(
       jvm_js_settings,
       libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
       }.toList,
       typeClasses := TypeClass.core
     )
@@ -295,6 +319,7 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
+      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -309,6 +334,7 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
+      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)

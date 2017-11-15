@@ -38,7 +38,7 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
         }
         // Should we keep running?
         if (continueRunning) {
-          Thread.sleep(safeTickMs)
+          Thread.sleep(safeTickMs.toLong)
           innerRun()
         }
       }

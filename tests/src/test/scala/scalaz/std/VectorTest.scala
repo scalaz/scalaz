@@ -86,13 +86,13 @@ object VectorTest extends SpecLite {
   "mapAccumLeft" ! forAll {
     (xs: Vector[Int]) =>
       mapAccumLeft(xs)(Vector[Int](), (c: Vector[Int], a) =>
-        (c :+ a, a)) must_===(xs, xs)
+        (c :+ a, a)) must_===(xs -> xs)
   }
 
   "mapAccumRight" ! forAll {
     (xs: Vector[Int]) =>
       mapAccumRight(xs)(Vector[Int](), (c: Vector[Int], a) =>
-        (c :+ a, a)) must_===(xs.reverse, xs)
+        (c :+ a, a)) must_===(xs.reverse -> xs)
   }
 
   "Issue #266" in {

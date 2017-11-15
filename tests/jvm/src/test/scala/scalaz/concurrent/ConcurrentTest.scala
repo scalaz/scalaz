@@ -30,7 +30,6 @@ object ConcurrentTest extends SpecLite{
     "fail when timeout occurs" in {
       (withTimeout(100) {
         Thread.sleep(2000)
-        ()
       }).mustThrowA[RuntimeException]
     }
   }

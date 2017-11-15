@@ -1,6 +1,9 @@
 package scalaz
 
-import scalaz.Tags.{Conjunction}
+import scala.annotation.tailrec
+import scalaz.Free.{Trampoline, return_, suspend}
+import scalaz.Maybe.Just
+import scalaz.Tags.Conjunction
 
 
 /**
@@ -49,6 +52,24 @@ sealed abstract class Reducer[C, M] {
       override def cons(x: C, p: (M, N)) = (Reducer.this.cons(x, p._1), r.cons(x, p._2))
     }
   }
+
+  final def unfoldl[B](seed: B)(f: B => Maybe[(B, C)]): M = {
+    @tailrec
+    def rec(seed: B, acc: M): M = f(seed) match {
+      case Just((b, c)) => rec(b, cons(c, acc))
+      case _ => acc
+    }
+    rec(seed, zero)
+  }
+
+  def unfoldr[B](seed: B)(f: B => Maybe[(C, B)]): M = {
+    @tailrec
+    def rec(seed: B, acc: M): M = f(seed) match {
+      case Just((c, b)) => rec(b, snoc(acc, c))
+      case _ => acc
+    }
+    rec(seed, zero)
+  }
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
@@ -71,7 +92,7 @@ object Reducer extends ReducerInstances {
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
     */
-  def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
+  def apply[C, M](u: C => M, cs: (C, M) => M, sc: (M, C) => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
 }
 
@@ -80,18 +101,19 @@ sealed abstract class ReducerInstances {
   /** Collect `C`s into a list, in order. */
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
-    unitConsReducer(_ :: Nil, c => c :: _)
+    unitConsReducer(_ :: Nil, _ :: _)
   }
 
   /** Collect `C`s into an ilist, in order. */
   implicit def IListReducer[C]: Reducer[C, IList[C]] = {
-    unitConsReducer(_ :: INil(), c => c :: _)
+    unitConsReducer(_ :: INil(), _ :: _)
   }
 
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._
-    unitConsReducer(Stream(_), c => c #:: _)
+    import Stream._
+    unitLazyConsReducer(cons(_, empty): Stream[C], cons(_, _))
   }
 
   /** Ignore `C`s. */
@@ -153,15 +175,15 @@ sealed abstract class ReducerInstances {
   implicit def LastOptionReducer[A]: Reducer[Option[A], Option[A] @@ Last] = unitReducer(o => Tag[Option[A], Last](o))
 
   /** Alias for [[scalaz.Reducer]]`.apply`. */
-  def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
+  def reducer[C, M](u: C => M, cs: (C, M) => M, sc: (M, C) => M)(implicit mm: Monoid[M]): Reducer[C, M] =
     new Reducer[C, M] {
       val monoid = mm
 
       def unit(c: C) = u(c)
 
-      def snoc(m: M, c: C): M = sc(m)(c)
+      def snoc(m: M, c: C): M = sc(m, c)
 
-      def cons(c: C, m: M): M = cs(c)(m)
+      def cons(c: C, m: M): M = cs(c, m)
     }
 
   def foldReduce[F[_], A, B](a: F[A])(implicit f: Foldable[F], r: Reducer[A, B]): B =
@@ -174,14 +196,41 @@ sealed abstract class ReducerInstances {
       def unit(c: C) = u(c)
     }
 
-  def unitConsReducer[C, M](u: C => M, cs: C => M => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
+  def unitConsReducer[C, M](u: C => M, cs: (C, M) => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
     val monoid = mm
 
     def unit(c: C) = u(c)
 
     def snoc(m: M, c: C): M = mm.append(m, u(c))
 
-    def cons(c: C, m: M): M = cs(c)(m)
+    def cons(c: C, m: M): M = cs(c, m)
+
+    override def unfoldr[B](seed: B)(f: B => Maybe[(C, B)]): M = {
+      import  std.function._
+      def go(s: B, f: B => Maybe[(C, B)]): Trampoline[M] = f(s) match {
+        case Just((c, b)) => suspend(go(b, f)) map (m => cs(c, m))
+        case _ => return_[Function0, M](zero)
+      }
+      go(seed, f).run
+    }
+  }
+
+  def unitLazyConsReducer[C, M](u: C => M, cs: (C, => M) => M)(implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
+    val monoid = mm
+
+    def unit(c: C) = u(c)
+
+    def snoc(m: M, c: C): M = mm.append(m, u(c))
+
+    def cons(c: C, m: M): M = cs(c, m)
+
+    override def unfoldr[B](seed: B)(f: B => Maybe[(C, B)]): M = {
+      def unfold(s: B): M = f(s) match {
+        case Just((a, r)) => cs(a, unfold(r))
+        case _ => zero
+      }
+      unfold(seed)
+    }
   }
 
   /** The reducer derived from any monoid.  Not implicit because it is

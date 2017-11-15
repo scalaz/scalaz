@@ -141,7 +141,7 @@ object ImmutableArray extends ImmutableArrayInstances {
       def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
     }
 
-  implicit def canBuildFromChar(implicit m: ClassTag[Char]): CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+  implicit val canBuildFromChar: CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
     new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
       def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
 

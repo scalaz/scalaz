@@ -20,8 +20,7 @@ object BooleanLatch {
       def unavailable = getState == UNAVAILABLE
 
       override def tryAcquire(ignore: Int) =
-        if (!released) false
-        else compareAndSetState(RELEASED, UNAVAILABLE)
+        released && compareAndSetState(RELEASED, UNAVAILABLE)
 
       override def tryRelease(ignore: Int) = {
         if (unavailable) setState(RELEASED)

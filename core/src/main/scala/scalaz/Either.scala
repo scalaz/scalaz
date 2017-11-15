@@ -128,7 +128,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Run the side-effect on the right of this disjunction. */
   def foreach(g: B => Unit): Unit =
-    bimap(_ => (), g)
+    fold(_ => (), g)
 
   /** Apply a function in the environment of the right of this disjunction. */
   def ap[AA, C](f: => AA \/ (B => C))(implicit evA: A <~< AA): (AA \/ C) =
@@ -377,7 +377,7 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
-  def fromTryCatchThrowable[T, E](a: => T)(implicit ev: E <~< Throwable, nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
+  def fromTryCatchThrowable[T, E: NotNothing: ? <~< Throwable](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])

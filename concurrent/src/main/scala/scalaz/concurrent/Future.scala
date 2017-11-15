@@ -1,6 +1,6 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
+import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import scala.collection.JavaConverters._
@@ -379,15 +379,15 @@ object Future {
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Future[A] = Async { cb =>
-    pool.submit { new Callable[Unit] { def call = cb(a).run }}
+    pool.execute { new Runnable { def run = cb(a).run }}
   }
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
       Strategy.DefaultTimeoutScheduler): Future[A] =
     Async { cb =>
-      pool.schedule(new Callable[Unit] {
-        def call = cb(a).run
+      val _ = pool.schedule(new Runnable {
+        def run = cb(a).run
       }, delay.toMillis, TimeUnit.MILLISECONDS)
     }
 

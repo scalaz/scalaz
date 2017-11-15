@@ -64,7 +64,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     this match {
       case This(_) => None
       case That(_) => None
-      case Both(a, b) => Some(a, b)
+      case Both(a, b) => Some((a, b))
     }
 
   def pad: (Option[A], Option[B]) =
@@ -147,7 +147,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     }
 
   def foreach(g: B => Unit): Unit =
-    bimap(_ => (), g)
+    fold(_ => (), g, (_, b) => g(b))
 
   def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
     this match {
