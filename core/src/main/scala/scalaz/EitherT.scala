@@ -279,7 +279,7 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
-  def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
+  def fromTryCatchThrowable[F[_], A, B](a: => F[A])(implicit ev: B <~< Throwable, F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
       right(a)
     } catch {

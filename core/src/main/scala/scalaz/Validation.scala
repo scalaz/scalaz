@@ -2,6 +2,7 @@ package scalaz
 
 import scala.util.control.NonFatal
 import scala.reflect.ClassTag
+import Liskov.<~<
 
 /**
  * Represents either:
@@ -410,7 +411,7 @@ object Validation extends ValidationInstances {
   def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
     lift(a)(f, fail).toValidationNel
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
+  def fromTryCatchThrowable[T, E](a: => T)(implicit ev: E <~< Throwable, nn: NotNothing[E], ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])

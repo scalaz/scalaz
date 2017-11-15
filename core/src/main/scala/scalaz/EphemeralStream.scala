@@ -2,6 +2,7 @@ package scalaz
 
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicReference
+import Liskov.<~<
 
 /** Like [[scala.collection.immutable.Stream]], but doesn't save
   * computed values.  As such, it can be used to represent similar
@@ -114,9 +115,12 @@ sealed abstract class EphemeralStream[A] {
     else
       cons((head(), b.head()), tail() zip b.tail())
 
-  def unzip[X, Y](implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
-    foldr((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q => r =>
-      (cons(q._1, r._1), cons(q._2, r._2)))
+  def unzip[X, Y](implicit ev: A <~< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
+    foldr((emptyEphemeralStream[X], emptyEphemeralStream[Y])){ qa => ra =>
+      val (q1, q2) = ev(qa)
+      val (r1, r2) = ra
+      (cons(q1, r1), cons(q2, r2))
+    }
 
   def alignWith[B, C](f: A \&/ B => C)(b: EphemeralStream[B]): EphemeralStream[C] =
     if(b.isEmpty)

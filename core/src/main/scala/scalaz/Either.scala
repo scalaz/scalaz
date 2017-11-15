@@ -66,11 +66,11 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Spin in tail-position on the right value of this disjunction. */
   def loopr[AA, BB, X](left: AA => X, right: BB => X \/ (AA \/ BB))(implicit evA: A <~< AA, evB: B <~< BB): X =
-    \/.loopRight(this.bimap(evA, evB), left, right)
+    \/.loopRight(Liskov.lift2(evA, evB)(this), left, right)
 
   /** Spin in tail-position on the left value of this disjunction. */
   def loopl[AA, BB, X](left: AA => X \/ (AA \/ BB), right: BB => X)(implicit evA: A <~< AA, evB: B <~< BB): X =
-    \/.loopLeft(this.bimap(evA, evB), left, right)
+    \/.loopLeft(Liskov.lift2(evA, evB)(this), left, right)
 
   /** Flip the left/right values in this disjunction. Alias for `unary_~` */
   def swap: (B \/ A) =
@@ -122,7 +122,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Traverse on the right of this disjunction. */
   def traverse[F[_]: Applicative, AA, D](g: B => F[D])(implicit evA: A <~< AA): F[AA \/ D] =
     this match {
-      case a @ -\/(_) => Applicative[F].point(a.leftMap(evA))
+      case a @ -\/(_) => Applicative[F].point(Liskov.co(evA)(a))
       case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
@@ -137,7 +137,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Bind through the right of this disjunction. */
   def flatMap[AA, D](g: B => (AA \/ D))(implicit evA: A <~< AA): (AA \/ D) =
     this match {
-      case a @ -\/(_) => a.leftMap(evA)
+      case a @ -\/(_) => Liskov.co(evA)(a)
       case \/-(b) => g(b)
     }
 
@@ -263,21 +263,21 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
-  def ensure[AA](onLeft: => AA)(f: B => Boolean)(implicit evA: A <~< AA): (AA \/ B) = this.leftMap(evA) match {
-    case either @ \/-(b) => if (f(b)) either else -\/(onLeft)
-    case either @ -\/(_) => either
-  }
+  def ensure[AA](onLeft: => AA)(f: B => Boolean)(implicit evA: A <~< AA): (AA \/ B) = Liskov.co2(evA)(this) match {
+      case either @ \/-(b) => if (f(b)) either else -\/(onLeft)
+      case either @ -\/(_) => either
+    }
 
   /** Run the given function on the left and return right with the result. */
   def recover[BB](pf: PartialFunction[A, BB])(implicit evB: B <~< BB): (A \/ BB) = this match {
     case -\/(a) if (pf isDefinedAt a) => \/-(pf(a))
-    case _ => this.map(evB)
+    case _ => Liskov.co2_2(evB)(this)
   }
 
   /** Run the given function on the left and return the result. */
-  def recoverWith[AA, BB](pf: PartialFunction[AA, AA \/ BB])(implicit evA: A <~< AA, evB: B <~< BB): (AA \/ BB) = this.leftMap(evA) match {
+  def recoverWith[AA, BB](pf: PartialFunction[AA, AA \/ BB])(implicit evA: A <~< AA, evB: B <~< BB): (AA \/ BB) = Liskov.lift2(evA, evB)(this) match {
     case -\/(a) if (pf isDefinedAt a) => pf(a)
-    case other => other.map(evB)
+    case other => other
   }
 
   /** Compare two disjunction values for equality. */
@@ -308,9 +308,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
 
   /** Show for a disjunction value. */
   def show[AA, BB](implicit evA: A <~< AA, evB: B <~< BB, SA: Show[AA], SB: Show[BB]): Cord =
-    this match {
-      case -\/(a) => ("-\\/(": Cord) ++ SA.show(evA(a)) :- ')'
-      case \/-(b) => ("\\/-(": Cord) ++ SB.show(evB(b)) :- ')'
+    Liskov.lift2(evA, evB)(this) match {
+      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a) :- ')'
+      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
     }
 
   /** Convert to a Validation. */
@@ -336,10 +336,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     validationed(k)
 
   /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
-  def merge[AA](implicit ev: B <~< AA, ev2: A <~< AA): AA =
-    this match {
-      case -\/(a) => ev2(a)
-      case \/-(b) => ev(b)
+  def merge[AA](implicit ev: A <~< AA, ev2: B <~< AA): AA =
+    Liskov.lift2[\/, A, AA, B, AA](ev, ev2)(this) match {
+      case \/-(a) => a
+      case -\/(a) => a
     }
 
   /** Convert to a These. */

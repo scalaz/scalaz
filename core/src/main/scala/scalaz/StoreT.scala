@@ -1,6 +1,7 @@
 package scalaz
 
 import Id._
+import Liskov._
 
 /**
  * @see [[scalaz.Lens]]
@@ -12,8 +13,8 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def xmap[X1, X2](f: I => X1)(g: X2 => A)(implicit F: Functor[F]): IndexedStoreT[F, X1, X2, B] =
     indexedStoreT((F.map(set)(_ compose g), f(pos)))
 
-  def bmap[X, Z >: I <: A](b: Bijection[Z, X])(implicit F: Functor[F]): StoreT[F, X, B] =
-    xmap(b to)(b from)
+  def bmap[X, Z](b: Bijection[Z, X])(implicit evSuperI: Z >~> I, evSubA: Z <~< A, F: Functor[F]): StoreT[F, X, B] =
+    xmap(evSuperI.substF(b to))(evSubA.onF(b from))
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     indexedStoreT((set, f(pos)))

@@ -4,6 +4,8 @@ package std
 import Isomorphism.{<~>, IsoFunctorTemplate}
 import scala.util.{Failure, Success, Try}
 
+import Liskov.<~<
+
 trait TryFunctions {
   def cata[A, B](t: Try[A])(success: A => B, failure: Throwable => B): B =
     t match {
@@ -14,8 +16,8 @@ trait TryFunctions {
   def toDisjunction[A](t: Try[A]): Throwable \/ A =
     cata(t)(\/.right, \/.left)
 
-  def fromDisjunction[T <: Throwable, A](d: T \/ A): Try[A] =
-    d.fold(Failure.apply, Success.apply)
+  def fromDisjunction[T, A](d: T \/ A)(implicit ev: T <~< Throwable): Try[A] =
+    d.fold(e => Failure.apply(ev(e)), Success.apply)
 
   def toValidation[A](t: Try[A]): Validation[Throwable, A] =
     cata(t)(Validation.success, Validation.failure)
@@ -23,8 +25,8 @@ trait TryFunctions {
   def toValidationNel[A](t: Try[A]) : ValidationNel[Throwable, A] =
     cata(t)(Validation.success, Validation.failureNel)
 
-  def fromValidation[T <: Throwable, A](v: Validation[T, A]) : Try[A] =
-    v.fold(Failure.apply, Success.apply)
+  def fromValidation[T, A](v: Validation[T, A])(implicit ev: T <~< Throwable): Try[A] =
+    v.fold(e => Failure.apply(ev(e)), Success.apply)
 }
 
 trait TryInstances {

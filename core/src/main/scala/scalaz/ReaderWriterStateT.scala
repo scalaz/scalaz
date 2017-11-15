@@ -1,13 +1,15 @@
 package scalaz
 
+import Liskov.<~<
+
 /** A monad transformer stack yielding `(R, S1) => F[(W, A, S2)]`. */
 sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
   self =>
 
-  def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[(W, A, S2)]]
+  def getF[S, RR](implicit evS: S <~< S1, evR: RR <~< R): Monad[F] => F[(RR, S) => F[(W, A, S2)]]
 
   def run(r: R, s: S1)(implicit F: Monad[F]): F[(W, A, S2)] =
-    F.join( F.map[(R, S1) => F[(W, A, S2)], F[(W, A, S2)]](getF(F))(f => f(r, s)) )
+    F.join( F.map[(R, S1) => F[(W, A, S2)], F[(W, A, S2)]](getF[S1, R].apply(F))(f => f(r, s)) )
 
   /** Discards the writer component. */
   def state(r: R)(implicit F: Monad[F]): IndexedStateT[F, S1, S2, A] =
@@ -19,31 +21,31 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
     IndexedReaderWriterStateT { case (r, s) => f(run(r, s)) }
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZero[S <: S1](r: R)(implicit F: Monad[F], S: Monoid[S]): F[(W, A, S2)] =
-    run(r, S.zero)
+  def runZero[S](r: R)(implicit ev: S <~< S1, F: Monad[F], S: Monoid[S]): F[(W, A, S2)] =
+    run(r, ev(S.zero))
 
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(r: R, s: S1)(implicit F: Monad[F]): F[(W, A)] =
     F.map(run(r,s)) { case (w,a,s2) => (w,a) }
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
-  def evalZero[S <: S1](r:R)(implicit F: Monad[F], S: Monoid[S]): F[(W,A)] =
-    eval(r,S.zero)
+  def evalZero[S](r:R)(implicit ev: S <~< S1, F: Monad[F], S: Monoid[S]): F[(W,A)] =
+    eval(r, ev(S.zero))
 
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(r: R, s: S1)(implicit F: Monad[F]): F[(W,S2)] =
     F.map(run(r,s)){case (w,a,s2) => (w,s2)}
 
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
-  def execZero[S <: S1](r:R)(implicit F: Monad[F], S: Monoid[S]): F[(W,S2)] =
-    exec(r,S.zero)
+  def execZero[S](r:R)(implicit ev: S <~< S1, F: Monad[F], S: Monoid[S]): F[(W,S2)] =
+    exec(r, ev(S.zero))
 
   def map[B](f: A => B)(implicit F: Functor[F]): IndexedReaderWriterStateT[F, R, W, S1, S2, B] =
     IndexedReaderWriterStateT.create[F, R, W, S1, S2, B]( (G: Monad[F]) => (r: R, s: S1) => F.map(self.run(r, s)(G))(t => (t._1, f(t._2), t._3)))
 
-  def flatMap[B, RR <: R, S3](f: A => IndexedReaderWriterStateT[F, RR, W, S2, S3, B])(implicit F: Bind[F], W: Semigroup[W]): IndexedReaderWriterStateT[F, RR, W, S1, S3, B] =
+  def flatMap[B, RR, S3](f: A => IndexedReaderWriterStateT[F, RR, W, S2, S3, B])(implicit ev: RR <~< R, F: Bind[F], W: Semigroup[W]): IndexedReaderWriterStateT[F, RR, W, S1, S3, B] =
     IndexedReaderWriterStateT.create[F, RR, W, S1, S3, B]( (G: Monad[F]) => (r: RR, s1: S1) =>
-      F.bind(self.run(r, s1)(G)) {
+      F.bind(self.run(ev(r), s1)(G)) {
         case (w1, a, s2) => {
           F.map(f(a).run(r, s2)(G)) {
             case (w2, b, s3) => (W.append(w1, w2), b, s3)
@@ -54,11 +56,21 @@ sealed abstract class IndexedReaderWriterStateT[F[_], -R, W, -S1, S2, A] {
 
 object IndexedReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
   def apply[F[_], R, W, S1, S2, A](f: (R, S1) => F[(W, A, S2)]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] = new IndexedReaderWriterStateT[F, R, W, S1, S2, A] {
-    override def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[(W, A, S2)]] = (F: Monad[F]) => F.point((r: R, s: S) => f(r, s))
+    override def getF[S, RR](implicit evS: S <~< S1, evR: RR <~< R): Monad[F] => F[(RR, S) => F[(W, A, S2)]] = {
+      val liskov:  ((R, S1) => F[(W, A, S2)]) <~< ((RR, S) => F[(W, A, S2)]) =
+        Liskov.liftF2(evR, evS, implicitly)
+
+      (F: Monad[F]) => F.point(liskov((r: R, s: S1) => f(r, s)))
+    }
   }
 
   def create[F[_], R, W, S1, S2, A](f: Monad[F] => (R, S1) => F[(W,A, S2)]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] = new IndexedReaderWriterStateT[F, R, W, S1, S2, A] {
-    override def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[(W, A, S2)]] = (F: Monad[F]) => F.point(f(F))
+    override def getF[S, RR](implicit evS: S <~< S1, evR: RR <~< R): Monad[F] => F[(RR, S) => F[(W, A, S2)]] = {
+      val liskov:  ((R, S1) => F[(W, A, S2)]) <~< ((RR, S) => F[(W, A, S2)]) =
+        Liskov.liftF2(evR, evS, implicitly)
+
+      (F: Monad[F]) => F.point(liskov(f(F)))
+    }
   }
 }
 

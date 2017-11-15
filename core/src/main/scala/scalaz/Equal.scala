@@ -1,5 +1,6 @@
 package scalaz
 
+import Liskov.<~<
 ////
 /**
  * A type safe alternative to universal equality (`scala.Any#==`).
@@ -47,8 +48,9 @@ object Equal {
   }
 
   /** Creates an Equal instance based on reference equality, `a1 eq a2` */
-  def equalRef[A <: AnyRef]: Equal[A] = new Equal[A] {
-    def equal(a1: A, a2: A): Boolean = a1 eq a2
+  def equalRef[A](implicit ev: A <~< AnyRef): Equal[A] = new Equal[A] {
+    def equal(a1: A, a2: A): Boolean =
+      ev(a1) eq ev(a2)
   }
 
   def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
