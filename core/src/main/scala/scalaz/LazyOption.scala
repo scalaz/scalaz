@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.<~<
+
 /** [[scala.Option]], but with a value by name. */
 sealed abstract class LazyOption[+A] extends Product with Serializable {
 
@@ -96,8 +98,11 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
       y <- b
     } yield (x, y)
 
-  def unzip[X, Y](implicit ev: A <:< (X, Y)): (LazyOption[X], LazyOption[Y]) =
-    fold(xy => (lazySome(xy._1), lazySome(xy._2)), (lazyNone, lazyNone))
+  def unzip[X, Y](implicit ev: A <~< (X, Y)): (LazyOption[X], LazyOption[Y]) =
+    this.fold(
+      { a => val (xy1, xy2) = ev(a); (lazySome(xy1), lazySome(xy2)) },
+      (lazyNone, lazyNone)
+    )
 
 }
 
