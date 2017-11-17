@@ -93,7 +93,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
     mapsf(sf => (s0:S0) => F.map(sf(ev(l get s0)))(t => (l.set(s0, t._1), t._2)))
 
   def liftF[S](implicit ev: S <~< S1): Free[IndexedStateT[F, S, S2, ?], A] =
-    Free.liftF[IndexedStateT[F, S, S2, ?], A](self)
+    Free.liftF[IndexedStateT[F, S, S2, ?], A](ev.subst[IndexedStateT[F, -?, S2, A]](self))
 
   def mapsf[X1, X2, B](f: (S1 => F[(S2, A)]) => (X1 => F[(X2, B)])): IndexedStateT[F, X1, X2, B] =
     IndexedStateT.createState((m: Monad[F]) => f((s:S1) => run(s)(m)))
