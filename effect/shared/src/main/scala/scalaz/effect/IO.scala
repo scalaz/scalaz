@@ -141,7 +141,7 @@ sealed abstract class IO[A] { self =>
    * otherwise executes the specified action.
    */
   final def orElse(that: => IO[A]): IO[A] =
-    self.attempt.flatMap(_.fold(_ => that)(IO(_)))
+    self.attempt.flatMap(_.fold(_ => that)(IO.now(_)))
 
   /**
    * Executes this action, capturing both failure and success and returning
@@ -256,7 +256,7 @@ sealed abstract class IO[A] { self =>
    * Recovers from all errors.
    *
    * {{{
-   * openFile("config.json").catchAll(_ => IO(defaultConfig))
+   * openFile("config.json").catchAll(_ => IO.now(defaultConfig))
    * }}}
    */
   final def catchAll(h: Throwable => IO[A]): IO[A] = catchSome {
@@ -323,7 +323,7 @@ sealed abstract class IO[A] { self =>
   final def retryFor(duration: Duration): IO[A] =
     IO.absolve(
       retry.attempt race (IO.sleep(duration) *>
-                          IO(-\/(Errors.TimeoutException(duration)))))
+                          IO.now(-\/(Errors.TimeoutException(duration)))))
 
   /**
    * Maps this action to one producing unit, but preserving the effects of
@@ -352,7 +352,7 @@ sealed abstract class IO[A] { self =>
    * }}}
    */
   final def timeout(duration: Duration): IO[A] = {
-    val err: IO[Throwable \/ A] = IO(-\/(Errors.TimeoutException(duration)))
+    val err: IO[Throwable \/ A] = IO.now(-\/(Errors.TimeoutException(duration)))
 
     IO.absolve(self.attempt.race(err.delay(duration)))
   }
@@ -450,10 +450,10 @@ object IO extends IOInstances {
 
   /**
    * Lifts a non-strictly evaluated value into the `IO` monad. Do not use this
-   * function to capture effectful code. The result is undefined but could
-   * include runtime errors or duplicated effects.
+   * function to capture effectful code. The result is undefined but may
+   * include runtime errors.
    */
-  final def apply[A](a: => A): IO[A] = Point(() => a)
+  final def point[A](a: => A): IO[A] = Point(() => a)
 
   /**
    * Raises the specified error. The moral equivalent of `throw` for pure code.

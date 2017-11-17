@@ -50,10 +50,10 @@ object MyApp extends SafeApp {
 
 ## Pure Values
 
-You can lift pure values into `IO` with `IO.apply`:
+You can lift pure values into `IO` with `IO.point`:
 
 ```scala
-val liftedString: IO[String] = IO("Hello World")
+val liftedString: IO[String] = IO.point("Hello World")
 ```
 
 The constructor uses non-strict evaluation, so the parameter will not be evaluated until when and if the `IO` action is executed at runtime.
@@ -86,7 +86,7 @@ def makeRequest(req: Request): IO[Response] =
 You can change an `IO[A]` to an `IO[B]` by calling the `map` method with a function `A => B`. This lets you transform values produced by actions into other values.
 
 ```scala
-val answer = IO(21).map(_ * 2)
+val answer = IO.point(21).map(_ * 2)
 ```
 
 ## Chaining
@@ -222,7 +222,7 @@ On the JVM, fibers will use threads, but will not consume *unlimited* threads. I
 
 ```scala
 def fib(n: Int): IO[Int] =
-  if (n <= 1) IO(1)
+  if (n <= 1) IO.point(1)
   else for {
     fiber1 <- fib(n - 2).fork
     fiber2 <- fib(n - 1).fork

@@ -61,11 +61,11 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
                                           """ */
 
   def testPoint = {
-    unsafePerformIO(IO(1)) must_=== 1
+    unsafePerformIO(IO.point(1)) must_=== 1
   }
 
   def testPointIsLazy = {
-    IO(throw new Error("Not lazy")) must not (throwA[Throwable])
+    IO.point(throw new Error("Not lazy")) must not (throwA[Throwable])
   }
 
   def testNowIsEager = {
@@ -77,12 +77,12 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testSuspendIsEvaluatable = {
-    unsafePerformIO(IO.suspend(IO(42))) must_=== 42
+    unsafePerformIO(IO.suspend(IO.point(42))) must_=== 42
   }
 
   def testSyncEvalLoop = {
     def fibIo(n: Int): IO[BigInt] =
-      if (n <= 1) IO(n) else for {
+      if (n <= 1) IO.point(n) else for {
         a <- fibIo(n - 1)
         b <- fibIo(n - 2)
       } yield a + b
@@ -158,7 +158,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     var reported: Throwable = null
 
     unsafePerformIO {
-      IO(42).ensuring(IO.fail(ExampleError)).
+      IO.point(42).ensuring(IO.fail(ExampleError)).
         fork0(e => IO.sync[Unit] { reported = e; () })
     }
 
@@ -207,7 +207,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testDeepBindOfAsyncChainIsStackSafe = {
-    val result = (0 until 10000).foldLeft(IO(0)) { (acc, _) =>
+    val result = (0 until 10000).foldLeft(IO.point(0)) { (acc, _) =>
       acc.flatMap(n => IO.async[Int](_(\/-(n + 1))))
     }
 
@@ -223,7 +223,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testForkJoinIsId = {
-    unsafePerformIO(IO(42).fork.flatMap(_.join)) must_=== 42
+    unsafePerformIO(IO.point(42).fork.flatMap(_.join)) must_=== 42
   }
 
   def testDeepForkJoinIsId = {
@@ -243,7 +243,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testRaceOfValueNever = {
-    unsafePerformIO(IO(42).race(IO.never[Int])) == 42
+    unsafePerformIO(IO.point(42).race(IO.never[Int])) == 42
   }
 
   // Utility stuff
@@ -254,7 +254,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     else n + sum(n - 1)
 
   def deepMapPoint(n: Int): IO[Int] =
-    if (n <= 0) IO(n) else IO(n - 1).map(_ + 1)
+    if (n <= 0) IO.point(n) else IO.point(n - 1).map(_ + 1)
 
   def deepMapNow(n: Int): IO[Int] =
     if (n <= 0) IO.now(n) else IO.now(n - 1).map(_ + 1)
@@ -275,7 +275,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     else fib(n - 1) + fib(n - 2)
 
   def concurrentFib(n: Int): IO[BigInt] =
-    if (n <= 1) IO(n)
+    if (n <= 1) IO.point(n)
     else for {
       f1 <- concurrentFib(n - 1).fork
       f2 <- concurrentFib(n - 2).fork
