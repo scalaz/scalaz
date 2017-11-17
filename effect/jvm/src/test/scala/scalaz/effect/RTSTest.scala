@@ -36,6 +36,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     fail on error                           $testEvalOfFailOnError
     finalizer errors not caught             $testErrorInFinalizerCannotBeCaught
     finalizer errors reported               ${upTo(1.second)(testErrorInFinalizerIsReported)}
+    deep effects                            $testEvalOfDeepSyncEffect
 
   RTS synchronous stack safety
     deep map of point                       $testDeepMapOfPoint
@@ -165,6 +166,26 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     while (reported == null) Thread.`yield`()
 
     reported must_=== ExampleError
+  }
+
+  def testEvalOfDeepSyncEffect = {
+    def incLeft(n: Int, ref: IORef[Int]): IO[Int] =
+      if (n <= 0) ref.read
+      else incLeft(n - 1, ref) <* ref.modify(_ + 1)
+
+    def incRight(n: Int, ref: IORef[Int]): IO[Int] =
+      if (n <= 0) ref.read
+      else ref.modify(_ + 1) *> incRight(n - 1, ref)
+
+    unsafePerformIO(for {
+      ref <- IORef(0)
+      v   <- incLeft(100, ref)
+    } yield v) must_=== 100
+
+    unsafePerformIO(for {
+      ref <- IORef(0)
+      v   <- incRight(1000, ref)
+    } yield v) must_=== 1000
   }
 
   def testDeepMapOfPoint = {

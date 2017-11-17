@@ -29,7 +29,7 @@ final class IORef[A] private (@volatile private var value : A) {
   /**
    * Modifies the `IORef` with the specified function.
    */
-  final def mod(f: A => A): IO[A] = IO.sync({value = f(value); value})
+  final def modify(f: A => A): IO[A] = IO.sync({value = f(value); value})
 }
 
 object IORef {

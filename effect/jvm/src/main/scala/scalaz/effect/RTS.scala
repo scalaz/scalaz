@@ -401,7 +401,7 @@ private object RTS {
               try {
                 val value = io.effect()
 
-                curIo = nextInstr(io.effect(), stack)
+                curIo = nextInstr(value, stack)
 
                 if (curIo == null) {
                   eval   = false
