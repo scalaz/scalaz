@@ -56,7 +56,7 @@ class IONarrowFlatMapBenchmark {
   }
 
   @Benchmark
-  def catsNarrowFlatMap(): BigInt = {
+  def catsNarrowFlatMap(): Int = {
     import cats.effect._
 
     def loop(i: Int): IO[Int] =

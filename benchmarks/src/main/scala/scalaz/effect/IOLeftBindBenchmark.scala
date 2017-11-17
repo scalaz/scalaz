@@ -63,7 +63,7 @@ class IOLeftBindBenchmark {
   }
 
   @Benchmark
-  def catsLeftBindBenchmark(): BigInt = {
+  def catsLeftBindBenchmark(): Int = {
     import cats.effect._
 
     def loop(i: Int): IO[Int] =
