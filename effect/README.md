@@ -64,7 +64,7 @@ Alternately, you can use the `IO.now` constructor for strict evaluation:
 val lifted: IO[String] = IO.now("Hello World")
 ```
 
-You should never use either constructor for impure code. The result of doing so is undefined, and will probably result in runtime errors or replicated effects.
+You should never use either constructor for impure code. The result of doing so is undefined, and will probably result in runtime errors.
 
 ## Impure Code
 

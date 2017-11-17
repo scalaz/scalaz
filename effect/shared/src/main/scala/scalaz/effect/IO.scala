@@ -42,7 +42,9 @@ import scalaz.data.Maybe
 sealed abstract class IO[A] { self =>
   /**
    * Maps an `IO[A]` into an `IO[B]` by applying the specified `A => B` function
-   * to the output of this action.
+   * to the output of this action. Repeated applications of `map`
+   * (`io.map(f1).map(f2)...map(f10000)`) are guaranteed stack safe to a depth
+   * of at least 10,000.
    */
   final def map[B](f: A => B): IO[B] = (self.tag : @switch) match {
     case IO.Tags.Point =>

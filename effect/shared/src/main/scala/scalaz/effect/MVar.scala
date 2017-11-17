@@ -17,7 +17,7 @@ import scalaz.data.Maybe
  * {{{
  * for {
  *   v <- IO.emptyMVar[Int] // A new empty `MVar` that holds `Int`
- *   _ <- v.put(3).fork     // In a separate fiber, put 4 into the `MVar`
+ *   _ <- v.put(3).fork     // In a separate fiber, put 3 into the `MVar`
  *   i <- v.take            // Resumes when the above `put` succeeds
  *   _ <- putStrLn("Value = " + i.toString) // "Value = 3"
  * } yield i
