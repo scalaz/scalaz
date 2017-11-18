@@ -28,6 +28,8 @@ trait NaturalTransformation[-F[_], +G[_]] {
     *
     * The current NaturalTransformation will be used to transform the Left (`F`) value of
     * the [[scalaz.Coproduct]] while the other one will be used to transform the Right (`H`) value.
+    *
+    * TODO: Rewrite using higher order Liskov when possible
     */
   def or[H[_], F0[A] <: F[A], G0[A] >: G[A]](hg: H ~> G0): Coproduct[F0, H, ?] ~> G0 =
     λ[Coproduct[F0, H, ?] ~> G0](_.fold(self, hg))

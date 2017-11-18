@@ -1,6 +1,7 @@
 package scalaz
 
 import annotation.tailrec
+import Liskov.>~>
 
 /**
  * Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
@@ -25,14 +26,14 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Update the focus in this zipper.
    */
-  def update[AA >: A](focus: AA): Zipper[AA] = {
-    this.copy(this.lefts, focus, this.rights)
+  def update[AA](focus: AA)(implicit ev: AA >~> A): Zipper[AA] = {
+    Liskov.co(ev)(this).copy(focus = focus)
   }
 
   /**
    * Apply f to the focus and update with the result.
    */
-  def modify[AA >: A](f: A => AA): Zipper[AA] = this.update(f(this.focus))
+  def modify[AA](f: A => AA)(implicit ev: AA >~> A): Zipper[AA] = Liskov.co(ev)(this).update(f(this.focus))
 
   /**
    * Possibly moves to next element to the right of focus.
@@ -45,8 +46,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to next element to the right of focus.
    */
-  def nextOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    next getOrElse z
+  def nextOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).next getOrElse z
 
   /**
    * Possibly moves to the previous element to the left of focus.
@@ -59,8 +60,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to previous element to the left of focus.
    */
-  def previousOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    previous getOrElse z
+  def previousOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).previous getOrElse z
 
   /**
    * Moves to the previous element to the left of focus, or error if there is no element on the left.
@@ -70,17 +71,23 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * An alias for insertRight
    */
-  def insert[AA >: A]: (AA => Zipper[AA]) = insertRight(_: AA)
+  def insert[AA](aa: AA)(implicit ev: AA >~> A): Zipper[AA] = insertRight[AA](aa)
 
   /**
    * Inserts an element to the left of focus and focuses on the new element.
    */
-  def insertLeft[AA >: A](y: AA): Zipper[AA] = zipper(lefts, y, focus #:: rights)
+  def insertLeft[AA](y: AA)(implicit ev: AA >~> A): Zipper[AA] = {
+    val widened = Liskov.co(ev)(this)
+    zipper(widened.lefts, y, widened.focus #:: widened.rights)
+  }
 
   /**
    * Inserts an element to the right of focus and focuses on the new element.
    */
-  def insertRight[AA >: A](y: AA): Zipper[AA] = zipper(focus #:: lefts, y, rights)
+  def insertRight[AA](y: AA)(implicit ev: AA >~> A): Zipper[AA] = {
+    val widened = Liskov.co(ev)(this)
+    zipper(widened.focus #:: widened.lefts, y, widened.rights)
+  }
 
   /**
    * An alias for `deleteRight`
@@ -103,8 +110,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
    * focus is moved to the right.
    */
-  def deleteLeftOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    deleteLeft getOrElse z
+  def deleteLeftOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).deleteLeft getOrElse z
 
   /**
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
@@ -122,8 +129,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
    * focus is moved to the left.
    */
-  def deleteRightOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    deleteRight getOrElse z
+  def deleteRightOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).deleteRight getOrElse z
 
   /**
    * Deletes all elements except the focused element.
@@ -190,8 +197,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Moves focus to the nth element of the zipper, or the default if there is no such element.
    */
-  def moveOr[AA >: A](n: Int, z: => Zipper[AA]): Zipper[AA] =
-    move(n) getOrElse z
+  def moveOr[AA](n: Int, z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).move(n) getOrElse z
 
   /**
    * Moves focus to the nearest element matching the given predicate, preferring the left,
@@ -208,8 +215,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Moves focus to the nearest element matching the given predicate, preferring the left,
    * or the default if no element matches.
    */
-  def findZor[AA >: A](p: A => Boolean, z: => Zipper[AA]): Zipper[AA] =
-    findZ(p) getOrElse z
+  def findZor[AA](p: A => Boolean, z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(Liskov.co[Zipper, A, AA](ev))(findZ(p)) getOrElse z
 
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
@@ -291,8 +298,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the left. If the focus was on the first element,
    * focus is moved to the last element.
    */
-  def deleteLeftCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    deleteLeftC getOrElse z
+  def deleteLeftCOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).deleteLeftC getOrElse z
 
   /**
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
@@ -315,8 +322,8 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
    * focus is moved to the first element.
    */
-  def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
-    deleteRightC getOrElse z
+  def deleteRightCOr[AA](z: => Zipper[AA])(implicit ev: AA >~> A): Zipper[AA] =
+    Liskov.co(ev)(this).deleteRightC getOrElse z
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
     val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried

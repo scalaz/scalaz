@@ -1,6 +1,7 @@
 package scalaz
 
 import reflect.ClassTag
+import Liskov.<~<
 
 import org.scalacheck._
 
@@ -79,7 +80,7 @@ abstract class SpecLite extends Properties("") {
       b
     }
 
-    def mustBe_<(x: Int)(implicit ev: A <:< Int) = {
+    def mustBe_<(x: Int)(implicit ev: A <~< Int) = {
       val act = actual
       def test = ev(act) < x
       def koMessage = "%s <! %s".format(actual, x)
@@ -87,7 +88,7 @@ abstract class SpecLite extends Properties("") {
         fail(koMessage)
     }
 
-    def mustThrowA[T <: Throwable](implicit man: ClassTag[T]): Unit = {
+    def mustThrowA[T](implicit ev: T <~< Throwable, man: ClassTag[T]): Unit = {
       val erasedClass = man.runtimeClass
       try {
         actual

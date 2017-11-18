@@ -1,5 +1,6 @@
 package scalaz
 
+import Liskov.>~>
 /** [[scala.Either]], but with a value by name. */
 sealed abstract class LazyEither[+A, +B] {
 
@@ -31,8 +32,8 @@ sealed abstract class LazyEither[+A, +B] {
   def disjunction: (A \/ B) =
     fold(-\/(_), \/-(_))
 
-  def getOrElse[BB >: B](default: => BB): BB =
-    fold(_ => default, z => z)
+  def getOrElse[BB](default: => BB)(implicit ev: BB >~> B): BB =
+    fold(_ => default, z => ev(z))
 
   def exists(f: (=> B) => Boolean): Boolean =
     fold(_ => false, f)
@@ -40,8 +41,8 @@ sealed abstract class LazyEither[+A, +B] {
   def forall(f: (=> B) => Boolean): Boolean =
     fold(_ => true, f)
 
-  def orElse[AA >: A, BB >: B](x: => LazyEither[AA, BB]): LazyEither[AA, BB] =
-    ?(x, this)
+  def orElse[AA, BB](x: => LazyEither[AA, BB])(implicit evA: AA >~> A, evB: BB >~> B): LazyEither[AA, BB] =
+    ?(x, Liskov.lift2(evA, evB)(this))
 
   def toLazyOption: LazyOption[B] =
     fold(_ => lazyNone, lazySome(_))
@@ -49,14 +50,14 @@ sealed abstract class LazyEither[+A, +B] {
   def toOption: Option[B] =
     fold(_ => None, Some(_))
 
-  def toMaybe[BB >: B]: Maybe[BB] =
-    fold(_ => Maybe.empty, Maybe.just(_))
+  def toMaybe[BB](implicit ev: BB >~> B): Maybe[BB] =
+    fold(_ => Maybe.empty, b => Maybe.just(ev(b)))
 
   def toList: List[B] =
     fold(_ => Nil, _ :: Nil)
 
-  def toIList[BB >: B]: IList[BB] =
-    fold(_ => INil(), ICons(_, INil()))
+  def toIList[BB](implicit ev: BB >~> B): IList[BB] =
+    fold(_ => INil(), b => ICons(ev(b), INil()))
 
   def toStream: Stream[B] =
     fold(_ => Stream(), Stream(_))
@@ -74,20 +75,20 @@ sealed abstract class LazyEither[+A, +B] {
   def foreach(f: (=> B) => Unit): Unit =
     fold(_ => (), f)
 
-  def flatMap[AA >: A, C](f: (=> B) => LazyEither[AA, C]): LazyEither[AA, C] =
-    fold(lazyLeft(_), f)
+  def flatMap[AA, C](f: (=> B) => LazyEither[AA, C])(implicit ev: AA >~> A): LazyEither[AA, C] =
+    fold(a => lazyLeft(ev(a)), f)
 
-  def traverse[G[_]: Applicative, AA >: A, C](f: B => G[C]): G[LazyEither[AA, C]] =
+  def traverse[G[_]: Applicative, AA, C](f: B => G[C])(implicit ev: AA >~> A): G[LazyEither[AA, C]] =
     fold(
-      left = x => Applicative[G].point(LazyEither.lazyLeft[C](x)),
-      right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
+      left = x => Applicative[G].point(LazyEither.lazyLeft[C](ev(x))),
+      right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[AA](c))
     )
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
     fold(left = _ => z, right = a => f(a, z))
 
-  def ap[AA >: A, C](f: => LazyEither[AA, B => C]): LazyEither[AA, C] =
-    f flatMap (k => map(k apply _))
+  def ap[AA, C](f: => LazyEither[AA, B => C])(implicit ev: AA >~> A): LazyEither[AA, C] =
+    f flatMap (k => Liskov.co2(ev)(this).map(k apply _))
 
   def left: LeftProjection[A, B] =
     new LeftProjection[A, B](this)

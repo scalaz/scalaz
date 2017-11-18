@@ -1,5 +1,6 @@
 package scalaz
 
+import Liskov.{<~<, >~>}
 import Id._
 import scala.collection.immutable
 
@@ -31,14 +32,14 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): LensFamily[X1, X2, B1, B2] =
     lensFamily(x => run(g(x)) map f)
 
-  def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): LensFamily[X, X, B1, B2] =
-    xmapA(b to)(b from)
+  def xmapbA[X, A](b: Bijection[A, X])(implicit evSuper: A >~> A2, evSub: A <~< A1): LensFamily[X, X, B1, B2] =
+    xmapA(evSuper.substF(b to))(evSub.onF(b from))
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): LensFamily[A1, A2, X1, X2] =
     lensFamily(a => run(a).xmap(f)(g))
 
-  def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): LensFamily[A1, A2, X, X] =
-    xmapB(b to)(b from)
+  def xmapbB[X, B](b: Bijection[B, X])(implicit evSuper: B >~> B1, evSub: B <~< B2): LensFamily[A1, A2, X, X] =
+    xmapB(evSuper.substF(b to))(evSub.onF(b from))
 
   def get(a: A1): B1 =
     run(a).pos
@@ -200,15 +201,26 @@ sealed abstract class LensFamily[A1, A2, B1, B2] {
   def ***[C1, C2, D1, D2](that: LensFamily[ C1, C2, D1, D2]): LensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] = product(that)
 
   trait LensLaw {
-    def identity[A >: A2 <: A1, B >: B1 <: B2](a: A)(implicit A: Equal[A]): Boolean = {
-      val c = run(a)
-      A.equal(c.put(c.pos: B), a)
+    def identity[A, B](a: A)(implicit evSuperA: A >~> A2, evSubA: A <~< A1, evSuperB: B >~> B1, evSubB: B <~< B2, A: Equal[A]): Boolean = {
+      val c = run(evSubA(a))
+      val typeAdjustedPut: B1 => A = Liskov.liftF1(evSubB compose evSuperB, evSuperA)(c.put _)
+
+      A.equal(typeAdjustedPut(c.pos), a)
     }
-    def retention[A >: A2 <: A1, B >: B1 <: B2](a: A, b: B)(implicit B: Equal[B]): Boolean =
-      B.equal(run(run(a).put(b): A).pos, b)
-    def doubleSet[A >: A2 <: A1, B >: B1 <: B2](a: A, b1: B, b2: B)(implicit A: Equal[A]): Boolean = {
-      val r = run(a)
-      A.equal(run(r.put(b1): A) put b2, r put b2)
+    def retention[A, B](a: A, b: B)(implicit evSuperA: A >~> A2, evSubA: A <~< A1, evSuperB: B >~> B1, evSubB: B <~< B2, B: Equal[B]): Boolean = {
+      val c = run(evSubA(a))
+      val typeAdjustedPut: B => A1 = Liskov.liftF1(evSubB, evSubA compose evSuperA)(c.put _)
+      val typeAdjustedRunPos: A1 => B = evSuperB.onF(run(_).pos)
+      val inOut = typeAdjustedRunPos compose typeAdjustedPut
+
+      B.equal(inOut(b), b)
+    }
+
+    def doubleSet[A, B](a: A, b1: B, b2: B)(implicit evSuperA: A >~> A2, evSubA: A <~< A1, evSubB: B <~< B2, A: Equal[A]): Boolean = {
+      val r = run(evSubA(a))
+      val typeAdjustedPut: B => A1 = Liskov.liftF1(evSubB, evSubA compose evSuperA)(r.put _)
+
+      A.equal(evSuperA(run(typeAdjustedPut(b1)) put evSubB(b2)), evSuperA(r put evSubB(b2)))
     }
   }
 

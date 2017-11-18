@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.>~>
+
 /** @since 7.0.3 */
 sealed abstract class \&/[+A, +B] extends Product with Serializable {
   import \&/._
@@ -97,8 +99,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def ~[AA, BB](k: (B \&/ A) => (BB \&/ AA)): (AA \&/ BB) =
     swapped(k)
 
-  def append[AA >: A, BB >: B](that: => (AA \&/ BB))(implicit SA: Semigroup[AA], SB: Semigroup[BB]): (AA \&/ BB) =
-    (this, that) match {
+  def append[AA, BB](that: => (AA \&/ BB))(implicit evA: AA >~> A, evB: BB >~> B, SA: Semigroup[AA], SB: Semigroup[BB]): (AA \&/ BB) =
+    (Liskov.lift2(evA, evB)(this), that) match {
       case (This(a1),     This(a2))     => This(SA.append(a1, a2))
       case (This(a1),     Both(a2, b))  => Both(SA.append(a1, a2), b)
       case (This(a),      That(b))      => Both(a,                 b)
@@ -136,39 +138,34 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def map[D](g: B => D): (A \&/ D) =
     bimap(identity, g)
 
-  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
-    this match {
+  def traverse[F[_]: Applicative, AA, D](g: B => F[D])(implicit ev: AA >~> A): F[AA \&/ D] =
+    Liskov.co2(ev)(this) match {
       case a @ This(_) =>
         Applicative[F].point(a)
       case That(b) =>
         Functor[F].map(g(b))(That(_))
       case Both(a, b) =>
-        Functor[F].map(g(b))(Both(a, _): A \&/ D)
+        Functor[F].map(g(b))(Both(a, _))
     }
 
   def foreach(g: B => Unit): Unit =
     fold(_ => (), g, (_, b) => g(b))
 
-  def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
-    this match {
-      case a @ This(_) =>
-        a
-      case That(b) =>
-        g(b)
+  def flatMap[AA, D](g: B => (AA \&/ D))(implicit ev: AA >~> A, M: Semigroup[AA]): (AA \&/ D) =
+    Liskov.co2(ev)(this) match {
+      case This(a) => This(a)
+      case That(b) => g(b)
       case Both(a, b) =>
         g(b) match {
-          case This(aa) =>
-            This(M.append(a, aa))
-          case That(bb) =>
-            Both(a, bb)
-          case Both(aa, bb) =>
-            Both(M.append(a, aa), bb)
+          case This(aa) => This(M.append(a, aa))
+          case That(bb) => Both(a, bb)
+          case Both(aa, bb) => Both(M.append(a, aa), bb)
         }
     }
 
-  def &&&[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
+  def &&&[AA, C](t: AA \&/ C)(implicit ev: AA >~> A, M: Semigroup[AA]): AA \&/ (B, C) =
     for {
-      b <- this
+      b <- Liskov.co2(ev)(this)
       c <- t
     } yield (b, c)
 
@@ -203,16 +200,17 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def toList: List[B] =
     b.toList
 
-  def toIList[BB >: B]: IList[BB] = fold(_ => INil(), IList(_), (_, b) => IList(b))
+  def toIList[BB](implicit ev: BB >~> B): IList[BB] =
+    fold(_ => INil(), b => IList(ev(b)), (_, b) => IList(ev(b)))
 
-  def getOrElse[BB >: B](bb: => BB): BB =
-    b getOrElse bb
+  def getOrElse[BB](bb: => BB)(implicit ev: BB >~> B): BB =
+    Liskov.co(ev)(b) getOrElse bb
 
-  def |[BB >: B](bb: => BB): BB =
+  def |[BB](bb: => BB)(implicit ev: BB >~> B): BB =
     getOrElse(bb)
 
-  def valueOr[BB >: B](x: A => BB)(implicit M: Semigroup[BB]): BB =
-    this match {
+  def valueOr[BB](x: A => BB)(implicit ev: BB >~> B, M: Semigroup[BB]): BB =
+    Liskov.co2_2(ev)(this) match {
       case This(a) =>
         x(a)
       case That(b) =>
@@ -221,8 +219,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         M.append(x(a), b)
     }
 
-  def ===[AA >: A, BB >: B](x: AA \&/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
-    this match {
+  def ===[AA, BB](x: AA \&/ BB)(implicit evA: AA >~> A, evB: BB >~> B, EA: Equal[AA], EB: Equal[BB]): Boolean =
+    Liskov.lift2(evA, evB)(this) match {
       case This(a) =>
         x match {
           case This(aa) =>
@@ -246,8 +244,8 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         }
     }
 
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
-    this match {
+  def show[AA, BB](implicit evA: AA >~> A, evB: BB >~> B, SA: Show[AA], SB: Show[BB]): Cord =
+    Liskov.lift2(evA, evB)(this) match {
       case This(a) =>
         "This(" +: SA.show(a) :+ ")"
       case That(b) =>

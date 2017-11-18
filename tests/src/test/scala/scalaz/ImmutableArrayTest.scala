@@ -5,10 +5,13 @@ import std.anyVal._
 
 object ImmutableArrayTest extends SpecLite {
 
+  /*
+   TODO: Talk about this.
   "Issue #525" in {
     val xs = ImmutableArray.fromArray(Array(1)) ++ ImmutableArray.fromArray(Array("a"))
     xs.toArray.toList must_==(Array(1, "a").toList)
   }
+  */
 
   "Issue #812" in {
     val xs = ImmutableArray.fromArray(Array("test"))

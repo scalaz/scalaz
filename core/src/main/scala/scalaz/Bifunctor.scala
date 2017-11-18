@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.>~>
+
 ////
 /**
  * A type giving rise to two unrelated [[scalaz.Functor]]s.
@@ -63,8 +65,8 @@ trait Bifunctor[F[_, _]]  { self =>
     embed[Id.Id,H]
 
   /** Bifunctors are covariant by nature */
-  def widen[A, B, C >: A, D >: B](fab: F[A, B]): F[C, D] =
-    bimap(fab)(identity[C], identity[D])
+  def widen[A, B, C, D](fab: F[A, B])(implicit evC: C >~> A, evD: D >~> B): F[C, D] =
+    bimap(fab)(evC, evD)
 
   ////
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }

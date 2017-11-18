@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.{<~<, >~>}
+
 final case class IndexedContsT[W[_], M[_], R, O, A](_run: W[A => M[O]] => M[R]) {
   def run(wamo: W[A => M[O]]): M[R] =
     _run(wamo)
@@ -46,9 +48,9 @@ final case class IndexedContsT[W[_], M[_], R, O, A](_run: W[A => M[O]] => M[R]) 
 
   import BijectionT._
 
-  def bmap[X >: R <: O, Z](f: Bijection[X, Z])(implicit M: Functor[M], W: Functor[W]): ContsT[W, M, Z, A] =
+  def bmap[X, Z](f: Bijection[X, Z])(implicit evSuperR: X >~> R, evSubO: X <~< O, M: Functor[M], W: Functor[W]): ContsT[W, M, Z, A] =
     IndexedContsT { wami =>
-      M.map(run(W.map(wami) { ami => { a => M.map(ami(a))(f from _) } }))(f to _)
+      M.map(run(W.map(wami) {ami => { a => M.map(ami(a))(evSubO.onF(f from)) } }))(evSuperR.substF(f to))
     }
 
   def plus(that: IndexedContsT[W, M, R, O, A])(implicit M: Plus[M]): IndexedContsT[W, M, R, O, A] =

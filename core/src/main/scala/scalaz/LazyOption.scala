@@ -1,6 +1,6 @@
 package scalaz
 
-import Liskov.<~<
+import Liskov.{<~<, >~>}
 
 /** [[scala.Option]], but with a value by name. */
 sealed abstract class LazyOption[+A] extends Product with Serializable {
@@ -24,10 +24,10 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def isEmpty: Boolean =
     !isDefined
 
-  def getOrElse[AA >: A](default: => AA): AA =
-    fold(a => a, default)
+  def getOrElse[AA](default: => AA)(implicit ev: AA >~> A): AA =
+    fold(a => ev(a), default)
 
-  def |[AA >: A](default: => AA): AA =
+  def |[AA](default: => AA)(implicit ev: AA >~> A): AA =
     getOrElse(default)
 
   def exists(f: (=> A) => Boolean): Boolean =
@@ -54,8 +54,8 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def toList: List[A] =
     fold(_ :: Nil, Nil)
 
-  def orElse[AA >: A](a: => LazyOption[AA]): LazyOption[AA] =
-    fold(_ => this, a)
+  def orElse[AA](a: => LazyOption[AA])(implicit ev: AA >~> A): LazyOption[AA] =
+    fold(a => LazySome(() => ev(a)), a)
 
 /* TODO
   def first: FirstLazyOption[A] =
