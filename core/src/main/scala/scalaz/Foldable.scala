@@ -1,7 +1,5 @@
 package scalaz
 
-
-import Liskov.<~<
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -10,6 +8,8 @@ import Liskov.<~<
 ////
 trait Foldable[F[_]]  { self =>
   ////
+
+  import Liskov.<~<
   import collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */

@@ -1,6 +1,5 @@
 package scalaz
 
-import Liskov.<~<
 ////
 /**
  * A type safe alternative to universal equality (`scala.Any#==`).
@@ -41,6 +40,9 @@ object Equal {
   @inline def apply[F](implicit F: Equal[F]): Equal[F] = F
 
   ////
+
+  import Liskov.<~<
+
   /** Creates an Equal instance based on universal equality, `a1 == a2` */
   def equalA[A]: Equal[A] = new Equal[A] {
     def equal(a1: A, a2: A): Boolean = a1 == a2

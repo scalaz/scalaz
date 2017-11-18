@@ -1,7 +1,5 @@
 package scalaz
 
-import Liskov.>~>
-
 ////
 /**
  * A type giving rise to two unrelated [[scalaz.Functor]]s.
@@ -9,6 +7,8 @@ import Liskov.>~>
 ////
 trait Bifunctor[F[_, _]]  { self =>
   ////
+
+  import Liskov.>~>
 
   /** `map` over both type parameters. */
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
