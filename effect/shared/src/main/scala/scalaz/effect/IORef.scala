@@ -10,7 +10,7 @@ package scalaz.effect
  * {{{
  * for {
  *   ref <- IORef(2)
- *   v   <- ref.mod(_ + 3)
+ *   v   <- ref.modify(_ + 3)
  *   _   <- putStrLn("Value = " + v.show) // Value = 5
  * } yield ()
  * }}}

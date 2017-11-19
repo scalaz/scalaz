@@ -273,10 +273,8 @@ sealed abstract class IO[A] { self =>
    * }}}
    */
   final def catchSome(pf: PartialFunction[Throwable, IO[A]]): IO[A] = {
-    def tryRescue(t: Throwable): IO[A] = t match {
-      case t if pf.isDefinedAt(t) => pf(t)
-      case t => IO.fail(t)
-    }
+    def tryRescue(t: Throwable): IO[A] =
+      if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
 
     self.attempt.flatMap(_.fold(tryRescue)(IO.now(_)))
   }
