@@ -82,7 +82,7 @@ trait RTS {
    *
    * FIXME: Replace this entirely with the new scheme.
    */
-  val YieldMaxOpCount = 1024
+  final val YieldMaxOpCount = 1048576
 
   lazy val scheduledExecutor = Executors.newScheduledThreadPool(1)
 
@@ -197,7 +197,8 @@ private object RTS {
 
     // Accessed from multiple threads:
     private[this] val status = new AtomicReference[FiberStatus[A]](FiberStatus.Initial[A])
-    @volatile private[this] var killed = false
+    //@volatile
+    private[this] var killed = false
 
     // TODO: A lot can be pulled out of status to increase performance
 
@@ -206,7 +207,7 @@ private object RTS {
     private[this] var supervised : List[Set[FiberContext[_]]] = Nil
     private[this] var supervising = 0
 
-    final val stack: Stack = new Stack()
+    private[this] val stack: Stack = new Stack()
 
     /**
      * Creates an action to dispatch a list of errors to the fiber's uncaught
@@ -584,39 +585,37 @@ private object RTS {
 
           opcount = opcount + 1
 
-          if (eval) {
-            // Check to see if the fiber needs to be interrupted or cooperatively
-            // yield to other fibers:
-            shouldDie match {
-              case None =>
-                // Fiber does not need to be interrupted, but might need to yield:
-                if (opcount == maxopcount) {
-                  // Cooperatively yield to other fibers currently suspended.
-                  // FIXME: Replace with the new design.
-                  eval = false
+          // Check to see if the fiber needs to be interrupted or cooperatively
+          // yield to other fibers:
+          shouldDie match {
+            case None =>
+              // Fiber does not need to be interrupted, but might need to yield:
+              if (opcount == maxopcount) {
+                // Cooperatively yield to other fibers currently suspended.
+                // FIXME: Replace with the new design.
+                eval = false
 
-                  opcount = 0
+                opcount = 0
 
-                  rts.submit(evalSync(curIo))
-                }
+                rts.submit(evalSync(curIo))
+              }
 
-              case Some(t) =>
-                // Fiber is being interrupted. Grab all finalizers from the
-                // stack to ensure they are run:
-                val finalizer = interruptStack(t)
+            case Some(t) =>
+              // Fiber is being interrupted. Grab all finalizers from the
+              // stack to ensure they are run:
+              val finalizer = interruptStack(t)
 
-                if (finalizer == null) {
-                  // No finalizers, simply produce error:
-                  eval    = false
-                  result  = -\/(t)
-                } else {
-                  // Must run finalizers first before failing:
-                  val reported  = dispatchErrors(finalizer)
-                  val completer = IO.fail[Any](t)
+              if (finalizer == null) {
+                // No finalizers, simply produce error:
+                eval    = false
+                result  = -\/(t)
+              } else {
+                // Must run finalizers first before failing:
+                val reported  = dispatchErrors(finalizer)
+                val completer = IO.fail[Any](t)
 
-                  curIo = (reported *> completer).uninterruptibly
-                }
-            }
+                curIo = (reported *> completer).uninterruptibly
+              }
           }
         }
 
