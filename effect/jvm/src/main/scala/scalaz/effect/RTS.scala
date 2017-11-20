@@ -24,7 +24,7 @@ trait RTS {
    * Effectfully and synchronously interprets an `IO[A]`, either throwing an
    * error, running forever, or producing an `A`.
    */
-  def unsafePerformIO[A](io: IO[A]): A = extract(tryUnsafePerformIO(io))
+  final def unsafePerformIO[A](io: IO[A]): A = extract(tryUnsafePerformIO(io))
 
   /**
    * Effectfully interprets an `IO`, blocking if necessary to obtain the result.
@@ -37,7 +37,7 @@ trait RTS {
 
     val context = new FiberContext[A](this, defaultHandler)
 
-    context.evalSync(io)
+    context.evaluate(io)
 
     (context.register { (r: Try[A]) =>
       try {
@@ -68,6 +68,9 @@ trait RTS {
   val defaultHandler: Throwable => IO[Unit] =
     (t: Throwable) => IO.sync(t.printStackTrace())
 
+  /**
+   * The main thread pool used for executing fibers.
+   */
   val threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().max(2))
 
   /**
@@ -320,105 +323,83 @@ private object RTS {
      *
      * @param io0 The `IO` to evaluate on the fiber.
      */
-    final def evalSync(io0: IO[_]): Unit = {
-      try {
-        val maxopcount = YieldMaxOpCount
+    final def evaluate(io0: IO[_]): Unit = {
+      // Do NOT accidentally capture any of local variables in a closure,
+      // or Scala will wrap them in ObjectRef and performance will plummet.
+      var curIo : IO[Any] = io0.asInstanceOf[IO[Any]]
 
-        // Local variables. Do NOT accidentally capture any of these in a closure,
-        // or Scala will wrap them in ObjectRef and performance will plummet.
-        var result  : Try[Any]  = null
-        var curIo   : IO[Any]   = io0.asInstanceOf[IO[Any]]
-        var eval    : Boolean   = true
-        var opcount : Int       = 0
+      while (curIo != null) {
+        try {
+          // Put the maximum operation count on the stack for fast access:
+          val maxopcount = YieldMaxOpCount
 
-        do {
-          // Check to see if the fiber should continue executing or not:
-          val die = shouldDie
+          var result  : Try[Any]  = null
+          var eval    : Boolean   = true
+          var opcount : Int       = 0
 
-          if (die eq None) {
-            // Fiber does not need to be interrupted, but might need to yield:
-            if (opcount == maxopcount) {
-              // Cooperatively yield to other fibers currently suspended.
-              // FIXME: Replace with the new design.
-              eval = false
+          do {
+            // Check to see if the fiber should continue executing or not:
+            val die = shouldDie
 
-              opcount = 0
+            if (die eq None) {
+              // Fiber does not need to be interrupted, but might need to yield:
+              if (opcount == maxopcount) {
+                // Cooperatively yield to other fibers currently suspended.
+                // FIXME: Replace with the new design.
+                eval = false
 
-              // Cannot capture `curIo` since it will be boxed into `ObjectRef`,
-              // which destroys performance, so we create a temp val here.
-              val tmpIo = curIo
+                opcount = 0
 
-              rts.submit(evalSync(tmpIo))
-            } else {
-              // Fiber is neither being interrupted nor needs to yield. Execute
-              // the next instruction in the program:
-              (curIo.tag : @switch) match {
-                case IO.Tags.FlatMap =>
-                  val io = curIo.asInstanceOf[IO.FlatMap[Any, Any]]
+                // Cannot capture `curIo` since it will be boxed into `ObjectRef`,
+                // which destroys performance, so we create a temp val here.
+                val tmpIo = curIo
 
-                  val nested = io.io
+                rts.submit(evaluate(tmpIo))
+              } else {
+                // Fiber is neither being interrupted nor needs to yield. Execute
+                // the next instruction in the program:
+                (curIo.tag : @switch) match {
+                  case IO.Tags.FlatMap =>
+                    val io = curIo.asInstanceOf[IO.FlatMap[Any, Any]]
 
-                  // A mini interpreter for the left side of FlatMap that evaluates
-                  // anything that is 1-hop away. This eliminates heap usage for the
-                  // happy path.
-                  (nested.tag : @switch) match {
-                    case IO.Tags.Point =>
-                      val io2 = nested.asInstanceOf[IO.Point[Any]]
+                    val nested = io.io
 
-                      curIo = io.flatMapper(io2.value())
+                    // A mini interpreter for the left side of FlatMap that evaluates
+                    // anything that is 1-hop away. This eliminates heap usage for the
+                    // happy path.
+                    (nested.tag : @switch) match {
+                      case IO.Tags.Point =>
+                        val io2 = nested.asInstanceOf[IO.Point[Any]]
 
-                    case IO.Tags.Strict =>
-                      val io2 = nested.asInstanceOf[IO.Strict[Any]]
+                        curIo = io.flatMapper(io2.value())
 
-                      curIo = io.flatMapper(io2.value)
+                      case IO.Tags.Strict =>
+                        val io2 = nested.asInstanceOf[IO.Strict[Any]]
 
-                    case IO.Tags.SyncEffect =>
-                      val io2 = nested.asInstanceOf[IO.SyncEffect[Any]]
+                        curIo = io.flatMapper(io2.value)
 
-                      try {
-                        curIo = io.flatMapper(io2.effect())
-                      } catch {
-                        case t : Throwable if (nonFatal(t)) =>
-                          curIo = IO.Fail(t)
-                      }
+                      case IO.Tags.SyncEffect =>
+                        val io2 = nested.asInstanceOf[IO.SyncEffect[Any]]
 
-                    case _ =>
-                      // Fallback case. We couldn't evaluate the LHS so we have to
-                      // use the stack:
-                      curIo = nested
+                        try {
+                          curIo = io.flatMapper(io2.effect())
+                        } catch {
+                          case t : Throwable if (nonFatal(t)) =>
+                            curIo = IO.Fail(t)
+                        }
 
-                      stack.push(io.flatMapper)
-                  }
+                      case _ =>
+                        // Fallback case. We couldn't evaluate the LHS so we have to
+                        // use the stack:
+                        curIo = nested
 
-                case IO.Tags.Point =>
-                  val io = curIo.asInstanceOf[IO.Point[Any]]
+                        stack.push(io.flatMapper)
+                    }
 
-                  val value = io.value()
+                  case IO.Tags.Point =>
+                    val io = curIo.asInstanceOf[IO.Point[Any]]
 
-                  curIo = nextInstr(value, stack)
-
-                  if (curIo == null) {
-                    eval   = false
-                    result = \/-(value)
-                  }
-
-                case IO.Tags.Strict =>
-                  val io = curIo.asInstanceOf[IO.Strict[Any]]
-
-                  val value = io.value
-
-                  curIo = nextInstr(value, stack)
-
-                  if (curIo == null) {
-                    eval   = false
-                    result = \/-(value)
-                  }
-
-                case IO.Tags.SyncEffect =>
-                  val io = curIo.asInstanceOf[IO.SyncEffect[Any]]
-
-                  try {
-                    val value = io.effect()
+                    val value = io.value()
 
                     curIo = nextInstr(value, stack)
 
@@ -426,244 +407,271 @@ private object RTS {
                       eval   = false
                       result = \/-(value)
                     }
-                  } catch {
-                    case t : Throwable if (nonFatal(t)) =>
-                      curIo = IO.Fail(t)
-                  }
 
-                case IO.Tags.Fail =>
-                  val io = curIo.asInstanceOf[IO.Fail[Any]]
+                  case IO.Tags.Strict =>
+                    val io = curIo.asInstanceOf[IO.Strict[Any]]
 
-                  val error = io.failure
+                    val value = io.value
 
-                  val finalizer = catchException(error)
+                    curIo = nextInstr(value, stack)
 
-                  if (stack.isEmpty()) {
-                    // Exception not caught, stack is empty:
-                    if (finalizer == null) {
-                      // No finalizer, so immediately produce the error.
+                    if (curIo == null) {
                       eval   = false
-                      result = -\/(error)
-                    } else {
-                      // We have finalizers to run. We'll resume executing with the
-                      // uncaught failure after we have executed all the finalizers:
-                      val reported  = dispatchErrors(finalizer)
-                      val completer = IO.fail[Any](error)
-
-                      // FIXME: Here and elsewhere when this pattern is used we
-                      // need a guarantee the actions will not be interrupted.
-                      // Which means we have to not use `uninterruptibly`,
-                      // because we might terminate before entering the block.
-                      // We need to start non-interruption now, and then end it
-                      // after the block executes.
-
-                      curIo = (reported *> completer).uninterruptibly
+                      result = \/-(value)
                     }
-                  } else {
-                    val value: Try[Any] = -\/(error)
 
-                    // Exception caught:
-                    if (finalizer == null) {
-                      // No finalizer to run:
+                  case IO.Tags.SyncEffect =>
+                    val io = curIo.asInstanceOf[IO.SyncEffect[Any]]
+
+                    try {
+                      val value = io.effect()
+
                       curIo = nextInstr(value, stack)
 
                       if (curIo == null) {
                         eval   = false
                         result = \/-(value)
                       }
-                    } else {
-                      // Must run finalizer first:
-                      val reported  = dispatchErrors(finalizer)
-                      val completer = IO.now[Any](\/-(value))
-
-                      curIo = (reported *> completer).uninterruptibly
+                    } catch {
+                      case t : Throwable if (nonFatal(t)) =>
+                        curIo = IO.Fail(t)
                     }
-                  }
 
-                case IO.Tags.AsyncEffect =>
-                  val io = curIo.asInstanceOf[IO.AsyncEffect[Any]]
+                  case IO.Tags.Fail =>
+                    val io = curIo.asInstanceOf[IO.Fail[Any]]
 
-                  try {
-                    val id = enterAsyncStart()
+                    val error = io.failure
+
+                    val finalizer = catchException(error)
+
+                    if (stack.isEmpty()) {
+                      // Exception not caught, stack is empty:
+                      if (finalizer == null) {
+                        // No finalizer, so immediately produce the error.
+                        eval   = false
+                        result = -\/(error)
+                      } else {
+                        // We have finalizers to run. We'll resume executing with the
+                        // uncaught failure after we have executed all the finalizers:
+                        val reported  = dispatchErrors(finalizer)
+                        val completer = IO.fail[Any](error)
+
+                        // Do not interrupt finalization:
+                        this.noInterrupt += 1
+
+                        curIo = ensuringUninterruptibleExit(reported *> completer)
+                      }
+                    } else {
+                      val value: Try[Any] = -\/(error)
+
+                      // Exception caught:
+                      if (finalizer == null) {
+                        // No finalizer to run:
+                        curIo = nextInstr(value, stack)
+
+                        if (curIo == null) {
+                          eval   = false
+                          result = \/-(value)
+                        }
+                      } else {
+                        // Must run finalizer first:
+                        val reported  = dispatchErrors(finalizer)
+                        val completer = IO.now[Any](\/-(value))
+
+                        // Do not interrupt finalization:
+                        this.noInterrupt += 1
+
+                        curIo = ensuringUninterruptibleExit(reported *> completer)
+                      }
+                    }
+
+                  case IO.Tags.AsyncEffect =>
+                    val io = curIo.asInstanceOf[IO.AsyncEffect[Any]]
 
                     try {
-                      io.register(resumeAsync(_)) match {
-                        case AsyncReturn.Now(value) =>
-                          // Value returned synchronously, callback will never be
-                          // invoked. Attempt resumption now:
-                          if (resumeAsync()) {
-                            curIo = nextInstr(value, stack)
+                      val id = enterAsyncStart()
 
-                            if (curIo == null) {
-                              eval   = false
-                              result = \/-(value)
+                      try {
+                        io.register(resumeAsync) match {
+                          case AsyncReturn.Now(value) =>
+                            // Value returned synchronously, callback will never be
+                            // invoked. Attempt resumption now:
+                            if (resumeAsync()) {
+                              curIo = nextInstr(value, stack)
+
+                              if (curIo == null) {
+                                eval   = false
+                                result = \/-(value)
+                              }
+                            } else {
+                              eval = false
                             }
-                          } else {
+
+                          case AsyncReturn.MaybeLater(canceler) =>
+                            // We have a canceler, attempt to store a reference to
+                            // it in case the async computation is interrupted:
+                            awaitAsync(id, canceler)
+
                             eval = false
-                          }
 
-                        case AsyncReturn.MaybeLater(canceler) =>
-                          // We have a canceler, attempt to store a reference to
-                          // it in case the async computation is interrupted:
-                          awaitAsync(id, canceler)
-
+                          case _ =>
+                            eval = false
+                        }
+                      } finally enterAsyncEnd()
+                    } catch {
+                      // The async effect threw an exception, so we'll never get
+                      // any more information. Treat it as a failure & resume:
+                      case t : Throwable if (nonFatal(t)) =>
+                        if (resumeAsync()) {
+                          curIo = IO.Fail(t)
+                        } else {
                           eval = false
+                        }
+                    }
 
-                        case _ =>
-                          eval = false
-                      }
-                    } finally enterAsyncEnd()
-                  } catch {
-                    // The async effect threw an exception, so we'll never get
-                    // any more information. Treat it as a failure & resume:
-                    case t : Throwable if (nonFatal(t)) =>
-                      if (resumeAsync()) {
-                        curIo = IO.Fail(t)
-                      } else {
-                        eval = false
-                      }
-                  }
+                  case IO.Tags.Attempt =>
+                    val io = curIo.asInstanceOf[IO.Attempt[Any]]
 
-                case IO.Tags.Attempt =>
-                  val io = curIo.asInstanceOf[IO.Attempt[Any]]
+                    curIo = io.value
 
-                  curIo = io.value
+                    stack.push(Catcher)
 
-                  stack.push(Catcher)
+                  case IO.Tags.Fork =>
+                    val io = curIo.asInstanceOf[IO.Fork[Any]]
 
-                case IO.Tags.Fork =>
-                  val io = curIo.asInstanceOf[IO.Fork[Any]]
+                    val optHandler = Maybe.toOption(io.handler)
 
-                  val optHandler = Maybe.toOption(io.handler)
+                    val handler = if (optHandler eq None) unhandled else optHandler.get
 
-                  val handler = if (optHandler eq None) unhandled else optHandler.get
+                    val value: FiberContext[Any] = fork(io.value, handler)
 
-                  val value: FiberContext[Any] = fork(io.value, handler)
+                    supervise(value)
 
-                  supervise(value)
+                    curIo = nextInstr(value : Fiber[Any], stack)
 
-                  curIo = nextInstr(value : Fiber[Any], stack)
+                    if (curIo == null) {
+                      eval   = false
+                      result = \/-(value)
+                    }
 
-                  if (curIo == null) {
-                    eval   = false
-                    result = \/-(value)
-                  }
+                  case IO.Tags.Race =>
+                    val io = curIo.asInstanceOf[IO.Race[Any, Any, Any]]
 
-                case IO.Tags.Race =>
-                  val io = curIo.asInstanceOf[IO.Race[Any, Any, Any]]
+                    curIo = raceWith(unhandled, io.left, io.right, io.finish)
 
-                  curIo = raceWith(unhandled, io.left, io.right, io.finish)
+                  case IO.Tags.Suspend =>
+                    val io = curIo.asInstanceOf[IO.Suspend[Any]]
 
-                case IO.Tags.Suspend =>
-                  val io = curIo.asInstanceOf[IO.Suspend[Any]]
+                    curIo = io.value()
 
-                  curIo = io.value()
+                  case IO.Tags.Bracket =>
+                    val io = curIo.asInstanceOf[IO.Bracket[Any, Any]]
 
-                case IO.Tags.Bracket =>
-                  val io = curIo.asInstanceOf[IO.Bracket[Any, Any]]
+                    val ref = new AtomicReference[Any]()
 
-                  val ref = new AtomicReference[Any]()
+                    val finalizer = Finalizer(rez =>
+                      IO.suspend(if (ref.get != null) io.release(rez, ref.get) else IO.unit))
 
-                  val finalizer = Finalizer(rez =>
-                    IO.suspend(if (ref.get != null) io.release(rez, ref.get) else IO.unit ))
+                    stack.push(finalizer)
 
-                  stack.push(finalizer)
+                    // TODO: Optimize
+                    // FIXME: Handle case of release throwing error.
+                    curIo =
+                      for {
+                        a <- (for {
+                               a <- io.acquire
+                               _ <- IO.sync(ref.set(a))
+                             } yield a).uninterruptibly
+                        b <- io.use(a)
+                        _ <- (io.release(BracketResult.Completed(b), a) <* IO.sync(ref.set(null))).uninterruptibly
+                      } yield b
 
-                  // TODO: Optimize, especially for special case of io.acquire ==
-                  // IO.unit (ensuring)
-                  curIo =
-                    for {
-                      a <- (for {
-                             a <- io.acquire
-                             _ <- IO.sync(ref.set(a))
-                           } yield a).uninterruptibly
-                      b <- io.use(a)
-                      _ <- (io.release(BracketResult.Completed(b), a) <* IO.sync(ref.set(null))).uninterruptibly
-                    } yield b
+                  case IO.Tags.Uninterruptible =>
+                    val io = curIo.asInstanceOf[IO.Uninterruptible[Any]]
 
-                case IO.Tags.Uninterruptible =>
-                  val io = curIo.asInstanceOf[IO.Uninterruptible[Any]]
+                    curIo = IO.absolve(for {
+                      _ <- enterUninterruptible
+                      v <- io.io.attempt
+                      _ <- exitUninterruptible
+                    } yield v)
 
-                  curIo = IO.absolve(for {
-                    _ <- enterNonInterruptible
-                    v <- io.io.attempt
-                    _ <- exitNonInterruptible
-                  } yield v)
+                  case IO.Tags.Sleep =>
+                    val io = curIo.asInstanceOf[IO.Sleep]
 
-                case IO.Tags.Sleep =>
-                  val io = curIo.asInstanceOf[IO.Sleep]
+                    curIo = IO.AsyncEffect { callback =>
+                      rts.schedule(callback(SuccessUnit.asInstanceOf[Try[Any]]), io.duration).asInstanceOf[AsyncReturn[Any]]
+                    }
 
-                  curIo = IO.AsyncEffect { callback =>
-                    rts.schedule(callback(SuccessUnit.asInstanceOf[Try[Any]]), io.duration).asInstanceOf[AsyncReturn[Any]]
-                  }
+                  case IO.Tags.Supervise =>
+                    val io = curIo.asInstanceOf[IO.Supervise[Any]]
 
-                case IO.Tags.Supervise =>
-                  val io = curIo.asInstanceOf[IO.Supervise[Any]]
+                    curIo = enterSupervision *>
+                      io.value.ensuring(exitSupervision(io.error))
+                }
+              }
+            } else {
+              val t = die.get
 
-                  curIo =
-                    for {
-                      _ <- enterSupervision
-                      v <- io.value.ensuring(exitSupervision(io.error))
-                    } yield v
+              // Fiber is being interrupted. Grab all finalizers from the
+              // stack to ensure they are run:
+              val finalizer = interruptStack(t)
+
+              if (finalizer == null) {
+                // No finalizers, simply produce error:
+                eval    = false
+                result  = -\/(t)
+              } else {
+                // Must run finalizers first before failing:
+                val reported  = dispatchErrors(finalizer)
+                val completer = IO.fail[Any](t)
+
+                // Do not interrupt finalization:
+                this.noInterrupt += 1
+
+                curIo = ensuringUninterruptibleExit(reported *> completer)
               }
             }
-          } else {
-            val t = die.get
 
-            // Fiber is being interrupted. Grab all finalizers from the
-            // stack to ensure they are run:
-            val finalizer = interruptStack(t)
+            opcount = opcount + 1
+          } while (eval)
 
-            if (finalizer == null) {
-              // No finalizers, simply produce error:
-              eval    = false
-              result  = -\/(t)
-            } else {
-              // Must run finalizers first before failing:
-              val reported  = dispatchErrors(finalizer)
-              val completer = IO.fail[Any](t)
+          if (result != null) {
+            done(result.asInstanceOf[Try[A]])
+          }
 
-              curIo = (reported *> completer).uninterruptibly
+          curIo = null // Ensure termination of outer loop
+        } catch {
+          // Catastrophic error handler. Any error thrown inside the interpreter is
+          // either a bug in the interpreter or a bug in the user's code. Let the
+          // fiber die but attempt finalization & report errors.
+          case t : Throwable if (nonFatal(t)) =>
+            val handled = unhandled(t).attempt.map {
+              case -\/(t) => t :: Nil
+              case _ => Nil
             }
-          }
 
-          opcount = opcount + 1
-        } while (eval)
+            val finalizer0 = interruptStack(t)
 
-        if (result != null) {
-          done(result.asInstanceOf[Try[A]])
+            val finalizer =
+              if (finalizer0 == null) handled
+              else finalizer0.flatMap(first => handled.map(last => first ::: last))
+
+            val reported  = dispatchErrors(finalizer)
+            val completer = IO.fail[Any](t)
+
+            // Do not interrupt finalization:
+            this.noInterrupt += 1
+
+            // Continue with the outer loop:
+            curIo = ensuringUninterruptibleExit(reported *> completer)
         }
-      } catch {
-        // Catastrophic error handler. Any error thrown inside the interpreter is
-        // either a bug in the interpreter or a bug in the user's code. Let the
-        // fiber die but attempt finalization & report errors.
-        case t : Throwable if (nonFatal(t)) =>
-          val handled = unhandled(t).attempt.map {
-            case -\/(t) => t :: Nil
-            case _ => Nil
-          }
-
-          val finalizer0 = interruptStack(t)
-
-          val finalizer =
-            if (finalizer0 == null) handled
-            else finalizer0.flatMap(first => handled.map(last => first ::: last))
-
-          val reported  = dispatchErrors(finalizer)
-          val completer = IO.fail[Any](t)
-
-          val io = (reported *> completer).uninterruptibly
-
-          // Run on thread pool to avoid growing stack. TODO: Run here by using
-          // another top-level loop.
-          rts.submit(evalSync(io))
       }
     }
 
     final def fork[A](io: IO[A], handler: Throwable => IO[Unit]): FiberContext[A] = {
       val context = new FiberContext[A](rts, handler)
 
-      rts.submit(context.evalSync(io))
+      rts.submit(context.evaluate(io))
 
       context
     }
@@ -673,12 +681,12 @@ private object RTS {
      *
      * @param value The value which will be used to resume the sync evaluation.
      */
-    private final def resumeEvalSync(value: Try[Any]): Unit = {
+    private final def resumeEvaluate(value: Try[Any]): Unit = {
       def continueWithValue(v: Any, value: Try[Any]): Unit = {
         val io = nextInstr(v, stack)
 
         if (io == null) done(value.asInstanceOf[Try[A]])
-        else evalSync(io)
+        else evaluate(io)
       }
 
       value match {
@@ -697,7 +705,10 @@ private object RTS {
             val reported  = dispatchErrors(finalizer)
             val completer = if (stack.isEmpty()) IO.fail(t) else IO.now(\/-(value))
 
-            evalSync((reported *> completer).uninterruptibly)
+            // Do not interrupt finalization:
+            this.noInterrupt += 1
+
+            evaluate(ensuringUninterruptibleExit(reported *> completer))
           }
       }
     }
@@ -705,14 +716,16 @@ private object RTS {
     /**
      * Resumes an asynchronous computation.
      *
-     * @param value     The value produced by the asynchronous computation.
+     * @param value The value produced by the asynchronous computation.
      */
     private final def resumeAsync[A](value: Try[Any]): Unit = {
       if (resumeAsync()) {
         // TODO: CPS transform
+        // Take care not to overflow the stack in cases of 'deeply' nested
+        // asynchronous callbacks.
         if (this.reentrancy > MaxResumptionDepth) {
-          rts.submit(resumeEvalSync(value))
-        } else resumeEvalSync(value)
+          rts.submit(resumeEvaluate(value))
+        } else resumeEvaluate(value)
       }
     }
 
@@ -722,7 +735,7 @@ private object RTS {
       val left = fork(leftIO, unhandled)
       val right = fork(rightIO, unhandled)
 
-      // TODO: Kill raced fibers if parent is killed?
+      // TODO: Interrupt raced fibers if parent is interrupted?
 
       val leftWins = (w: A, l: Fiber[B]) => finish(-\/((w, l)))
       val rightWins = (w: B, l: Fiber[A]) => finish(\/-((w, l)))
@@ -807,7 +820,7 @@ private object RTS {
 
     final def interrupt(t: Throwable): IO[Unit] = IO.async0(kill1(t, _))
 
-    final def join: IO[A] = IO.async0(join1(_))
+    final def join: IO[A] = IO.async0(join1)
 
     final def enterSupervision: IO[Unit] = IO.sync {
       supervising += 1
@@ -939,9 +952,12 @@ private object RTS {
       }
     }
 
-    final def enterNonInterruptible: IO[Unit] = IO.sync { noInterrupt += 1 }
+    final def ensuringUninterruptibleExit[Z](io: IO[Z]): IO[Z] =
+      IO.absolve(io.attempt <* exitUninterruptible)
 
-    final def exitNonInterruptible: IO[Unit] = IO.sync { noInterrupt -= 1 }
+    final def enterUninterruptible: IO[Unit] = IO.sync { noInterrupt += 1 }
+
+    final def exitUninterruptible: IO[Unit] = IO.sync { noInterrupt -= 1 }
 
     final def register(cb: Callback[A]): AsyncReturn[Try[A]] = join0(cb)
 
