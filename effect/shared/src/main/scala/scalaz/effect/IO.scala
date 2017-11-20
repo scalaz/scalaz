@@ -141,7 +141,7 @@ sealed abstract class IO[A] { self =>
    * otherwise executes the specified action.
    */
   final def orElse(that: => IO[A]): IO[A] =
-    self.attempt.flatMap(_.fold(_ => that)(IO.now(_)))
+    self.attempt.flatMap(_.fold(_ => that)(IO.now))
 
   /**
    * Executes this action, capturing both failure and success and returning
@@ -188,7 +188,7 @@ sealed abstract class IO[A] { self =>
    * errors produced by the `release` action can be caught and ignored.
    *
    * {{{
-   * openFile("data.json").bracket(closeFile(_)) { file =>
+   * openFile("data.json").bracket(closeFile) { file =>
    *   for {
    *     header <- readHeader(file)
    *     ...
@@ -276,7 +276,7 @@ sealed abstract class IO[A] { self =>
     def tryRescue(t: Throwable): IO[A] =
       if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
 
-    self.attempt.flatMap(_.fold(tryRescue)(IO.now(_)))
+    self.attempt.flatMap(_.fold(tryRescue)(IO.now))
   }
 
   /**
@@ -336,7 +336,7 @@ sealed abstract class IO[A] { self =>
    *
    * {{{
    * for {
-   *   file <- readFile("data.json").peek(putStrLn(_))
+   *   file <- readFile("data.json").peek(putStrLn)
    * } yield file
    * }}}
    */
@@ -541,7 +541,7 @@ object IO extends IOInstances {
    * value, then the specified error will be raised.
    */
   final def require[A](t: Throwable): IO[Maybe[A]] => IO[A] =
-    (io: IO[Maybe[A]]) => io.flatMap(_.fold(IO.now[A](_), IO.fail[A](t)))
+    (io: IO[Maybe[A]]) => io.flatMap(_.fold(IO.now[A], IO.fail[A](t)))
 
   private final val Never: IO[Any] = IO.async[Any] { (k: (Throwable \/ Any) => Unit) => }
 }
