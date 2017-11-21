@@ -22,7 +22,7 @@ trait MaybeFunctions {
 }
 
 /** To be mixed into Prelude. */
-trait MaybePrelude extends MaybeFunctions {
+trait MaybePrelude extends MaybeFunctions with MaybeSyntax {
   type Maybe[A] = data.Maybe[A]
 
   override def empty[A]                     = data.Maybe.empty[A]

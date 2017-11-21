@@ -1,7 +1,6 @@
 package scalaz
 
 import typeclass._
-import data._
 
 import scala.language.implicitConversions
 
@@ -43,7 +42,7 @@ trait Prelude  extends data.DisjunctionFunctions
   def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
   def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
   def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
-  def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P 
+  def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P
   def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
   def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
   def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
@@ -69,26 +68,23 @@ trait Prelude  extends data.DisjunctionFunctions
   implicit def PfunctorOps[F[_], A](fa: F[A])(implicit F: Functor[F]): FunctorSyntax.Ops[F, A] =
     new FunctorSyntax.Ops(fa)
 
-  // MaybeSyntax
-  implicit class POptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
-
   // TraversableSyntax
   implicit def PtraversableOps[T[_], A](ta: T[A])(implicit T: Traversable[T]): TraversableSyntax.Ops[T, A] =
     new TraversableSyntax.Ops(ta)
 
-  implicit def PprofunctorOps[P[_,_], A, B](pab: P[A, B])(implicit P: Profunctor[P]): ProfunctorSyntax.Ops[P, A, B] = 
+  implicit def PprofunctorOps[P[_,_], A, B](pab: P[A, B])(implicit P: Profunctor[P]): ProfunctorSyntax.Ops[P, A, B] =
     new ProfunctorSyntax.Ops(pab)
-  
+
   implicit def PchoiceOps[P[_,_], A, B](pab: P[A, B])(implicit P: Choice[P]): ChoiceSyntax.Ops[P, A, B] =
    new ChoiceSyntax.Ops(pab)
 
   implicit def PstrongOps[P[_,_], A, B](pab: P[A, B])(implicit P: Strong[P]): StrongSyntax.Ops[P, A, B] =
     new StrongSyntax.Ops(pab)
-   
+
   //InvariantFunctorSyntax
   implicit def InvariantFunctorOps[F[_], A](fa: F[A])(implicit F: InvariantFunctor[F]): InvariantFunctorSyntax.Ops[F, A] =
     new InvariantFunctorSyntax.Ops(fa)
-  
+
   implicit def CobindOps[F[_], A](fa: F[A])(implicit F: Cobind[F]): CobindSyntax.Ops[F, A] =
     new CobindSyntax.Ops(fa)
 
@@ -98,7 +94,7 @@ trait Prelude  extends data.DisjunctionFunctions
 
   // Base Data
   // =========
-  
+
   type \/[L, R] = data.Disjunction.\/[L, R]
   type ===[A, B] = data.===[A, B]
   type Identity[A] = data.Identity[A]
