@@ -526,6 +526,13 @@ object IO extends IOInstances {
    */
   final def never[A]: IO[A] = Never.asInstanceOf[IO[A]]
 
+  import scala.concurrent.ExecutionContext
+
+  def shift[A](io: IO[A], ec: ExecutionContext): IO[A] =
+    IO.flatten(IO.async[IO[A]](k => ec.execute {
+      new Runnable() { def run: Unit = k(\/-(io)) }
+    }))
+
   /**
    * Submerges the error case of a disjunction into the `IO`. The inverse
    * operation of `IO.attempt`.

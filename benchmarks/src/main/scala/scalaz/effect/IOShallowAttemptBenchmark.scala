@@ -31,13 +31,13 @@ class IOShallowAttemptBenchmark {
     import scala.concurrent.duration.Duration.Inf
 
     def throwup(n: Int): Future[BigInt] =
-      if (n == 0) throwup(n + 1).andThen {
-        case Failure(_) => 0
-        case Success(v) => v
+      if (n == 0) throwup(n + 1).transform {
+        case Failure(_) => Success(0)
+        case Success(v) => Success(v)
       } else if (n == depth) Future(1)
-      else throwup(n + 1).andThen {
-        case Failure(_) => 0
-        case Success(v) => v
+      else throwup(n + 1).transform {
+        case Failure(_) => Success(0)
+        case Success(v) => Success(v)
       }.flatMap(_ => Future.failed(new Error("Oh noes!")))
 
     Await.result(throwup(0), Inf)

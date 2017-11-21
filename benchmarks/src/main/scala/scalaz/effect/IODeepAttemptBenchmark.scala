@@ -34,9 +34,9 @@ class IODeepAttemptBenchmark {
 
     def descend(n: Int): Future[BigInt] =
       if (n == depth) Future.failed(new Error("Oh noes!"))
-      else if (n == halfway) descend(n + 1).andThen {
-        case Failure(_) => 50
-        case Success(v) => v
+      else if (n == halfway) descend(n + 1).transform {
+        case Failure(_) => Success(50)
+        case Success(v) => Success(v)
       } else descend(n + 1).map(_ + n)
 
     Await.result(descend(0), Inf)
