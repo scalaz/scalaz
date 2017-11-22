@@ -132,6 +132,14 @@ sealed trait Is[A, B] { ab =>
     type f[a] = A =:= a
     subst[f](implicitly[A =:= A])
   }
+
+  /**
+    * Given `A === B`, prove `A <~< B`.
+    */
+  def toAs: A <~< B = {
+    type f[a] = A <~< a
+    subst[f](As.refl[A])
+  }
 }
 
 object Is {
@@ -188,4 +196,23 @@ object Is {
     type f3[α] = F[A, I, M] === F[B, J, α]
     mn.subst[f3](ij.subst[f2](ab.subst[f1](refl)))
   }
+
+  /**
+    * It can be convenient to convert a [[=:=]] value into a `Leibniz` value.
+    * This is not strictly valid as while it is almost certainly true that
+    * `A =:= B` implies `A === B` it is not the case that you can create
+    * evidence of `A === B` except via a coercion. Use responsibly.
+    */
+  def fromPredef[A, B](ev: A =:= B): A === B = {
+    val _ = ev
+    unsafeForce[A, B]
+  }
+
+  /**
+    * Unsafe coercion between types. `force` abuses `asInstanceOf` to
+    * explicitly coerce types. It is unsafe, but needed where Leibnizian
+    * equality isn't sufficient.
+    */
+  def unsafeForce[A, B]: A === B =
+    refl[Any].asInstanceOf[A === B]
 }

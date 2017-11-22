@@ -5,6 +5,7 @@ package data
 import com.github.ghik.silencer.silent
 
 import Prelude.<~<
+import scalaz.typeclass.{IsContravariant, IsCovariant}
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -104,7 +105,7 @@ sealed abstract class As[-A, +B] { ab =>
   }
 }
 
-object As extends AsInstances with AsFunctions {
+object As extends AsInstances {
   def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 
   private[this] final case class Refl[A]() extends (A <~< A) {
@@ -121,5 +122,38 @@ object As extends AsInstances with AsFunctions {
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  implicit def reify[A, B >: A]: A <~< B = Forall.toForallOps(refl_).apply[A]
+  implicit def reify[A, B >: A]: A <~< B = refl[A]
+
+  implicit final class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
+    def liftCoF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
+      F.liftLiskov(ab)
+
+    def liftCtF[F[_]](implicit F: IsContravariant[F]): F[B] As F[A] =
+      F.liftLiskov(ab)
+
+    def substCvF[F[_]](fa: F[A])(implicit F: IsCovariant[F]): F[B] = {
+      type f[+x] = x
+      F.substCv[f, A, B](fa)(ab)
+    }
+
+    def substCtF[F[_]](fb: F[B])(implicit F: IsContravariant[F]): F[A] = {
+      type f[+x] = x
+      F.substCv[f, A, B](fb)(ab)
+    }
+  }
+
+  /**
+    * Given `A <:< B`, prove `A <~< B`
+    */
+  def fromPredef[A, B](ev: A <:< B): A <~< B = {
+    val _ = ev
+    unsafeForce[A, B]
+  }
+
+  /**
+    * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
+    * explicitly coerce types. It is unsafe.
+    */
+  def unsafeForce[A, B]: A <~< B =
+    refl[Any].asInstanceOf[A <~< B]
 }

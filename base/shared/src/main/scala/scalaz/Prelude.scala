@@ -13,7 +13,6 @@ trait Prelude  extends data.DisjunctionFunctions
                   with typeclass.BindFunctions
                   with typeclass.FunctorFunctions
                   with typeclass.InvariantFunctorFunctions
-                  with AsFunctions
                   with typeclass.TraversableFunctions {
 
   // Base Class
