@@ -15,8 +15,8 @@ import Prelude._
   *
   * @see [[<~<]] `A <~< B` is a type synonym to `A As B`
   */
-sealed abstract class Liskov[-A, +B] { ab =>
-  import Liskov._
+sealed abstract class As[-A, +B] { ab =>
+  import As._
 
   /**
     * Substitution into a covariant context.
@@ -104,7 +104,7 @@ sealed abstract class Liskov[-A, +B] { ab =>
   }
 }
 
-object Liskov extends LiskovInstances with LiskovFunctions {
+object As extends AsInstances with AsFunctions {
   def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 
   private[this] final case class Refl[A]() extends (A <~< A) {

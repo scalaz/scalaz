@@ -3,9 +3,9 @@ package typeclass
 
 import Prelude.<~<
 
-trait LiskovFunctions {
+trait AsFunctions {
   /**Lift Scala's subtyping relationship */
-  def isa[A, B >: A]: A <~< B = Liskov.refl
+  def isa[A, B >: A]: A <~< B = As.refl
 
   def liftCt[F[_], A, B](a: A <~< B)(implicit F: IsContravariant[F]): F[B] <~< F[A] =
     F.liftLiskov[A, B](a)
@@ -21,5 +21,5 @@ trait LiskovFunctions {
     g.substCt[λ[`-α` => α <~< C]](f)
 
   def unsafeForce[A, B]: A <~< B =
-    Liskov.refl[A].asInstanceOf[A <~< B]
+    As.refl[A].asInstanceOf[A <~< B]
 }

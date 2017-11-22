@@ -18,7 +18,7 @@ object IsCovariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] =
-      substCv[F[A] <~< +?, A, B](Liskov.refl[F[A]])
+      substCv[F[A] <~< +?, A, B](As.refl[F[A]])
  
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       substCv[F[A] => +?, A, B](identity[F[A]]).apply(fa)
@@ -33,7 +33,7 @@ object IsCovariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] =
-      substCt[-? <~< F[B], A, B](Liskov.refl[F[B]])
+      substCt[-? <~< F[B], A, B](As.refl[F[B]])
  
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       substCt[-? => F[B], A, B](identity[F[B]]).apply(fa)

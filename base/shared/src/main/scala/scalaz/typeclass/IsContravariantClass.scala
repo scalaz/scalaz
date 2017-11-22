@@ -18,7 +18,7 @@ object IsContravariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[B] <~< F[A] =
-      substCv[F[B] <~< +?, A, B](Liskov.refl[F[B]])
+      substCv[F[B] <~< +?, A, B](As.refl[F[B]])
  
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       substCv[F[B] => +?, A, B](identity[F[B]]).apply(fb)
@@ -33,7 +33,7 @@ object IsContravariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[B] <~< F[A] =
-      substCt[-? <~< F[A], A, B](Liskov.refl[F[A]])
+      substCt[-? <~< F[A], A, B](As.refl[F[A]])
  
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       substCt[-? => F[A], A, B](identity[F[A]]).apply(fb)

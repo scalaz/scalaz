@@ -3,7 +3,7 @@ package data
 
 import Prelude.<~<
 
-import typeclass.Liskov
+import typeclass.As
 import scala.language.implicitConversions
 
 trait ForallModule {
@@ -74,9 +74,9 @@ private[data] object ForallImpl extends ForallModule with ForallSyntax {
 
   def of[F[_]]: MkForall[F] = new MkForallImpl[F]
 
-  def instantiation[F[_], A]: ∀[F] <~< F[A] = Liskov.unsafeForce
+  def instantiation[F[_], A]: ∀[F] <~< F[A] = As.unsafeForce
 
-  def vacuous[A]: A <~< ∀[λ[α => A]] = Liskov.refl[A]
+  def vacuous[A]: A <~< ∀[λ[α => A]] = As.refl[A]
 
   // Justification:
   // Having evidence `ev` that `F[α]` is a subtype of `G[α]` for all types `α`,
@@ -86,7 +86,7 @@ private[data] object ForallImpl extends ForallModule with ForallSyntax {
   // via `of[G].from(f): ∀[G]`, and this is identity on `f`.
   // We have shown that any value `f: ∀[F]` can be used where `∀[G]` is required,
   // which is the very idea of Liskov substitution principle.
-  def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G] = Liskov.unsafeForce
+  def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G] = As.unsafeForce
 }
 
 private[data] final class MkForallImpl[F[_]](val dummy: Boolean = false) extends AnyVal with ForallImpl.MkForall[F] {
