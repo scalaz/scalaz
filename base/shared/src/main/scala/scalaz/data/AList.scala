@@ -130,7 +130,7 @@ final case class ACons[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) ex
 sealed abstract case class ANil[F[_, _], A, B]() extends AList[F, A, B] {
   def   subst[G[_]](ga: G[A]): G[B]
   def unsubst[G[_]](gb: G[B]): G[A]
-  def leibniz: A === B = subst[A === ?](Leibniz.refl[A])
+  def leibniz: A === B = subst[A === ?](Is.refl[A])
 }
 
 object AList {

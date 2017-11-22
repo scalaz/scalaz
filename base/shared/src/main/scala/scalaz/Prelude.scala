@@ -100,7 +100,7 @@ trait Prelude  extends data.DisjunctionFunctions
   // =========
   
   type \/[L, R] = data.Disjunction.\/[L, R]
-  type ===[A, B] = data.===[A, B]
+  type ===[A, B] = data.Is[A, B]
   type Identity[A] = data.Identity[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
 
