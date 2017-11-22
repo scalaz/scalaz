@@ -2,6 +2,7 @@ package scalaz
 package typeclass
 
 import Prelude.<~<
+import data.As
 
 trait IsContravariantClass[F[_]] extends IsContravariant[F] {
   final def isContravariant: IsContravariant[F] = this

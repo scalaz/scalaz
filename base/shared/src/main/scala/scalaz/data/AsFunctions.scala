@@ -1,7 +1,8 @@
 package scalaz
-package typeclass
+package data
 
 import Prelude.<~<
+import typeclass.{IsContravariant, IsCovariant}
 
 trait AsFunctions {
   /**Lift Scala's subtyping relationship */

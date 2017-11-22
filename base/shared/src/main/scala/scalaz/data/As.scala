@@ -1,10 +1,10 @@
 package scalaz
-package typeclass
+package data
 
 // FIXME: remove once https://github.com/scala/bug/issues/10623 is fixed.
 import com.github.ghik.silencer.silent
 
-import Prelude._
+import Prelude.<~<
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -111,15 +111,15 @@ object As extends AsInstances with AsFunctions {
     def substCv[F[+_]](p: F[A]): F[A] = p
   }
 
-  private[this] val refl_ = ∀.of[λ[α => α <~< α]].from(new Refl)
+  private[this] val refl_ : ∀[λ[α => α <~< α]] = ∀.of[λ[α => α <~< α]].from(new Refl)
 
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: (A <~< A) = refl_[A]
+  implicit def refl[A]: (A <~< A) = Forall.toForallOps(refl_).apply[A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  implicit def reify[A, B >: A]: A <~< B = refl_[A]
+  implicit def reify[A, B >: A]: A <~< B = Forall.toForallOps(refl_).apply[A]
 }

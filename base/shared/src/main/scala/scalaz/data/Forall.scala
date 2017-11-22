@@ -3,7 +3,6 @@ package data
 
 import Prelude.<~<
 
-import typeclass.As
 import scala.language.implicitConversions
 
 trait ForallModule {

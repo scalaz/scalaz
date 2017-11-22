@@ -1,8 +1,7 @@
 package scalaz
-package typeclass
+package data
 
 import scala.language.implicitConversions
-
 import Prelude.<~<
 
 trait AsInstances {
