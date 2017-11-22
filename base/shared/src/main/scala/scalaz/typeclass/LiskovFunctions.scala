@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import Prelude.<~<
 
 trait LiskovFunctions {
   /**Lift Scala's subtyping relationship */
@@ -18,7 +18,7 @@ trait LiskovFunctions {
 
   /**Subtyping is transitive */
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
-    g.subst[λ[`-α` => α <~< C]](f)
+    g.substCt[λ[`-α` => α <~< C]](f)
 
   def unsafeForce[A, B]: A <~< B =
     Liskov.refl[A].asInstanceOf[A <~< B]

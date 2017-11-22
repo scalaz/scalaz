@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import Prelude.<~<
 
 trait IsCovariantClass[F[_]] extends IsCovariant[F] {
   final def isCovariant: IsCovariant[F] = this
@@ -46,7 +46,7 @@ object IsCovariantClass {
       liftLiskov[A, B].substCv[G](g)
 
     override def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
-      liftLiskov[A, B].subst[G](g)
+      liftLiskov[A, B].substCt[G](g)
 
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       liftLiskov[A, B].apply(fa)

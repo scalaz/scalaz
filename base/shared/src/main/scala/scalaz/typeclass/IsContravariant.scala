@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import Prelude.<~<
 
 /**
  * Witnesses that the type constructor `F[_]` is contravariant,

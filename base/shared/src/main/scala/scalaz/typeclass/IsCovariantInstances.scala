@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import Prelude.<~<
 
 trait IsCovariantInstances {
   implicit def scalaCovariant[F[+_]]: IsCovariant[F] =

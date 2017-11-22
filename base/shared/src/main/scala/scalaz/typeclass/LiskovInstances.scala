@@ -3,7 +3,7 @@ package typeclass
 
 import scala.language.implicitConversions
 
-import Liskov.<~<
+import Prelude.<~<
 
 trait LiskovInstances {
   /**We can witness equality by using it to convert between types */

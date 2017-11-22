@@ -3,7 +3,6 @@ package data
 
 import Prelude._
 import typeclass.Liskov
-import typeclass.Liskov.<~<
 
 trait FixModule {
   type Fix[F[_]]

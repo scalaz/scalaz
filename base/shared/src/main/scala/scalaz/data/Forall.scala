@@ -1,8 +1,9 @@
 package scalaz
 package data
 
+import Prelude.<~<
+
 import typeclass.Liskov
-import typeclass.Liskov.<~<
 import scala.language.implicitConversions
 
 trait ForallModule {

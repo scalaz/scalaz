@@ -101,6 +101,8 @@ trait Prelude  extends data.DisjunctionFunctions
   
   type \/[L, R] = data.Disjunction.\/[L, R]
   type ===[A, B] = data.Is[A, B]
+  type <~<[-A, +B] = typeclass.Liskov[A, B]
+  type >~>[+B, -A] = typeclass.Liskov[A, B]
   type Identity[A] = data.Identity[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
 

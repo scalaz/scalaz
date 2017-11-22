@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import Prelude.<~<
 
 trait IsContravariantClass[F[_]] extends IsContravariant[F] {
   final def isContravariant: IsContravariant[F] = this
@@ -46,7 +46,7 @@ object IsContravariantClass {
       liftLiskov[A, B].substCv[G](g)
 
     override def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
-      liftLiskov[A, B].subst[G](g)
+      liftLiskov[A, B].substCt[G](g)
 
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       liftLiskov[A, B].apply(fb)
