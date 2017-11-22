@@ -121,5 +121,5 @@ object Liskov extends LiskovInstances with LiskovFunctions {
   /**
     * Reify Scala's subtyping relationship into an evidence value.
     */
-  implicit def reify[A, B >: A]: A <~< B = Refl[A]()
+  implicit def reify[A, B >: A]: A <~< B = refl_[A]
 }
