@@ -5,7 +5,7 @@ package syntax
 final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B])(implicit ap: Apply[M]) {
   def apply[C](f: (A, B) => C): M[C] = ap.apply2(a, b)(f)
 
-  def tupled: M[(A, B)] = apply(Tuple2.apply)
+  def tupled: M[(A, B)] = ap.tuple2(a, b)
 
   def ⊛[C](c: M[C]) = new ApplicativeBuilder3[C](c)
 
@@ -14,7 +14,7 @@ final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B])(implicit ap: Apply[
   final class ApplicativeBuilder3[C](c: M[C]) {
     def apply[D](f: (A, B, C) => D): M[D] = ap.apply3(a, b, c)(f)
 
-    def tupled: M[(A, B, C)] = apply(Tuple3.apply)
+    def tupled: M[(A, B, C)] = ap.tuple3(a, b, c)
 
     def ⊛[D](d: M[D]) = new ApplicativeBuilder4[D](d)
 
@@ -23,7 +23,7 @@ final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B])(implicit ap: Apply[
     final class ApplicativeBuilder4[D](d: M[D]) {
       def apply[E](f: (A, B, C, D) => E): M[E] = ap.apply4(a, b, c, d)(f)
 
-      def tupled: M[(A, B, C, D)] = apply(Tuple4.apply)
+      def tupled: M[(A, B, C, D)] = ap.tuple4(a, b, c, d)
 
       def ⊛[E](e: M[E]) = new ApplicativeBuilder5[E](e)
 
@@ -32,7 +32,7 @@ final class ApplicativeBuilder[M[_], A, B](a: M[A], b: M[B])(implicit ap: Apply[
       final class ApplicativeBuilder5[E](e: M[E]) {
         def apply[F](f: (A, B, C, D, E) => F): M[F] = ap.apply5(a, b, c, d, e)(f)
 
-        def tupled: M[(A, B, C, D, E)] = apply(Tuple5.apply)
+        def tupled: M[(A, B, C, D, E)] = ap.tuple5(a, b, c, d, e)
 
         def ⊛[F](f: M[F]) = new ApplicativeBuilder6[F](f)
 
