@@ -124,8 +124,48 @@ object As extends AsInstances {
     */
   implicit def reify[A, B >: A]: A <~< B = refl[A]
 
+  def pair[A1, B1, A2, B2] (eq1: A1 <~< B1, eq2: A2 <~< B2): Pair[A1, B1, A2, B2] =
+    Pair(eq1, eq2)
+  final case class Pair[A1, B1, A2, B2] (eq1: A1 <~< B1, eq2: A2 <~< B2) {
+    def liftCvCv[F[+_, +_]]: F[A1, A2] <~< F[B1, B2] = {
+      type f1[+a1] = F[A1, A2] <~< F[a1, A2]
+      type f2[+a2] = F[A1, A2] <~< F[B1, a2]
+      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+    }
+
+    def liftCvCt[F[+_, -_]]: F[A1, B2] <~< F[B1, A2] = {
+      type f1[+a1] = F[A1, A2] <~< F[a1, A2]
+      type f2[+a2] = F[A1, a2] <~< F[B1, A2]
+      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+    }
+
+    def liftCtCv[F[-_, +_]]: F[B1, A2] <~< F[A1, B2] = {
+      type f1[+a1] = F[a1, A2] <~< F[A1, A2]
+      type f2[+a2] = F[B1, A2] <~< F[A1, a2]
+      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+    }
+
+    def liftCtCt[F[-_, -_]]: F[B1, B2] <~< F[A1, A2] = {
+      type f1[+a1] = F[a1, A2] <~< F[A1, A2]
+      type f2[+a2] = F[B1, a2] <~< F[A1, A2]
+      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+    }
+
+    def substCvCv[F[+_, +_]](value: F[A1, A2]): F[B1, B2] =
+      liftCvCv[F].apply(value)
+
+    def substCtCv[F[-_, +_]](value: F[B1, A2]): F[A1, B2] =
+      liftCtCv[F].apply(value)
+
+    def substCvCt[F[+_, -_]](value: F[A1, B2]): F[B1, A2] =
+      liftCvCt[F].apply(value)
+
+    def substCtCt[F[-_, -_]](value: F[B1, B2]): F[A1, A2] =
+      liftCtCt[F].apply(value)
+  }
+
   implicit final class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
-    def liftCoF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
+    def liftCvF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
       F.liftLiskov(ab)
 
     def liftCtF[F[_]](implicit F: IsContravariant[F]): F[B] As F[A] =

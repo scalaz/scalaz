@@ -2,6 +2,7 @@ package scalaz
 package data
 
 import Prelude.<~<
+import scalaz.typeclass.{IsContravariant, IsCovariant}
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -119,6 +120,26 @@ object Liskov {
   def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H]
   (bc: Liskov[L, H, B, C], ab: Liskov[L, H, A, B]): Liskov[L, H, A, C] =
     bc.substCv[λ[`+α >: L <: H` => Liskov[L, H, A, α]]](ab)
+
+  implicit class LiskovOps[L, H >: L, A >: L <: H, B >: L <: H]
+  (val ab: Liskov[L, H, A, B]) extends AnyVal
+  {
+    def liftCvF[LF, HF >: LF, F[_] >: LF <: HF]
+    (implicit F: IsCovariant[F]): Liskov[LF, HF, F[A], F[B]] =
+      fromAs[LF, HF, F[A], F[B]](ab.toAs.liftCvF[F])
+
+    def liftCtF[LF, HF >: LF, F[_] >: LF <: HF]
+    (implicit F: IsContravariant[F]): Liskov[LF, HF, F[B], F[A]] =
+      fromAs[LF, HF, F[B], F[A]](ab.toAs.liftCtF[F])
+
+    def substCoF[LF, HF >: LF, F[_] >: LF <: HF]
+    (fa: F[A])(implicit F: IsCovariant[F]): F[B] =
+      liftCvF[LF, HF, F].coerce(fa)
+
+    def substCt[LF, HF >: LF, F[_] >: LF <: HF]
+    (fb: F[B])(implicit F: IsContravariant[F]): F[A] =
+      liftCtF[LF, HF, F].coerce(fb)
+  }
 
   /**
     * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is

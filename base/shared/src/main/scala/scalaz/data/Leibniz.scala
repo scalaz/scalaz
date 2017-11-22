@@ -191,16 +191,16 @@ object Leibniz {
     * @see [[lift3]]
     */
   def pair[
-  L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
-  L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
   ] (
-      eq1: Leibniz[L1, H1, A1, B1],
-      eq2: Leibniz[L2, H2, A2, B2]
-    ) : Pair[L1, H1, A1, B1, L2, H2, A2, B2] = Pair(eq1, eq2)
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2]
+  ) : Pair[L1, H1, A1, B1, L2, H2, A2, B2] = Pair(eq1, eq2)
 
   final case class Pair[
-  L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
-  L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2
   ](eq1: Leibniz[L1, H1, A1, B1], eq2: Leibniz[L2, H2, A2, B2]) {
     def bounded[LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF]: Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
       type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[α, A2]]
@@ -228,13 +228,13 @@ object Leibniz {
     * @see [[lift3]]
     */
   def lift2[
-  L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
-  L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
-  LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
+    LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF
   ] (
-      eq1: Leibniz[L1, H1, A1, B1],
-      eq2: Leibniz[L2, H2, A2, B2]
-    ): Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2]
+  ): Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
     type f1[a1 >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[a1, A2]]
     type f2[a2 >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, a2]]
     eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2]]))
@@ -249,15 +249,15 @@ object Leibniz {
     * @see [[lift2]]
     */
   def lift3[
-  L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
-  L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
-  L3, H3 >: L3, A3 >: L3 <: H3, B3 >: L3 <: H3,
-  LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2, _ >: L3 <: H3] >: LF <: HF
+    L1, H1 >: L1, A1 >: L1 <: H1, B1 >: L1 <: H1,
+    L2, H2 >: L2, A2 >: L2 <: H2, B2 >: L2 <: H2,
+    L3, H3 >: L3, A3 >: L3 <: H3, B3 >: L3 <: H3,
+    LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2, _ >: L3 <: H3] >: LF <: HF
   ] (
-      eq1: Leibniz[L1, H1, A1, B1],
-      eq2: Leibniz[L2, H2, A2, B2],
-      eq3: Leibniz[L3, H3, A3, B3]
-    ): Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, B3]] = {
+    eq1: Leibniz[L1, H1, A1, B1],
+    eq2: Leibniz[L2, H2, A2, B2],
+    eq3: Leibniz[L3, H3, A3, B3]
+  ): Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, B3]] = {
     type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2, A3], F[α, A2, A3]]
     type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, α, A3]]
     type f3[α >: L3 <: H3] = Leibniz[LF, HF, F[A1, A2, A3], F[B1, B2, α]]
