@@ -13,7 +13,7 @@ import scalaz.typeclass.{IsContravariant, IsCovariant}
   *
   * @see [[As]] an unbounded version of [[Liskov]].
   */
-sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] private[Liskov]() { ab =>
+sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
   /**
     * Substitution into a covariant context.
     *
