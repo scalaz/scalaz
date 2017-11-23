@@ -4,7 +4,7 @@ package data
 import Prelude.{ ===, <~< }
 
 /**
-  * This particular version of Leibnitz’ equality has been generalized to
+  * This particular version of Leibniz’ equality has been generalized to
   * handle subtyping so that it can be used with constrained type constructors,
   * such as `F[_ >: L <: H]`. `Leibniz[L, H, A, B]` witnesses both `A === B` and
   * that [[A]] and [[B]] are between [[L]] and [[H]]. Subtyping lets you loosen
