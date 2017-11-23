@@ -1,11 +1,10 @@
 package scalaz
-package typeclass
+package data
 
 import scala.language.implicitConversions
+import Prelude.<~<
 
-import Liskov.<~<
-
-trait LiskovInstances {
+trait AsInstances {
   /**We can witness equality by using it to convert between types */
   implicit def witness[A, B](lt: A <~< B): A => B = lt(_)
 }
