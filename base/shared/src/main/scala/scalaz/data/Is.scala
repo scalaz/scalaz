@@ -116,9 +116,17 @@ sealed trait Is[A, B] { ab =>
   /**
     * Given `A === B` we can convert `(X => A)` into `(X => B)`.
     */
-  def onF[X](fa: X => A): X => B = {
+  def onCvF[X](fa: X => A): X => B = {
     type f[a] = X => a
     subst[f](fa)
+  }
+
+  /**
+    * Given `A === B` we can convert `(B => X)` into `(A => X)`.
+    */
+  def onCtF[X](fa: B => X): A => X = {
+    type f[a] = a => X
+    ab.flip.subst[f](fa)
   }
 
   /**
