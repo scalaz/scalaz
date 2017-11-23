@@ -70,6 +70,22 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
   }
 
   /**
+    * Given `Liskov[L, H, A, B]` we can convert `(X => A)` into `(X => B)`.
+    */
+  final def onCvF[X](fa: X => A): X => B = {
+    type f[+a] = X => a
+    substCv[f](fa)
+  }
+
+  /**
+    * Given `Liskov[L, H, A, B]` we can convert `(B => X)` into `(A => X)`.
+    */
+  def onCtF[X](fa: B => X): A => X = {
+    type f[-a] = a => X
+    substCt[f](fa)
+  }
+
+  /**
     * Given `Liskov[L, H, A, B]`, prove `A <:< B`.
     */
   final def toPredef: A <:< B = {
