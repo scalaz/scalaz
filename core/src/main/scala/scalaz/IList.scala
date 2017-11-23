@@ -697,10 +697,19 @@ private trait IListEqual[A] extends Equal[IList[A]] {
   implicit def A: Equal[A]
 
   @tailrec final override def equal(a: IList[A], b: IList[A]): Boolean =
-    (a, b) match {
-      case (INil(), INil()) => true
-      case (ICons(a, as), ICons(b, bs)) if A.equal(a, b) => equal(as, bs)
-      case _ => false
+    (a.asInstanceOf[AnyRef] eq b.asInstanceOf[AnyRef]) || {
+      a match {
+        case _: INil[A] => b match {
+          case _ : INil[A] => true
+          case _ => false
+        }
+        case ac: ICons[A] => b match {
+          case _ : INil[A] => false
+          case bc: ICons[A] =>
+            (ac.head.asInstanceOf[AnyRef] eq bc.head.asInstanceOf[AnyRef]) ||
+              A.equal(ac.head, bc.head) && equal(ac.tail, bc.tail)
+        }
+      }
     }
 
 }
