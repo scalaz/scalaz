@@ -7,8 +7,7 @@ lazy val root = project.in(file("."))
             , metaJS
             , effectJVM
             , effectJS
-            , exampleJVM
-            , exampleJS
+            , example
             , benchmarks
 ).enablePlugins(ScalaJSPlugin)
 
@@ -50,9 +49,7 @@ lazy val metaJVM      = meta.jvm
 
 lazy val metaJS       = meta.js
 
-lazy val example      = crossProject.module
-  .dependsOn( base )
-
-lazy val exampleJVM   = example.jvm
-
-lazy val exampleJS    = example.js
+lazy val example      = project.module
+  .dependsOn( baseJVM )
+  .enablePlugins(TutPlugin)
+  .settings(libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.5")
