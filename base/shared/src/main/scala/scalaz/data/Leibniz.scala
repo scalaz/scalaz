@@ -77,11 +77,19 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
     Leibniz.lift[L, H, A, B, LF, HF, F](ab)
 
   /**
-    * Given `Liskov[L, H, A, B]` we can convert `(X => A)` into `(X => B)`.
+    * Given `Leibniz[L, H, A, B]` we can convert `(X => A)` into `(X => B)`.
     */
-  final def onF[X](fa: X => A): X => B = {
+  final def onCvF[X](fa: X => A): X => B = {
     type f[a] = X => a
     subst[f](fa)
+  }
+
+  /**
+    * Given `Leibniz[L, H, A, B]` we can convert `(B => X)` into `(A => X)`.
+    */
+  def onCtF[X](fa: B => X): A => X = {
+    type f[a] = a => X
+    ab.flip.subst[f](fa)
   }
 
   /**
