@@ -12,7 +12,7 @@ import Prelude.{ ===, <~< }
   *
   * @see [[Is]]
   */
-sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] private[Leibniz]() { ab =>
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
   /**
     * To create an instance of `Leibniz[L, H, A, B]` you must show that for
     * every choice of `F[_ >: L <: H]` you can convert `F[A]` to `F[B]`.
