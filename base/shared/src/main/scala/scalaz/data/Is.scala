@@ -110,12 +110,8 @@ sealed trait Is[A, B] { ab =>
     * @see [[Is.lift2]]
     * @see [[Is.lift3]]
     */
-  def lift2[F[_, _]]: PartiallyAppliedLift2[F] =
-    new PartiallyAppliedLift2[F]
-  final class PartiallyAppliedLift2[F[_, _]] {
-    def apply[I, J](ij: I === J): F[A, I] === F[B, J] =
-      Is.lift2[F, A, B, I, J](ab, ij)
-  }
+  def lift2[F[_, _]]: PartiallyAppliedLift2[F, A, B] =
+    new PartiallyAppliedLift2[F, A, B](ab)
 
   /**
     * Given `A === B` we can convert `(X => A)` into `(X => B)`.
@@ -195,6 +191,11 @@ object Is {
     type f2[α] = F[A, I, M] === F[B, α, M]
     type f3[α] = F[A, I, M] === F[B, J, α]
     mn.subst[f3](ij.subst[f2](ab.subst[f1](refl)))
+  }
+
+  private[Is] final class PartiallyAppliedLift2[F[_, _], A, B](val ab: A === B) extends AnyVal {
+    def apply[I, J](ij: I === J): F[A, I] === F[B, J] =
+      Is.lift2[F, A, B, I, J](ab, ij)
   }
 
   /**
