@@ -6,6 +6,6 @@ trait Monoid[A] {
   def empty: A
 }
 
-object Monoid {
+object Monoid extends MonoidInstances {
   def apply[A](implicit A: Monoid[A]): Monoid[A] = A
 }

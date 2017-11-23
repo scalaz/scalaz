@@ -18,6 +18,9 @@ package object data {
   type ~>[F[_], G[_]] = ∀[λ[α => F[α] => G[α]]]
   type ~~>[F[_, _], G[_, _]] = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
 
+  type \&/[A, B] = These.\&/[A, B]
+  val \&/ : These.type = These
+
   /**
    * Type-aligned pair. Isomorphic to
    *
