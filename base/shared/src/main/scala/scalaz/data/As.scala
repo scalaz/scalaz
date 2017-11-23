@@ -4,7 +4,7 @@ package data
 // FIXME: remove once https://github.com/scala/bug/issues/10623 is fixed.
 import com.github.ghik.silencer.silent
 
-import Prelude.<~<
+import Prelude.{ <~<, === }
 import scalaz.typeclass.{IsContravariant, IsCovariant}
 
 /**
@@ -180,6 +180,16 @@ object As extends AsInstances {
       type f[+x] = x
       F.substCv[f, A, B](fb)(ab)
     }
+  }
+
+  /**
+    * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
+    * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
+    * SI-7278]] is fixed.
+    */
+  def bracket[A, B](f: A <~< B, g: B <~< A): A === B = {
+    val (_, _) = (f, g)
+    Is.unsafeForce[A, B]
   }
 
   /**
