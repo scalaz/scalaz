@@ -11,7 +11,7 @@ import scalaz.typeclass.{IsContravariant, IsCovariant}
   * that expects a `B`. (e.g. if you could pass an `A` into any function
   * that expects a `B`.)
   *
-  * @see [[<~<]] `A <~< B` is a type synonym to `Liskov[A, B]`
+  * @see [[As]] an unbounded version of [[Liskov]].
   */
 sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] private[Liskov]() { ab =>
   /**
@@ -142,9 +142,7 @@ object Liskov {
   }
 
   /**
-    * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
-    * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
-    * SI-7278]] is fixed, so this function is marked unsafe.
+    * Subtyping is antisymmetric.
     */
   def bracket[L, H >: L, A >: L <: H, B >: L <: H]
   (f: Liskov[L, H, A, B], g: Liskov[L, H, B, A]): Leibniz[L, H, A, B] = {
