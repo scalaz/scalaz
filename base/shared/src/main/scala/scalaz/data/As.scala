@@ -97,11 +97,81 @@ sealed abstract class As[-A, +B] { ab =>
   }
 
   /**
+    * Given `A <~< B` and `I <~< J` we can prove that `F[A, I] <~< F[B, J]`.
+    *
+    * This method allows you to compose two `<~<` values in infix manner:
+    * {{{
+    *   def either(ab: A <~< B, ij: I <~< J): Either[A, I] <~< Either[B, J] =
+    *     ab liftCvCv[Either] ij
+    * }}}
+    */
+  def liftCvCv[F[+_, +_]]: PartiallyAppliedLiftCvCv[F, A, B] =
+    new PartiallyAppliedLiftCvCv[F, A, B](ab)
+
+  /**
+    * Given `A <~< B` and `I <~< J` we can prove that `F[A, J] <~< F[B, I]`.
+    *
+    * This method allows you to compose two `<~<` values in infix manner:
+    * {{{
+    *   type F[+A, -B] = B => A
+    *   def either(ab: A <~< B, ij: I <~< J): F[A, J] <~< F[B, I] =
+    *     ab liftCvCt[F] ij
+    * }}}
+    */
+  def liftCvCt[F[+_, -_]]: PartiallyAppliedLiftCvCt[F, A, B] =
+    new PartiallyAppliedLiftCvCt[F, A, B](ab)
+
+  /**
+    * Given `A <~< B` and `I <~< J` we can prove that `F[B, I] <~< F[A, J]`.
+    *
+    * This method allows you to compose two `<~<` values in infix manner:
+    * {{{
+    *   def either(ab: A <~< B, ij: I <~< J): (B => I) <~< (A => J) =
+    *     ab liftCtCv[? => ?] ij
+    * }}}
+    */
+  def liftCtCv[F[-_, +_]]: PartiallyAppliedLiftCtCv[F, A, B] =
+    new PartiallyAppliedLiftCtCv[F, A, B](ab)
+
+  /**
+    * Given `A <~< B` and `I <~< J` we can prove that `F[B, J] <~< F[A, I]`.
+    *
+    * This method allows you to compose two `<~<` values in infix manner:
+    * {{{
+    *   type F[-A, -B] = (A, B) => Boolean
+    *   def either(ab: A <~< B, ij: I <~< J): F[B, J] <~< F[A, I] =
+    *     ab liftCtCt[F] ij
+    * }}}
+    */
+  def liftCtCt[F[-_, -_]]: PartiallyAppliedLiftCtCt[F, A, B] =
+    new PartiallyAppliedLiftCtCt[F, A, B](ab)
+
+  /**
+    * Given `A <~< B` and `I <~< J` we can prove that `F[A, I] <~< F[B, J]`.
+    *
+    * This method allows you to compose two `<~<` values in infix manner:
+    * {{{
+    *   def either(ab: A <~< B, ij: I <~< J): Either[A, I] <~< Either[B, J] =
+    *     (ab and ij).liftCvCv[Either]
+    * }}}
+    */
+  def and[I, J](ij: I <~< J): Pair[A, B, I, J] =
+    new Pair[A, B, I, J](ab, ij)
+
+  /**
     * Given `A <~< B` we can convert `(X => A)` into `(X => B)`.
     */
-  def onF[X](fa: X => A): X => B = {
+  def onCvF[X](fa: X => A): X => B = {
     type f[+a] = X => a
     substCv[f](fa)
+  }
+
+  /**
+    * Given `A <~< B` we can convert `(B => X)` into `(A => X)`.
+    */
+  def onCtF[X](fa: B => X): A => X = {
+    type f[-a] = a => X
+    substCt[f](fa)
   }
 }
 
@@ -124,44 +194,63 @@ object As extends AsInstances {
     */
   implicit def reify[A, B >: A]: A <~< B = refl[A]
 
+  def liftCvCv[F[+_, +_], A1, B1, A2, B2]
+  (eq1: A1 <~< B1, eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] = {
+    type f1[+a1] = F[A1, A2] <~< F[a1, A2]
+    type f2[+a2] = F[A1, A2] <~< F[B1, a2]
+    eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+  }
+
+  def liftCvCt[F[+_, -_], A1, B1, A2, B2]
+  (eq1: A1 <~< B1, eq2: A2 <~< B2): F[A1, B2] <~< F[B1, A2] = {
+    type f1[+a1] = F[A1, A2] <~< F[a1, A2]
+    type f2[+a2] = F[A1, a2] <~< F[B1, A2]
+    eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+  }
+
+  def liftCtCv[F[-_, +_], A1, B1, A2, B2]
+  (eq1: A1 <~< B1, eq2: A2 <~< B2): F[B1, A2] <~< F[A1, B2] = {
+    type f1[+a1] = F[a1, A2] <~< F[A1, A2]
+    type f2[+a2] = F[B1, A2] <~< F[A1, a2]
+    eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+  }
+
+  def liftCtCt[F[-_, -_], A1, B1, A2, B2]
+  (eq1: A1 <~< B1, eq2: A2 <~< B2): F[B1, B2] <~< F[A1, A2] = {
+    type f1[+a1] = F[a1, A2] <~< F[A1, A2]
+    type f2[+a2] = F[B1, a2] <~< F[A1, A2]
+    eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
+  }
+
+  private[As] final class PartiallyAppliedLiftCvCv[F[+_, +_], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+    def apply[A2, B2](eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] =
+      liftCvCv[F, A1, B1, A2, B2](eq1, eq2)
+  }
+  private[As] final class PartiallyAppliedLiftCvCt[F[+_, -_], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+    def apply[A2, B2](eq2: A2 <~< B2): F[A1, B2] <~< F[B1, A2] =
+      liftCvCt[F, A1, B1, A2, B2](eq1, eq2)
+  }
+  private[As] final class PartiallyAppliedLiftCtCv[F[-_, +_], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+    def apply[A2, B2](eq2: A2 <~< B2): F[B1, A2] <~< F[A1, B2] =
+      liftCtCv[F, A1, B1, A2, B2](eq1, eq2)
+  }
+  private[As] final class PartiallyAppliedLiftCtCt[F[-_, -_], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+    def apply[A2, B2](eq2: A2 <~< B2): F[B1, B2] <~< F[A1, A2] =
+      liftCtCt[F, A1, B1, A2, B2](eq1, eq2)
+  }
+
   def pair[A1, B1, A2, B2] (eq1: A1 <~< B1, eq2: A2 <~< B2): Pair[A1, B1, A2, B2] =
     Pair(eq1, eq2)
-  final case class Pair[A1, B1, A2, B2] (eq1: A1 <~< B1, eq2: A2 <~< B2) {
-    def liftCvCv[F[+_, +_]]: F[A1, A2] <~< F[B1, B2] = {
-      type f1[+a1] = F[A1, A2] <~< F[a1, A2]
-      type f2[+a2] = F[A1, A2] <~< F[B1, a2]
-      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
-    }
+  private[As] final case class Pair[-A1, +B1, -A2, +B2] (eq1: A1 <~< B1, eq2: A2 <~< B2) {
+    def liftCvCv[F[+_, +_]]: F[A1, A2] <~< F[B1, B2] = As.liftCvCv[F, A1, B1, A2, B2](eq1, eq2)
+    def liftCvCt[F[+_, -_]]: F[A1, B2] <~< F[B1, A2] = As.liftCvCt[F, A1, B1, A2, B2](eq1, eq2)
+    def liftCtCv[F[-_, +_]]: F[B1, A2] <~< F[A1, B2] = As.liftCtCv[F, A1, B1, A2, B2](eq1, eq2)
+    def liftCtCt[F[-_, -_]]: F[B1, B2] <~< F[A1, A2] = As.liftCtCt[F, A1, B1, A2, B2](eq1, eq2)
 
-    def liftCvCt[F[+_, -_]]: F[A1, B2] <~< F[B1, A2] = {
-      type f1[+a1] = F[A1, A2] <~< F[a1, A2]
-      type f2[+a2] = F[A1, a2] <~< F[B1, A2]
-      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
-    }
-
-    def liftCtCv[F[-_, +_]]: F[B1, A2] <~< F[A1, B2] = {
-      type f1[+a1] = F[a1, A2] <~< F[A1, A2]
-      type f2[+a2] = F[B1, A2] <~< F[A1, a2]
-      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
-    }
-
-    def liftCtCt[F[-_, -_]]: F[B1, B2] <~< F[A1, A2] = {
-      type f1[+a1] = F[a1, A2] <~< F[A1, A2]
-      type f2[+a2] = F[B1, a2] <~< F[A1, A2]
-      eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
-    }
-
-    def substCvCv[F[+_, +_]](value: F[A1, A2]): F[B1, B2] =
-      liftCvCv[F].apply(value)
-
-    def substCtCv[F[-_, +_]](value: F[B1, A2]): F[A1, B2] =
-      liftCtCv[F].apply(value)
-
-    def substCvCt[F[+_, -_]](value: F[A1, B2]): F[B1, A2] =
-      liftCvCt[F].apply(value)
-
-    def substCtCt[F[-_, -_]](value: F[B1, B2]): F[A1, A2] =
-      liftCtCt[F].apply(value)
+    def substCvCv[F[+_, +_]](value: F[A1, A2]): F[B1, B2] = liftCvCv[F].apply(value)
+    def substCtCv[F[-_, +_]](value: F[B1, A2]): F[A1, B2] = liftCtCv[F].apply(value)
+    def substCvCt[F[+_, -_]](value: F[A1, B2]): F[B1, A2] = liftCvCt[F].apply(value)
+    def substCtCt[F[-_, -_]](value: F[B1, B2]): F[A1, A2] = liftCtCt[F].apply(value)
   }
 
   implicit final class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
