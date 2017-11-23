@@ -183,9 +183,7 @@ object As extends AsInstances {
   }
 
   /**
-    * Subtyping is antisymmetric in theory (and in Dotty). Notice that this is
-    * not true in Scala until [[https://issues.scala-lang.org/browse/SI-7278
-    * SI-7278]] is fixed.
+    * Subtyping is antisymmetric.
     */
   def bracket[A, B](f: A <~< B, g: B <~< A): A === B = {
     val (_, _) = (f, g)
