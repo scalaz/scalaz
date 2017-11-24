@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import Prelude._
-import typeclass.{MonadClass, TraversableClass}
+import typeclass.{MonadClass, TraversableClass, Show}
 import typeclass.FoldableClass._
 
 sealed trait MaybeModule extends MaybeFunctions {
@@ -16,12 +16,14 @@ sealed trait MaybeModule extends MaybeFunctions {
   def isCovariant: IsCovariant[Maybe]
   def monad: Monad[Maybe]
   def traversable: Traversable[Maybe]
+  def show[A: Show]: Show[Maybe[A]]
 }
 
 object MaybeModule extends MaybeSyntax {
   implicit def monadMaybe: Monad[Maybe] = Maybe.monad
   implicit def traversableMaybe: Traversable[Maybe] = Maybe.traversable
   implicit def isCovariantMaybe: IsCovariant[Maybe] = Maybe.isCovariant
+  implicit def showMaybe[A: Show]: Show[Maybe[A]] = Maybe.show[A]
 }
 
 private[data] object MaybeImpl extends MaybeModule {
@@ -39,6 +41,11 @@ private[data] object MaybeImpl extends MaybeModule {
   def isCovariant: IsCovariant[Maybe] = typeclass.IsCovariant.scalaCovariant[Option]
   def monad: Monad[Maybe] = instance
   def traversable: Traversable[Maybe] = instance
+
+  def show[A](implicit A: Show[A]): Show[Maybe[A]] = {
+    case Some(a) => s"Just(${A.show(a)})"
+    case None    =>  "Empty"
+  }
 
   private val instance =
     new MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] {

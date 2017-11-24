@@ -31,6 +31,7 @@ trait Prelude  extends data.DisjunctionFunctions
   type Cobind[F[_]] = typeclass.Cobind[F]
   type IsCovariant[F[_]] = typeclass.IsCovariant[F]
   type IsContravariant[F[_]] = typeclass.IsContravariant[F]
+  type Show[A] = typeclass.Show[A]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -48,6 +49,7 @@ trait Prelude  extends data.DisjunctionFunctions
   def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
   def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
   def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
+  def Show[A](implicit A: Show[A]): Show[A] = A
 
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
@@ -93,6 +95,9 @@ trait Prelude  extends data.DisjunctionFunctions
 
   implicit def ComonadOps[F[_], A](fa: F[A])(implicit F: Comonad[F]): ComonadSyntax.Ops[F, A] =
     new ComonadSyntax.Ops(fa)
+
+  implicit def ShowOps[A](a: A)(implicit A: Show[A]): ShowSyntax.Ops[A] =
+    new ShowSyntax.Ops[A](a)(A)
 
 
   // Base Data

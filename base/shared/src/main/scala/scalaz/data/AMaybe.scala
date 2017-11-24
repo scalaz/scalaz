@@ -8,7 +8,7 @@ import Prelude.===
   */
 sealed abstract class AMaybe[F[_, _], A, B]
 
-case class AJust[F[_, _], A, B](value: F[A, B]) extends AMaybe[F, A, B]
+final case class AJust[F[_, _], A, B](value: F[A, B]) extends AMaybe[F, A, B]
 
 /**
   * The empty case contains evidence of type equality
@@ -20,7 +20,7 @@ sealed abstract case class AEmpty[F[_, _], A, B]() extends AMaybe[F, A, B] {
   def leibniz: A Is B = subst[A === ?](Is.refl)
 }
 
-object AMaybe {
+object AMaybe extends AMaybeInstances {
   def empty[F[_, _], A]: AMaybe[F, A, A] = None.asInstanceOf[AMaybe[F, A, A]]
 
   private val None = none[Nothing, Nothing]

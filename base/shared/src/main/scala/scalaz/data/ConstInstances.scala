@@ -45,4 +45,7 @@ trait ConstInstances {
     def semigroup: Semigroup[Const[A, B]] = implicitly
     def empty: Const[A, B] = Const(A.empty)
   }
+
+  implicit def show[A, B](implicit A: Show[A]): Show[Const[A, B]] =
+    a => A.show(a.getConst)
 }

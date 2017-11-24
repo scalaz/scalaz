@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import typeclass.IsCovariant
+import typeclass.{IsCovariant, Show}
 
 sealed trait Maybe2Module {
   /**
@@ -14,6 +14,7 @@ sealed trait Maybe2Module {
 
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]]
+  implicit def show[A: Show, B: Show]: Show[Maybe2[A, B]]
 
   object Just2 {
     def unapply[A, B](m: Maybe2[A, B]): Just2Extractor[A, B] = new Just2Extractor(toOption2(m))
@@ -41,6 +42,11 @@ private[data] object Maybe2Impl extends Maybe2Module {
 
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
+
+  implicit def show[A, B](implicit A: Show[A], B: Show[B]): Show[Maybe2[A, B]] = {
+    case Some2(_1, _2) => s"Just2(${A.show(_1)}, ${B.show(_2)})"
+    case None2         =>  "Empty2"
+  }
 
   private[data] def fromOption2[A, B](o: Option2[A, B]): Maybe2[A, B] = o
   private[data] def toOption2  [A, B](m: Maybe2[A, B]): Option2[A, B] = m
