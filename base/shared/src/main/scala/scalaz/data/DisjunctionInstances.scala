@@ -19,4 +19,9 @@ trait DisjunctionInstances {
     override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
       oa.fold[L \/ B](l => -\/(l))(a => f(a))
   }
+
+  implicit def show[L, R](implicit L: Show[L], R: Show[R]): Show[L \/ R] = {
+    case -\/(left)  => s"""-\/(${L.show(left)})"""
+    case \/-(right) => s"""\/-(${R.show(right)})"""
+  }
 }
