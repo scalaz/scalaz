@@ -82,7 +82,7 @@ object FingerTreeTest extends SpecLite {
 
     "apply effects in order" in {
       val s: Writer[String, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[Writer[String, ?], Int, Int](x => Writer(x.toString, x))
-      s.run must_===("12345", streamToTree(intStream.take(5)))
+      s.run must_===("12345" -> streamToTree(intStream.take(5)))
     }
 
     "traverseTree through the option effect yielding result" in {

@@ -88,7 +88,7 @@ object TraverseTest extends SpecLite {
           _ <- State.put(i + 1)
         } yield i)
       val state: State[Int, List[Int]] = states.sequenceU
-      state.run(0) must_===(2, (List(0, 1)))
+      state.run(0) must_===(2 -> List(0, 1))
     }
 
     "reverse" in {

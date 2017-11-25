@@ -93,6 +93,12 @@ sealed abstract class IndexedReaderWriterStateTInstances extends IndexedReaderWr
       def A = F1
       def W = W0
     }
+
+  implicit def rwstMonadError[F[_], R, W, S, E](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[ReaderWriterStateT[F, R, W, S, ?], E] =
+    new ReaderWriterStateTMonadError[F, R, W, S, E] {
+      override implicit def F: MonadError[F, E] = F0
+      override implicit def W: Monoid[W] = W0
+    }
 }
 
 sealed abstract class ReaderWriterStateTInstances0 extends IndexedReaderWriterStateTInstances {
@@ -144,6 +150,23 @@ private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2] extends Funct
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: IndexedReaderWriterStateT[F, R, W, S1, S2, A])(f: A => B): IndexedReaderWriterStateT[F, R, W, S1, S2, B] = fa map f
+}
+
+private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[ReaderWriterStateT[F, R, W, S, ?], E] {
+  implicit def F: MonadError[F, E]
+  implicit def W: Monoid[W]
+
+  override def raiseError[A](e: E): RWST[F, R, W, S, A] =
+    RWST((_, _) => F.raiseError(e))
+
+  override def handleError[A](fa: RWST[F, R, W, S, A])(f: (E) => RWST[F, R, W, S, A]): RWST[F, R, W, S, A] =
+    RWST((r, s) => F.handleError(fa.run(r, s))(f(_).run(r, s)))
+
+  override def bind[A, B](fa: RWST[F, R, W, S, A])(f: (A) => RWST[F, R, W, S, B]): RWST[F, R, W, S, B] =
+    fa flatMap f
+
+  override def point[A](a: => A): RWST[F, R, W, S, A] =
+    RWST((_, s) => F.point((W.zero, a, s)))
 }
 
 private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterStateT[F, R, W, S, ?]] with IndexedReaderWriterStateTFunctor[F, R, W, S, S] {

@@ -26,7 +26,7 @@ object TypeCheckerWithExplicitTypes {
       val _   = compare(t, boolT, boolT, "error: if required bool in test position, but got: " + t)
       val lt  = typeCheck(texp, env)
       val rt  = typeCheck(fexp, env)
-      val res = compare(lt, rt, lt, "error: if branches not the same type, got: " + (lt, rt))
+      val res = compare(lt, rt, lt, "error: if branches not the same type, got: " + (lt -> rt))
       res
     case Fun(arg, argType, body) =>
       val t = typeCheck(body, env + (arg -> argType))

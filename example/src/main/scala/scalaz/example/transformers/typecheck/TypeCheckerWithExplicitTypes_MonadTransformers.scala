@@ -32,7 +32,7 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
       _   <- liftK(compare(t, boolT, boolT, "if required bool in test position, but got: " + t))
       lt  <- typeCheck(texp)
       rt  <- typeCheck(fexp)
-      res <- liftK(compare(lt, rt, lt, "if branches not the same type, got: " + (lt, rt)))
+      res <- liftK(compare(lt, rt, lt, "if branches not the same type, got: " + (lt -> rt)))
     } yield res
     case Fun(arg, argType, body) => for {
       t <- local((env: TypeEnv) => env + (arg -> argType))(typeCheck(body))
