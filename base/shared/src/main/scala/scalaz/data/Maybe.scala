@@ -38,7 +38,7 @@ private[data] object MaybeImpl extends MaybeModule {
   def fromOption[A](oa: Option[A]): Maybe[A] = oa
   def toOption[A](ma: Maybe[A]): Option[A] = ma
 
-  def isCovariant: IsCovariant[Maybe] = typeclass.IsCovariant.scalaCovariant[Option]
+  def isCovariant: IsCovariant[Maybe] = typeclass.IsCovariant.reify[Option]
   def monad: Monad[Maybe] = instance
   def traversable: Traversable[Maybe] = instance
 

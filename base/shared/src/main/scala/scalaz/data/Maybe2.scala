@@ -40,8 +40,8 @@ private[data] object Maybe2Impl extends Maybe2Module {
   def just2 [A, B](a: A, b: B): Maybe2[A, B] = Some2(a, b)
   def empty2[A, B]            : Maybe2[A, B] = None2
 
-  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
-  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
+  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.reify[Option2[+?, B]]
+  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.reify[Option2[A, +?]]
 
   implicit def show[A, B](implicit A: Show[A], B: Show[B]): Show[Maybe2[A, B]] = {
     case Some2(_1, _2) => s"Just2(${A.show(_1)}, ${B.show(_2)})"
