@@ -1,9 +1,9 @@
 package scalaz
 package typeclass
 
-import Prelude._
-import data.{As, Inhabited, StrictAs, Void}
+import scalaz.Prelude._
 import scalaz.data.Disjunction.{-\/, \/-}
+import scalaz.data.{As, Inhabited, StrictAs}
 
 /**
  * Witnesses that the type constructor `F[_]` is covariant,
