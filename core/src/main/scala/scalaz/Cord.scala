@@ -69,13 +69,13 @@ final case class Cord(self: FingerTree[Int, String]) {
    * Prepends a `Char` to the beginning of this `Cord`.
    * Time complexity: O(1)
    */
-  def -:(x: => Char): Cord = cord(x.toString +: self)
+  def -:(x: => Char): Cord = cord(String.valueOf(x) +: self)
 
   /**
    * Appends a `Char` to the end of this `Cord`.
    * Time complexity: O(1)
    */
-  def :-(x: => Char): Cord = cord(self :+ x.toString)
+  def :-(x: => Char): Cord = cord(self :+ String.valueOf(x))
 
   /**
    * Removes the first character of this `Cord`.
@@ -111,11 +111,8 @@ final case class Cord(self: FingerTree[Int, String]) {
   def toStream: Stream[Char] = toVector.toStream
   def toVector: Vector[Char] = self.foldMap(_.toVector)
   override def toString: String = {
-    import syntax.foldable._
-    import Free._
     val sb = new StringBuilder(self.measure)
-    val t = self.traverse_[Trampoline](x => Trampoline.delay(sb ++= x))
-    t.run
+    self.foreach(sb ++= _)
     sb.toString
   }
 
