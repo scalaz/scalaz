@@ -35,10 +35,10 @@ final class IsCovariant[F[_]](proof: ¬¬[IsConstant[F] \/ IsStrictlyCovariant[F
     G.andThenCo[F](F)
 
   def composeCv[G[_]](G: IsCovariant[G]): IsCovariant[λ[x => F[G[x]]]] =
-    witness[λ[x => F[G[x]]]](F(G(As.bottomTop)))
+    witness1[λ[x => F[G[x]]]](F(G(As.bottomTop)))
 
   def composeCt[G[_]](G: IsContravariant[G]): IsContravariant[λ[x => F[G[x]]]] =
-    IsContravariant.witness[λ[x => F[G[x]]]](F(G(As.bottomTop)))
+    IsContravariant.witness1[λ[x => F[G[x]]]](F(G(As.bottomTop)))
 
   def composeStCv[G[_]](G: IsStrictlyCovariant[G]): IsCovariant[λ[x => F[G[x]]]] =
     F composeCv G.covariant
@@ -59,27 +59,7 @@ final class IsCovariant[F[_]](proof: ¬¬[IsConstant[F] \/ IsStrictlyCovariant[F
 object IsCovariant {
   def apply[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
 
-  def witness[F[_]](implicit ev: F[Void] <~< F[Any]): IsCovariant[F] = {
-    def injective(inj: IsInjective[F]): ¬¬[IsStrictlyCovariant[F]] =
-      inj.decompose.map {
-        case \/-(inv) => inv(Void.isNotAny).notLessOrEqual(ev)
-        case -\/(variance) =>
-          variance match {
-            case \/-(cv) => cv
-            case -\/(ct) => ct(StrictAs.bottomTop).contradicts(ev)
-          }
-      }
-
-    val proof : ¬¬[IsConstant[F] \/ IsStrictlyCovariant[F]] =
-      Axioms.parametricity[F].flatMap {
-        case \/-(inj) => injective(inj).map(\/-.apply)
-        case -\/(ph) => Inhabited.value(-\/(ph))
-      }
-
-    witness2(proof)
-  }
-
-  def witness1[F[_], A, B](implicit p: A </< B, q: F[A] <~< F[B]): IsCovariant[F] = {
+  def witness[F[_], A, B](implicit p: A </< B, q: F[A] <~< F[B]): IsCovariant[F] = {
     def injective(inj: IsInjective[F]): ¬¬[IsStrictlyCovariant[F]] =
       inj.decompose.map {
         case \/-(inv) => inv[A, B](p.inequality[A, B]).notLessOrEqual(q)
@@ -96,13 +76,16 @@ object IsCovariant {
         case -\/(ph) => Inhabited.value(-\/(ph))
       }
 
-    witness2(proof)
+    new IsCovariant[F](proof)
   }
 
-  def witness2[F[_]](ev: ¬¬[IsConstant[F] \/ IsStrictlyCovariant[F]]): IsCovariant[F] =
-    new IsCovariant[F](ev)
+  def witness1[F[_]](implicit ev: F[Void] <~< F[Any]): IsCovariant[F] =
+    witness(StrictAs.bottomTop, ev)
 
-  implicit def reify[F[+_]]: IsCovariant[F] = witness[F](As[F[Void], F[Any]])
+  def witness2[F[_]](proof: ¬¬[IsConstant[F] \/ IsStrictlyCovariant[F]]): IsCovariant[F] =
+    new IsCovariant[F](proof)
+
+  implicit def reify[F[+_]]: IsCovariant[F] = witness1[F](As[F[Void], F[Any]])
 
   implicit def id: IsCovariant[λ[x => x]] = {
     type f[+x] = x

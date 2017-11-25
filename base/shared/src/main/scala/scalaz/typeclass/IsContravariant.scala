@@ -35,10 +35,10 @@ final class IsContravariant[F[_]](proof: ¬¬[IsConstant[F] \/ IsStrictlyContrav
     G.andThenCt[F](F)
 
   def composeCv[G[_]](G: IsCovariant[G]): IsContravariant[λ[x => F[G[x]]]] =
-    witness[λ[x => F[G[x]]]](F(G(As.bottomTop)))
+    witness1[λ[x => F[G[x]]]](F(G(As.bottomTop)))
 
   def composeCt[G[_]](G: IsContravariant[G]): IsCovariant[λ[x => F[G[x]]]] =
-    IsCovariant.witness[λ[x => F[G[x]]]](F(G(As.bottomTop)))
+    IsCovariant.witness1[λ[x => F[G[x]]]](F(G(As.bottomTop)))
 
   def composeInv[G[_]](G: IsInvariant[G]): ¬¬[IsConstant[F] \/ IsInvariant[λ[x => F[G[x]]]]] =
     F.decompose.map {
@@ -52,27 +52,7 @@ final class IsContravariant[F[_]](proof: ¬¬[IsConstant[F] \/ IsStrictlyContrav
 object IsContravariant {
   def apply[F[_]](implicit ev: IsContravariant[F]): IsContravariant[F] = ev
 
-  def witness[F[_]](implicit ev: F[Any] <~< F[Void]): IsContravariant[F] = {
-    def injective(inj: IsInjective[F]): ¬¬[IsStrictlyContravariant[F]] =
-      inj.decompose.map {
-        case \/-(inv) => inv(Void.isNotAny).notGreaterOrEqual(ev)
-        case -\/(variance) =>
-          variance match {
-            case \/-(cv) => cv(StrictAs.bottomTop).contradicts(ev)
-            case -\/(ct) => ct
-          }
-      }
-
-    val proof : ¬¬[IsConstant[F] \/ IsStrictlyContravariant[F]] =
-      Axioms.parametricity[F].flatMap {
-        case \/-(inj) => injective(inj).map(\/-.apply)
-        case -\/(ph) => Inhabited.value(-\/(ph))
-      }
-
-    new IsContravariant(proof)
-  }
-
-  def witness1[F[_], A, B](implicit p: A </< B, q: F[B] <~< F[A]): IsContravariant[F] = {
+  def witness[F[_], A, B](implicit p: A </< B, q: F[B] <~< F[A]): IsContravariant[F] = {
     def injective(inj: IsInjective[F]): ¬¬[IsStrictlyContravariant[F]] =
       inj.decompose.map {
         case \/-(inv) => inv[A, B](p.inequality[A, B]).notGreaterOrEqual(q)
@@ -92,7 +72,13 @@ object IsContravariant {
     new IsContravariant(proof)
   }
 
-  implicit def reify[F[-_]]: IsContravariant[F] = witness[F](As[F[Any], F[Void]])
+  def witness1[F[_]](implicit ev: F[Any] <~< F[Void]): IsContravariant[F] =
+    witness[F, Void, Any](StrictAs.bottomTop, ev)
+
+  def witness2[F[_]](ev: ¬¬[IsConstant[F] \/ IsStrictlyContravariant[F]]): IsContravariant[F] =
+    new IsContravariant[F](ev)
+
+  implicit def reify[F[-_]]: IsContravariant[F] = witness1[F](As[F[Any], F[Void]])
 
   implicit val void: IsContravariant[λ[x => (x => Void)]] = {
     type f[-x] = x => Void

@@ -21,14 +21,14 @@ final class IsInvariant[F[_]](proof: F[Void] >!< F[Any]) { F =>
               case -\/(rel) =>
                 (frel, rel) match {
                   case (\/-(flt), \/-(lt)) =>
-                    proof.notLessOrEqual(IsCovariant.witness1[F, A, B](lt, flt.conformity).apply(As.bottomTop))
+                    proof.notLessOrEqual(IsCovariant.witness[F, A, B](lt, flt.conformity).apply(As.bottomTop))
                   case (-\/(fgt), -\/(gt)) =>
-                    proof.notLessOrEqual(IsCovariant.witness1[F, B, A](gt, fgt.conformity).apply(As.bottomTop))
+                    proof.notLessOrEqual(IsCovariant.witness[F, B, A](gt, fgt.conformity).apply(As.bottomTop))
 
                   case (\/-(flt), -\/(gt)) =>
-                    proof.notGreaterOrEqual(IsContravariant.witness1[F, B, A](gt, flt.conformity).apply(As.bottomTop))
+                    proof.notGreaterOrEqual(IsContravariant.witness[F, B, A](gt, flt.conformity).apply(As.bottomTop))
                   case (-\/(fgt), \/-(lt)) =>
-                    proof.notGreaterOrEqual(IsContravariant.witness1[F, A, B](lt, fgt.conformity).apply(As.bottomTop))
+                    proof.notGreaterOrEqual(IsContravariant.witness[F, A, B](lt, fgt.conformity).apply(As.bottomTop))
                 }
             }
         }

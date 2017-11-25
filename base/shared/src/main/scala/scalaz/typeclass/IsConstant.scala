@@ -30,10 +30,10 @@ final class IsConstant[F[_]](proof: F[Void] === F[Any]) { F =>
   }
 
   def toCovariant: IsCovariant[F] =
-    IsCovariant.witness[F](apply[Void, Any].toAs)
+    IsCovariant.witness1[F](apply[Void, Any].toAs)
 
   def toContravariant: IsContravariant[F] =
-    IsContravariant.witness[F](apply[Any, Void].toAs)
+    IsContravariant.witness1[F](apply[Any, Void].toAs)
 }
 object IsConstant {
   def apply[F[_]](implicit ev: IsConstant[F]): IsConstant[F] = ev
