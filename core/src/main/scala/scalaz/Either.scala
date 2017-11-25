@@ -65,12 +65,12 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Spin in tail-position on the right value of this disjunction. */
-  def loopr[AA >: A, BB >: B, X](left: AA => X, right: BB => X \/ (AA \/ BB)): X =
-    \/.loopRight(this, left, right)
+  def loopr[AA, BB, X](left: AA => X, right: BB => X \/ (AA \/ BB))(implicit evA: A <~< AA, evB: B <~< BB): X =
+    \/.loopRight(Liskov.lift2(evA, evB)(this), left, right)
 
   /** Spin in tail-position on the left value of this disjunction. */
-  def loopl[AA >: A, BB >: B, X](left: AA => X \/ (AA \/ BB), right: BB => X): X =
-    \/.loopLeft(this, left, right)
+  def loopl[AA, BB, X](left: AA => X \/ (AA \/ BB), right: BB => X)(implicit evA: A <~< AA, evB: B <~< BB): X =
+    \/.loopLeft(Liskov.lift2(evA, evB)(this), left, right)
 
   /** Flip the left/right values in this disjunction. Alias for `unary_~` */
   def swap: (B \/ A) =
@@ -120,9 +120,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Traverse on the right of this disjunction. */
-  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
+  def traverse[F[_]: Applicative, AA, D](g: B => F[D])(implicit evA: A <~< AA): F[AA \/ D] =
     this match {
-      case a @ -\/(_) => Applicative[F].point(a)
+      case a @ -\/(_) => Applicative[F].point(Liskov.co(evA)(a))
       case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
@@ -131,13 +131,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     fold(_ => (), g)
 
   /** Apply a function in the environment of the right of this disjunction. */
-  def ap[AA >: A, C](f: => AA \/ (B => C)): (AA \/ C) =
-    f flatMap (ff => map(ff(_)))
+  def ap[AA, C](f: => AA \/ (B => C))(implicit evA: A <~< AA): (AA \/ C) =
+    f flatMap (ff => bimap(evA, ff(_)))
 
   /** Bind through the right of this disjunction. */
-  def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
+  def flatMap[AA, D](g: B => (AA \/ D))(implicit evA: A <~< AA): (AA \/ D) =
     this match {
-      case a @ -\/(_) => a
+      case a @ -\/(_) => Liskov.co(evA)(a)
       case \/-(b) => g(b)
     }
 
@@ -149,24 +149,24 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Filter on the right of this disjunction. */
-  def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA]): (AA \/ B) =
-    this match {
-      case -\/(_) => this
-      case \/-(b) => if(p(b)) this else -\/(M.zero)
+  def filter[AA](p: B => Boolean)(implicit evA: A <~< AA, M: Monoid[AA]): (AA \/ B) =
+    this.leftMap(evA) match {
+      case l @ -\/(_) => l
+      case r @ \/-(b) => if(p(b)) r else -\/(M.zero)
     }
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
-  def exists[BB >: B](p: BB => Boolean): Boolean =
+  def exists[BB](p: BB => Boolean)(implicit evB: B <~< BB): Boolean =
     this match {
       case -\/(_) => false
-      case \/-(b) => p(b)
+      case \/-(b) => p(evB(b))
     }
 
   /** Return `true` if this disjunction is a left value or the right value satisfies the given predicate. */
-  def forall[BB >: B](p: BB => Boolean): Boolean =
+  def forall[BB](p: BB => Boolean)(implicit evB: B <~< BB): Boolean =
     this match {
       case -\/(_) => true
-      case \/-(b) => p(b)
+      case \/-(b) => p(evB(b))
     }
 
   /** Return an empty list or list with one element on the right of this disjunction. */
@@ -177,10 +177,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return an empty list or list with one element on the right of this disjunction. */
-  def toIList[BB >: B]: IList[BB] =
+  def toIList[BB](implicit evB: B <~< BB): IList[BB] =
     this match {
       case -\/(_) => INil()
-      case \/-(b) => b :: INil()
+      case \/-(b) => evB(b) :: INil()
     }
 
 
@@ -199,10 +199,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return an empty maybe or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
-  def toMaybe[BB >: B]: Maybe[BB] =
+  def toMaybe[BB](implicit evB: B <~< BB): Maybe[BB] =
     this match {
       case -\/(_) => Maybe.empty
-      case \/-(b) => Maybe.just(b)
+      case \/-(b) => Maybe.just(evB(b))
     }
 
   /** Convert to a core `scala.Either` at your own peril. */
@@ -213,33 +213,33 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
-  def getOrElse[BB >: B](x: => BB): BB =
+  def getOrElse[BB](x: => BB)(implicit evB: B <~< BB): BB =
     this match {
       case -\/(_) => x
-      case \/-(b) => b
+      case \/-(b) => evB(b)
     }
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
-  def |[BB >: B](x: => BB): BB =
-    getOrElse(x)
+  def |[BB](x: => BB)(implicit evB: B <~< BB): BB =
+    map(evB).getOrElse(x)
 
   /** Return the right value of this disjunction or run the given function on the left. */
-  def valueOr[BB >: B](x: A => BB): BB =
+  def valueOr[BB](x: A => BB)(implicit evB: B <~< BB): BB =
     this match {
       case -\/(a) => x(a)
-      case \/-(b) => b
+      case \/-(b) => evB(b)
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse[C, BB >: B](x: => C \/ BB): C \/ BB =
+  def orElse[C, BB](x: => C \/ BB)(implicit evB: B <~< BB): C \/ BB =
     this match {
       case -\/(_) => x
-      case right@ \/-(_) => right
+      case right @ \/-(_) => right.map(evB)
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||[C, BB >: B](x: => C \/ BB): C \/ BB =
-    orElse(x)
+  def |||[C, BB](x: => C \/ BB)(implicit evB: B <~< BB): C \/ BB =
+    this.map(evB(_)).orElse(x)
 
   /**
    * Sums up values inside disjunction, if both are left or right. Returns first left otherwise.
@@ -250,11 +250,11 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
    * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
    * }}}
    */
-  def +++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M1: Semigroup[BB], M2: Semigroup[AA]): AA \/ BB =
-    this match {
-      case -\/(a1) => x match {
+  def +++[AA, BB](x: => AA \/ BB)(implicit evA: A <~< AA, evB: B <~< BB, M1: Semigroup[BB], M2: Semigroup[AA]): AA \/ BB =
+    this.bimap(evA, evB) match {
+      case l @ -\/(a1) => x match {
         case -\/(a2) => -\/(M2.append(a1, a2))
-        case \/-(_) => this
+        case \/-(_) => l
       }
       case \/-(b1) => x match {
         case b2 @ -\/(_) => b2
@@ -263,52 +263,52 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
-  def ensure[AA >: A](onLeft: => AA)(f: B => Boolean): (AA \/ B) = this match {
-    case \/-(b) => if (f(b)) this else -\/(onLeft)
-    case -\/(_) => this
-  }
+  def ensure[AA](onLeft: => AA)(f: B => Boolean)(implicit evA: A <~< AA): (AA \/ B) = Liskov.co2(evA)(this) match {
+      case either @ \/-(b) => if (f(b)) either else -\/(onLeft)
+      case either @ -\/(_) => either
+    }
 
   /** Run the given function on the left and return right with the result. */
-  def recover[BB >: B](pf: PartialFunction[A, BB]): (A \/ BB) = this match {
+  def recover[BB](pf: PartialFunction[A, BB])(implicit evB: B <~< BB): (A \/ BB) = this match {
     case -\/(a) if (pf isDefinedAt a) => \/-(pf(a))
-    case _ => this
+    case _ => Liskov.co2_2(evB)(this)
   }
 
   /** Run the given function on the left and return the result. */
-  def recoverWith[AA >: A, BB >: B](pf: PartialFunction[AA, AA \/ BB]): (AA \/ BB) = this match {
+  def recoverWith[AA, BB](pf: PartialFunction[AA, AA \/ BB])(implicit evA: A <~< AA, evB: B <~< BB): (AA \/ BB) = Liskov.lift2(evA, evB)(this) match {
     case -\/(a) if (pf isDefinedAt a) => pf(a)
-    case _ => this
+    case other => other
   }
 
   /** Compare two disjunction values for equality. */
-  def ===[AA >: A, BB >: B](x: AA \/ BB)(implicit EA: Equal[AA], EB: Equal[BB]): Boolean =
+  def ===[AA, BB](x: AA \/ BB)(implicit evA: A <~< AA, evB: B <~< BB, EA: Equal[AA], EB: Equal[BB]): Boolean =
     this match {
       case -\/(a1) => x match {
-        case -\/(a2) => Equal[AA].equal(a1, a2)
+        case -\/(a2) => Equal[AA].equal(evA(a1), a2)
         case \/-(_) => false
       }
       case \/-(b1) => x match {
-        case \/-(b2) => Equal[BB].equal(b1, b2)
+        case \/-(b2) => Equal[BB].equal(evB(b1), b2)
         case -\/(_) => false
       }
     }
 
   /** Compare two disjunction values for ordering. */
-  def compare[AA >: A, BB >: B](x: AA \/ BB)(implicit EA: Order[AA], EB: Order[BB]): Ordering =
+  def compare[AA, BB](x: AA \/ BB)(implicit evA: A <~< AA, evB: B <~< BB, EA: Order[AA], EB: Order[BB]): Ordering =
     this match {
       case -\/(a1) => x match {
-        case -\/(a2) => Order[AA].apply(a1, a2)
+        case -\/(a2) => Order[AA].apply(evA(a1), a2)
         case \/-(_) => Ordering.LT
       }
       case \/-(b1) => x match {
-        case \/-(b2) => Order[BB].apply(b1, b2)
+        case \/-(b2) => Order[BB].apply(evB(b1), b2)
         case -\/(_) => Ordering.GT
       }
     }
 
   /** Show for a disjunction value. */
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
-    this match {
+  def show[AA, BB](implicit evA: A <~< AA, evB: B <~< BB, SA: Show[AA], SB: Show[BB]): Cord =
+    Liskov.lift2(evA, evB)(this) match {
       case -\/(a) => ("-\\/(": Cord) ++ SA.show(a) :- ')'
       case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
     }
@@ -321,9 +321,9 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Convert to a ValidationNel. */
-  def validationNel[AA>:A] : ValidationNel[AA,B] =
+  def validationNel[AA](implicit ev: A <~< AA) : ValidationNel[AA,B] =
     this match {
-      case -\/(a) => Failure(NonEmptyList(a))
+      case -\/(a) => Failure(NonEmptyList(ev(a)))
       case \/-(b) => Success(b)
     }
 
@@ -336,10 +336,10 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     validationed(k)
 
   /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
-  def merge[AA >: A](implicit ev: B <~< AA): AA =
-    this match {
+  def merge[AA](implicit ev: A <~< AA, ev2: B <~< AA): AA =
+    Liskov.lift2[\/, A, AA, B, AA](ev, ev2)(this) match {
+      case \/-(a) => a
       case -\/(a) => a
-      case \/-(b) => ev(b)
     }
 
   /** Convert to a These. */
@@ -377,7 +377,7 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
-  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
+  def fromTryCatchThrowable[T, E: NotNothing: ? <~< Throwable](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])

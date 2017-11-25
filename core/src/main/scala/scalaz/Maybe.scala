@@ -4,6 +4,7 @@ import scala.util.control.NonFatal
 import scala.reflect.ClassTag
 import Ordering._
 import Isomorphism.{<~>, IsoFunctorTemplate}
+import Liskov.<~<
 
 /** An optional value
  *
@@ -172,7 +173,7 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
-  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Maybe[T] = try {
+  def fromTryCatchThrowable[T, E: NotNothing: ? <~< Throwable](a: => T)(implicit ex: ClassTag[E]): Maybe[T] = try {
     just(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => empty

@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.>~>
+
 final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 
   def map[C](f: B => C)(implicit F: Functor[F]): TheseT[F, A, C] =
@@ -8,17 +10,17 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def mapT[G[_], C, D](f: F[A \&/ B] => G[C \&/ D]): TheseT[G, C, D] =
     TheseT(f(run))
 
-  def flatMap[AA >: A, C](f: B => TheseT[F, AA, C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
+  def flatMap[AA, C](f: B => TheseT[F, AA, C])(implicit ev: AA >~> A, M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
   = TheseT(M.bind(run) {
-    case a @ \&/.This(_) => M.point(a)
+    case \&/.This(a) => M.point(\&/.This(ev(a)))
     case \&/.That(b)     => f(b).run
     case \&/.Both(aa, b) => M.map(f(b).run) {
-      case \&/.This(a)    => \&/.This(S.append(aa, a))
-      case \&/.That(c)    => \&/.Both(aa, c)
-      case \&/.Both(a, c) => \&/.Both(S.append(aa, a), c)
+      case \&/.This(a)    => \&/.This(S.append(ev(aa), a))
+      case \&/.That(c)    => \&/.Both(ev(aa), c)
+      case \&/.Both(a, c) => \&/.Both(S.append(ev(aa), a), c)
     }
   })
-  def flatMapF[AA >: A, C](f: B => F[AA \&/ C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
+  def flatMapF[AA, C](f: B => F[AA \&/ C])(implicit ev: AA >~> A, M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
   = flatMap[AA, C](f andThen (x => TheseT(x)))
 
 
@@ -50,7 +52,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def |(default: => B)(implicit F: Functor[F]): F[B]
   = getOrElse(default)
 
-  def valueOr[BB >: B](x: A => BB)(implicit M: Semigroup[BB], F: Functor[F]): F[BB]
+  def valueOr[BB](x: A => BB)(implicit ev: BB >~> B, M: Semigroup[BB], F: Functor[F]): F[BB]
   = F.map(run)(_ valueOr x)
 
   def swapped[AA, BB](k: (B \&/ A) => (BB \&/ AA))(implicit F: Functor[F]): TheseT[F, AA,  BB] =
@@ -62,7 +64,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def a(implicit F: Functor[F]): OptionT[F, A] = OptionT(F.map(run)(_.a))
   def b(implicit F: Functor[F]): OptionT[F, B] = OptionT(F.map(run)(_.b))
 
-  def append[AA >: A, BB >: B](that: => TheseT[F, AA,  BB])(implicit F: Apply[F], SA: Semigroup[AA], SB: Semigroup[BB]): TheseT[F, AA,  BB]
+  def append[AA, BB](that: => TheseT[F, AA,  BB])(implicit evA: AA >~> A, evB: BB >~> B, F: Apply[F], SA: Semigroup[AA], SB: Semigroup[BB]): TheseT[F, AA,  BB]
   = TheseT(F.apply2(this.run, that.run)(_ append _))
 
   def leftMap[C](f: A => C)(implicit F: Functor[F]): TheseT[F, C, B]
@@ -71,14 +73,14 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): TheseT[F, C, D]
   = TheseT(F.map(run)(_.bimap(f, g)))
 
-  def traverse[G[_], AA >: A, D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, AA, D]]
-  = G.map(F.traverse(run)(o => Traverse[AA \&/ ?].traverse(o)(g)))(TheseT(_))
+  def traverse[G[_], AA, D](g: B => G[D])(implicit ev: AA >~> A, F: Traverse[F], G: Applicative[G]): G[TheseT[F, AA, D]]
+  = G.map(F.traverse(run)(o => Traverse[AA \&/ ?].traverse(Liskov.co2(ev)(o))(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]
   = G.map(F.traverse(run)(Bitraverse[\&/].bitraverseF(f, g)))(TheseT(_: F[C \&/ D]))
 
-  def &&&[AA >: A, C](t: TheseT[F, AA, C])(implicit M: Semigroup[AA], F: Apply[F]): TheseT[F, AA, (B, C)]
+  def &&&[AA, C](t: TheseT[F, AA, C])(implicit ev: AA >~> A, M: Semigroup[AA], F: Apply[F]): TheseT[F, AA, (B, C)]
   = TheseT(F.apply2(run, t.run)(_ &&& _))
 
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord]

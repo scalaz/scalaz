@@ -3,6 +3,7 @@ package effect
 
 ////
 import java.io.Closeable
+import Liskov.<~<
 
 /**
  *
@@ -32,11 +33,11 @@ object Resource {
       def close(a: A): IO[Unit] = closeAction(a)
     }
 
-  def resourceFromAutoCloseable[A <: java.lang.AutoCloseable]: Resource[A] =
-    resource(a => IO(a.close()))
+  def resourceFromAutoCloseable[A](implicit ev: A <~< java.lang.AutoCloseable): Resource[A] =
+    resource(a => IO(ev(a).close()))
 
-  def resourceFromCloseable[A <: Closeable]: Resource[A] =
-    resource(a => IO(a.close))
+  def resourceFromCloseable[A](implicit ev: A <~< Closeable): Resource[A] =
+    resource(a => IO(ev(a).close))
 
   implicit val contravariant: Contravariant[Resource] =
     new Contravariant[Resource] {

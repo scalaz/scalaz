@@ -8,6 +8,7 @@ import scalaz.Tags.Parallel
 import scalaz.syntax.monad._
 import scalaz.Free.Trampoline
 import scalaz.\/._
+import scalaz.Liskov.{<~<, >~>}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -65,17 +66,17 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * function, calling Task.now on the result. Any nonmatching exceptions
    * are reraised.
    */
-  def handle[B>:A](f: PartialFunction[Throwable,B]): Task[B] =
+  def handle[B](f: PartialFunction[Throwable,B])(implicit ev: B >~> A): Task[B] =
     handleWith(f andThen Task.now)
 
   /**
    * Calls `attempt` and handles some exceptions using the given partial
    * function. Any nonmatching exceptions are reraised.
    */
-  def handleWith[B>:A](f: PartialFunction[Throwable,Task[B]]): Task[B] =
+  def handleWith[B](f: PartialFunction[Throwable,Task[B]])(implicit ev: B >~> A): Task[B] =
     attempt flatMap {
       case -\/(e) => f.lift(e) getOrElse Task.fail(e)
-      case \/-(a) => Task.now(a)
+      case \/-(a) => Task.now(ev(a))
     }
 
   /**
@@ -83,8 +84,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * This is rather coarse-grained. Use `attempt`, `handle`, and
    * `flatMap` for more fine grained control of exception handling.
    */
-  def or[B>:A](t2: Task[B]): Task[B] =
-    new Task(this.get flatMap {
+  def or[B](t2: Task[B])(implicit ev: B >~> A): Task[B] =
+    new Task(Liskov.co(ev)(this).get flatMap {
       case -\/(e) => t2.get
       case a => Future.now(a)
     })
@@ -408,8 +409,8 @@ object Task {
   def fromMaybe[A](ma: Maybe[A])(t: => Throwable): Task[A] =
     ma.cata(Task.now, Task.fail(t))
 
-  def fromDisjunction[A <: Throwable, B](x: A \/ B): Task[B] =
-    x.fold(Task.fail, Task.now)
+  def fromDisjunction[A, B](x: A \/ B)(implicit ev: A <~< Throwable): Task[B] =
+    x.fold(ev.substF(Task.fail(_)), Task.now)
 
   def tailrecM[A, B](a: A)(f: A => Task[A \/ B]): Task[B] =
     f(a).flatMap {

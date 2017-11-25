@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Bifunctor` */
 final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Bifunctor[F]) extends Ops[F[A, B]] {
   ////
-  import Liskov.<~<
+  import Liskov.{<~<, >~>}
 
   final def bimap[C, D](f: A => C, g: B => D): F[C, D] = F.bimap(self)(f, g)
   final def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
@@ -15,7 +15,7 @@ final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
   final def leftMap[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
   final def rightAs[C](c: => C): F[A, C] = F.bimap(self)(a => a, _ => c)
   final def leftAs[C](c: => C): F[C, B] = F.bimap(self)(_ => c, b => b)
-  final def widen[C >: A, D >: B]: F[C, D] = F.widen(self)
+  final def widen[C, D](implicit evC: C >~> A, evD: D >~> B): F[C, D] = F.widen(self)
   ////
 }
 

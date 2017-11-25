@@ -6,6 +6,7 @@ import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
 import collection.IndexedSeqOptimized
 import syntax.Ops
+import Liskov.>~>
 
 /**
  * An immutable wrapper for arrays
@@ -21,11 +22,11 @@ sealed abstract class ImmutableArray[+A] {
 
   def isEmpty: Boolean = length == 0
 
-  def toArray[B >: A : ClassTag]: Array[B]
-  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
+  def toArray[B: ClassTag](implicit ev: B >~> A): Array[B]
+  def copyToArray[B](xs: Array[B], start: Int, len: Int)(implicit ev: B >~> A): Unit
   def slice(from: Int, until: Int): ImmutableArray[A]
 
-  def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
+  def ++[B: ClassTag](other: ImmutableArray[B])(implicit ev: B >~> A): ImmutableArray[B]
 }
 
 sealed abstract class ImmutableArrayInstances {
@@ -158,15 +159,15 @@ object ImmutableArray extends ImmutableArrayInstances {
     def apply(idx: Int) = arr(idx)
 
     def length = arr.length
-    def toArray[B >: A : ClassTag] = arr.clone.asInstanceOf[Array[B]]
-    def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit = { arr.copyToArray(xs, start, len) }
+    def toArray[B: ClassTag](implicit ev: B >~> A): Array[B] = arr.clone.asInstanceOf[Array[B]]
+    def copyToArray[B](xs: Array[B], start: Int, len: Int)(implicit ev: B >~> A): Unit = { arr.asInstanceOf[Array[B]].copyToArray(xs, start, len) }
 
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
-    override def ++[B >: A: ClassTag](other: ImmutableArray[B]) = {
-      val newArr = new Array(length + other.length)
-      this.copyToArray(newArr, 0, length)
+    override def ++[B: ClassTag](other: ImmutableArray[B])(implicit ev: B >~> A): ImmutableArray[B] = {
+      val newArr = new Array[B](length + other.length)
+      Liskov.co(ev)(this).copyToArray(newArr, 0, length)
       other.copyToArray(newArr, length, other.length)
       fromArray(newArr)
     }
@@ -222,12 +223,14 @@ object ImmutableArray extends ImmutableArrayInstances {
     def apply(idx: Int) = str(idx)
 
     def length = str.length
-    def toArray[B >: Char : ClassTag] = str.toArray
-    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int): Unit = { str.copyToArray(xs, start, len) }
+    def toArray[B: ClassTag](implicit ev: B >~> Char) = str.toArray.asInstanceOf[Array[B]]
+    def copyToArray[B](xs: Array[B], start: Int, len: Int)(implicit ev: B >~> Char): Unit = {
+      Liskov.co(ev)(str.iterator).copyToArray(xs, start, len)
+    }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
-    def ++[B >: Char: ClassTag](other: ImmutableArray[B]) =
+    def ++[B: ClassTag: ? >~> Char](other: ImmutableArray[B]): ImmutableArray[B] =
       other match {
         case other: StringArray => new StringArray(str + other.str)
         case _ => {

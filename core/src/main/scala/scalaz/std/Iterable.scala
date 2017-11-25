@@ -1,14 +1,15 @@
 package scalaz
 package std
 
+import Liskov.<~<
 import collection.SeqLike
 import collection.generic.{CanBuildFrom, SeqFactory, GenericTraversableTemplate}
 import collection.immutable.Seq
 
 trait IterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
+  implicit def iterableShow[CC[_], A: Show](implicit ev: CC[A] <~< Iterable[A]): Show[CC[A]] = new Show[CC[A]] {
+    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", ev(as).map(Show[A].show(_)).toSeq:_*) :+ "]"
   }
 
   /** Lexicographical ordering */
@@ -31,10 +32,10 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+  implicit def iterableEqual[CC[_], A: Equal](implicit ev: CC[A] <~< Iterable[A]): Equal[CC[A]] = new Equal[CC[A]] {
     def equal(a1: CC[A], a2: CC[A]) = {
-      val i1 = a1.iterator
-      val i2 = a2.iterator
+      val i1 = ev(a1).iterator
+      val i2 = ev(a2).iterator
       var b = false
 
       while (i1.hasNext && i2.hasNext && !b) {
@@ -50,6 +51,7 @@ trait IterableInstances {
     }
   }
 
+  // TODO: Reimplement using Polykinded <~< when possible.
   implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] =
     new IterableSubtypeFoldable[I] {}
 }

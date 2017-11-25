@@ -609,9 +609,9 @@ object ScalazProperties {
   }
 
   object lens {
-    def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]): Prop = forAll(l.lensLaw.identity _)
-    def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]): Prop = forAll(l.lensLaw.retention _)
-    def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]): Prop = forAll(l.lensLaw.doubleSet _)
+    def identity[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], EA: Equal[A]): Prop = forAll(l.lensLaw.identity[A, B] _)
+    def retention[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[B]): Prop = forAll(l.lensLaw.retention[A, B] _)
+    def doubleSet[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EB: Equal[A]): Prop = forAll(l.lensLaw.doubleSet[A, B] _)
 
     def laws[A, B](l: Lens[A, B])(implicit A: Arbitrary[A], B: Arbitrary[B], EA: Equal[A], EB: Equal[B]): Properties =
       newProperties("lens") { p =>

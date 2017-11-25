@@ -1,5 +1,7 @@
 package scalaz
 
+import Liskov.{<~<, >~>}
+
 /**
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is
@@ -31,14 +33,14 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): PLensFamily[X1, X2, B1, B2] =
     plensFamily(x => apply(g(x)) map (_ map (f)))
 
-  def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): PLensFamily[X, X, B1, B2] =
-    xmapA(b to)(b from)
+  def xmapbA[X, A](b: Bijection[A, X])(implicit evSuper: A >~> A2, evSub: A <~< A1): PLensFamily[X, X, B1, B2] =
+    xmapA(evSuper.substF(b to))(evSub.onF(b from))
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): PLensFamily[A1, A2, X1, X2] =
     plensFamily(a => apply(a) map (_.xmap(f)(g)))
 
-  def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): PLensFamily[A1, A2, X, X] =
-    xmapB(b to)(b from)
+  def xmapbB[X, B](b: Bijection[B, X])(implicit evSuper: B >~> B1, evSub: B <~< B2): PLensFamily[A1, A2, X, X] =
+    xmapB(evSuper.substF(b to))(evSub.onF(b from))
 
   def get(a: A1): Option[B1] =
     run(a) map (_.pos)
@@ -103,48 +105,48 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     modg(f, _)
 
   /** Modify the potential value viewed through the partial lens */
-  def mod[A >: A2 <: A1](f: B1 => B2, a: A): A =
-    run(a) match {
-      case None => a: A
-      case Some(w) => (w puts f): A
+  def mod[A](f: B1 => B2, a: A)(implicit evSuper: A >~> A2, evSub: A <~< A1): A =
+    run(evSub(a)) match {
+      case None => a
+      case Some(w) => evSuper(w puts f)
     }
 
-  def =>=[A >: A2 <: A1](f: B1 => B2): A => A =
+  def =>=[A](f: B1 => B2)(implicit evSuper: A >~> A2, evSub: A <~< A1): A => A =
     mod(f, _)
 
   def st: PState[A1, B1] =
     State(s => (s, get(s)))
 
-  def %=[A >: A2 <: A1](f: B1 => B2): PState[A, B2] =
-    State(a => run(a) match {
+  def %=[A](f: B1 => B2)(implicit evSuper: A >~> A2, evSub: A <~< A1): PState[A, B2] =
+    State(a => run(evSub(a)) match {
       case None => (a, None)
       case Some(w) => {
         val r = f(w.pos)
-        (w put r, Some(r))
+        (evSuper(w put r), Some(r))
       }
     })
 
-  def :=[A >: A2 <: A1](b: => B2): PState[A, B2] =
+  def :=[A](b: => B2)(implicit evSuper: A >~> A2, evSub: A <~< A1): PState[A, B2] =
     %=(_ => b)
 
-  def %==[A >: A2 <: A1](f: B1 => B2): State[A, Unit] =
+  def %==[A](f: B1 => B2)(implicit evSuper: A >~> A2, evSub: A <~< A1): State[A, Unit] =
     State(a =>
   (mod(f, a), ()))
 
-  def %%=[A >: A2 <: A1, C](s: IndexedState[B1, B2, C]): PState[A, C] =
-    State(a => run(a) match {
+  def %%=[A, C](s: IndexedState[B1, B2, C])(implicit evSuper: A >~> A2, evSub: A <~< A1): PState[A, C] =
+    State(a => run(evSub(a)) match {
       case None => (a, None)
       case Some(w) => {
         val r = s.run(w.pos): (B2, C)
-        (w put r._1, Some(r._2))
+        (evSuper(w put r._1), Some(r._2))
       }
     })
 
-  def >-[A >: A2 <: A1, C](f: B1 => C): PState[A, C] =
-    State(a => (a, get(a) map f))
+  def >-[A, C](f: B1 => C)(implicit evSub: A <~< A1): PState[A, C] =
+    State(a => (a, get(evSub(a)) map f))
 
-  def >>-[A >: A2 <: A1, C](f: B1 => State[A, C]): PState[A, C] =
-    StateT(a => get(a) match {
+  def >>-[A, C](f: B1 => State[A, C])(implicit evSub: A <~< A1): PState[A, C] =
+    StateT(a => get(evSub(a)) match {
       case None => (a, None)
       case Some(w) =>
         f(w) apply a match {
@@ -152,7 +154,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
         }
     })
 
-  def ->>-[A >: A2 <: A1, C](f: => State[A, C]): PState[A, C] =
+  def ->>-[A, C](f: => State[A, C])(implicit evSub: A <~< A1): PState[A, C] =
     >>-(_ => f)
 
   /** Partial Lenses can be composed */

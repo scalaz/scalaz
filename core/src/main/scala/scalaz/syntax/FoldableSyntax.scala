@@ -64,7 +64,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def distinct(implicit A: Order[A]): IList[A] = F.distinct(self)
   final def distinctE(implicit A: Equal[A]): IList[A] = F.distinctE(self)
   final def distinctBy[B: Equal](f: A => B): IList[A] = F.distinctBy(self)(f)
-  final def longDigits(implicit d: A <:< Digit): Long = F.longDigits(self)
+  final def longDigits(implicit d: A <~< Digit): Long = F.longDigits(self)
   final def empty: Boolean = F.empty(self)
   final def element(a: A)(implicit A: Equal[A]): Boolean = F.element(self, a)
   final def splitWith(p: A => Boolean): List[NonEmptyList[A]] = F.splitWith(self)(p)

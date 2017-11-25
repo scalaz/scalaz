@@ -18,6 +18,7 @@ sealed abstract class Liskov[-A, +B] {
   final def compose[C](that: Liskov[C, A]): Liskov[C, B] = Liskov.trans(this, that)
 
   def onF[X](fa: X => A): X => B = Liskov.co2_2[Function1, B, X, A](this)(fa)
+  def substF[X](fa: B => X): A => X = subst[-? => X](fa)
 }
 
 sealed abstract class LiskovInstances {
@@ -32,6 +33,7 @@ sealed abstract class LiskovInstances {
 }
 
 object Liskov extends LiskovInstances {
+  def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 
   /**A convenient type alias for Liskov */
   type <~<[-A, +B] = Liskov[A, B]

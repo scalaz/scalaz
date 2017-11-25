@@ -1,6 +1,7 @@
 package scalaz
 
 import reflect.ClassTag
+import Liskov.>~>
 
 /** A function memoization strategy.  See companion for various
   * instances employing various strategies.
@@ -22,7 +23,7 @@ object Memo extends MemoInstances {
 
   def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[K, V] = memo[K, V](z => z)
 
-  private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
+  private class ArrayMemo[V: ? >~> Null: ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       val a = Need(new Array[V](n))
       k => {
@@ -57,7 +58,7 @@ object Memo extends MemoInstances {
   }
 
   /** Cache results in an `n`-long array. */
-  def arrayMemo[V >: Null : ClassTag](n: Int): Memo[Int, V] = new ArrayMemo(n)
+  def arrayMemo[V: ? >~> Null: ClassTag](n: Int): Memo[Int, V] = new ArrayMemo[V](n)
 
   /** As with `arrayMemo`, but memoizing double results !=
     * `sentinel`.

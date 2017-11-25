@@ -1,11 +1,12 @@
 package scalaz
 package syntax
 
+import Liskov.<~<
 import annotation.tailrec
 
 final class IdOps[A](private val self: A) extends AnyVal {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
-  final def ??(d: => A)(implicit ev: Null <:< A): A =
+  final def ??(d: => A)(implicit ev: Null <~< A): A =
     if (self == ev(null)) d else self
 
   /**Applies `self` to the provided function. The Thrush combinator. */

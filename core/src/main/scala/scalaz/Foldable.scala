@@ -8,6 +8,8 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
+
+  import Liskov.<~<
   import collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
@@ -289,7 +291,7 @@ trait Foldable[F[_]]  { self =>
   def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
     msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
 
-  def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
+  def longDigits[A](fa: F[A])(implicit d: A <~< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + d(a))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)
   /** Whether `a` is an element of `fa`. */
