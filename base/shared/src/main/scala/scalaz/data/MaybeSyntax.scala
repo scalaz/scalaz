@@ -3,4 +3,8 @@ package data
 
 trait MaybeSyntax {
   implicit class OptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
+
+  implicit class MaybeOps[A](a: A) {
+    def just: Maybe[A] = Maybe.just(a)
+  }
 }

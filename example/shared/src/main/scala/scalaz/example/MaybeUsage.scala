@@ -15,4 +15,8 @@ object MaybeUsage extends App {
 
   // monad instance and monad ops
   x flatMap { _ => y }
+
+  // Maybe syntax
+  val five: Maybe[Int] = 5.just
+  val foo: Maybe[String] = "foo".just
 }
