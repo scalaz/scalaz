@@ -1,8 +1,13 @@
+---
+layout: docs
+title:  "Forall"
+---
+
 # Forall
 
 ## Instance creation
 
-Create instance using `of` or `mk`
+Create instances using `of` or `mk`
 
 ```tut
 import scalaz.Prelude._
