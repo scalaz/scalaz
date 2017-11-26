@@ -26,19 +26,14 @@ class IOShallowAttemptBenchmark {
 
   @Benchmark
   def futureShallowAttempt(): BigInt = {
-    import scala.util.{Success, Failure}
+    import scala.util.Success
     import scala.concurrent.Future
     import scala.concurrent.duration.Duration.Inf
 
     def throwup(n: Int): Future[BigInt] =
-      if (n == 0) throwup(n + 1).transform {
-        case Failure(_) => Success(0)
-        case Success(v) => Success(v)
-      } else if (n == depth) Future(1)
-      else throwup(n + 1).transform {
-        case Failure(_) => Success(0)
-        case Success(v) => Success(v)
-      }.flatMap(_ => Future.failed(new Error("Oh noes!")))
+      if (n == 0) throwup(n + 1).transform(_.transform(Success(_), _ => Success(0)))
+      else if (n == depth) Future(1)
+      else throwup(n + 1).transform(_.transform(Success(_), _ => Success(0))).flatMap(_ => Future.failed(new Exception("Oh noes!")))
 
     Await.result(throwup(0), Inf)
   }
