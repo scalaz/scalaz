@@ -5,13 +5,19 @@ title:  "Forall"
 
 # Forall
 
+`Forall` allows for the defition of types, whose behaviour is valid for any inhabiting type; they are universally quantified types.
+
+**Typical imports**
+
+```tut:silent
+import scalaz.Prelude._
+```
+
 ## Instance creation
 
 Create instances using `of` or `mk`
 
 ```tut
-import scalaz.Prelude._
-
 val nil: ∀[List] = ∀.of[List](Nil)
 val emptyMap: ∀∀[Map] = ∀∀.of[Map](Map())
 
@@ -22,7 +28,6 @@ val emptyMap1: ∀∀[Map] = ∀∀.mk[∀∀[Map]].from(Map())
 ## Universally quantified Semigroup
 
 ```tut
-import scalaz.Prelude._
 import scalaz.typeclass.Semigroup
 
 def listSemigroup[A]: Semigroup[List[A]] = new Semigroup[List[A]] {
@@ -38,8 +43,6 @@ listPlus[Int].append(List(1, 2), List(3, 4)) == List(1, 2, 3, 4)
 ## Natural transformation
 
 ```tut
-import scalaz.Prelude._
-
 type ~>[F[_], G[_]] = ∀[λ[A => F[A] => G[A]]]
 
 val headOption: List ~> Option = ∀.mk[List ~> Option].from(_.headOption)
