@@ -7,6 +7,9 @@ options:
     menu_section: data
 
     nested_options:
+    - title: Disjunction
+      url: data/Disjunction.html
+      menu_section: data
     - title: Forall
       url: data/Forall.html
       menu_section: data
