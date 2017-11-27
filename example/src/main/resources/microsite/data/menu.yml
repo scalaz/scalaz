@@ -1,0 +1,12 @@
+options:
+  - title: Home
+    url: index.html
+
+  - title: Data classes
+    url: data/index.html
+    menu_section: data
+
+    nested_options:
+    - title: Forall
+      url: data/Forall.html
+      menu_section: data

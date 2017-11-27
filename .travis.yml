@@ -1,6 +1,15 @@
 language: scala
 sudo: false
 scala:
-   - 2.12.4
+  - 2.12.4
 jdk:
   - oraclejdk8
+before_install:
+  - export PATH=${PATH}:./vendor/bundle
+install:
+  - rvm use 2.2.3 --install --fuzzy
+  - gem update --system
+  - gem install sass
+  - gem install jekyll -v 3.2.1
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION test example/makeMicrosite
