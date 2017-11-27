@@ -2,6 +2,15 @@ options:
   - title: Home
     url: index.html
 
+  - title: Type classes
+    url: typeclass/index.html
+    menu_section: typeclass
+
+    nested_options:
+    - title: Show
+      url: typeclass/Show.html
+      menu_section: typeclass
+
   - title: Data classes
     url: data/index.html
     menu_section: data
