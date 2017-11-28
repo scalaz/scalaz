@@ -31,13 +31,13 @@ val emptyMap1: ∀∀[Map] = ∀∀.mk[∀∀[Map]].from(Map())
 import scalaz.typeclass.Semigroup
 
 def listSemigroup[A]: Semigroup[List[A]] = new Semigroup[List[A]] {
-  def append(x: List[A], y: => List[A]) = x ++ y
+  def append(x: List[A])(y: => List[A]) = x ++ y
 }
 
 type Plus[F[_]] = ∀[λ[A => Semigroup[F[A]]]]
 
 val listPlus: Plus[List] = ∀.mk[Plus[List]].from(listSemigroup)
-listPlus[Int].append(List(1, 2), List(3, 4)) == List(1, 2, 3, 4)
+listPlus[Int].append(List(1, 2))(List(3, 4)) == List(1, 2, 3, 4)
 ```
 
 ## Natural transformation

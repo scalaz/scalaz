@@ -7,7 +7,7 @@ import scala.language.implicitConversions
 import scala.language.experimental.macros
 
 trait SemigroupSyntax {
-  implicit def equalOpsA[A: Semigroup](a: A): SemigroupSyntax.OpsA[A] = new SemigroupSyntax.OpsA(a)
+  implicit def semigroupOps[A: Semigroup](a: A): SemigroupSyntax.OpsA[A] = new SemigroupSyntax.OpsA(a)
 }
 
 object SemigroupSyntax {
