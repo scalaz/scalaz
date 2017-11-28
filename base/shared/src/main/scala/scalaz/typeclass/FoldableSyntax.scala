@@ -13,6 +13,7 @@ object FoldableSyntax {
   class Ops[F[_], A](self: F[A])(implicit F: Foldable[F]) {
     def foldLeft[B](f: B)(g: (B, A) => B): B = F.foldLeft(self, f)(g)
     def foldRight[B](f: => B)(g: (A, => B) => B): B = F.foldRight(self, f)(g) //TODO: macro-ize foldable syntax
+    def foldMap[B: Monoid](f: A => B): B = F.foldMap(self)(f)
     def toList: List[A] = macro meta.Ops._f0[List[A]]
   }
 }
