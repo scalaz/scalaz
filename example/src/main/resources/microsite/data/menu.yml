@@ -9,6 +9,9 @@ options:
     nested_options:
     - title: Functor
       url: typeclass/Functor.html
+    - title: Semigroup
+      menu_section: typeclass
+      url: typeclass/Semigroup.html
       menu_section: typeclass
     - title: Show
       url: typeclass/Show.html
