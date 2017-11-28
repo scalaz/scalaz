@@ -6,7 +6,7 @@ title:  "Disjunction"
 # Disjunction
 
 `Disjunction` is a data type used to signal multiple possible outcomes of a computation.
-It can be most useful when dealing with exceptional and errors but is not tied to these cases.
+It is often used to dealing with errors, but is not tied to that case.
 
 **Typical imports**
 

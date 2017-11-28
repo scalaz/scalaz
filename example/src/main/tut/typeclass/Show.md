@@ -39,4 +39,4 @@ import scalaz.data.Maybe
 Maybe.just(Foo(1)).show
 ```
 
-*Note that the `Show` instance for `Maybe` resolves against the `Show` instance for `Foo`*
+*Note that the `Show` instance for `Maybe` resolves against the `Show` instance for `Foo`.*

@@ -5,7 +5,8 @@ title:  "Forall"
 
 # Forall
 
-`Forall` allows for the defition of types, whose behaviour is valid for any inhabiting type; they are universally quantified types.
+`Forall` allows for the definition of types, whose behaviour is valid for any 
+inhabiting type. In other words, they are universally quantified types.
 
 **Typical imports**
 
