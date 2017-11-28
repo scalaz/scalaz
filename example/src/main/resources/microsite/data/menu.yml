@@ -10,6 +10,9 @@ options:
     - title: Functor
       url: typeclass/Functor.html
       menu_section: typeclass
+    - title: Monoid
+      url: typeclass/Monoid.html
+      menu_section: typeclass
     - title: Show
       url: typeclass/Show.html
       menu_section: typeclass
