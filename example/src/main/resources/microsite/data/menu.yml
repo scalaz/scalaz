@@ -7,6 +7,9 @@ options:
     menu_section: typeclass
 
     nested_options:
+    - title: Functor
+      url: typeclass/Functor.html
+      menu_section: typeclass
     - title: Show
       url: typeclass/Show.html
       menu_section: typeclass
