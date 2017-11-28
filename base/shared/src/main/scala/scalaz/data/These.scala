@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import typeclass._
+import Prelude._
 
 sealed abstract class These[L, R] {
   import These.{This, That, Both}
@@ -15,21 +15,21 @@ sealed abstract class These[L, R] {
     case Both(left, right) => fboth(left, right)
   }
 
-  final def thisSide: Option[L] = this match {
-    case This(left)    => Some(left)
-    case That(_)       => None
-    case Both(left, _) => Some(left)
+  final def thisSide: Maybe[L] = this match {
+    case This(left)    => just(left)
+    case That(_)       => empty
+    case Both(left, _) => just(left)
   }
 
-  final def thatSide: Option[R] = this match {
-    case This(_)        => None
-    case That(right)    => Some(right)
-    case Both(_, right) => Some(right)
+  final def thatSide: Maybe[R] = this match {
+    case This(_)        => empty
+    case That(right)    => just(right)
+    case Both(_, right) => just(right)
   }
 
-  final def both: Option[(L, R)] = this match {
-    case Both(left, right) => Some((left, right))
-    case _                 => None
+  final def both: Maybe[(L, R)] = this match {
+    case Both(left, right) => just((left, right))
+    case _                 => empty
   }
 
   final def swap: These[R, L] = this match {
@@ -46,18 +46,33 @@ sealed abstract class These[L, R] {
   }
   final def lmap[C](fl: L => C): These[C, R] = this match {
     case This(left)        => This(fl(left))
-    case That(right)       => That(right)
+    case that @ That(_)    => that.pmap[C]
     case Both(left, right) => Both(fl(left), right)
   }
   final def rmap[D](fr: R => D): These[L, D] = this match {
-    case This(left)        => This(left)
+    case thiz @ This(_)    => thiz.pmap[D]
     case That(right)       => That(fr(right))
     case Both(left, right) => Both(left, fr(right))
   }
 
+  /* Applicative (on the right) */
+  final def ap[D](f: These[L, R => D])(implicit L: Semigroup[L]): These[L, D] = this match {
+    case thiz @ This(_)    => thiz.pmap[D]
+    case That(right)       => f match {
+      case thiz1 @ This(_)     => thiz1.pmap[D]
+      case That(right1)        => That(right1(right))
+      case Both(left1, right1) => Both(left1, right1(right))
+    }
+    case Both(left, right) => f match {
+      case This(left1)         => This(L.append(left, left1))
+      case That(right1)        => Both(left, right1(right))
+      case Both(left1, right1) => Both(L.append(left, left1), right1(right))
+    }
+  }
+
   /* Monad (on the right) */
   final def flatMap[D](f: R => These[L, D])(implicit L: Semigroup[L]): These[L, D] = this match {
-    case This(left)        => This(left)
+    case thiz @ This(_)    => thiz.pmap[D]
     case That(right)       => f(right)
     case Both(left, right) => f(right) match {
       case This(left1)         => This(L.append(left, left1))
@@ -84,22 +99,28 @@ sealed abstract class These[L, R] {
 
   /* Traversable (on the right) */
   final def traverse[F[_], B](f: R => F[B])(implicit F: Applicative[F]): F[These[L, B]] = this match {
-    case This(left)        => F.pure(This(left))
+    case thiz @ This(_)    => F.pure(thiz.pmap[B])
     case That(right)       => F.apply.functor.map(f(right))(That(_))
     case Both(left, right) => F.apply.functor.map(f(right))(Both(left, _))
   }
 
   /* Semigroup */
-  final def append(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] = (this, other) match {
-    case (This(l1),     This(l2)    ) => This(L.append(l1, l2))
-    case (This(l1),     That(r2)    ) => Both(l1, r2)
-    case (This(l1),     Both(l2, r2)) => Both(L.append(l1, l2), r2)
-    case (That(r1),     This(l2)    ) => Both(l2, r1)
-    case (That(r1),     That(r2)    ) => That(R.append(r1, r2))
-    case (That(r1),     Both(l2, r2)) => Both(l2, R.append(r1, r2))
-    case (Both(l1, r1), This(l2)    ) => Both(L.append(l1, l2), r1)
-    case (Both(l1, r1), That(r2)    ) => Both(l1, R.append(r1, r2))
-    case (Both(l1, r1), Both(l2, r2)) => Both(L.append(l1, l2), R.append(r1, r2))
+  final def append(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] = other match {
+    case This(left)        => lappend(left)
+    case That(right)       => rappend(right)
+    case Both(left, right) => lappend(left).rappend(right)
+  }
+
+  final def lappend(other: L)(implicit L: Semigroup[L]): These[L, R] = this match {
+    case This(left)        => This(L.append(left, other))
+    case That(right)       => Both(other, right)
+    case Both(left, right) => Both(L.append(left, other), right)
+  }
+
+  final def rappend(other: R)(implicit R: Semigroup[R]): These[L, R] = this match {
+    case This(left)        => Both(left, other)
+    case That(right)       => That(R.append(right, other))
+    case Both(left, right) => Both(left, R.append(right, other))
   }
 
 }
@@ -108,18 +129,22 @@ object These extends TheseInstances {
   type \&/[A, B] = These[A, B]
 
   /* ADT cases */
-  final case class This[L, R](thisValue: L)               extends These[L, R]
-  final case class That[L, R](thatValue: R)               extends These[L, R]
+  final case class This[L, R](thisValue: L) extends These[L, R] {
+    @inline private[data] final def pmap[RR]: This[L, RR] = this.asInstanceOf[This[L, RR]]
+  }
+  final case class That[L, R](thatValue: R)               extends These[L, R] {
+    @inline private[data] final def pmap[LL]: That[LL, R] = this.asInstanceOf[That[LL, R]]
+  }
   final case class Both[L, R](thisValue: L, thatValue: R) extends These[L, R]
 
   /* "smart" constructors */
   object This {
-    @inline def apply[L, R](thisValue: L): These[L, R] = new This[L, R](thisValue)
+    @inline final def apply[L, R](thisValue: L): These[L, R] = new This[L, R](thisValue)
   }
   object That {
-    @inline def apply[L, R](thatValue: R): These[L, R] = new That[L, R](thatValue)
+    @inline final def apply[L, R](thatValue: R): These[L, R] = new That[L, R](thatValue)
   }
   object Both {
-    @inline def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
+    @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
   }
 }

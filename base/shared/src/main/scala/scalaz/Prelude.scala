@@ -32,6 +32,8 @@ trait Prelude  extends data.DisjunctionFunctions
   type IsCovariant[F[_]] = typeclass.IsCovariant[F]
   type IsContravariant[F[_]] = typeclass.IsContravariant[F]
   type Show[A] = typeclass.Show[A]
+  type Semigroup[T] = typeclass.Semigroup[T]
+  type Monoid[T] = typeclass.Monoid[T]
 
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
@@ -50,6 +52,8 @@ trait Prelude  extends data.DisjunctionFunctions
   def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
   def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
   def Show[A](implicit A: Show[A]): Show[A] = A
+  def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T] = T
+  def Monoid[T](implicit T: Monoid[T]): Monoid[T] = T
 
   // ApplicativeSyntax
   implicit def PapplicativeOpsA[A](a: A): ApplicativeSyntax.OpsA[A] = new ApplicativeSyntax.OpsA(a)
@@ -98,6 +102,9 @@ trait Prelude  extends data.DisjunctionFunctions
 
   implicit def ShowOps[A](a: A)(implicit A: Show[A]): ShowSyntax.Ops[A] =
     new ShowSyntax.Ops[A](a)(A)
+
+  implicit def SemigroupOps[A](a: A)(implicit A: Semigroup[A]): SemigroupSyntax.OpsA[A] =
+    new SemigroupSyntax.OpsA[A](a)
 
 
   // Base Data

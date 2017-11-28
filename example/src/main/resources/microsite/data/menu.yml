@@ -22,3 +22,6 @@ options:
     - title: Forall
       url: data/Forall.html
       menu_section: data
+    - title: These
+      url: data/These.html
+      menu_section: data

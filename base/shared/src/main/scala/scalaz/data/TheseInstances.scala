@@ -8,14 +8,14 @@ trait TheseInstances {
 
   // implicit def bifunctor: Bifunctor[These] = ...
 
-  implicit def monad[L: Semigroup]: Monad[These[L, ?]] =
+  implicit final def monad[L: Semigroup]: Monad[These[L, ?]] =
     new MonadClass.Template[These[L, ?]] with BindClass.Ap[These[L, ?]] {
       override def map[A, B](ma: These[L, A])(f: A => B) = ma.rmap(f)
       def flatMap[A, B](ma: These[L, A])(f: A => These[L, B]) = ma.flatMap(f)
       def pure[A](a: A) = That(a)
     }
 
-  implicit def traversable[L]: Traversable[These[L, ?]] =
+  implicit final def traversable[L]: Traversable[These[L, ?]] =
     new TraversableClass[These[L, ?]]
         with TraversableClass.Traverse[These[L, ?]]
         with FoldableClass.FoldMap[These[L, ?]] {
@@ -28,12 +28,12 @@ trait TheseInstances {
       def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B) = fa.foldLeft(z)(f)
     }
 
-  implicit def semigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =
+  implicit final def semigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =
     new SemigroupClass[These[L, R]] {
       def append(a1: These[L, R], a2: => These[L, R]) = a1.append(a2)
     }
 
-  implicit def show[L, R](implicit L: Show[L], R: Show[R]): Show[These[L, R]] =
+  implicit final def show[L, R](implicit L: Show[L], R: Show[R]): Show[These[L, R]] =
     new Show[These[L, R]] {
       def show(a: These[L, R]) =
         a.bimap(L.show)(R.show).toString
