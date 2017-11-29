@@ -20,9 +20,13 @@ trait Prelude  extends data.DisjunctionFunctions
   type Applicative[F[_]] = typeclass.Applicative[F]
   type Apply[F[_]] = typeclass.Apply[F]
   type Bind[M[_]] = typeclass.Bind[M]
+  type Choice[P[_,_]] = typeclass.Choice[P]
+  type Compose[P[_,_]] = typeclass.Compose[P]
   type Foldable[T[_]] = typeclass.Foldable[T]
   type Functor[F[_]] = typeclass.Functor[F]
   type Monad[M[_]] = typeclass.Monad[M]
+  type Phantom[F[_]] = typeclass.Phantom[F]
+  type Strong[F[_,_]] = typeclass.Strong[F]
   type Traversable[T[_]] = typeclass.Traversable[T]
   type Profunctor[F[_,_]] = typeclass.Profunctor[F]
   type Category[=>:[_,_]] = typeclass.Category[=>:]
@@ -38,9 +42,11 @@ trait Prelude  extends data.DisjunctionFunctions
   def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
   def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
   def Bind[F[_]](implicit F: Bind[F]): Bind[F] = F
+  def Compose[P[_,_]](implicit P: Compose[P]): Compose[P] = P
   def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F] = F
   def Functor[F[_]](implicit F: Functor[F]): Functor[F] = F
   def Monad[M[_]](implicit M: Monad[M]): Monad[M] = M
+  def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F] = F
   def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T] = T
   def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
   def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
@@ -66,6 +72,10 @@ trait Prelude  extends data.DisjunctionFunctions
   implicit def PbindOps[M[_], A](ma: M[A])(implicit M: Bind[M]): BindSyntax.Ops[M, A] =
     new BindSyntax.Ops(ma)
 
+  // ComposeSyntax
+  implicit def PcomposeOps[P[_, _], A, B](pab: P[A, B])(implicit P: Compose[P]): ComposeSyntax.Ops[P, A, B] =
+    new ComposeSyntax.Ops(pab)
+
   // FoldableSyntax
   implicit def PfoldableOps[F[_], A](fa: F[A])(implicit F: Foldable[F]): FoldableSyntax.Ops[F, A] =
     new FoldableSyntax.Ops(fa)
@@ -76,6 +86,10 @@ trait Prelude  extends data.DisjunctionFunctions
 
   // MaybeSyntax
   implicit class POptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
+
+  // PhantomSyntax
+  implicit def PphantomOps[F[_], A](fa: F[A])(implicit F: Phantom[F]): PhantomSyntax.Ops[F, A] =
+    new PhantomSyntax.Ops(fa)
 
   // TraversableSyntax
   implicit def PtraversableOps[T[_], A](ta: T[A])(implicit T: Traversable[T]): TraversableSyntax.Ops[T, A] =

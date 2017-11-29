@@ -14,6 +14,6 @@ trait TraversableSyntax {
 
 object TraversableSyntax {
   class Ops[T[_]: Traversable, A](@silent self: T[A]) {
-    def traverse[F[_], B](f: A => F[B])(implicit g: Applicative[F]): F[T[B]] = macro meta.Ops._f2[A => F[B], Applicative[F], F[T[B]]]
+    def traverse[F[_], B](f: A => F[B])(implicit g: Applicative[F]): F[T[B]] = macro meta.Ops.f_1_1
   }
 }

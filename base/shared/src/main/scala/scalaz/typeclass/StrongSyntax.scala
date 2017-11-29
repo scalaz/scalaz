@@ -13,7 +13,7 @@ trait StrongSyntax {
 
 object StrongSyntax {
   class Ops[F[_, _]: Strong, A, B](@silent self: F[A, B]) {
-    def first[C]: F[(A, C), (B, C)] = macro meta.Ops._f0[F[(A, C), (B, C)]]
-    def second[C]: F[(C, A), (C, B)] = macro meta.Ops._f0[F[(C, A), (C, B)]]
+    def first[C]: F[(A, C), (B, C)] = macro meta.Ops.f_0
+    def second[C]: F[(C, A), (C, B)] = macro meta.Ops.f_0
   }
 }

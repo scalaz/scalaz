@@ -14,9 +14,7 @@ trait ChoiceSyntax {
 
 object ChoiceSyntax {
   class Ops[P[_, _]: Choice, A, B](@silent self: P[A, B]) {
-   
-    def leftchoice[C]: P[A \/ C, B \/ C] = macro meta.Ops._f0[P[A \/ C, B \/ C]]
-
-    def rightchoice[C]: P[C \/ A, C \/ B] = macro meta.Ops._f0[P[C \/ A, C \/ B]]
+    def leftchoice[C]: P[A \/ C, B \/ C] = macro meta.Ops.f_0
+    def rightchoice[C]: P[C \/ A, C \/ B] = macro meta.Ops.f_0
   }
 }

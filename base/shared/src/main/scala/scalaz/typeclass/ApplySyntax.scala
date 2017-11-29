@@ -13,6 +13,6 @@ trait ApplySyntax {
 
 object ApplySyntax {
   class Ops[F[_] : Apply, A](@silent fa: F[A]) {
-    def ap[B](f: F[A => B]): F[B] = macro meta.Ops._f1[F[A => B], F[B]]
+    def ap[B](f: F[A => B]): F[B] = macro meta.Ops.f_1
   }
 }

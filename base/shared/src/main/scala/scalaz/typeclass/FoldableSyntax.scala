@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import com.github.ghik.silencer.silent
+
 import scala.language.implicitConversions
 import scala.language.experimental.macros
 
@@ -10,10 +12,10 @@ trait FoldableSyntax {
 }
 
 object FoldableSyntax {
-  class Ops[F[_], A](self: F[A])(implicit F: Foldable[F]) {
-    def foldLeft[B](f: B)(g: (B, A) => B): B = F.foldLeft(self, f)(g)
-    def foldRight[B](f: => B)(g: (A, => B) => B): B = F.foldRight(self, f)(g) //TODO: macro-ize foldable syntax
-    def foldMap[B: Monoid](f: A => B): B = F.foldMap(self)(f)
-    def toList: List[A] = macro meta.Ops._f0[List[A]]
+  class Ops[F[_]: Foldable, A](@silent self: F[A]) {
+    def foldLeft[B](f: B)(g: (B, A) => B): B = macro meta.Ops.fa_1_1
+    def foldRight[B](f: => B)(g: (A, => B) => B): B = macro meta.Ops.fa_1_1
+    def foldMap[B: Monoid](f: A => B): B = macro meta.Ops.f_1_1
+    def toList: List[A] = macro meta.Ops.f_0
   }
 }
