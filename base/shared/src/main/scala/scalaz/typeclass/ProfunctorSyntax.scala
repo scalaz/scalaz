@@ -15,9 +15,9 @@ object ProfunctorSyntax {
 
   //weird parameter names because of the macros 
   class Ops[F[_, _]: Profunctor, A, B](@silent self: F[A, B]) {
-    def lmap[C](f: C => A): F[C, B] = macro meta.Ops._f1[C => A, F[C, B]]
-    def rmap[C](f: B => C): F[A, C] = macro meta.Ops._f1[B => C, F[A, C]]
-    def dimap[C, D](f: C => A)(g: B => D): F[C, D] = macro meta.Ops._f2[C => A, B => D, F[C, D]]
+    def lmap[C](f: C => A): F[C, B] = macro meta.Ops.f_1
+    def rmap[C](f: B => C): F[A, C] = macro meta.Ops.f_1
+    def dimap[C, D](f: C => A)(g: B => D): F[C, D] = macro meta.Ops.f_1_1
   }
 }
 

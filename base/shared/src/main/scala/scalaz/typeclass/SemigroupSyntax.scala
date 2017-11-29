@@ -12,6 +12,6 @@ trait SemigroupSyntax {
 
 object SemigroupSyntax {
   class OpsA[A: Semigroup](@silent a: A) {
-    def append(f: => A): A = macro meta.Ops._f1[A, A]
+    def append(f: => A): A = macro meta.Ops.fa_1
   }
 }

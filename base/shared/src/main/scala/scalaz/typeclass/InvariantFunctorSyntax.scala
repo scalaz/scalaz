@@ -13,7 +13,7 @@ trait InvariantFunctorSyntax {
 
 object InvariantFunctorSyntax {
   class Ops[F[_]: InvariantFunctor, A](@silent self: F[A]) {
-    def imap[B](f: A => B)(g: B => A): F[B] = macro meta.Ops._f2[A => B, B => A, F[B]]
+    def imap[B](f: A => B)(g: B => A): F[B] = macro meta.Ops.f_1_1
   }
 }
 

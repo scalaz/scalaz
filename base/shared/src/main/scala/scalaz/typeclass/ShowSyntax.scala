@@ -12,6 +12,6 @@ trait ShowSyntax {
 
 object ShowSyntax {
   class Ops[A](@silent self: A)(implicit @silent A: Show[A]) {
-    def show: String = macro meta.Ops._f0[String]
+    def show: String = macro meta.Ops.f_0
   }
 }

@@ -7,12 +7,12 @@ import scala.language.implicitConversions
 import scala.language.experimental.macros
 
 trait ComposeSyntax {
-  implicit def composeOps[=>:[_, _], A, B](fa: A =>: B)(implicit F: Compose[=>:]): ComposeSyntax.Ops[=>:, A, B] =
+  implicit def composeOps[=>:[_, _], B, C](fa: B =>: C)(implicit F: Compose[=>:]): ComposeSyntax.Ops[=>:, B, C] =
     new ComposeSyntax.Ops(fa)
 }
 
 object ComposeSyntax {
-  class Ops[=>:[_, _]: Compose, A, B](@silent self: A =>: B) {
-    def compose[C](f: B =>: C): A =>: C = macro meta.Ops._f1[B =>: C, A =>: C] 
+  class Ops[=>:[_, _]: Compose, B, C](@silent self: B =>: C) {
+    def compose[A](f: A =>: B): A =>: C = macro meta.Ops.fa_1
   }
 }

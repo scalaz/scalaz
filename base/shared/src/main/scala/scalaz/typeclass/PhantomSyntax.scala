@@ -13,6 +13,6 @@ trait PhantomSyntax {
 
 object PhantomSyntax {
   class Ops[F[_]: Phantom, A](@silent self: F[A]) {
-    def pmap[B]: F[B] = macro meta.Ops._f0[F[B]]
+    def pmap[B]: F[B] = macro meta.Ops.f_0
   }
 }

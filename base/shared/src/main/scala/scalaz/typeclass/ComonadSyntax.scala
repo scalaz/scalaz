@@ -12,6 +12,6 @@ trait ComonadSyntax {
 
 object ComonadSyntax {
   class Ops[F[_]: Comonad, A](@silent self: F[A]) {
-    def copoint: A = macro meta.Ops._f0[A]
+    def copoint: A = macro meta.Ops.f_0
   }
 }
