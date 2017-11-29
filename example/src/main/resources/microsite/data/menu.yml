@@ -31,6 +31,12 @@ options:
     - title: Forall
       url: data/Forall.html
       menu_section: data
+    - title: Maybe
+      url: data/Maybe.html
+      menu_section: data
+    - title: Maybe2
+      url: data/Maybe2.html
+      menu_section: data
     - title: These
       url: data/These.html
       menu_section: data
