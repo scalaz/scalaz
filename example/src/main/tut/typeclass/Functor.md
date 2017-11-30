@@ -5,11 +5,7 @@ title:  "Functor"
 
 # Functor
 
-The `Functor` type class represents a type that can be mapped over.
-
-**Category Theory**
-
-*A (mathematical) functor represents a mapping between categories.*
+*The `Functor` type class represents a type that can be mapped over.*
 
 A functor needs to satisfy the two functor laws:
 
