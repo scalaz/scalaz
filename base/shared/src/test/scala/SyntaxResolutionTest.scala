@@ -3,6 +3,8 @@ import scalaz.Prelude._
 /* Tests that the various syntax macros work for the typeclasses which use them. */
 object SyntaxResolutionTest {
 
+  def _applicative[F[_]: Applicative, A](a: A): F[A] = a.pure[F]
+
   def _apply[F[_]: Apply, A, B](fa: F[A], f: F[A => B]): F[B] = fa.ap(f)
 
   def _bind[F[_]: Bind, A, B](fa: F[A], f: A => F[B]): F[B] = fa.flatMap(f)

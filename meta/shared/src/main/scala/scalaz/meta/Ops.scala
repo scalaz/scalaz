@@ -61,5 +61,23 @@ class Ops(val c: blackbox.Context) {
         (ev, c.macroApplication.symbol.name.toTermName, x)
       case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
     }
+}
 
+/** Versions of the zero-cost macros for when the receiver is not an instance
+  * of the typeclass in question.
+  */
+class IdOps(val c: blackbox.Context) {
+  import c.universe._
+
+  /* def method(x: A): R */
+  def id_1(x: Tree): Tree = q"$x.$name($lhs)"
+
+  private lazy val lhs =
+    c.prefix.tree match {
+      case Apply(TypeApply(_, _), List(lhs)) => lhs
+      case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
+    }
+
+  private lazy val name =
+    c.macroApplication.symbol.name.toTermName
 }
