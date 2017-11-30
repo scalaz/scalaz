@@ -1,5 +1,6 @@
 package scalaz
 
+import scalaz.Id._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
@@ -25,7 +26,7 @@ object StateTTest extends SpecLite {
   checkAll(monadError.laws[StateT[Either[Int, ?], Int, ?], Int])
 
   object instances {
-    def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
+    def functor[S, F[_] : Applicative] = Functor[StateT[F, S, ?]]
     def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
     def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[F, S, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[F, S, ?], S]
@@ -83,5 +84,40 @@ object StateTTest extends SpecLite {
     val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
       .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
     4000 must_=== result(0).run._1
+  }
+
+  "State can be run without stack overflow" in {
+    val st = (0 to 10000).foldLeft(State[Int, Int](s => (s, s)))((s, i) => s.flatMap(_ => State((_: Int) => (i, i))))
+    st.evalRec(0) must_=== (10000)
+  }
+
+  "State with nasty flatMaps can be run without stack overflow" in {
+    def nasty: State[Int, Int] =
+      State[Int, Int](n => (n-1, n-1)).flatMap(i =>
+        if(i > 0) nasty
+        else State[Int, Int](n => (n, n))
+      )
+
+    nasty.evalRec(10000) must_=== (0)
+  }
+
+  "iterated zoom on trampolined StateT is stack-safe" in {
+    import scalaz.Free._
+    val l: Lens[Int, Int] = Lens.lensId[Int]
+    val st = (0 to 10000).foldLeft(StateT[Trampoline, Int, Int](s => Trampoline.done((s, s))))((s, _) => s.zoom(l))
+    st.eval(5).run must_=== (5)
+  }
+
+  "iterated zoom on State is stack-safe" in {
+    val l: Lens[Int, Int] = Lens.lensId[Int]
+    val st = (0 to 10000).foldLeft(State[Int, Int](s => (s, s)))((s, _) => s.zoom(l))
+    st.evalRec(5) must_=== (5)
+  }
+
+  "tailrecM is stack-safe, even when the given function returns an ugly StateT" in {
+    def go(n: Int): State[Int, Int \/ Int] =
+      (1 to n).foldLeft(State[Int, Int](s => (s, 0)))((s, i) => s.flatMap(_ => State[Int, Int](t => (t, i)))).map(\/.right)
+
+    StateT.stateTBindRec[Int, Id].tailrecM(10000)(go).evalRec(0) must_=== (10000)
   }
 }

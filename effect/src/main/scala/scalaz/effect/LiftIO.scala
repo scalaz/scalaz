@@ -62,7 +62,7 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = WriterT(LiftIO[F].liftIO(ioa.map((Monoid[W].zero, _))))
     }
 
-  implicit def stateTLiftIO[F[_]: LiftIO, S](implicit F: Monad[F]) =
+  implicit def stateTLiftIO[F[_]: LiftIO, S] =
     new LiftIO[StateT[F, S, ?]] {
       def liftIO[A](ioa: IO[A]) = StateT(s => LiftIO[F].liftIO(ioa.map((s, _))))
     }
