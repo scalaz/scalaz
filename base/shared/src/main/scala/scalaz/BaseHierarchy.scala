@@ -11,7 +11,9 @@ object BaseHierarchy {
     implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M] = M.applicative
     implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M] = M.applicative.apply
     implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M] = M.applicative.apply.functor
+    implicit def semigroupMagma[A](implicit A:Semigroup[A]):Magma[A] = A.magma
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A] = A.semigroup
+    implicit def groupMonoid[A](implicit A:Group[A]):Monoid[A] = A.monoid
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
     implicit def categoryComposable[=>:[_,_]](implicit C: Category[=>:]): Compose[=>:] = C.compose 
     implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F] = F.cobind
