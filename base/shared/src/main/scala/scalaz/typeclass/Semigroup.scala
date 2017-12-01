@@ -1,8 +1,11 @@
 package scalaz
 package typeclass
 
+/**
+ * A Semigroup is a Magma with associativity
+ */
 trait Semigroup[A] {
-  def append(a1: A, a2: => A): A
+  def magma:Magma[A]
 }
 
 object Semigroup extends SemigroupSyntax {
