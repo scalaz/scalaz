@@ -64,9 +64,9 @@ sealed abstract class These[L, R] {
       case Both(left1, right1) => Both(left1, right1(right))
     }
     case Both(left, right) => f match {
-      case This(left1)         => This(L.magma.append(left, left1))
+      case This(left1)         => This(L.append(left, left1))
       case That(right1)        => Both(left, right1(right))
-      case Both(left1, right1) => Both(L.magma.append(left, left1), right1(right))
+      case Both(left1, right1) => Both(L.append(left, left1), right1(right))
     }
   }
 
@@ -75,9 +75,9 @@ sealed abstract class These[L, R] {
     case thiz @ This(_)    => thiz.pmap[D]
     case That(right)       => f(right)
     case Both(left, right) => f(right) match {
-      case This(left1)         => This(L.magma.append(left, left1))
+      case This(left1)         => This(L.append(left, left1))
       case That(right1)        => Both(left, right1)
-      case Both(left1, right1) => Both(L.magma.append(left, left1), right1)
+      case Both(left1, right1) => Both(L.append(left, left1), right1)
     }
   }
 
@@ -112,15 +112,15 @@ sealed abstract class These[L, R] {
   }
 
   final def lappend(other: L)(implicit L: Semigroup[L]): These[L, R] = this match {
-    case This(left)        => This(L.magma.append(left, other))
+    case This(left)        => This(L.append(left, other))
     case That(right)       => Both(other, right)
-    case Both(left, right) => Both(L.magma.append(left, other), right)
+    case Both(left, right) => Both(L.append(left, other), right)
   }
 
   final def rappend(other: R)(implicit R: Semigroup[R]): These[L, R] = this match {
     case This(left)        => Both(left, other)
-    case That(right)       => That(R.magma.append(right, other))
-    case Both(left, right) => Both(left, R.magma.append(right, other))
+    case That(right)       => That(R.append(right, other))
+    case Both(left, right) => Both(left, R.append(right, other))
   }
 
 }
