@@ -10,7 +10,7 @@ title:  "Applicative"
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
+import scalaz.Scalaz._
 ```
 
 ## Instance declaration
@@ -27,11 +27,17 @@ implicit val listap: Applicative[List] = new ApplicativeClass[List] {
 
 ## Usage
 
-```tut
+```tut:reset
+import scalaz.Scalaz._
 
 val l: List[Int] = 123.pure[List]
 
-implicit val f: Functor[List] = listap.apply.functor
-
 l.map(_ + 25)
+
+val l2 = List(17, 19, 23)
+
+val fs: List[Int => Int] = List(_ * 2, _ * 3, _ * 4, _ * 5)
+
+l2.ap(fs)
 ```
+
