@@ -14,6 +14,8 @@ object BaseHierarchy {
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A] = A.semigroup
     implicit def groupMonoid[A](implicit A:Group[A]):Monoid[A] = A.monoid
     implicit def abelianGroupGroup[A](implicit A:AbelianGroup[A]):Group[A] = A.group
+    implicit def ringAbelianGroup[A](implicit A:Ring[A]):AbelianGroup[A] = A.abelianGroup
+    implicit def ringMonoid[A](implicit A:Ring[A]):Monoid[A] = A.monoid
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
     implicit def categoryComposable[=>:[_,_]](implicit C: Category[=>:]): Compose[=>:] = C.compose 
     implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F] = F.cobind
