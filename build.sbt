@@ -24,6 +24,7 @@ lazy val effect       = crossProject.in(file("effect"))
   .settings(
     libraryDependencies ++=
       Seq ( "org.specs2" %%% "specs2-core"           % "4.0.0" % "test"
+          , "org.specs2" %%% "specs2-scalacheck"     % "4.0.0" % "test"
           , "org.specs2" %%% "specs2-matcher-extra"  % "4.0.0" % "test"),
       scalacOptions in Test ++= Seq("-Yrangepos"))
   .dependsOn( base )
