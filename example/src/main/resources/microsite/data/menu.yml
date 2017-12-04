@@ -13,6 +13,9 @@ options:
       menu_section: typeclass
       url: typeclass/Semigroup.html
       menu_section: typeclass
+    - title: Monad
+      url: typeclass/Monad.html
+      menu_section: typeclass
     - title: Monoid
       url: typeclass/Monoid.html
       menu_section: typeclass
