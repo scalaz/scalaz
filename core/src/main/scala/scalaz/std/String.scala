@@ -6,7 +6,8 @@ trait StringInstances {
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
-    override def show(f: String) = '"' + f + '"'
+    override def show(f: String): Cord = new Cord(FingerTree.three("\"", f, "\"")(Cord.sizer).toTree)
+    override def shows(f: String): String = '"' + f + '"'
     def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
     override def equal(x: String, y: String) = x == y
     override def equalIsNatural: Boolean = true
