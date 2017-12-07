@@ -471,9 +471,8 @@ private object RTS {
                         curIo = nextInstr(value, stack)
 
                         if (curIo == null) {
-                          println("GOT HERE!!!!!!!!!!!!")
                           eval   = false
-                          result = \/-(value)
+                          result = value
                         }
                       } else {
                         // Must run finalizer first:
@@ -705,7 +704,7 @@ private object RTS {
             else continueWithValue(value, \/-(value))
           } else {
             val reported  = dispatchErrors(finalizer)
-            val completer = if (stack.isEmpty()) IO.fail(t) else IO.now(\/-(value))
+            val completer = if (stack.isEmpty()) IO.fail(t) else IO.now(value)
 
             // Do not interrupt finalization:
             this.noInterrupt += 1

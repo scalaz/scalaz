@@ -48,6 +48,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     rethrown caught error in acquisition    $testBracketRethrownCaughtErrorInAcquisition
     rethrown caught error in release        $testBracketRethrownCaughtErrorInRelease
     rethrown caught error in usage          $testBracketRethrownCaughtErrorInUsage
+    test eval of async fail                 $testEvalOfAsyncAttemptOfFail
 
   RTS synchronous stack safety
     deep map of point                       $testDeepMapOfPoint
@@ -218,6 +219,16 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     actual must (throwA(ExampleError))
   }
 
+  def testEvalOfAsyncAttemptOfFail = {
+    val io1 = IO.unit.bracket_(AsyncUnit)(asyncExampleError[Unit])
+    val io2 = AsyncUnit.bracket_(IO.unit)(asyncExampleError[Unit])
+
+    unsafePerformIO(io1) must (throwA(ExampleError))
+    unsafePerformIO(io2) must (throwA(ExampleError))
+    unsafePerformIO(IO.absolve(io1.attempt)) must (throwA(ExampleError))
+    unsafePerformIO(IO.absolve(io2.attempt)) must (throwA(ExampleError))
+  }
+
   def testEvalOfDeepSyncEffect = {
     def incLeft(n: Int, ref: IORef[Int]): IO[Int] =
       if (n <= 0) ref.read
@@ -299,6 +310,8 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   // Utility stuff
   val ExampleError = new Error("Oh noes!")
 
+  def asyncExampleError[A]: IO[A] = IO.async[A](_(-\/(ExampleError)))
+
   def sum(n: Int): Int =
     if (n <= 0) 0
     else n + sum(n - 1)
@@ -332,4 +345,6 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
       v1 <- f1.join
       v2 <- f2.join
     } yield v1 + v2
+
+  val AsyncUnit = IO.async[Unit](_(\/-(())))
 }
