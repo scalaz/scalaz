@@ -24,7 +24,7 @@ object EitherTTest extends SpecLite {
   "rightU" should {
     val a: String \/ Int = \/-(1)
     val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
-    b must_== EitherT.right[({type l[a] = String \/ a})#l, Boolean, Int](a)
+    b must_== EitherT.rightT[({type l[a] = String \/ a})#l, Boolean, Int](a)
   }
 
   "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
@@ -44,14 +44,42 @@ object EitherTTest extends SpecLite {
     Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
   }
 
+  "either, pureLeft, pure" ! forAll { (a: String \/ Int) =>
+    val e = EitherT.eitherT(Option(a))
+
+    e must_=== {
+      a match {
+        case -\/(v) => EitherT.pureLeft(v)
+        case \/-(v) => EitherT.pure(v)
+      }
+    }
+
+    e must_=== EitherT.either(a)
+  }
+
+  "eitherT, leftT, rightT syntax" ! forAll { (a: String \/ Int) =>
+    import scalaz.syntax.eithert._
+
+    val e = EitherT.eitherT(Option(a))
+
+    e must_=== {
+      a match {
+        case -\/(v) => v.leftT
+        case \/-(v) => v.rightT
+      }
+    }
+
+    e must_=== a.eitherT
+  }
+
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }
 
   "orElse only executes the left hand monad once" should {
     val counter = new AtomicInteger(0)
-    val inc: EitherTComputation[Int] = EitherT.right(() => counter.incrementAndGet())
-    val other: EitherTComputation[Int] = EitherT.right(() => 0) // does nothing
+    val inc: EitherTComputation[Int] = EitherT.rightT(() => counter.incrementAndGet())
+    val other: EitherTComputation[Int] = EitherT.rightT(() => 0) // does nothing
 
     (inc orElse other).run.apply() must_== \/-(1)
     counter.get() must_== 1
