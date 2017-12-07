@@ -209,7 +209,7 @@ sealed abstract class IO[A] { self =>
    * action is not needed.
    */
   final def bracket_[B](release: IO[Unit])(use: IO[B]): IO[B] =
-    bracket(_ => release)(_ => use)
+    self.bracket(_ => release)(_ => use)
 
   /**
    * Executes the specified finalizer, whether this action succeeds, fails, or
@@ -525,13 +525,6 @@ object IO extends IOInstances {
    * equivalent of `while(true) {}`, only without the wasted CPU cycles.
    */
   final def never[A]: IO[A] = Never.asInstanceOf[IO[A]]
-
-  import scala.concurrent.ExecutionContext
-
-  def shift[A](io: IO[A], ec: ExecutionContext): IO[A] =
-    IO.flatten(IO.async[IO[A]](k => ec.execute {
-      new Runnable() { def run: Unit = k(\/-(io)) }
-    }))
 
   /**
    * Submerges the error case of a disjunction into the `IO`. The inverse

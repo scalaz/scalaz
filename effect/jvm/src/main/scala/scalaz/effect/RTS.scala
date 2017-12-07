@@ -471,13 +471,14 @@ private object RTS {
                         curIo = nextInstr(value, stack)
 
                         if (curIo == null) {
+                          println("GOT HERE!!!!!!!!!!!!")
                           eval   = false
                           result = \/-(value)
                         }
                       } else {
                         // Must run finalizer first:
                         val reported  = dispatchErrors(finalizer)
-                        val completer = IO.now[Any](\/-(value))
+                        val completer = IO.now[Any](value)
 
                         // Do not interrupt finalization:
                         this.noInterrupt += 1

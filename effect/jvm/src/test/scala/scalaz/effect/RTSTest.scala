@@ -24,6 +24,9 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     suspend must be evaluatable             $testSuspendIsEvaluatable
     point, bind, map                        $testSyncEvalLoop
     sync effect                             $testEvalOfSyncEffect
+    deep effects                            $testEvalOfDeepSyncEffect
+
+  RTS failure
     error in sync effect                    $testEvalOfAttemptOfSyncEffectError
     attempt . fail                          $testEvalOfAttemptOfFail
     deep attempt sync effect error          $testAttemptOfDeepSyncEffectError
@@ -32,11 +35,19 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     uncaught sync effect error              $testEvalOfUncaughtThrownSyncEffect
     deep uncaught sync effect error         $testEvalOfDeepUncaughtThrownSyncEffect
     deep uncaught fail                      $testEvalOfDeepUncaughtFail
+
+  RTS bracket
     fail ensuring                           $testEvalOfFailEnsuring
     fail on error                           $testEvalOfFailOnError
     finalizer errors not caught             $testErrorInFinalizerCannotBeCaught
     finalizer errors reported               ${upTo(1.second)(testErrorInFinalizerIsReported)}
-    deep effects                            $testEvalOfDeepSyncEffect
+    bracket result is usage result          $testBracketResultIsUsageResult
+    error in just acquisition               $testBracketErrorInAcquisition
+    error in just release                   $testBracketErrorInRelease
+    error in just usage                     $testBracketErrorInUsage
+    rethrown caught error in acquisition    $testBracketRethrownCaughtErrorInAcquisition
+    rethrown caught error in release        $testBracketRethrownCaughtErrorInRelease
+    rethrown caught error in usage          $testBracketRethrownCaughtErrorInUsage
 
   RTS synchronous stack safety
     deep map of point                       $testDeepMapOfPoint
@@ -103,7 +114,9 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testEvalOfAttemptOfFail = {
-    unsafePerformIO(IO.fail(ExampleError).attempt) must_=== -\/(ExampleError)
+    unsafePerformIO(IO.fail[Int](ExampleError).attempt) must_=== -\/(ExampleError)
+
+    unsafePerformIO(IO.suspend(IO.suspend(IO.fail[Int](ExampleError)).attempt)) must_=== -\/(ExampleError)
   }
 
   def testAttemptOfDeepSyncEffectError = {
@@ -166,6 +179,43 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     while (reported == null) Thread.`yield`()
 
     reported must_=== ExampleError
+  }
+
+  def testBracketResultIsUsageResult = {
+    unsafePerformIO(IO.unit.bracket_(IO.unit)(IO.point(42))) must_=== 42
+  }
+
+  def testBracketErrorInAcquisition = {
+    unsafePerformIO(IO.fail[Unit](ExampleError).bracket_(IO.unit)(IO.unit)) must
+      (throwA(ExampleError))
+  }
+
+  def testBracketErrorInRelease = {
+    unsafePerformIO(IO.unit.bracket_(IO.fail[Unit](ExampleError))(IO.unit)) must
+      (throwA(ExampleError))
+  }
+
+  def testBracketErrorInUsage = {
+    unsafePerformIO(IO.unit.bracket_(IO.unit)(IO.fail[Unit](ExampleError))) must
+      (throwA(ExampleError))
+  }
+
+  def testBracketRethrownCaughtErrorInAcquisition = {
+    lazy val actual = unsafePerformIO(IO.absolve(IO.fail[Unit](ExampleError).bracket_(IO.unit)(IO.unit).attempt))
+
+    actual must (throwA(ExampleError))
+  }
+
+  def testBracketRethrownCaughtErrorInRelease = {
+    lazy val actual = unsafePerformIO(IO.absolve(IO.unit.bracket_(IO.fail[Unit](ExampleError))(IO.unit).attempt))
+
+    actual must (throwA(ExampleError))
+  }
+
+  def testBracketRethrownCaughtErrorInUsage = {
+    lazy val actual = unsafePerformIO(IO.absolve(IO.unit.bracket_(IO.unit)(IO.fail[Unit](ExampleError)).attempt))
+
+    actual must (throwA(ExampleError))
   }
 
   def testEvalOfDeepSyncEffect = {
