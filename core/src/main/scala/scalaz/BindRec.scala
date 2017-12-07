@@ -1,5 +1,7 @@
 package scalaz
 
+import Isomorphism._
+
 ////
 /**
  * [[scalaz.Bind]] capable of using constant stack space when doing recursive
@@ -47,8 +49,30 @@ trait BindRec[F[_]] extends Bind[F] { self =>
   val bindRecSyntax = new scalaz.syntax.BindRecSyntax[F] { def F = BindRec.this }
 }
 
+trait MonadRecSafely[M[_], A] {
+  def apply[S[_]: BindRec: Applicative](lift: M <~> S): S[A]
+}
+
 object BindRec {
   @inline def apply[F[_]](implicit F: BindRec[F]): BindRec[F] = F
+
+  def safely[M[_], A](f: MonadRecSafely[M, A])(implicit M: BindRec[M], MA: Applicative[M]): M[A] = {
+    def iso[F[_]](implicit FBR: BindRec[F], FA: Applicative[F]): F <~> Free[F, ?] =
+      new (F <~> Free[F, ?]) {
+        val from: Free[F, ?] ~> F =
+          new (Free[F, ?] ~> F) {
+            def apply[A](fa: Free[F, A]): F[A] =
+              fa.runRecM(a => a)(FA, FA, FBR)
+          }
+        val to: F ~> Free[F, ?] =
+          new (F ~> Free[F, ?]) {
+            def apply[A](fa: F[A]): Free[F, A] =
+              Free.liftF(fa)
+          }
+      }
+
+    iso[M].from(f(iso[M]))
+  }
 
   ////
 
