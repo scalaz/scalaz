@@ -74,6 +74,15 @@ object BindRec {
     iso[M].from(f(iso[M]))
   }
 
+  def traverse_[F[_], M[_], A](fa: F[A])(f: A => M[Unit])
+               (implicit F: Foldable[F], M: BindRec[M], MA: Applicative[M]): M[Unit] =
+    safely(
+      new MonadRecSafely[M, Unit] {
+        def apply[S[_]: BindRec: Applicative](lift: M <~> S): S[Unit] =
+          F.traverse_(fa)(a => lift.to(f(a)))
+      }
+    )
+
   ////
 
   ////
