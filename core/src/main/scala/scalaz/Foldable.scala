@@ -1,5 +1,7 @@
 package scalaz
 
+import Isomorphism.<~>
+
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -87,6 +89,15 @@ trait Foldable[F[_]]  { self =>
       (foldLeft(fa, s)((s, a) => f(a)(s)._1), ())
     }
 
+  def traverseRec_[M[_], A](fa: F[A])(f: A => M[Unit])
+                  (implicit M: BindRec[M], MA: Applicative[M]): M[Unit] =
+    MonadRecSafely.safely(
+      new MonadRecSafely[M, Unit] {
+        def apply[S[_]: BindRec: Applicative](lift: M <~> S): S[Unit] =
+          traverse_(fa)(a => lift.to(f(a)))
+      }
+    )
+
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
     traverse_(fa)(x => x)
@@ -98,6 +109,15 @@ trait Foldable[F[_]]  { self =>
   /** `sequence_` for Free. collapses into a single Free **/
   def sequenceF_[M[_], A](ffa: F[Free[M, A]]): Free[M, Unit] =
     foldLeft[Free[M,A],Free[M,Unit]](ffa, Free.pure[M, Unit](()))((c,d) => c.flatMap(_ => d.map(_ => ())))
+
+  def sequenceRec_[M[_], A](fa: F[M[A]])
+                  (implicit M: BindRec[M], MA: Applicative[M]): M[Unit] =
+    MonadRecSafely.safely(
+      new MonadRecSafely[M, Unit] {
+        def apply[S[_]: BindRec: Applicative](lift: M <~> S): S[Unit] =
+          traverse_(fa)(lift.to)
+      }
+    )
 
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
