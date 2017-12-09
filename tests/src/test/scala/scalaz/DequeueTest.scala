@@ -10,7 +10,7 @@ object DequeueTest extends SpecLite {
   checkAll(isEmpty.laws[Dequeue])
   checkAll(foldable.laws[Dequeue])
   checkAll(plusEmpty.laws[Dequeue])
-  checkAll(functor.laws[Dequeue])
+  checkAll(monadPlus.laws[Dequeue])
 
   "fromList works" ! forAll{ (l: List[Int]) ⇒
     Dequeue.fromFoldable(l).toStream must_===(l.toStream)
