@@ -3,6 +3,16 @@ import com.typesafe.sbt.osgi.OsgiKeys
 import org.scalajs.sbtplugin.cross._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
+/*
+ * NOTICE if you are a contributor who only cares about the JVM, create a file
+ * `local.sbt` containing
+ *
+ *   onLoad in Global := { s => "project rootJVM" :: s }
+ *
+ * and regular commands such as "compile" / "test" will skip over all the
+ * scalajs / scala-native stuff.
+ */
+
 lazy val jsProjects = Seq[ProjectReference](
   coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
 )
