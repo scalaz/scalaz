@@ -1,7 +1,5 @@
 package scalaz
 
-import Isomorphism.<~>
-
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -10,6 +8,8 @@ import Isomorphism.<~>
 ////
 trait Foldable[F[_]]  { self =>
   ////
+
+  import Isomorphism.<~>
   import collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
