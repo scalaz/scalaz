@@ -249,7 +249,7 @@ sealed abstract class DequeueInstances {
       override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
       override def point[A](a: => A): Dequeue[A] = Dequeue(a)
       override def bind[A, B](fa: Dequeue[A])(f: A => Dequeue[B]): Dequeue[B] = foldMap(fa)(f)
-      override def traverseImpl[F[_], A, B](fa: Dequeue[A])(f: A => F[B])(implicit F: scalaz.Applicative[F]): F[Dequeue[B]] =
+      override def traverseImpl[F[_], A, B](fa: Dequeue[A])(f: A => F[B])(implicit F: Applicative[F]): F[Dequeue[B]] =
         fa.foldRight(F.point(Dequeue.empty[B]))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
 
     }
