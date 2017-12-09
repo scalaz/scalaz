@@ -60,20 +60,29 @@ package recadt {
   final case class Branch(left: ATree, right: ATree) extends ATree
 
   object Leaf {
-    implicit val equal: Equal[Leaf] =
+    implicit val equal: Equal[Leaf] = {
       Derives[Equal].xderiving1((v: String) => Leaf(v), _.value)
+    }
     implicit val default: Default[Leaf] =
       Derives[Default].xderiving1((v: String) => Leaf(v), _.value)
   }
   object Branch {
     implicit val equal: Equal[Branch] =
-      Derives[Equal]
-        .xderiving2((left: ATree, right: ATree) => Branch(left, right),
-                    b => (b.left, b.right))
+      Derives[Equal].xproduct2(
+        implicitly[Equal[ATree]],
+        implicitly[Equal[ATree]]
+      )(
+        (left: ATree, right: ATree) => Branch(left, right),
+        b => (b.left, b.right)
+      )
     implicit val default: Default[Branch] =
-      Derives[Default]
-        .xderiving2((left: ATree, right: ATree) => Branch(left, right),
-                    b => (b.left, b.right))
+      Derives[Default].xproduct2(
+        implicitly[Default[ATree]],
+        implicitly[Default[ATree]]
+      )(
+        (left: ATree, right: ATree) => Branch(left, right),
+        b => (b.left, b.right)
+      )
   }
   object ATree {
     private[this] val to: Leaf \/ Branch => ATree = {
@@ -86,7 +95,10 @@ package recadt {
     }
 
     implicit val equal: Equal[ATree] =
-      Derives[Equal].xcoderiving2(to, from)
+      Derives[Equal].xcoproduct2(
+        implicitly[Equal[Leaf]],
+        implicitly[Equal[Branch]]
+      )(to, from)
     implicit val default: Default[ATree] =
       Derives[Default].xcoderiving2(to, from)
   }
@@ -107,12 +119,18 @@ package recgadt {
   }
   object GBranch {
     implicit def equal[A: Equal]: Equal[GBranch[A]] =
-      Derives[Equal].xderiving2(
+      Derives[Equal].xproduct2(
+        implicitly[Equal[GTree[A]]],
+        implicitly[Equal[GTree[A]]]
+      )(
         (left: GTree[A], right: GTree[A]) => GBranch(left, right),
         b => (b.left, b.right)
       )
     implicit def default[A: Default]: Default[GBranch[A]] =
-      Derives[Default].xderiving2(
+      Derives[Default].xproduct2(
+        implicitly[Default[GTree[A]]],
+        implicitly[Default[GTree[A]]]
+      )(
         (left: GTree[A], right: GTree[A]) => GBranch(left, right),
         b => (b.left, b.right)
       )
@@ -128,9 +146,15 @@ package recgadt {
     }
 
     implicit def equal[A: Equal]: Equal[GTree[A]] =
-      Derives[Equal].xcoderiving2(to, from)
+      Derives[Equal].xcoproduct2(
+        implicitly[Equal[GLeaf[A]]],
+        implicitly[Equal[GBranch[A]]]
+      )(to, from)
     implicit def default[A: Default]: Default[GTree[A]] =
-      Derives[Default].xcoderiving2(to, from)
+      Derives[Default].xcoproduct2(
+        implicitly[Default[GLeaf[A]]],
+        implicitly[Default[GBranch[A]]]
+      )(to, from)
   }
 
 }

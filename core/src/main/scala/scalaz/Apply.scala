@@ -7,7 +7,7 @@ package scalaz
  * @see [[scalaz.Apply.ApplyLaw]]
  */
 ////
-trait Apply[F[_]] extends Functor[F] { self =>
+trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
   ////
   /** Sequence `f`, then `fa`, combining their results by function
     * application.
@@ -105,6 +105,34 @@ trait Apply[F[_]] extends Functor[F] { self =>
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): F[R] =
     ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))
+
+  final def applying1[Z, A1](f: A1 => Z)(
+    implicit a1: F[A1]
+  ): F[Z] = map(a1)(f)
+  final def applying2[Z, A1, A2](
+    f: (A1, A2) => Z
+  )(implicit a1: F[A1], a2: F[A2]): F[Z] =
+    apply2(a1, a2)(f)
+  final def applying3[Z, A1, A2, A3](
+    f: (A1, A2, A3) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3]): F[Z] =
+    apply3(a1, a2, a3)(f)
+  final def applying4[Z, A1, A2, A3, A4](
+    f: (A1, A2, A3, A4) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] =
+    apply4(a1, a2, a3, a4)(f)
+
+  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
+    f: (A1, A2) => Z, g: Z => (A1, A2)
+  ): F[Z] = apply2(a1, a2)(f)
+  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
+    f: (A1, A2, A3) => Z,
+    g: Z => (A1, A2, A3)
+  ): F[Z] = apply3(a1, a2, a3)(f)
+  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
+    f: (A1, A2, A3, A4) => Z,
+    g: Z => (A1, A2, A3, A4)
+  ): F[Z] = apply4(a1, a2, a3, a4)(f)
 
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))

@@ -267,7 +267,7 @@ trait IsomorphismInvariantFunctor[F[_], G[_]] extends InvariantFunctor[F]  {
 trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravariant[F, G] {
   implicit def G: Divide[G]
 
-  override def divide[A, B, C](fa: F[A], fb: F[B])(f: C => (A, B)): F[C] =
+  override def divide2[A, B, C](fa: =>F[A], fb: =>F[B])(f: C => (A, B)): F[C] =
     iso.from(G.divide(iso.to(fa), iso.to(fb))(f))
 }
 
