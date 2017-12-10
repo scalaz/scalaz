@@ -31,10 +31,6 @@ trait NaturalTransformation[-F[_], +G[_]] {
     */
   def or[H[_], F0[A] <: F[A], G0[A] >: G[A]](hg: H ~> G0): Coproduct[F0, H, ?] ~> G0 =
     λ[Coproduct[F0, H, ?] ~> G0](_.fold(self, hg))
-
-  /** Reify a `NaturalTransformation`. */
-  def toFunction[A]: F[A] => G[A] =
-    x => apply(x)
 }
 
 trait NaturalTransformations {

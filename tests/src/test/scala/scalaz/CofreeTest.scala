@@ -85,16 +85,16 @@ object CofreeTest extends SpecLite {
     Functor[Arbitrary].map(implicitly[Arbitrary[OneAndStream[A]]])(oneAndStreamCofreeLazyOptionIso.to(_))
 
   implicit def CofreeStreamArb[A: Arbitrary]: Arbitrary[CofreeStream[A]] =
-    Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to.toFunction)
+    Functor[Arbitrary].map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to.apply)
 
   implicit def CofreeLazyOptionCogen[A: Cogen]: Cogen[CofreeLazyOption[A]] =
-    implicitly[Cogen[OneAndStream[A]]].contramap(oneAndStreamCofreeLazyOptionIso.from.toFunction)
+    implicitly[Cogen[OneAndStream[A]]].contramap(oneAndStreamCofreeLazyOptionIso.from.apply)
 
   implicit def CofreeStreamCogen[A: Cogen]: Cogen[CofreeStream[A]] =
-    implicitly[Cogen[Tree[A]]].contramap(treeCofreeStreamIso.from.toFunction)
+    implicitly[Cogen[Tree[A]]].contramap(treeCofreeStreamIso.from.apply)
 
   implicit def CofreeOptionCogen[A: Cogen]: Cogen[CofreeOption[A]] =
-    implicitly[Cogen[OneAndList[A]]].contramap(oneAndListCofreeOptionIso.from.toFunction)
+    implicitly[Cogen[OneAndList[A]]].contramap(oneAndListCofreeOptionIso.from.apply)
 
   implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
     import org.scalacheck.Arbitrary._
