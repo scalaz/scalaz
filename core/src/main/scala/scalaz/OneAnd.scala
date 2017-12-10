@@ -33,6 +33,14 @@ import scalaz.Ordering.orderingInstance
 final class OneAnd[F[_], A](h: Name[A], t: Name[F[A]]) {
   def head: A    = h.value
   def tail: F[A] = t.value
+
+  // because, legacy
+  override def equals(other: Any): Boolean = other match {
+    case OneAnd(th, tt) => head == th && tail == tt
+    case _              => false
+  }
+  override def hashCode: Int = head.hashCode + 13*tail.hashCode
+  override def toString: String = s"OneAnd($head, $tail)"
 }
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
