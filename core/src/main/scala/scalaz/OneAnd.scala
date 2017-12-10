@@ -30,7 +30,10 @@ import scalaz.Ordering.orderingInstance
   *
   * @since 7.0.3
   */
-final case class OneAnd[F[_], A](head: A, tail: F[A])
+final class OneAnd[F[_], A](h: Name[A], t: Name[F[A]]) {
+  def head: A    = h.value
+  def tail: F[A] = t.value
+}
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
   def F: Functor[F]
@@ -326,11 +329,17 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 }
 
 object OneAnd extends OneAndInstances {
-  def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
+  def apply[F[_], A](h: A, t: F[A]): OneAnd[F, A] = new OneAnd(Value(h), Value(t))
+  def need[F[_], A](h: =>A, t: =>F[A]): OneAnd[F, A] = new OneAnd(Need(h), Need(t))
+  def ephemeral[F[_], A](h: =>A, t: =>F[A]): OneAnd[F, A] = new OneAnd(Name(h), Name(t))
+  def lazylist[F[_], A](h: A, t: =>F[A]): OneAnd[F, A] = new OneAnd(Value(h), Need(t))
 
-  val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =
-    new IsoFunctorTemplate[NonEmptyList, OneAnd[List, ?]] {
-      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail.toList)
-      def from[A](ga: OneAnd[List, A]) = NonEmptyList.nel(ga.head, IList.fromList(ga.tail))
+  def unapply[F[_], A](oa: OneAnd[F, A]): Option[(A, F[A])] =
+    Some(oa.head -> oa.tail)
+
+  val oneAndNelIso: NonEmptyList <~> OneAnd[IList, ?] =
+    new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, ?]] {
+      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
+      def from[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
     }
 }
