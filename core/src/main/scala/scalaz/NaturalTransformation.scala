@@ -31,6 +31,10 @@ trait NaturalTransformation[-F[_], +G[_]] {
     */
   def or[H[_], F0[A] <: F[A], G0[A] >: G[A]](hg: H ~> G0): Coproduct[F0, H, ?] ~> G0 =
     λ[Coproduct[F0, H, ?] ~> G0](_.fold(self, hg))
+
+  /** Reify a `NaturalTransformation`. */
+  def toFunction[A]: F[A] => G[A] =
+    x => apply(x)
 }
 
 trait NaturalTransformations {
@@ -46,9 +50,6 @@ trait NaturalTransformations {
   /** A universally quantified identity function */
   def refl[F[_]]: F ~> F =
     λ[F ~> F](fa => fa)
-
-  /** Reify a `NaturalTransformation`. */
-  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
 
 object NaturalTransformation extends NaturalTransformations
