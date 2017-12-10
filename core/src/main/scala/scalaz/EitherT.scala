@@ -216,6 +216,12 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances with EitherTFunctions {
+  def either[F[_]: Applicative, A, B](d: A \/ B): EitherT[F, A, B] = apply(Applicative[F].point(d))
+  def leftT[F[_]: Functor, A, B](fa: F[A]): EitherT[F, A, B] = apply(Functor[F].map(fa)(\/.left))
+  def rightT[F[_]: Functor, A, B](fb: F[B]): EitherT[F, A, B] = apply(Functor[F].map(fb)(\/.right))
+  def pureLeft[F[_]: Applicative, A, B](a: A): EitherT[F, A, B] = apply(Applicative[F].point(-\/(a)))
+  def pure[F[_]: Applicative, A, B](b: B): EitherT[F, A, B] = apply(Applicative[F].point(\/-(b)))
+
   def fromDisjunction[F[_]]: FromDisjunctionAux[F] = new FromDisjunctionAux
 
   final class FromDisjunctionAux[F[_]] private[EitherT] {
@@ -245,12 +251,12 @@ object EitherT extends EitherTInstances with EitherTFunctions {
 
   private[scalaz] final class EitherTLeft[B] {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
-      left[F.M, F.A, B](F(fa))(F.TC)
+      leftT[F.M, F.A, B](F(fa))(F.TC)
   }
 
   private[scalaz] final class EitherTRight[A] {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
-      right[F.M, A, F.A](F(fb))(F.TC)
+      rightT[F.M, A, F.A](F(fb))(F.TC)
   }
 
   /** Construct a disjunction value from a standard `scala.Either`. */
@@ -267,16 +273,16 @@ object EitherT extends EitherTInstances with EitherTFunctions {
 
   def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassManifest[B]): EitherT[F, B, A] =
     try {
-      right(a)
+      rightT(a)
     } catch {
-      case e if ex.erasure.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+      case e if ex.erasure.isInstance(e) => leftT(F.point(e.asInstanceOf[B]))
     }
 
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
     try {
-      right(a)
+      rightT(a)
     } catch {
-      case NonFatal(t) => left(F.point(t))
+      case NonFatal(t) => leftT(F.point(t))
     }
 
   def eitherTU[FAB, AB, A0, B0](fab: FAB)(
