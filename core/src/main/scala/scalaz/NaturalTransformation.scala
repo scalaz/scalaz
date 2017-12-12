@@ -46,9 +46,6 @@ trait NaturalTransformations {
   /** A universally quantified identity function */
   def refl[F[_]]: F ~> F =
     λ[F ~> F](fa => fa)
-
-  /** Reify a `NaturalTransformation`. */
-  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
 
 object NaturalTransformation extends NaturalTransformations

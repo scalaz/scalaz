@@ -32,8 +32,8 @@ sealed abstract class Isomorphisms {
 
     def unlift[A](implicit FG: Arr[F, G] <~< (F ~> G), GF: Arr[G, F] <~< (G ~> F)): F[A] <=> G[A] =
       new (F[A] <=> G[A]){
-        def from = GF(self.from)
-        def to   = FG(self.to)
+        def from = GF(self.from).apply
+        def to   = FG(self.to).apply
       }
 
     def %~(f: G ~> G)(implicit FG: Arr[F, G] <~< (F ~> G), GF: Arr[G, F] <~< (G ~> F)): F ~> F =
@@ -355,7 +355,7 @@ trait IsomorphismNondeterminism[F[_], G[_]] extends Nondeterminism[F] with Isomo
   implicit def G: Nondeterminism[G]
 
   override def chooseAny[A](head: F[A], tail: Seq[F[A]]): F[(A, Seq[F[A]])] =
-    iso.from(G.map(G.chooseAny(iso.to(head), tail.map(iso.to))){case (a, b) => (a, b.map(iso.from))})
+    iso.from(G.map(G.chooseAny(iso.to(head), tail.map(iso.to.apply))){case (a, b) => (a, b.map(iso.from.apply))})
 }
 
 trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G] {
@@ -457,7 +457,7 @@ trait IsomorphismOptional[F[_], G[_]] extends Optional[F] {
   def iso: F <~> G
 
   override def pextract[B, A](fa: F[A]): F[B] \/ A =
-    G.pextract(iso.to(fa)).leftMap(iso.from)
+    G.pextract(iso.to(fa)).leftMap(iso.from.apply)
 }
 
 trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {

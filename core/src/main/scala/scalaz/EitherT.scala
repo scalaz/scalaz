@@ -467,7 +467,7 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[F, ?, ?]] with 
 
 private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]]] {
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    λ[EitherT[M, A, ?] ~> EitherT[N, A, ?]](_ mapT f)
+    λ[EitherT[M, A, ?] ~> EitherT[N, A, ?]](_ mapT f.apply)
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 

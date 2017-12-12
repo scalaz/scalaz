@@ -428,7 +428,7 @@ private trait WriterTHoist[W] extends Hoist[λ[(α[_], β) => WriterT[α, W, β]
   implicit def apply[M[_]: Monad]: Monad[WriterT[M, W, ?]] = WriterT.writerTMonad
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    λ[WriterT[M, W, ?] ~> WriterT[N, W, ?]](_ mapT f)
+    λ[WriterT[M, W, ?] ~> WriterT[N, W, ?]](_ mapT f.apply)
 }
 
 private trait WriterTMonadListen[F[_], W] extends MonadListen[WriterT[F, W, ?], W] with WriterTMonad[F, W] {

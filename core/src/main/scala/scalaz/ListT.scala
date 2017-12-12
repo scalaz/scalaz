@@ -173,5 +173,5 @@ private trait ListTHoist extends Hoist[ListT] {
     fromIList(G.map(a)(entry => entry :: INil()))
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
-    λ[ListT[M, ?] ~> ListT[N, ?]](_ mapT f)
+    λ[ListT[M, ?] ~> ListT[N, ?]](_ mapT f.apply)
 }
