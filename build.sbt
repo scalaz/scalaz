@@ -30,26 +30,28 @@ lazy val nativeProjects = Seq[ProjectReference](
 
 lazy val scalaz = Project(
   id = "scalaz",
-  base = file("."),
-  settings = standardSettings ++ Seq[Sett](
-    mimaPreviousArtifacts := Set.empty,
-    description := "scalaz unidoc",
-    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
-    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
-    pomPostProcess := { node =>
-      import scala.xml._
-      import scala.xml.transform._
-      val rule = new RewriteRule {
-        override def transform(n: Node) =
-          if (n.label == "dependencies") NodeSeq.Empty else n
-      }
-      new RuleTransformer(rule).transform(node)(0)
-    },
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-      (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
+  base = file(".")
+).settings(
+  standardSettings,
+  mimaPreviousArtifacts := Set.empty,
+  description := "scalaz unidoc",
+  artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
+  packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+  pomPostProcess := { node =>
+    import scala.xml._
+    import scala.xml.transform._
+    val rule = new RewriteRule {
+      override def transform(n: Node) =
+        if (n.label == "dependencies") NodeSeq.Empty else n
     }
-  ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-  aggregate = jvmProjects ++ jsProjects
+    new RuleTransformer(rule).transform(node)(0)
+  },
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := {
+    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
+  },
+  Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
+).aggregate(
+  jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
@@ -84,14 +86,15 @@ lazy val coreNative = core.native
 
 lazy val concurrent = Project(
   id = "concurrent",
-  base = file("concurrent"),
-  settings = standardSettings ++ Seq(
-    name := ConcurrentName,
-    typeClasses := TypeClass.concurrent,
-    osgiExport("scalaz.concurrent"),
-    OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-  ),
-  dependencies = Seq(coreJVM, effectJVM)
+  base = file("concurrent")
+).settings(
+  standardSettings,
+  name := ConcurrentName,
+  typeClasses := TypeClass.concurrent,
+  osgiExport("scalaz.concurrent"),
+  OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
+).dependsOn(
+  coreJVM, effectJVM
 )
 
 lazy val effectJVM = effect.jvm
@@ -104,13 +107,14 @@ lazy val iterateeNative = iteratee.native
 
 lazy val example = Project(
   id = "example",
-  base = file("example"),
-  dependencies = Seq(coreJVM, iterateeJVM, concurrent),
-  settings = standardSettings ++ Seq[Sett](
-    name := "scalaz-example",
-    mimaPreviousArtifacts := Set.empty,
-    publishArtifact := false
-  )
+  base = file("example")
+).settings(
+  standardSettings,
+  name := "scalaz-example",
+  mimaPreviousArtifacts := Set.empty,
+  publishArtifact := false
+).dependsOn(
+  coreJVM, iterateeJVM, concurrent
 )
 
 def scalacheckBindingProject(id: String, base: String, scalacheckVersion: SettingKey[String]) =

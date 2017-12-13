@@ -180,6 +180,7 @@ object build {
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
     genTypeClasses := {
+      val s = streams.value
       typeClasses.value.flatMap { tc =>
         val dir = name.value match {
           case ConcurrentName =>
@@ -187,7 +188,7 @@ object build {
           case _ =>
             ScalazCrossType.shared(baseDirectory.value, "main")
         }
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, streams.value.log))
+        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
       }
     },
     checkGenTypeClasses := {
