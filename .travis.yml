@@ -43,7 +43,6 @@ matrix:
   - scala: 2.11.11
     jdk: oraclejdk8
     sudo: required
-    dist: trusty
     before_install:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
