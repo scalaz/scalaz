@@ -112,7 +112,7 @@ lazy val example = Project(
   standardSettings,
   name := "scalaz-example",
   mimaPreviousArtifacts := Set.empty,
-  publishArtifact := false
+  notPublish
 ).dependsOn(
   coreJVM, iterateeJVM, concurrent
 )
@@ -183,7 +183,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(
     name := "scalaz-tests",
     mimaPreviousArtifacts := Set.empty,
-    publishArtifact := false
+    notPublish
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding_1_13)
   .jvmConfigure(_ dependsOn concurrent)
