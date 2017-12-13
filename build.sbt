@@ -106,7 +106,7 @@ lazy val example = Project(
 ).settings(
   standardSettings,
   name := "scalaz-example",
-  publishArtifact := false,
+  notPublish,
   scalacOptions in (Compile, compile) -= "-Yno-adapted-args"
 ).dependsOn(
   coreJVM, iterateeJVM, concurrent
@@ -133,7 +133,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
-    publishArtifact := false,
+    notPublish,
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
