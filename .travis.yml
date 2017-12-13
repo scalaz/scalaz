@@ -18,7 +18,7 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mimaReportBinaryIssues publishLocal
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses test mimaReportBinaryIssues publishLocal
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -34,7 +34,7 @@ matrix:
       script:
       - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
       - git show --oneline --check
-      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test publishLocal
+      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses test publishLocal
 
 addons:
   # https://github.com/travis-ci/travis-ci/issues/5227
