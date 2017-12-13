@@ -328,9 +328,9 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 object OneAnd extends OneAndInstances {
   def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
 
-  val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =
-    new IsoFunctorTemplate[NonEmptyList, OneAnd[List, ?]] {
-      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail.toList)
-      def from[A](ga: OneAnd[List, A]) = NonEmptyList.nel(ga.head, IList.fromList(ga.tail))
+  val oneAndNelIso: NonEmptyList <~> OneAnd[IList, ?] =
+    new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, ?]] {
+      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
+      def from[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
     }
 }
