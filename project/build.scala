@@ -374,19 +374,19 @@ object build {
     }
   }
 
-  lazy val scalazMimaBasis = SettingKey[String]("scalazMimaBasis", "Version of scalaz against which to run MIMA.")
+  lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
-  lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
+  lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
-  lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
+  lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
-  lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
+  lazy val genToSyntax = taskKey[String]("")
 
-  lazy val showDoc = TaskKey[Unit]("show-doc")
+  lazy val showDoc = taskKey[Unit]("")
 
-  lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+  lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
 
-  lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
+  lazy val checkGenTypeClasses = taskKey[Unit]("")
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
