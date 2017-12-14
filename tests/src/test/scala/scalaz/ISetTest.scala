@@ -179,7 +179,7 @@ object ISetTest extends SpecLite {
     a.member(i) must_=== a.toList.contains(i)
   }
 
-  "Foldable.member" ! forAll {(a: ISet[Int], i: Int) =>
+  "Foldable.element" ! forAll {(a: ISet[Int], i: Int) =>
     import scalaz.syntax.foldable._
 
     a.element(i) must_=== a.toList.contains(i)

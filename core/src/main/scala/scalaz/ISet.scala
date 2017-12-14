@@ -769,7 +769,7 @@ sealed abstract class ISetInstances {
     override def empty[A](fa: ISet[A]) =
       fa.isEmpty
 
-    // we're assuming typeclass coherence elsewhere...
+    // assuming typeclass coherence...
     override def element[A: Equal](fa: ISet[A], a: A): Boolean =
       Equal[A] match {
         case o: Order[_] =>
