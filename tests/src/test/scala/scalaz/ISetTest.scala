@@ -179,6 +179,12 @@ object ISetTest extends SpecLite {
     a.member(i) must_=== a.toList.contains(i)
   }
 
+  "Foldable.member" ! forAll {(a: ISet[Int], i: Int) =>
+    import scalaz.syntax.foldable._
+
+    a.element(i) must_=== a.toList.contains(i)
+  }
+
   "sound delete" ! forAll {(a: ISet[Int], i: Int) =>
     val b = a.delete(i)
     structurallySound(b)
