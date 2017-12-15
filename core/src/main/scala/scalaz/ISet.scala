@@ -769,10 +769,18 @@ sealed abstract class ISetInstances {
     override def empty[A](fa: ISet[A]) =
       fa.isEmpty
 
-    // assuming typeclass coherence...
     override def element[A: Equal](fa: ISet[A], a: A): Boolean =
       Equal[A] match {
+        // if we can extract the Order[A] we can do binary search which is far
+        // more efficient than the default linear search.
         case o: Order[_] =>
+          // Order is a subtype of Equal. Both Order and Equal are invariant. If
+          // our Equal[A] is also an Order[_] then it follows that Order[_] must
+          // be Order[A], making this use of asInstanceOf safe.
+          //
+          // However, there is a hidden assumption of typeclass coherency. If
+          // the user has different instances of Order[A], and chooses to define
+          // one as having type Equal[A], then this will give bogus results.
           fa.member(a)(o.asInstanceOf[Order[A]])
         case _ => super.element(fa, a)
       }
