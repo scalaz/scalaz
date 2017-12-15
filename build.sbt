@@ -1,6 +1,5 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
-import org.scalajs.sbtplugin.cross._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 /*

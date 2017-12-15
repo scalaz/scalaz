@@ -12,7 +12,7 @@ import sbtrelease.Utilities._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi._
+import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
@@ -37,8 +37,9 @@ object build {
       // getPublishTo fails if no publish repository is set up.
       val ex = st.extract
       val ref = ex.get(thisProjectRef)
-      Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
-      st
+      val (newState, value) = ex.runTask(publishTo in Global in ref, st)
+      Classpaths.getPublishTo(value)
+      newState
     },
     enableCrossBuild = true
   )
@@ -46,7 +47,7 @@ object build {
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -268,7 +269,7 @@ object build {
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.5",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ osgiSettings ++ Seq[Sett](
+  ) ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 

@@ -8,6 +8,7 @@ cache:
 
 language: scala
 scala:
+  - 2.13.0-M2
   - 2.12.4
   - 2.11.11
 jdk:
@@ -16,8 +17,8 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile
+  - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -36,30 +37,13 @@ addons:
 
 matrix:
   include:
-  - scala: 2.13.0-M2
+  - scala: 2.12.4
+    jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"
-  - scala: 2.13.0-M2
-    env: TEST_PROJECT="rootJS"
   - scala: 2.11.11
     jdk: oraclejdk8
     sudo: required
     before_install:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
-    - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
-  - scala: 2.12.4
-    jdk: oraclejdk9
-    before_install:
-    # https://github.com/sbt/sbt/pull/2951
-    - git clone https://github.com/retronym/java9-rt-export
-    - cd java9-rt-export/
-    - git checkout 1019a2873d057dd7214f4135e84283695728395d
-    - jdk_switcher use oraclejdk8
-    - echo "sbt.version=1.0.2" > project/build.properties
-    - sbt package
-    - java -version
-    - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
-    - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
-    - cd ..
-    script:
-    - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
+    - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
