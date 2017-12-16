@@ -164,11 +164,11 @@ sealed abstract class ISet[A] {
   final def insert(x: A)(implicit o: Order[A]): ISet[A] =
     this match {
       case Tip() => singleton(x)
-      case Bin(y, l, r) =>
+      case self @ Bin(y, l, r) =>
         o.order(x, y) match {
           case LT => balanceL(y, l.insert(x), r)
           case GT => balanceR(y, l, r.insert(x))
-          case EQ => Bin(x, l, r)
+          case EQ => self
         }
     }
 
