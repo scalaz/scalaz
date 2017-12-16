@@ -223,7 +223,7 @@ private[scalaz] final case object EmptyDequeue extends Dequeue[Nothing] {
   override val backMaybe = Maybe.empty
 
   def apply[A]() = this.asInstanceOf[Dequeue[A]]
-  def unapply[A](q: Dequeue[A]) = q.isEmpty
+  def unapply[A](q: Dequeue[A]) = this eq q
 }
 
 sealed abstract class DequeueInstances {
