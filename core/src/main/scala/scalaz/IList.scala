@@ -475,9 +475,10 @@ sealed abstract class IList[A] extends Product with Serializable {
 
 }
 
-// In order to get exhaustiveness checking and a sane unapply in both 2.9 and 2.10 it seems
-// that we need to use bare case classes. Sorry. Suggestions welcome.
-final case class INil[A]() extends IList[A]
+final case object INil extends IList[Nothing] {
+  def apply[A](): IList[A] = this.asInstanceOf[IList[A]]
+  def unapply[A](e: IList[A]): Boolean = this == e
+}
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListInstances {
@@ -714,8 +715,8 @@ private trait IListEqual[A] extends Equal[IList[A]] {
             equal(ac.tail, bc.tail)
           case _ => false
         }
-        case _: INil[A] => b match {
-          case _ : INil[A] => true
+        case INil() => b match {
+          case INil() => true
           case _ => false
         }
       }
