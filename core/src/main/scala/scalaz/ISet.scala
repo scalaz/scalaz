@@ -769,6 +769,9 @@ sealed abstract class ISetInstances {
     override def empty[A](fa: ISet[A]) =
       fa.isEmpty
 
+    override def element[A: Equal](fa: ISet[A], a: A): Boolean =
+      Equal[A].toOrder.cata(fa.member(a)(_), super.element(fa, a))
+
     override def any[A](fa: ISet[A])(f: A => Boolean) =
       fa match {
         case Tip() => false

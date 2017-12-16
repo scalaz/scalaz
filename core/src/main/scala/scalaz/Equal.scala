@@ -20,6 +20,9 @@ trait Equal[F]  { self =>
 
   // derived functions
 
+  /** A coherent / consistent instance of Order, should one exist. */
+  def toOrder: Maybe[Order[F]] = Maybe.empty
+
   trait EqualLaw {
     import std.boolean.conditional
     def commutative(f1: F, f2: F): Boolean = equal(f1, f2) == equal(f2, f1)
