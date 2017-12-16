@@ -24,7 +24,7 @@ import Liskov.<~<
  * first "left" they evaluate. This fail-fast behavior allows [[\/]] to have lawful [[Monad]] instances that are consistent
  * with their [[Applicative]] instances, while [[Validation]] cannot.
  */
-sealed abstract class \/[+A, +B] extends Product with Serializable {
+sealed abstract class \/[A, B] extends Product with Serializable {
   final class SwitchingDisjunction[X](r: => X) {
     def <<?:(left: X): X =
       foldConst(left, r)
@@ -355,13 +355,13 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
  *
  * Often used to represent the failure case of a result
  */
-final case class -\/[+A](a: A) extends (A \/ Nothing)
+final case class -\/[A, B](a: A) extends (A \/ B)
 
 /** A right disjunction
  *
  * Often used to represent the success case of a result
  */
-final case class \/-[+B](b: B) extends (Nothing \/ B)
+final case class \/-[A, B](b: B) extends (A \/ B)
 
 object \/ extends DisjunctionInstances {
 
