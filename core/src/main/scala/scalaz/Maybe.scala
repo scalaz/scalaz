@@ -153,7 +153,7 @@ object Maybe extends MaybeInstances {
 
   final case object Empty extends Maybe[Nothing] {
     def apply[A](): Maybe[A] = this.asInstanceOf[Maybe[A]]
-    def unapply[A](e: Maybe[A]): Boolean = this == e
+    def unapply[A](e: Maybe[A]): Boolean = this eq e
   }
 
   final case class Just[A](a: A) extends Maybe[A]

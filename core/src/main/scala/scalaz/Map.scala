@@ -1218,12 +1218,10 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
 }
 
 object ==>> extends MapInstances {
-  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
+  private[scalaz] final case object Tip extends (Nothing ==>> Nothing) {
     val size = 0
-
-    def unapply[A, B](a: A ==>> B): Boolean = a eq this
-
     def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
+    def unapply[A, B](a: A ==>> B): Boolean = this eq a
   }
 
   private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {

@@ -477,7 +477,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 
 final case object INil extends IList[Nothing] {
   def apply[A](): IList[A] = this.asInstanceOf[IList[A]]
-  def unapply[A](e: IList[A]): Boolean = this == e
+  def unapply[A](e: IList[A]): Boolean = this eq e
 }
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
