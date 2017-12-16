@@ -82,6 +82,13 @@ object MaybeTest extends SpecLite {
 
   "empty isn't just" ! check(!empty.isJust)
 
+  "empty pattern matches" ! check {
+    empty match {
+      case Empty() => true
+      case _       => false
+    }
+  }
+
   "just to option is some" ! forAll { x: Int => just(x).toOption.isDefined }
 
   "empty to option is none" ! check(empty.toOption.isEmpty)
