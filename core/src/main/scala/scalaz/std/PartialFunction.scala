@@ -22,6 +22,19 @@ trait PartialFunctionInstances {
           false
         }
       }
+      override def applyOrElse[A1 <: A, C1 >: C](a: A1, default: A1 => C1): C1 = {
+        val x: B = g.applyOrElse(a, checkFallback[B])
+        if (!fallbackOccurred(x)) {
+          val y: C = f.applyOrElse(x, checkFallback[C])
+          if (!fallbackOccurred(y)) {
+            y
+          } else {
+            default(a)
+          }
+        } else {
+          default(a)
+        }
+      }
     }
 
     def id[A] = {
