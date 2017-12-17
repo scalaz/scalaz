@@ -217,13 +217,14 @@ private[scalaz] final case class FullDequeue[A](front: NonEmptyList[A], fsize: I
 /**
   * a queue which has no elements
   */
-private[scalaz] final case object EmptyDequeue extends Dequeue[Nothing] {
+private[scalaz] sealed abstract case class EmptyDequeue[A] private() extends Dequeue[A] {
   override val isEmpty = true
-  override val frontMaybe = Maybe.empty
-  override val backMaybe = Maybe.empty
-
-  def apply[A]() = this.asInstanceOf[Dequeue[A]]
-  def unapply[A](q: Dequeue[A]) = this eq q
+  override val frontMaybe = Maybe.empty[A]
+  override val backMaybe = Maybe.empty[A]
+}
+object EmptyDequeue {
+  private[this] val value: Dequeue[Nothing] = new EmptyDequeue[Nothing]{}
+  def apply[A](): Dequeue[A] = value.asInstanceOf[Dequeue[A]]
 }
 
 sealed abstract class DequeueInstances {
