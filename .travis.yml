@@ -37,6 +37,9 @@ matrix:
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test publishLocal
 
 addons:
+  # https://github.com/travis-ci/travis-ci/issues/5227
+  hosts: workaround-travis-ci-issue-5227
+  hostname: workaround-travis-ci-issue-5227
   apt:
     packages:
       - oracle-java8-installer
