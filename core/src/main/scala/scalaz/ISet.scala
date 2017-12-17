@@ -874,10 +874,12 @@ object ISet extends ISetInstances {
         }
     }
 
-  private[scalaz] final case object Tip extends ISet[Nothing] {
+  private[scalaz] sealed abstract case class Tip[A] private() extends ISet[A] {
     val size = 0
-    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
-    def unapply[A](i: ISet[A]): Boolean = this eq i
+  }
+  private[scalaz] object Tip {
+    private[this] val value: Tip[Nothing] = new Tip[Nothing]{}
+    def apply[A](): ISet[A] = value.asInstanceOf[ISet[A]]
   }
 
   private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {

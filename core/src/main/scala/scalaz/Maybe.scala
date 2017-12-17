@@ -151,9 +151,10 @@ sealed abstract class Maybe[A] {
 
 object Maybe extends MaybeInstances {
 
-  final case object Empty extends Maybe[Nothing] {
-    def apply[A](): Maybe[A] = this.asInstanceOf[Maybe[A]]
-    def unapply[A](e: Maybe[A]): Boolean = this eq e
+  sealed abstract case class Empty[A] private() extends Maybe[A]
+  object Empty {
+    private[this] val value: Empty[Nothing] = new Empty[Nothing]{}
+    def apply[A](): Maybe[A] = value.asInstanceOf[Empty[A]]
   }
 
   final case class Just[A](a: A) extends Maybe[A]
