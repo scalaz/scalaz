@@ -166,9 +166,22 @@ sealed abstract class ISet[A] {
       case Tip() => singleton(x)
       case self @ Bin(y, l, r) =>
         o.order(x, y) match {
-          case LT => balanceL(y, l.insert(x), r)
-          case GT => balanceR(y, l, r.insert(x))
-          case EQ => self
+          case LT =>
+            val left = l.insert(x)
+            if (left eq l) {
+              self
+            } else {
+              balanceL(y, left, r)
+            }
+          case GT =>
+            val right = r.insert(x)
+            if (right eq r) {
+              self
+            } else {
+              balanceR(y, l, right)
+            }
+          case EQ =>
+            self
         }
     }
 
