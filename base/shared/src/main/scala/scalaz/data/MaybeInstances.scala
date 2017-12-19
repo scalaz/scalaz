@@ -12,24 +12,10 @@ trait MaybeInstances {
     }
   }
 
-  implicit val maybeMonad =
-    new MonadClass.Template[Maybe] with TraversableClass[Maybe] with FoldRight[Maybe] {
+  implicit val maybeIsCovariant: IsCovariant[Maybe] = Scalaz.scalaCovariant[Option]
+
+  implicit val maybeTraversable: Traversable[Maybe] = new TraversableClass[Maybe] with FoldRight[Maybe] {
       def just[A](a: A): Maybe[A] = Some(a)
-
-      override def ap[A, B](ma: Maybe[A])(mf: Maybe[A => B]): Maybe[B] =
-        mf match {
-          case Some(f) => ma.map(f)
-          case None    => None
-        }
-
-      override def flatMap[A, B](ma: Maybe[A])(f: A => Maybe[B]): Maybe[B] =
-        ma.flatMap(f)
-
-      override def map[A, B](ma: Maybe[A])(f: A => B): Maybe[B] =
-        ma.map(f)
-
-      override def pure[A](a: A): Maybe[A] =
-        just(a)
 
       override def traverse[F[_], A, B](ma: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]): F[Maybe[B]] =
         ma match {
@@ -57,5 +43,28 @@ trait MaybeInstances {
 
       override def toList[A](ma: Maybe[A]): List[A] =
         ma.toList
+
+      override def map[A, B](ma: Maybe[A])(f: A => B): Maybe[B] =
+        ma.map(f)
+  }
+
+  implicit val maybeMonad: Monad[Maybe] =
+    new MonadClass.Template[Maybe] {
+      def just[A](a: A): Maybe[A] = Some(a)
+
+      override def ap[A, B](ma: Maybe[A])(mf: Maybe[A => B]): Maybe[B] =
+        mf match {
+          case Some(f) => ma.map(f)
+          case None    => None
+        }
+
+      override def flatMap[A, B](ma: Maybe[A])(f: A => Maybe[B]): Maybe[B] =
+        ma.flatMap(f)
+
+      override def map[A, B](ma: Maybe[A])(f: A => B): Maybe[B] =
+        ma.map(f)
+
+      override def pure[A](a: A): Maybe[A] =
+        just(a)
     }
 }

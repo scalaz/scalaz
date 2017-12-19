@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import Prelude._
+
 import scala.annotation.tailrec
 
 /**

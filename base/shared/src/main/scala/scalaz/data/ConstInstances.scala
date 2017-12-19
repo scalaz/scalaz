@@ -3,6 +3,7 @@ package data
 
 import typeclass.{FoldableClass, TraversableClass}
 
+import Prelude._
 import FoldableClass._
 import TraversableClass._
 

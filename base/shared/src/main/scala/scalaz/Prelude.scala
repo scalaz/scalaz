@@ -82,6 +82,8 @@ trait BaseData {
 
   val \/- = data.Disjunction.\/-
   val -\/ = data.Disjunction.-\/
+  val Empty = data.MaybeImpl.Empty
+  val Just = data.MaybeImpl.Just
 }
 
 trait AllInstances extends data.AMaybeInstances
@@ -133,4 +135,13 @@ trait AllSyntax extends data.AsSyntax
     with typeclass.StrongSyntax
     with typeclass.TraversableSyntax
 
-object Scalaz extends AllInstances with AllSyntax
+object Prelude extends BaseHierarchy
+
+trait LowPriority extends BaseHierarchy.BH0
+  with BaseTypeclasses
+  with BaseData
+  with BaseDataAliases
+
+object Scalaz extends LowPriority
+  with AllSyntax
+  with AllInstances

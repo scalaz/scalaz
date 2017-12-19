@@ -9,14 +9,4 @@ trait MaybeFunctions {
   def maybe[A, B](n: B)(f: A => B): Maybe[A] => B
   def fromOption[A](oa: Option[A]): Maybe[A]
   def toOption[A](ma: Maybe[A]): Option[A]
-
-  /* extractors */
-
-  object Just {
-    def unapply[A](ma: Maybe[A]): Option[A] = toOption(ma)
-  }
-
-  object Empty {
-    def unapply[A](ma: Maybe[A]): Boolean = toOption(ma).isEmpty
-  }
 }

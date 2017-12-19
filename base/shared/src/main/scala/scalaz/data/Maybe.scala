@@ -4,14 +4,9 @@ package data
 sealed trait MaybeModule extends MaybeFunctions {
   def fold[A, B](ma: Maybe[A])(f: A => B, b: => B): B =
     toOption(ma).fold(b)(f)
-
-  /* typeclass instances */
-  def isCovariant: IsCovariant[Maybe]
-  def monad: Monad[Maybe]
-  def traversable: Traversable[Maybe]
 }
 
-private[data] object MaybeImpl extends MaybeModule with MaybeInstances {
+private[scalaz] object MaybeImpl extends MaybeModule {
   def empty[A]: Maybe[A] = None
   def just[A](a: A): Maybe[A] = Some(a)
   def maybe[A, B](n: B)(f: A => B): Maybe[A] => B = _ match {
@@ -21,7 +16,11 @@ private[data] object MaybeImpl extends MaybeModule with MaybeInstances {
   def fromOption[A](oa: Option[A]): Maybe[A] = oa
   def toOption[A](ma: Maybe[A]): Option[A] = ma
 
-  def isCovariant: IsCovariant[Maybe] = Scalaz.scalaCovariant[Option]
-  def monad: Monad[Maybe] = maybeMonad
-  def traversable: Traversable[Maybe] = maybeMonad
+  object Just {
+    def unapply[A](ma: Maybe[A]): Option[A] = toOption(ma)
+  }
+
+  object Empty {
+    def unapply[A](ma: Maybe[A]): Boolean = toOption(ma).isEmpty
+  }
 }
