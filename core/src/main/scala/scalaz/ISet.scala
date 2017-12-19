@@ -188,13 +188,23 @@ sealed abstract class ISet[A] {
   final def delete(x: A)(implicit o: Order[A]): ISet[A] =
     this match {
       case Tip() =>
-        Tip()
-      case Bin(y, l, r) =>
+        this
+      case self @ Bin(y, l, r) =>
         o.order(x, y) match {
           case LT =>
-            balanceR(y, l.delete(x), r)
+            val left = l.delete(x)
+            if (left eq l) {
+              self
+            } else {
+              balanceR(y, left, r)
+            }
           case GT =>
-            balanceL(y, l, r.delete(x))
+            val right = r.delete(x)
+            if (right eq r) {
+              self
+            } else {
+              balanceL(y, l, right)
+            }
           case EQ =>
             glue(l, r)
         }
