@@ -1,11 +1,7 @@
 package scalaz
 package data
 
-import Prelude._
-
 sealed abstract class These[L, R] {
-  import These.{This, That, Both}
-
   /**
     * The canonical catamorphism from `These` values.
     */
@@ -16,20 +12,20 @@ sealed abstract class These[L, R] {
   }
 
   final def thisSide: Maybe[L] = this match {
-    case This(left)    => just(left)
-    case That(_)       => empty
-    case Both(left, _) => just(left)
+    case This(left)    => Maybe.just(left)
+    case That(_)       => Maybe.empty
+    case Both(left, _) => Maybe.just(left)
   }
 
   final def thatSide: Maybe[R] = this match {
-    case This(_)        => empty
-    case That(right)    => just(right)
-    case Both(_, right) => just(right)
+    case This(_)        => Maybe.empty
+    case That(right)    => Maybe.just(right)
+    case Both(_, right) => Maybe.just(right)
   }
 
   final def both: Maybe[(L, R)] = this match {
-    case Both(left, right) => just((left, right))
-    case _                 => empty
+    case Both(left, right) => Maybe.just((left, right))
+    case _                 => Maybe.empty
   }
 
   final def swap: These[R, L] = this match {
@@ -125,26 +121,24 @@ sealed abstract class These[L, R] {
 
 }
 
-object These extends TheseInstances {
-  type \&/[A, B] = These[A, B]
+final case class This[L, R](thisValue: L) extends These[L, R] {
+  @inline private[data] final def pmap[RR]: This[L, RR] = this.asInstanceOf[This[L, RR]]
+}
 
-  /* ADT cases */
-  final case class This[L, R](thisValue: L) extends These[L, R] {
-    @inline private[data] final def pmap[RR]: This[L, RR] = this.asInstanceOf[This[L, RR]]
-  }
-  final case class That[L, R](thatValue: R)               extends These[L, R] {
-    @inline private[data] final def pmap[LL]: That[LL, R] = this.asInstanceOf[That[LL, R]]
-  }
-  final case class Both[L, R](thisValue: L, thatValue: R) extends These[L, R]
+final case class That[L, R](thatValue: R)               extends These[L, R] {
+  @inline private[data] final def pmap[LL]: That[LL, R] = this.asInstanceOf[That[LL, R]]
+}
 
-  /* "smart" constructors */
-  object This {
-    @inline final def apply[L, R](thisValue: L): These[L, R] = new This[L, R](thisValue)
-  }
-  object That {
-    @inline final def apply[L, R](thatValue: R): These[L, R] = new That[L, R](thatValue)
-  }
-  object Both {
-    @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
-  }
+final case class Both[L, R](thisValue: L, thatValue: R) extends These[L, R]
+
+object This {
+  @inline final def apply[L, R](thisValue: L): These[L, R] = new This[L, R](thisValue)
+}
+
+object That {
+  @inline final def apply[L, R](thatValue: R): These[L, R] = new That[L, R](thatValue)
+}
+
+object Both {
+  @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
 }

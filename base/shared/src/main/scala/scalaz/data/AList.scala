@@ -1,9 +1,7 @@
 package scalaz
 package data
 
-import Prelude._
 import scala.annotation.tailrec
-import scalaz.typeclass.{Category, Compose}
 
 /**
  * A potentially empty type-aligned list.
@@ -81,7 +79,7 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Category[G]): G[A, B] =
     this match {
-      case ACons(h, t)  => t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ)).result
+      case ACons(h, t)  => t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(Forall2.specialize(φ).apply(h)))(PostComposeBalancer.rightAction(φ)).result
       case nil @ ANil() => nil.subst[G[A, ?]](G.id[A])
     }
 
@@ -90,15 +88,15 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def foldMapMaybe[G[_, _]](φ: F ~~> G)(implicit G: Compose[G]): AMaybe[G, A, B] =
     this match {
-      case ACons(h, t)  => AJust(t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ)).result)
+      case ACons(h, t)  => AJust(t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(Forall2.specialize(φ).apply(h)))(PostComposeBalancer.rightAction(φ)).result)
       case nil @ ANil() => nil.subst[AMaybe[G, A, ?]](AMaybe.empty[G, A])
     }
 
   def map[G[_, _]](φ: F ~~> G): AList[G, A, B] =
-    foldRight[AList[G, ?, B]](empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) :: gs))
+    foldRight[AList[G, ?, B]](empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => Forall2.specialize(φ).apply(f) :: gs))
 
   def flatMap[G[_, _]](φ: F ~~> AList[G, ?, ?]): AList[G, A, B] =
-    foldRight[AList[G, ?, B]](empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs))
+    foldRight[AList[G, ?, B]](empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => Forall2.specialize(φ).apply(f) ::: gs))
 
   def size: Int = {
     @tailrec def go(acc: Int, fs: AList[F, _, _]): Int = fs match {

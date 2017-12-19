@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude.<~<
-
 import scala.language.implicitConversions
 
 trait ForallModule {

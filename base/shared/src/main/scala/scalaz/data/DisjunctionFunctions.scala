@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Disjunction.{\/, \/-, -\/}
-
 trait DisjunctionFunctions {
   @inline def left[L, R](value: L): Disjunction[L, R] = -\/(value)
   @inline def right[L, R](value: R): Disjunction[L, R] = \/-(value)

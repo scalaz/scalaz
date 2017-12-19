@@ -1,16 +1,11 @@
 package scalaz
 package data
 
-import typeclass.{IsCovariant, Show}
-
 sealed trait Maybe2Module {
   /**
    * Isomorphic to `Maybe[(A, B)]`, but avoids allocating a `Tuple2` isntance.
    */
   type Maybe2[A, B]
-
-  def just2 [A, B](a: A, b: B): Maybe2[A, B]
-  def empty2[A, B]            : Maybe2[A, B]
 
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]]
@@ -34,14 +29,16 @@ final class Just2Extractor[A, B] private[data] (private val value: Option2[A, B]
   def _2: B = value._2
 }
 
+trait Maybe2Syntax {
+  def just2 [A, B](a: A, b: B): Maybe2Impl.Maybe2[A, B] = Maybe2Impl.fromOption2(Some2(a, b))
+  def empty2[A, B]            : Maybe2Impl.Maybe2[A, B] = None2
+}
+
 private[data] object Maybe2Impl extends Maybe2Module {
   type Maybe2[A, B] = Option2[A, B]
 
-  def just2 [A, B](a: A, b: B): Maybe2[A, B] = Some2(a, b)
-  def empty2[A, B]            : Maybe2[A, B] = None2
-
-  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
-  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
+  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = typeclass.IsCovariant.scalaCovariant[Option2[+?, B]]
+  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = typeclass.IsCovariant.scalaCovariant[Option2[A, +?]]
 
   implicit def show[A, B](implicit A: Show[A], B: Show[B]): Show[Maybe2[A, B]] = {
     case Some2(_1, _2) => s"Just2(${A.show(_1)}, ${B.show(_2)})"

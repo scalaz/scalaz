@@ -11,7 +11,8 @@ title:  "Maybe"
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
+import scalaz._
+import Scalaz._
 ```
 
 ## Creation

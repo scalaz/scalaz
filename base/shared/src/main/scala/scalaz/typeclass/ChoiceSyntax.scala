@@ -5,7 +5,6 @@ import com.github.ghik.silencer.silent
 
 import scala.language.implicitConversions
 import scala.language.experimental.macros
-import data.Disjunction._
 
 trait ChoiceSyntax {
   implicit def choiceOps[F[_, _], A, B](fa: F[A, B])(implicit F: Choice[F]): ChoiceSyntax.Ops[F, A, B] =

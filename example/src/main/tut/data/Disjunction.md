@@ -11,9 +11,8 @@ It is often used to dealing with errors, but is not tied to that case.
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
-import scalaz.data.Disjunction._
-import scalaz.data.Disjunction.Syntax._
+import scalaz._
+import Scalaz._
 ```
 
 ## Construction

@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import Prelude.<~<
-
 /**
  * Witnesses that the type constructor `F[_]` is covariant,
  * even though the variance annotation of its type parameter has been forgotten.

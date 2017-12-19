@@ -4,9 +4,6 @@ package data
 // FIXME: remove once https://github.com/scala/bug/issues/10623 is fixed.
 import com.github.ghik.silencer.silent
 
-import Prelude.{ <~<, === }
-import scalaz.typeclass.{IsContravariant, IsCovariant}
-
 /**
   * Liskov substitutability: A better `<:<`.
   *
@@ -251,24 +248,6 @@ object As extends AsInstances {
     def substCtCv[F[-_, +_]](value: F[B1, A2]): F[A1, B2] = liftCtCv[F].apply(value)
     def substCvCt[F[+_, -_]](value: F[A1, B2]): F[B1, A2] = liftCvCt[F].apply(value)
     def substCtCt[F[-_, -_]](value: F[B1, B2]): F[A1, A2] = liftCtCt[F].apply(value)
-  }
-
-  implicit final class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
-    def liftCvF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
-      F.liftLiskov(ab)
-
-    def liftCtF[F[_]](implicit F: IsContravariant[F]): F[B] As F[A] =
-      F.liftLiskov(ab)
-
-    def substCvF[F[_]](fa: F[A])(implicit F: IsCovariant[F]): F[B] = {
-      type f[+x] = x
-      F.substCv[f, A, B](fa)(ab)
-    }
-
-    def substCtF[F[_]](fb: F[B])(implicit F: IsContravariant[F]): F[A] = {
-      type f[+x] = x
-      F.substCv[f, A, B](fb)(ab)
-    }
   }
 
   /**

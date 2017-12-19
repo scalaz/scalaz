@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude.===
-
 /** Similar to `Option[F[A, B]]`, except that
   * the empty case witnesses type equality between `A` and `B`.
   */

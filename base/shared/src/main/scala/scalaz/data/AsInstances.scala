@@ -2,7 +2,6 @@ package scalaz
 package data
 
 import scala.language.implicitConversions
-import Prelude.<~<
 
 trait AsInstances {
   /**We can witness equality by using it to convert between types */

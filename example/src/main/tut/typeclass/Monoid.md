@@ -16,7 +16,8 @@ A monoid instance must satisfy the following laws in addition to those defined b
 
 **Typical imports**
 ```tut:silent
-import scalaz.typeclass.Monoid
+import scalaz._
+import Scalaz._
 ```
 
 ## Instance declaration

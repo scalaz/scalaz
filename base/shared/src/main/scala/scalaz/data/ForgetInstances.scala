@@ -1,6 +1,7 @@
 package scalaz
 package data
-import typeclass.{Strong, StrongClass}
+
+import typeclass.StrongClass
 
 trait ForgetInstances { self =>
 

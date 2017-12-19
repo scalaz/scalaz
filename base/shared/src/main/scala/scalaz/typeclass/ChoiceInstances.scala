@@ -2,10 +2,9 @@ package scalaz
 package typeclass
 
 import data.Disjunction
-import data.Disjunction.\/
 
 trait ChoiceInstances { instances =>
-  implicit val function: Choice[Function] = new ChoiceClass[Function] {
+  implicit val functionChoice: Choice[Function] = new ChoiceClass[Function] {
  
     override def dimap[A, B, C, D](fab: Function[A, B])(ca: C => A)(bd: B => D): Function[C, D] =
       profunctor.dimap(fab)(ca)(bd)

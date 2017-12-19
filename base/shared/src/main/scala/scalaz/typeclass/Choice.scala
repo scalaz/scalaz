@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import data.Disjunction._
-
 trait Choice[P[_, _]] {
   def profunctor: Profunctor[P]
 

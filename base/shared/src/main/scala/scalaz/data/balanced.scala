@@ -1,9 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-import scalaz.typeclass.Compose
-
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the right and addition of new elements (i.e. "increment") from the left.
@@ -41,7 +38,7 @@ object PreComposeBalancer {
     ν[LeftAction[PreComposeBalancer[F, ?, Z], F]][X, Y]((f, acc) => f +: acc)
 
   def leftAction[G[_, _], F[_, _], Z](φ: F ~~> G)(implicit G: Compose[G]): LeftAction[PreComposeBalancer[G, ?, Z], F] =
-    ν[LeftAction[PreComposeBalancer[G, ?, Z], F]][X, Y]((f, acc) => φ.apply(f) +: acc)
+    ν[LeftAction[PreComposeBalancer[G, ?, Z], F]][X, Y]((f, acc) => Forall2.specialize(φ).apply(f) +: acc)
 }
 
 /**
@@ -70,7 +67,7 @@ object PostComposeBalancer {
     ν[RightAction[PostComposeBalancer[F, A, ?], F]][B, C]((acc, f) => acc :+ f)
 
   def rightAction[G[_, _], F[_, _], A](φ: F ~~> G)(implicit G: Compose[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
-    ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
+    ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ Forall2.specialize(φ).apply(f))
 
   private def flip[F[_, _]](F: Compose[F]): Compose[λ[(α, β) => F[β, α]]] =
     new Compose[λ[(α, β) => F[β, α]]] {

@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude.{ ===, <~< }
-
 /**
   * This particular version of Leibniz’ equality has been generalized to
   * handle subtyping so that it can be used with constrained type constructors,

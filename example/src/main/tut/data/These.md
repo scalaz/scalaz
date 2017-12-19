@@ -7,11 +7,12 @@ title:  "These"
 
 `These` (aliased as `\&/`) is an inclusive "or" of two data types, as opposed to
 `\/`, which is an exclusive "or". `These[A, B]` is isomorphic to
-`A \/ B \/ (A, B)`, but is significantly easier to use and has different 
+`A \/ B \/ (A, B)`, but is significantly easier to use and has different
 typeclass instances.
 
 ```tut:silent
-import scalaz.Prelude._, scalaz.data._, These._
+import scalaz._
+import Scalaz._
 ```
 
 ## Basics
@@ -72,7 +73,7 @@ aString.flatMap(_ => anInt)
 
 ### Semigroup
 
-`These` is a `Semigroup` if both `A` and `B` are. 
+`These` is a `Semigroup` if both `A` and `B` are.
 
 ```tut
 anInt append aString

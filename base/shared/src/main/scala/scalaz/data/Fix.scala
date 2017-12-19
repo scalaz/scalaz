@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-
 trait FixModule {
   type Fix[F[_]]
 

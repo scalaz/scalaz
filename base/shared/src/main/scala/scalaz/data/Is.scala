@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-
 /**
   * The data type `Is` is the encoding of Leibnitz’ law which states that
   * if `a` and `b` are identical then they must have identical properties.
@@ -158,7 +156,7 @@ object Is {
   /**
     * Equality is reflexive relation.
     */
-  implicit def refl[A]: A === A = refl_[A]
+  implicit def refl[A]: A === A = Forall.specialize(refl_)
 
   /**
     * Given `A === B` we can prove that `F[A] === F[B]`.

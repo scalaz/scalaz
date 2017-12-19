@@ -1,8 +1,7 @@
 package scalaz
 package data
 
-import Prelude._
-import typeclass.{MonadClass, TraversableClass, Show}
+import typeclass.{MonadClass, TraversableClass}
 import typeclass.FoldableClass._
 
 sealed trait MaybeModule extends MaybeFunctions {
@@ -67,13 +66,13 @@ private[data] object MaybeImpl extends MaybeModule {
 
       override def traverse[F[_], A, B](ma: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]): F[Maybe[B]] =
         ma match {
-          case Some(a) => f(a).map(just)
+          case Some(a) => F.apply.functor.map(f(a))(just)
           case None    => F.pure(None)
         }
 
       override def sequence[F[_], A](ma: Maybe[F[A]])(implicit F: Applicative[F]): F[Maybe[A]] =
         ma match {
-          case Some(fa) => fa.map(just)
+          case Some(fa) => F.apply.functor.map(fa)(just)
           case None     => F.pure(None)
         }
 

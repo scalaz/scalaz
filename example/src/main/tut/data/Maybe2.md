@@ -10,7 +10,8 @@ title:  "Maybe2"
 **Typical imports**
 
 ```tut:silent
-import scalaz.data.Maybe2._
+import scalaz._
+import Scalaz._
 ```
 
 ## Creation

@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import typeclass._
+import typeclass.MonadClass
 
 trait IdentityInstances {
   implicit val monad: Monad[Identity] = new MonadClass[Identity] {
