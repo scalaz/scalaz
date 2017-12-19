@@ -292,7 +292,17 @@ sealed abstract class ISet[A] {
     this match {
       case Tip() => this
       case Bin(x, l, r) =>
-        if (p(x)) join(x, l.filter(p), r.filter(p)) else l.filter(p) merge r.filter(p)
+        if (p(x)) {
+          val left = l.filter(p)
+          val right = r.filter(p)
+          if ((left eq l) && (right eq r)) {
+            this
+          } else {
+            join(x, left, right)
+          }
+        } else {
+          l.filter(p) merge r.filter(p)
+        }
     }
 
   final def partition(p: A => Boolean): (ISet[A], ISet[A]) =
