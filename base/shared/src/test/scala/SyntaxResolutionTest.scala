@@ -1,5 +1,4 @@
-import scalaz._
-import Scalaz._
+import scalaz.Scalaz._
 
 /* Tests that the various syntax macros work for the typeclasses which use them. */
 object SyntaxResolutionTest {

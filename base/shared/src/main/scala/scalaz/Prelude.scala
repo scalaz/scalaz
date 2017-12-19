@@ -135,9 +135,9 @@ trait AllSyntax extends data.AsSyntax
     with typeclass.StrongSyntax
     with typeclass.TraversableSyntax
 
-object Prelude extends BaseHierarchy
+object Prelude extends BaseHierarchy with BaseData
 
-trait LowPriority extends BaseHierarchy.BH0
+trait LowPriority extends BaseHierarchy
   with BaseTypeclasses
   with BaseData
   with BaseDataAliases

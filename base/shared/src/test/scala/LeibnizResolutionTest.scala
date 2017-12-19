@@ -1,4 +1,4 @@
-import scalaz._
+import scalaz.Prelude._
 
 class LeibnizResolutionTest {
   implicitly[Leibniz[Nothing, Any, Int, Int]]

@@ -1,4 +1,3 @@
-import scalaz._
 import scalaz.Scalaz._
 
 class AsResolutionTest {

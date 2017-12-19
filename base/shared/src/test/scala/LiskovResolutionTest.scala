@@ -1,4 +1,4 @@
-import scalaz._
+import scalaz.Prelude._
 
 class LiskovResolutionTest {
   implicitly[Liskov[Nothing, Any, Int, AnyVal]]
