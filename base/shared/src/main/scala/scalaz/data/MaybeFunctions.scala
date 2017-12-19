@@ -2,7 +2,7 @@ package scalaz
 package data
 
 trait MaybeFunctions {
-  type Maybe[A]
+  type Maybe[A] = Option[A]
 
   def empty[A]: Maybe[A]
   def just[A](a: A): Maybe[A]

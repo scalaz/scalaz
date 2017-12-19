@@ -8,8 +8,3 @@ trait Choice[P[_, _]] {
 
   def rightchoice[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B]
 }
-
-object Choice extends ChoiceInstances {
-  def apply[P[_, _]](implicit P: Choice[P]): Choice[P] = P
-}
-

@@ -112,7 +112,7 @@ object Liskov {
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: Liskov[A, A, A, A] = Forall.toForallOps(reflAll).apply[A]
+  implicit def refl[A]: Liskov[A, A, A, A] = Forall.specialize(reflAll)
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.

@@ -17,7 +17,3 @@ trait IsCovariant[F[_]] {
 
   def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B]
 }
-
-object IsCovariant extends IsCovariantInstances {
-  def apply[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
-}

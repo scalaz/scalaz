@@ -18,8 +18,6 @@ import Scalaz._
 # Built-in instances
 
 ```tut
-val stringShow: Show[String] = implicitly
-
 "Scalaz 8".show
 ```
 

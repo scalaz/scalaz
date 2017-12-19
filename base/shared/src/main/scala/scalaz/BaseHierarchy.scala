@@ -9,7 +9,7 @@ object BaseHierarchy {
   trait BH0 extends BH1 {
     implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P] = P.profunctor
     implicit def monadBind[M[_]](implicit M: Monad[M]): Bind[M] = M.bind
-    implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M] = M.applicative
+    // implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M] = M.applicative
     implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M] = M.applicative.apply
     implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M] = M.applicative.apply.functor
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A] = A.semigroup

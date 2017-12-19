@@ -184,7 +184,7 @@ object As extends AsInstances {
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: (A <~< A) = Forall.toForallOps(refl_).apply[A]
+  implicit def refl[A]: (A <~< A) = Forall.specialize(refl_)
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.

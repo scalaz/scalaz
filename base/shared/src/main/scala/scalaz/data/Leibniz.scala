@@ -136,7 +136,7 @@ object Leibniz {
   /**
     * Equality is reflexive relation.
     */
-  implicit def refl[A]: Leibniz[A, A, A, A] = Forall.toForallOps(reflAll).apply[A]
+  implicit def refl[A]: Leibniz[A, A, A, A] = Forall.specialize(reflAll)
 
   /**
     * Equality is reflexive relation. Compared to [[refl]], this function

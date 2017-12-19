@@ -25,8 +25,6 @@ empty[Int]
 ## Use the type class instances
 
 ```tut
-import scalaz.typeclass.ApplicativeSyntax._
-
 val x: Maybe[Long] = just(50L)
 val y = "Hello".pure[Maybe]
 

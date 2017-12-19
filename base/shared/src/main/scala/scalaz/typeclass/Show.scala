@@ -12,9 +12,7 @@ trait Show[A] {
   def show(a: A): String
 }
 
-object Show extends ShowInstances with ShowSyntax {
-  @inline def apply[A](implicit A: Show[A]): Show[A] = A
-
+object Show {
   /** A factory for `Show` instances which delegates to Scala's `.toString` method.
     */
   def fromToString[A]: Show[A] = _.toString()

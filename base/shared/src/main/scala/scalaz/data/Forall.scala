@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import scala.language.implicitConversions
-
 trait ForallModule {
   type Forall[F[_]]
 
@@ -46,19 +44,6 @@ trait ForallModule {
   object Unapply {
     implicit def unapply[G[_]]: Unapply[∀[G]] { type F[A] = G[A] } =
       new Unapply[∀[G]] { type F[A] = G[A] }
-  }
-}
-
-trait ForallSyntax {
-  import ForallSyntax._
-
-  implicit def toForallOps[F[_]](a: ∀[F]): Ops[F] = new Ops[F](a)
-}
-
-object ForallSyntax {
-  final class Ops[F[_]](val a: ∀[F]) extends AnyVal {
-    def of[A]: F[A] = Forall.specialize(a)
-    def apply[A]: F[A] = of[A]
   }
 }
 

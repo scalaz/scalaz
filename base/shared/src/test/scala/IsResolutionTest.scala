@@ -1,5 +1,5 @@
 import scalaz._
-import scalaz.Prelude._
+import scalaz.Scalaz._
 
 class IsResolutionTest {
   implicitly[Int === Int]

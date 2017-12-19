@@ -2,7 +2,7 @@ package scalaz
 package data
 
 trait AsSyntax {
-  implicit class AsOps[A, B](val ab: As[A, B]) {
+  implicit final class ToAsOps[A, B](val ab: As[A, B]) {
     def liftCvF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
       F.liftLiskov(ab)
 

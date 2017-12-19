@@ -61,6 +61,7 @@ trait BaseDataAliases { self: BaseData =>
   type ∀∀[F[_, _]]                = data.Forall2.Forall2[F]
 
   type \&/[A, B] = data.These[A, B]
+  type Id[X] = X
 }
 
 trait BaseData {
@@ -69,6 +70,8 @@ trait BaseData {
   type Forall[F[_]] = data.Forall.Forall[F]
   type Forget[A, B, C] = data.Forget[A, B, C]
   type Identity[A] = data.Identity[A]
+  type Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] = data.Leibniz[L, H, A, B]
+  type Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] = data.Liskov[L, H, A, B]
   type Maybe[A] = data.Maybe[A]
   type That[A, B] = data.That[A, B]
   type This[A, B] = data.This[A, B]
@@ -88,6 +91,7 @@ trait AllInstances extends data.AMaybeInstances
     with data.DownStarInstances
     with data.ForgetInstances
     with data.IdentityInstances
+    with data.MaybeInstances
     with data.TheseInstances
     with data.UpStarInstances
     with typeclass.BindInstances
@@ -118,6 +122,7 @@ trait AllSyntax extends data.AsSyntax
     with typeclass.ChoiceSyntax
     with typeclass.CobindSyntax
     with typeclass.ComonadSyntax
+    with typeclass.ComposeSyntax
     with typeclass.FoldableSyntax
     with typeclass.FunctorSyntax
     with typeclass.InvariantFunctorSyntax
