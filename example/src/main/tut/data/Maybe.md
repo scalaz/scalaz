@@ -24,8 +24,6 @@ empty[Int]
 ## Use the type class instances
 
 ```tut
-implicit val maybeApplicative: Applicative[Maybe] = monadApplicative(maybeMonad)
-
 val x: Maybe[Long] = just(50L)
 val y = "Hello".pure[Maybe]
 

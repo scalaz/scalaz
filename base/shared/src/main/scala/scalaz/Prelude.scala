@@ -93,7 +93,6 @@ trait AllInstances extends data.AMaybeInstances
     with data.DownStarInstances
     with data.ForgetInstances
     with data.IdentityInstances
-    with data.MaybeInstances
     with data.TheseInstances
     with data.UpStarInstances
     with typeclass.BindInstances
