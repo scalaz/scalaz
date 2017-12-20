@@ -30,6 +30,7 @@ final class PreComposeBalancer[F[_, _], A, B] private(count: Int, stack: AList1[
 }
 
 object PreComposeBalancer {
+  import Forall2Syntax._
 
   def apply[F[_, _], A, B](f: F[A, B]): PreComposeBalancer[F, A, B] =
     new PreComposeBalancer(1, AList1(f))
@@ -38,7 +39,7 @@ object PreComposeBalancer {
     ν[LeftAction[PreComposeBalancer[F, ?, Z], F]][X, Y]((f, acc) => f +: acc)
 
   def leftAction[G[_, _], F[_, _], Z](φ: F ~~> G)(implicit G: Compose[G]): LeftAction[PreComposeBalancer[G, ?, Z], F] =
-    ν[LeftAction[PreComposeBalancer[G, ?, Z], F]][X, Y]((f, acc) => Forall2.specialize(φ).apply(f) +: acc)
+    ν[LeftAction[PreComposeBalancer[G, ?, Z], F]][X, Y]((f, acc) => φ.apply(f) +: acc)
 }
 
 /**
@@ -57,6 +58,8 @@ final class PostComposeBalancer[F[_, _], A, B](private val repr: PreComposeBalan
 }
 
 object PostComposeBalancer {
+  import Forall2Syntax._
+
   def apply[F[_, _], A, B](f: F[A, B]): PostComposeBalancer[F, A, B] =
     wrap(PreComposeBalancer[λ[(α, β) => F[β, α]], B, A](f))
 
@@ -67,7 +70,7 @@ object PostComposeBalancer {
     ν[RightAction[PostComposeBalancer[F, A, ?], F]][B, C]((acc, f) => acc :+ f)
 
   def rightAction[G[_, _], F[_, _], A](φ: F ~~> G)(implicit G: Compose[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
-    ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ Forall2.specialize(φ).apply(f))
+    ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
 
   private def flip[F[_, _]](F: Compose[F]): Compose[λ[(α, β) => F[β, α]]] =
     new Compose[λ[(α, β) => F[β, α]]] {
