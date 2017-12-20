@@ -86,6 +86,12 @@ trait BaseDataAliases { self: BaseData =>
   type Id[X] = X
 }
 
+trait AllFunctions extends data.DisjunctionFunctions
+    with data.MaybePrelude
+    with typeclass.InvariantFunctorFunctions
+    with typeclass.PhantomFunctions
+    with typeclass.TraversableFunctions
+
 trait AllInstances extends data.AMaybeInstances
     with data.AsInstances
     with data.ConstInstances
@@ -134,7 +140,7 @@ trait AllSyntax extends data.AsSyntax
     with typeclass.StrongSyntax
     with typeclass.TraversableSyntax
 
-object Prelude extends BaseHierarchy with BaseData
+object Prelude extends BaseHierarchy with BaseData with AllFunctions
 
 trait LowPriority extends BaseHierarchy
   with BaseTypeclasses
@@ -142,5 +148,6 @@ trait LowPriority extends BaseHierarchy
   with BaseDataAliases
 
 object Scalaz extends LowPriority
+  with AllFunctions
   with AllSyntax
   with AllInstances
