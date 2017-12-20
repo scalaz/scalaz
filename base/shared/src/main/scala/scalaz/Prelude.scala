@@ -46,24 +46,6 @@ trait BaseTypeclasses {
   def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T] = T
 }
 
-trait BaseDataAliases { self: BaseData =>
-  type \/[L, R] = data.Disjunction.\/[L, R]
-  type ===[A, B] = data.Is[A, B]
-  type <~<[-A, +B] = data.As[A, B]
-  type >~>[+B, -A] = data.As[A, B]
-
-  val Forall : data.Forall.type = data.Forall
-  val ∀      : data.Forall.type = data.Forall
-  type ∀[F[_]]                  = data.Forall.Forall[F]
-
-  val Forall2 : data.Forall2.type = data.Forall2
-  val ∀∀      : data.Forall2.type = data.Forall2
-  type ∀∀[F[_, _]]                = data.Forall2.Forall2[F]
-
-  type \&/[A, B] = data.These[A, B]
-  type Id[X] = X
-}
-
 trait BaseData {
   type Both[A, B] = data.Both[A, B]
   type Forall2[F[_, _]] = data.Forall2.Forall2[F]
@@ -84,6 +66,24 @@ trait BaseData {
   val -\/ = data.Disjunction.-\/
   val Empty = data.MaybeImpl.Empty
   val Just = data.MaybeImpl.Just
+}
+
+trait BaseDataAliases { self: BaseData =>
+  type \/[L, R] = data.Disjunction.\/[L, R]
+  type ===[A, B] = data.Is[A, B]
+  type <~<[-A, +B] = data.As[A, B]
+  type >~>[+B, -A] = data.As[A, B]
+
+  val Forall : data.Forall.type = data.Forall
+  val ∀      : data.Forall.type = data.Forall
+  type ∀[F[_]]                  = data.Forall.Forall[F]
+
+  val Forall2 : data.Forall2.type = data.Forall2
+  val ∀∀      : data.Forall2.type = data.Forall2
+  type ∀∀[F[_, _]]                = data.Forall2.Forall2[F]
+
+  type \&/[A, B] = data.These[A, B]
+  type Id[X] = X
 }
 
 trait AllInstances extends data.AMaybeInstances

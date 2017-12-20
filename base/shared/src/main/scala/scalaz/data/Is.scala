@@ -145,6 +145,8 @@ sealed trait Is[A, B] { ab =>
 }
 
 object Is {
+  import ForallSyntax._
+
   def apply[A, B](implicit ev: A Is B): A Is B = ev
 
   private[this] final case class Refl[A]() extends Is[A, A] {
@@ -156,7 +158,7 @@ object Is {
   /**
     * Equality is reflexive relation.
     */
-  implicit def refl[A]: A === A = Forall.specialize(refl_)
+  implicit def refl[A]: A === A = refl_[A]
 
   /**
     * Given `A === B` we can prove that `F[A] === F[B]`.

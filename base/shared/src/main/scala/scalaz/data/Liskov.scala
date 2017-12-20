@@ -100,6 +100,8 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
 }
 
 object Liskov {
+  import ForallSyntax._
+
   def apply[L, H >: L, A >: L <: H, B >: L <: H]
   (implicit ab: Liskov[L, H, A, B]): Liskov[L, H, A, B] = ab
 
@@ -112,7 +114,7 @@ object Liskov {
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: Liskov[A, A, A, A] = Forall.specialize(reflAll)
+  implicit def refl[A]: Liskov[A, A, A, A] = reflAll[A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.

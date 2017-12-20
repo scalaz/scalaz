@@ -11,6 +11,8 @@ package data
  */
 sealed abstract class AList1[F[_, _], A, B] {
   import AList1._
+  import ForallSyntax._
+  import Forall2Syntax._
 
   type Pivot
 
@@ -37,7 +39,7 @@ sealed abstract class AList1[F[_, _], A, B] {
   def reverse_:::[Z](that: Composed1[F, Z, A]): AList1[F, Z, B] =
     that.toList reverse_::: this
 
-  def reverse: Composed1[F, A, B] = 
+  def reverse: Composed1[F, A, B] =
     tail reverse_::: AList1[λ[(α, β) => F[β, α]], Pivot, A](head)
 
   def :::[Z](that: AList[F, Z, A]): AList1[F, Z, B] =
@@ -62,7 +64,7 @@ sealed abstract class AList1[F[_, _], A, B] {
     tail.foldLeft[G](φ.apply(ga, head))(φ)
 
   def foldLeft1[G[_]](init: F[A, ?] ~> G)(φ: RightAction[G, F]): G[B] =
-    tail.foldLeft[G](Forall.specialize(init).apply(head))(φ)
+    tail.foldLeft[G](init.apply(head))(φ)
 
   def foldRight[G[_]](gb: G[B])(φ: LeftAction[G, F]): G[A] =
     reverse.foldLeft(gb)(RightAction.fromLeft(φ))
@@ -80,15 +82,15 @@ sealed abstract class AList1[F[_, _], A, B] {
    * Map and then compose the elements of this list in a balanced binary fashion.
    */
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Compose[G]): G[A, B] =
-    tail.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(Forall2.specialize(φ).apply(head)))(PostComposeBalancer.rightAction(φ)).result
+    tail.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightAction(φ)).result
 
   def map[G[_, _]](φ: F ~~> G): AList1[G, A, B] =
-    ACons1(Forall2.specialize(φ).apply(head), tail.map(φ))
+    ACons1(φ.apply(head), tail.map(φ))
 
   def flatMap[G[_, _]](φ: F ~~> AList1[G, ?, ?]): AList1[G, A, B] = {
     type FXB[X] = F[X, B]
     type GXB[X] = AList1[G, X, B]
-    foldRight1[AList1[G, ?, B]](∀.mk[FXB ~> GXB].from(Forall2.specialize(φ).apply(_)))(ν[LeftAction[AList1[G, ?, B], F]][α, β]((f, gs) => Forall2.specialize(φ).apply(f) ::: gs))
+    foldRight1[AList1[G, ?, B]](∀.mk[FXB ~> GXB].from(φ.apply(_)))(ν[LeftAction[AList1[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs))
   }
 
   def size: Int = 1 + tail.size

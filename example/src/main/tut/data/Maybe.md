@@ -17,7 +17,7 @@ import scalaz.Scalaz._
 ## Creation
 
 ```tut
-just("Hello World")
+"Hello World".just
 empty[Int]
 ```
 

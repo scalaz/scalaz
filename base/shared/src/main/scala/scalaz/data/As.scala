@@ -173,6 +173,8 @@ sealed abstract class As[-A, +B] { ab =>
 }
 
 object As extends AsInstances {
+  import ForallSyntax._
+
   def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 
   private[this] final case class Refl[A]() extends (A <~< A) {
@@ -184,7 +186,7 @@ object As extends AsInstances {
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: (A <~< A) = Forall.specialize(refl_)
+  implicit def refl[A]: (A <~< A) = refl_[A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.

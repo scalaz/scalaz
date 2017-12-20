@@ -7,3 +7,5 @@ trait ForallSyntax {
     def apply[A]: F[A] = of[A]
   }
 }
+
+object ForallSyntax extends ForallSyntax

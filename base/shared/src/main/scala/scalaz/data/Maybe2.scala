@@ -7,6 +7,9 @@ sealed trait Maybe2Module {
    */
   type Maybe2[A, B]
 
+  def just2 [A, B](a: A, b: B): Maybe2[A, B]
+  def empty2[A, B]            : Maybe2[A, B]
+
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]]
   implicit def show[A: Show, B: Show]: Show[Maybe2[A, B]]
@@ -31,6 +34,9 @@ final class Just2Extractor[A, B] private[data] (private val value: Option2[A, B]
 
 private[data] object Maybe2Impl extends Maybe2Module {
   type Maybe2[A, B] = Option2[A, B]
+
+  def just2 [A, B](a: A, b: B): Maybe2[A, B] = Maybe2Impl.fromOption2(Some2(a, b))
+  def empty2[A, B]            : Maybe2[A, B] = None2
 
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = Scalaz.scalaCovariant[Option2[+?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = Scalaz.scalaCovariant[Option2[A, +?]]
