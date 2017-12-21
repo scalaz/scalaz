@@ -35,6 +35,8 @@ trait Order[F] extends Equal[F] { self =>
     override def equal(b1: B, b2: B) = self.equal(f(b1), f(b2))
   }
 
+  override def toOrder: Maybe[Order[F]] = Maybe.just(this)
+
   /** @note `Order.fromScalaOrdering(toScalaOrdering).order(x, y)`
             = `this.order(x, y)` */
   def toScalaOrdering: SOrdering[F] = new SOrdering[F] {
