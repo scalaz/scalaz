@@ -8,8 +8,3 @@ trait MaybeSyntax {
     def just: Maybe[A] = Maybe.just(a)
   }
 }
-
-trait MaybePrelude {
-  def empty[A] = Maybe.empty[A]
-  def just[A](a: A) = Maybe.just(a)
-}

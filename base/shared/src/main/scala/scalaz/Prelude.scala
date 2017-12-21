@@ -87,7 +87,7 @@ trait BaseDataAliases { self: BaseData =>
 }
 
 trait AllFunctions extends data.DisjunctionFunctions
-    with data.MaybePrelude
+    with data.MaybeFunctions
     with typeclass.InvariantFunctorFunctions
     with typeclass.PhantomFunctions
     with typeclass.TraversableFunctions

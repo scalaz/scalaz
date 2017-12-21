@@ -4,14 +4,27 @@ package data
 import typeclass.{MonadClass, TraversableClass}
 import typeclass.FoldableClass._
 
-sealed trait MaybeModule extends MaybeFunctions {
+sealed trait MaybeModule {
+  type Maybe[A]
+
+  object Just {
+    def unapply[A](ma: Maybe[A]): Option[A] = toOption(ma)
+  }
+
+  object Empty {
+    def unapply[A](ma: Maybe[A]): Boolean = toOption(ma).isEmpty
+  }
 
   def fold[A, B](ma: Maybe[A])(f: A => B, b: => B): B =
     toOption(ma).fold(b)(f)
 
+  def empty[A]: Maybe[A]
+  def just[A](a: A): Maybe[A]
+  def maybe[A, B](n: B)(f: A => B): Maybe[A] => B
+  def fromOption[A](oa: Option[A]): Maybe[A]
+  def toOption[A](ma: Maybe[A]): Option[A]
 
   /* typeclass instances */
-
   def isCovariant: IsCovariant[Maybe]
   def monad: Monad[Maybe]
   def traversable: Traversable[Maybe]
