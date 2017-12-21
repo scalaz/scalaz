@@ -145,8 +145,8 @@ sealed abstract class Maybe[A] {
   /**
    * Return the underlying value wrapped in type `F` if present, otherwise the
    * empty value for type `F` */
-  final def orEmpty[F[_]](implicit F: Applicative[F], G: PlusEmpty[F]): F[A] =
-    cata(F.point(_), G.empty)
+  final def orEmpty[F[_]](implicit F: ApplicativePlus[F]): F[A] =
+    cata(F.point(_), F.empty)
 }
 
 object Maybe extends MaybeInstances {
