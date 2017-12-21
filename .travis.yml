@@ -47,19 +47,8 @@ matrix:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
     - scala: 2.12.4
       jdk: oraclejdk9
-      before_install:
-      # https://github.com/sbt/sbt/pull/2951
-      - git clone https://github.com/retronym/java9-rt-export
-      - cd java9-rt-export/
-      - git checkout 1019a2873d057dd7214f4135e84283695728395d
-      - echo "sbt.version=1.0.2" > project/build.properties
-      - sbt package
-      - java -version
-      - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
-      - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
-      - cd ..
       script:
-      - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
+      - ./sbt -Dsbt.scala.version=2.10.7 ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
 
 env:
   matrix:
