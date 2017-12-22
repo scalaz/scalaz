@@ -33,6 +33,15 @@ object StreamTest extends SpecLite {
     evaluated must_=== false
   }
 
+  "traverse is lazy" ! {
+    import syntax.traverse._
+    import Scalaz.Id
+
+    val stream = Stream.continually(1)
+    val trav = stream.traverse[Id, Int](identity)
+    // got here without exception... that's good!
+  }
+
   "intercalate empty stream is flatten" ! forAll((a: Stream[Stream[Int]]) => a.intercalate(Stream.empty[Int]) must_===(a.flatten))
 
   "intersperse then remove odd items is identity" ! forAll {

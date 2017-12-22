@@ -158,6 +158,15 @@ object EphemeralStreamTest extends SpecLite {
     Foldable[EphemeralStream].foldMapRight1Opt(infiniteStream)(identity)(_ || _) must_===(Some(true))
   }
 
+  "traverse is lazy" ! {
+    import syntax.traverse._
+    import Scalaz.Id
+
+    val stream = EphemeralStream.iterate(1)(_ + 1)
+    val trav = stream.traverse[Id, Int](identity)
+    // got here without exception... that's good!
+  }
+
   "zipL" in {
     val size = 100
     val infinite = EphemeralStream.iterate(0)(_ + 1)
