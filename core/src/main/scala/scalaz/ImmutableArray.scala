@@ -15,14 +15,15 @@ import syntax.Ops
 sealed abstract class ImmutableArray[+A] {
   protected[this] def elemTag: ClassTag[A]
 
-  def apply(index: Int): A
+  // these methods are not total
+  private[scalaz] def apply(index: Int): A
+  private[scalaz] def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
 
   def length: Int
 
   def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassTag]: Array[B]
-  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
   def slice(from: Int, until: Int): ImmutableArray[A]
 
   def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
