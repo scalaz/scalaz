@@ -18,13 +18,13 @@ sealed abstract class ImmutableArray[+A] {
   // these methods are not total
   private[scalaz] def apply(index: Int): A
   private[scalaz] def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
-  private[scalaz] def slice(from: Int, until: Int): ImmutableArray[A]
 
   def length: Int
 
   def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassTag]: Array[B]
+  def slice(from: Int, until: Int): ImmutableArray[A]
 
   def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
 }
