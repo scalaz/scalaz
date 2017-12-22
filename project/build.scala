@@ -396,12 +396,23 @@ object build {
       Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
-  lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password") map sys.props.get match {
-      case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+  lazy val credentialsSetting = credentials ++= {
+    val name = "Sonatype Nexus Repository Manager"
+    val realm = "oss.sonatype.org"
+    (
+      sys.props.get("build.publish.user"),
+      sys.props.get("build.publish.password"),
+      sys.env.get("SONATYPE_USERNAME"),
+      sys.env.get("SONATYPE_PASSWORD")
+    ) match {
+      case (Some(user), Some(pass), _, _)  => Seq(Credentials(name, realm, user, pass))
+      case (_, _, Some(user), Some(pass))  => Seq(Credentials(name, realm, user, pass))
       case _                           =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
+        val ivyFile = Path.userHome / ".ivy2" / ".credentials"
+        val m2File = Path.userHome / ".m2" / "credentials"
+        if (ivyFile.exists()) Seq(Credentials(ivyFile))
+        else if (m2File.exists()) Seq(Credentials(m2File))
+        else Nil
     }
   }
 
