@@ -102,11 +102,11 @@ object build {
     "-Xsource:2.12",
     "-Ypartial-unification",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
-    "-unchecked"
+    "-unchecked",
+    "-Xexperimental" // SAM types in 2.11
   )
 
   private val Scala211_jvm_and_js_options = Seq(
-    "-Xexperimental", // SAM types
     "-Ybackend:GenBCode",
     "-Ydelambdafy:method",
     "-target:jvm-1.8"
