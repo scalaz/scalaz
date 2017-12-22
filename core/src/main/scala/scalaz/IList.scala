@@ -483,7 +483,6 @@ object INil {
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListInstances {
-  private[this] val nil: IList[Nothing] = INil()
 
   def apply[A](as: A*): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
@@ -492,7 +491,7 @@ object IList extends IListInstances {
     ICons(a, empty)
 
   def empty[A]: IList[A] =
-    nil.asInstanceOf[IList[A]]
+    INil()
 
   def fromList[A](as: List[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
