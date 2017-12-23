@@ -22,7 +22,7 @@ object Free extends FreeInstances {
   def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
     liftF(value).flatMap(x => x)
 
-  private val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
+  private[this] val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
 
   // Cache `point(())` to avoid frequent allocation
   @inline private def pointUnit[S[_]]: Free[S, Unit] = pointUnitCache.asInstanceOf[Free[S, Unit]]
