@@ -409,24 +409,6 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
-  "IList.:: pattern match" ! forAll { (n: Int, ns: IList[Int]) =>
-    import IList.::
-
-    (n :: ns) match {
-      case n1 :: ns1 =>
-        n1 must_=== n
-        ns1 must_=== ns
-    }
-  }
-
-  "IList() pattern match" ! forAll { (n: Int, ns: IList[Int]) =>
-    (n :: ns) match {
-      case IList(a, _) =>
-        a must_=== n
-      case _ =>
-    }
-  }
-
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
   object instances {
