@@ -51,7 +51,7 @@ object CABRunLengthEncoder {
    "CAAAAAB."
    "C5AB."
    "C3AAAB."
-   "1C5CB."
+   "1C5AB."
    */
 
   // The State we will carry in the Monad during our computation
