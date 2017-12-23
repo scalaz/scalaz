@@ -1,10 +1,16 @@
+package scalaz
+
+////
 // Copyright: 2017 Sam Halliday
 // License: https://opensource.org/licenses/BSD-3-Clause
 
-package scalaz
+/** Coproduct analogue of Divide
+ *
+ */
+////
+trait Codivide[F[_]] extends CoapplicativeCodivide[F] { self =>
+  ////
 
-/** Coproduct analogue of Divide */
-trait Codivide[F[_]] extends CoapplicativeCodivide[F] {
   def codivide1[Z, A1](a1: =>F[A1])(f: Z => A1): F[Z]
   def codivide2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(f: Z => A1 \/ A2): F[Z]
   def codivide3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
@@ -53,7 +59,14 @@ trait Codivide[F[_]] extends CoapplicativeCodivide[F] {
     g: Z => (A1 \/ (A2 \/ (A3 \/ A4)))
   ): F[Z] = codivide4(a1, a2, a3, a4)(g)
 
+  ////
+  val codivideSyntax = new scalaz.syntax.CodivideSyntax[F] { def F = Codivide.this }
 }
+
 object Codivide {
-  @inline def apply[F[_]](implicit i: Codivide[F]): Codivide[F] = i
+  @inline def apply[F[_]](implicit F: Codivide[F]): Codivide[F] = F
+
+  ////
+
+  ////
 }
