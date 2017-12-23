@@ -419,6 +419,14 @@ object IListTest extends SpecLite {
     }
   }
 
+  "IList() pattern match" ! forAll { (n: Int, ns: IList[Int]) =>
+    (n :: ns) match {
+      case IList(a, _) =>
+        a must_=== n
+      case _ =>
+    }
+  }
+
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
   object instances {

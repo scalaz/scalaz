@@ -487,6 +487,9 @@ object IList extends IListInstances {
   def apply[A](as: A*): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
+  // warning, use of this extractor disables exhaustivity checks
+  def unapplySeq[A](ilist: IList[A]): Option[Seq[A]] = Some(ilist.toList)
+
   def single[A](a: A): IList[A] =
     ICons(a, empty)
 
@@ -520,9 +523,9 @@ object IList extends IListInstances {
     }
 
   object :: {
-    def unapply[A](xs: IList[A]): Option[(A, IList[A])] = xs match {
+    // warning, use of this extractor disables exhaustivity checks
+    def unapply[A](xs: ICons[A]): Option[(A, IList[A])] = xs match {
       case ICons(head, tail) => Some(head -> tail)
-      case INil()            => None
     }
   }
 
