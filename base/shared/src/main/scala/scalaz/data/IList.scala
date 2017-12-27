@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import Prelude._
-import typeclass.IsCovariantClass
+import scalaz.typeclass.IsCovariant
 
 trait IListModule {
   type IList[A]
@@ -18,13 +18,9 @@ private[data] object IListImpl extends IListModule {
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]] =
     Fix.unfix[Maybe2[A, ?]](as)
 
-  implicit val isCovariantInstance: IsCovariant[IList] =
-    new IsCovariantClass[IList] with IsCovariantClass.LiftLiskov[IList] {
-
-      override def liftLiskov[A, B](implicit ev: A <~< B): IList[A] <~< IList[B] = {
-        type <~~<[F[_], G[_]] = ∀.Prototype[λ[α => F[α] <~< G[α]]]
-        val ev1 = Λ[α](Maybe2.isCovariant_1[α].liftLiskov[A, B]): Maybe2[A, ?] <~~< Maybe2[B, ?]
-        Fix.liftLiskov[Maybe2[A, ?], Maybe2[B, ?]](ev1.make)(Maybe2.isCovariant_2[A])
-      }
-    }
+  implicit val isCovariantInstance: IsCovariant[IList] = IsCovariant.witness1[IList] {
+    type <~~<[F[_], G[_]] = ∀.Prototype[λ[α => F[α] <~< G[α]]]
+    val ev1 = Λ[α](Maybe2.isCovariant_1[α].apply[Void, Any]): Maybe2[Void, ?] <~~< Maybe2[Any, ?]
+    Fix.liftLiskov[Maybe2[Void, ?], Maybe2[Any, ?]](ev1.make)(Maybe2.isCovariant_2[Void])
+  }
 }

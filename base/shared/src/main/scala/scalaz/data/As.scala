@@ -4,8 +4,9 @@ package data
 // FIXME: remove once https://github.com/scala/bug/issues/10623 is fixed.
 import com.github.ghik.silencer.silent
 
-import Prelude.{ <~<, === }
-import scalaz.typeclass.{IsContravariant, IsCovariant}
+import Prelude._
+import scalaz.data.Disjunction.{-\/, \/-}
+import scalaz.typeclass.{Axioms, IsContravariant, IsCovariant, Proposition}
 
 /**
   * Liskov substitutability: A better `<:<`.
@@ -173,6 +174,15 @@ sealed abstract class As[-A, +B] { ab =>
     type f[-a] = a => X
     substCt[f](fa)
   }
+
+  /**
+    * a ≤ b ⟷ a < b ⋁  a ~ b
+    */
+  def decompose[AA <: A, BB >: B]: ¬¬[(AA </< BB) \/ (AA === BB)] =
+    Inhabited.lem[AA === BB].map {
+      case -\/(notEqual) => -\/(StrictAs.witness[AA, BB](notEqual, ab))
+      case \/-(equal) => \/-(equal)
+    }
 }
 
 object As extends AsInstances {
@@ -193,6 +203,11 @@ object As extends AsInstances {
     * Reify Scala's subtyping relationship into an evidence value.
     */
   implicit def reify[A, B >: A]: A <~< B = refl[A]
+
+  def lessOrEqual[A, B](ev: (A </< B) \/ (A === B)): A <~< B = ev match {
+    case -\/(below) => below.conformity
+    case \/-(equal) => equal.toAs
+  }
 
   def liftCvCv[F[+_, +_], A1, B1, A2, B2]
   (eq1: A1 <~< B1, eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] = {
@@ -255,10 +270,10 @@ object As extends AsInstances {
 
   implicit final class AsOps[A, B](val ab: As[A, B]) extends AnyVal {
     def liftCvF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
-      F.liftLiskov(ab)
+      F(ab)
 
     def liftCtF[F[_]](implicit F: IsContravariant[F]): F[B] As F[A] =
-      F.liftLiskov(ab)
+      F(ab)
 
     def substCvF[F[_]](fa: F[A])(implicit F: IsCovariant[F]): F[B] = {
       type f[+x] = x
@@ -274,23 +289,17 @@ object As extends AsInstances {
   /**
     * Subtyping is antisymmetric.
     */
-  def bracket[A, B](f: A <~< B, g: B <~< A): A === B = {
-    val (_, _) = (f, g)
-    Is.unsafeForce[A, B]
-  }
+  def bracket[A, B](f: A <~< B, g: B <~< A): A === B =
+    Axioms.bracket(f, g)
 
   /**
     * Given `A <:< B`, prove `A <~< B`
     */
-  def fromPredef[A, B](ev: A <:< B): A <~< B = {
-    val _ = ev
-    unsafeForce[A, B]
-  }
+  def fromPredef[A, B](ev: A <:< B): A <~< B =
+    Axioms.predefConformity(ev)
 
-  /**
-    * Unsafe coercion between types. `unsafeForce` abuses `asInstanceOf` to
-    * explicitly coerce types. It is unsafe.
-    */
-  def unsafeForce[A, B]: A <~< B =
-    refl[Any].asInstanceOf[A <~< B]
+  val bottomTop: Void <~< Any = reify[Void, Any]
+
+  implicit def proposition[A, B]: Proposition[A <~< B] =
+    p => As.refl[A].asInstanceOf[A <~< B]
 }

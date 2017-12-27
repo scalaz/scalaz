@@ -123,11 +123,22 @@ trait Prelude  extends data.DisjunctionFunctions
 
   // Base Data
   // =========
+
+  type Void = data.Void.Type
+  type Not[-A] = A => Void
+  type   ¬[-A] = Not[A]
+  type  ¬¬[+A] = data.Inhabited[A]
   
   type \/[L, R] = data.Disjunction.\/[L, R]
-  type ===[A, B] = data.Is[A, B]
-  type <~<[-A, +B] = As[A, B]
-  type >~>[+B, -A] = As[A, B]
+
+  type ===[ A,  B] = data.Is[A, B]
+  type <~<[-A, +B] = data.As[A, B]
+  type >!<[ A,  B] = data.Incomparable[A, B]
+  type </<[-A, +B] = data.StrictAs[A, B]
+
+  type =!=[ A,  B] = ¬[A === B]
+  type >~>[+A, -B] = B <~< A
+
   type Identity[A] = data.Identity[A]
   type Forget[A, B, C] = data.Forget[A, B, C]
 

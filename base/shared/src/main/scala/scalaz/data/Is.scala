@@ -2,6 +2,7 @@ package scalaz
 package data
 
 import Prelude._
+import scalaz.typeclass.{Axioms, Proposition}
 
 /**
   * The data type `Is` is the encoding of Leibnitz’ law which states that
@@ -207,21 +208,11 @@ object Is {
   }
 
   /**
-    * It can be convenient to convert a [[=:=]] value into a `Leibniz` value.
-    * This is not strictly valid as while it is almost certainly true that
-    * `A =:= B` implies `A === B` it is not the case that you can create
-    * evidence of `A === B` except via a coercion. Use responsibly.
+    * It can be convenient to convert a [[=:=]] value into a [[===]] value.
     */
-  def fromPredef[A, B](ev: A =:= B): A === B = {
-    val _ = ev
-    unsafeForce[A, B]
-  }
+  def fromPredef[A, B](ev: A =:= B): A === B =
+    Axioms.predefEq(ev)
 
-  /**
-    * Unsafe coercion between types. `force` abuses `asInstanceOf` to
-    * explicitly coerce types. It is unsafe, but needed where Leibnizian
-    * equality isn't sufficient.
-    */
-  def unsafeForce[A, B]: A === B =
-    refl[Any].asInstanceOf[A === B]
+  implicit def proposition[A, B]: Proposition[A === B] =
+    p => Is.refl[A].asInstanceOf[A === B]
 }
