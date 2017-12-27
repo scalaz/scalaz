@@ -30,7 +30,7 @@ object FingerTreeTest extends SpecLite {
 
   val intStream = Stream.from(1)
 
-  def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty(SizeReducer[A])) {
+  def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty[Int, A]) {
     case (t, x) => (t :+ x)
   }
 
@@ -73,10 +73,10 @@ object FingerTreeTest extends SpecLite {
   }
 
   "foldLeft snoc is identity" ! forAll {
-    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream must_==(tree.toStream)
+    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])(_ :+ _).toStream must_==(tree.toStream)
   }
 
-  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))((x, y) => y +: x).toStream must_==(tree.toStream.reverse)}
+  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])((x, y) => y +: x).toStream must_==(tree.toStream.reverse)}
 
   "Fingertree" should {
 

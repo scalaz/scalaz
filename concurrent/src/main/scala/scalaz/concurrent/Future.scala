@@ -302,9 +302,9 @@ object Future {
 
     // implementation runs all threads, dumping to a shared queue
     // last thread to finish invokes the callback with the results
-    override def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+    override def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M], M: Monoid[M]): Future[M] =
       fs match {
-      case Seq() => Future.now(R.zero)
+      case Seq() => Future.now(M.zero)
       case Seq(f) => f.map(R.unit)
       case other => Async { cb =>
         val results = new ConcurrentLinkedQueue[M]
@@ -321,7 +321,7 @@ object Future {
 
             // only last completed f will hit the 0 here.
             if (c.decrementAndGet() == 0)
-              cb(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b)))
+              cb(results.asScala.foldLeft(M.zero)((a, b) => R.append(a, b)))
             else Trampoline.done(())
           }
         }
@@ -397,6 +397,6 @@ object Future {
   def gatherUnordered[A](fs: Seq[Future[A]]): Future[IList[A]] =
     futureInstance.gatherUnordered(fs)
 
-  def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+  def reduceUnordered[A, M: Reducer[A, ?]: Monoid](fs: Seq[Future[A]]): Future[M] =
     futureInstance.reduceUnordered(fs)
 }

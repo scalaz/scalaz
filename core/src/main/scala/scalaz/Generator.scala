@@ -1,29 +1,32 @@
 package scalaz
 
 /**
- * A `Generator[C]` is a container of elements, and which knows how to efficiently apply a [[scalaz.Reducer]]
+ * `Generator` a class of container of elements that knows how to efficiently apply a [[scalaz.Reducer]]
  * to extract an answer by combining elements. A `Reducer` may supply efficient left-to-right and
  * right-to-left reduction strategies that a `Generator` may avail itself of.
  */
-trait Generator[C[_]] {
-  def reduce[E, M](r: Reducer[E, M], c: C[E]): M = to(r, r.zero, c)
+trait Generator[C, Elem] {
 
-  def to[E, M](r: Reducer[E, M], m: M, c: C[E]): M = r.append(m, reduce(r, c))
+  def mapReduce[E, M](e: Elem => E, c: C)(implicit r: Reducer[E, M], m: Monoid[M]): M = mapTo(e, m.zero, c)
 
-  def from[E, M](r: Reducer[E, M], c: C[E], m: M): M = r.append(reduce(r, c), m)
+  def mapTo[E, M](e: Elem => E, m: M, c: C)(implicit r: Reducer[E, M], M: Monoid[M]): M = r.append(m, mapReduce(e, c))
+
+  def mapFrom[E, M](e: Elem => E, c: C, m: M)(implicit r: Reducer[E, M], M: Monoid[M]): M = r.append(mapReduce(e, c), m)
 }
 
 object Generator extends Generators
 
 trait Generators {
 
-  def FoldrGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
-    override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Foldable[F].foldr(c, r.zero)(a => b => r.cons(a, b))
+  def FoldrGenerator[F[_] : Foldable, A]: Generator[F[A], A] = new Generator[F[A], A] {
+
+    override def mapReduce[E, M](e: A => E, c: F[A])(implicit r: Reducer[E, M], m: Monoid[M]): M =
+      Foldable[F].foldRight(c, m.zero)((a, b) => r.cons(e(a), b))
   }
 
-  def FoldlGenerator[F[_] : Foldable]: Generator[F] = new Generator[F] {
-    override def reduce[E, M](r: Reducer[E, M], c: F[E]): M =
-      Foldable[F].foldLeft(c, r.zero)((b, a) => r.snoc(b, a))
+  def FoldlGenerator[F[_] : Foldable, A]: Generator[F[A], A] = new Generator[F[A], A] {
+    override def mapReduce[E, M](e: A => E, c: F[A])(implicit r: Reducer[E, M], m: Monoid[M]): M =
+      Foldable[F].foldLeft(c, m.zero)((b, a) => r.snoc(b, e(a)))
   }
+
 }

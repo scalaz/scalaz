@@ -8,7 +8,7 @@ object FingerTreeUsage extends App{
   import FingerTree._
   import std.anyVal._
 
-  def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] = stream.foldLeft(empty(SizeReducer[A])) {
+  def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] = stream.foldLeft(empty[Int, A]) {
     case (t, x) => (t :+ x)
   }
 
@@ -16,7 +16,7 @@ object FingerTreeUsage extends App{
 
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
 
-  val emptyTree = empty[Int, Int](SizeReducer[Int])
+  val emptyTree = empty[Int, Int]
 
   assert(emptyTree.isEmpty)
 

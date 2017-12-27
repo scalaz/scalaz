@@ -23,7 +23,7 @@ final class ReducerOps[A](private val self: A) extends AnyVal {
     * }}}
     */
   def unfoldl[C](f: A => Maybe[(A, C)]): UnfoldTo[C] = new UnfoldTo[C] {
-    def reduceTo[M](implicit r: Reducer[C, M]): M = r.unfoldl(self)(f)
+    def reduceTo[M: Monoid](implicit r:  Reducer[C, M]): M = r.unfoldl(self)(f)
   }
 
   /** Unfold to the right using this value as initial seed
@@ -34,7 +34,7 @@ final class ReducerOps[A](private val self: A) extends AnyVal {
     * }}}
     */
   def unfoldr[C](f: A => Maybe[(C, A)]): UnfoldTo[C] = new UnfoldTo[C] {
-    def reduceTo[M](implicit r: Reducer[C, M]): M = r.unfoldr(self)(f)
+    def reduceTo[M: Monoid](implicit r:  Reducer[C, M]): M = r.unfoldr(self)(f)
   }
 }
 
@@ -45,8 +45,8 @@ trait ToReducerOps {
 object ReducerOps {
 
   sealed abstract class UnfoldTo[C] {
-    def reduceTo[M](implicit r: Reducer[C, M]): M
+    def reduceTo[M: Monoid](implicit r: Reducer[C, M]): M
 
-    final def to[M[_]](implicit r: Reducer[C, M[C]]): M[C] = reduceTo[M[C]]
+    final def to[M[_]](implicit r: Reducer[C, M[C]], m: Monoid[M[C]]): M[C] = reduceTo[M[C]]
   }
 }
