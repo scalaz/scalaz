@@ -541,7 +541,7 @@ object IO extends IOInstances {
    * value, then the specified error will be raised.
    */
   final def require[A](t: Throwable): IO[Maybe[A]] => IO[A] =
-    (io: IO[Maybe[A]]) => io.flatMap(_.fold(IO.now[A], IO.fail[A](t)))
+    (io: IO[Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[A](t))(IO.now[A](_)))
 
   private final val Never: IO[Any] = IO.async[Any] { (k: (Throwable \/ Any) => Unit) => }
 }

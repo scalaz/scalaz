@@ -1,8 +1,6 @@
 package scalaz
 
-import typeclass._
-
-class BaseHierarchy extends BaseHierarchy.BH0
+trait BaseHierarchy extends BaseHierarchy.BH0
 
 object BaseHierarchy {
   trait BH0 extends BH1 {
@@ -13,7 +11,7 @@ object BaseHierarchy {
     implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M] = M.applicative.apply.functor
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A] = A.semigroup
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T] = T.foldable
-    implicit def categoryComposable[=>:[_,_]](implicit C: Category[=>:]): Compose[=>:] = C.compose 
+    implicit def categoryComposable[=>:[_,_]](implicit C: Category[=>:]): Compose[=>:] = C.compose
     implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F] = F.cobind
   }
 

@@ -1,7 +1,5 @@
 package scalaz
 
-import typeclass.Compose
-
 package object data {
   val Forall: ForallModule with ForallSyntax = ForallImpl
   val ∀ : Forall.type = Forall

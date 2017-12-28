@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait StrongInstances { instances =>
-  implicit val function: Strong[Function] = new StrongClass[Function] {
+  implicit val functionStrong: Strong[Function] = new StrongClass[Function] {
 
     override def dimap[A, B, C, D](fab: Function[A, B])(ca: C => A)(bd: B => D): Function[C, D] =
       profunctor.dimap(fab)(ca)(bd)

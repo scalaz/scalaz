@@ -2,7 +2,6 @@ package scalaz
 package data
 
 import scala.annotation.tailrec
-import scalaz.typeclass.Compose
 
 /**
  * Non-empty type-aligned sequence represented as a (non-balanced) binary tree,

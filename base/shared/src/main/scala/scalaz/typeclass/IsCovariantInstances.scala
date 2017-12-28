@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
-
 trait IsCovariantInstances {
   implicit def scalaCovariant[F[+_]]: IsCovariant[F] =
     new IsCovariantClass[F] with IsCovariantClass.SubstCv[F] {

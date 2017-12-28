@@ -67,10 +67,9 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     shallow fork/join identity              $testForkJoinIsId
     deep fork/join identity                 $testDeepForkJoinIsId
     interrupt of never                      ${upTo(1.second)(testNeverIsInterruptible)}
-    """
-    /*
     race of value & never                   ${upTo(1.second)(testRaceOfValueNever)}
-                                          """ */
+    
+  """
 
   def testPoint = {
     unsafePerformIO(IO.point(1)) must_=== 1

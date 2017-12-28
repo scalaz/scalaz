@@ -1,11 +1,10 @@
 package scalaz
 package data
 
-import typeclass._
-import Disjunction.{\/, -\/, \/-}
+import typeclass.MonadClass
 
 trait DisjunctionInstances {
-  implicit def monad[L]: Monad[L \/ ?] = new MonadClass.Template[L \/ ?] {
+  implicit def disjunctionMonad[L]: Monad[L \/ ?] = new MonadClass.Template[L \/ ?] {
 
     override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
       ma.fold[L \/ B](l => -\/(l))(r => \/-(f(r)))
@@ -18,5 +17,10 @@ trait DisjunctionInstances {
 
     override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
       oa.fold[L \/ B](l => -\/(l))(a => f(a))
+  }
+
+  implicit def disjunctionShow[L, R](implicit L: Show[L], R: Show[R]): Show[L \/ R] = {
+    case -\/(left)  => s"""-\/(${L.show(left)})"""
+    case \/-(right) => s"""\/-(${R.show(right)})"""
   }
 }

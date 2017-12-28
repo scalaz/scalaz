@@ -1,9 +1,7 @@
 package scalaz
 package data
 
-import Prelude._
 import typeclass.IsCovariantClass
-import typeclass.Liskov.<~<
 
 trait IListModule {
   type IList[A]

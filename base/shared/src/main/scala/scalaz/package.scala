@@ -1,2 +1,3 @@
-package object scalaz extends scalaz.BaseHierarchy
-
+package object scalaz extends BaseTypeclasses
+  with BaseData
+  with BaseDataAliases

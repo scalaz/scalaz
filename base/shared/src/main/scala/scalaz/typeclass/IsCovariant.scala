@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
-
 /**
  * Witnesses that the type constructor `F[_]` is covariant,
  * even though the variance annotation of its type parameter has been forgotten.
@@ -18,8 +16,4 @@ trait IsCovariant[F[_]] {
   def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B]
 
   def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B]
-}
-
-object IsCovariant extends IsCovariantInstances {
-  def apply[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
 }

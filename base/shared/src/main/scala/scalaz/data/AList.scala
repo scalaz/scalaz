@@ -2,8 +2,8 @@ package scalaz
 package data
 
 import Prelude._
+
 import scala.annotation.tailrec
-import scalaz.typeclass.{Category, Compose}
 
 /**
  * A potentially empty type-aligned list.
@@ -17,6 +17,7 @@ import scalaz.typeclass.{Category, Compose}
  */
 sealed abstract class AList[F[_, _], A, B] {
   import AList._
+  import Forall2Syntax._
 
   def ::[Z](fza: F[Z, A]): AList[F, Z, B] = ACons(fza, this)
 
@@ -130,7 +131,7 @@ final case class ACons[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) ex
 sealed abstract case class ANil[F[_, _], A, B]() extends AList[F, A, B] {
   def   subst[G[_]](ga: G[A]): G[B]
   def unsubst[G[_]](gb: G[B]): G[A]
-  def leibniz: A === B = subst[A === ?](Leibniz.refl[A])
+  def leibniz: A === B = subst[A === ?](Is.refl[A])
 }
 
 object AList {

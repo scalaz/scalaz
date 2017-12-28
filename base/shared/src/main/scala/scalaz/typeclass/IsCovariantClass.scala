@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import data.As
 
 trait IsCovariantClass[F[_]] extends IsCovariant[F] {
   final def isCovariant: IsCovariant[F] = this
@@ -18,7 +18,7 @@ object IsCovariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] =
-      substCv[F[A] <~< +?, A, B](Liskov.refl[F[A]])
+      substCv[F[A] <~< +?, A, B](As.refl[F[A]])
  
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       substCv[F[A] => +?, A, B](identity[F[A]]).apply(fa)
@@ -33,7 +33,7 @@ object IsCovariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] =
-      substCt[-? <~< F[B], A, B](Liskov.refl[F[B]])
+      substCt[-? <~< F[B], A, B](As.refl[F[B]])
  
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       substCt[-? => F[B], A, B](identity[F[B]]).apply(fa)
@@ -46,7 +46,7 @@ object IsCovariantClass {
       liftLiskov[A, B].substCv[G](g)
 
     override def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
-      liftLiskov[A, B].subst[G](g)
+      liftLiskov[A, B].substCt[G](g)
 
     override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       liftLiskov[A, B].apply(fa)

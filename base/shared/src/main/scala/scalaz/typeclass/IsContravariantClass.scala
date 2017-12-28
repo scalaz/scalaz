@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import Liskov.<~<
+import data.As
 
 trait IsContravariantClass[F[_]] extends IsContravariant[F] {
   final def isContravariant: IsContravariant[F] = this
@@ -18,7 +18,7 @@ object IsContravariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[B] <~< F[A] =
-      substCv[F[B] <~< +?, A, B](Liskov.refl[F[B]])
+      substCv[F[B] <~< +?, A, B](As.refl[F[B]])
  
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       substCv[F[B] => +?, A, B](identity[F[B]]).apply(fb)
@@ -33,7 +33,7 @@ object IsContravariantClass {
     }
  
     override def liftLiskov[A, B](implicit ev: A <~< B): F[B] <~< F[A] =
-      substCt[-? <~< F[A], A, B](Liskov.refl[F[A]])
+      substCt[-? <~< F[A], A, B](As.refl[F[A]])
  
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       substCt[-? => F[A], A, B](identity[F[A]]).apply(fb)
@@ -46,7 +46,7 @@ object IsContravariantClass {
       liftLiskov[A, B].substCv[G](g)
 
     override def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
-      liftLiskov[A, B].subst[G](g)
+      liftLiskov[A, B].substCt[G](g)
 
     override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =
       liftLiskov[A, B].apply(fb)

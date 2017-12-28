@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import Prelude._
+
 trait FoldableClass[F[_]] extends Foldable[F]{
   final def foldable: Foldable[F] = this
 }

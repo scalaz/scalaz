@@ -1,10 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-import typeclass.Liskov
-import typeclass.Liskov.<~<
-
 trait FixModule {
   type Fix[F[_]]
 
@@ -27,5 +23,5 @@ private[data] object FixImpl extends FixModule {
   def subst[G[_[_[_]]]](g: G[λ[α[_] => α[data.Fix[α]]]]): G[Fix] = g
 
   def liftLiskov[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]])(implicit F: IsCovariant[F]): Fix[F] <~< Fix[G] =
-    Liskov.unsafeForce
+    As.unsafeForce
 }

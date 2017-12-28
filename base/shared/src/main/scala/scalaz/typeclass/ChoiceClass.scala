@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-import data.Disjunction._
+import data.Disjunction.swap
 
 trait ChoiceClass[P[_, _]] extends Choice[P] with ProfunctorClass[P] {
   final def choice: Choice[P] = this
