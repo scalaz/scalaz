@@ -1,12 +1,9 @@
 package scalaz.effect
 
-import scala.scalajs.js
-
-trait SafeApp extends js.JSApp {
+trait SafeApp {
   /**
-   * The main function of the Scala.js application.
+   * The main function of the application, which will be passed the command-line
+   * arguments to the program.
    */
-  def run: IO[Unit]
-
-  final def main(): Unit = ???
+  def run(args: List[String]): IO[Unit]
 }
