@@ -25,7 +25,7 @@ object LazyOptionTest extends SpecLite {
 
     val result =
       BindRec[LazyOption].tailrecM(0) {
-        i => LazyOption.lazySome(if (i < 10000) \/.left(i + 1) else \/.right(i))
+        i => LazyOption.lazySome[Int \/ Int](if (i < 10000) \/.left(i + 1) else \/.right(i))
       }
     result.getOrElse(0) must_=== times
   }

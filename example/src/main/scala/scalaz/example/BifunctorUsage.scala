@@ -40,8 +40,8 @@ object BifunctorUsage extends App {
   assert(Bifunctor[Validation].bimap("asdf".failure[Int])(_.toUpperCase, _+1) === "ASDF".failure)
   assert(Bifunctor[Validation].bimap(1.success[String])(_.toUpperCase, _+1) === 2.success)
 
-  assert(Bifunctor[\/].bimap("asdf".left[Int])(_.toUpperCase, _+1) === "ASDF".left)
-  assert(Bifunctor[\/].bimap(1.right[String])(_.toUpperCase, _+1) === 2.right)
+  assert(Bifunctor[\/].bimap("asdf".left[Int])(_.toUpperCase, _+1) === "ASDF".left[Int])
+  assert(Bifunctor[\/].bimap(1.right[String])(_.toUpperCase, _+1) === 2.right[String])
 
   // There is syntax for bimap:
   assert(("asdf",1).bimap(_.length, _+1) === (4 -> 2))
@@ -83,7 +83,7 @@ object BifunctorUsage extends App {
   // bifunctor, we can get a bimap that operates on every item in the
   // list.
   val bff = Functor[List] bicompose Bifunctor[\/]
-  val bfres = bff.bimap(List("asdf".left, 2.right, "qwer".left, 4.right))(_.toUpperCase, _+1)
+  val bfres = bff.bimap[String, Int, String, Int](List("asdf".left, 2.right, "qwer".left, 4.right))(_.toUpperCase, _+1)
   assert(bfres === List("ASDF".left, 3.right, "QWER".left, 5.right))
 
   //
@@ -92,12 +92,12 @@ object BifunctorUsage extends App {
 
   // We can get at the either the left or right underlying functors.
   val leftF = Bifunctor[\/].leftFunctor[String]
-  assert(leftF.map("asdf".right[Int])(_ + 1) === "asdf".right)
-  assert(leftF.map(1.left)(_ + 1) === 2.left)
+  assert(leftF.map("asdf".right[Int])(_ + 1) === "asdf".right[Int])
+  assert(leftF.map(1.left)(_ + 1) === 2.left[String])
 
   val rightF = Bifunctor[\/].rightFunctor[String]
-  assert(rightF.map("asdf".left[Int])(_ + 1) === "asdf".left)
-  assert(rightF.map(1.right)(_ + 1) === 2.right)
+  assert(rightF.map("asdf".left[Int])(_ + 1) === "asdf".left[Int])
+  assert(rightF.map(1.right)(_ + 1) === 2.right[String])
 
   //
   // Ufunctor

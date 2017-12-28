@@ -192,7 +192,7 @@ sealed abstract class Free[S[_], A] {
   final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
     B.tailrecM(this)(_.resume match {
       case -\/(sf) => M.map(f(sf))(\/.left)
-      case a @ \/-(_) => M.point(a)
+      case a @ \/-(_) => M.point(a.coerceLeft)
     })
   }
 

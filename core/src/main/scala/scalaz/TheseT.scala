@@ -8,9 +8,9 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def mapT[G[_], C, D](f: F[A \&/ B] => G[C \&/ D]): TheseT[G, C, D] =
     TheseT(f(run))
 
-  def flatMap[AA >: A, C](f: B => TheseT[F, AA, C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
+  def flatMap[C](f: B => TheseT[F, A, C])(implicit M: Monad[F], S: Semigroup[A]): TheseT[F, A, C]
   = TheseT(M.bind(run) {
-    case a @ \&/.This(_) => M.point(a)
+    case a @ \&/.This(_) => M.point(a.coerceThat)
     case \&/.That(b)     => f(b).run
     case \&/.Both(aa, b) => M.map(f(b).run) {
       case \&/.This(a)    => \&/.This(S.append(aa, a))
@@ -18,8 +18,8 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
       case \&/.Both(a, c) => \&/.Both(S.append(aa, a), c)
     }
   })
-  def flatMapF[AA >: A, C](f: B => F[AA \&/ C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
-  = flatMap[AA, C](f andThen (x => TheseT(x)))
+  def flatMapF[C](f: B => F[A \&/ C])(implicit M: Monad[F], S: Semigroup[A]): TheseT[F, A, C]
+  = flatMap[C](f andThen (x => TheseT(x)))
 
 
   def swap(implicit F: Functor[F]): TheseT[F, B, A]
@@ -71,14 +71,14 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): TheseT[F, C, D]
   = TheseT(F.map(run)(_.bimap(f, g)))
 
-  def traverse[G[_], AA >: A, D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, AA, D]]
-  = G.map(F.traverse(run)(o => Traverse[AA \&/ ?].traverse(o)(g)))(TheseT(_))
+  def traverse[G[_], D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, A, D]]
+  = G.map(F.traverse(run)(o => Traverse[A \&/ ?].traverse(o)(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]
   = G.map(F.traverse(run)(Bitraverse[\&/].bitraverseF(f, g)))(TheseT(_: F[C \&/ D]))
 
-  def &&&[AA >: A, C](t: TheseT[F, AA, C])(implicit M: Semigroup[AA], F: Apply[F]): TheseT[F, AA, (B, C)]
+  def &&&[C](t: TheseT[F, A, C])(implicit M: Semigroup[A], F: Apply[F]): TheseT[F, A, (B, C)]
   = TheseT(F.apply2(run, t.run)(_ &&& _))
 
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord]

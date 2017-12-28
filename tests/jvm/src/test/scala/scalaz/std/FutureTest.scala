@@ -10,6 +10,7 @@ import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
+import scalaz.syntax.all._
 import scalaz.Tags._
 
 import scala.concurrent._
@@ -28,13 +29,13 @@ class FutureTest extends SpecLite {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
-    val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
+    val futureWithError = future.map(_.right[Throwable]).recover { case e => e.left[A] }
     Await.result(futureWithError, duration)
   }
 
   implicit def futureShow[A: Show]: Show[Future[A]] = Contravariant[Show].contramap(Show[String \/ A]){
     future: Future[A] =>
-      val futureWithError = future.map(\/-(_)).recover { case e => -\/(e.toString) }
+      val futureWithError = future.map(_.right[String]).recover { case e => e.toString.left[A] }
       Await.result(futureWithError, duration)
   }
 

@@ -3,7 +3,7 @@ package scalaz
 import scalaz.syntax.equal._
 import scalaz.syntax.show._
 
-sealed abstract class Either3[+A, +B, +C] extends Product with Serializable {
+sealed abstract class Either3[A, B, C] extends Product with Serializable {
   def fold[Z](left: A => Z, middle: B => Z, right: C => Z): Z = this match {
     case Left3(a)   => left(a)
     case Middle3(b) => middle(b)
@@ -27,9 +27,9 @@ sealed abstract class Either3[+A, +B, +C] extends Product with Serializable {
   def rightOr[Z](z: => Z)(f: C => Z): Z = fold(_ => z, _ => z, f)
 }
 
-final case class Left3[+A, +B, +C](a: A) extends Either3[A, B, C]
-final case class Middle3[+A, +B, +C](b: B) extends Either3[A, B, C]
-final case class Right3[+A, +B, +C](c: C) extends Either3[A, B, C]
+final case class Left3[A, B, C](a: A) extends Either3[A, B, C]
+final case class Middle3[A, B, C](b: B) extends Either3[A, B, C]
+final case class Right3[A, B, C](c: C) extends Either3[A, B, C]
 
 object Either3 {
   def left3[A, B, C](a: A):   Either3[A, B, C] = Left3(a)

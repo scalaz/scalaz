@@ -224,7 +224,7 @@ package object scalaz {
     *
     * Useful for accumulating errors through the corresponding [[scalaz.Applicative]] instance.
     */
-  type ValidationNel[E, +X] = Validation[NonEmptyList[E], X]
+  type ValidationNel[E, X] = Validation[NonEmptyList[E], X]
 
   type FirstOf[A] = A @@ Tags.FirstVal
   type LastOf[A] = A @@ Tags.LastVal
@@ -346,15 +346,13 @@ package object scalaz {
   type IMap[A, B] = ==>>[A, B]
   val IMap = ==>>
 
-  type GlorifiedTuple[+A, +B] = A \/ B
-
-  type Disjunction[+A, +B] = \/[A, B]
+  type Disjunction[A, B] = \/[A, B]
   val Disjunction = \/
 
-  type DLeft[+A] = -\/[A]
+  type DLeft[A, B] = -\/[A, B]
   val DLeft = -\/
 
-  type DRight[+B] = \/-[B]
+  type DRight[A, B] = \/-[A, B]
   val DRight = \/-
 
   type DisjunctionT[F[_], A, B] = EitherT[F, A, B]

@@ -1,7 +1,7 @@
 package scalaz
 
 /** [[scala.Either]], but with a value by name. */
-sealed abstract class LazyEither[+A, +B] {
+sealed abstract class LazyEither[A, B] {
 
   import LazyOption._
   import LazyEither._
@@ -40,7 +40,7 @@ sealed abstract class LazyEither[+A, +B] {
   def forall(f: (=> B) => Boolean): Boolean =
     fold(_ => true, f)
 
-  def orElse[AA >: A, BB >: B](x: => LazyEither[AA, BB]): LazyEither[AA, BB] =
+  def orElse(x: => LazyEither[A, B]): LazyEither[A, B] =
     ?(x, this)
 
   def toLazyOption: LazyOption[B] =
@@ -77,7 +77,7 @@ sealed abstract class LazyEither[+A, +B] {
   def flatMap[AA >: A, C](f: (=> B) => LazyEither[AA, C]): LazyEither[AA, C] =
     fold(lazyLeft(_), f)
 
-  def traverse[G[_]: Applicative, AA >: A, C](f: B => G[C]): G[LazyEither[AA, C]] =
+  def traverse[G[_]: Applicative, C](f: B => G[C]): G[LazyEither[A, C]] =
     fold(
       left = x => Applicative[G].point(LazyEither.lazyLeft[C](x)),
       right = x => Applicative[G].map(f(x))(c => LazyEither.lazyRight[A](c))
@@ -86,7 +86,7 @@ sealed abstract class LazyEither[+A, +B] {
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z): Z =
     fold(left = _ => z, right = a => f(a, z))
 
-  def ap[AA >: A, C](f: => LazyEither[AA, B => C]): LazyEither[AA, C] =
+  def ap[C](f: => LazyEither[A, B => C]): LazyEither[A, C] =
     f flatMap (k => map(k apply _))
 
   def left: LeftProjection[A, B] =
@@ -122,7 +122,7 @@ object LazyEither extends LazyEitherInstances {
     def apply[B](b: => B) = LazyRight(() => b)
   }
 
-  final case class LeftProjection[+A, +B](e: LazyEither[A, B]) {
+  final case class LeftProjection[A, B](e: LazyEither[A, B]) {
     import LazyOption._
 
     def getOrElse[AA >: A](default: => AA): AA =
@@ -134,7 +134,7 @@ object LazyEither extends LazyEitherInstances {
     def forall(f: (=> A) => Boolean): Boolean =
       e.fold(f, _ => true)
 
-    def orElse[AA >: A, BB >: B](x: => LazyEither[AA, BB]): LazyEither[AA, BB] =
+    def orElse(x: => LazyEither[A, B]): LazyEither[A, B] =
       e.?(e, x)
 
     def toLazyOption: LazyOption[A] =

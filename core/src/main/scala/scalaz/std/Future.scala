@@ -57,7 +57,7 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
     fab zip fa map { case (fa, a) => fa(a) }
 
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
-    f.map(\/.right).recover { case e => -\/(e) }
+    f.map(\/.right[Throwable, A]).recover { case e => -\/(e) }
 
   def fail[A](e: Throwable): Future[A] =
     Future.failed(e)

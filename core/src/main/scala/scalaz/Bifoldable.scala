@@ -82,6 +82,7 @@ trait Bifoldable[F[_, _]]  { self =>
 
   trait BifoldableLaw {
     import std.vector._
+    import syntax.either._
 
     def leftFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
@@ -89,7 +90,7 @@ trait Bifoldable[F[_, _]]  { self =>
 
     def rightFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
-                                  bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
+                                  bifoldRight(fa, Vector.empty[B \/ A])(_.right[B] +: _)(_.left[A] +: _))
   }
 
   def bifoldableLaw = new BifoldableLaw {}

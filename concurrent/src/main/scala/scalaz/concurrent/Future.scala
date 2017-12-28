@@ -51,7 +51,7 @@ import scala.concurrent.duration._
  * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
-sealed abstract class Future[+A] {
+sealed abstract class Future[A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
@@ -233,9 +233,9 @@ sealed abstract class Future[+A] {
 }
 
 object Future {
-  case class Now[+A](a: A) extends Future[A]
-  case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
-  case class Suspend[+A](thunk: () => Future[A]) extends Future[A]
+  case class Now[A](a: A) extends Future[A]
+  case class Async[A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
+  case class Suspend[A](thunk: () => Future[A]) extends Future[A]
   case class BindSuspend[A,B](thunk: () => Future[A], f: A => Future[B]) extends Future[B]
   case class BindAsync[A,B](onFinish: (A => Trampoline[Unit]) => Unit,
                             f: A => Future[B]) extends Future[B]
