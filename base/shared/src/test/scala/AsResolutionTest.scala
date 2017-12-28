@@ -1,5 +1,4 @@
-import scalaz._
-import scalaz.Prelude._
+import scalaz.Scalaz._
 
 class AsResolutionTest {
   implicitly[Int <~< Int]

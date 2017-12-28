@@ -1,10 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-import scalaz.typeclass.Compose
-
-
 /**
  * Type-aligned list with at least 1 element.
  * Example:
@@ -15,6 +11,8 @@ import scalaz.typeclass.Compose
  */
 sealed abstract class AList1[F[_, _], A, B] {
   import AList1._
+  import ForallSyntax._
+  import Forall2Syntax._
 
   type Pivot
 
@@ -41,7 +39,7 @@ sealed abstract class AList1[F[_, _], A, B] {
   def reverse_:::[Z](that: Composed1[F, Z, A]): AList1[F, Z, B] =
     that.toList reverse_::: this
 
-  def reverse: Composed1[F, A, B] = 
+  def reverse: Composed1[F, A, B] =
     tail reverse_::: AList1[λ[(α, β) => F[β, α]], Pivot, A](head)
 
   def :::[Z](that: AList[F, Z, A]): AList1[F, Z, B] =

@@ -11,14 +11,13 @@ By providing instances of this typeclass, a type explicitly defines that it can 
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
+import scalaz._
+import Scalaz._
 ```
 
 # Built-in instances
 
 ```tut
-val stringShow: Show[String] = implicitly
-
 "Scalaz 8".show
 ```
 

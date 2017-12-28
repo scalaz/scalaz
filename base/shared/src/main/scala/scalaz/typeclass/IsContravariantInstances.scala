@@ -1,8 +1,6 @@
 package scalaz
 package typeclass
 
-import Prelude.<~<
-
 trait IsContravariantInstances {
   implicit def scalaContravariant[F[-_]]: IsContravariant[F] =
     new IsContravariantClass[F] with IsContravariantClass.SubstCv[F] {

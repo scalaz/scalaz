@@ -1,18 +1,30 @@
 package scalaz
 package data
 
-import Prelude._
-import typeclass.{MonadClass, TraversableClass, Show}
+import typeclass.{MonadClass, TraversableClass}
 import typeclass.FoldableClass._
 
-sealed trait MaybeModule extends MaybeFunctions {
+sealed trait MaybeModule {
+  type Maybe[A]
+
+  object Just {
+    def unapply[A](ma: Maybe[A]): Option[A] = toOption(ma)
+  }
+
+  object Empty {
+    def unapply[A](ma: Maybe[A]): Boolean = toOption(ma).isEmpty
+  }
 
   def fold[A, B](ma: Maybe[A])(f: A => B, b: => B): B =
     toOption(ma).fold(b)(f)
 
+  def empty[A]: Maybe[A]
+  def just[A](a: A): Maybe[A]
+  def maybe[A, B](n: B)(f: A => B): Maybe[A] => B
+  def fromOption[A](oa: Option[A]): Maybe[A]
+  def toOption[A](ma: Maybe[A]): Option[A]
 
   /* typeclass instances */
-
   def isCovariant: IsCovariant[Maybe]
   def monad: Monad[Maybe]
   def traversable: Traversable[Maybe]
@@ -26,7 +38,7 @@ object MaybeModule extends MaybeSyntax {
   implicit def showMaybe[A: Show]: Show[Maybe[A]] = Maybe.show[A]
 }
 
-private[data] object MaybeImpl extends MaybeModule {
+private[scalaz] object MaybeImpl extends MaybeModule {
   type Maybe[A] = Option[A]
 
   def empty[A]: Maybe[A] = None
@@ -38,7 +50,7 @@ private[data] object MaybeImpl extends MaybeModule {
   def fromOption[A](oa: Option[A]): Maybe[A] = oa
   def toOption[A](ma: Maybe[A]): Option[A] = ma
 
-  def isCovariant: IsCovariant[Maybe] = typeclass.IsCovariant.scalaCovariant[Option]
+  def isCovariant: IsCovariant[Maybe] = Scalaz.scalaCovariant[Option]
   def monad: Monad[Maybe] = instance
   def traversable: Traversable[Maybe] = instance
 
@@ -67,13 +79,13 @@ private[data] object MaybeImpl extends MaybeModule {
 
       override def traverse[F[_], A, B](ma: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]): F[Maybe[B]] =
         ma match {
-          case Some(a) => f(a).map(just)
+          case Some(a) => F.apply.functor.map(f(a))(just)
           case None    => F.pure(None)
         }
 
       override def sequence[F[_], A](ma: Maybe[F[A]])(implicit F: Applicative[F]): F[Maybe[A]] =
         ma match {
-          case Some(fa) => fa.map(just)
+          case Some(fa) => F.apply.functor.map(fa)(just)
           case None     => F.pure(None)
         }
 

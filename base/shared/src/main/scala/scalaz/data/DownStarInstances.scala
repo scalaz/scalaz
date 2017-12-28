@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import typeclass.{Functor, Profunctor}
-
 trait DownStarInstances {
   implicit def downstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[DownStar[F, ?, ?]] =
     new Profunctor[DownStar[F, ?, ?]] {

@@ -11,21 +11,19 @@ title:  "Maybe"
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
+import scalaz.Scalaz._
 ```
 
 ## Creation
 
 ```tut
-just("Hello World")
+"Hello World".just
 empty[Int]
 ```
 
 ## Use the type class instances
 
 ```tut
-import scalaz.typeclass.ApplicativeSyntax._
-
 val x: Maybe[Long] = just(50L)
 val y = "Hello".pure[Maybe]
 

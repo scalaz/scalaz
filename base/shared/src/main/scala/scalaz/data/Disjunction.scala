@@ -2,7 +2,6 @@ package scalaz
 package data
 
 sealed trait Disjunction[L, R] {
-  import Disjunction.{-\/, \/-}
   final def fold[A](la: L => A)(ra: R => A): A = this match {
     case -\/(l) => la(l)
     case \/-(r) => ra(r)

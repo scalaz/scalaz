@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude.{ ===, <~< }
-
 /**
   * This particular version of Leibniz’ equality has been generalized to
   * handle subtyping so that it can be used with constrained type constructors,
@@ -126,6 +124,8 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
 }
 
 object Leibniz {
+  import ForallSyntax._
+
   def apply[L, H >: L, A >: L <: H, B >: L <: H]
   (implicit ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, B] = ab
 
@@ -138,7 +138,7 @@ object Leibniz {
   /**
     * Equality is reflexive relation.
     */
-  implicit def refl[A]: Leibniz[A, A, A, A] = Forall.toForallOps(reflAll).apply[A]
+  implicit def refl[A]: Leibniz[A, A, A, A] = reflAll[A]
 
   /**
     * Equality is reflexive relation. Compared to [[refl]], this function

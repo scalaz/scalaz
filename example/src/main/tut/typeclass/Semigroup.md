@@ -13,8 +13,8 @@ A semigroup instance needs to satisfy the following law:
 
 **Typical imports**
 ```tut:silent
-import scalaz.typeclass.Semigroup
-import scalaz.typeclass.Semigroup._
+import scalaz._
+import Scalaz._
 ```
 
 ## Instance declaration

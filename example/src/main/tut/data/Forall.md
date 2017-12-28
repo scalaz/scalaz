@@ -5,13 +5,14 @@ title:  "Forall"
 
 # Forall
 
-`Forall` allows for the definition of types, whose behaviour is valid for any 
+`Forall` allows for the definition of types, whose behaviour is valid for any
 inhabiting type. In other words, they are universally quantified types.
 
 **Typical imports**
 
 ```tut:silent
-import scalaz.Prelude._
+import scalaz._
+import Scalaz._
 ```
 
 ## Instance creation

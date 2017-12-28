@@ -16,15 +16,13 @@ A monoid instance must satisfy the following laws in addition to those defined b
 
 **Typical imports**
 ```tut:silent
-import scalaz.typeclass.Monoid
+import scalaz._
+import Scalaz._
 ```
 
 ## Instance declaration
 
 ```tut
-import scalaz.typeclass.Semigroup
-import scalaz.typeclass.Semigroup._
-
 def ListSemigroup[A]: Semigroup[List[A]] = new Semigroup[List[A]] {
   def append(a1: List[A], a2: => List[A]) = a1 ++ a2
 }

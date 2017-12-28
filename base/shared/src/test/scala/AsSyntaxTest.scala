@@ -1,5 +1,4 @@
-import scalaz.Prelude.<~<
-import scalaz.typeclass.IsCovariant
+import scalaz.Scalaz._
 
 class AsSyntaxTest {
   val ev1: Either[Int, String] <~< Either[AnyVal, AnyRef] =

@@ -1,7 +1,6 @@
 package scalaz
 package typeclass
 
-import Prelude.<~<
 import data.As
 
 trait IsCovariantClass[F[_]] extends IsCovariant[F] {

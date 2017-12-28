@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
-
 /**
   * The data type `Is` is the encoding of Leibnitz’ law which states that
   * if `a` and `b` are identical then they must have identical properties.
@@ -147,6 +145,8 @@ sealed trait Is[A, B] { ab =>
 }
 
 object Is {
+  import ForallSyntax._
+
   def apply[A, B](implicit ev: A Is B): A Is B = ev
 
   private[this] final case class Refl[A]() extends Is[A, A] {

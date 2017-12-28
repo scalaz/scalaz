@@ -1,9 +1,6 @@
 package scalaz
 package data
 
-import Prelude.<~<
-import scalaz.typeclass.{IsContravariant, IsCovariant}
-
 /**
   * Liskov substitutability: A better `<:<`.
   *
@@ -103,6 +100,8 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
 }
 
 object Liskov {
+  import ForallSyntax._
+
   def apply[L, H >: L, A >: L <: H, B >: L <: H]
   (implicit ab: Liskov[L, H, A, B]): Liskov[L, H, A, B] = ab
 
@@ -115,7 +114,7 @@ object Liskov {
   /**
     * Subtyping relation is reflexive.
     */
-  implicit def refl[A]: Liskov[A, A, A, A] = Forall.toForallOps(reflAll).apply[A]
+  implicit def refl[A]: Liskov[A, A, A, A] = reflAll[A]
 
   /**
     * Reify Scala's subtyping relationship into an evidence value.
@@ -142,11 +141,11 @@ object Liskov {
   {
     def liftCvF[LF, HF >: LF, F[_] >: LF <: HF]
     (implicit F: IsCovariant[F]): Liskov[LF, HF, F[A], F[B]] =
-      fromAs[LF, HF, F[A], F[B]](ab.toAs.liftCvF[F])
+      fromAs[LF, HF, F[A], F[B]](F.liftLiskov(ab.toAs))
 
     def liftCtF[LF, HF >: LF, F[_] >: LF <: HF]
     (implicit F: IsContravariant[F]): Liskov[LF, HF, F[B], F[A]] =
-      fromAs[LF, HF, F[B], F[A]](ab.toAs.liftCtF[F])
+      fromAs[LF, HF, F[B], F[A]](F.liftLiskov(ab.toAs))
 
     def substCoF[LF, HF >: LF, F[_] >: LF <: HF]
     (fa: F[A])(implicit F: IsCovariant[F]): F[B] =
