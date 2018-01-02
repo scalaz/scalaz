@@ -16,9 +16,6 @@ options:
     - title: Functor
       url: typeclass/Functor.html
       menu_section: typeclass
-    - title: Semigroup
-      menu_section: typeclass
-      url: typeclass/Semigroup.html
       menu_section: typeclass
     - title: Monad
       url: typeclass/Monad.html
@@ -26,6 +23,9 @@ options:
     - title: Monoid
       url: typeclass/Monoid.html
       menu_section: typeclass
+    - title: Semigroup
+      menu_section: typeclass
+      url: typeclass/Semigroup.html
     - title: Show
       url: typeclass/Show.html
       menu_section: typeclass
