@@ -23,6 +23,7 @@ trait Plus[F[_]]  { self =>
 
   def plus[A](a: F[A], b: => F[A]): F[A]
 
+  @deprecated("breaks typeclass coherence, use Plus at the callsite instead of Semigroup", "7.3.0")
   def semigroup[A]: Semigroup[F[A]] = new Semigroup[F[A]] {
     def append(f1: F[A], f2: => F[A]): F[A] = plus(f1, f2)
   }

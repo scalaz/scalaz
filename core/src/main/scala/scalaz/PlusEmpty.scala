@@ -24,6 +24,7 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
 
   // derived functions
 
+  @deprecated("breaks typeclass coherence, use PlusEmpty at the callsite instead of Monoid", "7.3.0")
   def monoid[A]: Monoid[F[A]] =
     new Monoid[F[A]] {
       def append(f1: F[A], f2: => F[A]): F[A] = plus(f1, f2)
