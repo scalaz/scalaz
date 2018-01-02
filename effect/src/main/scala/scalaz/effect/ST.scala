@@ -134,8 +134,7 @@ object ST extends STInstances {
     private[effect] def run = f()
   }
 
-  // Implicit conversions between IO and ST
-  implicit def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
+  def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
     IO.io(rw => Free.return_((rw, st.run)))
 
   /**Put a value in a state thread */

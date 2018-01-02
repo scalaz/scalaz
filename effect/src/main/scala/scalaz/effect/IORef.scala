@@ -20,7 +20,7 @@ sealed abstract class IORef[A] {
 object IORef extends IORefs
 
 trait IORefs {
-  private[effect] def ioRef[A](v: STRef[IvoryTower, A]): IORef[A] = new IORef[A] {
+  def ioRef[A](v: STRef[IvoryTower, A]): IORef[A] = new IORef[A] {
     val value = v
   }
 }
