@@ -5,8 +5,6 @@ title:  "Monoid"
 
 # Monoid
 
-**Category Theory**
-
 *A monoid is a semigroup with a unique identity element.*
 
 A monoid instance must satisfy the following laws in addition to those defined by [Semigroup](Semigroup.html):
