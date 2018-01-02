@@ -6,6 +6,8 @@ import org.openjdk.jmh.annotations._
 import scala.concurrent.Await
 import scala.annotation.tailrec
 
+import scalaz.data.Void
+
 import IOBenchmarks._
 
 @State(Scope.Thread)
@@ -53,7 +55,7 @@ class IOMapBenchmark {
   @Benchmark
   def scalazMap(): BigInt = {
     @tailrec
-    def sumTo(t: IO[BigInt], n: Int): IO[BigInt] =
+    def sumTo(t: IO[Void, BigInt], n: Int): IO[Void, BigInt] =
       if (n <= 1) t
       else sumTo(t.map(_ + n), n - 1)
 

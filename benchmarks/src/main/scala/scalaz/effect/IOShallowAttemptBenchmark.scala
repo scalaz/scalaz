@@ -52,7 +52,7 @@ class IOShallowAttemptBenchmark {
 
   @Benchmark
   def scalazShallowAttempt(): BigInt = {
-    def throwup(n: Int): IO[BigInt] =
+    def throwup(n: Int): IO[Throwable, BigInt] =
       if (n == 0) throwup(n + 1).attempt.map(_.fold[BigInt](_ => 0)(a => a))
       else if (n == depth) IO.point(1)
       else throwup(n + 1).attempt.map(_.fold[BigInt](_ => 0)(a => a)).flatMap(_ => IO.fail(new Error("Oh noes!")))

@@ -9,14 +9,14 @@ import java.util.concurrent.atomic.AtomicReference
 import MVarInternal._
 
 private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state: AtomicReference[MVarState[A]]) extends MVar[A] {
-  final def peek: IO[Maybe[A]] = IO.sync {
+  final def peek[E]: IO[E, Maybe[A]] = IO.sync {
     state.get match {
       case Surplus(head, _) => Maybe.just(head)
       case Deficit(_, _) => Maybe.empty[A]
     }
   }
 
-  final def take: IO[A] = IO.async0 { taker =>
+  final def take[E]: IO[E, A] = IO.async0 { taker =>
     var loop  = true
     var finish: Action[A] = null
 
@@ -54,7 +54,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
     finish()
   }
 
-  final def read: IO[A] = IO.async0 { reader =>
+  final def read[E]: IO[E, A] = IO.async0 { reader =>
     var loop = true
     var finish: Action[A] = null
 
@@ -79,7 +79,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
     finish()
   }
 
-  final def put(v: A): IO[Unit] = IO.async0 { putter =>
+  final def put[E](v: A): IO[E, Unit] = IO.async0 { putter =>
     var loop = true
     var finish: Action[Unit] = null
 
@@ -106,7 +106,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
     finish()
   }
 
-  final def tryPut(v: A): IO[Boolean] = IO.sync {
+  final def tryPut[E](v: A): IO[E, Boolean] = IO.sync {
     var loop = true
     var value = false
     var finish = UnitAction
@@ -139,7 +139,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
     value
   }
 
-  final def tryTake: IO[Maybe[A]] = IO.sync {
+  final def tryTake[E]: IO[E, Maybe[A]] = IO.sync {
     var loop = true
     var finish: () => Unit = null
     var value: Maybe[A] = null.asInstanceOf[Maybe[A]]

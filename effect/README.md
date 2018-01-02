@@ -39,7 +39,7 @@ import scalaz.effect.{IO, SafeApp}
 import scalaz.effect.console._
 
 object MyApp extends SafeApp {
-  def run(args: IList[String]): IO[Unit] =
+  def run(args: IList[String]): IO[E, Unit] =
     for {
       _ <- putStrLn("Hello! What is your name?")
       n <- getStrLn
@@ -53,7 +53,7 @@ object MyApp extends SafeApp {
 You can lift pure values into `IO` with `IO.point`:
 
 ```scala
-val liftedString: IO[String] = IO.point("Hello World")
+val liftedString: IO[E, String] = IO.point("Hello World")
 ```
 
 The constructor uses non-strict evaluation, so the parameter will not be evaluated until when and if the `IO` action is executed at runtime.
@@ -61,7 +61,7 @@ The constructor uses non-strict evaluation, so the parameter will not be evaluat
 Alternately, you can use the `IO.now` constructor for strict evaluation:
 
 ```scala
-val lifted: IO[String] = IO.now("Hello World")
+val lifted: IO[E, String] = IO.now("Hello World")
 ```
 
 You should never use either constructor for impure code. The result of doing so is undefined, and will probably result in runtime errors.
@@ -71,19 +71,19 @@ You should never use either constructor for impure code. The result of doing so 
 You can use the `sync` method of `IO` to import effectful synchronous code into your purely functional program:
 
 ```scala
-def readFile(f: String): IO[ByteArray] = IO.sync(Bytes.readFile(f))
+def readFile(f: String): IO[E, ByteArray] = IO.sync(Bytes.readFile(f))
 ```
 
 You can use the `async` method of `IO` to import effectful asynchronous code into your purely functional program:
 
 ```scala
-def makeRequest(req: Request): IO[Response] =
+def makeRequest(req: Request): IO[E, Response] =
   IO.async(cb => Http.req(req, cb))
 ```
 
 ## Mapping
 
-You can change an `IO[A]` to an `IO[B]` by calling the `map` method with a function `A => B`. This lets you transform values produced by actions into other values.
+You can change an `IO[E, A]` to an `IO[E, B]` by calling the `map` method with a function `A => B`. This lets you transform values produced by actions into other values.
 
 ```scala
 val answer = IO.point(21).map(_ * 2)
@@ -94,7 +94,7 @@ val answer = IO.point(21).map(_ * 2)
 You can execute two actions in sequence with the `flatMap` method. The second action may depend on the value produced by the first action.
 
 ```scala
-val contacts: IO[IList[Contact]] =
+val contacts: IO[E, IList[Contact]] =
   readFile("contacts.csv").flatMap((file: ByteArray) =>
     parseCsv(file).map((csv: IList[CsvRow]) =>
       csv.map(rowToContact)
@@ -105,7 +105,7 @@ val contacts: IO[IList[Contact]] =
 You can use Scala's `for` comprehension syntax to make this type of code more compact:
 
 ```scala
-val contacts: IO[IList[Contact]] =
+val contacts: IO[E, IList[Contact]] =
   for {
     file <- readFile("contacts.csv")
     csv  <- parseCsv(file)
@@ -117,12 +117,12 @@ val contacts: IO[IList[Contact]] =
 You can create `IO` actions that describe failure with `IO.fail`:
 
 ```scala
-val io: IO[String] = IO.fail(new Error("Oh noes!"))
+val io: IO[E, String] = IO.fail(new Error("Oh noes!"))
 ```
 
 Like all `IO` values, these are immutable values and do not actually throw any exceptions; they merely describe failure as a first-class value.
 
-You can surface failures with `attempt`, which takes an `IO[A]` and produces an `IO[Throwable \/ A]`:
+You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[Throwable \/ A]`:
 
 ```scala
 val result = openFile("data.json").attempt.map {
@@ -131,10 +131,10 @@ val result = openFile("data.json").attempt.map {
 }
 ```
 
-You can submerge failures with `IO.absolve`, which turns an `IO[Throwable \/ A]` into an `IO[A]`:
+You can submerge failures with `IO.absolve`, which turns an `IO[Throwable \/ A]` into an `IO[E, A]`:
 
 ```scala
-def sqrt(io: IO[Double]): IO[Double] =
+def sqrt(io: IO[E, Double]): IO[E, Double] =
   IO.absolve(
     io.map(value =>
       if (value < 0.0) -\/(new Error("Only non-negative values!"))
@@ -203,13 +203,13 @@ val composite = action1.ensuring(cleanupAction)
 
 To perform an action without blocking the current process, you can use fibers, which are a lightweight mechanism for concurrency.
 
-You can `fork` any `IO[A]` to immediately yield an `IO[Fiber[A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
+You can `fork` any `IO[E, A]` to immediately yield an `IO[E, Fiber[A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
 
 ```scala
 val analyzed =
   for {
-    fiber1   <- analyzeData(data).fork  // IO[Analysis]
-    fiber2   <- validateData(data).fork // IO[Boolean]
+    fiber1   <- analyzeData(data).fork  // IO[E, Analysis]
+    fiber2   <- validateData(data).fork // IO[E, Boolean]
     ... // Do other stuff
     valid    <- fiber2.join
     _        <- if (!valid) fiber1.interrupt(DataValidationError(data))
@@ -221,7 +221,7 @@ val analyzed =
 On the JVM, fibers will use threads, but will not consume *unlimited* threads. Instead, fibers yield cooperatively during periods of high-contention.
 
 ```scala
-def fib(n: Int): IO[Int] =
+def fib(n: Int): IO[E, Int] =
   if (n <= 1) IO.point(1)
   else for {
     fiber1 <- fib(n - 2).fork
@@ -240,7 +240,7 @@ A more powerful variant of `fork`, called `fork0`, allows specification of a han
 To execute actions in parallel, the `par` method can be used:
 
 ```scala
-def bigCompute(m1: Matrix, m2: Matrix, v: Matrix): IO[Matrix] =
+def bigCompute(m1: Matrix, m2: Matrix, v: Matrix): IO[E, Matrix] =
   for {
     t <- computeInverse(m1).par(computeInverse(m2))
     val (i1, i2) = t

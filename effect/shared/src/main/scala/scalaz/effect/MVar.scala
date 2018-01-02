@@ -28,7 +28,7 @@ trait MVar[A] {
    * Peeks to see if the `MVar` contains an value. This method returns
    * immediately and synchronously.
    */
-  def peek: IO[Maybe[A]]
+  def peek[E]: IO[E, Maybe[A]]
 
   /**
    * Takes a value from the `MVar`. If the `MVar` contains a value, it will be
@@ -36,7 +36,7 @@ trait MVar[A] {
    * request will be added to a FIFO queue, and the returned `IO` action
    * will not resume until a value has been taken from the `MVar`.
    */
-  def take: IO[A]
+  def take[E]: IO[E, A]
 
   /**
    * Reads, but does not take, a value from the `MVar`. If the `MVar` contains a
@@ -44,7 +44,7 @@ trait MVar[A] {
    * then the read request will be added to a FIFO queue, and the returned `IO`
    * action will not resume until a value has been read from the `MVar`.
    */
-  def read: IO[A]
+  def read[E]: IO[E, A]
 
   /**
    * Puts a value into this `MVar`. If the `MVar` is empty, then the put request
@@ -52,17 +52,17 @@ trait MVar[A] {
    * put request will be added to a FIFO queue, and the returned `IO`
    * action will not resume until the value has been placed in the `MVar`.
    */
-  def put(v: A): IO[Unit]
+  def put[E](v: A): IO[E, Unit]
 
   /**
    * Attempts to synchronously put a value in the `MVar`, but only succeeds if
    * the `MVar` is empty. The status is reflected in the computed `Boolean`.
    */
-  def tryPut(v: A): IO[Boolean]
+  def tryPut[E](v: A): IO[E, Boolean]
 
   /**
    * Attempts to synchronously take a value from the `MVar`, but only succeeds
    * if the `MVar` has a value.
    */
-  def tryTake: IO[Maybe[A]]
+  def tryTake[E]: IO[E, Maybe[A]]
 }

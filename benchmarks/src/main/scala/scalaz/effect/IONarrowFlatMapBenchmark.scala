@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.concurrent.Await
 
+import scalaz.data.Void
+
 import IOBenchmarks._
 
 @State(Scope.Thread)
@@ -48,7 +50,7 @@ class IONarrowFlatMapBenchmark {
 
   @Benchmark
   def scalazNarrowFlatMap(): Int = {
-    def loop(i: Int): IO[Int] =
+    def loop(i: Int): IO[Void, Int] =
       if (i < size) IO.point(i + 1).flatMap(loop)
       else IO.point(i)
 

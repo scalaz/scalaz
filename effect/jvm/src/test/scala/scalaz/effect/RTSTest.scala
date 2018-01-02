@@ -68,7 +68,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     deep fork/join identity                 $testDeepForkJoinIsId
     interrupt of never                      ${upTo(1.second)(testNeverIsInterruptible)}
     race of value & never                   ${upTo(1.second)(testRaceOfValueNever)}
-    
+
   """
 
   def testPoint = {
@@ -92,7 +92,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testSyncEvalLoop = {
-    def fibIo(n: Int): IO[BigInt] =
+    def fibIo(n: Int): IO[E, BigInt] =
       if (n <= 1) IO.point(n) else for {
         a <- fibIo(n - 1)
         b <- fibIo(n - 2)
@@ -102,7 +102,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testEvalOfSyncEffect = {
-    def sumIo(n: Int): IO[Int] =
+    def sumIo(n: Int): IO[E, Int] =
       if (n <= 0) IO.sync(0)
       else IO.sync(n).flatMap(b => sumIo(n - 1).map(a => a + b))
 
@@ -159,7 +159,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testErrorInFinalizerCannotBeCaught = {
-    val nested: IO[Int] =
+    val nested: IO[E, Int] =
       IO.fail(ExampleError).ensuring(
         IO.fail(new Error("e2"))).ensuring(
           IO.fail(new Error("e3")))
@@ -229,11 +229,11 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   }
 
   def testEvalOfDeepSyncEffect = {
-    def incLeft(n: Int, ref: IORef[Int]): IO[Int] =
+    def incLeft(n: Int, ref: IORef[Int]): IO[E, Int] =
       if (n <= 0) ref.read
       else incLeft(n - 1, ref) <* ref.modify(_ + 1)
 
-    def incRight(n: Int, ref: IORef[Int]): IO[Int] =
+    def incRight(n: Int, ref: IORef[Int]): IO[E, Int] =
       if (n <= 0) ref.read
       else ref.modify(_ + 1) *> incRight(n - 1, ref)
 
@@ -309,26 +309,26 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
   // Utility stuff
   val ExampleError = new Error("Oh noes!")
 
-  def asyncExampleError[A]: IO[A] = IO.async[A](_(-\/(ExampleError)))
+  def asyncExampleError[A]: IO[E, A] = IO.async[A](_(-\/(ExampleError)))
 
   def sum(n: Int): Int =
     if (n <= 0) 0
     else n + sum(n - 1)
 
-  def deepMapPoint(n: Int): IO[Int] =
+  def deepMapPoint(n: Int): IO[E, Int] =
     if (n <= 0) IO.point(n) else IO.point(n - 1).map(_ + 1)
 
-  def deepMapNow(n: Int): IO[Int] =
+  def deepMapNow(n: Int): IO[E, Int] =
     if (n <= 0) IO.now(n) else IO.now(n - 1).map(_ + 1)
 
-  def deepMapEffect(n: Int): IO[Int] =
+  def deepMapEffect(n: Int): IO[E, Int] =
     if (n <= 0) IO.sync(n) else IO.sync(n - 1).map(_ + 1)
 
-  def deepErrorEffect(n: Int): IO[Unit] =
+  def deepErrorEffect(n: Int): IO[E, Unit] =
     if (n == 0) IO.sync(throw ExampleError)
     else IO.unit *> deepErrorEffect(n - 1)
 
-  def deepErrorFail(n: Int): IO[Unit] =
+  def deepErrorFail(n: Int): IO[E, Unit] =
     if (n == 0) IO.fail(ExampleError)
     else IO.unit *> deepErrorFail(n - 1)
 
@@ -336,7 +336,7 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     if (n <= 1) n
     else fib(n - 1) + fib(n - 2)
 
-  def concurrentFib(n: Int): IO[BigInt] =
+  def concurrentFib(n: Int): IO[E, BigInt] =
     if (n <= 1) IO.point(n)
     else for {
       f1 <- concurrentFib(n - 1).fork

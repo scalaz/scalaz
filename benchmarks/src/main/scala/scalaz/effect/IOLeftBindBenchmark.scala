@@ -7,6 +7,8 @@ import scala.concurrent.Await
 
 import IOBenchmarks._
 
+import scalaz.data.Void
+
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -54,7 +56,7 @@ class IOLeftBindBenchmark {
 
   @Benchmark
   def scalazLeftBindBenchmark(): Int = {
-    def loop(i: Int): IO[Int] =
+    def loop(i: Int): IO[Void, Int] =
       if (i % depth == 0) IO.point(i + 1).flatMap(loop)
       else if (i < size) loop(i + 1).flatMap(i => IO.point(i))
       else IO.point(i)

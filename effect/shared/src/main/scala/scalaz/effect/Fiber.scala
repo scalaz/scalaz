@@ -19,13 +19,13 @@ package scalaz.effect
  * } yield a
  * }}}
  */
-trait Fiber[A] {
+trait Fiber[E, A] {
   /**
    * Joins the fiber, with suspends the joining fiber until the result of the
    * fiber has been determined. Attempting to join a fiber that has been or is
    * killed before producing its result will result in a catchable error.
    */
-  def join: IO[A]
+  def join: IO[E, A]
 
   /**
    * Interrupts the fiber with the specified error. If the fiber has already
@@ -33,11 +33,11 @@ trait Fiber[A] {
    * immediately. Otherwise, it will resume when the fiber has been
    * successfully interrupted or has produced its result.
    */
-  def interrupt(t: Throwable): IO[Unit]
+  def interrupt(t: Throwable): IO[E, Unit]
 
   /**
    * Interrupts the fiber with the specified error asynchronously, and ignores
    * any errors that result from interrupting the fiber.
    */
-  final def interruptIgnore(t: Throwable): IO[Unit] = interrupt(t).fork.toUnit
+  final def interruptIgnore(t: Throwable): IO[E, Unit] = interrupt(t).fork.toUnit
 }

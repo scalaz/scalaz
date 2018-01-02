@@ -57,6 +57,7 @@ trait BaseData {
   type Maybe[A] = data.Maybe[A]
   type That[A, B] = data.That[A, B]
   type This[A, B] = data.This[A, B]
+  type Void = data.Void
 
   val Both = data.Both
   val That = data.That

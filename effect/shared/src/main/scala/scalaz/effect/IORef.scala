@@ -19,22 +19,22 @@ final class IORef[A] private (@volatile private var value : A) {
   /**
    * Reads the value from the `IORef`.
    */
-  final def read: IO[A] = IO.sync(value)
+  final def read[E]: IO[E, A] = IO.sync(value)
 
   /**
    * Writes a new value to the `IORef`.
    */
-  final def write(a: A): IO[Unit] = IO.sync(this.value = a)
+  final def write[E](a: A): IO[E, Unit] = IO.sync(this.value = a)
 
   /**
    * Modifies the `IORef` with the specified function.
    */
-  final def modify(f: A => A): IO[A] = IO.sync({value = f(value); value})
+  final def modify[E](f: A => A): IO[E, A] = IO.sync({value = f(value); value})
 }
 
 object IORef {
   /**
    * Creates a new `IORef` with the specified value.
    */
-  final def apply[A](a: A): IO[IORef[A]] = IO.sync(new IORef[A](a))
+  final def apply[E, A](a: A): IO[E, IORef[A]] = IO.sync(new IORef[A](a))
 }
