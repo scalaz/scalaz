@@ -1,6 +1,12 @@
 package scalaz
 
 package object data {
+  val Cofree: CofreeModule = CofreeImpl
+  type Cofree[F[_], A] = Cofree.Cofree[F, A]
+
+  val Free: FreeModule = FreeImpl
+  type Free[F[_], A] = Free.Free[F, A]
+
   val Forall: ForallModule with ForallSyntax = ForallImpl
   val ∀ : Forall.type = Forall
 
@@ -15,6 +21,7 @@ package object data {
 
   type ~>[F[_], G[_]] = ∀[λ[α => F[α] => G[α]]]
   type ~~>[F[_, _], G[_, _]] = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
+
 
   /**
    * Type-aligned pair. Isomorphic to

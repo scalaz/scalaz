@@ -1,1 +1,34 @@
-target
+# Misc
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Ignore IDEA
+.idea/
+*.iml
+*/*.iml
+
+
+# Mac OS X
+.DS_Store
+
+# Eclipse
+*.classpath
+*.project
+*.settings
+*bin
+*.cache-main
+*.cache-tests
+
+# Ensime
+*.ensime
