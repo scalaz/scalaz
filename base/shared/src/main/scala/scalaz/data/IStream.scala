@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-sealed abstract class IStreamModule {
+sealed trait IStreamModule {
   type IStream[A]
 
   def scons[A](a: =>A)(as: =>IStream[A]): IStream[A]
