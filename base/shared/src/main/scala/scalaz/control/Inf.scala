@@ -1,9 +1,6 @@
 package scalaz
 package control
 
-/**
-  * Modelled from http://www.cse.chalmers.se/~nad/publications/danielsson-altenkirch-mixing.pdf
-  */
 sealed abstract class Bool
 sealed abstract class True extends Bool
 sealed abstract class False extends Bool
@@ -14,6 +11,9 @@ object Bool {
   implicit object FalseValue extends Value[False]
 }
 
+/**
+  * Modelled from http://www.cse.chalmers.se/~nad/publications/danielsson-altenkirch-mixing.pdf
+  */
 final class Inf[+A] private (thunk: () => A) {
   lazy val force: A = thunk()
 }

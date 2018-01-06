@@ -1,11 +1,6 @@
 package scalaz
 
 package object data {
-  val Cofree: CofreeModule = CofreeImpl
-  type Cofree[F[_], A] = Cofree.Cofree[F, A]
-
-  val Free: FreeModule = FreeImpl
-  type Free[F[_], A] = Free.Free[F, A]
 
   val Forall: ForallModule with ForallSyntax = ForallImpl
   val ∀ : Forall.type = Forall
@@ -88,4 +83,13 @@ package object data {
 
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
+
+  val Cofree: CofreeModule = CofreeImpl
+  type Cofree[F[_], A] = Cofree.Cofree[F, A]
+
+  val Free: FreeModule = FreeImpl
+  type Free[F[_], A] = Free.Free[F, A]
+
+  val IStream: IStreamModule = IStreamImpl
+  type IStream[A] = IStream.IStream[A]
 }
