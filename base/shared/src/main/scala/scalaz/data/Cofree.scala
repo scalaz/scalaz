@@ -11,14 +11,15 @@ trait CofreeModule {
   def wrapCofree[F[_], A](a: =>A)(f: =>F[Cofree[F, A]]): Cofree[F, A]
 }
 
-private[data] object CofreeImpl extends CofreeModule {
-  final class EnvT[A, T[_], X](val run: (A, Inf[T[X]]))
+private[data] final class MkCofree[A, T[_], X](val runCofree: (A, Inf[T[X]])) extends AnyVal
 
-  type Cofree[F[_], A] = Fix[EnvT[A, F, ?]]
+private[data] object CofreeImpl extends CofreeModule {
+
+  type Cofree[F[_], A] = Fix[MkCofree[A, F, ?]]
 
   def runCofree[F[_], A](f: Cofree[F, A]): (A, Inf[F[Cofree[F, A]]]) =
-    Fix.unfix[EnvT[A, F, ?]](f).run
+    Fix.unfix[MkCofree[A, F, ?]](f).runCofree
 
   def wrapCofree[F[_], A](a: =>A)(f: =>F[Cofree[F, A]]): Cofree[F, A] =
-    Fix.fix[EnvT[A, F, ?]](new EnvT((a, Inf(f))))
+    Fix.fix[MkCofree[A, F, ?]](new MkCofree((a, Inf(f))))
 }
