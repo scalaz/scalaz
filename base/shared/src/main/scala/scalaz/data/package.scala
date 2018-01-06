@@ -92,4 +92,7 @@ package object data {
 
   val IStream: IStreamModule = IStreamImpl
   type IStream[A] = IStream.IStream[A]
+
+  val Kleisli: KleisliModule = KleisliImpl
+  type Kleisli[M[_], A, B] = Kleisli.Kleisli[M, A, B]
 }
