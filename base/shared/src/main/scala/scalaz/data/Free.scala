@@ -12,7 +12,6 @@ sealed abstract class Free[F[_], A] {
   final def flatMap[B](k: A => Free[F, B]): Free[F, B] =
     Free.impure(this, k)
 
-  //type ~>[F[_], G[_]] = ∀[λ[α => F[α] => G[α]]]
   final def foldFree[B](la: F[Free[F, A]] => B)(ra: A => B)(implicit F: Functor[F]): B =
     resume.fold(la)(ra)
 
