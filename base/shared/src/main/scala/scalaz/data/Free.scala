@@ -35,14 +35,6 @@ sealed abstract class Free[F[_], A] {
       case ff @ Free.Impure(_, _) => M.bind.flatMap(ff.ff foldMap α)(c => ff.k(c).foldMap(α))
     }
 
-  final def hoistFree[G[_]](α: F ~> G): Free[G, A] =
-    this match {
-      case Free.Pure(a) => Free.pure[G, A](a)
-      case Free.LiftF(fa) => Free.lift(Forall.specialize[λ[α => F[α] => G[α]], A](α).apply(fa))
-      case Free.Impure(ff, k) => k(ff).hoistFree(α)
-
-    }
-
   @tailrec
   private[Free] final def step: Free[F, A] =
     this match {
