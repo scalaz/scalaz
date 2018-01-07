@@ -176,6 +176,23 @@ sealed abstract class StateTInstances1 extends StateTInstances2 {
 sealed abstract class StateTInstances0 extends StateTInstances1 {
   implicit def StateMonadTrans[S]: Hoist[λ[(g[_], a) => StateT[g, S, a]]] =
     new StateTHoist[S] {}
+
+  implicit def stateComonad[S](implicit S: Monoid[S]): Comonad[State[S, ?]] =
+    new Comonad[State[S, ?]] {
+      override def copoint[A](fa: State[S, A]): A =
+        fa.eval(S.zero)
+
+      override def cojoin[A](fa: State[S, A]): State[S, State[S, A]] =
+        State[S, State[S, A]](s => (
+          fa.exec(s),
+          State((t: S) => fa.run(S.append(s, t)))))
+
+      override def map[A, B](fa: State[S, A])(f: A => B): State[S, B] =
+        fa map f
+
+      override def cobind[A, B](fa: State[S, A])(f: State[S, A] => B): State[S, B] =
+        cojoin(fa).map(f)
+    }
 }
 
 abstract class StateTInstances extends StateTInstances0 {

@@ -1,5 +1,7 @@
 package scalaz
 
+import org.scalacheck.Arbitrary
+import scalaz.Id._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
@@ -9,11 +11,22 @@ object StateTTest extends SpecLite {
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
 
-  implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
+  private[this] val stateTestInts = (-10 to 10).toList
+
+  private[this] implicit def stateTIntEqual[F[_]: Monad](implicit e: Equal[List[F[(Int, Int)]]]): Equal[StateT[F, Int, Int]] =
+    e.contramap((s: StateT[F, Int, Int]) => stateTestInts.map(s.run(_)))
 
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
+
+  checkAll {
+    // Not sure why this is needed explicitly
+    val am: Arbitrary[State[Int, Int]]        = implicitly
+    val af: Arbitrary[State[Int, Int] => Int] = implicitly
+    val eq: Equal[State[Int, Int]]            = implicitly
+    comonad.laws[State[Int, ?]](implicitly, am, af, eq)
+  }
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]

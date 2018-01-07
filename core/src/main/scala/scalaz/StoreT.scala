@@ -144,6 +144,17 @@ sealed abstract class StoreTInstances0 extends StoreTInstances1 {
 abstract class StoreTInstances extends StoreTInstances0 {
   implicit def storeTCohoist[S]: Cohoist[λ[(ƒ[_], α) => StoreT[ƒ, S, α]]] =
     new StoreTCohoist[S] {}
+
+  implicit def storeMonad[S](implicit S: Monoid[S]): Monad[Store[S, ?]] =
+    new Monad[Store[S, ?]] {
+      override def point[A](a: => A): Store[S, A] =
+        Store[S, A](_ => a, S.zero)
+
+      override def bind[A, B](fa: Store[S, A])(f: A => Store[S, B]): Store[S, B] =
+        Store[S, B](
+          s => f(fa.peek(s)).peek(s),
+          S.append(fa.pos, f(fa.peek(S.zero)).pos))
+    }
 }
 
 private trait IndexedStoreTFunctorLeft[F[_], A0, B0] extends Functor[IndexedStoreT[F, ?, A0, B0]]{
