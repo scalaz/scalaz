@@ -32,7 +32,7 @@ sealed abstract class Free[F[_], A] {
     step match {
       case Free.Pure(a) => M.applicative.pure(a)
       case Free.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
-      case ff => M.bind.flatMap(ff.ff foldMap α)(c => ff.kf(c).foldMap(α))
+      case ff @ Free.Impure(_, _) => M.bind.flatMap(ff.ff foldMap α)(c => ff.kf(c).foldMap(α))
     }
 
   @tailrec
@@ -54,7 +54,7 @@ object Free {
   private[Free] final case class Impure[F[_], EE, A] private (ff: Free[F, EE], kf: EE => Free[F, A]) extends Free[F, A] {
     type E = EE
     def fa: Free[F, E] = ff
-    def k: E => Free[F, A] = kf
+    def k: EE => Free[F, A] = kf
   }
 
   def pure[F[_], A](a: A): Pure[F, A] = Pure(a)
