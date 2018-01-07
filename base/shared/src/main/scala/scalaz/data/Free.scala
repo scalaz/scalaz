@@ -54,10 +54,10 @@ object Free {
   private[Free] final case class Impure[F[_], EE, A] private (ff: Free[F, EE], kf: EE => Free[F, A]) extends Free[F, A] {
     type E = EE
     def fa: Free[F, E] = ff
-    def k: EE => Free[F, A] = kf
+    def k: E => Free[F, A] = kf
   }
 
-  def pure[F[_], A](a: A): Pure[F, A] = Pure(a)
+  def pure[F[_], A](a: A): Pure[F, A] = Pure[F, A](a)
   def lift[F[_], A](fa: F[A]): LiftF[F, A] = LiftF(fa)
   def impure[F[_], E, A](ff: Free[F, E], k: E => Free[F, A]): Free[F, A] = Impure(ff, k)
 
