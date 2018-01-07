@@ -1,7 +1,6 @@
 package scalaz
 package data
 
-
 trait IStreamModule {
   type IStream[A]
 
