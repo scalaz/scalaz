@@ -57,7 +57,7 @@ object Free {
     def k: E => Free[F, A] = kf
   }
 
-  def pure[F[_], A](a: A): Pure[F, A] = Pure[F, A](a)
+  def pure[F[_], A](a: A): Pure[F, A] = Pure(a)
   def lift[F[_], A](fa: F[A]): LiftF[F, A] = LiftF(fa)
   def impure[F[_], E, A](ff: Free[F, E], k: E => Free[F, A]): Free[F, A] = Impure(ff, k)
 
