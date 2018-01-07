@@ -236,7 +236,7 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
 
       override def cojoin[A](fa: State[S, A]): State[S, State[S, A]] =
         State[S, State[S, A]](s => (
-          fa.exec(S.zero),
+          fa.exec(s),
           State((t: S) => fa.run(S.append(s, t)))))
 
       override def map[A, B](fa: State[S, A])(f: A => B): State[S, B] =
