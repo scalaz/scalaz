@@ -49,9 +49,9 @@ sealed abstract class Free[F[_], A] {
 }
 
 object Free {
-  private[Free] final case class Pure[F[_], A] private (a: A) extends Free[F, A]
-  private[Free] final case class LiftF[F[_], A] private (fa: F[A]) extends Free[F, A]
-  private[Free] final case class Impure[F[_], EE, A] private (ff: Free[F, EE], k: EE => Free[F, A]) extends Free[F, A] {
+  private[Free] final case class Pure[F[_], A](a: A) extends Free[F, A]
+  private[Free] final case class LiftF[F[_], A](fa: F[A]) extends Free[F, A]
+  private[Free] final case class Impure[F[_], EE, A](ff: Free[F, EE], k: EE => Free[F, A]) extends Free[F, A] {
     type E = EE
     def fa: Free[F, E] = ff
     def kk: E => Free[F, A] = k
@@ -63,5 +63,4 @@ object Free {
 
   def wrap[F[_], A](ff: F[Free[F, A]]): Free[F, A] = lift(ff) flatMap identity
   def defer[F[_], A](f: Free[F, A]): Free[F, A] = pure(()) flatMap (_ => f)
-
 }
