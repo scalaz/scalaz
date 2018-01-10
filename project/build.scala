@@ -16,6 +16,7 @@ import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
