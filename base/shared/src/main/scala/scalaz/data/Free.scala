@@ -28,6 +28,7 @@ sealed abstract class Free[F[_], A] {
         }
   }
 
+
   final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
     step match {
       case Free.Pure(a) => M.applicative.pure(a)
@@ -48,10 +49,10 @@ sealed abstract class Free[F[_], A] {
     }
 }
 
-object Free {
-  private[Free] final case class Pure[F[_], A](a: A) extends Free[F, A]
-  private[Free] final case class LiftF[F[_], A](fa: F[A]) extends Free[F, A]
-  private[Free] final case class Impure[F[_], EE, A](ff: Free[F, EE], k: EE => Free[F, A]) extends Free[F, A] {
+object Free extends FreeInstances {
+  final case class Pure[F[_], A](a: A) extends Free[F, A]
+  final case class LiftF[F[_], A](fa: F[A]) extends Free[F, A]
+  final case class Impure[F[_], EE, A](ff: Free[F, EE], k: EE => Free[F, A]) extends Free[F, A] {
     type E = EE
     def fa: Free[F, E] = ff
     def kk: E => Free[F, A] = k

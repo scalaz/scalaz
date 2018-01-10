@@ -97,4 +97,7 @@ package object data {
 
   val CoEnv: CoEnvModule = CoEnvImpl
   type CoEnv[F[_], A, B]= CoEnv.CoEnv[F, A, B]
+
+  val Codensity: CodensityModule = CodensityImpl
+  type Codensity[M[_], A] = Codensity.Codensity[M, A]
 }
