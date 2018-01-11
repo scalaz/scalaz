@@ -12,9 +12,19 @@ sealed abstract class Free[F[_], A] {
   final def flatMap[B](k: A => Free[F, B]): Free[F, B] =
     Free.impure(this, k)
 
+  final def hoist[G[_]](α: F ~> Free[G, ?]): Free[G, A] =
+    foldMap(α)(Free.monad)
+
   final def foldFree[B](la: F[Free[F, A]] => B)(ra: A => B)(implicit F: Functor[F]): B =
     resume.fold(la)(ra)
 
+  final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
+    step match {
+      case Free.Pure(a) => M.applicative.pure(a)
+      case Free.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
+      case ff @ Free.Impure(_, _) => M.bind.flatMap(ff.ff foldMap α)(c => ff.k(c).foldMap(α))
+    }
+  
   @tailrec
   final def resume(implicit F: Functor[F]): F[Free[F, A]] \/ A =
     this match {
@@ -27,14 +37,6 @@ sealed abstract class Free[F[_], A] {
           case Free.Impure(gg, j) => gg.flatMap(c => j(c).flatMap(k)).resume
         }
   }
-
-
-  final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
-    step match {
-      case Free.Pure(a) => M.applicative.pure(a)
-      case Free.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
-      case ff @ Free.Impure(_, _) => M.bind.flatMap(ff.ff foldMap α)(c => ff.k(c).foldMap(α))
-    }
 
   @tailrec
   private[Free] final def step: Free[F, A] =
