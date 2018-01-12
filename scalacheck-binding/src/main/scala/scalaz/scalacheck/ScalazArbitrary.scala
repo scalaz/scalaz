@@ -222,8 +222,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
       ^(arbitrary[A], arbitrary[B])(\&/.Both(_, _)),
-      arbitrary[A].map(\&/.This(_)),
-      arbitrary[B].map(\&/.That(_))
+      arbitrary[A].map(\&/.This[A, B](_)),
+      arbitrary[B].map(\&/.That[A, B](_))
     ))
 
   implicit def endoArb[A](implicit A: Arbitrary[A => A]): Arbitrary[Endo[A]] =

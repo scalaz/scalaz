@@ -54,12 +54,12 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
       case -\/(a) => apply(a) map (\/.left)
-      case c @ \/-(_) => Some(c)
+      case c @ \/-(_) => Some(c.coerceLeft)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
-      case c @ -\/(_) => Some(c)
+      case c @ -\/(_) => Some(c.coerceRight)
       case \/-(a) => apply(a) map (\/.right)
     }
 

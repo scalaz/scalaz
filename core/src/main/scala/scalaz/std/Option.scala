@@ -79,7 +79,10 @@ trait OptionInstances extends OptionInstances0 {
         a map (Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-        fa map \/.right getOrElse -\/(None)
+        fa match {
+          case Some(a) => \/-(a)
+          case None    => -\/(None)
+        }
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
       override def toOption[A](fa: Option[A]): Option[A] = fa
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d

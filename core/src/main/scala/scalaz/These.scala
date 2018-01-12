@@ -1,7 +1,7 @@
 package scalaz
 
 /** @since 7.0.3 */
-sealed abstract class \&/[+A, +B] extends Product with Serializable {
+sealed abstract class \&/[A, B] extends Product with Serializable {
   import \&/._
 
   def isThis: Boolean =
@@ -136,10 +136,10 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def map[D](g: B => D): (A \&/ D) =
     bimap(identity, g)
 
-  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
+  def traverse[F[_]: Applicative, D](g: B => F[D]): F[A \&/ D] =
     this match {
       case a @ This(_) =>
-        Applicative[F].point(a)
+        Applicative[F].point(a.coerceThat)
       case That(b) =>
         Functor[F].map(g(b))(That(_))
       case Both(a, b) =>
@@ -149,10 +149,10 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def foreach(g: B => Unit): Unit =
     fold(_ => (), g, (_, b) => g(b))
 
-  def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
+  def flatMap[D](g: B => (A \&/ D))(implicit M: Semigroup[A]): (A \&/ D) =
     this match {
       case a @ This(_) =>
-        a
+        a.coerceThat
       case That(b) =>
         g(b)
       case Both(a, b) =>
@@ -166,7 +166,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         }
     }
 
-  def &&&[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
+  def &&&[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
     for {
       b <- this
       c <- t
@@ -260,8 +260,12 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
 }
 
 object \&/ extends TheseInstances {
-  final case class This[A](aa: A) extends (A \&/ Nothing)
-  final case class That[B](bb: B) extends (Nothing \&/ B)
+  final case class This[A, B](aa: A) extends (A \&/ B) {
+    def coerceThat[C]: A \&/ C = this.asInstanceOf[A \&/ C]
+  }
+  final case class That[A, B](bb: B) extends (A \&/ B) {
+    def coerceThis[C]: C \&/ B = this.asInstanceOf[C \&/ B]
+  }
   final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
 
   def apply[A, B](a: A, b: B): These[A, B] =
@@ -342,7 +346,7 @@ object \&/ extends TheseInstances {
       }
 
     f(a) match {
-      case t @ This(l) => t
+      case t @ This(l) => t.coerceThat
       case That(-\/(a0)) => tailrecM(a0)(f)
       case That(\/-(b)) => \&/.That(b)
       case Both(l, -\/(a0)) => tailrecM(a0)(go(l))

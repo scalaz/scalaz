@@ -122,7 +122,7 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions thrown in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.unsafePerformSyncAttempt ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay[Int](throw SadTrombone) }.unsafePerformSyncAttempt ==
       -\/(SadTrombone)
   }
 
@@ -179,7 +179,7 @@ object TaskTest extends SpecLite {
 
       // NB: Task can only be interrupted in between steps (before the `map`)
       val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { now(throw ex) }
+      val t2 = fork { now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
@@ -203,7 +203,7 @@ object TaskTest extends SpecLite {
 
       // NB: Task can only be interrupted in between steps (before the `map`)
       val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { sleep(100); now(throw ex) }
+      val t2 = fork { sleep(100); now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
       val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)

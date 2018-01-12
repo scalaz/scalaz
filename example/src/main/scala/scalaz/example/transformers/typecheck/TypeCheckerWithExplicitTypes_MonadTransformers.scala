@@ -18,7 +18,7 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
   def compare(t1: Type, t2: Type, resultType: Type, errorMsg: String): String \/ Type =
     if (t1 == t2) success(resultType) else typeError(errorMsg)
 
-  type V[+T] = String \/ T
+  type V[T] = String \/ T
 
   def liftK[T, U](e: String \/ U): ReaderT[V, T, U] = kleisli[V, T, U]((env: T) => e)
 

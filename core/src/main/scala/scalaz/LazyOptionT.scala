@@ -48,7 +48,7 @@ final case class LazyOptionT[F[_], A](run: F[LazyOption[A]]) {
 
   def orElse(a: => LazyOptionT[F, A])(implicit F: Monad[F]): LazyOptionT[F, A] =
     LazyOptionT(F.bind(run) {
-      case LazyNone => a.run
+      case LazyNone() => a.run
       case x@LazySome(_) => F.point(x)
     })
 

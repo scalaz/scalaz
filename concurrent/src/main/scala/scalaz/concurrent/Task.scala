@@ -26,13 +26,13 @@ import scala.concurrent.duration._
  * are responsible for ensuring the exception safety of the provided
  * `Future`.
  */
-class Task[+A](val get: Future[Throwable \/ A]) {
+class Task[A](val get: Future[Throwable \/ A]) {
 
   def flatMap[B](f: A => Task[B]): Task[B] =
     new Task(get flatMap {
       case -\/(e) => Future.now(-\/(e))
       case \/-(a) => Task.Try(f(a)) match {
-        case e @ -\/(_) => Future.now(e)
+        case e @ -\/(_) => Future.now(e.coerceRight)
         case \/-(task) => task.get
       }
     })
@@ -83,7 +83,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * This is rather coarse-grained. Use `attempt`, `handle`, and
    * `flatMap` for more fine grained control of exception handling.
    */
-  def or[B>:A](t2: Task[B]): Task[B] =
+  def or(t2: Task[A]): Task[A] =
     new Task(this.get flatMap {
       case -\/(e) => t2.get
       case a => Future.now(a)
@@ -273,7 +273,7 @@ object Task {
   def point[A](a: => A) = new Task(Future.delay(Try(a)))
 
   /** A `Task` which fails with the given `Throwable`. */
-  def fail(e: Throwable): Task[Nothing] = new Task(Future.now(-\/(e)))
+  def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
 
   /** Convert a strict value to a `Task`. Also see `delay`. */
   def now[A](a: A): Task[A] = new Task(Future.now(\/-(a)))
@@ -392,7 +392,7 @@ object Task {
                 // food for thought - might be safe to set the interrupt first
                 // but, this may also kill `cb(e)`
                 // could have separate AtomicBooleans for each task
-                cb(e) *> Trampoline.delay { interrupt.set(true) }
+                cb(e.coerceRight) *> Trampoline.delay { interrupt.set(true) }
               else
                 Trampoline.done(())
           }

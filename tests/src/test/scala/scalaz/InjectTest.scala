@@ -107,12 +107,12 @@ object InjectTest extends SpecLite {
 
   "apply in left" in {
     val fa = Test1(Seq("a"), Free.pure[Test1Algebra, Int](_))
-    (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must_===(true)
+    (Inject[Test1Algebra, C0].inj(fa).run == -\/(fa)) must_===(true)
   }
 
   "apply in right" in {
     val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
-    (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must_===(true)
+    (Inject[Test2Algebra, C0].inj(fa).run == \/-(fa)) must_===(true)
   }
 
   "unapply from left" in {
