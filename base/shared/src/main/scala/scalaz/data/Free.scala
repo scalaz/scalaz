@@ -24,7 +24,7 @@ sealed abstract class Free[F[_], A] {
       case Free.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
       case ff @ Free.Impure(_, _) => M.bind.flatMap(ff.ff foldMap α)(c => ff.k(c).foldMap(α))
     }
-  
+
   @tailrec
   final def resume(implicit F: Functor[F]): F[Free[F, A]] \/ A =
     this match {
@@ -36,7 +36,7 @@ sealed abstract class Free[F[_], A] {
           case Free.LiftF(ga) => -\/(F.map(ga)(k))
           case Free.Impure(gg, j) => gg.flatMap(c => j(c).flatMap(k)).resume
         }
-  }
+    }
 
   @tailrec
   private[Free] final def step: Free[F, A] =
