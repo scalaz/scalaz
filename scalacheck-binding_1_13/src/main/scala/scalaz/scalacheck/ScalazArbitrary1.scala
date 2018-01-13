@@ -13,6 +13,9 @@ abstract class ScalazArbitrary1 {
   implicit def cogenAp[F[_], A](implicit F: Cogen[F[A]]): Cogen[Ap[F, A]] =
     F.contramap(_.f)
 
+  implicit def cogenTannen[F[_], G[_, _], A, B](implicit F: Cogen[F[G[A, B]]]): Cogen[Tannen[F, G, A, B]] =
+    F.contramap(_.f)
+
   implicit def cogenIList[A: Cogen]: Cogen[IList[A]] =
     Cogen[List[A]].contramap(_.toList)
 

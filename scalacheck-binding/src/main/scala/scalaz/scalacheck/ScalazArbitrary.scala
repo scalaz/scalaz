@@ -18,6 +18,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  implicit def tannenArbitrary[F[_], G[_, _], A, B](implicit F: Arbitrary[F[G[A, B]]]): Arbitrary[Tannen[F, G, A, B]] =
+    Functor[Arbitrary].map(F)(Tannen[F, G, A, B](_))
+
   implicit def apArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Ap[F, A]] =
     Functor[Arbitrary].map(F)(Ap[F, A](_))
 
