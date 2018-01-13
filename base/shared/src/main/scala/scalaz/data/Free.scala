@@ -16,7 +16,7 @@ sealed abstract class Free[F[_], A] {
     foldMap(α)(Free.monad)
 
   final def foldFree[B](la: F[Free[F, A]] => B)(ra: A => B)(implicit F: Functor[F]): B =
-    resume.fold(la)(ra)
+    runFree.fold(la)(ra)
 
   final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
     step match {
@@ -26,15 +26,15 @@ sealed abstract class Free[F[_], A] {
     }
 
   @tailrec
-  final def resume(implicit F: Functor[F]): F[Free[F, A]] \/ A =
+  final def runFree(implicit F: Functor[F]): F[Free[F, A]] \/ A =
     this match {
       case Free.Pure(a) => \/-(a)
       case Free.LiftF(fa) => -\/(F.map(fa)(Free.pure))
       case Free.Impure(ff, k) =>
         ff match {
-          case Free.Pure(b) => k(b).resume
+          case Free.Pure(b) => k(b).runFree
           case Free.LiftF(ga) => -\/(F.map(ga)(k))
-          case Free.Impure(gg, j) => gg.flatMap(c => j(c).flatMap(k)).resume
+          case Free.Impure(gg, j) => gg.flatMap(c => j(c).flatMap(k)).runFree
         }
     }
 

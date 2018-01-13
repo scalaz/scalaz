@@ -7,7 +7,7 @@ trait KleisliModule {
   def wrapKleisli[M[_], A, B](f: A => M[B]): Kleisli[M, A, B]
 }
 
-private[data] object KleisliImpl extends KleisliModule {
+object KleisliImpl extends KleisliModule with KleisliInstances {
   type Kleisli[M[_], A, B] = A => M[B]
 
   def runKleisli[M[_], A, B](k: Kleisli[M, A, B]): A => M[B] = k
