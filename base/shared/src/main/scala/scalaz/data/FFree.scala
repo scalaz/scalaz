@@ -13,6 +13,11 @@ sealed abstract class FFree[F[_], A] {
       case FFree.Impure(ff, rs) => FFree.impure(ff, rs.:+(Kleisli.wrapKleisli(k)))
     }
 
+//  final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] = ???
+//
+//  final def hoist[G[_]](α: F ~> FFree[G, ?]): FFree[G, A] =
+//    foldMap(α)(FFree.monad)
+
   final def foldFree[B](la: F[FFree[F, A]] => B)(ra: A => B): B =
     runFree.fold(la)(ra)
 
