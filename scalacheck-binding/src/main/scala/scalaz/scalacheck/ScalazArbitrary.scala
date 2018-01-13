@@ -206,6 +206,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenAp[F[_], A](implicit F: Cogen[F[A]]): Cogen[Ap[F, A]] =
     F.contramap(_.f)
 
+  implicit def cogenTannen[F[_], G[_, _], A, B](implicit F: Cogen[F[G[A, B]]]): Cogen[Tannen[F, G, A, B]] =
+    F.contramap(_.f)
+
+  implicit def tannenArbitrary[F[_], G[_, _], A, B](implicit F: Arbitrary[F[G[A, B]]]): Arbitrary[Tannen[F, G, A, B]] =
+    Functor[Arbitrary].map(F)(Tannen[F, G, A, B](_))
+
   implicit def apArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Ap[F, A]] =
     Functor[Arbitrary].map(F)(Ap[F, A](_))
 
