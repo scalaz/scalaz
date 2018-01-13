@@ -50,4 +50,7 @@ sealed abstract class TannenInstances extends TannenInstances0 {
       def bitraverseImpl[H[_], A, B, C, D](fab: Tannen[F, G, A, B])(f: A => H[C], g: B => H[D])(implicit H: Applicative[H]): H[Tannen[F, G, C, D]] =
         H.map(F.traverse(fab.f)(G.bitraverse(_)(f)(g)))(Tannen.apply)
     }
+
+  implicit def TannenEqual[F[_], G[_, _], A, B](implicit F: Equal[F[G[A, B]]]): Equal[Tannen[F, G, A, B]] =
+    F.contramap(_.f)
 }
