@@ -20,7 +20,7 @@ sealed abstract class Freer[F[_], A] {
     this match {
       case Freer.Pure(a) => k(a)
       case l @ Freer.LiftF(_) => Freer.impure(l, Freer.singleK(Kleisli.wrapKleisli(k)))
-      case Freer.Impure(ff, rs) => Freer.runQuiver(ff)(rs :+ Kleisli.wrapKleisli(k))
+      case Freer.Impure(ff, rs) => Freer.impure(ff, rs :+ Kleisli.wrapKleisli(k))
     }
 
   final def hoist[G[_]](α: F ~> Freer[G, ?]): Freer[G, A] =
