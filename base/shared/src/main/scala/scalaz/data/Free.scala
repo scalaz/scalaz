@@ -4,6 +4,13 @@ package data
 import scala.annotation.tailrec
 import scalaz.data.Free.Impure
 
+/**
+  * When choosing a Free monad, remember to consider your use-case - asymoptotics and constant factors
+  * vary from implementation to implementation.
+  *
+  * [View Ed Kmett's comments here](https://www.reddit.com/r/haskell/comments/7q4sku/are_people_using_freer_monads_or_still_mostly/dsmlnh7/)
+  *
+  */
 sealed abstract class Free[F[_], A] {
 
   final def map[B](f: A => B): Free[F, B] =
@@ -42,8 +49,7 @@ sealed abstract class Free[F[_], A] {
   private[Free] final def step: Free[F, A] =
     this match {
       case ff @ Impure(_, _) => ff.ff match {
-        case gg @ Free.Impure(_, _) =>
-          gg.ff.flatMap(a => gg.k(a).flatMap(ff.k)).step
+        case gg @ Free.Impure(_, _) => gg.ff.flatMap(a => gg.k(a).flatMap(ff.k)).step
         case Free.Pure(a)=> ff.k(a).step
         case _ => ff
       }
