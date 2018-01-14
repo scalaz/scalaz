@@ -21,8 +21,7 @@ sealed abstract class Freer[F[_], A] {
 
   final def foldFreer[B](la: F[Freer[F, A]] => B)(ra: A => B)(implicit F: Functor[F]): B =
     runFreer.fold(la)(ra)
-
-  @tailrec
+  
   final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
     this match {
       case Freer.Pure(a) => M.applicative.pure(a)
