@@ -42,7 +42,15 @@ sealed abstract class Freer[F[_], A] {
     this match {
       case Freer.Pure(a) => \/-(a)
       case Freer.LiftF(fa) => -\/(F.map(fa)(Freer.pure))
-      case Freer.Impure(f, q) => Freer.runQuiver(f)(q).runFreer
+      case Freer.Impure(f, q) =>
+        f match {
+          case Freer.Pure(b) =>
+            Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose)).apply(b).runFreer
+          case Freer.LiftF(fa) =>
+            -\/(F.map(fa)(Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose))))
+          case Freer.Impure(ff, qq) =>
+            Freer.runQuiver(ff)(qq >>> q).runFreer
+        }
     }
 }
 
