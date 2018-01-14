@@ -12,18 +12,18 @@ sealed abstract class Freer[F[_], A] {
   def flatMap[B](k: A => Freer[F, B]): Freer[F, B] =
     this match {
       case Freer.Pure(a) => k(a)
-      case Freer.Impure(ff, rs) => Freer.impure(ff)(rs.:+(Kleisli.wrapKleisli(k)))
+      case Freer.Impure(ff, rs) => Freer.impure(ff)(rs :+ Kleisli.wrapKleisli(k))
     }
-
+  
   @tailrec
-  def runFreer[E]: A =
+  def runFreer: A =
     this match {
       case Freer.Pure(a) => a
       case Freer.Impure(f, q) =>
         f match {
-          case Freer.Pure(e) => Freer.runQuiver(e)(q).runFreer
+          case Freer.Pure(e) => Kleisli.runKleisli(Freer.runQuiver(q)).apply(e).runFreer
           case Freer.Impure(ff, qq) =>
-            Freer.impure(ff)(qq >>> q).runFreer
+            Freer.impure(ff)(qq :+ Freer.runQuiver(q)).runFreer
         }
     }
 }
@@ -43,13 +43,13 @@ object Freer extends FreerInstances {
   def impure[F[_], E, A](ff: Freer[F, E])(rs: Quiver[F, E, A]): Freer[F, A] = Impure(ff, rs)
   def defer[F[_], A](f: Freer[F, A]): Freer[F, A] = pure(()) flatMap (_ => f)
 
-  private[Freer] def ksingleton[F[_], A, B](f: A => Freer[F, B]): Quiver[F, A, B] =
-    ACatenable1.lift[=>:[F, ?, ?], A, B](Kleisli.wrapKleisli[Freer[F, ?], A, B](f))
+  private[Freer] def singleF[F[_], A, B](f: A => Freer[F, B]): Quiver[F, A, B] =
+    singleK(Kleisli.wrapKleisli[Freer[F, ?], A, B](f))
 
   private[Freer] def singleK[F[_], A, B](r: =>:[F, A, B]): Quiver[F, A, B] =
     ACatenable1.lift[=>:[F, ?, ?], A, B](r)
 
-  private[Freer] def runQuiver[F[_], A, B](a: A)(q: Freer.Quiver[F, A, B]): Freer[F, B] =
-    Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose[Freer[F, ?]])).apply(a)
+  private[Freer] def runQuiver[F[_], A, B](q: Freer.Quiver[F, A, B]): =>:[F, A, B] =
+    q.fold(KleisliImpl.kleisliCompose[Freer[F, ?]])
 
 }
