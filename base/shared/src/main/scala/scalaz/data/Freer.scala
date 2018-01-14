@@ -33,8 +33,7 @@ sealed abstract class Freer[F[_], A] {
     this match {
       case Freer.Pure(a) => M.applicative.pure(a)
       case Freer.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
-      case Freer.Impure(f, q) =>
-        M.bind.flatMap(f foldMap α)(a => Freer.runQuiver(f)(q).foldMap(α))
+      case Freer.Impure(f, q) => M.bind.flatMap(f foldMap α)(a => Freer.runQuiver(f)(q).foldMap(α))
     }
 
   @tailrec
@@ -44,12 +43,9 @@ sealed abstract class Freer[F[_], A] {
       case Freer.LiftF(fa) => -\/(F.map(fa)(Freer.pure))
       case Freer.Impure(f, q) =>
         f match {
-          case Freer.Pure(b) =>
-            Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose)).apply(b).runFreer
-          case Freer.LiftF(fa) =>
-            -\/(F.map(fa)(Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose))))
-          case Freer.Impure(ff, qq) =>
-            Freer.runQuiver(ff)(qq >>> q).runFreer
+          case Freer.Pure(b) => Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose)).apply(b).runFreer
+          case Freer.LiftF(fa) => -\/(F.map(fa)(Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose))))
+          case Freer.Impure(ff, qq) => Freer.runQuiver(ff)(qq >>> q).runFreer
         }
     }
 }
