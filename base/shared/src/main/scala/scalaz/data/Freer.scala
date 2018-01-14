@@ -3,6 +3,14 @@ package data
 
 import scala.annotation.tailrec
 
+/**
+  * Free(r) Monad - arrows A => Free[F, B] are concatenated using a type-aligned
+  * stack-ended queue ([[ACatenable1]]), for better complexity on certain types
+  * of Free monad use cases.
+  *
+  * For more information, [see Ed Kmett's comments here.](https://www.reddit.com/r/haskell/comments/7q4sku/are_people_using_freer_monads_or_still_mostly/dsmlnh7/)
+  *
+  */
 sealed abstract class Freer[F[_], A] {
 
   def map[B](f: A => B): Freer[F, B] =
