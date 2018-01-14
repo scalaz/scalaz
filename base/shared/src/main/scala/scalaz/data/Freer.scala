@@ -69,7 +69,7 @@ object Freer extends FreerInstances {
   private[Freer] def runQuiver[F[_], A, B](fa: Freer[F, A])(q: Freer.Quiver[F, A, B]): Freer[F, B] =
     q.foldLeft[Freer[F, ?]](fa)(
       ν[RightAction[Freer[F, ?], =>:[F, ?, ?]]][A, B](
-        (f, k) => Freer.monad[F].flatMap(f)(Kleisli.runKleisli(k))
+        (f, k) => f.flatMap(Kleisli.runKleisli(k))
       )
     )
 }
