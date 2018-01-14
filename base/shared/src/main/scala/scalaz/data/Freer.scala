@@ -30,7 +30,7 @@ sealed abstract class Freer[F[_], A] {
     runFreer.fold(la)(ra)
 
   final def foldMap[M[_]](α: F ~> M)(implicit M: Monad[M]): M[A] =
-    this match {
+    step match {
       case Freer.Pure(a) => M.applicative.pure(a)
       case Freer.LiftF(fa) => Forall.specialize[λ[α => F[α] => M[α]], A](α).apply(fa)
       case Freer.Impure(f, q) => M.bind.flatMap(f foldMap α)(a => Freer.runQuiver(f)(q).foldMap(α))
@@ -47,6 +47,13 @@ sealed abstract class Freer[F[_], A] {
           case Freer.LiftF(fa) => -\/(F.map(fa)(Kleisli.runKleisli(q.fold(KleisliImpl.kleisliCompose))))
           case Freer.Impure(ff, qq) => Freer.runQuiver(ff)(qq >>> q).runFreer
         }
+    }
+
+  @tailrec
+  private[Freer] final def step: Freer[F, A] =
+    this match {
+      case Freer.Impure(f, q) => Freer.runQuiver(f)(q).step
+      case f => f
     }
 }
 
