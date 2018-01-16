@@ -35,6 +35,7 @@ matrix:
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.11
       jdk: oraclejdk8
+      env: SCALA_NATIVE
       sudo: required
       before_install:
       - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.2/bin/travis_setup.sh | bash -
