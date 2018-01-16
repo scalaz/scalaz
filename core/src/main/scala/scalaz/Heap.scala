@@ -213,9 +213,9 @@ sealed abstract class Heap[A] {
   override def toString = "<heap>"
 }
 
-case class Ranked[A](rank: Int, value: A)
-
 object Heap extends HeapInstances {
+  final case class Ranked[A](rank: Int, value: A)
+
   type Forest[A] = Stream[Tree[Ranked[A]]]
   type ForestZipper[A] = (Forest[A], Forest[A])
 
