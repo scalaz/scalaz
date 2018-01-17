@@ -7,10 +7,16 @@ package scalaz
  * @see [[https://youtu.be/cB8DapKQz-I?t=20m35s ZuriHac 2015 - Discrimination is Wrong: Improving Productivity]]
  */
 ////
-trait Divisible[F[_]] extends Divide[F] { self =>
+trait Divisible[F[_]] extends Divide[F] with ApplicativeDivisible[F] { self =>
   ////
-
+  /** Universally quantified instance of F[_] */
   def conquer[A]: F[A]
+
+  override def contramap[A, B](fa: F[A])(f: B => A): F[B] =
+    divide2(conquer[Unit], fa)(c => ((), f(c)))
+
+  // ApplicativeDivisible impl
+  override def xproduct0[Z](z: =>Z): F[Z] = conquer
 
   trait DivisibleLaw extends DivideLaw {
     def rightIdentity[A](fa: F[A])(implicit E: Equal[F[A]]): Boolean =

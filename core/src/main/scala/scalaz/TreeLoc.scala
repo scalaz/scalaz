@@ -412,7 +412,7 @@ sealed abstract class TreeLocInstances {
       import std.stream._, std.tuple._
 
       override def order(a: TreeLoc[A], b: TreeLoc[A]) =
-        Divide[Order].deriving4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
+        Divide[Order].dividing4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
     }
 }
 

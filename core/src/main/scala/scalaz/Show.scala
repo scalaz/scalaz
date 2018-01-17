@@ -36,11 +36,13 @@ object Show {
     override def shows(a: A): String = f(a)
   }
 
-  implicit val showContravariant: Contravariant[Show] = new Contravariant[Show] {
+  // scalaz-deriving provides a coherent n-arity derivers extending this
+  private[scalaz] class ShowContravariant extends Contravariant[Show] {
     def contramap[A, B](r: Show[A])(f: B => A): Show[B] = new Show[B] {
       override def show(b: B): Cord = r.show(f(b))
     }
   }
+  implicit val showContravariant: Contravariant[Show] = new ShowContravariant
 
   final case class Shows(override val toString: String) extends AnyVal
   object Shows {

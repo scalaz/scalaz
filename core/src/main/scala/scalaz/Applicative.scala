@@ -17,7 +17,7 @@ package scalaz
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
  */
 ////
-trait Applicative[F[_]] extends Apply[F] { self =>
+trait Applicative[F[_]] extends Apply[F] with ApplicativeDivisible[F] { self =>
   ////
   def point[A](a: => A): F[A]
 
@@ -30,6 +30,9 @@ trait Applicative[F[_]] extends Apply[F] { self =>
 
   override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     ap2(fa, fb)(point(f))
+
+  // ApplicativeDivisible impl
+  override def xproduct0[Z](z: =>Z): F[Z] = pure(z)
 
   // impls of sequence, traverse, etc
 
