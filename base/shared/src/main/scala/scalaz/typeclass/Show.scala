@@ -8,6 +8,7 @@ trait Show[A] {
     */
   /* todo: when we have a `Cord`, change this to return that instead,
    * todo: and add a `def shows(a: A): String = show(a).toString`
+   * todo: fix documentation once above have been implemented
    */
   def show(a: A): String
 }
