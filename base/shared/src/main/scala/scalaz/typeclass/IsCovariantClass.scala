@@ -4,7 +4,7 @@ package typeclass
 import data.As
 
 trait IsCovariantClass[F[_]] extends IsCovariant[F] {
-  final def isCovariant: IsCovariant[F] = this
+  final def isCovariant: IsCovariant[F] with this.type = this
 }
 
 object IsCovariantClass {

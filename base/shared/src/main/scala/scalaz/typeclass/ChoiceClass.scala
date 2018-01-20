@@ -4,7 +4,7 @@ package typeclass
 import data.Disjunction.swap
 
 trait ChoiceClass[P[_, _]] extends Choice[P] with ProfunctorClass[P] {
-  final def choice: Choice[P] = this
+  final def choice: Choice[P] with this.type = this
 }
 
 object ChoiceClass {

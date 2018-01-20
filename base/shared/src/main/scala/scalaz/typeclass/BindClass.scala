@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait BindClass[M[_]] extends Bind[M] with ApplyClass[M] {
-  final def bind: Bind[M] = this
+  final def bind: Bind[M] with this.type = this
 }
 
 object BindClass {

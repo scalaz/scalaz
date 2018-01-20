@@ -3,7 +3,6 @@ package data
 
 import typeclass.{FoldableClass, TraversableClass}
 
-import Prelude._
 import FoldableClass._
 import TraversableClass._
 
@@ -21,30 +20,54 @@ trait ConstInstances {
     override def toList[A](fa: Const[R, A]): List[A] = Nil
   }
 
-  implicit def constFunctor[R]: Functor[Const[R, ?]] = new Functor[Const[R, ?]] {
+  trait ConstFunctor[R] extends Functor[Const[R, ?]] {
     def map[A, B](fa: Const[R, A])(f: A => B): Const[R, B] =
       fa.retag[B]
   }
 
-  implicit def constApply[R](implicit R: Semigroup[R]): Apply[Const[R, ?]] = new Apply[Const[R, ?]] {
-    def functor: Functor[Const[R, ?]] = Const.constFunctor[R]
+  trait ConstApply[R] extends Apply[Const[R, ?]] with ConstFunctor[R] {
+    protected val RS: Semigroup[R]
+    def functor: Functor[Const[R, ?]] with this.type = this
     def ap[A, B](fa: Const[R, A])(f: Const[R, A => B]): Const[R, B] =
-      Const(R.append(fa.getConst, f.getConst))
+      Const(RS.append(fa.getConst, f.getConst))
   }
 
-  implicit def constApplicative[R](implicit R: Monoid[R]): Applicative[Const[R, ?]] = new Applicative[Const[R, ?]] {
-    def apply: Apply[Const[R, ?]] = Const.constApply[R]
-    def pure[A](a: A): Const[R, A] = Const(R.empty)
+  trait ConstApplicative[R] extends Applicative[Const[R, ?]] with ConstApply[R]  {
+    protected val RM: Monoid[R]
+    protected val RS: Semigroup[R] = RM.semigroup
+    def apply: Apply[Const[R, ?]] with this.type = this
+    def pure[A](a: A): Const[R, A] = Const(RM.empty)
   }
 
-  implicit def constSemigroup[A, B](implicit A: Semigroup[A]): Semigroup[Const[A, B]] = new Semigroup[Const[A, B]] {
+  trait ConstSemigroup[A, B] extends Semigroup[Const[A, B]] {
+    protected val AS: Semigroup[A]
     def append(a1: Const[A, B], a2: => Const[A, B]): Const[A, B] =
-      Const(A.append(a1.getConst, a2.getConst))
+      Const(AS.append(a1.getConst, a2.getConst))
   }
 
-  implicit def constMonoid[A, B](implicit A: Monoid[A]): Monoid[Const[A, B]] = new Monoid[Const[A, B]] {
-    def semigroup: Semigroup[Const[A, B]] = implicitly
-    def empty: Const[A, B] = Const(A.empty)
+  trait ConstMonoid[A, B] extends Monoid[Const[A, B]] with ConstSemigroup[A, B] {
+    protected val AM: Monoid[A]
+    protected val AS = AM.semigroup
+    def semigroup: Semigroup[Const[A, B]] with this.type = this
+    def empty: Const[A, B] = Const(AM.empty)
+  }
+
+  implicit def constFunctor[R]: Functor[Const[R, ?]] = new ConstFunctor[R] {}
+
+  implicit def constApply[R](implicit R: Semigroup[R]): Apply[Const[R, ?]] = new ConstApply[R] {
+    protected val RS = R
+  }
+
+  implicit def constApplicative[R](implicit R: Monoid[R]): Applicative[Const[R, ?]] = new ConstApplicative[R] {
+    protected val RM = R
+  }
+
+  implicit def constSemigroup[A, B](implicit A: Semigroup[A]): Semigroup[Const[A, B]] = new ConstSemigroup[A, B] {
+    protected val AS = A
+  }
+
+  implicit def constMonoid[A, B](implicit A: Monoid[A]): Monoid[Const[A, B]] = new ConstMonoid[A, B] {
+    protected val AM = A
   }
 
   implicit def constShow[A, B](implicit A: Show[A]): Show[Const[A, B]] =

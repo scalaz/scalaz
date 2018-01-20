@@ -2,5 +2,5 @@ package scalaz
 package typeclass
 
 trait SemigroupClass[A] extends Semigroup[A]{
-  final def semigroup: Semigroup[A] = this
+  final def semigroup: Semigroup[A] with this.type = this
 }
