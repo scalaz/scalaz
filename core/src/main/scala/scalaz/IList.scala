@@ -519,13 +519,6 @@ object IList extends IListInstances {
       def from[A](fa: IList[A]) = fa.toList
     }
 
-  object :: {
-    def unapply[A](xs: IList[A]): Option[(A, IList[A])] = xs match {
-      case ICons(head, tail) => Some(head -> tail)
-      case INil()            => None
-    }
-  }
-
 }
 
 sealed abstract class IListInstance0 {
