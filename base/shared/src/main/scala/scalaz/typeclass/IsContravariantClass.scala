@@ -4,7 +4,7 @@ package typeclass
 import data.As
 
 trait IsContravariantClass[F[_]] extends IsContravariant[F] {
-  final def isContravariant: IsContravariant[F] = this
+  final def isContravariant: IsContravariant[F] with this.type = this
 }
 
 object IsContravariantClass {

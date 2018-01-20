@@ -4,7 +4,7 @@ package typeclass
 import BindClass._
 
 trait MonadClass[M[_]] extends Monad[M] with BindClass[M] with ApplicativeClass[M] {
-  final def monad: Monad[M] = this
+  final def monad: Monad[M] with this.type = this
 }
 
 object MonadClass {

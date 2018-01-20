@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait ComonadClass[F[_]] extends Comonad[F] with CobindClass[F] with FunctorClass[F] {
-  final def comonad: Comonad[F] = this
+  final def comonad: Comonad[F] with this.type = this
 }
 
 object ComonadClass {

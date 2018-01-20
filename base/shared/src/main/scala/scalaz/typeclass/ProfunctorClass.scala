@@ -2,7 +2,7 @@ package scalaz
 package typeclass
 
 trait ProfunctorClass[F[_, _]] extends Profunctor[F] {
-  final def profunctor: Profunctor[F] = this
+  final def profunctor: Profunctor[F] with this.type = this
 }
 
 object ProfunctorClass {
