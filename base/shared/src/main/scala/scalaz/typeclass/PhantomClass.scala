@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-trait PhantomClass[F[_]] extends Phantom[F] with Functor[F] with Contravariant[F] {
+trait PhantomClass[F[_]] extends Phantom[F] with Functor.Template[F] with Contravariant[F] {
   final def phantom: Phantom[F] = this
 }
 

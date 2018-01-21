@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-trait CobindClass[F[_]] extends Cobind[F] with FunctorClass[F] {
+trait CobindClass[F[_]] extends Cobind[F] with Functor.Template[F] {
   final def cobind: Cobind[F] = this
 }
 

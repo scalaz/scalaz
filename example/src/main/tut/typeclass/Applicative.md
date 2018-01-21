@@ -16,9 +16,9 @@ import scalaz.Scalaz._
 ## Instance declaration
 
 ```tut
-import scalaz.typeclass.ApplicativeClass
+import scalaz.Prelude._
 
-implicit val listap: Applicative[List] = new ApplicativeClass[List] {
+implicit val listap: Applicative[List] = new Applicative.Template[List] {
   def pure[A](a: A): List[A] = List(a)
   def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = fa.zip(f).map(t => t._2(t._1))
   def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)

@@ -22,9 +22,9 @@ import scalaz.Scalaz._
 ## Instance declaration
 
 ```tut
-import scalaz.typeclass.MonadClass
+import scalaz.Prelude._
 
-val listMonad: Monad[List] = new MonadClass[List] {
+val listMonad: Monad[List] = new Monad.Template[List] {
   def pure[A](a: A): List[A] = List(a)
   def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = fa.zip(f).map(t => t._2(t._1))
   def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)

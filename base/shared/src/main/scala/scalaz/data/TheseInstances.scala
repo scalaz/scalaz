@@ -1,22 +1,19 @@
 package scalaz
 package data
 
-import typeclass.{ BindClass, FoldableClass, MonadClass, SemigroupClass, TraversableClass }
-
 trait TheseInstances {
   // implicit def bifunctor: Bifunctor[These] = ...
 
   implicit final def theseMonad[L: Semigroup]: Monad[These[L, ?]] =
-    new MonadClass.Template[These[L, ?]] with BindClass.Ap[These[L, ?]] {
+    new Monad.Template[These[L, ?]] with Bind.DeriveAp[These[L, ?]] with Bind.DeriveFlatten[These[L, ?]] {
       override def map[A, B](ma: These[L, A])(f: A => B) = ma.rmap(f)
       def flatMap[A, B](ma: These[L, A])(f: A => These[L, B]) = ma.flatMap(f)
       def pure[A](a: A) = That(a)
     }
 
   implicit final def theseTraversable[L]: Traversable[These[L, ?]] =
-    new TraversableClass[These[L, ?]]
-        with TraversableClass.Traverse[These[L, ?]]
-        with FoldableClass.FoldMap[These[L, ?]] {
+    new Traversable.Template[These[L, ?]]
+        with Traversable.DeriveSequence[These[L, ?]] with Foldable.DeriveToList[These[L, ?]] {
       def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
       def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B) = fa.foldMap(f)
       def map[A, B](ma: These[L, A])(f: A => B) = ma.rmap(f)
@@ -27,7 +24,7 @@ trait TheseInstances {
     }
 
   implicit final def theseSemigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =
-    new SemigroupClass[These[L, R]] {
+    new Semigroup.Template[These[L, R]] {
       def append(a1: These[L, R], a2: => These[L, R]) = a1.append(a2)
     }
 
