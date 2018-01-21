@@ -1,6 +1,6 @@
 package scalaz
 package typeclass
 
-trait ProfunctorInstances { instances =>
+trait ProfunctorInstances {
   
 }

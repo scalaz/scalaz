@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scalaz.typeclass.ComposeClass
+
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the right and addition of new elements (i.e. "increment") from the left.
@@ -72,9 +74,9 @@ object PostComposeBalancer {
   def rightAction[G[_, _], F[_, _], A](φ: F ~~> G)(implicit G: Compose[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
     ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
 
-  private def flip[F[_, _]](F: Compose[F]): Compose[λ[(α, β) => F[β, α]]] =
-    new Compose[λ[(α, β) => F[β, α]]] {
+  private def flip[F[_, _]](F: Compose[F]): Compose[λ[(α, β) => F[β, α]]] = instanceOf(
+    new ComposeClass[λ[(α, β) => F[β, α]]] {
       def compose[A, B, C](f: F[C, B], g: F[B, A]): F[C, A] =
         F.compose(g, f)
-    }
+    })
 }

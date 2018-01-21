@@ -1,8 +1,10 @@
 package scalaz
 package data
 
+import scalaz.typeclass.ProfunctorClass
+
 trait UpStarInstances {
-  implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] = new Profunctor[UpStar[F, ?, ?]] {
+  implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] = instanceOf(new ProfunctorClass[UpStar[F, ?, ?]] {
     override def lmap[A, B, C](fab: UpStar[F, A, B])(ca: C => A): UpStar[F, C, B] =
       UpStar(c => fab.run(ca(c)))
 
@@ -11,5 +13,5 @@ trait UpStarInstances {
 
     override def dimap[A, B, C, D](fab: UpStar[F, A, B])(ca: C => A)(bd: B => D): UpStar[F, C, D] =
       UpStar(c => F.map(fab.run(ca(c)))(bd))
-  }
+  })
 }

@@ -20,17 +20,12 @@ import scalaz.Scalaz._
 ## Instance declaration
 
 ```tut
-val listApply: Apply[List] = new Apply[List] {
-  val functor = implicitly
-  def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = fa.zip(f).map(t => t._2(t._1))
-}
-
 import scalaz.typeclass.ApplyClass
 
-val listApply2 = new ApplyClass[List] {
+val listApply: Apply[List] = instanceOf(new ApplyClass[List] {
   def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = fa.zip(f).map(t => t._2(t._1))
   def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
-}
+})
 ```
 
 ## Usage

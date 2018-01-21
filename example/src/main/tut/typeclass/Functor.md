@@ -22,12 +22,15 @@ import Scalaz._
 ## Instance declaration
 
 ```tut
-val listFunctor: Functor[List] = new Functor[List] {
+import scalaz.Prelude._
+import scalaz.typeclass.FunctorClass
+
+val listFunctor: Functor[List] = instanceOf(new FunctorClass[List] {
   def map[A, B](ma: List[A])(f: A => B): List[B] = ma match {
     case Nil => Nil
     case x :: xs => f(x) :: map(xs)(f)
   }
-}
+})
 ```
 
 ## Usage
