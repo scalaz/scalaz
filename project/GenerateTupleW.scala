@@ -11,8 +11,6 @@ object GenerateTupleW {
       file
     }
 
-    def double(s: String) = s + s
-
     val tuples: IndexedSeq[(String, String)] = for (arity: Int <- arities) yield {
       case class N(n: Int) {
         val alpha: String = ('A' + (n - 1)).toChar.toString

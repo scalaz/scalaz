@@ -12,9 +12,9 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
 
   def ∗[B](f: A => F[B]): F[B] = F.bind(self)(f)
 
-  def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
+  def join[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev)
 
-  def μ[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev(_))
+  def μ[B](implicit ev: A <~< F[B]): F[B] = F.bind(self)(ev)
 
   def >>[B](b: => F[B]): F[B] = F.bind(self)(_ => b)
 

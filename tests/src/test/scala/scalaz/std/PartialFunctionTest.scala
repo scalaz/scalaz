@@ -24,4 +24,45 @@ object PartialFunctionTest extends SpecLite {
       (definedness.find(_._2).get._1(nums)
        must_===((0 - num, 0 - num2)))
   }
+
+  "Arrow[PartialFunction]#compose#isDefinedAt" ! forAll{ a: Int =>
+    var callF: Int = 0
+    var callG: Int = 0
+    val f: PartialFunction[Int, Int] = {
+      case n if {callF += 1; n % 2 == 0} => n
+    }
+    val g: PartialFunction[Int, String] = {
+      case n if {callG += 1; n % 3 == 0} => n.toString
+    }
+    val h = A.compose(g, f)
+    h.isDefinedAt(a) must_=== (a % 6 == 0)
+    callF must_=== 1
+    if (a % 2 == 0) {
+      callG must_=== 1
+    } else {
+      callG must_=== 0
+    }
+  }
+
+  "Arrow[PartialFunction]#compose#applyOrElse" ! forAll{ a: Int =>
+    var callF: Int = 0
+    var callG: Int = 0
+    val f: PartialFunction[Int, Int] = {
+      case n if {callF += 1; n % 2 == 0} => n
+    }
+    val g: PartialFunction[Int, String] = {
+      case n if {callG += 1; n % 3 == 0} => n.toString
+    }
+    val h = A.compose(g, f)
+    h.applyOrElse(a, (_: Int) => "default") must_=== (
+      if (a % 6 == 0) a.toString
+      else "default"
+    )
+    callF must_=== 1
+    if (a % 2 == 0) {
+      callG must_=== 1
+    } else {
+      callG must_=== 0
+    }
+  }
 }
