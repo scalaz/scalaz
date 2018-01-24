@@ -137,7 +137,7 @@ object Cord {
 
   def apply(as: Cord*): Cord = as.foldLeft(cord(FingerTree.empty))(_ ++ _)
 
-  def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String](sizer))((x, y) => x :+ y))
+  def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String])((x, y) => x :+ y))
 
   implicit val sizer: Reducer[String, Int] = UnitReducer((a: String) => a.length)
 

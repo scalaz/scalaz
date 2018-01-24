@@ -247,15 +247,15 @@ object Task {
           a.map((_, residuals.map(new Task(_))))
         })
       val AE = Apply[Throwable \/ ?]
-      override def reduceUnordered[A, M](fs: Seq[Task[A]])(implicit R: Reducer[A, M]): Task[M] = {
-        import R.monoid
-        val RR: Reducer[Throwable \/ A, Throwable \/ M] =
+      override def reduceUnordered[A, M](fs: Seq[Task[A]])(implicit R: Reducer[A, M], M: Monoid[M]): Task[M] = {
+        implicit val MM: Monoid[Throwable \/ M] = Monoid.liftMonoid[Throwable \/ ?, M]
+        implicit val RR: Reducer[Throwable \/ A, Throwable \/ M] =
           Reducer[Throwable \/ A, Throwable \/ M](
             _.map(R.unit),
-            AE.apply2(_, _)(R.cons(_, _)),
-            AE.apply2(_, _)(R.snoc(_, _))
-          )(Monoid.liftMonoid[Throwable \/ ?, M])
-        new Task(F.reduceUnordered(fs.map(_.get))(RR))
+            AE.apply2(_, _)(R.cons),
+            AE.apply2(_, _)(R.snoc)
+          )
+        new Task(F.reduceUnordered[Throwable \/ A, Throwable \/ M](fs.map(_.get)))
       }
       def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
       def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
@@ -346,13 +346,13 @@ object Task {
     else
       reduceUnordered[A, IList[A]](tasks, exceptionCancels)
 
-  def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
+  def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M], M: Monoid[M]): Task[M] =
     if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
     else tasks match {
       // Unfortunately we cannot reuse the future's combinator
       // due to early terminating requirement on task
       // when task fails.  This also makes implementation a bit trickier
-      case Seq() => Task.now(R.zero)
+      case Seq() => Task.now(M.zero)
       case Seq(t) => t.map(R.unit)
       case _ => new Task(Future.Async { cb =>
         val interrupt = new AtomicBoolean(false)
@@ -371,7 +371,7 @@ object Task {
 
               // only last completed f will hit the 0 here.
               if (togo.decrementAndGet() == 0)
-                cb(\/-(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b))))
+                cb(\/-(results.asScala.foldLeft(M.zero)((a, b) => R.append(a, b))))
               else
                 Trampoline.done(())
             case e@(-\/(failure)) =>

@@ -458,19 +458,19 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   import FingerTree._
 
-  implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
+  implicit def FingerArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
     arbitrary[A].map(one(_): Finger[V, A]),
     ^(arbitrary[A], arbitrary[A])(two(_, _): Finger[V, A]),
     ^^(arbitrary[A], arbitrary[A], arbitrary[A])(three(_, _, _): Finger[V, A]),
     ^^^(arbitrary[A], arbitrary[A], arbitrary[A], arbitrary[A])(four(_, _, _, _): Finger[V, A])
   ))
 
-  implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
+  implicit def NodeArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
     ^(arbitrary[A], arbitrary[A])(node2[V, A](_, _)),
     ^^(arbitrary[A], arbitrary[A], arbitrary[A])(node3[V, A](_, _, _))
   ))
 
-  implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
+  implicit def FingerTreeArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
     def fingerTree[A](n: Int)(implicit a1: Arbitrary[A], measure1: Reducer[A, V]): Gen[FingerTree[V, A]] = n match {
       case 0 => empty[V, A]
       case 1 => arbitrary[A].map(single[V, A](_))
