@@ -24,7 +24,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
   checkAll(band.laws[XMap[String, ISet[Int]]])
-
+  
   checkAll("satisfy equals laws when not natural", equal.laws[Map[NotNatural, String]])
 
   implicit def mapArb[A: Arbitrary: BKC, B: Arbitrary]: Arbitrary[Map[A, B]] =

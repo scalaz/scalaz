@@ -239,4 +239,19 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
   implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
+
+  implicit def nonEmptyListCofoldable1[A]: Cofoldable1[NonEmptyList, A] = new Cofoldable1[NonEmptyList, A] {
+    override def unfoldr1[B](b: B)(f: B => (A, Option[B])): NonEmptyList[A] = { 
+      def unfold(b: B, rnel: NonEmptyList[A]): NonEmptyList[A] =
+        f(b) match {
+          case (a, Some(b)) => unfold(b, NonEmptyList.nel(a, rnel.head :: rnel.tail))
+          case (a, None) => NonEmptyList.nel(a, rnel.head :: rnel.tail)
+        }
+
+      f(b) match {
+        case (a, Some(b)) => unfold(b, NonEmptyList(a))
+        case (a, None) => NonEmptyList(a)
+      }
+    }
+  }
 }

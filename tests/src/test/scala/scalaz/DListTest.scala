@@ -15,6 +15,7 @@ object DListTest extends SpecLite {
   checkAll(isEmpty.laws[DList])
   checkAll(bindRec.laws[DList])
   checkAll(monadPlus.strongLaws[DList])
+  checkAll(cofoldable.laws[DList])
 
   "DList append" ! ((0 to 100000).foldLeft(DList[Int]())(_ :+ _).toList must_== (0 to 100000).toList)
 

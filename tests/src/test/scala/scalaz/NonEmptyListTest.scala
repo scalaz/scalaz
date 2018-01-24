@@ -17,6 +17,7 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", zip.laws[NonEmptyList])
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
+  checkAll("NonEmptyList", cofoldable1.laws[NonEmptyList])
 
   "scanLeft1" ! forAll { fa: NonEmptyList[List[Int]] =>
     def f[A]: (List[A], List[A]) => List[A] = _ ::: _

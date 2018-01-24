@@ -13,6 +13,7 @@ object SetTest extends SpecLite {
   checkAll(foldable.laws[Set])
   checkAll(FoldableTests.anyAndAllLazy[Set])
   checkAll(semilattice.laws[Set[Int]])
+  checkAll(cofoldable.laws[Set])
 
   "foldLeftM" should {
 

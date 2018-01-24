@@ -5,7 +5,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
-
 object IListTest extends SpecLite {
 
   // Same laws that hold for List
@@ -19,6 +18,7 @@ object IListTest extends SpecLite {
   checkAll(isEmpty.laws[IList])
   checkAll(cobind.laws[IList])
   checkAll(order.laws[IList[Int]])
+  checkAll(cofoldable.laws[IList])
 
   // These tests hold for List, so they had better hold for IList
 

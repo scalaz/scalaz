@@ -87,8 +87,10 @@ object TypeClass {
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
-
+  
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
+  lazy val cofoldable = TypeClass("Cofoldable", |*->*|->*, extendsList = Seq(cofoldable1), createSyntax = true)
+  lazy val cofoldable1 = TypeClass("Cofoldable1", |*->*|->*, extendsList = Seq(), createSyntax = true)
 
   def core: List[TypeClass] = List(semigroup,
     monoid,
@@ -150,7 +152,9 @@ object TypeClass {
     monadTell,
     monadReader,
     comonadStore,
-    bindRec
+    bindRec,
+    cofoldable,
+    cofoldable1
   )
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)

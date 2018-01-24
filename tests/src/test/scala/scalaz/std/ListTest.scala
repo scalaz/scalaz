@@ -17,6 +17,7 @@ object ListTest extends SpecLite {
   checkAll(isEmpty.laws[List])
   checkAll(cobind.laws[List])
   checkAll(order.laws[List[Int]])
+  checkAll(cofoldable.laws[List])
 
   import std.list.listSyntax._
   import syntax.foldable._
