@@ -95,6 +95,14 @@ private trait ProductFoldable[F[_], G[_]] extends Foldable[λ[α => (F[α], G[α
     G.foldLeft(fa._2, F.foldLeft(fa._1, z)(f))(f)
 }
 
+private trait ProductCofoldable[F[_], G[_], A] extends Cofoldable[λ[α => (F[α], G[α])], A] {
+ implicit def F: Cofoldable[F, A]
+ implicit def G: Cofoldable[G, A]
+
+  def unfoldr[B](b: B)(f: B => Option[(B, A)]): (F[A], G[A]) =
+    (F.unfoldr(b)(f), G.unfoldr(b)(f))
+}
+
 private trait ProductFoldable1L[F[_], G[_]] extends Foldable1[λ[α => (F[α], G[α])]] with ProductFoldable[F, G] {
   implicit def F: Foldable1[F]
 

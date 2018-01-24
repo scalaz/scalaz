@@ -10,6 +10,17 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
+  
+  implicit def listCofdable[A]: Cofoldable[List, A] = new Cofoldable[List, A] {
+    def unfoldr[B](b: B)(f: B => Option[(B, A)]): List[A] = {
+      def unfold(b: B, d: List[A]): List[A] = f(b) match {
+        case Some((b, a)) => unfold(b, a +: d)
+        case None => d
+      }
+      unfold(b, List())
+    }
+  }
+  
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
