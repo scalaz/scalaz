@@ -1,10 +1,10 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
 package scalaz.effect
 
-import scalaz.typeclass.{Monad, MonadClass}
+import scalaz.typeclass.{Bind, Monad}
 
 trait IOInstances {
-  implicit val monad: Monad[IO] = new MonadClass.Template[IO] {
+  implicit val monad: Monad[IO] = new Monad.Template[IO] with Bind.DeriveFlatten[IO] {
     override final def map[A, B](ma: IO[A])(f: A => B): IO[B] =
       ma.map(f)
 

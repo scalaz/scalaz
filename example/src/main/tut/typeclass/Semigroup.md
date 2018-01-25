@@ -20,7 +20,9 @@ import Scalaz._
 ## Instance declaration
 
 ```tut
-implicit val StringSemigroup = new Semigroup[String] {
+import scalaz.Prelude._
+
+implicit val StringSemigroup: Semigroup[String] = new Semigroup.Template[String] {
   def append(a1: String, a2: => String) = a1 + a2
 }
 ```
@@ -28,6 +30,6 @@ implicit val StringSemigroup = new Semigroup[String] {
 ## Usage
 
 ```tut
-StringSemigroup.append("hello", "world")
+Semigroup[String].append("hello", "world")
 "hello".append("world")
 ```

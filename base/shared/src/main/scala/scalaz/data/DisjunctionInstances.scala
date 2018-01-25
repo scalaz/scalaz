@@ -1,10 +1,8 @@
 package scalaz
 package data
 
-import typeclass.MonadClass
-
 trait DisjunctionInstances {
-  implicit def disjunctionMonad[L]: Monad[L \/ ?] = new MonadClass.Template[L \/ ?] {
+  implicit def disjunctionMonad[L]: Monad[L \/ ?] = new Monad.Template[L \/ ?] with Bind.DeriveFlatten[L \/ ?] {
 
     override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
       ma.fold[L \/ B](l => -\/(l))(r => \/-(f(r)))

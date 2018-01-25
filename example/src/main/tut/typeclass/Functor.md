@@ -22,7 +22,9 @@ import Scalaz._
 ## Instance declaration
 
 ```tut
-val listFunctor: Functor[List] = new Functor[List] {
+import scalaz.Prelude._
+
+val listFunctor: Functor[List] = new Functor.Template[List] {
   def map[A, B](ma: List[A])(f: A => B): List[B] = ma match {
     case Nil => Nil
     case x :: xs => f(x) :: map(xs)(f)
