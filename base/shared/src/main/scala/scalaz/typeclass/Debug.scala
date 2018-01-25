@@ -3,17 +3,17 @@ package typeclass
 
 /** A typeclass describing types which can be meaningfully represented as a `String`.
   */
-trait Show[A] {
+trait Debug[A] {
   /** Produce a `String` representation of `a`.
     */
   /* todo: when we have a `Cord`, change this to return that instead,
-   * todo: and add a `def shows(a: A): String = show(a).toString`
+   * todo: and add a `def debugs(a: A): String = debug(a).toString`
    */
-  def show(a: A): String
+  def debug(a: A): String
 }
 
-object Show {
-  /** A factory for `Show` instances which delegates to Scala's `.toString` method.
+object Debug {
+  /** A factory for `Debug` instances which delegates to Scala's `.toString` method.
     */
-  def fromToString[A]: Show[A] = _.toString()
+  def fromToString[A]: Debug[A] = _.toString()
 }
