@@ -386,7 +386,7 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
+  val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
     new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
@@ -396,12 +396,20 @@ sealed trait TrampolineInstances {
       def tailrecM[A, B](a: A)(f: A => Trampoline[A \/ B]): Trampoline[B] =
         f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
+
+  implicit val trampolineComonad: Comonad[Trampoline] =
+    new Comonad[Trampoline] {
+      def map[A, B](ta: Trampoline[A])(f: A => B) = ta map f
+      def copoint[A](fa: Trampoline[A]) = fa.run
+      def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
+      override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
+    }
 }
 
 object Sink extends SinkInstances
 
 sealed trait SinkInstances {
-  implicit def sinkMonad[S]: Monad[Sink[S, ?]] =
+  def sinkMonad[S]: Monad[Sink[S, ?]] =
     new Monad[Sink[S, ?]] {
       def point[A](a: => A) = liftF[(=> S) => ?, Unit](s => ()).map(_ => a)
       def bind[A, B](s: Sink[S, A])(f: A => Sink[S, B]) = s flatMap f
@@ -411,7 +419,7 @@ sealed trait SinkInstances {
 object Source extends SourceInstances
 
 sealed trait SourceInstances {
-  implicit def sourceMonad[S]: Monad[Source[S, ?]] =
+  def sourceMonad[S]: Monad[Source[S, ?]] =
     new Monad[Source[S, ?]] {
       override def point[A](a: => A) = Free.point[(S, ?), A](a)
       def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f

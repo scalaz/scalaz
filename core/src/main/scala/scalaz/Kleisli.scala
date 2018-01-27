@@ -151,6 +151,11 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
     new KleisliBindRec[F, R] {
       implicit def F: BindRec[F] = F0
     }
+
+  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, ?]] =
+    new KleisliPlusEmpty[F, A] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class KleisliInstances6 extends KleisliInstances7 {
@@ -230,11 +235,6 @@ abstract class KleisliInstances extends KleisliInstances0 {
   implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]): Monoid[Kleisli[F, A, B]] =
     new KleisliMonoid[F, A, B] {
       implicit def FB = FB0
-    }
-
-  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, ?]] =
-    new KleisliPlusEmpty[F, A] {
-      implicit def F = F0
     }
 
   implicit def kleisliMonadTrans[R]: Hoist[λ[(α[_], β) => Kleisli[α, R, β]]] =
