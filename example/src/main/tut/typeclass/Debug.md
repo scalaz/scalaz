@@ -1,11 +1,11 @@
 ---
 layout: docs
-title:  "Show"
+title:  "Debug"
 ---
 
-# Show
+# Debug
 
-`Show` presents a safe and explicit alternative to `Object.toString`.
+`Debug` presents a safe and explicit alternative to `Object.toString`.
 By providing instances of this typeclass, a type explicitly defines that it can be converted into human-readable output.
 
 **Typical imports**
@@ -18,24 +18,24 @@ import Scalaz._
 # Built-in instances
 
 ```tut
-"Scalaz 8".show
+"Scalaz 8".debug
 ```
 
 # Instance declaration
 
 ```tut
 case class Foo(a: Int)
-implicit val fooShow: Show[Foo] = (f: Foo) => s"Foo[${f.a}]"
+implicit val fooDebug: Debug[Foo] = (f: Foo) => s"Foo[${f.a}]"
 ```
 
 # Usage
 
 ```tut
 val bad = Foo(1).toString
-val good = Foo(1).show
+val good = Foo(1).debug
 
 import scalaz.data.Maybe
-Maybe.just(Foo(1)).show
+Maybe.just(Foo(1)).debug
 ```
 
-*Note that the `Show` instance for `Maybe` resolves against the `Show` instance for `Foo`.*
+*Note that the `Debug` instance for `Maybe` resolves against the `Debug` instance for `Foo`.*

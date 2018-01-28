@@ -31,8 +31,8 @@ trait TheseInstances {
       def append(a1: These[L, R], a2: => These[L, R]) = a1.append(a2)
     }
 
-  implicit final def theseShow[L, R](implicit L: Show[L], R: Show[R]): Show[These[L, R]] =
-    Show.fromShows[These[L, R]] {
-      _.bimap(L.show)(R.show).toString
+  implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] =
+    Debug.fromDebugs[These[L, R]] {
+      _.bimap(L.debugs)(R.debugs).toString
     }
 }

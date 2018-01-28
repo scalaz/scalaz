@@ -47,7 +47,6 @@ trait ConstInstances {
     def empty: Const[A, B] = Const(A.empty)
   }
 
-  implicit def constShow[A, B](implicit A: Show[A]): Show[Const[A, B]] =
-    Show.fromShows[Const[A, B]](a => A.shows(a.getConst))
-
+  implicit def constDebug[A, B](implicit A: Debug[A]): Debug[Const[A, B]] =
+    Debug.fromDebugs(a => A.debugs(a.getConst))
 }

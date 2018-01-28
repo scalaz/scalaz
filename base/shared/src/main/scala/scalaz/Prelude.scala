@@ -19,7 +19,7 @@ trait BaseTypeclasses {
   type Phantom[F[_]] = typeclass.Phantom[F]
   type Profunctor[F[_,_]] = typeclass.Profunctor[F]
   type Semigroup[T] = typeclass.Semigroup[T]
-  type Show[A] = typeclass.Show[A]
+  type Debug[A] = typeclass.Debug[A]
   type Strong[F[_,_]] = typeclass.Strong[F]
   type Traversable[T[_]] = typeclass.Traversable[T]
 
@@ -41,7 +41,7 @@ trait BaseTypeclasses {
   val Phantom = typeclass.Phantom
   val Profunctor = typeclass.Profunctor
   val Semigroup = typeclass.Semigroup
-  val Show = typeclass.Show
+  val Debug = typeclass.Debug
   val Strong = typeclass.Strong
   val Traversable = typeclass.Traversable
 }
@@ -113,7 +113,7 @@ trait AllInstances extends data.AMaybeInstances
     with typeclass.PhantomInstances
     with typeclass.ProfunctorInstances
     with typeclass.SemigroupInstances
-    with typeclass.ShowInstances
+    with typeclass.DebugInstances
     with typeclass.StrongInstances
     with typeclass.TraversableInstances
 
@@ -136,7 +136,7 @@ trait AllSyntax extends data.AsSyntax
     with typeclass.PhantomSyntax
     with typeclass.ProfunctorSyntax
     with typeclass.SemigroupSyntax
-    with typeclass.ShowSyntax
+    with typeclass.DebugSyntax
     with typeclass.StrongSyntax
     with typeclass.TraversableSyntax
 

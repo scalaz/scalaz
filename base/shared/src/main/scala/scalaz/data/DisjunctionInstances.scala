@@ -19,9 +19,9 @@ trait DisjunctionInstances {
       oa.fold[L \/ B](l => -\/(l))(a => f(a))
   }
 
-  implicit def disjunctionShow[L, R](implicit L: Show[L], R: Show[R]): Show[L \/ R] = 
-    Show.fromShows[L \/ R] {
-      case -\/(left)  => s"""-\/(${L.show(left)})"""
-      case \/-(right) => s"""\/-(${R.show(right)})"""
+  implicit def disjunctionDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[L \/ R] =
+    Debug.fromDebugs {
+      case -\/(left)  => s"""-\/(${L.debug(left)})"""
+      case \/-(right) => s"""\/-(${R.debug(right)})"""
     }
 }
