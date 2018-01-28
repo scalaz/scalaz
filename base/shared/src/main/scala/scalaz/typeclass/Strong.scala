@@ -9,3 +9,6 @@ trait Strong[P[_, _]] {
   def second[A, B, C](pab: P[A, B]): P[(C, A), (C, B)]
 }
 
+object Strong {
+  def apply[P[_, _]](implicit P: Strong[P]): Strong[P] = P
+}

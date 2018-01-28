@@ -6,6 +6,6 @@ trait Comonad[F[_]] {
   def copoint[A](fa: F[A]): A
 }
 
-object Comonad extends ComonadSyntax {
+object Comonad {
   def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 }

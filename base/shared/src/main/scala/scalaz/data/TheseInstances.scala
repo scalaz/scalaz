@@ -32,8 +32,7 @@ trait TheseInstances {
     }
 
   implicit final def theseShow[L, R](implicit L: Show[L], R: Show[R]): Show[These[L, R]] =
-    new Show[These[L, R]] {
-      def show(a: These[L, R]) =
-        a.bimap(L.show)(R.show).toString
+    Show.fromShows[These[L, R]] {
+      _.bimap(L.show)(R.show).toString
     }
 }

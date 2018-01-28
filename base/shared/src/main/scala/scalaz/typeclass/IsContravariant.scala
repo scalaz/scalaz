@@ -17,3 +17,7 @@ trait IsContravariant[F[_]] {
 
   def widen[A, B](fa: F[B])(implicit ev: A <~< B): F[A]
 }
+
+object IsContravariant {
+  def apply[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
+}

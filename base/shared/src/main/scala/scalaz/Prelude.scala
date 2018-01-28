@@ -23,27 +23,27 @@ trait BaseTypeclasses {
   type Strong[F[_,_]] = typeclass.Strong[F]
   type Traversable[T[_]] = typeclass.Traversable[T]
 
-  def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
-  def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
-  def Bind[F[_]](implicit F: Bind[F]): Bind[F] = F
-  def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P
-  def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
-  def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
-  def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
-  def Compose[P[_,_]](implicit P: Compose[P]): Compose[P] = P
-  def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F] = F
-  def Functor[F[_]](implicit F: Functor[F]): Functor[F] = F
-  def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
-  def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
-  def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
-  def Monad[M[_]](implicit M: Monad[M]): Monad[M] = M
-  def Monoid[T](implicit T: Monoid[T]): Monoid[T] = T
-  def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F] = F
-  def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
-  def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T] = T
-  def Show[A](implicit A: Show[A]): Show[A] = A
-  def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
-  def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T] = T
+  val Applicative = typeclass.Applicative
+  val Apply = typeclass.Apply
+  val Bind = typeclass.Bind
+  val Category = typeclass.Category
+  val Choice = typeclass.Choice
+  val Cobind = typeclass.Cobind
+  val Comonad = typeclass.Comonad
+  val Compose = typeclass.Compose
+  val Foldable = typeclass.Foldable
+  val Functor = typeclass.Functor
+  val InvariantFunctor = typeclass.InvariantFunctor
+  val IsContravariant = typeclass.IsContravariant
+  val IsCovariant = typeclass.IsCovariant
+  val Monad = typeclass.Monad
+  val Monoid = typeclass.Monoid
+  val Phantom = typeclass.Phantom
+  val Profunctor = typeclass.Profunctor
+  val Semigroup = typeclass.Semigroup
+  val Show = typeclass.Show
+  val Strong = typeclass.Strong
+  val Traversable = typeclass.Traversable
 }
 
 trait BaseData {
@@ -94,11 +94,11 @@ trait AllFunctions extends data.DisjunctionFunctions
 
 trait AllInstances extends data.AMaybeInstances
     with data.AsInstances
+    with data.BiconstInstances
     with data.ConstInstances
     with data.DisjunctionInstances
     with data.DownStarInstances
     with data.ForgetInstances
-    with data.IdentityInstances
     with data.TheseInstances
     with data.UpStarInstances
     with typeclass.BindInstances

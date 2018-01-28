@@ -48,5 +48,6 @@ trait ConstInstances {
   }
 
   implicit def constShow[A, B](implicit A: Show[A]): Show[Const[A, B]] =
-    a => A.show(a.getConst)
+    Show.fromShows[Const[A, B]](a => A.shows(a.getConst))
+
 }

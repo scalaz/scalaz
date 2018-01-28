@@ -54,7 +54,7 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   def monad: Monad[Maybe] = instance
   def traversable: Traversable[Maybe] = instance
 
-  def show[A](implicit A: Show[A]): Show[Maybe[A]] = {
+  def show[A](implicit A: Show[A]): Show[Maybe[A]] = Show.fromShows[Option[A]] {
     case Some(a) => s"Just(${A.show(a)})"
     case None    =>  "Empty"
   }
