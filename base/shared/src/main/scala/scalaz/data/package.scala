@@ -79,6 +79,9 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 
+  val Cord: CordModule = CordImpl
+  type Cord = Cord.Cord
+
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
 }
