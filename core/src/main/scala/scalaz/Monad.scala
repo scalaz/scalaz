@@ -89,7 +89,7 @@ object Monad {
 
   ////
 
-  implicit def monadMTMAB[MT[_[_], _], MAB[_, _], A](implicit t: MonadTrans[MT], m: Monad[MAB[A, ?]]): Monad[MT[MAB[A, ?], ?]] =
+  def monadMTMAB[MT[_[_], _], MAB[_, _], A](implicit t: MonadTrans[MT], m: Monad[MAB[A, ?]]): Monad[MT[MAB[A, ?], ?]] =
     t.apply[MAB[A, ?]]
 
   ////

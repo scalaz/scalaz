@@ -27,12 +27,6 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.13.0-M2
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJVM"
-    - scala: 2.13.0-M2
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJS"
     - scala: 2.12.4
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
@@ -50,6 +44,15 @@ matrix:
       jdk: oraclejdk9
       script:
       - ./sbt -Dsbt.scala.version=2.10.7 ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
+    - scala: 2.13.0-M3
+      jdk: oraclejdk8
+      script:
+      - git clone -b v0.9.5 https://github.com/non/kind-projector.git
+      - cd kind-projector
+      - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
+      - cd ..
+      # TODO scalacheck_sjs0.6_2.13.0-M3
+      - sbt "++${TRAVIS_SCALA_VERSION}" -J-Xmx3784m checkGenTypeClasses rootJVM/test coreJS/compile effectJS/compile iterateeJS/compile
 
 env:
   matrix:

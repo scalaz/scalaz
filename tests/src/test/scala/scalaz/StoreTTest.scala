@@ -21,6 +21,7 @@ object StoreTTest extends SpecLite {
     def comonad[F[_] : Comonad] = Comonad[StoreT[F, A, ?]]
 
     // checking absence of ambiguity
+    def functor[F[_] : Cobind] = Functor[StoreT[F, A, ?]]
     def functor[F[_] : Comonad] = Functor[StoreT[F, A, ?]]
     def cobind[F[_] : Comonad] = Cobind[StoreT[F, A, ?]]
   }

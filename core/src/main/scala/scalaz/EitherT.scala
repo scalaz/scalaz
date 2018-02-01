@@ -318,7 +318,8 @@ sealed abstract class EitherTInstances2 extends EitherTInstances3 {
 }
 
 sealed abstract class EitherTInstances1 extends EitherTInstances2 {
-  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
+  // for binary compatibility
+  def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
     new EitherTMonad[F, L] {
       implicit def F = F0
     }

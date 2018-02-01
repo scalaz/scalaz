@@ -180,7 +180,9 @@ object CofreeTest extends SpecLite {
 
     // checking absence of ambiguity
     def bind[F[_]: PlusEmpty: Functor] = Bind[Cofree[F, ?]]
-    def functor[F[_]: PlusEmpty: Traverse] = Functor[Cofree[F, ?]]
+    def functor[F[_]: Traverse] = Functor[Cofree[F, ?]]
+    def functor[F[_]: Traverse1] = Functor[Cofree[F, ?]]
+    def functor[F[_]: Plus: Functor] = Functor[Cofree[F, ?]]
     def foldable1[F[_]: Traverse1] = Foldable1[Cofree[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[Cofree[F, ?]]
 
