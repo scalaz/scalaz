@@ -65,8 +65,10 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   def raiseError[A](e: Throwable): Future[A] =
     fail(e)
 
-  def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
-    fa.recoverWith(PartialFunction(f))
+  def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] = {
+    val pf: PartialFunction[Throwable, Future[A]] = { case x => f(x) }
+    fa.recoverWith(pf)
+  }
 }
 
 object scalaFuture extends FutureInstances
