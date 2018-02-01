@@ -12,7 +12,11 @@ object AlterTest extends SpecLite {
   checkAll("Alter[Maybe, Int]", monoid.laws[Alter[Maybe, Int]])
 
   object instances {
-    def semigroup[A: Monoid] = Semigroup[Alter[IList, A]]
-    def monoid[A: Monoid] = Monoid[Alter[Maybe, A]]
+    def equal[F[_], A](implicit F: Equal[F[A]]) = Equal[Alter[F, A]]
+    def semigroup[F[_]: Plus, A: Semigroup] = Semigroup[Alter[F, A]]
+    def semigroup[F[_]: Plus, A: Monoid] = Semigroup[Alter[F, A]]
+    def semigroup[F[_]: PlusEmpty, A: Semigroup] = Semigroup[Alter[F, A]]
+    def semigroup[F[_]: PlusEmpty, A: Monoid] = Semigroup[Alter[F, A]]
+    def monoid[F[_]: PlusEmpty, A: Monoid] = Monoid[Alter[F, A]]
   }
 }

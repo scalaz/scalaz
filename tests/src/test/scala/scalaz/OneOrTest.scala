@@ -44,6 +44,24 @@ object OneOrTest extends SpecLite {
     def foldable1[F[_]: Foldable1] = Foldable1[OneOr[F, ?]]
     def traverse[F[_]: Traverse] = Traverse[OneOr[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[OneOr[F, ?]]
+
+    // checking absence of ambiguity
+    def functor[F[_]: Apply] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Cobind] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Comonad] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Traverse] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Traverse1] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Apply: Cobind] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Apply: Comonad] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Apply: Traverse] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Apply: Traverse1] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Cobind: Traverse] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Cobind: Traverse1] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Comonad: Traverse] = Functor[OneOr[F, ?]]
+    def functor[F[_]: Comonad: Traverse1] = Functor[OneOr[F, ?]]
+    def cobind[F[_]: Comonad] = Cobind[OneOr[F, ?]]
+    def foldable[F[_]: Foldable1] = Foldable[OneOr[F, ?]]
+    def traverse[F[_]: Traverse1] = Traverse[OneOr[F, ?]]
   }
 
 }
