@@ -176,8 +176,23 @@ object LazyEitherT extends LazyEitherTInstances {
     }
 }
 
-sealed abstract class LazyEitherTInstances1 {
-  implicit def lazyEitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[LazyEitherT[F, L, ?]] =
+sealed abstract class LazyEitherTInstances3 {
+  implicit def lazyEitherTFunctor0[F[_], L](implicit F0: Functor[F]): Functor[LazyEitherT[F, L, ?]] =
+    new LazyEitherTFunctor[F, L] {
+      implicit def F = F0
+    }
+}
+
+sealed abstract class LazyEitherTInstances2 extends LazyEitherTInstances3 {
+  implicit def lazyEitherTMonadError0[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] =
+    new LazyEitherTMonadError[F, L] {
+      implicit def F = F0
+    }
+}
+
+sealed abstract class LazyEitherTInstances1 extends LazyEitherTInstances2 {
+  // for binary compatibility
+  def lazyEitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[LazyEitherT[F, L, ?]] =
     new LazyEitherTFunctor[F, L] {
       implicit def F = F0
     }
@@ -189,7 +204,8 @@ sealed abstract class LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] =
+  // for binary compatibility
+  def lazyEitherTMonadError[F[_], L](implicit F0: Monad[F]): MonadError[LazyEitherT[F, L, ?], L] =
     new LazyEitherTMonadError[F, L] {
       implicit def F = F0
     }
@@ -225,7 +241,8 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
     }
 
-  implicit def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
+  // for binary compatibility
+  def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
     new LazyEitherTMonad[F, L] {
       implicit def F = F0
     }
