@@ -8,7 +8,6 @@ cache:
 
 language: scala
 scala:
-  - 2.13.0-M2
   - 2.12.4
   - 2.11.11
 jdk:
@@ -48,3 +47,11 @@ matrix:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
     - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
+  - scala: 2.13.0-M3
+    jdk: oraclejdk8
+    script:
+    - git clone -b v0.9.5 https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
+    - cd ..
+    - sbt "++${TRAVIS_SCALA_VERSION}! -v" -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile example/compile concurrent/compile coreJS/compile effectJS/compile iterateeJS/compile

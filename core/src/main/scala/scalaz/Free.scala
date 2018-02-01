@@ -386,15 +386,12 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
-    new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
-      override def point[A](a: => A) = return_[Function0, A](a)
-      def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
+  implicit val trampolineInstance: Comonad[Trampoline] =
+    new Comonad[Trampoline] {
+      override def map[A, B](fa: Trampoline[A])(f: A => B) = fa map f
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
-      def tailrecM[A, B](a: A)(f: A => Trampoline[A \/ B]): Trampoline[B] =
-        f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 }
 

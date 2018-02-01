@@ -142,7 +142,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M2"),
+    crossScalaVersions := Seq(Scala211, Scala212),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.5",
@@ -304,7 +304,7 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
-      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.2"
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.3"
     )
     .jvmSettings(
       jvm_js_settings,
