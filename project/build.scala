@@ -243,7 +243,7 @@ object build {
         <licenses>
           <license>
             <name>BSD-style</name>
-            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
             <distribution>repo</distribution>
           </license>
         </licenses>
@@ -269,7 +269,7 @@ object build {
               <developer>
                 <id>{id}</id>
                 <name>{name}</name>
-                <url>http://github.com/{id}</url>
+                <url>https://github.com/{id}</url>
               </developer>
           }
         }

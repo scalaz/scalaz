@@ -6,7 +6,7 @@ import Id._
  * Leibnizian equality: a better `=:=`
  *
  * This technique was first used in
- * [[http://portal.acm.org/citation.cfm?id=583852.581494  Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
+ * [[https://portal.acm.org/citation.cfm?id=583852.581494  Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
  *
  * It is generalized here to handle subtyping so that it can be used with constrained type constructors.
  *

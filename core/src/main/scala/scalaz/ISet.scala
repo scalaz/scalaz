@@ -5,7 +5,7 @@ import Ordering._
 import std.option._
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
+ * @see [[https://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Set/Base.hs]]
  */
 sealed abstract class ISet[A] {

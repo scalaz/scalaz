@@ -1,6 +1,6 @@
 package scalaz
 
-// http://www.haskell.org/ghc/docs/7.0.2/html/libraries/containers-0.4.0.0/src/Data-Map.html
+// https://www.haskell.org/ghc/docs/7.0.2/html/libraries/containers-0.4.0.0/src/Data-Map.html
 
 import Ordering.{ EQ, LT, GT }
 
