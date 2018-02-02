@@ -91,6 +91,13 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 }
 
 sealed abstract class TheseTInstances1 {
+  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
+    new TheseTFunctor[F, L] {
+      override def F = implicitly
+    }
+}
+
+sealed abstract class TheseTInstances0 extends TheseTInstances1 {
   implicit def TheseTInstance1[F[_]: Traverse, L]: Traverse[TheseT[F, L, ?]]
   = new Traverse[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
     override def F = implicitly
@@ -106,11 +113,9 @@ sealed abstract class TheseTInstances1 {
 
     override implicit def apply[G[_]: Monad]: Monad[TheseT[G, A, ?]] = TheseT.theseTMonad[G, A]
   }
-
-
 }
 
-sealed abstract class TheseTInstances0 extends TheseTInstances1 {
+sealed abstract class TheseTInstances extends TheseTInstances0 {
   implicit def theseTMonad[F[_]: Monad, L: Semigroup]: Monad[TheseT[F, L, ?]]
   = new Monad[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
     override def F = implicitly
@@ -132,13 +137,6 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
   }
   implicit def theseTEqual[F[_], A, B](implicit F0: Equal[F[A \&/ B]]): Equal[TheseT[F, A, B]] =
     F0.contramap((_: TheseT[F, A, B]).run)
-
-}
-sealed abstract class TheseTInstances extends TheseTInstances0 {
-  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
-    new TheseTFunctor[F, L] {
-      override def F = implicitly
-    }
 }
 
 object TheseT extends TheseTInstances {

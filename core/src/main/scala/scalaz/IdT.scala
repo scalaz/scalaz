@@ -46,32 +46,33 @@ sealed abstract class IdTInstances1 extends IdTInstances2 {
     new IdTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
-  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
-    new IdTBindRec[F] {
-      implicit def F: BindRec[F] = F0
-    }
-}
 
-sealed abstract class IdTInstances0 extends IdTInstances1 {
+  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
+
   implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[IdT[F, ?]] =
     new IdTMonad[F] {
       implicit def F: Monad[F] = F0
     }
-
-  implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
-    F.contramap(_.run)
 }
 
-sealed abstract class IdTInstances extends IdTInstances0 {
-  implicit val idTHoist: Hoist[IdT] = IdTHoist
+sealed abstract class IdTInstances0 extends IdTInstances1 {
+  implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
+    F.contramap(_.run)
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, ?]] =
     new IdTTraverse[F] {
       implicit def F: Traverse[F] = F0
     }
+}
 
-  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
-    F.contramap(_.run)
+sealed abstract class IdTInstances extends IdTInstances0 {
+  implicit val idTHoist: Hoist[IdT] = IdTHoist
+
+  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
+    new IdTBindRec[F] {
+      implicit def F: BindRec[F] = F0
+    }
 }
 
 object IdT extends IdTInstances

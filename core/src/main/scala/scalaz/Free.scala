@@ -325,8 +325,8 @@ sealed abstract class Free[S[_], A] {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (-\/((e, c)), -\/(f)) => go(c, f(Some(e)))
-        case (-\/((e, c)), \/-(y)) => go(c, Sink.sinkMonad[Option[E]].pure(y))
-        case (\/-(x), -\/(f))      => go(Source.sourceMonad[E].pure(x), f(None))
+        case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[Option[E], ?]].pure(y))
+        case (\/-(x), -\/(f))      => go(Monad[Source[E, ?]].pure(x), f(None))
         case (\/-(x), \/-(y))      => (x, y)
       }
     go(ev(this), sink)
@@ -346,7 +346,7 @@ sealed abstract class Free[S[_], A] {
   def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] =:= Sink[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (-\/((e, c)), -\/(f)) => go(c, f(e))
-      case (-\/((e, c)), \/-(y)) => go(c, Sink.sinkMonad[E].pure(y))
+      case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[E, ?]].pure(y))
       case (\/-(x), -\/(f))      => sys.error("Not enough values in source.")
       case (\/-(x), \/-(y))      => (y, x)
     }
@@ -373,7 +373,7 @@ sealed abstract class Free[S[_], A] {
     }
 }
 
-object Trampoline extends TrampolineInstances {
+object Trampoline {
 
   def done[A](a: A): Trampoline[A] =
     Free.pure[Function0,A](a)
@@ -385,7 +385,7 @@ object Trampoline extends TrampolineInstances {
     Free.suspend(a)
 }
 
-sealed trait TrampolineInstances {
+sealed abstract class FreeInstances4 {
   implicit val trampolineInstance: Comonad[Trampoline] =
     new Comonad[Trampoline] {
       override def map[A, B](fa: Trampoline[A])(f: A => B) = fa map f
@@ -395,27 +395,7 @@ sealed trait TrampolineInstances {
     }
 }
 
-object Sink extends SinkInstances
-
-sealed trait SinkInstances {
-  implicit def sinkMonad[S]: Monad[Sink[S, ?]] =
-    new Monad[Sink[S, ?]] {
-      def point[A](a: => A) = liftF[(=> S) => ?, Unit](s => ()).map(_ => a)
-      def bind[A, B](s: Sink[S, A])(f: A => Sink[S, B]) = s flatMap f
-    }
-}
-
-object Source extends SourceInstances
-
-sealed trait SourceInstances {
-  implicit def sourceMonad[S]: Monad[Source[S, ?]] =
-    new Monad[Source[S, ?]] {
-      override def point[A](a: => A) = Free.point[(S, ?), A](a)
-      def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f
-    }
-}
-
-sealed abstract class FreeInstances3 {
+sealed abstract class FreeInstances3 extends FreeInstances4 {
   implicit def freeFoldable[F[_]: Foldable]: Foldable[Free[F, ?]] =
     new FreeFoldable[F] {
       def F = implicitly
@@ -446,9 +426,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
     Semigroup.liftSemigroup[Free[S, ?], A]
 }
 
-// Trampoline, Sink, and Source are type aliases. We need to add their type class instances
-// to Free to be part of the implicit scope.
-sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
+sealed abstract class FreeInstances extends FreeInstances0 {
   implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
     new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f

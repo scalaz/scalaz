@@ -119,7 +119,7 @@ object build {
     "-Ywarn-unused-import",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
-    "-Yrangepos"
+    // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
   private def Scala211 = "2.11.11"
