@@ -560,7 +560,7 @@ object ContravariantCoyonedaUsage extends App {
   println("finalsort: " |+| finalsort.shows)
 
   // [1] https://en.wikipedia.org/wiki/Schwartzian_transform
-  // [2] http://failex.blogspot.com/2013/06/fake-theorems-for-free.html
+  // [2] https://failex.blogspot.com/2013/06/fake-theorems-for-free.html
   // [3] https://github.com/scodec/scodec
   // [4] https://github.com/joshcough/f0
 }

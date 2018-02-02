@@ -97,7 +97,7 @@ object KleisliTest extends SpecLite {
       def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 
-      // Sigh, more tests needed, see http://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
+      // Sigh, more tests needed, see https://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
       trait X
       type ReaderX[A] = Reader[X, A]
       def readerXFunctor = Functor[ReaderX]

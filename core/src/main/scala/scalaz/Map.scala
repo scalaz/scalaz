@@ -1,7 +1,7 @@
 package scalaz
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
+ * @see [[https://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Map/Base.hs]]
  */
 import Ordering.{ EQ, LT, GT }

@@ -7,7 +7,7 @@ package example
   from it, and allow us to create new typeclass instances for our
   newly created type to get different behaviors.  The same thing could
   be done with scala 2.10's Value Classes:
-  http://docs.scala-lang.org/overviews/core/value-classes.html however
+  https://docs.scala-lang.org/overviews/core/value-classes.html however
   one has to be very careful when using value classes, because there
   are a lot of instances in which using a value class will incur a
   runtime boxing/unboxing of your value, which incurs a runtime
