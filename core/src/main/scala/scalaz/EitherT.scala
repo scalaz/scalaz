@@ -301,7 +301,7 @@ sealed abstract class EitherTInstances5 {
     }
 }
 
-sealed abstract class EitherTInstances4 extends EitherTInstances5 {
+sealed abstract class EitherTInstances4 extends EitherTInstances5{
   implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
@@ -314,19 +314,16 @@ sealed abstract class EitherTInstances3 extends EitherTInstances4 {
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
+}
+
+sealed abstract class EitherTInstances2 extends EitherTInstances3 {
   implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[EitherT[F, L, ?]] =
     new EitherTFunctor[F, L] {
       implicit def F = F0
     }
 }
 
-sealed abstract class EitherTInstances2 extends EitherTInstances3
-
-sealed abstract class EitherTInstances1 extends EitherTInstances3 {
-  def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
-    new EitherTMonad[F, L] {
-      implicit def F = F0
-    }
+sealed abstract class EitherTInstances1 extends EitherTInstances2 {
   implicit def eitherTPlus[F[_], L](implicit F0: Monad[F], L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
     new EitherTPlus[F, L] {
       implicit def F = F0
@@ -467,7 +464,7 @@ private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/.right))
 
-  implicit def apply[M[_] : Monad]: Monad[EitherT[M, A, ?]] = EitherT.eitherTMonad
+  implicit def apply[M[_] : Monad]: Monad[EitherT[M, A, ?]] = EitherT.eitherTMonadError
 }
 
 private[scalaz] trait EitherTMonadTell[F[_], W, A] extends MonadTell[EitherT[F, A, ?], W] with EitherTMonad[F, A] with EitherTHoist[A] {
