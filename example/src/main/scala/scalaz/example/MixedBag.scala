@@ -29,9 +29,8 @@ object MixedBag extends App {
     import std.list._
     import syntax.traverse._
 
-    //    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
-    //    println(xs map (_ take 10))
-    ()
+    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
+    println(xs map (_ take 10))
   }
 
   def traverseBigStream(): Unit = {
