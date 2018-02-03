@@ -187,10 +187,22 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class StreamTInstances0 {
-  implicit def StreamTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = StreamT[F, α]})#λ] = new StreamTFunctor[F] {
+sealed abstract class StreamTInstances1 {
+  implicit def StreamTFunctor0[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = StreamT[F, α]})#λ] = new StreamTFunctor[F] {
+    def F: Functor[F] = F0
+  }
+}
+
+sealed abstract class StreamTInstances0 extends StreamTInstances1 {
+  // for binary compatibility
+  def StreamTFunctor[F[_]](implicit F0: Functor[F]): Functor[({type λ[α] = StreamT[F, α]})#λ] = new StreamTFunctor[F] {
     implicit def F: Functor[F] = F0
   }
+
+  implicit def StreamTInstance0[F[_]](implicit F0: Functor[F]): Bind[({type λ[α] = StreamT[F, α]})#λ] with Plus[({type λ[α] = StreamT[F, α]})#λ] =
+    new StreamTInstance1[F] {
+      def F = F0
+    }
 
   implicit def StreamTSemigroup[F[_], A](implicit F0: Functor[F]): Semigroup[StreamT[F, A]] = new StreamTSemigroup[F, A] {
     implicit def F: Functor[F] = F0
@@ -275,7 +287,8 @@ object StreamT extends StreamTInstances {
     def unapply[A, S](s: Step[A, S]): Boolean = s((_, _) => false, _ => false, true)
   }
 
-  implicit def StreamTInstance1[F[_]](implicit F0: Functor[F]): Bind[({type λ[α] = StreamT[F, α]})#λ] with Plus[({type λ[α] = StreamT[F, α]})#λ] =
+  // for binary compatibility
+  def StreamTInstance1[F[_]](implicit F0: Functor[F]): Bind[({type λ[α] = StreamT[F, α]})#λ] with Plus[({type λ[α] = StreamT[F, α]})#λ] =
     new StreamTInstance1[F] {
       def F = F0
     }

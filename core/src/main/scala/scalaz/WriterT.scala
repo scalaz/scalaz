@@ -115,7 +115,26 @@ object WriterT extends WriterTInstances with WriterTFunctions {
 
 }
 
-sealed abstract class WriterTInstances12 {
+sealed abstract class WriterTInstances15 {
+  implicit def writerTFunctor0[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFunctor[F, W] {
+    def F = F0
+  }
+}
+sealed abstract class WriterTInstances14 extends WriterTInstances15 {
+  implicit def writerTApply0[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTApply[F, W] {
+    def F = F0
+    def W = W0
+  }
+  implicit def writerTFoldable0[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFoldable[F, W] {
+    def F = F0
+  }
+}
+sealed abstract class WriterTInstances13 extends WriterTInstances14 {
+  implicit def writerTTraverse0[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
+    implicit def F = F0
+  }
+}
+sealed abstract class WriterTInstances12 extends WriterTInstances13 {
   implicit def writerTMonoid[F[_], W, A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[F, W, A]] = new Monoid[WriterT[F, W, A]] {
     def zero = WriterT(M.zero)
     def append(a: WriterT[F, W, A], b: => WriterT[F, W, A]) = WriterT(M.append(a.run, b.run))
@@ -129,7 +148,8 @@ sealed abstract class WriterTInstances12 {
     }
 }
 sealed abstract class WriterTInstances11 extends WriterTInstances12 {
-  implicit def writerTFunctor[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFunctor[F, W] {
+  // for binary compatibility
+  def writerTFunctor[F[_], W](implicit F0: Functor[F]): Functor[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFunctor[F, W] {
     implicit def F = F0
   }
 
@@ -147,7 +167,7 @@ sealed abstract class WriterTInstances10 extends WriterTInstances11 {
 }
 
 sealed abstract class WriterTInstances9 extends WriterTInstances10 {
-  implicit def writerTApply[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTApply[F, W] {
+  def writerTApply[F[_], W](implicit W0: Semigroup[W], F0: Apply[F]): Apply[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTApply[F, W] {
     implicit def F = F0
     implicit def W = W0
   }
@@ -179,6 +199,8 @@ sealed abstract class WriterTInstance5 extends WriterTInstances6 {
     implicit def F = F0
     implicit def W = W0
   }
+
+  implicit def writerTEqual0[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
 }
 
 sealed abstract class WriterTInstances4 extends WriterTInstance5 {
@@ -198,10 +220,12 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
   implicit def writerTBifunctor[F[_]](implicit F0: Functor[F]): Bifunctor[({type λ[α, β]=WriterT[F, α, β]})#λ] = new WriterTBifunctor[F] {
     implicit def F = F0
   }
-  implicit def writerTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFoldable[F, W] {
+  // for binary compatibility
+  def writerTFoldable[F[_], W](implicit F0: Foldable[F]): Foldable[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTFoldable[F, W] {
     implicit def F = F0
   }
-  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
+  // for binary compatibility
+  def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
 
   implicit def writerTMonadPlus[F[_], W](implicit W0: Monoid[W], F0: MonadPlus[F]): MonadPlus[({type λ[α]=WriterT[F, W, α]})#λ] =
     new WriterTMonadPlus[F, W] {
@@ -233,7 +257,8 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
   implicit def writerTBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[({type λ[α, β]=WriterT[F, α, β]})#λ] = new WriterTBitraverse[F] {
     implicit def F = F0
   }
-  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
+  // for binary compatibility
+  def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[({type λ[α]=WriterT[F, W, α]})#λ] = new WriterTTraverse[F, W] {
     implicit def F = F0
   }
   @deprecated("Index is deprecated, use Foldable instead", "7.1")

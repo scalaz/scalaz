@@ -189,7 +189,7 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
     def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
   }
 
-  implicit def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[({type λ[α]=LazyEitherT[F, L, α]})#λ] = new LazyEitherTMonad[F, L] {
+  def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[({type λ[α]=LazyEitherT[F, L, α]})#λ] = new LazyEitherTMonad[F, L] {
     implicit def F = F0
   }
   implicit def lazyEitherTLeftProjectionMonad[F[_], L](implicit F0: Monad[F]) = new IsomorphismMonad[({type λ[α] = LazyEitherT.LeftProjectionT[F, L, α]})#λ, ({type λ[α] = LazyEitherT[F, L, α]})#λ] {

@@ -231,12 +231,14 @@ trait OneOrFunctions {
 }
 
 sealed abstract class OneOrInstances extends OneOrInstances0 {
-  implicit def OneOrFunctor[F[_]: Functor]: Functor[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrFunctor[F[_]: Functor]: Functor[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFunctor[F] {
       def F = implicitly
     }
 
-  implicit def OneOrEqual[F[_], A](implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
+  // for binary compatibility
+  def OneOrEqual[F[_], A](implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
     new OneOrEqual[F, A] {
       def OA = implicitly
       def OFA = implicitly
@@ -250,11 +252,15 @@ sealed abstract class OneOrInstances extends OneOrInstances0 {
 }
 
 sealed abstract class OneOrInstances0 extends OneOrInstances1 {
-  implicit def OneOrCobind[F[_]: Cobind]: Cobind[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrCobind[F[_]: Cobind]: Cobind[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrCobind[F] {
       def F = implicitly
     }
-
+  override implicit def OneOrComonad[F[_]: Comonad]: Comonad[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrComonad[F] {
+      def F = implicitly
+    }
   implicit def OneOrOrder[F[_], A](implicit oa: Order[A], ofa: Order[F[A]]): Order[OneOr[F, A]] =
     new OneOrOrder[F, A] {
       def OA = implicitly
@@ -263,11 +269,20 @@ sealed abstract class OneOrInstances0 extends OneOrInstances1 {
 }
 
 sealed abstract class OneOrInstances1 extends OneOrInstances2 {
-  implicit def OneOrComonad[F[_]: Comonad]: Comonad[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrComonad[F[_]: Comonad]: Comonad[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrComonad[F] {
       def F = implicitly
     }
-
+  implicit def OneOrCobind0[F[_]: Cobind]: Cobind[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrCobind[F] {
+      def F = implicitly
+    }
+  implicit def OneOrEqual0[F[_], A](implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
+    new OneOrEqual[F, A] {
+      def OA = implicitly
+      def OFA = implicitly
+    }
 }
 
 sealed abstract class OneOrInstances2 extends OneOrInstances3 {
@@ -278,29 +293,55 @@ sealed abstract class OneOrInstances2 extends OneOrInstances3 {
 }
 
 sealed abstract class OneOrInstances3 extends OneOrInstances4 {
-  implicit def OneOrFoldable[F[_]: Foldable]: Foldable[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrFoldable[F[_]: Foldable]: Foldable[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable[F] {
+      def F = implicitly
+    }
+
+  implicit def OneOrTraverse1_0[F[_]: Traverse1]: Traverse1[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrTraverse1[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class OneOrInstances4 extends OneOrInstances5 {
-  implicit def OneOrFoldable1[F[_]: Foldable1]: Foldable1[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrFoldable1[F[_]: Foldable1]: Foldable1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
-}
 
-sealed abstract class OneOrInstances5 extends OneOrInstances6 {
-  implicit def OneOrTraverse[F[_]: Traverse]: Traverse[({type λ[α] = OneOr[F, α]})#λ] =
+  implicit def OneOrTraverse0[F[_]: Traverse]: Traverse[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
 }
 
+sealed abstract class OneOrInstances5 extends OneOrInstances6 {
+  // for binary compatibility
+  def OneOrTraverse[F[_]: Traverse]: Traverse[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrTraverse[F] {
+      def F = implicitly
+    }
+  implicit def OneOrFoldable1_0[F[_]: Foldable1]: Foldable1[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrFoldable1[F] {
+      def F = implicitly
+    }
+}
+
 sealed abstract class OneOrInstances6 {
-  implicit def OneOrTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OneOr[F, α]})#λ] =
+  // for binary compatibility
+  def OneOrTraverse1[F[_]: Traverse1]: Traverse1[({type λ[α] = OneOr[F, α]})#λ] =
     new OneOrTraverse1[F] {
+      def F = implicitly
+    }
+  implicit def OneOrFoldable0[F[_]: Foldable]: Foldable[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrFoldable[F] {
+      def F = implicitly
+    }
+  implicit def OneOrFunctor0[F[_]: Functor]: Functor[({type λ[α] = OneOr[F, α]})#λ] =
+    new OneOrFunctor[F] {
       def F = implicitly
     }
 }

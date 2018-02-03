@@ -25,7 +25,8 @@ trait EndomorphicFunctions {
 
 sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
 
-  implicit def endomorphicMonoid[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
+  // for binary compatibility
+  def endomorphicMonoid[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
     new Monoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
       val F = G
       def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
@@ -45,14 +46,15 @@ sealed abstract class EndomorphicInstances0 extends EndomorphicInstances1 {
 
 sealed abstract class EndomorphicInstances1 extends EndomorphicInstances2 {
 
-  implicit def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
+  // for binary compatibility
+  def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
     new EndomorphicSemigroup[=>:, A] {
       val F = G
     }
 
 }
 
-sealed abstract class EndomorphicInstances2 {
+sealed abstract class EndomorphicInstances2 extends EndomorphicInstances3 {
 
   implicit def kleisliEndoSemigroup[F[_]: Bind, A]: Semigroup[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
     Endomorphic.endomorphicSemigroup[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
@@ -60,6 +62,21 @@ sealed abstract class EndomorphicInstances2 {
   implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
     Endomorphic.endomorphicSemigroup[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
 
+}
+
+sealed abstract class EndomorphicInstances3 extends EndomorphicInstances4 {
+  implicit def endomorphicMonoid0[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
+    new Monoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
+      val F = G
+      def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
+    }
+}
+
+sealed abstract class EndomorphicInstances4 {
+  implicit def endomorphicSemigroup0[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
+    new EndomorphicSemigroup[=>:, A] {
+      val F = G
+    }
 }
 
 private trait EndomorphicSemigroup[=>:[_, _], A] extends Semigroup[Endomorphic[=>:, A]] {

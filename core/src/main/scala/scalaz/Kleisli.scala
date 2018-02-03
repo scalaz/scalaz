@@ -97,6 +97,10 @@ sealed abstract class KleisliInstances8 {
       def zip[A, B](a: => Kleisli[F, R, A], b: => Kleisli[F, R, B]) =
         Kleisli(r => F.zip(a(r), b(r)))
     }
+
+  implicit def kleisliProfunctor0[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+    def F = F0
+  }
 }
 
 sealed abstract class KleisliInstances7 extends KleisliInstances8 {
@@ -108,14 +112,22 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
   implicit def kleisliDistributive[F[_], R](implicit F0: Distributive[F]): Distributive[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliDistributive[F, R] {
     implicit def F: Distributive[F] = F0
   }
+
+  implicit def kleisliPlus0[F[_], A](implicit F0: Plus[F]): Plus[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlus[F, A] {
+    def F = F0
+  }
 }
 
 sealed abstract class KleisliInstances6 extends KleisliInstances7 {
   implicit def kleisliApplicative[F[_], R](implicit F0: Applicative[F]): Applicative[({type λ[α] = Kleisli[F, R, α]})#λ] = new KleisliApplicative[F, R] {
     implicit def F: Applicative[F] = F0
   }
-  implicit def kleisliPlus[F[_], A](implicit F0: Plus[F]): Plus[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlus[F, A] {
+  // for binary compatibility
+  def kleisliPlus[F[_], A](implicit F0: Plus[F]): Plus[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlus[F, A] {
     implicit def F = F0
+  }
+  implicit def kleisliPlusEmpty0[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlusEmpty[F, A] {
+    def F = F0
   }
 }
 
@@ -152,6 +164,7 @@ sealed abstract class KleisliInstances1 extends KleisliInstances2 {
 sealed abstract class KleisliInstances0 extends KleisliInstances1 {
   implicit def kleisliIdApply[R]: Apply[({type λ[α] = Kleisli[Id, R, α]})#λ] = kleisliApply[Id, R]
 
+  // for binary compatibility
   def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
     implicit def F = F0
   }
@@ -177,7 +190,8 @@ abstract class KleisliInstances extends KleisliInstances0 {
   implicit def kleisliMonoid[F[_], A, B](implicit FB0: Monoid[F[B]]): Monoid[Kleisli[F, A, B]] = new KleisliMonoid[F, A, B] {
     implicit def FB = FB0
   }
-  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlusEmpty[F, A] {
+  // for binary compatibility
+  def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[({type λ[α] = Kleisli[F, A, α]})#λ] = new KleisliPlusEmpty[F, A] {
     implicit def F = F0
   }
   implicit def kleisliMonadTrans[R]: Hoist[({type λ[α[_], β] = Kleisli[α, R, β]})#λ] = new KleisliHoist[R] {}
@@ -216,7 +230,8 @@ object Kleisli extends KleisliInstances with KleisliFunctions {
       def F = F0
     }
 
-  implicit override def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
+  // for binary compatibility
+  override def kleisliProfunctor[F[_]](implicit F0: Functor[F]): Profunctor[({type λ[α, β]=Kleisli[F, α, β]})#λ] = new KleisliProfunctor[F] {
     def F = F0
   }
 }

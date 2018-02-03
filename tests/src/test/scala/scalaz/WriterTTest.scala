@@ -83,6 +83,7 @@ object WriterTTest extends SpecLite {
     def foldable[F[_]: Traverse, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
 
     object writer {
+      def equal[W: Equal, A: Equal] = Equal[Writer[W, A]]
       def functor[W] = Functor[({type λ[α]=Writer[W, α]})#λ]
       def apply[W: Semigroup] = Apply[({type λ[α]=Writer[W, α]})#λ]
       def apply[W: Monoid] = Apply[({type λ[α]=Writer[W, α]})#λ]

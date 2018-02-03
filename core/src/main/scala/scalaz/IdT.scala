@@ -46,6 +46,9 @@ sealed abstract class IdTInstances1 extends IdTInstances2 {
   implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[({type λ[α] = IdT[F, α]})#λ] = new IdTFoldable[F] {
     implicit def F: Foldable[F] = F0
   }
+
+  implicit def idTEqual0[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
 }
 
 sealed abstract class IdTInstances0 extends IdTInstances1 {
@@ -64,7 +67,8 @@ sealed abstract class IdTInstances extends IdTInstances0 {
     implicit def F: Traverse[F] = F0
   }
 
-  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+  // for binary compatibility
+  def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
     F.contramap(_.run)
 }
 
