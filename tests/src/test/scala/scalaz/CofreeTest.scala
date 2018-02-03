@@ -165,7 +165,12 @@ object CofreeTest extends SpecLite {
 
     // checking absence of ambiguity
     def bind[F[_]: PlusEmpty: Functor] = Bind[({type λ[α] = Cofree[F, α]})#λ]
+    def bind[F[_]: PlusEmpty: Traverse] = Bind[({type λ[α] = Cofree[F, α]})#λ]
+    def functor[F[_]: Traverse] = Functor[({type λ[α] = Cofree[F, α]})#λ]
+    def functor[F[_]: Traverse1] = Functor[({type λ[α] = Cofree[F, α]})#λ]
+    def functor[F[_]: Plus: Functor] = Functor[({type λ[α] = Cofree[F, α]})#λ]
     def functor[F[_]: PlusEmpty: Traverse] = Functor[({type λ[α] = Cofree[F, α]})#λ]
+    def functor[F[_]: PlusEmpty: Traverse1] = Functor[({type λ[α] = Cofree[F, α]})#λ]
     def foldable1[F[_]: Traverse1] = Foldable1[({type λ[α] = Cofree[F, α]})#λ]
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = Cofree[F, α]})#λ]
 
@@ -175,6 +180,7 @@ object CofreeTest extends SpecLite {
       def applicative[F[_]: Applicative] = Applicative[({type λ[α] = CofreeZip[F, α]})#λ]
 
       // checking absence of ambiguity
+      def functor[F[_]: Apply] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
       def functor[F[_]: Applicative] = Functor[({type λ[α] = CofreeZip[F, α]})#λ]
       def apply[F[_]: Applicative] = Apply[({type λ[α] = CofreeZip[F, α]})#λ]
     }

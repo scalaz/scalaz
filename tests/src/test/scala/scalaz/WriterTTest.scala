@@ -45,6 +45,7 @@ object WriterTTest extends SpecLite {
   }
 
   object instances {
+    def monoid[F[_], W, A](implicit F: Monoid[F[(W,A)]]) = Monoid[WriterT[F, W, A]]
     def plus[F[_]: Plus, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
     def plusEmpty[F[_]: PlusEmpty, W] = PlusEmpty[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: Functor, W] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
@@ -60,7 +61,15 @@ object WriterTTest extends SpecLite {
     def plus[F[_]: PlusEmpty, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
     def plus[F[_]: MonadPlus, W] = Plus[({type λ[α]=WriterT[F, W, α]})#λ]
     def plusEmpty[F[_]: MonadPlus, W] = PlusEmpty[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Apply, W: Semigroup] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Apply, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Bind, W: Semigroup] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Bind, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Traverse, W: Semigroup] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Traverse, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: Monad, W: Semigroup] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: Monad, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
+    def functor[F[_]: MonadPlus, W: Semigroup] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def functor[F[_]: MonadPlus, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: MonadPlus, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
     def apply[F[_]: Monad, W: Monoid] = Apply[({type λ[α]=WriterT[F, W, α]})#λ]
@@ -71,12 +80,12 @@ object WriterTTest extends SpecLite {
     def applicative[F[_]: Monad, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
     def applicative[F[_]: MonadPlus, W: Monoid] = Applicative[({type λ[α]=WriterT[F, W, α]})#λ]
     def monad[F[_]: MonadPlus, W: Monoid] = Monad[({type λ[α]=WriterT[F, W, α]})#λ]
-    def functor[F[_]: Traverse, W: Monoid] = Functor[({type λ[α]=WriterT[F, W, α]})#λ]
     def foldable[F[_]: Traverse, W] = Foldable[({type λ[α]=WriterT[F, W, α]})#λ]
 
     object writer {
       def functor[W] = Functor[({type λ[α]=Writer[W, α]})#λ]
       def apply[W: Semigroup] = Apply[({type λ[α]=Writer[W, α]})#λ]
+      def apply[W: Monoid] = Apply[({type λ[α]=Writer[W, α]})#λ]
       def applicative[W: Monoid] = Applicative[({type λ[α]=Writer[W, α]})#λ]
       def monad[W: Monoid] = Monad[({type λ[α]=Writer[W, α]})#λ]
       def foldable[W] = Foldable[({type λ[α]=Writer[W, α]})#λ](WriterT.writerTFoldable[Id, W])

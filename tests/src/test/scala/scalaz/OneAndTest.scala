@@ -80,8 +80,8 @@ object OneAndTest extends SpecLite {
 
   object instances {
     def functor[F[_]: Functor] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
-    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
     def apply[F[_]: Applicative: Plus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def align[F[_]: Align] = Align[({type λ[α] = OneAnd[F, α]})#λ]
     def applicative[F[_]: ApplicativePlus] = Applicative[({type λ[α] = OneAnd[F, α]})#λ]
     def bind[F[_]: Monad: Plus] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
     def monad[F[_]: MonadPlus] = Monad[({type λ[α] = OneAnd[F, α]})#λ]
@@ -92,5 +92,22 @@ object OneAndTest extends SpecLite {
     def traverse1[F[_]: Traverse1] = Traverse1[({type λ[α] = OneAnd[F, α]})#λ]
     def each[F[_]: Each] = Each[({type λ[α] = OneAnd[F, α]})#λ]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
+
+    // checking absence of ambiguity
+    def functor[F[_]: Traverse] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Traverse1] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Apply] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Applicative] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Bind] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: Monad] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def functor[F[_]: MonadPlus] = Functor[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: ApplicativePlus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Applicative: PlusEmpty] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: Monad: PlusEmpty] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def apply[F[_]: MonadPlus] = Apply[({type λ[α] = OneAnd[F, α]})#λ]
+    def bind[F[_]: MonadPlus] = Bind[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: ApplicativePlus] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: Monad: Plus] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
+    def plus[F[_]: MonadPlus] = Plus[({type λ[α] = OneAnd[F, α]})#λ]
   }
 }

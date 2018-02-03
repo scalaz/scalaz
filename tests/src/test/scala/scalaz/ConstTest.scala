@@ -22,8 +22,10 @@ object ConstTest extends SpecLite {
 
   object instances {
     def functor[C] = Functor[({type λ[α] = Const[C, α]})#λ]
-    def functorMax[C: Monoid] = Functor[({type λ[α] = Const[C, α]})#λ]
+    def functor[C: Semigroup] = Functor[({type λ[α] = Const[C, α]})#λ]
+    def functor[C: Monoid] = Functor[({type λ[α] = Const[C, α]})#λ]
     def apply[C: Semigroup] = Apply[({type λ[α] = Const[C, α]})#λ]
+    def apply[C: Monoid] = Apply[({type λ[α] = Const[C, α]})#λ]
     def applicative[C: Monoid] = Applicative[({type λ[α] = Const[C, α]})#λ]
     def equal[C: Equal, A] = Equal[Const[C, A]]
     def equalMax[C: Order, A] = Equal[Const[C, A]]
