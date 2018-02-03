@@ -9,7 +9,7 @@ cache:
 language: scala
 scala:
   - 2.12.4
-  - 2.11.11
+  - 2.11.12
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -39,7 +39,7 @@ matrix:
   - scala: 2.12.4
     jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"
-  - scala: 2.11.11
+  - scala: 2.11.12
     jdk: oraclejdk8
     env: SCALA_NATIVE
     sudo: required

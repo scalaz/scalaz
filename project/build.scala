@@ -122,7 +122,7 @@ object build {
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
-  private def Scala211 = "2.11.11"
+  private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
