@@ -41,7 +41,15 @@ lazy val core = Project(
     sourceGenerators in Compile += (sourceManaged in Compile) map {
       dir => Seq(GenerateTupleW(dir))
     },
-    scalaParserCombinatorsVersion := "1.0.6",
+    scalaParserCombinatorsVersion := {
+      val scalaV = scalaVersion.value
+      CrossVersion.partialVersion(scalaV) match {
+        case Some((2, v)) if (v >= 13) && (scalaV != "2.13.0-M1") && (scalaV != "2.13.0-M2") =>
+          "1.1.0"
+        case _ =>
+          "1.0.6"
+      }
+    },
     scalaXmlVersion := "1.0.6",
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
