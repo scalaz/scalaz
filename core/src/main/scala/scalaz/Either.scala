@@ -370,10 +370,18 @@ final case class \/-[A, B](b: B) extends (A \/ B) {
 object \/ extends DisjunctionInstances {
 
   /** Construct a left disjunction value. */
+  def inl[A, B](a: A): A \/ B =
+    -\/(a)
+
+  /** Construct a right disjunction value. */
+  def inr[A, B](b: B): A \/ B =
+    \/-(b)
+
+  /** Left injection as a function. */
   def left[A, B]: A => A \/ B =
     -\/(_)
 
-  /** Construct a right disjunction value. */
+  /** Right injection as a function. */
   def right[A, B]: B => A \/ B =
     \/-(_)
 
