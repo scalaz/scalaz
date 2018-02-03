@@ -48,9 +48,8 @@ trait StringFunctions {
 
   // Parsing functions.
   private def intChars(s: String): Boolean = (s.length > 0) && (s.forall(c => c.isDigit || c == '-'))
-  private def floatChars(s: String): Boolean = (s.length > 0) && (s.forall(c => c.isDigit || c == '-' || c == '.'))
 
-  private def asNumber[T](f: String => T, b: String => Boolean, r: Tuple2[T, T], s: String)(implicit t: ClassTag[T]): Validation[String, T] =
+  private def asNumber[T](f: String => T, r: Tuple2[T, T], s: String)(implicit t: ClassTag[T]): Validation[String, T] =
     try {
       Success(f(s))
     } catch {
@@ -59,19 +58,19 @@ trait StringFunctions {
       case NonFatal(e) => Failure(e.getMessage)
     }
 
-  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, intChars, (Long.MinValue, Long.MaxValue), s)
-  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, intChars, (Int.MinValue, Int.MaxValue), s)
-  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, intChars, (Byte.MinValue, Byte.MaxValue), s)
-  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, intChars, (Short.MinValue, Short.MaxValue), s)
+  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, (Long.MinValue, Long.MaxValue), s)
+  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, (Int.MinValue, Int.MaxValue), s)
+  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, (Byte.MinValue, Byte.MaxValue), s)
+  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, (Short.MinValue, Short.MaxValue), s)
 
   def parseDouble(s: String): Validation[String, Double] =
-    asNumber(_.toDouble, floatChars, (Double.MinValue, Double.MaxValue), s)
+    asNumber(_.toDouble, (Double.MinValue, Double.MaxValue), s)
       .filter(_ != Double.NegativeInfinity)
       .filter(_ != Double.PositiveInfinity)
       .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Double" else e)
 
   def parseFloat(s: String): Validation[String, Float] =
-    asNumber(_.toFloat, floatChars, (Float.MinValue, Float.MaxValue), s)
+    asNumber(_.toFloat, (Float.MinValue, Float.MaxValue), s)
       .filter(_ != Float.NegativeInfinity)
       .filter(_ != Float.PositiveInfinity)
       .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Float" else e)
