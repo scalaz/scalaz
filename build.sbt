@@ -4,6 +4,8 @@ import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
+val minSuccessfulTests = settingKey[Int]("")
+
 /*
  * NOTICE if you are a contributor who only cares about the JVM, create a file
  * `local.sbt` containing
@@ -66,8 +68,7 @@ lazy val rootJS = Project(
   file("rootJS")
 ).settings(
   standardSettings,
-  notPublish,
-  mimaPreviousArtifacts := Set.empty
+  notPublish
 ).aggregate(jsProjects: _*)
 
 lazy val rootJVM = Project(
@@ -75,8 +76,7 @@ lazy val rootJVM = Project(
   file("rootJVM")
 ).settings(
   standardSettings,
-  notPublish,
-  mimaPreviousArtifacts := Set.empty
+  notPublish
 ).aggregate(jvmProjects: _*)
 
 lazy val coreJVM = core.jvm
@@ -110,7 +110,6 @@ lazy val example = Project(
 ).settings(
   standardSettings,
   name := "scalaz-example",
-  mimaPreviousArtifacts := Set.empty,
   notPublish
 ).dependsOn(
   coreJVM, iterateeJVM, concurrent
@@ -158,17 +157,19 @@ lazy val scalacheckBinding_1_13 = {
       } else {
         scalacheckBinding_1_13Version(v)
       }
-    },
+    }
+  )
+  .jvmSettings(
     mimaPreviousArtifacts := {
-      val artifactId =
-        if(isScalaJSProject.value) {
-          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
-        } else {
-          s"${name.value}_${scalaBinaryVersion.value}"
-        }
-
       scalazMimaBasis.?.value.map { v =>
-        organization.value % artifactId % scalacheckBinding_1_13Version(v)
+        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
+      }.toSet
+    }
+  )
+  .jsSettings(
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map { v =>
+        organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
       }.toSet
     }
   )
@@ -182,12 +183,28 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
-    mimaPreviousArtifacts := Set.empty,
-    notPublish
+    testOptions in Test += {
+      val scalacheckOptions = Seq(
+        "-maxSize", "5",
+        "-workers", "1",
+        "-maxDiscardRatio", "50",
+        "-minSuccessfulTests", minSuccessfulTests.value.toString
+      )
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
+    }
+  )
+  .jvmSettings(
+    minSuccessfulTests := 33
+  )
+  .jsSettings(
+    minSuccessfulTests := 10
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding_1_13)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
+  .settings(
+    notPublish
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js

@@ -24,7 +24,6 @@ import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 
 object build {
   type Sett = Def.Setting[_]
@@ -76,6 +75,11 @@ object build {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
+    },
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % _
+      }.toSet
     }
   )
 
@@ -84,7 +88,8 @@ object build {
     publish := {},
     publishLocal := {},
     publishSigned := {},
-    publishLocalSigned := {}
+    publishLocalSigned := {},
+    mimaPreviousArtifacts := Set.empty
   )
 
   // avoid move files
@@ -170,15 +175,6 @@ object build {
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += {
-      val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isScalaJSProject.value)
-          Seq("-minSuccessfulTests", "10")
-        else
-          Seq("-minSuccessfulTests", "33")
-      }
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
-    },
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
@@ -292,15 +288,8 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
-      val artifactId =
-        if(isScalaJSProject.value) {
-          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
-        } else {
-          s"${name.value}_${scalaBinaryVersion.value}"
-        }
-
       scalazMimaBasis.?.value.map {
-        organization.value % artifactId % _
+        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
       }.toSet
     }
   )
