@@ -47,30 +47,30 @@ trait StringFunctions {
   def charsNel(s:String, e: => NonEmptyList[Char]) : NonEmptyList[Char] = charsNel(s) getOrElse e
 
   // Parsing functions.
-  private def intChars(s: String): Boolean = (s.length > 0) && (s.forall(c => c.isDigit || c == '-'))
+  private def intChars(s: String): Boolean = s.length == 1 && s.charAt(0).isDigit || ((s.length > 1) && s.stripPrefix("-").forall(_.isDigit))
 
-  private def asNumber[T](f: String => T, r: Tuple2[T, T], s: String)(implicit t: ClassTag[T]): Validation[String, T] =
+  private def asNumber[T](f: String => T, lowerBound: T, upperBound: T, s: String)(implicit t: ClassTag[T]): Validation[String, T] =
     try {
       Success(f(s))
     } catch {
-      case _: NumberFormatException if intChars(s) => Failure(s"${s} is outside of range for ${t} (${r._1} - ${r._2})")
+      case _: NumberFormatException if intChars(s) => Failure(s"${s} is outside of range for ${t} (${lowerBound} - ${upperBound})")
       case _: NumberFormatException => Failure(s"${s} does not represent a valid ${t}")
       case NonFatal(e) => Failure(e.getMessage)
     }
 
-  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, (Long.MinValue, Long.MaxValue), s)
-  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, (Int.MinValue, Int.MaxValue), s)
-  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, (Byte.MinValue, Byte.MaxValue), s)
-  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, (Short.MinValue, Short.MaxValue), s)
+  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, Long.MinValue, Long.MaxValue, s)
+  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, Int.MinValue, Int.MaxValue, s)
+  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, Byte.MinValue, Byte.MaxValue, s)
+  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, Short.MinValue, Short.MaxValue, s)
 
   def parseDouble(s: String): Validation[String, Double] =
-    asNumber(_.toDouble, (Double.MinValue, Double.MaxValue), s)
+    asNumber(_.toDouble, Double.MinValue, Double.MaxValue, s)
       .filter(_ != Double.NegativeInfinity)
       .filter(_ != Double.PositiveInfinity)
       .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Double" else e)
 
   def parseFloat(s: String): Validation[String, Float] =
-    asNumber(_.toFloat, (Float.MinValue, Float.MaxValue), s)
+    asNumber(_.toFloat, Float.MinValue, Float.MaxValue, s)
       .filter(_ != Float.NegativeInfinity)
       .filter(_ != Float.PositiveInfinity)
       .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Float" else e)
