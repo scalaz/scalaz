@@ -20,7 +20,6 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 
 object build {
   type Sett = Def.Setting[_]
@@ -160,15 +159,6 @@ object build {
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += {
-      val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isScalaJSProject.value)
-          Seq("-minSuccessfulTests", "10")
-        else
-          Seq("-minSuccessfulTests", "33")
-      }
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
-    },
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>

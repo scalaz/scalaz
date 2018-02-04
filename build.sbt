@@ -2,6 +2,8 @@ import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
+val minSuccessfulTests = settingKey[Int]("")
+
 /*
  * NOTICE if you are a contributor who only cares about the JVM, create a file
  * `local.sbt` containing
@@ -133,7 +135,22 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(
     name := "scalaz-tests",
     notPublish,
+    testOptions in Test += {
+      val scalacheckOptions = Seq(
+        "-maxSize", "5",
+        "-workers", "1",
+        "-maxDiscardRatio", "50",
+        "-minSuccessfulTests", minSuccessfulTests.value.toString
+      )
+      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
+    },
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
+  .jvmSettings(
+    minSuccessfulTests := 33
+  )
+  .jsSettings(
+    minSuccessfulTests := 10
+  )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
