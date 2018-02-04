@@ -2,7 +2,6 @@ import build._
 
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
-import org.scalajs.sbtplugin.cross._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 /*
@@ -118,7 +117,8 @@ lazy val example = Project(
 )
 
 def scalacheckBindingProject(id: String, base: String, scalacheckVersion: SettingKey[String]) =
-  sbtcrossproject.CrossProject(id, file(base), ScalazCrossType, JVMPlatform, JSPlatform)
+  sbtcrossproject.CrossProject(id, file(base))(JVMPlatform, JSPlatform)
+    .crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
