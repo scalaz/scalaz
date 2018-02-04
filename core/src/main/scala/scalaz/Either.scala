@@ -370,12 +370,12 @@ final case class \/-[A, B](b: B) extends (A \/ B) {
 object \/ extends DisjunctionInstances {
 
   /** Construct a left disjunction value. */
-  def left[A, B]: A => A \/ B =
-    -\/(_)
+  def left[A, B](a: A): A \/ B =
+    -\/(a)
 
   /** Construct a right disjunction value. */
-  def right[A, B]: B => A \/ B =
-    \/-(_)
+  def right[A, B](b: B): A \/ B =
+    \/-(b)
 
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
