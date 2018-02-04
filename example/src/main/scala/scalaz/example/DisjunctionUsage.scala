@@ -59,20 +59,23 @@ object DisjunctionUsage extends App {
 
 
   /*
-     Example #2: Standard Notation
-        Standard Notation is a bit different, rather than using Infix's
-        Left \/ Right, Standard is \/[Left, Right]
+     Example #2: Bracket Notation
+        Rather than using Infix's Left \/ Right,
+        Bracket is \/[Left, Right]. Some IDEs generate Bracket Notation,
+        which could lead newcomers to Scalaz to wrongly think that this
+        a good way to write these types. Should an IDE generate
+        Bracket Notation by default, please replace with Infix Notation.
    */
-  def standardNotation(p: Int): \/[Boolean, String] = p match {
-    case 5 => \/-("Correct!")
-    case _ => -\/(false)
+  def bracketNotation(p: Int): \/[Boolean, String] = p match {
+    case 5 => "Correct!".right
+    case _ => false.left
   }
 
   /*
      Rather than just assigning another val, we can assert
      more elegantly:
   */
-  assert(standardNotation(1) === -\/(false))
-  assert(standardNotation(5) === \/-("Correct!"))
+  assert(bracketNotation(1) === -\/(false))
+  assert(bracketNotation(5) === \/-("Correct!"))
 
 }
