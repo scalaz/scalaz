@@ -147,10 +147,10 @@ sealed abstract class WriterTInstances12 extends WriterTInstances13 {
 }
 
 sealed abstract class WriterTInstances11 extends WriterTInstances12 {
-  implicit def writerBindRec[W](implicit W0: Semigroup[W]): BindRec[Writer[W, ?]] =
-    new WriterTBindRec[Id, W] {
-      implicit def F = idInstance
-      implicit def A = idInstance
+  implicit def writerTBindRec[F[_], W](implicit W0: Semigroup[W], F0: BindRec[F], F1: Applicative[F]): BindRec[WriterT[F, W, ?]] =
+    new WriterTBindRec[F, W] {
+      implicit def F = F0
+      implicit def A = F1
       implicit def W = W0
     }
 }
@@ -180,10 +180,10 @@ sealed abstract class WriterTInstances8 extends WriterTInstances9 {
 }
 
 sealed abstract class WriterTInstances7 extends WriterTInstances8 {
-  implicit def writerTBindRec[F[_], W](implicit W0: Semigroup[W], F0: BindRec[F], F1: Applicative[F]): BindRec[WriterT[F, W, ?]] =
-    new WriterTBindRec[F, W] {
-      implicit def F = F0
-      implicit def A = F1
+  implicit def writerBindRec[W](implicit W0: Semigroup[W]): BindRec[Writer[W, ?]] =
+    new WriterTBindRec[Id, W] {
+      implicit def F = idInstance
+      implicit def A = idInstance
       implicit def W = W0
     }
 }
@@ -209,7 +209,7 @@ sealed abstract class WriterTInstances4 extends WriterTInstance5 {
     new WriterTFoldable[Id, W] {
       implicit def F = idInstance
     }
-  implicit def writerEqual[W, A](implicit E: Equal[(W, A)]): Equal[Writer[W, A]] = E.contramap((_: Writer[W, A]).run)
+  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
 
   implicit def writerTMonadError[F[_], E, W](implicit F0: MonadError[F, E], W0: Monoid[W]): MonadError[WriterT[F, W, ?], E] =
     new WriterTMonadError[F, E, W] {
@@ -227,7 +227,7 @@ sealed abstract class WriterTInstances3 extends WriterTInstances4 {
     new WriterTFoldable[F, W] {
       implicit def F = F0
     }
-  implicit def writerTEqual[F[_], W, A](implicit E: Equal[F[(W, A)]]): Equal[WriterT[F, W, A]] = E.contramap((_: WriterT[F, W, A]).run)
+  implicit def writerEqual[W, A](implicit E: Equal[(W, A)]): Equal[Writer[W, A]] = E.contramap((_: Writer[W, A]).run)
 
   implicit def writerTMonadPlus[F[_], W](implicit W0: Monoid[W], F0: MonadPlus[F]): MonadPlus[WriterT[F, W, ?]] =
     new WriterTMonadPlus[F, W] {
@@ -248,9 +248,9 @@ sealed abstract class WriterTInstances1 extends WriterTInstances2 {
     new WriterTBitraverse[Id] {
       implicit def F = idInstance
     }
-  implicit def writerTraverse[W]: Traverse[Writer[W, ?]] =
-    new WriterTTraverse[Id, W] {
-      implicit def F = idInstance
+  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, ?]] =
+    new WriterTTraverse[F, W] {
+      implicit def F = F0
     }
 }
 
@@ -259,9 +259,9 @@ sealed abstract class WriterTInstances0 extends WriterTInstances1 {
     new WriterTBitraverse[F] {
       implicit def F = F0
     }
-  implicit def writerTTraverse[F[_], W](implicit F0: Traverse[F]): Traverse[WriterT[F, W, ?]] =
-    new WriterTTraverse[F, W] {
-      implicit def F = F0
+  implicit def writerTraverse[W]: Traverse[Writer[W, ?]] =
+    new WriterTTraverse[Id, W] {
+      implicit def F = idInstance
     }
 }
 

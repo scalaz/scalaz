@@ -99,7 +99,6 @@ object build {
     "-encoding", "UTF-8",
     "-feature",
     "-Xfuture",
-    "-Xsource:2.12",
     "-Ypartial-unification",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked",
@@ -149,6 +148,14 @@ object build {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
     }),
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 11 | 12)) =>
+          Seq("-Xsource:2.12")
+        case _ =>
+          Nil
+      }
+    },
     scalacOptions in (Compile, compile) ++= "-Yno-adapted-args" +: lintOptions,
     scalacOptions in (Test, compile) ++= lintOptions,
 
