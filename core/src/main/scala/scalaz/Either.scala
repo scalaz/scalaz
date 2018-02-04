@@ -359,12 +359,22 @@ final case class -\/[A, B](a: A) extends (A \/ B) {
   def coerceRight[C]: A \/ C = this.asInstanceOf[A \/ C]
 }
 
+object -\/ {
+  /** Override smart constructor to return less specific type. */
+  def apply[A, B](a: A): A \/ B = new -\/(a)
+}
+
 /** A right disjunction
  *
  * Often used to represent the success case of a result
  */
 final case class \/-[A, B](b: B) extends (A \/ B) {
   def coerceLeft[C]: C \/ B = this.asInstanceOf[C \/ B]
+}
+
+object \/- {
+  /** Override smart constructor to return less specific type. */
+  def apply[A, B](b: B): A \/ B = new \/-(b)
 }
 
 object \/ extends DisjunctionInstances {
