@@ -12,3 +12,7 @@ trait Foldable[F[_]] {
   // TODO Use IList (`toIList`)
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, List[A]())((t, h) => h :: t).reverse
 }
+
+object Foldable {
+  def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
+}

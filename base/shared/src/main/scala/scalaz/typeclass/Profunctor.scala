@@ -6,3 +6,7 @@ trait Profunctor[F[_, _]] {
   def rmap[A, B, C](fab: F[A, B])(bc: B => C): F[A, C]
   def dimap[A, B, C, D](fab: F[A, B])(ca: C => A)(bd: B => D): F[C, D]
 }
+
+object Profunctor {
+  def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
+}

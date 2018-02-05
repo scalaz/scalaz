@@ -9,3 +9,6 @@ trait Traversable[T[_]] {
   def sequence[F[_], A](ta: T[F[A]])(implicit F: Applicative[F]): F[T[A]]
 }
 
+object Traversable {
+  def apply[T[_]](implicit T: Traversable[T]): Traversable[T] = T
+}

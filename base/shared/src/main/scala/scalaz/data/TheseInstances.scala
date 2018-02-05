@@ -32,8 +32,7 @@ trait TheseInstances {
     }
 
   implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] =
-    new Debug[These[L, R]] {
-      def debug(a: These[L, R]) =
-        a.bimap(L.debug)(R.debug).toString
+    Debug.fromDebugs[These[L, R]] {
+      _.bimap(L.debugs)(R.debugs).toString
     }
 }

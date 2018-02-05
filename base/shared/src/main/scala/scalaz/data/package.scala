@@ -79,6 +79,18 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 
+  val Biconst: BiconstModule = BiconstImpl
+  type Biconst[A, B, C] = Biconst.Biconst[A, B, C]
+
+  val Identity: IdentityModule = IdentityImpl
+  type Identity[A] = Identity.Identity[A]
+
+  val Cord: CordModule = CordImpl
+  type Cord = Cord.Cord
+
+  val Catenable1: Catenable1Module = Catenable1Impl
+  type Catenable1[A] = Catenable1.Catenable1[A]
+
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
 }

@@ -48,5 +48,5 @@ trait ConstInstances {
   }
 
   implicit def constDebug[A, B](implicit A: Debug[A]): Debug[Const[A, B]] =
-    a => A.debug(a.getConst)
+    Debug.fromDebugs(a => A.debugs(a.getConst))
 }
