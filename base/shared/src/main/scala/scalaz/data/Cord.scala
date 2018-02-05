@@ -13,8 +13,6 @@ trait CordModule {
 
   def length(cord: Cord): Int
 
-  def unsafeAppendTo(cord: Cord, builder: StringBuilder): Unit
-
   def fold(cord: Cord): String
 }
 
@@ -39,33 +37,34 @@ object CordImpl extends CordModule {
 
   def length(cord: Cord): Int = cord.length
 
-  def fold(cord: Cord): String = {
-    val sb = new StringBuilder(cord.length)
-    unsafeAppendTo(cord, sb)
-    sb.toString()
-  }
-
-  def unsafeAppendToH(rights: Array[AnyRef], cord: Cord, builder: StringBuilder): Unit = {
-    var current = cord.under
+  def unsafeAppendToH(rights: Array[AnyRef], out: Array[Char], cord: AnyRef): Unit = {
+    var current = cord
     var stackPtr = 0
-    while (current != null) current match {
-      case s: String =>
-        builder.append(s)
+    var outputPtr = 0
+    while (current != null) {
+      if (current.getClass == classOf[String]) {
+        val s = current.asInstanceOf[String]
+        s.getChars(0, s.length, out, outputPtr)
+        outputPtr += s.length
         if (stackPtr > 0) {
           stackPtr = stackPtr - 1
           current = rights(stackPtr)
         } else {
           current = null
         }
-      case c: Concat =>
+      } else {
+        val c = current.asInstanceOf[Concat]
         current = c.left
         rights(stackPtr) = c.right
         stackPtr = stackPtr + 1
+      }
     }
   }
 
-  def unsafeAppendTo(cord: Cord, builder: StringBuilder): Unit = {
+  def fold(cord: Cord): String = {
     val rights = new Array[AnyRef](cord.depth)
-    unsafeAppendToH(rights, cord, builder)
+    val out = new Array[Char](cord.length)
+    unsafeAppendToH(rights, out, cord.under)
+    new String(out)
   }
 }

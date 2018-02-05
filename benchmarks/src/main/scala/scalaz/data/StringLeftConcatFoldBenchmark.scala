@@ -7,19 +7,12 @@ import org.openjdk.jmh.annotations._
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
+@Fork(value = 1, jvmArgsAppend = Array("-Xms2g", "-Xmx2g"))
 class StringLeftConcatFoldBenchmark {
   @Param(Array("10000"))
   var size: Int = _
 
-  final val testString: String = "test"
-
-  @Benchmark
-  def stringLeftConcatFoldBenchmark(): String = {
-    def loop(i: Int, str: String): String =
-      if (i > 0) loop(i - 1, testString + str)
-      else str
-    loop(size, "")
-  }
+  final val testString: String = "testString" * 5
 
   @Benchmark
   def listStringLeftConcatFoldBenchmark(): String = {

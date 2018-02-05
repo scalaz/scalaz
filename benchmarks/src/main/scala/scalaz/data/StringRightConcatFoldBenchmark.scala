@@ -12,15 +12,7 @@ class StringRightConcatFoldBenchmark {
   @Param(Array("10000"))
   var size: Int = _
 
-  final val testString: String = "test"
-
-  @Benchmark
-  def stringRightConcatFoldBenchmark(): String = {
-    def loop(i: Int, str: String): String =
-      if (i > 0) loop(i - 1, str + testString)
-      else str
-    loop(size, "")
-  }
+  final val testString: String = "testString" * 5
 
   @Benchmark
   def listStringRightConcatFoldBenchmark(): String = {
