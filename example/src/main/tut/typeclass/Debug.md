@@ -25,7 +25,7 @@ import Scalaz._
 
 ```tut
 case class Foo(a: Int)
-implicit val fooDebug: Debug[Foo] = (f: Foo) => s"Foo[${f.a}]"
+implicit val fooDebug: Debug[Foo] = Debug.fromDebugs((f: Foo) => s"Foo[${f.a}]")
 ```
 
 # Usage
