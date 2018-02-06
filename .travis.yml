@@ -49,10 +49,17 @@ matrix:
     - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
   - scala: 2.13.0-M3
     jdk: oraclejdk8
-    script:
+    env: TEST_PROJECT="rootJVM"
+    before_script:
     - git clone -b v0.9.5 https://github.com/non/kind-projector.git
     - cd kind-projector
     - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
     - cd ..
-    # TODO scalacheck_sjs0.6_2.13.0-M3
-    - sbt "++${TRAVIS_SCALA_VERSION}! -v" -J-Xmx3784m checkGenTypeClasses rootJVM/test coreJS/compile effectJS/compile iterateeJS/compile
+  - scala: 2.13.0-M3
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJS"
+    before_script:
+    - git clone -b v0.9.5 https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
+    - cd ..
