@@ -10,6 +10,7 @@ language: scala
 scala:
   - 2.12.4
   - 2.11.12
+  - 2.13.0-M3
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -47,19 +48,3 @@ matrix:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
     - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
-  - scala: 2.13.0-M3
-    jdk: oraclejdk8
-    env: TEST_PROJECT="rootJVM"
-    before_script:
-    - git clone -b v0.9.5 https://github.com/non/kind-projector.git
-    - cd kind-projector
-    - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
-    - cd ..
-  - scala: 2.13.0-M3
-    jdk: oraclejdk8
-    env: TEST_PROJECT="rootJS"
-    before_script:
-    - git clone -b v0.9.5 https://github.com/non/kind-projector.git
-    - cd kind-projector
-    - sbt ++${TRAVIS_SCALA_VERSION} publishLocal
-    - cd ..
