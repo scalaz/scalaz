@@ -1,20 +1,22 @@
 package scalaz
 package typeclass
 
-trait TraversableClass[T[_]] extends Traversable[T] with FunctorClass[T] with FoldableClass[T] {
-  final def traversable: Traversable[T] = this
+trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
+
+  def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]]
+
+  def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]]
 }
 
 object TraversableClass {
-  trait Traverse[T[_]] extends Alt[Traverse[T]] { self : Traversable[T] =>
-    override def traverse[F[_], A, B](ta: T[A])(f: A => F[B])(implicit F: Applicative[F]): F[T[B]]
-    override def sequence[F[_], A](ta: T[F[A]])(implicit F: Applicative[F]): F[T[A]] = traverse(ta)(identity)
+
+  trait DeriveSequence[T[_]] extends  TraversableClass[T] with Alt[DeriveSequence[T]] {
+    final override def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
   }
 
-  trait Sequence[T[_]] extends Alt[Sequence[T]] { self : Traversable[T] =>
-    override def sequence[F[_], A](ta: T[F[A]])(implicit F: Applicative[F]): F[T[A]]
-    override def traverse[F[_], A, B](ta: T[A])(f: A => F[B])(implicit F: Applicative[F]): F[T[B]] = sequence(functor.map(ta)(f))
+  trait DeriveTraverse[T[_]] extends TraversableClass[T] with Alt[DeriveTraverse[T]] {
+    final override def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]] = sequence(map(ta)(f))
   }
 
-  trait Alt[D <: Alt[D]] { self: D => }
+  trait Alt[D <: Alt[D]]
 }

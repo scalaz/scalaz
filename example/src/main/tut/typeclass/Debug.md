@@ -24,8 +24,10 @@ import Scalaz._
 # Instance declaration
 
 ```tut
+import scalaz.typeclass.DebugClass
+
 case class Foo(a: Int)
-implicit val fooDebug: Debug[Foo] = (f: Foo) => s"Foo[${f.a}]"
+implicit val fooDebug: Debug[Foo] = instanceOf[DebugClass[Foo]](f => s"Foo[${f.a}]")
 ```
 
 # Usage

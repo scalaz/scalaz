@@ -1,49 +1,57 @@
 package scalaz
 
-trait BaseTypeclasses {
-  type Applicative[F[_]] = typeclass.Applicative[F]
-  type Apply[F[_]] = typeclass.Apply[F]
-  type Bind[M[_]] = typeclass.Bind[M]
-  type Category[=>:[_,_]] = typeclass.Category[=>:]
-  type Choice[P[_,_]] = typeclass.Choice[P]
-  type Cobind[F[_]] = typeclass.Cobind[F]
-  type Comonad[F[_]] = typeclass.Comonad[F]
-  type Compose[P[_,_]] = typeclass.Compose[P]
-  type Foldable[T[_]] = typeclass.Foldable[T]
-  type Functor[F[_]] = typeclass.Functor[F]
-  type InvariantFunctor[F[_]] = typeclass.InvariantFunctor[F]
-  type IsContravariant[F[_]] = typeclass.IsContravariant[F]
-  type IsCovariant[F[_]] = typeclass.IsCovariant[F]
-  type Monad[M[_]] = typeclass.Monad[M]
-  type Monoid[T] = typeclass.Monoid[T]
-  type Phantom[F[_]] = typeclass.Phantom[F]
-  type Profunctor[F[_,_]] = typeclass.Profunctor[F]
-  type Semigroup[T] = typeclass.Semigroup[T]
-  type Debug[A] = typeclass.Debug[A]
-  type Strong[F[_,_]] = typeclass.Strong[F]
-  type Traversable[T[_]] = typeclass.Traversable[T]
+import typeclass._
 
-  def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
-  def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
-  def Bind[F[_]](implicit F: Bind[F]): Bind[F] = F
-  def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P
-  def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
-  def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
-  def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
-  def Compose[P[_,_]](implicit P: Compose[P]): Compose[P] = P
-  def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F] = F
-  def Functor[F[_]](implicit F: Functor[F]): Functor[F] = F
-  def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
-  def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
-  def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
-  def Monad[M[_]](implicit M: Monad[M]): Monad[M] = M
-  def Monoid[T](implicit T: Monoid[T]): Monoid[T] = T
-  def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F] = F
-  def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
-  def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T] = T
-  def Debug[A](implicit A: Debug[A]): Debug[A] = A
-  def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
-  def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T] = T
+trait BaseTypeclasses {
+  type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]
+
+  @inline
+  final def instanceOf[T](t: T): InstanceOf[T] = InstanceOfModule.impl.instanceOf(t)
+
+  type Applicative[F[_]] = InstanceOf[ApplicativeClass[F]]
+  type Apply[F[_]] = InstanceOf[ApplyClass[F]]
+  type Bind[M[_]] = InstanceOf[BindClass[M]]
+  type Category[=>:[_,_]] = InstanceOf[CategoryClass[=>:]]
+  type Choice[P[_,_]] = InstanceOf[ChoiceClass[P]]
+  type Cobind[F[_]] = InstanceOf[CobindClass[F]]
+  type Comonad[F[_]] = InstanceOf[ComonadClass[F]]
+  type Compose[P[_,_]] = InstanceOf[ComposeClass[P]]
+  type Foldable[T[_]] = InstanceOf[FoldableClass[T]]
+  type Functor[F[_]] = InstanceOf[FunctorClass[F]]
+  type InvariantFunctor[F[_]] = InstanceOf[InvariantFunctorClass[F]]
+  type IsContravariant[F[_]] = InstanceOf[IsContravariantClass[F]]
+  type IsCovariant[F[_]] = InstanceOf[IsCovariantClass[F]]
+  type Monad[M[_]] = InstanceOf[MonadClass[M]]
+  type Monoid[T] = InstanceOf[MonoidClass[T]]
+  type Contravariant[F[_]] = InstanceOf[ContravariantClass[F]]
+  type Phantom[F[_]] = InstanceOf[PhantomClass[F]]
+  type Profunctor[F[_,_]] = InstanceOf[ProfunctorClass[F]]
+  type Semigroup[T] = InstanceOf[SemigroupClass[T]]
+  type Debug[A] = InstanceOf[DebugClass[A]]
+  type Strong[F[_,_]] = InstanceOf[StrongClass[F]]
+  type Traversable[T[_]] = InstanceOf[TraversableClass[T]]
+
+  final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F] = F
+  final def Apply[F[_]](implicit F: Apply[F]): Apply[F] = F
+  final def Bind[F[_]](implicit F: Bind[F]): Bind[F] = F
+  final def Category[=>:[_,_]](implicit P: Category[=>:]): Category[=>:] = P
+  final def Choice[P[_,_]](implicit P: Choice[P]): Choice[P] = P
+  final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F] = F
+  final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F] = F
+  final def Compose[P[_,_]](implicit P: Compose[P]): Compose[P] = P
+  final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F] = F
+  final def Functor[F[_]](implicit F: Functor[F]): Functor[F] = F
+  final def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
+  final def IsContravariant[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
+  final def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
+  final def Monad[M[_]](implicit M: Monad[M]): Monad[M] = M
+  final def Monoid[T](implicit T: Monoid[T]): Monoid[T] = T
+  final def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F] = F
+  final def Profunctor[P[_,_]](implicit P: Profunctor[P]): Profunctor[P] = P
+  final def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T] = T
+  final def Debug[A](implicit A: Debug[A]): Debug[A] = A
+  final def Strong[P[_,_]](implicit P: Strong[P]): Strong[P] = P
+  final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T] = T
 }
 
 trait BaseData {

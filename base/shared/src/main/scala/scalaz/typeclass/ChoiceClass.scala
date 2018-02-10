@@ -3,22 +3,24 @@ package typeclass
 
 import data.Disjunction.swap
 
-trait ChoiceClass[P[_, _]] extends Choice[P] with ProfunctorClass[P] {
-  final def choice: Choice[P] = this
+trait ChoiceClass[P[_, _]] extends ProfunctorClass[P] {
+
+  def leftchoice[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C]
+
+  def rightchoice[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B]
 }
 
 object ChoiceClass {
-  trait Left[P[_, _]] extends Alt[Left[P]] { self : Choice[P] =>
-    override def leftchoice[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C]
+
+  trait DeriveRight[P[_, _]] extends ChoiceClass[P] with Alt[DeriveRight[P]] {
     override def rightchoice[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B] =
-      profunctor.dimap[A \/ C, B \/ C, C \/ A, C \/ B](leftchoice(pab))(swap(_))(swap(_))
+      dimap[A \/ C, B \/ C, C \/ A, C \/ B](leftchoice(pab))(swap)(swap)
   }
 
-  trait Right[P[_, _]] extends Alt[Right[P]] { self : Choice[P] =>
-    override def rightchoice[A, B, C](pab: P[A, B]): P[C \/ A, C \/ B]
+  trait DeriveLeft[P[_, _]] extends ChoiceClass[P] with Alt[DeriveLeft[P]] {
     override def leftchoice[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C] =
-      profunctor.dimap[C \/ A, C \/ B, A \/ C, B \/ C](rightchoice(pab))(swap(_))(swap(_))
+      dimap[C \/ A, C \/ B, A \/ C, B \/ C](rightchoice(pab))(swap)(swap)
   }
 
-  trait Alt[D <: Alt[D]] { self: D => }
+  trait Alt[D <: Alt[D]]
 }

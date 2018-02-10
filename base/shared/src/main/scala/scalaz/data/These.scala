@@ -96,8 +96,8 @@ sealed abstract class These[L, R] {
   /* Traversable (on the right) */
   final def traverse[F[_], B](f: R => F[B])(implicit F: Applicative[F]): F[These[L, B]] = this match {
     case thiz @ This(_)    => F.pure(thiz.pmap[B])
-    case That(right)       => F.apply.functor.map(f(right))(That(_))
-    case Both(left, right) => F.apply.functor.map(f(right))(Both(left, _))
+    case That(right)       => F.map(f(right))(That(_))
+    case Both(left, right) => F.map(f(right))(Both(left, _))
   }
 
   /* Semigroup */

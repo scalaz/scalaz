@@ -148,17 +148,17 @@ trait Plus[F[_]] {
 is equivalently just a polymorphic semigroup:
 
 ```tut
-import scalaz.typeclass.Semigroup
-
 type Plus[F[_]] = ∀[λ[A => Semigroup[F[A]]]]
 ```
 
 Here is an instance for list:
 
 ```tut
-def listSemigroup[A]: Semigroup[List[A]] = new Semigroup[List[A]] {
+import scalaz.typeclass.SemigroupClass
+
+def listSemigroup[A]: Semigroup[List[A]] = instanceOf(new SemigroupClass[List[A]] {
   def append(x: List[A], y: => List[A]) = x ++ y
-}
+})
 
 val listPlus: Plus[List] = ∀.mk[Plus[List]].from(listSemigroup)
 
