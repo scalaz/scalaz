@@ -2,9 +2,10 @@ package scalaz
 package data
 
 sealed abstract class These[L, R] {
+
   /**
-    * The canonical catamorphism from `These` values.
-    */
+   * The canonical catamorphism from `These` values.
+   */
   final def fold[C](fl: L => C)(fr: R => C)(fboth: (L, R) => C): C = this match {
     case This(left)        => fl(left)
     case That(right)       => fr(right)
@@ -53,28 +54,31 @@ sealed abstract class These[L, R] {
 
   /* Applicative (on the right) */
   final def ap[D](f: These[L, R => D])(implicit L: Semigroup[L]): These[L, D] = this match {
-    case thiz @ This(_)    => thiz.pmap[D]
-    case That(right)       => f match {
-      case thiz1 @ This(_)     => thiz1.pmap[D]
-      case That(right1)        => That(right1(right))
-      case Both(left1, right1) => Both(left1, right1(right))
-    }
-    case Both(left, right) => f match {
-      case This(left1)         => This(L.append(left, left1))
-      case That(right1)        => Both(left, right1(right))
-      case Both(left1, right1) => Both(L.append(left, left1), right1(right))
-    }
+    case thiz @ This(_) => thiz.pmap[D]
+    case That(right) =>
+      f match {
+        case thiz1 @ This(_)     => thiz1.pmap[D]
+        case That(right1)        => That(right1(right))
+        case Both(left1, right1) => Both(left1, right1(right))
+      }
+    case Both(left, right) =>
+      f match {
+        case This(left1)         => This(L.append(left, left1))
+        case That(right1)        => Both(left, right1(right))
+        case Both(left1, right1) => Both(L.append(left, left1), right1(right))
+      }
   }
 
   /* Monad (on the right) */
   final def flatMap[D](f: R => These[L, D])(implicit L: Semigroup[L]): These[L, D] = this match {
-    case thiz @ This(_)    => thiz.pmap[D]
-    case That(right)       => f(right)
-    case Both(left, right) => f(right) match {
-      case This(left1)         => This(L.append(left, left1))
-      case That(right1)        => Both(left, right1)
-      case Both(left1, right1) => Both(L.append(left, left1), right1)
-    }
+    case thiz @ This(_) => thiz.pmap[D]
+    case That(right)    => f(right)
+    case Both(left, right) =>
+      f(right) match {
+        case This(left1)         => This(L.append(left, left1))
+        case That(right1)        => Both(left, right1)
+        case Both(left1, right1) => Both(L.append(left, left1), right1)
+      }
   }
 
   /* Foldable (on the right) */
@@ -125,7 +129,7 @@ final case class This[L, R](thisValue: L) extends These[L, R] {
   @inline private[data] final def pmap[RR]: This[L, RR] = this.asInstanceOf[This[L, RR]]
 }
 
-final case class That[L, R](thatValue: R)               extends These[L, R] {
+final case class That[L, R](thatValue: R) extends These[L, R] {
   @inline private[data] final def pmap[LL]: That[LL, R] = this.asInstanceOf[That[LL, R]]
 }
 

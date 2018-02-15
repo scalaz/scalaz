@@ -10,7 +10,7 @@ trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
 
 object TraversableClass {
 
-  trait DeriveSequence[T[_]] extends  TraversableClass[T] with Alt[DeriveSequence[T]] {
+  trait DeriveSequence[T[_]] extends TraversableClass[T] with Alt[DeriveSequence[T]] {
     final override def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
   }
 

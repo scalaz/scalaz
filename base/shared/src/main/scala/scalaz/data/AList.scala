@@ -64,7 +64,8 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def fold(implicit F: Category[F]): F[A, B] =
     this match {
-      case ACons(h, t)  => t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result
+      case ACons(h, t) =>
+        t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result
       case nil @ ANil() => nil.subst[F[A, ?]](F.id[A])
     }
 
@@ -73,7 +74,8 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def foldMaybe(implicit F: Compose[F]): AMaybe[F, A, B] =
     this match {
-      case ACons(h, t)  => AJust(t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result)
+      case ACons(h, t) =>
+        AJust(t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result)
       case nil @ ANil() => nil.subst[AMaybe[F, A, ?]](AMaybe.empty[F, A])
     }
 
@@ -82,7 +84,9 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Category[G]): G[A, B] =
     this match {
-      case ACons(h, t)  => t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ)).result
+      case ACons(h, t) =>
+        t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ))
+          .result
       case nil @ ANil() => nil.subst[G[A, ?]](G.id[A])
     }
 
@@ -91,7 +95,11 @@ sealed abstract class AList[F[_, _], A, B] {
    */
   def foldMapMaybe[G[_, _]](φ: F ~~> G)(implicit G: Compose[G]): AMaybe[G, A, B] =
     this match {
-      case ACons(h, t)  => AJust(t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ)).result)
+      case ACons(h, t) =>
+        AJust(
+          t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ))
+            .result
+        )
       case nil @ ANil() => nil.subst[AMaybe[G, A, ?]](AMaybe.empty[G, A])
     }
 
@@ -114,14 +122,16 @@ sealed abstract class AList[F[_, _], A, B] {
 
   def mkString(prefix: String, delim: String, suffix: String): String =
     this match {
-      case ANil()      => s"$prefix$suffix"
+      case ANil() => s"$prefix$suffix"
       case ACons(h, t) =>
         val sb = new StringBuilder(prefix)
         type SB[a] = StringBuilder
-        t.foldLeft[SB]( sb.append(h.toString)
-                     )( ν[RightAction[SB, F]][α, β]((buf, f) => buf.append(delim).append(f.toString))
-                     ).append(suffix).toString
-  }
+        t.foldLeft[SB](sb.append(h.toString))(
+            ν[RightAction[SB, F]][α, β]((buf, f) => buf.append(delim).append(f.toString))
+          )
+          .append(suffix)
+          .toString
+    }
 }
 
 final case class ACons[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) extends AList[F, A, B] {
@@ -129,12 +139,13 @@ final case class ACons[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) ex
 }
 
 sealed abstract case class ANil[F[_, _], A, B]() extends AList[F, A, B] {
-  def   subst[G[_]](ga: G[A]): G[B]
+  def subst[G[_]](ga: G[A]): G[B]
   def unsubst[G[_]](gb: G[B]): G[A]
   def leibniz: A === B = subst[A === ?](Is.refl[A])
 }
 
 object AList {
+
   /**
    * Reversed type-aligned list is type-aligned with flipped type constructor.
    * For example, when we reverse
@@ -160,13 +171,13 @@ object AList {
    */
   type Composed[F[_, _], A, B] = AList[λ[(α, β) => F[β, α]], B, A]
 
-  def apply[F[_, _], A](): AList[F, A, A] = empty
+  def apply[F[_, _], A](): AList[F, A, A]              = empty
   def apply[F[_, _], A, B](f: F[A, B]): AList[F, A, B] = f :: empty
-  def empty[F[_, _], A]: AList[F, A, A] = Nil.asInstanceOf[AList[F, A, A]]
+  def empty[F[_, _], A]: AList[F, A, A]                = Nil.asInstanceOf[AList[F, A, A]]
 
   private val Nil = nil[Nothing, Nothing]
   private def nil[F[_, _], A]: ANil[F, A, A] = new ANil[F, A, A] {
-    def   subst[G[_]](ga: G[A]): G[A] = ga
+    def subst[G[_]](ga: G[A]): G[A]   = ga
     def unsubst[G[_]](gb: G[A]): G[A] = gb
   }
 }

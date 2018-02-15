@@ -4,8 +4,8 @@ package data
 import scalaz.typeclass.ProfunctorClass
 
 trait DownStarInstances {
-  implicit def downstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[DownStar[F, ?, ?]] = instanceOf(
-    new ProfunctorClass[DownStar[F, ?, ?]] {
+  implicit def downstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[DownStar[F, ?, ?]] =
+    instanceOf(new ProfunctorClass[DownStar[F, ?, ?]] {
       override def lmap[A, B, C](fab: DownStar[F, A, B])(ca: C => A): DownStar[F, C, B] =
         DownStar(fc => fab.run(F.map(fc)(ca)))
 
