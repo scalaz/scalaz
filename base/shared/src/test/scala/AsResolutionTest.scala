@@ -34,6 +34,6 @@ class AsResolutionTest {
   def g2[L, H >: L](a: F[L, H]): a.A <~< a.B = implicitly[a.A <~< a.B]
 
   def h1[A, B >: A]: A <~< B = implicitly[A <~< B]
-  def h2[A]: A <~< A = implicitly[A <~< A]
+  def h2[A]: A <~< A         = implicitly[A <~< A]
 
 }
