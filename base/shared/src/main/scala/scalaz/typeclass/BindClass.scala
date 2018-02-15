@@ -16,7 +16,7 @@ object BindClass {
     final override def flatten[A](ma: M[M[A]]): M[A] = flatMap(ma)(identity)
   }
 
-  trait DeriveFlatMap[M[_]] extends  BindClass[M] with Alt[DeriveFlatMap[M]] {
+  trait DeriveFlatMap[M[_]] extends BindClass[M] with Alt[DeriveFlatMap[M]] {
     final override def flatMap[A, B](ma: M[A])(f: (A) => M[B]): M[B] = flatten(map(ma)(f))
   }
 

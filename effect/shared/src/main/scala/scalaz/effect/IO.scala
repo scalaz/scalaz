@@ -40,13 +40,14 @@ import scalaz.data.Maybe
  * `SafeApp`.
  */
 sealed abstract class IO[A] { self =>
+
   /**
    * Maps an `IO[A]` into an `IO[B]` by applying the specified `A => B` function
    * to the output of this action. Repeated applications of `map`
    * (`io.map(f1).map(f2)...map(f10000)`) are guaranteed stack safe to a depth
    * of at least 10,000.
    */
-  final def map[B](f: A => B): IO[B] = (self.tag : @switch) match {
+  final def map[B](f: A => B): IO[B] = (self.tag: @switch) match {
     case IO.Tags.Point =>
       val io = self.asInstanceOf[IO.Point[A]]
 
@@ -75,9 +76,9 @@ sealed abstract class IO[A] { self =>
    * val parsed = readFile("foo.txt").flatMap(file => parseFile(file))
    * }}}
    */
-  final def flatMap[B](f0: A => IO[B]): IO[B] = (self.tag : @switch) match {
+  final def flatMap[B](f0: A => IO[B]): IO[B] = (self.tag: @switch) match {
     case IO.Tags.Fail => self.asInstanceOf[IO[B]]
-    case _ => IO.FlatMap(self, f0)
+    case _            => IO.FlatMap(self, f0)
   }
 
   /**
@@ -134,7 +135,8 @@ sealed abstract class IO[A] { self =>
    * Races this action with the specified action, invoking the
    * specified finisher as soon as one value or the other has been computed.
    */
-  final def raceWith[B, C](that: IO[B])(finish: (A, Fiber[B]) \/ (B, Fiber[A]) => IO[C]): IO[C] = IO.Race[A, B, C](self, that, finish)
+  final def raceWith[B, C](that: IO[B])(finish: (A, Fiber[B]) \/ (B, Fiber[A]) => IO[C]): IO[C] =
+    IO.Race[A, B, C](self, that, finish)
 
   /**
    * Executes this action and returns its value, if it succeeds, but
@@ -148,7 +150,7 @@ sealed abstract class IO[A] { self =>
    * the result in a `Disjunction`. This method is useful for recovering from
    * `IO` actions that may fail.
    */
-  final def attempt: IO[Throwable \/ A] = (self.tag : @switch) match {
+  final def attempt: IO[Throwable \/ A] = (self.tag: @switch) match {
     case IO.Tags.Point =>
       val io = self.asInstanceOf[IO.Point[A]]
 
@@ -196,13 +198,15 @@ sealed abstract class IO[A] { self =>
    * }
    * }}}
    */
-  final def bracket[B](release: A => IO[Unit])(use: A => IO[B]): IO[B] = IO.Bracket(this, (_: BracketResult[B], a: A) => release(a), use)
+  final def bracket[B](release: A => IO[Unit])(use: A => IO[B]): IO[B] =
+    IO.Bracket(this, (_: BracketResult[B], a: A) => release(a), use)
 
   /**
    * A more powerful version of `bracket` that provides information on whether
    * or not `use` succeeded to the release action.
    */
-  final def bracket0[B](release: (BracketResult[B], A) => IO[Unit])(use: A => IO[B]): IO[B] = IO.Bracket(this, release, use)
+  final def bracket0[B](release: (BracketResult[B], A) => IO[Unit])(use: A => IO[B]): IO[B] =
+    IO.Bracket(this, release, use)
 
   /**
    * A less powerful variant of `bracket` where the value produced by this
@@ -222,21 +226,28 @@ sealed abstract class IO[A] { self =>
    * Executes the release action only if there was an error.
    */
   final def bracketOnError[B](release: A => IO[Unit])(use: A => IO[B]): IO[B] =
-    bracket0((r: BracketResult[B], a: A) => r match {
-      case BracketResult.Failed(_) => release(a)
-      case BracketResult.Interrupted(_) => release(a)
-      case _ => IO.unit
-    })(use)
+    bracket0(
+      (r: BracketResult[B], a: A) =>
+        r match {
+          case BracketResult.Failed(_)      => release(a)
+          case BracketResult.Interrupted(_) => release(a)
+          case _                            => IO.unit
+      }
+    )(use)
 
   /**
    * Runs the specified cleanup action if this action errors, providing the
    * error to the cleanup action. The cleanup action will not be interrupted.
    */
-  final def onError(cleanup: Throwable => IO[Unit]): IO[A] = IO.unit.bracket0((r: BracketResult[A], a: Unit) => r match {
-    case BracketResult.Failed(e) => cleanup(e)
-    case BracketResult.Interrupted(e) => cleanup(e)
-    case _ => IO.unit
-  })(_ => self)
+  final def onError(cleanup: Throwable => IO[Unit]): IO[A] =
+    IO.unit.bracket0(
+      (r: BracketResult[A], a: Unit) =>
+        r match {
+          case BracketResult.Failed(e)      => cleanup(e)
+          case BracketResult.Interrupted(e) => cleanup(e)
+          case _                            => IO.unit
+      }
+    )(_ => self)
 
   /**
    * Supervises this action, which ensures that any fibers that are forked
@@ -260,7 +271,7 @@ sealed abstract class IO[A] { self =>
    * }}}
    */
   final def catchAll(h: Throwable => IO[A]): IO[A] = catchSome {
-    case t : Throwable => h(t)
+    case t: Throwable => h(t)
   }
 
   /**
@@ -288,13 +299,13 @@ sealed abstract class IO[A] { self =>
   /**
    * A variant of `flatMap` that ignores the value produced by this action.
    */
-  final def *> [B](io: => IO[B]): IO[B] = self.flatMap(_ => io)
+  final def *>[B](io: => IO[B]): IO[B] = self.flatMap(_ => io)
 
   /**
    * Sequences the specified action after this action, but ignores the
    * value produced by the action.
    */
-  final def <* [B](io: => IO[B]): IO[A] = self.flatMap(io.const(_))
+  final def <*[B](io: => IO[B]): IO[A] = self.flatMap(io.const(_))
 
   /**
    * Repeats this action forever (until the first error).
@@ -321,7 +332,8 @@ sealed abstract class IO[A] { self =>
   final def retryFor(duration: Duration): IO[A] =
     IO.absolve(
       retry.attempt race (IO.sleep(duration) *>
-                          IO.now(-\/(Errors.TimeoutException(duration)))))
+        IO.now(-\/(Errors.TimeoutException(duration))))
+    )
 
   /**
    * Maps this action to one producing unit, but preserving the effects of
@@ -370,20 +382,20 @@ sealed abstract class IO[A] { self =>
 
 object IO extends IOInstances {
   object Tags {
-    final val FlatMap           = 0
-    final val Point             = 1
-    final val Strict            = 2
-    final val SyncEffect        = 3
-    final val Fail              = 4
-    final val AsyncEffect       = 5
-    final val Attempt           = 6
-    final val Fork              = 7
-    final val Race              = 8
-    final val Suspend           = 9
-    final val Bracket           = 10
-    final val Uninterruptible   = 11
-    final val Sleep             = 12
-    final val Supervise         = 13
+    final val FlatMap         = 0
+    final val Point           = 1
+    final val Strict          = 2
+    final val SyncEffect      = 3
+    final val Fail            = 4
+    final val AsyncEffect     = 5
+    final val Attempt         = 6
+    final val Fork            = 7
+    final val Race            = 8
+    final val Suspend         = 9
+    final val Bracket         = 10
+    final val Uninterruptible = 11
+    final val Sleep           = 12
+    final val Supervise       = 13
   }
   final case class FlatMap[A0, A](io: IO[A0], flatMapper: A0 => IO[A]) extends IO[A] {
     override final def tag = Tags.FlatMap
@@ -417,7 +429,8 @@ object IO extends IOInstances {
     override final def tag = Tags.Fork
   }
 
-  final case class Race[A0, A1, A](left: IO[A0], right: IO[A1], finish: (A0, Fiber[A1]) \/ (A1, Fiber[A0]) => IO[A]) extends IO[A] {
+  final case class Race[A0, A1, A](left: IO[A0], right: IO[A1], finish: (A0, Fiber[A1]) \/ (A1, Fiber[A0]) => IO[A])
+      extends IO[A] {
     override final def tag = Tags.Race
   }
 
@@ -425,7 +438,8 @@ object IO extends IOInstances {
     override final def tag = Tags.Suspend
   }
 
-  final case class Bracket[A, B](acquire: IO[A], release: (BracketResult[B], A) => IO[Unit], use: A => IO[B]) extends IO[B] {
+  final case class Bracket[A, B](acquire: IO[A], release: (BracketResult[B], A) => IO[Unit], use: A => IO[B])
+      extends IO[B] {
     override final def tag = Tags.Bracket
   }
 
@@ -543,5 +557,6 @@ object IO extends IOInstances {
   final def require[A](t: Throwable): IO[Maybe[A]] => IO[A] =
     (io: IO[Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[A](t))(IO.now[A](_)))
 
-  private final val Never: IO[Any] = IO.async[Any] { (k: (Throwable \/ Any) => Unit) => }
+  private final val Never: IO[Any] = IO.async[Any] { (k: (Throwable \/ Any) => Unit) =>
+    }
 }

@@ -31,9 +31,7 @@ sealed abstract class AList1[F[_, _], A, B] {
   def :++[C](that: AList[F, B, C]): AList1[F, A, C] = {
     type FXB[X] = F[X, B]
     type FXC[X] = AList1[F, X, C]
-    foldRight1[AList1[F, ?, C]]             (
-      ∀.mk[FXB ~> FXC].from(_ +: that)     )(
-      ν[LeftAction[FXC, F]][α, β](_ :: _)  )
+    foldRight1[AList1[F, ?, C]](∀.mk[FXB ~> FXC].from(_ +: that))(ν[LeftAction[FXC, F]][α, β](_ :: _))
   }
 
   def reverse_:::[Z](that: Composed1[F, Z, A]): AList1[F, Z, B] =
@@ -82,7 +80,9 @@ sealed abstract class AList1[F[_, _], A, B] {
    * Map and then compose the elements of this list in a balanced binary fashion.
    */
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Compose[G]): G[A, B] =
-    tail.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightAction(φ)).result
+    tail
+      .foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightAction(φ))
+      .result
 
   def map[G[_, _]](φ: F ~~> G): AList1[G, A, B] =
     ACons1(φ.apply(head), tail.map(φ))
@@ -90,7 +90,9 @@ sealed abstract class AList1[F[_, _], A, B] {
   def flatMap[G[_, _]](φ: F ~~> AList1[G, ?, ?]): AList1[G, A, B] = {
     type FXB[X] = F[X, B]
     type GXB[X] = AList1[G, X, B]
-    foldRight1[AList1[G, ?, B]](∀.mk[FXB ~> GXB].from(φ.apply(_)))(ν[LeftAction[AList1[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs))
+    foldRight1[AList1[G, ?, B]](∀.mk[FXB ~> GXB].from(φ.apply(_)))(
+      ν[LeftAction[AList1[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs)
+    )
   }
 
   def size: Int = 1 + tail.size
@@ -105,6 +107,7 @@ final case class ACons1[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) e
 }
 
 object AList1 {
+
   /**
    * Reversed type-aligned list is type-aligned with flipped type constructor.
    * For example, when we reverse

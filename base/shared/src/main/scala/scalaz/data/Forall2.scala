@@ -46,9 +46,10 @@ private[data] object Forall2Impl extends Forall2Module with Forall2Syntax {
   def of[F[_, _]]: MkForall2[F] = new MkForall2Impl[F]
 }
 
-private[data] final class MkForall2Impl[F[_, _]](val dummy: Boolean = false) extends AnyVal with Forall2Impl.MkForall2[F] {
+private[data] final class MkForall2Impl[F[_, _]](val dummy: Boolean = false)
+    extends AnyVal
+    with Forall2Impl.MkForall2[F] {
   type T = Any
   type U = Any
   def from(ft: F[T, U]): Forall2Impl.∀∀[F] = ft
 }
-

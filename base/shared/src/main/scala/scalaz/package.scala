@@ -1,3 +1,1 @@
-package object scalaz extends BaseTypeclasses
-  with BaseData
-  with BaseDataAliases
+package object scalaz extends BaseTypeclasses with BaseData with BaseDataAliases

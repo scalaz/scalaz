@@ -4,16 +4,16 @@ package typeclass
 import data.As
 
 /**
-  * Witnesses that the type constructor `F[_]` is covariant,
-  * even though the variance annotation of its type parameter has been forgotten.
-  *
-  * A safer alternative to
-  * https://typelevel.org/blog/2014/03/09/liskov_lifting.html
-  */
+ * Witnesses that the type constructor `F[_]` is covariant,
+ * even though the variance annotation of its type parameter has been forgotten.
+ *
+ * A safer alternative to
+ * https://typelevel.org/blog/2014/03/09/liskov_lifting.html
+ */
 trait IsCovariantClass[F[_]] {
-  def substCv[G[+_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]]
+  def substCv[G[+ _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]]
 
-  def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]]
+  def substCt[G[- _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]]
 
   def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B]
 
@@ -23,7 +23,7 @@ trait IsCovariantClass[F[_]] {
 object IsCovariantClass {
 
   trait SubstCv[F[_]] extends IsCovariantClass[F] with Alt[SubstCv[F]] {
-    final override def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] = {
+    final override def substCt[G[- _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] = {
       type H[+a] = G[a] => G[F[A]]
       substCv[H, A, B](identity[G[F[A]]]).apply(g)
     }
@@ -36,28 +36,29 @@ object IsCovariantClass {
   }
 
   trait SubstCt[F[_]] extends IsCovariantClass[F] with Alt[SubstCt[F]] {
-    final override def substCv[G[+_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] = {
+    final override def substCv[G[+ _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] = {
       type H[-a] = G[a] => G[F[B]]
       substCt[H, A, B](identity[G[F[B]]]).apply(g)
     }
 
     final override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] =
       substCt[-? <~< F[B], A, B](As.refl[F[B]])
- 
+
     final override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       substCt[-? => F[B], A, B](identity[F[B]]).apply(fa)
   }
 
   trait LiftLiskov[F[_]] extends IsCovariantClass[F] with Alt[LiftLiskov[F]] {
-    final override def substCv[G[+_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
+    final override def substCv[G[+ _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
       liftLiskov[A, B].substCv[G](g)
 
-    final override def substCt[G[-_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
+    final override def substCt[G[- _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
       liftLiskov[A, B].substCt[G](g)
 
     final override def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
       liftLiskov[A, B].apply(fa)
   }
 
-  trait Alt[D <: Alt[D]] { self: D => }
+  trait Alt[D <: Alt[D]] { self: D =>
+  }
 }

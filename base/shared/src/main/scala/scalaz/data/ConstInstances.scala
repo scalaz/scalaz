@@ -3,19 +3,22 @@ package data
 
 import scalaz.typeclass._
 
-
 trait ConstInstances {
-  implicit def constTraverse[R]: Traversable[Const[R, ?]] = instanceOf(new TraversableClass.DeriveSequence[Const[R, ?]] with FoldableClass.DeriveFoldMap[Const[R, ?]] with ConstFunctor[R] {
+  implicit def constTraverse[R]: Traversable[Const[R, ?]] =
+    instanceOf(
+      new TraversableClass.DeriveSequence[Const[R, ?]] with FoldableClass.DeriveFoldMap[Const[R, ?]]
+      with ConstFunctor[R] {
 
-    override def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
-      F.pure(ta.retag)
+        override def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
+          F.pure(ta.retag)
 
-    override def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
+        override def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
 
-    override def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
+        override def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
 
-    override def toList[A](fa: Const[R, A]): List[A] = Nil
-  })
+        override def toList[A](fa: Const[R, A]): List[A] = Nil
+      }
+    )
 
   private trait ConstFunctor[R] extends FunctorClass[Const[R, ?]] {
     final override def map[A, B](fa: Const[R, A])(f: A => B): Const[R, B] =
@@ -28,7 +31,7 @@ trait ConstInstances {
       Const(R.append(fa.getConst, f.getConst))
   }
 
-  private trait ConstApplicative[R] extends ApplicativeClass[Const[R, ?]] with ConstApply[R]  {
+  private trait ConstApplicative[R] extends ApplicativeClass[Const[R, ?]] with ConstApply[R] {
     override def R: MonoidClass[R]
     final override def pure[A](a: A): Const[R, A] = Const(R.empty)
   }
@@ -44,23 +47,28 @@ trait ConstInstances {
     final override def empty: Const[A, B] = Const(A.empty)
   }
 
-  implicit def constApply[R: Semigroup]: Apply[Const[R, ?]] = instanceOf(new ConstApply[R] {
-    override val R = implicitly
-  })
+  implicit def constApply[R: Semigroup]: Apply[Const[R, ?]] =
+    instanceOf(new ConstApply[R] {
+      override val R = implicitly
+    })
 
-  implicit def constApplicative[R: Monoid]: Applicative[Const[R, ?]] = instanceOf(new ConstApplicative[R] {
-    override val R = implicitly
-  })
+  implicit def constApplicative[R: Monoid]: Applicative[Const[R, ?]] =
+    instanceOf(new ConstApplicative[R] {
+      override val R = implicitly
+    })
 
-  implicit def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] = instanceOf(new ConstSemigroup[A, B] {
-    override val A = implicitly
-  })
+  implicit def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] =
+    instanceOf(new ConstSemigroup[A, B] {
+      override val A = implicitly
+    })
 
-  implicit def constMonoid[A: Monoid, B]: Monoid[Const[A, B]] = instanceOf(new ConstMonoid[A, B] {
-    override val A = implicitly
-  })
+  implicit def constMonoid[A: Monoid, B]: Monoid[Const[A, B]] =
+    instanceOf(new ConstMonoid[A, B] {
+      override val A = implicitly
+    })
 
-  implicit def constDebug[A, B](implicit A: DebugClass[A]): DebugClass[Const[A, B]] = instanceOf[DebugClass[Const[A, B]]](
-    a => A.debug(a.getConst)
-  )
+  implicit def constDebug[A, B](implicit A: DebugClass[A]): DebugClass[Const[A, B]] =
+    instanceOf[DebugClass[Const[A, B]]](
+      a => A.debug(a.getConst)
+    )
 }

@@ -4,16 +4,16 @@ package typeclass
 import data.As
 
 /**
-  * Witnesses that the type constructor `F[_]` is contravariant,
-  * even though the variance annotation of its type parameter has been forgotten.
-  *
-  * A safer alternative to
-  * https://typelevel.org/blog/2014/03/09/liskov_lifting.html
-  */
+ * Witnesses that the type constructor `F[_]` is contravariant,
+ * even though the variance annotation of its type parameter has been forgotten.
+ *
+ * A safer alternative to
+ * https://typelevel.org/blog/2014/03/09/liskov_lifting.html
+ */
 trait IsContravariantClass[F[_]] {
-  def substCv[G[+_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]]
+  def substCv[G[+ _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]]
 
-  def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]]
+  def substCt[G[- _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]]
 
   def liftLiskov[A, B](implicit ev: A <~< B): F[B] <~< F[A]
 
@@ -23,7 +23,7 @@ trait IsContravariantClass[F[_]] {
 object IsContravariantClass {
 
   trait SubstCv[F[_]] extends IsContravariantClass[F] with Alt[SubstCv[F]] {
-    final override def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] = {
+    final override def substCt[G[- _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] = {
       type H[+a] = G[a] => G[F[B]]
       substCv[H, A, B](identity[G[F[B]]]).apply(g)
     }
@@ -35,8 +35,8 @@ object IsContravariantClass {
       substCv[F[B] => +?, A, B](identity[F[B]]).apply(fb)
   }
 
-  trait SubstCt[F[_]]  extends IsContravariantClass[F] with Alt[SubstCt[F]] {
-    final override def substCv[G[+_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] = {
+  trait SubstCt[F[_]] extends IsContravariantClass[F] with Alt[SubstCt[F]] {
+    final override def substCv[G[+ _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] = {
       type H[-a] = G[a] => G[F[A]]
       substCt[H, A, B](identity[G[F[A]]]).apply(g)
     }
@@ -49,10 +49,10 @@ object IsContravariantClass {
   }
 
   trait LiftLiskov[F[_]] extends IsContravariantClass[F] with Alt[LiftLiskov[F]] {
-    final override def substCv[G[+_], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
+    final override def substCv[G[+ _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] =
       liftLiskov[A, B].substCv[G](g)
 
-    final override def substCt[G[-_], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
+    final override def substCt[G[- _], A, B](g: G[F[A]])(implicit ev: A <~< B): G[F[B]] =
       liftLiskov[A, B].substCt[G](g)
 
     final override def widen[A, B](fb: F[B])(implicit ev: A <~< B): F[A] =

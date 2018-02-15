@@ -2,6 +2,7 @@
 package scalaz.effect
 
 package object console {
+
   /**
    * Prints text to the console.
    */

@@ -14,16 +14,16 @@ sealed abstract class AsyncReturn[A] { self =>
 
   final def fold[Z](later: => Z, now: A => Z, maybeLater: Canceler => Z): Z =
     self match {
-      case Now(v) => now(v)
+      case Now(v)        => now(v)
       case MaybeLater(c) => maybeLater(c)
-      case _ => later
+      case _             => later
     }
 }
 object AsyncReturn {
   type Canceler = Throwable => Unit
 
-  private final case object Later extends AsyncReturn[Nothing]
-  final case class Now[A](value: A) extends AsyncReturn[A]
+  private final case object Later                    extends AsyncReturn[Nothing]
+  final case class Now[A](value: A)                  extends AsyncReturn[A]
   final case class MaybeLater[A](canceler: Canceler) extends AsyncReturn[A]
 
   /**
