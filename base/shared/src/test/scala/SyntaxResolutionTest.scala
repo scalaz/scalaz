@@ -35,8 +35,8 @@ object SyntaxResolutionTest {
   def _phantom[F[_]: Phantom, A, B](fa: F[A]): F[B] = fa.pmap
 
   def _profunctor[F[_, _]: Profunctor, A, B, C, D](fab: F[A, B], ca: C => A, bd: B => D) = {
-    fab.lmap(ca) : F[C, B]
-    fab.rmap(bd) : F[A, D]
+    fab.lmap(ca): F[C, B]
+    fab.rmap(bd): F[A, D]
     fab.dimap(ca)(bd): F[C, D]
   }
 
