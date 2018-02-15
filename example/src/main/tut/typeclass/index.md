@@ -10,12 +10,12 @@ This is achieved by adding constraints to type variables in parametrically polym
 
 Type class instances allow us to add behaviour to types without changing the types themselves.
 
-As an example, let us look at the [Show](./Show.html) type class, a safe alternative to the JVM's `Object.toString`.
-It defines that all its instances implement a method `show` with the following signature:
+As an example, let us look at the [Debug](./Debug.html) type class, a safe alternative to the JVM's `Object.toString`.
+It defines that all its instances implement a method `debug` with the following signature:
 
 ```tut:silent
-trait Show[A] {
-  def show(a: A): String
+trait Debug[A] {
+  def debug(a: A): String
 }
 ```
 
@@ -25,31 +25,31 @@ Now assume that we have a class which we are unable or unwilling to change in or
 final case class BusinessObject(id: Long, value: Long)
 ```
 
-Using the `Show` type class, we can easily just define such a conversion:
+Using the `Debug` type class, we can easily just define such a conversion:
 
 ```tut:silent
-implicit val businessObjectShow: Show[BusinessObject] = new Show[BusinessObject] {
-  def show(b: BusinessObject) = s"BO[${b.id} = ${b.value}]"
+implicit val businessObjectDebug: Debug[BusinessObject] = new Debug[BusinessObject] {
+  def debug(b: BusinessObject) = s"BO[${b.id} = ${b.value}]"
 }
 ```
 
-Now, whenever we would like to turn our `BusinessObject` into a String, we can do so using our `Show` instance.
+Now, whenever we would like to turn our `BusinessObject` into a String, we can do so using our `Debug` instance.
 
 ```tut
 val bo = BusinessObject(1234L, 1234567L)
 
-businessObjectShow.show(bo)
+businessObjectDebug.debug(bo)
 ```
 
-However, this is not too convenient and very specific to our `BusinessObject`. Would it not be nicer to be able to say `bo.show`?
+However, this is not too convenient and very specific to our `BusinessObject`. Would it not be nicer to be able to say `bo.debug`?
 
 Luckily, **Scalaz** makes all this very easy.
 
 We need something similar to the following:
 
 ```tut:silent
-implicit final class ShowOps[A](self: A)(implicit s: Show[A]) {
-  def show: String = s.show(self)
+implicit final class DebugOps[A](self: A)(implicit s: Debug[A]) {
+  def debug: String = s.debug(self)
 }
 ```
 
@@ -57,24 +57,25 @@ Luckily, most of this ships in Scalaz by default.
 
 ```tut:reset
 import scalaz.Scalaz._
+import scalaz.typeclass.DebugClass
 
 final case class BusinessObject(id: Long, value: Long)
 
-implicit val businessObjectShow: Show[BusinessObject] = (b: BusinessObject) => s"BO[${b.id} = ${b.value}]"
+implicit val businessObjectDebug: Debug[BusinessObject] = instanceOf[DebugClass[BusinessObject]](b => s"BO[${b.id} = ${b.value}]")
 
-BusinessObject(1234L, 1234567L).show
+BusinessObject(1234L, 1234567L).debug
 ```
 
 After showing that we can add behaviour, it should now be easy to see how type classes can be used as constraints for parametrically polymorphic functions.
 
-For example, we could define a function `loudShow` as follows:
+For example, we could define a function `loudDebug` as follows:
 
 ```tut:silent
-def loudShow[A: Show](a: A) = a.show.toUpperCase
+def loudDebug[A: Debug](a: A) = a.debug.toUpperCase
 ```
 
-Notice that the type parameter `A` now has a constraint that requires it have an instance of `Show`.
-The above `loudShow` can be used with our original `BusinessObject` class or any type that has a `Show` instance.
+Notice that the type parameter `A` now has a constraint that requires it have an instance of `Debug`.
+The above `loudDebug` can be used with our original `BusinessObject` class or any type that has a `Debug` instance.
 
 ---
 
