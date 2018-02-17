@@ -42,22 +42,22 @@ sealed abstract class ZapInstances {
     }
 
   /** A free monad and a cofree comonad annihilate each other */
-  implicit def monadComonadZap[F[_], G[_]](implicit d: Zap[F, G], F: Functor[F]): Zap[Free[F, ?], Cofree[G, ?]] =
+  implicit def monadComonadZap[F[_], G[_]](implicit d: Zap[F, G]): Zap[Free[F, ?], Cofree[G, ?]] =
     new Zap[Free[F, ?], Cofree[G, ?]] {
       def zapWith[A, B, C](ma: Free[F, A], wb: Cofree[G, B])(f: (A, B) => C): C =
-        ma.resume match {
+        ma.resumeC match {
           case \/-(a) => f(a, wb.head)
-          case -\/(k) => d.zapWith(k, wb.tail)(zapWith(_, _)(f))
+          case -\/(k) => d.zapWith(k.fi, wb.tail)((i, b) => zapWith(k.k(i), b)(f))
         }
     }
 
   /** A cofree comonad and a free monad annihilate each other */
-  implicit def comonadMonadZap[F[_], G[_]](implicit d: Zap[F, G], G: Functor[G]): Zap[Cofree[F, ?], Free[G, ?]] =
+  implicit def comonadMonadZap[F[_], G[_]](implicit d: Zap[F, G]): Zap[Cofree[F, ?], Free[G, ?]] =
     new Zap[Cofree[F, ?], Free[G, ?]] {
       def zapWith[A, B, C](wa: Cofree[F, A], mb: Free[G, B])(f: (A, B) => C): C =
-        mb.resume match {
+        mb.resumeC match {
           case \/-(b) => f(wa.head, b)
-          case -\/(k) => d.zapWith(wa.tail, k)(zapWith(_, _)(f))
+          case -\/(k) => d.zapWith(wa.tail, k.fi)((a, i) => zapWith(a, k.k(i))(f))
         }
     }
 }

@@ -5,7 +5,7 @@ import collection.immutable.{Map, MapLike} // Just so we're clear.
 import collection.generic.CanBuildFrom
 
 trait MapSub {
-  type XMap[K, V] <: Map[K, V] with MapLike[K, V, XMap[K, V]]
+  type XMap[K, +V] <: Map[K, V] with MapLike[K, V, XMap[K, V]]
   /** Evidence on key needed to construct new maps. */
   type BuildKeyConstraint[K]
   protected implicit def buildXMap[K, V, K2: BuildKeyConstraint, V2]
@@ -17,7 +17,7 @@ trait MapSub {
   protected def ab_+[K: BuildKeyConstraint, V
                    ](m: XMap[K, V], k: K, v: V): XMap[K, V]
 
-  /** As with `ab_+, but with `MapLike#-`. */
+  /** As with `ab_+`, but with `MapLike#-`. */
   protected def ab_-[K: BuildKeyConstraint, V
                    ](m: XMap[K, V], k: K): XMap[K, V]
 
@@ -27,7 +27,7 @@ trait MapSub {
 }
 
 sealed trait MapSubMap extends MapSub {
-  type XMap[K, V] = Map[K, V]
+  type XMap[K, +V] = Map[K, V]
   type BuildKeyConstraint[K] = DummyImplicit
   protected final def buildXMap[K, V, K2: BuildKeyConstraint, V2] = implicitly
 
@@ -81,6 +81,7 @@ trait MapSubInstances0 extends MapSub {
 }
 
 trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
+  import Liskov.<~<
   import syntax.std.function2._
 
   /** Covariant over the value parameter, where `plus` applies the
@@ -93,6 +94,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
       def isEmpty[V](fa: XMap[K, V]) = fa.isEmpty
       def bind[A, B](fa: XMap[K,A])(f: A => XMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
       override def map[A, B](fa: XMap[K, A])(f: A => B) = fa.transform{case (_, v) => f(v)}
+      override def widen[A, B](fa: XMap[K, A])(implicit ev: A <~< B) = Liskov.co[XMap[K, +?], A, B](ev)(fa)
       def traverseImpl[G[_],A,B](m: XMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[XMap[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => fromSeq(xs:_*))
       import \&/._

@@ -5,7 +5,7 @@ package syntax
 final class PlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Plus[F]) extends Ops[F[A]] {
   ////
 
-  final def <+>(other: => F[A]) = F.plus(self, other)
+  final def <+>(other: => F[A]): F[A] = F.plus(self, other)
 
   ////
 }

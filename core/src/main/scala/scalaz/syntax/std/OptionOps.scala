@@ -5,7 +5,7 @@ package std
 import scalaz.std.{option => o}
 import scalaz.Tags.{Last, First}
 
-final class OptionOps[A](val self: Option[A]) extends AnyVal {
+final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
 
   /**

@@ -5,6 +5,11 @@ sealed trait OptionInstances0 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
+
+  implicit def optionBand[A: Band]: Band[Option[A]] =
+    new OptionMonoid[A] with Band[Option[A]] {
+      override def B = implicitly
+    }
 }
 
 trait OptionInstances extends OptionInstances0 {
@@ -81,16 +86,10 @@ trait OptionInstances extends OptionInstances0 {
         }
     }
 
-  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
-    def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
-      case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
-      case (Some(a1), None)     => f1
-      case (None, sa2 @ Some(a2)) => sa2
-      case (None, None)         => None
+  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
+    new OptionMonoid[A] {
+      override def B = implicitly
     }
-
-    def zero: Option[A] = None
-  }
 
   /** Add `None` as an element less than all `A`s. */
   implicit def optionOrder[A](implicit A0: Order[A]): Order[Option[A]] = new OptionOrder[A] {
@@ -104,7 +103,7 @@ trait OptionInstances extends OptionInstances0 {
     }
   }
 
-  implicit def optionFirst[A] = new Monoid[FirstOption[A]] {
+  implicit def optionFirst[A]: Monoid[FirstOption[A]] with Band[FirstOption[A]] = new Monoid[FirstOption[A]] with Band[FirstOption[A]] {
     def zero: FirstOption[A] = Tag(None)
 
     def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
@@ -116,7 +115,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstMonad: Monad[FirstOption] = Tags.First.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionLast[A] = new Monoid[LastOption[A]] {
+  implicit def optionLast[A]: Monoid[LastOption[A]] with Band[LastOption[A]] = new Monoid[LastOption[A]] with Band[LastOption[A]] {
     def zero: LastOption[A] = Tag(None)
 
     def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
@@ -128,7 +127,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastMonad: Monad[LastOption] = Tags.Last.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
+  implicit def optionMin[A](implicit o: Order[A]): Monoid[MinOption[A]] with Band[MinOption[A]] = new Monoid[MinOption[A]] with Band[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -145,7 +144,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMinMonad: Monad[MinOption] = Tags.Min.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
+  implicit def optionMax[A](implicit o: Order[A]): Monoid[MaxOption[A]] with Band[MaxOption[A]] = new Monoid[MaxOption[A]] with Band[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -285,4 +284,17 @@ private trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
     case (Some(_), None)      => GT
     case (None, None)         => EQ
   }
+}
+
+private trait OptionMonoid[A] extends Monoid[Option[A]] {
+  def B: Semigroup[A]
+
+  def append(a: Option[A], b: => Option[A]): Option[A] = (a, b) match {
+    case (Some(aa), Some(bb)) => Some(B.append(aa, bb))
+    case (Some(_), None) => a
+    case (None, b2 @ Some(_)) => b2
+    case (None, None) => None
+  }
+
+  def zero: Option[A] = None
 }

@@ -4,12 +4,12 @@ sudo: false
 cache:
   directories:
     - $HOME/.ivy2/cache
+    - $HOME/.sbt/launchers
 
 language: scala
 scala:
-  - 2.12.1
-  - 2.11.8
-  - 2.10.6
+  - 2.12.2
+  - 2.11.11
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -34,7 +34,30 @@ addons:
 
 matrix:
   include:
-  - scala: 2.11.8
+  - scala: 2.13.0-M1
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJVM"
+    script:
+    # https://github.com/non/kind-projector/issues/50
+    - git clone https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - git checkout v0.9.3
+    - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
+    - cd ..
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
+  - scala: 2.13.0-M1
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJS"
+    script:
+    # https://github.com/non/kind-projector/issues/50
+    - git clone https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - git checkout v0.9.3
+    - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
+    - cd ..
+    # https://github.com/rickynils/scalacheck/issues/330
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes coreJS/compile effectJS/compile iterateeJS/compile
+  - scala: 2.11.11
     jdk: oraclejdk8
     sudo: required
     before_install:
@@ -45,13 +68,24 @@ matrix:
     - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     - sudo apt-get -qq update
     - sudo apt-get install -y libgc-dev clang++-3.7 llvm-3.7 llvm-3.7-dev llvm-3.7-runtime llvm-3.7-tool libunwind7-dev
+    # Install re2
+    # https://github.com/scala-native/scala-native/commit/1d312519788534ff41477e4d7f758a6e7451be05#diff-354f30a63fb0907d4ad57269548329e3R28
+    - sudo apt-get install -y make
+    - export CXX=clang++-3.7
+    - git clone https://code.googlesource.com/re2
+    - pushd re2
+    - git checkout 2017-03-01
+    - make -j4 test
+    - sudo make install prefix=/usr
+    - make testinstall prefix=/usr
+    - popd
     script:
-    - sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+    - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
 
   - dist: trusty
     group: edge
     sudo: required
-    scala: 2.12.1
+    scala: 2.12.2
     jdk: oraclejdk9
     script:
     # https://github.com/sbt/sbt/pull/2951
@@ -64,6 +98,4 @@ matrix:
     - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
     - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
     - cd ..
-    - echo "sbt.version=0.13.14-RC1" > project/build.properties
-    - wget https://raw.githubusercontent.com/paulp/sbt-extras/9ade5fa54914ca8aded44105bf4b9a60966f3ccd/sbt && chmod +x ./sbt
     - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes rootJVM/test rootJS/test

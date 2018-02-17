@@ -1,6 +1,7 @@
 package scalaz
 
 import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicReference
 
 /** Like [[scala.collection.immutable.Stream]], but doesn't save
   * computed values.  As such, it can be used to represent similar
@@ -64,7 +65,7 @@ sealed abstract class EphemeralStream[A] {
   def map[B](f: A => B): EphemeralStream[B] =
     flatMap(x => EphemeralStream(f(x)))
 
-  def length = {
+  def length: Int = {
     def addOne(c: => Int)(a: => A) = 1 + c
     foldLeft(0)(addOne _)
   }
@@ -297,17 +298,25 @@ object EphemeralStream extends EphemeralStreamInstances {
   }
 
   def weakMemo[V](f: => V): () => V = {
-    val latch = new Object
-    // TODO I don't think this annotation does anything, as `v` isn't a class member.
-    @volatile var v: Option[WeakReference[V]] = None
+    val ref: AtomicReference[WeakReference[V]] = new AtomicReference()
     () => {
-      val a = v.map(x => x.get)
-      if (a.isDefined && a.get != null) a.get
-      else latch.synchronized {
-        val x = f
-        v = Some(new WeakReference(x))
-        x
+      @inline
+      def genNew(x: V, old: WeakReference[V]): V = {
+        if (ref.compareAndSet(old, new WeakReference(x)))
+          x
+        else {
+          val crt = ref.get.get
+          if (crt != null) crt
+          else x
+        }
       }
+      val v = ref.get()
+      if (v != null) {
+        val crt = v.get()
+        if (crt == null) {
+          genNew(f, v)
+        } else crt
+      } else genNew(f, v)
     }
   }
 

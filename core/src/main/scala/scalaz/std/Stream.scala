@@ -71,6 +71,11 @@ trait StreamInstances {
 
     override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
 
+    override def map[A, B](fa: Stream[A])(f: A => B): Stream[B] = fa map f
+
+    import Liskov.<~<
+    override def widen[A, B](fa: Stream[A])(implicit ev: A <~< B): Stream[B] = Liskov.co(ev)(fa)
+
     def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
     def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
@@ -127,7 +132,7 @@ trait StreamInstances {
       }
     }
 
-  implicit def streamMonoid[A] = new Monoid[Stream[A]] {
+  implicit def streamMonoid[A]: Monoid[Stream[A]] = new Monoid[Stream[A]] {
     def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
     def zero: Stream[A] = scala.Stream.empty
   }
@@ -153,7 +158,7 @@ trait StreamInstances {
           }
         }
     }
-  implicit def streamShow[A](implicit A0: Show[A]) =
+  implicit def streamShow[A](implicit A0: Show[A]): Show[Stream[A]] =
     new Show[Stream[A]] {
       override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
     }

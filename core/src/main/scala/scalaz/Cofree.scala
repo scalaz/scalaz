@@ -67,11 +67,11 @@ sealed abstract class Cofree[S[_], A] {
     applyCofree(x => b, g)
 
   /** Applies a function `f` to a value in this comonad and a corresponding value in the dual monad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =
     Zap.comonadMonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a monad to the corresponding value in this comonad, annihilating both. */
-  final def zap[G[_], B](fs: Free[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Free[G, A => B])(implicit d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 }
 

@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class ReducerOps[A](val self: A) extends AnyVal {
+final class ReducerOps[A](private val self: A) extends AnyVal {
   /** Convert the value into a monoid */
   def unit[M](implicit r: Reducer[A,M]): M = r.unit(self)
 
@@ -13,5 +13,5 @@ final class ReducerOps[A](val self: A) extends AnyVal {
 }
 
 trait ToReducerOps {
-  implicit def ToReducerOps[A](a: A) = new ReducerOps(a)
+  implicit def ToReducerOps[A](a: A): ReducerOps[A] = new ReducerOps(a)
 }

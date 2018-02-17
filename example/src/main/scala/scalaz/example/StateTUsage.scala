@@ -2,38 +2,18 @@ package scalaz.example
 
 import scalaz._
 
-object StateTUsage extends App {
-  import StateT._
-
-  def f[M[_]: Functor] = {
-    Functor[StateT[M, Int, ?]]
-  }
-
-  def m[M[_]: Monad] = {
-    Applicative[StateT[M, Int, ?]]
-    Monad[StateT[M, Int, ?]]
-    MonadState[StateT[M, Int, ?], Int]
-  }
-
-  def state(): Unit = {
-    val state: State[String, Int] = State((x: String) => (x + 1, 0))
-    val eval: Int = state.eval("")
-    state.flatMap(_ => state)
-  }
-}
-
 object FibStateExample extends App {
   val S = scalaz.StateT.stateMonad[(Int, Int)]
-  import S.monadSyntax._
-  import scalaz.State._
+  import S._ // for support if init, put, get, gets, ...
+  import scalaz.syntax.monad._ // for support of replicateM
 
   val initialState = (0, 1)
 
-  val (nextFib: State[(Int, Int), Int]) = for {
-    s <- init:State[(Int, Int), (Int, Int)]
+  val (nextFib: State[(Int, Int), Int]) : State[(Int, Int), Int] = for {
+    s <- get
     (a,b) = s
     n = a + b
-    _ <- put (b, n)
+    _ <- put ((b, n))
   } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
             // yield b instead to get (1,1,2,3...)
 
@@ -63,12 +43,12 @@ object LaunchburyInterpreter extends App {
   import scala.collection.immutable.HashMap
   import scalaz.std.function._
   import scalaz.std.list._
+  import scalaz.syntax.monad._
   import scalaz.syntax.traverse._
   import scalaz.syntax.arrow._
 
   val S = scalaz.StateT.stateMonad[ReduceState]
-  import S.monadSyntax._
-  import scalaz.State._
+  import S._
 
   /** Simple lambda calculus Abstract Syntax Tree.
     * Note that that apply applies a let-bound argument to an Expr.
@@ -98,7 +78,7 @@ object LaunchburyInterpreter extends App {
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
   private def sub(m: Map[String, String])(e: Expr): Expr = {
     val subExpr = sub(m) _
-    def subName(n: String) = if (m contains n) m(n) else n
+    def subName(n: String) : String = if (m contains n) m(n) else n
     e match {
       case Lambda(z, e2) => Lambda(subName(z), subExpr(e2))
       case Apply(e2, z)  => Apply(subExpr(e2), subName(z))
@@ -111,9 +91,10 @@ object LaunchburyInterpreter extends App {
   // replaces every bound variable with a new, "fresh" variable
   // e.g. freshen(Lambda("x", Var("x"))).eval(initialState) => Lambda("$1", Var("$1"))
   private def freshen(e: Expr): State[ReduceState, Expr] = {
-    val getFreshVar = for { s <- init: State[ReduceState,ReduceState]
+    val getFreshVar : State[ReduceState, String] = for {
+                            s <- get
                             ReduceState(_, f #:: fs) = s
-                            _ <- modify((s:ReduceState) => s.copy(freshVars = fs))
+                            _ <- modify(s => s.copy(freshVars = fs))
                           } yield f
     // Lambda and Let define new bound variables, so we substitute fresh variables into them
     // Var and Apply just recursively traverse the AST
@@ -149,15 +130,15 @@ object LaunchburyInterpreter extends App {
       case Apply(e2, x)  => reduce(e2) >>= { case Lambda(y, e3) => reduce( sub(HashMap(y -> x))(e3) )
                                              case _ => sys.error("Ill-typed lambda term")
                                            }
-      case Var(x)        => for { state <- init:State[ReduceState, ReduceState]
+      case Var(x)        => for { state <- get
                                   e2 = state.heap(x)
-                                  _ <- modify((s:ReduceState) => s.copy(heap = s.heap - x))
+                                  _ <- modify(s => s.copy(heap = s.heap - x))
                                   e3 <- reduce(e2)
-                                  _ <- modify((s:ReduceState) => s.copy(heap = s.heap + ((x, e3))))
+                                  _ <- modify(s => s.copy(heap = s.heap + ((x, e3))))
                                   freshendE <- freshen(e3)
                                 } yield freshendE
      case Let(bs, e2)   => { val heapAdd = ((binding:(String, Expr)) =>
-                                              modify((s:ReduceState) => s.copy(heap = s.heap + binding)))
+                                              modify(s => s.copy(heap = s.heap + binding)))
                              bs.toList.traverseS(heapAdd) >> reduce(e2)
                            }
    }
@@ -167,4 +148,3 @@ object LaunchburyInterpreter extends App {
  // run an example through the magic of App
  println(evaluate(example2))
 }
-

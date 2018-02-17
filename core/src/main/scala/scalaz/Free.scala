@@ -22,9 +22,14 @@ object Free extends FreeInstances {
   def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
     liftF(value).flatMap(x => x)
 
+  private val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
+
+  // Cache `point(())` to avoid frequent allocation
+  @inline private def pointUnit[S[_]]: Free[S, Unit] = pointUnitCache.asInstanceOf[Free[S, Unit]]
+
   /** Suspend a computation in a pure step of the applicative functor `S` */
-  def suspend[S[_], A](value: => Free[S, A])(implicit S: Applicative[S]): Free[S, A] =
-    liftF(S.pure(())).flatMap(_ => value)
+  def suspend[S[_], A](value: => Free[S, A]): Free[S, A] =
+    pointUnit.flatMap(_ => value)
 
   /** A version of `liftF` that infers the nested type constructor. */
   def liftFU[MA](value: => MA)(implicit MA: Unapply[Functor, MA]): Free[MA.M, MA.A] =
@@ -62,14 +67,22 @@ object Free extends FreeInstances {
     def f: A => Free[S, B] = f0
   }
 
-  /** A computation that can be stepped through, suspended, and paused */
+  /** A computation that can be stepped through, suspended, and paused
+    *
+    * @template
+    */
   type Trampoline[A] = Free[Function0, A]
 
-  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`. */
+  /** A computation that produces values of type `A`, eventually resulting in a value of type `B`.
+    *
+    * @template
+    */
   type Source[A, B] = Free[(A, ?), B]
 
   /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
     * Note the similarity to an [[scalaz.iteratee.Iteratee]].
+    *
+    * @template
     */
   type Sink[A, B] = Free[(=> A) => ?, B]
 
@@ -101,14 +114,18 @@ sealed abstract class Free[S[_], A] {
     resume.fold(s, r)
 
   /** Evaluates a single layer of the free monad **/
-  @tailrec final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) =
+  final def resume(implicit S: Functor[S]): (S[Free[S,A]] \/ A) =
+    resumeC.leftMap(_.run)
+
+  /** Evaluates a single layer of the free monad **/
+  @tailrec final def resumeC: (Coyoneda[S, Free[S,A]] \/ A) =
     this match {
       case Return(a) => \/-(a)
-      case Suspend(t) => -\/(S.map(t)(Return(_)))
+      case Suspend(t) => -\/(Coyoneda(t)(Return(_)))
       case b @ Gosub(_, _) => b.a match {
-        case Return(a) => b.f(a).resume
-        case Suspend(t) => -\/(S.map(t)(b.f))
-        case c @ Gosub(_, _) => c.a.flatMap(z => c.f(z).flatMap(b.f)).resume
+        case Return(a) => b.f(a).resumeC
+        case Suspend(t) => -\/(Coyoneda(t)(b.f))
+        case c @ Gosub(_, _) => c.a.flatMap(z => c.f(z).flatMap(b.f)).resumeC
       }
     }
 
@@ -135,11 +152,11 @@ sealed abstract class Free[S[_], A] {
     foldMap[Free[T,?]](f)(freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit S: Functor[S], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =
     Zap.monadComonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a comonad to the corresponding value in this monad, annihilating both. */
-  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit S: Functor[S], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Cofree[G, A => B])(implicit d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 
   /** Runs a single step, using a function that extracts the resumption from its suspension functor. */
@@ -445,13 +462,13 @@ sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstan
         f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 
-  implicit def freeZip[S[_]](implicit F: Functor[S], Z: Zip[S]): Zip[Free[S, ?]] =
+  implicit def freeZip[S[_]](implicit Z: Zip[S]): Zip[Free[S, ?]] =
     new Zip[Free[S, ?]] {
       override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
-        (aa.resume, bb.resume) match {
-          case (-\/(a), -\/(b)) => roll(Z.zipWith(a, b)(zip(_, _)))
-          case (-\/(a), \/-(b)) => roll(F.map(a)(zip(_, point(b))))
-          case (\/-(a), -\/(b)) => roll(F.map(b)(zip(point(a), _)))
+        (aa.resumeC, bb.resumeC) match {
+          case (-\/(a), -\/(b)) => liftF(Z.zip(a.fi, b.fi)).flatMap(ab => zip(a.k(ab._1), b.k(ab._2)))
+          case (-\/(a), \/-(b)) => liftF(a.fi).flatMap(i => a.k(i).map((_, b)))
+          case (\/-(a), -\/(b)) => liftF(b.fi).flatMap(i => b.k(i).map((a, _)))
           case (\/-(a), \/-(b)) => point((a, b))
         }
     }
@@ -522,8 +539,8 @@ private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFo
 
   override final def traverseImpl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Applicative[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverseImpl(s)(traverseImpl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }
 
@@ -532,7 +549,7 @@ private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[Free[F, ?]] 
 
   override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =
     fa.resume match {
-      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll(_))
-      case \/-(r) => G.map(f(r))(point(_))
+      case -\/(s) => G.map(F.traverse1Impl(s)(traverse1Impl[G, A, B](_)(f)))(roll)
+      case \/-(r) => G.map(f(r))(point)
     }
 }

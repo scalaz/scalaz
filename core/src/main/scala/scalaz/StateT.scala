@@ -49,7 +49,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
 
   import BijectionT._
   def bmap[X, S >: S2 <: S1](b: Bijection[S, X]): StateT[F, X, A] =
-    xmap(b to _)(b from _)
+    xmap(b to)(b from)
 
   def contramap[X](g: X => S1): IndexedStateT[F, X, S2, A] =
     mapsf(_ compose g)
@@ -91,7 +91,7 @@ sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(implicit F: Functor[F]): IndexedStateT[F, S0, S3, A] =
     mapsf(sf => (s0:S0) => F.map(sf(l get s0))(t => (l.set(s0, t._1), t._2)))
 
-  def liftF[S <: S1](implicit F: Functor[IndexedStateT[F, S, S2, ?]]) =
+  def liftF[S <: S1](implicit F: Functor[IndexedStateT[F, S, S2, ?]]): Free[IndexedStateT[F, S, S2, ?], A] =
     Free.liftF[IndexedStateT[F, S, S2, ?], A](self)
 
   def mapsf[X1, X2, B](f: (S1 => F[(S2, A)]) => (X1 => F[(X2, B)])): IndexedStateT[F, X1, X2, B] =

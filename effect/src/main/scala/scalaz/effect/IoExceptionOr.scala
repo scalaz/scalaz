@@ -33,7 +33,7 @@ object IoExceptionOr {
     } catch {
       case e: java.io.IOException => ioException(e)
     }
-  def unapply[A](ioExceptionOr: IoExceptionOr[A]) = ioExceptionOr.toOption
+  def unapply[A](ioExceptionOr: IoExceptionOr[A]): Option[A] = ioExceptionOr.toOption
 
   type IoException =
   java.io.IOException

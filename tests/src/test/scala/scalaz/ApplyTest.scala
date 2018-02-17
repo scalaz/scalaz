@@ -43,4 +43,41 @@ object ApplyTest extends SpecLite {
   "<*>" in {
     some(9) <*> some({(_: Int) + 3}) must_===(some(12))
   }
+
+  import Scalaz.none
+
+  def err: Option[String] = sys.error("should be non-strict!")
+
+  "*>" in {
+    some(1)       *> some(2)   must_=== (some(2))
+    some(1)       *> none[Int] must_=== (none[Int])
+    none[Int]     *> none[Int] must_=== (none[Int])
+    none[Int]     *> some(2)   must_=== (none[Int])
+    (none[String] *> err).mustThrowA[RuntimeException]
+  }
+
+  "`*>ByName`" in {
+    some(1)       `*>ByName` some(2)   must_=== (some(2))
+    some(1)       `*>ByName` none[Int] must_=== (none[Int])
+    none[Int]     `*>ByName` none[Int] must_=== (none[Int])
+    none[Int]     `*>ByName` some(2)   must_=== (none[Int])
+    none[String]  `*>ByName` err       must_=== (none[String])
+  }
+
+  "<*" in {
+    some(1)       <* some(2)   must_=== (some(1))
+    some(1)       <* none[Int] must_=== (none[Int])
+    none[Int]     <* none[Int] must_=== (none[Int])
+    none[Int]     <* some(2)   must_=== (none[Int])
+    (none[String] <* err).mustThrowA[RuntimeException]
+  }
+
+  "<*ByName" in {
+    some(1)       `<*ByName` some(2)   must_=== (some(1))
+    some(1)       `<*ByName` none[Int] must_=== (none[Int])
+    none[Int]     `<*ByName` none[Int] must_=== (none[Int])
+    none[Int]     `<*ByName` some(2)   must_=== (none[Int])
+    (none[String] `<*ByName` err)      must_=== (none[String])
+  }
+
 }

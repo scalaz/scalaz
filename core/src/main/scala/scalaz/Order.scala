@@ -16,19 +16,19 @@ trait Order[F] extends Equal[F] { self =>
   def equal(x: F, y: F): Boolean = order(x, y) == Ordering.EQ
 
   // derived functions
-  def lessThan(x: F, y: F) = order(x, y) == Ordering.LT
+  def lessThan(x: F, y: F): Boolean = order(x, y) == Ordering.LT
 
-  def lessThanOrEqual(x: F, y: F) = order(x, y) != Ordering.GT
+  def lessThanOrEqual(x: F, y: F): Boolean = order(x, y) != Ordering.GT
 
-  def greaterThan(x: F, y: F) = order(x, y) == Ordering.GT
+  def greaterThan(x: F, y: F): Boolean = order(x, y) == Ordering.GT
 
-  def greaterThanOrEqual(x: F, y: F) = order(x, y) != Ordering.LT
+  def greaterThanOrEqual(x: F, y: F): Boolean = order(x, y) != Ordering.LT
 
-  def max(x: F, y: F) = if (greaterThanOrEqual(x, y)) x else y
+  def max(x: F, y: F): F = if (greaterThanOrEqual(x, y)) x else y
 
-  def min(x: F, y: F) = if (lessThan(x, y)) x else y
+  def min(x: F, y: F): F = if (lessThan(x, y)) x else y
 
-  def sort(x: F, y: F) = if (lessThanOrEqual(x, y)) (x, y) else (y, x)
+  def sort(x: F, y: F): (F, F) = if (lessThanOrEqual(x, y)) (x, y) else (y, x)
 
   override def contramap[B](f: B => F): Order[B] = new Order[B] {
     def order(b1: B, b2: B): Ordering = self.order(f(b1), f(b2))
@@ -105,7 +105,7 @@ object Order {
     def order(a1: A, a2: A) = f(a1, a2)
   }
 
-  implicit def orderMonoid[A] = new Monoid[Order[A]] {
+  implicit def orderMonoid[A]: Monoid[Order[A]] = new Monoid[Order[A]] {
     def zero: Order[A] = new Order[A] {
       def order(x: A, y: A): Ordering = Monoid[Ordering].zero
     }

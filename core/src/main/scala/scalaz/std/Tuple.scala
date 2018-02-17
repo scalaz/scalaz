@@ -15,6 +15,68 @@ sealed trait TupleInstances0 {
   implicit def tuple6Functor[A1, A2, A3, A4, A5]: Traverse[(A1, A2, A3, A4, A5, ?)] = new Tuple6Functor[A1, A2, A3, A4, A5] {}
   implicit def tuple7Functor[A1, A2, A3, A4, A5, A6]: Traverse[(A1, A2, A3, A4, A5, A6, ?)] = new Tuple7Functor[A1, A2, A3, A4, A5, A6] {}
   implicit def tuple8Functor[A1, A2, A3, A4, A5, A6, A7]: Traverse[(A1, A2, A3, A4, A5, A6, A7, ?)] = new Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {}
+
+  implicit def tuple1Band[A1](implicit A1: Band[A1]): Band[Tuple1[A1]] =
+    new Tuple1Semigroup[A1] with Band[Tuple1[A1]] {
+      def _1 = A1
+    }
+  implicit def tuple2Band[A1, A2](implicit A1: Band[A1], A2: Band[A2]): Band[(A1, A2)] =
+    new Tuple2Semigroup[A1, A2] with Band[(A1, A2)] {
+      def _1 = A1
+      def _2 = A2
+    }
+  implicit def tuple3Band[A1, A2, A3](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3]): Band[(A1, A2, A3)] =
+    new Tuple3Semigroup[A1, A2, A3] with Band[(A1, A2, A3)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+    }
+  implicit def tuple4Band[A1, A2, A3, A4](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3], A4: Band[A4]): Band[(A1, A2, A3, A4)] =
+    new Tuple4Semigroup[A1, A2, A3, A4] with Band[(A1, A2, A3, A4)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+    }
+  implicit def tuple5Band[A1, A2, A3, A4, A5](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3], A4: Band[A4], A5: Band[A5]): Band[(A1, A2, A3, A4, A5)] =
+    new Tuple5Semigroup[A1, A2, A3, A4, A5] with Band[(A1, A2, A3, A4, A5)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+    }
+  implicit def tuple6Band[A1, A2, A3, A4, A5, A6](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3], A4: Band[A4], A5: Band[A5], A6: Band[A6]): Band[(A1, A2, A3, A4, A5, A6)] =
+    new Tuple6Semigroup[A1, A2, A3, A4, A5, A6] with Band[(A1, A2, A3, A4, A5, A6)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+    }
+  implicit def tuple7Band[A1, A2, A3, A4, A5, A6, A7](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3], A4: Band[A4], A5: Band[A5], A6: Band[A6], A7: Band[A7]): Band[(A1, A2, A3, A4, A5, A6, A7)] =
+    new Tuple7Semigroup[A1, A2, A3, A4, A5, A6, A7] with Band[(A1, A2, A3, A4, A5, A6, A7)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+      def _7 = A7
+    }
+  implicit def tuple8Band[A1, A2, A3, A4, A5, A6, A7, A8](implicit A1: Band[A1], A2: Band[A2], A3: Band[A3], A4: Band[A4], A5: Band[A5], A6: Band[A6], A7: Band[A7], A8: Band[A8]): Band[(A1, A2, A3, A4, A5, A6, A7, A8)] =
+    new Tuple8Semigroup[A1, A2, A3, A4, A5, A6, A7, A8] with Band[(A1, A2, A3, A4, A5, A6, A7, A8)] {
+      def _1 = A1
+      def _2 = A2
+      def _3 = A3
+      def _4 = A4
+      def _5 = A5
+      def _6 = A6
+      def _7 = A7
+      def _8 = A8
+    }
+
 }
 
 sealed trait TupleInstances1 extends TupleInstances0 {

@@ -9,13 +9,13 @@ sealed abstract class Input[E] {
 
   def fold[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z
 
-  def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z) =
+  def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z =
     fold(empty, el, eof)
 
   def el: LazyOption[E] =
     apply(lazyNone[E], lazySome(_), lazyNone[E])
 
-  def elOr(e: => E) =
+  def elOr(e: => E): E =
     el.getOrElse(e)
 
   def isEmpty: Boolean =
@@ -36,7 +36,7 @@ sealed abstract class Input[E] {
   def filter(f: (=> E) => Boolean): Input[E] =
     fold(emptyInput, e => if (f(e)) this else emptyInput, eofInput)
 
-  def foreach(f: (=> E) => Unit) =
+  def foreach(f: (=> E) => Unit): Unit =
     fold((), e => f(e), ())
 
   def forall(p: (=> E) => Boolean): Boolean =

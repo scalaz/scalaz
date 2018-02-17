@@ -9,15 +9,16 @@ trait MonadCatchIO[M[_]] extends MonadIO[M] {
 object MonadCatchIO extends MonadCatchIOFunctions {
   @inline def apply[M[_]](implicit M: MonadCatchIO[M]): MonadCatchIO[M] = M
 
-  implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup] = new MonadCatchIO[TheseT[M, E, ?]] {
-    val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
-    val M = MonadCatchIO[M]
-    override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) =
-      ma.mapT(M.except(_)(handler(_).run))
+  implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup]: MonadCatchIO[TheseT[M, E, ?]] =
+    new MonadCatchIO[TheseT[M, E, ?]] {
+      val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
+      val M = MonadCatchIO[M]
+      override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) =
+        ma.mapT(M.except(_)(handler(_).run))
 
-    override def point[A](a: => A) = TheseTMonadIO.point(a)
-    override def bind[A, B](fa: TheseT[M, E, A])(f: A => TheseT[M, E, B]) = TheseTMonadIO.bind(fa)(f)
-    override def liftIO[A](ioa: IO[A]) = TheseTMonadIO.liftIO(ioa)
+      override def point[A](a: => A) = TheseTMonadIO.point(a)
+      override def bind[A, B](fa: TheseT[M, E, A])(f: A => TheseT[M, E, B]) = TheseTMonadIO.bind(fa)(f)
+      override def liftIO[A](ioa: IO[A]) = TheseTMonadIO.liftIO(ioa)
   }
 
 }
@@ -83,7 +84,7 @@ sealed abstract class MonadCatchIOFunctions {
     } yield r
 
   /** An automatic resource management. */
-  def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]) =
+  def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]): M[B] =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
   implicit def KleisliMonadCatchIO[F[_], R](implicit F: MonadCatchIO[F]): MonadCatchIO[Kleisli[F, R, ?]] =

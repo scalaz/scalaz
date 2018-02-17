@@ -251,7 +251,7 @@ kind-projector syntax. Here's some inline syntax examples:
     F[X, ?]     ===  ({type l[a] = F[X, a]})#l
     F[X, ?, ?]  ===  ({type l[a, b] = F[X, a, b]})#l
 
-If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficent), use greek letters for
+If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficient), use greek letters for
 parameters.
 
     λ[α => (α, α)]  ===  ({type λ[α] = (α, α)})#λ
@@ -314,3 +314,13 @@ the osgiExport method:
     * `core/show-doc` in SBT will build and pop up the scaladoc.
  * Review code base for consistency problems
  * Review type class hierarchy
+
+
+ ## Building and Testing Scalaz Locally
+
+  * Navigate to the root directory of scalaz on your local machine
+  * Start SBT by entering `sbt`
+  * To compile the entire project, enter `compile`
+     * If there is a requirement to only compile certain directories such as `example`, specify it like this: `example/compile`
+  * After any changes are made, run all the tests in the project by entering `test`
+     * If there is a requirement to only run tests in certain directories such as `example`, specify it like this: `example/test`

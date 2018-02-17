@@ -17,14 +17,13 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   import OptionT._
 
   final class Switching_\/[X](r: => X) {
-    def <<?:(left: => X)(implicit F: Functor[F]): F[X] =
-      F.map(EitherT.this.run){
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X)(implicit F: Functor[F]): F[X] =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): Switching_\/[X] =
     new Switching_\/(right)
 
@@ -33,6 +32,9 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   def foldM[X](l: A => F[X], r: B => F[X])(implicit F: Bind[F]): F[X] =
     F.join(fold(l, r))
+
+  def foldConst[X](l: => X, r: => X)(implicit F: Functor[F]): F[X] =
+    F.map(run)(_.foldConst(l, r))
 
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
@@ -257,12 +259,12 @@ object EitherT extends EitherTInstances {
   def rightU[A]: EitherTRight[A] =
     new EitherTRight[A](true)
 
-  private[scalaz] final class EitherTLeft[B](val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTLeft[B](private val dummy: Boolean) extends AnyVal {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
       left[F.M, F.A, B](F(fa))(F.TC)
   }
 
-  private[scalaz] final class EitherTRight[A](val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTRight[A](private val dummy: Boolean) extends AnyVal {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
       right[F.M, A, F.A](F(fb))(F.TC)
   }
@@ -287,7 +289,14 @@ object EitherT extends EitherTInstances {
 
 }
 
-sealed abstract class EitherTInstances4 {
+sealed abstract class EitherTInstances5 {
+  implicit def eitherTNondeterminism[F[_], E](implicit F0: Nondeterminism[F]): Nondeterminism[EitherT[F, E, ?]] =
+    new EitherTNondeterminism[F, E] {
+      implicit def F = F0
+    }
+}
+
+sealed abstract class EitherTInstances4 extends EitherTInstances5{
   implicit def eitherTBindRec[F[_], E](implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
@@ -492,5 +501,15 @@ private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E]
     EitherT(F.bind(fa.run) {
       case -\/(e) => f(e).run
       case r => F.point(r)
+    })
+}
+
+private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[F, E, ?]] with EitherTMonad[F, E] {
+  implicit def F: Nondeterminism[F]
+
+  def chooseAny[A](head: EitherT[F, E, A], tail: Seq[EitherT[F, E, A]]): EitherT[F, E, (A, Seq[EitherT[F, E, A]])] =
+    EitherT(F.map(F.chooseAny(head.run, tail map (_.run))) {
+      case (a, residuals) =>
+        a.map((_, residuals.map(new EitherT(_))))
     })
 }

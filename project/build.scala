@@ -50,9 +50,6 @@ object build {
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
-  def scalac210Options = Seq("-Yno-generic-signatures", "-target:jvm-1.7")
-
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
   }
@@ -113,7 +110,7 @@ object build {
     "-target:jvm-1.8"
   )
 
-  private def Scala211 = "2.11.8"
+  private def Scala211 = "2.11.11"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -122,8 +119,8 @@ object build {
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
-    scalaVersion := "2.12.1",
-    crossScalaVersions := Seq("2.10.6", Scala211, "2.12.1"),
+    scalaVersion := "2.12.2",
+    crossScalaVersions := Seq(Scala211, "2.12.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.4",
@@ -133,12 +130,12 @@ object build {
       "-encoding", "UTF-8",
       "-feature",
       "-Xfuture",
+      "-Ypartial-unification",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,10)) => scalac210Options
       case Some((2,11)) => Scala211_jvm_and_js_options
-      case _ => Nil
+      case _ => Seq("-opt:l:method")
     }),
 
     scalacOptions in (Compile, doc) ++= {
@@ -255,12 +252,6 @@ object build {
         </developers>
       ),
     // kind-projector plugin
-    libraryDependencies ++= (scalaBinaryVersion.value match {
-      case "2.10" =>
-        compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch) :: Nil
-      case _ =>
-        Nil
-    }),
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.3",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
@@ -274,7 +265,31 @@ object build {
     }
   )
 
+  // workaround for https://github.com/scala-native/scala-native/issues/562
+  private[this] def scalaNativeDiscoverOrDummy(binaryName: String, binaryVersions: Seq[(String, String)]): File = {
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L59
+    // https://github.com/scala-native/scala-native/blob/v0.1.0/sbt-scala-native/src/main/scala/scala/scalanative/sbtplugin/ScalaNativePluginInternal.scala#L284-L289
+    try {
+      val clazz = scalanative.sbtplugin.ScalaNativePluginInternal.getClass
+      val instance = clazz.getField(scala.reflect.NameTransformer.MODULE_INSTANCE_NAME).get(null)
+      val method = clazz.getMethods.find(_.getName contains "discover").getOrElse(sys.error("could not found the discover method"))
+      method.invoke(instance, binaryName, binaryVersions).asInstanceOf[File]
+    } catch {
+      case e: Throwable =>
+        val e0 = e match {
+          case _: java.lang.reflect.InvocationTargetException if e.getCause != null =>
+            e.getCause
+          case _ =>
+            e
+        }
+        scala.Console.err.println(e0)
+        file("dummy")
+    }
+  }
+
   val nativeSettings = Seq(
+    nativeClang := scalaNativeDiscoverOrDummy("clang", Seq(("3", "8"), ("3", "7"))),
+    nativeClangPP := scalaNativeDiscoverOrDummy("clang++", Seq(("3", "8"), ("3", "7"))),
     scalacOptions --= Scala211_jvm_and_js_options,
     scalaVersion := Scala211,
     crossScalaVersions := Scala211 :: Nil
@@ -296,7 +311,7 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
-      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.0"
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.1"
     )
     .jvmSettings(
       jvm_js_settings,

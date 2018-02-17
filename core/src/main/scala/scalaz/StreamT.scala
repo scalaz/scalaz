@@ -25,10 +25,10 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
          ))
     )
 
-  def ::(a: => A)(implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
+  def ::(a: A)(implicit M: Applicative[M]): StreamT[M, A] = StreamT[M, A](M.point(Yield(a, this)))
 
-  def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(!_.isDefined)
-  def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.map(unconsRec)(!_.isDefined)
+  def isEmpty(implicit M: Monad[M]): M[Boolean] = M.map(uncons)(_.isEmpty)
+  def isEmptyRec(implicit M: BindRec[M]): M[Boolean] = M.map(unconsRec)(_.isEmpty)
 
   def head(implicit M: Monad[M]): M[A] = M.map(uncons)(_.getOrElse(sys.error("head: empty StreamT"))._1)
   def headRec(implicit M: BindRec[M]): M[A] = M.map(unconsRec)(_.getOrElse(sys.error("head: empty StreamT"))._1)
@@ -382,6 +382,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
   implicit def apply[G[_] : Monad]: Monad[StreamT[G, ?]] = StreamTMonadPlus[G]
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] = StreamT[G, A](G.map(a)(Yield(_, empty)))
+
+  override def wrapEffect[G[_]: Monad, A](a: G[StreamT[G, A]]): StreamT[G, A] = StreamT.wrapEffect(a)
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
     λ[StreamT[M, ?] ~> StreamT[N, ?]](a =>
