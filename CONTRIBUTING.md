@@ -311,6 +311,6 @@ the osgiExport method:
  * Documentation
     * Class level documentation for each type class.
     * Brief method documentation welcome
-    * `core/show-doc` in SBT will build and pop up the scaladoc.
+    * `coreJVM/showDoc` in SBT will build and pop up the scaladoc.
  * Review code base for consistency problems
  * Review type class hierarchy
