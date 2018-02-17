@@ -5,7 +5,7 @@ package std
 import scalaz.std.{list => l}
 
 
-final class ListOps[A](val self: List[A]) extends AnyVal {
+final class ListOps[A](private val self: List[A]) extends AnyVal {
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
   final def tailOption: Option[List[A]] = l.tailOption(self)

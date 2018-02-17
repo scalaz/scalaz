@@ -11,6 +11,8 @@ trait Syntaxes {
 
   object monoid extends ToMonoidOps
 
+  object band extends ToBandOps
+
   object equal extends ToEqualOps
 
   object show extends ToShowOps
@@ -163,7 +165,7 @@ trait ToDataOps
   with ToContTOps
 
 trait ToTypeClassOps
-  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
+  extends ToSemigroupOps with ToMonoidOps with ToBandOps with ToEqualOps with ToShowOps
   with ToOrderOps with ToEnumOps with ToPlusEmptyOps
   with ToFunctorOps with ToContravariantOps with ToApplyOps
   with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps

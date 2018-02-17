@@ -24,11 +24,17 @@ object OptionTest extends SpecLite {
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
+  checkAll("Option", band.laws[Option[ISet[Int]]])
 
   checkAll("Option @@ First", monoid.laws[FirstOption[Int]])
   checkAll("Option @@ Last", monoid.laws[LastOption[Int]])
   checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
   checkAll("Option @@ Max", monoid.laws[MaxOption[Int]])
+
+  checkAll("Band[Option @@ First]", band.laws[FirstOption[Int]])
+  checkAll("Band[Option @@ Last]", band.laws[LastOption[Int]])
+  checkAll("Band[Option @@ Min]", band.laws[MinOption[Int]])
+  checkAll("Band[Option @@ Max]", band.laws[MaxOption[Int]])
 
   checkAll("Option @@ First", monad.laws[FirstOption])
   checkAll("Option @@ Last", monad.laws[LastOption])

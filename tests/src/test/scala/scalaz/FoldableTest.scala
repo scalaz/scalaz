@@ -72,6 +72,13 @@ object FoldableTest extends SpecLite {
       if (xs.length > 0) xs.distinctE(Equal.equal((_,_) => true)).length must_== 1
   }
 
+  "distinctBy" ! {
+    case class Foo(a: Int, b: String)
+    val xs = IList(Foo(1, "x"), Foo(2, "x"), Foo(1, "y"))
+    xs.distinctBy(_.a) must_== IList(Foo(1, "x"), Foo(2, "x"))
+    xs.distinctBy(_.b) must_== IList(Foo(1, "x"), Foo(1, "y"))
+  }
+
   "sumr1Opt" ! forAll {
     (xs: List[String]) => xs match {
       case Nil => xs.sumr1Opt must_== None

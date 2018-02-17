@@ -132,7 +132,7 @@ trait StreamInstances {
       }
     }
 
-  implicit def streamMonoid[A] = new Monoid[Stream[A]] {
+  implicit def streamMonoid[A]: Monoid[Stream[A]] = new Monoid[Stream[A]] {
     def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
     def zero: Stream[A] = scala.Stream.empty
   }
@@ -158,7 +158,7 @@ trait StreamInstances {
           }
         }
     }
-  implicit def streamShow[A](implicit A0: Show[A]) =
+  implicit def streamShow[A](implicit A0: Show[A]): Show[Stream[A]] =
     new Show[Stream[A]] {
       override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
     }

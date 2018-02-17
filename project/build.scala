@@ -311,7 +311,7 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
-      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.0"
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.1"
     )
     .jvmSettings(
       jvm_js_settings,

@@ -5,7 +5,7 @@ import java.util.concurrent.Callable
 
 
 trait CallableInstances {
-  implicit def callableOrder[A: Order] = new Order[Callable[A]] {
+  implicit def callableOrder[A: Order]: Order[Callable[A]] = new Order[Callable[A]] {
     def order(f1: Callable[A], f2: Callable[A]) = Order[A].order(f1.call, f2.call)
   }
 
