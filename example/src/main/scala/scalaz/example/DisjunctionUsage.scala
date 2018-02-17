@@ -30,19 +30,11 @@ object DisjunctionUsage extends App {
     case _ => -\/(false)
   }
 
-  // Simple val that is assigned the value of 5.
-  // We'll use this as a parameter for our above function.
   val x = 5
-
-  // Getting the result, expecting -\/("Correct!")
   val expectingCorrect = infixNotation(x)
   assert(expectingCorrect === \/-("Correct!"))
 
-  // Let's try getting false with another val assigned the
-  // value of 6.
   val y = 6
-
-  // Getting the result, expecting \/-(false)
   val expectingFalse = infixNotation(y)
   assert(expectingFalse === -\/(false))
 
@@ -71,11 +63,6 @@ object DisjunctionUsage extends App {
     case _ => false.left
   }
 
-  /*
-     Rather than just assigning another val, we can assert
-     more elegantly:
-  */
   assert(bracketNotation(1) === -\/(false))
   assert(bracketNotation(5) === \/-("Correct!"))
-
 }
