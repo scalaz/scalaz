@@ -321,6 +321,6 @@ the osgiExport method:
   * Navigate to the root directory of scalaz on your local machine
   * Start SBT by entering `sbt`
   * To compile the entire project, enter `compile`
-     * If there is a need to only compile certain directories such as `example`, specify it like this: `example/compile`
+     * If there is a requirement to only compile certain directories such as `example`, specify it like this: `example/compile`
   * After any changes are made, run all the tests in the project by entering `test`
-     * If there is a need to only run tests in certain directories such as `example`, specify it like this: `example/test`
+     * If there is a requirement to only run tests in certain directories such as `example`, specify it like this: `example/test`
