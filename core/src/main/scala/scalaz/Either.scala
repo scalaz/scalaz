@@ -335,6 +335,11 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       b => \&/.That(b)
     )
 
+  def orRaiseError[F[_], AA >: A, BB >: B](implicit F: MonadError[F, AA]): F[BB] =
+    fold(
+      a => F.raiseError(a),
+      b => F.point(b)
+    )
 }
 
 /** A left disjunction

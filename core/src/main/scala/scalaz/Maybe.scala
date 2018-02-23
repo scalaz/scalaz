@@ -147,6 +147,10 @@ sealed abstract class Maybe[A] {
    * empty value for type `F` */
   final def orEmpty[F[_]](implicit F: Applicative[F], G: PlusEmpty[F]): F[A] =
     cata(F.point(_), G.empty)
+
+  final def orError[F[_], E](e: E)(implicit F: MonadError[F, E]): F[A] =
+    cata(F.point(_), F.raiseError(e))
+
 }
 
 object Maybe extends MaybeInstances {
