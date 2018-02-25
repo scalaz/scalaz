@@ -38,7 +38,7 @@ matrix:
       env: SCALA_NATIVE
       sudo: required
       before_install:
-      - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.2/bin/travis_setup.sh | bash -
+      - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
     - scala: 2.12.4
