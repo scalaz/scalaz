@@ -34,7 +34,7 @@ object TaskTest extends SpecLite {
   }
 
   "gather-based map == sequential map" ! forAll { (xs: IList[Int]) =>
-    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1)).toList).unsafePerformSync
+    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
   }
 
   case object FailWhale extends RuntimeException {
@@ -148,7 +148,7 @@ object TaskTest extends SpecLite {
       val t1 = fork(now(1))(es)
       val t2 = delay(7).flatMap(_=>fork(now(2))(es))
       val t3 = fork(now(3))(es)
-      val t = fork(Task.reduceUnordered(Seq(t1,t2,t3)))(es)
+      val t = fork(Task.reduceUnordered(IList(t1,t2,t3)))(es)
 
       t.unsafePerformSync must_== Set(1,2,3)
     }
@@ -157,13 +157,13 @@ object TaskTest extends SpecLite {
     "correctly process reduceUnordered for 1 task in non-blocking way" in {
       val t1 = fork(now(1))(es)
 
-      val t = fork(Task.reduceUnordered(Seq(t1)))(es)
+      val t = fork(Task.reduceUnordered(IList(t1)))(es)
 
       t.unsafePerformSync must_== Set(1)
     }
 
     "correctly process reduceUnordered for empty seq of tasks in non-blocking way" in {
-      val t = fork(Task.reduceUnordered(Seq()))(es)
+      val t = fork(Task.reduceUnordered(IList.empty[Task[Int]]))(es)
 
       t.unsafePerformSync must_== Set()
     }
@@ -182,7 +182,7 @@ object TaskTest extends SpecLite {
       val t2 = fork { now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
-      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+      val t = fork(Task.gatherUnordered(IList(t1,t2,t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
@@ -206,7 +206,7 @@ object TaskTest extends SpecLite {
       val t2 = fork { sleep(100); now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
-      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+      val t = fork(Task.gatherUnordered(IList(t1,t2,t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true

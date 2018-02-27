@@ -85,8 +85,8 @@ class FutureTest extends SpecLite {
         is match {
           case i :: is0 =>
             promises(i).complete(scala.util.Try(xs(i)))
-            Nondeterminism[Future].chooseAny(fs).get.flatMap { case (x, fs0) =>
-              loop(is0, fs0, acc :+ x)
+            Nondeterminism[Future].chooseAny(IList(fs: _*)).get.flatMap { case (x, fs0) =>
+              loop(is0, fs0.toList, acc :+ x)
             }
           case Nil =>
             Future(acc)
@@ -99,7 +99,7 @@ class FutureTest extends SpecLite {
 
     "gather maintains order" ! forAll { (xs: List[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
-      val f = Nondeterminism[Future].gather(promises.map(_.future))
+      val f = Nondeterminism[Future].gather(IList(promises.map(_.future): _*))
       (promises zip xs).reverseIterator.foreach { case (p, x) =>
         p.complete(scala.util.Try(x))
       }
