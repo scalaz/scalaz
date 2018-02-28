@@ -10,5 +10,3 @@ trait ProfunctorSyntax {
     def dimap[C, D](f: C => A)(g: B => D): F[C, D] = macro meta.Ops.f_1_1
   }
 }
-
-

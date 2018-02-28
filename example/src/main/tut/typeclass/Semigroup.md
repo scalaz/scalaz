@@ -20,14 +20,17 @@ import Scalaz._
 ## Instance declaration
 
 ```tut
-implicit val StringSemigroup = new Semigroup[String] {
+import scalaz.Prelude._
+import scalaz.typeclass.SemigroupClass
+
+implicit val StringSemigroup: Semigroup[String] = instanceOf(new SemigroupClass[String] {
   def append(a1: String, a2: => String) = a1 + a2
-}
+})
 ```
 
 ## Usage
 
 ```tut
-StringSemigroup.append("hello", "world")
+Semigroup[String].append("hello", "world")
 "hello".append("world")
 ```

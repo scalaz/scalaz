@@ -1,6 +1,4 @@
 package scalaz
 package typeclass
 
-trait FoldableInstances {
-
-}
+trait FoldableInstances {}

@@ -24,6 +24,7 @@ import scalaz.data.Maybe
  * }}}
  */
 trait MVar[A] {
+
   /**
    * Peeks to see if the `MVar` contains an value. This method returns
    * immediately and synchronously.

@@ -1,7 +1,6 @@
 package scalaz
 package typeclass
 
-trait CategoryClass[=>:[_,_]] extends Category[=>:] with Compose[=>:] {
-  def compose: Compose[=>:] = this
+trait CategoryClass[=>:[_, _]] extends ComposeClass[=>:] {
   def id[A]: A =>: A
 }

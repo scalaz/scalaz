@@ -20,6 +20,7 @@ package scalaz.effect
  * }}}
  */
 trait Fiber[A] {
+
   /**
    * Joins the fiber, with suspends the joining fiber until the result of the
    * fiber has been determined. Attempting to join a fiber that has been or is

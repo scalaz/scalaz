@@ -3,7 +3,7 @@ package data
 
 trait DisjunctionSyntax {
   implicit final class ToDisjunctionOps[A](a: A) {
-    def left[B]: A \/ B = -\/(a)
+    def left[B]: A \/ B  = -\/(a)
     def right[B]: B \/ A = \/-(a)
   }
 

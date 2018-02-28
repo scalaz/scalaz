@@ -24,11 +24,11 @@ trait ForallModule {
   def vacuous[A]: A <~< ∀[λ[α => A]]
 
   /** The name monotonicity becomes more apparent if we define a type alias
-    * `type <~~<[F[_], G[_]] = ∀[λ[α => F[α] <~< G[α]]]`.
-    * Then the signature reads as
-    *
-    *   `F <~~< G` implies `∀[F] <~< ∀[G]`.
-    */
+   * `type <~~<[F[_], G[_]] = ∀[λ[α => F[α] <~< G[α]]]`.
+   * Then the signature reads as
+   *
+   *   `F <~~< G` implies `∀[F] <~< ∀[G]`.
+   */
   def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G]
 
   sealed trait MkForall[F[_]] extends Any {

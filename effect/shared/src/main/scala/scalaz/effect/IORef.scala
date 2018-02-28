@@ -11,11 +11,12 @@ package scalaz.effect
  * for {
  *   ref <- IORef(2)
  *   v   <- ref.modify(_ + 3)
- *   _   <- putStrLn("Value = " + v.show) // Value = 5
+ *   _   <- putStrLn("Value = " + v.debug) // Value = 5
  * } yield ()
  * }}}
  */
-final class IORef[A] private (@volatile private var value : A) {
+final class IORef[A] private (@volatile private var value: A) {
+
   /**
    * Reads the value from the `IORef`.
    */
@@ -29,10 +30,11 @@ final class IORef[A] private (@volatile private var value : A) {
   /**
    * Modifies the `IORef` with the specified function.
    */
-  final def modify(f: A => A): IO[A] = IO.sync({value = f(value); value})
+  final def modify(f: A => A): IO[A] = IO.sync({ value = f(value); value })
 }
 
 object IORef {
+
   /**
    * Creates a new `IORef` with the specified value.
    */

@@ -8,16 +8,17 @@ import java.util.concurrent.atomic.AtomicReference
 
 import MVarInternal._
 
-private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state: AtomicReference[MVarState[A]]) extends MVar[A] {
+private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state: AtomicReference[MVarState[A]])
+    extends MVar[A] {
   final def peek: IO[Maybe[A]] = IO.sync {
     state.get match {
       case Surplus(head, _) => Maybe.just(head)
-      case Deficit(_, _) => Maybe.empty[A]
+      case Deficit(_, _)    => Maybe.empty[A]
     }
   }
 
   final def take: IO[A] = IO.async0 { taker =>
-    var loop  = true
+    var loop              = true
     var finish: Action[A] = null
 
     while (loop) {
@@ -55,7 +56,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   final def read: IO[A] = IO.async0 { reader =>
-    var loop = true
+    var loop              = true
     var finish: Action[A] = null
 
     while (loop) {
@@ -80,7 +81,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   final def put(v: A): IO[Unit] = IO.async0 { putter =>
-    var loop = true
+    var loop                 = true
     var finish: Action[Unit] = null
 
     while (loop) {
@@ -107,8 +108,8 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   final def tryPut(v: A): IO[Boolean] = IO.sync {
-    var loop = true
-    var value = false
+    var loop   = true
+    var value  = false
     var finish = UnitAction
 
     while (loop) {
@@ -126,7 +127,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
           val (newState, finish2) = doPut(v, readers, takers)
 
           finish = finish2
-          value  = true
+          value = true
 
           newState
       }
@@ -140,9 +141,9 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   final def tryTake: IO[Maybe[A]] = IO.sync {
-    var loop = true
+    var loop               = true
     var finish: () => Unit = null
-    var value: Maybe[A] = null.asInstanceOf[Maybe[A]]
+    var value: Maybe[A]    = null.asInstanceOf[Maybe[A]]
 
     while (loop) {
       val oldState = state.get
@@ -174,24 +175,25 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
     value
   }
 
-  private final def doPut(v: A, readers: Vector[Callback[A]], takers: Vector[Callback[A]]): (MVarState[A], Action[Unit]) = {
+  private final def doPut(v: A,
+                          readers: Vector[Callback[A]],
+                          takers: Vector[Callback[A]]): (MVarState[A], Action[Unit]) = {
     val result: Try[A] = \/-(v)
 
     if (takers.length == 0) (Surplus(v, Vector()), UnitAction)
     else {
       val taker = takers(0)
 
-      (if (takers.length == 1) Empty[A] else Deficit(takers.tail, Vector()),
-       () => {
-         readers.foreach(reader => reader(result))
-         taker(result)
-         AsyncReturn.later[Unit]
-       })
+      (if (takers.length == 1) Empty[A] else Deficit(takers.tail, Vector()), () => {
+        readers.foreach(reader => reader(result))
+        taker(result)
+        AsyncReturn.later[Unit]
+      })
     }
   }
 
   private final def removePutter(putter: Callback[Unit], t: Throwable): Unit = {
-    var loop = true
+    var loop    = true
     var removed = false
 
     while (loop) {
@@ -214,7 +216,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   private final def removeTaker(taker: Callback[A], t: Throwable): Unit = {
-    var loop = true
+    var loop    = true
     var removed = false
 
     while (loop) {
@@ -237,7 +239,7 @@ private[effect] final class MVarImpl[A](threadPool: (=> Unit) => Unit, val state
   }
 
   private final def removeReader(reader: Callback[A], t: Throwable): Unit = {
-    var loop = true
+    var loop    = true
     var removed = false
 
     while (loop) {
@@ -277,7 +279,7 @@ private[effect] object MVarInternal {
 
   sealed abstract class MVarState[+A]
 
-  final case class Surplus[A](head: A, tail: Vector[(A, Callback[Unit])]) extends MVarState[A]
+  final case class Surplus[A](head: A, tail: Vector[(A, Callback[Unit])])                extends MVarState[A]
   final case class Deficit[A](takers: Vector[Callback[A]], readers: Vector[Callback[A]]) extends MVarState[A]
 
   def Empty[A] = Deficit[A](Vector(), Vector())

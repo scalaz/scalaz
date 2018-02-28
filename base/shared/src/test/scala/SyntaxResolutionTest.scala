@@ -35,14 +35,14 @@ object SyntaxResolutionTest {
   def _phantom[F[_]: Phantom, A, B](fa: F[A]): F[B] = fa.pmap
 
   def _profunctor[F[_, _]: Profunctor, A, B, C, D](fab: F[A, B], ca: C => A, bd: B => D) = {
-    fab.lmap(ca) : F[C, B]
-    fab.rmap(bd) : F[A, D]
+    fab.lmap(ca): F[C, B]
+    fab.rmap(bd): F[A, D]
     fab.dimap(ca)(bd): F[C, D]
   }
 
   def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
 
-  def _show[A: Show](a: A): String = a.show
+  def _debug[A: Debug](a: A): String = a.debug
 
   def _strong[F[_, _]: Strong, A, B, C](fab: F[A, B]) = {
     fab.first[C]: F[(A, C), (B, C)]

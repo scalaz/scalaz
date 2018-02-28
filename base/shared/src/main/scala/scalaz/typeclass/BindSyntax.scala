@@ -8,4 +8,3 @@ trait BindSyntax {
     def flatMap[B](f: A => M[B]): M[B] = macro meta.Ops.f_1
   }
 }
-

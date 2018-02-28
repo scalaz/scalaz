@@ -1,11 +1,13 @@
 package scalaz
 package data
 
+import scalaz.typeclass.ComposeClass
+
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the right and addition of new elements (i.e. "increment") from the left.
  */
-final class PreComposeBalancer[F[_, _], A, B] private(count: Int, stack: AList1[F, A, B]) {
+final class PreComposeBalancer[F[_, _], A, B] private (count: Int, stack: AList1[F, A, B]) {
 
   /** Pre-compose an element. */
   def +:[Z](f: F[Z, A])(implicit F: Compose[F]): PreComposeBalancer[F, Z, B] =
@@ -14,19 +16,20 @@ final class PreComposeBalancer[F[_, _], A, B] private(count: Int, stack: AList1[
   def result(implicit F: Compose[F]): F[A, B] =
     stack.tail.foldLeft(stack.head)(RightAction.compose(F))
 
-  private def add[X, Y](h: F[X, Y], t: AList1[F, Y, B], hcount: Int, tfactor: Int)(implicit F: Compose[F]): PreComposeBalancer[F, X, B] = {
+  private def add[X, Y](h: F[X, Y], t: AList1[F, Y, B], hcount: Int, tfactor: Int)(
+    implicit F: Compose[F]
+  ): PreComposeBalancer[F, X, B] =
     // hcount: number of elemnts composed in the head (`h`)
     // tfactor: how many times more elements are there in tail (`t`) than in head (tcount = hcount * tfactor)
-    if(tfactor % 2 == 0) new PreComposeBalancer(hcount * (tfactor + 1), h :: t)
+    if (tfactor % 2 == 0) new PreComposeBalancer(hcount * (tfactor + 1), h :: t)
     else {
-      val h1 = F.compose(t.head, h)
+      val h1      = F.compose(t.head, h)
       val h1count = hcount * 2
       t.tail match {
         case nil @ ANil() => assert(tfactor == 1); new PreComposeBalancer(h1count, h1 +: nil)
         case ACons(f, fs) => add(h1, f +: fs, h1count, tfactor / 2)
       }
     }
-  }
 }
 
 object PreComposeBalancer {
@@ -46,7 +49,8 @@ object PreComposeBalancer {
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the left and addition of new elements (i.e. "increment") from the right.
  */
-final class PostComposeBalancer[F[_, _], A, B](private val repr: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A]) extends AnyVal {
+final class PostComposeBalancer[F[_, _], A, B](private val repr: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A])
+    extends AnyVal {
   import PostComposeBalancer._
 
   /** Post-compose an element. */
@@ -69,12 +73,14 @@ object PostComposeBalancer {
   def rightAction[F[_, _], A](implicit F: Compose[F]): RightAction[PostComposeBalancer[F, A, ?], F] =
     ν[RightAction[PostComposeBalancer[F, A, ?], F]][B, C]((acc, f) => acc :+ f)
 
-  def rightAction[G[_, _], F[_, _], A](φ: F ~~> G)(implicit G: Compose[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
+  def rightAction[G[_, _], F[_, _], A](
+    φ: F ~~> G
+  )(implicit G: Compose[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
     ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
 
   private def flip[F[_, _]](F: Compose[F]): Compose[λ[(α, β) => F[β, α]]] =
-    new Compose[λ[(α, β) => F[β, α]]] {
+    instanceOf(new ComposeClass[λ[(α, β) => F[β, α]]] {
       def compose[A, B, C](f: F[C, B], g: F[B, A]): F[C, A] =
         F.compose(g, f)
-    }
+    })
 }
