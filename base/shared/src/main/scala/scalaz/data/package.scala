@@ -1,6 +1,7 @@
 package scalaz
 
 package object data {
+
   val Forall: ForallModule with ForallSyntax = ForallImpl
   val ∀ : Forall.type                        = Forall
 
@@ -81,4 +82,22 @@ package object data {
 
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
+
+  val Cofree: CofreeModule = CofreeImpl
+  type Cofree[F[_], A] = Cofree.Cofree[F, A]
+
+  val IStream: IStreamModule = IStreamImpl
+  type IStream[A] = IStream.IStream[A]
+
+  val Kleisli: KleisliModule = KleisliImpl
+  type Kleisli[M[_], A, B] = Kleisli.Kleisli[M, A, B]
+
+  val EnvT: EnvTModule = EnvTImpl
+  type EnvT[T[_], A, B] = EnvT.EnvT[T, A, B]
+
+  val CoEnv: CoEnvModule = CoEnvImpl
+  type CoEnv[F[_], A, B] = CoEnv.CoEnv[F, A, B]
+
+  val Codensity: CodensityModule = CodensityImpl
+  type Codensity[M[_], A] = Codensity.Codensity[M, A]
 }
