@@ -93,10 +93,10 @@ package object data {
   type Kleisli[M[_], A, B] = Kleisli.Kleisli[M, A, B]
 
   val EnvT: EnvTModule = EnvTImpl
-  type EnvT[T[_], A, B]= EnvT.EnvT[T, A, B]
+  type EnvT[T[_], A, B] = EnvT.EnvT[T, A, B]
 
   val CoEnv: CoEnvModule = CoEnvImpl
-  type CoEnv[F[_], A, B]= CoEnv.CoEnv[F, A, B]
+  type CoEnv[F[_], A, B] = CoEnv.CoEnv[F, A, B]
 
   val Codensity: CodensityModule = CodensityImpl
   type Codensity[M[_], A] = Codensity.Codensity[M, A]

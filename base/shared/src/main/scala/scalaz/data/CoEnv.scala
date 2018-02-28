@@ -12,6 +12,6 @@ trait CoEnvModule {
 private[data] object CoEnvImpl extends CoEnvModule {
   type CoEnv[F[_], A, B] = B \/ F[A]
 
-  def run[F[_], A, B](c: CoEnv[F, A, B]): B \/ F[A] = c
+  def run[F[_], A, B](c: CoEnv[F, A, B]): B \/ F[A]       = c
   def wrapCoEnv[F[_], A, B](c: B \/ F[A]): CoEnv[F, A, B] = c
 }

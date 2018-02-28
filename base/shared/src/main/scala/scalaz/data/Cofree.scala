@@ -9,7 +9,6 @@ sealed trait CofreeModule {
   def wrapCofree[F[_], A](a: A)(f: F[Cofree[F, A]]): Cofree[F, A]
 }
 
-
 private[data] object CofreeImpl extends CofreeModule {
 
   type Cofree[F[_], A] = Fix[EnvT[F, A, ?]]
