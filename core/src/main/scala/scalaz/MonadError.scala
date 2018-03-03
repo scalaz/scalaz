@@ -33,15 +33,15 @@ object MonadError {
   ////
 
   /**
-   * Derives a MonadError for something isomorphic to ReaderT, having an
-   * underlying MonadError. Useful for typeclasses with a covariant SAM, where
-   * In is the contravariant parameter and Out is the covariant parameter,
-   * errors as E. e.g. decoders from In to String \/ A.
+   * Derives a MonadError for something isomorphic to a thing with a MonadError.
+   * Useful for typeclasses with a covariant SAM, where In is the contravariant
+   * parameter and Out is the covariant parameter, errors as E. e.g. decoders
+   * from In to String \/ A.
    */
-  def fromIsoWithMonadError[F[_], In, Out[_], E](
-    D: F <~> ReaderT[Out, In, ?]
+  def fromIsoWithMonadError[F[_], G[_], E](
+    D: F <~> G
   )(
-    implicit ME: MonadError[ReaderT[Out, In, ?], E]
+    implicit ME: MonadError[G, E]
   ): MonadError[F, E] = new MonadError[F, E] {
     override def point[A](a: => A): F[A] =
       D.from(ME.point(a))
