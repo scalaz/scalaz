@@ -39,9 +39,9 @@ object MonadError {
    * errors as E. e.g. decoders from In to String \/ A.
    */
   def fromIsoWithMonadError[F[_], In, Out[_], E](
-      implicit
-      D: F <~> ReaderT[Out, In, ?],
-      ME: MonadError[ReaderT[Out, In, ?], E]
+    D: F <~> ReaderT[Out, In, ?]
+  )(
+    implicit ME: MonadError[ReaderT[Out, In, ?], E]
   ): MonadError[F, E] = new MonadError[F, E] {
     override def point[A](a: => A): F[A] =
       D.from(ME.point(a))
