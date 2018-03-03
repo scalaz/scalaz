@@ -34,9 +34,6 @@ object MonadError {
 
   /**
    * Derives a MonadError for something isomorphic to a thing with a MonadError.
-   * Useful for typeclasses with a covariant SAM, where In is the contravariant
-   * parameter and Out is the covariant parameter, errors as E. e.g. decoders
-   * from In to String \/ A.
    */
   def fromIsoWithMonadError[F[_], G[_], E](
     D: F <~> G
