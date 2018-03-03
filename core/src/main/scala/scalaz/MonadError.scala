@@ -1,7 +1,5 @@
 package scalaz
 
-import Isomorphism.<~>
-
 ////
 /**
  *
@@ -31,6 +29,7 @@ object MonadError {
   @inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
 
   ////
+  import Isomorphism.<~>
 
   /**
    * Derives a MonadError for something isomorphic to a thing with a MonadError.
