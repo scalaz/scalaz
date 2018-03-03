@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 import syntax.either._
-import syntax.functor._
+import syntax.monadError._
 import Isomorphism.{ <~>, IsoFunctorTemplate }
 
 object MonadErrorTest extends SpecLite {
@@ -33,6 +33,14 @@ object MonadErrorTest extends SpecLite {
 
   "fromIsoWithMonadError" in {
     Decoder[String].map(_.toUpperCase).decode("hello") must_=== "HELLO".right
+  }
+
+  "emap syntax" in {
+    def f(s: String): String \/ String =
+      if (s.startsWith("h")) "fail".left else s.right
+
+    Decoder[String].emap(f).decode("hello") must_=== "fail".left
+    Decoder[String].emap(f).decode("goodbye") must_=== "goodbye".right
   }
 
 }
