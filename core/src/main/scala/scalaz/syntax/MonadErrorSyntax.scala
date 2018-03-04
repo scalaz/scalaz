@@ -8,7 +8,7 @@ final class MonadErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit val F
     F.handleError(self)(f)
 
   final def emap(f: A => S \/ A): F[A] =
-    F.bind(self)(a => f(a).fold(F.raiseError(_), F.pure(_)))
+    F.emap(self)(f)
 
   ////
 }
