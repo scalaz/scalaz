@@ -19,7 +19,7 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters}
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
@@ -303,6 +303,13 @@ object build {
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
+      mimaBinaryIssueFilters ++= {
+        import com.typesafe.tools.mima.core._
+        import com.typesafe.tools.mima.core.ProblemFilters._
+        Seq(
+          exclude[ReversedMissingMethodProblem]("scalaz.MonadError.emap")
+        )
+      },
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
