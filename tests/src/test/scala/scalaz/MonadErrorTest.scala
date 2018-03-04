@@ -35,11 +35,12 @@ object MonadErrorTest extends SpecLite {
   }
 
   "emap syntax" in {
-    def f(s: String): String \/ String =
-      if (s.startsWith("h")) "fail".left else s.right
+    def f(s: String): String \/ Char =
+      if (s.length == 1) s(0).right
+      else s"not a char: $s".left
 
-    Decoder[String].emap(f).decode("hello") must_=== "fail".left
-    Decoder[String].emap(f).decode("goodbye") must_=== "goodbye".right
+    Decoder[String].emap(f).decode("hello") must_=== "not a char: hello".left
+    Decoder[String].emap(f).decode("g") must_=== 'g'.right
   }
 
 }
