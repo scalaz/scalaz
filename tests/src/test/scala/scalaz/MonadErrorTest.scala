@@ -27,8 +27,7 @@ object MonadErrorTest extends SpecLite {
         def to[A](fa: Decoder[A]) = ReaderT[Out, String, A](fa.decode)
       }
 
-    implicit val monad: MonadError[Decoder, String] =
-      MonadError.fromIsoWithMonadError(isoReaderT)
+    implicit val monad: MonadError[Decoder, String] = MonadError.fromIso(isoReaderT)
   }
 
   "fromIsoWithMonadError" in {

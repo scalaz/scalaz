@@ -31,23 +31,11 @@ object MonadError {
   ////
   import Isomorphism.<~>
 
-  /**
-   * Derives a MonadError for something isomorphic to a thing with a MonadError.
-   */
-  def fromIsoWithMonadError[F[_], G[_], E](
-    D: F <~> G
-  )(
-    implicit ME: MonadError[G, E]
-  ): MonadError[F, E] = new MonadError[F, E] {
-    override def point[A](a: => A): F[A] =
-      D.from(ME.point(a))
-    override def raiseError[A](e: E): F[A] =
-      D.from(ME.raiseError(e))
-    override def bind[A, B](fa: F[A])(f: A => F[B]): F[B] =
-      D.from(ME.bind(D.to(fa))(a => D.to(f(a))))
-    override def handleError[A](fa: F[A])(f: E => F[A]): F[A] =
-      D.from(ME.handleError(D.to(fa))(a => D.to(f(a))))
-  }
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit ME: MonadError[G, E]): MonadError[F, E] =
+    new IsomorphismMonadError[F, G, E] {
+      override implicit def G: MonadError[G, E] = ME
+      override def iso: F <~> G = D
+    }
 
   ////
 }
