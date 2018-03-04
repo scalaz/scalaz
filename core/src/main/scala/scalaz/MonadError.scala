@@ -11,7 +11,7 @@ trait MonadError[F[_], S] extends Monad[F] { self =>
   def raiseError[A](e: S): F[A]
   def handleError[A](fa: F[A])(f: S => F[A]): F[A]
 
-  def emap[A](fa: F[A])(f: A => S \/ A): F[A] =
+  def emap[A, B](fa: F[A])(f: A => S \/ B): F[B] =
     bind(fa)(a => f(a).fold(raiseError(_), pure(_)))
 
   trait MonadErrorLaw {

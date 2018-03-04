@@ -496,7 +496,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         case r => r
       }
 
-      override def emap[A](fa: L \/ A)(f: A => L \/ A): L \/ A =
+      override def emap[A, B](fa: L \/ A)(f: A => L \/ B): L \/ B =
         bind(fa)(f)
     }
 }
