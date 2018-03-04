@@ -306,9 +306,7 @@ object build {
       mimaBinaryIssueFilters ++= {
         import com.typesafe.tools.mima.core._
         import com.typesafe.tools.mima.core.ProblemFilters._
-        Seq(
-          exclude[ReversedMissingMethodProblem]("scalaz.MonadError.emap")
-        )
+        Nil
       },
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
