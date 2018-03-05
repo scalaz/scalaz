@@ -359,7 +359,7 @@ object Task {
         val results = new ConcurrentLinkedQueue[M]
         val togo = new AtomicInteger(tasks.length)
 
-        val _ = tasks.map { t =>
+        foreach(tasks) { t =>
           val handle: (Throwable \/ A) => Trampoline[Unit] = {
             case \/-(success) =>
               // Try to reduce number of values in the queue
@@ -400,6 +400,10 @@ object Task {
         }
       })
     }
+
+  private def foreach[A](list: IList[A])(f: A => Unit): Unit = {
+    list.foldLeft(())((_, a) => f(a))
+  }
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =

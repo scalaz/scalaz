@@ -275,7 +275,7 @@ object Future {
           (ind, f, residual, listener, ref)
         }
 
-        val _ = fs.map { case (ind, f, residual, listener, ref) =>
+        foreach(fs) { case (ind, f, residual, listener, ref) =>
           f.unsafePerformListen { a =>
             ref.set(a)
             val notifyWinner =
@@ -310,7 +310,7 @@ object Future {
         val results = new ConcurrentLinkedQueue[M]
         val c = new AtomicInteger(fs.length)
 
-        val _ = fs.map { f =>
+        foreach(fs){ f =>
           f.unsafePerformListen { a =>
             // Try to reduce number of values in the queue
             val front = results.poll()
@@ -326,6 +326,10 @@ object Future {
           }
         }
       }
+    }
+
+    private def foreach[A](list: IList[A])(f: A => Unit): Unit = {
+      list.foldLeft(())((_, a) => f(a))
     }
   }
 
