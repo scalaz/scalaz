@@ -225,8 +225,19 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
+    val arrowLike = Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)
+    val classifiedTypeIdent = if (arrowLike(tc)) "=>:"
     else "F"
+
+    val k: TypeClass => String = t => t.kind match {
+      case Kind.|*->*|->* =>
+        "F, S"
+      case _ =>
+        if (arrowLike(t)) "=>:"
+        else "F"
+    }
+
+    val classifiedTypeIdent0 = k(tc)
 
     val typeShape: String = kind match {
       case Kind.*      => ""
@@ -255,8 +266,15 @@ object GenTypeClass {
         }
     }
     val extendsLikeList = {
-      val parent = if(tc.parent) List(tc.parentName) else Nil
-      extendsListText(suffix = "", parents = extendsList ++ parent)
+      val parent = if(tc.parent) List(tc.parentName -> classifiedTypeIdent0) else Nil
+      val extendsList = tc.extendsList.toList.map(t => t.name -> k(t))
+      (extendsList ++ parent) match {
+        case Seq() => ""
+        case es =>
+          es.map{
+            case (n, cti) => n + "[" + cti + "]"
+          }.mkString("extends ", " with ", "")
+      }
     }
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
@@ -459,18 +477,7 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
 
 ////
 ////
-trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent}] =>
-  ////
-
-  ////
-}
-"""
-      val emptyParent =
-        s"""${tc.packageString0}
-
-////
-////
-trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent}] =>
+trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent0}] =>
   ////
 
   ////
@@ -481,7 +488,7 @@ trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTyp
           empty = SourceFile(
             packages = tc.pack,
             fileName = tc.parentName + ".scala",
-            source = emptyParent,
+            source = parent,
             baseDir = dir => dir.getParentFile / "scala-2.12-"
           ),
           parent = SourceFile(
