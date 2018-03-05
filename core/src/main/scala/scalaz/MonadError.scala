@@ -29,6 +29,13 @@ object MonadError {
   @inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
 
   ////
+  import Isomorphism.<~>
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit ME: MonadError[G, E]): MonadError[F, E] =
+    new IsomorphismMonadError[F, G, E] {
+      override implicit def G: MonadError[G, E] = ME
+      override def iso: F <~> G = D
+    }
 
   ////
 }
