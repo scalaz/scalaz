@@ -193,7 +193,7 @@ class Task[A](val get: Future[Throwable \/ A]) {
    * errors into a list.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, IList[Throwable])] =
+  def retryAccumulating(delays: IList[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, IList[Throwable])] =
     retryInternal(delays, p, true)
 
   /**
@@ -201,18 +201,18 @@ class Task[A](val get: Future[Throwable \/ A]) {
    * each retry delayed by the corresponding duration.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
+  def retry(delays: IList[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
     retryInternal(delays, p, false).map(_._1)
 
-  private def retryInternal(delays: Seq[Duration],
+  private def retryInternal(delays: IList[Duration],
                             p: (Throwable => Boolean),
                             accumulateErrors: Boolean): Task[(A, IList[Throwable])] = {
-      def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, Stream[Throwable])] = {
+      def help(ds: IList[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, Stream[Throwable])] = {
         def acc: Stream[Throwable] = if (accumulateErrors) es else Stream.empty
 
         ds match {
-          case Seq() => get map (_.map(_ -> acc))
-          case Seq(t, ts @_*) => get flatMap {
+          case INil() => get map (_.map(_ -> acc))
+          case ICons(t, ts) => get flatMap {
             case -\/(e) if p(e) =>
               help(ts, e #:: es) after t
             case x => Future.now(x.map(_ -> acc))
