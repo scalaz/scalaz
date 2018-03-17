@@ -84,4 +84,7 @@ package object data {
 
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
+
+  val AList: AListModule = AListImpl
+  type AList[F[_, _], A, B] = AList.AList[F, A, B]
 }
