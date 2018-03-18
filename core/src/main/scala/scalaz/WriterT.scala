@@ -438,5 +438,5 @@ private trait WriterTMonadListen[F[_], W] extends MonadListen[WriterT[F, W, ?], 
   def writer[A](w: W, v: A): WriterT[F, W, A] = WriterT.writerT(F.point((w, v)))
 
   def listen[A](fa: WriterT[F, W, A]): WriterT[F, W, (A, W)] =
-    WriterT(F.bind(fa.run){ case (w, a) => F.point((w, (a, w))) })
+    WriterT(F.map(fa.run){ case (w, a) => (w, (a, w)) })
 }
