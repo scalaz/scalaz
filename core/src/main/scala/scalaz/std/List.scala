@@ -66,6 +66,12 @@ trait ListInstances extends ListInstances0 {
         r
       }
 
+      override def atraverse[A, B, G[_]](fa: List[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
+        fa match {
+          case Nil => G.empty[B]
+          case head :: tail => G.plus(f(head), atraverse(tail)(f)(G))
+        }
+
       def cobind[A, B](fa: List[A])(f: List[A] => B) =
         fa match {
           case Nil => Nil

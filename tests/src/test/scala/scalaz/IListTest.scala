@@ -409,6 +409,21 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
+  "atraverse should be lazy" in {
+    import scalaz.syntax.enum._
+    import scalaz.syntax.show._
+    import Maybe.just
+
+    var called = 0
+    def foo(s: Int): Maybe[String] = {
+      called += 1
+      just(s.shows)
+    }
+
+    (1 |-> 10).atraverse(foo) must_=== just("1")
+    called must_=== 1
+  }
+
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
   object instances {

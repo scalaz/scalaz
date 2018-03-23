@@ -283,6 +283,7 @@ trait Foldable[F[_]]  { self =>
   def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
     foldLeft1Opt(fa)(A.append(_, _))
 
+  // should be revisited by https://github.com/scalaz/scalaz/issues/1663
   def atraverse[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
     foldRight(fa, G.empty[B])((a, as) => G.plus(f(a), as))
 

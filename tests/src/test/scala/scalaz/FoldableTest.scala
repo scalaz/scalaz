@@ -128,22 +128,9 @@ object FoldableTest extends SpecLite {
     IList(empty[String], just("foo"), just("bar")).asum must_=== just("foo")
   }
 
-  "atraverse should be lazy" in {
-    import scalaz.syntax.enum._
-    import scalaz.syntax.show._
+  "atraverse should be lazy for lazy structures" in {
     import Maybe.just
-
     Stream.continually("a").atraverse(just) must_=== just("a")
-
-    // even for eager data structures. Side effect needed to capture execution
-    var called = 0
-    def foo(s: Int): Maybe[String] = {
-      called += 1
-      just(s.shows)
-    }
-
-    (1 |-> 10).atraverse(foo) must_=== just("1")
-    called must_=== 1
   }
 
   "non-empty folding" should {
