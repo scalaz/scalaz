@@ -624,11 +624,11 @@ sealed abstract class IListInstances extends IListInstance0 {
         }
 
       // WARNING: not stack safe, but expected to short-circuit
-      override def atraverse[A, B, G[_]](fa: IList[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
+      override def aFoldMap[A, B, G[_]](fa: IList[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
         fa match {
           case INil() => G.empty[B]
           case ICons(head, tail) =>
-            G.plus(f(head), atraverse(tail)(f)(G))
+            G.plus(f(head), aFoldMap(tail)(f)(G))
         }
 
       override def index[A](fa: IList[A], i: Int) = {

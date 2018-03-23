@@ -284,7 +284,7 @@ trait Foldable[F[_]]  { self =>
     foldLeft1Opt(fa)(A.append(_, _))
 
   // should be revisited by https://github.com/scalaz/scalaz/issues/1663
-  def atraverse[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
+  def aFoldMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
     foldRight(fa, G.empty[B])((a, as) => G.plus(f(a), as))
 
   def asum[G[_], A](fa: F[G[A]])(implicit G: Alternative[G]): G[A] =

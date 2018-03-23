@@ -89,7 +89,7 @@ object NonEmptyListTest extends SpecLite {
     xs.zipWithIndex.list must_== xs.list.zipWithIndex
   }
 
-  "atraverse should be lazy" in {
+  "aFoldMap should be lazy" in {
     import scalaz.syntax.either._
     import scalaz.syntax.foldable1._
     import scalaz.syntax.show._
@@ -100,7 +100,7 @@ object NonEmptyListTest extends SpecLite {
       s.shows.right
     }
 
-    NonEmptyList(1, 2, 3, 4, 5).atraverse1(foo) must_=== "1".right
+    NonEmptyList(1, 2, 3, 4, 5).aFoldMap1(foo) must_=== "1".right
     called must_=== 1
   }
 
