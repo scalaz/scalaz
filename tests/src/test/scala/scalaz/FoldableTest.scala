@@ -128,9 +128,9 @@ object FoldableTest extends SpecLite {
     IList(empty[String], just("foo"), just("bar")).asum must_=== just("foo")
   }
 
-  "aFoldMap should be lazy for lazy structures" in {
+  "asumMap should be lazy for lazy structures" in {
     import Maybe.just
-    Stream.continually("a").aFoldMap(just) must_=== just("a")
+    Stream.continually("a").asumMap(just) must_=== just("a")
   }
 
   "non-empty folding" should {

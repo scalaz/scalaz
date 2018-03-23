@@ -158,7 +158,7 @@ object ListTest extends SpecLite {
         (c :+ a, f(a))) must_===(xs.reverse -> xs.map(f))
   }
 
-  "aFoldMap should be lazy" in {
+  "asumMap should be lazy" in {
     import scalaz.syntax.show._
     import Maybe.just
 
@@ -168,7 +168,7 @@ object ListTest extends SpecLite {
       just(s.shows)
     }
 
-    (1 to 10).toList.aFoldMap(foo) must_=== just("1")
+    (1 to 10).toList.asumMap(foo) must_=== just("1")
     called must_=== 1
   }
 
