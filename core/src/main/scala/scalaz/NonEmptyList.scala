@@ -182,6 +182,12 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
       }
 
+      override def atraverse1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
+        fa.tail match {
+          case INil() => f(fa.head)
+          case ICons(snd, rest) => G.plus(f(fa.head), atraverse1(NonEmptyList.nel(snd, rest))(f)(G))
+        }
+
       // would otherwise use traverse1Impl
       override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B, A) => B): B =
         fa.tail.foldLeft(f(z, fa.head))(f)
