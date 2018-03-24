@@ -158,6 +158,20 @@ object ListTest extends SpecLite {
         (c :+ a, f(a))) must_===(xs.reverse -> xs.map(f))
   }
 
+  "asumMap should be lazy" in {
+    import scalaz.syntax.show._
+    import Maybe.just
+
+    var called = 0
+    def foo(s: Int): Maybe[String] = {
+      called += 1
+      just(s.shows)
+    }
+
+    (1 to 10).toList.asumMap(foo) must_=== just("1")
+    called must_=== 1
+  }
+
   checkAll(FoldableTests.anyAndAllLazy[List])
 
 

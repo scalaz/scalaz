@@ -283,6 +283,15 @@ trait Foldable[F[_]]  { self =>
   def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
     foldLeft1Opt(fa)(A.append(_, _))
 
+  // should be revisited by https://github.com/scalaz/scalaz/issues/1663
+  /** map into an G[B] and pick the first "winner", as determined by Alternative */
+  def asumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
+    foldRight(fa, G.empty[B])((a, as) => G.plus(f(a), as))
+
+  /** pick the first "winner", as determined by Alternative */
+  def asum[G[_], A](fa: F[G[A]])(implicit G: Alternative[G]): G[A] =
+    foldRight(fa, G.empty[A])(G.plus[A](_, _))
+
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldLeft(fa, G.empty[A])(G.plus[A](_, _))
 

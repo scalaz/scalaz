@@ -88,4 +88,20 @@ object NonEmptyListTest extends SpecLite {
   "zipWithIndex" ! forAll { xs: NonEmptyList[Int] =>
     xs.zipWithIndex.list must_== xs.list.zipWithIndex
   }
+
+  "asumMap should be lazy" in {
+    import scalaz.syntax.either._
+    import scalaz.syntax.foldable1._
+    import scalaz.syntax.show._
+
+    var called = 0
+    def foo(s: Int): Int \/ String = {
+      called += 1
+      s.shows.right
+    }
+
+    NonEmptyList(1, 2, 3, 4, 5).asumMap1(foo) must_=== "1".right
+    called must_=== 1
+  }
+
 }

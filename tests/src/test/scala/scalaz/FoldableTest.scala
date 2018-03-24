@@ -115,6 +115,24 @@ object FoldableTest extends SpecLite {
     }
   }
 
+  "asum should be lazy" in {
+    import Maybe.just
+
+    // note that msuml instead of asum would fail this test
+    Stream.continually("a").map(just).asum must_=== just("a")
+  }
+
+  "asum should ignore empty values" in {
+    import Maybe.{empty, just}
+
+    IList(empty[String], just("foo"), just("bar")).asum must_=== just("foo")
+  }
+
+  "asumMap should be lazy for lazy structures" in {
+    import Maybe.just
+    Stream.continually("a").asumMap(just) must_=== just("a")
+  }
+
   "non-empty folding" should {
 
     val gt1: (Int, Int)    => Int = (i, j) => i - j

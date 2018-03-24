@@ -25,6 +25,8 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def distinctE1(implicit A: Equal[A]): NonEmptyList[A] = F.distinctE1(self)
   final def intercalate1(a: A)(implicit A: Semigroup[A]): A = F.intercalate1(self, a)
   final def msuml1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.msuml1(ev.subst[F](self))
+  final def asum1[G[_], B](implicit ev: A === G[B], G: Plus[G]): G[B] = F.asum1(ev.subst[F](self))
+  final def asumMap1[G[_], B](f: A => G[B])(implicit G: Plus[G]): G[B] = F.asumMap1(self)(f)(G)
   final def toNel: NonEmptyList[A] = F.toNel(self)
   final def scanLeft1(f: (A, A) => A): NonEmptyList[A] = F.scanLeft1(self)(f)
   final def scanRight1(f: (A, A) => A): NonEmptyList[A] = F.scanRight1(self)(f)
