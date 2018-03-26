@@ -30,15 +30,17 @@ trait BindRec[F[_]] extends Bind[F] { self =>
 
   trait BindRecLaw extends BindLaw {
     def tailrecBindConsistency[A](a: A, f: A => F[A])(implicit FA: Equal[F[A]]): Boolean = {
-      val bounce = tailrecM[(Boolean, A), A]((false, a)) {
-        case (bounced, a0) =>
-          if (!bounced)
-            map(f(a0))(a1 => -\/((true, a1)))
-          else
-            map(f(a0))(\/.right)
+      val g: ((Int, A)) => F[(Int, A) \/ A] = { case (i, a) =>
+        if (i > 0)
+          map(f(a))(a => -\/((i-1, a)))
+        else
+          map(f(a))(\/.right)
       }
 
-      FA.equal(bind(f(a))(f), bounce)
+      val result = tailrecM[(Int, A), A]((4, a))(g)
+      val expected = bind(f(a))(a => bind(f(a))(a => bind(f(a))(a => bind(f(a))(f))))
+
+      FA.equal(result, expected)
     }
   }
   def bindRecLaw = new BindRecLaw {}
