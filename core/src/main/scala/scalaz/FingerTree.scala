@@ -44,7 +44,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V], monoid:
       s.append(s.append(pr.foldMap(f), m.foldMap(x => x.foldMap(f))), sf.foldMap(f)))
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = {
-    foldMap((a: A) => (Endo.endo(f(a, _: B)))) apply z
+    foldMap(a => Endo.endoByName[B](f(a, _))).apply(z)
   }
 
   def foldLeft[B](b: B)(f: (B, A) => B): B = {
@@ -574,7 +574,7 @@ sealed abstract class FingerTreeInstances {
     new Foldable[Node[V, ?]] {
       def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
       def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
-         foldMap(v)((a: A) => (Endo.endo(f.curried(a)(_: B)))) apply z
+         foldMap(v)((a: A) => Endo.endoByName[B](f(a, _))) apply z
     }
 
   implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, ?]] =

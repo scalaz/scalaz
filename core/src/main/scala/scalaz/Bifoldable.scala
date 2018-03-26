@@ -107,7 +107,7 @@ object Bifoldable {
    */
   trait FromBifoldMap[F[_, _]] extends Bifoldable[F] {
     override def bifoldRight[A,B,C](fa: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
-      bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) => (Endo.endo(g(b, _: C)))) apply z
+      bifoldMap(fa)((a: A) => Endo.endoByName[C](f(a, _)))((b: B) => Endo.endoByName[C](g(b, _))) apply z
   }
 
   /**

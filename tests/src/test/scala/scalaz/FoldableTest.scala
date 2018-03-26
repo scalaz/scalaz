@@ -6,6 +6,7 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
+import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
@@ -233,6 +234,22 @@ object FoldableTest extends SpecLite {
     (l: List[Int], l2: List[Int]) =>
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
+  }
+
+  "foldRight from foldMap" should {
+
+    val fromFoldMap: Foldable[EphemeralStream] = new FromFoldMap[EphemeralStream] {
+      override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Monoid[B]): B = EphemeralStream.ephemeralStreamInstance.foldMap(fa)(f)
+    }
+
+    "foldRight is Lazy" in {
+      val infiniteStream = EphemeralStream.iterate(0)(_ + 1)
+
+      // This would failed with a StackOverflowError if foldRight was not lazy, which was the case with strict Endo:
+      val stream: Stream[Int] = fromFoldMap.foldRight(infiniteStream, Stream.empty[Int]){ (i, is) => Stream.cons(i, is)}
+
+      stream.take(100) must_=== infiniteStream.take(100).toStream
+    }
   }
 }
 

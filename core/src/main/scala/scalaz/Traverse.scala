@@ -119,7 +119,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._1
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-    foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+    foldMap(fa)((a: A) => Endo.endoByName[B](f(a, _))) apply z
 
   def reverse[A](fa: F[A]): F[A] = {
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t,h) => (h :: t,h))

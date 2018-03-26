@@ -421,17 +421,17 @@ object Foldable {
    */
   trait FromFoldMap[F[_]] extends Foldable[F] {
     override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-      foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+      foldMap(fa)((a: A) => Endo.endoByName[B](f(a, _))) apply z
   }
 
   /**
-   * Template trait to define `Foldable` in terms of `foldr`
+   * Template trait to define `Foldable` in terms of `foldRight`
    *
    * Example:
    * {{{
    * new Foldable[Option] with Foldable.FromFoldr[Option] {
-   *   def foldr[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B) = fa match {
-   *     case Some(a) => f(a)(z)
+   *   def foldRight[A, B](fa: Option[A], z: B)(f: (A, => B) => B) = fa match {
+   *     case Some(a) => f(a, z)
    *     case None => z
    *   }
    * }
@@ -439,7 +439,7 @@ object Foldable {
    */
   trait FromFoldr[F[_]] extends Foldable[F] {
     override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) =
-        foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
+      foldRight[A, B](fa, F.zero)((x, y) => F.append(f(x),  y))
   }
 
   ////
