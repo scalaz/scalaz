@@ -182,10 +182,10 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
       }
 
-      override def asumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
+      override def psumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
         fa.tail match {
           case INil() => f(fa.head)
-          case ICons(snd, rest) => G.plus(f(fa.head), asumMap1(NonEmptyList.nel(snd, rest))(f)(G))
+          case ICons(snd, rest) => G.plus(f(fa.head), psumMap1(NonEmptyList.nel(snd, rest))(f)(G))
         }
 
       // would otherwise use traverse1Impl

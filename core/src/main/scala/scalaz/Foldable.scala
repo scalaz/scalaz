@@ -284,13 +284,25 @@ trait Foldable[F[_]]  { self =>
     foldLeft1Opt(fa)(A.append(_, _))
 
   // should be revisited by https://github.com/scalaz/scalaz/issues/1663
-  /** map into an G[B] and pick the first "winner", as determined by PlusEmpty */
-  def asumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
+  /**
+   * Map elements to `G[B]` and sum using a polymorphic monoid ([[PlusEmpty]]).
+   * Should support early termination, i.e. mapping and summing
+   * no more elements than is needed to determine the result.
+   */
+  def psumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
     foldRight(fa, G.empty[B])((a, as) => G.plus(f(a), as))
 
-  /** pick the first "winner", as determined by PlusEmpty */
-  def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+  /**
+   * Sum using a polymorphic monoid ([[PlusEmpty]]).
+   * Should support early termination, i.e. summing no more
+   * elements than is needed to determine the result.
+   */
+  def psum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldRight(fa, G.empty[A])(G.plus[A](_, _))
+
+  /** Alias for [[psum]]. `asum` is the name used in Haskell. */
+  final def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+    psum(fa)
 
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     foldLeft(fa, G.empty[A])(G.plus[A](_, _))

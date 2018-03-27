@@ -84,7 +84,8 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.msuml(ev.subst[F](self))
   final def msumlU(implicit G: Unapply[PlusEmpty, A]): G.M[G.A] = F.msumlU(self)
   final def asum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.asum(ev.subst[F](self))(G)
-  final def asumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.asumMap(self)(f)(G)
+  final def psum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.psum(ev.subst[F](self))(G)
+  final def psumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.psumMap(self)(f)(G)
   ////
 }
 
