@@ -624,7 +624,7 @@ sealed abstract class IListInstances extends IListInstance0 {
         }
 
       // WARNING: not stack safe, but expected to short-circuit
-      override def asumMap[A, B, G[_]](fa: IList[A])(f: A => G[B])(implicit G: Alternative[G]): G[B] =
+      override def asumMap[A, B, G[_]](fa: IList[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
         fa match {
           case INil() => G.empty[B]
           case ICons(head, tail) =>
