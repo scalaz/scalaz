@@ -235,6 +235,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def endoArb[A](implicit A: Arbitrary[A => A]): Arbitrary[Endo[A]] =
     Functor[Arbitrary].map(A)(Endo.endo)
 
+  implicit def endoByNameArb[A](implicit A: Arbitrary[A => A]): Arbitrary[EndoByName[A]] =
+    Functor[Arbitrary].map(A)(f => Endo.endoByName(f(_)))
+
   implicit def endomorphicArbitrary[F[_, _], A](implicit F: Arbitrary[F[A, A]]): Arbitrary[Endomorphic[F, A]] =
     Functor[Arbitrary].map(F)(Endomorphic[F, A](_))
 
