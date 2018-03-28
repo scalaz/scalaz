@@ -74,6 +74,15 @@ sealed abstract class Reducer[C, M] {
 
   def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M =
     unfoldrOpt(seed)(f) getOrElse M.zero
+
+  trait ReducerLaw {
+    def consCorrectness(c: C, m: M)(implicit E: Equal[M]): Boolean =
+      E.equal(cons(c, m), append(unit(c), m))
+
+    def snocCorrectness(m: M, c: C)(implicit E: Equal[M]): Boolean =
+      E.equal(snoc(m, c), append(m, unit(c)))
+  }
+  def reducerLaw = new ReducerLaw {}
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def semigroup: Semigroup[M]
