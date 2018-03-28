@@ -50,23 +50,29 @@ sealed abstract class Reducer[C, M] {
     }
   }
 
-  final def unfoldl[B](seed: B)(f: B => Maybe[(B, C)])(implicit M: Monoid[M]): M = {
+  def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] = {
     @tailrec
     def rec(seed: B, acc: M): M = f(seed) match {
       case Just((b, c)) => rec(b, cons(c, acc))
       case _ => acc
     }
-    rec(seed, M.zero)
+    f(seed) map { case (b, c) => rec(b, unit(c)) }
   }
 
-  def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M = {
+  def unfoldl[B](seed: B)(f: B => Maybe[(B, C)])(implicit M: Monoid[M]): M =
+    unfoldlOpt(seed)(f) getOrElse M.zero
+
+  def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] = {
     @tailrec
-    def rec(seed: B, acc: M): M = f(seed) match {
-      case Just((c, b)) => rec(b, snoc(acc, c))
+    def rec(acc: M, seed: B): M = f(seed) match {
+      case Just((c, b)) => rec(snoc(acc, c), b)
       case _ => acc
     }
-    rec(seed, M.zero)
+    f(seed) map { case (c, b) => rec(unit(c), b) }
   }
+
+  def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M =
+    unfoldrOpt(seed)(f) getOrElse M.zero
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def semigroup: Semigroup[M]
