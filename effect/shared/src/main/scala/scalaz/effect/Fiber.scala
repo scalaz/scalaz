@@ -1,4 +1,4 @@
-// Copyright (C) 2017 John A. De Goes. All rights reserved.
+// Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
 /**
@@ -26,6 +26,10 @@ trait Fiber[E, A] {
    * killed before producing its result will result in a catchable error.
    */
   def join: IO[E, A]
+
+  // fork >=> join = id
+
+  // def pause: IO[Void, IO[E, A]]
 
   /**
    * Interrupts the fiber with the specified error. If the fiber has already

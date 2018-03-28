@@ -1,8 +1,8 @@
-// Copyright (C) 2017 John A. De Goes. All rights reserved.
+// Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
 import scala.annotation.switch
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
@@ -136,12 +136,25 @@ sealed abstract class IO[E, A] { self =>
    */
   final def raceWith[B, C](that: IO[E, B])(finish: (A, Fiber[E, B]) \/ (B, Fiber[E, A]) => IO[E, C]): IO[E, C] = IO.Race[E, A, B, C](self, that, finish)
 
+  // final def raceWith[E2, E3, B, C](that: IO[E2, B])(finish: (A, Fiber[E2, B]) \/ (B, Fiber[E, A]) => IO[E3, C]): IO[E3, C] = ???
+
   /**
    * Executes this action and returns its value, if it succeeds, but
    * otherwise executes the specified action.
    */
   final def orElse(that: => IO[E, A]): IO[E, A] =
     self.attempt.flatMap(_.fold(_ => that)(IO.now))
+
+  // final def leftMap[E2](f: E => E2): IO[E2, A] =
+  //   IO.absolve(attempt[Void].flatMap {
+  //     case -\/ (e) => -\/ (f(e))
+  //     case  \/-(a) =>  \/-(a)
+  //   })
+
+  // final def attempt[E2](io: IO[E, A]): IO[E2, E \/ A] = ???
+  // final def absolve[A](v: IO[Void, E \/ A]): IO[E, A] = ???
+  // final def absolve[A, E2](v: IO[E2, E \/ A]): IO[E \/ E2, A] = ???
+  // IO.absolve(io.attempt[Void]) == io
 
   /**
    * Executes this action, capturing both failure and success and returning
@@ -310,9 +323,7 @@ sealed abstract class IO[E, A] { self =>
    * Retries this action the specified number of times, until the first success.
    * Note that the action will always be run at least once, even if `n < 1`.
    */
-  final def retryN(n: Int): IO[E, A] =
-    if (n <= 1) self
-    else self orElse (retryN(n - 1))
+  final def retryN(n: Int): IO[E, A] = retryBackoff(n, 1.0, Duration.fromNanos(0))
 
   /**
    * Retries continuously until the action succeeds or the specified duration
@@ -322,6 +333,46 @@ sealed abstract class IO[E, A] { self =>
     IO.absolve(
       retry.attempt race (IO.sleep(duration) *>
                           IO.now(-\/(Errors.TimeoutException(duration)))))
+
+  /**
+   * Retries continuously, increasing the duration between retries each time by
+   * the specified multiplication factor, and stopping after the specified upper
+   * limit on retries.
+   */
+  final def retryBackoff(n: Int, factor: Double, duration: Duration): IO[E, A] =
+    if (n <= 1) self
+    else self orElse (IO.sleep(duration) *> retryBackoff(n - 1, factor, duration * factor))
+
+  /**
+   * Repeats this computation continuously until the first error, with the
+   * specified interval between each full execution.
+   */
+  final def repeat[B](interval: Duration): IO[E, B] =
+    self *> IO.sleep(interval) *> repeat(interval)
+
+  /**
+   * Repeats this computation continuously until the first error, with the
+   * specified interval between the start of each full execution. Note that if
+   * the execution of this computation takes longer than the specified interval,
+   * then the computation will instead execute as quickly as possible, but not
+   * necessarily at the specified interval.
+   */
+  final def repeatFixed[B](interval: Duration): IO[E, B] =
+    repeatFixed0(IO.sync(System.nanoTime()))(interval)
+
+  final def repeatFixed0[B](nanoTime: IO[E, Long])(interval: Duration): IO[E, B] =
+    IO.flatten(nanoTime.flatMap { start =>
+      val gapNs = interval.toNanos
+
+      def tick[B](n: Int): IO[E, B] =
+        self *> nanoTime.flatMap { now =>
+          val await = ((start + n * gapNs) - now).max(0L)
+
+          IO.sleep(await.nanoseconds) *> tick[B](n + 1)
+        }
+
+      tick(1)
+    })
 
   /**
    * Maps this action to one producing unit, but preserving the effects of
@@ -335,9 +386,7 @@ sealed abstract class IO[E, A] { self =>
    * value produced by the action.
    *
    * {{{
-   * for {
-   *   file <- readFile("data.json").peek(putStrLn)
-   * } yield file
+   * readFile("data.json").peek(putStrLn)
    * }}}
    */
   final def peek[B](f: A => IO[E, B]): IO[E, A] = self.flatMap(a => f(a).const(a))
@@ -354,6 +403,29 @@ sealed abstract class IO[E, A] { self =>
 
     IO.absolve(self.attempt.race(err.delay(duration)))
   }
+
+  /**
+   * Returns a new computation that executes this one and times the execution.
+   */
+  final def timed: IO[E, (Duration, A)] = timed0(IO.sync(System.nanoTime()))
+
+  /**
+   * A more powerful variation of `timed` that allows specifying the clock.
+   */
+  final def timed0(nanoTime: IO[E, Long]): IO[E, (Duration, A)] =
+    summarized[Long, Duration]((start, end) => Duration.fromNanos(end - start))(nanoTime)
+
+  /**
+   * Summarizes a computation by computing some value before and after
+   * execution, and then combining the values to produce a summary, together
+   * with the result of execution.
+   */
+  final def summarized[B, C](f: (B, B) => C)(summary: IO[E, B]): IO[E, (C, A)] =
+    for {
+      start <- summary
+      value <- self
+      end   <- summary
+    } yield (f(start, end), value)
 
   /**
    * Delays this action by the specified amount of time.
@@ -458,6 +530,8 @@ object IO extends IOInstances {
    */
   final def fail[E, A](t: Throwable): IO[E, A] = Fail(t)
 
+  // final def fail[E, A](t: E): IO[E, A] = Fail(t)
+
   /**
    * Strictly-evaluated unit lifted into the `IO` monad.
    */
@@ -502,6 +576,9 @@ object IO extends IOInstances {
    */
   final def sync[E, A](effect: => A): IO[E, A] = SyncEffect(() => effect)
 
+  // final def sync[A](effect: => A): IO[Throwable, A] = ???
+  //final def sync[E, A](effect: => A): IO[E, A] = SyncEffect(() => effect)
+
   /**
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
    * the more expressive variant of this function.
@@ -537,6 +614,12 @@ object IO extends IOInstances {
       case -\/(e) => IO.fail(e)
       case \/-(a) => IO.now(a)
     }
+
+  // Add:
+  // def uncaughtErrorHandler[E]: IO[E, Throwable => IO[Unit]]
+  //
+
+  // final def absolve[A](v: IO[Void, E \/ A]): IO[E, A] = ???
 
   /**
    * Requires that the given `IO[E, Maybe[A]]` contain a value. If there is no
