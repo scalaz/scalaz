@@ -130,6 +130,20 @@ object ScalazProperties {
     }
   }
 
+  object reducer {
+    def consCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.consCorrectness _)
+
+    def snocCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.snocCorrectness _)
+
+    def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: Reducer[C, M]): Properties =
+      newProperties("reducer") { p =>
+        p.property("cons correctness") = consCorrectness[C, M]
+        p.property("snoc correctness") = snocCorrectness[C, M]
+      }
+  }
+
   object invariantFunctor {
     def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]): Prop =
       forAll(F.invariantFunctorLaw.invariantIdentity[X] _)

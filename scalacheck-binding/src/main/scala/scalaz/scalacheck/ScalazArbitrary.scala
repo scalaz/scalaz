@@ -88,6 +88,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
 
+  implicit val IntDualArbitrary: Arbitrary[Int @@ Dual] = Tag.subst(arb[Int])
+
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, IList[A], NonEmptyList[A]](arb[A], ilistArbitrary)(nel(_, _))
 

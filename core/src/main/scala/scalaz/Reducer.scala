@@ -71,6 +71,15 @@ sealed abstract class Reducer[C, M] {
     }
     rec(seed, zero)
   }
+
+  trait ReducerLaw {
+    def consCorrectness(c: C, m: M)(implicit E: Equal[M]): Boolean =
+      E.equal(cons(c, m), append(unit(c), m))
+
+    def snocCorrectness(m: M, c: C)(implicit E: Equal[M]): Boolean =
+      E.equal(snoc(m, c), append(m, unit(c)))
+  }
+  def reducerLaw = new ReducerLaw {}
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
