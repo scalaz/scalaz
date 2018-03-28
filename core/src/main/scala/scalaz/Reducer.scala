@@ -1,6 +1,5 @@
 package scalaz
 
-import scala.annotation.tailrec
 import scalaz.Free.{Trampoline, return_, suspend}
 import scalaz.Maybe.Just
 import scalaz.Tags.Conjunction
@@ -19,16 +18,7 @@ import scalaz.Tags.Conjunction
  * Based on the Reducer Haskell library by Edward Kmett
  * (https://hackage.haskell.org/package/reducers).
  */
-sealed abstract class Reducer[C, M] {
-  implicit def semigroup: Semigroup[M]
-
-  def unit(c: C): M
-
-  /** Faster `append(m, unit(c))`. */
-  def snoc(m: M, c: C): M
-
-  /** Faster `append(unit(c), m)`. */
-  def cons(c: C, m: M): M
+sealed abstract class Reducer[C, M] extends RightReducer[C, M] with LeftReducer[C, M] {
 
   def append(a1: M, a2: => M): M =
     semigroup.append(a1, a2)
@@ -51,37 +41,7 @@ sealed abstract class Reducer[C, M] {
     }
   }
 
-  def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] = {
-    @tailrec
-    def rec(seed: B, acc: M): M = f(seed) match {
-      case Just((b, c)) => rec(b, cons(c, acc))
-      case _ => acc
-    }
-    f(seed) map { case (b, c) => rec(b, unit(c)) }
-  }
-
-  def unfoldl[B](seed: B)(f: B => Maybe[(B, C)])(implicit M: Monoid[M]): M =
-    unfoldlOpt(seed)(f) getOrElse M.zero
-
-  def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] = {
-    @tailrec
-    def rec(acc: M, seed: B): M = f(seed) match {
-      case Just((c, b)) => rec(snoc(acc, c), b)
-      case _ => acc
-    }
-    f(seed) map { case (c, b) => rec(unit(c), b) }
-  }
-
-  def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M =
-    unfoldrOpt(seed)(f) getOrElse M.zero
-
-  trait ReducerLaw {
-    def consCorrectness(c: C, m: M)(implicit E: Equal[M]): Boolean =
-      E.equal(cons(c, m), append(unit(c), m))
-
-    def snocCorrectness(m: M, c: C)(implicit E: Equal[M]): Boolean =
-      E.equal(snoc(m, c), append(m, unit(c)))
-  }
+  trait ReducerLaw extends RightReducerLaw with LeftReducerLaw
   def reducerLaw = new ReducerLaw {}
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
