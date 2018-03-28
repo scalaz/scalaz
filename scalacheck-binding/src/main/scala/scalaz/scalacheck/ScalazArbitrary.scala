@@ -286,6 +286,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
+  implicit val IntDualArbitrary: Arbitrary[Int @@ Dual] = Tag.subst(arb[Int])
+
   implicit val DigitArbitrary: Arbitrary[Digit] = {
     val digitList = Digit.digits.toList
     Arbitrary(oneOf(digitList))
