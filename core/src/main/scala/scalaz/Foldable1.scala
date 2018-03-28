@@ -127,10 +127,10 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def suml1[A](fa: F[A])(implicit A: Semigroup[A]): A =
     foldLeft1(fa)(A.append(_, _))
 
-  def asum1[G[_], A](fa: F[G[A]])(implicit G: Plus[G]): G[A] =
+  def psum1[G[_], A](fa: F[G[A]])(implicit G: Plus[G]): G[A] =
     foldRight1[G[A]](fa)(G.plus[A](_, _))
 
-  def asumMap1[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
+  def psumMap1[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
     foldMapRight1(fa)(f)((a, as) => G.plus(f(a), as))
 
   def msuml1[G[_], A](fa: F[G[A]])(implicit G: Plus[G]): G[A] =
