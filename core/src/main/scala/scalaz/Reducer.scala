@@ -17,6 +17,7 @@ import scalaz.Tags.Conjunction
  * Minimal definition: `unit` or `snoc`
  *
  * Based on the Reducer Haskell library by Edward Kmett
+ * (https://hackage.haskell.org/package/reducers).
  */
 sealed abstract class Reducer[C, M] {
   implicit def semigroup: Semigroup[M]
