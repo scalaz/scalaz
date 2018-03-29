@@ -1,6 +1,9 @@
 package scalaz
 
 ////
+import scala.annotation.tailrec
+import Maybe.Just
+
 /**
  * An associative binary operation, circumscribed by type and the
  * semigroup laws.  Unlike [[scalaz.Monoid]], there is not necessarily
@@ -32,13 +35,45 @@ trait Semigroup[F]  { self =>
    * require `O(log n)` uses of [[append]]
    */
   def multiply1(value: F, n: Int): F = {
-    @scala.annotation.tailrec
+    @tailrec
     def go(x: F, y: Int, z: F): F = y match {
       case y if (y & 1) == 0 => go(append(x, x), y >>> 1, z)
       case y if (y == 1)     => append(x, z)
       case _                 => go(append(x, x), (y - 1) >>>  1, append(x, z))
     }
     if (n <= 0) value else go(value, n, value)
+  }
+
+  /**
+   * Unfold `seed` to the left and sum using [[#append]].
+   * Semigroups with right absorbing elements may override this method
+   * to not unfold more than is necessary to determine the result.
+   */
+  def unfoldlSumOpt[S](seed: S)(f: S => Maybe[(S, F)]): Maybe[F] =
+    defaultUnfoldlSumOpt(seed)(f)
+
+  @inline private def defaultUnfoldlSumOpt[S](seed: S)(f: S => Maybe[(S, F)]): Maybe[F] = {
+    @tailrec def go(s: S, acc: F): F = f(s) match {
+      case Just((s, f)) => go(s, append(f, acc))
+      case _ => acc
+    }
+    f(seed) map { case (s, a) => go(s, a) }
+  }
+
+  /**
+   * Unfold `seed` to the right and sum using [[#append]].
+   * Semigroups with left absorbing elements may override this method
+   * to not unfold more than is necessary to determine the result.
+   */
+  def unfoldrSumOpt[S](seed: S)(f: S => Maybe[(F, S)]): Maybe[F] =
+    defaultUnfoldrSumOpt(seed)(f)
+
+  @inline private def defaultUnfoldrSumOpt[S](seed: S)(f: S => Maybe[(F, S)]): Maybe[F] = {
+    @tailrec def go(acc: F, s: S): F = f(s) match {
+      case Just((f, s)) => go(append(acc, f), s)
+      case _ => acc
+    }
+    f(seed) map { case (a, s) => go(a, s) }
   }
 
 
@@ -77,6 +112,24 @@ trait Semigroup[F]  { self =>
   trait SemigroupLaw {
     def associative(f1: F, f2: F, f3: F)(implicit F: Equal[F]): Boolean =
       F.equal(append(f1, append(f2, f3)), append(append(f1, f2), f3))
+
+    def unfoldlSumOptConsistency[S](s: S, f: S => Maybe[(S, F)])(implicit E: Equal[F]): Boolean = {
+      val g: ((Int, S)) => Maybe[((Int, S), F)] = { case (i, s) =>
+        if(i > 0) f(s) map { case (s, f) => ((i-1, s), f) }
+        else Maybe.empty
+      }
+      val limit = 4 // to prevent infinite unfolds
+      Equal[Maybe[F]].equal(unfoldlSumOpt((limit, s))(g), defaultUnfoldlSumOpt((limit, s))(g))
+    }
+
+    def unfoldrSumOptConsistency[S](s: S, f: S => Maybe[(F, S)])(implicit E: Equal[F]): Boolean = {
+      val g: ((Int, S)) => Maybe[(F, (Int, S))] = { case (i, s) =>
+        if(i > 0) f(s) map { case (f, s) => (f, (i-1, s)) }
+        else Maybe.empty
+      }
+      val limit = 4 // to prevent infinite unfolds
+      Equal[Maybe[F]].equal(unfoldrSumOpt((limit, s))(g), defaultUnfoldrSumOpt((limit, s))(g))
+    }
   }
   def semigroupLaw = new SemigroupLaw {}
 

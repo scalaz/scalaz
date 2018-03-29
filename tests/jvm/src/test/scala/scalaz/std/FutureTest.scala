@@ -3,7 +3,7 @@ package std
 
 import _root_.java.util.concurrent.Executors
 
-import org.scalacheck.{Cogen, Arbitrary}
+import org.scalacheck.{Arbitrary, Cogen, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop.forAll
 
@@ -48,11 +48,18 @@ class FutureTest extends SpecLite {
   implicit val cogenThrowable: Cogen[Throwable] =
     Cogen[Int].contramap(_.asInstanceOf[SomeFailure].n)
 
-  checkAll(monoid.laws[Future[Int]])
-  checkAll(monoid.laws[Future[Int @@ Multiplication]])
+  checkAll(monoid.laws[Future[Int]](implicitly, implicitly, futureArb))
+  checkAll(monoid.laws[Future[Int @@ Multiplication]](implicitly, implicitly, futureArb))
+
+
+  def futureSuccessArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
+    Arbitrary(A.arbitrary.map(Future.successful))
 
   def futureArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
-    Arbitrary(A.arbitrary.map(Future.successful))
+    Arbitrary(Gen.oneOf(
+      futureSuccessArb[A].arbitrary,
+      ArbitraryThrowable.arbitrary.map(Future.failed)
+    ))
 
   val `Arbitrary[Throwable => Future[Int]]` : Arbitrary[Throwable => Future[Int]] =
     Arbitrary.arbFunction1(futureArb, implicitly)
@@ -64,7 +71,7 @@ class FutureTest extends SpecLite {
   // Should fail to compile by default: implicitly[Comonad[Future]]
   {
     implicit val cm: Comonad[Future] = futureComonad(duration)
-    checkAll(comonad.laws[Future](implicitly, futureArb, implicitly, implicitly))
+    checkAll(comonad.laws[Future](implicitly, futureSuccessArb, implicitly, implicitly))
   }
 
   "issues 964" ! {
