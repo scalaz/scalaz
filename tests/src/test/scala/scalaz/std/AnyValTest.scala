@@ -38,6 +38,11 @@ object AnyValTest extends SpecLite {
     checkAll("Boolean", monoid.laws[Boolean])
   }
 
+  {
+    implicit val B = std.anyVal.booleanInstance.disjunction
+    checkAll("Boolean", monoid.laws[Boolean])
+  }
+
   checkAll("Int @@ Multiplication", monoid.laws[Int @@ Multiplication])
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
@@ -76,5 +81,33 @@ object AnyValTest extends SpecLite {
 
     M.unfoldlSum(5)(f) must_=== Tag(0)
     M.unfoldrSum(5)(g) must_=== Tag(0)
+  }
+
+  "conjunction should terminate when encountering false" in {
+    val M = booleanInstance.conjunction
+
+    val f: Int => Maybe[(Int, Boolean)] = i => {
+      if(i > 0) Maybe.just((i-1, true))
+      else if(i == 0) Maybe.just((i-1, false))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== false
+    M.unfoldrSum(5)(g) must_=== false
+  }
+
+  "disjunction should terminate when encountering true" in {
+    val M = booleanInstance.disjunction
+
+    val f: Int => Maybe[(Int, Boolean)] = i => {
+      if(i > 0) Maybe.just((i-1, false))
+      else if(i == 0) Maybe.just((i-1, true))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== true
+    M.unfoldrSum(5)(g) must_=== true
   }
 }

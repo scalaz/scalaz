@@ -32,6 +32,8 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
+  import Tags.{Conjunction, Disjunction}
+
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
     override def shows(f: Boolean) = f.toString
 
@@ -51,21 +53,13 @@ trait AnyValInstances {
 
     override def equalIsNatural: Boolean = true
 
-    object conjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 && f2
+    val conjunction: Monoid[Boolean] =
+      Conjunction.unsubst[Monoid, Boolean](booleanConjunctionNewTypeInstance)
 
-      def zero: Boolean = true
-    }
-
-    object disjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 || f2
-
-      def zero = false
-    }
+    val disjunction: Monoid[Boolean] =
+      Disjunction.unsubst[Monoid, Boolean](booleanDisjunctionNewTypeInstance)
 
   }
-
-  import Tags.{Conjunction, Disjunction}
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(Tag.unwrap(f1) || Tag.unwrap(f2))
@@ -85,6 +79,26 @@ trait AnyValInstances {
     override def min = Disjunction.subst(Enum[Boolean].min)
 
     override def max = Disjunction.subst(Enum[Boolean].max)
+
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Boolean @@ Disjunction, S)]): Maybe[Boolean @@ Disjunction] = {
+      val f0 = Disjunction.unsubst[λ[x => S => Maybe[(x, S)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((b, s)) => b || go(s)
+        case _ => false
+      }
+      f0(s) map { case (b, s) => Disjunction(b || go(s)) }
+    }
+
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Disjunction)]): Maybe[Boolean @@ Disjunction] = {
+      val f0 = Disjunction.unsubst[λ[x => S => Maybe[(S, x)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((s, b)) => b || go(s)
+        case _ => false
+      }
+      f0(s) map { case (s, b) => Disjunction(b || go(s)) }
+    }
 
   }
 
@@ -106,6 +120,26 @@ trait AnyValInstances {
     override def min = Conjunction.subst(Enum[Boolean].min)
 
     override def max = Conjunction.subst(Enum[Boolean].max)
+
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Boolean @@ Conjunction, S)]): Maybe[Boolean @@ Conjunction] = {
+      val f0 = Conjunction.unsubst[λ[x => S => Maybe[(x, S)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((b, s)) => b && go(s)
+        case _ => true
+      }
+      f0(s) map { case (b, s) => Conjunction(b && go(s)) }
+    }
+
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Conjunction)]): Maybe[Boolean @@ Conjunction] = {
+      val f0 = Conjunction.unsubst[λ[x => S => Maybe[(S, x)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((s, b)) => b && go(s)
+        case _ => true
+      }
+      f0(s) map { case (s, b) => Conjunction(b && go(s)) }
+    }
 
   }
 
