@@ -49,11 +49,11 @@ object PlusEmpty {
   @inline def apply[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F] = F
 
   ////
-  implicit def liftPlusEmpty[M[_], N[_]](implicit M: Monad[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
+  implicit def liftPlusEmpty[M[_], N[_]](implicit M: Applicative[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
     new PlusEmpty[λ[α => M[N[α]]]] {
       def empty[A] = M.point(P.empty[A])
       def plus[A](a: M[N[A]], b: => M[N[A]]): M[N[A]] =
-        M.bind(a) { a0 => M.map(b) { P.plus(a0, _) } }
+        M.apply2(a, b)(P.plus(_, _))
     }
   ////
 }
