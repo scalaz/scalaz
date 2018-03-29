@@ -102,6 +102,18 @@ object MaybeTest extends SpecLite {
 
   "fromNullable(notNull) is just" ! forAll { (s: String) => Maybe.fromNullable(s) must_=== just(s) }
 
+  "Maybe addition should terminate when encountering the first Just" in {
+    val P = PlusEmpty[Maybe]
+
+    val f: Int => Maybe[(Maybe[String], Int)] = i => {
+      if (i > 0) just((Maybe.empty, i-1))
+      else if (i == 0) just((just("Stop"), i-1))
+      else sys.error("BOOM!")
+    }
+
+    P.unfoldrPsum(5)(f) must_=== Just("Stop")
+  }
+
   object instances {
     def equal[A: Equal] = Equal[Maybe[A]]
     def order[A: Order] = Order[Maybe[A]]

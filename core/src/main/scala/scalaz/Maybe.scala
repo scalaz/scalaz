@@ -323,6 +323,21 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
       def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
 
+      override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(Maybe[A], S)]): Maybe[Maybe[A]] = {
+        @scala.annotation.tailrec
+        def go(s: S): Maybe[A] = f(s) match {
+          case Just((ma, s)) => ma match {
+            case a @ Just(_) => a
+            case _ => go(s)
+          }
+          case Empty() => Empty()
+        }
+        f(seed) map { case (ma, s) => ma match {
+          case a @ Just(_) => a
+          case Empty() => go(s)
+        }}
+      }
+
       override def foldRight[A, B](fa: Maybe[A], z: => B)(f: (A, => B) => B) =
         fa.cata(f(_, z), z)
 
