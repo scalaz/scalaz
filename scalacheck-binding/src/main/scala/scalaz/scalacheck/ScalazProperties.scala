@@ -229,7 +229,10 @@ object ScalazProperties {
     def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
       newProperties("apply") { p =>
+        implicit val r: Reducer[F[Int], F[Int]] = F.liftReducer(Reducer.identityReducer[Int])
+
         p.include(functor.laws[F])
+        p.include(reducer.laws[F[Int], F[Int]])
         p.property("composition") = self.composition[F, Int, Int, Int]
       }
   }

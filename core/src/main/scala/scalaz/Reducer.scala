@@ -19,7 +19,7 @@ import scalaz.Tags.Conjunction
  * Based on the Reducer Haskell library by Edward Kmett
  * (https://hackage.haskell.org/package/reducers).
  */
-sealed abstract class Reducer[C, M] {
+trait Reducer[C, M] {
   implicit def semigroup: Semigroup[M]
 
   def unit(c: C): M
