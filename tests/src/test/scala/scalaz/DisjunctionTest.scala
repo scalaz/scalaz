@@ -33,6 +33,15 @@ object DisjunctionTest extends SpecLite {
     \/.fromTryCatchThrowable[Int, Bar](throw foo).mustThrowA[Foo]
   }
 
+  "fromPartial" in {
+    // the JVM number parsers give useless error messages. Prefer .parseInt and
+    // friends from scalaz.std.syntax.string, giving hand-crafted error messages
+    // as of scalaz 7.3.0.
+    \/.fromPartial("foo".toInt)(_.getMessage) must_=== \/.left("For input string: \"foo\"")
+
+    \/.fromPartial("1".toInt)(_.getMessage) must_=== \/.right(1)
+  }
+
   "recover" in {
     sealed trait Foo
     case object Bar extends Foo

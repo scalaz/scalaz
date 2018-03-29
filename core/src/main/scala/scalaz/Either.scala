@@ -368,17 +368,46 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
+  @deprecated("Throwable is not referentially transparent, use fromPartial", "7.2.21")
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 
+  @deprecated("Throwable is not referentially transparent, use fromPartial", "7.2.21")
   def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
     \/-(a)
   } catch {
     case NonFatal(t) => -\/(t)
   }
+
+  /**
+   * Wrap a call to a deterministic partial function, making a total function.
+   * May be used to interface with legacy methods that do not have an FP
+   * equivalent.
+   *
+   * The `err` callback must convert the non-referentially transparent
+   * `Exception` into a data type. The caller is trusted not to allow
+   * non-referentially transparent parts (for example, the stack trace) to
+   * escape into the `A` data type.
+   *
+   * Note that exceptions are extremely inefficient. Callers should consider
+   * validating the input to their partial function and exiting early.
+   *
+   * If no useful information can be obtained from the `Exception`, prefer
+   * [[scalaz.Maybe#fromPartial]].
+   *
+   * For interfacing with non-deterministic blocks of code that may or may not
+   * throw `Throwable`, use [[scalaz.effect.IO]].
+   *
+   * For interfacing with deterministic functions that violate the type system
+   * by returning `null`, use [[scalaz.Maybe#fromNullable]].
+   */
+  def fromPartial[A, B](f: => B)(err: Exception => A): A \/ B =
+    try \/-(f) catch {
+      case e: Exception => -\/(err(e))
+    }
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec

@@ -176,17 +176,30 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
+  @deprecated("Not referentially transparent, use fromPartial", "7.2.21")
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Maybe[T] = try {
     just(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => empty
   }
 
+  @deprecated("NonFatal is too forgiving, use fromPartial", "7.2.21")
   def fromTryCatchNonFatal[T](a: => T): Maybe[T] = try {
     just(a)
   } catch {
     case NonFatal(t) => empty
   }
+
+  /**
+   * For interfacing with legacy, deterministic, partial functions. See
+   * [[\/.fromPartial]] for a further details.
+   */
+  def fromPartial[T](a: => T): Maybe[T] = try {
+    just(a)
+  } catch {
+    case e: Exception => empty
+  }
+
 }
 
 sealed abstract class MaybeInstances1 {
