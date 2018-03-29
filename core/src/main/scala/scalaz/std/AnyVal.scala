@@ -305,7 +305,7 @@ trait AnyValInstances {
 
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(Tag.unwrap(a1), Tag.unwrap(a2))
 
-    override def unfoldlSum[S](s: S)(f: S => Maybe[(S, Int @@ Multiplication)]) = {
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Int @@ Multiplication)]) = {
       val f0 = Multiplication.unsubst[λ[x => S => Maybe[(S, x)]], Int](f)
 
       @tailrec def go(s: S, acc: Int): Int =
@@ -315,11 +315,11 @@ trait AnyValInstances {
           case _ => acc
         }
 
-      Multiplication(f0(s) map { case (s, i) => go(s, i) } getOrElse 1)
+      f0(s) map { case (s, i) => Multiplication(go(s, i)) }
     }
 
-    override def unfoldrSum[S](s: S)(f: S => Maybe[(Int @@ Multiplication, S)]) =
-      unfoldlSum[S](s)(f(_) map (_.swap))
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Int @@ Multiplication, S)]) =
+      unfoldlSumOpt[S](s)(f(_) map (_.swap))
   }
 
   implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
