@@ -81,11 +81,14 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(G)
   final def sequenceS_[S, B](implicit ev: A === State[S,B]): State[S,Unit] = F.sequenceS_(ev.subst[F](self))
   def sequenceF_[M[_],B](implicit ev: F[A] <~< F[Free[M,B]]): Free[M, Unit] = F.sequenceF_(ev(self))
-  final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.msuml(ev.subst[F](self))
-  final def msumlU(implicit G: Unapply[PlusEmpty, A]): G.M[G.A] = F.msumlU(self)
   final def asum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.asum(ev.subst[F](self))(G)
   final def psum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.psum(ev.subst[F](self))(G)
   final def psumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.psumMap(self)(f)(G)
+
+  @deprecated("use psum", "7.3.0")
+  final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.msuml(ev.subst[F](self))
+  @deprecated("use psum", "7.3.0")
+  final def msumlU(implicit G: Unapply[PlusEmpty, A]): G.M[G.A] = F.msumlU(self)
   ////
 }
 

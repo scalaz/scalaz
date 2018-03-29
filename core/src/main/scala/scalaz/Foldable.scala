@@ -283,14 +283,13 @@ trait Foldable[F[_]]  { self =>
   def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
     foldLeft1Opt(fa)(A.append(_, _))
 
-  // should be revisited by https://github.com/scalaz/scalaz/issues/1663
   /**
    * Map elements to `G[B]` and sum using a polymorphic monoid ([[PlusEmpty]]).
    * Should support early termination, i.e. mapping and summing
    * no more elements than is needed to determine the result.
    */
   def psumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
-    foldRight(fa, G.empty[B])((a, as) => G.plus(f(a), as))
+    foldMap(fa)(f)(G.monoid)
 
   /**
    * Sum using a polymorphic monoid ([[PlusEmpty]]).
@@ -298,15 +297,17 @@ trait Foldable[F[_]]  { self =>
    * elements than is needed to determine the result.
    */
   def psum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
-    foldRight(fa, G.empty[A])(G.plus[A](_, _))
+    fold(fa)(G.monoid)
 
   /** Alias for [[psum]]. `asum` is the name used in Haskell. */
   final def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     psum(fa)
 
+  @deprecated("use psum", "7.3.0")
   def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
-    foldLeft(fa, G.empty[A])(G.plus[A](_, _))
+    psum(fa)
 
+  @deprecated("use psum", "7.3.0")
   def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
     msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
 
