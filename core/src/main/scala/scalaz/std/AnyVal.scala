@@ -1,7 +1,9 @@
 package scalaz
 package std
 
+import scala.annotation.tailrec
 import scalaz._
+import Maybe.Just
 import Id._
 
 trait AnyValInstances {
@@ -268,6 +270,22 @@ trait AnyValInstances {
     override def max = Multiplication.subst(Enum[Int].max)
 
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(Tag.unwrap(a1), Tag.unwrap(a2))
+
+    override def unfoldlSum[S](s: S)(f: S => Maybe[(S, Int @@ Multiplication)]) = {
+      val f0 = Multiplication.unsubst[λ[x => S => Maybe[(S, x)]], Int](f)
+
+      @tailrec def go(s: S, acc: Int): Int =
+        if (acc == 0) 0
+        else f0(s) match {
+          case Just((s, i)) => go(s, i * acc)
+          case _ => acc
+        }
+
+      Multiplication(f0(s) map { case (s, i) => go(s, i) } getOrElse 1)
+    }
+
+    override def unfoldrSum[S](s: S)(f: S => Maybe[(Int @@ Multiplication, S)]) =
+      unfoldlSum[S](s)(f(_) map (_.swap))
   }
 
   implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {

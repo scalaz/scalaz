@@ -7,6 +7,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Arbitrary
 import Tags._
+import syntax.contravariant._
 
 object AnyValTest extends SpecLite {
 
@@ -37,6 +38,7 @@ object AnyValTest extends SpecLite {
     checkAll("Boolean", monoid.laws[Boolean])
   }
 
+  checkAll("Int @@ Multiplication", monoid.laws[Int @@ Multiplication])
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
@@ -62,4 +64,17 @@ object AnyValTest extends SpecLite {
   checkAll("Long @@ Multiplication", enum.laws[Long @@ Multiplication])
   checkAll("Short @@ Multiplication", enum.laws[Short @@ Multiplication])
 
+  "Int multiplication should terminate when encountering 0" in {
+    val M = Monoid[Int @@ Multiplication]
+    implicit val S: Show[Int @@ Multiplication] = Show[Int].contramap(Tag.unwrap)
+
+    val f: Int => Maybe[(Int, Int @@ Multiplication)] = i => {
+      if(i >= 0) Maybe.just((i-1, Tag(i)))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== Tag(0)
+    M.unfoldrSum(5)(g) must_=== Tag(0)
+  }
 }
