@@ -34,12 +34,19 @@ object DisjunctionTest extends SpecLite {
   }
 
   "attempt" in {
+    import scalaz.syntax.either._
+
     // the JVM number parsers give useless error messages. Prefer .parseInt and
     // friends from scalaz.std.syntax.string, giving hand-crafted error messages
     // as of scalaz 7.3.0.
-    \/.attempt("foo".toInt)(_.getMessage) must_=== \/.left("For input string: \"foo\"")
+    {
+      for {
+        s <- "foo".right[String]
+        i <- \/.attempt(_.getMessage + " not an integer")(s.toInt)
+      } yield i
+    } must_=== \/.left("For input string: \"foo\" not an integer")
 
-    \/.attempt("1".toInt)(_.getMessage) must_=== \/.right(1)
+    \/.attempt(_.getMessage + " not an integer")("1".toInt) must_=== \/.right(1)
   }
 
   "recover" in {
