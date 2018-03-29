@@ -95,10 +95,10 @@ object MaybeTest extends SpecLite {
 
   "fromNullable(notNull) is just" ! forAll { (s: String) => Maybe.fromNullable(s) must_=== just(s) }
 
-  "fromPartial" in {
-    Maybe.fromPartial("foo".toInt) must_=== Maybe.empty
+  "attempt" in {
+    Maybe.attempt("foo".toInt) must_=== Maybe.empty
 
-    Maybe.fromPartial("1".toInt) must_=== Maybe.just(1)
+    Maybe.attempt("1".toInt) must_=== Maybe.just(1)
   }
 
   object instances {

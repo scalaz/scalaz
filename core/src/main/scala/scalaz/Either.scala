@@ -368,14 +368,14 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
-  @deprecated("Throwable is not referentially transparent, use fromPartial", "7.2.21")
+  @deprecated("Throwable is not referentially transparent, use attempt", "7.2.21")
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 
-  @deprecated("Throwable is not referentially transparent, use fromPartial", "7.2.21")
+  @deprecated("Throwable is not referentially transparent, use attempt", "7.2.21")
   def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
     \/-(a)
   } catch {
@@ -396,7 +396,7 @@ object \/ extends DisjunctionInstances {
    * validating the input to their partial function and exiting early.
    *
    * If no useful information can be obtained from the `Exception`, prefer
-   * [[scalaz.Maybe#fromPartial]].
+   * [[scalaz.Maybe#attempt]].
    *
    * For interfacing with non-deterministic blocks of code that may or may not
    * throw `Throwable`, use [[scalaz.effect.IO]].
@@ -404,7 +404,7 @@ object \/ extends DisjunctionInstances {
    * For interfacing with deterministic functions that violate the type system
    * by returning `null`, use [[scalaz.Maybe#fromNullable]].
    */
-  def fromPartial[A, B](f: => B)(err: Exception => A): A \/ B =
+  def attempt[A, B](f: => B)(err: Exception => A): A \/ B =
     try \/-(f) catch {
       case e: Exception => -\/(err(e))
     }
