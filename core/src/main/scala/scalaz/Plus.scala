@@ -42,5 +42,18 @@ object Plus {
 
   ////
 
+  private[this] trait LiftedPlus[G[_], F[_]] extends Plus[λ[a => G[F[a]]]] {
+    implicit def G: Apply[G]
+    implicit def F: Plus[F]
+
+    def plus[A](x: G[F[A]], y: => G[F[A]]): G[F[A]] = G.apply2(x, y)(F.plus(_, _))
+  }
+
+  def liftPlus[G[_], F[_]](implicit G0: Apply[G], F0: Plus[F]): Plus[λ[a => G[F[a]]]] =
+    new LiftedPlus[G, F] {
+      def G = G0
+      def F = F0
+    }
+
   ////
 }
