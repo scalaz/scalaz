@@ -42,11 +42,11 @@ object DisjunctionTest extends SpecLite {
     {
       for {
         s <- "foo".right[String]
-        i <- \/.attempt(_.getMessage + " not an integer")(s.toInt)
+        i <- \/.attempt(s.toInt)(_.getMessage + " not an integer")
       } yield i
     } must_=== \/.left("For input string: \"foo\" not an integer")
 
-    \/.attempt(_.getMessage + " not an integer")("1".toInt) must_=== \/.right(1)
+    \/.attempt("1".toInt)(_.getMessage) must_=== \/.right(1)
   }
 
   "recover" in {

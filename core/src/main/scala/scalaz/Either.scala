@@ -404,7 +404,7 @@ object \/ extends DisjunctionInstances {
    * For interfacing with deterministic functions that violate the type system
    * by returning `null`, use [[scalaz.Maybe#fromNullable]].
    */
-  def attempt[A, B](err: Exception => A)(f: => B): A \/ B =
+  def attempt[A, B](f: => B)(err: Exception => A): A \/ B =
     try \/-(f) catch {
       case e: Exception => -\/(err(e))
     }
