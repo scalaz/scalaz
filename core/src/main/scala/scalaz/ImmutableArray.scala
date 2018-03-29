@@ -15,9 +15,9 @@ import syntax.Ops
 sealed abstract class ImmutableArray[+A] {
   protected[this] def elemTag: ClassTag[A]
 
-  @deprecated("7.2.19", "removed in scalaz 7.3: not total")
+  @deprecated("removed in scalaz 7.3: not total", since = "7.2.19")
   def apply(index: Int): A
-  @deprecated("7.2.19", "removed in scalaz 7.3: not total")
+  @deprecated("removed in scalaz 7.3: not total", since = "7.2.19")
   def copyToArray[B >: A](xs: Array[B], start: Int, len: Int): Unit
 
   def length: Int
