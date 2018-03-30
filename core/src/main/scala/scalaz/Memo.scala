@@ -64,7 +64,7 @@ object Memo extends MemoInstances {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
-  @deprecated("7.2.19", "removed in scalaz 7.3: leaks mutable state, not thread safe")
+  @deprecated("removed in scalaz 7.3: leaks mutable state, not thread safe", since = "7.2.19")
   def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
     memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
@@ -72,14 +72,14 @@ object Memo extends MemoInstances {
     * Nonsensical if `K` lacks a meaningful `hashCode` and
     * `java.lang.Object.equals`.
     */
-  @deprecated("7.2.19", "removed in scalaz 7.3: not thread safe, relies on Object")
+  @deprecated("removed in scalaz 7.3: not thread safe, relies on Object", since = "7.2.19")
   def mutableHashMapMemo[K, V]: Memo[K, V] =
     mutableMapMemo(new collection.mutable.HashMap[K, V])
 
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
-  @deprecated("7.2.19", "removed in scalaz 7.3: not thread safe, relies on Object, not efficient")
+  @deprecated("removed in scalaz 7.3: not thread safe, relies on Object, not efficient", since = "7.2.19")
   def weakHashMapMemo[K, V]: Memo[K, V] =
     mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
 
@@ -105,7 +105,7 @@ object Memo extends MemoInstances {
   /** Cache results in a list map.  Nonsensical unless `K` has
     * a meaningful `java.lang.Object.equals`.  $immuMapNote
     */
-  @deprecated("7.2.19", "removed in scalaz 7.3: not efficient")
+  @deprecated("removed in scalaz 7.3: not efficient", since = "7.2.19")
   def immutableListMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new ListMap[K, V])
 
   /** Cache results in a tree map. $immuMapNote */

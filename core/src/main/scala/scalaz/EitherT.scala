@@ -244,12 +244,12 @@ object EitherT extends EitherTInstances {
   }
 
   /** Construct a left disjunction value. */
-  @deprecated("7.2.18", "prefer leftT, this method's meaning will change in scalaz 7.3")
+  @deprecated("prefer leftT; this method's meaning will change in scalaz 7.3", since = "7.2.18")
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left))
 
   /** Construct a right disjunction value. */
-  @deprecated("7.2.18", "prefer rightT, this method's meaning will change in scalaz 7.3")
+  @deprecated("prefer rightT; this method's meaning will change in scalaz 7.3", since = "7.2.18")
   def right[F[_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(b)(\/.right))
 
