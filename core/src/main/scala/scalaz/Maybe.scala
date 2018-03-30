@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 import scala.reflect.ClassTag
 import Ordering._
@@ -306,8 +307,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
       def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
 
-      @scala.annotation.tailrec
-      def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
+      @tailrec def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
         f(a) match {
           case Empty() => Empty()
           case Just(-\/(a)) => tailrecM(a)(f)
@@ -324,8 +324,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
       def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
 
       override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(Maybe[A], S)]): Maybe[Maybe[A]] = {
-        @scala.annotation.tailrec
-        def go(s: S): Maybe[A] = f(s) match {
+        @tailrec def go(s: S): Maybe[A] = f(s) match {
           case Just((ma, s)) => ma match {
             case a @ Just(_) => a
             case _ => go(s)
@@ -335,6 +334,20 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
         f(seed) map { case (ma, s) => ma match {
           case a @ Just(_) => a
           case Empty() => go(s)
+        }}
+      }
+
+      override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(Maybe[A], S)])(implicit r: Reducer[A, B]): Maybe[Maybe[B]] = {
+        @tailrec def go(acc: B, s: S): Maybe[B] = f(s) match {
+          case Just((ma, s)) => ma match {
+            case Just(a) => go(r.snoc(acc, a), s)
+            case _ => Empty()
+          }
+          case _ => Just(acc)
+        }
+        f(seed) map { case (ma, s) => ma match {
+          case Just(a) => go(r.unit(a), s)
+          case _ => Empty()
         }}
       }
 
