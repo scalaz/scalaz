@@ -197,7 +197,7 @@ object Maybe extends MaybeInstances {
   def attempt[T](a: => T): Maybe[T] = try {
     just(a)
   } catch {
-    case e: Exception => empty
+    case NonFatal(_) => empty
   }
 
 }

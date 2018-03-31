@@ -376,11 +376,7 @@ object \/ extends DisjunctionInstances {
   }
 
   @deprecated("Throwable is not referentially transparent, use attempt", "7.2.21")
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
-    \/-(a)
-  } catch {
-    case NonFatal(t) => -\/(t)
-  }
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = attempt(a)(identity)
 
   /**
    * Wrap a call to a deterministic partial function, making a total function.
@@ -388,14 +384,14 @@ object \/ extends DisjunctionInstances {
    * equivalent.
    *
    * The `err` callback must convert the non-referentially transparent
-   * `Exception` into a data type. The caller is trusted not to allow
-   * non-referentially transparent parts (for example, the stack trace) to
-   * escape into the `A` data type.
+   * `Throwable` (which is anything caught by the `NonFatal` construct) into a
+   * data type. The caller is trusted not to allow the stack trace to escape
+   * into the `A` data type.
    *
    * Note that exceptions are extremely inefficient. Callers should consider
    * validating the input to their partial function and exiting early.
    *
-   * If no useful information can be obtained from the `Exception`, prefer
+   * If no useful information can be obtained from the `Throwable`, prefer
    * [[scalaz.Maybe#attempt]].
    *
    * For interfacing with non-deterministic blocks of code that may or may not
@@ -404,9 +400,9 @@ object \/ extends DisjunctionInstances {
    * For interfacing with deterministic functions that violate the type system
    * by returning `null`, use [[scalaz.Maybe#fromNullable]].
    */
-  def attempt[A, B](f: => B)(err: Exception => A): A \/ B =
+  def attempt[A, B](f: => B)(err: Throwable => A): A \/ B =
     try \/-(f) catch {
-      case e: Exception => -\/(err(e))
+      case NonFatal(t) => -\/(err(t))
     }
 
   /** Spin in tail-position on the right value of the given disjunction. */
