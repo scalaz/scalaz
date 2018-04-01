@@ -8,7 +8,7 @@ import scalaz.data.Disjunction._
  * either completed with a value, failed because of an uncaught error thrown
  * from within the fiber, or interrupted externally by another fiber.
  */
-sealed trait BracketResult[A] { self =>
+sealed trait BracketResult[E, A] { self =>
   import BracketResult._
 
   final def succeeded: Boolean = self match {
@@ -36,7 +36,7 @@ sealed trait BracketResult[A] { self =>
   }
 }
 object BracketResult {
-  final case class Completed[A](value: A) extends BracketResult[A]
-  final case class Failed[A](error: Throwable) extends BracketResult[A]
-  final case class Interrupted[A](error: Throwable) extends BracketResult[A]
+  final case class Completed[E, A](value: A) extends BracketResult[E, A]
+  final case class Failed[E, A](error: Throwable) extends BracketResult[E, A]
+  final case class Interrupted[E, A](error: Throwable) extends BracketResult[E, A]
 }

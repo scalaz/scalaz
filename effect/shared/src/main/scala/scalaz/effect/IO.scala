@@ -209,13 +209,13 @@ sealed abstract class IO[E, A] { self =>
    * }
    * }}}
    */
-  final def bracket[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] = IO.Bracket(this, (_: BracketResult[B], a: A) => release(a), use)
+  final def bracket[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] = IO.Bracket(this, (_: BracketResult[E, B], a: A) => release(a), use)
 
   /**
    * A more powerful version of `bracket` that provides information on whether
    * or not `use` succeeded to the release action.
    */
-  final def bracket0[B](release: (BracketResult[B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] = IO.Bracket(this, release, use)
+  final def bracket0[B](release: (BracketResult[E, B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] = IO.Bracket(this, release, use)
 
   /**
    * A less powerful variant of `bracket` where the value produced by this
@@ -235,7 +235,7 @@ sealed abstract class IO[E, A] { self =>
    * Executes the release action only if there was an error.
    */
   final def bracketOnError[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
-    bracket0((r: BracketResult[B], a: A) => r match {
+    bracket0((r: BracketResult[E, B], a: A) => r match {
       case BracketResult.Failed(_) => release(a)
       case BracketResult.Interrupted(_) => release(a)
       case _ => IO.unit
@@ -245,7 +245,7 @@ sealed abstract class IO[E, A] { self =>
    * Runs the specified cleanup action if this action errors, providing the
    * error to the cleanup action. The cleanup action will not be interrupted.
    */
-  final def onError(cleanup: Throwable => IO[E, Unit]): IO[E, A] = IO.unit[E].bracket0((r: BracketResult[A], a: Unit) => r match {
+  final def onError(cleanup: Throwable => IO[E, Unit]): IO[E, A] = IO.unit[E].bracket0((r: BracketResult[E, A], a: Unit) => r match {
     case BracketResult.Failed(e) => cleanup(e)
     case BracketResult.Interrupted(e) => cleanup(e)
     case _ => IO.unit
@@ -456,6 +456,7 @@ object IO extends IOInstances {
     final val Uninterruptible   = 11
     final val Sleep             = 12
     final val Supervise         = 13
+    final val Interrupt         = 14
   }
   final case class FlatMap[E, A0, A](io: IO[E, A0], flatMapper: A0 => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.FlatMap
@@ -477,7 +478,7 @@ object IO extends IOInstances {
     override final def tag = Tags.Fail
   }
 
-  final case class AsyncEffect[E, A](register: (Throwable \/ A => Unit) => AsyncReturn[A]) extends IO[E, A] {
+  final case class AsyncEffect[E, A](register: (BracketResult[E, A] => Unit) => AsyncReturn[A]) extends IO[E, A] {
     override final def tag = Tags.AsyncEffect
   }
 
@@ -497,7 +498,7 @@ object IO extends IOInstances {
     override final def tag = Tags.Suspend
   }
 
-  final case class Bracket[E, A, B](acquire: IO[E, A], release: (BracketResult[B], A) => IO[E, Unit], use: A => IO[E, B]) extends IO[E, B] {
+  final case class Bracket[E, A, B](acquire: IO[E, A], release: (BracketResult[E, B], A) => IO[E, Unit], use: A => IO[E, B]) extends IO[E, B] {
     override final def tag = Tags.Bracket
   }
 
@@ -511,6 +512,10 @@ object IO extends IOInstances {
 
   final case class Supervise[E, A](value: IO[E, A], error: Throwable) extends IO[E, A] {
     override final def tag = Tags.Supervise
+  }
+
+  final case class Interrupt[E, A](failure: Throwable) extends IO[E, A] {
+    override final def tag = Tags.Interrupt
   }
 
   /**
@@ -583,7 +588,7 @@ object IO extends IOInstances {
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
    * the more expressive variant of this function.
    */
-  final def async[E, A](register: (Throwable \/ A => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
+  final def async[E, A](register: (BracketResult[E, A] => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
     register(callback)
 
     AsyncReturn.later[A]
@@ -597,7 +602,7 @@ object IO extends IOInstances {
    * returning a canceler, which will be used by the runtime to cancel the
    * asynchronous effect if the fiber executing the effect is interrupted.
    */
-  final def async0[E, A](register: (Throwable \/ A => Unit) => AsyncReturn[A]): IO[E, A] = AsyncEffect(register)
+  final def async0[E, A](register: (BracketResult[E, A] => Unit) => AsyncReturn[A]): IO[E, A] = AsyncEffect(register)
 
   /**
    * Returns a computation that will never produce anything. The moral
@@ -628,5 +633,5 @@ object IO extends IOInstances {
   final def require[E, A](t: Throwable): IO[E, Maybe[A]] => IO[E, A] =
     (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](t))(IO.now[E, A](_)))
 
-  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (Throwable \/ Any) => Unit) => }
+  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (BracketResult[Nothing, Any]) => Unit) => }
 }

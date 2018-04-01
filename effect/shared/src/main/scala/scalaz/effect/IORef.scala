@@ -43,8 +43,8 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
   final def tryWrite[E](a: A): IO[E, Boolean] = IO.sync(value.compareAndSet(value.get, a))
 
   /**
-   * Modifies the `IORef` with the specified function. This is not implemented
-   * in terms of `modify0` purely for performance reasons.
+   * Atomically modifies the `IORef` with the specified function. This is not
+   * implemented in terms of `modifyFold` purely for performance reasons.
    */
   final def modify[E](f: A => A): IO[E, A] = IO.sync {
     var loop = true
@@ -62,10 +62,11 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
   }
 
   /**
-   * Modifies the `IORef` with the specified function, which computes a return
-   * value for the modification. This is a more powerful version of `modify`.
+   * Atomically modifies the `IORef` with the specified function, which computes
+   * a return value for the modification. This is a more powerful version of
+   * `modify`.
    */
-  final def modify0[E, B](f: A => (B, A)): IO[E, B] = IO.sync {
+  final def modifyFold[E, B](f: A => (B, A)): IO[E, B] = IO.sync {
     var loop = true
     var b : B = null.asInstanceOf[B]
 
@@ -83,8 +84,9 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
   }
 
   /**
-   * Attempts to modify the `IORef` with the specified function, but aborts
-   * immediately under concurrent modification of the value by other fibers.
+   * Attempts to atomically modify the `IORef` with the specified function, but
+   * aborts immediately under concurrent modification of the value by other
+   * fibers.
    */
   final def tryModify[E](f: A => A): IO[E, Maybe[A]] = IO.sync {
     val current = value.get
@@ -96,10 +98,11 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
   }
 
   /**
-   * Attempts to modify the `IORef` with the specified function, but aborts
-   * immediately under concurrent modification of the value by other fibers.
+   * Attempts to atomically modify the `IORef` with the specified function, but
+   * aborts immediately under concurrent modification of the value by other
+   * fibers.
    */
-  final def tryModify0[E, B](f: A => (B, A)): IO[E, Maybe[B]] = IO.sync {
+  final def tryModifyFold[E, B](f: A => (B, A)): IO[E, Maybe[B]] = IO.sync {
     val current = value.get
 
     val tuple = f(current)
