@@ -279,6 +279,7 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.2.21")
   def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
       rightT(a)
@@ -286,6 +287,7 @@ object EitherT extends EitherTInstances {
       case e if ex.runtimeClass.isInstance(e) => leftT(F.point(e.asInstanceOf[B]))
     }
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.2.21")
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
     try {
       rightT(a)
