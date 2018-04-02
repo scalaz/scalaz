@@ -111,6 +111,12 @@ object MaybeTest extends SpecLite {
     val Unfoo(_, _) = Unfoo("hello", 1)
   }
 
+  "attempt" in {
+    Maybe.attempt("foo".toInt) must_=== Maybe.empty
+
+    Maybe.attempt("1".toInt) must_=== Maybe.just(1)
+  }
+
   "Maybe addition should terminate when encountering the first Just" in {
     val P = PlusEmpty[Maybe]
 

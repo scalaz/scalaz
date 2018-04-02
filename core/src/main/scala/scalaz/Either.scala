@@ -397,17 +397,42 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
-    \/-(a)
-  } catch {
-    case NonFatal(t) => -\/(t)
-  }
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = attempt(a)(identity)
+
+  /**
+   * Wrap a call to a deterministic partial function, making a total function.
+   * May be used to interface with legacy methods that do not have an FP
+   * equivalent.
+   *
+   * The `err` callback must convert the non-referentially transparent
+   * `Throwable` (which is anything caught by the `NonFatal` construct) into a
+   * data type. The caller is trusted not to allow the stack trace to escape
+   * into the `A` data type.
+   *
+   * Note that exceptions are extremely inefficient. Callers should consider
+   * validating the input to their partial function and exiting early.
+   *
+   * If no useful information can be obtained from the `Throwable`, prefer
+   * [[scalaz.Maybe#attempt]].
+   *
+   * For interfacing with non-deterministic blocks of code that may or may not
+   * throw `Throwable`, use [[scalaz.effect.IO]].
+   *
+   * For interfacing with deterministic functions that violate the type system
+   * by returning `null`, use [[scalaz.Maybe#fromNullable]].
+   */
+  def attempt[A, B](f: => B)(err: Throwable => A): A \/ B =
+    try \/-(f) catch {
+      case NonFatal(t) => -\/(err(t))
+    }
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec

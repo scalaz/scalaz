@@ -407,12 +407,14 @@ object Validation extends ValidationInstances {
   def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
     lift(a)(f, fail).toValidationNel
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Validation[E, T] = try {
     Success(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
   }
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
     Success(a)
   } catch {
