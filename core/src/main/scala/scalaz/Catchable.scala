@@ -16,7 +16,6 @@ package scalaz
  * total.
  */
 ////
-@deprecated("No laws, and Throwable is not referentially transparent. Prefer MonadError", "7.2.21")
 trait Catchable[F[_]]  { self =>
   ////
 
