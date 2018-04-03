@@ -368,12 +368,14 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
+  @deprecated("Throwable is not referentially transparent, use attempt", "7.2.21")
   def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 
+  @deprecated("Throwable is not referentially transparent, use attempt", "7.2.21")
   def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = attempt(a)(identity)
 
   /**
