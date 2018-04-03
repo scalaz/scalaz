@@ -1,4 +1,4 @@
-// Copyright (C) 2017 John A. De Goes. All rights reserved.
+// Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
 /**
@@ -9,22 +9,14 @@ package scalaz.effect
  * asynchronous action, `now` which represents a synchronously computed value,
  * or `maybeLater`, which represents an interruptible asynchronous action.
  */
-sealed abstract class AsyncReturn[A] { self =>
-  import AsyncReturn._
-
-  final def fold[Z](later: => Z, now: A => Z, maybeLater: Canceler => Z): Z =
-    self match {
-      case Now(v) => now(v)
-      case MaybeLater(c) => maybeLater(c)
-      case _ => later
-    }
-}
+sealed abstract class AsyncReturn[E, A]
 object AsyncReturn {
-  type Canceler = Throwable => Unit
+  type Interruptor = Throwable => Unit
 
-  private final case object Later extends AsyncReturn[Nothing]
-  final case class Now[A](value: A) extends AsyncReturn[A]
-  final case class MaybeLater[A](canceler: Canceler) extends AsyncReturn[A]
+  private final case object Later extends AsyncReturn[Nothing, Nothing]
+  // TODO: Optimize this common case to less overhead with opaque types
+  final case class Now[E, A](value: FiberResult[E, A]) extends AsyncReturn[E, A]
+  final case class MaybeLater[E, A](interruptor: Interruptor) extends AsyncReturn[E, A]
 
   /**
    * Constructs an `AsyncReturn` that represents an uninterruptible asynchronous
@@ -33,7 +25,7 @@ object AsyncReturn {
    *
    * See `IO.async0` for more information.
    */
-  final def later[A]: AsyncReturn[A] = Later.asInstanceOf[AsyncReturn[A]]
+  final def later[E, A]: AsyncReturn[E, A] = Later.asInstanceOf[AsyncReturn[E, A]]
 
   /**
    * Constructs an `AsyncReturn` that represents a synchronous return. The
@@ -41,7 +33,7 @@ object AsyncReturn {
    *
    * See `IO.async0` for more information.
    */
-  final def now[A](a: A): AsyncReturn[A] = Now(a)
+  final def now[E, A](result: FiberResult[E, A]): AsyncReturn[E, A] = Now(result)
 
   /**
    * Constructs an `AsyncReturn` that represents an interruptible asynchronous
@@ -53,6 +45,6 @@ object AsyncReturn {
    * results are no longer needed because the fiber computing them has been
    * terminated.
    */
-  final def maybeLater[A](canceler: Canceler): AsyncReturn[A] =
-    MaybeLater(canceler)
+  final def maybeLater[E, A](interruptor: Interruptor): AsyncReturn[E, A] =
+    MaybeLater(interruptor)
 }

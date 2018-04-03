@@ -34,7 +34,7 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
    * Writes a new value to the `IORef` without providing a guarantee of
    * immediate consistency.
    */
-  final def writeAsync[E](a: A): IO[E, Unit] = IO.sync(value.lazySet(a))
+  final def writeLater[E](a: A): IO[E, Unit] = IO.sync(value.lazySet(a))
 
   /**
    * Attempts to write a new value to the `IORef`, but aborts immediately under

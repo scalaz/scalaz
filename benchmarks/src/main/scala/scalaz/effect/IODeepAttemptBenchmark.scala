@@ -54,7 +54,7 @@ class IODeepAttemptBenchmark {
 
   @Benchmark
   def scalazDeepAttempt(): BigInt = {
-    def descend(n: Int): IO[Throwable, BigInt] =
+    def descend(n: Int): IO[Error, BigInt] =
       if (n == depth) IO.fail(new Error("Oh noes!"))
       else if (n == halfway) descend(n + 1).attempt.map(_.fold[BigInt](_ => 50)(a => a))
       else descend(n + 1).map(_ + n)
