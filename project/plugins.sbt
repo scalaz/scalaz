@@ -18,7 +18,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.4.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.18")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.2.0")
 
 // https://github.com/ThoughtWorksInc/sbt-api-mappings/issues/8
 libraryDependencies ++= {
