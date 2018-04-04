@@ -151,9 +151,8 @@ object build {
     }),
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 12)) =>
+        case Some((2, v)) if v >= 12 =>
           Seq(
-            "-Xsource:2.12",
             "-opt:l:method,inline",
             "-opt-inline-from:scalaz.**"
           )
