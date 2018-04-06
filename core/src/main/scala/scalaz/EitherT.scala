@@ -508,7 +508,7 @@ private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E]
 private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[F, E, ?]] with EitherTMonad[F, E] {
   implicit def F: Nondeterminism[F]
 
-  def chooseAny[A](head: EitherT[F, E, A], tail: Seq[EitherT[F, E, A]]): EitherT[F, E, (A, Seq[EitherT[F, E, A]])] =
+  def chooseAny[A](head: EitherT[F, E, A], tail: IList[EitherT[F, E, A]]): EitherT[F, E, (A, IList[EitherT[F, E, A]])] =
     EitherT(F.map(F.chooseAny(head.run, tail map (_.run))) {
       case (a, residuals) =>
         a.map((_, residuals.map(new EitherT(_))))
