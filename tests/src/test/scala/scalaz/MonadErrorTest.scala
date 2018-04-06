@@ -21,11 +21,10 @@ object MonadErrorTest extends SpecLite {
     type In = String
     type Out[a] = Int \/ a
     type MT[a] = ReaderT[Out, In, a]
-    implicit val isoReaderT: Decoder <~> MT =
-      new IsoFunctorTemplate[Decoder, MT] {
-        def from[A](fa: MT[A]) = instance(fa.run(_))
-        def to[A](fa: Decoder[A]) = ReaderT[Out, In, A](fa.decode)
-      }
+    implicit val isoReaderT: Decoder <~> MT = Kleisli.iso[Decoder, In, Out]( // type inference doesn't work
+      instance = λ[λ[a => (In => Out[a])] ~> Decoder](instance(_)),
+      decode   = λ[Decoder ~> λ[a => (In => Out[a])]](_.decode)
+    )
 
     implicit val monad: MonadError[Decoder, Int] = MonadError.fromIso(isoReaderT)
   }
