@@ -8,26 +8,26 @@ import Isomorphism.{ <~>, IsoFunctorTemplate }
 object MonadErrorTest extends SpecLite {
 
   trait Decoder[A] {
-    def decode(s: String): String \/ A
+    def decode(s: String): Int \/ A
   }
   object Decoder {
     @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
-    @inline def instance[A](f: String => String \/ A): Decoder[A] = new Decoder[A] {
-      override def decode(s: String): String \/ A = f(s)
+    @inline def instance[A](f: String => Int \/ A): Decoder[A] = new Decoder[A] {
+      override def decode(s: String): Int \/ A = f(s)
     }
 
-    // type aliases are needed to help with type inference, even kind-projector
-    // fails us...
-    type Out[a] = String \/ a
-    type MT[a] = ReaderT[Out, String, a]
     implicit val string: Decoder[String] = instance(_.right)
+
+    type In = String
+    type Out[a] = Int \/ a
+    type MT[a] = ReaderT[Out, In, a]
     implicit val isoReaderT: Decoder <~> MT =
       new IsoFunctorTemplate[Decoder, MT] {
         def from[A](fa: MT[A]) = instance(fa.run(_))
-        def to[A](fa: Decoder[A]) = ReaderT[Out, String, A](fa.decode)
+        def to[A](fa: Decoder[A]) = ReaderT[Out, In, A](fa.decode)
       }
 
-    implicit val monad: MonadError[Decoder, String] = MonadError.fromIso(isoReaderT)
+    implicit val monad: MonadError[Decoder, Int] = MonadError.fromIso(isoReaderT)
   }
 
   "fromIsoWithMonadError" in {
@@ -35,11 +35,11 @@ object MonadErrorTest extends SpecLite {
   }
 
   "emap syntax" in {
-    def f(s: String): String \/ Char =
+    def f(s: String): Int \/ Char =
       if (s.length == 1) s(0).right
-      else s"not a char: $s".left
+      else 1.left
 
-    Decoder[String].emap(f).decode("hello") must_=== "not a char: hello".left
+    Decoder[String].emap(f).decode("hello") must_=== 1.left
     Decoder[String].emap(f).decode("g") must_=== 'g'.right
   }
 
