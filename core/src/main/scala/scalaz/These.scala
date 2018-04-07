@@ -336,22 +336,21 @@ object \&/ extends TheseInstances {
         S.append(a1, a2)
     }
 
-  @annotation.tailrec
   def tailrecM[L, A, B](a: A)(f: A => L \&/ (A \/ B))(implicit L: Semigroup[L]): L \&/ B = {
-    def go(l0: L)(a0: A): L \&/ (A \/ B) =
-      f(a0) match {
-        case This(l1) => \&/.This(L.append(l0, l1))
-        case That(e) => \&/.Both(l0, e)
-        case Both(l1, e) => \&/.Both(L.append(l0, l1), e)
-      }
-
-    f(a) match {
-      case t @ This(l) => t.coerceThat
-      case That(-\/(a0)) => tailrecM(a0)(f)
+    @annotation.tailrec
+    def go(x: L \&/ (A \/ B)): L \&/ B = x match {
+      case t @ This(_) => t.coerceThat
+      case That(-\/(a)) => go(f(a))
       case That(\/-(b)) => \&/.That(b)
-      case Both(l, -\/(a0)) => tailrecM(a0)(go(l))
+      case Both(l, -\/(a)) => f(a) match {
+        case This(l1) => \&/.This(L.append(l, l1))
+        case That(ab) => go(\&/.Both(l, ab))
+        case Both(l1, ab) => go(\&/.Both(L.append(l, l1), ab))
+      }
       case Both(l, \/-(b)) => \&/.Both(l, b)
     }
+
+    go(f(a))
   }
 }
 
