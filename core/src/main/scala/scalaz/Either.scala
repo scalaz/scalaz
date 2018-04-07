@@ -490,6 +490,8 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
         fa flatMap f
 
+      override def emap[A, B](fa: L \/ A)(f: A => L \/ B) = bind(fa)(f)
+
       def point[A](a: => A) =
         \/-(a)
 
