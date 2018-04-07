@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_], S] extends Monad[F] { self =>
+trait MonadError[F[_], S] extends Monad[F] with MonadErrorParent[F, S] { self =>
   ////
 
   def raiseError[A](e: S): F[A]
