@@ -1,7 +1,9 @@
 package scalaz
 package data
 
+import Prelude._
 import scalaz.typeclass.ComposeClass
+import AList.aListOps
 
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,
@@ -25,9 +27,12 @@ final class PreComposeBalancer[F[_, _], A, B] private (count: Int, stack: AList1
     else {
       val h1      = F.compose(t.head, h)
       val h1count = hcount * 2
-      t.tail match {
-        case nil @ ANil() => assert(tfactor == 1); new PreComposeBalancer(h1count, h1 +: nil)
-        case ACons(f, fs) => add(h1, f +: fs, h1count, tfactor / 2)
+      t.tail.uncons match {
+        case ev @ AEmpty2() =>
+          assert(tfactor == 1)
+          new PreComposeBalancer(h1count, h1 +: ev.unsubst[AList[F, ?, B]](AList.empty[F, B]))
+        case AJust2(f, fs) =>
+          add(h1, f +: fs, h1count, tfactor / 2)
       }
     }
 }

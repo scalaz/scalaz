@@ -1,6 +1,9 @@
 package scalaz
 package data
 
+import Prelude._
+import AList.aListOps
+
 /**
  * Type-aligned list with at least 1 element.
  * Example:
@@ -11,8 +14,6 @@ package data
  */
 sealed abstract class AList1[F[_, _], A, B] {
   import AList1._
-  import ForallSyntax._
-  import Forall2Syntax._
 
   type Pivot
 
@@ -41,21 +42,21 @@ sealed abstract class AList1[F[_, _], A, B] {
     tail reverse_::: AList1[λ[(α, β) => F[β, α]], Pivot, A](head)
 
   def :::[Z](that: AList[F, Z, A]): AList1[F, Z, B] =
-    (that ::: this.toList) match {
-      case ACons(h, t) => ACons1(h, t)
-      case ANil()      => sys.error("unreachable code")
+    (that ::: this.toList).uncons match {
+      case AJust2(h, t) => ACons1(h, t)
+      case AEmpty2()    => sys.error("unreachable code")
     }
 
   def reverse_:::[Z](that: AList.Composed[F, Z, A]): AList1[F, Z, B] =
-    (that reverse_::: this.toList) match {
-      case ACons(h, t) => ACons1(h, t)
-      case ANil()      => sys.error("unreachable code")
+    (that reverse_::: this.toList).uncons match {
+      case AJust2(h, t) => ACons1(h, t)
+      case AEmpty2()    => sys.error("unreachable code")
     }
 
   def uncons: Either[F[A, B], APair[F[A, ?], AList1[F, ?, B]]] =
-    tail match {
-      case ev @ ANil() => Left(ev.subst[F[A, ?]](head))
-      case ACons(h, t) => Right(APair.of[F[A, ?], AList1[F, ?, B]](head, ACons1(h, t)))
+    tail.uncons match {
+      case ev @ AEmpty2() => Left(ev.subst[F[A, ?]](head))
+      case AJust2(h, t)   => Right(APair.of[F[A, ?], AList1[F, ?, B]](head, ACons1(h, t)))
     }
 
   def foldLeft[G[_]](ga: G[A])(φ: RightAction[G, F]): G[B] =
