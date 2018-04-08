@@ -77,8 +77,11 @@ trait BaseData {
 }
 
 trait BaseDataAliases { self: BaseData =>
+  type Void = data.Void.Void
+
   type \/[L, R]    = data.Disjunction.\/[L, R]
   type ===[A, B]   = data.Is[A, B]
+  type =!=[A, B]   = data.NotIs[A, B]
   type <~<[-A, +B] = data.As[A, B]
   type >~>[+B, -A] = data.As[A, B]
 
@@ -95,7 +98,8 @@ trait BaseDataAliases { self: BaseData =>
 }
 
 trait AllFunctions
-    extends data.DisjunctionFunctions
+    extends data.VoidFunctions
+    with data.DisjunctionFunctions
     with data.MaybeFunctions
     with typeclass.InvariantFunctorFunctions
     with typeclass.PhantomFunctions
