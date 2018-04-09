@@ -328,6 +328,8 @@ object build {
 
   final val ConcurrentName = "scalaz-concurrent"
 
+  final val IOEffectName = "scalaz-io"
+
   lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
