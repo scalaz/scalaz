@@ -55,7 +55,7 @@ trait BaseTypeclasses {
 }
 
 trait BaseData {
-  type Void = data.Void.Void
+  type Void                                            = data.Void.Void
   type Both[A, B]                                      = data.Both[A, B]
   type Forall2[F[_, _]]                                = data.Forall2.Forall2[F]
   type Forall[F[_]]                                    = data.Forall.Forall[F]
