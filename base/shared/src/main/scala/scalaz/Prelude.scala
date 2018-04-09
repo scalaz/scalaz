@@ -55,6 +55,7 @@ trait BaseTypeclasses {
 }
 
 trait BaseData {
+  type Void = data.Void.Void
   type Both[A, B]                                      = data.Both[A, B]
   type Forall2[F[_, _]]                                = data.Forall2.Forall2[F]
   type Forall[F[_]]                                    = data.Forall.Forall[F]
@@ -80,13 +81,13 @@ trait BaseData {
 }
 
 trait BaseDataAliases { self: BaseData =>
-  type Void = data.Void.Void
-
   type \/[L, R]    = data.Disjunction.\/[L, R]
   type ===[A, B]   = data.Is[A, B]
   type =!=[A, B]   = data.NotIs[A, B]
   type <~<[-A, +B] = data.As[A, B]
   type >~>[+B, -A] = data.As[A, B]
+
+  val Void: data.Void.type = data.Void
 
   val Forall: data.Forall.type = data.Forall
   val ∀ : data.Forall.type     = data.Forall
@@ -135,7 +136,8 @@ trait AllInstances
     with typeclass.TraversableInstances
 
 trait AllSyntax
-    extends data.AsSyntax
+    extends data.VoidSyntax
+    with data.AsSyntax
     with data.DisjunctionSyntax
     with data.ForallSyntax
     with data.Forall2Syntax

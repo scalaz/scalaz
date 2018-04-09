@@ -1,8 +1,6 @@
 package scalaz
 package data
 
-import com.github.ghik.silencer.silent
-
 sealed abstract class Iso[A, B] { ab =>
   def to(a: A): B
   def from(b: B): A
@@ -133,11 +131,10 @@ object Iso {
         case -\/(b) => \/-(b)
       })
 
-    @silent
     final def unit[A]: Iso[A, A ⨂ Id] =
       unsafe({ case a => -\/(a) }, {
         case -\/(a)   => a
-        case \/-(n)   => n // Dead code warning.
+        case \/-(n)   => n.absurd
       })
 
     final def first[A, B, C](iso: Iso[A, C]): Iso[A ⨂ B, C ⨂ B] =
