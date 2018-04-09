@@ -25,7 +25,7 @@ trait VoidSyntax {
   }
 }
 
-// NOTE[alex]: this is some next level black compiler magic
+// NOTE: this is some next level black compiler magic
 // but without this object syntax doesn't resolve...
 object VoidSyntax extends VoidSyntax
 
