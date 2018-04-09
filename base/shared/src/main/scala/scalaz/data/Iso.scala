@@ -68,7 +68,8 @@ object Iso {
     def from(b: A): A = b
   }
 
-  def id[A]: Iso[A, A] = Id[A]()
+  private[this] val id_ : Forall[Id] = Forall.of[Id](Id())
+  def id[A]: Iso[A, A] = id_[A]
 
   private[this] final case class Unsafe[A, B](ab: A => B, ba: B => A) extends Iso[A, B] {
     def to(a: A): B   = ab(a)
