@@ -3,7 +3,7 @@ package data
 
 import com.github.ghik.silencer.silent
 
-sealed trait Iso[A, B] { ab =>
+sealed abstract class Iso[A, B] { ab =>
   def to(a: A): B
   def from(b: B): A
 
