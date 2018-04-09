@@ -47,13 +47,13 @@ trait Iso[A, B] { ab =>
   def and[I, J](ij: Iso[I, J]): Iso[(A, I), (B, J)] =
     Iso.unsafe({ case (a, i) => (ab.to(a), ij.to(i)) }, { case (b, j) => (ab.from(b), ij.from(j)) })
 
-  def or[I, J](ij: Iso[I, J]): Iso[Either[A, I], Either[B, J]] =
+  def or[I, J](ij: Iso[I, J]): Iso[A \/ I, B \/ J] =
     Iso.unsafe({
-      case Left(a)  => Left(ab.to(a))
-      case Right(i) => Right(ij.to(i))
+      case -\/(a) => -\/(ab.to(a))
+      case \/-(i) => \/-(ij.to(i))
     }, {
-      case Left(b)  => Left(ab.from(b))
-      case Right(j) => Right(ij.from(j))
+      case -\/(b) => -\/(ab.from(b))
+      case \/-(j) => \/-(ij.from(j))
     })
 }
 object Iso {
@@ -84,9 +84,11 @@ object Iso {
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe({ case (a, (b, c)) => ((a, b), c) }, { case ((a, b), c) => (a, (b, c)) })
 
-    final def commute[A, B]: Iso[A ⨂ B, B ⨂ A] = unsafe({ case (a, b) => (b, a) }, { case (b, a) => (a, b) })
+    final def commute[A, B]: Iso[A ⨂ B, B ⨂ A] =
+      unsafe({ case (a, b) => (b, a) }, { case (b, a) => (a, b) })
 
-    final def unit[A]: Iso[A, A ⨂ Id] = unsafe({ case a => (a, ()) }, { case (a, ()) => a })
+    final def unit[A]: Iso[A, A ⨂ Id] =
+      unsafe({ case a => (a, ()) }, { case (a, ()) => a })
 
     final def first[A, B, C](iso: Iso[A, C]): Iso[A ⨂ B, C ⨂ B] =
       iso and id
@@ -96,37 +98,36 @@ object Iso {
   }
 
   object Coproduct {
-    type ⨂[A, B] = Either[A, B]
+    type ⨂[A, B] = \/[A, B]
     type Id      = Void
 
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe(
         {
-          case Left(a)         => Left(Left(a))
-          case Right(Left(b))  => Left(Right(b))
-          case Right(Right(c)) => Right(c)
+          case -\/(a)      => -\/(-\/(a))
+          case \/-(-\/(b)) => -\/(\/-(b))
+          case \/-(\/-(c)) => \/-(c)
         }, {
-          case Left(Left(a))  => Left(a)
-          case Left(Right(b)) => Right(Left(b))
-          case Right(c)       => Right(Right(c))
+          case -\/(-\/(a)) => -\/(a)
+          case -\/(\/-(b)) => \/-(-\/(b))
+          case \/-(c)      => \/-(\/-(c))
         }
       )
 
     final def commute[A, B]: Iso[A ⨂ B, B ⨂ A] =
       unsafe({
-        case Left(a)  => Right(a)
-        case Right(b) => Left(b)
+        case -\/(a) => \/-(a)
+        case \/-(b) => -\/(b)
       }, {
-        case Right(a) => Left(a)
-        case Left(b)  => Right(b)
+        case \/-(a) => -\/(a)
+        case -\/(b) => \/-(b)
       })
 
-    // Dead code warning.
     @silent
     final def unit[A]: Iso[A, A ⨂ Id] =
-      unsafe({ case a => Left(a) }, {
-        case Left(a)  => a
-        case Right(n) => n
+      unsafe({ case a => -\/(a) }, {
+        case -\/(a)   => a
+        case \/-(n)   => n // Dead code warning.
       })
 
     final def first[A, B, C](iso: Iso[A, C]): Iso[A ⨂ B, C ⨂ B] =
