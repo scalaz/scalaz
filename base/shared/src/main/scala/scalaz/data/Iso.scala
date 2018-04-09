@@ -3,7 +3,7 @@ package data
 
 import com.github.ghik.silencer.silent
 
-trait Iso[A, B] { ab =>
+sealed trait Iso[A, B] { ab =>
   def to(a: A): B
   def from(b: B): A
 
@@ -13,7 +13,7 @@ trait Iso[A, B] { ab =>
   def substCtF[F[_]](fa: F[A])(implicit F: Contravariant[F]): F[B] =
     F.contramap(fa)(from)
 
-  def substF[F[_]](fa: F[A])(implicit F: InvariantFunctor[F]): F[B] =
+  def substInvF[F[_]](fa: F[A])(implicit F: InvariantFunctor[F]): F[B] =
     F.imap(fa)(to)(from)
 
   def andThen[C](bc: Iso[B, C]): Iso[A, C] = new Iso[A, C] {
@@ -44,25 +44,38 @@ trait Iso[A, B] { ab =>
     override val flip: Iso[A, B] = ab
   }
 
-  def and[I, J](ij: Iso[I, J]): Iso[(A, I), (B, J)] =
-    Iso.unsafe({ case (a, i) => (ab.to(a), ij.to(i)) }, { case (b, j) => (ab.from(b), ij.from(j)) })
+  def and[I, J](ij: Iso[I, J]): Iso[(A, I), (B, J)] = new Iso[(A, I), (B, J)] {
+    def to(ai: (A, I)): (B, J)   = (ab.to(ai._1), ij.to(ai._2))
+    def from(bj: (B, J)): (A, I) = (ab.from(bj._1), ij.from(bj._2))
+  }
 
-  def or[I, J](ij: Iso[I, J]): Iso[A \/ I, B \/ J] =
-    Iso.unsafe({
+  def or[I, J](ij: Iso[I, J]): Iso[A \/ I, B \/ J] = new Iso[A \/ I, B \/ J] {
+    def to(ai: A \/ I): B \/ J = ai match {
       case -\/(a) => -\/(ab.to(a))
       case \/-(i) => \/-(ij.to(i))
-    }, {
+    }
+    def from(bj: B \/ J): A \/ I = bj match {
       case -\/(b) => -\/(ab.from(b))
       case \/-(j) => \/-(ij.from(j))
-    })
+    }
+  }
 }
 object Iso {
   def apply[A, B](implicit ab: Iso[A, B]): Iso[A, B] = ab
 
-  def unsafe[A, B](ab: A => B, ba: B => A): Iso[A, B] = new Iso[A, B] {
+  private[this] final case class Id[A]() extends Iso[A, A] {
+    def to(a: A): A   = a
+    def from(b: A): A = b
+  }
+
+  def id[A]: Iso[A, A] = Id[A]()
+
+  private[this] final case class Unsafe[A, B](ab: A => B, ba: B => A) extends Iso[A, B] {
     def to(a: A): B   = ab(a)
     def from(b: B): A = ba(b)
   }
+
+  def unsafe[A, B](ab: A => B, ba: B => A): Iso[A, B] = new Unsafe(ab, ba)
 
   def singleton[A <: Singleton, B <: Singleton](a: A, b: B): Iso[A, B] =
     new Iso[A, B] {
@@ -70,16 +83,11 @@ object Iso {
       def from(b: B): A = a
     }
 
-  final case class Refl[A]() extends Iso[A, A] {
-    def to(a: A): A   = a
-    def from(b: A): A = b
-  }
-
-  def id[A]: Iso[A, A] = Refl[A]()
-
   object Product {
-    type ⨂[A, B] = (A, B)
-    type Id      = Unit
+    // private[data] because private and private[this] give
+    // [warning] private type ⨂ in object Product is never used
+    private[data] type ⨂[A, B] = (A, B)
+    private[data] type Id      = Unit
 
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe({ case (a, (b, c)) => ((a, b), c) }, { case ((a, b), c) => (a, (b, c)) })
@@ -98,8 +106,8 @@ object Iso {
   }
 
   object Coproduct {
-    type ⨂[A, B] = \/[A, B]
-    type Id      = Void
+    private[data] type ⨂[A, B] = \/[A, B]
+    private[data] type Id      = Void
 
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe(
