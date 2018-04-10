@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ BifunctorClass, BindClass, DebugClass, MonadClass }
+import scalaz.typeclass.{ BifunctorClass, BindClass, DebugClass, EqClass, MonadClass }
 
 trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
@@ -33,4 +33,11 @@ trait DisjunctionInstances {
         case \/-(b) => \/-(bt(b))
       }
     })
+
+  implicit def disjunctionEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[A \/ B] =
+    instanceOf[EqClass[A \/ B]] {
+      case (-\/(a1), -\/(a2)) => A.equal(a1, a2)
+      case (\/-(b1), \/-(b2)) => B.equal(b1, b2)
+      case _                  => false
+    }
 }

@@ -1,7 +1,8 @@
 package scalaz
 package data
 
-import typeclass.IsCovariantClass
+import scala.annotation.tailrec
+import typeclass.{ EqClass, IsCovariantClass }
 
 trait IListModule {
   type IList[A]
@@ -9,6 +10,22 @@ trait IListModule {
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]]
 
   implicit def isCovariantInstance: IsCovariant[IList]
+}
+
+trait IListInstances {
+  implicit final def listEq[A](implicit A: Eq[A]): Eq[IList[A]] =
+    instanceOf[EqClass[IList[A]]] { (a1, a2) =>
+      @tailrec def go(l1: IList[A], l2: IList[A]): Boolean =
+        (IList.uncons(l1), IList.uncons(l2)) match {
+          case (Maybe2.Empty2(), Maybe2.Empty2()) => true
+          case (Maybe2.Just2(x, xs), Maybe2.Just2(y, ys)) =>
+            if (A.equal(x, y)) go(xs, ys)
+            else false
+          case _ => false
+        }
+
+      go(a1, a2)
+    }
 }
 
 private[data] object IListImpl extends IListModule {
