@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.MonadClass
+import scalaz.typeclass.{ EqClass, MonadClass }
 
 trait IdentityInstances {
   implicit val monad: Monad[Identity] = instanceOf(new MonadClass[Identity] {
@@ -11,4 +11,13 @@ trait IdentityInstances {
     override def flatMap[A, B](oa: Identity[A])(f: A => Identity[B]): Identity[B] = f(oa.run)
     override def flatten[A](ma: Identity[Identity[A]]): Identity[A]               = ma.run
   })
+
+  implicit final def identityEq[A](implicit A: Eq[A]): Eq[Identity[A]] =
+    instanceOf[EqClass[Identity[A]]](
+      (x, y) =>
+        (x, y) match {
+          case (Identity(a1), Identity(a2)) => A.equal(a1, a2)
+          case _                            => false
+      }
+    )
 }

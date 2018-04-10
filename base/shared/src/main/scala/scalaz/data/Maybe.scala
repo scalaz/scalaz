@@ -28,6 +28,7 @@ sealed trait MaybeModule {
   def monad: Monad[Maybe]
   def traversable: Traversable[Maybe]
   def debug[A: Debug]: Debug[Maybe[A]]
+  def eq[A: Eq]: Eq[Maybe[A]]
 }
 
 object MaybeModule extends MaybeSyntax {
@@ -56,6 +57,12 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   def debug[A](implicit A: Debug[A]): Debug[Maybe[A]] = instanceOf[DebugClass[Maybe[A]]] {
     case Some(a) => s"Just(${A.debug(a)})"
     case _       => "Empty"
+  }
+
+  def eq[A](implicit A: Eq[A]): Eq[Maybe[A]] = instanceOf[EqClass[Maybe[A]]] {
+    case (Some(a), Some(b)) => A.equal(a, b)
+    case (None, None)       => true
+    case _                  => false
   }
 
   private val instance =

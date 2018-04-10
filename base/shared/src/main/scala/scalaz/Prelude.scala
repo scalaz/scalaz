@@ -18,6 +18,7 @@ trait BaseTypeclasses {
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
   type Compose[P[_, _]]       = InstanceOf[ComposeClass[P]]
   type Debug[A]               = InstanceOf[DebugClass[A]]
+  type Eq[A]                  = InstanceOf[EqClass[A]]
   type Foldable[T[_]]         = InstanceOf[FoldableClass[T]]
   type Functor[F[_]]          = InstanceOf[FunctorClass[F]]
   type InvariantFunctor[F[_]] = InstanceOf[InvariantFunctorClass[F]]
@@ -41,6 +42,7 @@ trait BaseTypeclasses {
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
   final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F]                            = F
   final def Compose[P[_, _]](implicit P: Compose[P]): Compose[P]                         = P
+  final def Eq[A](implicit P: Eq[A]): Eq[A]                                              = P
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
   final def Functor[F[_]](implicit F: Functor[F]): Functor[F]                            = F
   final def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
@@ -119,6 +121,7 @@ trait AllInstances
     with data.DownStarInstances
     with data.ForgetInstances
     with data.IdentityInstances
+    with data.IListInstances
     with data.TheseInstances
     with data.UpStarInstances
     with typeclass.BifunctorInstances
@@ -126,6 +129,7 @@ trait AllInstances
     with typeclass.ChoiceInstances
     with typeclass.CobindInstances
     with typeclass.ComonadInstances
+    with typeclass.EqInstances
     with typeclass.FoldableInstances
     with typeclass.IsContravariantInstances
     with typeclass.IsCovariantInstances
@@ -154,6 +158,7 @@ trait AllSyntax
     with typeclass.CobindSyntax
     with typeclass.ComonadSyntax
     with typeclass.ComposeSyntax
+    with typeclass.EqSyntax
     with typeclass.FoldableSyntax
     with typeclass.FunctorSyntax
     with typeclass.InvariantFunctorSyntax
