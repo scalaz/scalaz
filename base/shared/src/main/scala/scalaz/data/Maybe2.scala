@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.DebugClass
+import scalaz.typeclass.{ BifunctorClass, DebugClass }
 
 sealed trait Maybe2Module {
 
@@ -16,6 +16,7 @@ sealed trait Maybe2Module {
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]]
   implicit def debug[A: Debug, B: Debug]: Debug[Maybe2[A, B]]
+  implicit def bifunctor: Bifunctor[Maybe2]
 
   object Just2 {
     def unapply[A, B](m: Maybe2[A, B]): Just2Extractor[A, B] = new Just2Extractor(toOption2(m))
@@ -49,6 +50,15 @@ private[data] object Maybe2Impl extends Maybe2Module {
       case Some2(_1, _2) => s"Just2(${A.debug(_1)}, ${B.debug(_2)})"
       case _             => "Empty2"
     }
+
+  implicit def bifunctor: scalaz.Bifunctor[Maybe2] =
+    instanceOf(new BifunctorClass[Maybe2] with BifunctorClass.DeriveLmapRmap[Maybe2] {
+      def bimap[A, B, S, T](fab: Maybe2[A, B])(as: A => S, bt: B => T): Maybe2[S, T] =
+        fab match {
+          case Some2(_1, _2) => Some2(as(_1), bt(_2))
+          case None2         => None2
+        }
+    })
 
   private[data] def fromOption2[A, B](o: Option2[A, B]): Maybe2[A, B] = o
   private[data] def toOption2[A, B](m: Maybe2[A, B]): Option2[A, B]   = m
