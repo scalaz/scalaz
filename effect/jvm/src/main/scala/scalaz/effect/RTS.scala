@@ -485,7 +485,7 @@ private object RTS {
                         case AsyncReturn.Now(value) =>
                           // Value returned synchronously, callback will never be
                           // invoked. Attempt resumption now:
-                          if (resumeAsync()) {
+                          if (shouldResumeAsync()) {
                             value match {
                               case FiberResult.Completed(v) =>
                                 curIo = nextInstr[E](v, stack)
@@ -515,6 +515,36 @@ private object RTS {
                           eval = false
                       }
                     } finally enterAsyncEnd()
+
+                    case IO.Tags.AsyncIOEffect =>
+                      val io = curIo.asInstanceOf[IO.AsyncIOEffect[E, Any]]
+
+                      enterAsyncStart()
+
+                      try {
+                        val value = rts.tryUnsafePerformIO(io.register(resumeAsync))
+
+                        // Value returned synchronously, callback will never be
+                        // invoked. Attempt resumption now:
+                        if (shouldResumeAsync()) {
+                          value match {
+                            case FiberResult.Completed(v) =>
+                              curIo = nextInstr[E](v, stack)
+
+                              if (curIo == null) {
+                                eval   = false
+                                result = value.asInstanceOf[FiberResult[E,Any]]
+                              }
+                            case FiberResult.Interrupted(t) =>
+                              curIo = IO.Interrupt(t)
+                            case FiberResult.Failed(e) =>
+                              curIo = IO.Fail(e)
+                          }
+                        } else {
+                          // Completion handled by interruptor:
+                          eval = false
+                        }
+                      } finally enterAsyncEnd()
 
                   case IO.Tags.Attempt =>
                     val io = curIo.asInstanceOf[IO.Attempt[E, Any, Any]]
@@ -680,7 +710,7 @@ private object RTS {
      * @param value The value produced by the asynchronous computation.
      */
     private final def resumeAsync[A](value: FiberResult[E, Any]): Unit = {
-      if (resumeAsync()) {
+      if (shouldResumeAsync()) {
         // TODO: CPS transform
         // Take care not to overflow the stack in cases of 'deeply' nested
         // asynchronous callbacks.
@@ -869,17 +899,17 @@ private object RTS {
     }
 
     @tailrec
-    final def resumeAsync(): Boolean = {
+    final def shouldResumeAsync(): Boolean = {
       val oldStatus = status.get
 
       oldStatus match {
         case AsyncRegion(0, 1, _, joiners, killers) =>
           // No more resumptions are left!
-          if (!status.compareAndSet(oldStatus, Executing(joiners, killers))) resumeAsync()
+          if (!status.compareAndSet(oldStatus, Executing(joiners, killers))) shouldResumeAsync()
           else true
 
         case AsyncRegion(reentrancy, resume, _, joiners, killers) =>
-          if (!status.compareAndSet(oldStatus, AsyncRegion(reentrancy, resume - 1, None, joiners, killers))) resumeAsync()
+          if (!status.compareAndSet(oldStatus, AsyncRegion(reentrancy, resume - 1, None, joiners, killers))) shouldResumeAsync()
           else true
 
         case _ => false

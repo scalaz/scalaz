@@ -8,7 +8,9 @@ package scalaz.effect
  * concurrently with the parent `IO` action.
  *
  * Fibers can be joined, yielding their result other fibers, or interrupted,
- * which terminates the fiber with a user-defined error.
+ * which terminates the fiber with a runtime error.
+ *
+ * Fork-Join Identity: fork >=> join = id
  *
  * {{{
  * for {
@@ -27,9 +29,7 @@ trait Fiber[E, A] {
    */
   def join: IO[E, A]
 
-  // fork >=> join = id
-
-  // def pause: IO[Void, IO[E, A]]
+  // def pause[E]: IO[E, IO[E, A]]
 
   /**
    * Interrupts the fiber with the specified error. If the fiber has already
@@ -43,5 +43,5 @@ trait Fiber[E, A] {
    * Interrupts the fiber with the specified error asynchronously, and ignores
    * any errors that result from interrupting the fiber.
    */
-  final def interruptIgnore(t: Throwable): IO[E, Unit] = interrupt(t).fork.toUnit
+  final def interruptIgnore[E2](t: Throwable): IO[E2, Unit] = interrupt(t).fork.attempt[E2].toUnit
 }

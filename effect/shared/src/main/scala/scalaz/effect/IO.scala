@@ -275,9 +275,11 @@ sealed abstract class IO[E, A] { self =>
    * openFile("config.json").catchAll(_ => IO.now(defaultConfig))
    * }}}
    */
-  final def catchAll(h: Throwable => IO[E, A]): IO[E, A] = catchSome {
-    case t : Throwable => h(t)
-  }
+  final def catchAll[E2](h: E => IO[E2, A]): IO[E2, A] =
+    self.attempt[E2].flatMap {
+      case -\/ (e) => h(e)
+      case  \/-(a) => IO.now[E2, A](a)
+    }
 
   /**
    * Recovers from some or all of the error cases.
@@ -332,9 +334,9 @@ sealed abstract class IO[E, A] { self =>
    * Retries continuously until the action succeeds or the specified duration
    * elapses.
    */
-  final def retryFor(duration: Duration): IO[E, TimeoutException \/ A] =
-    retry.map(Disjunction.right[TimeoutException, A](_)) race
-      (IO.sleep[E](duration) *> IO.now[E, TimeoutException \/ A](Disjunction.left(TimeoutException(duration))))
+  final def retryFor(duration: Duration): IO[E, Maybe[A]] =
+    retry.map(Maybe.just[A](_)) race
+      (IO.sleep[E](duration) *> IO.now[E, Maybe[A]](Maybe.empty[A]))
 
   /**
    * Retries continuously, increasing the duration between retries each time by
@@ -400,10 +402,10 @@ sealed abstract class IO[E, A] { self =>
    * action.timeout(1.second)
    * }}}
    */
-  final def timeout(duration: Duration): IO[E, TimeoutException \/ A] = {
-    val timer = IO.now[E, TimeoutException \/ A](Disjunction.left(TimeoutException(duration)))
+  final def timeout(duration: Duration): IO[E, Maybe[A]] = {
+    val timer = IO.now[E, Maybe[A]](Maybe.empty[A])
 
-    self.map(Disjunction.right[TimeoutException, A](_)).race(timer.delay(duration))
+    self.map(Maybe.just[A](_)).race(timer.delay(duration))
   }
 
   /**
@@ -450,15 +452,16 @@ object IO extends IOInstances {
     final val SyncEffect        = 3
     final val Fail              = 4
     final val AsyncEffect       = 5
-    final val Attempt           = 6
-    final val Fork              = 7
-    final val Race              = 8
-    final val Suspend           = 9
-    final val Bracket           = 10
-    final val Uninterruptible   = 11
-    final val Sleep             = 12
-    final val Supervise         = 13
-    final val Interrupt         = 14
+    final val AsyncIOEffect     = 6
+    final val Attempt           = 7
+    final val Fork              = 8
+    final val Race              = 9
+    final val Suspend           = 10
+    final val Bracket           = 11
+    final val Uninterruptible   = 12
+    final val Sleep             = 13
+    final val Supervise         = 14
+    final val Interrupt         = 15
   }
   final case class FlatMap[E, A0, A](io: IO[E, A0], flatMapper: A0 => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.FlatMap
@@ -482,6 +485,10 @@ object IO extends IOInstances {
 
   final case class AsyncEffect[E, A](register: (FiberResult[E, A] => Unit) => AsyncReturn[E, A]) extends IO[E, A] {
     override final def tag = Tags.AsyncEffect
+  }
+
+  final case class AsyncIOEffect[E, A](register: (FiberResult[E, A] => Unit) => IO[E, Unit]) extends IO[E, A] {
+    override final def tag = Tags.AsyncIOEffect
   }
 
   final case class Attempt[E1, E2, A](value: IO[E1, A]) extends IO[E2, E1 \/ A] {
@@ -600,6 +607,12 @@ object IO extends IOInstances {
 
     AsyncReturn.later[E, A]
   }
+
+  /**
+   * Imports an asynchronous effect into a pure `IO` value. This formulation is
+   * necessary when the effect is itself expressed in terms of `IO`.
+   */
+  final def asyncIO[E, A](register: (FiberResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. The effect has the

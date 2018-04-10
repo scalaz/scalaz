@@ -122,7 +122,7 @@ val io: IO[E, String] = IO.fail(new Error("Oh noes!"))
 
 Like all `IO` values, these are immutable values and do not actually throw any exceptions; they merely describe failure as a first-class value.
 
-You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[Throwable \/ A]`:
+You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[Void, E \/ A]`:
 
 ```scala
 val result = openFile("data.json").attempt.map {
@@ -131,7 +131,7 @@ val result = openFile("data.json").attempt.map {
 }
 ```
 
-You can submerge failures with `IO.absolve`, which turns an `IO[Throwable \/ A]` into an `IO[E, A]`:
+You can submerge failures with `IO.absolve`, which turns an `IO[Void, E \/ A]` into an `IO[E, A]`:
 
 ```scala
 def sqrt(io: IO[E, Double]): IO[E, Double] =
