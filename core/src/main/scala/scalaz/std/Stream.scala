@@ -38,7 +38,10 @@ trait StreamInstances {
     }
 
     override def foldMap[A, B](fa: Stream[A])(f: A => B)(implicit M: Monoid[B]) =
-      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+      M.unfoldrSum(fa)(as => as.headOption match {
+        case Some(a) => Maybe.just((f(a), as.tail))
+        case None => Maybe.empty
+      })
 
     override def foldMap1Opt[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
       foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))

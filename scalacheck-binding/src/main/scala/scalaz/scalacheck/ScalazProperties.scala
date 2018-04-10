@@ -88,11 +88,21 @@ object ScalazProperties {
   }
 
   object semigroup {
+    import ScalazArbitrary.Arbitrary_Maybe
+
     def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]): Prop = forAll(A.semigroupLaw.associative _)
+
+    def unfoldlSumOptConsistency[A, S](implicit A: Semigroup[A], eqa: Equal[A], aa: Arbitrary[A], as: Arbitrary[S], cs: Cogen[S]): Prop =
+      forAll(A.semigroupLaw.unfoldlSumOptConsistency[S] _)
+
+    def unfoldrSumOptConsistency[A, S](implicit A: Semigroup[A], eqa: Equal[A], aa: Arbitrary[A], as: Arbitrary[S], cs: Cogen[S]): Prop =
+      forAll(A.semigroupLaw.unfoldrSumOptConsistency[S] _)
 
     def laws[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]): Properties =
       newProperties("semigroup") { p =>
         p.property("associative") = associative[A]
+        p.property("unfoldlSumOpt consistency") = unfoldlSumOptConsistency[A, Int]
+        p.property("unfoldrSumOpt consistency") = unfoldrSumOptConsistency[A, Int]
       }
   }
 

@@ -9,6 +9,12 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
   ////
   def empty[A]: F[A]
 
+  def unfoldlPsum[S, A](seed: S)(f: S => Maybe[(S, F[A])]): F[A] =
+    unfoldlPsumOpt(seed)(f) getOrElse empty
+
+  def unfoldrPsum[S, A](seed: S)(f: S => Maybe[(F[A], S)]): F[A] =
+    unfoldrPsumOpt(seed)(f) getOrElse empty
+
   /**The composition of PlusEmpty `F` and `G`, `[x]F[G[x]]`, is a PlusEmpty */
   override def compose[G[_]]: PlusEmpty[λ[α => F[G[α]]]] =
     new CompositionPlusEmpty[F, G] {
@@ -28,6 +34,9 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
     new Monoid[F[A]] {
       def append(f1: F[A], f2: => F[A]): F[A] = plus(f1, f2)
       def zero: F[A] = empty[A]
+
+      override def unfoldlSum[S](seed: S)(f: S => Maybe[(S, F[A])]): F[A] = unfoldlPsum(seed)(f)
+      override def unfoldrSum[S](seed: S)(f: S => Maybe[(F[A], S)]): F[A] = unfoldrPsum(seed)(f)
     }
 
   trait EmptyLaw extends PlusLaw {

@@ -116,22 +116,29 @@ object FoldableTest extends SpecLite {
     }
   }
 
-  "psum should be lazy" in {
-    import Maybe.just
-
-    // note that msuml instead of psum would fail this test
-    Stream.continually("a").map(just).psum must_=== just("a")
-  }
-
-  "[sum should ignore empty values" in {
+  "psum should be stack-safe and short-circuiting" in {
     import Maybe.{empty, just}
-
-    IList(empty[String], just("foo"), just("bar")).psum must_=== just("foo")
+    val N = 10000
+    Stream.from(1).map(i =>
+      if(i < N)
+        empty[String]
+      else if(i < N+2)
+        // put two "Stop" elements before "BOOM!",
+        // because Stream always evaluates the first element
+        just("Stop")
+      else
+        sys.error("BOOM!")
+    ).psum must_=== just("Stop")
   }
 
-  "psumMap should be lazy for lazy structures" in {
-    import Maybe.just
-    Stream.continually("a").psumMap(just) must_=== just("a")
+  "psumMap should be stack-safe and short-circuiting" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    Stream.from(1).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
   }
 
   "non-empty folding" should {

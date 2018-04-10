@@ -91,6 +91,12 @@ sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   def snoc(m: M, c: C): M = semigroup.append(m, unit(c))
 
   def cons(c: C, m: M): M = semigroup.append(unit(c), m)
+
+  override def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] =
+    semigroup.unfoldlSumOpt(seed)(f(_) map { case (b, c) => (b, unit(c)) })
+
+  override def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] =
+    semigroup.unfoldrSumOpt(seed)(f(_) map { case (c, b) => (unit(c), b) })
 }
 
 object UnitReducer {
@@ -254,5 +260,17 @@ sealed abstract class ReducerInstances {
   /** The reducer derived from any semigroup.  Not implicit because it is
     * suboptimal for most reducer applications.
     */
-  def identityReducer[M](implicit mm: Semigroup[M]): Reducer[M, M] = unitReducer(x => x)
+  def identityReducer[M](implicit mm: Semigroup[M]): Reducer[M, M] =
+    new Reducer[M, M] {
+      def semigroup = mm
+      def unit(c: M): M = c
+      def cons(c: M, m: M): M = append(c, m)
+      def snoc(m: M, c: M): M = append(m, c)
+
+      override def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, M)]): Maybe[M] =
+        mm.unfoldlSumOpt(seed)(f)
+
+      override def unfoldrOpt[B](seed: B)(f: B => Maybe[(M, B)]): Maybe[M] =
+        mm.unfoldrSumOpt(seed)(f)
+    }
 }
