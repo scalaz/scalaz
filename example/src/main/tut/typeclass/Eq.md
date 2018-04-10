@@ -27,18 +27,13 @@ These laws entail symmetry and transitivity, which should be easier to test, sin
 
 ## Instance declaration
 
-A `Eq` can be declared by `equal`.
-
 ```tut
 import scalaz._, Prelude._, typeclass.EqClass
 
 implicit final def optionEq[A](implicit A: Eq[A]): Eq[Option[A]] =
-  instanceOf[EqClass[Option[A]]](
-    (a1, a2) =>
-      (a1, a2) match {
-        case (None, None)         => true
-        case (Some(a1), Some(a2)) => A.equal(a1, a2)
-        case _                    => false
-    }
-  )
+  instanceOf[EqClass[Option[A]]] {
+    case (None, None)         => true
+    case (Some(a1), Some(a2)) => A.equal(a1, a2)
+    case _                    => false
+  }
 ```
