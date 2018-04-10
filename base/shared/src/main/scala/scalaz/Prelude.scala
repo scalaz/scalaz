@@ -10,12 +10,14 @@ trait BaseTypeclasses {
 
   type Applicative[F[_]]      = InstanceOf[ApplicativeClass[F]]
   type Apply[F[_]]            = InstanceOf[ApplyClass[F]]
+  type Bifunctor[F[_, _]]     = InstanceOf[BifunctorClass[F]]
   type Bind[M[_]]             = InstanceOf[BindClass[M]]
   type Category[=>:[_, _]]    = InstanceOf[CategoryClass[=>:]]
   type Choice[P[_, _]]        = InstanceOf[ChoiceClass[P]]
   type Cobind[F[_]]           = InstanceOf[CobindClass[F]]
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
   type Compose[P[_, _]]       = InstanceOf[ComposeClass[P]]
+  type Debug[A]               = InstanceOf[DebugClass[A]]
   type Foldable[T[_]]         = InstanceOf[FoldableClass[T]]
   type Functor[F[_]]          = InstanceOf[FunctorClass[F]]
   type InvariantFunctor[F[_]] = InstanceOf[InvariantFunctorClass[F]]
@@ -27,12 +29,12 @@ trait BaseTypeclasses {
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
-  type Debug[A]               = InstanceOf[DebugClass[A]]
   type Strong[F[_, _]]        = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]      = InstanceOf[TraversableClass[T]]
 
   final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F]                = F
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                  = F
+  final def Bifunctor[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F]                   = F
   final def Bind[F[_]](implicit F: Bind[F]): Bind[F]                                     = F
   final def Category[=>:[_, _]](implicit P: Category[=>:]): Category[=>:]                = P
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
@@ -55,6 +57,7 @@ trait BaseTypeclasses {
 }
 
 trait BaseData {
+  type Void                                            = data.Void.Void
   type Both[A, B]                                      = data.Both[A, B]
   type Forall2[F[_, _]]                                = data.Forall2.Forall2[F]
   type Forall[F[_]]                                    = data.Forall.Forall[F]
@@ -65,6 +68,9 @@ trait BaseData {
   type Maybe[A]                                        = data.Maybe[A]
   type That[A, B]                                      = data.That[A, B]
   type This[A, B]                                      = data.This[A, B]
+  type Iso[A, B]                                       = data.Iso[A, B]
+
+  val Iso = data.Iso
 
   val Both = data.Both
   val That = data.That
@@ -79,8 +85,11 @@ trait BaseData {
 trait BaseDataAliases { self: BaseData =>
   type \/[L, R]    = data.Disjunction.\/[L, R]
   type ===[A, B]   = data.Is[A, B]
+  type =!=[A, B]   = data.NotIs[A, B]
   type <~<[-A, +B] = data.As[A, B]
   type >~>[+B, -A] = data.As[A, B]
+
+  val Void: data.Void.type = data.Void
 
   val Forall: data.Forall.type = data.Forall
   val ∀ : data.Forall.type     = data.Forall
@@ -95,7 +104,8 @@ trait BaseDataAliases { self: BaseData =>
 }
 
 trait AllFunctions
-    extends data.DisjunctionFunctions
+    extends data.VoidFunctions
+    with data.DisjunctionFunctions
     with data.MaybeFunctions
     with typeclass.InvariantFunctorFunctions
     with typeclass.PhantomFunctions
@@ -111,6 +121,7 @@ trait AllInstances
     with data.IdentityInstances
     with data.TheseInstances
     with data.UpStarInstances
+    with typeclass.BifunctorInstances
     with typeclass.BindInstances
     with typeclass.ChoiceInstances
     with typeclass.CobindInstances
@@ -128,7 +139,8 @@ trait AllInstances
     with typeclass.TraversableInstances
 
 trait AllSyntax
-    extends data.AsSyntax
+    extends data.VoidSyntax
+    with data.AsSyntax
     with data.DisjunctionSyntax
     with data.ForallSyntax
     with data.Forall2Syntax
@@ -136,6 +148,7 @@ trait AllSyntax
     with data.Maybe2Syntax
     with typeclass.ApplicativeSyntax
     with typeclass.ApplySyntax
+    with typeclass.BifunctorSyntax
     with typeclass.BindSyntax
     with typeclass.ChoiceSyntax
     with typeclass.CobindSyntax

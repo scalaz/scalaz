@@ -13,6 +13,9 @@ options:
     - title: Apply
       url: typeclass/Apply.html
       menu_section: typeclass
+    - title: Bifunctor
+      url: typeclass/Bifunctor.html
+      menu_section: typeclass
     - title: Debug
       url: typeclass/Debug.html
       menu_section: typeclass
