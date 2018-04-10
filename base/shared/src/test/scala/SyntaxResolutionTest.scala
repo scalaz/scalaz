@@ -8,9 +8,9 @@ object SyntaxResolutionTest {
   def _apply[F[_]: Apply, A, B](fa: F[A], f: F[A => B]): F[B] = fa.ap(f)
 
   def _bifunctor[F[_, _]: Bifunctor, A, B, S, T](fab: F[A, B], as: A => S, bt: B => T) = {
-    fab.lmap(as)      : F[S, B]
-    fab.rmap(bt)      : F[A, T]
-    fab.bimap(as, bt) : F[S, T]
+    fab.lmap(as): F[S, B]
+    fab.rmap(bt): F[A, T]
+    fab.bimap(as, bt): F[S, T]
   }
 
   def _bind[F[_]: Bind, A, B](fa: F[A], f: A => F[B]): F[B] = fa.flatMap(f)
