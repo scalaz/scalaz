@@ -70,11 +70,17 @@ package object data {
     }
   }
 
+  val AFix: AFixModule = AFixImpl
+  type AFix[F[_[_, _], _, _], A, B] = AFix.AFix[F, A, B]
+
+  val AList: AListModule = AListImpl
+  type AList[F[_, _], A, B] = AList.AList[F, A, B]
+
   val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
 
-  val AFix: AFixModule = AFixImpl
-  type AFix[F[_[_, _], _, _], A, B] = AFix.AFix[F, A, B]
+  val IList: IListModule = IListImpl
+  type IList[A] = IList.IList[A]
 
   val Maybe: MaybeModule = MaybeImpl
   type Maybe[A] = Maybe.Maybe[A]
@@ -82,9 +88,4 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 
-  val IList: IListModule = IListImpl
-  type IList[A] = IList.IList[A]
-
-  val AList: AListModule = AListImpl
-  type AList[F[_, _], A, B] = AList.AList[F, A, B]
 }

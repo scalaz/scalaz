@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ BindClass, DebugClass, MonadClass }
+import scalaz.typeclass.{BifunctorClass, BindClass, DebugClass, MonadClass}
 
 trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
@@ -25,4 +25,12 @@ trait DisjunctionInstances {
       case -\/(left)  => s"""-\/(${L.debug(left)})"""
       case \/-(right) => s"""\/-(${R.debug(right)})"""
     }
+
+  implicit val disjunctionBifunctor: Bifunctor[Disjunction] =
+    instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
+      def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
+        case -\/(a) => -\/(as(a))
+        case \/-(b) => \/-(bt(b))
+      }
+    })
 }

@@ -10,12 +10,14 @@ trait BaseTypeclasses {
 
   type Applicative[F[_]]      = InstanceOf[ApplicativeClass[F]]
   type Apply[F[_]]            = InstanceOf[ApplyClass[F]]
+  type Bifunctor[F[_, _]]     = InstanceOf[BifunctorClass[F]]
   type Bind[M[_]]             = InstanceOf[BindClass[M]]
   type Category[=>:[_, _]]    = InstanceOf[CategoryClass[=>:]]
   type Choice[P[_, _]]        = InstanceOf[ChoiceClass[P]]
   type Cobind[F[_]]           = InstanceOf[CobindClass[F]]
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
   type Compose[P[_, _]]       = InstanceOf[ComposeClass[P]]
+  type Debug[A]               = InstanceOf[DebugClass[A]]
   type Foldable[T[_]]         = InstanceOf[FoldableClass[T]]
   type Functor[F[_]]          = InstanceOf[FunctorClass[F]]
   type InvariantFunctor[F[_]] = InstanceOf[InvariantFunctorClass[F]]
@@ -27,12 +29,12 @@ trait BaseTypeclasses {
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
-  type Debug[A]               = InstanceOf[DebugClass[A]]
   type Strong[F[_, _]]        = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]      = InstanceOf[TraversableClass[T]]
 
   final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F]                = F
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                  = F
+  final def Bifunctor[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F]                   = F
   final def Bind[F[_]](implicit F: Bind[F]): Bind[F]                                     = F
   final def Category[=>:[_, _]](implicit P: Category[=>:]): Category[=>:]                = P
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
@@ -115,6 +117,7 @@ trait AllInstances
     with data.IdentityInstances
     with data.TheseInstances
     with data.UpStarInstances
+    with typeclass.BifunctorInstances
     with typeclass.BindInstances
     with typeclass.ChoiceInstances
     with typeclass.CobindInstances
@@ -140,6 +143,7 @@ trait AllSyntax
     with data.Maybe2Syntax
     with typeclass.ApplicativeSyntax
     with typeclass.ApplySyntax
+    with typeclass.BifunctorSyntax
     with typeclass.BindSyntax
     with typeclass.ChoiceSyntax
     with typeclass.CobindSyntax
