@@ -3,10 +3,10 @@ package typeclass
 
 import scalaz.data.Const
 
-trait PhantomInstances { instances =>
-  implicit def const[R]: Phantom[Const[R, ?]] = new PhantomClass.MapContramap[Const[R, ?]] {
+trait PhantomInstances {
 
-    def pmap[A, B](ma: Const[R, A]): Const[R, B] = ma.retag[B]
-
-  }
+  implicit def const[R]: Phantom[Const[R, ?]] =
+    instanceOf(new PhantomClass.DeriveMapContramap[Const[R, ?]] {
+      def pmap[A, B](ma: Const[R, A]): Const[R, B] = ma.retag[B]
+    })
 }

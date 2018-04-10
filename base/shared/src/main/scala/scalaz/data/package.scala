@@ -1,19 +1,21 @@
 package scalaz
 
 package object data {
+  val Void: VoidModule with VoidSyntax = VoidImpl
+
   val Forall: ForallModule with ForallSyntax = ForallImpl
-  val ∀ : Forall.type = Forall
+  val ∀ : Forall.type                        = Forall
 
   type Forall[F[_]] = Forall.Forall[F]
-  type ∀[F[_]] = Forall[F]
+  type ∀[F[_]]      = Forall[F]
 
   val Forall2: Forall2Module with Forall2Syntax = Forall2Impl
-  val ∀∀ : Forall2.type = Forall2
+  val ∀∀ : Forall2.type                         = Forall2
 
   type Forall2[F[_, _]] = Forall2.Forall2[F]
-  type ∀∀[F[_, _]] = Forall2[F]
+  type ∀∀[F[_, _]]      = Forall2[F]
 
-  type ~>[F[_], G[_]] = ∀[λ[α => F[α] => G[α]]]
+  type ~>[F[_], G[_]]        = ∀[λ[α => F[α] => G[α]]]
   type ~~>[F[_, _], G[_, _]] = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
 
   /**
@@ -70,8 +72,17 @@ package object data {
     }
   }
 
+  val AFix: AFixModule = AFixImpl
+  type AFix[F[_[_, _], _, _], A, B] = AFix.AFix[F, A, B]
+
+  val AList: AListModule = AListImpl
+  type AList[F[_, _], A, B] = AList.AList[F, A, B]
+
   val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
+
+  val IList: IListModule = IListImpl
+  type IList[A] = IList.IList[A]
 
   val Maybe: MaybeModule = MaybeImpl
   type Maybe[A] = Maybe.Maybe[A]
@@ -79,6 +90,4 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 
-  val IList: IListModule = IListImpl
-  type IList[A] = IList.IList[A]
 }

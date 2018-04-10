@@ -7,6 +7,12 @@ object SyntaxResolutionTest {
 
   def _apply[F[_]: Apply, A, B](fa: F[A], f: F[A => B]): F[B] = fa.ap(f)
 
+  def _bifunctor[F[_, _]: Bifunctor, A, B, S, T](fab: F[A, B], as: A => S, bt: B => T) = {
+    fab.lmap(as): F[S, B]
+    fab.rmap(bt): F[A, T]
+    fab.bimap(as, bt): F[S, T]
+  }
+
   def _bind[F[_]: Bind, A, B](fa: F[A], f: A => F[B]): F[B] = fa.flatMap(f)
 
   def _choice[F[_, _]: Choice, A, B, C](fab: F[A, B]) = {
@@ -35,14 +41,14 @@ object SyntaxResolutionTest {
   def _phantom[F[_]: Phantom, A, B](fa: F[A]): F[B] = fa.pmap
 
   def _profunctor[F[_, _]: Profunctor, A, B, C, D](fab: F[A, B], ca: C => A, bd: B => D) = {
-    fab.lmap(ca) : F[C, B]
-    fab.rmap(bd) : F[A, D]
+    fab.lmap(ca): F[C, B]
+    fab.rmap(bd): F[A, D]
     fab.dimap(ca)(bd): F[C, D]
   }
 
   def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
 
-  def _show[A: Show](a: A): String = a.show
+  def _debug[A: Debug](a: A): String = a.debug
 
   def _strong[F[_, _]: Strong, A, B, C](fab: F[A, B]) = {
     fab.first[C]: F[(A, C), (B, C)]

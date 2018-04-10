@@ -5,11 +5,7 @@ title:  "Functor"
 
 # Functor
 
-The `Functor` type class represents a type that can be mapped over.
-
-**Category Theory**
-
-*A (mathematical) functor represents a mapping between categories.*
+*The `Functor` type class represents a type that can be mapped over.*
 
 A functor needs to satisfy the two functor laws:
 
@@ -26,12 +22,15 @@ import Scalaz._
 ## Instance declaration
 
 ```tut
-val listFunctor: Functor[List] = new Functor[List] {
+import scalaz.Prelude._
+import scalaz.typeclass.FunctorClass
+
+val listFunctor: Functor[List] = instanceOf(new FunctorClass[List] {
   def map[A, B](ma: List[A])(f: A => B): List[B] = ma match {
     case Nil => Nil
     case x :: xs => f(x) :: map(xs)(f)
   }
-}
+})
 ```
 
 ## Usage

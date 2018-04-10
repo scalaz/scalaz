@@ -19,11 +19,13 @@ package scalaz.effect
  * }}}
  */
 trait SafeApp extends RTS {
+  type Error
+
   /**
    * The main function of the application, which will be passed the command-line
    * arguments to the program.
    */
-  def run[E](args: List[String]): IO[E, Unit]
+  def run(args: List[String]): IO[Error, Unit]
 
   /**
    * The Scala main function, intended to be called only by the Scala runtime.

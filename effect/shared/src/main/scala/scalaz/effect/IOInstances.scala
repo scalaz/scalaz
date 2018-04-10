@@ -1,10 +1,11 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scalaz.typeclass.{Monad, MonadClass}
+import scalaz.typeclass.{ BindClass, MonadClass }
 
 trait IOInstances {
-  implicit def monad[E]: Monad[IO[E, ?]] = new MonadClass.Template[IO[E, ?]] {
+  implicit def monad[E]: Monad[IO[E, ?]] = instanceOf(new MonadClass[IO[E, ?]] with BindClass.DeriveFlatten[IO[E, ?]] {
     override final def map[A, B](ma: IO[E, A])(f: A => B): IO[E, B] =
       ma.map(f)
 
@@ -15,5 +16,5 @@ trait IOInstances {
 
     override final def flatMap[A, B](ma: IO[E, A])(f: A => IO[E, B]): IO[E, B] =
       ma.flatMap(f)
-  }
+  })
 }

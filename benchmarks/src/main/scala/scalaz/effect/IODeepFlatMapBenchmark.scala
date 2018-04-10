@@ -17,9 +17,10 @@ class IODeepFlatMapBenchmark {
   @Benchmark
   def thunkDeepFlatMap(): BigInt = {
     def fib(n: Int): Thunk[BigInt] =
-      if (n <= 1) Thunk(n) else
-        fib(n-1).flatMap { a =>
-          fib(n-2).flatMap(b => Thunk(a + b))
+      if (n <= 1) Thunk(n)
+      else
+        fib(n - 1).flatMap { a =>
+          fib(n - 2).flatMap(b => Thunk(a + b))
         }
 
     fib(depth).unsafePerformIO()
@@ -31,9 +32,10 @@ class IODeepFlatMapBenchmark {
     import scala.concurrent.duration.Duration.Inf
 
     def fib(n: Int): Future[BigInt] =
-      if (n <= 1) Future(n) else
-        fib(n-1).flatMap { a =>
-          fib(n-2).flatMap(b => Future(a + b))
+      if (n <= 1) Future(n)
+      else
+        fib(n - 1).flatMap { a =>
+          fib(n - 2).flatMap(b => Future(a + b))
         }
 
     Await.result(fib(depth), Inf)
@@ -44,9 +46,10 @@ class IODeepFlatMapBenchmark {
     import monix.eval.Task
 
     def fib(n: Int): Task[BigInt] =
-      if (n <= 1) Task.eval(n) else
-        fib(n-1).flatMap { a =>
-          fib(n-2).flatMap(b => Task.eval(a + b))
+      if (n <= 1) Task.eval(n)
+      else
+        fib(n - 1).flatMap { a =>
+          fib(n - 2).flatMap(b => Task.eval(a + b))
         }
 
     fib(depth).runSyncMaybe.right.get
@@ -68,9 +71,10 @@ class IODeepFlatMapBenchmark {
     import cats.effect._
 
     def fib(n: Int): IO[BigInt] =
-      if (n <= 1) IO(n) else
-        fib(n-1).flatMap { a =>
-          fib(n-2).flatMap(b => IO(a + b))
+      if (n <= 1) IO(n)
+      else
+        fib(n - 1).flatMap { a =>
+          fib(n - 2).flatMap(b => IO(a + b))
         }
 
     fib(depth).unsafeRunSync

@@ -1,6 +1,6 @@
 package scalaz
 package typeclass
 
-trait ApplyClass[F[_]] extends Apply[F] with FunctorClass[F] {
-  implicit final def apply: Apply[F] = this
+trait ApplyClass[F[_]] extends FunctorClass[F] {
+  def ap[A, B](fa: F[A])(f: F[A => B]): F[B]
 }

@@ -73,21 +73,17 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
 
   """
 
-  def testPoint = {
+  def testPoint =
     unsafePerformIO(IO.point(1)) must_=== 1
-  }
 
-  def testPointIsLazy = {
-    IO.point(throw new Error("Not lazy")) must not (throwA[Throwable])
-  }
+  def testPointIsLazy =
+    IO.point(throw new Error("Not lazy")) must not(throwA[Throwable])
 
-  def testNowIsEager = {
+  def testNowIsEager =
     (IO.now(throw new Error("Eager"))) must (throwA[Error])
-  }
 
-  def testSuspendIsLazy = {
-    IO.suspend(throw new Error("Eager")) must not (throwA[Throwable])
-  }
+  def testSuspendIsLazy =
+    IO.suspend(throw new Error("Eager")) must not(throwA[Throwable])
 
   def testSuspendIsEvaluatable = {
     unsafePerformIO(IO.suspend(IO.point[Throwable, Int](42))) must_=== 42
@@ -250,17 +246,14 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     } yield v) must_=== 1000
   }
 
-  def testDeepMapOfPoint = {
+  def testDeepMapOfPoint =
     unsafePerformIO(deepMapPoint(10000)) must_=== 10000
-  }
 
-  def testDeepMapOfNow = {
+  def testDeepMapOfNow =
     unsafePerformIO(deepMapNow(10000)) must_=== 10000
-  }
 
-  def testDeepMapOfSyncEffectIsStackSafe = {
+  def testDeepMapOfSyncEffectIsStackSafe =
     unsafePerformIO(deepMapEffect(10000)) must_=== 10000
-  }
 
   def testDeepAttemptIsStackSafe = {
     unsafePerformIO((0 until 10000).foldLeft(IO.sync[Throwable, Unit](())) { (acc, _) =>
@@ -280,9 +273,8 @@ class RTSSpec(implicit ee : ExecutionEnv) extends Specification
     unsafePerformIO(IO.async[Throwable, Int](cb => cb(FiberResult.Completed(42)))) must_=== 42
   }
 
-  def testSleepZeroReturns = {
+  def testSleepZeroReturns =
     unsafePerformIO(IO.sleep(1.nanoseconds)) must_=== ((): Unit)
-  }
 
   def testForkJoinIsId = {
     unsafePerformIO(IO.point[Throwable, Int](42).fork.flatMap(_.join)) must_=== 42

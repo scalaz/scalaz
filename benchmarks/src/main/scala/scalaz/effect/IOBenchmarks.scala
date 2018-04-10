@@ -14,12 +14,13 @@ object IOBenchmarks extends RTS {
       new Thunk(() => ab(unsafePerformIO()))
     def flatMap[B](afb: A => Thunk[B]): Thunk[B] =
       new Thunk(() => afb(unsafePerformIO()).unsafePerformIO())
-    def attempt: Thunk[Either[Throwable, A]] = new Thunk(() => {
-      try Right(unsafePerformIO())
-      catch {
-        case t : Throwable => Left(t)
-      }
-    })
+    def attempt: Thunk[Either[Throwable, A]] =
+      new Thunk(() => {
+        try Right(unsafePerformIO())
+        catch {
+          case t: Throwable => Left(t)
+        }
+      })
   }
   object Thunk {
     def apply[A](a: => A): Thunk[A] = new Thunk(() => a)

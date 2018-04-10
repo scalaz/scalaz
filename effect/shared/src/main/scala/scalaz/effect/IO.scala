@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 import scalaz.data.Disjunction
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
-import scalaz.data.Void
+import scalaz.Void
 
 import scalaz.effect.Errors._
 
