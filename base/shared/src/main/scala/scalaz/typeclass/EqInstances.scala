@@ -25,14 +25,11 @@ trait EqInstances {
     instanceOf[EqClass[Double]]((a, b) => doubleToRawLongBits(a) == doubleToRawLongBits(b))
 
   implicit final def optionEq[A](implicit A: Eq[A]): Eq[Option[A]] =
-    instanceOf[EqClass[Option[A]]](
-      (a1, a2) =>
-        (a1, a2) match {
-          case (None, None)         => true
-          case (Some(a1), Some(a2)) => A.equal(a1, a2)
-          case _                    => false
-      }
-    )
+    instanceOf[EqClass[Option[A]]] {
+      case (None, None)         => true
+      case (Some(a1), Some(a2)) => A.equal(a1, a2)
+      case _                    => false
+    }
 
   implicit final def eitherEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Either[A, B]] =
     instanceOf[EqClass[Either[A, B]]] {
