@@ -96,6 +96,22 @@ lazy val concurrent = Project(
   coreJVM, effectJVM
 )
 
+lazy val ioeffect = Project(
+  id = "ioeffect",
+  base = file("ioeffect")
+).settings(
+  standardSettings,
+  name := IOEffectName,
+  osgiExport("scalaz.ioeffect"),
+  OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"),
+  libraryDependencies ++=
+  Seq("org.specs2" %% "specs2-core"          % "4.0.0" % "test",
+    "org.specs2" %% "specs2-matcher-extra" % "4.0.0" % "test"),
+  scalacOptions in Test ++= Seq("-Yrangepos")
+).dependsOn(
+  coreJVM
+)
+
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
 lazy val effectNative = effect.native
