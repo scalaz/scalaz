@@ -13,7 +13,13 @@ sealed abstract class AsyncReturn[E, A]
 object AsyncReturn {
   type Interruptor = Throwable => Unit
 
-  private final case object Later extends AsyncReturn[Nothing, Nothing]
+  sealed abstract case class Later[E, A] private () extends AsyncReturn[E, A]
+  object Later {
+    // Trick thanks to Sam Halliday. We eliminate allocation overhead but also
+    // preserve exhaustivity checking.
+    private[this] val value: Later[Nothing, Nothing] = new Later[Nothing, Nothing] {}
+    def apply[E, A](): AsyncReturn[E, A]             = value.asInstanceOf[AsyncReturn[E, A]]
+  }
   // TODO: Optimize this common case to less overhead with opaque types
   final case class Now[E, A](value: FiberResult[E, A]) extends AsyncReturn[E, A]
   final case class MaybeLater[E, A](interruptor: Interruptor) extends AsyncReturn[E, A]
@@ -25,7 +31,7 @@ object AsyncReturn {
    *
    * See `IO.async0` for more information.
    */
-  final def later[E, A]: AsyncReturn[E, A] = Later.asInstanceOf[AsyncReturn[E, A]]
+  final def later[E, A]: AsyncReturn[E, A] = Later()
 
   /**
    * Constructs an `AsyncReturn` that represents a synchronous return. The

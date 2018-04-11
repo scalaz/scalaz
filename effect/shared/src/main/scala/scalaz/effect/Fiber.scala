@@ -29,8 +29,6 @@ trait Fiber[E, A] {
    */
   def join: IO[E, A]
 
-  // def pause[E]: IO[E, IO[E, A]]
-
   /**
    * Interrupts the fiber with the specified error. If the fiber has already
    * terminated, either successfully or with error, this will resume

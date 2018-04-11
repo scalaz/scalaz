@@ -163,6 +163,9 @@ sealed abstract class IO[E, A] { self =>
    * Executes this action, capturing both failure and success and returning
    * the result in a `Disjunction`. This method is useful for recovering from
    * `IO` actions that may fail.
+   *
+   * The error parameter of the returned `IO` may be chosen arbitrarily, since
+   * it is guaranteed the `IO` computation does not raise any errors.
    */
   final def attempt[E2]: IO[E2, E \/ A] = (self.tag : @switch) match {
     case IO.Tags.Point =>
