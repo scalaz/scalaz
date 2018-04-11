@@ -5,7 +5,7 @@ title:  "Type classes"
 
 # Type classes
 
-_In computer science, a type class is a type system construct that supports ad hoc polymorphism.
+_A type class is a type system construct that supports ad hoc polymorphism.
 This is achieved by adding constraints to type variables in parametrically polymorphic types._ <sup>[1](#f1)</sup>
 
 Type class instances allow us to add behaviour to types without changing the types themselves.
