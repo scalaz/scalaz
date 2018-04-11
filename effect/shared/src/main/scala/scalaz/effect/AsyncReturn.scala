@@ -17,8 +17,9 @@ object AsyncReturn {
   object Later {
     // Trick thanks to Sam Halliday. We eliminate allocation overhead but also
     // preserve exhaustivity checking.
-    private[this] val value: Later[Nothing, Nothing] = new Later[Nothing, Nothing] {}
-    def apply[E, A](): AsyncReturn[E, A]             = value.asInstanceOf[AsyncReturn[E, A]]
+    private[this] final class Later_[+E, +A] extends Later[E, A]
+    private[this] val value: Later[Nothing, Nothing] = new Later_[Nothing, Nothing]
+    def apply[E, A](): AsyncReturn[E, A]             = value.asInstanceOf[Later[E, A]]
   }
   // TODO: Optimize this common case to less overhead with opaque types
   final case class Now[E, A](value: FiberResult[E, A])        extends AsyncReturn[E, A]
