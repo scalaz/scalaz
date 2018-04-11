@@ -23,14 +23,15 @@ import Promise.internal._
  * }}}
  */
 class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) extends AnyVal {
+
   /**
    * Retrieves the value of the promise, suspending the fiber running the action
    * until the result is available.
    */
   final def get: IO[E, A] =
     IO.async0[E, A](k => {
-      var result : AsyncReturn[E, A] = null.asInstanceOf[AsyncReturn[E, A]]
-      var retry = true
+      var result: AsyncReturn[E, A] = null.asInstanceOf[AsyncReturn[E, A]]
+      var retry                     = true
 
       while (retry) {
         val oldState = state.get
@@ -71,36 +72,37 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
    * Completes the promise with the specified result. If the specified promise
    * has already been completed, the method will produce false.
    */
-  final def done[E2](r: FiberResult[E, A]): IO[E2, Boolean] = IO.flatten(IO.sync {
-    var action: IO[E2, Boolean] = null.asInstanceOf[IO[E2, Boolean]]
-    var retry = true
+  final def done[E2](r: FiberResult[E, A]): IO[E2, Boolean] =
+    IO.flatten(IO.sync {
+      var action: IO[E2, Boolean] = null.asInstanceOf[IO[E2, Boolean]]
+      var retry                   = true
 
-    while (retry) {
-      val oldState = state.get
+      while (retry) {
+        val oldState = state.get
 
-      val newState = oldState match {
-        case Pending(joiners) =>
-          action =
-            forkAll(joiners.map(k => IO.sync[E2, Unit](k(r)))) *>
-            IO.now[E2, Boolean](true)
+        val newState = oldState match {
+          case Pending(joiners) =>
+            action =
+              forkAll(joiners.map(k => IO.sync[E2, Unit](k(r)))) *>
+                IO.now[E2, Boolean](true)
 
-          Done(r)
+            Done(r)
 
-        case Done(_) =>
-          action = IO.now[E2, Boolean](false)
+          case Done(_) =>
+            action = IO.now[E2, Boolean](false)
 
-          oldState
+            oldState
+        }
+
+        retry = !state.compareAndSet(oldState, newState)
       }
 
-      retry = !state.compareAndSet(oldState, newState)
-    }
-
-    action
-  })
+      action
+    })
 
   // TODO: This is the main bottleneck
   private def forkAll[E2](l: List[IO[E2, Unit]]): IO[E2, Unit] = l match {
-    case Nil => IO.unit[E2]
+    case Nil     => IO.unit[E2]
     case x :: xs => x.fork.toUnit *> forkAll(xs)
   }
 
@@ -123,6 +125,7 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
   }
 }
 object Promise {
+
   /**
    * Makes a new promise.
    */
@@ -141,6 +144,6 @@ object Promise {
   private[effect] object internal {
     sealed trait State[E, A]
     final case class Pending[E, A](joiners: List[FiberResult[E, A] => Unit]) extends State[E, A]
-    final case class Done[E, A](value: FiberResult[E, A]) extends State[E, A]
+    final case class Done[E, A](value: FiberResult[E, A])                    extends State[E, A]
   }
 }

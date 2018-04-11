@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicReference
  * } yield ()
  * }}}
  */
-final class IORef[A] private (private val value : AtomicReference[A]) extends AnyVal {
+final class IORef[A] private (private val value: AtomicReference[A]) extends AnyVal {
+
   /**
    * Reads the value from the `IORef`.
    */
@@ -47,8 +48,8 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
    * implemented in terms of `modifyFold` purely for performance reasons.
    */
   final def modify[E](f: A => A): IO[E, A] = IO.sync {
-    var loop = true
-    var next : A = null.asInstanceOf[A]
+    var loop    = true
+    var next: A = null.asInstanceOf[A]
 
     while (loop) {
       val current = value.get
@@ -68,7 +69,7 @@ final class IORef[A] private (private val value : AtomicReference[A]) extends An
    */
   final def modifyFold[E, B](f: A => (B, A)): IO[E, B] = IO.sync {
     var loop = true
-    var b : B = null.asInstanceOf[B]
+    var b: B = null.asInstanceOf[B]
 
     while (loop) {
       val current = value.get
