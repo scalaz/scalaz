@@ -117,9 +117,8 @@ class SymOps(val c: blackbox.Context) {
       case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
     }
 
-    val methodNameEnd      = T.tpe.typeSymbol.name.encodedName.toString
-    val uncappedMethodName = String.valueOf(Character.toLowerCase(methodNameEnd.charAt(0))) + methodNameEnd.substring(1)
-    (ev, TermName(uncappedMethodName), lhs)
+    val methodName = T.tpe.typeSymbol.name.encodedName.toString
+    (ev, TermName(methodName), lhs)
   }
 }
 
