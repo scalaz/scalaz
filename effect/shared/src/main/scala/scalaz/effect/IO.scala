@@ -162,6 +162,12 @@ sealed abstract class IO[E, A] { self =>
     }
 
   /**
+   * Widens the error type to any supertype. While `leftMap` suffices for this
+   * purpose, this method is significantly faster for this purpose.
+   */
+  final def widen[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
+
+  /**
    * Executes this action, capturing both failure and success and returning
    * the result in a `Disjunction`. This method is useful for recovering from
    * `IO` actions that may fail.
