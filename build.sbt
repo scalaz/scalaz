@@ -149,7 +149,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
     minSuccessfulTests := 33
   )
   .jsSettings(
-    minSuccessfulTests := 10
+    minSuccessfulTests := 10,
+    parallelExecution in Test := false
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
