@@ -63,6 +63,65 @@ class Ops(val c: blackbox.Context) {
     }
 }
 
+/* Version of the zero-cost syntax macro that allows you to pass
+ * the method name in as a type.
+ */
+class SymOps(val c: blackbox.Context) {
+  import c.universe._
+
+  /* def method: R */
+  def f_0[T](implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs)"
+  }
+
+  /* def method(a: A): R */
+  def f_1[T](f: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs)($f)"
+  }
+
+  /* def method(f: A): R */
+  def fa_1[T](f: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs, $f)"
+  }
+
+  /* def method(f: A)(g: B): R */
+  def f_1_1[T](f: Tree)(g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs)($f)($g)"
+  }
+
+  /* def method(f: A)(g: B): R */
+  def fa_1_1[T](f: Tree)(g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs, $f)($g)"
+  }
+
+  /* def method(f: A, g: B): R */
+  def f_2[T](f: Tree, g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
+    val (ev, name, lhs) = unpack[T]
+    q"$ev.$name($lhs)($f, $g)"
+  }
+
+  /** Destructured macro application.
+   * - `ev`: the typeclass evidence
+   * - `name`: the name of the invoked method
+   * - `lhs`: the invocation target of the call
+   */
+  private def unpack[T](implicit T: c.WeakTypeTag[T]): (c.Tree, TermName, c.Tree) = {
+    val (ev, lhs) = c.prefix.tree match {
+      case Apply(Apply(TypeApply(_, _), List(lhs)), List(ev)) =>
+        (ev, lhs)
+      case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
+    }
+
+    val methodName = T.tpe.typeSymbol.name.encodedName.toString
+    (ev, TermName(methodName), lhs)
+  }
+}
+
 /** Versions of the zero-cost macros for when the receiver is not an instance
  * of the typeclass in question.
  */
