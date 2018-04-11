@@ -7,8 +7,6 @@ import scala.concurrent.Await
 
 import IOBenchmarks._
 
-import scalaz.data.Void
-
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)

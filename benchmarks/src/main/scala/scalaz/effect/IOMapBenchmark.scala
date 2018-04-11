@@ -6,8 +6,6 @@ import org.openjdk.jmh.annotations._
 import scala.concurrent.Await
 import scala.annotation.tailrec
 
-import scalaz.data.Void
-
 import IOBenchmarks._
 
 @State(Scope.Thread)
