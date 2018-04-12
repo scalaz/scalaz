@@ -48,6 +48,7 @@ import scalaz.effect.Errors._
  * `SafeApp`.
  */
 sealed abstract class IO[E, A] { self =>
+
   /**
    * Maps an `IO[E, A]` into an `IO[E, B]` by applying the specified `A => B` function
    * to the output of this action. Repeated applications of `map`
