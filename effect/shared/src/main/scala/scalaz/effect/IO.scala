@@ -607,15 +607,18 @@ object IO extends IOInstances {
   final def suspend[E, A](io: => IO[E, A]): IO[E, A] = Suspend(() => io)
 
   /**
-   * Imports a synchronous effect into a pure `IO` value. If the thunk returns
-   * a null value, this will throw a `NullPointerException` inside `IO`.
+   * Imports a synchronous effect into a pure `IO` value.
    *
    * {{{
-   * def putStrLn(line: String): IO[Throwable, Unit] = IO.partialSync(println(line))
+   * val nanoTime: IO[Void, Long] = IO.sync(System.nanoTime())
    * }}}
    */
   final def sync[E, A](effect: => A): IO[E, A] = SyncEffect(() => effect)
 
+  /**
+   * Imports a synchronous effect into a pure `IO` value, translating any errors
+   * into a disjunction.
+   */
   final def trySync[E, A](effect: => A): IO[E, Throwable \/ A] =
     IO.sync(try {
       val result = effect
@@ -623,6 +626,15 @@ object IO extends IOInstances {
       Disjunction.right(result)
     } catch { case t: Throwable => Disjunction.left(t) })
 
+  /**
+   *
+   * Imports a synchronous effect into a pure `IO` value, translating any errors
+   * into a `Throwable` failure in the returned value.
+   *
+   * {{{
+   * def putStrLn(line: String): IO[Throwable, Unit] = IO.partialSync(println(line))
+   * }}}
+   */
   final def partialSync[A](effect: => A): IO[Throwable, A] =
     IO.absolve(trySync[Throwable, A](effect))
 
