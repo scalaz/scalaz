@@ -76,11 +76,11 @@ You can use the `sync` method of `IO` to import effectful synchronous code into 
 val nanoTime: IO[Void, Long] = IO.sync(System.nanoTime())
 ```
 
-If you are importing effectful code that may throw exceptions, you can use the `partialSync` method of `IO`:
+If you are importing effectful code that may throw exceptions, you can use the `syncThrowable` method of `IO`:
 
 ```scala
 def readFile(name: String): IO[Throwable, ByteArray] =
-  IO.partialSync(FileUtils.readBytes(name))
+  IO.syncThrowable(FileUtils.readBytes(name))
 ```
 
 You can use the `async` method of `IO` to import effectful asynchronous code into your purely functional program:
@@ -265,7 +265,7 @@ Separately from errors of type `E`, a fiber may be terminated for the following 
  * The fiber failed to handle an `E`. This situation happens only when an `IO.fail` is not handled at a higher-level. For values of type `IO[Void, A]`, this type of failure is impossible.
  * The fiber has a defect that leads to a non-recoverable error. There are only two ways this can happen:
      1. A partial function is passed to a higher-order function such as `map` or `flatMap`. For example, `io.map(_ => throw e)`, or `io.flatMap(a => throw e)`. The solution to this problem is to not to pass impure functions to purely functional libraries like Scalaz, because doing so leads to violations of laws and destruction of equational reasoning.
-     2. Error-throwing code was embedded into some value via `IO.point`, `IO.sync`, etc. For importing partial effects into `IO`, the proper solution is to use a method such as `partialSync`, which safely translates exceptions into values.
+     2. Error-throwing code was embedded into some value via `IO.point`, `IO.sync`, etc. For importing partial effects into `IO`, the proper solution is to use a method such as `syncThrowable`, which safely translates exceptions into values.
 
 When a fiber is terminated, the reason for the termination, expressed as a `Throwable`, is passed to the fiber's supervisor, which may choose to log, print the stack trace, restart the fiber, or perform some other action appropriate to the context.
 

@@ -107,7 +107,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   }
 
   def testEvalOfAttemptOfSyncEffectError =
-    unsafePerformIO(IO.partialSync(throw ExampleError).attempt[Throwable]) must_=== -\/(ExampleError)
+    unsafePerformIO(IO.syncThrowable(throw ExampleError).attempt[Throwable]) must_=== -\/(ExampleError)
 
   def testEvalOfAttemptOfFail = {
     unsafePerformIO(IO.fail[Throwable, Int](ExampleError).attempt[Throwable]) must_=== -\/(ExampleError)
@@ -316,7 +316,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     if (n <= 0) IO.sync(n) else IO.sync(n - 1).map(_ + 1)
 
   def deepErrorEffect(n: Int): IO[Throwable, Unit] =
-    if (n == 0) IO.partialSync(throw ExampleError)
+    if (n == 0) IO.syncThrowable(throw ExampleError)
     else IO.unit *> deepErrorEffect(n - 1)
 
   def deepErrorFail(n: Int): IO[Throwable, Unit] =

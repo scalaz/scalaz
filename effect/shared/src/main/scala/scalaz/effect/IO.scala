@@ -16,6 +16,10 @@ import scalaz.effect.Errors._
  * describes an effectful action that may fail with an `E`, run forever, or
  * produce a single `A` at some point in the future.
  *
+ * Conceptually, this structure is equivalent to `EitherT[F, E, A]` for some
+ * infallible effect monad `F`, but because monad transformers perform poorly
+ * in Scala, this structure bakes in the `EitherT` without runtime overhead.
+ *
  * `IO` values are ordinary immutable values, and may be used like any other
  * values in purely functional code. Because `IO` values just *describe*
  * effects, which must be interpreted by a separate runtime system, they are
@@ -44,7 +48,6 @@ import scalaz.effect.Errors._
  * `SafeApp`.
  */
 sealed abstract class IO[E, A] { self =>
-
   /**
    * Maps an `IO[E, A]` into an `IO[E, B]` by applying the specified `A => B` function
    * to the output of this action. Repeated applications of `map`
@@ -607,6 +610,12 @@ object IO extends IOInstances {
   final def suspend[E, A](io: => IO[E, A]): IO[E, A] = Suspend(() => io)
 
   /**
+   * Interrupts the fiber executing this action, which terminates the fiber
+   * immediately, running all finalizers.
+   */
+  final def interrupt[E, A](t: Throwable): IO[E, A] = Interrupt(t)
+
+  /**
    * Imports a synchronous effect into a pure `IO` value.
    *
    * {{{
@@ -616,27 +625,44 @@ object IO extends IOInstances {
   final def sync[E, A](effect: => A): IO[E, A] = SyncEffect(() => effect)
 
   /**
-   * Imports a synchronous effect into a pure `IO` value, translating any errors
-   * into a disjunction.
+   *
+   * Imports a synchronous effect into a pure `IO` value, translating any
+   * throwables into a `Throwable` failure in the returned value.
+   *
+   * {{{
+   * def putStrLn(line: String): IO[Throwable, Unit] = IO.syncThrowable(println(line))
+   * }}}
    */
-  final def trySync[E, A](effect: => A): IO[E, Throwable \/ A] =
-    IO.sync(try {
-      val result = effect
-
-      Disjunction.right(result)
-    } catch { case t: Throwable => Disjunction.left(t) })
+  final def syncThrowable[A](effect: => A): IO[Throwable, A] =
+    syncCatch(effect) {
+      case t: Throwable => t
+    }
 
   /**
    *
-   * Imports a synchronous effect into a pure `IO` value, translating any errors
-   * into a `Throwable` failure in the returned value.
+   * Imports a synchronous effect into a pure `IO` value, translating any
+   * exceptions into an `Exception` failure in the returned value.
    *
    * {{{
-   * def putStrLn(line: String): IO[Throwable, Unit] = IO.partialSync(println(line))
+   * def putStrLn(line: String): IO[Throwable, Unit] = IO.syncThrowable(println(line))
    * }}}
    */
-  final def partialSync[A](effect: => A): IO[Throwable, A] =
-    IO.absolve(trySync[Throwable, A](effect))
+  final def syncException[A](effect: => A): IO[Exception, A] =
+    syncCatch(effect) {
+      case e: Exception => e
+    }
+
+  /**
+   * Safely imports an exception-throwing synchronous effect into a pure `IO`
+   * value, translating the specified throwables into `E` with the provided
+   * user-defined function.
+   */
+  final def syncCatch[E, A](effect: => A)(f: PartialFunction[Throwable, E]): IO[E, A] =
+    IO.absolve(IO.sync(try {
+      val result = effect
+
+      Disjunction.right(result)
+    } catch { case t: Throwable if f.isDefinedAt(t) => Disjunction.left(f(t)) }))
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
