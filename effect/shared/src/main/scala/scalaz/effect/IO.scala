@@ -12,9 +12,9 @@ import scalaz.Void
 import scalaz.effect.Errors._
 
 /**
- * An `IO[E, A]` ("Eye-Oh of A") is an immutable data structure that describes an
- * effectful action that may fail with an `E`, run forever, or produce a single
- * `A` at some point in the future.
+ * An `IO[E, A]` ("Eye-Oh of Eeh Aye") is an immutable data structure that
+ * describes an effectful action that may fail with an `E`, run forever, or
+ * produce a single `A` at some point in the future.
  *
  * `IO` values are ordinary immutable values, and may be used like any other
  * values in purely functional code. Because `IO` values just *describe*
@@ -23,7 +23,7 @@ import scalaz.effect.Errors._
  *
  * `IO` values can efficiently describe the following classes of effects:
  *
- *  * **Pure Values** &mdash; `IO.apply`
+ *  * **Pure Values** &mdash; `IO.point`
  *  * **Synchronous Effects** &mdash; `IO.sync`
  *  * **Asynchronous Effects** &mdash; `IO.async`
  *  * **Concurrent Effects** &mdash; `io.fork`
@@ -165,7 +165,7 @@ sealed abstract class IO[E, A] { self =>
    * Widens the error type to any supertype. While `leftMap` suffices for this
    * purpose, this method is significantly faster for this purpose.
    */
-  final def widen[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
+  final def apply[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
 
   /**
    * Executes this action, capturing both failure and success and returning
@@ -567,14 +567,15 @@ object IO extends IOInstances {
   final def point[E, A](a: => A): IO[E, A] = Point(() => a)
 
   /**
-   * Raises the specified error. The moral equivalent of `throw` for pure code.
+   * Creates an `IO` value that represents failure with the specified error.
+   * The moral equivalent of `throw` for pure code.
    */
   final def fail[E, A](error: E): IO[E, A] = Fail(error)
 
   /**
    * Strictly-evaluated unit lifted into the `IO` monad.
    */
-  def unit[E]: IO[E, Unit] = Unit.asInstanceOf[IO[E, Unit]]
+  final def unit[E]: IO[E, Unit] = Unit.asInstanceOf[IO[E, Unit]]
 
   private val Unit: IO[Nothing, Unit] = now(())
 

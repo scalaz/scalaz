@@ -14,7 +14,7 @@ Effect monads like `IO` are how purely functional programs interact with the rea
 
 However, there are many practical reasons to build your programs using `IO`, including all of the following:
 
- * **Asynchronicity**. Like Scala's `Future`, `IO` lets you easily write asynchronous code without blocking or callbacks. Compared to `Future`, `IO` has significantly better performance and cleaner, more expressive, and more composable semantics.
+ * **Asynchronicity**. Like Scala's own `Future`, `IO` lets you easily write asynchronous code without blocking or callbacks. Compared to `Future`, `IO` has significantly better performance and cleaner, more expressive, and more composable semantics.
  * **Composability**. Purely functional code can't be combined with impure code that has side-effects without the straightforward reasoning properties of functional programming. `IO` lets you wrap up all effects into a purely functional package that lets you build composable real world programs.
  * **Concurrency**. `IO` has all the concurrency features of `Future`, and more, based on a clean fiber concurrency model designed to scale well past the limits of native threads. Unlike other effect monads, `IO`'s concurrency primitives do not leak threads.
  * **Interruptibility**. All concurrent computations can be interrupted, in a way that still guarantees resources are cleaned up safely, allowing you to write aggressively parallel code that doesn't waste valuable resources or bring down production servers.
@@ -39,7 +39,9 @@ import scalaz.effect.{IO, SafeApp}
 import scalaz.effect.console._
 
 object MyApp extends SafeApp {
-  def run(args: IList[String]): IO[E, Unit] =
+  type Error = Throwable
+
+  def run(args: IList[String]): IO[Error, Unit] =
     for {
       _ <- putStrLn("Hello! What is your name?")
       n <- getStrLn
@@ -53,7 +55,7 @@ object MyApp extends SafeApp {
 You can lift pure values into `IO` with `IO.point`:
 
 ```scala
-val liftedString: IO[E, String] = IO.point("Hello World")
+val liftedString: IO[Void, String] = IO.point("Hello World")
 ```
 
 The constructor uses non-strict evaluation, so the parameter will not be evaluated until when and if the `IO` action is executed at runtime.
@@ -61,23 +63,30 @@ The constructor uses non-strict evaluation, so the parameter will not be evaluat
 Alternately, you can use the `IO.now` constructor for strict evaluation:
 
 ```scala
-val lifted: IO[E, String] = IO.now("Hello World")
+val lifted: IO[Void, String] = IO.now("Hello World")
 ```
 
-You should never use either constructor for impure code. The result of doing so is undefined, and will probably result in runtime errors.
+You should never use either constructor for impure code. The result of doing so is undefined.
 
 ## Impure Code
 
 You can use the `sync` method of `IO` to import effectful synchronous code into your purely functional program:
 
 ```scala
-def readFile(f: String): IO[E, ByteArray] = IO.sync(Bytes.readFile(f))
+val nanoTime: IO[Void, Long] = IO.sync(System.nanoTime())
+```
+
+If you are importing effectful code that may throw exceptions, you can use the `partialSync` method of `IO`:
+
+```scala
+def readFile(name: String): IO[Throwable, ByteArray] =
+  IO.partialSync(FileUtils.readBytes(name))
 ```
 
 You can use the `async` method of `IO` to import effectful asynchronous code into your purely functional program:
 
 ```scala
-def makeRequest(req: Request): IO[E, Response] =
+def makeRequest(req: Request): IO[HttpException, Response] =
   IO.async(cb => Http.req(req, cb))
 ```
 
@@ -89,12 +98,19 @@ You can change an `IO[E, A]` to an `IO[E, B]` by calling the `map` method with a
 val answer = IO.point(21).map(_ * 2)
 ```
 
+You can transform an `IO[E, A]` into an `IO[E2, A]` by calling the `leftMap` method with a function `E => E2`:
+
+```scala
+val response: IO[AppError, Response] =
+  makeRequest(r).leftMap(AppError(_))
+```
+
 ## Chaining
 
 You can execute two actions in sequence with the `flatMap` method. The second action may depend on the value produced by the first action.
 
 ```scala
-val contacts: IO[E, IList[Contact]] =
+val contacts: IO[IOException, IList[Contact]] =
   readFile("contacts.csv").flatMap((file: ByteArray) =>
     parseCsv(file).map((csv: IList[CsvRow]) =>
       csv.map(rowToContact)
@@ -105,7 +121,7 @@ val contacts: IO[E, IList[Contact]] =
 You can use Scala's `for` comprehension syntax to make this type of code more compact:
 
 ```scala
-val contacts: IO[E, IList[Contact]] =
+val contacts: IO[IOException, IList[Contact]] =
   for {
     file <- readFile("contacts.csv")
     csv  <- parseCsv(file)
@@ -117,33 +133,35 @@ val contacts: IO[E, IList[Contact]] =
 You can create `IO` actions that describe failure with `IO.fail`:
 
 ```scala
-val io: IO[E, String] = IO.fail(new Error("Oh noes!"))
+val failure: IO[String, Unit] = IO.fail("Oh noes!")
 ```
 
 Like all `IO` values, these are immutable values and do not actually throw any exceptions; they merely describe failure as a first-class value.
 
-You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[Void, E \/ A]`:
+You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[E2, E \/ A]`. The choice of `E2` is unconstrained, because the resulting computation cannot fail with any error.
+
+The `Void` type makes a suitable choice to describe computations that cannot fail:
 
 ```scala
-val result = openFile("data.json").attempt.map {
-  case -\/ (error) => /* handle error */ ???
-  case  \/-(file)  => /* handle file */ ???
+val file: IO[Void, Data] = readData("data.json").attempt[Void].map {
+  case -\/ (_)    => IO.point(NoData)
+  case  \/-(data) => IO.point(data)
 }
 ```
 
-You can submerge failures with `IO.absolve`, which turns an `IO[Void, E \/ A]` into an `IO[E, A]`:
+You can submerge failures with `IO.absolve`, which turns an `IO[E, E \/ A]` into an `IO[E, A]`:
 
 ```scala
-def sqrt(io: IO[E, Double]): IO[E, Double] =
+def sqrt(io: IO[Void, Double]): IO[NonNegError, Double] =
   IO.absolve(
-    io.map(value =>
-      if (value < 0.0) -\/(new Error("Only non-negative values!"))
+    io[NonNegError].map(value =>
+      if (value < 0.0) -\/(NonNegError)
       else \/-(Math.sqrt(value))
     )
   )
 ```
 
-If you want to catch and recover from all types of exceptions and effectfully attempt recovery, you can use the `catchAll` method:
+If you want to catch and recover from all types of errors and effectfully attempt recovery, you can use the `catchAll` method:
 
 ```scala
 openFile("primary.json").catchAll(_ => openFile("backup.json"))
@@ -203,7 +221,7 @@ val composite = action1.ensuring(cleanupAction)
 
 To perform an action without blocking the current process, you can use fibers, which are a lightweight mechanism for concurrency.
 
-You can `fork` any `IO[E, A]` to immediately yield an `IO[E, Fiber[A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
+You can `fork` any `IO[E, A]` to immediately yield an `IO[E, Fiber[E, A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
 
 ```scala
 val analyzed =
@@ -221,7 +239,7 @@ val analyzed =
 On the JVM, fibers will use threads, but will not consume *unlimited* threads. Instead, fibers yield cooperatively during periods of high-contention.
 
 ```scala
-def fib(n: Int): IO[E, Int] =
+def fib(n: Int): IO[Void, Int] =
   if (n <= 1) IO.point(1)
   else for {
     fiber1 <- fib(n - 2).fork
@@ -231,16 +249,36 @@ def fib(n: Int): IO[E, Int] =
   } yield v1 + v2
 ```
 
-Interrupting a fiber returns an action that resumes when the fiber has completed or has been interrupted and all its finalizers have been run. These semantics allow construction of programs that do not leak resources.
+Interrupting a fiber returns an action that resumes when the fiber has completed or has been interrupted and all its finalizers have been run. These precise semantics allow construction of programs that do not leak resources.
 
-A more powerful variant of `fork`, called `fork0`, allows specification of a handler that will be passed any uncaught errors from the forked fiber, including all uncaught errors that occur in finalizers. If this handler is not specified, then the handler of the parent fiber will be used, recursively, up to the root handler, which can be specified in `RTS`.
+A more powerful variant of `fork`, called `fork0`, allows specification of supervisor that will be passed any non-recoverable errors from the forked fiber, including all such errors that occur in finalizers. If this supervisor is not specified, then the supervisor of the parent fiber will be used, recursively, up to the root handler, which can be specified in `RTS` (the default supervisor merely prints the stack trace).
+
+## Error Model
+
+The `IO` error model is simple, consistent, permits both typed errors and interruption, and does not violate any laws in the `Functor` hierarchy.
+
+An `IO[E, A]` value may only raise errors of type `E`. These errors are recoverable, and may be caught the `attempt` method. The `attempt` method yields a value that cannot possibly fail with any error `E`. This rigorous guarantee can be reflected at compile-time by choosing an error type such as `Nothing` or `Void`, which is possible because `attempt` is polymorphic in the error type of the returned value.
+
+Separately from errors of type `E`, a fiber may be terminated for the following reasons:
+
+ * The fiber was interrupted by itself or another fiber. The "main" fiber cannot be interrupted because it was not forked from any other fiber.
+ * The fiber failed to handle an `E`. This situation happens only when an `IO.fail` is not handled at a higher-level. For values of type `IO[Void, A]`, this type of failure is impossible.
+ * The fiber has a defect that leads to a non-recoverable error. There are only two ways this can happen:
+     1. A partial function is passed to a higher-order function such as `map` or `flatMap`. For example, `io.map(_ => throw e)`, or `io.flatMap(a => throw e)`. The solution to this problem is to not to pass impure functions to purely functional libraries like Scalaz, because doing so leads to violations of laws and destruction of equational reasoning.
+     2. Error-throwing code was embedded into some value via `IO.point`, `IO.sync`, etc. For importing partial effects into `IO`, the proper solution is to use a method such as `partialSync`, which safely translates exceptions into values.
+
+When a fiber is terminated, the reason for the termination, expressed as a `Throwable`, is passed to the fiber's supervisor, which may choose to log, print the stack trace, restart the fiber, or perform some other action appropriate to the context.
+
+A fiber cannot stop its own termination. However, all finalizers will be run during termination. Errors thrown by finalizers are passed to the fiber's supervisor.
+
+There are no circumstances in which any errors will be "lost", which makes the `IO` error model more diagnostic-friendly than the `try`/`catch`/`finally` construct that is baked into both Scala and Java, which can easily lose errors.
 
 ### Parallelism
 
 To execute actions in parallel, the `par` method can be used:
 
 ```scala
-def bigCompute(m1: Matrix, m2: Matrix, v: Matrix): IO[E, Matrix] =
+def bigCompute(m1: Matrix, m2: Matrix, v: Matrix): IO[Void, Matrix] =
   for {
     t <- computeInverse(m1).par(computeInverse(m2))
     val (i1, i2) = t
@@ -291,4 +329,4 @@ These defaults help guarantee stack safety and cooperative multitasking. They ca
 
 # Legal
 
-Copyright (C) 2017 John A. De Goes. All rights reserved.
+Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
