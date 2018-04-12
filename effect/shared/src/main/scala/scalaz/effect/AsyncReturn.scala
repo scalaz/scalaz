@@ -15,8 +15,8 @@ object AsyncReturn {
 
   sealed abstract case class Later[E, A] private () extends AsyncReturn[E, A]
   object Later {
-    // Trick thanks to Sam Halliday. We eliminate allocation overhead but also
-    // preserve exhaustivity checking.
+    // @xuwei-k's trick with a fix by @hrhino. We eliminate allocation overhead
+    // but also preserve exhaustivity checking.
     private[this] final class Later_[+E, +A] extends Later[E, A]
     private[this] val value: Later[Nothing, Nothing] = new Later_[Nothing, Nothing]
     def apply[E, A](): AsyncReturn[E, A]             = value.asInstanceOf[Later[E, A]]
