@@ -190,6 +190,11 @@ sealed abstract class IO[E, A] { self =>
 
       IO.Strict(\/-(io.value))
 
+    case IO.Tags.SyncEffect =>
+      val io = self.asInstanceOf[IO.SyncEffect[E, A]]
+
+      IO.SyncEffect(() => \/-(io.effect()))
+
     case IO.Tags.Fail =>
       val io = self.asInstanceOf[IO.Fail[E, A]]
 

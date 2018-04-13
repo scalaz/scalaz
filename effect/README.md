@@ -27,6 +27,14 @@ While functional programmers *must* use `IO` (or something like it) to represent
 
 Use `IO` because it's simply not practical to write real-world, correct software without it.
 
+# Introduction
+
+A value of type `IO[E, A]` describes an effect that may fail with an `E`, run forever, or produce a single `A`.
+
+`IO` values are immutable, and all `IO` functions produce new `IO` values, enabling `IO` to be reasoned about and used like any ordinary Scala immutable data structure.
+
+`IO` values do not actually _do_ anything. However, they may be interpreted by the `IO` runtime system into effectful interactions with the external world. Ideally, this occurs at a single time, in your application's `main` function (`SafeApp` provides this functionality automatically).
+
 # Usage
 
 ## Main
@@ -38,8 +46,10 @@ system and allows your entire program to be purely functional.
 import scalaz.effect.{IO, SafeApp}
 import scalaz.effect.console._
 
+import java.io.IOException
+
 object MyApp extends SafeApp {
-  type Error = Throwable
+  type Error = IOException
 
   def run(args: IList[String]): IO[Error, Unit] =
     for {
@@ -66,7 +76,7 @@ Alternately, you can use the `IO.now` constructor for strict evaluation:
 val lifted: IO[Void, String] = IO.now("Hello World")
 ```
 
-You should never use either constructor for impure code. The result of doing so is undefined.
+You should never use either constructor for importing impure code into `IO`. The result of doing so is undefined.
 
 ## Impure Code
 
