@@ -140,17 +140,31 @@ object ScalazProperties {
     }
   }
 
+  object rightReducer {
+    def snocCorrectness[C, M](implicit R: RightReducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.rightReducerLaw.snocCorrectness _)
+
+    def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: RightReducer[C, M]): Properties =
+      newProperties("right reducer") { p =>
+        p.property("snoc correctness") = snocCorrectness[C, M]
+      }
+  }
+
+  object leftReducer {
+    def consCorrectness[C, M](implicit R: LeftReducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.leftReducerLaw.consCorrectness _)
+
+    def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: LeftReducer[C, M]): Properties =
+      newProperties("left reducer") { p =>
+        p.property("cons correctness") = consCorrectness[C, M]
+      }
+  }
+
   object reducer {
-    def consCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
-      forAll(R.reducerLaw.consCorrectness _)
-
-    def snocCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
-      forAll(R.reducerLaw.snocCorrectness _)
-
     def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: Reducer[C, M]): Properties =
       newProperties("reducer") { p =>
-        p.property("cons correctness") = consCorrectness[C, M]
-        p.property("snoc correctness") = snocCorrectness[C, M]
+        p.include(rightReducer.laws[C, M])
+        p.include(leftReducer.laws[C, M])
       }
   }
 
