@@ -40,17 +40,15 @@ trait ListInstances extends ListInstances0 {
         (a, b) => loop(a, b, Nil)
       }
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-        // implementation with `foldRight` leads to SOE in:
-        //
-        //  def wc(c: Char) = State[Boolean, Int]{(inWord) =>
-        //    val s = c != ' '
-        //    (test(!(inWord && s)), s)
-        //  }
-        //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
+        val revOpt: Maybe[F[List[B]]] =
+          F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
+            case a :: as => Maybe.just((f(a), as))
+            case Nil => Maybe.empty
+          })(Reducer.ReverseListReducer[B])
 
-        l.reverse.foldLeft(F.point(Nil: List[B])) { (flb: F[List[B]], a: A) =>
-          F.apply2(f(a), flb)(_ :: _)
-        }
+        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+        F.map(rev)(_.reverse)
       }
 
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {

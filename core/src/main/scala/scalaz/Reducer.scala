@@ -19,7 +19,7 @@ import scalaz.Tags.Conjunction
  * Based on the Reducer Haskell library by Edward Kmett
  * (https://hackage.haskell.org/package/reducers).
  */
-sealed abstract class Reducer[C, M] {
+trait Reducer[C, M] {
   implicit def semigroup: Semigroup[M]
 
   def unit(c: C): M
@@ -51,7 +51,10 @@ sealed abstract class Reducer[C, M] {
     }
   }
 
-  def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] = {
+  def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] =
+    defaultUnfoldlOpt(seed)(f)
+
+  @inline private def defaultUnfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] = {
     @tailrec
     def rec(seed: B, acc: M): M = f(seed) match {
       case Just((b, c)) => rec(b, cons(c, acc))
@@ -63,7 +66,10 @@ sealed abstract class Reducer[C, M] {
   def unfoldl[B](seed: B)(f: B => Maybe[(B, C)])(implicit M: Monoid[M]): M =
     unfoldlOpt(seed)(f) getOrElse M.zero
 
-  def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] = {
+  def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] =
+    defaultUnfoldrOpt(seed)(f)
+
+  @inline private def defaultUnfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] = {
     @tailrec
     def rec(acc: M, seed: B): M = f(seed) match {
       case Just((c, b)) => rec(snoc(acc, c), b)
@@ -81,6 +87,24 @@ sealed abstract class Reducer[C, M] {
 
     def snocCorrectness(m: M, c: C)(implicit E: Equal[M]): Boolean =
       E.equal(snoc(m, c), append(m, unit(c)))
+
+    def unfoldlOptConsistency[B](seed: B, f: B => Maybe[(B, C)])(implicit E: Equal[M]): Boolean = {
+      val g: ((Int, B)) => Maybe[((Int, B), C)] = { case (i, b) =>
+        if(i > 0) f(b) map { case (b, c) => ((i-1, b), c) }
+        else Maybe.empty
+      }
+      val limit = 4 // to prevent infinite unfolds
+      Equal[Maybe[M]].equal(unfoldlOpt((limit, seed))(g), defaultUnfoldlOpt((limit, seed))(g))
+    }
+
+    def unfoldrOptConsistency[B](seed: B, f: B => Maybe[(C, B)])(implicit E: Equal[M]): Boolean = {
+      val g: ((Int, B)) => Maybe[(C, (Int, B))] = { case (i, b) =>
+        if(i > 0) f(b) map { case (c, b) => (c, (i-1, b)) }
+        else Maybe.empty
+      }
+      val limit = 4 // to prevent infinite unfolds
+      Equal[Maybe[M]].equal(unfoldrOpt((limit, seed))(g), defaultUnfoldrOpt((limit, seed))(g))
+    }
   }
   def reducerLaw = new ReducerLaw {}
 }
@@ -121,6 +145,11 @@ sealed abstract class ReducerInstances {
   implicit def ListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
     unitConsReducer(_ :: Nil, _ :: _)
+  }
+
+  def ReverseListReducer[C]: Reducer[C, List[C]] = {
+    import std.list._
+    reducer(_ :: Nil, (c, cs) => cs :+ c, (cs, c) => c :: cs)
   }
 
   /** Collect `C`s into an ilist, in order. */

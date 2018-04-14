@@ -114,6 +114,44 @@ object MaybeTest extends SpecLite {
     P.unfoldrPsum(5)(f) must_=== Just("Stop")
   }
 
+  "lifted Monoid is short-circuiting" in {
+    val M: Monoid[Maybe[Int]] = Monoid.liftMonoid
+
+    val f: Int => Maybe[(Maybe[Int], Int)] = i => {
+      if (i > 0) just((just(i), i-1))
+      else if (i == 0) just((empty, i-1))
+      else sys.error("BOOM!")
+    }
+
+    M.unfoldrSum(5)(f) must_=== Empty()
+  }
+
+  "lifted PlusEmpty is short-circuiting" in {
+    import scalaz.std.list._
+
+    val P: PlusEmpty[λ[a => Maybe[List[a]]]] = PlusEmpty.liftPlusEmpty[Maybe, List]
+
+    val f: Int => Maybe[(Maybe[List[Int]], Int)] = i => {
+      if (i > 0) just((just(List.range(0, i)), i-1))
+      else if (i == 0) just((empty, i-1))
+      else sys.error("BOOM!")
+    }
+
+    P.unfoldrPsum(5)(f) must_=== Empty()
+  }
+
+  "lifted Reducer is short-circuiting" in {
+    val R: Reducer[Maybe[Int], Maybe[Int]] = Apply[Maybe].liftReducer(Reducer.identityReducer[Int])
+
+    val f: Int => Maybe[(Maybe[Int], Int)] = i => {
+      if (i > 0) just((just(i), i-1))
+      else if (i == 0) just((empty, i-1))
+      else sys.error("BOOM!")
+    }
+
+    R.unfoldrOpt(5)(f) must_=== Just(Empty())
+  }
+
   object instances {
     def equal[A: Equal] = Equal[Maybe[A]]
     def order[A: Order] = Order[Maybe[A]]

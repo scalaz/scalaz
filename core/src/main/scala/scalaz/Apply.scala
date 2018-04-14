@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scala.annotation.tailrec
+
 /**
  * [[scalaz.Applicative]] without `point`.
  *
@@ -32,6 +34,20 @@ trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
    * Repeats an applicative action infinitely
    */
   def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
+
+  /**
+   * Unfold `seed` to the right and combine effects left-to-right,
+   * using the given [[Reducer]] to combine values.
+   * Implementations may override this method to not unfold more
+   * than is necessary to determine the result.
+   */
+  def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(F[A], S)])(implicit R: Reducer[A, B]): Maybe[F[B]] = {
+    @tailrec def go(acc: F[B], s: S): F[B] = f(s) match {
+      case Maybe.Just((fa, s)) => go(apply2(acc, fa)(R.snoc), s)
+      case _ => acc
+    }
+    f(seed) map { case (fa, s) => go(map(fa)(R.unit), s) }
+  }
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
@@ -183,6 +199,17 @@ trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
         case (-\/(f), \/-(a)) => -\/(self.map(f)(_(a)))
         case (-\/(f), -\/(a)) => -\/(self.ap(a)(f))
       }
+    }
+
+  def liftReducer[A, B](implicit r: Reducer[A, B]): Reducer[F[A], F[B]] =
+    new Reducer[F[A], F[B]] {
+      def semigroup: Semigroup[F[B]] = Semigroup.liftSemigroup(Apply.this, r.semigroup)
+      def unit(fa: F[A]): F[B] = map(fa)(r.unit)
+      def cons(fa: F[A], fb: F[B]): F[B] = apply2(fa, fb)(r.cons)
+      def snoc(fb: F[B], fa: F[A]): F[B] = apply2(fb, fa)(r.snoc)
+
+      override def unfoldrOpt[S](seed: S)(f: S => Maybe[(F[A], S)]): Maybe[F[B]] =
+        Apply.this.unfoldrOpt(seed)(f)
     }
 
   trait ApplyLaw extends FunctorLaw {

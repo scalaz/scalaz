@@ -141,16 +141,26 @@ object ScalazProperties {
   }
 
   object reducer {
+    import ScalazArbitrary.Arbitrary_Maybe
+
     def consCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
       forAll(R.reducerLaw.consCorrectness _)
 
     def snocCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
       forAll(R.reducerLaw.snocCorrectness _)
 
+    def unfoldlOptConsistency[C, M, S](implicit R: Reducer[C, M], ac: Arbitrary[C], as: Arbitrary[S], cs: Cogen[S], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.unfoldlOptConsistency[S] _)
+
+    def unfoldrOptConsistency[C, M, S](implicit R: Reducer[C, M], ac: Arbitrary[C], as: Arbitrary[S], cs: Cogen[S], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.unfoldrOptConsistency[S] _)
+
     def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: Reducer[C, M]): Properties =
       newProperties("reducer") { p =>
         p.property("cons correctness") = consCorrectness[C, M]
         p.property("snoc correctness") = snocCorrectness[C, M]
+        p.property("unfoldlOpt consistency") = unfoldlOptConsistency[C, M, Int]
+        p.property("unfoldrOpt consistency") = unfoldrOptConsistency[C, M, Int]
       }
   }
 
@@ -219,7 +229,10 @@ object ScalazProperties {
     def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
       newProperties("apply") { p =>
+        implicit val r: Reducer[F[Int], F[Int]] = F.liftReducer(Reducer.identityReducer[Int])
+
         p.include(functor.laws[F])
+        p.include(reducer.laws[F[Int], F[Int]])
         p.property("composition") = self.composition[F, Int, Int, Int]
       }
   }

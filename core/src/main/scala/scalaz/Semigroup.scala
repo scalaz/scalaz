@@ -186,6 +186,9 @@ object Semigroup {
     implicit def F: Apply[F]
     implicit def M: Semigroup[M]
     def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
+
+    override def unfoldrSumOpt[S](seed: S)(f: S => Maybe[(F[M], S)]): Maybe[F[M]] =
+      F.unfoldrOpt(seed)(f)(Reducer.identityReducer[M])
   }
 
   /**A semigroup for sequencing Apply effects. */
