@@ -1,7 +1,7 @@
 package scalaz
 
 package object data {
-  val Void: VoidModule with VoidSyntax = VoidImpl
+  val Void: VoidModule = VoidImpl
 
   val Forall: ForallModule with ForallSyntax = ForallImpl
   val ∀ : Forall.type                        = Forall
