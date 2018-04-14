@@ -105,6 +105,10 @@ sealed abstract class ReducerInstances {
     unitConsReducer(_ :: Nil, c => c :: _)
   }
 
+  /** Collect `C`s into an ilist, in order. */
+  implicit def IListReducer[C]: Reducer[C, IList[C]] =
+    unitConsReducer(_ :: INil(), c => c :: _)
+
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._
