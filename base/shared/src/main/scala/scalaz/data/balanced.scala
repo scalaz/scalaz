@@ -38,7 +38,6 @@ final class PreComposeBalancer[F[_, _], A, B] private (count: Int, stack: AList1
 }
 
 object PreComposeBalancer {
-  //import Forall2Syntax._
 
   def apply[F[_, _], A, B](f: F[A, B]): PreComposeBalancer[F, A, B] =
     new PreComposeBalancer(1, AList1(f))
