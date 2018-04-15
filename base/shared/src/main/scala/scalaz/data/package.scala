@@ -4,13 +4,13 @@ package object data {
   val Void: VoidModule = VoidImpl
 
   val Forall: ForallModule = ForallImpl
-  val ∀ : Forall.type                        = Forall
+  val ∀ : Forall.type      = Forall
 
   type Forall[F[_]] = Forall.Forall[F]
   type ∀[F[_]]      = Forall[F]
 
   val Forall2: Forall2Module = Forall2Impl
-  val ∀∀ : Forall2.type                         = Forall2
+  val ∀∀ : Forall2.type      = Forall2
 
   type Forall2[F[_, _]] = Forall2.Forall2[F]
   type ∀∀[F[_, _]]      = Forall2[F]
