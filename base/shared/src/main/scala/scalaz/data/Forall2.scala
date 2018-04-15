@@ -36,6 +36,15 @@ trait Forall2Module {
   }
 }
 
+trait Forall2Syntax {
+  implicit final class Ops[F[_, _]](val a: ∀∀[F]) {
+    def of[A, B]: F[A, B]    = Forall2.specialize(a)
+    def apply[A, B]: F[A, B] = of[A, B]
+  }
+}
+
+object Forall2Module extends Forall2Syntax
+
 private[data] object Forall2Impl extends Forall2Module with Forall2Syntax {
   type Forall2[F[_, _]] = F[Any, Any]
 

@@ -145,7 +145,6 @@ sealed trait Is[A, B] { ab =>
 }
 
 object Is {
-  import ForallSyntax._
 
   def apply[A, B](implicit ev: A Is B): A Is B = ev
 

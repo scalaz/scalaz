@@ -173,7 +173,6 @@ sealed abstract class As[-A, +B] { ab =>
 }
 
 object As extends AsInstances {
-  import ForallSyntax._
 
   def apply[A, B](implicit ev: A <~< B): A <~< B = ev
 

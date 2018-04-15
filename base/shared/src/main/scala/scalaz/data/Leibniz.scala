@@ -123,7 +123,6 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
 }
 
 object Leibniz {
-  import ForallSyntax._
 
   def apply[L, H >: L, A >: L <: H, B >: L <: H](implicit ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, B] = ab
 
