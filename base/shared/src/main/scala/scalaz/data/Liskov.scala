@@ -99,7 +99,6 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
 }
 
 object Liskov {
-  import ForallSyntax._
 
   def apply[L, H >: L, A >: L <: H, B >: L <: H](implicit ab: Liskov[L, H, A, B]): Liskov[L, H, A, B] = ab
 
