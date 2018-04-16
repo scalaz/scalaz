@@ -7,6 +7,7 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.Specification
 import org.specs2.specification.AroundTimeout
 
+import scalaz.Void
 import scalaz.data.Disjunction._
 
 import scalaz.effect.Errors.UnhandledError
@@ -169,7 +170,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     unsafePerformIO {
       IO.point[Throwable, Int](42)
         .ensuring(IO.fail[Throwable, Unit](ExampleError))
-        .fork0(e => IO.sync[Throwable, Unit] { reported = e; () })
+        .fork0(e => IO.sync[Void, Unit] { reported = e; () })
     }
 
     // FIXME: Is this an issue with thread synchronization?

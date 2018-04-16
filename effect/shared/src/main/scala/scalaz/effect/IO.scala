@@ -66,11 +66,6 @@ sealed abstract class IO[E, A] { self =>
 
       IO.Strict(f(io.value))
 
-    case IO.Tags.SyncEffect =>
-      val io = self.asInstanceOf[IO.SyncEffect[E, A]]
-
-      IO.SyncEffect(() => f(io.effect()))
-
     case IO.Tags.Fail => self.asInstanceOf[IO[E, B]]
 
     case _ => IO.FlatMap(self, (a: A) => IO.Strict(f(a)))
