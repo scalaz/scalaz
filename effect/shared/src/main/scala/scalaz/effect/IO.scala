@@ -510,7 +510,7 @@ object IO extends IOInstances {
     override final def tag = Tags.Fail
   }
 
-  final case class AsyncEffect[E, A](register: (ExitResult[E, A] => Unit) => AsyncReturn[E, A]) extends IO[E, A] {
+  final case class AsyncEffect[E, A](register: (ExitResult[E, A] => Unit) => Async[E, A]) extends IO[E, A] {
     override final def tag = Tags.AsyncEffect
   }
 
@@ -675,7 +675,7 @@ object IO extends IOInstances {
   final def async[E, A](register: (ExitResult[E, A] => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
     register(callback)
 
-    AsyncReturn.later[E, A]
+    Async.later[E, A]
   }
 
   /**
@@ -692,7 +692,7 @@ object IO extends IOInstances {
    * returning a canceler, which will be used by the runtime to cancel the
    * asynchronous effect if the fiber executing the effect is interrupted.
    */
-  final def async0[E, A](register: (ExitResult[E, A] => Unit) => AsyncReturn[E, A]): IO[E, A] = AsyncEffect(register)
+  final def async0[E, A](register: (ExitResult[E, A] => Unit) => Async[E, A]): IO[E, A] = AsyncEffect(register)
 
   /**
    * Returns a computation that will never produce anything. The moral

@@ -30,19 +30,19 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
    */
   final def get: IO[E, A] =
     IO.async0[E, A](k => {
-      var result: AsyncReturn[E, A] = null.asInstanceOf[AsyncReturn[E, A]]
-      var retry                     = true
+      var result: Async[E, A] = null.asInstanceOf[Async[E, A]]
+      var retry               = true
 
       while (retry) {
         val oldState = state.get
 
         val newState = oldState match {
           case Pending(joiners) =>
-            result = AsyncReturn.maybeLater[E, A](interruptJoiner(k))
+            result = Async.maybeLater[E, A](interruptJoiner(k))
 
             Pending(k :: joiners)
           case s @ Done(value) =>
-            result = AsyncReturn.now[E, A](value)
+            result = Async.now[E, A](value)
 
             s
         }

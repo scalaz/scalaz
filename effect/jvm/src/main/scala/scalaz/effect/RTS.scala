@@ -53,7 +53,7 @@ trait RTS {
         done.signal()
       } finally lock.unlock()
     }) match {
-      case AsyncReturn.Now(v) =>
+      case Async.Now(v) =>
         result = v
 
       case _ =>
@@ -103,17 +103,17 @@ trait RTS {
     ()
   }
 
-  final def schedule[E, A](block: => A, duration: Duration): AsyncReturn[E, Unit] =
+  final def schedule[E, A](block: => A, duration: Duration): Async[E, Unit] =
     if (duration == Duration.Zero) {
       submit(block)
 
-      AsyncReturn.later[E, Unit]
+      Async.later[E, Unit]
     } else {
       val future = scheduledExecutor.schedule(new Runnable {
         def run: Unit = submit(block)
       }, duration.toNanos, TimeUnit.NANOSECONDS)
 
-      AsyncReturn.maybeLater { (t: Throwable) =>
+      Async.maybeLater { (t: Throwable) =>
         future.cancel(true); ()
       }
     }
@@ -487,7 +487,7 @@ private object RTS {
 
                     try {
                       io.register(resumeAsync) match {
-                        case AsyncReturn.Now(value) =>
+                        case Async.Now(value) =>
                           // Value returned synchronously, callback will never be
                           // invoked. Attempt resumption now:
                           if (shouldResumeAsync()) {
@@ -509,14 +509,14 @@ private object RTS {
                             eval = false
                           }
 
-                        case AsyncReturn.MaybeLater(canceler) =>
+                        case Async.MaybeLater(canceler) =>
                           // We have a canceler, attempt to store a reference to
                           // it in case the async computation is interrupted:
                           awaitAsync(id, canceler)
 
                           eval = false
 
-                        case AsyncReturn.Later() =>
+                        case Async.Later() =>
                           eval = false
                       }
                     } finally enterAsyncEnd()
@@ -622,7 +622,7 @@ private object RTS {
                     curIo = IO.AsyncEffect { callback =>
                       rts
                         .schedule(callback(SuccessUnit[E].asInstanceOf[ExitResult[E, Any]]), io.duration)
-                        .asInstanceOf[AsyncReturn[E, Any]]
+                        .asInstanceOf[Async[E, Any]]
                     }
 
                   case IO.Tags.Supervise =>
@@ -793,15 +793,15 @@ private object RTS {
 
         // TODO: Tighten this up a bit by dealing with synchronous returns.
         left.register(callback(right, leftWins)) match {
-          case AsyncReturn.Now(tryA) => callback(right, leftWins)(tryA)
-          case AsyncReturn.MaybeLater(cancel) =>
+          case Async.Now(tryA) => callback(right, leftWins)(tryA)
+          case Async.MaybeLater(cancel) =>
             canceler = cancel
-          case AsyncReturn.Later() =>
+          case Async.Later() =>
         }
 
         right.register(callback(left, rightWins)) match {
-          case AsyncReturn.Now(tryA) => callback(left, rightWins)(tryA)
-          case AsyncReturn.MaybeLater(cancel) =>
+          case Async.Now(tryA) => callback(left, rightWins)(tryA)
+          case Async.MaybeLater(cancel) =>
             if (canceler == null) canceler = cancel
             else {
               val oldCanceler = canceler
@@ -818,8 +818,8 @@ private object RTS {
           case _ =>
         }
 
-        if (canceler == null) AsyncReturn.later[E, IO[E, C]]
-        else AsyncReturn.maybeLater(canceler)
+        if (canceler == null) Async.later[E, IO[E, C]]
+        else Async.maybeLater(canceler)
       })
     }
 
@@ -971,7 +971,7 @@ private object RTS {
 
     final def exitUninterruptible: IO[E, Unit] = IO.sync { noInterrupt -= 1 }
 
-    final def register(cb: Callback[E, A]): AsyncReturn[E, A] = join0(cb)
+    final def register(cb: Callback[E, A]): Async[E, A] = join0(cb)
 
     @tailrec
     final def done(v: ExitResult[E, A]): Unit = {
@@ -996,7 +996,7 @@ private object RTS {
     }
 
     @tailrec
-    private final def kill0(t: Throwable, cb: Callback[E, Unit]): AsyncReturn[E, Unit] = {
+    private final def kill0(t: Throwable, cb: Callback[E, Unit]): Async[E, Unit] = {
       killed = true
 
       val oldStatus = status.get
@@ -1004,11 +1004,11 @@ private object RTS {
       oldStatus match {
         case Executing(joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else AsyncReturn.later[E, Unit]
+          else Async.later[E, Unit]
 
         case Interrupting(t, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else AsyncReturn.later[E, Unit]
+          else Async.later[E, Unit]
 
         case AsyncRegion(_, resume, cancelOpt, joiners, killers) if (resume > 0 && noInterrupt == 0) =>
           val v = ExitResult.Terminated[E, A](t)
@@ -1032,35 +1032,35 @@ private object RTS {
 
             purgeJoinersKillers(v, joiners, killers)
 
-            AsyncReturn.now(SuccessUnit[E])
+            Async.now(SuccessUnit[E])
           }
 
         case AsyncRegion(_, _, _, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else AsyncReturn.later[E, Unit]
+          else Async.later[E, Unit]
 
-        case Done(_) => AsyncReturn.now(SuccessUnit[E])
+        case Done(_) => Async.now(SuccessUnit[E])
       }
     }
 
     @tailrec
-    private final def join0(cb: Callback[E, A]): AsyncReturn[E, A] = {
+    private final def join0(cb: Callback[E, A]): Async[E, A] = {
       val oldStatus = status.get
 
       oldStatus match {
         case Executing(joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Executing(cb :: joiners, killers))) join0(cb)
-          else AsyncReturn.later[E, A]
+          else Async.later[E, A]
 
         case Interrupting(t, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, cb :: joiners, killers))) join0(cb)
-          else AsyncReturn.later[E, A]
+          else Async.later[E, A]
 
         case AsyncRegion(reenter, resume, cancel, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, AsyncRegion(reenter, resume, cancel, cb :: joiners, killers))) join0(cb)
-          else AsyncReturn.later[E, A]
+          else Async.later[E, A]
 
-        case Done(v) => AsyncReturn.now(v)
+        case Done(v) => Async.now(v)
       }
     }
 
