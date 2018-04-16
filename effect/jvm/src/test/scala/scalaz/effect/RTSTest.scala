@@ -41,7 +41,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     fail on error                           $testEvalOfFailOnError
     finalizer errors not caught             $testErrorInFinalizerCannotBeCaught
     finalizer errors reported               ${upTo(1.second)(testErrorInFinalizerIsReported)}
-    bracket result is usage result          $testFiberResultIsUsageResult
+    bracket result is usage result          $testExitResultIsUsageResult
     error in just acquisition               $testBracketErrorInAcquisition
     error in just release                   $testBracketErrorInRelease
     error in just usage                     $testBracketErrorInUsage
@@ -178,7 +178,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     ((throw reported): Int) must (throwA(UnhandledError(ExampleError)))
   }
 
-  def testFiberResultIsUsageResult =
+  def testExitResultIsUsageResult =
     unsafePerformIO(IO.unit.bracket_(IO.unit[Throwable])(IO.point[Throwable, Int](42))) must_=== 42
 
   def testBracketErrorInAcquisition =
@@ -263,14 +263,14 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def testDeepBindOfAsyncChainIsStackSafe = {
     val result = (0 until 10000).foldLeft(IO.point[Throwable, Int](0)) { (acc, _) =>
-      acc.flatMap(n => IO.async[Throwable, Int](_(FiberResult.Completed[Throwable, Int](n + 1))))
+      acc.flatMap(n => IO.async[Throwable, Int](_(ExitResult.Completed[Throwable, Int](n + 1))))
     }
 
     unsafePerformIO(result) must_=== 10000
   }
 
   def testAsyncEffectReturns =
-    unsafePerformIO(IO.async[Throwable, Int](cb => cb(FiberResult.Completed(42)))) must_=== 42
+    unsafePerformIO(IO.async[Throwable, Int](cb => cb(ExitResult.Completed(42)))) must_=== 42
 
   def testSleepZeroReturns =
     unsafePerformIO(IO.sleep(1.nanoseconds)) must_=== ((): Unit)
@@ -300,7 +300,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   // Utility stuff
   val ExampleError = new Exception("Oh noes!")
 
-  def asyncExampleError[A]: IO[Throwable, A] = IO.async[Throwable, A](_(FiberResult.Failed(ExampleError)))
+  def asyncExampleError[A]: IO[Throwable, A] = IO.async[Throwable, A](_(ExitResult.Failed(ExampleError)))
 
   def sum(n: Int): Int =
     if (n <= 0) 0
@@ -337,5 +337,5 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
         v2 <- f2.join
       } yield v1 + v2
 
-  val AsyncUnit = IO.async[Throwable, Unit](_(FiberResult.Completed(())))
+  val AsyncUnit = IO.async[Throwable, Unit](_(ExitResult.Completed(())))
 }

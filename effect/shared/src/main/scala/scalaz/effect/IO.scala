@@ -84,10 +84,7 @@ sealed abstract class IO[E, A] { self =>
    * val parsed = readFile("foo.txt").flatMap(file => parseFile(file))
    * }}}
    */
-  final def flatMap[B](f0: A => IO[E, B]): IO[E, B] = (self.tag: @switch) match {
-    case IO.Tags.Fail => self.asInstanceOf[IO[E, B]]
-    case _            => IO.FlatMap(self, f0)
-  }
+  final def flatMap[B](f0: A => IO[E, B]): IO[E, B] = IO.FlatMap(self, f0)
 
   /**
    * Forks this action into its own separate fiber, returning immediately
@@ -105,13 +102,13 @@ sealed abstract class IO[E, A] { self =>
    * } yield a
    * }}}
    */
-  final def fork: IO[E, Fiber[E, A]] = IO.Fork(this, Maybe.empty)
+  final def fork[E2]: IO[E2, Fiber[E, A]] = IO.Fork(this, Maybe.empty)
 
   /**
    * A more powerful version of `fork` that allows specifying a handler to be
    * invoked on any exceptions that are not handled by the forked fiber.
    */
-  final def fork0(handler: Throwable => IO[E, Unit]): IO[E, Fiber[E, A]] =
+  final def fork0[E2](handler: Throwable => IO[Void, Unit]): IO[E2, Fiber[E, A]] =
     IO.Fork(this, Maybe.just(handler))
 
   /**
@@ -123,9 +120,9 @@ sealed abstract class IO[E, A] { self =>
    */
   final def par[B](that: IO[E, B]): IO[E, (A, B)] =
     self.attempt[E].raceWith(that.attempt[E]) {
-      case -\/((-\/(e), fiberb)) => fiberb.interrupt(InterruptedException(e)) *> IO.fail(e)
+      case -\/((-\/(e), fiberb)) => fiberb.interrupt(TerminatedException(e)) *> IO.fail(e)
       case -\/((\/-(a), fiberb)) => IO.absolve(fiberb.join).map((b: B) => (a, b))
-      case \/-((-\/(e), fibera)) => fibera.interrupt(InterruptedException(e)) *> IO.fail(e)
+      case \/-((-\/(e), fibera)) => fibera.interrupt(TerminatedException(e)) *> IO.fail(e)
       case \/-((\/-(b), fibera)) => IO.absolve(fibera.join).map((a: A) => (a, b))
     }
 
@@ -169,7 +166,7 @@ sealed abstract class IO[E, A] { self =>
    * Widens the error type to any supertype. While `leftMap` suffices for this
    * purpose, this method is significantly faster for this purpose.
    */
-  final def apply[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
+  final def widen[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
 
   /**
    * Executes this action, capturing both failure and success and returning
@@ -233,13 +230,13 @@ sealed abstract class IO[E, A] { self =>
    * }}}
    */
   final def bracket[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
-    IO.Bracket(this, (_: FiberResult[E, B], a: A) => release(a), use)
+    IO.Bracket(this, (_: ExitResult[E, B], a: A) => release(a), use)
 
   /**
    * A more powerful version of `bracket` that provides information on whether
    * or not `use` succeeded to the release action.
    */
-  final def bracket0[B](release: (FiberResult[E, B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
+  final def bracket0[B](release: (ExitResult[E, B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
     IO.Bracket(this, release, use)
 
   /**
@@ -261,11 +258,11 @@ sealed abstract class IO[E, A] { self =>
    */
   final def bracketOnError[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
     bracket0(
-      (r: FiberResult[E, B], a: A) =>
+      (r: ExitResult[E, B], a: A) =>
         r match {
-          case FiberResult.Failed(_)      => release(a)
-          case FiberResult.Interrupted(_) => release(a)
-          case _                          => IO.unit
+          case ExitResult.Failed(_)     => release(a)
+          case ExitResult.Terminated(_) => release(a)
+          case _                        => IO.unit
       }
     )(use)
 
@@ -276,11 +273,11 @@ sealed abstract class IO[E, A] { self =>
   final def onError(cleanup: Throwable \/ E => IO[E, Unit]): IO[E, A] =
     IO.unit[E]
       .bracket0(
-        (r: FiberResult[E, A], a: Unit) =>
+        (r: ExitResult[E, A], a: Unit) =>
           r match {
-            case FiberResult.Failed(e)      => cleanup(Disjunction.right(e))
-            case FiberResult.Interrupted(e) => cleanup(Disjunction.left(e))
-            case _                          => IO.unit
+            case ExitResult.Failed(e)     => cleanup(Disjunction.right(e))
+            case ExitResult.Terminated(e) => cleanup(Disjunction.left(e))
+            case _                        => IO.unit
         }
       )(_ => self)
 
@@ -513,11 +510,11 @@ object IO extends IOInstances {
     override final def tag = Tags.Fail
   }
 
-  final case class AsyncEffect[E, A](register: (FiberResult[E, A] => Unit) => AsyncReturn[E, A]) extends IO[E, A] {
+  final case class AsyncEffect[E, A](register: (ExitResult[E, A] => Unit) => AsyncReturn[E, A]) extends IO[E, A] {
     override final def tag = Tags.AsyncEffect
   }
 
-  final case class AsyncIOEffect[E, A](register: (FiberResult[E, A] => Unit) => IO[E, Unit]) extends IO[E, A] {
+  final case class AsyncIOEffect[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]) extends IO[E, A] {
     override final def tag = Tags.AsyncIOEffect
   }
 
@@ -525,7 +522,8 @@ object IO extends IOInstances {
     override final def tag = Tags.Attempt
   }
 
-  final case class Fork[E, A](value: IO[E, A], handler: Maybe[Throwable => IO[E, Unit]]) extends IO[E, Fiber[E, A]] {
+  final case class Fork[E1, E2, A](value: IO[E1, A], handler: Maybe[Throwable => IO[Void, Unit]])
+      extends IO[E2, Fiber[E1, A]] {
     override final def tag = Tags.Fork
   }
 
@@ -541,7 +539,7 @@ object IO extends IOInstances {
   }
 
   final case class Bracket[E, A, B](acquire: IO[E, A],
-                                    release: (FiberResult[E, B], A) => IO[E, Unit],
+                                    release: (ExitResult[E, B], A) => IO[E, Unit],
                                     use: A => IO[E, B])
       extends IO[E, B] {
     override final def tag = Tags.Bracket
@@ -674,7 +672,7 @@ object IO extends IOInstances {
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
    * the more expressive variant of this function.
    */
-  final def async[E, A](register: (FiberResult[E, A] => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
+  final def async[E, A](register: (ExitResult[E, A] => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
     register(callback)
 
     AsyncReturn.later[E, A]
@@ -684,7 +682,7 @@ object IO extends IOInstances {
    * Imports an asynchronous effect into a pure `IO` value. This formulation is
    * necessary when the effect is itself expressed in terms of `IO`.
    */
-  final def asyncIO[E, A](register: (FiberResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
+  final def asyncIO[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. The effect has the
@@ -694,7 +692,7 @@ object IO extends IOInstances {
    * returning a canceler, which will be used by the runtime to cancel the
    * asynchronous effect if the fiber executing the effect is interrupted.
    */
-  final def async0[E, A](register: (FiberResult[E, A] => Unit) => AsyncReturn[E, A]): IO[E, A] = AsyncEffect(register)
+  final def async0[E, A](register: (ExitResult[E, A] => Unit) => AsyncReturn[E, A]): IO[E, A] = AsyncEffect(register)
 
   /**
    * Returns a computation that will never produce anything. The moral
@@ -725,6 +723,6 @@ object IO extends IOInstances {
   final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
     (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A](_)))
 
-  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (FiberResult[Nothing, Any]) => Unit) =>
+  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (ExitResult[Nothing, Any]) => Unit) =>
     }
 }

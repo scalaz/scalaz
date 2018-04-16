@@ -12,6 +12,7 @@ import java.lang.{ Runnable, Runtime }
 
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
+import scalaz.Void
 
 /**
  * This trait provides a high-performance implementation of a runtime system for
@@ -25,25 +26,25 @@ trait RTS {
    * error, running forever, or producing an `A`.
    */
   final def unsafePerformIO[E, A](io: IO[E, A]): A = tryUnsafePerformIO(io) match {
-    case FiberResult.Completed(v)   => v
-    case FiberResult.Interrupted(t) => throw t
-    case FiberResult.Failed(e)      => throw Errors.UnhandledError(e)
+    case ExitResult.Completed(v)  => v
+    case ExitResult.Terminated(t) => throw t
+    case ExitResult.Failed(e)     => throw Errors.UnhandledError(e)
   }
 
   /**
    * Effectfully interprets an `IO`, blocking if necessary to obtain the result.
    */
-  final def tryUnsafePerformIO[E, A](io: IO[E, A]): FiberResult[E, A] = {
+  final def tryUnsafePerformIO[E, A](io: IO[E, A]): ExitResult[E, A] = {
     // TODO: Optimize — this is slow and inefficient
-    var result: FiberResult[E, A] = null
-    lazy val lock                 = new ReentrantLock()
-    lazy val done                 = lock.newCondition()
+    var result: ExitResult[E, A] = null
+    lazy val lock                = new ReentrantLock()
+    lazy val done                = lock.newCondition()
 
     val context = new FiberContext[E, A](this, defaultHandler)
 
     context.evaluate(io)
 
-    (context.register { (r: FiberResult[E, A]) =>
+    (context.register { (r: ExitResult[E, A]) =>
       lock.lock()
 
       try {
@@ -131,7 +132,7 @@ private object RTS {
     case object Finished    extends RaceState
   }
 
-  type Callback[E, A] = FiberResult[E, A] => Unit
+  type Callback[E, A] = ExitResult[E, A] => Unit
 
   @inline
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
@@ -146,7 +147,7 @@ private object RTS {
     final def apply(v: Any): IO[Any, Any] = IO.now(v)
   }
 
-  final case class Finalizer[E](finalizer: FiberResult[E, Any] => IO[E, Unit]) extends Function[Any, IO[E, Any]] {
+  final case class Finalizer[E](finalizer: ExitResult[E, Any] => IO[E, Unit]) extends Function[Any, IO[E, Any]] {
     final def apply(v: Any): IO[E, Any] = IO.now(v)
   }
 
@@ -188,7 +189,7 @@ private object RTS {
   /**
    * An implementation of Fiber that maintains context necessary for evaluation.
    */
-  final class FiberContext[E, A](rts: RTS, val unhandled: Throwable => IO[E, Unit]) extends Fiber[E, A] {
+  final class FiberContext[E, A](rts: RTS, val unhandled: Throwable => IO[Void, Unit]) extends Fiber[E, A] {
     import FiberStatus._
     import java.util.{ Collections, Set, WeakHashMap }
     import rts.{ MaxResumptionDepth, YieldMaxOpCount }
@@ -213,14 +214,14 @@ private object RTS {
      *
      * @param errors  The effectfully produced list of errors, in reverse order.
      */
-    final def dispatchErrors(errors: IO[E, List[E]]): IO[E, Unit] =
+    final def dispatchErrors(errors: IO[Void, List[E]]): IO[Void, Unit] =
       errors.flatMap(
         errors =>
           // Each error produced by a finalizer must be handled using the
           // context's unhandled exception handler:
           errors.reverse.map { error =>
             unhandled(Errors.UnhandledError(error))
-          }.foldLeft(IO.unit[E])(_ *> _)
+          }.foldLeft(IO.unit[Void])(_ *> _)
       )
 
     /**
@@ -233,7 +234,7 @@ private object RTS {
      */
     final def catchException[E2](err: E): IO[E2, List[E]] = {
       var finalizer: IO[E2, List[E]] = null
-      var body: FiberResult[E, Any]  = null
+      var body: ExitResult[E, Any]   = null
 
       var caught = false
 
@@ -246,7 +247,7 @@ private object RTS {
             val f = f0.asInstanceOf[Finalizer[E]]
 
             // Lazy initialization of body:
-            if (body == null) body = FiberResult.Failed(err)
+            if (body == null) body = ExitResult.Failed(err)
 
             val currentFinalizer: IO[E2, List[E]] = f.finalizer(body).attempt[E2].map {
               case -\/(error) => error :: Nil
@@ -285,9 +286,9 @@ private object RTS {
       var finalizer: IO[E2, List[E]] = null
 
       if (!stack.isEmpty()) {
-        // Any finalizers will require FiberResult. Here we fake lazy evaluation
+        // Any finalizers will require ExitResult. Here we fake lazy evaluation
         // to eliminate unnecessary allocation:
-        var body: FiberResult[E, Any] = null
+        var body: ExitResult[E, Any] = null
 
         while (!stack.isEmpty()) {
           // Peel off all the finalizers, composing them into a single finalizer
@@ -299,7 +300,7 @@ private object RTS {
               val f = f0.asInstanceOf[Finalizer[E]]
 
               // Lazy initialization of body:
-              if (body == null) body = FiberResult.Interrupted(error)
+              if (body == null) body = ExitResult.Terminated(error)
 
               val currentFinalizer = f.finalizer(body).attempt[E2].map {
                 case -\/(t) => t :: Nil
@@ -339,9 +340,9 @@ private object RTS {
           // Put the maximum operation count on the stack for fast access:
           val maxopcount = YieldMaxOpCount
 
-          var result: FiberResult[E, Any] = null
-          var eval: Boolean               = true
-          var opcount: Int                = 0
+          var result: ExitResult[E, Any] = null
+          var eval: Boolean              = true
+          var opcount: Int               = 0
 
           do {
             // Check to see if the fiber should continue executing or not:
@@ -406,7 +407,7 @@ private object RTS {
 
                     if (curIo == null) {
                       eval = false
-                      result = FiberResult.Completed(value)
+                      result = ExitResult.Completed(value)
                     }
 
                   case IO.Tags.Strict =>
@@ -418,7 +419,7 @@ private object RTS {
 
                     if (curIo == null) {
                       eval = false
-                      result = FiberResult.Completed(value)
+                      result = ExitResult.Completed(value)
                     }
 
                   case IO.Tags.SyncEffect =>
@@ -430,7 +431,7 @@ private object RTS {
 
                     if (curIo == null) {
                       eval = false
-                      result = FiberResult.Completed(value)
+                      result = ExitResult.Completed(value)
                     }
 
                   case IO.Tags.Fail =>
@@ -438,14 +439,14 @@ private object RTS {
 
                     val error = io.failure
 
-                    val finalizer = catchException[E](error)
+                    val finalizer = catchException[Void](error)
 
                     if (stack.isEmpty()) {
                       // Exception not caught, stack is empty:
                       if (finalizer == null) {
                         // No finalizer, so immediately produce the error.
                         eval = false
-                        result = FiberResult.Failed(error)
+                        result = ExitResult.Failed(error)
                       } else {
                         // We have finalizers to run. We'll resume executing with the
                         // uncaught failure after we have executed all the finalizers:
@@ -455,7 +456,7 @@ private object RTS {
                         // Do not interrupt finalization:
                         this.noInterrupt += 1
 
-                        curIo = ensuringUninterruptibleExit(finalization *> completer)
+                        curIo = ensuringUninterruptibleExit(finalization[E] *> completer)
                       }
                     } else {
                       // Exception caught:
@@ -465,7 +466,7 @@ private object RTS {
 
                         if (curIo == null) {
                           eval = false
-                          result = FiberResult.Failed(error)
+                          result = ExitResult.Failed(error)
                         }
                       } else {
                         // Must run finalizer first:
@@ -475,7 +476,7 @@ private object RTS {
                         // Do not interrupt finalization:
                         this.noInterrupt += 1
 
-                        curIo = ensuringUninterruptibleExit(finalization *> completer)
+                        curIo = ensuringUninterruptibleExit(finalization[E] *> completer)
                       }
                     }
 
@@ -491,16 +492,16 @@ private object RTS {
                           // invoked. Attempt resumption now:
                           if (shouldResumeAsync()) {
                             value match {
-                              case FiberResult.Completed(v) =>
+                              case ExitResult.Completed(v) =>
                                 curIo = nextInstr[E](v, stack)
 
                                 if (curIo == null) {
                                   eval = false
                                   result = value
                                 }
-                              case FiberResult.Interrupted(t) =>
+                              case ExitResult.Terminated(t) =>
                                 curIo = IO.Interrupt(t)
-                              case FiberResult.Failed(e) =>
+                              case ExitResult.Failed(e) =>
                                 curIo = IO.Fail(e)
                             }
                           } else {
@@ -532,16 +533,16 @@ private object RTS {
                       // invoked. Attempt resumption now:
                       if (shouldResumeAsync()) {
                         value match {
-                          case FiberResult.Completed(v) =>
+                          case ExitResult.Completed(v) =>
                             curIo = nextInstr[E](v, stack)
 
                             if (curIo == null) {
                               eval = false
-                              result = value.asInstanceOf[FiberResult[E, Any]]
+                              result = value.asInstanceOf[ExitResult[E, Any]]
                             }
-                          case FiberResult.Interrupted(t) =>
+                          case ExitResult.Terminated(t) =>
                             curIo = IO.Interrupt(t)
-                          case FiberResult.Failed(e) =>
+                          case ExitResult.Failed(e) =>
                             curIo = IO.Fail(e)
                         }
                       } else {
@@ -558,21 +559,21 @@ private object RTS {
                     stack.push(Catcher)
 
                   case IO.Tags.Fork =>
-                    val io = curIo.asInstanceOf[IO.Fork[E, Any]]
+                    val io = curIo.asInstanceOf[IO.Fork[_, E, Any]]
 
                     val optHandler = Maybe.toOption(io.handler)
 
                     val handler = if (optHandler eq None) unhandled else optHandler.get
 
-                    val value: FiberContext[E, Any] = fork(io.value, handler)
+                    val value: FiberContext[_, Any] = fork(io.value, handler)
 
                     supervise(value)
 
-                    curIo = nextInstr[E](value: Fiber[E, Any], stack)
+                    curIo = nextInstr[E](value, stack)
 
                     if (curIo == null) {
                       eval = false
-                      result = FiberResult.Completed(value)
+                      result = ExitResult.Completed(value)
                     }
 
                   case IO.Tags.Race =>
@@ -603,7 +604,7 @@ private object RTS {
                             _ <- IO.sync(ref.set(a))
                           } yield a).uninterruptibly
                       b <- io.use(a)
-                      _ <- (io.release(FiberResult.Completed(b), a) <* IO.sync(ref.set(null))).uninterruptibly
+                      _ <- (io.release(ExitResult.Completed(b), a) <* IO.sync(ref.set(null))).uninterruptibly
                     } yield b
 
                   case IO.Tags.Uninterruptible =>
@@ -620,7 +621,7 @@ private object RTS {
 
                     curIo = IO.AsyncEffect { callback =>
                       rts
-                        .schedule(callback(SuccessUnit[E].asInstanceOf[FiberResult[E, Any]]), io.duration)
+                        .schedule(callback(SuccessUnit[E].asInstanceOf[ExitResult[E, Any]]), io.duration)
                         .asInstanceOf[AsyncReturn[E, Any]]
                     }
 
@@ -633,12 +634,12 @@ private object RTS {
                   case IO.Tags.Interrupt =>
                     val io = curIo.asInstanceOf[IO.Interrupt[E, Any]]
 
-                    val finalizer = interruptStack[E](io.failure)
+                    val finalizer = interruptStack[Void](io.failure)
 
                     if (finalizer == null) {
                       // No finalizers, simply produce error:
                       eval = false
-                      result = FiberResult.Interrupted(io.failure)
+                      result = ExitResult.Terminated(io.failure)
                     } else {
                       // Must run finalizers first before failing:
                       val finalization = dispatchErrors(finalizer)
@@ -649,7 +650,7 @@ private object RTS {
 
                       // FIXME: Call uncaught error handler
 
-                      curIo = ensuringUninterruptibleExit(finalization *> completer)
+                      curIo = ensuringUninterruptibleExit(finalization[E] *> completer)
                     }
                 }
               }
@@ -664,7 +665,7 @@ private object RTS {
           } while (eval)
 
           if (result != null) {
-            done(result.asInstanceOf[FiberResult[E, A]])
+            done(result.asInstanceOf[ExitResult[E, A]])
           }
 
           curIo = null // Ensure termination of outer loop
@@ -681,7 +682,7 @@ private object RTS {
       }
     }
 
-    final def fork[E, A](io: IO[E, A], handler: Throwable => IO[E, Unit]): FiberContext[E, A] = {
+    final def fork[E, A](io: IO[E, A], handler: Throwable => IO[Void, Unit]): FiberContext[E, A] = {
       val context = new FiberContext[E, A](rts, handler)
 
       rts.submit(context.evaluate(io))
@@ -694,18 +695,18 @@ private object RTS {
      *
      * @param value The value which will be used to resume the sync evaluation.
      */
-    private final def resumeEvaluate(value: FiberResult[E, Any]): Unit =
+    private final def resumeEvaluate(value: ExitResult[E, Any]): Unit =
       value match {
-        case FiberResult.Completed(v) =>
+        case ExitResult.Completed(v) =>
           // Async produced a value:
           val io = nextInstr[E](v, stack)
 
-          if (io == null) done(value.asInstanceOf[FiberResult[E, A]])
+          if (io == null) done(value.asInstanceOf[ExitResult[E, A]])
           else evaluate(io)
 
-        case FiberResult.Failed(t) => evaluate(IO.Fail[E, Any](t))
+        case ExitResult.Failed(t) => evaluate(IO.Fail[E, Any](t))
 
-        case FiberResult.Interrupted(t) => evaluate(IO.Interrupt[E, Any](t))
+        case ExitResult.Terminated(t) => evaluate(IO.Interrupt[E, Any](t))
       }
 
     /**
@@ -713,7 +714,7 @@ private object RTS {
      *
      * @param value The value produced by the asynchronous computation.
      */
-    private final def resumeAsync[A](value: FiberResult[E, Any]): Unit =
+    private final def resumeAsync[A](value: ExitResult[E, Any]): Unit =
       if (shouldResumeAsync()) {
         // TODO: CPS transform
         // Take care not to overflow the stack in cases of 'deeply' nested
@@ -723,7 +724,7 @@ private object RTS {
         } else resumeEvaluate(value)
       }
 
-    private final def raceWith[A, B, C](unhandled: Throwable => IO[E, Unit],
+    private final def raceWith[A, B, C](unhandled: Throwable => IO[Void, Unit],
                                         leftIO: IO[E, A],
                                         rightIO: IO[E, B],
                                         finish: (A, Fiber[E, B]) \/ (B, Fiber[E, A]) => IO[E, C]): IO[E, C] = {
@@ -740,8 +741,8 @@ private object RTS {
       IO.flatten(IO.async0[E, IO[E, C]] { resume =>
         val state = new AtomicReference[RaceState](Started)
 
-        def callback[A1, B1](other: Fiber[E, B1], finish: (A1, Fiber[E, B1]) => IO[E, C]): FiberResult[E, A1] => Unit =
-          (tryA: FiberResult[E, A1]) => {
+        def callback[A1, B1](other: Fiber[E, B1], finish: (A1, Fiber[E, B1]) => IO[E, C]): ExitResult[E, A1] => Unit =
+          (tryA: ExitResult[E, A1]) => {
             var loop               = true
             var action: () => Unit = null
 
@@ -752,29 +753,29 @@ private object RTS {
                 case Finished => oldStatus
                 case OtherFailed =>
                   tryA match {
-                    case FiberResult.Completed(a) =>
+                    case ExitResult.Completed(a) =>
                       action = () => {
-                        resume(FiberResult.Completed(finish(a, other)))
+                        resume(ExitResult.Completed(finish(a, other)))
                       }
                       Finished
 
-                    case FiberResult.Failed(e) =>
+                    case ExitResult.Failed(e) =>
                       action = () => {
-                        resume(FiberResult.Failed(e))
+                        resume(ExitResult.Failed(e))
                       }
                       Finished
 
-                    case FiberResult.Interrupted(e) =>
+                    case ExitResult.Terminated(e) =>
                       action = () => {
-                        resume(FiberResult.Interrupted(e))
+                        resume(ExitResult.Terminated(e))
                       }
                       Finished
                   }
                 case Started =>
                   tryA match {
-                    case FiberResult.Completed(a) =>
+                    case ExitResult.Completed(a) =>
                       action = () => {
-                        resume(FiberResult.Completed(finish(a, other)))
+                        resume(ExitResult.Completed(finish(a, other)))
                       }
                       Finished
 
@@ -973,7 +974,7 @@ private object RTS {
     final def register(cb: Callback[E, A]): AsyncReturn[E, A] = join0(cb)
 
     @tailrec
-    final def done(v: FiberResult[E, A]): Unit = {
+    final def done(v: ExitResult[E, A]): Unit = {
       val oldStatus = status.get
 
       oldStatus match {
@@ -1010,7 +1011,7 @@ private object RTS {
           else AsyncReturn.later[E, Unit]
 
         case AsyncRegion(_, resume, cancelOpt, joiners, killers) if (resume > 0 && noInterrupt == 0) =>
-          val v = FiberResult.Interrupted[E, A](t)
+          val v = ExitResult.Terminated[E, A](t)
 
           if (!status.compareAndSet(oldStatus, Done(v))) kill0(t, cb)
           else {
@@ -1023,10 +1024,10 @@ private object RTS {
                 catch { case t: Throwable if (nonFatal(t)) => /* TODO: Don't throw away? */ }
             }
 
-            val finalizer = interruptStack[E](t)
+            val finalizer = interruptStack[Void](t)
 
             if (finalizer != null) {
-              fork(dispatchErrors(finalizer), unhandled)
+              fork[Void, Unit](dispatchErrors(finalizer), unhandled)
             }
 
             purgeJoinersKillers(v, joiners, killers)
@@ -1063,7 +1064,7 @@ private object RTS {
       }
     }
 
-    private final def purgeJoinersKillers(v: FiberResult[E, A],
+    private final def purgeJoinersKillers(v: ExitResult[E, A],
                                           joiners: List[Callback[E, A]],
                                           killers: List[Callback[E, Unit]]): Unit = {
       // FIXME: Put all but one of these (first joiner?) on the thread pool.
@@ -1086,12 +1087,12 @@ private object RTS {
                                        joiners: List[Callback[E, A]],
                                        killers: List[Callback[E, Unit]])
         extends FiberStatus[E, A]
-    final case class Done[E, A](value: FiberResult[E, A]) extends FiberStatus[E, A]
+    final case class Done[E, A](value: ExitResult[E, A]) extends FiberStatus[E, A]
 
     def Initial[E, A] = Executing[E, A](Nil, Nil)
   }
 
-  val _SuccessUnit: FiberResult[Nothing, Unit] = FiberResult.Completed(())
+  val _SuccessUnit: ExitResult[Nothing, Unit] = ExitResult.Completed(())
 
-  def SuccessUnit[E]: FiberResult[E, Unit] = _SuccessUnit.asInstanceOf[FiberResult[E, Unit]]
+  def SuccessUnit[E]: ExitResult[E, Unit] = _SuccessUnit.asInstanceOf[ExitResult[E, Unit]]
 }

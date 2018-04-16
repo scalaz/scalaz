@@ -22,7 +22,7 @@ object AsyncReturn {
     def apply[E, A](): AsyncReturn[E, A]             = value.asInstanceOf[Later[E, A]]
   }
   // TODO: Optimize this common case to less overhead with opaque types
-  final case class Now[E, A](value: FiberResult[E, A])        extends AsyncReturn[E, A]
+  final case class Now[E, A](value: ExitResult[E, A])         extends AsyncReturn[E, A]
   final case class MaybeLater[E, A](interruptor: Interruptor) extends AsyncReturn[E, A]
 
   /**
@@ -40,7 +40,7 @@ object AsyncReturn {
    *
    * See `IO.async0` for more information.
    */
-  final def now[E, A](result: FiberResult[E, A]): AsyncReturn[E, A] = Now(result)
+  final def now[E, A](result: ExitResult[E, A]): AsyncReturn[E, A] = Now(result)
 
   /**
    * Constructs an `AsyncReturn` that represents an interruptible asynchronous

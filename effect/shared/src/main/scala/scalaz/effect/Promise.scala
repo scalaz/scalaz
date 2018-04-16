@@ -56,23 +56,23 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
   /**
    * Completes the promise with the specified value.
    */
-  final def complete[E2](a: A): IO[E2, Boolean] = done(FiberResult.Completed[E, A](a))
+  final def complete[E2](a: A): IO[E2, Boolean] = done(ExitResult.Completed[E, A](a))
 
   /**
    * Fails the promise with the specified error.
    */
-  final def error[E2](e: E): IO[E2, Boolean] = done(FiberResult.Failed[E, A](e))
+  final def error[E2](e: E): IO[E2, Boolean] = done(ExitResult.Failed[E, A](e))
 
   /**
    * Interrupts the promise with the specified throwable.
    */
-  final def interrupt[E2](t: Throwable): IO[E2, Boolean] = done(FiberResult.Interrupted[E, A](t))
+  final def interrupt[E2](t: Throwable): IO[E2, Boolean] = done(ExitResult.Terminated[E, A](t))
 
   /**
    * Completes the promise with the specified result. If the specified promise
    * has already been completed, the method will produce false.
    */
-  final def done[E2](r: FiberResult[E, A]): IO[E2, Boolean] =
+  final def done[E2](r: ExitResult[E, A]): IO[E2, Boolean] =
     IO.flatten(IO.sync {
       var action: IO[E2, Boolean] = null.asInstanceOf[IO[E2, Boolean]]
       var retry                   = true
@@ -106,7 +106,7 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
     case x :: xs => x.fork.toUnit *> forkAll(xs)
   }
 
-  private def interruptJoiner(joiner: FiberResult[E, A] => Unit): Throwable => Unit = (t: Throwable) => {
+  private def interruptJoiner(joiner: ExitResult[E, A] => Unit): Throwable => Unit = (t: Throwable) => {
     var retry = true
 
     while (retry) {
@@ -143,7 +143,7 @@ object Promise {
 
   private[effect] object internal {
     sealed trait State[E, A]
-    final case class Pending[E, A](joiners: List[FiberResult[E, A] => Unit]) extends State[E, A]
-    final case class Done[E, A](value: FiberResult[E, A])                    extends State[E, A]
+    final case class Pending[E, A](joiners: List[ExitResult[E, A] => Unit]) extends State[E, A]
+    final case class Done[E, A](value: ExitResult[E, A])                    extends State[E, A]
   }
 }
