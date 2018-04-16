@@ -88,7 +88,7 @@ object FutureTest extends SpecLite {
       })).unsafePerformSync
       val duration = System.currentTimeMillis() - start
 
-      result.length must_== times.size and duration.toInt mustBe_< times.fold(0)(_ + _)
+      result.length must_== times.size and duration.toInt mustBe_< times.foldLeft(0)(_ + _)
     }
   }
 

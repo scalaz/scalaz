@@ -3,7 +3,6 @@ package scalaz
 import reflect.ClassTag
 import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
-import collection.generic.CanBuildFrom
 import collection.IndexedSeqOptimized
 import syntax.Ops
 
@@ -31,7 +30,7 @@ sealed abstract class ImmutableArray[+A] {
   def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
 }
 
-sealed abstract class ImmutableArrayInstances {
+sealed abstract class ImmutableArrayInstances extends ImmutableArrayInstances1 {
 
   implicit def immutableArrayEqual[A](implicit A: Equal[A]): Equal[ImmutableArray[A]] =
     Equal.equal{ (a, b) =>
@@ -136,20 +135,6 @@ object ImmutableArray extends ImmutableArrayInstances {
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
-
-  implicit def canBuildFrom[T](implicit m: ClassTag[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
-    new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
-      def apply(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] = newBuilder(m)
-
-      def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
-    }
-
-  implicit def canBuildFromChar(implicit m: ClassTag[Char]): CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
-    new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
-      def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
-
-      def apply: Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
-    }
 
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
@@ -265,8 +250,6 @@ object ImmutableArray extends ImmutableArrayInstances {
           IndexedSeq[A] with IndexedSeqOptimized[A, WrappedImmutableArray[A]] {
     def apply(index: Int) = value(index)
     def length = value.length
-
-    override def stringPrefix = "ImmutableArray"
 
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
 

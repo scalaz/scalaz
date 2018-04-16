@@ -76,7 +76,7 @@ object CofreeTest extends SpecLite {
   val treeCofreeStreamIso: Tree <~> CofreeStream =
     new IsoFunctorTemplate[Tree, CofreeStream] {
       def to[A](tree: Tree[A]): CofreeStream[A] =
-        Cofree(tree.rootLabel, tree.subForest.map(to))
+        Cofree(tree.rootLabel, tree.subForest.map(to(_)))
       def from[A](c: CofreeStream[A]): Tree[A] =
         Tree.Node(c.head, c.tail.map(from(_)))
     }
