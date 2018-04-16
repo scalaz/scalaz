@@ -85,7 +85,6 @@ lazy val concurrent = Project(
 ).settings(
   standardSettings,
   name := ConcurrentName,
-  scalacOptions in (Compile, compile) += "-Xfatal-warnings",
   typeClasses := TypeClass.concurrent,
   osgiExport("scalaz.concurrent"),
   OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
@@ -118,7 +117,6 @@ lazy val scalacheckBinding =
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")

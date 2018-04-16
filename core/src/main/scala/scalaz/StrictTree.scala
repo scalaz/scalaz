@@ -30,7 +30,7 @@ case class StrictTree[A](
     val stack = mutable.Stack[BottomUpStackElem[A, B]](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (here.hasNext) {
         val child = here.next()
         val nextStackElem = BottomUpStackElem[A, B](Some(here), child)
@@ -136,7 +136,7 @@ case class StrictTree[A](
     val stack = mutable.Stack[ZipStackElem[A, B]](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (here.hasNext) {
         val (childA, childB) = here.next()
         val nextStackElem = ZipStackElem[A, B](Some(here), childA, childB)
@@ -198,7 +198,7 @@ sealed abstract class StrictTreeInstances {
         val stack = mutable.Stack(root)
 
         while (stack.nonEmpty) {
-          val here = stack.elems.head
+          val here = stack.head
           if (here.hasNext) {
             val nextChildren = here.next()
             val nextStackElem = AlignStackElem[A, B, C](Some(here), nextChildren)
@@ -429,7 +429,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
     val stack = mutable.Stack[EqualStackElem](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
         val aNext = here.aSubIterator.hasNext
         val bNext = here.bSubIterator.hasNext

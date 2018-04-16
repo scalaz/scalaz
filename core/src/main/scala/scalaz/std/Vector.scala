@@ -11,9 +11,34 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] with StrictSeqSubtypeCovariant[Vector] {
-    protected[this] override val Factory = Vector
-    protected[this] override def canBuildFrom[A] = Vector.canBuildFrom
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
+
+    override def point[A](a: => A): Vector[A] =
+      Vector(a)
+
+    override def bind[A, B](fa: Vector[A])(f: A => Vector[B]): Vector[B] =
+      fa flatMap f
+
+    override def createNewBuilder[A]() =
+      Vector.newBuilder[A]
+
+    override def isEmpty[A](fa: Vector[A]): Boolean =
+      fa.isEmpty
+
+    override def plus[A](a: Vector[A], b: => Vector[A]): Vector[A] =
+      a ++ b
+
+    override def empty[A]: Vector[A] =
+      Vector.empty[A]
+
+    override def unzip[A, B](a: Vector[(A, B)]): (Vector[A], Vector[B]) =
+      a.unzip
+
+    override def zip[A, B](a: => Vector[A],b: => Vector[B]): Vector[(A, B)] = {
+      val _a = a
+      if(_a.isEmpty) empty
+      else _a zip b
+    }
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       v.foldLeft(F.point(empty[B])) { (fvb, a) =>

@@ -34,7 +34,7 @@ object TimeTestJVM extends SpecLite {
 
   implicit val zoneIdArbitrary: Arbitrary[ZoneId] =
     Arbitrary(
-      Gen.oneOf(ZoneId.getAvailableZoneIds.asScala.map(ZoneId.of)(collection.breakOut))
+      Gen.oneOf(ZoneId.getAvailableZoneIds.asScala.map(ZoneId.of).toList)
     )
 
   implicit val offsetDateTimeArbitrary: Arbitrary[OffsetDateTime] =

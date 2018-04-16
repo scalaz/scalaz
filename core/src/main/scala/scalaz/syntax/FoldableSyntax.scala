@@ -4,7 +4,6 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Foldable` */
 final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
   ////
-  import collection.generic.CanBuildFrom
   import Liskov.<~<
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
@@ -42,7 +41,6 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def toStream: Stream[A] = F.toStream(self)
   final def toIList: IList[A] = F.toIList(self)
   final def toEphemeralStream: EphemeralStream[A] = F.toEphemeralStream(self)
-  final def to[G[_]](implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] = F.to[A, G](self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
   final def ∀(p: A => Boolean): Boolean = F.all(self)(p)
   final def allM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.allM(self)(p)
