@@ -70,5 +70,12 @@ object Equal {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit E: Equal[G]): Equal[F] =
+    new IsomorphismEqual[F, G] {
+      override implicit def G: Equal[G] = E
+      override def iso: F <=> G = D
+    }
   ////
 }

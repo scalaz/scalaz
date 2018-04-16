@@ -123,5 +123,12 @@ object Monoid {
       }
     }
 
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Monoid[G]): Monoid[F] =
+    new IsomorphismMonoid[F, G] {
+      override implicit def G: Monoid[G] = M
+      override def iso: F <=> G = D
+    }
   ////
 }

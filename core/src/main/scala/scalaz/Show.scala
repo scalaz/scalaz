@@ -42,5 +42,12 @@ object Show {
     }
   }
 
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit S: Show[G]): Show[F] =
+    new IsomorphismShow[F, G] {
+      override implicit def G: Show[G] = S
+      override def iso: F <=> G = D
+    }
   ////
 }

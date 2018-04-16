@@ -155,5 +155,12 @@ object Semigroup {
         }
     }
 
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit S: Semigroup[G]): Semigroup[F] =
+    new IsomorphismSemigroup[F, G] {
+      override implicit def G: Semigroup[G] = S
+      override def iso: F <=> G = D
+    }
   ////
 }
