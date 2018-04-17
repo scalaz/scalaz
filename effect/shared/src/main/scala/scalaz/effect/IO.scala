@@ -1,16 +1,24 @@
-// Copyright (C) 2017 John A. De Goes. All rights reserved.
+// Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
 import scala.annotation.switch
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
+import scalaz.data.Disjunction
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
+import scalaz.Void
+
+import scalaz.effect.Errors._
 
 /**
- * An `IO[A]` ("Eye-Oh of A") is an immutable data structure that describes an
- * effectful action that may throw an exception (`Throwable`), run forever, or
+ * An `IO[E, A]` ("Eye-Oh of Eeh Aye") is an immutable data structure that
+ * describes an effectful action that may fail with an `E`, run forever, or
  * produce a single `A` at some point in the future.
+ *
+ * Conceptually, this structure is equivalent to `EitherT[F, E, A]` for some
+ * infallible effect monad `F`, but because monad transformers perform poorly
+ * in Scala, this structure bakes in the `EitherT` without runtime overhead.
  *
  * `IO` values are ordinary immutable values, and may be used like any other
  * values in purely functional code. Because `IO` values just *describe*
@@ -19,7 +27,7 @@ import scalaz.data.Maybe
  *
  * `IO` values can efficiently describe the following classes of effects:
  *
- *  * **Pure Values** &mdash; `IO.apply`
+ *  * **Pure Values** &mdash; `IO.point`
  *  * **Synchronous Effects** &mdash; `IO.sync`
  *  * **Asynchronous Effects** &mdash; `IO.async`
  *  * **Concurrent Effects** &mdash; `io.fork`
@@ -39,31 +47,26 @@ import scalaz.data.Maybe
  * values, see the default interpreter in `RTS` or the safe main function in
  * `SafeApp`.
  */
-sealed abstract class IO[A] { self =>
+sealed abstract class IO[E, A] { self =>
 
   /**
-   * Maps an `IO[A]` into an `IO[B]` by applying the specified `A => B` function
+   * Maps an `IO[E, A]` into an `IO[E, B]` by applying the specified `A => B` function
    * to the output of this action. Repeated applications of `map`
    * (`io.map(f1).map(f2)...map(f10000)`) are guaranteed stack safe to a depth
    * of at least 10,000.
    */
-  final def map[B](f: A => B): IO[B] = (self.tag: @switch) match {
+  final def map[B](f: A => B): IO[E, B] = (self.tag: @switch) match {
     case IO.Tags.Point =>
-      val io = self.asInstanceOf[IO.Point[A]]
+      val io = self.asInstanceOf[IO.Point[E, A]]
 
       IO.Point(() => f(io.value()))
 
     case IO.Tags.Strict =>
-      val io = self.asInstanceOf[IO.Strict[A]]
+      val io = self.asInstanceOf[IO.Strict[E, A]]
 
       IO.Strict(f(io.value))
 
-    case IO.Tags.SyncEffect =>
-      val io = self.asInstanceOf[IO.SyncEffect[A]]
-
-      IO.SyncEffect(() => f(io.effect()))
-
-    case IO.Tags.Fail => self.asInstanceOf[IO[B]]
+    case IO.Tags.Fail => self.asInstanceOf[IO[E, B]]
 
     case _ => IO.FlatMap(self, (a: A) => IO.Strict(f(a)))
   }
@@ -76,18 +79,15 @@ sealed abstract class IO[A] { self =>
    * val parsed = readFile("foo.txt").flatMap(file => parseFile(file))
    * }}}
    */
-  final def flatMap[B](f0: A => IO[B]): IO[B] = (self.tag: @switch) match {
-    case IO.Tags.Fail => self.asInstanceOf[IO[B]]
-    case _            => IO.FlatMap(self, f0)
-  }
+  final def flatMap[B](f0: A => IO[E, B]): IO[E, B] = IO.FlatMap(self, f0)
 
   /**
    * Forks this action into its own separate fiber, returning immediately
    * without the value produced by this action.
    *
-   * The `Fiber[A]` returned by this action can be used to interrupt the forked
-   * fiber with some exception, or to join the fiber to "await" its computed
-   * value.
+   * The `Fiber[E, A]` returned by this action can be used to interrupt the
+   * forked fiber with some exception, or to join the fiber to "await" its
+   * computed value.
    *
    * {{{
    * for {
@@ -97,13 +97,13 @@ sealed abstract class IO[A] { self =>
    * } yield a
    * }}}
    */
-  final def fork: IO[Fiber[A]] = IO.Fork(this, Maybe.empty)
+  final def fork[E2]: IO[E2, Fiber[E, A]] = IO.Fork(this, Maybe.empty)
 
   /**
    * A more powerful version of `fork` that allows specifying a handler to be
    * invoked on any exceptions that are not handled by the forked fiber.
    */
-  final def fork0(handler: Throwable => IO[Unit]): IO[Fiber[A]] =
+  final def fork0[E2](handler: Throwable => IO[Void, Unit]): IO[E2, Fiber[E, A]] =
     IO.Fork(this, Maybe.just(handler))
 
   /**
@@ -113,12 +113,12 @@ sealed abstract class IO[A] { self =>
    *
    * TODO: Replace with optimized primitive.
    */
-  final def par[B](that: IO[B]): IO[(A, B)] =
-    self.attempt.raceWith(that.attempt) {
-      case -\/((-\/(e), fiberb)) => fiberb.interrupt(e) *> IO.fail(e)
-      case -\/((\/-(a), fiberb)) => IO.absolve(fiberb.join).map(b => (a, b))
-      case \/-((-\/(e), fibera)) => fibera.interrupt(e) *> IO.fail(e)
-      case \/-((\/-(b), fibera)) => IO.absolve(fibera.join).map(a => (a, b))
+  final def par[B](that: IO[E, B]): IO[E, (A, B)] =
+    self.attempt[E].raceWith(that.attempt[E]) {
+      case -\/((-\/(e), fiberb)) => fiberb.interrupt(TerminatedException(e)) *> IO.fail(e)
+      case -\/((\/-(a), fiberb)) => IO.absolve(fiberb.join).map((b: B) => (a, b))
+      case \/-((-\/(e), fibera)) => fibera.interrupt(TerminatedException(e)) *> IO.fail(e)
+      case \/-((\/-(b), fibera)) => IO.absolve(fibera.join).map((a: A) => (a, b))
     }
 
   /**
@@ -126,43 +126,67 @@ sealed abstract class IO[A] { self =>
    * result to produce an `A`, whichever it is. If neither action succeeds,
    * then the action will be terminated with some error.
    */
-  final def race(that: IO[A]): IO[A] = raceWith(that) {
-    case -\/((a, fiber)) => fiber.interrupt(Errors.LostRace(\/-(fiber))).const(a)
-    case \/-((a, fiber)) => fiber.interrupt(Errors.LostRace(-\/(fiber))).const(a)
+  final def race(that: IO[E, A]): IO[E, A] = raceWith(that) {
+    case -\/((a, fiber)) => fiber.interrupt(LostRace(\/-(fiber))).const(a)
+    case \/-((a, fiber)) => fiber.interrupt(LostRace(-\/(fiber))).const(a)
   }
 
   /**
    * Races this action with the specified action, invoking the
    * specified finisher as soon as one value or the other has been computed.
    */
-  final def raceWith[B, C](that: IO[B])(finish: (A, Fiber[B]) \/ (B, Fiber[A]) => IO[C]): IO[C] =
-    IO.Race[A, B, C](self, that, finish)
+  final def raceWith[B, C](that: IO[E, B])(finish: (A, Fiber[E, B]) \/ (B, Fiber[E, A]) => IO[E, C]): IO[E, C] =
+    IO.Race[E, A, B, C](self, that, finish)
 
   /**
    * Executes this action and returns its value, if it succeeds, but
    * otherwise executes the specified action.
    */
-  final def orElse(that: => IO[A]): IO[A] =
+  final def orElse(that: => IO[E, A]): IO[E, A] =
     self.attempt.flatMap(_.fold(_ => that)(IO.now))
+
+  /**
+   * Maps over the error type. This can be used to lift a "smaller" error into
+   * a "larger" error.
+   */
+  final def leftMap[E2](f: E => E2): IO[E2, A] =
+    attempt[E2].flatMap {
+      case -\/(e) => IO.fail[E2, A](f(e))
+      case \/-(a) => IO.now[E2, A](a)
+    }
+
+  /**
+   * Widens the error type to any supertype. While `leftMap` suffices for this
+   * purpose, this method is significantly faster for this purpose.
+   */
+  final def widen[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
 
   /**
    * Executes this action, capturing both failure and success and returning
    * the result in a `Disjunction`. This method is useful for recovering from
    * `IO` actions that may fail.
+   *
+   * The error parameter of the returned `IO` may be chosen arbitrarily, since
+   * it is guaranteed the `IO` computation does not raise any errors.
    */
-  final def attempt: IO[Throwable \/ A] = (self.tag: @switch) match {
+  final def attempt[E2]: IO[E2, E \/ A] = (self.tag: @switch) match {
     case IO.Tags.Point =>
-      val io = self.asInstanceOf[IO.Point[A]]
+      val io = self.asInstanceOf[IO.Point[E, A]]
 
       IO.Point(() => \/-(io.value()))
 
     case IO.Tags.Strict =>
-      val io = self.asInstanceOf[IO.Strict[A]]
+      val io = self.asInstanceOf[IO.Strict[E, A]]
 
       IO.Strict(\/-(io.value))
 
+    case IO.Tags.SyncEffect =>
+      val io = self.asInstanceOf[IO.SyncEffect[E, A]]
+
+      IO.SyncEffect(() => \/-(io.effect()))
+
     case IO.Tags.Fail =>
-      val io = self.asInstanceOf[IO.Fail[A]]
+      val io = self.asInstanceOf[IO.Fail[E, A]]
 
       IO.Strict(-\/(io.failure))
 
@@ -198,40 +222,40 @@ sealed abstract class IO[A] { self =>
    * }
    * }}}
    */
-  final def bracket[B](release: A => IO[Unit])(use: A => IO[B]): IO[B] =
-    IO.Bracket(this, (_: BracketResult[B], a: A) => release(a), use)
+  final def bracket[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
+    IO.Bracket(this, (_: ExitResult[E, B], a: A) => release(a), use)
 
   /**
    * A more powerful version of `bracket` that provides information on whether
    * or not `use` succeeded to the release action.
    */
-  final def bracket0[B](release: (BracketResult[B], A) => IO[Unit])(use: A => IO[B]): IO[B] =
+  final def bracket0[B](release: (ExitResult[E, B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
     IO.Bracket(this, release, use)
 
   /**
    * A less powerful variant of `bracket` where the value produced by this
    * action is not needed.
    */
-  final def bracket_[B](release: IO[Unit])(use: IO[B]): IO[B] =
+  final def bracket_[B](release: IO[E, Unit])(use: IO[E, B]): IO[E, B] =
     self.bracket(_ => release)(_ => use)
 
   /**
    * Executes the specified finalizer, whether this action succeeds, fails, or
    * is interrupted.
    */
-  final def ensuring(finalizer: IO[Unit]): IO[A] =
+  final def ensuring(finalizer: IO[E, Unit]): IO[E, A] =
     IO.unit.bracket(_ => finalizer)(_ => self)
 
   /**
    * Executes the release action only if there was an error.
    */
-  final def bracketOnError[B](release: A => IO[Unit])(use: A => IO[B]): IO[B] =
+  final def bracketOnError[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
     bracket0(
-      (r: BracketResult[B], a: A) =>
+      (r: ExitResult[E, B], a: A) =>
         r match {
-          case BracketResult.Failed(_)      => release(a)
-          case BracketResult.Interrupted(_) => release(a)
-          case _                            => IO.unit
+          case ExitResult.Failed(_)     => release(a)
+          case ExitResult.Terminated(_) => release(a)
+          case _                        => IO.unit
       }
     )(use)
 
@@ -239,29 +263,30 @@ sealed abstract class IO[A] { self =>
    * Runs the specified cleanup action if this action errors, providing the
    * error to the cleanup action. The cleanup action will not be interrupted.
    */
-  final def onError(cleanup: Throwable => IO[Unit]): IO[A] =
-    IO.unit.bracket0(
-      (r: BracketResult[A], a: Unit) =>
-        r match {
-          case BracketResult.Failed(e)      => cleanup(e)
-          case BracketResult.Interrupted(e) => cleanup(e)
-          case _                            => IO.unit
-      }
-    )(_ => self)
+  final def onError(cleanup: Throwable \/ E => IO[E, Unit]): IO[E, A] =
+    IO.unit[E]
+      .bracket0(
+        (r: ExitResult[E, A], a: Unit) =>
+          r match {
+            case ExitResult.Failed(e)     => cleanup(Disjunction.right(e))
+            case ExitResult.Terminated(e) => cleanup(Disjunction.left(e))
+            case _                        => IO.unit
+        }
+      )(_ => self)
 
   /**
    * Supervises this action, which ensures that any fibers that are forked
    * by the action are killed with the specified error when this action
    * completes.
    */
-  final def supervised(error: Throwable): IO[A] = IO.Supervise(self, error)
+  final def supervised(error: Throwable): IO[E, A] = IO.Supervise(self, error)
 
   /**
    * Performs this action non-interruptibly. This will prevent the
    * action from being killed externally, but the action may fail
    * for internal reasons (e.g. an uncaught exception).
    */
-  final def uninterruptibly: IO[A] = IO.Uninterruptible(self)
+  final def uninterruptibly: IO[E, A] = IO.Uninterruptible(self)
 
   /**
    * Recovers from all errors.
@@ -270,9 +295,11 @@ sealed abstract class IO[A] { self =>
    * openFile("config.json").catchAll(_ => IO.now(defaultConfig))
    * }}}
    */
-  final def catchAll(h: Throwable => IO[A]): IO[A] = catchSome {
-    case t: Throwable => h(t)
-  }
+  final def catchAll[E2](h: E => IO[E2, A]): IO[E2, A] =
+    self.attempt[E2].flatMap {
+      case -\/(e) => h(e)
+      case \/-(a) => IO.now[E2, A](a)
+    }
 
   /**
    * Recovers from some or all of the error cases.
@@ -283,63 +310,99 @@ sealed abstract class IO[A] { self =>
    * }
    * }}}
    */
-  final def catchSome(pf: PartialFunction[Throwable, IO[A]]): IO[A] = {
-    def tryRescue(t: Throwable): IO[A] =
+  final def catchSome(pf: PartialFunction[E, IO[E, A]]): IO[E, A] = {
+    def tryRescue(t: E): IO[E, A] =
       if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
 
-    self.attempt.flatMap(_.fold(tryRescue)(IO.now))
+    self.attempt[E].flatMap(_.fold(tryRescue)(IO.now))
   }
 
   /**
    * Maps this action to the specified constant while preserving the
    * effects of this action.
    */
-  final def const[B](b: => B): IO[B] = self.map(_ => b)
+  final def const[B](b: => B): IO[E, B] = self.map(_ => b)
 
   /**
    * A variant of `flatMap` that ignores the value produced by this action.
    */
-  final def *>[B](io: => IO[B]): IO[B] = self.flatMap(_ => io)
+  final def *>[B](io: => IO[E, B]): IO[E, B] = self.flatMap(_ => io)
 
   /**
    * Sequences the specified action after this action, but ignores the
    * value produced by the action.
    */
-  final def <*[B](io: => IO[B]): IO[A] = self.flatMap(io.const(_))
+  final def <*[B](io: => IO[E, B]): IO[E, A] = self.flatMap(io.const(_))
 
   /**
    * Repeats this action forever (until the first error).
    */
-  final def forever[B]: IO[B] = self *> self.forever
+  final def forever[B]: IO[E, B] = self *> self.forever
 
   /**
    * Retries continuously until this action succeeds.
    */
-  final def retry: IO[A] = self orElse retry
+  final def retry: IO[E, A] = self orElse retry
 
   /**
    * Retries this action the specified number of times, until the first success.
    * Note that the action will always be run at least once, even if `n < 1`.
    */
-  final def retryN(n: Int): IO[A] =
-    if (n <= 1) self
-    else self orElse (retryN(n - 1))
+  final def retryN(n: Int): IO[E, A] = retryBackoff(n, 1.0, Duration.fromNanos(0))
 
   /**
    * Retries continuously until the action succeeds or the specified duration
    * elapses.
    */
-  final def retryFor(duration: Duration): IO[A] =
-    IO.absolve(
-      retry.attempt race (IO.sleep(duration) *>
-        IO.now(-\/(Errors.TimeoutException(duration))))
-    )
+  final def retryFor(duration: Duration): IO[E, Maybe[A]] =
+    retry.map(Maybe.just[A](_)) race
+      (IO.sleep[E](duration) *> IO.now[E, Maybe[A]](Maybe.empty[A]))
+
+  /**
+   * Retries continuously, increasing the duration between retries each time by
+   * the specified multiplication factor, and stopping after the specified upper
+   * limit on retries.
+   */
+  final def retryBackoff(n: Int, factor: Double, duration: Duration): IO[E, A] =
+    if (n <= 1) self
+    else self orElse (IO.sleep(duration) *> retryBackoff(n - 1, factor, duration * factor))
+
+  /**
+   * Repeats this computation continuously until the first error, with the
+   * specified interval between each full execution.
+   */
+  final def repeat[B](interval: Duration): IO[E, B] =
+    self *> IO.sleep(interval) *> repeat(interval)
+
+  /**
+   * Repeats this computation continuously until the first error, with the
+   * specified interval between the start of each full execution. Note that if
+   * the execution of this computation takes longer than the specified interval,
+   * then the computation will instead execute as quickly as possible, but not
+   * necessarily at the specified interval.
+   */
+  final def repeatFixed[B](interval: Duration): IO[E, B] =
+    repeatFixed0(IO.sync(System.nanoTime()))(interval)
+
+  final def repeatFixed0[B](nanoTime: IO[E, Long])(interval: Duration): IO[E, B] =
+    IO.flatten(nanoTime.flatMap { start =>
+      val gapNs = interval.toNanos
+
+      def tick[B](n: Int): IO[E, B] =
+        self *> nanoTime.flatMap { now =>
+          val await = ((start + n * gapNs) - now).max(0L)
+
+          IO.sleep(await.nanoseconds) *> tick[B](n + 1)
+        }
+
+      tick(1)
+    })
 
   /**
    * Maps this action to one producing unit, but preserving the effects of
    * this action.
    */
-  final def toUnit: IO[Unit] = const(())
+  final def toUnit: IO[E, Unit] = const(())
 
   /**
    * Calls the provided function with the result of this action, and
@@ -347,12 +410,10 @@ sealed abstract class IO[A] { self =>
    * value produced by the action.
    *
    * {{{
-   * for {
-   *   file <- readFile("data.json").peek(putStrLn)
-   * } yield file
+   * readFile("data.json").peek(putStrLn)
    * }}}
    */
-  final def peek[B](f: A => IO[B]): IO[A] = self.flatMap(a => f(a).const(a))
+  final def peek[B](f: A => IO[E, B]): IO[E, A] = self.flatMap(a => f(a).const(a))
 
   /**
    * Times out this action by the specified duration.
@@ -361,16 +422,39 @@ sealed abstract class IO[A] { self =>
    * action.timeout(1.second)
    * }}}
    */
-  final def timeout(duration: Duration): IO[A] = {
-    val err: IO[Throwable \/ A] = IO.now(-\/(Errors.TimeoutException(duration)))
+  final def timeout(duration: Duration): IO[E, Maybe[A]] = {
+    val timer = IO.now[E, Maybe[A]](Maybe.empty[A])
 
-    IO.absolve(self.attempt.race(err.delay(duration)))
+    self.map(Maybe.just[A](_)).race(timer.delay(duration))
   }
+
+  /**
+   * Returns a new computation that executes this one and times the execution.
+   */
+  final def timed: IO[E, (Duration, A)] = timed0(IO.sync(System.nanoTime()))
+
+  /**
+   * A more powerful variation of `timed` that allows specifying the clock.
+   */
+  final def timed0(nanoTime: IO[E, Long]): IO[E, (Duration, A)] =
+    summarized[Long, Duration]((start, end) => Duration.fromNanos(end - start))(nanoTime)
+
+  /**
+   * Summarizes a computation by computing some value before and after
+   * execution, and then combining the values to produce a summary, together
+   * with the result of execution.
+   */
+  final def summarized[B, C](f: (B, B) => C)(summary: IO[E, B]): IO[E, (C, A)] =
+    for {
+      start <- summary
+      value <- self
+      end   <- summary
+    } yield (f(start, end), value)
 
   /**
    * Delays this action by the specified amount of time.
    */
-  final def delay(duration: Duration): IO[A] =
+  final def delay(duration: Duration): IO[E, A] =
     IO.sleep(duration) *> self
 
   /**
@@ -388,111 +472,129 @@ object IO extends IOInstances {
     final val SyncEffect      = 3
     final val Fail            = 4
     final val AsyncEffect     = 5
-    final val Attempt         = 6
-    final val Fork            = 7
-    final val Race            = 8
-    final val Suspend         = 9
-    final val Bracket         = 10
-    final val Uninterruptible = 11
-    final val Sleep           = 12
-    final val Supervise       = 13
+    final val AsyncIOEffect   = 6
+    final val Attempt         = 7
+    final val Fork            = 8
+    final val Race            = 9
+    final val Suspend         = 10
+    final val Bracket         = 11
+    final val Uninterruptible = 12
+    final val Sleep           = 13
+    final val Supervise       = 14
+    final val Interrupt       = 15
   }
-  final case class FlatMap[A0, A](io: IO[A0], flatMapper: A0 => IO[A]) extends IO[A] {
+  final case class FlatMap[E, A0, A](io: IO[E, A0], flatMapper: A0 => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.FlatMap
   }
 
-  final case class Point[A](value: () => A) extends IO[A] {
+  final case class Point[E, A](value: () => A) extends IO[E, A] {
     override final def tag = Tags.Point
   }
 
-  final case class Strict[A](value: A) extends IO[A] {
+  final case class Strict[E, A](value: A) extends IO[E, A] {
     override final def tag = Tags.Strict
   }
 
-  final case class SyncEffect[A](effect: () => A) extends IO[A] {
+  final case class SyncEffect[E, A](effect: () => A) extends IO[E, A] {
     override final def tag = Tags.SyncEffect
   }
 
-  final case class Fail[A](failure: Throwable) extends IO[A] {
+  final case class Fail[E, A](failure: E) extends IO[E, A] {
     override final def tag = Tags.Fail
   }
 
-  final case class AsyncEffect[A](register: (Throwable \/ A => Unit) => AsyncReturn[A]) extends IO[A] {
+  final case class AsyncEffect[E, A](register: (ExitResult[E, A] => Unit) => Async[E, A]) extends IO[E, A] {
     override final def tag = Tags.AsyncEffect
   }
 
-  final case class Attempt[A](value: IO[A]) extends IO[Throwable \/ A] {
+  final case class AsyncIOEffect[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]) extends IO[E, A] {
+    override final def tag = Tags.AsyncIOEffect
+  }
+
+  final case class Attempt[E1, E2, A](value: IO[E1, A]) extends IO[E2, E1 \/ A] {
     override final def tag = Tags.Attempt
   }
 
-  final case class Fork[A](value: IO[A], handler: Maybe[Throwable => IO[Unit]]) extends IO[Fiber[A]] {
+  final case class Fork[E1, E2, A](value: IO[E1, A], handler: Maybe[Throwable => IO[Void, Unit]])
+      extends IO[E2, Fiber[E1, A]] {
     override final def tag = Tags.Fork
   }
 
-  final case class Race[A0, A1, A](left: IO[A0], right: IO[A1], finish: (A0, Fiber[A1]) \/ (A1, Fiber[A0]) => IO[A])
-      extends IO[A] {
+  final case class Race[E, A0, A1, A](left: IO[E, A0],
+                                      right: IO[E, A1],
+                                      finish: (A0, Fiber[E, A1]) \/ (A1, Fiber[E, A0]) => IO[E, A])
+      extends IO[E, A] {
     override final def tag = Tags.Race
   }
 
-  final case class Suspend[A](value: () => IO[A]) extends IO[A] {
+  final case class Suspend[E, A](value: () => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.Suspend
   }
 
-  final case class Bracket[A, B](acquire: IO[A], release: (BracketResult[B], A) => IO[Unit], use: A => IO[B])
-      extends IO[B] {
+  final case class Bracket[E, A, B](acquire: IO[E, A],
+                                    release: (ExitResult[E, B], A) => IO[E, Unit],
+                                    use: A => IO[E, B])
+      extends IO[E, B] {
     override final def tag = Tags.Bracket
   }
 
-  final case class Uninterruptible[A](io: IO[A]) extends IO[A] {
+  final case class Uninterruptible[E, A](io: IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.Uninterruptible
   }
 
-  final case class Sleep(duration: Duration) extends IO[Unit] {
+  final case class Sleep[E](duration: Duration) extends IO[E, Unit] {
     override final def tag = Tags.Sleep
   }
 
-  final case class Supervise[A](value: IO[A], error: Throwable) extends IO[A] {
+  final case class Supervise[E, A](value: IO[E, A], error: Throwable) extends IO[E, A] {
     override final def tag = Tags.Supervise
+  }
+
+  final case class Interrupt[E, A](failure: Throwable) extends IO[E, A] {
+    override final def tag = Tags.Interrupt
   }
 
   /**
    * Lifts a strictly evaluated value into the `IO` monad.
    */
-  final def now[A](a: A): IO[A] = Strict(a)
+  final def now[E, A](a: A): IO[E, A] = Strict(a)
 
   /**
    * Lifts a non-strictly evaluated value into the `IO` monad. Do not use this
    * function to capture effectful code. The result is undefined but may
    * include runtime errors.
    */
-  final def point[A](a: => A): IO[A] = Point(() => a)
+  final def point[E, A](a: => A): IO[E, A] = Point(() => a)
 
   /**
-   * Raises the specified error. The moral equivalent of `throw` for pure code.
+   * Creates an `IO` value that represents failure with the specified error.
+   * The moral equivalent of `throw` for pure code.
    */
-  final def fail[A](t: Throwable): IO[A] = Fail(t)
+  final def fail[E, A](error: E): IO[E, A] = Fail(error)
 
   /**
    * Strictly-evaluated unit lifted into the `IO` monad.
    */
-  final val unit: IO[Unit] = now(())
+  final def unit[E]: IO[E, Unit] = Unit.asInstanceOf[IO[E, Unit]]
+
+  private val Unit: IO[Nothing, Unit] = now(())
 
   /**
    * Sleeps for the specified duration. This is always asynchronous.
    */
-  final def sleep(duration: Duration): IO[Unit] = Sleep(duration)
+  final def sleep[E](duration: Duration): IO[E, Unit] = Sleep(duration)
 
   /**
    * Supervises the specified action, which ensures that any actions directly
    * forked by the action are killed with the specified error upon the action's
    * own termination.
    */
-  final def supervise[A](io: IO[A], error: Throwable): IO[A] = Supervise(io, error)
+  final def supervise[E, A](io: IO[E, A], error: Throwable): IO[E, A] = Supervise(io, error)
 
   /**
    * Flattens a nested action.
    */
-  final def flatten[A](io: IO[IO[A]]): IO[A] = io.flatMap(a => a)
+  final def flatten[E, A](io: IO[E, IO[E, A]]): IO[E, A] = io.flatMap(a => a)
 
   /**
    * Lazily produces an `IO` value whose construction may have actional costs
@@ -502,27 +604,78 @@ object IO extends IOInstances {
    * will be undefined and most likely involve the physical explosion of your
    * computer in a heap of rubble.
    */
-  final def suspend[A](io: => IO[A]): IO[A] = Suspend(() => io)
+  final def suspend[E, A](io: => IO[E, A]): IO[E, A] = Suspend(() => io)
 
   /**
-   * Imports a synchronous effect into a pure `IO` value. If the thunk returns
-   * a null value, this will throw a `NullPointerException` inside `IO`.
+   * Interrupts the fiber executing this action, which terminates the fiber
+   * immediately, running all finalizers.
+   */
+  final def interrupt[E, A](t: Throwable): IO[E, A] = Interrupt(t)
+
+  /**
+   * Imports a synchronous effect into a pure `IO` value.
    *
    * {{{
-   * def putStrLn(line: String): IO[Unit] = IO.sync(println(line))
+   * val nanoTime: IO[Void, Long] = IO.sync(System.nanoTime())
    * }}}
    */
-  final def sync[A](effect: => A): IO[A] = SyncEffect(() => effect)
+  final def sync[E, A](effect: => A): IO[E, A] = SyncEffect(() => effect)
+
+  /**
+   *
+   * Imports a synchronous effect into a pure `IO` value, translating any
+   * throwables into a `Throwable` failure in the returned value.
+   *
+   * {{{
+   * def putStrLn(line: String): IO[Throwable, Unit] = IO.syncThrowable(println(line))
+   * }}}
+   */
+  final def syncThrowable[A](effect: => A): IO[Throwable, A] =
+    syncCatch(effect) {
+      case t: Throwable => t
+    }
+
+  /**
+   *
+   * Imports a synchronous effect into a pure `IO` value, translating any
+   * exceptions into an `Exception` failure in the returned value.
+   *
+   * {{{
+   * def putStrLn(line: String): IO[Throwable, Unit] = IO.syncThrowable(println(line))
+   * }}}
+   */
+  final def syncException[A](effect: => A): IO[Exception, A] =
+    syncCatch(effect) {
+      case e: Exception => e
+    }
+
+  /**
+   * Safely imports an exception-throwing synchronous effect into a pure `IO`
+   * value, translating the specified throwables into `E` with the provided
+   * user-defined function.
+   */
+  final def syncCatch[E, A](effect: => A)(f: PartialFunction[Throwable, E]): IO[E, A] =
+    IO.absolve(IO.sync(try {
+      val result = effect
+
+      Disjunction.right(result)
+    } catch { case t: Throwable if f.isDefinedAt(t) => Disjunction.left(f(t)) }))
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
    * the more expressive variant of this function.
    */
-  final def async[A](register: (Throwable \/ A => Unit) => Unit): IO[A] = AsyncEffect { callback =>
+  final def async[E, A](register: (ExitResult[E, A] => Unit) => Unit): IO[E, A] = AsyncEffect { callback =>
     register(callback)
 
-    AsyncReturn.later[A]
+    Async.later[E, A]
   }
+
+  /**
+   * Imports an asynchronous effect into a pure `IO` value. This formulation is
+   * necessary when the effect is itself expressed in terms of `IO`.
+   */
+  final def asyncIO[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. The effect has the
@@ -532,31 +685,37 @@ object IO extends IOInstances {
    * returning a canceler, which will be used by the runtime to cancel the
    * asynchronous effect if the fiber executing the effect is interrupted.
    */
-  final def async0[A](register: (Throwable \/ A => Unit) => AsyncReturn[A]): IO[A] = AsyncEffect(register)
+  final def async0[E, A](register: (ExitResult[E, A] => Unit) => Async[E, A]): IO[E, A] = AsyncEffect(register)
 
   /**
    * Returns a computation that will never produce anything. The moral
    * equivalent of `while(true) {}`, only without the wasted CPU cycles.
    */
-  final def never[A]: IO[A] = Never.asInstanceOf[IO[A]]
+  final def never[E, A]: IO[E, A] = Never.asInstanceOf[IO[E, A]]
 
   /**
    * Submerges the error case of a disjunction into the `IO`. The inverse
    * operation of `IO.attempt`.
    */
-  final def absolve[A](v: IO[Throwable \/ A]): IO[A] =
+  final def absolve[E, A](v: IO[E, E \/ A]): IO[E, A] =
     v.flatMap {
       case -\/(e) => IO.fail(e)
       case \/-(a) => IO.now(a)
     }
 
   /**
-   * Requires that the given `IO[Maybe[A]]` contain a value. If there is no
+   * Retrieves the uncaught error handler associated with the fiber running the
+   * action returned by this method.
+   */
+  def uncaughtErrorHandler[E]: IO[E, Throwable => IO[Void, Unit]] = ???
+
+  /**
+   * Requires that the given `IO[E, Maybe[A]]` contain a value. If there is no
    * value, then the specified error will be raised.
    */
-  final def require[A](t: Throwable): IO[Maybe[A]] => IO[A] =
-    (io: IO[Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[A](t))(IO.now[A](_)))
+  final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
+    (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A](_)))
 
-  private final val Never: IO[Any] = IO.async[Any] { (k: (Throwable \/ Any) => Unit) =>
+  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (ExitResult[Nothing, Any]) => Unit) =>
     }
 }

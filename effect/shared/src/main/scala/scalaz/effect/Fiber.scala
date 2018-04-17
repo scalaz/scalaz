@@ -1,4 +1,4 @@
-// Copyright (C) 2017 John A. De Goes. All rights reserved.
+// Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
 /**
@@ -8,7 +8,9 @@ package scalaz.effect
  * concurrently with the parent `IO` action.
  *
  * Fibers can be joined, yielding their result other fibers, or interrupted,
- * which terminates the fiber with a user-defined error.
+ * which terminates the fiber with a runtime error.
+ *
+ * Fork-Join Identity: fork >=> join = id
  *
  * {{{
  * for {
@@ -19,14 +21,14 @@ package scalaz.effect
  * } yield a
  * }}}
  */
-trait Fiber[A] {
+trait Fiber[E, A] {
 
   /**
    * Joins the fiber, with suspends the joining fiber until the result of the
    * fiber has been determined. Attempting to join a fiber that has been or is
    * killed before producing its result will result in a catchable error.
    */
-  def join: IO[A]
+  def join: IO[E, A]
 
   /**
    * Interrupts the fiber with the specified error. If the fiber has already
@@ -34,11 +36,5 @@ trait Fiber[A] {
    * immediately. Otherwise, it will resume when the fiber has been
    * successfully interrupted or has produced its result.
    */
-  def interrupt(t: Throwable): IO[Unit]
-
-  /**
-   * Interrupts the fiber with the specified error asynchronously, and ignores
-   * any errors that result from interrupting the fiber.
-   */
-  final def interruptIgnore(t: Throwable): IO[Unit] = interrupt(t).fork.toUnit
+  def interrupt[E2](t: Throwable): IO[E2, Unit]
 }

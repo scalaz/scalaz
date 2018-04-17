@@ -5,16 +5,17 @@ package effect
 import scalaz.typeclass.{ BindClass, MonadClass }
 
 trait IOInstances {
-  implicit val monad: Monad[IO] = instanceOf(new MonadClass[IO] with BindClass.DeriveFlatten[IO] {
-    override final def map[A, B](ma: IO[A])(f: A => B): IO[B] =
-      ma.map(f)
+  implicit def monad[E]: Monad[IO[E, ?]] =
+    instanceOf(new MonadClass[IO[E, ?]] with BindClass.DeriveFlatten[IO[E, ?]] {
+      override final def map[A, B](ma: IO[E, A])(f: A => B): IO[E, B] =
+        ma.map(f)
 
-    override final def ap[A, B](ma: IO[A])(mf: IO[A => B]): IO[B] =
-      ma.flatMap(a => mf.map(f => f(a)))
+      override final def ap[A, B](ma: IO[E, A])(mf: IO[E, A => B]): IO[E, B] =
+        ma.flatMap(a => mf.map(f => f(a)))
 
-    override final def pure[A](a: A): IO[A] = IO.now(a)
+      override final def pure[A](a: A): IO[E, A] = IO.now(a)
 
-    override final def flatMap[A, B](ma: IO[A])(f: A => IO[B]): IO[B] =
-      ma.flatMap(f)
-  })
+      override final def flatMap[A, B](ma: IO[E, A])(f: A => IO[E, B]): IO[E, B] =
+        ma.flatMap(f)
+    })
 }
