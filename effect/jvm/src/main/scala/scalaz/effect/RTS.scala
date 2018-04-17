@@ -823,7 +823,11 @@ private object RTS {
       })
     }
 
-    final def interrupt(t: Throwable): IO[E, Unit] = IO.async0(kill0(t, _))
+    final def changeErrorUnit[E2](cb: Callback[E2, Unit]): Callback[E, Unit] =
+      changeError[E2, E, Unit](_ => SuccessUnit[E2], cb)
+
+    final def interrupt[E2](t: Throwable): IO[E2, Unit] =
+      IO.async0[E2, Unit](cb => kill0[E2](t, changeErrorUnit[E2](cb)))
 
     final def join: IO[E, A] = IO.async0(join0)
 
@@ -995,8 +999,13 @@ private object RTS {
       }
     }
 
+    def changeError[E1, E2, A](f: E2 => ExitResult[E1, A], cb: Callback[E1, A]): Callback[E2, A] = {
+      case ExitResult.Completed(a)  => cb(ExitResult.Completed(a))
+      case ExitResult.Terminated(t) => cb(ExitResult.Terminated(t))
+      case ExitResult.Failed(e2)    => cb(f(e2))
+    }
     @tailrec
-    private final def kill0(t: Throwable, cb: Callback[E, Unit]): Async[E, Unit] = {
+    private final def kill0[E2](t: Throwable, cb: Callback[E, Unit]): Async[E2, Unit] = {
       killed = true
 
       val oldStatus = status.get
@@ -1004,11 +1013,11 @@ private object RTS {
       oldStatus match {
         case Executing(joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else Async.later[E, Unit]
+          else Async.later[E2, Unit]
 
         case Interrupting(t, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else Async.later[E, Unit]
+          else Async.later[E2, Unit]
 
         case AsyncRegion(_, resume, cancelOpt, joiners, killers) if (resume > 0 && noInterrupt == 0) =>
           val v = ExitResult.Terminated[E, A](t)
@@ -1032,14 +1041,14 @@ private object RTS {
 
             purgeJoinersKillers(v, joiners, killers)
 
-            Async.now(SuccessUnit[E])
+            Async.now(SuccessUnit[E2])
           }
 
         case AsyncRegion(_, _, _, joiners, killers) =>
           if (!status.compareAndSet(oldStatus, Interrupting(t, joiners, cb :: killers))) kill0(t, cb)
-          else Async.later[E, Unit]
+          else Async.later[E2, Unit]
 
-        case Done(_) => Async.now(SuccessUnit[E])
+        case Done(_) => Async.now(SuccessUnit[E2])
       }
     }
 

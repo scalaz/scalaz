@@ -85,9 +85,9 @@ sealed abstract class IO[E, A] { self =>
    * Forks this action into its own separate fiber, returning immediately
    * without the value produced by this action.
    *
-   * The `Fiber[E, A]` returned by this action can be used to interrupt the forked
-   * fiber with some exception, or to join the fiber to "await" its computed
-   * value.
+   * The `Fiber[E, A]` returned by this action can be used to interrupt the
+   * forked fiber with some exception, or to join the fiber to "await" its
+   * computed value.
    *
    * {{{
    * for {

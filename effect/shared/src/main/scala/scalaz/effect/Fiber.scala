@@ -36,11 +36,10 @@ trait Fiber[E, A] {
    * immediately. Otherwise, it will resume when the fiber has been
    * successfully interrupted or has produced its result.
    */
-  def interrupt(t: Throwable): IO[E, Unit]
+  def interrupt[E2](t: Throwable): IO[E2, Unit]
 
   /**
-   * Interrupts the fiber with the specified error asynchronously, and ignores
-   * any errors that result from interrupting the fiber.
+   * Interrupts the fiber with the specified error asynchronously.
    */
-  final def interruptIgnore[E2](t: Throwable): IO[E2, Unit] = interrupt(t).fork.attempt[E2].toUnit
+  final def interruptAsync[E2](t: Throwable): IO[E2, Unit] = interrupt(t).fork.toUnit
 }

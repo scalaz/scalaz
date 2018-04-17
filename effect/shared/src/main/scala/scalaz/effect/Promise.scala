@@ -59,12 +59,14 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
   final def complete[E2](a: A): IO[E2, Boolean] = done(ExitResult.Completed[E, A](a))
 
   /**
-   * Fails the promise with the specified error.
+   * Fails the promise with the specified error, which will be propagated to all
+   * fibers waiting on the value of the promise.
    */
   final def error[E2](e: E): IO[E2, Boolean] = done(ExitResult.Failed[E, A](e))
 
   /**
-   * Interrupts the promise with the specified throwable.
+   * Interrupts the promise with the specified throwable. This will interrupt
+   * all fibers waiting on the value of the promise.
    */
   final def interrupt[E2](t: Throwable): IO[E2, Boolean] = done(ExitResult.Terminated[E, A](t))
 

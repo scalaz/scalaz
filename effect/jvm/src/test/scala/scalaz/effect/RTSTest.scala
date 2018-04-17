@@ -288,7 +288,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   def testNeverIsInterruptible = {
     val io =
       for {
-        fiber <- IO.never[Throwable, Int].fork
+        fiber <- IO.never[Throwable, Int].fork[Throwable]
         _     <- fiber.interrupt(ExampleError)
       } yield 42
 
