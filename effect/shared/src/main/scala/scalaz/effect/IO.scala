@@ -167,7 +167,7 @@ sealed abstract class IO[E, A] { self =>
    * `IO` actions that may fail.
    *
    * The error parameter of the returned `IO` may be chosen arbitrarily, since
-   * it is guaranteed the `IO` computation does not raise any errors.
+   * it is guaranteed the `IO` action does not raise any errors.
    */
   final def attempt[E2]: IO[E2, E \/ A] = (self.tag: @switch) match {
     case IO.Tags.Point =>
@@ -188,7 +188,7 @@ sealed abstract class IO[E, A] { self =>
     case IO.Tags.Fail =>
       val io = self.asInstanceOf[IO.Fail[E, A]]
 
-      IO.Strict(-\/(io.failure))
+      IO.Strict(-\/(io.error))
 
     case _ => IO.Attempt(self)
   }
@@ -209,7 +209,7 @@ sealed abstract class IO[E, A] { self =>
    * In between acquisition and release of the resource, the `use` action is
    * executed.
    *
-   * If the `release` action fails, then the entire computation will fail even
+   * If the `release` action fails, then the entire action will fail even
    * if the `use` action succeeds. If this fail-fast behavior is not desired,
    * errors produced by the `release` action can be caught and ignored.
    *
@@ -275,16 +275,16 @@ sealed abstract class IO[E, A] { self =>
       )(_ => self)
 
   /**
-   * Supervises this action, which ensures that any fibers that are forked
-   * by the action are killed with the specified error when this action
+   * Supervises this action, which ensures that any fibers that are forked by
+   * the action are interrupted with the specified error when this action
    * completes.
    */
   final def supervised(error: Throwable): IO[E, A] = IO.Supervise(self, error)
 
   /**
-   * Performs this action non-interruptibly. This will prevent the
-   * action from being killed externally, but the action may fail
-   * for internal reasons (e.g. an uncaught exception).
+   * Performs this action non-interruptibly. This will prevent the action from
+   * being terminated externally, but the action may fail for internal reasons
+   * (e.g. an uncaught error) or be terminated due to defect.
    */
   final def uninterruptibly: IO[E, A] = IO.Uninterruptible(self)
 
@@ -368,28 +368,28 @@ sealed abstract class IO[E, A] { self =>
     else self orElse (IO.sleep(duration) *> retryBackoff(n - 1, factor, duration * factor))
 
   /**
-   * Repeats this computation continuously until the first error, with the
-   * specified interval between each full execution.
+   * Repeats this action continuously until the first error, with the specified
+   * interval between each full execution.
    */
   final def repeat[B](interval: Duration): IO[E, B] =
     self *> IO.sleep(interval) *> repeat(interval)
 
   /**
-   * Repeats this computation continuously until the first error, with the
-   * specified interval between the start of each full execution. Note that if
-   * the execution of this computation takes longer than the specified interval,
-   * then the computation will instead execute as quickly as possible, but not
+   * Repeats this action continuously until the first error, with the specified
+   * interval between the start of each full execution. Note that if the
+   * execution of this action takes longer than the specified interval, then the
+   * action will instead execute as quickly as possible, but not
    * necessarily at the specified interval.
    */
   final def repeatFixed[B](interval: Duration): IO[E, B] =
     repeatFixed0(IO.sync(System.nanoTime()))(interval)
 
-  final def repeatFixed0[B](nanoTime: IO[E, Long])(interval: Duration): IO[E, B] =
-    IO.flatten(nanoTime.flatMap { start =>
+  final def repeatFixed0[B](nanoTime: IO[Void, Long])(interval: Duration): IO[E, B] =
+    IO.flatten(nanoTime[E].flatMap { start =>
       val gapNs = interval.toNanos
 
       def tick[B](n: Int): IO[E, B] =
-        self *> nanoTime.flatMap { now =>
+        self *> nanoTime[E].flatMap { now =>
           val await = ((start + n * gapNs) - now).max(0L)
 
           IO.sleep(await.nanoseconds) *> tick[B](n + 1)
@@ -429,7 +429,7 @@ sealed abstract class IO[E, A] { self =>
   }
 
   /**
-   * Returns a new computation that executes this one and times the execution.
+   * Returns a new action that executes this one and times the execution.
    */
   final def timed: IO[E, (Duration, A)] = timed0(IO.sync(System.nanoTime()))
 
@@ -440,9 +440,9 @@ sealed abstract class IO[E, A] { self =>
     summarized[Long, Duration]((start, end) => Duration.fromNanos(end - start))(nanoTime)
 
   /**
-   * Summarizes a computation by computing some value before and after
-   * execution, and then combining the values to produce a summary, together
-   * with the result of execution.
+   * Summarizes a action by computing some value before and after execution, and
+   * then combining the values to produce a summary, together with the result of
+   * execution.
    */
   final def summarized[B, C](f: (B, B) => C)(summary: IO[E, B]): IO[E, (C, A)] =
     for {
@@ -481,7 +481,8 @@ object IO extends IOInstances {
     final val Uninterruptible = 12
     final val Sleep           = 13
     final val Supervise       = 14
-    final val Interrupt       = 15
+    final val Terminate       = 15
+    final val Supervisor      = 16
   }
   final case class FlatMap[E, A0, A](io: IO[E, A0], flatMapper: A0 => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.FlatMap
@@ -499,7 +500,7 @@ object IO extends IOInstances {
     override final def tag = Tags.SyncEffect
   }
 
-  final case class Fail[E, A](failure: E) extends IO[E, A] {
+  final case class Fail[E, A](error: E) extends IO[E, A] {
     override final def tag = Tags.Fail
   }
 
@@ -550,8 +551,12 @@ object IO extends IOInstances {
     override final def tag = Tags.Supervise
   }
 
-  final case class Interrupt[E, A](failure: Throwable) extends IO[E, A] {
-    override final def tag = Tags.Interrupt
+  final case class Terminate[E, A](cause: Throwable) extends IO[E, A] {
+    override final def tag = Tags.Terminate
+  }
+
+  final case class Supervisor[E]() extends IO[E, Throwable => IO[Void, Unit]] {
+    override final def tag = Tags.Supervisor
   }
 
   /**
@@ -562,7 +567,7 @@ object IO extends IOInstances {
   /**
    * Lifts a non-strictly evaluated value into the `IO` monad. Do not use this
    * function to capture effectful code. The result is undefined but may
-   * include runtime errors.
+   * include duplicated effects.
    */
   final def point[E, A](a: => A): IO[E, A] = Point(() => a)
 
@@ -576,8 +581,6 @@ object IO extends IOInstances {
    * Strictly-evaluated unit lifted into the `IO` monad.
    */
   final def unit[E]: IO[E, Unit] = Unit.asInstanceOf[IO[E, Unit]]
-
-  private val Unit: IO[Nothing, Unit] = now(())
 
   /**
    * Sleeps for the specified duration. This is always asynchronous.
@@ -607,10 +610,9 @@ object IO extends IOInstances {
   final def suspend[E, A](io: => IO[E, A]): IO[E, A] = Suspend(() => io)
 
   /**
-   * Interrupts the fiber executing this action, which terminates the fiber
-   * immediately, running all finalizers.
+   * Terminates the fiber executing this action, running all finalizers.
    */
-  final def interrupt[E, A](t: Throwable): IO[E, A] = Interrupt(t)
+  final def terminate[E, A](t: Throwable): IO[E, A] = Terminate(t)
 
   /**
    * Imports a synchronous effect into a pure `IO` value.
@@ -641,7 +643,7 @@ object IO extends IOInstances {
    * exceptions into an `Exception` failure in the returned value.
    *
    * {{{
-   * def putStrLn(line: String): IO[Throwable, Unit] = IO.syncThrowable(println(line))
+   * def putStrLn(line: String): IO[Exception, Unit] = IO.syncException(println(line))
    * }}}
    */
   final def syncException[A](effect: => A): IO[Exception, A] =
@@ -675,7 +677,7 @@ object IO extends IOInstances {
    * Imports an asynchronous effect into a pure `IO` value. This formulation is
    * necessary when the effect is itself expressed in terms of `IO`.
    */
-  final def asyncIO[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
+  final def asyncPure[E, A](register: (ExitResult[E, A] => Unit) => IO[E, Unit]): IO[E, A] = AsyncIOEffect(register)
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. The effect has the
@@ -688,7 +690,7 @@ object IO extends IOInstances {
   final def async0[E, A](register: (ExitResult[E, A] => Unit) => Async[E, A]): IO[E, A] = AsyncEffect(register)
 
   /**
-   * Returns a computation that will never produce anything. The moral
+   * Returns a action that will never produce anything. The moral
    * equivalent of `while(true) {}`, only without the wasted CPU cycles.
    */
   final def never[E, A]: IO[E, A] = Never.asInstanceOf[IO[E, A]]
@@ -704,10 +706,10 @@ object IO extends IOInstances {
     }
 
   /**
-   * Retrieves the uncaught error handler associated with the fiber running the
-   * action returned by this method.
+   * Retrieves the supervisor associated with the fiber running the action
+   * returned by this method.
    */
-  def uncaughtErrorHandler[E]: IO[E, Throwable => IO[Void, Unit]] = ???
+  def supervisor[E]: IO[E, Throwable => IO[Void, Unit]] = Supervisor()
 
   /**
    * Requires that the given `IO[E, Maybe[A]]` contain a value. If there is no
@@ -716,6 +718,9 @@ object IO extends IOInstances {
   final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
     (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A](_)))
 
-  private final val Never: IO[Nothing, Any] = IO.async[Nothing, Any] { (k: (ExitResult[Nothing, Any]) => Unit) =>
-    }
+  private final val Never: IO[Nothing, Any] =
+    IO.async[Nothing, Any] { (k: (ExitResult[Nothing, Any]) => Unit) =>
+      }
+
+  private final val Unit: IO[Nothing, Unit] = now(())
 }

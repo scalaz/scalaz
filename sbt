@@ -2,15 +2,17 @@
 #
 # A more capable sbt runner, coincidentally also called sbt.
 # Author: Paul Phillips <paulp@improving.org>
+# https://github.com/paulp/sbt-extras
 
 set -o pipefail
 
-declare -r sbt_release_version="0.13.15"
-declare -r sbt_unreleased_version="0.13.15"
+declare -r sbt_release_version="0.13.16"
+declare -r sbt_unreleased_version="0.13.16"
 
+declare -r latest_213="2.13.0-M2"
 declare -r latest_212="2.12.4"
-declare -r latest_211="2.11.11"
-declare -r latest_210="2.10.6"
+declare -r latest_211="2.11.12"
+declare -r latest_210="2.10.7"
 declare -r latest_29="2.9.3"
 declare -r latest_28="2.8.2"
 
@@ -27,7 +29,7 @@ declare -r noshare_opts="-Dsbt.global.base=project/.sbtboot -Dsbt.boot.directory
 declare sbt_jar sbt_dir sbt_create sbt_version sbt_script sbt_new
 declare sbt_explicit_version
 declare verbose noshare batch trace_level
-declare sbt_saved_stty debugUs
+declare debugUs
 
 declare java_cmd="java"
 declare sbt_launch_dir="$HOME/.sbt/launchers"
@@ -43,19 +45,21 @@ echoerr () { echo >&2 "$@"; }
 vlog ()    { [[ -n "$verbose" ]] && echoerr "$@"; }
 die ()     { echo "Aborting: $@" ; exit 1; }
 
-# restore stty settings (echo in particular)
-onSbtRunnerExit() {
-  [[ -n "$sbt_saved_stty" ]] || return
-  vlog ""
-  vlog "restoring stty: $sbt_saved_stty"
-  stty "$sbt_saved_stty"
-  unset sbt_saved_stty
-}
+setTrapExit () {
+  # save stty and trap exit, to ensure echo is re-enabled if we are interrupted.
+  export SBT_STTY="$(stty -g 2>/dev/null)"
 
-# save stty and trap exit, to ensure echo is re-enabled if we are interrupted.
-trap onSbtRunnerExit EXIT
-sbt_saved_stty="$(stty -g 2>/dev/null)"
-vlog "Saved stty: $sbt_saved_stty"
+  # restore stty settings (echo in particular)
+  onSbtRunnerExit() {
+    [ -t 0 ] || return
+    vlog ""
+    vlog "restoring stty: $SBT_STTY"
+    stty "$SBT_STTY"
+  }
+
+  vlog "saving stty: $SBT_STTY"
+  trap onSbtRunnerExit EXIT
+}
 
 # this seems to cover the bases on OSX, and someone will
 # have to tell me about the others.
@@ -228,8 +232,13 @@ execRunner () {
     vlog ""
   }
 
-  [[ -n "$batch" ]] && exec </dev/null
-  exec "$@"
+  setTrapExit
+
+  if [[ -n "$batch" ]]; then
+    "$@" < /dev/null
+  else
+    "$@"
+  fi
 }
 
 jar_url ()  { make_url "$1"; }
@@ -251,9 +260,9 @@ download_url () {
   echoerr "    To  $jar"
 
   mkdir -p "${jar%/*}" && {
-    if which curl >/dev/null; then
+    if command -v curl > /dev/null 2>&1; then
       curl --fail --silent --location "$url" --output "$jar"
-    elif which wget >/dev/null; then
+    elif command -v wget > /dev/null 2>&1; then
       wget -q -O "$jar" "$url"
     fi
   } && [[ -r "$jar" ]]
@@ -320,6 +329,7 @@ runner with the -x option.
   -210                      use $latest_210
   -211                      use $latest_211
   -212                      use $latest_212
+  -213                      use $latest_213
   -scala-home <path>        use the scala build at the specified directory
   -scala-version <version>  use the specified version of scala
   -binary-version <version> use the specified scala version when searching for dependencies
@@ -399,6 +409,7 @@ process_args () {
               -210) setScalaVersion "$latest_210" && shift ;;
               -211) setScalaVersion "$latest_211" && shift ;;
               -212) setScalaVersion "$latest_212" && shift ;;
+              -213) setScalaVersion "$latest_213" && shift ;;
                new) sbt_new=true && : ${sbt_explicit_version:=$sbt_release_version} && addResidual "$1" && shift ;;
                  *) addResidual "$1" && shift ;;
     esac

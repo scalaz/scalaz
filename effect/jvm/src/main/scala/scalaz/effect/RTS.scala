@@ -227,7 +227,7 @@ private object RTS {
      *
      * @param err   The exception that is being thrown.
      */
-    final def catchException[E2](err: E): IO[E2, List[E]] = {
+    final def catchError[E2](err: E): IO[E2, List[E]] = {
       var finalizer: IO[E2, List[E]] = null
       var body: ExitResult[E, Any]   = null
 
@@ -432,21 +432,24 @@ private object RTS {
                   case IO.Tags.Fail =>
                     val io = curIo.asInstanceOf[IO.Fail[E, Any]]
 
-                    val error = io.failure
+                    val error = io.error
 
-                    val finalizer = catchException[Void](error)
+                    val finalizer = catchError[Void](error)
 
                     if (stack.isEmpty()) {
-                      // Exception not caught, stack is empty:
+                      // Error not caught, stack is empty:
                       if (finalizer == null) {
                         // No finalizer, so immediately produce the error.
                         eval = false
                         result = ExitResult.Failed(error)
+
+                        // Report the uncaught error to the supervisor:
+                        rts.submit(rts.unsafePerformIO(unhandled(Errors.UnhandledError(error))))
                       } else {
                         // We have finalizers to run. We'll resume executing with the
                         // uncaught failure after we have executed all the finalizers:
                         val finalization = dispatchErrors(finalizer)
-                        val completer    = IO.fail[E, Any](error)
+                        val completer    = io
 
                         // Do not interrupt finalization:
                         this.noInterrupt += 1
@@ -454,19 +457,21 @@ private object RTS {
                         curIo = ensuringUninterruptibleExit(finalization[E] *> completer)
                       }
                     } else {
-                      // Exception caught:
+                      // Error caught:
+                      val value = -\/(error)
+
                       if (finalizer == null) {
                         // No finalizer to run:
-                        curIo = nextInstr[E](-\/(error), stack)
+                        curIo = nextInstr[E](value, stack)
 
                         if (curIo == null) {
                           eval = false
-                          result = ExitResult.Failed(error)
+                          result = ExitResult.Completed(value)
                         }
                       } else {
                         // Must run finalizer first:
                         val finalization = dispatchErrors(finalizer)
-                        val completer    = IO.fail[E, Any](error)
+                        val completer    = IO.now[E, Any](value)
 
                         // Do not interrupt finalization:
                         this.noInterrupt += 1
@@ -495,7 +500,7 @@ private object RTS {
                                   result = value
                                 }
                               case ExitResult.Terminated(t) =>
-                                curIo = IO.Interrupt(t)
+                                curIo = IO.Terminate(t)
                               case ExitResult.Failed(e) =>
                                 curIo = IO.Fail(e)
                             }
@@ -536,7 +541,7 @@ private object RTS {
                               result = value.asInstanceOf[ExitResult[E, Any]]
                             }
                           case ExitResult.Terminated(t) =>
-                            curIo = IO.Interrupt(t)
+                            curIo = IO.Terminate(t)
                           case ExitResult.Failed(e) =>
                             curIo = IO.Fail(e)
                         }
@@ -626,26 +631,39 @@ private object RTS {
                     curIo = enterSupervision *>
                       io.value.ensuring(exitSupervision(io.error))
 
-                  case IO.Tags.Interrupt =>
-                    val io = curIo.asInstanceOf[IO.Interrupt[E, Any]]
+                  case IO.Tags.Terminate =>
+                    val io = curIo.asInstanceOf[IO.Terminate[E, Any]]
 
-                    val finalizer = interruptStack[Void](io.failure)
+                    val cause = io.cause
+
+                    val finalizer = interruptStack[Void](cause)
 
                     if (finalizer == null) {
                       // No finalizers, simply produce error:
                       eval = false
-                      result = ExitResult.Terminated(io.failure)
+                      result = ExitResult.Terminated(cause)
+
+                      // Report the termination cause to the supervisor:
+                      rts.submit(rts.unsafePerformIO(unhandled(cause)))
                     } else {
                       // Must run finalizers first before failing:
                       val finalization = dispatchErrors(finalizer)
-                      val completer    = IO.Interrupt[E, Any](io.failure)
+                      val completer    = io
 
                       // Do not interrupt finalization:
                       this.noInterrupt += 1
 
-                      // FIXME: Call uncaught error handler
-
                       curIo = ensuringUninterruptibleExit(finalization[E] *> completer)
+                    }
+
+                  case IO.Tags.Supervisor =>
+                    val value = unhandled
+
+                    curIo = nextInstr[E](value, stack)
+
+                    if (curIo == null) {
+                      eval = false
+                      result = ExitResult.Completed(value)
                     }
                 }
               }
@@ -653,7 +671,7 @@ private object RTS {
               // Interruption cannot be interrupted:
               this.noInterrupt += 1
 
-              curIo = IO.Interrupt[E, Any](die.get)
+              curIo = IO.Terminate[E, Any](die.get)
             }
 
             opcount = opcount + 1
@@ -672,7 +690,7 @@ private object RTS {
             // Interruption cannot be interrupted:
             this.noInterrupt += 1
 
-            curIo = IO.Interrupt[E, Any](t)
+            curIo = IO.Terminate[E, Any](t)
         }
       }
     }
@@ -701,7 +719,7 @@ private object RTS {
 
         case ExitResult.Failed(t) => evaluate(IO.Fail[E, Any](t))
 
-        case ExitResult.Terminated(t) => evaluate(IO.Interrupt[E, Any](t))
+        case ExitResult.Terminated(t) => evaluate(IO.Terminate[E, Any](t))
       }
 
     /**
