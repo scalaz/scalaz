@@ -86,12 +86,14 @@ You can use the `sync` method of `IO` to import effectful synchronous code into 
 val nanoTime: IO[Void, Long] = IO.sync(System.nanoTime())
 ```
 
-If you are importing effectful code that may throw exceptions, you can use the `syncThrowable` method of `IO`:
+If you are importing effectful code that may throw exceptions, you can use the `syncException` method of `IO`:
 
 ```scala
-def readFile(name: String): IO[Throwable, ByteArray] =
-  IO.syncThrowable(FileUtils.readBytes(name))
+def readFile(name: String): IO[Exception, ByteArray] =
+  IO.syncException(FileUtils.readBytes(name))
 ```
+
+The `syncCatch` method is more general, allowing you to catch and optionally translate any type of `Throwable` into an error type.
 
 You can use the `async` method of `IO` to import effectful asynchronous code into your purely functional program:
 
@@ -150,7 +152,7 @@ Like all `IO` values, these are immutable values and do not actually throw any e
 
 You can surface failures with `attempt`, which takes an `IO[E, A]` and produces an `IO[E2, E \/ A]`. The choice of `E2` is unconstrained, because the resulting computation cannot fail with any error.
 
-The `Void` type makes a suitable choice to describe computations that cannot fail:
+The `scalaz.Void` type makes a suitable choice to describe computations that cannot fail:
 
 ```scala
 val file: IO[Void, Data] = readData("data.json").attempt[Void].map {
@@ -159,7 +161,7 @@ val file: IO[Void, Data] = readData("data.json").attempt[Void].map {
 }
 ```
 
-You can submerge failures with `IO.absolve`, which turns an `IO[E, E \/ A]` into an `IO[E, A]`:
+You can submerge failures with `IO.absolve`, which is the opposite of `attempt` and turns an `IO[E, E \/ A]` into an `IO[E, A]`:
 
 ```scala
 def sqrt(io: IO[Void, Double]): IO[NonNegError, Double] =
@@ -231,7 +233,7 @@ val composite = action1.ensuring(cleanupAction)
 
 To perform an action without blocking the current process, you can use fibers, which are a lightweight mechanism for concurrency.
 
-You can `fork` any `IO[E, A]` to immediately yield an `IO[E, Fiber[E, A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
+You can `fork` any `IO[E, A]` to immediately yield an `IO[Void, Fiber[E, A]]`. The provided `Fiber` can be used to `join` the fiber, which will resume on production of the fiber's value, or to `interrupt` the fiber with some exception.
 
 ```scala
 val analyzed =
@@ -265,21 +267,21 @@ A more powerful variant of `fork`, called `fork0`, allows specification of super
 
 ## Error Model
 
-The `IO` error model is simple, consistent, permits both typed errors and interruption, and does not violate any laws in the `Functor` hierarchy.
+The `IO` error model is simple, consistent, permits both typed errors and termination, and does not violate any laws in the `Functor` hierarchy.
 
-An `IO[E, A]` value may only raise errors of type `E`. These errors are recoverable, and may be caught the `attempt` method. The `attempt` method yields a value that cannot possibly fail with any error `E`. This rigorous guarantee can be reflected at compile-time by choosing an error type such as `Nothing` or `Void`, which is possible because `attempt` is polymorphic in the error type of the returned value.
+An `IO[E, A]` value may only raise errors of type `E`. These errors are recoverable, and may be caught the `attempt` method. The `attempt` method yields a value that cannot possibly fail with any error `E`. This rigorous guarantee can be reflected at compile-time by choosing a new error type such as `Nothing` or `Void`, which is possible because `attempt` is polymorphic in the error type of the returned value.
 
 Separately from errors of type `E`, a fiber may be terminated for the following reasons:
 
- * The fiber was interrupted by itself or another fiber. The "main" fiber cannot be interrupted because it was not forked from any other fiber.
- * The fiber failed to handle an `E`. This situation happens only when an `IO.fail` is not handled at a higher-level. For values of type `IO[Void, A]`, this type of failure is impossible.
+ * The fiber self-terminated or was interrupted by another fiber. The "main" fiber cannot be interrupted because it was not forked from any other fiber.
+ * The fiber failed to handle some error of type `E`. This can happen only when an `IO.fail` is not handled. For values of type `IO[Void, A]`, this type of failure is impossible.
  * The fiber has a defect that leads to a non-recoverable error. There are only two ways this can happen:
      1. A partial function is passed to a higher-order function such as `map` or `flatMap`. For example, `io.map(_ => throw e)`, or `io.flatMap(a => throw e)`. The solution to this problem is to not to pass impure functions to purely functional libraries like Scalaz, because doing so leads to violations of laws and destruction of equational reasoning.
-     2. Error-throwing code was embedded into some value via `IO.point`, `IO.sync`, etc. For importing partial effects into `IO`, the proper solution is to use a method such as `syncThrowable`, which safely translates exceptions into values.
+     2. Error-throwing code was embedded into some value via `IO.point`, `IO.sync`, etc. For importing partial effects into `IO`, the proper solution is to use a method such as `syncException`, which safely translates exceptions into values.
 
 When a fiber is terminated, the reason for the termination, expressed as a `Throwable`, is passed to the fiber's supervisor, which may choose to log, print the stack trace, restart the fiber, or perform some other action appropriate to the context.
 
-A fiber cannot stop its own termination. However, all finalizers will be run during termination. Errors thrown by finalizers are passed to the fiber's supervisor.
+A fiber cannot stop its own termination. However, all finalizers will be run during termination, even when some finalizers throw non-recoverable errors. Errors thrown by finalizers are passed to the fiber's supervisor.
 
 There are no circumstances in which any errors will be "lost", which makes the `IO` error model more diagnostic-friendly than the `try`/`catch`/`finally` construct that is baked into both Scala and Java, which can easily lose errors.
 
