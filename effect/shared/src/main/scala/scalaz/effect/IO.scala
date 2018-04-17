@@ -138,8 +138,6 @@ sealed abstract class IO[E, A] { self =>
   final def raceWith[B, C](that: IO[E, B])(finish: (A, Fiber[E, B]) \/ (B, Fiber[E, A]) => IO[E, C]): IO[E, C] =
     IO.Race[E, A, B, C](self, that, finish)
 
-  // final def raceWith[E2, E3, B, C](that: IO[E2, B])(finish: (A, Fiber[E2, B]) \/ (B, Fiber[E, A]) => IO[E3, C]): IO[E3, C] = ???
-
   /**
    * Executes this action and returns its value, if it succeeds, but
    * otherwise executes the specified action.

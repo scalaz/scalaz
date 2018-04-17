@@ -37,9 +37,4 @@ trait Fiber[E, A] {
    * successfully interrupted or has produced its result.
    */
   def interrupt[E2](t: Throwable): IO[E2, Unit]
-
-  /**
-   * Interrupts the fiber with the specified error asynchronously.
-   */
-  final def interruptAsync[E2](t: Throwable): IO[E2, Unit] = interrupt(t).fork.toUnit
 }
