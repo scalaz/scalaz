@@ -57,7 +57,6 @@ sealed trait AListModule {
 
 final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   import AList._
-  import Forall2Syntax._
 
   def uncons: AMaybe2[F, AList[F, ?, ?], A, B] = AList.uncons(self)
 

@@ -41,4 +41,12 @@ trait TheseInstances {
     instanceOf[DebugClass[These[L, R]]](
       _.bimap(L.debug)(R.debug).toString
     )
+
+  implicit final def theseEq[L, R](implicit L: Eq[L], R: Eq[R]): Eq[These[L, R]] =
+    instanceOf[EqClass[These[L, R]]] {
+      case (This(l1), This(l2))         => L.equal(l1, l2)
+      case (That(r1), That(r2))         => R.equal(r1, r2)
+      case (Both(l1, r1), Both(l2, r2)) => L.equal(l1, l2) && R.equal(r1, r2)
+      case _                            => false
+    }
 }

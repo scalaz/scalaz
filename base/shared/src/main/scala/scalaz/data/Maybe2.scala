@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ BifunctorClass, DebugClass }
+import scalaz.typeclass.{ BifunctorClass, DebugClass, EqClass }
 
 sealed trait Maybe2Module {
 
@@ -17,6 +17,8 @@ sealed trait Maybe2Module {
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]]
   implicit def debug[A: Debug, B: Debug]: Debug[Maybe2[A, B]]
   implicit def bifunctor: Bifunctor[Maybe2]
+
+  implicit def eq[A: Eq, B: Eq]: Eq[Maybe2[A, B]]
 
   object Just2 {
     def unapply[A, B](m: Maybe2[A, B]): Just2Extractor[A, B] = new Just2Extractor(toOption2(m))
@@ -49,6 +51,13 @@ private[data] object Maybe2Impl extends Maybe2Module {
     instanceOf[DebugClass[Maybe2[A, B]]] {
       case Some2(_1, _2) => s"Just2(${A.debug(_1)}, ${B.debug(_2)})"
       case _             => "Empty2"
+    }
+
+  implicit def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
+    instanceOf[EqClass[Maybe2[A, B]]] {
+      case (Some2(a1, b1), Some2(a2, b2)) => A.equal(a1, a2) && B.equal(b1, b2)
+      case (None2, None2)                 => true
+      case _                              => false
     }
 
   implicit def bifunctor: scalaz.Bifunctor[Maybe2] =

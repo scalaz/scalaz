@@ -13,7 +13,7 @@ options:
     - title: Apply
       url: typeclass/Apply.html
       menu_section: typeclass
-    - tiel: Bifunctor
+    - title: Bifunctor
       url: typeclass/Bifunctor.html
       menu_section: typeclass
     - title: Debug
@@ -22,15 +22,14 @@ options:
     - title: Functor
       url: typeclass/Functor.html
       menu_section: typeclass
-    - title: Semigroup
-      menu_section: typeclass
-      url: typeclass/Semigroup.html
-      menu_section: typeclass
     - title: Monad
       url: typeclass/Monad.html
       menu_section: typeclass
     - title: Monoid
       url: typeclass/Monoid.html
+      menu_section: typeclass
+    - title: Semigroup
+      url: typeclass/Semigroup.html
       menu_section: typeclass
 
   - title: Data classes

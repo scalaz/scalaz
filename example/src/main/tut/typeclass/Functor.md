@@ -15,8 +15,7 @@ A functor needs to satisfy the two functor laws:
 **Typical imports**
 
 ```tut:silent
-import scalaz._
-import Scalaz._
+import scalaz.Scalaz._
 ```
 
 ## Instance declaration

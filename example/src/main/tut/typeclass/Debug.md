@@ -11,8 +11,7 @@ By providing instances of this typeclass, a type explicitly defines that it can 
 **Typical imports**
 
 ```tut:silent
-import scalaz._
-import Scalaz._
+import scalaz.Scalaz._
 ```
 
 # Built-in instances

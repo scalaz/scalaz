@@ -47,6 +47,12 @@ trait ConstInstances {
     final override def empty: Const[A, B] = Const(A.empty)
   }
 
+  private trait ConstEq[A, B] extends EqClass[Const[A, B]] {
+    def A: EqClass[A]
+    final override def equal(x: Const[A, B], y: Const[A, B]): Boolean =
+      A.equal(x.getConst, y.getConst)
+  }
+
   implicit def constApply[R: Semigroup]: Apply[Const[R, ?]] =
     instanceOf(new ConstApply[R] {
       override val R = implicitly
@@ -71,4 +77,9 @@ trait ConstInstances {
     instanceOf[DebugClass[Const[A, B]]](
       a => A.debug(a.getConst)
     )
+
+  implicit def constEq[A: Eq, B]: Eq[Const[A, B]] =
+    instanceOf(new ConstEq[A, B] {
+      override val A = implicitly
+    })
 }

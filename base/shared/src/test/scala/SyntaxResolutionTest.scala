@@ -50,6 +50,8 @@ object SyntaxResolutionTest {
 
   def _debug[A: Debug](a: A): String = a.debug
 
+  def _eq[A: Eq](a: A): Boolean = a === a
+
   def _strong[F[_, _]: Strong, A, B, C](fab: F[A, B]) = {
     fab.first[C]: F[(A, C), (B, C)]
     fab.second[C]: F[(C, A), (C, B)]
