@@ -70,6 +70,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     interrupt of never                      ${upTo(1.second)(testNeverIsInterruptible)}
     race of value & never                   ${upTo(1.second)(testRaceOfValueNever)}
 
+  RTS regression tests
+    regression 1                            $testDeadlockRegression
   """
 
   def testPoint =
@@ -297,6 +299,23 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def testRaceOfValueNever =
     unsafePerformIO(IO.point(42).race(IO.never[Throwable, Int])) == 42
+
+  def testDeadlockRegression = {
+    import scalaz._
+    import java.util.concurrent.Executors
+    import scalaz.effect.RTS
+
+    val e = Executors.newSingleThreadExecutor()
+
+    for (i <- (0 until 10000)) {
+      val t = IO.async[Void, Int] { cb =>
+        val _ = e.submit[Unit](() => cb(ExitResult.Completed(1)))
+      }
+      unsafePerformIO(t)
+    }
+
+    e.shutdown() must_=== (())
+  }
 
   // Utility stuff
   val ExampleError = new Exception("Oh noes!")

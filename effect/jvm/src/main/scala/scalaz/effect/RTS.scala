@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.{ Executors, TimeUnit }
 import java.lang.{ Runnable, Runtime }
 
@@ -36,35 +35,31 @@ trait RTS {
    */
   final def tryUnsafePerformIO[E, A](io: IO[E, A]): ExitResult[E, A] = {
     // TODO: Optimize — this is slow and inefficient
-    var result: ExitResult[E, A] = null
-    lazy val lock                = new ReentrantLock()
-    lazy val done                = lock.newCondition()
+    val result = new AtomicReference[ExitResult[E, A]](null)
 
     val context = new FiberContext[E, A](this, defaultHandler)
 
     context.evaluate(io)
 
     (context.register { (r: ExitResult[E, A]) =>
-      lock.lock()
+      result.synchronized {
+        result.set(r)
 
-      try {
-        result = r
-
-        done.signal()
-      } finally lock.unlock()
+        result.notifyAll()
+      }
     }) match {
       case Async.Now(v) =>
-        result = v
+        result.set(v)
 
       case _ =>
-        while (result == null) {
-          lock.lock()
-          try done.await()
-          finally lock.unlock()
+        while (result.get == null) {
+          result.synchronized {
+            if (result.get == null) result.wait()
+          }
         }
     }
 
-    result
+    result.get
   }
 
   /**
