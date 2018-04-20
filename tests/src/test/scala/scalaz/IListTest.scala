@@ -246,10 +246,6 @@ object IListTest extends SpecLite {
     ns.lastIndexOf(n).getOrElse(-1) must_=== ns.toList.lastIndexOf(n)
   }
 
-  "lastIndexOfSlice" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    ns.lastIndexOfSlice(ms).getOrElse(-1) must_=== ns.toList.lastIndexOfSlice(ms.toList)
-  }
-
   "lastIndexWhere" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
     ns.lastIndexWhere(f).getOrElse(-1) must_=== ns.toList.lastIndexWhere(f)
   }

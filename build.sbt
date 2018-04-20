@@ -124,7 +124,7 @@ def scalacheckBindingProject(id: String, base: String, scalacheckVersion: Settin
       (unmanagedSourceDirectories in Compile) += {
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/src/main/scala"
       },
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion.value,
+      libraryDependencies += scalaCheckGroupId.value %%% "scalacheck" % scalacheckVersion.value,
       osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)

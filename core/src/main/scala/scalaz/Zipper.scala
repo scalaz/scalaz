@@ -259,7 +259,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     case (Stream.Empty, Stream.Empty) => this
     case (_, Stream.Empty)            =>
       val xs = lefts.reverse
-      zipper(rights, xs.head, xs.tail.append(Stream(focus)))
+      zipper(rights, xs.head, xs.tail ++ Stream(focus))
     case (_, r #:: rs)                =>
       zipper(Stream.cons(focus, lefts), r, rs)
   }
@@ -271,7 +271,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     case (Stream.Empty, Stream.Empty) => this
     case (Stream.Empty, _)            =>
       val xs = rights.reverse
-      zipper(xs.tail.append(Stream(focus)), xs.head, lefts)
+      zipper(xs.tail ++ Stream(focus), xs.head, lefts)
     case (_, _)                       => tryPrevious
   }
 

@@ -58,6 +58,7 @@ object build {
 
   val scalaCheckVersion_1_12 = SettingKey[String]("scalaCheckVersion_1_12")
   val scalaCheckVersion_1_13 = SettingKey[String]("scalaCheckVersion_1_13")
+  val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -117,19 +118,24 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.4"
+  private def Scala213 = "2.13.0-M4-pre-20d3c21"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   private[this] val buildInfoPackageName = "scalaz"
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
-    unmanagedSourceDirectories in Compile += {
-      val base = ScalazCrossType.shared(baseDirectory.value, "main").getParentFile
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v >= 12 =>
-          base / "scala-2.12+"
-        case _ =>
-          base / "scala-2.12-"
+  lazy val standardSettings: Seq[Sett] = Def.settings(
+    Seq(12, 13).flatMap { scalaV =>
+      Seq((Compile, "main"), (Test, "test")).map { case (scope, dir) =>
+        unmanagedSourceDirectories in scope += {
+          val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
+          CrossVersion.partialVersion(scalaVersion.value) match {
+            case Some((2, v)) if v >= scalaV =>
+              base / s"scala-2.${scalaV}+"
+            case _ =>
+              base / s"scala-2.${scalaV}-"
+          }
+        }
       }
     },
     organization := "org.scalaz",
@@ -144,7 +150,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq("2.10.7", Scala211, Scala212, "2.13.0-M3"),
+    crossScalaVersions := Seq("2.10.7", Scala211, Scala212),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion_1_12 := {
@@ -155,7 +161,24 @@ object build {
           "1.12.6"
       }
     },
-    scalaCheckVersion_1_13 := "1.13.5",
+    scalaCheckVersion_1_13 := {
+      val scalaV = scalaVersion.value
+      CrossVersion.partialVersion(scalaV) match {
+        case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
+          "1.14.0-newCollections"
+        case _ =>
+          "1.13.5"
+      }
+    },
+    scalaCheckGroupId := {
+      val scalaV = scalaVersion.value
+      CrossVersion.partialVersion(scalaV) match {
+        case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
+          "org.scala-lang.modules"
+        case _ =>
+          "org.scalacheck"
+      }
+    },
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -223,13 +246,17 @@ object build {
       inquireVersions,
       runTest,
       SetScala211,
-      releaseStepCommand(s"${nativeTestId}/run"),
+      releaseStepCommandAndRemaining(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       publishSignedArtifacts,
       SetScala211,
-      releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
+          "core", "effect", "iteratee", "scalacheck-binding_1_13"
+        ).map{ p => s" ${p}JVM/publishSigned " }.mkString(" ; ")
+      ),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
