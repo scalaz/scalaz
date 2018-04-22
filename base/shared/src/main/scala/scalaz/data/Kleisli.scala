@@ -17,7 +17,7 @@ sealed trait KleisliModule {
 
 }
 
-private[data] object KleisliImpl extends KleisliModule with KleisliSyntax with KleisliInstances {
+private[data] object KleisliImpl extends KleisliModule {
   type Kleisli[F[_], A, B] = A => F[B]
 
   override def run[F[_], A, B](k: Kleisli[F, A, B]): A => F[B] = k
