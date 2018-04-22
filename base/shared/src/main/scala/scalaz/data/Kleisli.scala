@@ -17,8 +17,6 @@ sealed trait KleisliModule {
 
 }
 
-object KleisliModule extends KleisliSyntax
-
 private[data] object KleisliImpl extends KleisliModule with KleisliSyntax with KleisliInstances {
   type Kleisli[F[_], A, B] = A => F[B]
 

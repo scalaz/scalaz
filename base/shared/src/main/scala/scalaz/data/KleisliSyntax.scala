@@ -16,7 +16,7 @@ trait KleisliSyntax {
       j >=> k
 
     def =<<(fa: F[A])(implicit B: Bind[F]): F[B] =
-      B.flatMap(fa)(run(k).apply)
+      B.flatMap(fa)(run(k))
   }
 
 }
