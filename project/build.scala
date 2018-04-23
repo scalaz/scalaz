@@ -56,8 +56,8 @@ object build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val scalaCheckVersion_1_12 = SettingKey[String]("scalaCheckVersion_1_12")
   val scalaCheckVersion_1_13 = SettingKey[String]("scalaCheckVersion_1_13")
+  val scalaCheckVersion_1_14 = SettingKey[String]("scalaCheckVersion_1_14")
   val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
@@ -153,21 +153,14 @@ object build {
     crossScalaVersions := Seq("2.10.7", Scala211, Scala212),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_12 := {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v <= 11 =>
-          "1.12.5"
-        case _ =>
-          "1.12.6"
-      }
-    },
-    scalaCheckVersion_1_13 := {
+    scalaCheckVersion_1_13 := "1.13.5",
+    scalaCheckVersion_1_14 := {
       val scalaV = scalaVersion.value
       CrossVersion.partialVersion(scalaV) match {
         case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
           "1.14.0-newCollections"
         case _ =>
-          "1.13.5"
+          "1.14.0"
       }
     },
     scalaCheckGroupId := {
@@ -254,7 +247,7 @@ object build {
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee", "scalacheck-binding_1_13"
+          "core", "effect", "iteratee", "scalacheck-binding_1_14"
         ).map{ p => s" ${p}JVM/publishSigned " }.mkString(" ; ")
       ),
       setNextVersion,
