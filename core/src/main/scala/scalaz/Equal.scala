@@ -57,20 +57,20 @@ object Equal {
   private[scalaz] class EqualDerives extends ContravariantDerives[Equal] {
     override def divide2[A1, A2, Z](a1: =>Equal[A1], a2: =>Equal[A2])(
       f: Z => (A1, A2)
-    ): Equal[Z] = { (z1, z2) =>
+    ): Equal[Z] = Equal.equal{ (z1, z2) =>
       val (s1, s2) = f(z1)
       val (t1, t2) = f(z2)
       ((s1.asInstanceOf[AnyRef] eq t1.asInstanceOf[AnyRef]) || a1.equal(s1, t1)) &&
       ((s2.asInstanceOf[AnyRef] eq t2.asInstanceOf[AnyRef]) || a2.equal(s2, t2))
     }
-    override def conquer[A]: Equal[A] = ((_, _) => true)
+    override def conquer[A]: Equal[A] = Equal.equal((_, _) => true)
 
     override def codivide1[Z, A1](a1: =>Equal[A1])(f: Z => A1): Equal[Z] =
-      ((z1, z2) => a1.equal(f(z1), f(z2)))
+      Equal.equal((z1, z2) => a1.equal(f(z1), f(z2)))
 
     override def codivide2[Z, A1, A2](a1: =>Equal[A1], a2: =>Equal[A2])(
       f: Z => A1 \/ A2
-    ): Equal[Z] = { (z1, z2) =>
+    ): Equal[Z] = Equal.equal{ (z1, z2) =>
       (f(z1), f(z2)) match {
         case (-\/(s), -\/(t)) => (s.asInstanceOf[AnyRef] eq t.asInstanceOf[AnyRef]) || a1.equal(s, t)
         case (\/-(s), \/-(t)) => (s.asInstanceOf[AnyRef] eq t.asInstanceOf[AnyRef]) || a2.equal(s, t)

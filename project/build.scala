@@ -102,8 +102,7 @@ object build {
     "-Xfuture",
     "-Ypartial-unification",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
-    "-unchecked",
-    "-Xexperimental" // SAM types in 2.11
+    "-unchecked"
   )
 
   private val Scala211_jvm_and_js_options = Seq(
@@ -144,7 +143,7 @@ object build {
     crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.13.5",
+    scalaCheckVersion := "1.14.0",
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
