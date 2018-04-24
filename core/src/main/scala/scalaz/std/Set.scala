@@ -11,7 +11,7 @@ trait SetInstances {
     override def foldRight[A, B](fa: Set[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
-      fa.foreach(a => s += a)
+      fa.foreach(a => s push a)
       var r = z
       while (!s.isEmpty) {
         // Fixes stack overflow issue (#866)
