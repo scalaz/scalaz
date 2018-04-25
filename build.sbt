@@ -18,11 +18,11 @@ val minSuccessfulTests = settingKey[Int]("")
 
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_12, scalacheckBindingJS_1_13, testsJS
+  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_13, scalacheckBindingJS_1_14, testsJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_12, scalacheckBindingJVM_1_13, testsJVM, concurrent, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_13, scalacheckBindingJVM_1_14, testsJVM, concurrent, example
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
@@ -48,7 +48,7 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_12)
+    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_13)
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
@@ -115,16 +115,32 @@ lazy val example = Project(
   coreJVM, iterateeJVM, concurrent
 )
 
-def scalacheckBindingProject(id: String, base: String, scalacheckVersion: SettingKey[String]) =
+def scalacheckBindingProject(
+  id: String,
+  base: String,
+  scalacheckVersion: SettingKey[String],
+  versionSuffix: String,
+  previousVersion: (String, String => String) => Option[String]) = {
+
+  def fullVersion(base: String) = base + "-scalacheck-" + versionSuffix
+
   sbtcrossproject.CrossProject(id, file(base))(JVMPlatform, JSPlatform)
     .crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
+      version ~= { v =>
+        val snapshotSuffix = "-SNAPSHOT"
+        if(v.endsWith(snapshotSuffix)) {
+          fullVersion(v.dropRight(snapshotSuffix.length)) + snapshotSuffix
+        } else {
+          fullVersion(v)
+        }
+      },
       (unmanagedSourceDirectories in Compile) += {
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/src/main/scala"
       },
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion.value,
+      libraryDependencies += scalaCheckGroupId.value %%% "scalacheck" % scalacheckVersion.value,
       osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
@@ -132,51 +148,50 @@ def scalacheckBindingProject(id: String, base: String, scalacheckVersion: Settin
     .jvmSettings(
       (unmanagedSourceDirectories in Compile) += {
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/jvm/src/main/scala"
+      },
+      mimaPreviousArtifacts := {
+        scalazMimaBasis.?.value.flatMap { v =>
+          previousVersion(v, fullVersion).map { x =>
+            organization.value % s"${name.value}_${scalaBinaryVersion.value}" % x
+          }
+        }.toSet
       }
     )
     .jsSettings(
       (unmanagedSourceDirectories in Compile) += {
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/js/src/main/scala"
+      },
+      mimaPreviousArtifacts := {
+        scalazMimaBasis.?.value.flatMap { v =>
+          previousVersion(v, fullVersion).map { x =>
+            organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % x
+          }
+        }.toSet
       }
     )
-
-lazy val scalacheckBinding_1_12 =
-  scalacheckBindingProject("scalacheck-binding_1_12", "scalacheck-binding_1_12", scalaCheckVersion_1_12)
-lazy val scalacheckBindingJVM_1_12 = scalacheckBinding_1_12.jvm
-lazy val scalacheckBindingJS_1_12  = scalacheckBinding_1_12.js
-
-
-lazy val scalacheckBinding_1_13 = {
-  def scalacheckBinding_1_13Version(base: String) = base + "-scalacheck-1.13"
-
-  scalacheckBindingProject("scalacheck-binding_1_13", "scalacheck-binding_1_13", scalaCheckVersion_1_13).settings(
-    version ~= { v =>
-      val snapshotSuffix = "-SNAPSHOT"
-      if(v.endsWith(snapshotSuffix)) {
-        scalacheckBinding_1_13Version(v.dropRight(snapshotSuffix.length)) + snapshotSuffix
-      } else {
-        scalacheckBinding_1_13Version(v)
-      }
-    }
-  )
-  .jvmSettings(
-    mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map { v =>
-        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
-      }.toSet
-    }
-  )
-  .jsSettings(
-    mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map { v =>
-        organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % scalacheckBinding_1_13Version(v)
-      }.toSet
-    }
-  )
 }
+
+lazy val scalacheckBinding_1_13 = scalacheckBindingProject(
+  id = "scalacheck-binding_1_13",
+  base = "scalacheck-binding_1_13",
+  scalacheckVersion = scalaCheckVersion_1_13,
+  versionSuffix = "1.13",
+  previousVersion = (v, f) => Some(f(v))
+)
 
 lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
 lazy val scalacheckBindingJS_1_13  = scalacheckBinding_1_13.js
+
+lazy val scalacheckBinding_1_14 = scalacheckBindingProject(
+  id = "scalacheck-binding_1_14",
+  base = "scalacheck-binding_1_14",
+  scalacheckVersion = scalaCheckVersion_1_14,
+  versionSuffix = "1.14",
+  previousVersion = (v, f) => None // TODO change after 7.2.22 released
+)
+
+lazy val scalacheckBindingJVM_1_14 = scalacheckBinding_1_14.jvm
+lazy val scalacheckBindingJS_1_14  = scalacheckBinding_1_14.js
 
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
@@ -199,7 +214,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .jsSettings(
     minSuccessfulTests := 10
   )
-  .dependsOn(core, effect, iteratee, scalacheckBinding_1_13)
+  .dependsOn(core, effect, iteratee, scalacheckBinding_1_14)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
   .settings(

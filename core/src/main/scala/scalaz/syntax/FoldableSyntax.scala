@@ -43,6 +43,10 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def toStream: Stream[A] = F.toStream(self)
   final def toIList: IList[A] = F.toIList(self)
   final def toEphemeralStream: EphemeralStream[A] = F.toEphemeralStream(self)
+  /**
+    * @throws NoSuchMethodException if Scala 2.13 or later
+    */
+  @deprecated(message = "removed in scalaz 7.3", since = "7.2.22")
   final def to[G[_]](implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] = F.to[A, G](self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
   final def ∀(p: A => Boolean): Boolean = F.all(self)(p)

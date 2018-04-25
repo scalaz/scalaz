@@ -29,18 +29,7 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   implicit def mapArb[A: Arbitrary: BKC, B: Arbitrary]: Arbitrary[Map[A, B]] =
     Arbitrary(arbitrary[SMap[A, B]] map (m => fromSeq(m.toSeq:_*)))
 
-  class NotNatural(val id: Int)
-  implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =
-    Arbitrary(arbitrary[Int] map (new NotNatural(_)))
-
-  implicit def NotNaturalOrder: Order[NotNatural] =
-    Order.orderBy[NotNatural, Int](_.id)
-
   implicit def NotNaturalBKC: BKC[NotNatural] = BKCF.contramap(OI)(_.id)
-
-  implicit def NotNaturalEqual: Equal[NotNatural] = new Equal[NotNatural] {
-    def equal(a1: NotNatural, a2: NotNatural): Boolean = a1.id == a2.id
-  }
 
   "map ordering" ! forAll {
     val O = implicitly[Order[Map[String,Int]]]

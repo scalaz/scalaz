@@ -76,7 +76,7 @@ object TypeClass {
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad), parent = true)
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
