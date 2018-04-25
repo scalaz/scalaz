@@ -114,5 +114,13 @@ object Order {
     }
   }
 
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit O: Order[G]): Order[F] =
+    new IsomorphismOrder[F, G] {
+      override implicit def G: Order[G] = O
+      override def iso: F <=> G = D
+    }
+
   ////
 }

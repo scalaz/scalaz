@@ -251,5 +251,13 @@ object Enum {
     }
     z
   }
+
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit E: Enum[G]): Enum[F] =
+    new IsomorphismEnum[F, G] with IsomorphismOrder[F, G] {
+      override implicit def G: Enum[G] = E
+      override def iso: F <=> G = D
+    }
   ////
 }
