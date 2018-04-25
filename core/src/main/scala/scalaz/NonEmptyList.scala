@@ -182,6 +182,12 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
       }
 
+      override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
+        M.unfoldrSum(fa.list)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
+          case None => Maybe.empty
+        })   
+
       override def psumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
         fa.tail match {
           case INil() => f(fa.head)

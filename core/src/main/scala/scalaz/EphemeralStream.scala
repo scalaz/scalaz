@@ -171,7 +171,10 @@ sealed abstract class EphemeralStreamInstances {
     override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
       if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
-      this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
+      M.unfoldrSum(fa)(as => as.headOption match {
+        case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(EphemeralStream())))
+        case None => Maybe.empty
+      })
     override def foldMap1Opt[A, B](fa: EphemeralStream[A])(f: A => B)(implicit B: Semigroup[B]) =
       foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =

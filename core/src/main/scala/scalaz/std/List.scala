@@ -64,6 +64,12 @@ trait ListInstances extends ListInstances0 {
         r
       }
 
+      override def foldMap[A, B](fa: List[A])(f: A => B)(implicit M: Monoid[B]) =
+        M.unfoldrSum(fa)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tail))
+          case None => Maybe.empty
+        })
+
       override def psumMap[A, B, G[_]](fa: List[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
         fa match {
           case Nil => G.empty[B]

@@ -609,7 +609,10 @@ sealed abstract class IListInstances extends IListInstance0 {
         foldMapLeft1Opt(fa.reverse)(z)((b, a) => f(a, b))
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
-        fa.foldLeft(M.zero)((b, a) => M.append(b, f(a)))
+        M.unfoldrSum(fa)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))          
+          case None => Maybe.empty
+        })
 
       override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
         fa match {
