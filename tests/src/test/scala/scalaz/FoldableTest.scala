@@ -244,18 +244,17 @@ object FoldableTest extends SpecLite {
   }
 
   "foldRight from foldMap" should {
-
+    
     val fromFoldMap: Foldable[EphemeralStream] = new FromFoldMap[EphemeralStream] {
       override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Monoid[B]): B = EphemeralStream.ephemeralStreamInstance.foldMap(fa)(f)
     }
 
-    "foldRight is Lazy" in {
-      val infiniteStream = EphemeralStream.iterate(0)(_ + 1)
-
-      // This would failed with a StackOverflowError if foldRight was not lazy, which was the case with strict Endo:
-      val stream: Stream[Int] = fromFoldMap.foldRight(infiniteStream, Stream.empty[Int]){ (i, is) => Stream.cons(i, is)}
-
-      stream.take(100) must_=== infiniteStream.take(100).toStream
+    "foldRight should be stack-safe and short-circuiting" in {
+      fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream(1,2,3,4,5,6), None){ (i, acc) =>
+        if(i < 5) Some(i + acc.getOrElse(0))
+        else if(i == 5) None
+        else sys.error("Boom")
+      } must_=== Some(10)
     }
   }
 }
