@@ -113,6 +113,9 @@ package object scalaz {
   type <~[+F[_], -G[_]] = NaturalTransformation[G, F]
   type ~~>[-F[_,_], +G[_,_]] = BiNaturalTransformation[F, G]
 
+  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
+  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
+
   type ⊥ = Nothing
   type ⊤ = Any
 
