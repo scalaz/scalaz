@@ -131,12 +131,48 @@ object FoldableTest extends SpecLite {
     ).psum must_=== just("Stop")
   }
 
-  "psumMap should be stack-safe and short-circuiting" in {
+  "psumMap should be stack-safe and short-circuiting with Stream" in {
     import Maybe.{empty, just}
     val N = 10000
     Stream.from(1).psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with EphemeralStream" in {
+    import Maybe.{empty, just}
+    EphemeralStream(1,2,3,4,5,6,7).psumMap(i =>
+      if(i < 4) empty[String]
+      else if(i < 4 + 2) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with List" in {
+    import Maybe.{empty, just}    
+    List(1,2,3,4,5,6,7).psumMap(i =>
+      if(i < 4) empty[String]
+      else if(i < 4 + 2) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with IList" in {
+    import Maybe.{empty, just}    
+    IList(1,2,3,4,5,6,7).psumMap(i =>
+      if(i < 4) empty[String]
+      else if(i < 4 + 2) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+  
+  "psumMap should be stack-safe and short-circuiting with NonEmptyList" in {
+    import Maybe.{empty, just}    
+    NonEmptyList(1,2,3,4,5,6,7).psumMap(i =>
+      if(i < 4) empty[String]
+      else if(i < 4 + 2) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
