@@ -27,10 +27,10 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.12
@@ -41,7 +41,7 @@ matrix:
       - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk9
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
