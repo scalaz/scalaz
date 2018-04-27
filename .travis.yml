@@ -8,7 +8,7 @@ cache:
 
 language: scala
 scala:
-  - 2.12.4
+  - 2.12.6
   - 2.11.12
   - 2.13.0-M3
 jdk:
@@ -37,7 +37,7 @@ addons:
 
 matrix:
   include:
-  - scala: 2.12.4
+  - scala: 2.12.6
     jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"
   - scala: 2.11.12
