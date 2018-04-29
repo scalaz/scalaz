@@ -66,6 +66,10 @@ object IListTest extends SpecLite {
     ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
+  "foldMap" ! forAll { xs: IList[Int]  =>
+    xs.foldMap(i => i) must_=== xs.foldRight(0)(_+_)  
+  }
+
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
     val f = (_: Int) + 1
     xs.mapAccumLeft(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs -> xs.map(f))
