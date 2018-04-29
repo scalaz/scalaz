@@ -136,7 +136,7 @@ object ListTest extends SpecLite {
   }
 
   "foldMap" ! forAll { xs: List[Int]  => 
-    xs.foldMap(i => i) must_=== xs.foldRight(0)(_+_)  
+    xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)  
   }
 
   "index" ! forAll { (xs: List[Int], n: Int) =>
