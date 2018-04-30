@@ -241,7 +241,7 @@ object EitherT extends EitherTInstances {
   def eitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
                                           u1: Unapply[Functor, FAB]{type A = AB},
                                           @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-                                          l: Leibniz.===[AB, A0 \/ B0]
+                                          l: AB === (A0 \/ B0)
   ): EitherT[u1.M, A0, B0] = eitherT(l.subst[u1.M](u1(fab)))
 
   def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): EitherTMonadTell[F, W, A] = new EitherTMonadTell[F, W, A]{

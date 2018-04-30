@@ -61,7 +61,7 @@ object TraverseUsage extends App {
   // val result = validations.sequence
 
   // it gives you the perhaps hard to understand error:
-  // could not find implicit value for parameter ev: scalaz.Leibniz.===[scalaz.Validation[String,Int],G[B]
+  // could not find implicit value for parameter ev: scalaz.===[scalaz.Validation[String,Int],G[B]
 
   // these however work:
   val result: ValidationNel[String, Vector[Int]] = validations.sequenceU

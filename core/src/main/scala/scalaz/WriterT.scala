@@ -287,7 +287,7 @@ trait WriterTFunctions {
   def writerTU[FAB, AB, A0, B0](fab: FAB)(implicit
                                           u1: Unapply[Functor, FAB]{type A = AB},
                                           @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-                                          l: Leibniz.===[AB, (A0, B0)]
+                                          l: AB === (A0, B0)
   ): WriterT[u1.M, A0, B0] = WriterT(l.subst[u1.M](u1(fab)))
 
   def writer[W, A](v: (W, A)): Writer[W, A] =
