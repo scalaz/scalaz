@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Bind` */
 final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind[F]) extends Ops[F[A]] {
   ////
-  import Liskov.<~<, Leibniz.===
+  import Liskov.<~<
 
   def flatMap[B](f: A => F[B]): F[B] = F.bind(self)(f)
 

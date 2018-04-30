@@ -5,7 +5,6 @@ package syntax
 final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
   ////
   import collection.generic.CanBuildFrom
-  import Leibniz.===
   import Liskov.<~<
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)

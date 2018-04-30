@@ -2,7 +2,6 @@ package scalaz
 package syntax
 package std
 
-import Leibniz.===
 
 final class Function1Ops[T, R](private val self: T => R) extends AnyVal {
 

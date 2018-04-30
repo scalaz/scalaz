@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.annotation._
-import Leibniz.{===, refl}
+import Leibniz.refl
 
 /**
  * Represents a type `MA` that has been destructured into as a type constructor `M[_]`

@@ -5,7 +5,6 @@ package syntax
 final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Traverse[F]) extends Ops[F[A]] {
   ////
 
-  import Leibniz.===
 
   final def tmap[B](f: A => B): F[B] =
     F.map(self)(f)
