@@ -293,7 +293,7 @@ sealed abstract class Free[S[_], A] {
     }
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
-  final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
+  final def run(implicit ev: Free[S, A] === Trampoline[A]): A =
     ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
@@ -311,7 +311,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Runs a `Source` all the way to the end, tail-recursively, collecting the produced values. */
-  def collect[B](implicit ev: Free[S, A] =:= Source[B, A]): (Vector[B], A) = {
+  def collect[B](implicit ev: Free[S, A] === Source[B, A]): (Vector[B], A) = {
     @tailrec def go(c: Source[B, A], v: Vector[B] = Vector()): (Vector[B], A) =
       c.resume match {
         case -\/((b, cont)) => go(cont, v :+ b)
@@ -321,7 +321,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Drive this `Source` with the given Sink. */
-  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] =:= Source[E, A]): (A, B) = {
+  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] === Source[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (-\/((e, c)), -\/(f)) => go(c, f(Some(e)))
@@ -333,7 +333,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Feed the given stream to this `Source`. */
-  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] =:= Sink[E, A]): A = {
+  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] === Sink[E, A]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, -\/(f)) => go(f(x), xs)
       case (Stream(), -\/(f)) => go(f(sys.error("No more values.")), Stream())
@@ -343,7 +343,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Feed the given source to this `Sink`. */
-  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] =:= Sink[E, A]): (A, B) = {
+  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] === Sink[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (-\/((e, c)), -\/(f)) => go(c, f(e))
       case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[E, ?]].pure(y))
