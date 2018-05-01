@@ -17,7 +17,8 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile
+  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+  # restart sbt for avoid OutOfMemoryError
   - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
 before_cache:
