@@ -143,9 +143,10 @@ object FoldableTest extends SpecLite {
 
   "psumMap should be stack-safe and short-circuiting with EphemeralStream" in {
     import Maybe.{empty, just}
-    EphemeralStream(1,2,3,4,5,6,7).psumMap(i =>
-      if(i < 4) empty[String]
-      else if(i < 4 + 2) just("Stop")
+    val N = 10000
+    EphemeralStream.fromStream(Stream.from(1)).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
@@ -286,7 +287,7 @@ object FoldableTest extends SpecLite {
     }
 
     "foldRight should be stack-safe and short-circuiting" in {
-      fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream(1,2,3,4,5,6), None){ (i, acc) =>
+      fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream.fromStream(Stream(1,2,3,4,5,6)), None){ (i, acc) =>
         if(i < 5) Some(i + acc.getOrElse(0))
         else if(i == 5) None
         else sys.error("Boom")
