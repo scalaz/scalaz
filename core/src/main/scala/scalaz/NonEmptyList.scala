@@ -167,6 +167,12 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
 
+      override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
+        M.unfoldrSum(fa.list)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
+          case None => Maybe.empty
+        })   
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -181,12 +187,6 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def foldMap1[A, B](fa: NonEmptyList[A])(f: A => B)(implicit F: Semigroup[B]): B = {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
       }
-
-      override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
-        M.unfoldrSum(fa.list)(as => as.headOption match {
-          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
-          case None => Maybe.empty
-        })   
 
       override def psumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
         fa.tail match {
