@@ -96,13 +96,13 @@ identity[Int](5)
 
 ## Empty data structures
 
-Consider a generic data structure, such as `List[A]` or `Option[A]`.
+Consider a generic scalaz.data structure, such as `List[A]` or `Option[A]`.
 The empty case (like `Nil` or `None`) can be the same runtime object
 for all types `A`.
 
 The way this is achieved in the Scala standard library is to declare
-such data structures covariant (`List[+A]`, `Option[+A]`, ...)
-and have the empty case be an instantiation of the data structure
+such scalaz.data structures covariant (`List[+A]`, `Option[+A]`, ...)
+and have the empty case be an instantiation of the scalaz.data structure
 at the bottom type `Nothing` (`object Nil extends List[Nothing]`).
 
 But covariance is not necessary (and often undesirable).
@@ -137,7 +137,7 @@ val emptyMap: ∀∀[Map] = ∀∀.of[Map](Map())
 
 ## Universally quantified Semigroup
 
-The typeclass
+The scalaz.data.typeclass
 
 ```scala
 trait Plus[F[_]] {
@@ -222,7 +222,7 @@ val none2: ∀∀[Option2] = pick $ emptyMap
 
 Since the same runtime object is shared among all instantiations
 of a polymorphic value, it is not a good idea to create polymorphic
-values of mutable data types. It even leads to unsoundness:
+values of mutable scalaz.data types. It even leads to unsoundness:
 
 ```tut
 class Foo[A](var elems: List[A])

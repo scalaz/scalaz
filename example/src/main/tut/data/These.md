@@ -5,10 +5,10 @@ title:  "These"
 
 # These
 
-`These` (aliased as `\&/`) is an inclusive "or" of two data types, as opposed to
+`These` (aliased as `\&/`) is an inclusive "or" of two scalaz.data types, as opposed to
 `\/`, which is an exclusive "or". `These[A, B]` is isomorphic to
 `A \/ B \/ (A, B)`, but is significantly easier to use and has different
-typeclass instances.
+scalaz.data.typeclass instances.
 
 ```tut:silent
 import scalaz._

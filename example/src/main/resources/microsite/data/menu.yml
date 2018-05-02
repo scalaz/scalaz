@@ -3,52 +3,52 @@ options:
     url: index.html
 
   - title: Type classes
-    url: typeclass/index.html
-    menu_section: typeclass
+    url: scalaz.data.typeclass/index.html
+    menu_section: scalaz.data.typeclass
 
     nested_options:
     - title: Applicative
-      url: typeclass/Applicative.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Applicative.html
+      menu_section: scalaz.data.typeclass
     - title: Apply
-      url: typeclass/Apply.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Apply.html
+      menu_section: scalaz.data.typeclass
     - title: Bifunctor
-      url: typeclass/Bifunctor.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Bifunctor.html
+      menu_section: scalaz.data.typeclass
     - title: Debug
-      url: typeclass/Debug.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Debug.html
+      menu_section: scalaz.data.typeclass
     - title: Functor
-      url: typeclass/Functor.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Functor.html
+      menu_section: scalaz.data.typeclass
     - title: Monad
-      url: typeclass/Monad.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Monad.html
+      menu_section: scalaz.data.typeclass
     - title: Monoid
-      url: typeclass/Monoid.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Monoid.html
+      menu_section: scalaz.data.typeclass
     - title: Semigroup
-      url: typeclass/Semigroup.html
-      menu_section: typeclass
+      url: scalaz.data.typeclass/Semigroup.html
+      menu_section: scalaz.data.typeclass
 
   - title: Data classes
-    url: data/index.html
-    menu_section: data
+    url: scalaz.data/index.html
+    menu_section: scalaz.data
 
     nested_options:
     - title: Disjunction
-      url: data/Disjunction.html
-      menu_section: data
+      url: scalaz.data/Disjunction.html
+      menu_section: scalaz.data
     - title: Forall
-      url: data/Forall.html
-      menu_section: data
+      url: scalaz.data/Forall.html
+      menu_section: scalaz.data
     - title: Maybe
-      url: data/Maybe.html
-      menu_section: data
+      url: scalaz.data/Maybe.html
+      menu_section: scalaz.data
     - title: Maybe2
-      url: data/Maybe2.html
-      menu_section: data
+      url: scalaz.data/Maybe2.html
+      menu_section: scalaz.data
     - title: These
-      url: data/These.html
-      menu_section: data
+      url: scalaz.data/These.html
+      menu_section: scalaz.data

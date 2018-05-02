@@ -1,3 +1,5 @@
+package scalaz.data
+
 import scalaz.Scalaz._
 
 class IsResolutionTest {

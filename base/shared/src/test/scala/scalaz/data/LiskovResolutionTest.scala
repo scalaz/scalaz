@@ -1,3 +1,5 @@
+package scalaz.data
+
 import scalaz.Prelude._
 
 class LiskovResolutionTest {

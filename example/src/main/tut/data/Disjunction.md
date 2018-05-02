@@ -5,7 +5,7 @@ title:  "Disjunction"
 
 # Disjunction
 
-`Disjunction` is a data type used to signal multiple possible outcomes of a computation.
+`Disjunction` is a scalaz.data type used to signal multiple possible outcomes of a computation.
 It is often used when dealing with errors, but is not tied to that case.
 
 **Typical imports**

@@ -92,5 +92,4 @@ package object data {
 
   val Kleisli: KleisliModule = KleisliImpl
   type Kleisli[F[_], A, B] = Kleisli.Kleisli[F, A, B]
-
 }

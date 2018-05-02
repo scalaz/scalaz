@@ -24,10 +24,10 @@ import scala.reflect.macros.blackbox
  *
  * Due to the way that scala.reflect macros work, there is no shape-polymorphic
  * macro implementation. The methods are named according to the shape of the
- * parameter list(s) of the typeclass method. Methods beginning with `fa_` have
+ * parameter list(s) of the scalaz.data.typeclass method. Methods beginning with `fa_` have
  * their first parameter list prefixed by the target of the invocation, rather
  * than having the target in its own (first) parameter list. This is to support
- * typeclass methods such as `Semigroup#append` and `Foldable#foldLeft`.
+ * scalaz.data.typeclass methods such as `Semigroup#append` and `Foldable#foldLeft`.
  */
 class Ops(val c: blackbox.Context) {
   import c.universe._
@@ -51,7 +51,7 @@ class Ops(val c: blackbox.Context) {
   def f_2(f: Tree, g: Tree): Tree = q"$ev.$name($lhs)($f, $g)"
 
   /** Destructured macro application.
-   * - `ev`: the typeclass evidence
+   * - `ev`: the scalaz.data.typeclass evidence
    * - `name`: the name of the invoked method
    * - `lhs`: the invocation target of the call
    */
@@ -106,7 +106,7 @@ class SymOps(val c: blackbox.Context) {
   }
 
   /** Destructured macro application.
-   * - `ev`: the typeclass evidence
+   * - `ev`: the scalaz.data.typeclass evidence
    * - `name`: the name of the invoked method
    * - `lhs`: the invocation target of the call
    */
@@ -123,7 +123,7 @@ class SymOps(val c: blackbox.Context) {
 }
 
 /** Versions of the zero-cost macros for when the receiver is not an instance
- * of the typeclass in question.
+ * of the scalaz.data.typeclass in question.
  */
 class IdOps(val c: blackbox.Context) {
   import c.universe._

@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-/** A typeclass describing types which can be meaningfully represented as a `String`.
+/** A scalaz.data.typeclass describing types which can be meaningfully represented as a `String`.
  */
 trait DebugClass[A] {
 

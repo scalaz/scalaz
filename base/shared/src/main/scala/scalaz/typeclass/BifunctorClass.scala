@@ -1,7 +1,7 @@
 package scalaz
 package typeclass
 
-/** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
+/** A scalaz.data.typeclass for types which are (covariant) [[Functor]]s in both type parameters.
  *
  * Minimal definition:
  * - `bimap` (using [[BifunctorClass.DeriveLmapRmap]])
