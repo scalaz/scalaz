@@ -4,9 +4,9 @@ package scalaz.effect
 import scala.annotation.switch
 import scala.concurrent.duration._
 
-import data.Disjunction
-import data.Disjunction._
-import data.Maybe
+import scalaz.data.Disjunction
+import scalaz.data.Disjunction._
+import scalaz.data.Maybe
 import scalaz.Void
 
 import scalaz.effect.Errors._

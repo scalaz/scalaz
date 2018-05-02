@@ -137,7 +137,7 @@ val emptyMap: ∀∀[Map] = ∀∀.of[Map](Map())
 
 ## Universally quantified Semigroup
 
-The data.typeclass
+The typeclass
 
 ```scala
 trait Plus[F[_]] {

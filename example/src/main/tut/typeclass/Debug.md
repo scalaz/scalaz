@@ -6,7 +6,7 @@ title:  "Debug"
 # Debug
 
 `Debug` presents a safe and explicit alternative to `Object.toString`.
-By providing instances of this scalaz.data.typeclass, a type explicitly defines that it can be converted into human-readable output.
+By providing instances of this typeclass, a type explicitly defines that it can be converted into human-readable output.
 
 **Typical imports**
 

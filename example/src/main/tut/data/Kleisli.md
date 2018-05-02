@@ -19,14 +19,14 @@ import data._ // this gets us our Kleisli object
 
 val f: Int => List[Boolean] = i => List(i < 2)
 
-val k: Kleisli[F, Int, Boolean] = Kleisli.wrap(f)
+val k: Kleisli[List, Int, Boolean] = Kleisli.wrap(f)
 val ff: Int => List[Boolean] = Kleisli.run(k)
 
 ```
 
 Note the following:
 
-```tut:silent
+```
 Kleisli.wrap(Kleisli.run(k)) === k
 
 // And
@@ -36,9 +36,9 @@ Kleisli.run(Kleisli.wrap(f)) === f
 
 As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Monad`, then `Kleisli`s compose via M's `flatMap`:
 
-```tut:silent
+```
 
-  override def compose[F[_], A, B, C](
+  def compose[F[_], A, B, C](
     k: Kleisli[F, A, B],
     j: Kleisli[F, B, C]
   )(implicit M: Monad[F]): Kleisli[F, A, C] =
@@ -51,7 +51,7 @@ This is where things get interesting! With a little imagination, it turns out th
 
 We provide the following functions in addition to `wrap` and `run` for `Kleisli`:
 
-```tut:silent
+```
 
     // turn F into G via some natural transformation
     def hoist[G[_]](η: F ~> G): Kleisli[G, A, B]
