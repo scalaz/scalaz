@@ -52,3 +52,6 @@ options:
     - title: These
       url: scalaz.data/These.html
       menu_section: scalaz.data
+    - title: Kleisli
+      url: scalaz.data/Kleisli.html
+      menu_section: scalaz.data
