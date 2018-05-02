@@ -10,7 +10,7 @@ Given a given `Category` C, and a `Monad` M over C, we can construct a new Categ
 
 ## Basics
 
-While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli`. The `Kleisli` data object provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrap`, and `run`:
+While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli`. The `Kleisli` data object provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
 
 ```tut:silent
 import scalaz._
@@ -19,19 +19,19 @@ import data._ // this gets us our Kleisli object
 
 val f: Int => List[Boolean] = i => List(i < 2)
 
-val k: Kleisli[List, Int, Boolean] = Kleisli.wrap(f)
-val ff: Int => List[Boolean] = Kleisli.run(k)
+val k: Kleisli[List, Int, Boolean] = Kleisli.wrapKleisli(f)
+val ff: Int => List[Boolean] = Kleisli.runKleisli(k)
 
 ```
 
 Note the following:
 
 ```
-Kleisli.wrap(Kleisli.run(k)) === k
+Kleisli.wrapKleisli(Kleisli.runKleisli(k)) === k
 
 // And
 
-Kleisli.run(Kleisli.wrap(f)) === f
+Kleisli.runKleisli(Kleisli.wrapKleisli(f)) === f
 ```
 
 As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Monad`, then `Kleisli`s compose via M's `flatMap`:
@@ -49,7 +49,7 @@ This is where things get interesting! With a little imagination, it turns out th
 
 ## Functions
 
-We provide the following functions in addition to `wrap` and `run` for `Kleisli`:
+We provide the following functions in addition to `wrapKleisli` and `runKleisli` for `Kleisli`:
 
 ```
 
@@ -75,6 +75,9 @@ We provide the following functions in addition to `wrap` and `run` for `Kleisli`
     // reverse version of `>>=`
     def =<<(fa: F[A])(implicit M: Monad[F]): F[B]
 
+    // An alias for `andThen`
+    def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C] 
+
     // Split the input between the two argument arrows and combine their output. Note that this is in general not a functor.
     def ***[C, D](j: Kleisli[F, C, D])(
       implicit S: Strong[Kleisli[F, ?, ?]],
@@ -94,18 +97,18 @@ Usage will vary, but as an example, we will show how some of the symbols may be 
 ```tut:silent
 
 import scalaz._
-import Scalaz._ // this reveals Kleisli functions aside from wrap and run
+import Scalaz._ // this reveals Kleisli functions aside from wrapKleisli and runKleisli
 import data._ // this gets us our Kleisli object
 
 val f: Int => List[Boolean] = i => List(i < 2)
 val g: Boolean => List[String] = b => if(b) List("Scalaz") else List("Scala")
 
-val k: Kleisli[List, Int, Boolean] = Kleisli.wrap(f)
-val j: Kleisli[List, Boolean, String] = Kleisli.wrap(g)
+val k: Kleisli[List, Int, Boolean] = Kleisli.wrapKleisli(f)
+val j: Kleisli[List, Boolean, String] = Kleisli.wrapKleisli(g)
 
 k >=> j // : Kleisli[List, Int, String]
 
-val l: Kleisli[List, String, Int] = Kleisli.wrap(s => List(s.size))
+val l: Kleisli[List, String, Int] = Kleisli.wrapKleisli(s => List(s.size))
 
 k <=< l // : Kleisli[List, String, Boolean]
 
