@@ -27,7 +27,6 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
   def =<=[C](c: Cokleisli[F, C, A])(implicit F: Cobind[F]): Cokleisli[F, C, B] =
     compose(c)
 
-  import Leibniz.===
   def endo(implicit ev: B === A): Endomorphic[Cokleisli[F, ?, ?], A] =
     Endomorphic[Cokleisli[F, ?, ?], A](ev.subst[Cokleisli[F, A, ?]](this))
 }

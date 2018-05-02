@@ -22,7 +22,7 @@ trait EnumeratorT[E, F[_]] { self =>
   def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]): EnumeratorT[B, F] =
     EnumerateeT.flatMap(f) run self
 
-  def flatten[B](implicit ev: E =:= F[B], F: Monad[F]): EnumeratorT[B, F] =
+  def flatten[B](implicit ev: E === F[B], F: Monad[F]): EnumeratorT[B, F] =
     flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(ev(e)))
 
   def bindM[B, G[_]](f: E => G[EnumeratorT[B, F]])(implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[B, F]]] = {

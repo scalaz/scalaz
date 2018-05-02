@@ -4,7 +4,6 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Foldable1` */
 final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable1[F]) extends Ops[F[A]] {
   ////
-  import Leibniz.===
 
   final def foldMapRight1[B](z: A => B)(f: (A, => B) => B): B = F.foldMapRight1(self)(z)(f)
   final def foldMapLeft1[B](z: A => B)(f: (B, A) => B): B = F.foldMapLeft1(self)(z)(f)

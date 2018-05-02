@@ -7,15 +7,15 @@ final case class IndexedContsT[W[_], M[_], R, O, A](_run: W[A => M[O]] => M[R]) 
   def apply(wamo: W[A => M[O]]): M[R] =
     run(wamo)
 
-  def run_(implicit W: Applicative[W], M: Applicative[M], ev: A =:= O): M[R] =
-    run(W.point(x => M.point(x)))
+  def run_(implicit W: Applicative[W], M: Applicative[M], ev: A === O): M[R] =
+    run(W.point(x => M.point(ev(x))))
 
   def map[B](f: A => B)(implicit W: Functor[W]): IndexedContsT[W, M, R, O, B] =
     IndexedContsT { wbmo =>
       run(W.map(wbmo)(f andThen _))
     }
 
-  def flatten[E, B](implicit ev: A =:= IndexedContsT[W, M, O, E, B], W: Cobind[W]): IndexedContsT[W, M, R, E, B] = flatMap(ev)
+  def flatten[E, B](implicit ev: A === IndexedContsT[W, M, O, E, B], W: Cobind[W]): IndexedContsT[W, M, R, E, B] = flatMap(ev)
 
   def flatMap[E, B](f: A => IndexedContsT[W, M, O, E, B])(implicit W: Cobind[W]): IndexedContsT[W, M, R, E, B] =
     IndexedContsT { wbme =>

@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.annotation._
-import Leibniz.{===, refl}
+import Leibniz.refl
 
 /**
  * Represents a type `MA` that has been destructured into as a type constructor `M[_]`
@@ -59,7 +59,7 @@ trait Unapply[TC[_[_]], MA] {
   /** The instance of the type class */
   def TC: TC[M]
 
-  /** Evidence that MA =:= M[A] */
+  /** Evidence that MA === M[A] */
   def leibniz: MA === M[A]
 
   /** Compatibility. */
@@ -162,7 +162,7 @@ trait Unapply2[TC[_[_, _]], MAB] {
   /** The instance of the type class */
   def TC: TC[M]
 
-  /** Evidence that MAB =:= M[A, B] */
+  /** Evidence that MAB === M[A, B] */
   def leibniz: MAB === M[A, B]
 
   /** Compatibility. */
