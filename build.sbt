@@ -1,5 +1,12 @@
 import Scalaz._
 
+publishTo in ThisBuild := Some("snapshots" at sys.env.getOrElse("SNAPSHOT_REPO", ""))
+
+credentials += Credentials("Sonatype Nexus Repository Manager",
+                           "oss.sonatype.org",
+                           sys.env.getOrElse("SNAPSHOT_REPO_USER", ""),
+                           sys.env.getOrElse("SNAPSHOT_REPO_PASSWORD", ""))
+
 lazy val root = project
   .in(file("."))
   .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, example, benchmarks)
