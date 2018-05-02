@@ -2,7 +2,7 @@ package scalaz
 package data
 
 trait KleisliSyntax {
-  import Kleisli.{ compose, runKleisli, wrapKleisli }
+  import Kleisli.{ runKleisli, wrapKleisli }
 
   implicit class ToKleisliOps[F[_], A, B](k: Kleisli[F, A, B]) {
 
