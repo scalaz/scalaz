@@ -5,7 +5,7 @@ title:  "Kleisli"
 
 # Kleisli
 
-Given a given `Category` C, and a `Monad` M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are those arrows `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
+Given a given `Category` C, and a `Monad` M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are arrows of the form `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
 
 
 ## Basics
@@ -34,22 +34,29 @@ Kleisli.wrapKleisli(Kleisli.runKleisli(k)) === k
 Kleisli.runKleisli(Kleisli.wrapKleisli(f)) === f
 ```
 
+Additionally, we provide the following utility allowing one to translate `Kleisli`s from `F[_]` to `G[_]` according to some natural transformation (`~>`) for convenience:
+
+```
+  def hoist[F[_], G[_], A, B](k: Kleisli[F, A, B])(η: F ~> G): Kleisli[G, A, B]
+```
+
+
 As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Monad`, then `Kleisli`s compose via M's `flatMap`:
 
 ```
 
   def compose[F[_], A, B, C](
-    k: Kleisli[F, A, B],
-    j: Kleisli[F, B, C]
+    j: Kleisli[F, B, C],
+    k: Kleisli[F, A, B]
   )(implicit M: Monad[F]): Kleisli[F, A, C] =
     a => M.flatMap(k(a))(j)
 ```
 
-This is where things get interesting! With a little imagination, it turns out that the `Kleisli` construction not only forms a new Category, but when M is a `Monad`, `Kleisli`s form a `Monad` as well!
+With a little imagination, we can see that the `Kleisli` construction not only forms a new Category, but when M is a `Monad`, `Kleisli`s form a `Monad` as well!
 
 ## Functions
 
-We provide the following functions in addition to `wrapKleisli` and `runKleisli` for `Kleisli`:
+We provide the following functions in addition to `wrapKleisli`, `runKleisli`, and `compose` for `Kleisli`:
 
 ```
 
@@ -76,7 +83,7 @@ We provide the following functions in addition to `wrapKleisli` and `runKleisli`
     def =<<(fa: F[A])(implicit M: Monad[F]): F[B]
 
     // An alias for `andThen`
-    def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C] 
+    def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C]
 
     // Split the input between the two argument arrows and combine their output. Note that this is in general not a functor.
     def ***[C, D](j: Kleisli[F, C, D])(
