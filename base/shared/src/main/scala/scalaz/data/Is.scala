@@ -2,14 +2,14 @@ package scalaz
 package data
 
 /**
- * The scalaz.data type `Is` is the encoding of Leibnitz’ law which states that
+ * The data type `Is` is the encoding of Leibnitz’ law which states that
  * if `a` and `b` are identical then they must have identical properties.
  * Leibnitz’ original definition reads as follows:
  *   a ≡ b = ∀ f .f a ⇔ f b
  * and can be proven to be equivalent to:
  *   a ≡ b = ∀ f .f a → f b
  *
- * The `Is` scalaz.data type encodes true type equality, since the identity
+ * The `Is` data type encodes true type equality, since the identity
  * function is the only non-diverging conversion function that can be used
  * as an implementation of the `subst` method assuming that we do not break
  * parametricity. As the substitution function has to work for any `F[_]`, it

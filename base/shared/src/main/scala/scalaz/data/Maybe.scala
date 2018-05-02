@@ -23,7 +23,7 @@ sealed trait MaybeModule {
   def fromOption[A](oa: Option[A]): Maybe[A]
   def toOption[A](ma: Maybe[A]): Option[A]
 
-  /* scalaz.data.typeclass instances */
+  /* typeclass instances */
   def isCovariant: IsCovariant[Maybe]
   def monad: Monad[Maybe]
   def traversable: Traversable[Maybe]

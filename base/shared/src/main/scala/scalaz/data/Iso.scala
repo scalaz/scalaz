@@ -84,7 +84,7 @@ object Iso {
     }
 
   object Product {
-    // private[scalaz.data] because private and private[this] give
+    // private[data] because private and private[this] give
     // [warning] private type ⨂ in object Product is never used
     private[data] type ⨂[A, B] = (A, B)
     private[data] type Id      = Unit

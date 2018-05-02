@@ -1,4 +1,5 @@
-package scalaz.data
+package scalaz
+package data
 
 import scalaz.Prelude._
 
