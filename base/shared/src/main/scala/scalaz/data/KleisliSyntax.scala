@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import Prelude._
+
 trait KleisliSyntax {
   import Kleisli.{ runKleisli, wrapKleisli }
 
@@ -9,27 +11,27 @@ trait KleisliSyntax {
     def hoist[G[_]](η: F ~> G): Kleisli[G, A, B] =
       Kleisli.hoist(k)(η)
 
-    def andThen[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C] =
+    def andThen[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
       Kleisli.compose(j, k)
 
-    def compose[E](j: Kleisli[F, E, A])(implicit M: Monad[F]): Kleisli[F, E, B] =
+    def compose[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
       Kleisli.compose(k, j)
 
-    def >=>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C] =
+    def >=>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
       Kleisli.compose(j, k)
 
-    def <=<[E](j: Kleisli[F, E, A])(implicit M: Monad[F]): Kleisli[F, E, B] =
+    def <=<[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
       Kleisli.compose(k, j)
 
-    def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C] =
+    def >>>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
       Kleisli.compose(j, k)
 
-    def =<<(fa: F[A])(implicit M: Monad[F]): F[B] =
-      M.flatMap(fa)(runKleisli(k))
+    def =<<(fa: F[A])(implicit B: Bind[F]): F[B] =
+      B.flatMap(fa)(runKleisli(k))
 
     def ***[C, D](j: Kleisli[F, C, D])(
       implicit S: Strong[Kleisli[F, ?, ?]],
-      M: Monad[F]
+      B: Bind[F]
     ): Kleisli[F, (A, C), (B, D)] =
       S.first(k) >>> S.second(j)
 

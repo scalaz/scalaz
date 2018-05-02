@@ -13,7 +13,7 @@ sealed trait KleisliModule {
   def compose[F[_], A, B, C](
     j: Kleisli[F, B, C],
     k: Kleisli[F, A, B]
-  )(implicit M: Monad[F]): Kleisli[F, A, C]
+  )(implicit B: Bind[F]): Kleisli[F, A, C]
 
 }
 
@@ -30,6 +30,6 @@ private[data] object KleisliImpl extends KleisliModule {
   override def compose[F[_], A, B, C](
     j: Kleisli[F, B, C],
     k: Kleisli[F, A, B]
-  )(implicit M: Monad[F]): Kleisli[F, A, C] =
-    a => M.flatMap(k(a))(j)
+  )(implicit B: Bind[F]): Kleisli[F, A, C] =
+    a => B.flatMap(k(a))(j)
 }
