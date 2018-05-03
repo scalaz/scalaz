@@ -10,7 +10,7 @@ Given a given `Category` C, and a `Monad` M over C, we can construct a new Categ
 
 ## Basics
 
-While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli`. The `Kleisli[F, A, B]` data object provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
+While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli[F, A, B]`. The `Kleisli[F, A, B]` type provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
 
 ```tut:silent
 import scalaz._
@@ -112,6 +112,8 @@ val k: Kleisli[List, Int, Boolean] = Kleisli.wrapKleisli(f)
 val j: Kleisli[List, Boolean, String] = Kleisli.wrapKleisli(g)
 
 k >=> j // : Kleisli[List, Int, String]
+
+k >>> j // : Kleisli[List, Int, String]
 
 val l: Kleisli[List, String, Int] = Kleisli.wrapKleisli(s => List(s.size))
 
