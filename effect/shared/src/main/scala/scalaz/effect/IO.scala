@@ -222,34 +222,34 @@ sealed abstract class IO[E, A] { self =>
    * }
    * }}}
    */
-  final def bracket[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
+  final def bracket[B](release: A => IO[Void, Unit])(use: A => IO[E, B]): IO[E, B] =
     IO.Bracket(this, (_: ExitResult[E, B], a: A) => release(a), use)
 
   /**
    * A more powerful version of `bracket` that provides information on whether
    * or not `use` succeeded to the release action.
    */
-  final def bracket0[B](release: (ExitResult[E, B], A) => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
+  final def bracket0[B](release: (ExitResult[E, B], A) => IO[Void, Unit])(use: A => IO[E, B]): IO[E, B] =
     IO.Bracket(this, release, use)
 
   /**
    * A less powerful variant of `bracket` where the value produced by this
    * action is not needed.
    */
-  final def bracket_[B](release: IO[E, Unit])(use: IO[E, B]): IO[E, B] =
+  final def bracket_[B](release: IO[Void, Unit])(use: IO[E, B]): IO[E, B] =
     self.bracket(_ => release)(_ => use)
 
   /**
    * Executes the specified finalizer, whether this action succeeds, fails, or
    * is interrupted.
    */
-  final def ensuring(finalizer: IO[E, Unit]): IO[E, A] =
+  final def ensuring(finalizer: IO[Void, Unit]): IO[E, A] =
     IO.unit.bracket(_ => finalizer)(_ => self)
 
   /**
    * Executes the release action only if there was an error.
    */
-  final def bracketOnError[B](release: A => IO[E, Unit])(use: A => IO[E, B]): IO[E, B] =
+  final def bracketOnError[B](release: A => IO[Void, Unit])(use: A => IO[E, B]): IO[E, B] =
     bracket0(
       (r: ExitResult[E, B], a: A) =>
         r match {
@@ -263,7 +263,7 @@ sealed abstract class IO[E, A] { self =>
    * Runs the specified cleanup action if this action errors, providing the
    * error to the cleanup action. The cleanup action will not be interrupted.
    */
-  final def onError(cleanup: Throwable \/ E => IO[E, Unit]): IO[E, A] =
+  final def onError(cleanup: Throwable \/ E => IO[Void, Unit]): IO[E, A] =
     IO.unit[E]
       .bracket0(
         (r: ExitResult[E, A], a: Unit) =>
@@ -284,7 +284,7 @@ sealed abstract class IO[E, A] { self =>
   /**
    * Performs this action non-interruptibly. This will prevent the action from
    * being terminated externally, but the action may fail for internal reasons
-   * (e.g. an uncaught error) or be terminated due to defect.
+   * (e.g. an uncaught error) or terminate due to defect.
    */
   final def uninterruptibly: IO[E, A] = IO.Uninterruptible(self)
 
@@ -458,6 +458,11 @@ sealed abstract class IO[E, A] { self =>
     IO.sleep(duration) *> self
 
   /**
+   * Runs this action in a new fiber, resuming when the fiber terminates.
+   */
+  final def run[E2]: IO[E2, ExitResult[E, A]] = IO.Run(self)
+
+  /**
    * An integer that identifies the term in the `IO` sum type to which this
    * instance belongs (e.g. `IO.Tags.Point`).
    */
@@ -483,6 +488,7 @@ object IO extends IOInstances {
     final val Supervise       = 14
     final val Terminate       = 15
     final val Supervisor      = 16
+    final val Run             = 17
   }
   final case class FlatMap[E, A0, A](io: IO[E, A0], flatMapper: A0 => IO[E, A]) extends IO[E, A] {
     override final def tag = Tags.FlatMap
@@ -533,7 +539,7 @@ object IO extends IOInstances {
   }
 
   final case class Bracket[E, A, B](acquire: IO[E, A],
-                                    release: (ExitResult[E, B], A) => IO[E, Unit],
+                                    release: (ExitResult[E, B], A) => IO[Void, Unit],
                                     use: A => IO[E, B])
       extends IO[E, B] {
     override final def tag = Tags.Bracket
@@ -557,6 +563,10 @@ object IO extends IOInstances {
 
   final case class Supervisor[E]() extends IO[E, Throwable => IO[Void, Unit]] {
     override final def tag = Tags.Supervisor
+  }
+
+  final case class Run[E1, E2, A](value: IO[E1, A]) extends IO[E2, ExitResult[E1, A]] {
+    override final def tag = Tags.Run
   }
 
   /**
