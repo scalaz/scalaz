@@ -5,7 +5,7 @@ title:  "Kleisli"
 
 # Kleisli
 
-Given a given `Category` C, and a `Monad` M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are arrows of the form `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
+Given a `Category` C, and a `Monad` M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are arrows of the form `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
 
 
 ## Basics
