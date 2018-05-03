@@ -41,9 +41,8 @@ trait KleisliSyntax {
       k.first >>> j.second
 
     def &&&[C](j: Kleisli[F, A, C])(
-      implicit M: Monad[F]
+      implicit A: Apply[F]
     ): Kleisli[F, A, (B, C)] =
-      wrapKleisli((a: A) => M.pure((a, a))) >>> (k *** j)
-
+      wrapKleisli(a => A.ap(runKleisli(j)(a))(A.map(runKleisli(k)(a))(a => (a, _))))
   }
 }
