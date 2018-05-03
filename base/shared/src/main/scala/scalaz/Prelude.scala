@@ -71,6 +71,7 @@ trait BaseData {
   type That[A, B]                                      = data.That[A, B]
   type This[A, B]                                      = data.This[A, B]
   type Iso[A, B]                                       = data.Iso[A, B]
+  type Kleisli[F[_], A, B]                             = data.Kleisli[F, A, B]
 
   val Iso = data.Iso
 
@@ -91,7 +92,8 @@ trait BaseDataAliases { self: BaseData =>
   type <~<[-A, +B] = data.As[A, B]
   type >~>[+B, -A] = data.As[A, B]
 
-  val Void: data.Void.type = data.Void
+  val Void: data.Void.type       = data.Void
+  val Kleisli: data.Kleisli.type = data.Kleisli
 
   val Forall: data.Forall.type = data.Forall
   val ∀ : data.Forall.type     = data.Forall
@@ -109,6 +111,7 @@ trait AllFunctions
     extends data.VoidFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
+    with data.KleisliFunctions
     with typeclass.InvariantFunctorFunctions
     with typeclass.PhantomFunctions
     with typeclass.TraversableFunctions
@@ -124,6 +127,7 @@ trait AllInstances
     with data.IListInstances
     with data.TheseInstances
     with data.UpStarInstances
+    with data.KleisliInstances
     with typeclass.BifunctorInstances
     with typeclass.BindInstances
     with typeclass.ChoiceInstances
@@ -150,6 +154,7 @@ trait AllSyntax
     with data.Forall2Syntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
+    with data.KleisliSyntax
     with typeclass.ApplicativeSyntax
     with typeclass.ApplySyntax
     with typeclass.BifunctorSyntax
