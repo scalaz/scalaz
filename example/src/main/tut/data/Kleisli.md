@@ -73,6 +73,13 @@ We provide the following functions in addition to `wrapKleisli`, `runKleisli`, a
       j: Kleisli[F, E, A]
     )(implicit M: Monad[F]): Kleisli[F, E, B]
 
+    //
+    def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
+      Kleisli.first(k)
+
+    def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
+      Kleisli.second(k)
+
     // symbolic version of `andThen`
     def >=>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C]
 
@@ -85,7 +92,7 @@ We provide the following functions in addition to `wrapKleisli`, `runKleisli`, a
     // An alias for `andThen`
     def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C]
 
-    // Split the input between the two argument arrows and combine their output. Note that this is in general not a functor.
+    // Split the input between the two argument arrows and combine their output.
     def ***[C, D](j: Kleisli[F, C, D])(
       implicit S: Strong[Kleisli[F, ?, ?]],
       M: Monad[F]

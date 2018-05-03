@@ -37,7 +37,7 @@ trait KleisliInstances {
       new StrongClass[Kleisli[M, ?, ?]] with StrongClass.DeriveSecond[Kleisli[M, ?, ?]]
       with ProfunctorClass.DeriveLRMap[Kleisli[M, ?, ?]] {
         override def first[A, B, C](pab: Kleisli[M, A, B]): Kleisli[M, (A, C), (B, C)] =
-          wrapKleisli(t => M.map(runKleisli(pab)(t._1))((_, t._2)))
+          Kleisli.first(pab)
 
         override def dimap[A, B, C, D](fab: Kleisli[M, A, B])(ca: C => A)(bd: B => D): Kleisli[M, C, D] =
           wrapKleisli(c => M.map(runKleisli(fab)(ca(c)))(bd))
