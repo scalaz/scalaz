@@ -45,6 +45,6 @@ trait KleisliSyntax {
       implicit M: Monad[F]
     ): Kleisli[F, A, (B, C)] =
       wrapKleisli((a: A) => M.pure((a, a))) >>> (k *** j)
-    
+
   }
 }
