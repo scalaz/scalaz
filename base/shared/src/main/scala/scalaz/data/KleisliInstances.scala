@@ -17,10 +17,10 @@ trait KleisliInstances {
       }
     )
 
-  implicit def compose[M[_]](implicit M: Monad[M]): Compose[Kleisli[M, ?, ?]] =
+  implicit def compose[M[_]](implicit B: Bind[M]): Compose[Kleisli[M, ?, ?]] =
     instanceOf(new ComposeClass[Kleisli[M, ?, ?]] {
       def compose[A, B, C](f: Kleisli[M, B, C], g: Kleisli[M, A, B]): Kleisli[M, A, C] =
-        wrapKleisli(a => M.flatMap(runKleisli(g)(a))(runKleisli(f)))
+        wrapKleisli(a => B.flatMap(runKleisli(g)(a))(runKleisli(f)))
     })
 
   implicit def monoid[M[_], A, B](implicit M: Monoid[M[B]]): Monoid[Kleisli[M, A, B]] =

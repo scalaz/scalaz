@@ -34,25 +34,24 @@ Kleisli.wrapKleisli(Kleisli.runKleisli(k)) === k
 Kleisli.runKleisli(Kleisli.wrapKleisli(f)) === f
 ```
 
-Additionally, we provide the following utility allowing one to translate `Kleisli[F, A, B]` from `Kleisli[G, A, B]` according to some natural transformation (`~>`) for convenience:
+Additionally, we provide the following utility allowing one to translate from `Kleisli[F, A, B]` to `Kleisli[G, A, B]` according to some natural transformation (`~>`) for convenience:
 
 ```
   def hoist[F[_], G[_], A, B](k: Kleisli[F, A, B])(η: F ~> G): Kleisli[G, A, B]
 ```
 
 
-As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli[F, A, B]`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Monad`, then `Kleisli`s compose via M's `flatMap`:
+As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli[F, A, B]`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Bind`, then `Kleisli`s compose via M's `flatMap`:
 
 ```
-
   def compose[F[_], A, B, C](
     j: Kleisli[F, B, C],
     k: Kleisli[F, A, B]
-  )(implicit M: Monad[F]): Kleisli[F, A, C] =
-    a => M.flatMap(k(a))(j)
+  )(implicit B: Bind[F]): Kleisli[F, A, C] =
+    a => B.flatMap(k(a))(j)
 ```
 
-With a little imagination, we can see that the `Kleisli[F, A, B]` construction not only forms a new Category, but when M is a `Monad`, `Kleisli[F, A, ?]`s form a `Monad` as well!
+With a little imagination, we can see that the `Kleisli[F, ?, ?]` construction not only forms a new Category, but when M is a `Monad`, `Kleisli[F, A, ?]`s form a `Monad` as well!
 
 ## Functions
 
@@ -129,7 +128,7 @@ k =<< List(3) // : List(false): List[Boolean]
 
 - `Monad` for `Kleisli[M, A, ?]` when M is a `Monad`
 
-- `Compose` for `Kleisli[M, ?, ?]` when M is a `Monad`
+- `Compose` for `Kleisli[M, ?, ?]` when M is a `Bind`
 
 - `Monoid` for `Kleisli[M, A, B]` when `M[B]` is any `Monoid`
 
