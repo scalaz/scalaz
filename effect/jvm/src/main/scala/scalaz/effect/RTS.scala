@@ -37,7 +37,7 @@ trait RTS {
 
     context.register(k) match {
       case Async.Now(v) => k(v)
-      case _ =>
+      case _            =>
     }
   }
 
@@ -214,13 +214,12 @@ private object RTS {
 
     private[this] val stack: Stack = new Stack()
 
-    final def collectDefect[E, A](e: ExitResult[E, A]): List[Throwable] = {
+    final def collectDefect[E, A](e: ExitResult[E, A]): List[Throwable] =
       e match {
         case ExitResult.Terminated(t) => t :: Nil
         case ExitResult.Completed(_)  => Nil
         case ExitResult.Failed(_)     => Nil
       }
-    }
 
     /**
      * Creates an action to dispatch a list of errors to the fiber's uncaught
@@ -245,7 +244,7 @@ private object RTS {
      */
     final def catchError[E2](err: E): IO[E2, List[Throwable]] = {
       var finalizer: IO[E2, List[Throwable]] = null
-      var body     : ExitResult[E, Any]      = null
+      var body: ExitResult[E, Any]           = null
 
       var caught = false
 
@@ -263,10 +262,11 @@ private object RTS {
             val currentFinalizer: IO[E2, List[Throwable]] = f.finalizer(body).run.map(collectDefect)
 
             if (finalizer == null) finalizer = currentFinalizer
-            else finalizer = for {
-              oldErrors <- finalizer
-              newErrors <- currentFinalizer
-            } yield newErrors ::: oldErrors
+            else
+              finalizer = for {
+                oldErrors <- finalizer
+                newErrors <- currentFinalizer
+              } yield newErrors ::: oldErrors
 
           case _ =>
         }
@@ -312,10 +312,11 @@ private object RTS {
               val currentFinalizer = f.finalizer(body).run[E2].map(collectDefect)
 
               if (finalizer == null) finalizer = currentFinalizer
-              else finalizer = for {
-                oldErrors <- finalizer
-                newErrors <- currentFinalizer
-              } yield newErrors ::: oldErrors
+              else
+                finalizer = for {
+                  oldErrors <- finalizer
+                  newErrors <- currentFinalizer
+                } yield newErrors ::: oldErrors
 
             case _ =>
           }
@@ -607,9 +608,9 @@ private object RTS {
                     // TODO: Optimize
                     curIo = for {
                       a <- (for {
-                              a <- io.acquire
-                              _ <- IO.sync(ref.set(a))
-                            } yield a).uninterruptibly
+                            a <- io.acquire
+                            _ <- IO.sync(ref.set(a))
+                          } yield a).uninterruptibly
                       b <- io.use(a)
                       _ <- (io.release(ExitResult.Completed(b), a)[E] <* IO.sync(ref.set(null))).uninterruptibly
                     } yield b
@@ -682,9 +683,9 @@ private object RTS {
                       value.register { (v: ExitResult[E, Any]) =>
                         k(ExitResult.Completed(v))
                       } match {
-                        case Async.Now(v) => Async.Now(ExitResult.Completed(v))
+                        case Async.Now(v)        => Async.Now(ExitResult.Completed(v))
                         case Async.MaybeLater(c) => Async.MaybeLater(c)
-                        case Async.Later() => Async.Later()
+                        case Async.Later()       => Async.Later()
                       }
                     }
                 }
