@@ -14,10 +14,7 @@ sealed trait KleisliModule {
 
   def second[F[_], A, B, C](k: Kleisli[F, A, B])(implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)]
 
-  def compose[F[_], A, B, C](
-    j: Kleisli[F, B, C],
-    k: Kleisli[F, A, B]
-  )(implicit B: Bind[F]): Kleisli[F, A, C]
+  def compose[F[_], A, B, C](j: Kleisli[F, B, C], k: Kleisli[F, A, B])(implicit B: Bind[F]): Kleisli[F, A, C]
 
 }
 

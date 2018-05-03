@@ -36,9 +36,9 @@ trait KleisliSyntax {
       B.flatMap(fa)(runKleisli(k))
 
     def ***[C, D](j: Kleisli[F, C, D])(
-      implicit B: Bind[F]
+      implicit A: Apply[F]
     ): Kleisli[F, (A, C), (B, D)] =
-      k.first >>> j.second
+      wrapKleisli(t => A.ap(runKleisli(j)(t._2))(A.map(runKleisli(k)(t._1))(a => (a, _))))
 
     def &&&[C](j: Kleisli[F, A, C])(
       implicit A: Apply[F]
