@@ -76,6 +76,12 @@ object Contravariant {
   @inline def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Contravariant[G]): Contravariant[F] =
+    new IsomorphismContravariant[F, G] {
+      override implicit def G: Contravariant[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

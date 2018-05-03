@@ -114,6 +114,12 @@ object Functor {
   @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Functor[G]): Functor[F] =
+    new IsomorphismFunctor[F, G] {
+      override implicit def G: Functor[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

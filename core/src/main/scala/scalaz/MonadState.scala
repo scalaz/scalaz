@@ -25,6 +25,12 @@ object MonadState {
   @inline def apply[F[_], S](implicit F: MonadState[F, S]): MonadState[F, S] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_], S](D: F <~> G)(implicit E: MonadState[G, S]): MonadState[F, S] =
+    new IsomorphismMonadState[F, G, S] {
+      override implicit def G: MonadState[G, S] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

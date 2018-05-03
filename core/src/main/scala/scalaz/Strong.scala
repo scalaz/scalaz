@@ -19,6 +19,12 @@ object Strong {
   @inline def apply[F[_, _]](implicit F: Strong[F]): Strong[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
 
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Strong[G]): Strong[F] =
+    new IsomorphismStrong[F, G] {
+      override implicit def G: Strong[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

@@ -76,6 +76,12 @@ object Bind {
   @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Bind[G]): Bind[F] =
+    new IsomorphismBind[F, G] {
+      override implicit def G: Bind[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

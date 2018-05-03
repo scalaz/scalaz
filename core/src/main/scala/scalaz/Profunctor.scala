@@ -79,5 +79,13 @@ object Profunctor {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
         DownStar(k compose Tag.unwrap(f))
     }
+
+  import scalaz.Isomorphism.<~~>
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Profunctor[G]): Profunctor[F] =
+    new IsomorphismProfunctor[F, G] {
+      override implicit def G: Profunctor[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

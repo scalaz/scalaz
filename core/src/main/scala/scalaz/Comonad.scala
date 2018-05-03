@@ -32,6 +32,12 @@ object Comonad {
   @inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Comonad[G]): Comonad[F] =
+    new IsomorphismComonad[F, G] {
+      override implicit def G: Comonad[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

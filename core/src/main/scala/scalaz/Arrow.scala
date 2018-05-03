@@ -70,6 +70,12 @@ object Arrow {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
 
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Arrow[G]): Arrow[F] =
+    new IsomorphismArrow[F, G] {
+      override implicit def G: Arrow[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

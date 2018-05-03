@@ -19,6 +19,12 @@ object MonadTell {
   @inline def apply[F[_], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_], S](D: F <~> G)(implicit E: MonadTell[G, S]): MonadTell[F, S] =
+    new IsomorphismMonadTell[F, G, S] {
+      override implicit def G: MonadTell[G, S] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

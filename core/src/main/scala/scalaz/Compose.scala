@@ -43,5 +43,12 @@ object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Compose[G]): Compose[F] =
+    new IsomorphismCompose[F, G] {
+      override implicit def G: Compose[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

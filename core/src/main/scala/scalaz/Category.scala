@@ -51,5 +51,12 @@ object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Category[G]): Category[F] =
+    new IsomorphismCategory[F, G] {
+      override implicit def G: Category[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

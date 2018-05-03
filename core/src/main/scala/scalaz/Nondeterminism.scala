@@ -195,6 +195,12 @@ object Nondeterminism {
   @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Nondeterminism[G]): Nondeterminism[F] =
+    new IsomorphismNondeterminism[F, G] {
+      override implicit def G: Nondeterminism[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

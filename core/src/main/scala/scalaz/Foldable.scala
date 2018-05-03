@@ -369,5 +369,11 @@ object Foldable {
         foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
   }
 
+
+  def fromIso[F[_], G[_]](D: F ~> G)(implicit E: Foldable[G]): Foldable[F] =
+    new IsomorphismFoldable[F, G] {
+      override implicit def G: Foldable[G] = E
+      override def naturalTrans: F ~> G = D
+    }
   ////
 }

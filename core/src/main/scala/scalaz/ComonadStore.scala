@@ -29,6 +29,12 @@ object ComonadStore {
   @inline def apply[F[_], S](implicit F: ComonadStore[F, S]): ComonadStore[F, S] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_], S](D: F <~> G)(implicit E: ComonadStore[G, S]): ComonadStore[F, S] =
+    new IsomorphismComonadStore[F, G, S] {
+      override implicit def G: ComonadStore[G, S] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

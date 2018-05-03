@@ -51,6 +51,12 @@ object BindRec {
   @inline def apply[F[_]](implicit F: BindRec[F]): BindRec[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: BindRec[G]): BindRec[F] =
+    new IsomorphismBindRec[F, G] {
+      override implicit def G: BindRec[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }
