@@ -45,7 +45,6 @@ trait RTS {
    * Effectfully interprets an `IO`, blocking if necessary to obtain the result.
    */
   final def tryUnsafePerformIO[E, A](io: IO[E, A]): ExitResult[E, A] = {
-    // TODO: Optimize — this is slow and inefficient
     val result = new AtomicReference[ExitResult[E, A]](null)
 
     val context = new FiberContext[E, A](this, defaultHandler)
@@ -142,7 +141,6 @@ private object RTS {
 
   @inline
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
-    // TODO: Eliminate type cast
     if (!stack.isEmpty()) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
 
   object Catcher extends Function[Any, IO[Any, Any]] {
@@ -206,6 +204,8 @@ private object RTS {
     private[this] var killed = false
 
     // TODO: A lot can be pulled out of status to increase performance
+    // Also the size of this structure should be minimized with laziness used
+    // to optimize further, to make forking a cheaper operation.
 
     // Accessed from within a single thread (not necessarily the same):
     private[this] var noInterrupt                               = 0
@@ -605,7 +605,8 @@ private object RTS {
 
                     stack.push(finalizer)
 
-                    // TODO: Optimize
+                    // TODO: This is very heavyweight and could benefit from
+                    // optimization.
                     curIo = for {
                       a <- (for {
                             a <- io.acquire
@@ -769,7 +770,7 @@ private object RTS {
       val left  = fork(leftIO, unhandled)
       val right = fork(rightIO, unhandled)
 
-      // TODO: Interrupt raced fibers if parent is interrupted?
+      // TODO: Interrupt raced fibers if parent is interrupted
 
       val leftWins  = (w: A, r: Fiber[E, B]) => finish(-\/((w, r)))
       val rightWins = (w: B, l: Fiber[E, A]) => finish(\/-((w, l)))
@@ -843,11 +844,7 @@ private object RTS {
               val oldCanceler = canceler
 
               canceler = (t: Throwable) => {
-                try oldCanceler(t)
-                catch {
-                  case t: Throwable if (nonFatal(t)) => // FIXME: Don't ignore
-                }
-
+                oldCanceler(t)
                 cancel(t)
               }
             }
@@ -1067,7 +1064,10 @@ private object RTS {
               case None =>
               case Some(cancel) =>
                 try cancel(t)
-                catch { case t: Throwable if (nonFatal(t)) => /* TODO: Don't throw away? */ }
+                catch {
+                  case t: Throwable if (nonFatal(t)) =>
+                    fork(unhandled(t), unhandled)
+                }
             }
 
             val finalizer = interruptStack[Void](t)
@@ -1113,9 +1113,10 @@ private object RTS {
     private final def purgeJoinersKillers(v: ExitResult[E, A],
                                           joiners: List[Callback[E, A]],
                                           killers: List[Callback[E, Unit]]): Unit = {
-      // FIXME: Put all but one of these (first joiner?) on the thread pool.
-      killers.reverse.foreach(_.apply(SuccessUnit[E]))
-      joiners.reverse.foreach(_.apply(v))
+      // To preserve fair scheduling, we submit all resumptions on the thread
+      // pool in (rough) order of their submission.
+      killers.reverse.foreach(k => rts.submit(k(SuccessUnit[E])))
+      joiners.foreach(k => rts.submit(k(v)))
     }
   }
 
