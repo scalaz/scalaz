@@ -40,7 +40,6 @@ trait KleisliSyntax {
     ): Kleisli[F, (A, C), (B, D)] =
       k.first >>> j.second
 
-    // a => F[(a, a)] => ((a, a) => F[(b, c)])
     def &&&[C](j: Kleisli[F, A, C])(
       implicit M: Monad[F]
     ): Kleisli[F, A, (B, C)] =
