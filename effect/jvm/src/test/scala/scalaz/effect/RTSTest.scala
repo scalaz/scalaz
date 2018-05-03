@@ -52,9 +52,9 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     test eval of async fail                 $testEvalOfAsyncAttemptOfFail
 
   RTS synchronous stack safety
-    deep map of point                       $testDeepMapOfPoint
-    deep map of now                         $testDeepMapOfNow
-    deep map of sync effect                 $testDeepMapOfSyncEffectIsStackSafe
+    deep bind of point                      $testDeepBindOfPoint
+    deep bind of now                        $testDeepBindOfNow
+    deep bind of sync effect                $testDeepBindOfSyncEffectIsStackSafe
     deep attempt                            $testDeepAttemptIsStackSafe
 
   RTS asynchronous stack safety
@@ -250,14 +250,14 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     } yield v) must_=== 1000
   }
 
-  def testDeepMapOfPoint =
-    unsafePerformIO(deepMapPoint(10000)) must_=== 10000
+  def testDeepBindOfPoint =
+    unsafePerformIO(deepMapPoint(100000, 0)) must_=== 100000
 
-  def testDeepMapOfNow =
-    unsafePerformIO(deepMapNow(10000)) must_=== 10000
+  def testDeepBindOfNow =
+    unsafePerformIO(deepMapNow(100000, 0)) must_=== 100000
 
-  def testDeepMapOfSyncEffectIsStackSafe =
-    unsafePerformIO(deepMapEffect(10000)) must_=== 10000
+  def testDeepBindOfSyncEffectIsStackSafe =
+    unsafePerformIO(deepMapEffect(100000, 0)) must_=== 100000
 
   def testDeepAttemptIsStackSafe =
     unsafePerformIO((0 until 10000).foldLeft(IO.sync[Throwable, Unit](())) { (acc, _) =>
@@ -326,14 +326,14 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     if (n <= 0) 0
     else n + sum(n - 1)
 
-  def deepMapPoint(n: Int): IO[Throwable, Int] =
-    if (n <= 0) IO.point(n) else IO.point(n - 1).map(_ + 1)
+  def deepMapPoint(n: Int, ctr: Int): IO[Throwable, Int] =
+    if (n <= 0) IO.point(ctr) else IO.point(n - 1).flatMap(deepMapPoint(_, ctr + 1))
 
-  def deepMapNow(n: Int): IO[Throwable, Int] =
-    if (n <= 0) IO.now(n) else IO.now(n - 1).map(_ + 1)
+  def deepMapNow(n: Int, ctr: Int): IO[Throwable, Int] =
+    if (n <= 0) IO.now(ctr) else IO.now(n - 1).flatMap(deepMapNow(_, ctr + 1))
 
-  def deepMapEffect(n: Int): IO[Throwable, Int] =
-    if (n <= 0) IO.sync(n) else IO.sync(n - 1).map(_ + 1)
+  def deepMapEffect(n: Int, ctr: Int): IO[Throwable, Int] =
+    if (n <= 0) IO.sync(ctr) else IO.sync(n - 1).flatMap(deepMapEffect(_, ctr + 1))
 
   def deepErrorEffect(n: Int): IO[Throwable, Unit] =
     if (n == 0) IO.syncThrowable(throw ExampleError)
