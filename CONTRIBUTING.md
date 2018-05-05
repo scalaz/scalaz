@@ -89,6 +89,15 @@ Define type class instances in the same files as the data structure. Type class 
     trait MyDataStructureFunctions {
         final def emptyMds[A]: MyDataStructure[A] = ...
     }
+    
+### Variance
+
+Avoid using variant type parameters in defining data structures, even if they
+behave variantly. Instead, provide `widen` or `narrow` methods which allow for
+explicit use of variance.
+
+If there are branches without type parameters, use a `sealed abstract case class`
+to enable easy pattern matching support. See `IList.scala` for an example.
 
 ## Type Class Instances
 

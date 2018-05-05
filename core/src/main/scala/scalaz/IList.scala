@@ -477,6 +477,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 
 sealed abstract case class INil[A] private() extends IList[A]
 object INil {
+  // #1712: covariant subclass of `INil` makes the pattern matcher see it as covariant
   private[this] final class _INil[+A] extends INil[A]
   private[this] val value = new _INil[Nothing]
   def apply[A](): IList[A] = value.asInstanceOf[IList[A]]
