@@ -141,8 +141,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   def testEvalOfFailEnsuring = {
     var finalized = false
 
-    unsafePerformIO(IO.fail[Throwable, Unit](ExampleError).ensuring(IO.sync[Throwable, Unit] { finalized = true; () })) must (throwA(
-      ExampleError
+    unsafePerformIO(IO.fail[Throwable, Unit](ExampleError).ensuring(IO.sync[Void, Unit] { finalized = true; () })) must (throwA(
+      UnhandledError(ExampleError)
     ))
     finalized must_=== true
   }
@@ -151,8 +151,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     var finalized = false
 
     unsafePerformIO(
-      IO.fail[Throwable, Unit](ExampleError).onError(_ => IO.sync[Throwable, Unit] { finalized = true; () })
-    ) must (throwA(ExampleError))
+      IO.fail[Throwable, Unit](ExampleError).onError(_ => IO.sync[Void, Unit] { finalized = true; () })
+    ) must (throwA(UnhandledError(ExampleError)))
 
     finalized must_=== true
   }
@@ -160,8 +160,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   def testErrorInFinalizerCannotBeCaught = {
     val nested: IO[Throwable, Int] =
       IO.fail[Throwable, Int](ExampleError)
-        .ensuring(IO.fail[Throwable, Unit](new Error("e2")))
-        .ensuring(IO.fail[Throwable, Unit](new Error("e3")))
+        .ensuring(IO.terminate(new Error("e2")))
+        .ensuring(IO.terminate(new Error("e3")))
 
     unsafePerformIO(nested) must (throwA(UnhandledError(ExampleError)))
   }
@@ -170,27 +170,27 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     var reported: Throwable = null
 
     unsafePerformIO {
-      IO.point[Throwable, Int](42)
-        .ensuring(IO.fail[Throwable, Unit](ExampleError))
+      IO.point[Void, Int](42)
+        .ensuring(IO.terminate(ExampleError))
         .fork0(e => IO.sync[Void, Unit] { reported = e; () })
     }
 
     // FIXME: Is this an issue with thread synchronization?
     while (reported == null) Thread.`yield`()
 
-    ((throw reported): Int) must (throwA(UnhandledError(ExampleError)))
+    ((throw reported): Int) must (throwA(ExampleError))
   }
 
   def testExitResultIsUsageResult =
-    unsafePerformIO(IO.unit.bracket_(IO.unit[Throwable])(IO.point[Throwable, Int](42))) must_=== 42
+    unsafePerformIO(IO.unit.bracket_(IO.unit[Void])(IO.point[Throwable, Int](42))) must_=== 42
 
   def testBracketErrorInAcquisition =
     unsafePerformIO(IO.fail[Throwable, Unit](ExampleError).bracket_(IO.unit)(IO.unit)) must
       (throwA(UnhandledError(ExampleError)))
 
   def testBracketErrorInRelease =
-    unsafePerformIO(IO.unit.bracket_(IO.fail[Throwable, Unit](ExampleError))(IO.unit)) must
-      (throwA(UnhandledError(ExampleError)))
+    unsafePerformIO(IO.unit[Void].bracket_(IO.terminate(ExampleError))(IO.unit[Void])) must
+      (throwA(ExampleError))
 
   def testBracketErrorInUsage =
     unsafePerformIO(IO.unit.bracket_(IO.unit)(IO.fail[Throwable, Unit](ExampleError))) must
@@ -206,10 +206,10 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def testBracketRethrownCaughtErrorInRelease = {
     lazy val actual = unsafePerformIO(
-      IO.absolve(IO.unit.bracket_(IO.fail[Throwable, Unit](ExampleError))(IO.unit).attempt[Throwable])
+      IO.unit[Void].bracket_(IO.terminate(ExampleError))(IO.unit[Void])
     )
 
-    actual must (throwA(UnhandledError(ExampleError)))
+    actual must (throwA(ExampleError))
   }
 
   def testBracketRethrownCaughtErrorInUsage = {
@@ -221,8 +221,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
   }
 
   def testEvalOfAsyncAttemptOfFail = {
-    val io1 = IO.unit.bracket_(AsyncUnit)(asyncExampleError[Unit])
-    val io2 = AsyncUnit.bracket_(IO.unit)(asyncExampleError[Unit])
+    val io1 = IO.unit.bracket_(AsyncUnit[Void])(asyncExampleError[Unit])
+    val io2 = AsyncUnit[Throwable].bracket_(IO.unit)(asyncExampleError[Unit])
 
     unsafePerformIO(io1) must (throwA(UnhandledError(ExampleError)))
     unsafePerformIO(io2) must (throwA(UnhandledError(ExampleError)))
@@ -357,5 +357,5 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
         v2 <- f2.join
       } yield v1 + v2
 
-  val AsyncUnit = IO.async[Throwable, Unit](_(ExitResult.Completed(())))
+  def AsyncUnit[E] = IO.async[E, Unit](_(ExitResult.Completed(())))
 }
