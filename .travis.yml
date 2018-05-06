@@ -12,5 +12,4 @@ install:
   - gem install sass
   - gem install jekyll -v 3.6.2
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite
-  - ./snapshotRelease.sh
+  - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite publish

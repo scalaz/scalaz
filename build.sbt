@@ -1,11 +1,24 @@
 import Scalaz._
 
-publishTo in ThisBuild := Some("snapshots" at sys.env.getOrElse("SNAPSHOT_REPO", ""))
+publishTo in ThisBuild := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
 
-credentials += Credentials("Sonatype Nexus Repository Manager",
-                           "oss.sonatype.org",
-                           sys.env.getOrElse("SNAPSHOT_REPO_USER", ""),
-                           sys.env.getOrElse("SNAPSHOT_REPO_PASSWORD", ""))
+dynverSonatypeSnapshots in ThisBuild := true
+
+lazy val sonataCredentials = for {
+  username <- sys.env.get("SONATYPE_USERNAME")
+  password <- sys.env.get("SONATYPE_PASSWORD")
+} yield Credentials("Sonatype Nexus Repository Manager",
+  "oss.sonatype.org",
+  username,
+  password)
+
+credentials ++= sonataCredentials.toSeq
 
 lazy val root = project
   .in(file("."))
