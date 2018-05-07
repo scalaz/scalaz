@@ -69,7 +69,7 @@ trait ListInstances extends ListInstances0 {
 
       override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
         State((s: S) => {
-          val buf = new collection.mutable.ListBuffer[B]
+          val buf = new scala.collection.mutable.ListBuffer[B]
           var cur = s
           l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
           (cur, buf.toList)

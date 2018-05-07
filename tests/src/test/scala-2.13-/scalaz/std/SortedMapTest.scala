@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import collection.immutable.SortedMap
+import scala.collection.immutable.SortedMap
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties.band
 import std.AllInstances._

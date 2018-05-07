@@ -416,8 +416,8 @@ sealed abstract class LensInstances0 { this: LensInstances =>
 abstract class LensInstances extends LensInstances0 {
   import LensFamily._
   import BijectionT._
-  import collection.SeqLike
-  import collection.immutable.Queue
+  import scala.collection.SeqLike
+  import scala.collection.immutable.Queue
 
   implicit val lensCategory: LensCategory = new LensCategory {
   }

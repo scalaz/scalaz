@@ -65,7 +65,7 @@ object Memo extends MemoInstances {
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
   @deprecated("removed in scalaz 7.3: leaks mutable state, not thread safe", since = "7.2.19")
-  def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
+  def mutableMapMemo[K, V](a: scala.collection.mutable.Map[K, V]): Memo[K, V] =
     memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
   /** Cache results in a [[scala.collection.mutable.HashMap]].
@@ -74,14 +74,14 @@ object Memo extends MemoInstances {
     */
   @deprecated("removed in scalaz 7.3: not thread safe, relies on Object", since = "7.2.19")
   def mutableHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.HashMap[K, V])
+    mutableMapMemo(new scala.collection.mutable.HashMap[K, V])
 
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
   @deprecated("removed in scalaz 7.3: not thread safe, relies on Object, not efficient", since = "7.2.19")
   def weakHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
+    mutableMapMemo(new scala.collection.mutable.WeakHashMap[K, V])
 
   def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
     var a = m
@@ -94,7 +94,7 @@ object Memo extends MemoInstances {
       }))
   }
 
-  import collection.immutable.{HashMap, ListMap, TreeMap}
+  import scala.collection.immutable.{HashMap, ListMap, TreeMap}
 
   /** Cache results in a hash map.  Nonsensical unless `K` has
     * a meaningful `hashCode` and `java.lang.Object.equals`.

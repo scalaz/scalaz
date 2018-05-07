@@ -8,7 +8,7 @@ package scalaz
 ////
 trait Foldable[F[_]] extends FoldableParent[F] { self =>
   ////
-  import collection.generic.CanBuildFrom
+  import scala.collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -169,7 +169,7 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
   @deprecated(message = "removed in scalaz 7.3", since = "7.2.22")
   def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] = {
     import scala.language.reflectiveCalls
-    val builder = c.asInstanceOf[{def apply(): collection.mutable.Builder[A, G[A]]}].apply()
+    val builder = c.asInstanceOf[{def apply(): scala.collection.mutable.Builder[A, G[A]]}].apply()
     foldLeft(fa, builder)(_ += _).result
   }
 

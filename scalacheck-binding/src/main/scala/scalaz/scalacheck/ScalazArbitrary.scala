@@ -3,7 +3,7 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
-import collection.mutable.ArraySeq
+import scala.collection.mutable.ArraySeq
 import reflect.ClassTag
 
 /**
