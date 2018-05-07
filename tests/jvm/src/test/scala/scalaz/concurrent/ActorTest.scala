@@ -1,7 +1,7 @@
 package scalaz
 package concurrent
 
-import collection.mutable
+import scala.collection.mutable
 import java.util.concurrent._
 import ConcurrentTest._
 
