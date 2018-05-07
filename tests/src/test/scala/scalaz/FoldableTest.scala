@@ -172,10 +172,11 @@ object FoldableTest extends SpecLite {
   }
   
   "psumMap should be short-circuiting with NonEmptyList" in {
-    import Maybe.{empty, just}    
-    NonEmptyList(1,2,3,4,5,5).psumMap(i =>
-      if(i < 4) empty[String]
-      else if(i < 4 + 2) just("Stop")
+    import Maybe.{empty, just}
+    val N = 4
+    NonEmptyList(1,2,3,4,5,6,7,8).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
