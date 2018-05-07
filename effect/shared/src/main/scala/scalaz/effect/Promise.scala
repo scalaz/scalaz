@@ -85,7 +85,7 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
         val newState = oldState match {
           case Pending(joiners) =>
             action =
-              forkAll(joiners.map(k => IO.sync[E2, Unit](k(r)))) *>
+              IO.forkAll(joiners.map(k => IO.sync[E2, Unit](k(r)))) *>
                 IO.now[E2, Boolean](true)
 
             Done(r)
@@ -101,12 +101,6 @@ class Promise[E, A] private (private val state: AtomicReference[State[E, A]]) ex
 
       action
     })
-
-  // TODO: This is the main bottleneck
-  private def forkAll[E2](l: List[IO[E2, Unit]]): IO[E2, Unit] = l match {
-    case Nil     => IO.unit[E2]
-    case x :: xs => x.fork.toUnit *> forkAll(xs)
-  }
 
   private def interruptJoiner(joiner: ExitResult[E, A] => Unit): Throwable => Unit = (t: Throwable) => {
     var retry = true

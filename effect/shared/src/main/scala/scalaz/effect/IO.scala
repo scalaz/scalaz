@@ -114,29 +114,34 @@ sealed abstract class IO[E, A] { self =>
    * TODO: Replace with optimized primitive.
    */
   final def par[B](that: IO[E, B]): IO[E, (A, B)] =
-    self.attempt[E].raceWith(that.attempt[E]) {
-      case -\/((-\/(e), fiberb)) => fiberb.interrupt(TerminatedException(e)) *> IO.fail(e)
-      case -\/((\/-(a), fiberb)) => IO.absolve(fiberb.join).map((b: B) => (a, b))
-      case \/-((-\/(e), fibera)) => fibera.interrupt(TerminatedException(e)) *> IO.fail(e)
-      case \/-((\/-(b), fibera)) => IO.absolve(fibera.join).map((a: A) => (a, b))
-    }
+    self
+      .attempt[E]
+      .raceWith(that.attempt[E])(
+        {
+          case (-\/(e), fiberb) => fiberb.interrupt(TerminatedException(e)) *> IO.fail(e)
+          case (\/-(a), fiberb) => IO.absolve(fiberb.join).map((b: B) => (a, b))
+        }, {
+          case (-\/(e), fibera) => fibera.interrupt(TerminatedException(e)) *> IO.fail(e)
+          case (\/-(b), fibera) => IO.absolve(fibera.join).map((a: A) => (a, b))
+        }
+      )
 
   /**
    * Races this action with the specified action, returning the first
    * result to produce an `A`, whichever it is. If neither action succeeds,
    * then the action will be terminated with some error.
    */
-  final def race(that: IO[E, A]): IO[E, A] = raceWith(that) {
-    case -\/((a, fiber)) => fiber.interrupt(LostRace(\/-(fiber))).const(a)
-    case \/-((a, fiber)) => fiber.interrupt(LostRace(-\/(fiber))).const(a)
-  }
+  final def race(that: IO[E, A]): IO[E, A] =
+    raceWith(that)((a, fiber) => fiber.interrupt(LostRace(\/-(fiber))).const(a),
+                   (a, fiber) => fiber.interrupt(LostRace(-\/(fiber))).const(a))
 
   /**
    * Races this action with the specified action, invoking the
    * specified finisher as soon as one value or the other has been computed.
    */
-  final def raceWith[B, C](that: IO[E, B])(finish: (A, Fiber[E, B]) \/ (B, Fiber[E, A]) => IO[E, C]): IO[E, C] =
-    IO.Race[E, A, B, C](self, that, finish)
+  final def raceWith[B, C](that: IO[E, B])(finishLeft: (A, Fiber[E, B]) => IO[E, C],
+                                           finishRight: (B, Fiber[E, A]) => IO[E, C]): IO[E, C] =
+    IO.Race[E, A, B, C](self, that, finishLeft, finishRight)
 
   /**
    * Executes this action and returns its value, if it succeeds, but
@@ -529,7 +534,8 @@ object IO extends IOInstances {
 
   final case class Race[E, A0, A1, A](left: IO[E, A0],
                                       right: IO[E, A1],
-                                      finish: (A0, Fiber[E, A1]) \/ (A1, Fiber[E, A0]) => IO[E, A])
+                                      finishLeft: (A0, Fiber[E, A1]) => IO[E, A],
+                                      finishRight: (A1, Fiber[E, A0]) => IO[E, A])
       extends IO[E, A] {
     override final def tag = Tags.Race
   }
@@ -727,6 +733,13 @@ object IO extends IOInstances {
    */
   final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
     (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A](_)))
+
+  // TODO: Make this fast, generalize from `Unit` to `A: Semigroup`,
+  // and use `IList` instead of `List`.
+  def forkAll[E2](l: List[IO[E2, Unit]]): IO[E2, Unit] = l match {
+    case Nil     => IO.unit[E2]
+    case x :: xs => x.fork.toUnit *> forkAll(xs)
+  }
 
   private final val Never: IO[Nothing, Any] =
     IO.async[Nothing, Any] { (k: (ExitResult[Nothing, Any]) => Unit) =>
