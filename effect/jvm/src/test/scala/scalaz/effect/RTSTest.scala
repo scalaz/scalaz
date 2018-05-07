@@ -69,6 +69,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     deep fork/join identity                 $testDeepForkJoinIsId
     interrupt of never                      ${upTo(1.second)(testNeverIsInterruptible)}
     race of value & never                   ${upTo(1.second)(testRaceOfValueNever)}
+    par regression                          ${upTo(5.seconds)(testPar)}
+    par of now values                       ${upTo(5.seconds)(testRepeatedPar)}
 
   RTS regression tests
     regression 1                            $testDeadlockRegression
@@ -299,6 +301,19 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def testRaceOfValueNever =
     unsafePerformIO(IO.point(42).race(IO.never[Throwable, Int])) == 42
+
+  def testRepeatedPar = {
+    def countdown(n: Int): IO[Void, Int] =
+      if (n == 0) IO.now(0)
+      else IO.now[Void, Int](1).par(IO.now[Void, Int](2)).flatMap(t => countdown(n - 1).map(y => t._1 + t._2 + y))
+
+    unsafePerformIO(countdown(50)) must_=== 150
+  }
+
+  def testPar =
+    (0 to 1000).map { _ =>
+      unsafePerformIO(IO.now[Void, Int](1).par(IO.now[Void, Int](2)).flatMap(t => IO.now(t._1 + t._2))) must_=== 3
+    }
 
   def testDeadlockRegression = {
     import scalaz._
