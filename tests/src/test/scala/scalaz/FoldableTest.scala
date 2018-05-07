@@ -151,27 +151,29 @@ object FoldableTest extends SpecLite {
     ) must_=== just("Stop")
   }
 
-  "psumMap should be stack-safe and short-circuiting with List" in {
-    import Maybe.{empty, just}    
-    List(1,2,3,4,5,6,7).psumMap(i =>
-      if(i < 4) empty[String]
-      else if(i < 4 + 2) just("Stop")
+  "psumMap should be short-circuiting with List" in {
+    import Maybe.{empty, just}
+    val N = 100
+    List.range(1,1000).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
 
-  "psumMap should be stack-safe and short-circuiting with IList" in {
-    import Maybe.{empty, just}    
-    IList(1,2,3,4,5,6,7).psumMap(i =>
-      if(i < 4) empty[String]
-      else if(i < 4 + 2) just("Stop")
+  "psumMap should be short-circuiting with IList" in {
+    import Maybe.{empty, just}
+    val N = 100    
+    IList.fromList(List.range(1,1000)).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
   
-  "psumMap should be stack-safe and short-circuiting with NonEmptyList" in {
+  "psumMap should be short-circuiting with NonEmptyList" in {
     import Maybe.{empty, just}    
-    NonEmptyList(1,2,3,4,5,6,7).psumMap(i =>
+    NonEmptyList(1,2,3,4,5,5).psumMap(i =>
       if(i < 4) empty[String]
       else if(i < 4 + 2) just("Stop")
       else sys.error("BOOM!")
@@ -281,17 +283,18 @@ object FoldableTest extends SpecLite {
   }
 
   "foldRight from foldMap" should {
-    
     val fromFoldMap: Foldable[EphemeralStream] = new FromFoldMap[EphemeralStream] {
       override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Monoid[B]): B = EphemeralStream.ephemeralStreamInstance.foldMap(fa)(f)
     }
 
     "foldRight should be stack-safe and short-circuiting" in {
-      fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream.fromStream(Stream(1,2,3,4,5,6)), None){ (i, acc) =>
-        if(i < 5) Some(i + acc.getOrElse(0))
-        else if(i == 5) None
+      import Maybe.{empty, just}      
+      val N =8
+      fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream(1,2,3,4,5,6,7,8,9,10), None){ (i, acc) =>
+        if(i < N) Some(0 + acc.getOrElse(0))
+        else if(i == N) None
         else sys.error("Boom")
-      } must_=== Some(10)
+      } must_=== Some(0)
     }
   }
 }
