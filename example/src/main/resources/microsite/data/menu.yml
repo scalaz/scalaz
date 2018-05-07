@@ -43,6 +43,9 @@ options:
     - title: Forall
       url: data/Forall.html
       menu_section: data
+    - title: Kleisli
+      url: data/Kleisli.html
+      menu_section: data
     - title: Maybe
       url: data/Maybe.html
       menu_section: data
