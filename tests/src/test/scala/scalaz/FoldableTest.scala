@@ -287,14 +287,13 @@ object FoldableTest extends SpecLite {
       override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Monoid[B]): B = EphemeralStream.ephemeralStreamInstance.foldMap(fa)(f)
     }
 
-    "foldRight should be stack-safe and short-circuiting" in {
-      import Maybe.{empty, just}      
-      val N =8
+    "foldRight should be short-circuiting" in {   
+      val N = 5
       fromFoldMap.foldRight[Int,Option[Int]](EphemeralStream(1,2,3,4,5,6,7,8,9,10), None){ (i, acc) =>
-        if(i < N) Some(0 + acc.getOrElse(0))
+        if(i < N) Some(i + acc.getOrElse(0))
         else if(i == N) None
         else sys.error("Boom")
-      } must_=== Some(0)
+      } must_=== Some(10)
     }
   }
 }
