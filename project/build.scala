@@ -327,7 +327,10 @@ object build {
       mimaBinaryIssueFilters ++= {
         import com.typesafe.tools.mima.core._
         import com.typesafe.tools.mima.core.ProblemFilters._
-        Nil
+        
+        Seq(        
+          ProblemFilters.exclude[ReversedMissingMethodProblem]("scalaz.syntax.ToShowOps.showInterpolator")
+        )
       },
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{

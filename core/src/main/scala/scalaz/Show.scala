@@ -56,7 +56,7 @@ object Show {
   }
 
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
-    def show(args: Shows*): String = sc.s(args: _*)
+    def z(args: Shows*): String = sc.s(args: _*)
   }
 
   ////
