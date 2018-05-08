@@ -426,17 +426,19 @@ trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismEmpt
 trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
   implicit def G: Foldable[G]
 
-  def iso: F <~> G
+  protected[this] def naturalTrans: F ~> G
 
-  override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) = G.foldMap(iso.to(fa))(f)
+  override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) = G.foldMap(naturalTrans(fa))(f)
 
-  override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldLeft(iso.to(fa), z)(f)
+  override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B) = G.foldLeft(naturalTrans(fa), z)(f)
 
-  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B = G.foldRight[A, B](iso.to(fa), z)(f)
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B = G.foldRight[A, B](naturalTrans(fa), z)(f)
 }
 
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldable[F, G] with IsomorphismFunctor[F, G] {
   implicit def G: Traverse[G]
+
+  protected[this] override final def naturalTrans: F ~> G = iso.to
 
   override def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
@@ -445,11 +447,11 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFoldab
 trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFoldable[F, G] {
   implicit def G: Foldable1[G]
 
-  override final def foldMap1[A, B: Semigroup](fa: F[A])(f: A => B): B = G.foldMap1(iso.to(fa))(f)
+  override final def foldMap1[A, B: Semigroup](fa: F[A])(f: A => B): B = G.foldMap1(naturalTrans(fa))(f)
 
-  override final def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = G.foldMapLeft1(iso.to(fa))(z)(f)
+  override final def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = G.foldMapLeft1(naturalTrans(fa))(z)(f)
 
-  override final def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B = G.foldMapRight1(iso.to(fa))(z)(f)
+  override final def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B = G.foldMapRight1(naturalTrans(fa))(z)(f)
 }
 
 trait IsomorphismTraverse1[F[_], G[_]] extends Traverse1[F] with IsomorphismTraverse[F, G] with IsomorphismFoldable1[F, G] {
@@ -607,21 +609,22 @@ trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[
 
 
 trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
-  def iso: F <~~> G
+  protected[this] def biNaturalTrans: F ~~> G
 
   implicit def G: Bifoldable[G]
 
   override final def bifoldMap[A, B, M: Monoid](fab: F[A, B])(f: A => M)(g: B => M): M =
-    G.bifoldMap(iso.to(fab))(f)(g)
+    G.bifoldMap(biNaturalTrans(fab))(f)(g)
 
   override final def bifoldRight[A, B, C](fab: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
-    G.bifoldRight(iso.to(fab), z)(f)(g)
+    G.bifoldRight(biNaturalTrans(fab), z)(f)(g)
 
   override final def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C =
-    G.bifoldLeft(iso.to(fa), z)(f)(g)
+    G.bifoldLeft(biNaturalTrans(fa), z)(f)(g)
 }
 
 trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] with IsomorphismBifoldable[F, G] {
+  override final protected[this] def biNaturalTrans: F ~~> G = iso.to
 
   implicit def G: Bitraverse[G]
 

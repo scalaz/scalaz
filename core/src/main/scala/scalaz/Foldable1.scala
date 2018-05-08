@@ -185,12 +185,10 @@ object Foldable1 {
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F
 
   ////
-  import Isomorphism.<~>
-
-  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Foldable1[G]): Foldable1[F] =
+  def fromIso[F[_], G[_]](D: F ~> G)(implicit E: Foldable1[G]): Foldable1[F] =
     new IsomorphismFoldable1[F, G] {
       override implicit def G: Foldable1[G] = E
-      override def iso: F <~> G = D
+      override def naturalTrans: F ~> G = D
     }
   ////
 }
