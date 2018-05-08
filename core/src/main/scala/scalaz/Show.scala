@@ -49,5 +49,15 @@ object Show {
       override implicit def G: Show[G] = S
       override def iso: F <=> G = D
     }
+
+  final case class Shows(override val toString: String) extends AnyVal
+  object Shows {
+    implicit def mat[A](x: A)(implicit S: Show[A]): Shows = Shows(S.shows(x))
+  }
+
+  final case class ShowInterpolator(sc: StringContext) extends AnyVal {
+    def z(args: Shows*): String = sc.s(args: _*)
+  }
+
   ////
 }
