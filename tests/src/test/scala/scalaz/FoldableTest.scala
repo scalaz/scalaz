@@ -151,20 +151,20 @@ object FoldableTest extends SpecLite {
     ) must_=== just("Stop")
   }
 
-  "psumMap should be short-circuiting with List" in {
+  "psumMap should be stack-safe and short-circuiting with List" in {
     import Maybe.{empty, just}
-    val N = 100
-    List.range(1,1000).psumMap(i =>
+    val N = 10000
+    List.range(1,11000).psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
 
-  "psumMap should be short-circuiting with IList" in {
+  "psumMap should be stack-safe and short-circuiting with IList" in {
     import Maybe.{empty, just}
-    val N = 100    
-    IList.fromList(List.range(1,1000)).psumMap(i =>
+    val N = 10000
+    IList.fromList(List.range(1,11000)).psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")

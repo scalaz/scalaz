@@ -70,12 +70,6 @@ trait ListInstances extends ListInstances0 {
           case None => Maybe.empty
         })
 
-      override def psumMap[A, B, G[_]](fa: List[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
-        fa match {
-          case Nil => G.empty[B]
-          case head :: tail => G.plus(f(head), psumMap(tail)(f)(G))
-        }
-
       def cobind[A, B](fa: List[A])(f: List[A] => B) =
         fa match {
           case Nil => Nil
