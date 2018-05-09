@@ -45,8 +45,13 @@ object Show {
   implicit val showContravariant: Contravariant[Show] = new ShowContravariant
 
   final case class Shows(override val toString: String) extends AnyVal
-  object Shows {
+  object Shows extends Shows0 {
     implicit def mat[A](x: A)(implicit S: Show[A]): Shows = Shows(S.shows(x))
+  }
+  sealed abstract class Shows0 { this: Shows.type =>
+    @annotation.implicitAmbiguous("Cannot use value of type ${A} in the `show` interpolator, as no `Show[${A}]` instance could be found")
+    implicit def showsAmbig0[A](x: A): Shows = sys.error("showsAmbig0")
+    implicit def showsAmbig1[A](x: A): Shows = sys.error("showsAmbig1")
   }
 
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
