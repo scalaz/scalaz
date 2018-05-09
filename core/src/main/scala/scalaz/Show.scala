@@ -49,7 +49,7 @@ object Show {
     implicit def mat[A](x: A)(implicit S: Show[A]): Shows = Shows(S.shows(x))
   }
   sealed abstract class Shows0 { this: Shows.type =>
-    @annotation.implicitAmbiguous("Cannot use value of type ${A} in the `show` interpolator, as no `Show[${A}]` instance could be found")
+    @compat.implicitAmbiguous("Cannot use value of type ${A} in the `show` interpolator, as no `Show[${A}]` instance could be found")
     implicit def showsAmbig0[A](x: A): Shows = sys.error("showsAmbig0")
     implicit def showsAmbig1[A](x: A): Shows = sys.error("showsAmbig1")
   }
