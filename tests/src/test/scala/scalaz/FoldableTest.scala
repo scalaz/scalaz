@@ -6,7 +6,7 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
-import scalaz.Foldable.FromFoldMap
+//import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
@@ -144,7 +144,8 @@ object FoldableTest extends SpecLite {
   "psumMap should be stack-safe and short-circuiting with EphemeralStream" in {
     import Maybe.{empty, just}
     val N = 10000
-    EphemeralStream.fromStream(Stream.from(1)).psumMap(i =>
+    val xs = EphemeralStream.fromStream(Stream.from(1))
+    xs.psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
@@ -154,7 +155,7 @@ object FoldableTest extends SpecLite {
   "psumMap should be stack-safe and short-circuiting with List" in {
     import Maybe.{empty, just}
     val N = 10000
-    List.range(1,11000).psumMap(i =>
+    List.range(1, 11000).psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
@@ -164,7 +165,8 @@ object FoldableTest extends SpecLite {
   "psumMap should be stack-safe and short-circuiting with IList" in {
     import Maybe.{empty, just}
     val N = 10000
-    IList.fromList(List.range(1,11000)).psumMap(i =>
+    val xs = IList.fromList(List.range(1, 11000))
+    xs.psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
@@ -173,8 +175,9 @@ object FoldableTest extends SpecLite {
   
   "psumMap should be short-circuiting with NonEmptyList" in {
     import Maybe.{empty, just}
-    val N = 4
-    NonEmptyList(1,2,3,4,5,6,7,8).psumMap(i =>
+    val N = 10000
+    val xs = NonEmptyList.nel(1, IList.fromList(List.range(2, 11000)))
+    xs.psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
