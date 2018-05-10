@@ -172,7 +172,7 @@ object FoldableTest extends SpecLite {
       else sys.error("BOOM!")
     ) must_=== just("Stop")
   }
-  
+
   "psumMap should be short-circuiting with NonEmptyList" in {
     import Maybe.{empty, just}
     val N = 10000
