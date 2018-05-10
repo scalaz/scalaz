@@ -140,7 +140,7 @@ private object RTS {
 
   @inline
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
-    if (!stack.isEmpty()) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
+    if (!stack.isEmpty) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
 
   object Catcher extends Function[Any, IO[Any, Any]] {
     final def apply(v: Any): IO[Any, Any] = IO.now(\/-(v))
@@ -157,35 +157,36 @@ private object RTS {
   final class Stack() {
     type Cont = Any => IO[_, Any]
 
-    private[this] var array = new Array[Cont](10)
-    private[this] var size  = 0
+    private[this] var array   = new Array[AnyRef](13)
+    private[this] var size    = 0
+    private[this] var nesting = 0
 
-    final def peek(): Cont = array(size - 1)
+    def isEmpty: Boolean = size == 0
 
-    final def isEmpty(): Boolean = size == 0
-
-    final def push(a: Cont): Unit = {
-      if (size == array.length) {
-        val array2 = new Array[Cont](array.length + (array.length >> 1))
-
-        Array.copy(array, 0, array2, 0, array.length)
-
-        array = array2
+    def push(a: Cont): Unit =
+      if (size == 13) {
+        array = Array(array, a, null, null, null, null, null, null, null, null, null, null, null)
+        size = 2
+        nesting += 1
+      } else {
+        array(size) = a
+        size += 1
       }
-      array(size) = a
-      size = size + 1
-    }
 
-    final def pop(): Cont = {
+    def pop(): Cont = {
       val idx = size - 1
-
-      val a = array(idx)
-
-      array(idx) = null.asInstanceOf[Cont] // GC
-
-      size = idx
-
-      a
+      var a   = array(idx)
+      if (idx == 0 && nesting > 0) {
+        array = a.asInstanceOf[Array[AnyRef]]
+        a = array(12)
+        array(12) = null // GC
+        size = 12
+        nesting -= 1
+      } else {
+        array(idx) = null // GC
+        size = idx
+      }
+      a.asInstanceOf[Cont]
     }
   }
 
@@ -249,7 +250,7 @@ private object RTS {
 
       // Unwind the stack, looking for exception handlers and coalescing
       // finalizers.
-      while (!caught && !stack.isEmpty()) {
+      while (!caught && !stack.isEmpty) {
         stack.pop() match {
           case `Catcher` => caught = true
           case f0: Finalizer[_] =>
@@ -271,7 +272,7 @@ private object RTS {
       // was caught but the stack is empty, we make the stack non-empty. This
       // lets us return only the finalizer, which will be null for common cases,
       // and result in zero heap allocations for the happy path.
-      if (caught && stack.isEmpty()) stack.push(IdentityCont)
+      if (caught && stack.isEmpty) stack.push(IdentityCont)
 
       finalizer
     }
@@ -286,12 +287,12 @@ private object RTS {
       // Use null to achieve zero allocs for the common case of no finalizers:
       var finalizer: IO[E2, List[Throwable]] = null
 
-      if (!stack.isEmpty()) {
+      if (!stack.isEmpty) {
         // Any finalizers will require ExitResult. Here we fake lazy evaluation
         // to eliminate unnecessary allocation:
         var body: ExitResult[E, Any] = null
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty) {
           // Peel off all the finalizers, composing them into a single finalizer
           // that produces a possibly empty list of errors that occurred when
           // executing the finalizers. The order of errors is outer-to-inner
@@ -434,7 +435,7 @@ private object RTS {
 
                     val finalizer = catchError[Void](error)
 
-                    if (stack.isEmpty()) {
+                    if (stack.isEmpty) {
                       // Error not caught, stack is empty:
                       if (finalizer == null) {
                         // No finalizer, so immediately produce the error.
