@@ -261,12 +261,7 @@ private object RTS {
             val currentFinalizer: IO[E2, List[Throwable]] = f.finalizer(body).run.map(collectDefect)
 
             if (finalizer == null) finalizer = currentFinalizer
-            else
-              finalizer = for {
-                oldErrors <- finalizer
-                newErrors <- currentFinalizer
-              } yield newErrors ::: oldErrors
-
+            else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
           case _ =>
         }
       }
@@ -311,12 +306,7 @@ private object RTS {
               val currentFinalizer = f.finalizer(body).run[E2].map(collectDefect)
 
               if (finalizer == null) finalizer = currentFinalizer
-              else
-                finalizer = for {
-                  oldErrors <- finalizer
-                  newErrors <- currentFinalizer
-                } yield newErrors ::: oldErrors
-
+              else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
             case _ =>
           }
         }
@@ -766,24 +756,25 @@ private object RTS {
       (tryA: ExitResult[E, A]) => {
         import RaceState._
 
-        var loop               = true
-        var action: () => Unit = null
+        var loop = true
+        var won  = false
 
         while (loop) {
           val oldStatus = state.get
 
           val newState = oldStatus match {
-            case Finished => oldStatus
+            case Finished =>
+              won = false
+              oldStatus
             case Started =>
-              action = () => resume(tryA.map(finish))
-
+              won = true
               Finished
           }
 
           loop = !state.compareAndSet(oldStatus, newState)
         }
 
-        if (action != null) action()
+        if (won) resume(tryA.map(finish))
       }
 
     private final def raceWith[A, B, C](unhandled: Throwable => IO[Void, Unit],
