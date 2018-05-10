@@ -69,6 +69,14 @@ trait Bifunctor[F[_, _]] extends BifunctorParent[F] { self =>
 object Bifunctor {
   @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Bifunctor[G]): Bifunctor[F] =
+    new IsomorphismBifunctor[F, G] {
+      override def G: Bifunctor[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
   ////

@@ -48,6 +48,8 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
 object PlusEmpty {
   @inline def apply[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F] = F
 
+
+
   ////
   implicit def liftPlusEmpty[M[_], N[_]](implicit M: Monad[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
     new PlusEmpty[λ[α => M[N[α]]]] {

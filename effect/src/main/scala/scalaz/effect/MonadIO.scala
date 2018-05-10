@@ -18,6 +18,14 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
 object MonadIO {
   @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: MonadIO[G]): MonadIO[F] =
+    new IsomorphismMonadIO[F, G] {
+      override def G: MonadIO[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack

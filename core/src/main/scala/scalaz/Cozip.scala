@@ -32,6 +32,14 @@ trait Cozip[F[_]]  { self =>
 object Cozip {
   @inline def apply[F[_]](implicit F: Cozip[F]): Cozip[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Cozip[G]): Cozip[F] =
+    new IsomorphismCozip[F, G] {
+      override def G: Cozip[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
   def cofzip[F[_], A, B](x: F[A \/ B])(implicit F: Cozip[F]): (F[A] \/ F[B]) = F.cozip(x)
   def cofzip3[F[_], A, B, C](x: F[A \/ (B \/ C)])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ F[C])) = F.cozip3(x)

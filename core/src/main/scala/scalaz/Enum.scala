@@ -223,6 +223,8 @@ trait Enum[F] extends Order[F] { self =>
 object Enum {
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
+
+
   ////
   def succn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
     var w = n

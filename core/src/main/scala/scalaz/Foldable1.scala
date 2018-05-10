@@ -184,6 +184,8 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 object Foldable1 {
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F
 
+
+
   ////
 
   ////

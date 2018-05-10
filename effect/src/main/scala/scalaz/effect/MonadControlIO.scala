@@ -18,6 +18,14 @@ trait MonadControlIO[F[_]] extends LiftControlIO[F] with Monad[F] { self =>
 object MonadControlIO {
   @inline def apply[F[_]](implicit F: MonadControlIO[F]): MonadControlIO[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: MonadControlIO[G]): MonadControlIO[F] =
+    new IsomorphismMonadControlIO[F, G] {
+      override def G: MonadControlIO[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

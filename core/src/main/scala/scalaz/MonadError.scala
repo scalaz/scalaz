@@ -28,14 +28,14 @@ trait MonadError[F[_], S] extends Monad[F] with MonadErrorParent[F, S] { self =>
 object MonadError {
   @inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
 
-  ////
-  import Isomorphism.<~>
+  import Isomorphism._
 
-  def fromIso[F[_], G[_], E](D: F <~> G)(implicit ME: MonadError[G, E]): MonadError[F, E] =
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: MonadError[G, E]): MonadError[F, E] =
     new IsomorphismMonadError[F, G, E] {
-      override implicit def G: MonadError[G, E] = ME
+      override def G: MonadError[G, E] = A
       override def iso: F <~> G = D
     }
 
+  ////
   ////
 }

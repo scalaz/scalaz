@@ -29,6 +29,14 @@ trait Divisible[F[_]] extends Divide[F] { self =>
 object Divisible {
   @inline def apply[F[_]](implicit F: Divisible[F]): Divisible[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Divisible[G]): Divisible[F] =
+    new IsomorphismDivisible[F, G] {
+      override def G: Divisible[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

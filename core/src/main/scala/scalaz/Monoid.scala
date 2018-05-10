@@ -85,6 +85,14 @@ trait Monoid[F] extends Semigroup[F] { self =>
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Monoid[G]): Monoid[F] =
+    new IsomorphismMonoid[F, G] {
+      override def G: Monoid[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   /** Make an append and zero into an instance. */
@@ -123,12 +131,5 @@ object Monoid {
       }
     }
 
-  import Isomorphism.<=>
-
-  def fromIso[F, G](D: F <=> G)(implicit M: Monoid[G]): Monoid[F] =
-    new IsomorphismMonoid[F, G] {
-      override implicit def G: Monoid[G] = M
-      override def iso: F <=> G = D
-    }
   ////
 }

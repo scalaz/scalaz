@@ -30,6 +30,14 @@ trait Catchable[F[_]]  { self =>
 object Catchable {
   @inline def apply[F[_]](implicit F: Catchable[F]): Catchable[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Catchable[G]): Catchable[F] =
+    new IsomorphismCatchable[F, G] {
+      override def G: Catchable[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////
