@@ -167,6 +167,9 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
 
+      override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
+        Foldable[IList].foldMap(fa.list)(f)(M)
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 

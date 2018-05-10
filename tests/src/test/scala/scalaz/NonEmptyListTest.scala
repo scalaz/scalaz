@@ -38,6 +38,11 @@ object NonEmptyListTest extends SpecLite {
     Foldable[NonEmptyList].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
+  "foldMap" in {
+    val a = NonEmptyList(1, 2, 3, 4, 5)
+    Foldable[NonEmptyList].foldMap(a)(identity) must_=== 15
+  }
+
   "findLeft" ! forAll{ a: NonEmptyList[Int] =>
     val f = (_: Int) % 3 == 0
     Foldable[NonEmptyList].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.list)(f)
