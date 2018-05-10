@@ -67,7 +67,7 @@ object IListTest extends SpecLite {
   }
 
   "foldMap" ! forAll { xs: IList[Int]  =>
-    xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)  
+    xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)
   }
 
   "mapAccumLeft" ! forAll { xs: IList[Int] =>

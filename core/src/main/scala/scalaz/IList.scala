@@ -610,7 +610,7 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
         M.unfoldrSum(fa)(as => as.headOption match {
-          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))          
+          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
           case None => Maybe.empty
         })
 
