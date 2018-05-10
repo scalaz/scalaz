@@ -40,3 +40,23 @@ Maybe.just(Foo(1)).debug
 ```
 
 *Note that the `Debug` instance for `Maybe` resolves against the `Debug` instance for `Foo`.*
+
+# String interpolator
+
+Scalaz contains a custom string interpolator that takes advantage of `Debug`.
+Inside the `z` String interpolation, only objects that have `Debug` instances can be used.
+
+```tut
+case class Bar(a: Int)
+
+val foo = Foo(123)
+val bar = Bar(234)
+
+val interpolated = z"${foo}"
+```
+
+The following fails to compile as there is no `Debug` instance for `Bar`
+
+```tut:fail
+z"${bar}"
+```
