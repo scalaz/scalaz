@@ -16,6 +16,9 @@ final class IdOps[A](private val self: A) extends AnyVal {
   final def ▹[B](f: A => B): B =
     f(self)
 
+  /** Alternative syntax for the Thrush combinator or a total `match`. */
+  @inline final def into[B](f: A => B): B = f(self)
+
   final def squared: (A, A) =
     (self, self)
 
