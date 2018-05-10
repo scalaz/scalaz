@@ -1,8 +1,6 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
-import scalaz.data.Maybe
-
 import java.util.concurrent.atomic.AtomicReference
 
 /**
