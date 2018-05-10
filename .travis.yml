@@ -17,7 +17,8 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+  # restart sbt for avoid OutOfMemoryError
   - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
 before_cache:
@@ -27,10 +28,10 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.12
@@ -41,7 +42,7 @@ matrix:
       - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
-    - scala: 2.12.4
+    - scala: 2.12.6
       jdk: oraclejdk9
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test

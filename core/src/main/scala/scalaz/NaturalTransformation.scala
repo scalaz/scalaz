@@ -41,7 +41,14 @@ trait NaturalTransformations {
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
 
-object NaturalTransformation extends NaturalTransformations
+object NaturalTransformation extends NaturalTransformations {
+  /**
+   * Construct a natural transformation over a coproduct from its parts.
+   * Useful for combining Free interpreters.
+   */
+  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, ?] ~> G =
+    λ[Coproduct[F, H, ?] ~> G](_.fold(fg, hg))
+}
 
 /** A function universally quantified over two parameters. */
 trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
