@@ -499,9 +499,9 @@ private object RTS {
                                   result = value
                                 }
                               case ExitResult.Terminated(t) =>
-                                curIo = IO.Terminate(t)
+                                curIo = IO.terminate(t)
                               case ExitResult.Failed(e) =>
-                                curIo = IO.Fail(e)
+                                curIo = IO.fail(e)
                             }
                           } else {
                             // Completion handled by interruptor:
@@ -540,9 +540,9 @@ private object RTS {
                               result = value.asInstanceOf[ExitResult[E, Any]]
                             }
                           case ExitResult.Terminated(t) =>
-                            curIo = IO.Terminate(t)
+                            curIo = IO.terminate(t)
                           case ExitResult.Failed(e) =>
-                            curIo = IO.Fail(e)
+                            curIo = IO.fail(e)
                         }
                       } else {
                         // Completion handled by interruptor:
@@ -618,7 +618,7 @@ private object RTS {
                   case IO.Tags.Sleep =>
                     val io = curIo.asInstanceOf[IO.Sleep[E]]
 
-                    curIo = IO.AsyncEffect { callback =>
+                    curIo = IO.async0 { callback =>
                       rts
                         .schedule(callback(SuccessUnit[E].asInstanceOf[ExitResult[E, Any]]), io.duration)
                         .asInstanceOf[Async[E, Any]]
@@ -685,7 +685,7 @@ private object RTS {
               // Interruption cannot be interrupted:
               this.noInterrupt += 1
 
-              curIo = IO.Terminate[E, Any](die.get)
+              curIo = IO.terminate[E, Any](die.get)
             }
 
             opcount = opcount + 1
@@ -704,7 +704,7 @@ private object RTS {
             // Interruption cannot be interrupted:
             this.noInterrupt += 1
 
-            curIo = IO.Terminate[E, Any](t)
+            curIo = IO.terminate[E, Any](t)
         }
       }
     }
@@ -731,9 +731,9 @@ private object RTS {
           if (io eq null) done(value.asInstanceOf[ExitResult[E, A]])
           else evaluate(io)
 
-        case ExitResult.Failed(t) => evaluate(IO.Fail[E, Any](t))
+        case ExitResult.Failed(t) => evaluate(IO.fail[E, Any](t))
 
-        case ExitResult.Terminated(t) => evaluate(IO.Terminate[E, Any](t))
+        case ExitResult.Terminated(t) => evaluate(IO.terminate[E, Any](t))
       }
 
     /**
