@@ -269,12 +269,12 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     }) must_=== (())
 
   def testDeepAbsolveAttemptIsIdentity =
-    unsafePerformIO((0 until 1000).foldLeft(IO.point[Int, Int](42))((acc, _) =>
-    IO.absolve(acc.attempt))) must_=== 42
+    unsafePerformIO((0 until 1000).foldLeft(IO.point[Int, Int](42))((acc, _) => IO.absolve(acc.attempt))) must_=== 42
 
   def testDeepAsyncAbsolveAttemptIsIdentity =
-    unsafePerformIO((0 until 1000).foldLeft(IO.async[Int, Int](k => k(ExitResult.Completed(42))))((acc, _) =>
-    IO.absolve(acc.attempt))) must_=== 42
+    unsafePerformIO(
+      (0 until 1000).foldLeft(IO.async[Int, Int](k => k(ExitResult.Completed(42))))((acc, _) => IO.absolve(acc.attempt))
+    ) must_=== 42
 
   def testDeepBindOfAsyncChainIsStackSafe = {
     val result = (0 until 10000).foldLeft(IO.point[Throwable, Int](0)) { (acc, _) =>
