@@ -340,6 +340,13 @@ sealed abstract class IO[E, A] { self =>
   final def <*[B](io: => IO[E, B]): IO[E, A] = self.flatMap(io.const(_))
 
   /**
+   * Sequentially zips this effect with the specified effect using the
+   * specified combiner function.
+   */
+  final def zipWith[B, C](that: IO[E, B])(f: (A, B) => C): IO[E, C] =
+    self.flatMap(a => that.map(b => f(a, b)))
+
+  /**
    * Repeats this action forever (until the first error).
    */
   final def forever[B]: IO[E, B] = self *> self.forever

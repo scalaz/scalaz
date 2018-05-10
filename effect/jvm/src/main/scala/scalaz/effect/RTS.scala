@@ -261,12 +261,7 @@ private object RTS {
             val currentFinalizer: IO[E2, List[Throwable]] = f.finalizer(body).run.map(collectDefect)
 
             if (finalizer == null) finalizer = currentFinalizer
-            else
-              finalizer = for {
-                oldErrors <- finalizer
-                newErrors <- currentFinalizer
-              } yield newErrors ::: oldErrors
-
+            else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
           case _ =>
         }
       }
@@ -311,12 +306,7 @@ private object RTS {
               val currentFinalizer = f.finalizer(body).run[E2].map(collectDefect)
 
               if (finalizer == null) finalizer = currentFinalizer
-              else
-                finalizer = for {
-                  oldErrors <- finalizer
-                  newErrors <- currentFinalizer
-                } yield newErrors ::: oldErrors
-
+              else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
             case _ =>
           }
         }
