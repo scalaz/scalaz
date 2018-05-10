@@ -367,7 +367,7 @@ sealed abstract class IO[E, A] { self =>
    * elapses.
    */
   final def retryFor(duration: Duration): IO[E, Maybe[A]] =
-    retry.map(Maybe.just[A](_)) race
+    retry.map(Maybe.just[A]) race
       (IO.sleep[E](duration) *> IO.now[E, Maybe[A]](Maybe.empty[A]))
 
   /**
@@ -437,7 +437,7 @@ sealed abstract class IO[E, A] { self =>
   final def timeout(duration: Duration): IO[E, Maybe[A]] = {
     val timer = IO.now[E, Maybe[A]](Maybe.empty[A])
 
-    self.map(Maybe.just[A](_)).race(timer.delay(duration))
+    self.map(Maybe.just[A]).race(timer.delay(duration))
   }
 
   /**
@@ -741,7 +741,7 @@ object IO extends IOInstances {
    * value, then the specified error will be raised.
    */
   final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
-    (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A](_)))
+    (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A]))
 
   // TODO: Make this fast, generalize from `Unit` to `A: Semigroup`,
   // and use `IList` instead of `List`.
