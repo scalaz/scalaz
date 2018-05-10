@@ -16,6 +16,9 @@ final class IdOps[A](val self: A) extends AnyVal {
   final def ▹[B](f: A => B): B =
     f(self)
 
+  /** Alternative syntax for the Thrush combinator or a total `match`. */
+  @inline final def into[B](f: A => B): B = f(self)
+
   /**Applies `self` to the provide function for its side effect, and returns `self`. The Kestrel combinator.
    * Mostly for use with dodgy libraries that give you values that need additional initialization or
    * mutation before they're valid to use.
