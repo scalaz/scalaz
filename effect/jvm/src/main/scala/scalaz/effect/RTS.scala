@@ -766,24 +766,25 @@ private object RTS {
       (tryA: ExitResult[E, A]) => {
         import RaceState._
 
-        var loop               = true
-        var action: () => Unit = null
+        var loop = true
+        var won  = false
 
         while (loop) {
           val oldStatus = state.get
 
           val newState = oldStatus match {
-            case Finished => oldStatus
+            case Finished =>
+              won = false
+              oldStatus
             case Started =>
-              action = () => resume(tryA.map(finish))
-
+              won = true
               Finished
           }
 
           loop = !state.compareAndSet(oldStatus, newState)
         }
 
-        if (action != null) action()
+        if (won) resume(tryA.map(finish))
       }
 
     private final def raceWith[A, B, C](unhandled: Throwable => IO[Void, Unit],

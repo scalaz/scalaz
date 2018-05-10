@@ -56,6 +56,8 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     deep map of now                         $testDeepMapOfNow
     deep map of sync effect                 $testDeepMapOfSyncEffectIsStackSafe
     deep attempt                            $testDeepAttemptIsStackSafe
+    deep absolve/attempt is identity        $testDeepAbsolveAttemptIsIdentity
+    deep async absolve/attempt is identity  $testDeepAsyncAbsolveAttemptIsIdentity
 
   RTS asynchronous stack safety
     deep bind of async chain                $testDeepBindOfAsyncChainIsStackSafe
@@ -265,6 +267,14 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     unsafePerformIO((0 until 10000).foldLeft(IO.sync[Throwable, Unit](())) { (acc, _) =>
       acc.attempt[Throwable].toUnit
     }) must_=== (())
+
+  def testDeepAbsolveAttemptIsIdentity =
+    unsafePerformIO((0 until 1000).foldLeft(IO.point[Int, Int](42))((acc, _) =>
+    IO.absolve(acc.attempt))) must_=== 42
+
+  def testDeepAsyncAbsolveAttemptIsIdentity =
+    unsafePerformIO((0 until 1000).foldLeft(IO.async[Int, Int](k => k(ExitResult.Completed(42))))((acc, _) =>
+    IO.absolve(acc.attempt))) must_=== 42
 
   def testDeepBindOfAsyncChainIsStackSafe = {
     val result = (0 until 10000).foldLeft(IO.point[Throwable, Int](0)) { (acc, _) =>
