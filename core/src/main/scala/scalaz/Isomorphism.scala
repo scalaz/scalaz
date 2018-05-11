@@ -203,6 +203,14 @@ trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G] 
   def zero: F = iso.from(G.zero)
 }
 
+trait IsomorphismBand[F, G] extends Band[F] with IsomorphismSemigroup[F, G] {
+  implicit def G: Band[G]
+}
+
+trait IsomorphismSemiLattice[F, G] extends SemiLattice[F] with IsomorphismBand[F, G] {
+  implicit def G: SemiLattice[G]
+}
+
 trait IsomorphismEqual[F, G] extends Equal[F] {
   implicit def G: Equal[G]
 
