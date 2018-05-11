@@ -40,9 +40,19 @@ object TraverseTest extends SpecLite {
       s.map(_.take(3)) must_===(some(List(0, 1, 2)))
     }
 
-    "be stack-safe and short-circuiting" in {
+    "be stack-safe and short-circuiting with List" in {
       val N = 10000
       val s: Maybe[List[Int]] = List.range(0, N) traverse { x =>
+        if(x < N-2) Maybe.just(x)
+        else if(x == N-2) Maybe.empty
+        else sys.error("BOOM!")
+      }
+      s must_=== Maybe.empty
+    }
+
+    "be stack-safe and short-circuiting with IList" in {
+      val N = 10000
+      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")

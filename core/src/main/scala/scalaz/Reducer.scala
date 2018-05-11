@@ -157,6 +157,10 @@ sealed abstract class ReducerInstances {
     unitConsReducer(_ :: INil(), _ :: _)
   }
 
+  def ReverseIListReducer[C]: Reducer[C, IList[C]] = {
+    reducer(_ :: INil(), (c, cs) => cs :+ c, (cs, c) => c :: cs)
+  }
+
   /** Collect `C`s into an NonEmptyList, in order. */
   implicit def NonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
     unitConsReducer(NonEmptyList.nel(_, INil()),  _ <:: _)
