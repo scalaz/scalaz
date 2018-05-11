@@ -62,9 +62,9 @@ trait RTS {
         result.set(v)
 
       case _ =>
-        while (result.get == null) {
+        while (result.get eq null) {
           result.synchronized {
-            if (result.get == null) result.wait()
+            if (result.get eq null) result.wait()
           }
         }
     }
@@ -140,7 +140,7 @@ private object RTS {
 
   @inline
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
-    if (!stack.isEmpty()) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
+    if (!stack.isEmpty) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
 
   object Catcher extends Function[Any, IO[Any, Any]] {
     final def apply(v: Any): IO[Any, Any] = IO.now(\/-(v))
@@ -157,35 +157,36 @@ private object RTS {
   final class Stack() {
     type Cont = Any => IO[_, Any]
 
-    private[this] var array = new Array[Cont](10)
-    private[this] var size  = 0
+    private[this] var array   = new Array[AnyRef](13)
+    private[this] var size    = 0
+    private[this] var nesting = 0
 
-    final def peek(): Cont = array(size - 1)
+    def isEmpty: Boolean = size == 0
 
-    final def isEmpty(): Boolean = size == 0
-
-    final def push(a: Cont): Unit = {
-      if (size == array.length) {
-        val array2 = new Array[Cont](array.length + (array.length >> 1))
-
-        Array.copy(array, 0, array2, 0, array.length)
-
-        array = array2
+    def push(a: Cont): Unit =
+      if (size == 13) {
+        array = Array(array, a, null, null, null, null, null, null, null, null, null, null, null)
+        size = 2
+        nesting += 1
+      } else {
+        array(size) = a
+        size += 1
       }
-      array(size) = a
-      size = size + 1
-    }
 
-    final def pop(): Cont = {
+    def pop(): Cont = {
       val idx = size - 1
-
-      val a = array(idx)
-
-      array(idx) = null.asInstanceOf[Cont] // GC
-
-      size = idx
-
-      a
+      var a   = array(idx)
+      if (idx == 0 && nesting > 0) {
+        array = a.asInstanceOf[Array[AnyRef]]
+        a = array(12)
+        array(12) = null // GC
+        size = 12
+        nesting -= 1
+      } else {
+        array(idx) = null // GC
+        size = idx
+      }
+      a.asInstanceOf[Cont]
     }
   }
 
@@ -249,18 +250,18 @@ private object RTS {
 
       // Unwind the stack, looking for exception handlers and coalescing
       // finalizers.
-      while (!caught && !stack.isEmpty()) {
+      while (!caught && !stack.isEmpty) {
         stack.pop() match {
           case `Catcher` => caught = true
           case f0: Finalizer[_] =>
             val f = f0.asInstanceOf[Finalizer[E]]
 
             // Lazy initialization of body:
-            if (body == null) body = ExitResult.Failed(err)
+            if (body eq null) body = ExitResult.Failed(err)
 
             val currentFinalizer: IO[E2, List[Throwable]] = f.finalizer(body).run.map(collectDefect)
 
-            if (finalizer == null) finalizer = currentFinalizer
+            if (finalizer eq null) finalizer = currentFinalizer
             else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
           case _ =>
         }
@@ -271,7 +272,7 @@ private object RTS {
       // was caught but the stack is empty, we make the stack non-empty. This
       // lets us return only the finalizer, which will be null for common cases,
       // and result in zero heap allocations for the happy path.
-      if (caught && stack.isEmpty()) stack.push(IdentityCont)
+      if (caught && stack.isEmpty) stack.push(IdentityCont)
 
       finalizer
     }
@@ -286,12 +287,12 @@ private object RTS {
       // Use null to achieve zero allocs for the common case of no finalizers:
       var finalizer: IO[E2, List[Throwable]] = null
 
-      if (!stack.isEmpty()) {
+      if (!stack.isEmpty) {
         // Any finalizers will require ExitResult. Here we fake lazy evaluation
         // to eliminate unnecessary allocation:
         var body: ExitResult[E, Any] = null
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty) {
           // Peel off all the finalizers, composing them into a single finalizer
           // that produces a possibly empty list of errors that occurred when
           // executing the finalizers. The order of errors is outer-to-inner
@@ -301,11 +302,11 @@ private object RTS {
               val f = f0.asInstanceOf[Finalizer[E]]
 
               // Lazy initialization of body:
-              if (body == null) body = ExitResult.Terminated(error)
+              if (body eq null) body = ExitResult.Terminated(error)
 
               val currentFinalizer = f.finalizer(body).run[E2].map(collectDefect)
 
-              if (finalizer == null) finalizer = currentFinalizer
+              if (finalizer eq null) finalizer = currentFinalizer
               else finalizer = finalizer.zipWith(currentFinalizer)(_ ++ _)
             case _ =>
           }
@@ -328,7 +329,7 @@ private object RTS {
       // or Scala will wrap them in ObjectRef and performance will plummet.
       var curIo: IO[E, Any] = io0.asInstanceOf[IO[E, Any]]
 
-      while (curIo != null) {
+      while (curIo ne null) {
         try {
           // Put the maximum operation count on the stack for fast access:
           val maxopcount = YieldMaxOpCount
@@ -398,7 +399,7 @@ private object RTS {
 
                     curIo = nextInstr[E](value, stack)
 
-                    if (curIo == null) {
+                    if (curIo eq null) {
                       eval = false
                       result = ExitResult.Completed(value)
                     }
@@ -410,7 +411,7 @@ private object RTS {
 
                     curIo = nextInstr[E](value, stack)
 
-                    if (curIo == null) {
+                    if (curIo eq null) {
                       eval = false
                       result = ExitResult.Completed(value)
                     }
@@ -422,7 +423,7 @@ private object RTS {
 
                     curIo = nextInstr[E](value, stack)
 
-                    if (curIo == null) {
+                    if (curIo eq null) {
                       eval = false
                       result = ExitResult.Completed(value)
                     }
@@ -434,9 +435,9 @@ private object RTS {
 
                     val finalizer = catchError[Void](error)
 
-                    if (stack.isEmpty()) {
+                    if (stack.isEmpty) {
                       // Error not caught, stack is empty:
-                      if (finalizer == null) {
+                      if (finalizer eq null) {
                         // No finalizer, so immediately produce the error.
                         eval = false
                         result = ExitResult.Failed(error)
@@ -458,11 +459,11 @@ private object RTS {
                       // Error caught:
                       val value = -\/(error)
 
-                      if (finalizer == null) {
+                      if (finalizer eq null) {
                         // No finalizer to run:
                         curIo = nextInstr[E](value, stack)
 
-                        if (curIo == null) {
+                        if (curIo eq null) {
                           eval = false
                           result = ExitResult.Completed(value)
                         }
@@ -493,14 +494,14 @@ private object RTS {
                               case ExitResult.Completed(v) =>
                                 curIo = nextInstr[E](v, stack)
 
-                                if (curIo == null) {
+                                if (curIo eq null) {
                                   eval = false
                                   result = value
                                 }
                               case ExitResult.Terminated(t) =>
-                                curIo = IO.Terminate(t)
+                                curIo = IO.terminate(t)
                               case ExitResult.Failed(e) =>
-                                curIo = IO.Fail(e)
+                                curIo = IO.fail(e)
                             }
                           } else {
                             // Completion handled by interruptor:
@@ -534,14 +535,14 @@ private object RTS {
                           case ExitResult.Completed(v) =>
                             curIo = nextInstr[E](v, stack)
 
-                            if (curIo == null) {
+                            if (curIo eq null) {
                               eval = false
                               result = value.asInstanceOf[ExitResult[E, Any]]
                             }
                           case ExitResult.Terminated(t) =>
-                            curIo = IO.Terminate(t)
+                            curIo = IO.terminate(t)
                           case ExitResult.Failed(e) =>
-                            curIo = IO.Fail(e)
+                            curIo = IO.fail(e)
                         }
                       } else {
                         // Completion handled by interruptor:
@@ -569,7 +570,7 @@ private object RTS {
 
                     curIo = nextInstr[E](value, stack)
 
-                    if (curIo == null) {
+                    if (curIo eq null) {
                       eval = false
                       result = ExitResult.Completed(value)
                     }
@@ -590,7 +591,7 @@ private object RTS {
                     val ref = new AtomicReference[Any]()
 
                     val finalizer =
-                      Finalizer[E](rez => IO.suspend(if (ref.get != null) io.release(rez, ref.get) else IO.unit))
+                      Finalizer[E](rez => IO.suspend(if (null != ref.get) io.release(rez, ref.get) else IO.unit))
 
                     stack.push(finalizer)
 
@@ -617,7 +618,7 @@ private object RTS {
                   case IO.Tags.Sleep =>
                     val io = curIo.asInstanceOf[IO.Sleep[E]]
 
-                    curIo = IO.AsyncEffect { callback =>
+                    curIo = IO.async0 { callback =>
                       rts
                         .schedule(callback(SuccessUnit[E].asInstanceOf[ExitResult[E, Any]]), io.duration)
                         .asInstanceOf[Async[E, Any]]
@@ -636,7 +637,7 @@ private object RTS {
 
                     val finalizer = interruptStack[Void](cause)
 
-                    if (finalizer == null) {
+                    if (finalizer eq null) {
                       // No finalizers, simply produce error:
                       eval = false
                       result = ExitResult.Terminated(cause)
@@ -659,7 +660,7 @@ private object RTS {
 
                     curIo = nextInstr[E](value, stack)
 
-                    if (curIo == null) {
+                    if (curIo eq null) {
                       eval = false
                       result = ExitResult.Completed(value)
                     }
@@ -684,13 +685,13 @@ private object RTS {
               // Interruption cannot be interrupted:
               this.noInterrupt += 1
 
-              curIo = IO.Terminate[E, Any](die.get)
+              curIo = IO.terminate[E, Any](die.get)
             }
 
             opcount = opcount + 1
           } while (eval)
 
-          if (result != null) {
+          if (result ne null) {
             done(result.asInstanceOf[ExitResult[E, A]])
           }
 
@@ -703,7 +704,7 @@ private object RTS {
             // Interruption cannot be interrupted:
             this.noInterrupt += 1
 
-            curIo = IO.Terminate[E, Any](t)
+            curIo = IO.terminate[E, Any](t)
         }
       }
     }
@@ -727,12 +728,12 @@ private object RTS {
           // Async produced a value:
           val io = nextInstr[E](v, stack)
 
-          if (io == null) done(value.asInstanceOf[ExitResult[E, A]])
+          if (io eq null) done(value.asInstanceOf[ExitResult[E, A]])
           else evaluate(io)
 
-        case ExitResult.Failed(t) => evaluate(IO.Fail[E, Any](t))
+        case ExitResult.Failed(t) => evaluate(IO.fail[E, Any](t))
 
-        case ExitResult.Terminated(t) => evaluate(IO.Terminate[E, Any](t))
+        case ExitResult.Terminated(t) => evaluate(IO.terminate[E, Any](t))
       }
 
     /**
@@ -813,7 +814,7 @@ private object RTS {
 
         val canceler = combineCancelers(c1, c2)
 
-        if (canceler == null) Async.later[E, IO[E, C]]
+        if (canceler eq null) Async.later[E, IO[E, C]]
         else Async.maybeLater(canceler)
       })
     }
@@ -1034,7 +1035,7 @@ private object RTS {
 
             val finalizer = interruptStack[Void](t)
 
-            if (finalizer != null) {
+            if (finalizer ne null) {
               fork[Void, Unit](dispatchErrors(finalizer), unhandled)
             }
 
@@ -1106,10 +1107,10 @@ private object RTS {
   final def SuccessUnit[E]: ExitResult[E, Unit] = _SuccessUnit.asInstanceOf[ExitResult[E, Unit]]
 
   final def combineCancelers(c1: Throwable => Unit, c2: Throwable => Unit): Throwable => Unit =
-    if (c1 == null) {
-      if (c2 == null) null
+    if (c1 eq null) {
+      if (c2 eq null) null
       else c2
-    } else if (c2 == null) {
+    } else if (c2 eq null) {
       c1
     } else
       (t: Throwable) => {

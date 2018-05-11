@@ -180,7 +180,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     }
 
     // FIXME: Is this an issue with thread synchronization?
-    while (reported == null) Thread.`yield`()
+    while (reported eq null) Thread.`yield`()
 
     ((throw reported): Int) must (throwA(ExampleError))
   }
