@@ -18,6 +18,7 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def is = s2"""
   RTS synchronous correctness
+    widen Void                              $testWidenVoid
     evaluation of point                     $testPoint
     point must be lazy                      $testPointIsLazy
     now must be eager                       $testNowIsEager
@@ -80,6 +81,18 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
 
   def testPoint =
     unsafePerformIO(IO.point(1)) must_=== 1
+
+  def testWidenVoid = {
+    val op1 = IO.sync[RuntimeException, String]("1")
+    val op2 = IO.sync[Void, String]("2")
+
+    val result: IO[RuntimeException, String] = for {
+      r1 <- op1
+      r2 <- op2.widen[RuntimeException]
+    } yield r1 + r2
+
+    unsafePerformIO(result) must_=== "12"
+  }
 
   def testPointIsLazy =
     IO.point(throw new Error("Not lazy")) must not(throwA[Throwable])

@@ -8,6 +8,7 @@ import scalaz.data.Disjunction
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
 import scalaz.Void
+import scalaz.<~<
 
 import scalaz.effect.Errors._
 
@@ -164,7 +165,10 @@ sealed abstract class IO[E, A] { self =>
    * Widens the error type to any supertype. While `leftMap` suffices for this
    * purpose, this method is significantly faster for this purpose.
    */
-  final def widen[E2 >: E]: IO[E2, A] = self.asInstanceOf[IO[E2, A]]
+  final def widen[E2](implicit ev: E <~< E2): IO[E2, A] = {
+    val _ = ev
+    self.asInstanceOf[IO[E2, A]]
+  }
 
   /**
    * Executes this action, capturing both failure and success and returning
