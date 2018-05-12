@@ -155,6 +155,16 @@ package object scalaz {
   }
   object State extends StateFunctions {
     def apply[S, A](f: S => (S, A)): State[S, A] = StateT[Id, S, A](f)
+
+    def united[S1, S2, A](s: State[S1, State[S2, A]]): State[(S1, S2), A] =
+      State(
+        ss => {
+          val (s1, s2) = ss
+          val (ns1, g) = s.run(s1)
+          val (ns2, a) = g(s2)
+          ((ns1, ns2), a)
+        }
+      )
   }
 
   type StoreT[F[_], A, B] = IndexedStoreT[F, A, A, B]
