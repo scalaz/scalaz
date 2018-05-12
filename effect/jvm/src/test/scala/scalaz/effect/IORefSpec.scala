@@ -54,9 +54,9 @@ class IORefSpec extends Specification with RTS {
       unsafePerformIO(
         for {
           ref   <- IORef(current)
-          r     <- ref.modifyFold(_ => (current, update))
+          r     <- ref.modifyFold(_ => ("hello", update))
           value <- ref.read[Void]
-        } yield (r must beTheSameAs(current)) and (value must beTheSameAs(update))
+        } yield (r must beTheSameAs("hello")) and (value must beTheSameAs(update))
       )
   }
 
