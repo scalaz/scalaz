@@ -52,7 +52,7 @@ object NaturalTransformation extends NaturalTransformations {
   /**
    * Like Hoist, for Functors, when we already know how to transform `F ~> G`.
    */
-  def hoist[F[_], G[_], H[_]: Functor](in: F ~> G): λ[α => H[F[α]]] ~> λ[α => H[G[α]]] =
+  def liftMap[F[_], G[_], H[_]: Functor](in: F ~> G): λ[α => H[F[α]]] ~> λ[α => H[G[α]]] =
     λ[λ[α => H[F[α]]] ~> λ[α => H[G[α]]]](fa => Functor[H].map(fa)(in))
 }
 
