@@ -82,7 +82,24 @@ class IORefSpec extends Specification with RTS {
       )
   }
 
-  def e7 = todo
+  def e7 = {
+
+    def tryWriteUntilFalse(ref: IORef[Int], update: Int): IO[Void, Boolean] =
+      ref.tryWrite(update).flatMap(success => if (!success) IO.point(success) else tryWriteUntilFalse(ref, update))
+
+    unsafePerformIO(
+      for {
+        ref     <- IORef(0)
+        f1      <- ref.write[Void](1).forever[Int].fork
+        f2      <- ref.write[Void](2).forever[Int].fork
+        success <- tryWriteUntilFalse(ref, 3)
+        value   <- ref.read[Void]
+        _       <- f1.interrupt(new Error("Terminated fiber 1"))
+        _       <- f2.interrupt(new Error("Terminated fiber 2"))
+      } yield (success must beFalse) and (value must be_!=(3))
+    )
+
+  }
 
   def e8 = forall(Data.tuples) {
     case (current, update) =>
