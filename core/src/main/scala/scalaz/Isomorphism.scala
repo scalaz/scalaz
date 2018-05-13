@@ -235,7 +235,7 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   override def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
-trait IsomorphismEnum[F, G] extends Enum[F] {
+trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G] {
   implicit def G: Enum[G]
 
   def iso: F <=> G
