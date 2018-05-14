@@ -5,8 +5,8 @@ import language.experimental.macros
 import language.implicitConversions
 
 trait DebugSyntax {
-  implicit final class ToDebugOps[A: Debug](self: A) {
-    def debug: String = macro meta.Ops.f_0
+  implicit final class ToDebugOps[A](self: A) {
+    def debug(implicit ev: Debug[A]): String = macro meta.Ops.i_0
   }
 
   implicit final def debugInterpolator(sc: StringContext): DebugInterpolator.Interpolator =
