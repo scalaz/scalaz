@@ -2,6 +2,9 @@ package scalaz.effect
 
 import org.specs2.Specification
 
+import scalaz._
+import Scalaz._
+
 class IORefSpec extends Specification with RTS {
 
   def is = "IORefSpec".title ^ s2"""
@@ -89,13 +92,12 @@ class IORefSpec extends Specification with RTS {
 
     unsafePerformIO(
       for {
-        ref     <- IORef(0)
-        f1      <- ref.write[Void](1).forever[Int].fork
-        f2      <- ref.write[Void](2).forever[Int].fork
+        ref     <- IORef[Void, Int](0)
+        f1      <- ref.write[Void](1).forever[Unit].fork[Void]
+        f2      <- ref.write[Void](2).forever[Unit].fork[Void]
         success <- tryWriteUntilFalse(ref, 3)
         value   <- ref.read[Void]
-        _       <- f1.interrupt(new Error("Terminated fiber 1"))
-        _       <- f2.interrupt(new Error("Terminated fiber 2"))
+        _       <- (f1 <> f2).interrupt[Void](new Error("Terminated fiber"))
       } yield (success must beFalse) and (value must be_!=(3))
     )
 
