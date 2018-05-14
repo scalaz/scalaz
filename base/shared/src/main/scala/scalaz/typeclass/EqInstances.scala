@@ -8,8 +8,6 @@ trait EqInstances {
   private[this] def singletonEq[A]: Eq[A] = instanceOf[EqClass[A]]((a, b) => true)
   private[this] def universalEq[A]: Eq[A] = instanceOf[EqClass[A]]((a, b) => a == b)
 
-  implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
-
   implicit final val unitEq: Eq[Unit] = singletonEq[Unit]
 
   implicit final val boolEq: Eq[Boolean] = universalEq[Boolean]
