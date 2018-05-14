@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import com.github.ghik.silencer.silent
-import scalaz.typeclass.{ EqClass, SemigroupClass }
+import scalaz.typeclass.SemigroupClass
 
 trait VoidModule {
   type Void
@@ -32,9 +32,7 @@ object VoidModule extends VoidSyntax {
   implicit def void_<~<[A]: Void <~< A = Void.conforms[A]
 }
 
-trait VoidInstance {
-  implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, _) => a.absurd)
-
+trait VoidInstances {
   implicit def voidSemigroup: Semigroup[Void] =
     instanceOf(new SemigroupClass[Void] {
       override def append(a1: Void, a2: => Void): Void = a1
@@ -42,7 +40,7 @@ trait VoidInstance {
 }
 
 @silent
-private[data] object VoidImpl extends VoidModule with VoidSyntax with VoidInstance {
+private[data] object VoidImpl extends VoidModule with VoidSyntax with VoidInstances {
   type Void = Nothing
 
   def absurd[A](v: Void): A = v
