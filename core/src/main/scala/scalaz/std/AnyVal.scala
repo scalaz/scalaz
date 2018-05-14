@@ -2,7 +2,7 @@ package scalaz
 package std
 
 import scala.annotation.tailrec
-import scalaz._
+
 import Maybe.Just
 import Id._
 
@@ -162,7 +162,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  import Tags.{Multiplication}
+  import Tags.Multiplication
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toByte)
@@ -544,20 +544,36 @@ trait BooleanFunctions {
     if (cond) M.point(a) else M0.empty
 
   /**
+    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
+    * for `M`.
+    */
+  final def emptyOrPoint[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+    if (!cond) M.point(a) else M0.empty
+
+  /**
    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
    * for `M`.
    */
+  @deprecated("use emptyOrPoint instead", since = "7.3.0")
   final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
+  /** [[pointOrEmpty]] curried into a natural transformation. */
   final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
       def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
     }
 
+  /** [[emptyOrPoint]] curried into a natural transformation. */
+  final def emptyOrPointNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
+    new (Id ~> M) {
+      def apply[A](a: A): M[A] = emptyOrPoint[M, A](cond)(a)
+    }
+
+  @deprecated("use emptyOrPointNT instead", since = "7.3.0")
   final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
     new (Id ~> M) {
-      def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
+      def apply[A](a: A): M[A] = emptyOrPoint[M, A](cond)(a)
     }
 }
 
