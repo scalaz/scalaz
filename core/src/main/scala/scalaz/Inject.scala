@@ -7,7 +7,7 @@ import std.option.{none, some}
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
  */
-sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
+abstract class Inject[F[_], G[_]] extends (F ~> G) {
   def apply[A](fa: F[A]): G[A] = inj(fa)
   def unapply[A](ga: G[A]): Option[F[A]] = prj(ga)
   def inj[A](fa: F[A]): G[A]
