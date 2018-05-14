@@ -10,6 +10,6 @@ install:
   - rvm use 2.4.3 --install --fuzzy
   - gem update --system
   - gem install sass
-  - gem install jekyll -v 3.6.2
+  - gem install jekyll -v 3.8.1
 script:
   - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite publish

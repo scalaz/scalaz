@@ -34,8 +34,8 @@ lazy val effect = crossProject
   .settings(stdSettings("effect"))
   .settings(
     libraryDependencies ++=
-      Seq("org.specs2" %%% "specs2-core"          % "4.0.0" % "test",
-          "org.specs2" %%% "specs2-matcher-extra" % "4.0.0" % "test"),
+      Seq("org.specs2" %%% "specs2-core"          % "4.2.0" % "test",
+          "org.specs2" %%% "specs2-matcher-extra" % "4.2.0" % "test"),
     scalacOptions in Test ++= Seq("-Yrangepos")
   )
   .dependsOn(base)
@@ -52,9 +52,9 @@ lazy val benchmarks = project.module
       Seq(
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-        "org.scalaz"     %% "scalaz-core"   % "7.2.7",
+        "org.scalaz"     %% "scalaz-core"   % "7.2.22",
         "io.monix"       %% "monix"         % "3.0.0-RC1",
-        "org.typelevel"  %% "cats-effect"   % "0.10"
+        "org.typelevel"  %% "cats-effect"   % "1.0.0-RC"
       )
   )
 
@@ -73,9 +73,9 @@ lazy val example = project.module
   .dependsOn(baseJVM)
   .enablePlugins(MicrositesPlugin)
   .settings(
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.5",
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
     micrositeFooterText := Some("""
-                                  |<p>&copy; 2017 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
+                                  |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),
     micrositeName := "Scalaz",
     micrositeDescription := "Scalaz examples",

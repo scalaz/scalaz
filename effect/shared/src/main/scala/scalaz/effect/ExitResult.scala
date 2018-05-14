@@ -15,6 +15,12 @@ sealed trait ExitResult[E, A] { self =>
     case Terminated(_) => false
   }
 
+  final def map[B](f: A => B): ExitResult[E, B] = self match {
+    case Completed(a)  => Completed(f(a))
+    case Failed(e)     => Failed(e)
+    case Terminated(t) => Terminated(t)
+  }
+
   final def failed: Boolean = !succeeded
 
   final def fold[Z](completed: A => Z, failed: E => Z, interrupted: Throwable => Z): Z = self match {

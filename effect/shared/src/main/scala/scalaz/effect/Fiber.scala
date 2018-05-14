@@ -1,6 +1,8 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
+import scalaz.{ Applicative, Monoid }
+
 /**
  * A fiber is a lightweight thread of execution that never consumes more than a
  * whole thread (but may consume much less, depending on contention). Fibers are
@@ -21,7 +23,7 @@ package scalaz.effect
  * } yield a
  * }}}
  */
-trait Fiber[E, A] {
+trait Fiber[E, A] { self =>
 
   /**
    * Joins the fiber, with suspends the joining fiber until the result of the
@@ -37,4 +39,29 @@ trait Fiber[E, A] {
    * successfully interrupted or has produced its result.
    */
   def interrupt[E2](t: Throwable): IO[E2, Unit]
+
+  /**
+   * Monoidal composition of fibers.
+   */
+  final def <>(that: => Fiber[E, A])(implicit M: Monoid[A]): Fiber[E, A] =
+    zipWith(that)(M.append(_, _))
+
+  /**
+   * Zips this fiber with the specified fiber, combining their results using
+   * the specified combiner function. Both joins and interruptions are performed
+   * in sequential order from left to right.
+   */
+  final def zipWith[B, C](that: => Fiber[E, B])(f: (A, B) => C): Fiber[E, C] =
+    new Fiber[E, C] {
+      def join: IO[E, C] =
+        self.join.zipWith(that.join)(f)
+
+      def interrupt[E2](t: Throwable): IO[E2, Unit] =
+        self.interrupt(t) *> that.interrupt(t)
+    }
+}
+
+object Fiber extends FiberInstances {
+  final def empty[E, A](implicit M: Monoid[A]): Fiber[E, A] = Monoid[Fiber[E, A]].empty
+  final def point[E, A](a: => A): Fiber[E, A]               = Applicative[Fiber[E, ?]].pure(a)
 }

@@ -27,7 +27,9 @@ trait VoidSyntax {
 
 // NOTE: this is some next level black compiler magic
 // but without this object syntax doesn't resolve...
-object VoidModule extends VoidSyntax
+object VoidModule extends VoidSyntax {
+  implicit def void_<~<[A]: Void <~< A = Void.conforms[A]
+}
 
 @silent
 private[data] object VoidImpl extends VoidModule with VoidSyntax {
