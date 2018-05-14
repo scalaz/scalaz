@@ -48,6 +48,12 @@ object NaturalTransformation extends NaturalTransformations {
    */
   def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, ?] ~> G =
     λ[Coproduct[F, H, ?] ~> G](_.fold(fg, hg))
+
+  /**
+   * Like Hoist, for Functors, when we already know how to transform `F ~> G`.
+   */
+  def liftMap[F[_], G[_], H[_]: Functor](in: F ~> G): λ[α => H[F[α]]] ~> λ[α => H[G[α]]] =
+    λ[λ[α => H[F[α]]] ~> λ[α => H[G[α]]]](fa => Functor[H].map(fa)(in))
 }
 
 /** A function universally quantified over two parameters. */
