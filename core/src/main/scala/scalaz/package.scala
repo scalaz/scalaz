@@ -163,7 +163,7 @@ package object scalaz {
       State(
         ss => {
           val (s1, s2) = ss
-          val (ns1, g) = s.run(s1)
+          val (ns1, g) = s(s1)
           val (ns2, a) = g(s2)
           ((ns1, ns2), a)
         }
