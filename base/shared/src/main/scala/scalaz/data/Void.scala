@@ -2,6 +2,7 @@ package scalaz
 package data
 
 import com.github.ghik.silencer.silent
+import scalaz.typeclass.SemigroupClass
 
 trait VoidModule {
   type Void
@@ -31,8 +32,15 @@ object VoidModule extends VoidSyntax {
   implicit def void_<~<[A]: Void <~< A = Void.conforms[A]
 }
 
+trait VoidInstances {
+  implicit def voidSemigroup: Semigroup[Void] =
+    instanceOf(new SemigroupClass[Void] {
+      override def append(a1: Void, a2: => Void): Void = a1
+    })
+}
+
 @silent
-private[data] object VoidImpl extends VoidModule with VoidSyntax {
+private[data] object VoidImpl extends VoidModule with VoidSyntax with VoidInstances {
   type Void = Nothing
 
   def absurd[A](v: Void): A = v
