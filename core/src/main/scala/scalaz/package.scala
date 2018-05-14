@@ -160,12 +160,18 @@ package object scalaz {
 
   object StateT extends StateTInstances with StateTFunctions {
     def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = IndexedStateT[F, S, S, A](f)
+
+    def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[F, S, ?] ~> StateT[G, S, ?] =
+      λ[StateT[F, S, ?] ~> StateT[G, S, ?]](st => StateT((s: S) => nat(st.run(s))))
   }
   object IndexedState extends StateFunctions {
     def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[Id, S1, S2, A](f)
   }
   object State extends StateFunctions {
     def apply[S, A](f: S => (S, A)): State[S, A] = StateT[Id, S, A](f)
+
+    def hoist[F[_], G[_], S](nat: F ~> G): λ[α => State[S, F[α]]] ~> λ[α => State[S, G[α]]] =
+      NaturalTransformation.liftMap[F, G, State[S, ?]](nat)
   }
 
   /** @template */
