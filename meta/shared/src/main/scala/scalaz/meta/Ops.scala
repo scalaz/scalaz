@@ -33,110 +33,65 @@ class Ops(val c: blackbox.Context) {
   import c.universe._
 
   /* def method: R */
-  def f_0: Tree = q"$ev.$name($lhs)"
+  def f_0: Tree                              = q"$ev.$methodName   ($lhs)"
+  def i_0(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)"
+  def n_0[T: c.WeakTypeTag]: Tree            = q"$ev.${typeName[T]}($lhs)"
+  def ni_0[T: c.WeakTypeTag](ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)"
 
   /* def method(a: A): R */
-  def f_1(f: Tree): Tree = q"$ev.$name($lhs)($f)"
+  def f_1(f: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f)"
+  def i_1(f: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)"
+  def n_1[T: c.WeakTypeTag](f: Tree): Tree            = q"$ev.${typeName[T]}($lhs)($f)"
+  def ni_1[T: c.WeakTypeTag](f: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)"
 
   /* def method(f: A): R */
-  def fa_1(f: Tree): Tree = q"$ev.$name($lhs, $f)"
+  def fa_1(f: Tree): Tree                              = q"$ev.$methodName   ($lhs, $f)"
+  def ia_1(f: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs, $f)"
+  def na_1[T: c.WeakTypeTag](f: Tree): Tree            = q"$ev.${typeName[T]}($lhs, $f)"
+  def nia_1[T: c.WeakTypeTag](f: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs, $f)"
 
   /* def method(f: A)(g: B): R */
-  def f_1_1(f: Tree)(g: Tree): Tree = q"$ev.$name($lhs)($f)($g)"
+  def f_1_1(f: Tree)(g: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f)($g)"
+  def i_1_1(f: Tree)(g: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)($g)"
+  def n_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree            = q"$ev.${typeName[T]}($lhs)($f)($g)"
+  def ni_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)($g)"
 
   /* def method(f: A)(g: B): R */
-  def fa_1_1(f: Tree)(g: Tree): Tree = q"$ev.$name($lhs, $f)($g)"
+  def fa_1_1(f: Tree)(g: Tree): Tree                              = q"$ev.$methodName   ($lhs, $f)($g)"
+  def ia_1_1(f: Tree)(g: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs, $f)($g)"
+  def na_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree            = q"$ev.${typeName[T]}($lhs, $f)($g)"
+  def nia_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs, $f)($g)"
+
+  /* def method(f: A)(implicit g: B): R */
+  def i_1_1i(f: Tree)(g: Tree, ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)($g)"
+  def ni_1_1i[T: c.WeakTypeTag](f: Tree)(g: Tree, ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)($g)"
 
   /* def method(f: A, g: B): R */
-  def f_2(f: Tree, g: Tree): Tree = q"$ev.$name($lhs)($f, $g)"
+  def f_2(f: Tree, g: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f, $g)"
+  def i_2(f: Tree, g: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f, $g)"
+  def n_2[T: c.WeakTypeTag](f: Tree, g: Tree): Tree            = q"$ev.${typeName[T]}($lhs)($f, $g)"
+  def ni_2[T: c.WeakTypeTag](f: Tree, g: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f, $g)"
 
-  /** Destructured macro application.
-   * - `ev`: the typeclass evidence
-   * - `name`: the name of the invoked method
-   * - `lhs`: the invocation target of the call
-   */
-  private lazy val (ev, name, lhs) =
-    c.prefix.tree match {
-      case Apply(Apply(TypeApply(_, _), List(x)), List(ev)) =>
-        (ev, c.macroApplication.symbol.name.toTermName, x)
-      case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
-    }
-}
+  /// Name of the type.
+  private def typeName[T](implicit T: c.WeakTypeTag[T]) =
+    TermName(T.tpe.typeSymbol.name.encodedName.toString)
 
-/* Version of the zero-cost syntax macro that allows you to pass
- * the method name in as a type.
- */
-class SymOps(val c: blackbox.Context) {
-  import c.universe._
-
-  /* def method: R */
-  def f_0[T](implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs)"
-  }
-
-  /* def method(a: A): R */
-  def f_1[T](f: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs)($f)"
-  }
-
-  /* def method(f: A): R */
-  def fa_1[T](f: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs, $f)"
-  }
-
-  /* def method(f: A)(g: B): R */
-  def f_1_1[T](f: Tree)(g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs)($f)($g)"
-  }
-
-  /* def method(f: A)(g: B): R */
-  def fa_1_1[T](f: Tree)(g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs, $f)($g)"
-  }
-
-  /* def method(f: A, g: B): R */
-  def f_2[T](f: Tree, g: Tree)(implicit T: c.WeakTypeTag[T]): Tree = {
-    val (ev, name, lhs) = unpack[T]
-    q"$ev.$name($lhs)($f, $g)"
-  }
-
-  /** Destructured macro application.
-   * - `ev`: the typeclass evidence
-   * - `name`: the name of the invoked method
-   * - `lhs`: the invocation target of the call
-   */
-  private def unpack[T](implicit T: c.WeakTypeTag[T]): (c.Tree, TermName, c.Tree) = {
-    val (ev, lhs) = c.prefix.tree match {
-      case Apply(Apply(TypeApply(_, _), List(lhs)), List(ev)) =>
-        (ev, lhs)
-      case t => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
-    }
-
-    val methodName = T.tpe.typeSymbol.name.encodedName.toString
-    (ev, TermName(methodName), lhs)
-  }
-}
-
-/** Versions of the zero-cost macros for when the receiver is not an instance
- * of the typeclass in question.
- */
-class IdOps(val c: blackbox.Context) {
-  import c.universe._
-
-  /* def method(x: A): R */
-  def id_1(x: Tree): Tree = q"$x.$name($lhs)"
-
-  private lazy val lhs =
-    c.prefix.tree match {
-      case Apply(TypeApply(_, _), List(lhs)) => lhs
-      case t                                 => c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
-    }
-
-  private lazy val name =
+  // Name of the invoked method.
+  private def methodName: TermName =
     c.macroApplication.symbol.name.toTermName
+
+  // Typeclass evidence.
+  private def ev: Tree = c.prefix.tree match {
+    case Apply(Apply(TypeApply(_, _), List(_)), List(ev)) => ev
+    case t =>
+      c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
+  }
+
+  // Invocation target of the call.
+  private def lhs: Tree = c.prefix.tree match {
+    case Apply(Apply(TypeApply(_, _), List(lhs)), List(_)) => lhs
+    case Apply(TypeApply(_, _), List(lhs))                 => lhs
+    case t =>
+      c.abort(c.enclosingPosition, s"Cannot extract subject of operation (tree = $t)")
+  }
 }

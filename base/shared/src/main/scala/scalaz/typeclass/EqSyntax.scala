@@ -4,8 +4,8 @@ package typeclass
 import scala.language.experimental.macros
 
 trait EqSyntax {
-  implicit final class ToEqOps[A: Eq](a: A) {
+  implicit final class ToEqOps[A](a: A) {
     private[typeclass] type equal
-    def ===(f: A): Boolean = macro meta.SymOps.fa_1[equal]
+    def ===(f: A)(implicit ev: Eq[A]): Boolean = macro meta.Ops.nia_1[equal]
   }
 }
