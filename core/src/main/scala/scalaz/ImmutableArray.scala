@@ -130,7 +130,7 @@ object ImmutableArray extends ImmutableArrayInstances {
   def fromString(str: String): ImmutableArray[Char] = new StringArray(str)
 
   def newBuilder[A](implicit elemTag: ClassTag[A]): Builder[A, ImmutableArray[A]] =
-    ArrayBuilder.make[A]()(elemTag).mapResult(make(_))
+    ArrayBuilder.make[A].mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
