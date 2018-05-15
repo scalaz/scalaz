@@ -118,7 +118,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.6"
-  private def Scala213 = "2.13.0-M4-pre-20d3c21"
+  private def Scala213 = "2.13.0-M4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -246,8 +246,9 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
+      // TODO scala-js and scalacheck for Scala 2.13
       releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee", "scalacheck-binding_1_14"
+          "core", "effect", "iteratee"
         ).map{ p => s" ${p}JVM/publishSigned " }.mkString(" ; ")
       ),
       setNextVersion,
