@@ -4,7 +4,7 @@ package std
 import scalaz.typeclass.{ EqClass, MonadClass }
 
 trait ListInstances {
-  implicit val monad: Monad[List] = instanceOf(new MonadClass[List] {
+  implicit val listMonad: Monad[List] = instanceOf(new MonadClass[List] {
     override def map[A, B](fa: List[A])(f: A => B): List[B]           = fa.map(f)
     override def ap[A, B](fa: List[A])(f: List[A => B]): List[B]      = fa.zip(f).map { case (e, f) => f(e) }
     override def pure[A](a: A): List[A]                               = List(a)

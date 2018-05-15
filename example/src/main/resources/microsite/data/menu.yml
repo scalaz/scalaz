@@ -61,6 +61,12 @@ options:
     menu_section: std
 
     nested_options:
+    - title: Either
+      url: std/Either.html
+      menu_section: std
     - title: List
       url: std/List.html
+      menu_section: std
+    - title: Set
+      url: std/Set.html
       menu_section: std

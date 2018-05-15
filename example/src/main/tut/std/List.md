@@ -24,5 +24,5 @@ val fs: List[Int => Int] = List(_ * 2, _ + 2, _ - 1)
 
 list1 === list2
 
-// list1.ap(fs) // TODO: Y THIS NO WORK?
+list1.ap(fs)
 ```
