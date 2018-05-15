@@ -131,7 +131,7 @@ object ImmutableArray extends ImmutableArrayInstances {
   def fromString(str: String): ImmutableArray[Char] = new StringArray(str)
 
   def newBuilder[A](implicit elemTag: ClassTag[A]): Builder[A, ImmutableArray[A]] =
-    ArrayBuilder.make[A]()(elemTag).mapResult(make(_))
+    ArrayBuilder.make[A].mapResult(make(_))
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
@@ -211,7 +211,14 @@ object ImmutableArray extends ImmutableArrayInstances {
 
     def length = str.length
     def toArray[B >: Char : ClassTag] = str.toArray
-    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int): Unit = { str.copyToArray(xs, start, len) }
+    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int): Unit = {
+      xs match {
+        case xs0: Array[Char] =>
+          str.copyToArray(xs0, start, len)
+        case _ =>
+          str.toCharArray.copyToArray(xs, start, len)
+      }
+    }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
