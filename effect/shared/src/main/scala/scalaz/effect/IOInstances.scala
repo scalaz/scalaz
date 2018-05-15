@@ -2,7 +2,7 @@
 package scalaz
 package effect
 
-import scalaz.typeclass.{ BindClass, MonadClass }
+import scalaz.typeclass.{ BifunctorClass, BindClass, MonadClass }
 
 trait IOInstances {
   implicit def monad[E]: Monad[IO[E, ?]] =
@@ -18,4 +18,11 @@ trait IOInstances {
       override final def flatMap[A, B](ma: IO[E, A])(f: A => IO[E, B]): IO[E, B] =
         ma.flatMap(f)
     })
+
+  implicit final val bifunctor: Bifunctor[IO] =
+    instanceOf(new BifunctorClass.DeriveBimap[IO] {
+      override def lmap[A, B, S](fab: IO[A, B])(as: A => S): IO[S, B] = fab.leftMap(as)
+      override def rmap[A, B, T](fab: IO[A, B])(bt: B => T): IO[A, T] = fab.map(bt)
+    })
+
 }
