@@ -9,12 +9,27 @@ trait StreamInstances {
 
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
+    
+    /*
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
         (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
       }
+    }
+    */
+
+    def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]): F[Stream[B]] = {
+      val revOpt: Maybe[F[Stream[B]]] =
+        F.unfoldrOpt[Stream[A], B, Stream[B]](fa)(_ match {
+          case a #:: as => Maybe.just((f(a), as))
+          case Stream.Empty => Maybe.empty
+        })(Reducer.ReverseStreamReducer[B])
+
+      val rev: F[Stream[B]] = revOpt getOrElse F.point(Stream.empty)
+
+      F.map(rev)(_.reverse)
     }
 
     override def index[A](fa: Stream[A], i: Int) = {

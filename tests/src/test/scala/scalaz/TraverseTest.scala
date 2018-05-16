@@ -40,19 +40,9 @@ object TraverseTest extends SpecLite {
       s.map(_.take(3)) must_===(some(List(0, 1, 2)))
     }
 
-    "be stack-safe and short-circuiting with List" in {
+    "be stack-safe and short-circuiting" in {
       val N = 10000
       val s: Maybe[List[Int]] = List.range(0, N) traverse { x =>
-        if(x < N-2) Maybe.just(x)
-        else if(x == N-2) Maybe.empty
-        else sys.error("BOOM!")
-      }
-      s must_=== Maybe.empty
-    }
-
-    "be stack-safe and short-circuiting with IList" in {
-      val N = 10000
-      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
@@ -74,6 +64,18 @@ object TraverseTest extends SpecLite {
 
   }
 
+  "ilist" should {
+    "be stack-safe and short-circuiting" in {
+      val N = 10000
+      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)) traverse { x =>
+        if(x < N-2) Maybe.just(x)
+        else if(x == N-2) Maybe.empty
+        else sys.error("BOOM!")
+      }
+      s must_=== Maybe.empty
+    }
+  }
+
   "stream" should {
     "apply effects in order" in {
       val s: Writer[String, Stream[Int]] = Stream(1, 2, 3).traverseU(x => Writer(x.toString, x))
@@ -83,10 +85,22 @@ object TraverseTest extends SpecLite {
     // ghci> import Data.Traversable
     // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
     // Nothing
+    /*
     "allow partial traversal" in {
       val stream = Stream.from(1)
       val s: Option[Stream[Int]] = stream.traverseU((x: Int) => if (x < 3) some(x) else none)
       s must_===(none)
+    }
+    */
+
+    "be stack-safe and short-circuiting" in {
+      val N = 10000
+      val s: Maybe[Stream[Int]] = Stream.from(0) traverse { x =>
+        if(x < N-2) Maybe.just(x)
+        else if(x == N-2) Maybe.empty
+        else sys.error("BOOM!")
+      }
+      s must_=== Maybe.empty
     }
   }
 

@@ -173,6 +173,12 @@ sealed abstract class ReducerInstances {
     unitLazyConsReducer(cons(_, empty): Stream[C], cons(_, _))
   }
 
+  def ReverseStreamReducer[C]: Reducer[C, Stream[C]] = {
+    import std.stream._
+    import Stream._
+    reducer(cons(_, empty), (c, cs) => cs :+ c, (cs, c) => c #:: cs)
+  }
+
   /** Ignore `C`s. */
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
     import std.anyVal._
