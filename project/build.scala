@@ -100,7 +100,6 @@ object build {
     "-encoding", "UTF-8",
     "-feature",
     "-Xfuture",
-    "-Ypartial-unification",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
@@ -148,6 +147,13 @@ object build {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
     }),
+    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
+      case Some((2, v)) if v <= 12 || scalaVersion.value == "2.13.0-M3" =>
+        Seq(
+          "-Ypartial-unification",
+          "-Yno-adapted-args"
+        )
+    }.toList.flatten,
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v >= 12 =>
@@ -162,8 +168,7 @@ object build {
           Nil
       }
     },
-    scalacOptions in (Compile, compile) ++= "-Yno-adapted-args" +: lintOptions,
-    scalacOptions in (Test, compile) ++= lintOptions,
+    scalacOptions ++= lintOptions,
 
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
