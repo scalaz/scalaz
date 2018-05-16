@@ -1,7 +1,8 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ BifunctorClass, BindClass, DebugClass, EqClass, MonadClass }
+import scalaz.ct._
+import scalaz.typeclass.{ DebugClass, EqClass }
 
 trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =

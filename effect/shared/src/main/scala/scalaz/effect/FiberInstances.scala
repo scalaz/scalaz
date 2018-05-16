@@ -1,8 +1,9 @@
 // Copyright (C) 2018 John A. De Goes. All rights reserved.
 package scalaz.effect
 
+import scalaz.algebra.MonoidClass
+import scalaz.ct.ApplicativeClass
 import scalaz.{ instanceOf, Applicative, Monoid }
-import scalaz.typeclass.{ ApplicativeClass, MonoidClass }
 
 trait FiberInstances {
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =

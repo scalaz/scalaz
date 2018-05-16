@@ -1,6 +1,8 @@
 package scalaz
 package typeclass
 
+import scalaz.ct.ContravariantClass
+
 trait DebugInstances {
   implicit final def stringDebug: Debug[String] = instanceOf[DebugClass[String]](s => s)
 

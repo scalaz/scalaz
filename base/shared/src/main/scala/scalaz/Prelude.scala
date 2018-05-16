@@ -1,6 +1,8 @@
 package scalaz
 
 import typeclass._
+import algebra._
+import ct._
 
 trait BaseTypeclasses {
   type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]
@@ -112,9 +114,9 @@ trait AllFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
     with data.KleisliFunctions
-    with typeclass.InvariantFunctorFunctions
-    with typeclass.PhantomFunctions
-    with typeclass.TraversableFunctions
+    with InvariantFunctorFunctions
+    with PhantomFunctions
+    with TraversableFunctions
 
 trait AllInstances
     extends data.AMaybeInstances
@@ -128,23 +130,23 @@ trait AllInstances
     with data.TheseInstances
     with data.UpStarInstances
     with data.KleisliInstances
-    with typeclass.BifunctorInstances
-    with typeclass.BindInstances
-    with typeclass.ChoiceInstances
-    with typeclass.CobindInstances
-    with typeclass.ComonadInstances
+    with BifunctorInstances
+    with BindInstances
+    with ChoiceInstances
+    with CobindInstances
+    with ComonadInstances
     with typeclass.EqInstances
-    with typeclass.FoldableInstances
+    with FoldableInstances
     with typeclass.IsContravariantInstances
     with typeclass.IsCovariantInstances
-    with typeclass.MonadInstances
-    with typeclass.MonoidInstances
-    with typeclass.PhantomInstances
-    with typeclass.ProfunctorInstances
-    with typeclass.SemigroupInstances
+    with MonadInstances
+    with MonoidInstances
+    with PhantomInstances
+    with ProfunctorInstances
+    with SemigroupInstances
     with typeclass.DebugInstances
-    with typeclass.StrongInstances
-    with typeclass.TraversableInstances
+    with StrongInstances
+    with TraversableInstances
 
 trait AllSyntax
     extends data.VoidSyntax
@@ -155,24 +157,24 @@ trait AllSyntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
     with data.KleisliSyntax
-    with typeclass.ApplicativeSyntax
-    with typeclass.ApplySyntax
-    with typeclass.BifunctorSyntax
-    with typeclass.BindSyntax
-    with typeclass.ChoiceSyntax
-    with typeclass.CobindSyntax
-    with typeclass.ComonadSyntax
-    with typeclass.ComposeSyntax
+    with ApplicativeSyntax
+    with ApplySyntax
+    with BifunctorSyntax
+    with BindSyntax
+    with ChoiceSyntax
+    with CobindSyntax
+    with ComonadSyntax
+    with ComposeSyntax
     with typeclass.EqSyntax
-    with typeclass.FoldableSyntax
-    with typeclass.FunctorSyntax
-    with typeclass.InvariantFunctorSyntax
-    with typeclass.PhantomSyntax
-    with typeclass.ProfunctorSyntax
-    with typeclass.SemigroupSyntax
+    with FoldableSyntax
+    with FunctorSyntax
+    with InvariantFunctorSyntax
+    with PhantomSyntax
+    with ProfunctorSyntax
+    with SemigroupSyntax
     with typeclass.DebugSyntax
-    with typeclass.StrongSyntax
-    with typeclass.TraversableSyntax
+    with StrongSyntax
+    with TraversableSyntax
 
 object Prelude extends BaseHierarchy with BaseData with AllFunctions
 

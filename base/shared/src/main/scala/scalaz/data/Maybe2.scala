@@ -1,7 +1,8 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ BifunctorClass, DebugClass, EqClass }
+import scalaz.ct.BifunctorClass
+import scalaz.typeclass.{ DebugClass, EqClass }
 
 sealed trait Maybe2Module {
 

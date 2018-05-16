@@ -2,8 +2,8 @@ package scalaz
 package data
 
 import Prelude._
-import scalaz.typeclass.ComposeClass
 import AList.aListOps
+import scalaz.ct.ComposeClass
 
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,

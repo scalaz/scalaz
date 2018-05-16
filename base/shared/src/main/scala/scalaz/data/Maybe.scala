@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import scalaz.ct._
 import scalaz.typeclass._
 
 sealed trait MaybeModule {

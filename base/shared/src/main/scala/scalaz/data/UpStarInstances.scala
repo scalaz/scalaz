@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.ProfunctorClass
+import scalaz.ct.ProfunctorClass
 
 trait UpStarInstances {
   implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] =

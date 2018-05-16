@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import typeclass.StrongClass
+import ct.StrongClass
 
 trait ForgetInstances { self =>
   implicit def strong[A]: Strong[Forget[A, ?, ?]] =

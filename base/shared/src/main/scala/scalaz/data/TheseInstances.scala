@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scalaz.algebra.SemigroupClass
+import scalaz.ct._
 import scalaz.typeclass._
 
 trait TheseInstances {
