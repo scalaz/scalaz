@@ -13,8 +13,7 @@ trait GenIO {
     for {
       syncA  <- genSyncSuccess(genA)
       asyncA <- genAsyncSuccess(genA)
-      gen    <- Gen.oneOf(syncA, asyncA)
-    } yield gen
+    } yield Gen.oneOf(syncA, asyncA)
 
   def genSyncFailure[E, A](genE: Gen[E]): Gen[IO[E, A]] = for (e <- genE) yield IO.fail(e)
 
@@ -25,8 +24,7 @@ trait GenIO {
     for {
       syncE  <- genSyncFailure(genE)
       asyncE <- genAsyncFailure(genE)
-      gen    <- Gen.oneOf(syncE, asyncE)
-    } yield gen
+    } yield Gen.oneOf(syncE, asyncE)
 
   def genUnLikeTrans[E, A](gen: Gen[IO[E, A]], genE: Gen[E], genA: Gen[A]): Gen[IO[E, A]] =
     for {
