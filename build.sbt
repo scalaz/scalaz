@@ -1,5 +1,7 @@
 import Scalaz._
 
+organization in ThisBuild := "org.scalaz"
+
 publishTo in ThisBuild := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
