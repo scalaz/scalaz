@@ -67,6 +67,12 @@ options:
     - title: List
       url: std/List.html
       menu_section: std
+    - title: Option
+      url: std/Option.html
+      menu_section: std
     - title: Set
       url: std/Set.html
+      menu_section: std
+    - title: Tuple
+      url: std/Tuple.html
       menu_section: std

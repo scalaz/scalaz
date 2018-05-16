@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import scalaz.typeclass.{ EqClass, MonadClass }
+import typeclass.{ EqClass, MonadClass }
 
 trait ListInstances {
   implicit val listMonad: Monad[List] = instanceOf(new MonadClass[List] {

@@ -9,7 +9,7 @@ Scalaz provides instances for Scala's built-in `Either` such as [Monad](../typec
 
 **Typical imports**
 
-```tut:silent_
+```tut:silent
 import scalaz.Scalaz._
 import scalaz.std._
 ```
