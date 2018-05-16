@@ -46,7 +46,19 @@ object Scalaz {
       compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "0.6")
     ),
     incOptions ~= (_.withLogRecompileOnMacro(false))
-  )
+  ) ++ {
+    Seq(packageBin, packageDoc, packageSrc).flatMap {
+      // include LICENSE.txt in all packaged artifacts
+      inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+    }
+  }
+
+  val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+  val findLicense = licenseFile in Global := {
+    val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+    if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+    LICENSE_txt
+  }
 
   implicit class ModuleHelper(p: Project) {
     def module: Project = p.in(file(p.id)).settings(stdSettings(p.id))
