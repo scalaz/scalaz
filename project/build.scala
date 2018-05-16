@@ -246,10 +246,15 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      // TODO scala-js and scalacheck for Scala 2.13
-      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
+      // TODO scalacheck for Scala 2.13
+      releaseStepCommandAndRemaining(
+        s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
           "core", "effect", "iteratee"
-        ).map{ p => s" ${p}JVM/publishSigned " }.mkString(" ; ")
+        ).flatMap{ p =>
+          Seq("JVM", "JS").map{ x =>
+            s" ${p}${x}/publishSigned "
+          }
+        }.mkString(" ; ")
       ),
       setNextVersion,
       setMimaVersion,
