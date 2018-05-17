@@ -5,7 +5,7 @@ title:  "Set"
 
 # Set
 
-Scalaz provides instances for Scala's built-in `Set` such as [Monad](../typeclass/Monad.html) and [Eq](../typeclass/Eq.html).
+Scalaz provides instances for Scala's built-in `Set` such as [Eq](../typeclass/Eq.html).
 
 **Typical imports**
 
@@ -20,9 +20,5 @@ import scalaz.std._
 val set1: Set[Int] = Set(1, 2, 3)
 val set2: Set[Int] = Set(1, 2, 3, 3)
 
-val fs: Set[Int => Int] = Set(_ * 2, _ + 2, _ - 1)
-
 set1 === set2
-
-set1.ap(fs)
 ```
