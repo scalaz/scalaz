@@ -2,7 +2,7 @@ import Scalaz._
 
 lazy val root = project
   .in(file("."))
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, example, benchmarks)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val base = crossProject.module
@@ -52,8 +52,15 @@ lazy val metaJVM = meta.jvm
 
 lazy val metaJS = meta.js
 
+lazy val std = crossProject.module
+  .in(file("std"))
+  .dependsOn(base)
+
+lazy val stdJVM = std.jvm
+lazy val stdJS  = std.js
+
 lazy val example = project.module
-  .dependsOn(baseJVM)
+  .dependsOn(baseJVM, stdJVM)
   .enablePlugins(MicrositesPlugin)
   .settings(
     libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",

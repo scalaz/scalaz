@@ -125,14 +125,24 @@ trait AllInstances
     with data.ForgetInstances
     with data.IdentityInstances
     with data.IListInstances
+    with data.KleisliInstances
     with data.TheseInstances
     with data.UpStarInstances
-    with data.KleisliInstances
+    with std.BooleanInstances
+    with std.ByteInstances
+    with std.DoubleInstances
+    with std.FloatInstances
+    with std.IntInstances
+    with std.LongInstances
+    with std.ShortInstances
+    with std.StringInstances
+    with std.UnitInstances
     with typeclass.BifunctorInstances
     with typeclass.BindInstances
     with typeclass.ChoiceInstances
     with typeclass.CobindInstances
     with typeclass.ComonadInstances
+    with typeclass.DebugInstances
     with typeclass.EqInstances
     with typeclass.FoldableInstances
     with typeclass.IsContravariantInstances
@@ -142,7 +152,6 @@ trait AllInstances
     with typeclass.PhantomInstances
     with typeclass.ProfunctorInstances
     with typeclass.SemigroupInstances
-    with typeclass.DebugInstances
     with typeclass.StrongInstances
     with typeclass.TraversableInstances
 
