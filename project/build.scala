@@ -275,11 +275,20 @@ object build {
         }
         </developers>
       ),
+
+    licenseFile := {
+      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+      LICENSE_txt
+    },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.7",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ SbtOsgi.projectSettings ++ Seq[Sett](
+  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
+    // include LICENSE.txt in all packaged artifacts
+    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
@@ -378,6 +387,8 @@ object build {
         else Nil
     }
   }
+
+  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
