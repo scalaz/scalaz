@@ -25,4 +25,9 @@ val fs: Either[String, Int => Int] = Right(_ * 2)
 either1 === either2
 
 either1.ap(fs)
+
+either2.bimap(
+ left => left.toUpperCase,
+ right => right * 10
+)
 ```

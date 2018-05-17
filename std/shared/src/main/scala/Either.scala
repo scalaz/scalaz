@@ -2,7 +2,7 @@ package scalaz
 package std
 
 import scalaz.core.EqClass
-import scalaz.ct.MonadClass
+import scalaz.ct.{ BifunctorClass, MonadClass }
 
 trait EitherInstances {
   implicit def eitherMonad[L]: Monad[Either[L, ?]] =
@@ -13,6 +13,21 @@ trait EitherInstances {
       def flatten[A](ma: Either[L, Either[L, A]]): Either[L, A]               = ma.flatMap(identity)
       def map[A, B](ma: Either[L, A])(f: A => B): Either[L, B]                = ma.map(f)
     })
+
+  implicit val eitherBifunctor: Bifunctor[Either] = instanceOf(new BifunctorClass[Either] {
+    def bimap[A, B, S, T](fab: Either[A, B])(as: A => S, bt: B => T): Either[S, T] = fab match {
+      case Left(x) => Left(as(x))
+      case Right(x) => Right(bt(x))
+    }
+    def lmap[A, B, S](fab: Either[A, B])(as: A => S): Either[S, B] = fab match {
+      case Left(x) => Left(as(x))
+      case _ => fab.asInstanceOf[Either[S, B]]
+    }
+    def rmap[A, B, T](fab: Either[A, B])(bt: B => T): Either[A, T] = fab match {
+      case Right(x) => Right(bt(x))
+      case _ => fab.asInstanceOf[Either[A, T]]
+    }
+  })
 
   implicit def eitherEq[L, R](implicit X: Eq[L], Y: Eq[R]): Eq[Either[L, R]] =
     instanceOf(new EqClass[Either[L, R]] {
