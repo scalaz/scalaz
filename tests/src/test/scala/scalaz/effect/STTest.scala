@@ -7,6 +7,12 @@ import ST._
 object STTest extends SpecLite {
   type ForallST[A] = Forall[ST[?, A]]
 
+  "STArray#fill" in {
+    val xs = STArray(3, "a")
+    xs.fill[Boolean]((a, b) => a, Vector((1, true)))
+    true
+  }
+
   "STRef" in {
     def e1[S] = for {
       x <- newVar[S](0)

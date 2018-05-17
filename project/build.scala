@@ -118,7 +118,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.6"
-  private def Scala213 = "2.13.0-M4-pre-20d3c21"
+  private def Scala213 = "2.13.0-M4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -246,9 +246,15 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee", "scalacheck-binding_1_14"
-        ).map{ p => s" ${p}JVM/publishSigned " }.mkString(" ; ")
+      // TODO scalacheck for Scala 2.13
+      releaseStepCommandAndRemaining(
+        s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
+          "core", "effect", "iteratee"
+        ).flatMap{ p =>
+          Seq("JVM", "JS").map{ x =>
+            s" ${p}${x}/publishSigned "
+          }
+        }.mkString(" ; ")
       ),
       setNextVersion,
       setMimaVersion,
@@ -296,6 +302,12 @@ object build {
         }
         </developers>
       ),
+
+    licenseFile := {
+      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+      LICENSE_txt
+    },
     // kind-projector plugin
     libraryDependencies ++= (scalaBinaryVersion.value match {
       case "2.10" =>
@@ -306,7 +318,10 @@ object build {
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.6",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ osgiSettings ++ Seq[Sett](
+  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
+    // include LICENSE.txt in all packaged artifacts
+    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  } ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
@@ -389,6 +404,8 @@ object build {
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
+
+  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
   lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 

@@ -53,8 +53,8 @@ matrix:
       - cd kind-projector
       - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
       - cd ..
-      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile concurrent/compile example/compile
-      # TODO scalacheck and scala-js for Scala 2.13.0-M4
+      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile concurrent/compile example/compile coreJS/compile effectJS/compile iterateeJS/compile
+      # TODO scalacheck for Scala 2.13.0-M4
 
 env:
   matrix:
