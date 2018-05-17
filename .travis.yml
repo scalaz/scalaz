@@ -13,3 +13,7 @@ install:
   - gem install jekyll -v 3.8.1
 script:
   - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite publish
+env:
+  global:
+  - secure: C23tA8LtUm60Qf/NB8smS6fsds+H5syr2jRtNN/WxyMyCMDARGy/yw5l6tf8Obt7kJOqlsx5ixZs43NASeji8ZZwMerV/Mf8xSf2+Lp6zhD8FMjtqtdzyEA3xu8I221OV0Q/XTYcbqRM0KSeJCOP3P/Uf7ljhuM6EdyiofcJGZA=
+  - secure: CVxaydpcmwovMCGtao9NPkAIj9axElwJhBb83VCw26r4ek+bNJDmuHTt0kINkGuT6iNj1gDTjnxoU9k4itRhioYbROUEwC7P+YKVG7x6zKsjuflYMfC3s6qIYrl/kTp7GzXdGoQ4khnsNWvpQwdtYn75OfPe5CctUeGBGaf8jpc=
