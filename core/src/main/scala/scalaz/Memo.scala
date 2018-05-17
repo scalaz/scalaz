@@ -91,7 +91,7 @@ object Memo extends MemoInstances {
     * a meaningful `hashCode` and `java.lang.Object.equals`.
     * $immuMapNote
     */
-  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new immutable.HashMap[K, V])
+  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(immutable.HashMap.empty[K, V])
 
   /** Cache results in a tree map. $immuMapNote */
   def immutableTreeMapMemo[K: scala.Ordering, V]: Memo[K, V] = immutableMapMemo(new immutable.TreeMap[K, V])
