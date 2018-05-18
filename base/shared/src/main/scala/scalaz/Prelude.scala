@@ -128,6 +128,7 @@ trait AllInstances
     with data.KleisliInstances
     with data.TheseInstances
     with data.UpStarInstances
+    with data.VoidInstances
     with std.BooleanInstances
     with std.ByteInstances
     with std.DoubleInstances
