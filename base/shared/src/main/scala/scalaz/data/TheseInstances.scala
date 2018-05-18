@@ -6,10 +6,11 @@ import scalaz.typeclass._
 trait TheseInstances {
   implicit def bifunctor: Bifunctor[These] =
     instanceOf(new BifunctorClass[These] {
-      def bimap[A, B, S, T](fab: These[A, B])(as: A => S, bt: B => T) = fab.bimap(as)(bt)
+      val minimal = meta.IsMinimal()
+      override def bimap[A, B, S, T](fab: These[A, B])(as: A => S, bt: B => T) = fab.bimap(as)(bt)
 
-      def lmap[A, B, S](fab: These[A, B])(as: A => S) = fab.lmap(as)
-      def rmap[A, B, T](fab: These[A, B])(bt: B => T) = fab.rmap(bt)
+      override def lmap[A, B, S](fab: These[A, B])(as: A => S) = fab.lmap(as)
+      override def rmap[A, B, T](fab: These[A, B])(bt: B => T) = fab.rmap(bt)
     })
 
   implicit final def theseMonad[L: Semigroup]: Monad[These[L, ?]] =

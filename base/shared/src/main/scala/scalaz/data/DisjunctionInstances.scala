@@ -27,11 +27,13 @@ trait DisjunctionInstances {
     }
 
   implicit val disjunctionBifunctor: Bifunctor[Disjunction] =
-    instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
-      def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
-        case -\/(a) => -\/(as(a))
-        case \/-(b) => \/-(bt(b))
-      }
+    instanceOf(new BifunctorClass[Disjunction] {
+      val minimal = meta.IsMinimal()
+      override def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T =
+        fab match {
+          case -\/(a) => -\/(as(a))
+          case \/-(b) => \/-(bt(b))
+        }
     })
 
   implicit def disjunctionEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[A \/ B] =
