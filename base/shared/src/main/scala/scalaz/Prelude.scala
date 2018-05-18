@@ -21,6 +21,7 @@ trait BaseTypeclasses {
   type Cobind[F[_]]           = InstanceOf[CobindClass[F]]
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
   type Compose[P[_, _]]       = InstanceOf[ComposeClass[P]]
+  type Contravariant[F[_]]    = InstanceOf[ContravariantClass[F]]
   type Debug[A]               = InstanceOf[DebugClass[A]]
   type Eq[A]                  = InstanceOf[EqClass[A]]
   type Foldable[T[_]]         = InstanceOf[FoldableClass[T]]
@@ -30,7 +31,7 @@ trait BaseTypeclasses {
   type IsCovariant[F[_]]      = InstanceOf[IsCovariantClass[F]]
   type Monad[M[_]]            = InstanceOf[MonadClass[M]]
   type Monoid[T]              = InstanceOf[MonoidClass[T]]
-  type Contravariant[F[_]]    = InstanceOf[ContravariantClass[F]]
+  type Ord[T]                 = InstanceOf[OrdClass[T]]
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
@@ -46,6 +47,7 @@ trait BaseTypeclasses {
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
   final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F]                            = F
   final def Compose[P[_, _]](implicit P: Compose[P]): Compose[P]                         = P
+  final def Debug[A](implicit A: Debug[A]): Debug[A]                                     = A
   final def Eq[A](implicit P: Eq[A]): Eq[A]                                              = P
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
   final def Functor[F[_]](implicit F: Functor[F]): Functor[F]                            = F
@@ -54,10 +56,10 @@ trait BaseTypeclasses {
   final def IsCovariant[F[_]](implicit F: IsCovariant[F]): IsCovariant[F]                = F
   final def Monad[M[_]](implicit M: Monad[M]): Monad[M]                                  = M
   final def Monoid[T](implicit T: Monoid[T]): Monoid[T]                                  = T
+  final def Ord[T](implicit T: Ord[T]): Ord[T]                                           = T
   final def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F]                            = F
   final def Profunctor[P[_, _]](implicit P: Profunctor[P]): Profunctor[P]                = P
   final def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T]                         = T
-  final def Debug[A](implicit A: Debug[A]): Debug[A]                                     = A
   final def Strong[P[_, _]](implicit P: Strong[P]): Strong[P]                            = P
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                = T
 }
@@ -87,6 +89,11 @@ trait BaseData {
   val -\/   = data.Disjunction.-\/
   val Empty = data.MaybeImpl.Empty
   val Just  = data.MaybeImpl.Just
+
+  val LT = algebra.LT
+  val GT = algebra.GT
+  val EQ = algebra.EQ
+  type Ordering = algebra.Ordering
 }
 
 trait BaseDataAliases { self: BaseData =>
@@ -165,9 +172,9 @@ trait AllSyntax
     with data.DisjunctionSyntax
     with data.ForallSyntax
     with data.Forall2Syntax
+    with data.KleisliSyntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
-    with data.KleisliSyntax
     with ct.ApplicativeSyntax
     with ct.ApplySyntax
     with ct.BifunctorSyntax
@@ -184,6 +191,7 @@ trait AllSyntax
     with ct.StrongSyntax
     with ct.TraversableSyntax
     with core.EqSyntax
+    with algebra.OrdSyntax
     with algebra.SemigroupSyntax
     with debug.DebugSyntax
 

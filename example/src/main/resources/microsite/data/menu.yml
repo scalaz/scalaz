@@ -28,6 +28,9 @@ options:
     - title: Monoid
       url: typeclass/Monoid.html
       menu_section: typeclass
+    - title: Ord
+      url: typeclass/Ord.html
+      menu_section: typeclass
     - title: Semigroup
       url: typeclass/Semigroup.html
       menu_section: typeclass
