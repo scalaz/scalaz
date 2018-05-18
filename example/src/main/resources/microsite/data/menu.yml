@@ -79,3 +79,6 @@ options:
     - title: Tuple
       url: std/Tuple.html
       menu_section: std
+    - title: Vector
+      url: std/Vector.html
+      menu_section: std
