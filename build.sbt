@@ -2,6 +2,9 @@ import Scalaz._
 
 lazy val root = project
   .in(file("."))
+  .settings(
+    skip in publish := true
+  )
   .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
@@ -31,6 +34,7 @@ lazy val benchmarks = project.module
   .dependsOn(baseJVM, effectJVM)
   .enablePlugins(JmhPlugin)
   .settings(
+    skip in publish := true,
     libraryDependencies ++=
       Seq(
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
@@ -63,6 +67,7 @@ lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
   .enablePlugins(MicrositesPlugin)
   .settings(
+    skip in publish := true,
     libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
