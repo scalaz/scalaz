@@ -237,8 +237,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def length: Int =
     foldLeft(0)((n, _) => n + 1)
 
-  def map[B](f: A => B): IList[B] =
-    foldRight(IList.empty[B])(f(_) :: _)
+  def map[B](f: A => B): IList[B] = reverse.reverseMap(f)
 
   // private helper for mapAccumLeft/Right below
   private[this] def mapAccum[B, C](as: IList[A])(c: C, f: (C, A) => (C, B)): (C, IList[B]) =
@@ -293,11 +292,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def reduceRightOption(f: (A, A) => A): Option[A] =
     reverse.reduceLeftOption((a, b) => f(b, a))
 
-  def reverse: IList[A] =
-    foldLeft(IList.empty[A])((as, a) => a :: as)
+  def reverse: IList[A] = {
+    @tailrec def go(as: IList[A], acc: IList[A]): IList[A] = as match {
+      case c : ICons[_] => go(c.tail, c.head :: acc)
+      case _ : INil[_] => acc
+    }
+    go(this, IList.empty)
+  }
 
-  def reverseMap[B](f: A => B): IList[B] =
-    foldLeft(IList.empty[B])((bs, a) => f(a) :: bs)
+  def reverseMap[B](f: A => B): IList[B] = {
+    @tailrec def go(as: IList[A], acc: IList[B]): IList[B] = as match {
+      case c : ICons[_] => go(c.tail, f(c.head) :: acc)
+      case _ : INil[_] => acc
+    }
+    go(this, IList.empty)
+  }
 
   def reverse_:::(as: IList[A]): IList[A] =
     as.foldLeft(this)((as, a) => a :: as)
