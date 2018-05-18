@@ -477,10 +477,17 @@ final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 object IList extends IListInstances {
   private[this] val nil: IList[Nothing] = INil()
 
+  // optimised versions of apply(A*)
+  @inline final def apply[A](a: A, b: A): IList[A] = a :: single(b)
+  @inline final def apply[A](a: A, b: A, c: A): IList[A] = a :: apply(b, c)
+  @inline final def apply[A](a: A, b: A, c: A, d: A): IList[A] = a :: apply(b, c, d)
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): IList[A] = a :: apply(b, c, d, e)
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): IList[A] = a :: apply(b, c, d, e, f)
+
   def apply[A](as: A*): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
-  def single[A](a: A): IList[A] =
+  @inline final def single[A](a: A): IList[A] =
     ICons(a, empty)
 
   def empty[A]: IList[A] =
