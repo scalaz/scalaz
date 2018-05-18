@@ -16,16 +16,16 @@ trait EitherInstances {
 
   implicit val eitherBifunctor: Bifunctor[Either] = instanceOf(new BifunctorClass[Either] {
     def bimap[A, B, S, T](fab: Either[A, B])(as: A => S, bt: B => T): Either[S, T] = fab match {
-      case Left(x) => Left(as(x))
+      case Left(x)  => Left(as(x))
       case Right(x) => Right(bt(x))
     }
     def lmap[A, B, S](fab: Either[A, B])(as: A => S): Either[S, B] = fab match {
       case Left(x) => Left(as(x))
-      case _ => fab.asInstanceOf[Either[S, B]]
+      case _       => fab.asInstanceOf[Either[S, B]]
     }
     def rmap[A, B, T](fab: Either[A, B])(bt: B => T): Either[A, T] = fab match {
       case Right(x) => Right(bt(x))
-      case _ => fab.asInstanceOf[Either[A, T]]
+      case _        => fab.asInstanceOf[Either[A, T]]
     }
   })
 
@@ -35,6 +35,15 @@ trait EitherInstances {
         case (Left(x), Left(y))   => X.equal(x, y)
         case (Right(x), Right(y)) => Y.equal(x, y)
         case _                    => false
+      }
+    })
+
+  // FIXME: https://github.com/scalaz/scalaz/pull/1633
+  implicit def eitherDebug[L, R](implicit X: Debug[L], Y: Debug[R]): Debug[Either[L, R]] =
+    instanceOf(new DebugClass[Either[L, R]] {
+      override def debug(e: Either[L, R]): String = e match {
+        case Left(x)  => "Left(" + X.debug(x) + ")"
+        case Right(y) => "Right(" + Y.debug(y) + ")"
       }
     })
 }

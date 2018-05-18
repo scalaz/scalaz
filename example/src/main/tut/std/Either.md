@@ -30,4 +30,7 @@ either2.bimap(
  left => left.toUpperCase,
  right => right * 10
 )
+
+either1.debug
+either2.debug
 ```
