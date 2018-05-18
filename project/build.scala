@@ -139,7 +139,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
+    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M4"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.0",
@@ -299,7 +299,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
@@ -331,7 +330,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -346,7 +344,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)

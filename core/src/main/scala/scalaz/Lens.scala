@@ -468,16 +468,16 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem1 + elem2 ++ elems)
 
     def ++=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ ++ xs)
+      lens %= (_ ++ xs.toIterable)
 
     def -=(elem: K): IndexedState[S1, S2, Set[K]] =
       lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ - elem1 - elem2 -- elems)
+      lens %= (_ - elem1 - elem2 diff elems.toSet)
 
     def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ -- xs)
+      lens %= (_ diff xs.toSet)
   }
 
   /** A lens that views a Set can provide the appearance of in place mutation */
@@ -507,7 +507,7 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem)
 
     def ++=(xs: TraversableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
-      lens %= (_ ++ xs)
+      lens %= (_ ++ xs.toIterable)
 
     def update(key: K, value: V): IndexedState[S1, S2, Unit] =
       lens %== (_.updated(key, value))
