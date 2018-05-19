@@ -306,11 +306,12 @@ sealed abstract class \/[A, B] extends Product with Serializable {
       }
     }
 
+  import syntax.show._
   /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
     this match {
-      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a) :- ')'
-      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
+      case -\/(a) => cord"-\\/(${SA.show(a)})"
+      case \/-(b) => cord"\\/-(${SB.show(b)})"
     }
 
   /** Convert to a Validation. */

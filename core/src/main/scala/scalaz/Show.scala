@@ -8,8 +8,8 @@ package scalaz
 ////
 trait Show[F]  { self =>
   ////
-  def show(f: F): Cord = Cord(shows(f))
-  def shows(f: F): String = show(f).toString
+  def show(f: F): Cord
+  def shows(f: F): String = show(f).shows
 
   // derived functions
   ////
@@ -22,6 +22,7 @@ object Show {
   ////
 
   def showFromToString[A]: Show[A] = new Show[A] {
+    override def show(f: A): Cord = Cord(shows(f))
     override def shows(f: A): String = f.toString
   }
 
@@ -33,6 +34,7 @@ object Show {
   }
 
   def shows[A](f: A => String): Show[A] = new Show[A] {
+    override def show(f: A): Cord = Cord(shows(f))
     override def shows(a: A): String = f(a)
   }
 

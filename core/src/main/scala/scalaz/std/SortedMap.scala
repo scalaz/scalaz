@@ -115,11 +115,13 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
       override def O = K
     }
 
-  implicit def sortedMapShow[K, V](implicit K: Show[K], V: Show[V]): Show[SortedMap[K, V]] =
-    Show.show(m => "SortedMap[" +:
-                Cord.mkCord(", ", m.toSeq.map{
-                  case (k, v) => Cord(K show k, "->", V show v)
-                }: _*) :+ "]")
+  implicit def sortedMapShow[K, V](implicit K: Show[K], V: Show[V]): Show[SortedMap[K, V]] = Show.show { m =>
+      import list.listInstance
+      import scalaz.syntax.show._
+      val els = m.toList.map { case (k, v) => cord"$k -> $v" }
+      val content = Foldable[List].intercalate(els, Cord(","))
+      cord"SortedMap[$content]"
+    }
 
   implicit def sortedMapOrder[K: Order, V: Order]: Order[SortedMap[K, V]] =
     new Order[SortedMap[K, V]] with SortedMapEqual[K, V] {

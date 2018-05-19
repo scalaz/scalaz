@@ -111,10 +111,14 @@ trait MapInstances extends MapInstances0 with MapFunctions {
     }
 
   implicit def mapShow[K, V](implicit K: Show[K], V: Show[V]): Show[Map[K, V]] =
-    Show.show(m => "Map[" +:
-                Cord.mkCord(", ", m.toSeq.map{
-                  case (k, v) => Cord(K show k, "->", V show v)
-                }: _*) :+ "]")
+    Show.show { m =>
+      import list.listInstance
+      import scalaz.syntax.show._
+
+      val els = m.toList.map { case (k, v) => cord"$k -> $v" }
+      val content = Foldable[List].intercalate(els, Cord(","))
+      cord"Map[$content]"
+    }
 
   implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] =
     new Order[Map[K, V]] with MapEqual[K, V] {

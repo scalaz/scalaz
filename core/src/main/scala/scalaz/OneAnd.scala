@@ -288,11 +288,10 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
       def F = implicitly
     }
 
-  implicit def oneAndShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OneAnd[F, A]] =
-    new Show[OneAnd[F, A]] {
-      override def show(f: OneAnd[F, A]) =
-        Cord("OneAnd(", A.show(f.head), ",", FA.show(f.tail), ")")
-    }
+  implicit def oneAndShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OneAnd[F, A]] = {
+    import scalaz.syntax.show._
+    Show.show { f => cord"OneAnd(${f.head},${f.tail})" }
+  }
 
   implicit def oneAndOrder[F[_], A](implicit A: Order[A], FA: Order[F[A]]): Order[OneAnd[F, A]] =
     new Order[OneAnd[F, A]] with OneAndEqual[F, A] {

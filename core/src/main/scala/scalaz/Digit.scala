@@ -144,6 +144,7 @@ sealed abstract class DigitInstances {
 
     override def max = Some(Digit._9)
 
+    override def show(f: Digit): Cord = Cord(shows(f))
     override def shows(f: Digit) = f.toChar.toString
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)
     override def equal(x: Digit, y: Digit): Boolean = x == y

@@ -432,13 +432,11 @@ sealed abstract class ZipperInstances {
       streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
   }
 
-  implicit def zipperShow[A: Show]: Show[Zipper[A]] = new Show[Zipper[A]]{
+  implicit def zipperShow[A: Show]: Show[Zipper[A]] = Show.show { f =>
     import std.stream._
-
-    override def show(f: Zipper[A]) =
-      Cord("Zipper(",
-        Show[Stream[A]].show(f.lefts), ", ",
-        Show[A].show(f.focus), ", ",
-        Show[Stream[A]].show(f.rights), ")")
+    import syntax.show._
+    val left = Show[Stream[A]].show(f.lefts)
+    val right = Show[Stream[A]].show(f.rights)
+    cord"Zipper($left,${f.focus},$right)"
   }
 }

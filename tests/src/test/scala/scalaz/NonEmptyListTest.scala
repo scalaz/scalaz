@@ -94,6 +94,12 @@ object NonEmptyListTest extends SpecLite {
     xs.zipWithIndex.list must_== xs.list.zipWithIndex
   }
 
+  "show should look like IList" in {
+    import scalaz.syntax.show._
+
+    NonEmptyList(1, 2, 3).shows.must_===("[1,2,3]")
+  }
+
   "psumMap should be lazy" in {
     import scalaz.syntax.either._
     import scalaz.syntax.foldable1._

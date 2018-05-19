@@ -9,6 +9,7 @@ import Id._
 trait AnyValInstances {
 
   implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
+    override def show(f: Unit): Cord = Cord()
     override def shows(f: Unit) = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
@@ -35,6 +36,7 @@ trait AnyValInstances {
   import Tags.{Conjunction, Disjunction}
 
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
+    override def show(f: Boolean): Cord = Cord(shows(f))
     override def shows(f: Boolean) = f.toString
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -144,6 +146,7 @@ trait AnyValInstances {
   }
 
   implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
+    override def show(f: Byte): Cord = Cord(shows(f))
     override def shows(f: Byte) = f.toString
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
@@ -188,6 +191,7 @@ trait AnyValInstances {
   }
 
   implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
+    override def show(f: Char): Cord = Cord(shows(f))
     override def shows(f: Char) = f.toString
 
     def append(f1: Char, f2: => Char) = (f1 + f2).toChar
@@ -229,6 +233,7 @@ trait AnyValInstances {
   }
 
   implicit val shortInstance: Monoid[Short] with Enum[Short] with Show[Short] = new Monoid[Short] with Enum[Short] with Show[Short] {
+    override def show(f: Short): Cord = Cord(shows(f))
     override def shows(f: Short) = f.toString
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
@@ -268,6 +273,7 @@ trait AnyValInstances {
   }
 
   implicit val intInstance: Monoid[Int] with Enum[Int] with Show[Int] = new Monoid[Int] with Enum[Int] with Show[Int] {
+    override def show(f: Int): Cord = Cord(shows(f))
     override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
@@ -323,6 +329,7 @@ trait AnyValInstances {
   }
 
   implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
+    override def show(f: Long): Cord = Cord(shows(f))
     override def shows(f: Long) = f.toString
 
     def append(f1: Long, f2: => Long) = f1 + f2
@@ -362,6 +369,7 @@ trait AnyValInstances {
   }
 
   implicit val floatInstance: Order[Float] with Show[Float] = new Order[Float] with Show[Float] {
+    override def show(f: Float): Cord = Cord(shows(f))
     override def shows(f: Float) = f.toString
 
     override def equalIsNatural: Boolean = true
@@ -370,6 +378,7 @@ trait AnyValInstances {
   }
 
   implicit val doubleInstance: Order[Double] with Show[Double] = new Order[Double] with Show[Double] {
+    override def show(f: Double): Cord = Cord(shows(f))
     override def shows(f: Double) = f.toString
 
     override def equalIsNatural: Boolean = true

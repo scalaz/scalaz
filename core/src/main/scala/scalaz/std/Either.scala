@@ -97,10 +97,11 @@ trait EitherInstances extends EitherInstances0 {
 
   }
 
-  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = new Show[Either[A,B]] {
-    override def show(f: Either[A, B]): Cord = f match {
-      case Left(a) => ("Left(" : Cord) ++ SA.show(a) :- ')'
-      case Right(b) => ("Right(" : Cord) ++ SB.show(b) :- ')'
+  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Left(a) => cord"Left($a)"
+      case Right(b) => cord"Right($b)"
     }
   }
 }

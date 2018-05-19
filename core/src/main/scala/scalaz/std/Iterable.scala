@@ -5,8 +5,8 @@ import collection.immutable.Seq
 
 trait IterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
+  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = Show.show {
+    as => list.listShow[A].show(as.toList)
   }
 
   /** Lexicographical ordering */
