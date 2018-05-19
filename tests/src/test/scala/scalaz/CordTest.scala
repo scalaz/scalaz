@@ -1,14 +1,22 @@
 package scalaz
 
 import org.scalacheck.{ Arbitrary, Gen }
-import scalaz.scalacheck.ScalazProperties._
+import org.scalacheck.Prop.forAll
 
+import scalaz.scalacheck.ScalazProperties._
 import scalaz.syntax.enum._
 import scalaz.syntax.monoid._
 import scalaz.std.anyVal._
 import scalaz.std.string._
 
 object CordTest extends SpecLite {
+
+  ".toString should be .shows" ! forAll { c: Cord =>
+    // potentially flushes out a bunch of problems, but the cords aren't that
+    // big so don't expect it to catch any stack overflow bugs.
+    c.shows.must_===(c.toString)
+  }
+
   ":: cons must produce the correct output" in {
     (Cord("hello") :: Cord(" ") :: Cord("world")).shows.must_===("hello world")
   }
@@ -17,14 +25,16 @@ object CordTest extends SpecLite {
     (Cord("hello") ++ Cord(" ") ++ Cord("world")).shows.must_===("hello world")
   }
 
-  ".toString must produce expected output" in {
-    val lefts = (0 |-> 9).foldLeft(Cord())((acc, i) => acc |+| Cord(i.toString))
-    lefts.toString.must_===(lefts.shows)
-    lefts.toString.must_===("0123456789")
+  ".shows must produce expected output" in {
+    val nums = (0 |-> 9).map(_.toString)
 
-    val rights = (0 |-> 9).foldRight(Cord())((i, acc) => Cord(i.toString) |+| acc)
-    rights.toString.must_===(rights.shows)
-    rights.toString.must_===(lefts.toString)
+    val lefts = nums.foldLeft(Cord())((acc, i) => acc |+| Cord(i))
+    lefts.shows.must_===(lefts.shows)
+    lefts.shows.must_===("0123456789")
+
+    val rights = nums.foldRight(Cord())((i, acc) => Cord(i) |+| acc)
+    rights.shows.must_===(rights.shows)
+    rights.shows.must_===(lefts.shows)
   }
 
   ".shows must be stack safe" in {
@@ -92,20 +102,22 @@ $b
     }
   }
 
-  // avoid stack overflows...
-  def fallback(c: Cord, backup: Cord.Leaf): Cord = c match {
-    case Cord.Branch(d, _, _) if d >= 5 => backup
-    case _ => c
-  }
-  lazy val genLeaf = for {
-    str <- Arbitrary.arbitrary[String]
+  // the Arbitrary is very limited in the shapes it can create, to avoid stack
+  // overflows when generating the recursive data... *sigh*
+  lazy val genLeaf: Gen[Cord.Leaf] = for {
+    str <- Gen.alphaNumStr
   } yield Cord.Leaf(str)
-  lazy val genBranch = for {
-    backup1 <- genLeaf
-    backup2 <- genLeaf
-    left <- genCord
-    right <- genCord
-  } yield Cord.Branch(fallback(left, backup1), fallback(right, backup2))
+  lazy val genLeft: Gen[Cord] = for {
+    left <- genLeaf
+    right <- genLeaf
+  } yield Cord.Branch(left, right)
+  lazy val genRight: Gen[Cord] = Gen.listOf(genLeft).map { cs =>
+    cs.foldRight(Cord())((i, acc) => i |+| acc)
+  }
+  lazy val genBranch: Gen[Cord] = for {
+    left <- Gen.oneOf(genLeft, genLeaf)
+    right <- Gen.oneOf(genRight, genLeaf)
+  } yield Cord.Branch(left, right)
   lazy val genCord: Gen[Cord] = Gen.oneOf(genLeaf, genBranch)
 
   implicit def ArbitraryCord: Arbitrary[Cord] = Arbitrary(genCord)
