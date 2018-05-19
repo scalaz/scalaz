@@ -685,9 +685,9 @@ private object RTS {
                       value.register { (v: ExitResult[E, Any]) =>
                         k(ExitResult.Completed(v))
                       } match {
-                        case Async.Now(v)           => Async.Now(ExitResult.Completed(v))
-                        case Async.MaybeLater(c)    => Async.MaybeLater(c)
-                        case Async.MaybeLaterIO(c)  => Async.MaybeLaterIO(c)
+                        case Async.Now(v)          => Async.Now(ExitResult.Completed(v))
+                        case Async.MaybeLater(c)   => Async.MaybeLater(c)
+                        case Async.MaybeLaterIO(c) => Async.MaybeLaterIO(c)
                       }
                     }
                 }
