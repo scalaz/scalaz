@@ -1,49 +1,105 @@
 package scalaz
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.{ Arbitrary, Gen }
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
-import Cord._
-import org.scalacheck.Prop.forAll
+
+import scalaz.syntax.enum._
+import scalaz.std.anyVal._
+import scalaz.std.string._
 
 object CordTest extends SpecLite {
-  "split() must result in two cords whose summary length is equal to the length of original cord " in {
-    val x = Cord("Once upon a midnight dreary")
-    for (i <- 0 until x.length) {
-      val split = x split i
-      split._1.length + split._2.length must_== x.length
+  ".toString must produce expected output" in {
+    val lefts = (0 |-> 9).foldLeft(Cord())((acc, i) => acc ++ Cord(i.toString))
+    lefts.toString.must_===(lefts.shows)
+    lefts.toString.must_===("0123456789")
+
+    val rights = (0 |-> 9).foldRight(Cord())((i, acc) => Cord(i.toString) ++ acc)
+    rights.toString.must_===(rights.shows)
+    rights.toString.must_===(lefts.toString)
+  }
+
+  ".shows must be stack safe" in {
+    val nums = (1 |-> 99999).map(_.toString)
+    val lefts = nums.foldLeft(Cord())((acc, i) => acc ++ Cord(i))
+    lefts.shows.length.must_===(488889)
+
+    // it's ok to change these assertions if you optimise the representation, so
+    // long as they are asserting the expectation that foldLeft / foldRight
+    // produce expected structures, and that you've stressed tested stack safety
+    // with any new corner cases that your repr may be susceptible to. This
+    // level of detail is not exposed to the public API.
+
+    lefts match {
+      case Cord.Branch(8, _, Cord.Leaf("99999")) =>
+      case Cord.Branch(x, _, _) => fail(s"lefts: unexpected depth $x")
+      case _ => fail("lefts: unexpected leaf")
+    }
+
+    val rights = nums.foldRight(Cord())((i, acc) => Cord(i) ++ acc)
+
+    // prefer minimal error output when these fail, otherwise they spam the buffer
+    assert(rights.shows == lefts.shows)
+    assert(lefts === rights)
+
+    rights match {
+      case Cord.Branch(1, Cord.Leaf("1"), _) =>
+      case Cord.Branch(x, _, _) => fail(s"rights: unexpected depth $x")
+      case _ => fail("rights: unexpected leaf")
     }
   }
 
-  "drop() must make cord shorter" in {
-    val theString = "While I pondered, weak and weary"
-    val x = Cord(theString)
-    for (i <- 0 until x.length) {
-      val y = x drop i
-      y.toString must_== theString.substring(i)
+  "cord interpolator should produce expected Cords" in {
+    import scalaz.syntax.show._
+
+    // trivial strings
+    cord"hello".shows.must_===("hello")
+
+    // interpolate Cord values
+    {
+      val a = Cord("hello")
+      val b = Cord("world")
+      cord"$a $b".shows.must_===("hello world")
+    }
+
+    // interpolate via Show instances
+    {
+      val a = "hello"
+      val b = "world"
+      cord"$a $b".shows.must_===("\"hello\" \"world\"")
+      cord" $a $b ".shows.must_===(" \"hello\" \"world\" ")
+    }
+
+    // handle escape characters
+    {
+      val a = "hello"
+      val b = "world"
+      cord"$a\n$b".shows.must_===("\"hello\"\n\"world\"")
+
+      cord"""
+$a
+
+$b
+""".shows.must_===("\n\"hello\"\n\n\"world\"\n")
     }
   }
 
-  "tail() must be smaller than the whole, generally" in {
-    val x = Cord("abc")
-    x.tail.toString must_== "bc"
-    x.tail.tail.toString must_== "c"
-    x.tail.tail.tail.toString must_== ""
+  // avoid stack overflows...
+  def fallback(c: Cord, backup: Cord.Leaf): Cord = c match {
+    case Cord.Branch(d, _, _) if d >= 5 => backup
+    case _ => c
   }
+  lazy val genLeaf = for {
+    str <- Arbitrary.arbitrary[String]
+  } yield Cord.Leaf(str)
+  lazy val genBranch = for {
+    backup1 <- genLeaf
+    backup2 <- genLeaf
+    left <- genCord
+    right <- genCord
+  } yield Cord.Branch(fallback(left, backup1), fallback(right, backup2))
+  lazy val genCord: Gen[Cord] = Gen.oneOf(genLeaf, genBranch)
 
-  "isEmpty() must indicate string is empty" ! forAll { (a:Cord, b:Cord) =>
-    a.isEmpty == a.toString.isEmpty &&
-    b.isEmpty == b.toString.isEmpty &&
-    (a ++ b).isEmpty == (a.toString.isEmpty && b.toString.isEmpty)
-  }
-
-  "nonEmpty() must indicate string is non-empty" ! forAll { (a:Cord, b:Cord) =>
-    a.nonEmpty == !a.toString.isEmpty &&
-    b.nonEmpty == !b.toString.isEmpty &&
-    (a ++ b).nonEmpty == (!a.toString.isEmpty || !b.toString.isEmpty)
-  }
-
-  implicit def ArbitraryCord: Arbitrary[Cord] = Functor[Arbitrary].map(implicitly[Arbitrary[String]])(Cord.stringToCord)
+  implicit def ArbitraryCord: Arbitrary[Cord] = Arbitrary(genCord)
 
   checkAll(monoid.laws[Cord])
   checkAll(equal.laws[Cord])

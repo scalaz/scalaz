@@ -1,163 +1,133 @@
 package scalaz
 
-import std.anyVal._
-import std.vector._
-import std.string._
+import scala.annotation.tailrec
 
 /**
- * A `Cord` is a purely functional data structure for efficiently
- * storing and manipulating `String`s that are potentially very long.
- * Very similar to `Rope[Char]`, but with better constant factors and a
- * simpler interface since it's specialized for `String`s.
+ * A `Cord` is a purely functional data structure for efficiently creating a
+ * `String` from smaller parts, useful for printing ADTs that must write out
+ * their contents into a text format.
+ *
+ * A `z` interpolator is available for building `String` from literals, using
+ * the `Show` typeclass to populate each "hole", and a `cord` interpolator
+ * for building `Cord` instances.
+ *
+ * If a more efficient solution is required to write a large `String` to a
+ * network socket or file, consider https://github.com/scalaz/scalaz/issues/1797
+ *
+ * If you require a general text manipulation data structure, consider using
+ * `Cord` or creating a custom structure to resemble that used by the popular
+ * text editors:
+ *
+ * - https://ecc-comp.blogspot.co.uk/2015/05/a-brief-glance-at-how-5-text-editors.html
+ * - https://pavelfatin.com/typing-with-pleasure/
  */
-final case class Cord(self: FingerTree[Int, String]) {
+sealed abstract class Cord {
+  /** LEGACY: scalaz <= 7.2 users expect toString to return the underlying String */
+  override final def toString: String = shows
 
-  import Cord.{stringToCord => _, _}
+  /** Evaluates and stores the String represented by this, returning an equivalent Cord. */
+  final def reset: Cord = Cord.Leaf(shows)
 
-  private def rangeError(i: Int) = sys.error("Index out of range: " + i + " >= " + self.measure)
-
-  /**
-    * Returns the character at the given position. Throws an error if the index is out of range.
-    * Time complexity: O(log N)
-    */
-  def apply(i: Int): Char = {
-    val (a, b) = self.split(_ > i)
-    b.viewl.headOption.map(_(i - a.measure)).getOrElse(rangeError(i))
+  /** Explicitly construct the output String represented by this Cord */
+  final def shows: String = this match {
+    case Cord.Leaf(str) => str
+    case _ =>
+      val sb = new StringBuilder
+      Cord.unsafeAppendTo(this, sb)
+      sb.toString
   }
 
-  /**
-   * Splits this `Cord` in two at the given position.
-   * Time complexity: O(log N)
-   */
-  def split(i: Int): (Cord, Cord) = {
-    val (l, mid, r) = self.split1(_ > i)
-    val (midl, midr) = mid.splitAt(i - l.measure)
-    (cord(l :+ midl), cord(midr +: r))
-  }
+  // Before adding any methods to this class, please consider if they can be
+  // reasonably implemented with future, optimised, representations of Cord. The
+  // purpose of this class is to generate Strings as fast as possible, not a
+  // general text manipulation structure. For example, a previous version used
+  // FingerTree, and many methods were added. But FingerTree was very
+  // inefficient at creating Strings yet we could not fix these performance
+  // problems because of the need for backcompatibility.
 
-  /**
-   * Returns the number of characters in this `Cord`.
-   * Time complexity: O(1)
-   */
-  def length: Int = self.measure
-
-  /**
-   * Returns the number of characters in this `Cord`.
-   * Time complexity: O(1)
-   */
-  def size: Int = self.measure
-
-  /**
-   * Appends another `Cord` to the end of this one.
-   * Time complexity: O(log (min N M)) where M and N are the lengths of the two `Cord`s.
-   */
-  def ++(xs: Cord): Cord = cord(self <++> xs.self)
-
-  /**
-   * Appends a `String` to the end of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def :+(x: => String): Cord = cord(self :+ x)
-
-  /**
-   * Prepends a `String` to the beginning of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def +:(x: String): Cord = cord(x +: self)
-
-  /**
-   * Prepends a `Char` to the beginning of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def -:(x: Char): Cord = cord(String.valueOf(x) +: self)
-
-  /**
-   * Appends a `Char` to the end of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def :-(x: => Char): Cord = cord(self :+ String.valueOf(x))
-
-  /**
-   * Removes the first character of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def tail: Cord = drop(1)
-
-  /**
-   * Removes the last character of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def init: Cord = take(self.measure - 1)
-
-  /**
-   * Removes the first `n` characters from the front of this `Cord`.
-   * Time complexity: O(min N (N - n))
-   */
-  def drop(n: Int): Cord = split(n)._2
-
-  /**
-   * Returns the first `n` characters at the front of this `Cord`.
-   * Time complexity: O(min N (N - n))
-   */
-  def take(n: Int): Cord = split(n)._1
-
-  /**
-   * Modifies each character in this `Cord` by the given function.
-   * Time complexity: O(N)
-   */
-  def map(f: Char => Char): Cord = cord(self map (_ map f))
-
-  def toList: List[Char] = toVector.toList
-  def toStream: Stream[Char] = toVector.toStream
-  def toVector: Vector[Char] = self.foldMap(_.toVector)
-  override def toString: String = {
-    val sb = new java.lang.StringBuilder(self.measure)
-    self.foreach { x =>
-      val _ = sb append x
-    }
-    sb.toString
-  }
-
-  /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
-  def flatMap(f: Char => Cord): Cord = toVector.foldLeft(Cord())((as, a) => as ++ f(a))
-
-  /** Returns whether this `Cord` will expand to an empty string. */
-  def isEmpty: Boolean = !nonEmpty
-
-  /** Returns whether this `Cord` will expand to a non-empty string. */
-  def nonEmpty: Boolean = self.iterator.exists(_.nonEmpty)
+  /** Strict evaluation variant of Monoid.append */
+  final def ++(o: Cord): Cord = Cord.Branch(this, o)
 }
-
 object Cord {
-  private def cord[A](v: FingerTree[Int, String]): Cord = new Cord(v)
+  def apply(s: String): Cord = Leaf.apply(s)
+  def apply(): Cord = Leaf.Empty
 
-  implicit def stringToCord(s: String): Cord = cord(FingerTree.single[Int, String](s))
-
-  lazy val empty: Cord = apply()
-
-  def apply(as: Cord*): Cord = as.foldLeft(cord(FingerTree.empty))(_ ++ _)
-
-  def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String])((x, y) => x :+ y))
-
-  implicit val sizer: Reducer[String, Int] = UnitReducer((a: String) => a.length)
-
-  def mkCord(sep: Cord, as: Cord*): Cord =
-    if (!as.isEmpty)
-      as.tail.foldLeft(as.head)(_ ++ sep ++ _)
-    else
-      Cord()
-
-  implicit val CordShow: Show[Cord] = new Show[Cord] {
-    override def show(x: Cord) = x
-    override def shows(x: Cord) = x.toString
+  private[scalaz] final case class Leaf private (
+    s: String
+  ) extends Cord
+  private[scalaz] object Leaf {
+    val Empty: Leaf = new Leaf("")
+    def apply(s: String): Leaf =
+      if (s.isEmpty) Empty
+      else new Leaf(s)
   }
 
-  implicit val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
-    def zero = empty
-    def append(x: Cord, y: => Cord) = x ++ y
+  private[scalaz] final case class Branch private (
+    leftDepth: Int,
+    left: Cord,
+    right: Cord
+  ) extends Cord
+
+  // Limiting the depth of a branch ensures we don't get stack overflows, at the
+  // cost of forcing some intermediate strings.
+  //
+  // However, repeated monoidic appends (e.g. foldLeft and fold) produce large
+  // LEFT legs that we cannot tail recurse down. Prefer foldRight (or
+  // intercalate) when creating Cord instances for collections.
+  private[scalaz] object Branch {
+    val max: Int = 100
+    def apply(a: Cord, b: Cord): Cord = {
+      // avoid constructing a Branch with empty leafs, otherwise Monoid.zero is
+      // degenerate over the empty string.
+      if (a == Leaf.Empty) b
+      else if (b == Leaf.Empty) a
+      else a match {
+        case _: Leaf =>
+          Branch(1, a, b)
+        case a: Branch =>
+          val branch = Branch(a.leftDepth + 1, a, b)
+          if (a.leftDepth >= max)
+            branch.reset
+          else
+            branch
+      }
+    }
   }
 
-  implicit val CordEqual: Equal[Cord] = new Equal[Cord] {
-    def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
+  implicit val monoid: Monoid[Cord] = new Monoid[Cord] {
+    def zero: Cord                         = Leaf.Empty
+    def append(f1: Cord, f2: =>Cord): Cord = Branch(f1, f2)
   }
+
+  implicit val show: Show[Cord] = Show.show(identity)
+  implicit val equal: Equal[Cord] = Equal.equal((a, b) => a.shows == b.shows)
+
+  final class CordInterpolator(private val sc: StringContext) extends AnyVal {
+    def cord(args: CordInterpolator.Cords*): Cord = {
+      import StringContext.treatEscapes
+      val strings = IList(sc.parts: _*).map(s => Cord(treatEscapes(s)))
+      val cords   = IList(args: _*).map(_.cord)
+      strings.interleave(cords).foldRight(Cord())((c, acc) => c ++ acc)
+    }
+  }
+  object CordInterpolator {
+    // the interpolator takes Cords (not Cord) which allows us to restrict the
+    // implicit materialisation of Cord (from Show instances) to this usecase.
+    final class Cords private (val cord: Cord) extends AnyVal
+    object Cords {
+      implicit def trivial(c: Cord): Cords   = new Cords(c)
+      implicit def mat[A: Show](a: A): Cords = new Cords(Show[A].show(a))
+    }
+  }
+
+  @tailrec private def unsafeAppendTo(c: Cord, sb: StringBuilder): Unit = c match {
+    case Branch(_, a, b) =>
+      unsafeAppendTo_(a, sb) // not tail recursive, left legs need to be capped
+      unsafeAppendTo(b, sb) // tail recursive, right legs can be arbitrarilly long
+    case Leaf(s) =>
+      val _ = sb.append(s)
+  }
+  // breaks out of the tail recursion
+  private[this] def unsafeAppendTo_(c: Cord, sb: StringBuilder): Unit = unsafeAppendTo(c, sb)
+
 }
