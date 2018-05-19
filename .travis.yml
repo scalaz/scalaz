@@ -49,10 +49,6 @@ matrix:
     - scala: 2.13.0-M4
       jdk: oraclejdk8
       script:
-      - git clone -b v0.9.6 https://github.com/non/kind-projector.git
-      - cd kind-projector
-      - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
-      - cd ..
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile concurrent/compile example/compile coreJS/compile effectJS/compile iterateeJS/compile
       # TODO scalacheck for Scala 2.13.0-M4
 
