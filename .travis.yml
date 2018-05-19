@@ -39,9 +39,8 @@ matrix:
   include:
   - scala: 2.13.0-M4
     script:
-    - sbt "++${TRAVIS_SCALA_VERSION}!" example/compile # coreJS/compile effectJS/compile iterateeJS/compile
+    - sbt "++${TRAVIS_SCALA_VERSION}!" example/compile coreJS/compile effectJS/compile iterateeJS/compile
     # TODO scalacheck for Scala 2.13.0-M4
-    # TODO https://github.com/scala-js/scala-js-java-time/issues/45
   - scala: 2.12.6
     jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"
