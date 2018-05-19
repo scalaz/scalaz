@@ -521,7 +521,9 @@ private object RTS {
 
                           eval = false
 
-                        case Async.Later() =>
+                        case Async.MaybeLaterIO(cancelerIo) =>
+                          awaitAsync(id, th => rts.submit(rts.unsafePerformIO(cancelerIo(th))))
+
                           eval = false
                       }
                     } finally enterAsyncEnd()
@@ -680,9 +682,9 @@ private object RTS {
                       value.register { (v: ExitResult[E, Any]) =>
                         k(ExitResult.Completed(v))
                       } match {
-                        case Async.Now(v)        => Async.Now(ExitResult.Completed(v))
-                        case Async.MaybeLater(c) => Async.MaybeLater(c)
-                        case Async.Later()       => Async.Later()
+                        case Async.Now(v)           => Async.Now(ExitResult.Completed(v))
+                        case Async.MaybeLater(c)    => Async.MaybeLater(c)
+                        case Async.MaybeLaterIO(c)  => Async.MaybeLaterIO(c)
                       }
                     }
                 }
@@ -808,14 +810,17 @@ private object RTS {
             raceCallback[A, C](k, state, leftWins)(tryA)
           case Async.MaybeLater(cancel) =>
             c1 = cancel
-          case Async.Later() =>
+          case Async.MaybeLaterIO(cancelIo) =>
+            c1 = th => rts.submit(rts.unsafePerformIO(cancelIo(th)))
         }
 
         right.register(raceCallback[B, C](k, state, rightWins)) match {
-          case Async.Now(tryA) => raceCallback[B, C](k, state, rightWins)(tryA)
+          case Async.Now(tryA) =>
+            raceCallback[B, C](k, state, rightWins)(tryA)
           case Async.MaybeLater(cancel) =>
             c2 = cancel
-          case _ =>
+          case Async.MaybeLaterIO(cancelIo) =>
+            c2 = th => rts.submit(rts.unsafePerformIO(cancelIo(th)))
         }
 
         val canceler = combineCancelers(c1, c2)
