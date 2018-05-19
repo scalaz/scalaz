@@ -45,7 +45,13 @@ sealed abstract class Cord {
   // inefficient at creating Strings yet we could not fix these performance
   // problems because of the need for backcompatibility.
 
-  /** Strict evaluation variant of Monoid.append */
+  /**
+   * Strict evaluation variant of `Monoid.append` that associates to the right,
+   * therefore building more optimal data structures.
+   */
+  final def ::(o: Cord): Cord = Cord.Branch(o, this)
+
+  /** Strict evaluation variant of `Monoid.append`. */
   final def ++(o: Cord): Cord = Cord.Branch(this, o)
 }
 object Cord {
@@ -73,7 +79,8 @@ object Cord {
   //
   // However, repeated monoidic appends (e.g. foldLeft and fold) produce large
   // LEFT legs that we cannot tail recurse down. Prefer foldRight (or
-  // intercalate) when creating Cord instances for collections.
+  // intercalate), or foldLeft with `::` when creating Cord instances for
+  // collections.
   private[scalaz] object Branch {
     val max: Int = 100
     def apply(a: Cord, b: Cord): Cord = {
@@ -107,7 +114,7 @@ object Cord {
       import StringContext.treatEscapes
       val strings = IList(sc.parts: _*).map(s => Cord(treatEscapes(s)))
       val cords   = IList(args: _*).map(_.cord)
-      strings.interleave(cords).foldRight(Cord())((c, acc) => c ++ acc)
+      strings.interleave(cords).foldRight(Cord())((c, acc) => monoid.append(c, acc))
     }
   }
   object CordInterpolator {

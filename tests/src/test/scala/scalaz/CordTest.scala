@@ -4,23 +4,32 @@ import org.scalacheck.{ Arbitrary, Gen }
 import scalaz.scalacheck.ScalazProperties._
 
 import scalaz.syntax.enum._
+import scalaz.syntax.monoid._
 import scalaz.std.anyVal._
 import scalaz.std.string._
 
 object CordTest extends SpecLite {
+  ":: cons must produce the correct output" in {
+    (Cord("hello") :: Cord(" ") :: Cord("world")).shows.must_===("hello world")
+  }
+
+  "++ strict append must produce the correct output" in {
+    (Cord("hello") ++ Cord(" ") ++ Cord("world")).shows.must_===("hello world")
+  }
+
   ".toString must produce expected output" in {
-    val lefts = (0 |-> 9).foldLeft(Cord())((acc, i) => acc ++ Cord(i.toString))
+    val lefts = (0 |-> 9).foldLeft(Cord())((acc, i) => acc |+| Cord(i.toString))
     lefts.toString.must_===(lefts.shows)
     lefts.toString.must_===("0123456789")
 
-    val rights = (0 |-> 9).foldRight(Cord())((i, acc) => Cord(i.toString) ++ acc)
+    val rights = (0 |-> 9).foldRight(Cord())((i, acc) => Cord(i.toString) |+| acc)
     rights.toString.must_===(rights.shows)
     rights.toString.must_===(lefts.toString)
   }
 
   ".shows must be stack safe" in {
     val nums = (1 |-> 99999).map(_.toString)
-    val lefts = nums.foldLeft(Cord())((acc, i) => acc ++ Cord(i))
+    val lefts = nums.foldLeft(Cord())((acc, i) => acc |+| Cord(i))
     lefts.shows.length.must_===(488889)
 
     // it's ok to change these assertions if you optimise the representation, so
@@ -35,7 +44,7 @@ object CordTest extends SpecLite {
       case _ => fail("lefts: unexpected leaf")
     }
 
-    val rights = nums.foldRight(Cord())((i, acc) => Cord(i) ++ acc)
+    val rights = nums.foldRight(Cord())((i, acc) => Cord(i) |+| acc)
 
     // prefer minimal error output when these fail, otherwise they spam the buffer
     assert(rights.shows == lefts.shows)

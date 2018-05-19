@@ -140,7 +140,7 @@ object CABRunLengthEncoder {
     if(length <= minRun)
       tell(Monoid[Cord].multiply(token.show, length))
     else
-      tell(length.show ++ token.show)
+      tell(length.show :: token.show)
 
 
   /**
