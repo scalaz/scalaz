@@ -4,10 +4,9 @@ package scalaz.effect
 import scala.annotation.switch
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
-
 import java.util.concurrent.atomic.AtomicReference
-import java.util.concurrent.{ Executors, TimeUnit }
-import java.lang.{ Runnable, Runtime }
+import java.util.concurrent.{Executors, TimeUnit}
+import java.lang.{Runnable, Runtime}
 
 import scalaz.data.Disjunction._
 import scalaz.data.Maybe
@@ -129,8 +128,8 @@ trait RTS {
       }
     }
 
-  final def submitCanceler[E, A](canceler: Throwable => IO[E, A]): Throwable => Unit =
-    th => submit(unsafePerformIO(canceler(th)))
+  final def performed(canceler: PureCanceler): Canceler =
+    th => unsafePerformIO(canceler(th))
 }
 
 private object RTS {
@@ -524,8 +523,10 @@ private object RTS {
 
                           eval = false
 
-                        case Async.MaybeLaterIO(cancelerIo) =>
-                          awaitAsync(id, rts.submitCanceler(cancelerIo))
+                        case Async.MaybeLaterIO(pureCancel) =>
+                          // As for the case above this stores an impure canceler
+                          // obtained performing the pure canceler on the same thread
+                          awaitAsync(id, rts.performed(pureCancel))
 
                           eval = false
                       }
@@ -813,8 +814,8 @@ private object RTS {
             raceCallback[A, C](k, state, leftWins)(tryA)
           case Async.MaybeLater(cancel) =>
             c1 = cancel
-          case Async.MaybeLaterIO(cancelIo) =>
-            c1 = rts.submitCanceler(cancelIo)
+          case Async.MaybeLaterIO(pureCancel) =>
+            c1 = rts.performed(pureCancel)
         }
 
         right.register(raceCallback[B, C](k, state, rightWins)) match {
@@ -822,8 +823,8 @@ private object RTS {
             raceCallback[B, C](k, state, rightWins)(tryA)
           case Async.MaybeLater(cancel) =>
             c2 = cancel
-          case Async.MaybeLaterIO(cancelIo) =>
-            c2 = rts.submitCanceler(cancelIo)
+          case Async.MaybeLaterIO(pureCancel) =>
+            c2 = rts.performed(pureCancel)
         }
 
         val canceler = combineCancelers(c1, c2)
