@@ -19,7 +19,7 @@ lazy val sonataCredentials = for {
   password <- sys.env.get("SONATYPE_PASSWORD")
 } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
 
-credentials ++= sonataCredentials.toSeq
+credentials in ThisBuild ++= sonataCredentials.toSeq
 
 lazy val root = project
   .in(file("."))
