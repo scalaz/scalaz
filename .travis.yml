@@ -1,7 +1,7 @@
 language: scala
 sudo: false
 scala:
-  - 2.12.4
+  - 2.12.6
 jdk:
   - oraclejdk8
 before_install:

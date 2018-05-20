@@ -39,7 +39,7 @@ lazy val benchmarks = project.module
       Seq(
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-        "org.scalaz"     %% "scalaz-core"   % "7.2.22",
+        "org.scalaz"     %% "scalaz-core"   % "7.2.23",
         "io.monix"       %% "monix"         % "3.0.0-RC1",
         "org.typelevel"  %% "cats-effect"   % "1.0.0-RC"
       )
