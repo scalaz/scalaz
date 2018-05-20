@@ -1,5 +1,5 @@
 package scalaz
-package typeclass
+package types
 
 trait IsContravariantInstances {
   implicit def scalaContravariant[F[- _]]: IsContravariant[F] =

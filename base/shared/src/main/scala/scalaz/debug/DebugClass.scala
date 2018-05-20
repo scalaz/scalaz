@@ -1,5 +1,5 @@
 package scalaz
-package typeclass
+package debug
 
 /** A typeclass describing types which can be meaningfully represented as a `String`.
  */

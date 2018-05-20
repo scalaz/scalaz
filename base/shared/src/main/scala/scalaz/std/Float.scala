@@ -2,8 +2,7 @@ package scalaz
 package std
 
 import java.lang.Float.floatToRawIntBits
-
-import typeclass.EqClass
+import scalaz.core.EqClass
 import utils._
 
 trait FloatInstances {

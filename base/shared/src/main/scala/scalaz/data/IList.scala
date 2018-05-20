@@ -1,8 +1,10 @@
 package scalaz
 package data
 
+import scalaz.core.EqClass
+import scalaz.types.IsCovariantClass
+
 import scala.annotation.tailrec
-import typeclass.{ EqClass, IsCovariantClass }
 
 trait IListModule {
   type IList[A]

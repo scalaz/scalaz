@@ -1,9 +1,10 @@
 package scalaz
 package data
 
-import scalaz.typeclass._
 import scalaz.algebra._
+import scalaz.core.EqClass
 import scalaz.ct._
+import scalaz.debug.DebugClass
 
 trait ConstInstances {
   implicit def constTraverse[R]: Traversable[Const[R, ?]] =

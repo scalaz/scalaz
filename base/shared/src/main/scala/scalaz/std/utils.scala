@@ -1,7 +1,8 @@
 package scalaz
 package std
 
-import typeclass.{ DebugClass, EqClass }
+import scalaz.core.EqClass
+import scalaz.debug.DebugClass
 
 private[std] object utils {
   def singletonEq[A]: Eq[A]      = instanceOf[EqClass[A]]((a, b) => true)

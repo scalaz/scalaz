@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import typeclass.EqClass
+import scalaz.core.EqClass
 
 trait SetInstances {
   implicit def setEq[A: Eq]: Eq[Set[A]] =

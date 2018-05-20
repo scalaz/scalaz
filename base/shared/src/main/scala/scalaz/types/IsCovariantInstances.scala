@@ -1,5 +1,5 @@
 package scalaz
-package typeclass
+package types
 
 trait IsCovariantInstances {
   implicit def scalaCovariant[F[+ _]]: IsCovariant[F] =

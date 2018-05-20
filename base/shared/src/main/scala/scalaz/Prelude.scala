@@ -1,8 +1,10 @@
 package scalaz
 
-import typeclass._
-import algebra._
 import ct._
+import algebra._
+import scalaz.core._
+import scalaz.debug._
+import scalaz.types._
 
 trait BaseTypeclasses {
   type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]
@@ -114,9 +116,9 @@ trait AllFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
     with data.KleisliFunctions
-    with InvariantFunctorFunctions
-    with PhantomFunctions
-    with TraversableFunctions
+    with ct.InvariantFunctorFunctions
+    with ct.PhantomFunctions
+    with ct.TraversableFunctions
 
 trait AllInstances
     extends data.AMaybeInstances
@@ -130,14 +132,6 @@ trait AllInstances
     with data.KleisliInstances
     with data.TheseInstances
     with data.UpStarInstances
-<<<<<<< HEAD
-    with data.KleisliInstances
-    with BifunctorInstances
-    with BindInstances
-    with ChoiceInstances
-    with CobindInstances
-    with ComonadInstances
-=======
     with std.BooleanInstances
     with std.ByteInstances
     with std.DoubleInstances
@@ -147,35 +141,23 @@ trait AllInstances
     with std.ShortInstances
     with std.StringInstances
     with std.UnitInstances
-    with typeclass.BifunctorInstances
-    with typeclass.BindInstances
-    with typeclass.ChoiceInstances
-    with typeclass.CobindInstances
-    with typeclass.ComonadInstances
-    with typeclass.DebugInstances
->>>>>>> series/8.0.x
-    with typeclass.EqInstances
-    with FoldableInstances
-    with typeclass.IsContravariantInstances
-    with typeclass.IsCovariantInstances
-<<<<<<< HEAD
-    with MonadInstances
-    with MonoidInstances
-    with PhantomInstances
-    with ProfunctorInstances
-    with SemigroupInstances
-    with typeclass.DebugInstances
-    with StrongInstances
-    with TraversableInstances
-=======
-    with typeclass.MonadInstances
-    with typeclass.MonoidInstances
-    with typeclass.PhantomInstances
-    with typeclass.ProfunctorInstances
-    with typeclass.SemigroupInstances
-    with typeclass.StrongInstances
-    with typeclass.TraversableInstances
->>>>>>> series/8.0.x
+    with ct.BifunctorInstances
+    with ct.BindInstances
+    with ct.ChoiceInstances
+    with ct.CobindInstances
+    with ct.ComonadInstances
+    with ct.FoldableInstances
+    with ct.MonadInstances
+    with ct.PhantomInstances
+    with ct.ProfunctorInstances
+    with ct.StrongInstances
+    with ct.TraversableInstances
+    with debug.DebugInstances
+    with core.EqInstances
+    with types.IsContravariantInstances
+    with types.IsCovariantInstances
+    with algebra.MonoidInstances
+    with algebra.SemigroupInstances
 
 trait AllSyntax
     extends data.VoidSyntax
@@ -186,24 +168,24 @@ trait AllSyntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
     with data.KleisliSyntax
-    with ApplicativeSyntax
-    with ApplySyntax
-    with BifunctorSyntax
-    with BindSyntax
-    with ChoiceSyntax
-    with CobindSyntax
-    with ComonadSyntax
-    with ComposeSyntax
-    with typeclass.EqSyntax
-    with FoldableSyntax
-    with FunctorSyntax
-    with InvariantFunctorSyntax
-    with PhantomSyntax
-    with ProfunctorSyntax
-    with SemigroupSyntax
-    with typeclass.DebugSyntax
-    with StrongSyntax
-    with TraversableSyntax
+    with ct.ApplicativeSyntax
+    with ct.ApplySyntax
+    with ct.BifunctorSyntax
+    with ct.BindSyntax
+    with ct.ChoiceSyntax
+    with ct.CobindSyntax
+    with ct.ComonadSyntax
+    with ct.ComposeSyntax
+    with ct.FoldableSyntax
+    with ct.FunctorSyntax
+    with ct.InvariantFunctorSyntax
+    with ct.PhantomSyntax
+    with ct.ProfunctorSyntax
+    with ct.StrongSyntax
+    with ct.TraversableSyntax
+    with core.EqSyntax
+    with algebra.SemigroupSyntax
+    with debug.DebugSyntax
 
 object Prelude extends BaseHierarchy with BaseData with AllFunctions
 

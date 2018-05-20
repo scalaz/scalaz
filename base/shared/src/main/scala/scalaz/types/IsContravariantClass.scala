@@ -1,7 +1,7 @@
 package scalaz
-package typeclass
+package types
 
-import data.As
+import scalaz.data.As
 
 /**
  * Witnesses that the type constructor `F[_]` is contravariant,

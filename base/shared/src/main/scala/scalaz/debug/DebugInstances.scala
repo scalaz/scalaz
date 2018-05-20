@@ -1,5 +1,5 @@
 package scalaz
-package typeclass
+package debug
 
 import scalaz.ct.ContravariantClass
 
