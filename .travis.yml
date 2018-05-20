@@ -12,7 +12,8 @@ install:
   - gem install sass
   - gem install jekyll -v 3.8.1
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite publish
+  - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sbt publish; fi
 env:
   global:
   - secure: C23tA8LtUm60Qf/NB8smS6fsds+H5syr2jRtNN/WxyMyCMDARGy/yw5l6tf8Obt7kJOqlsx5ixZs43NASeji8ZZwMerV/Mf8xSf2+Lp6zhD8FMjtqtdzyEA3xu8I221OV0Q/XTYcbqRM0KSeJCOP3P/Uf7ljhuM6EdyiofcJGZA=

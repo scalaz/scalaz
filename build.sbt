@@ -2,6 +2,8 @@ import Scalaz._
 
 organization in ThisBuild := "org.scalaz"
 
+version in ThisBuild := "8.0.0-SNAPSHOT"
+
 publishTo in ThisBuild := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
