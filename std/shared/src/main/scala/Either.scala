@@ -1,7 +1,8 @@
 package scalaz
 package std
 
-import scalaz.typeclass.{ EqClass, MonadClass }
+import scalaz.core.EqClass
+import scalaz.ct.MonadClass
 
 trait EitherInstances {
   implicit def eitherMonad[L]: Monad[Either[L, ?]] =

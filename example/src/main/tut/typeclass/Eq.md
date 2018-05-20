@@ -28,7 +28,7 @@ These laws entail symmetry and transitivity, which should be easier to test, sin
 ## Instance declaration
 
 ```tut
-import scalaz._, Prelude._, typeclass.EqClass
+import scalaz._, Prelude._, core.EqClass
 
 implicit final def optionEq[A](implicit A: Eq[A]): Eq[Option[A]] =
   instanceOf[EqClass[Option[A]]] {

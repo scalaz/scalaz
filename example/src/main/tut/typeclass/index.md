@@ -57,7 +57,7 @@ Luckily, most of this ships in Scalaz by default.
 
 ```tut:reset
 import scalaz.Scalaz._
-import scalaz.typeclass.DebugClass
+import scalaz.debug.DebugClass
 
 final case class BusinessObject(id: Long, value: Long)
 

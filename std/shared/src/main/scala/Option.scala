@@ -1,7 +1,9 @@
 package scalaz
 package std
 
-import scalaz.typeclass.{ DebugClass, EqClass, MonadClass }
+import scalaz.core.EqClass
+import scalaz.debug.DebugClass
+import scalaz.ct.MonadClass
 
 trait OptionInstances {
   implicit val optionMonad: Monad[Option] =

@@ -1,7 +1,10 @@
 package scalaz
 package data
 
-import scalaz.typeclass._
+import scalaz.algebra.SemigroupClass
+import scalaz.core.EqClass
+import scalaz.ct._
+import scalaz.debug.DebugClass
 
 trait TheseInstances {
   implicit def bifunctor: Bifunctor[These] =

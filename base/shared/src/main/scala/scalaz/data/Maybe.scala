@@ -1,7 +1,9 @@
 package scalaz
 package data
 
-import scalaz.typeclass._
+import scalaz.core.EqClass
+import scalaz.ct._
+import scalaz.debug.DebugClass
 
 sealed trait MaybeModule {
   type Maybe[A]

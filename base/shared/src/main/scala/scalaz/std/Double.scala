@@ -2,8 +2,7 @@ package scalaz
 package std
 
 import java.lang.Double.doubleToRawLongBits
-
-import typeclass.EqClass
+import scalaz.core.EqClass
 import utils._
 
 trait DoubleInstances {

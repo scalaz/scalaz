@@ -66,7 +66,7 @@ both.map(_ + " and others")
 collects `A` values in `This` or `Both` cases using the semigroupal `append`.
 
 ```tut
-import scalaz.typeclass.SemigroupClass
+import scalaz.algebra.SemigroupClass
 
 implicit val intSemigroup: Semigroup[Int] = instanceOf[SemigroupClass[Int]](_ + _)
 both.flatMap((s: String) => Both(789, s + s))

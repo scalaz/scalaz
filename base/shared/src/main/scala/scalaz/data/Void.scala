@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import com.github.ghik.silencer.silent
-import scalaz.typeclass.SemigroupClass
+import scalaz.algebra.SemigroupClass
 
 trait VoidModule {
   type Void

@@ -1,6 +1,10 @@
 package scalaz
 
-import typeclass._
+import ct._
+import algebra._
+import scalaz.core._
+import scalaz.debug._
+import scalaz.types._
 
 trait BaseTypeclasses {
   type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]
@@ -112,9 +116,9 @@ trait AllFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
     with data.KleisliFunctions
-    with typeclass.InvariantFunctorFunctions
-    with typeclass.PhantomFunctions
-    with typeclass.TraversableFunctions
+    with ct.InvariantFunctorFunctions
+    with ct.PhantomFunctions
+    with ct.TraversableFunctions
 
 trait AllInstances
     extends data.AMaybeInstances
@@ -137,23 +141,23 @@ trait AllInstances
     with std.ShortInstances
     with std.StringInstances
     with std.UnitInstances
-    with typeclass.BifunctorInstances
-    with typeclass.BindInstances
-    with typeclass.ChoiceInstances
-    with typeclass.CobindInstances
-    with typeclass.ComonadInstances
-    with typeclass.DebugInstances
-    with typeclass.EqInstances
-    with typeclass.FoldableInstances
-    with typeclass.IsContravariantInstances
-    with typeclass.IsCovariantInstances
-    with typeclass.MonadInstances
-    with typeclass.MonoidInstances
-    with typeclass.PhantomInstances
-    with typeclass.ProfunctorInstances
-    with typeclass.SemigroupInstances
-    with typeclass.StrongInstances
-    with typeclass.TraversableInstances
+    with ct.BifunctorInstances
+    with ct.BindInstances
+    with ct.ChoiceInstances
+    with ct.CobindInstances
+    with ct.ComonadInstances
+    with ct.FoldableInstances
+    with ct.MonadInstances
+    with ct.PhantomInstances
+    with ct.ProfunctorInstances
+    with ct.StrongInstances
+    with ct.TraversableInstances
+    with debug.DebugInstances
+    with core.EqInstances
+    with types.IsContravariantInstances
+    with types.IsCovariantInstances
+    with algebra.MonoidInstances
+    with algebra.SemigroupInstances
 
 trait AllSyntax
     extends data.VoidSyntax
@@ -164,24 +168,24 @@ trait AllSyntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
     with data.KleisliSyntax
-    with typeclass.ApplicativeSyntax
-    with typeclass.ApplySyntax
-    with typeclass.BifunctorSyntax
-    with typeclass.BindSyntax
-    with typeclass.ChoiceSyntax
-    with typeclass.CobindSyntax
-    with typeclass.ComonadSyntax
-    with typeclass.ComposeSyntax
-    with typeclass.EqSyntax
-    with typeclass.FoldableSyntax
-    with typeclass.FunctorSyntax
-    with typeclass.InvariantFunctorSyntax
-    with typeclass.PhantomSyntax
-    with typeclass.ProfunctorSyntax
-    with typeclass.SemigroupSyntax
-    with typeclass.DebugSyntax
-    with typeclass.StrongSyntax
-    with typeclass.TraversableSyntax
+    with ct.ApplicativeSyntax
+    with ct.ApplySyntax
+    with ct.BifunctorSyntax
+    with ct.BindSyntax
+    with ct.ChoiceSyntax
+    with ct.CobindSyntax
+    with ct.ComonadSyntax
+    with ct.ComposeSyntax
+    with ct.FoldableSyntax
+    with ct.FunctorSyntax
+    with ct.InvariantFunctorSyntax
+    with ct.PhantomSyntax
+    with ct.ProfunctorSyntax
+    with ct.StrongSyntax
+    with ct.TraversableSyntax
+    with core.EqSyntax
+    with algebra.SemigroupSyntax
+    with debug.DebugSyntax
 
 object Prelude extends BaseHierarchy with BaseData with AllFunctions
 

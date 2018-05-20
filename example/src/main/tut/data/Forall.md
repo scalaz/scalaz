@@ -154,7 +154,7 @@ type Plus[F[_]] = ∀[λ[A => Semigroup[F[A]]]]
 Here is an instance for list:
 
 ```tut
-import scalaz.typeclass.SemigroupClass
+import scalaz.algebra.SemigroupClass
 
 def listSemigroup[A]: Semigroup[List[A]] = instanceOf(new SemigroupClass[List[A]] {
   def append(x: List[A], y: => List[A]) = x ++ y

@@ -1,7 +1,8 @@
 package scalaz
 package data
 
-import scalaz.typeclass.{ EqClass, MonadClass }
+import scalaz.core.EqClass
+import scalaz.ct.MonadClass
 
 trait IdentityInstances {
   implicit val monad: Monad[Identity] = instanceOf(new MonadClass[Identity] {

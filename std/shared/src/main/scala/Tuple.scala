@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import typeclass.EqClass
+import scalaz.core.EqClass
 
 trait TupleInstances {
   implicit final def tuple1Eq[A](implicit A: Eq[A]): Eq[Tuple1[A]] =

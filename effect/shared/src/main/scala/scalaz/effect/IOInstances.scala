@@ -2,7 +2,7 @@
 package scalaz
 package effect
 
-import scalaz.typeclass.{ BifunctorClass, BindClass, MonadClass }
+import ct._
 
 trait IOInstances {
   implicit def monad[E]: Monad[IO[E, ?]] =

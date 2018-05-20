@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.typeclass.DebugClass
+import scalaz.debug.DebugClass
 
 trait AMaybeInstances {
   implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] =
