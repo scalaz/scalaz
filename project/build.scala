@@ -121,6 +121,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.6"
+  private def Scala213 = "2.13.0-M4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -139,7 +140,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M4"),
+    crossScalaVersions := Seq(Scala211, Scala212),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.0",
@@ -230,6 +231,16 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      // TODO scalacheck for Scala 2.13
+      releaseStepCommandAndRemaining(
+        s"; ++ ${Scala213}! ; concurrent/publishSigned ; " + Seq(
+          "core", "effect", "iteratee"
+        ).flatMap{ p =>
+          Seq("JVM", "JS").map{ x =>
+            s" ${p}${x}/publishSigned "
+          }
+        }.mkString(" ; ")
+      ),
       setNextVersion,
       commitNextVersion,
       pushChanges
