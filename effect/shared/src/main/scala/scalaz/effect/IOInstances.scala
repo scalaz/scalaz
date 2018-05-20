@@ -2,7 +2,7 @@
 package scalaz
 package effect
 
-import scalaz.typeclass.{ BifunctorClass, BindClass, MonadClass }
+import scalaz.typeclass.{BifunctorClass, BindClass, MonadClass}
 
 trait IOInstances {
   implicit def monad[E]: Monad[IO[E, ?]] =
@@ -20,7 +20,8 @@ trait IOInstances {
     })
 
   implicit final val bifunctor: Bifunctor[IO] =
-    instanceOf(new BifunctorClass.DeriveBimap[IO] {
+    instanceOf(new BifunctorClass[IO] {
+      val minimal = meta.IsMinimal()
       override def lmap[A, B, S](fab: IO[A, B])(as: A => S): IO[S, B] = fab.leftMap(as)
       override def rmap[A, B, T](fab: IO[A, B])(bt: B => T): IO[A, T] = fab.map(bt)
     })

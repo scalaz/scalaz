@@ -4,8 +4,8 @@ package typeclass
 /** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
  *
  * Minimal definition:
- * - `bimap` (using [[BifunctorClass.DeriveLmapRmap]])
- * - `lmap` and `rmap` (using [[BifunctorClass.DeriveBimap]])
+ * - `bimap`, or
+ * - `lmap` and `rmap`
  *
  * The laws for a [[Bifunctor]] instance are:
  * - for all `A`, `Bifunctor[A, ?]` must be a lawful [[Functor]] (with `map == rmap`);
@@ -15,32 +15,17 @@ package typeclass
  *       lmap(rmap(fab)(bt))(as) === rmap(lmap(fab)(as))(bt) === bimap(fab)(as, bt)
  *   ```
  */
-trait BifunctorClass[F[_, _]] {
+@meta.minimal("bimap", ("lmap", "rmap"))
+trait BifunctorClass[F[_, _]] extends TypeClass {
 
-  def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T]
+  def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T] =
+    rmap(lmap(fab)(as))(bt)
 
-  def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B]
+  def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B] =
+    bimap(fab)(as, identity)
 
-  def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T]
+  def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T] =
+    bimap(fab)(identity, bt)
 
 }
 
-object BifunctorClass {
-
-  trait DeriveLmapRmap[F[_, _]] extends BifunctorClass[F] with Alt[DeriveLmapRmap[F]] {
-    def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B] = bimap(fab)(as, identity)
-    def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T] = bimap(fab)(identity, bt)
-  }
-
-  trait DeriveBimap[F[_, _]] extends BifunctorClass[F] with Alt[DeriveBimap[F]] {
-    def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T] = rmap(lmap(fab)(as))(bt)
-  }
-
-  sealed trait Alt[D <: Alt[D]]
-
-  trait BifunctorFunctorTemplate[F[_, _], A] extends FunctorClass[F[A, ?]] {
-    val F: Bifunctor[F]
-
-    def map[B, BB](ma: F[A, B])(f: B => BB): F[A, BB] = F.rmap(ma)(f)
-  }
-}
