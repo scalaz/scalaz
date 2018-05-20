@@ -127,18 +127,38 @@ trait AllInstances
     with data.ForgetInstances
     with data.IdentityInstances
     with data.IListInstances
+    with data.KleisliInstances
     with data.TheseInstances
     with data.UpStarInstances
+<<<<<<< HEAD
     with data.KleisliInstances
     with BifunctorInstances
     with BindInstances
     with ChoiceInstances
     with CobindInstances
     with ComonadInstances
+=======
+    with std.BooleanInstances
+    with std.ByteInstances
+    with std.DoubleInstances
+    with std.FloatInstances
+    with std.IntInstances
+    with std.LongInstances
+    with std.ShortInstances
+    with std.StringInstances
+    with std.UnitInstances
+    with typeclass.BifunctorInstances
+    with typeclass.BindInstances
+    with typeclass.ChoiceInstances
+    with typeclass.CobindInstances
+    with typeclass.ComonadInstances
+    with typeclass.DebugInstances
+>>>>>>> series/8.0.x
     with typeclass.EqInstances
     with FoldableInstances
     with typeclass.IsContravariantInstances
     with typeclass.IsCovariantInstances
+<<<<<<< HEAD
     with MonadInstances
     with MonoidInstances
     with PhantomInstances
@@ -147,6 +167,15 @@ trait AllInstances
     with typeclass.DebugInstances
     with StrongInstances
     with TraversableInstances
+=======
+    with typeclass.MonadInstances
+    with typeclass.MonoidInstances
+    with typeclass.PhantomInstances
+    with typeclass.ProfunctorInstances
+    with typeclass.SemigroupInstances
+    with typeclass.StrongInstances
+    with typeclass.TraversableInstances
+>>>>>>> series/8.0.x
 
 trait AllSyntax
     extends data.VoidSyntax

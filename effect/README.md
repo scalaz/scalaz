@@ -49,9 +49,11 @@ import scalaz.effect.console._
 import java.io.IOException
 
 object MyApp extends SafeApp {
-  type Error = IOException
 
-  def run(args: IList[String]): IO[Error, Unit] =
+  def run(args: List[String]): IO[Void, ExitStatus] =
+    myAppLogic.attempt.map(_.fold(_ => 1)(_ => 0)).map(ExitStatus.ExitNow(_))
+
+  def myAppLogic: IO[IOException, Unit] =
     for {
       _ <- putStrLn("Hello! What is your name?")
       n <- getStrLn
