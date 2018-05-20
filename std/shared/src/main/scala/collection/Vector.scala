@@ -1,7 +1,8 @@
 package scalaz
 package std
 
-import typeclass.{ EqClass, MonadClass }
+import core.EqClass
+import ct.MonadClass
 
 trait VectorInstances {
   implicit val vectorMonad: Monad[Vector] = instanceOf(new MonadClass[Vector] {

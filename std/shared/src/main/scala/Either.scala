@@ -1,8 +1,9 @@
 package scalaz
 package std
 
-import scalaz.core.EqClass
-import scalaz.ct.{ BifunctorClass, MonadClass }
+import core.EqClass
+import ct.{ BifunctorClass, MonadClass }
+import debug.DebugClass
 
 trait EitherInstances {
   implicit def eitherMonad[L]: Monad[Either[L, ?]] =
