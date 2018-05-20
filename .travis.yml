@@ -1,20 +1,20 @@
 language: scala
 sudo: false
 scala:
-  - 2.12.6
+- 2.12.6
 jdk:
-  - oraclejdk8
+- oraclejdk8
 before_install:
-  - export PATH=${PATH}:./vendor/bundle
+- export PATH=${PATH}:./vendor/bundle
 install:
-  - rvm use 2.4.3 --install --fuzzy
-  - gem update --system
-  - gem install sass
-  - gem install jekyll -v 3.8.1
+- rvm use 2.4.4 --install --fuzzy
+- gem update --system
+- gem install sass
+- gem install jekyll -v 3.8.2
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sbt publish; fi
+- sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck test example/makeMicrosite
+- if [[ "$TRAVIS_PULL_REQUEST" = "false" && "$TRAVIS_BRANCH" = "series/8.0.x" ]]; then sbt publish; fi
 env:
   global:
-  - secure: C23tA8LtUm60Qf/NB8smS6fsds+H5syr2jRtNN/WxyMyCMDARGy/yw5l6tf8Obt7kJOqlsx5ixZs43NASeji8ZZwMerV/Mf8xSf2+Lp6zhD8FMjtqtdzyEA3xu8I221OV0Q/XTYcbqRM0KSeJCOP3P/Uf7ljhuM6EdyiofcJGZA=
-  - secure: CVxaydpcmwovMCGtao9NPkAIj9axElwJhBb83VCw26r4ek+bNJDmuHTt0kINkGuT6iNj1gDTjnxoU9k4itRhioYbROUEwC7P+YKVG7x6zKsjuflYMfC3s6qIYrl/kTp7GzXdGoQ4khnsNWvpQwdtYn75OfPe5CctUeGBGaf8jpc=
+  - secure: f9sDrym/MfYK1hBBSaILMxn4VCfyzJREqpuGXhEggrdZpYTNjp8GMXrqKfla3AwVAuWCveXk9u+skUYqKQ6LTG7RdQS5PzA2I9kx8afNRA5nxMmVQjuCKYM0/aF4egY5i98tGXG0NiMO3t72XuxtR+OeWLysUVB8hoNghpOOVMw=
+  - secure: PPURD7/Lj6+kqE342Ty99XhO5SR7GlrakSbZeKm5RKXS2Q5yFrexdf+UcS3KUbq6LaWnH75q+UgC2mcRMIspRmz37CtVXkGbJYp3VBYFJbmIga+w0bBVvlSw8QWIGhdz3xnOOuiEYpgeOKnAzShr59HYKG2O90jlMdt4cPRUrwg=
