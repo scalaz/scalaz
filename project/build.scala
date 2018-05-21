@@ -22,6 +22,8 @@ import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
 
+import sbtdynver.DynVerPlugin.autoImport._
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -141,6 +143,12 @@ object build {
     },
     scalaVersion := Scala212,
     crossScalaVersions := Seq(Scala211, Scala212),
+    commands += Command.command("setVersionUseDynver") { state =>
+      val extracted = Project extract state
+      val out = extracted get dynverGitDescribeOutput
+      val date = extracted get dynverCurrentDate
+      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+    },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.0",
