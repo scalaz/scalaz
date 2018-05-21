@@ -2,7 +2,9 @@ package scalaz
 package std
 
 import java.lang.Double.doubleToRawLongBits
-import scalaz.core.EqClass
+
+import algebra.OrdClass
+import core.EqClass
 import utils._
 
 trait DoubleInstances {
@@ -19,12 +21,11 @@ trait DoubleInstances {
       }
     })
 
-  /* https://github.com/scalaz/scalaz/pull/1792
   implicit val doubleOrd: Ord[Double] = instanceOf(new OrdClass[Double] {
-    def comp(a: Double, b: Double): Double = (a, b) match {
-      case (a, b) if doubleEq.equal(a, b) => EQ
+    def comp(a: Double, b: Double): Ordering = (a, b) match {
+      case (a, b) if doubleEq.equal(a, b)                            => EQ
       case (a, b) if doubleToRawLongBits(a) < doubleToRawLongBits(b) => LT
-      case _ => GT
+      case _                                                         => GT
     }
-  })*/
+  })
 }
