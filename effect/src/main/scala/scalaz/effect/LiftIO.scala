@@ -63,7 +63,7 @@ object LiftIO {
     }
 
   implicit def stateTLiftIO[F[_]: LiftIO, S] =
-    new LiftIO[StateT[F, S, ?]] {
+    new LiftIO[StateT[S, F, ?]] {
       def liftIO[A](ioa: IO[A]) = StateT(s => LiftIO[F].liftIO(ioa.map((s, _))))
     }
 

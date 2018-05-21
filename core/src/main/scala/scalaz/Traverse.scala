@@ -81,7 +81,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](s => {
-      val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
+      val st = traverse[λ[α => StateT[S, Trampoline, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
       st.run(s).run
     })
   }

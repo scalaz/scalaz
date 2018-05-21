@@ -8,21 +8,21 @@ import std.AllInstances._
 
 object StateTTest extends SpecLite {
 
-  type StateTList[S, A] = StateT[List, S, A]
+  type StateTList[S, A] = StateT[S, List, A]
   type StateTListInt[A] = StateTList[Int, A]
-  type IStateTList[S, A] = IndexedStateT[List, S, Int, A]
+  type IStateTList[S, A] = IndexedStateT[S, List, Int, A]
 
   private[this] val stateTestInts = (-10 to 10).toList
 
-  private[this] implicit def stateTIntEqual[F[_]: Bind](implicit e: Equal[List[F[(Int, Int)]]]): Equal[StateT[F, Int, Int]] =
-    e.contramap((s: StateT[F, Int, Int]) => stateTestInts.map(s.run(_)))
+  private[this] implicit def stateTIntEqual[F[_]: Bind](implicit e: Equal[List[F[(Int, Int)]]]): Equal[StateT[Int, F, Int]] =
+    e.contramap((s: StateT[Int, F, Int]) => stateTestInts.map(s.run(_)))
 
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
   checkAll(profunctor.laws[IStateTList])
-  checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
-  checkAll(monadError.laws[StateT[Either[Int, ?], Int, ?], Int])
+  checkAll(monadTrans.laws[StateT[Int, ?[_], ?], List])
+  checkAll(monadError.laws[StateT[Int, Either[Int, ?], ?], Int])
 
   checkAll {
     // Not sure why this is needed explicitly
@@ -33,19 +33,19 @@ object StateTTest extends SpecLite {
   }
 
   object instances {
-    def functor[S, F[_] : Applicative] = Functor[StateT[F, S, ?]]
-    def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
-    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[F, S, ?]]
-    def monadState[S, F[_] : Monad] = MonadState[StateT[F, S, ?], S]
-    def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
+    def functor[S, F[_] : Applicative] = Functor[StateT[S, F, ?]]
+    def plus[S1, F[_]: Monad: Plus, S2] = Plus[IndexedStateT[S1, F, S2, ?]]
+    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[S, F, ?]]
+    def monadState[S, F[_] : Monad] = MonadState[StateT[S, F, ?], S]
+    def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[S, F, ?]]
 
     // F = Id
     def functor[S] = Functor[State[S, ?]]
     def monadState[S] = MonadState[State[S, ?], S]
 
     // checking absence of ambiguity
-    def functor[S, F[_] : Monad] = Functor[StateT[F, S, ?]]
-    def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
+    def functor[S, F[_] : Monad] = Functor[StateT[S, F, ?]]
+    def plus[S, F[_]: MonadPlus] = Plus[StateT[S, F, ?]]
   }
 
   "monadState.point" in {
@@ -81,14 +81,14 @@ object StateTTest extends SpecLite {
   }
 
   "monadPlus.plus (List)" in {
-    val a = StateT[List, Int, Boolean](s => List((s, false)))
-    val b = StateT[List, Int, Boolean](s => List((s, true)))
+    val a = StateT[Int, List, Boolean](s => List((s, false)))
+    val b = StateT[Int, List, Boolean](s => List((s, true)))
     instances.monadPlus[Int, List].plus(a, b).run(0) must_===(List((0, false), (0, true)))
   }
 
   "StateT can be trampolined without stack overflow" in {
     import scalaz.Free._
-    val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
+    val result = (0 to 4000).toList.map(i => StateT[Int, Trampoline, Int]((ii:Int) => Trampoline.done((i,i))))
       .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
     4000 must_=== result(0).run._1
   }
@@ -111,7 +111,7 @@ object StateTTest extends SpecLite {
   "iterated zoom on trampolined StateT is stack-safe" in {
     import scalaz.Free._
     val l: Lens[Int, Int] = Lens.lensId[Int]
-    val st = (0 to 10000).foldLeft(StateT[Trampoline, Int, Int](s => Trampoline.done((s, s))))((s, _) => s.zoom(l))
+    val st = (0 to 10000).foldLeft(StateT[Int, Trampoline, Int](s => Trampoline.done((s, s))))((s, _) => s.zoom(l))
     st.eval(5).run must_=== (5)
   }
 

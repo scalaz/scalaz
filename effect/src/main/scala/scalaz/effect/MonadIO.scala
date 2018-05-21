@@ -56,7 +56,7 @@ object MonadIO {
 
   implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
 
-  implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
+  implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[S, F, ?]]
 
   ////
 }
