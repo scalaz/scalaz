@@ -22,6 +22,15 @@ trait IsCovariantClass[F[_]] {
 
 object IsCovariantClass {
 
+  /** Unsafe witness that the type constructor `F[_]` is covariant. */
+  def unsafeForce[F[_]]: IsCovariant[F] =
+    instanceOf(new IsCovariantClass.LiftLiskov[F] {
+      override def liftLiskov[A, B](implicit ev: A <~< B): F[A] <~< F[B] = {
+        val _ = ev
+        As.unsafeForce[F[A], F[B]]
+      }
+    })
+
   trait SubstCv[F[_]] extends IsCovariantClass[F] with Alt[SubstCv[F]] {
     final override def substCt[G[- _], A, B](g: G[F[B]])(implicit ev: A <~< B): G[F[A]] = {
       type H[+a] = G[a] => G[F[A]]
