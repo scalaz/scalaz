@@ -29,7 +29,6 @@ class PromiseSpec extends Specification with RTS {
         p <- Promise.make[Void, Int]
         f <- p.complete[Void](32).fork
         s <- f.join
-        _ <- f.interrupt(new Error("Terminated fiber"))
         v <- p.get
       } yield s must beTrue and (v must_=== 32)
     )
@@ -40,7 +39,6 @@ class PromiseSpec extends Specification with RTS {
         p <- Promise.make[Void, Int]
         f <- p.done[Void](ExitResult.Completed(14)).fork
         s <- f.join
-        _ <- f.interrupt(new Error("Terminated fiber"))
         v <- p.get
       } yield s must beTrue and (v must_=== 14)
     )
@@ -51,7 +49,6 @@ class PromiseSpec extends Specification with RTS {
         p <- Promise.make[String, Int]
         f <- p.error[String]("error in e3").fork
         s <- f.join
-        _ <- f.interrupt(new Error("Terminated fiber"))
         v <- p.get.attempt[String]
       } yield s must beTrue and (v must_=== -\/("error in e3"))
     )
@@ -62,7 +59,6 @@ class PromiseSpec extends Specification with RTS {
         p <- Promise.make[String, Int]
         f <- p.done[String](ExitResult.Failed("error in e4")).fork
         s <- f.join
-        _ <- f.interrupt(new Error("Terminated fiber"))
         v <- p.get.attempt[String]
       } yield s must beTrue and (v must_=== -\/("error in e4"))
     )
