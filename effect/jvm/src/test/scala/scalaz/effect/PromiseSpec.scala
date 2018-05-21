@@ -26,8 +26,7 @@ class PromiseSpec extends Specification with RTS {
     unsafePerformIO(
       for {
         p <- Promise.make[Void, Int]
-        f <- p.complete[Void](32).fork
-        s <- f.join
+        s <- p.complete[Void](32)
         v <- p.get
       } yield s must beTrue and (v must_=== 32)
     )
@@ -36,8 +35,7 @@ class PromiseSpec extends Specification with RTS {
     unsafePerformIO(
       for {
         p <- Promise.make[Void, Int]
-        f <- p.done[Void](ExitResult.Completed(14)).fork
-        s <- f.join
+        s <- p.done[Void](ExitResult.Completed(14))
         v <- p.get
       } yield s must beTrue and (v must_=== 14)
     )
@@ -46,8 +44,7 @@ class PromiseSpec extends Specification with RTS {
     unsafePerformIO(
       for {
         p <- Promise.make[String, Int]
-        f <- p.error[String]("error in e3").fork
-        s <- f.join
+        s <- p.error[String]("error in e3")
         v <- p.get.attempt[String]
       } yield s must beTrue and (v must_=== -\/("error in e3"))
     )
@@ -56,8 +53,7 @@ class PromiseSpec extends Specification with RTS {
     unsafePerformIO(
       for {
         p <- Promise.make[String, Int]
-        f <- p.done[String](ExitResult.Failed("error in e4")).fork
-        s <- f.join
+        s <- p.done[String](ExitResult.Failed("error in e4"))
         v <- p.get.attempt[String]
       } yield s must beTrue and (v must_=== -\/("error in e4"))
     )
@@ -72,7 +68,8 @@ class PromiseSpec extends Specification with RTS {
       } yield s must beFalse and (v must_=== 1)
     )
 
-  lazy val error = new Exception("Error!")
+  val error = new Exception("Error!")
+
   def e6 =
     unsafePerformIO(
       for {
