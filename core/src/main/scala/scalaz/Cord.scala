@@ -15,8 +15,8 @@ import scala.annotation.tailrec
  * network socket or file, consider https://github.com/scalaz/scalaz/issues/1797
  *
  * If you require a general text manipulation data structure, consider using
- * `Cord` or creating a custom structure to resemble that used by the popular
- * text editors:
+ * `FingerTree` or creating a custom structure to resemble that used by the
+ * popular text editors:
  *
  * - https://ecc-comp.blogspot.co.uk/2015/05/a-brief-glance-at-how-5-text-editors.html
  * - https://pavelfatin.com/typing-with-pleasure/
