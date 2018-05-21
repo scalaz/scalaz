@@ -58,24 +58,26 @@ object Cord {
   def apply(s: String): Cord = Leaf.apply(s)
   def apply(): Cord = Leaf.Empty
 
-  private[scalaz] final case class Leaf private (
-    s: String
+  private[scalaz] final class Leaf private (
+    val s: String
   ) extends Cord
   private[scalaz] object Leaf {
     val Empty: Leaf = new Leaf("")
     def apply(s: String): Leaf =
       if (s.isEmpty) Empty
       else new Leaf(s)
+    def unapply(l: Leaf): Some[String] = Some(l.s)
   }
 
-  private[scalaz] final case class Branch private (
-    leftDepth: Int,
-    left: Cord,
-    right: Cord
+  private[scalaz] final class Branch private (
+    val leftDepth: Int,
+    val left: Cord,
+    val right: Cord
   ) extends Cord
 
   // Limiting the depth of a branch ensures we don't get stack overflows, at the
-  // cost of forcing some intermediate strings.
+  // cost of forcing some intermediate strings. We could also have used a DList
+  // structure for the left legs, but it would be very inefficient.
   //
   // However, repeated monoidic appends (e.g. foldLeft and fold) produce large
   // LEFT legs that we cannot tail recurse down. Prefer foldRight (or
@@ -86,19 +88,20 @@ object Cord {
     def apply(a: Cord, b: Cord): Cord = {
       // avoid constructing a Branch with empty leafs, otherwise Monoid.zero is
       // degenerate over the empty string.
-      if (a == Leaf.Empty) b
-      else if (b == Leaf.Empty) a
+      if (a eq Leaf.Empty) b
+      else if (b eq Leaf.Empty) a
       else a match {
         case _: Leaf =>
-          Branch(1, a, b)
+          new Branch(1, a, b)
         case a: Branch =>
-          val branch = Branch(a.leftDepth + 1, a, b)
+          val branch = new Branch(a.leftDepth + 1, a, b)
           if (a.leftDepth >= max)
             branch.reset
           else
             branch
       }
     }
+    def unapply(b: Branch): Some[(Int, Cord, Cord)] = Some((b.leftDepth, b.left, b.right))
   }
 
   implicit val monoid: Monoid[Cord] = new Monoid[Cord] {
