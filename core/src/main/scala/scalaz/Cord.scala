@@ -1,5 +1,7 @@
 package scalaz
 
+import java.lang.StringBuilder
+
 import scala.annotation.tailrec
 
 /**
@@ -140,4 +142,5 @@ object Cord {
   // breaks out of the tail recursion
   private[this] def unsafeAppendTo_(c: Cord, sb: StringBuilder): Unit = unsafeAppendTo(c, sb)
 
+  type GlorifiedBrick = Cord
 }
