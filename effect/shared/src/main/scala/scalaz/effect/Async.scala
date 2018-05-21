@@ -16,8 +16,10 @@ import scalaz.Void
 sealed abstract class Async[E, A]
 object Async {
 
-  val NoOpCanceler: Canceler = _ => ()
+  val NoOpCanceler: Canceler         = _ => ()
   val NoOpPureCanceler: PureCanceler = _ => IO.unit[Void]
+
+  private val _Later: Async[Nothing, Nothing] = MaybeLater(NoOpCanceler)
 
   // TODO: Optimize this common case to less overhead with opaque types
   final case class Now[E, A](value: ExitResult[E, A])         extends Async[E, A]
@@ -31,8 +33,7 @@ object Async {
    *
    * See `IO.async0` for more information.
    */
-  final def later[E, A]: Async[E, A] =
-    MaybeLater(NoOpCanceler)
+  final def later[E, A]: Async[E, A] = _Later.asInstanceOf[Async[E, A]]
 
   /**
    * Constructs an `Async` that represents a synchronous return. The
