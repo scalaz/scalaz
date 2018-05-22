@@ -20,9 +20,9 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
 
   type V[T] = String \/ T
 
-  def liftK[T, U](e: String \/ U): ReaderT[V, T, U] = kleisli[V, T, U]((env: T) => e)
+  def liftK[T, U](e: String \/ U): ReaderT[T, V, U] = kleisli[V, T, U]((env: T) => e)
 
-  def typeCheck(expr: Exp): ReaderT[V, TypeEnv, Type] = expr match {
+  def typeCheck(expr: Exp): ReaderT[TypeEnv, V, Type] = expr match {
     case Lit(v) => liftK(success(litToTy(v)))
     case Id(x)  => for {env <- ask[V, TypeEnv]; res <- liftK(find(x, env))} yield res
     // make sure the first branch is a boolean and then

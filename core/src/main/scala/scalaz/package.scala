@@ -121,18 +121,21 @@ package object scalaz {
 
   type ∨[A, B] = A \/ B
 
-  type ReaderT[F[_], E, A] = Kleisli[F, E, A]
-  val ReaderT = Kleisli
+  type ReaderT[E, F[_], A] = Kleisli[F, E, A]
   type =?>[E, A] = Kleisli[Option, E, A]
   
   /** @template */
-  type Reader[E, A] = ReaderT[Id, E, A]
+  type Reader[E, A] = ReaderT[E, Id, A]
 
   /** @template */
   type Writer[W, A] = WriterT[W, Id, A]
 
   /** @template */
   type Unwriter[W, A] = UnwriterT[Id, W, A]
+
+  object ReaderT {
+    def apply[E, F[_], A](f: E => F[A]): ReaderT[E, F, A] = Kleisli[F, E, A](f)
+  }
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
