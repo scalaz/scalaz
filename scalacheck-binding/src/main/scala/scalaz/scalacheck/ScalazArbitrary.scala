@@ -155,7 +155,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[F, S1, S2, A]] =
     F.contramap(s => s.apply(_))
 
-  implicit def cogenWriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[F, A, B]] =
+  implicit def cogenWriterT[A, F[_], B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[A, F, B]] =
     F.contramap(_.run)
 
   implicit def cogenUnwriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[UnwriterT[F, A, B]] =
@@ -509,8 +509,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
     Functor[Arbitrary].map(a)(Coproduct(_))
 
-  implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
-    Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
+  implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[W, F, A]] =
+    Functor[Arbitrary].map(A)(WriterT[W, F, A](_))
 
   implicit def unwriterTArb[F[_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
     Functor[Arbitrary].map(A)(UnwriterT[F, U, A](_))

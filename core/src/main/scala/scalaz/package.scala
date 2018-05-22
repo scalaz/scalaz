@@ -129,7 +129,7 @@ package object scalaz {
   type Reader[E, A] = ReaderT[Id, E, A]
 
   /** @template */
-  type Writer[W, A] = WriterT[Id, W, A]
+  type Writer[W, A] = WriterT[W, Id, A]
 
   /** @template */
   type Unwriter[W, A] = UnwriterT[Id, W, A]
@@ -139,7 +139,7 @@ package object scalaz {
   }
 
   object Writer {
-    def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+    def apply[W, A](w: W, a: A): WriterT[W, Id, A] = WriterT[W, Id, A]((w, a))
   }
 
   object Unwriter {

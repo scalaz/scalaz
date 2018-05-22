@@ -54,7 +54,7 @@ object MonadIO {
 
   implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
 
-  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
+  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[W, F, ?]]
 
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
 
