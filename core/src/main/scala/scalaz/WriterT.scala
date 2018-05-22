@@ -91,7 +91,7 @@ final case class WriterT[W, F[_], A](run: F[(W, A)]) { self =>
       case (a, b) => G.tuple2(f(a), g(b))
     })(writerT(_))
 
-  def rwst[R, S](implicit F: Functor[F]): ReaderWriterStateT[F, R, W, S, A] = ReaderWriterStateT(
+  def rwst[R, S](implicit F: Functor[F]): ReaderWriterStateT[R, W, S, F, A] = ReaderWriterStateT(
     (r, s) => F.map(self.run) {
       case (w, a) => (w, a, s)
     }

@@ -82,7 +82,7 @@ object CABRunLengthEncoder {
   import Token._
   import Free.Trampoline
 
-  type RunLength[A] = ReaderWriterStateT[Trampoline, RunLengthConfig, Cord, RunLengthState, A]
+  type RunLength[A] = ReaderWriterStateT[RunLengthConfig, Cord, RunLengthState, Trampoline, A]
 
   // At its essence the RWST monad transformer is a wrap around a function with the following shape:
   // (ReaderType, StateType) => Monad[WriterType, Result, StateType]
@@ -103,7 +103,7 @@ object CABRunLengthEncoder {
   // modify -- alter the current state
   // tell   -- append to the writer
   // ask    -- read from the reader
-  val rle = ReaderWriterStateT.rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
+  val rle = ReaderWriterStateT.rwstMonad[RunLengthConfig, Cord, RunLengthState, Trampoline]
   import rle._
 
   /**

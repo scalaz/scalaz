@@ -200,27 +200,27 @@ package object scalaz {
   def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
   /** @template */
-  type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
+  type ReaderWriterStateT[-R, W, S, F[_], A] = IndexedReaderWriterStateT[R, W, S, S, F, A]
   object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[F[_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+    def apply[R, W, S, F[_], A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[R, W, S, F, A] = IndexedReaderWriterStateT[R, W, S, S, F, A] { (r: R, s: S) => f(r, s) }
   }
 
   /** @template */
-  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
+  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A]
   object IndexedReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) => f(r, s) }
+    def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A] { (r: R, s: S1) => f(r, s) }
   }
 
   /** @template */
-  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[Id, R, W, S, A]
+  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[R, W, S, Id, A]
   object ReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+    def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[R, W, S, S, Id, A] { (r: R, s: S) => f(r, s) }
   }
-  type IRWST[F[_], -R, W, -S1, S2, A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
+  type IRWST[-R, W, -S1, S2, F[_], A] = IndexedReaderWriterStateT[R, W, S1, S2, F, A]
   val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
   type IRWS[-R, W, -S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
   val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
-  type RWST[F[_], -R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
+  type RWST[-R, W, S, F[_], A] = ReaderWriterStateT[R, W, S, F, A]
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
   type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
