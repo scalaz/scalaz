@@ -125,7 +125,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenContravariantCoyoneda[F[_]: Contravariant, A](implicit F: Cogen[F[A]]): Cogen[ContravariantCoyoneda[F, A]] =
     Cogen[F[A]].contramap(_.run)
 
-  implicit def cogenEitherT[F[_], A, B](implicit F: Cogen[F[A \/ B]]): Cogen[EitherT[F, A, B]] =
+  implicit def cogenEitherT[A, F[_], B](implicit F: Cogen[F[A \/ B]]): Cogen[EitherT[A, F, B]] =
     F.contramap(_.run)
 
   implicit def cogenLazyEitherT[F[_], A, B](implicit F: Cogen[F[LazyEither[A, B]]]): Cogen[LazyEitherT[F, A, B]] =
@@ -552,8 +552,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
     Functor[Arbitrary].map(A)(IndexedStateT[F, S1, S2, A](_))
 
-  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
-      Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
+  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[A, F, B]] =
+      Functor[Arbitrary].map(A)(EitherT[A, F, B](_))
 
   implicit def theseTArb[F[_], A, B](implicit A: Arbitrary[F[A \&/ B]]): Arbitrary[TheseT[F, A, B]] =
     Functor[Arbitrary].map(A)(TheseT[F, A, B](_))

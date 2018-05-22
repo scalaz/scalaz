@@ -99,12 +99,12 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
     orElse(a)
 
   /** @since 7.0.3 */
-  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
+  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[E, F, A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
 
   def toListT(implicit F: Functor[F]) : ListT[F, A] =  ListT[F,A](F.map(run)(IList.fromOption))
 
   /** @since 7.0.3 */
-  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
+  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[A, F, B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
 
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }

@@ -367,6 +367,6 @@ package object scalaz {
   type DRight[A, B] = \/-[A, B]
   val DRight = \/-
 
-  type DisjunctionT[F[_], A, B] = EitherT[F, A, B]
+  type DisjunctionT[A, F[_], B] = EitherT[A, F, B]
   val DisjunctionT = EitherT
 }

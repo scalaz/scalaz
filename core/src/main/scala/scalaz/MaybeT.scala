@@ -83,9 +83,9 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   def |||(a: => MaybeT[F, A])(implicit F: Monad[F]): MaybeT[F, A] =
     orElse(a)
 
-  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(_.toRight(e)))
+  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[E, F, A] = EitherT(F.map(run)(_.toRight(e)))
 
-  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(_.toLeft(b)))
+  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[A, F, B] = EitherT(F.map(run)(_.toLeft(b)))
 
   private def mapO[B](f: Maybe[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }

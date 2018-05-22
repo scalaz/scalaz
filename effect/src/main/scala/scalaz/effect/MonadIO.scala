@@ -46,7 +46,7 @@ object MonadIO {
 
   implicit def optionTMonadIO[F[_]: MonadIO] = fromLiftIO[OptionT[F, ?]]
 
-  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
+  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[E, F, ?]]
 
   implicit def theseTMonadIO[F[_]: MonadIO, E: Semigroup] = fromLiftIO[TheseT[F, E, ?]]
 

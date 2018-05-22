@@ -37,7 +37,7 @@ object LiftIO {
     }
 
   implicit def eitherTLiftIO[F[_]: LiftIO, E] =
-    new LiftIO[EitherT[F, E, ?]] {
+    new LiftIO[EitherT[E, F, ?]] {
       def liftIO[A](ioa: IO[A]) = EitherT(LiftIO[F].liftIO(ioa.map(\/.right)))
     }
 
