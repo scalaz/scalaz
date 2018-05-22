@@ -110,18 +110,10 @@ trait ListInstances extends ListInstances0 {
 
   implicit def listMonoid[A]: Monoid[List[A]] = listInstance.monoid[A]
 
-  implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    override def show(as: List[A]) = {
-      def commaSep(rest: List[A], acc: Cord): Cord =
-        rest match {
-          case Nil => acc
-          case x::xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
-        }
-      "[" +: (as match {
-        case Nil => Cord()
-        case x::xs => commaSep(xs, Show[A].show(x))
-      }) :+ "]"
-    }
+  implicit def listShow[A](implicit A: Show[A]): Show[List[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[List].intercalate(as.map(A.show), Cord(","))
+    cord"[$content]"
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {

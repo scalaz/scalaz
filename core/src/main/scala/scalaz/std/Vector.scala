@@ -73,11 +73,9 @@ trait VectorInstances extends VectorInstances0 {
   // Vector concat was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
   // https://issues.scala-lang.org/browse/SI-4442
   implicit def vectorMonoid[A]: Monoid[Vector[A]] = vectorInstance.monoid[A]
- 
-  implicit def vectorShow[A: Show]: Show[Vector[A]] = new Show[Vector[A]] {
-    import Cord._
-    override def show(as: Vector[A]) =
-      Cord("[", mkCord(",", as.map(Show[A].show(_)):_*), "]")
+
+  implicit def vectorShow[A: Show]: Show[Vector[A]] = Show.show { as =>
+    list.listShow[A].show(as.toList)
   }
 
   implicit def vectorOrder[A](implicit A0: Order[A]): Order[Vector[A]] = new VectorOrder[A] {

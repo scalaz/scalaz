@@ -82,7 +82,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   = TheseT(F.apply2(run, t.run)(_ &&& _))
 
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord]
-  = F.map(run)(_.show)
+  = F.map(run)(\&/.TheseShow[A, B].show(_))
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z
   = F.foldRight[A \&/ B, Z](run, z)((a, b) => a.foldRight(b)(f))

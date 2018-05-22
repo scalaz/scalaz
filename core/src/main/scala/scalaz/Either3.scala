@@ -47,9 +47,9 @@ object Either3 {
 
   implicit def show[A: Show, B: Show, C: Show]: Show[Either3[A, B, C]] = new Show[Either3[A, B, C]] {
     override def show(v: Either3[A, B, C]) = v match {
-      case Left3(a)   => Cord("Left3(", a.shows, ")")
-      case Middle3(b) => Cord("Middle3(", b.shows, ")")
-      case Right3(c)  => Cord("Right3(", c.shows, ")")
+      case Left3(a)   => cord"Left3($a)"
+      case Middle3(b) => cord"Middle3($b)"
+      case Right3(c)  => cord"Right3($c)"
     }
   }
 }

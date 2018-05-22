@@ -704,20 +704,11 @@ sealed abstract class IListInstances extends IListInstance0 {
       def zero: IList[A] = empty
     }
 
-  implicit def show[A](implicit A: Show[A]): Show[IList[A]] =
-    new Show[IList[A]] {
-      override def show(as: IList[A]) = {
-        @tailrec def commaSep(rest: IList[A], acc: Cord): Cord =
-          rest match {
-            case INil() => acc
-            case ICons(x, xs) => commaSep(xs, (acc :+ ",") ++ A.show(x))
-          }
-        "[" +: (as match {
-          case INil() => Cord()
-          case ICons(x, xs) => commaSep(xs, A.show(x))
-        }) :+ "]"
-      }
-    }
+  implicit def show[A](implicit A: Show[A]): Show[IList[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = instances.intercalate(as.map(A.show), Cord(","))
+    cord"[$content]"
+  }
 
 }
 

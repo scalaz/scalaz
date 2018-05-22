@@ -17,6 +17,7 @@ trait ToShowOps  {
 
   ////
   implicit final def showInterpolator(sc: StringContext): Show.ShowInterpolator = Show.ShowInterpolator(sc)
+  implicit final def cordInterpolator(sc: StringContext): Cord.CordInterpolator = new Cord.CordInterpolator(sc)
   ////
 }
 

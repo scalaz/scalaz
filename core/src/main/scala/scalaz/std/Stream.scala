@@ -160,11 +160,11 @@ trait StreamInstances {
           }
         }
     }
-  implicit def streamShow[A](implicit A0: Show[A]): Show[Stream[A]] =
-    new Show[Stream[A]] {
-      override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
-    }
-
+  implicit def streamShow[A](implicit A0: Show[A]): Show[Stream[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[Stream].intercalate(as.map(A0.show), Cord(","))
+    cord"Stream($content)"
+  }
 
 }
 

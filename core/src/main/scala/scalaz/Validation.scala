@@ -291,13 +291,6 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
       }
     }
 
-  /** Show for a validation value. */
-  def show(implicit SE: Show[E], SA: Show[A]): Cord =
-    this match {
-      case Failure(e) => ("Failure(": Cord) ++ SE.show(e) :- ')'
-      case Success(a) => ("Success(": Cord) ++ SA.show(a) :- ')'
-    }
-
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `+|+` */
   def append(that: Validation[E, A])(implicit es: Semigroup[E], as: Semigroup[A]): Validation[E, A] = (this, that) match {
     case (Success(a1), Success(a2))   => Success(as.append(a1, a2))
@@ -492,8 +485,13 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
           a1 === a2
       }
 
-  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
-    Show.show(_.show)
+  implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Failure(e) => cord"Failure($e)"
+      case Success(a) => cord"Success($a)"
+    }
+  }
 
   implicit def ValidationSemigroup[E: Semigroup, A: Semigroup]: Semigroup[Validation[E, A]] =
     new Semigroup[Validation[E, A]] {

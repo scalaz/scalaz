@@ -140,7 +140,7 @@ object CABRunLengthEncoder {
     if(length <= minRun)
       tell(Monoid[Cord].multiply(token.show, length))
     else
-      tell(length.show ++ token.show)
+      tell(length.show :: token.show)
 
 
   /**
@@ -178,7 +178,7 @@ object CABRunLengthEncoder {
     val config = RunLengthConfig(minRun)
     val initialState = RunLengthState.initial(input)
     val (output, result, finalState) = untilM_(maybeEmit, done).run(config, initialState).run
-    output.shows
+    output.toString
   }
 }
 
