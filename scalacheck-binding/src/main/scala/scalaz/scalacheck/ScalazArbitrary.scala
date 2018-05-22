@@ -101,7 +101,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIndexedStoreT[F[_], I: Cogen, A, B](implicit F: Cogen[F[A => B]]): Cogen[IndexedStoreT[F, I, A, B]] =
     Cogen[(F[A => B], I)].contramap(_.run)
 
-  implicit def cogenIndexedContsT[W[_], M[_], R, O, A](implicit F: Cogen[W[A => M[O]] => M[R]]): Cogen[IndexedContsT[W, M, R, O, A]] =
+  implicit def cogenIndexedContsT[W[_], R, O, M[_], A](implicit F: Cogen[W[A => M[O]] => M[R]]): Cogen[IndexedContsT[W, R, O, M, A]] =
     F.contramap(_.run)
 
   implicit def cogenEndo[A](implicit A: Cogen[A => A]): Cogen[Endo[A]] =
@@ -546,7 +546,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def tracedTArb[W[_], A, B](implicit A: Arbitrary[W[A => B]]): Arbitrary[TracedT[W, A, B]] =
     Functor[Arbitrary].map(A)(TracedT(_))
 
-  implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, M, R, O, A]] =
+  implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, R, O, M, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
   implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[F, S1, S2, A]] =

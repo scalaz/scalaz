@@ -305,45 +305,45 @@ package object scalaz {
   type PState[S, A] = PStateT[Id, S, A]
 
   /** @template */
-  type IndexedConts[W[_], R, O, A] = IndexedContsT[W, Id, R, O, A]
+  type IndexedConts[W[_], R, O, A] = IndexedContsT[W, R, O, Id, A]
   object IndexedConts extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] = IndexedContsT[W, Id, R, O, A](f)
+    def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] = IndexedContsT[W, R, O, Id, A](f)
   }
 
   /** @template */
-  type IndexedContT[M[_], R, O, A] = IndexedContsT[Id, M, R, O, A]
+  type IndexedContT[R, O, M[_], A] = IndexedContsT[Id, R, O, M, A]
   object IndexedContT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[M, R, O, A] = IndexedContsT[Id, M, R, O, A](f)
+    def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[R, O, M, A] = IndexedContsT[Id, R, O, M, A](f)
   }
   
   /** @template */
-  type IndexedCont[R, O, A] = IndexedContT[Id, R, O, A]
+  type IndexedCont[R, O, A] = IndexedContT[R, O, Id, A]
   object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, Id, R, O, A](f)
+    def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, R, O, Id, A](f)
   }
 
   /** @template */
-  type ContsT[W[_], M[_], R, A] = IndexedContsT[W, M, R, R, A]
+  type ContsT[W[_], R, M[_], A] = IndexedContsT[W, R, R, M, A]
   object ContsT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], M[_], R, A](f: W[A => M[R]] => M[R]): ContsT[W, M, R, A] = IndexedContsT[W, M, R, R, A](f)
+    def apply[W[_], M[_], R, A](f: W[A => M[R]] => M[R]): ContsT[W, R, M, A] = IndexedContsT[W, R, R, M, A](f)
   }
 
   /** @template */
-  type Conts[W[_], R, A] = ContsT[W, Id, R, A]
+  type Conts[W[_], R, A] = ContsT[W, R, Id, A]
   object Conts extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], R, A](f: W[A => R] => R): Conts[W, R, A] = IndexedContsT[W, Id, R, R, A](f)
+    def apply[W[_], R, A](f: W[A => R] => R): Conts[W, R, A] = IndexedContsT[W, R, R, Id, A](f)
   }
 
   /** @template */
-  type ContT[M[_], R, A] = ContsT[Id, M, R, A]
+  type ContT[R, M[_], A] = ContsT[Id, R, M, A]
   object ContT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[M[_], R, A](f: (A => M[R]) => M[R]): ContT[M, R, A] = IndexedContsT[Id, M, R, R, A](f)
+    def apply[M[_], R, A](f: (A => M[R]) => M[R]): ContT[R, M, A] = IndexedContsT[Id, R, R, M, A](f)
   }
 
   /** @template */
-  type Cont[R, A] = ContT[Id, R, A]
+  type Cont[R, A] = ContT[R, Id, A]
   object Cont extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
+    def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, R, R, Id, A](f)
   }
 
   /** [[scalaz.Inject]][F, G] */
