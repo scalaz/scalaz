@@ -47,6 +47,8 @@ matrix:
     script:
     - sbt "++${TRAVIS_SCALA_VERSION}!" example/compile coreJS/compile effectJS/compile iterateeJS/compile
     # TODO scalacheck for Scala 2.13.0-M4
+    - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
+      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreJVM/publish effectJVM/publish iterateeJVM/publish concurrent/publish coreJS/publish effectJS/publish iterateeJS/publish ; fi
   - scala: 2.12.6
     jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"
@@ -58,3 +60,5 @@ matrix:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
     script:
     - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
+    - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
+      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreNative/publish effectNative/publish iterateeNative/publish ; fi
