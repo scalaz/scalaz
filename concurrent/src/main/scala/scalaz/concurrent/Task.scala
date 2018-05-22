@@ -220,7 +220,7 @@ class Task[A](val get: Future[Throwable \/ A]) {
         }
       }
 
-    Task.async { help(delays, Stream()).unsafePerformAsync }.map(tup => (tup._1, IList(tup._2: _*)))
+    Task.async { help(delays, Stream()).unsafePerformAsync }.map(tup => (tup._1, IList.fromSeq(tup._2)))
     }
 
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */

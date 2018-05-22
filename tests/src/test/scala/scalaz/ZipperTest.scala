@@ -1,7 +1,6 @@
 package scalaz
 
 import Scalaz._
-import NonEmptyList.nels
 import Zipper._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
@@ -25,7 +24,7 @@ object ZipperTest extends SpecLite {
   }
 
   "Zipper Move Then To Stream" in check {
-    val n = nels(1, 2, 3, 4)
+    val n = NonEmptyList(1, 2, 3, 4)
     n.toZipper.move(2).map(_.toStream).exists(_ ==(n.stream))
   }
 
