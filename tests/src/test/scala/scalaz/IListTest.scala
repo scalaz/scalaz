@@ -365,31 +365,31 @@ object IListTest extends SpecLite {
   }
 
   "toEphemeralStream" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
+    IList.fromSeq(ns).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
   }
 
   "toList" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toList must_=== ns
+    IList.fromSeq(ns).toList must_=== ns
   }
 
   "toMap" ! forAll { ps: List[(String, Int)] =>
-    IList(ps: _*).toMap must_=== ==>>(ps: _*)
+    IList.fromSeq(ps).toMap must_=== ==>>(ps: _*)
   }
 
   "toNel" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
+    IList.fromSeq(ns).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
   "toStream" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toStream must_=== ns.toStream
+    IList.fromSeq(ns).toStream must_=== ns.toStream
   }
 
   "toVector" ! forAll { ns: Vector[Int] =>
-    IList(ns: _*).toVector must_=== ns
+    IList.fromSeq(ns).toVector must_=== ns
   }
 
   "toZipper" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
+    IList.fromSeq(ns).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
   }
 
   // uncons is tested everywhere

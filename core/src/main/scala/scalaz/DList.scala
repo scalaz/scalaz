@@ -68,7 +68,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
 }
 
 object DList extends DListInstances {
-  def apply[A](xs: A*): DList[A] = fromIList(IList(xs: _*))
+  def apply[A](xs: A*): DList[A] = fromIList(IList.fromSeq(xs))
 
   def mkDList[A](f: (IList[A]) => Trampoline[IList[A]]): DList[A] =
     new DList[A](f)

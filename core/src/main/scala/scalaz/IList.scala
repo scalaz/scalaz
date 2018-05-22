@@ -338,7 +338,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     drop(from).take((until max 0)- (from max 0))
 
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
-    IList(toList.sortBy(f)(B.toScalaOrdering): _*)
+    IList.fromSeq(toList.sortBy(f)(B.toScalaOrdering))
 
   def sorted(implicit ev: Order[A]): IList[A] =
     sortBy(identity)
@@ -480,7 +480,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     ev.subst[λ[`-α` => IList[α @uncheckedVariance] <~< IList[B]]](refl)(this)
 
   def zipWithIndex: IList[(A, Int)] =
-    zip(IList(0 until length : _*))
+    zip(IList.fromSeq(0 until length))
 
 }
 
@@ -494,13 +494,22 @@ final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 object IList extends IListInstances {
 
   // optimised versions of apply(A*)
-  @inline final def apply[A](a: A, b: A): IList[A] = a :: single(b)
+  @inline final def apply[A](): IList[A] = INil()
+  @inline final def apply[A](a: A): IList[A] = ICons(a, INil())
+  @inline final def apply[A](a: A, b: A): IList[A] = a :: apply(b)
   @inline final def apply[A](a: A, b: A, c: A): IList[A] = a :: apply(b, c)
   @inline final def apply[A](a: A, b: A, c: A, d: A): IList[A] = a :: apply(b, c, d)
   @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): IList[A] = a :: apply(b, c, d, e)
   @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): IList[A] = a :: apply(b, c, d, e, f)
 
-  def apply[A](as: A*): IList[A] =
+  def apply[A](a: A, b: A, c: A, d: A, e: A, f: A, as: A*): IList[A] =
+    a :: b :: c :: d :: e :: f :: fromSeq(as)
+
+  /**
+   * For compatibility with the scala varargs language feature. Note that
+   * varargs are inefficient as they incur the overhead of a Seq creation.
+   */
+  def fromSeq[A](as: Seq[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
   @inline def single[A](a: A): IList[A] =

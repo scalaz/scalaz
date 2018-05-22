@@ -117,8 +117,8 @@ object Cord {
   final class CordInterpolator(private val sc: StringContext) extends AnyVal {
     def cord(args: CordInterpolator.Cords*): Cord = {
       import StringContext.treatEscapes
-      val strings = IList(sc.parts: _*).map(s => Cord(treatEscapes(s)))
-      val cords   = IList(args: _*).map(_.cord)
+      val strings = IList.fromSeq(sc.parts).map(s => Cord(treatEscapes(s)))
+      val cords   = IList.fromSeq(args).map(_.cord)
       strings.interleave(cords).foldRight(Cord())((c, acc) => monoid.append(c, acc))
     }
   }
