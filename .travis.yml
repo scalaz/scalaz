@@ -54,7 +54,7 @@ matrix:
       jdk: oraclejdk8
       script:
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile concurrent/compile example/compile coreJS/compile effectJS/compile iterateeJS/compile
-      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
+      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver coreJVM/publish effectJVM/publish iterateeJVM/publish concurrent/publish coreJS/publish effectJS/publish iterateeJS/publish ; fi
       # TODO scalacheck for Scala 2.13.0-M4
 
 env:
