@@ -17,9 +17,11 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
+  - if [[ "${JAVA_HOME}" != $(jdk_switcher home oraclejdk9) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${PUBLISH_SONATYPE}" != "true" && "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -41,21 +43,27 @@ matrix:
       before_install:
       - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -
       script:
-      - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+      - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run
+      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver rootNative/publish ; fi
     - scala: 2.12.6
       jdk: oraclejdk9
+      env: TEST_PROJECT=""
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
     - scala: 2.13.0-M4
       jdk: oraclejdk8
       script:
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses coreJVM/compile effectJVM/compile iterateeJVM/compile concurrent/compile example/compile coreJS/compile effectJS/compile iterateeJS/compile
+      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver rootNative/publish ; fi
       # TODO scalacheck for Scala 2.13.0-M4
 
 env:
   matrix:
   - TEST_PROJECT="rootJVM"
   - TEST_PROJECT="rootJS"
+  global:
+  - secure: f9sDrym/MfYK1hBBSaILMxn4VCfyzJREqpuGXhEggrdZpYTNjp8GMXrqKfla3AwVAuWCveXk9u+skUYqKQ6LTG7RdQS5PzA2I9kx8afNRA5nxMmVQjuCKYM0/aF4egY5i98tGXG0NiMO3t72XuxtR+OeWLysUVB8hoNghpOOVMw=
+  - secure: PPURD7/Lj6+kqE342Ty99XhO5SR7GlrakSbZeKm5RKXS2Q5yFrexdf+UcS3KUbq6LaWnH75q+UgC2mcRMIspRmz37CtVXkGbJYp3VBYFJbmIga+w0bBVvlSw8QWIGhdz3xnOOuiEYpgeOKnAzShr59HYKG2O90jlMdt4cPRUrwg=
 
 addons:
   apt:
