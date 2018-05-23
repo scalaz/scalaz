@@ -268,7 +268,11 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def EitherLastRightProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.RightProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
 
-  implicit def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
+  // for binary compatibility
+  private[scalaz] def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = {
+    val method = ArraySeq.asInstanceOf[{def apply[B](xs: Seq[B]): ArraySeq[B]}]
+    Functor[Arbitrary].map(arb[List[A]])(method.apply(_))
+  }
 
   import FingerTree._
 
