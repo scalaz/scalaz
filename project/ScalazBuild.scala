@@ -35,23 +35,24 @@ object Scalaz {
     "-opt-inline-from:<source>"
   )
 
-  def stdSettings(prjName: String) = Seq(
-    name := s"scalaz-$prjName",
-    scalacOptions := stdOptions,
-    scalacOptions in (Compile, compile) ++=
-      Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
-    libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
-      compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.6"),
-      compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
-      compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "0.6")
-    ),
-    incOptions ~= (_.withLogRecompileOnMacro(false))
-  ) ++ {
-    Seq(packageBin, packageDoc, packageSrc).flatMap {
-      // include LICENSE.txt in all packaged artifacts
-      inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  def stdSettings(prjName: String) =
+    Seq(
+      name := s"scalaz-$prjName",
+      scalacOptions := stdOptions,
+      scalacOptions in (Compile, compile) ++=
+        Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
+      libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
+        compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.6"),
+        compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
+        compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "0.6")
+      ),
+      incOptions ~= (_.withLogRecompileOnMacro(false))
+    ) ++ {
+      Seq(packageBin, packageDoc, packageSrc).flatMap {
+        // include LICENSE.txt in all packaged artifacts
+        inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+      }
     }
-  }
 
   val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
   val findLicense = licenseFile in Global := {
