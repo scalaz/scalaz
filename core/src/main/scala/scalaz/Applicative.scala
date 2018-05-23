@@ -122,5 +122,12 @@ object Applicative {
 
   implicit def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
 
+  import Isomorphism.<~>
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Applicative[G]): Applicative[F] =
+    new IsomorphismApplicative[F, G] {
+      override implicit def G: Applicative[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

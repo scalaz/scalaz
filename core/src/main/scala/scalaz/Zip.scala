@@ -72,5 +72,13 @@ object Zip {
 
   def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
       F.zip(t._1, t._2)
+
+  import Isomorphism.<~>
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Zip[G]): Zip[F] =
+    new IsomorphismZip[F, G] {
+      override implicit def G: Zip[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

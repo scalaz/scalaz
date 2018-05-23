@@ -64,6 +64,12 @@ object MonadPlus {
   @inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: MonadPlus[G]): MonadPlus[F] =
+    new IsomorphismMonadPlus[F, G] {
+      override implicit def G: MonadPlus[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

@@ -103,6 +103,12 @@ object Traverse1 {
   @inline def apply[F[_]](implicit F: Traverse1[F]): Traverse1[F] = F
 
   ////
+  import Isomorphism.<~>
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Traverse1[G]): Traverse1[F] =
+    new IsomorphismTraverse1[F, G] {
+      override implicit def G: Traverse1[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

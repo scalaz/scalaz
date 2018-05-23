@@ -130,6 +130,12 @@ object Bitraverse {
   @inline def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
 
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Bitraverse[G]): Bitraverse[F] =
+    new IsomorphismBitraverse[F, G] {
+      override implicit def G: Bitraverse[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

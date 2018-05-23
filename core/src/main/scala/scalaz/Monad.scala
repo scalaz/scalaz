@@ -92,5 +92,12 @@ object Monad {
   def monadMTMAB[MT[_[_], _], MAB[_, _], A](implicit t: MonadTrans[MT], m: Monad[MAB[A, ?]]): Monad[MT[MAB[A, ?], ?]] =
     t.apply[MAB[A, ?]]
 
+  import Isomorphism.<~>
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Monad[G]): Monad[F] =
+    new IsomorphismMonad[F, G] {
+      override implicit def G: Monad[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

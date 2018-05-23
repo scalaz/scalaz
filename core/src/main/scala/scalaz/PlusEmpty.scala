@@ -55,5 +55,13 @@ object PlusEmpty {
       def plus[A](a: M[N[A]], b: => M[N[A]]): M[N[A]] =
         M.bind(a) { a0 => M.map(b) { P.plus(a0, _) } }
     }
+
+  import Isomorphism.<~>
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: PlusEmpty[G]): PlusEmpty[F] =
+    new IsomorphismEmpty[F, G] {
+      override implicit def G: PlusEmpty[G] = E
+      override def iso: F <~> G = D
+    }
   ////
 }

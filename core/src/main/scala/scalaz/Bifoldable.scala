@@ -117,5 +117,10 @@ object Bifoldable {
       bifoldR(fa, F.zero)(x => y => F.append(f(x),  y))(x => y => F.append(g(x),  y))
   }
 
+  def fromIso[F[_, _], G[_, _]](D: F ~~> G)(implicit E: Bifoldable[G]): Bifoldable[F] =
+    new IsomorphismBifoldable[F, G] {
+      override implicit def G: Bifoldable[G] = E
+      override def biNaturalTrans: F ~~> G = D
+    }
   ////
 }

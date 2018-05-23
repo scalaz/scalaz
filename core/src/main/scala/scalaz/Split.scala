@@ -19,5 +19,12 @@ object Split {
   @inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Split[G]): Split[F] =
+    new IsomorphismSplit[F, G] {
+      override implicit def G: Split[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }

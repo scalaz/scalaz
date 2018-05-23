@@ -22,5 +22,12 @@ object Choice {
   @inline def apply[F[_, _]](implicit F: Choice[F]): Choice[F] = F
 
   ////
+  import scalaz.Isomorphism.<~~>
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Choice[G]): Choice[F] =
+    new IsomorphismChoice[F, G] {
+      override implicit def G: Choice[G] = E
+      override def iso: F <~~> G = D
+    }
   ////
 }
