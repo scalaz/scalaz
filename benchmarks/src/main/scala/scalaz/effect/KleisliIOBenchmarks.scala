@@ -5,6 +5,7 @@ object ScalazIOArray {
   def bubbleSort[A](lessThanEqual0: (A, A) => Boolean)(array: Array[A]): IO[Void, Unit] = {
 
     type IndexValue   = (Int, A)
+    type IJIndex      = (Int, Int)
     type IJIndexValue = (IndexValue, IndexValue)
 
     val lessThanEqual =
@@ -12,21 +13,21 @@ object ScalazIOArray {
         case ((_, ia), (_, ja)) => lessThanEqual0(ia, ja)
       }
 
-    val extractIJAndIncrementJ = KleisliIO.lift[Void, IJIndexValue, (Int, Int)] {
+    val extractIJAndIncrementJ = KleisliIO.lift[Void, IJIndexValue, IJIndex] {
       case ((i, _), (j, _)) => (i, j + 1)
     }
 
-    val extractIAndIncrementI = KleisliIO.lift[Void, (Int, Int), Int](_._1 + 1)
+    val extractIAndIncrementI = KleisliIO.lift[Void, IJIndex, Int](_._1 + 1)
 
-    val innerLoopStart = KleisliIO.lift[Void, Int, (Int, Int)]((i: Int) => (i, i + 1))
+    val innerLoopStart = KleisliIO.lift[Void, Int, IJIndex]((i: Int) => (i, i + 1))
 
     val outerLoopCheck: KleisliIO[Void, Int, Boolean] =
       KleisliIO.lift((i: Int) => i < array.length - 1)
 
-    val innerLoopCheck: KleisliIO[Void, (Int, Int), Boolean] =
+    val innerLoopCheck: KleisliIO[Void, IJIndex, Boolean] =
       KleisliIO.lift { case (_, j) => j < array.length }
 
-    val extractIJIndexValue: KleisliIO[Void, (Int, Int), IJIndexValue] =
+    val extractIJIndexValue: KleisliIO[Void, IJIndex, IJIndexValue] =
       KleisliIO.impureVoid {
         case (i, j) => ((i, array(i)), (j, array(j)))
       }
@@ -45,8 +46,8 @@ object ScalazIOArray {
         innerLoopStart >>>
           KleisliIO.whileDo(innerLoopCheck)(
             extractIJIndexValue >>>
-            KleisliIO.ifThenElse(lessThanEqual)(KleisliIO.identity)(swapIJ) >>>
-            extractIJAndIncrementJ
+              KleisliIO.ifThenElse(lessThanEqual)(KleisliIO.identity)(swapIJ) >>>
+              extractIJAndIncrementJ
           ) >>>
           extractIAndIncrementI
       )

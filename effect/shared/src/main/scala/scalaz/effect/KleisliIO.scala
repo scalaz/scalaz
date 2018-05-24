@@ -132,7 +132,7 @@ object KleisliIO {
       }
     )
 
-  final def impureVoid[A, B](f: A => B): KleisliIO[Void, A, B] = impure(VoidCatcher)(f)
+  final def impureVoid[A, B](f: A => B): KleisliIO[Void, A, B] = new Impure(f)
 
   final def compose[E, A, B, C](second: KleisliIO[E, B, C], first: KleisliIO[E, A, B]): KleisliIO[E, A, C] =
     (second, first) match {

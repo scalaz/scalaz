@@ -14,12 +14,11 @@ class BubbleSortBenchmarks {
   var size: Int = _
 
   def createTestArray: Array[Int] = (1 to size).toArray.reverse
-  def assertSorted(array: Array[Int]): Unit = {
+  def assertSorted(array: Array[Int]): Unit =
     if (!array.sorted.sameElements(array)) {
       println("Actual array: " + array.toList)
       throw new Exception("Array not correctly sorted")
     }
-  }
 
   @Benchmark
   def scalazBubbleSort() = {
