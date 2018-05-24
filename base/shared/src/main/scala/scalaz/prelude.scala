@@ -139,16 +139,16 @@ trait BaseDataAliases {
 }
 
 trait AllFunctions
-    extends VoidFunctions
-    with data.DisjunctionFunctions
-    with data.MaybeFunctions
-    with ct.KleisliFunctions
-    with ct.InvariantFunctorFunctions
-    with ct.PhantomFunctions
-    with ct.TraversableFunctions
+    extends scala.AnyRef
+    with algebra.AlgebraFunctions
+    with core.CoreFunctions
+    with ct.CtFunctions
+    with data.DataFunctions
+    with debug.DebugFunctions
 
 trait AllInstances
-    extends data.AMaybeInstances
+    extends scala.AnyRef
+    with data.AMaybeInstances
     with data.ConstInstances
     with data.DisjunctionInstances
     with data.DownStarInstances
@@ -171,11 +171,9 @@ trait AllInstances
     with ct.ChoiceInstances
     with ct.CobindInstances
     with ct.ComonadInstances
-    with ct.FoldableInstances
     with ct.KleisliInstances
     with ct.MonadInstances
     with ct.PhantomInstances
-    with ct.ProfunctorInstances
     with ct.StrongInstances
     with ct.TraversableInstances
     with debug.DebugInstances
@@ -184,7 +182,6 @@ trait AllInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances
     with algebra.MonoidInstances
-    with algebra.SemigroupInstances
 
 trait AllSyntax
     extends VoidSyntax

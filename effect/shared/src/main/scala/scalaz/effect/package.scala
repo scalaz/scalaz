@@ -2,7 +2,7 @@
 
 package scalaz
 
-import scala.AnyRef
+import scala.AnyVal
 
 package object effect {
   type Error            = java.lang.Error
@@ -12,7 +12,7 @@ package object effect {
   type RuntimeException = java.lang.RuntimeException
   type Throwable        = java.lang.Throwable
 
-  implicit class IOVoidSyntax[A](val io: IO[Void, A]) extends AnyRef {
+  implicit class IOVoidSyntax[A](val io: IO[Void, A]) extends AnyVal {
     def apply[E]: IO[E, A] = io.asInstanceOf[IO[E, A]]
   }
 

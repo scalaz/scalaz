@@ -25,6 +25,13 @@ object StrongClass {
   trait Alt[D <: Alt[D]]
 }
 
+trait StrongFunctions {
+  @inline final def first[F[_, _], A, B, C](fab: F[A, B])(implicit F: Strong[F]): F[(A, C), (B, C)] =
+    F.first(fab)
+  @inline final def second[F[_, _], A, B, C](fab: F[A, B])(implicit F: Strong[F]): F[(C, A), (C, B)] =
+    F.second(fab)
+}
+
 trait StrongInstances { instances =>
 
   implicit val functionStrong: Strong[Function] = instanceOf(

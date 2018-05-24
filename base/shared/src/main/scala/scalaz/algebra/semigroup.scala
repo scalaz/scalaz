@@ -7,7 +7,10 @@ trait SemigroupClass[A] {
   def append(a1: A, a2: => A): A
 }
 
-trait SemigroupInstances {}
+trait SemigroupFunctions {
+  @inline final def append[A](a: A, b: => A)(implicit A: Semigroup[A]): A =
+    A.append(a, b)
+}
 
 trait SemigroupSyntax {
   implicit final class ToSemigroupOps[A](a: A) {

@@ -26,8 +26,13 @@ object TraversableClass {
 }
 
 trait TraversableFunctions {
-  def sequence[T[_], F[_], A](tfa: T[F[A]])(implicit F: Applicative[F], T: Traversable[T]): F[T[A]] =
-    T.sequence(tfa)
+  @inline final def traverse[F[_], G[_]: Applicative, A, B](fa: F[A])(
+    f: A => G[B],
+  )(implicit F: Traversable[F]): G[F[B]] =
+    F.traverse(fa)(f)
+
+  @inline final def sequence[F[_], G[_]: Applicative, A](fga: F[G[A]])(implicit F: Traversable[F]): G[F[A]] =
+    F.sequence(fga)
 }
 
 trait TraversableInstances {

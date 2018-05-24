@@ -5,6 +5,11 @@ trait MonoidClass[A] extends SemigroupClass[A] {
   def empty: A
 }
 
+trait MonoidFunctions {
+  @inline final def empty[A](implicit A: Monoid[A]): A =
+    A.empty
+}
+
 trait MonoidInstances {
   implicit val stringMonoid: Monoid[String] = instanceOf(new MonoidClass[String] {
     def append(a1: String, a2: => String) = a1 + a2

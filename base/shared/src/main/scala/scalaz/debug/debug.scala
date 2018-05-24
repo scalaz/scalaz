@@ -28,6 +28,11 @@ object DebugClass {
   def fromToString[A]: Debug[A] = instanceOf[DebugClass[A]](_.toString)
 }
 
+trait DebugFunctions {
+  @inline final def debug[A](a: A)(implicit A: Debug[A]): String =
+    A.debug(a)
+}
+
 trait DebugInstances {
   implicit final def contravariantDebug: Contravariant[DebugClass] =
     instanceOf(new ContravariantClass[DebugClass] {

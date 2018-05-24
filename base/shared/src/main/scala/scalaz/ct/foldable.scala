@@ -36,7 +36,14 @@ object FoldableClass {
 
 }
 
-trait FoldableInstances {}
+trait FoldableFunctions {
+  @inline final def foldMap[F[_], A, B: Monoid](fa: F[A])(f: A => B)(implicit F: Foldable[F]): B =
+    F.foldMap(fa)(f)
+  @inline final def foldRight[F[_], A, B](fa: F[A], z: => B)(f: (A, => B) => B)(implicit F: Foldable[F]): B =
+    F.foldRight(fa, z)(f)
+  @inline final def foldLeft[F[_], A, B](fa: F[A], z: B)(f: (B, A) => B)(implicit F: Foldable[F]): B =
+    F.foldLeft(fa, z)(f)
+}
 
 trait FoldableSyntax {
   implicit final class ToFoldableOps[F[_], A](self: F[A]) {

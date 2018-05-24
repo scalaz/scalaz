@@ -1,8 +1,6 @@
 package scalaz
 package ct
 
-import scala.Tuple2
-
 import scala.language.experimental.macros
 
 /** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
@@ -49,7 +47,21 @@ object BifunctorClass {
   }
 }
 
+trait BifunctorFunctions {
+  @inline final def bimap[F[_, _], A, B, S, T](fab: F[A, B])(
+    as: A => S,
+    bt: B => T
+  )(implicit F: Bifunctor[F]): F[S, T] =
+    F.bimap(fab)(as, bt)
+
+  @inline final def lmap[F[_, _], A, B, S](fab: F[A, B])(as: A => S)(implicit F: Bifunctor[F]): F[S, B] =
+    F.lmap(fab)(as)
+  @inline final def rmap[F[_, _], A, B, T](fab: F[A, B])(bt: B => T)(implicit F: Bifunctor[F]): F[A, T] =
+    F.rmap(fab)(bt)
+}
+
 trait BifunctorInstances {
+  import scala.Tuple2
 
   implicit final val tuple2Bifunctor: Bifunctor[Tuple2] =
     instanceOf(new BifunctorClass[Tuple2] with BifunctorClass.DeriveBimap[Tuple2] {

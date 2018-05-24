@@ -1,11 +1,8 @@
 package scalaz
 package ct
 
-import scala.Function
-
-import data.Disjunction
-
-import data.Disjunction.swap
+import scalaz.data.Disjunction
+import scalaz.data.Disjunction.swap
 
 import scala.language.experimental.macros
 
@@ -29,6 +26,13 @@ object ChoiceClass {
   }
 
   trait Alt[D <: Alt[D]]
+}
+
+trait ChoiceFunctions {
+  @inline final def leftchoice[F[_, _], A, B, C](fab: F[A, B])(implicit F: Choice[F]): F[A \/ C, B \/ C] =
+    F.leftchoice(fab)
+  @inline final def rightchoice[F[_, _], A, B, C](fab: F[A, B])(implicit F: Choice[F]): F[C \/ A, C \/ B] =
+    F.rightchoice(fab)
 }
 
 trait ChoiceInstances {

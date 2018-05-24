@@ -22,6 +22,11 @@ trait OrdClass[A] extends EqClass[A] {
   def equal(a: A, b: A)       = comp(a, b) eq EQ
 }
 
+trait OrdFunctions {
+  @inline final def comp[A](a: A, b: A)(implicit A: Ord[A]): Ordering =
+    A.comp(a, b)
+}
+
 trait OrdSyntax {
   implicit final class ToOrdOps[A](a: A) {
     def comp(f: A)(implicit ev: Ord[A]): Ordering = macro meta.Ops.ia_1

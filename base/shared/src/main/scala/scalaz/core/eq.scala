@@ -7,6 +7,11 @@ trait EqClass[A] {
   def equal(first: A, second: A): Boolean
 }
 
+trait EqFunctions {
+  @inline final def equal[A](a: A, b: A)(implicit A: Eq[A]): Boolean =
+    A.equal(a, b)
+}
+
 trait EqInstances {
   implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
 }
