@@ -43,4 +43,16 @@ class BubbleSortBenchmarks {
       _     <- IO(assertSorted(array))
     } yield ()).unsafeRunSync()
   }
+  @Benchmark
+  def monixBubbleSort() = {
+    import MonixIOArray._
+    import monix.eval.Task
+    import IOBenchmarks.monixScheduler
+
+    (for {
+      array <- Task.eval(createTestArray)
+      _     <- bubbleSort[Int](_ <= _)(array)
+      _     <- Task.eval(assertSorted(array))
+    } yield ()).toIO.unsafeRunSync()
+  }
 }

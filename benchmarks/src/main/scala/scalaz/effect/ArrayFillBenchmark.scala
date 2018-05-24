@@ -4,8 +4,6 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 
-import IOBenchmarks.unsafePerformIO
-
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -17,6 +15,8 @@ class ArrayFillBenchmarks {
 
   @Benchmark
   def scalazArrayFill() = {
+    import IOBenchmarks.unsafePerformIO
+
     def arrayFill(array: Array[Int]) = {
       val condition = KleisliIO.lift[Void, Int, Boolean]((i: Int) => i < array.length)
 
@@ -46,5 +46,19 @@ class ArrayFillBenchmarks {
       array <- IO(createTestArray)
       _     <- arrayFill(array)(0)
     } yield ()).unsafeRunSync()
+  }
+  @Benchmark
+  def monixArrayFill() = {
+    import monix.eval.Task
+    import IOBenchmarks.monixScheduler
+
+    def arrayFill(array: Array[Int])(i: Int): Task[Unit] =
+      if (i >= array.length) Task.unit
+      else Task.eval(array.update(i, i)).flatMap(_ => arrayFill(array)(i + 1))
+
+    (for {
+      array <- Task.eval(createTestArray)
+      _     <- arrayFill(array)(0)
+    } yield ()).toIO.unsafeRunSync()
   }
 }
