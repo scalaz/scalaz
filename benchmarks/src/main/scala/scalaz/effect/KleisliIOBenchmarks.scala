@@ -64,18 +64,15 @@ object CatsIOArray {
     def innerLoop(i: Int, j: Int): IO[Unit] =
       if (j >= array.length) IO.unit
       else
-        for {
-          ia <- IO(array(i))
-          ja <- IO(array(j))
-          _  <- if (lessThanEqual0(ia, ja)) IO.unit else swapIJ(i, ia, j, ja)
-          _  <- innerLoop(i, j + 1)
-        } yield ()
+        IO((array(i), array(j))).flatMap {
+          case (ia, ja) =>
+            val maybeSwap = if (lessThanEqual0(ia, ja)) IO.unit else swapIJ(i, ia, j, ja)
+
+            maybeSwap.flatMap(_ => innerLoop(i, j + 1))
+        }
 
     def swapIJ(i: Int, ia: A, j: Int, ja: A): IO[Unit] =
-      for {
-        _ <- IO(array.update(i, ja))
-        _ <- IO(array.update(j, ia))
-      } yield ()
+      IO { array.update(i, ja); array.update(j, ia) }
 
     outerLoop(0)
   }
