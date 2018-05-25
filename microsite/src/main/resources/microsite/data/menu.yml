@@ -48,6 +48,8 @@ options:
       url: data/Disjunction.html
     - title: Forall
       url: data/Forall.html
+    - title: FixFree
+      url: data/FixFree.html
     - title: Maybe
       url: data/Maybe.html
     - title: Maybe2
