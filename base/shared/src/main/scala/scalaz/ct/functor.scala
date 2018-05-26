@@ -3,6 +3,17 @@ package ct
 
 import scala.language.experimental.macros
 
+trait FunctorClass[F[_]] extends InvariantFunctorClass[F] {
+
+  def map[A, B](ma: F[A])(f: A => B): F[B]
+
+  final override def imap[A, B](ma: F[A])(f: A => B)(g: B => A): F[B] = map(ma)(f)
+}
+
+trait FunctorFunctions {
+  def map[F[_], A, B](fa: F[A])(f: A => B)(implicit F: Functor[F]): F[B] = F.map(fa)(f)
+}
+
 trait FunctorSyntax {
   implicit final class ToFunctorOps[F[_], A](self: F[A]) {
     def map[B](f: A => B)(implicit ev: Functor[F]): F[B] = macro meta.Ops.i_1
