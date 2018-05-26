@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.language.experimental.macros
+
 trait BindClass[M[_]] extends ApplyClass[M] {
   def flatMap[A, B](ma: M[A])(f: A => M[B]): M[B]
   def flatten[A](ma: M[M[A]]): M[A]
@@ -22,4 +24,16 @@ object BindClass {
 
   trait Alt[D <: Alt[D]]
 
+}
+
+trait BindFunctions {
+  def flatMap[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: Bind[M]): M[B] = M.flatMap(ma)(f)
+}
+
+trait BindInstances {}
+
+trait BindSyntax {
+  implicit final class ToBindOps[M[_], A](ma: M[A]) {
+    def flatMap[B](f: A => M[B])(implicit ev: Bind[M]): M[B] = macro meta.Ops.i_1
+  }
 }

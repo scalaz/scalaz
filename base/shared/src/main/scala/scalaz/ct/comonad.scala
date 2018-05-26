@@ -1,6 +1,12 @@
 package scalaz
 package ct
 
+import scala.language.experimental.macros
+
+trait ComonadClass[F[_]] extends CobindClass[F] {
+  def copoint[A](fa: F[A]): A
+}
+
 trait ComonadInstances { instances =>
   implicit def tuple2Cobind[A1]: Comonad[Tuple2[A1, ?]] =
     instanceOf(new ComonadClass[Tuple2[A1, ?]] with CobindClass.DeriveCojoin[Tuple2[A1, ?]] {
@@ -22,4 +28,10 @@ trait ComonadInstances { instances =>
       override def copoint[A](fa: Function0[A]): A = fa()
     }
   )
+}
+
+trait ComonadSyntax {
+  implicit final class ToComonadOps[F[_], A](self: F[A]) {
+    def copoint(implicit ev: Comonad[F]): A = macro meta.Ops.i_0
+  }
 }
