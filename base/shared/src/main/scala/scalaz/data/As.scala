@@ -1,9 +1,6 @@
 package scalaz
 package data
 
-// FIXME: remove once https://github.com/scala/bug/issues/10623 is fixed.
-import com.github.ghik.silencer.silent
-
 /**
  * Liskov substitutability: A better `<:<`.
  *
@@ -47,7 +44,7 @@ sealed abstract class As[-A, +B] { ab =>
    * chain much like functions.
    */
   final def andThen[C](bc: B <~< C): A <~< C = {
-    @silent type f[+x] = A <~< x
+    type f[+x] = A <~< x
     bc.substCv[f](this)
   }
 
@@ -78,7 +75,7 @@ sealed abstract class As[-A, +B] { ab =>
    * @see [[liftCt]]
    */
   final def liftCv[F[+ _]]: F[A] <~< F[B] = {
-    @silent type f[+x] = F[A] <~< F[x]
+    type f[+x] = F[A] <~< F[x]
     substCv[f](refl[F[A]])
   }
 
@@ -89,7 +86,7 @@ sealed abstract class As[-A, +B] { ab =>
    * @see [[liftCv]]
    */
   final def liftCt[F[- _]]: F[B] <~< F[A] = {
-    @silent type f[+x] = F[x] <~< F[A]
+    type f[+x] = F[x] <~< F[A]
     substCv[f](refl)
   }
 
