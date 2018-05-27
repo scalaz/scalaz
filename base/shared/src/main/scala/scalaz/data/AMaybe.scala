@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Nothing
+
 import scalaz.types.Is
 
 /** Similar to `Option[F[A, B]]`, except that

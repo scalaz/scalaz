@@ -1,6 +1,10 @@
 package scalaz
 package std
 
+import scala.List
+
+import scala.Predef.$conforms
+
 import scalaz.core.EqClass
 import ct.MonadClass
 

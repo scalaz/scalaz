@@ -1,7 +1,7 @@
 package scalaz
 package ct
 
-import language.experimental.macros
+import scala.language.experimental.macros
 
 trait ApplicativeSyntax {
   implicit final class ToApplicativeOps[A](a: A) {

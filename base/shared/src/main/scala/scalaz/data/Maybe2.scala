@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ AnyVal, Nothing, sys }
+
 import scalaz.core.EqClass
 import scalaz.ct.BifunctorClass
 import scalaz.debug.DebugClass

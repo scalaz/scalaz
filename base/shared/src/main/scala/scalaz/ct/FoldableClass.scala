@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.List
+
 trait FoldableClass[F[_]] {
 
   def foldMap[A, B: Monoid](fa: F[A])(f: A => B): B

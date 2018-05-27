@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ Either, Left, Right, sys }
+
 import Prelude._
 import AList.aListOps
 

@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scala.{ Either, Left, Right }
+
 import core.EqClass
 import ct.{ BifunctorClass, MonadClass }
 import debug.DebugClass

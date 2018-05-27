@@ -1,6 +1,8 @@
 package scalaz
 package types
 
+import scala.{ Any, AnyVal }
+
 /**
  * Liskov substitutability: A better `<:<`.
  *

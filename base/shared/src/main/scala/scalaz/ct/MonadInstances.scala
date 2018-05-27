@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ Function0, Function1, List, Option }
+
 trait MonadInstances {
   implicit val optionMonad: Monad[Option] = instanceOf(new MonadClass[Option] with BindClass.DeriveFlatten[Option] {
     override def ap[A, B](oa: Option[A])(f: Option[A => B]): Option[B]      = oa.flatMap(a => f.map(_(a)))

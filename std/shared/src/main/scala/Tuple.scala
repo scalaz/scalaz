@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scala.{ Tuple1, Tuple2 }
+
 import scalaz.core.EqClass
 
 trait TupleInstances {

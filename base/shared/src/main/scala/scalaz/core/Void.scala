@@ -1,7 +1,12 @@
 package scalaz
 package core
 
+import java.lang.RuntimeException
+
+import scala.Nothing
+
 import com.github.ghik.silencer.silent
+
 import scalaz.algebra.SemigroupClass
 import scalaz.types.{ As, Is }
 

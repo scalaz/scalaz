@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.List
+
 import scala.language.experimental.macros
 
 trait FoldableSyntax {

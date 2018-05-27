@@ -3,6 +3,9 @@ package data
 
 import Prelude._
 
+import java.lang.StringBuilder
+
+import scala.AnyVal
 import scala.annotation.tailrec
 import scala.language.implicitConversions
 

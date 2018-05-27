@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Either
+
 trait DisjunctionSyntax {
   implicit final class ToDisjunctionOps[A](a: A) {
     def left[B]: A \/ B  = -\/(a)

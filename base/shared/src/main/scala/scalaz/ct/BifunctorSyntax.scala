@@ -1,7 +1,7 @@
 package scalaz
 package ct
 
-import language.experimental.macros
+import scala.language.experimental.macros
 
 trait BifunctorSyntax {
   implicit final class ToBifunctorOps[F[_, _]: Bifunctor, A, B](ma: F[A, B]) {
