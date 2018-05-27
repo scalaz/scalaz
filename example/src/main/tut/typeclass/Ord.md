@@ -7,7 +7,7 @@ title:  "Ord"
 
 *Ord is used for totally ordered datatypes.*
 
-Ord builds on top of [Eq](../core/Eq.html) in that it adds the concept of ordering values.
+Ord builds on top of [Eq](./Eq.html) in that it adds the concept of ordering values.
 A value can be "greater than", "less than" or "equal to" another value.
 
 

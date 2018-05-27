@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 import scala.language.implicitConversions
 
@@ -270,12 +270,6 @@ object As extends AsInstances {
     refl[Any].asInstanceOf[A <~< B]
 }
 
-trait AsInstances {
-
-  /**We can witness equality by using it to convert between types */
-  implicit def witness[A, B](lt: A <~< B): A => B = lt(_)
-}
-
 trait AsSyntax {
   implicit final class ToAsOps[A, B](val ab: As[A, B]) {
     def liftCvF[F[_]](implicit F: IsCovariant[F]): F[A] As F[B] =
@@ -294,4 +288,10 @@ trait AsSyntax {
       F.substCv[f, A, B](fb)(ab)
     }
   }
+}
+
+trait AsInstances {
+
+  /**We can witness equality by using it to convert between types */
+  implicit def witness[A, B](lt: A <~< B): A => B = lt(_)
 }

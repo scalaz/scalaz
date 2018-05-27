@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import scalaz.types.Is
 import scalaz.debug.DebugClass
 
 /** Similar to `Option[F[A, B]]`, except that

@@ -1,5 +1,5 @@
 package scalaz
-package data
+package ct
 
 final case class Endo[=>:[_, _], A](run: A =>: A) {
   final def compose(that: Endo[=>:, A])(implicit F: Compose[=>:]): Endo[=>:, A] =

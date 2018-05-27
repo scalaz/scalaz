@@ -2,14 +2,12 @@
 package scalaz.effect
 
 import scala.concurrent.duration.Duration
-import scalaz.Void
 
 /**
  * The entry point for a purely-functional application on the JVM.
  *
  * {{{
  * import java.io.IOException
- * import scalaz.Void
  * import scalaz.effect.{IO, SafeApp}
  * import scalaz.effect.console._
  *

@@ -64,22 +64,51 @@ trait BaseTypeclasses {
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                = T
 }
 
-trait BaseData {
-  type Void                                            = data.Void.Void
-  type Both[A, B]                                      = data.Both[A, B]
-  type Forall2[F[_, _]]                                = data.Forall2.Forall2[F]
-  type Forall[F[_]]                                    = data.Forall.Forall[F]
-  type Forget[A, B, C]                                 = data.Forget[A, B, C]
-  type Identity[A]                                     = data.Identity[A]
-  type Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H]  = data.Leibniz[L, H, A, B]
-  type Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] = data.Liskov[L, H, A, B]
-  type Maybe[A]                                        = data.Maybe[A]
-  type That[A, B]                                      = data.That[A, B]
-  type This[A, B]                                      = data.This[A, B]
-  type Iso[A, B]                                       = data.Iso[A, B]
-  type Kleisli[F[_], A, B]                             = data.Kleisli[F, A, B]
+trait BaseCore {
+  type Void = core.Void.Void
 
-  val Iso = data.Iso
+  val Void: core.Void.type = core.Void
+
+}
+
+trait BaseTypes {
+  type Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H]  = types.Leibniz[L, H, A, B]
+  type Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] = types.Liskov[L, H, A, B]
+
+  type ===[A, B] = types.Is[A, B]
+  type =!=[A, B] = types.NotIs[A, B]
+
+  type <~<[-A, +B] = types.As[A, B]
+  type >~>[+B, -A] = types.As[A, B]
+}
+
+trait BaseCt {
+  type Iso[A, B]           = ct.Iso[A, B]
+  type Kleisli[F[_], A, B] = ct.Kleisli[F, A, B]
+
+  val Iso = ct.Iso
+
+  val Kleisli: ct.Kleisli.type = ct.Kleisli
+
+}
+
+trait BaseAlgebra {
+  val LT = algebra.LT
+  val GT = algebra.GT
+  val EQ = algebra.EQ
+
+  type Ordering = algebra.Ordering
+}
+
+trait BaseData {
+  type Both[A, B]       = data.Both[A, B]
+  type Forall2[F[_, _]] = data.Forall2.Forall2[F]
+  type Forall[F[_]]     = data.Forall.Forall[F]
+  type Forget[A, B, C]  = data.Forget[A, B, C]
+  type Identity[A]      = data.Identity[A]
+  type Maybe[A]         = data.Maybe[A]
+  type That[A, B]       = data.That[A, B]
+  type This[A, B]       = data.This[A, B]
 
   val Both = data.Both
   val That = data.That
@@ -90,21 +119,11 @@ trait BaseData {
   val Empty = data.MaybeImpl.Empty
   val Just  = data.MaybeImpl.Just
 
-  val LT = algebra.LT
-  val GT = algebra.GT
-  val EQ = algebra.EQ
-  type Ordering = algebra.Ordering
 }
 
-trait BaseDataAliases { self: BaseData =>
-  type \/[L, R]    = data.Disjunction.\/[L, R]
-  type ===[A, B]   = data.Is[A, B]
-  type =!=[A, B]   = data.NotIs[A, B]
-  type <~<[-A, +B] = data.As[A, B]
-  type >~>[+B, -A] = data.As[A, B]
-
-  val Void: data.Void.type       = data.Void
-  val Kleisli: data.Kleisli.type = data.Kleisli
+trait BaseDataAliases {
+  self: BaseData =>
+  type \/[L, R] = data.Disjunction.\/[L, R]
 
   val Forall: data.Forall.type = data.Forall
   val ∀ : data.Forall.type     = data.Forall
@@ -119,24 +138,22 @@ trait BaseDataAliases { self: BaseData =>
 }
 
 trait AllFunctions
-    extends data.VoidFunctions
+    extends VoidFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
-    with data.KleisliFunctions
+    with ct.KleisliFunctions
     with ct.InvariantFunctorFunctions
     with ct.PhantomFunctions
     with ct.TraversableFunctions
 
 trait AllInstances
     extends data.AMaybeInstances
-    with data.AsInstances
     with data.ConstInstances
     with data.DisjunctionInstances
     with data.DownStarInstances
     with data.ForgetInstances
     with data.IdentityInstances
     with data.IListInstances
-    with data.KleisliInstances
     with data.TheseInstances
     with data.UpStarInstances
     with std.BooleanInstances
@@ -154,6 +171,7 @@ trait AllInstances
     with ct.CobindInstances
     with ct.ComonadInstances
     with ct.FoldableInstances
+    with ct.KleisliInstances
     with ct.MonadInstances
     with ct.PhantomInstances
     with ct.ProfunctorInstances
@@ -161,18 +179,17 @@ trait AllInstances
     with ct.TraversableInstances
     with debug.DebugInstances
     with core.EqInstances
+    with types.AsInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances
     with algebra.MonoidInstances
     with algebra.SemigroupInstances
 
 trait AllSyntax
-    extends data.VoidSyntax
-    with data.AsSyntax
+    extends VoidSyntax
     with data.DisjunctionSyntax
     with data.ForallSyntax
     with data.Forall2Syntax
-    with data.KleisliSyntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
     with ct.ApplicativeSyntax
@@ -186,6 +203,7 @@ trait AllSyntax
     with ct.FoldableSyntax
     with ct.FunctorSyntax
     with ct.InvariantFunctorSyntax
+    with ct.KleisliSyntax
     with ct.PhantomSyntax
     with ct.ProfunctorSyntax
     with ct.StrongSyntax
@@ -194,9 +212,17 @@ trait AllSyntax
     with algebra.OrdSyntax
     with algebra.SemigroupSyntax
     with debug.DebugSyntax
+    with types.AsSyntax
 
 object Prelude extends BaseHierarchy with BaseData with AllFunctions
 
-trait LowPriority extends BaseHierarchy with BaseTypeclasses with BaseData with BaseDataAliases
+trait LowPriority
+    extends BaseHierarchy
+    with BaseTypeclasses
+    with BaseData
+    with BaseDataAliases
+    with BaseTypes
+    with BaseCt
+    with BaseAlgebra
 
 object Scalaz extends LowPriority with AllFunctions with AllSyntax with AllInstances

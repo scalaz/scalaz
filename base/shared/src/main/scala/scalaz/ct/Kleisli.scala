@@ -1,8 +1,8 @@
 package scalaz
-package data
+package ct
 
+import scalaz.data.~>
 import scalaz.algebra.MonoidClass
-import scalaz.ct._
 
 sealed trait KleisliModule {
   type Kleisli[F[_], A, B]
@@ -21,7 +21,7 @@ sealed trait KleisliModule {
 
 }
 
-private[data] object KleisliImpl extends KleisliModule {
+private[ct] object KleisliImpl extends KleisliModule {
   type Kleisli[F[_], A, B] = A => F[B]
 
   override def runKleisli[F[_], A, B](k: Kleisli[F, A, B]): A => F[B] = k

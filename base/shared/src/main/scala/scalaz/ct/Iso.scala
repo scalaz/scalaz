@@ -1,5 +1,5 @@
 package scalaz
-package data
+package ct
 
 sealed abstract class Iso[A, B] { ab =>
   def to(a: A): B
@@ -58,7 +58,6 @@ sealed abstract class Iso[A, B] { ab =>
     }
   }
 }
-
 object Iso {
   def apply[A, B](implicit ab: Iso[A, B]): Iso[A, B] = ab
 
@@ -85,10 +84,10 @@ object Iso {
     }
 
   object Product {
-    // private[data] because private and private[this] give
+    // private[ct] because private and private[this] give
     // [warning] private type ⨂ in object Product is never used
-    private[data] type ⨂[A, B] = (A, B)
-    private[data] type Id      = Unit
+    private[ct] type ⨂[A, B] = (A, B)
+    private[ct] type Id      = Unit
 
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe({ case (a, (b, c)) => ((a, b), c) }, { case ((a, b), c) => (a, (b, c)) })
@@ -107,8 +106,8 @@ object Iso {
   }
 
   object Coproduct {
-    private[data] type ⨂[A, B] = \/[A, B]
-    private[data] type Id      = Void
+    private[ct] type ⨂[A, B] = \/[A, B]
+    private[ct] type Id      = Void
 
     final def associate[A, B, C]: Iso[A ⨂ (B ⨂ C), (A ⨂ B) ⨂ C] =
       unsafe(

@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 /**
  * This particular version of Leibniz’ equality has been generalized to
