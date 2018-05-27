@@ -2,6 +2,7 @@ package scalaz
 package data
 
 import scala.language.implicitConversions
+
 /**
  * Liskov substitutability: A better `<:<`.
  *
