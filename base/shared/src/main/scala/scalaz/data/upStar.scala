@@ -3,6 +3,8 @@ package data
 
 import scalaz.ct.ProfunctorClass
 
+final case class UpStar[F[_], A, B](run: A => F[B]) extends AnyVal
+
 trait UpStarInstances {
   implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] =
     instanceOf(new ProfunctorClass[UpStar[F, ?, ?]] {

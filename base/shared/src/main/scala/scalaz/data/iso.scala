@@ -58,6 +58,7 @@ sealed abstract class Iso[A, B] { ab =>
     }
   }
 }
+
 object Iso {
   def apply[A, B](implicit ab: Iso[A, B]): Iso[A, B] = ab
 

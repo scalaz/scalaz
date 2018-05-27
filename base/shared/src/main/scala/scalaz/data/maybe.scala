@@ -114,3 +114,16 @@ private[scalaz] object MaybeImpl extends MaybeModule {
         ma.toList
     }
 }
+
+trait MaybeFunctions {
+  def empty[A]      = Maybe.empty[A]
+  def just[A](a: A) = Maybe.just(a)
+}
+
+trait MaybeSyntax {
+  implicit final class OptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
+
+  implicit final class ToMaybeOps[A](a: A) {
+    def just: Maybe[A] = Maybe.just(a)
+  }
+}

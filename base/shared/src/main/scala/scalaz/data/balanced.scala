@@ -1,7 +1,6 @@
 package scalaz
 package data
 
-import Prelude._
 import AList.aListOps
 import scalaz.ct.ComposeClass
 

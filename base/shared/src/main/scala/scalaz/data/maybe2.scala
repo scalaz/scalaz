@@ -92,3 +92,9 @@ private[data] case object None2 extends Option2[Nothing, Nothing] {
   def _1: Nothing = sys.error("unreachable code")
   def _2: Nothing = sys.error("unreachable code")
 }
+
+trait Maybe2Syntax {
+
+  def empty2[A, B]            = Maybe2.empty2[A, B]
+  def just2[A, B](a: A, b: B) = Maybe2.just2(a, b)
+}

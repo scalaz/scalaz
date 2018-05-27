@@ -1,11 +1,11 @@
 package scalaz
 package data
 
+import scalaz.ct.ProfunctorClass
+
 final case class DownStar[F[_], A, B](run: F[A] => B) extends AnyVal
 
 object DownStar extends DownStarInstances
-
-import scalaz.ct.ProfunctorClass
 
 trait DownStarInstances {
   implicit def downstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[DownStar[F, ?, ?]] =
