@@ -5,7 +5,7 @@ title:  "Set"
 
 # Set
 
-Scalaz provides instances for Scala's built-in `Set` such as [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in `Set` such as [Eq](../typeclass/Eq.html).
 
 **Typical imports**
 

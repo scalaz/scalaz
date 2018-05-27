@@ -1,8 +1,9 @@
 package scalaz
-package data
+package core
 
 import com.github.ghik.silencer.silent
 import scalaz.algebra.SemigroupClass
+import scalaz.types.{ As, Is }
 
 trait VoidModule {
   type Void
@@ -40,12 +41,12 @@ trait VoidInstances {
 }
 
 @silent
-private[data] object VoidImpl extends VoidModule with VoidSyntax with VoidInstances {
+private[core] object VoidImpl extends VoidModule with VoidSyntax with VoidInstances {
   type Void = Nothing
 
   def absurd[A](v: Void): A = v
 
-  private[data] final class UnsafeVoid extends RuntimeException
+  private[core] final class UnsafeVoid extends RuntimeException
 
   def unsafeVoid: Void = throw new UnsafeVoid
 

@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scalaz.types.Is
+
 /**
  * Isomorphic to `AMaybe[λ[(α, β) => APair[F[α, ?], G[?, β]]], A, B]`,
  * but avoids allocating an `APair` instance.

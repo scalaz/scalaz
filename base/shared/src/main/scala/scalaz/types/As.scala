@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 /**
  * Liskov substitutability: A better `<:<`.

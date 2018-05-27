@@ -5,7 +5,7 @@ title:  "List"
 
 # List
 
-Scalaz provides instances for Scala's built-in `List` such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in `List` such as [Monad](../typeclass/Monad.html) and [Eq](../typeclass/Eq.html).
 
 **Typical imports**
 
