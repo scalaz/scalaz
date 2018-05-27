@@ -1,7 +1,7 @@
 package scalaz
-package data
+package ct
 
-import Prelude._
+import scalaz.data.~>
 
 trait KleisliSyntax {
   import Kleisli.{ runKleisli, wrapKleisli }

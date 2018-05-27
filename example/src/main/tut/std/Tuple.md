@@ -5,7 +5,7 @@ title:  "Option"
 
 # Option
 
-Scalaz provides instances for Scala's built-in `Tuple` variants (`Tuple2` through `Tuple22`) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in `Tuple` variants (`Tuple2` through `Tuple22`) such as [Monad](../typeclass/Monad.html) and [Eq](../typeclass/Eq.html).
 
 **Typical imports**
 

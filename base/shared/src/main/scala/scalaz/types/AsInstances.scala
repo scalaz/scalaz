@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 import scala.language.implicitConversions
 

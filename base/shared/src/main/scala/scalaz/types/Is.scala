@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 /**
  * The data type `Is` is the encoding of Leibnitz’ law which states that

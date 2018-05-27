@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 /**
  * The denial inequality is a symmetric irreflexive binary relation with

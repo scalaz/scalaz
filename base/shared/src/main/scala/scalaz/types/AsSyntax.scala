@@ -1,5 +1,5 @@
 package scalaz
-package data
+package types
 
 trait AsSyntax {
   implicit final class ToAsOps[A, B](val ab: As[A, B]) {

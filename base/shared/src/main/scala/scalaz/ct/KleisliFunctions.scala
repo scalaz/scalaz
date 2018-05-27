@@ -1,5 +1,5 @@
 package scalaz
-package data
+package ct
 
 trait KleisliFunctions {
   @inline def wrapKleisli[F[_], A, B](k: A => F[B]): Kleisli[F, A, B] = Kleisli.wrapKleisli(k)

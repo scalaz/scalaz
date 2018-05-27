@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scalaz.types.Is
+
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.
  */

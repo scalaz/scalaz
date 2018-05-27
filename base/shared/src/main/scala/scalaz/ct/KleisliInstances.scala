@@ -1,8 +1,7 @@
 package scalaz
-package data
+package ct
 
 import scalaz.algebra.MonoidClass
-import scalaz.ct._
 
 trait KleisliInstances {
   import Kleisli.{ runKleisli, wrapKleisli }
