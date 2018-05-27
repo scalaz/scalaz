@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scalaz.debug.DebugClass
+
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.
  */
@@ -26,4 +28,13 @@ object AMaybe extends AMaybeInstances {
     def subst[G[_]](ga: G[A]): G[A]   = ga
     def unsubst[G[_]](gb: G[A]): G[A] = gb
   }
+}
+
+trait AMaybeInstances {
+  implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] =
+    instanceOf[DebugClass[AMaybe[F, A, B]]] {
+      case AJust(value) => s"AMaybe(${FAB.debug(value)})"
+      case AEmpty()     => "AEmpty()"
+    }
+
 }

@@ -4,6 +4,8 @@ package data
 import scalaz.core.EqClass
 import scalaz.ct.MonadClass
 
+final case class Identity[A](run: A) extends AnyVal
+
 trait IdentityInstances {
   implicit val monad: Monad[Identity] = instanceOf(new MonadClass[Identity] {
     override def map[A, B](fa: Identity[A])(f: A => B): Identity[B]               = Identity(f(fa.run))

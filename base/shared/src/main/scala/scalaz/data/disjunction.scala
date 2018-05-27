@@ -5,6 +5,36 @@ import scalaz.core.EqClass
 import scalaz.ct._
 import scalaz.debug.DebugClass
 
+sealed trait Disjunction[L, R] {
+  final def fold[A](la: L => A)(ra: R => A): A = this match {
+    case -\/(l) => la(l)
+    case \/-(r) => ra(r)
+  }
+}
+
+object Disjunction extends DisjunctionInstances with DisjunctionFunctions {
+  object Syntax extends DisjunctionSyntax
+
+  type \/[L, R] = Disjunction[L, R]
+
+  case class -\/[L, R](value: L) extends (L \/ R)
+  case class \/-[L, R](value: R) extends (L \/ R)
+
+  def swap[L, R](ab: L \/ R): R \/ L = ab.fold[R \/ L](\/-(_))(-\/(_))
+
+  def fromEither[L, R](ab: Either[L, R]): L \/ R = ab.fold(-\/(_), \/-(_))
+}
+
+trait DisjunctionFunctions {
+  @inline def left[L, R](value: L): Disjunction[L, R]  = -\/(value)
+  @inline def right[L, R](value: R): Disjunction[L, R] = \/-(value)
+
+  def either[A, B, C](ac: A => C)(bc: B => C): A \/ B => C = _ match {
+    case -\/(l) => ac(l)
+    case \/-(r) => bc(r)
+  }
+}
+
 trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
     instanceOf(new MonadClass[L \/ ?] with BindClass.DeriveFlatten[L \/ ?] {
@@ -42,4 +72,15 @@ trait DisjunctionInstances {
       case (\/-(b1), \/-(b2)) => B.equal(b1, b2)
       case _                  => false
     }
+}
+
+trait DisjunctionSyntax {
+  implicit final class ToDisjunctionOps[A](a: A) {
+    def left[B]: A \/ B  = -\/(a)
+    def right[B]: B \/ A = \/-(a)
+  }
+
+  implicit final class EitherAsDisjunction[A, B](ab: Either[A, B]) {
+    def asDisjunction: A \/ B = Disjunction.fromEither(ab)
+  }
 }
