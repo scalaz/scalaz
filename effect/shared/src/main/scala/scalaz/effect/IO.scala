@@ -747,11 +747,9 @@ object IO extends IOInstances {
   final def require[E, A](error: E): IO[E, Maybe[A]] => IO[E, A] =
     (io: IO[E, Maybe[A]]) => io.flatMap(Maybe.maybe(IO.fail[E, A](error))(IO.now[E, A]))
 
-  // TODO: Make this fast, generalize from `Unit` to `A: Semigroup`,
-  // and use `IList` instead of `List`.
   def forkAll[E2](l: List[IO[E2, Unit]]): IO[E2, Unit] = l match {
     case Nil     => IO.unit[E2]
-    case x :: xs => x.fork.toUnit *> forkAll(xs)
+    case x :: xs => x.fork *> forkAll(xs)
   }
 
   private final val Never: IO[Nothing, Any] =

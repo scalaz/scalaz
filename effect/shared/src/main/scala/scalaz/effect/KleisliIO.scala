@@ -70,6 +70,7 @@ package scalaz.effect
  * able to perform fusion of effectful functions.
  */
 sealed trait KleisliIO[E, A, B] extends (A => IO[E, B]) { self =>
+
   /**
    * Applies the effectful function with the specified value, returning the
    * output in `IO`.
@@ -197,7 +198,8 @@ object KleisliIO {
       extends KleisliIO[E, A, C] {
     override final def apply(a: A): IO[E, C] = first(a).flatMap(b => second(b))
   }
-  private [effect] final class FlatMap[E, A, B, C](fa: KleisliIO[E, A, B], f: B => KleisliIO[E, A, C]) extends KleisliIO[E, A, C] {
+  private[effect] final class FlatMap[E, A, B, C](fa: KleisliIO[E, A, B], f: B => KleisliIO[E, A, C])
+      extends KleisliIO[E, A, C] {
     override final def apply(a: A): IO[E, C] = fa(a).flatMap(b => f(b)(a))
   }
 
@@ -307,16 +309,24 @@ object KleisliIO {
    * if the condition returns true, passes the `A` to the `then0` function, but
    * otherwise returns the original `A` unmodified.
    */
-  final def ifThen[E, A, B](cond: KleisliIO[E, A, Boolean])(then0: KleisliIO[E, A, A]): KleisliIO[E, A, A] =
-    ifThenElse(cond)(then0)(KleisliIO.identity[E, A])
+  final def ifThen[E, A](cond: KleisliIO[E, A, Boolean])(then0: KleisliIO[E, A, A]): KleisliIO[E, A, A] =
+    (cond, then0) match {
+      case (cond: Impure[_, _, _], then0: Impure[_, _, _]) =>
+        new Impure[E, A, A](a => if (cond.apply0(a)) then0.apply0(a) else a)
+      case _ => ifThenElse(cond)(then0)(KleisliIO.identity[E, A])
+    }
 
   /**
    * Returns a new effectful function that passes an `A` to the condition, and
    * if the condition returns false, passes the `A` to the `then0` function, but
    * otherwise returns the original `A` unmodified.
    */
-  final def ifNotThen[E, A, B](cond: KleisliIO[E, A, Boolean])(then0: KleisliIO[E, A, A]): KleisliIO[E, A, A] =
-    ifThenElse(cond)(KleisliIO.identity[E, A])(then0)
+  final def ifNotThen[E, A](cond: KleisliIO[E, A, Boolean])(then0: KleisliIO[E, A, A]): KleisliIO[E, A, A] =
+    (cond, then0) match {
+      case (cond: Impure[_, _, _], then0: Impure[_, _, _]) =>
+        new Impure[E, A, A](a => if (cond.apply0(a)) a else then0.apply0(a))
+      case _ => ifThenElse(cond)(KleisliIO.identity[E, A])(then0)
+    }
 
   /**
    * Returns a new effectful function that passes an `A` to the condition, and
@@ -393,7 +403,6 @@ object KleisliIO {
             } yield f(b, c)
         )
     }
-
 
   /**
    * See KleisliIO.left
