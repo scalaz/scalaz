@@ -188,10 +188,11 @@ object KleisliIO {
   }
   private[effect] final class Impure[E, A, B](val apply0: A => B) extends KleisliIO[E, A, B] {
     override final def apply(a: A): IO[E, B] =
-      try {
-        IO.sync[E, B](apply0(a))
-      } catch {
-        case e: KleisliIOError[_] => IO.fail[E, B](e.unsafeCoerce[E])
+      IO.suspend {
+        try IO.now[E, B](apply0(a))
+        catch {
+          case e: KleisliIOError[_] => IO.fail[E, B](e.unsafeCoerce[E])
+        }
       }
   }
 
