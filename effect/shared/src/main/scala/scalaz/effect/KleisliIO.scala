@@ -107,6 +107,12 @@ sealed trait KleisliIO[E, A, B] extends (A => IO[E, B]) { self =>
     self.andThen(that)
 
   /**
+   * A symbolic operator for `compose`.
+   */
+  final def <<<[C](that: KleisliIO[E, C, A]): KleisliIO[E, C, B] =
+    self.compose(that)
+
+  /**
    * Zips the output of this function with the output of that function, using
    * the specified combiner function.
    */
@@ -180,7 +186,7 @@ sealed trait KleisliIO[E, A, B] extends (A => IO[E, B]) { self =>
 
 object KleisliIO {
   private class KleisliIOError[E](error: E) extends Throwable {
-    def unsafeCoerce[E2] = error.asInstanceOf[E2]
+    final def unsafeCoerce[E2] = error.asInstanceOf[E2]
   }
 
   private[effect] final class Pure[E, A, B](apply0: A => IO[E, B]) extends KleisliIO[E, A, B] {
@@ -348,13 +354,13 @@ object KleisliIO {
    * Returns an effectful function that extracts out the first element of a
    * tuple.
    */
-  def _1[E, A, B]: KleisliIO[E, (A, B), A] = lift[E, (A, B), A](_._1)
+  final def _1[E, A, B]: KleisliIO[E, (A, B), A] = lift[E, (A, B), A](_._1)
 
   /**
    * Returns an effectful function that extracts out the second element of a
    * tuple.
    */
-  def _2[E, A, B]: KleisliIO[E, (A, B), B] = lift[E, (A, B), B](_._2)
+  final def _2[E, A, B]: KleisliIO[E, (A, B), B] = lift[E, (A, B), B](_._2)
 
   /**
    * See @KleisliIO.flatMap
