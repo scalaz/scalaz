@@ -78,6 +78,15 @@ trait Reducer[C, M] {
     f(seed) map { case (c, b) => rec(unit(c), b) }
   }
 
+  /*
+    l = List[A]
+    val revOpt: Maybe[F[List[B]]] =
+          F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
+            case a :: as => Maybe.just((f(a), as))
+            case Nil => Maybe.empty
+          })(Reducer.ReverseListReducer[B])
+  */
+
   def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M =
     unfoldrOpt(seed)(f) getOrElse M.zero
 
@@ -147,10 +156,35 @@ sealed abstract class ReducerInstances {
     unitConsReducer(_ :: Nil, _ :: _)
   }
 
+  /*
+  def unitConsReducer[C, M](u: C => M, cs: (C, M) => M)(implicit sm: Semigroup[M]): Reducer[C, M] = new Reducer[C, M] {
+    val semigroup = sm
+
+    def unit(c: C) = u(c)
+
+    def snoc(m: M, c: C): M = sm.append(m, u(c))
+
+    def cons(c: C, m: M): M = cs(c, m)
+
+  */
+
   def ReverseListReducer[C]: Reducer[C, List[C]] = {
     import std.list._
     reducer(_ :: Nil, (c, cs) => cs :+ c, (cs, c) => c :: cs)
   }
+
+  /*
+  def reducer[C, M](u: C => M, cs: (C, M) => M, sc: (M, C) => M)(implicit sm: Semigroup[M]): Reducer[C, M] =
+    new Reducer[C, M] {
+      val semigroup = sm
+
+      def unit(c: C) = u(c)
+
+      def snoc(m: M, c: C): M = sc(m, c)
+
+      def cons(c: C, m: M): M = cs(c, m)
+    }
+  */
 
   /** Collect `C`s into an ilist, in order. */
   implicit def IListReducer[C]: Reducer[C, IList[C]] = {
@@ -165,6 +199,10 @@ sealed abstract class ReducerInstances {
   implicit def NonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
     unitConsReducer(NonEmptyList.nel(_, INil()),  _ <:: _)
   }
+  
+  def ReverseNonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
+    reducer(NonEmptyList.nel(_, INil()), (c, cs) => NonEmptyList.nel(cs.head, cs.tail :+ c), (cs, c) => c <:: cs)
+  }
 
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
@@ -178,6 +216,15 @@ sealed abstract class ReducerInstances {
     import Stream._
     reducer(cons(_, empty), (c, cs) => cs :+ c, (cs, c) => c #:: cs)
   }
+
+  /*
+  def ReverseEphemeralStreamReducer[C]: Reducer[C, EphemeralStream[C]] = {
+    import EphemeralStream._
+    reducer(cons(_, EphemeralStream.emptyEphemeralStream), (c, cs) => cs :+ c, (cs, c) => c ##:: cs)
+  }
+  */
+  // tried: empty, EphemeralStream.empty, EphemeralStream.Empty
+  // EphemeralStream.emptyEphemeralStream works
 
   /** Ignore `C`s. */
   implicit def UnitReducer[C]: Reducer[C, Unit] = {

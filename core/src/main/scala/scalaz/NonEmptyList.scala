@@ -231,6 +231,11 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         (BindRec[IList].tailrecM[A, B](a)(a => f(a).list): @unchecked) match {
           case ICons(h, t) => NonEmptyList.nel(h, t)
         }
+
+      override def traverseImpl[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Applicative[F]): F[NonEmptyList[B]] = {
+        val x = Traverse[IList].traverseImpl(fa.list)(f)(F)
+        F.map(x)(x => NonEmptyList.nel(x.headOption.get, x.tailOption.getOrElse(INil())))        
+      }
     }
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
