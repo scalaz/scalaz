@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ Function0, Tuple2 }
+
 trait ComonadInstances { instances =>
   implicit def tuple2Cobind[A1]: Comonad[Tuple2[A1, ?]] =
     instanceOf(new ComonadClass[Tuple2[A1, ?]] with CobindClass.DeriveCojoin[Tuple2[A1, ?]] {

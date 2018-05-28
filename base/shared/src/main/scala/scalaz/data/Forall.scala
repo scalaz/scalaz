@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ Any, AnyVal }
+
 import scalaz.types.As
 
 trait ForallModule {

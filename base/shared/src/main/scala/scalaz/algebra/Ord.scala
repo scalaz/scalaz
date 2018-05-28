@@ -1,6 +1,8 @@
 package scalaz
 package algebra
 
+import scala.{ Product, Serializable }
+
 import core.EqClass
 
 sealed abstract class Ordering extends Product with Serializable

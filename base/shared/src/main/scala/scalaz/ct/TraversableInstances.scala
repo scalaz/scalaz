@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ List, Tuple2 }
+
 trait TraversableInstances {
   implicit val listTraversable: Traversable[List] = instanceOf(
     new TraversableClass.DeriveSequence[List] with FoldableClass.DeriveFoldMap[List] {

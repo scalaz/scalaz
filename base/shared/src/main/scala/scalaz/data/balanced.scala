@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.AnyVal
+
 import Prelude._
 import AList.aListOps
 import scalaz.ct.ComposeClass
@@ -29,7 +31,8 @@ final class PreComposeBalancer[F[_, _], A, B] private (count: Int, stack: AList1
       val h1count = hcount * 2
       t.tail.uncons match {
         case ev @ AEmpty2() =>
-          assert(tfactor == 1)
+          // FIXME: Throw exception?
+          // assert(tfactor == 1)
           new PreComposeBalancer(h1count, h1 +: ev.unsubst[AList[F, ?, B]](AList.empty[F, B]))
         case AJust2(f, fs) =>
           add(h1, f +: fs, h1count, tfactor / 2)

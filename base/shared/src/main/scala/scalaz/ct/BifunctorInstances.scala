@@ -1,8 +1,9 @@
 package scalaz
 package ct
 
-trait BifunctorInstances {
+import scala.Tuple2
 
+trait BifunctorInstances {
   implicit final val tuple2Bifunctor: Bifunctor[Tuple2] =
     instanceOf(new BifunctorClass[Tuple2] with BifunctorClass.DeriveBimap[Tuple2] {
       def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))

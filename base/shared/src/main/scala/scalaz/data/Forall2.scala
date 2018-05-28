@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ Any, AnyVal }
+
 trait Forall2Module {
   type Forall2[F[_, _]]
 

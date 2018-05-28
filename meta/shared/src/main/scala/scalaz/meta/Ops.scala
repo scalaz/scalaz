@@ -1,6 +1,7 @@
 package scalaz
 package meta
 
+import scala.{ List, StringContext }
 import scala.reflect.macros.blackbox
 
 // Originally inspired by http://typelevel.org/blog/2013/10/13/spires-ops-macros.html

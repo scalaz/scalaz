@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Option
+
 trait MaybeSyntax {
   implicit final class OptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
 

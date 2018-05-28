@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scala.{ None, Option, Some }
+
 import scalaz.core.EqClass
 import scalaz.debug.DebugClass
 import scalaz.ct.MonadClass

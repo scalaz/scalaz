@@ -1,6 +1,8 @@
 package scalaz
 package types
 
+import scala.AnyVal
+
 /**
  * The denial inequality is a symmetric irreflexive binary relation with
  * the additional condition that if two elements are apart, then any other

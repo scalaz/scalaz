@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.Function
+
 import data.Disjunction
 
 trait ChoiceInstances {

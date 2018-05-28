@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ Option, Some }
+
 /**
  * Type-aligned pair with upper-bounded type parameter. Isomorphic to
  *

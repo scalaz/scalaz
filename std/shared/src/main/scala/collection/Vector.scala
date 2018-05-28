@@ -1,6 +1,9 @@
 package scalaz
 package std
 
+import scala.Vector
+import scala.Predef.$conforms
+
 import core.EqClass
 import ct.MonadClass
 

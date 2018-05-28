@@ -1,8 +1,11 @@
 package scalaz
 package debug
 
-import language.experimental.macros
-import language.implicitConversions
+import scala.{ sys, AnyVal, StringContext }
+
+import scala.annotation.implicitAmbiguous
+import scala.language.experimental.macros
+import scala.language.implicitConversions
 
 trait DebugSyntax {
   implicit final class ToDebugOps[A](self: A) {
@@ -21,7 +24,7 @@ object DebugInterpolator {
   }
 
   sealed abstract class HasDebug0 {
-    @annotation.implicitAmbiguous(
+    @implicitAmbiguous(
       "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Show[${A}] instance is in scope."
     )
     implicit def ambiguousDebug1[A](a: A): HasDebug =

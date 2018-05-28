@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Either
+
 sealed trait Disjunction[L, R] {
   final def fold[A](la: L => A)(ra: R => A): A = this match {
     case -\/(l) => la(l)
