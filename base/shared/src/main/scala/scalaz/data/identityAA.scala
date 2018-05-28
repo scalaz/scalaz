@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.AnyVal
+
 import scalaz.core.EqClass
 import scalaz.ct.MonadClass
 

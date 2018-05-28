@@ -1,6 +1,8 @@
 package scalaz
 package types
 
+import scala.{ Any, AnyVal }
+
 /**
  * The data type `Is` is the encoding of Leibnitz’ law which states that
  * if `a` and `b` are identical then they must have identical properties.

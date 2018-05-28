@@ -1,5 +1,7 @@
 package scalaz
 
+import scala.{ Any, AnyVal, Option, Some }
+
 package object data {
   val Forall: ForallModule = ForallImpl
   val ∀ : Forall.type      = Forall

@@ -1,7 +1,7 @@
 package scalaz
 package ct
 
-import language.experimental.macros
+import scala.language.experimental.macros
 
 trait ApplicativeClass[F[_]] extends ApplyClass[F] {
   def pure[A](a: A): F[A]

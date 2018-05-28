@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.AnyVal
+
 import scalaz.ct.ProfunctorClass
 
 final case class UpStar[F[_], A, B](run: A => F[B]) extends AnyVal

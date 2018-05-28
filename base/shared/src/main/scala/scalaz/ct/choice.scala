@@ -1,7 +1,10 @@
 package scalaz
 package ct
 
+import scala.Function
+
 import data.Disjunction
+
 import data.Disjunction.swap
 
 import scala.language.experimental.macros
@@ -29,6 +32,7 @@ object ChoiceClass {
 }
 
 trait ChoiceInstances {
+
   implicit val functionChoice: Choice[Function] = instanceOf(
     new ChoiceClass[Function] with ProfunctorClass.DeriveDimap[Function] {
 

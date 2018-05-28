@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Nothing
+
 import scalaz.types.Is
 import scalaz.debug.DebugClass
 

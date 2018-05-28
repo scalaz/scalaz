@@ -1,10 +1,13 @@
 package scalaz
 package debug
 
+import scala.{ sys, AnyVal, StringContext }
+
 import scalaz.ct.ContravariantClass
 
-import language.experimental.macros
-import language.implicitConversions
+import scala.annotation.implicitAmbiguous
+import scala.language.experimental.macros
+import scala.language.implicitConversions
 
 /** A typeclass describing types which can be meaningfully represented as a `String`.
  */
@@ -50,7 +53,7 @@ object DebugInterpolator {
   }
 
   sealed abstract class HasDebug0 {
-    @annotation.implicitAmbiguous(
+    @implicitAmbiguous(
       "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Show[${A}] instance is in scope."
     )
     implicit def ambiguousDebug1[A](a: A): HasDebug =

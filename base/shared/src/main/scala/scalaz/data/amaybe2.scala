@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ AnyVal, Nothing }
+
 import scalaz.types.Is
 
 /**

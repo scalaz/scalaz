@@ -1,7 +1,9 @@
 package scalaz
 package ct
 
-import language.experimental.macros
+import scala.Tuple2
+
+import scala.language.experimental.macros
 
 /** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
  *

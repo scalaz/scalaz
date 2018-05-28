@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ Function0, Tuple2 }
+
 import scala.language.experimental.macros
 
 trait ComonadClass[F[_]] extends CobindClass[F] {

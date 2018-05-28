@@ -1,6 +1,8 @@
 package scalaz
 package types
 
+import scala.Any
+
 /**
  * This particular version of Leibniz’ equality has been generalized to
  * handle subtyping so that it can be used with constrained type constructors,

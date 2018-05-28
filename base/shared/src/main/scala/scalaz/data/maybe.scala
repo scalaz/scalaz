@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.{ List, None, Option, Some }
+
 import scalaz.core.EqClass
 import scalaz.ct._
 import scalaz.debug.DebugClass

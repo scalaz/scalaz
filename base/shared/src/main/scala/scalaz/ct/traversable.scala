@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ List, Tuple2 }
+
 import scala.language.experimental.macros
 
 trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {

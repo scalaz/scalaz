@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.{ List, Option, Some }
+
 import scala.language.experimental.macros
 
 trait CobindClass[F[_]] extends FunctorClass[F] {

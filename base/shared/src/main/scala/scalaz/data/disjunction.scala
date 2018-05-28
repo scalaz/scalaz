@@ -1,6 +1,8 @@
 package scalaz
 package data
 
+import scala.Either
+
 import scalaz.core.EqClass
 import scalaz.ct._
 import scalaz.debug.DebugClass
