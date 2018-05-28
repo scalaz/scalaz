@@ -89,7 +89,7 @@ sealed trait KleisliIO[E, A, B] extends (A => IO[E, B]) { self =>
     KleisliIO.flatMap(self, f)
 
   /**
-   * Composes to effectful functions.
+   * Composes two effectful functions.
    */
   final def compose[A0](that: KleisliIO[E, A0, A]): KleisliIO[E, A0, B] =
     KleisliIO.compose(self, that)
@@ -194,25 +194,11 @@ object KleisliIO {
         case e: KleisliIOError[_] => IO.fail[E, B](e.unsafeCoerce[E])
       }
   }
-  private[effect] final class Compose[E, A, B, C](second: KleisliIO[E, B, C], first: KleisliIO[E, A, B])
-      extends KleisliIO[E, A, C] {
-    override final def apply(a: A): IO[E, C] = first(a).flatMap(b => second(b))
-  }
-  private[effect] final class FlatMap[E, A, B, C](fa: KleisliIO[E, A, B], f: B => KleisliIO[E, A, C])
-      extends KleisliIO[E, A, C] {
-    override final def apply(a: A): IO[E, C] = fa(a).flatMap(b => f(b)(a))
-  }
 
   /**
    * Lifts a value into the monad formed by `KleisliIO`.
    */
   final def point[E, A, B](b: => B): KleisliIO[E, A, B] = lift((_: A) => b)
-
-  /**
-   * See KleisliIO.flatMap.
-   */
-  final def flatMap[E, A, B, C](fa: KleisliIO[E, A, B], f: B => KleisliIO[E, A, C]): KleisliIO[E, A, C] =
-    new FlatMap(fa, f)
 
   /**
    * Returns a `KleisliIO` representing a failure with the specified `E`.
@@ -370,6 +356,12 @@ object KleisliIO {
   def _2[E, A, B]: KleisliIO[E, (A, B), B] = lift[E, (A, B), B](_._2)
 
   /**
+   * See @KleisliIO.flatMap
+   */
+  final def flatMap[E, A, B, C](fa: KleisliIO[E, A, B], f: B => KleisliIO[E, A, C]): KleisliIO[E, A, C] =
+    new Pure((a: A) => fa(a).flatMap(b => f(b)(a)))
+
+  /**
    * See KleisliIO.compose
    */
   final def compose[E, A, B, C](second: KleisliIO[E, B, C], first: KleisliIO[E, A, B]): KleisliIO[E, A, C] =
@@ -378,7 +370,7 @@ object KleisliIO {
         new Impure(second.apply0.compose(first.apply0))
 
       case _ =>
-        new Compose(second, first)
+        new Pure((a: A) => first(a).flatMap(second))
     }
 
   /**
