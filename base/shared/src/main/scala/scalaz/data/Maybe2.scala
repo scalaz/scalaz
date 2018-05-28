@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scala.{ AnyVal, Nothing, sys }
+import scala.{ sys, AnyVal, Nothing }
 
 import scalaz.core.EqClass
 import scalaz.ct.BifunctorClass

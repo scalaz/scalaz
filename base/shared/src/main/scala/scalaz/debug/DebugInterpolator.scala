@@ -1,7 +1,7 @@
 package scalaz
 package debug
 
-import scala.{ AnyVal, StringContext, sys }
+import scala.{ sys, AnyVal, StringContext }
 
 import scala.annotation.implicitAmbiguous
 import scala.language.experimental.macros
