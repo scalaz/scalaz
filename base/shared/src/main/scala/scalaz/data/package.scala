@@ -1,8 +1,8 @@
 package scalaz
 
-package object data {
-  val Void: VoidModule = VoidImpl
+import scala.{ Any, AnyVal, Option, Some }
 
+package object data {
   val Forall: ForallModule = ForallImpl
   val ∀ : Forall.type      = Forall
 
@@ -89,7 +89,4 @@ package object data {
 
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
-
-  val Kleisli: KleisliModule = KleisliImpl
-  type Kleisli[F[_], A, B] = Kleisli.Kleisli[F, A, B]
 }

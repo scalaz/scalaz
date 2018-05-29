@@ -28,6 +28,9 @@ options:
     - title: Monoid
       url: typeclass/Monoid.html
       menu_section: typeclass
+    - title: Ord
+      url: typeclass/Ord.html
+      menu_section: typeclass
     - title: Semigroup
       url: typeclass/Semigroup.html
       menu_section: typeclass
@@ -75,4 +78,7 @@ options:
       menu_section: std
     - title: Tuple
       url: std/Tuple.html
+      menu_section: std
+    - title: Vector
+      url: std/Vector.html
       menu_section: std
