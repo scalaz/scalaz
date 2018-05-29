@@ -391,6 +391,18 @@ sealed abstract class IO[E, A] { self =>
     self *> IO.sleep(interval) *> repeat(interval)
 
   /**
+    * Repeats this action n time.
+    */
+  final def repeatN(n: Int): IO[E, A] = if (n <= 1) self else self *> repeatN(n - 1)
+
+  /**
+    * Repeats this action n time with a specified function, which computes
+    * a return value.
+    */
+  final def repeatNFold[B](n: Int)(b: B, f: (B, A) => B): IO[E, B] =
+    if (n <= 1) IO.now(b) else self.flatMap(a => repeatNFold(n - 1)(f(b, a), f))
+
+  /**
    * Repeats this action continuously until the first error, with the specified
    * interval between the start of each full execution. Note that if the
    * execution of this action takes longer than the specified interval, then the
@@ -413,6 +425,13 @@ sealed abstract class IO[E, A] { self =>
 
       tick(1)
     })
+
+
+  /**
+    * Repeats this action continuously until the function returns false.
+    */
+  final def doWhile(f: A => Boolean): IO[E, A] =
+    self.flatMap(a => if (f(a)) doWhile(f) else IO.now(a))
 
   /**
    * Maps this action to one producing unit, but preserving the effects of
