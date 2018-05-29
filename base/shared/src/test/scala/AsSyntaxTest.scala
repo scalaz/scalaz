@@ -1,4 +1,8 @@
-import scalaz.Scalaz._
+package scalaz
+
+import Scalaz._
+
+import scala.{ AnyRef, AnyVal, Either }
 
 class AsSyntaxTest {
   val ev1: Either[Int, String] <~< Either[AnyVal, AnyRef] =

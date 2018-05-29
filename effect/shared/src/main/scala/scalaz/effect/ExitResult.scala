@@ -1,5 +1,6 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
 /**
  * A description of the result of executing an `IO` value. The result is either

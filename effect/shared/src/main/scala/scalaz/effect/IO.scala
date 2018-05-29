@@ -1,14 +1,14 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
+import java.lang.{ Math, System }
+
+import scala.{ ::, Any, List, Nil, Nothing, PartialFunction }
 import scala.annotation.switch
 import scala.concurrent.duration._
 
 import scalaz.data.Disjunction
-import scalaz.data.Disjunction._
-import scalaz.data.Maybe
-import scalaz.Void
-import scalaz.<~<
 
 import scalaz.effect.Errors._
 
@@ -406,7 +406,7 @@ sealed abstract class IO[E, A] { self =>
 
       def tick[B](n: Int): IO[E, B] =
         self *> nanoTime[E].flatMap { now =>
-          val await = ((start + n * gapNs) - now).max(0L)
+          val await = Math.max(0L, (start + n * gapNs) - now)
 
           IO.sleep(await.nanoseconds) *> tick[B](n + 1)
         }

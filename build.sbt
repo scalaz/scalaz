@@ -86,6 +86,7 @@ lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
   .enablePlugins(MicrositesPlugin)
   .settings(
+    scalacOptions -= "-Yno-imports",
     skip in publish := true,
     libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
     micrositeFooterText := Some("""

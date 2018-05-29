@@ -1,3 +1,7 @@
+package scalaz
+
+import scala.{ Any, AnyRef, AnyVal, Nothing, Null }
+
 import scalaz.Scalaz._
 
 class AsResolutionTest {
