@@ -1,25 +1,29 @@
 package scalaz.effect
 
 import org.specs2.Specification
-import scalaz.Void
+import org.specs2.concurrent.ExecutionEnv
+import org.specs2.specification.AroundTimeout
+import scalaz.{Int, String, Unit, Void}
 
+import scala.{List, StringContext}
+import scala.collection.immutable.Range
 import scala.concurrent.duration._
 
-class IOQueueSpec extends Specification with RTS {
+class IOQueueSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeout with RTS {
 
   def is = "IOQueueSpec".title ^ s2"""
     Make an IOQueue and
     add values then call
-      `take` to retrieve them in correct order. $e1
-      `interruptTake`to interrupt fiber which is suspended on `take`. $e2
-      `interruptPutter`to interrupt fiber which is suspended on `offer`. $e3
-    `take` is called by fiber waiting on values to be added to the queue and join the fiber to get the added values correctly. $e4
-    fork 10 takers and offer 10 values, the values must be correct after join those fibers $e5
-    fork 10 putters and offer for each one 10 values then take the values 100 times, the values must be correct after join those fibers $e6
-    make capacity = 10, then put 20 values then check if the size is 10 $e7
-    the order is preserved even if we exceed the capacity of the queue $e8
-    take can be interrupted and all resources are released $e9
-    offer can be interrupted and all resources are released $e10
+      `take` to retrieve them in correct order. ${upTo(1.second)(e1)}
+      `interruptTake`to interrupt fiber which is suspended on `take`. ${upTo(1.second)(e2)}
+      `interruptPutter`to interrupt fiber which is suspended on `offer`. ${upTo(1.second)(e3)}
+    `take` is called by fiber waiting on values to be added to the queue and join the fiber to get the added values correctly. ${upTo(1.second)(e4)}
+    fork 10 takers and offer 10 values, the values must be correct after join those fibers ${upTo(1.second)(e5)}
+    fork 10 putters and offer for each one 10 values then take the values 100 times, the values must be correct after join those fibers ${upTo(1.second)(e6)}
+    make capacity = 10, then put 20 values then check if the size is 10 ${upTo(1.second)(e7)}
+    the order is preserved even if we exceed the capacity of the queue ${upTo(1.second)(e8)}
+    take can be interrupted and all resources are released ${upTo(1.second)(e9)}
+    offer can be interrupted and all resources are released ${upTo(1.second)(e10)}
 
     """
 
@@ -71,7 +75,7 @@ class IOQueueSpec extends Specification with RTS {
       queue <- IOQueue.make[Void, Int](10)
       _     <- IO.forkAll(List.fill(10)(queue.take[Void].toUnit))
       _     <- waitForSize(queue, -10)
-      _     <- (1 to 10).map(queue.offer[Void]).foldLeft[IO[Void, Unit]](IO.unit)(_ *> _)
+      _     <- Range.inclusive(1, 10).map(queue.offer[Void]).foldLeft[IO[Void, Unit]](IO.unit)(_ *> _)
       _     <- queue.offer(37)
       v     <- queue.take
     } yield v must_=== 37)
@@ -79,7 +83,7 @@ class IOQueueSpec extends Specification with RTS {
   def e6 =
     unsafePerformIO(for {
       queue <- IOQueue.make[Void, Int](10)
-      order = (1 to 10).toList
+      order = Range.inclusive(1, 10).toList
       _     <- IO.forkAll(order.map(queue.offer[Void]))
       _     <- waitForSize(queue, 10)
       l     <- queue.take.repeatNFold[List[Int]](10)(List.empty[Int], (l, i) => i :: l)
@@ -96,7 +100,7 @@ class IOQueueSpec extends Specification with RTS {
   def e8 =
     unsafePerformIO(for {
       queue  <- IOQueue.make[Void, Int](5)
-      orders = (1 to 10).toList
+      orders = Range.inclusive(1, 10).toList
       _      <- IO.forkAll(orders.map(n => waitForSize(queue, n - 1) *> queue.offer(n)))
       _      <- waitForSize(queue, 10)
       l      <- queue.take.repeatNFold[List[Int]](10)(List.empty[Int], (l, i) => i :: l)
