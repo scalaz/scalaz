@@ -1,8 +1,13 @@
-package scalaz.effect
+package scalaz
+package effect
+
+import java.lang.Object
+
+import scala.{ List, Seq }
+import scala.Predef.ArrowAssoc
 
 import org.specs2.Specification
 
-import scalaz._
 import Scalaz._
 
 class IORefSpec extends Specification with RTS {

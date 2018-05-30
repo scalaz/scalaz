@@ -1,7 +1,6 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
-
-import scalaz.{ Applicative, Monoid }
+package scalaz
+package effect
 
 /**
  * A fiber is a lightweight thread of execution that never consumes more than a

@@ -1,4 +1,7 @@
-package scalaz.effect
+package scalaz
+package effect
+
+import scala.List
 
 trait SafeApp {
 

@@ -37,6 +37,6 @@ val listFunctor: Functor[List] = instanceOf(new FunctorClass[List] {
 [Maybe](../data/Maybe.html) does not have a `map` method. Instead its `Functor` is used, which is implicitly available from the above imports.
 
 ```tut
-val x: Maybe[Long] = just(50L)
+val x = just(50L)
 x.map(_ - 8L)
 ```

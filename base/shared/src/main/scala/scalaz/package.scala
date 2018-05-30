@@ -8,6 +8,7 @@ package object scalaz
     with BaseCore {
 
   // Types
+  type Array[A]         = scala.Array[A]
   type Boolean          = scala.Boolean
   type Byte             = scala.Byte
   type Double           = scala.Double
@@ -18,6 +19,7 @@ package object scalaz
   type Short            = scala.Short
   type Singleton        = scala.Singleton
   type String           = java.lang.String
+  type Throwable        = java.lang.Throwable
   type Unit             = scala.Unit
 
   type <:<[-A, +B] = scala.Predef.<:<[A, B]

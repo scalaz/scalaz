@@ -24,7 +24,7 @@ empty[Int]
 ## Use the type class instances
 
 ```tut
-val x: Maybe[Long] = just(50L)
+val x = just(50L)
 val y = "Hello".pure[Maybe]
 
 y.map(_ + " World")

@@ -1,7 +1,8 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scalaz.data.Disjunction._
+import scala.Any
 
 object Errors {
   final case class LostRace(loser: Fiber[_, _] \/ Fiber[_, _])

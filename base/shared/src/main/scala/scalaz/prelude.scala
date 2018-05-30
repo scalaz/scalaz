@@ -106,19 +106,20 @@ trait BaseData {
   type Forall[F[_]]     = data.Forall.Forall[F]
   type Forget[A, B, C]  = data.Forget[A, B, C]
   type Identity[A]      = data.Identity[A]
-  type Maybe[A]         = data.Maybe[A]
+  type Maybe[A]         = Maybe.Maybe[A]
   type That[A, B]       = data.That[A, B]
   type This[A, B]       = data.This[A, B]
 
-  val Both = data.Both
-  val That = data.That
-  val This = data.This
+  val Both  = data.Both
+  val That  = data.That
+  val This  = data.This
+  val Maybe = data.MaybeImpl
 
-  val \/-   = data.Disjunction.\/-
-  val -\/   = data.Disjunction.-\/
-  val Empty = data.MaybeImpl.Empty
-  val Just  = data.MaybeImpl.Just
+  val \/- = data.Disjunction.\/-
+  val -\/ = data.Disjunction.-\/
 
+  val Just  = Maybe.Just
+  val Empty = Maybe.Empty
 }
 
 trait BaseDataAliases {

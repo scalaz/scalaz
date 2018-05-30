@@ -1,16 +1,14 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scala.annotation.switch
-import scala.annotation.tailrec
+import scala.{ ::, Any, AnyRef, Array, List, Nil, None, Nothing, Option, Some }
+import scala.annotation.{ switch, tailrec }
 import scala.concurrent.duration.Duration
+
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.{ Executors, TimeUnit }
-import java.lang.{ Runnable, Runtime }
-
-import scalaz.data.Disjunction._
-import scalaz.data.Maybe
-import scalaz.Void
+import java.lang.{ Math, Runnable, Runtime }
 
 /**
  * This trait provides a high-performance implementation of a runtime system for
@@ -89,7 +87,7 @@ trait RTS {
   /**
    * The main thread pool used for executing fibers.
    */
-  val threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().max(2))
+  val threadPool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2))
 
   /**
    * This determines the maximum number of resumptions placed on the stack
