@@ -169,7 +169,7 @@ sealed trait KleisliIO[E, A, B] extends (A => IO[E, B]) { self =>
   /**
    * Maps the output of this effectful function to the specified constant.
    */
-  final def const[C](c: C): KleisliIO[E, A, C] =
+  final def const[C](c: => C): KleisliIO[E, A, C] =
     self >>> KleisliIO.lift[E, B, C](_ => c)
 
   /**
@@ -256,25 +256,6 @@ object KleisliIO {
   final def impureVoid[A, B](f: A => B): KleisliIO[Void, A, B] = new Impure(f)
 
   /**
-   * Returns a new effectful function that either applies the left function, if
-   * the function is passed `Left(a)`, or applies the right function, if the
-   * function is passed `Right(c)`.
-   */
-  final def switch[E, A, B, C](l: KleisliIO[E, A, B], r: KleisliIO[E, C, B]): KleisliIO[E, Either[A, C], B] =
-    (l, r) match {
-      case (l: Impure[E, A, B], r: Impure[E, C, B]) =>
-        new Impure[E, Either[A, C], B]({
-          case Left(a)  => l.apply0(a)
-          case Right(c) => r.apply0(c)
-        })
-      case _ =>
-        KleisliIO.pure[E, Either[A, C], B] {
-          case Left(a)  => l(a)
-          case Right(c) => r(c)
-        }
-    }
-
-  /**
    * Returns a new effectful function that passes an `A` to the condition, and
    * if the condition returns true, returns `Left(a)`, but if the condition
    * returns false, returns `Right(a)`.
@@ -294,7 +275,7 @@ object KleisliIO {
     (cond, then0, else0) match {
       case (cond: Impure[_, _, _], then0: Impure[_, _, _], else0: Impure[_, _, _]) =>
         new Impure[E, A, B](a => if (cond.apply0(a)) then0.apply0(a) else else0.apply0(a))
-      case _ => test[E, A](cond) >>> switch(then0, else0)
+      case _ => test[E, A](cond) >>> (then0 ||| else0)
     }
 
   /**
