@@ -43,10 +43,10 @@ trait ChoiceInstances {
         fab andThen bc
 
       override def leftchoice[A, B, C](ab: A => B): A \/ C => B \/ C =
-        _.fold[B \/ C](a => Disjunction.left(ab(a)))(Disjunction.right)
+        _.fold(a => Disjunction.left(ab(a)), Disjunction.right)
 
       override def rightchoice[A, B, C](ab: A => B): C \/ A => C \/ B =
-        _.fold[C \/ B](Disjunction.left)(a => Disjunction.right(ab(a)))
+        _.fold(Disjunction.left, a => Disjunction.right(ab(a)))
     }
   )
 }
