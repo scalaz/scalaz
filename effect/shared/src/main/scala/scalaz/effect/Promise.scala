@@ -1,8 +1,10 @@
 // Copyright (C) 2018 John A. De Goes. All rights reserved.
-
-package scalaz.effect
+package scalaz
+package effect
 
 import java.util.concurrent.atomic.AtomicReference
+
+import scala.{ AnyVal, List, Nil }
 
 import Promise.internal._
 

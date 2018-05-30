@@ -1,4 +1,8 @@
-import scalaz.Scalaz._
+package scalaz
+
+import scala.{ Any, Nothing }
+
+import Scalaz._
 
 class IsResolutionTest {
   implicitly[Int === Int]

@@ -32,7 +32,8 @@ object Scalaz {
     "-Ywarn-unused:_,-imports",
     "-Ywarn-value-discard",
     "-opt:l:inline",
-    "-opt-inline-from:<source>"
+    "-opt-inline-from:<source>",
+    "-Yno-imports"
   )
 
   def stdSettings(prjName: String) = Seq(

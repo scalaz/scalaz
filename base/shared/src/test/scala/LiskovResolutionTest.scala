@@ -1,4 +1,6 @@
-import scalaz.types.Liskov
+package scalaz
+
+import scala.{ Any, AnyVal, Nothing }
 
 class LiskovResolutionTest {
   implicitly[Liskov[Nothing, Any, Int, AnyVal]]
