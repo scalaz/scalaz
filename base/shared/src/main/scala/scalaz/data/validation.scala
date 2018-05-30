@@ -22,9 +22,26 @@ trait ValidationModule {
   def fromDisjunction[A, B](oa: A \/ B): Validation[A, B]
   def invalid[L, R](value: L): Validation[L, R]
   def valid[L, R](value: R): Validation[L, R]
+
+  /* typeclass instances */
+  def applicative[L: Semigroup]: Applicative[Validation[L, ?]]
+  val bifunctor: Bifunctor[Validation]
+  def eq[L: Eq, R: Eq]: Eq[Validation[L, R]]
+  def debug[L: Debug, R: Debug]: Debug[Validation[L, R]]
+  def semigroup[L: Semigroup, R: Semigroup]: Semigroup[Validation[L, R]]
+  def monoid[L: Semigroup, R: Monoid]: Monoid[Validation[L, R]]
 }
 
-private[data] object ValidationImpl extends ValidationModule {
+object ValidationModule extends ValidationSyntax {
+  implicit def applicativeValidation[L: Semigroup]: Applicative[Validation[L, ?]]           = Validation.applicative
+  implicit val bifunctorValidation: Bifunctor[Validation]                                   = Validation.bifunctor
+  implicit def eqValidation[L: Eq, R: Eq]: Eq[Validation[L, R]]                             = Validation.eq
+  implicit def debugValidation[L: Debug, R: Debug]: Debug[Validation[L, R]]                 = Validation.debug
+  implicit def semigroupValidation[L: Semigroup, R: Semigroup]: Semigroup[Validation[L, R]] = Validation.semigroup
+  implicit def monoidValidation[L: Semigroup, R: Monoid]: Monoid[Validation[L, R]]          = Validation.monoid
+}
+
+private[scalaz] object ValidationImpl extends ValidationModule {
   type Validation[A, B] = A \/ B
 
   final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab match {
@@ -37,7 +54,7 @@ private[data] object ValidationImpl extends ValidationModule {
   @inline def invalid[L, R](value: L): Validation[L, R] = -\/(value)
   @inline def valid[L, R](value: R): Validation[L, R]   = \/-(value)
 
-  implicit def validationApplicative[L](implicit L: Semigroup[L]): Applicative[Validation[L, ?]] =
+  def applicative[L](implicit L: Semigroup[L]): Applicative[Validation[L, ?]] =
     instanceOf(new ApplicativeClass[Validation[L, ?]] {
 
       override def map[A, B](ma: Validation[L, A])(f: A => B): Validation[L, B] =
@@ -56,13 +73,13 @@ private[data] object ValidationImpl extends ValidationModule {
         \/-[L, A](a)
     })
 
-  implicit def validationDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Validation[L, R]] =
+  def debug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Validation[L, R]] =
     instanceOf[DebugClass[Validation[L, R]]] {
       case Invalid(left) => s"""Invalid(${L.debug(left)})"""
       case Valid(right)  => s"""Valid(${R.debug(right)})"""
     }
 
-  implicit val validationBifunctor: Bifunctor[Disjunction] =
+  val bifunctor: Bifunctor[Disjunction] =
     instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
       def bimap[A, B, S, T](fab: Validation[A, B])(as: A => S, bt: B => T): Validation[S, T] = fab match {
         case Invalid(a) => invalid(as(a))
@@ -70,14 +87,14 @@ private[data] object ValidationImpl extends ValidationModule {
       }
     })
 
-  implicit def validationEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Validation[A, B]] =
+  def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Validation[A, B]] =
     instanceOf[EqClass[Validation[A, B]]] {
       case (Invalid(a1), Invalid(a2)) => A.equal(a1, a2)
       case (Valid(b1), Valid(b2))     => B.equal(b1, b2)
       case _                          => false
     }
 
-  implicit def validationMonoid[L, R](implicit L: Semigroup[L], R: Monoid[R]): Monoid[Validation[L, R]] =
+  def monoid[L, R](implicit L: Semigroup[L], R: Monoid[R]): Monoid[Validation[L, R]] =
     instanceOf(new MonoidClass[Validation[L, R]] {
       def empty: Validation[L, R] = valid(R.empty)
       def append(a: Validation[L, R], b: => Validation[L, R]): Validation[L, R] =
@@ -89,7 +106,7 @@ private[data] object ValidationImpl extends ValidationModule {
         }
     })
 
-  implicit def validationSemigroup[L, R](implicit L: Semigroup[L], R: Semigroup[R]): Semigroup[Validation[L, R]] =
+  def semigroup[L, R](implicit L: Semigroup[L], R: Semigroup[R]): Semigroup[Validation[L, R]] =
     instanceOf(new SemigroupClass[Validation[L, R]] {
       def append(a: Validation[L, R], b: => Validation[L, R]): Validation[L, R] =
         (a, b) match {
