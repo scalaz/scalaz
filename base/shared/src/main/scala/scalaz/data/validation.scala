@@ -17,13 +17,8 @@ trait ValidationModule {
     def unapply[A, B](vab: Validation[A, B]): Option[B] = fold(vab)(_ => None, Some(_))
   }
 
-  final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab match {
-    case Invalid(a) => ia(a)
-    case Valid(b)   => vb(b)
-  }
-
   /* functions */
-
+  def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C
   def fromDisjunction[A, B](oa: A \/ B): Validation[A, B]
   def invalid[L, R](value: L): Validation[L, R]
   def valid[L, R](value: R): Validation[L, R]
@@ -31,6 +26,11 @@ trait ValidationModule {
 
 private[data] object ValidationImpl extends ValidationModule {
   type Validation[A, B] = A \/ B
+
+  final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab match {
+    case Invalid(a) => ia(a)
+    case Valid(b)   => vb(b)
+  }
 
   @inline def fromDisjunction[L, R](disj: L \/ R): Validation[L, R] = disj
 
