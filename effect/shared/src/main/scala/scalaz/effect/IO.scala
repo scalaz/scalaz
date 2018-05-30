@@ -149,7 +149,7 @@ sealed abstract class IO[E, A] { self =>
    * otherwise executes the specified action.
    */
   final def orElse(that: => IO[E, A]): IO[E, A] =
-    self.attempt.flatMap(_.fold(_ => that)(IO.now))
+    self.attempt.flatMap(_.fold(_ => that, IO.now))
 
   /**
    * Maps over the error type. This can be used to lift a "smaller" error into
@@ -323,7 +323,7 @@ sealed abstract class IO[E, A] { self =>
     def tryRescue(t: E): IO[E, A] =
       if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
 
-    self.attempt[E].flatMap(_.fold(tryRescue)(IO.now))
+    self.attempt[E].flatMap(_.fold(tryRescue, IO.now))
   }
 
   /**

@@ -8,7 +8,7 @@ import scalaz.ct._
 import scalaz.debug.DebugClass
 
 sealed trait Disjunction[L, R] {
-  final def fold[A](la: L => A)(ra: R => A): A = this match {
+  final def fold[A](la: L => A, ra: R => A): A = this match {
     case -\/(l) => la(l)
     case \/-(r) => ra(r)
   }
@@ -22,7 +22,7 @@ object Disjunction extends DisjunctionInstances with DisjunctionFunctions {
   case class -\/[L, R](value: L) extends (L \/ R)
   case class \/-[L, R](value: R) extends (L \/ R)
 
-  def swap[L, R](ab: L \/ R): R \/ L = ab.fold[R \/ L](\/-(_))(-\/(_))
+  def swap[L, R](ab: L \/ R): R \/ L = ab.fold[R \/ L](\/-(_), -\/(_))
 
   def fromEither[L, R](ab: Either[L, R]): L \/ R = ab.fold(-\/(_), \/-(_))
 }
@@ -42,16 +42,16 @@ trait DisjunctionInstances {
     instanceOf(new MonadClass[L \/ ?] with BindClass.DeriveFlatten[L \/ ?] {
 
       override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
-        ma.fold[L \/ B](l => -\/(l))(r => \/-(f(r)))
+        ma.fold[L \/ B](l => -\/(l), r => \/-(f(r)))
 
       override def ap[A, B](ma: L \/ A)(mf: L \/ (A => B)): L \/ B =
-        ma.fold[L \/ B](l => -\/(l))(a => map[(A => B), B](mf)(f => f(a)))
+        ma.fold[L \/ B](l => -\/(l), a => map[(A => B), B](mf)(f => f(a)))
 
       override def pure[A](a: A): L \/ A =
         \/-[L, A](a)
 
       override def flatMap[A, B](oa: L \/ A)(f: A => L \/ B): L \/ B =
-        oa.fold[L \/ B](l => -\/(l))(a => f(a))
+        oa.fold[L \/ B](l => -\/(l), a => f(a))
     })
 
   implicit def disjunctionDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[L \/ R] =
