@@ -1,7 +1,9 @@
 package scalaz.effect
 
-import scala.concurrent.duration._
 import org.specs2.Specification
+import scalaz.Void
+
+import scala.concurrent.duration._
 
 class IOQueueSpec extends Specification with RTS {
 
@@ -105,7 +107,7 @@ class IOQueueSpec extends Specification with RTS {
       queue <- IOQueue.make[Void, Int](100)
       f     <- queue.take[Void].fork
       _     <- f.interrupt(new Exception("interrupt fiber in e9"))
-      _     <- waitForSize(queue, 0) //TODO: löschen Sie diese Zeile nach korrigieren `interrupt`
+      _     <- waitForSize(queue, 0)
       size  <- queue.size[Void]
     } yield size must_=== 0
   )
@@ -115,7 +117,7 @@ class IOQueueSpec extends Specification with RTS {
       queue <- IOQueue.make[Void, Int](0)
       f     <- queue.offer[Void](1).fork
       _     <- f.interrupt(new Exception("interrupt fiber in e10"))
-      _     <- waitForSize(queue, 0) //TODO: löschen Sie diese Zeile nach korrigieren `interrupt`
+      _     <- waitForSize(queue, 0)
       size  <- queue.size[Void]
     } yield size must_=== 0
   )

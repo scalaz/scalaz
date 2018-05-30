@@ -1,9 +1,9 @@
 // Copyright (C) 2018 John A. De Goes. All rights reserved.
 
-package scalaz
-package effect
+package scalaz.effect
 
 import scalaz.effect.IOQueue.internal._
+import scalaz.Void
 
 import scala.collection.immutable.Queue
 
@@ -138,7 +138,7 @@ object IOQueue {
     sealed trait State[A] {
       def size: Int
     }
-    final case class Deficit[A](takers: Queue[Promise[_, A]]) extends State[A] {
+    final case class Deficit[A](takers: Queue[Promise[_, A]]) extends State[A] { //can we change Promise[_, A] type to IO[_, Promise[_, A]]?
       def size: Int = -takers.length
     }
     final case class Surplus[A](queue: Queue[A], putters: Queue[(A, Promise[_, Unit])]) extends State[A] {

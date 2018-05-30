@@ -127,15 +127,16 @@ object Promise {
    */
   final def make[E, A]: IO[E, Promise[E, A]] = make0[E, E, A]
 
+  final def unsafeMake[E, A]: Promise[E, A] =
+    new Promise[E, A](new AtomicReference[State[E, A]](new internal.Pending[E, A](Nil)))
+
   /**
    * Makes a new promise. This is a more powerful variant that can utilize
    * different error parameters for the returned promise and the creation of the
    * promise.
    */
   final def make0[E1, E2, A]: IO[E1, Promise[E2, A]] =
-    IO.sync[E1, Promise[E2, A]] {
-      new Promise[E2, A](new AtomicReference[State[E2, A]](new internal.Pending[E2, A](Nil)))
-    }
+    IO.sync[E1, Promise[E2, A]](unsafeMake[E2, A])
 
   private[effect] object internal {
     sealed trait State[E, A]
