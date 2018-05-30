@@ -1,7 +1,6 @@
 package scalaz
 package data
 
-import scalaz.core.EqClass
 import scalaz.algebra.{ MonoidClass, SemigroupClass }
 import scalaz.ct._
 import scalaz.debug.DebugClass
@@ -44,10 +43,7 @@ object ValidationModule extends ValidationSyntax {
 private[scalaz] object ValidationImpl extends ValidationModule {
   type Validation[A, B] = A \/ B
 
-  final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab match {
-    case Invalid(a) => ia(a)
-    case Valid(b)   => vb(b)
-  }
+  final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab.fold(ia)(vb)
 
   @inline def fromDisjunction[L, R](disj: L \/ R): Validation[L, R] = disj
 
@@ -79,20 +75,9 @@ private[scalaz] object ValidationImpl extends ValidationModule {
       case Valid(right)  => s"""Valid(${R.debug(right)})"""
     }
 
-  val bifunctor: Bifunctor[Disjunction] =
-    instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
-      def bimap[A, B, S, T](fab: Validation[A, B])(as: A => S, bt: B => T): Validation[S, T] = fab match {
-        case Invalid(a) => invalid(as(a))
-        case Valid(b)   => valid(bt(b))
-      }
-    })
+  val bifunctor: Bifunctor[Validation] = Bifunctor[Disjunction]
 
-  def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Validation[A, B]] =
-    instanceOf[EqClass[Validation[A, B]]] {
-      case (Invalid(a1), Invalid(a2)) => A.equal(a1, a2)
-      case (Valid(b1), Valid(b2))     => B.equal(b1, b2)
-      case _                          => false
-    }
+  def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Validation[A, B]] = Eq[Disjunction[A, B]]
 
   def monoid[L, R](implicit L: Semigroup[L], R: Monoid[R]): Monoid[Validation[L, R]] =
     instanceOf(new MonoidClass[Validation[L, R]] {
