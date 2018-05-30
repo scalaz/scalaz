@@ -3,23 +3,28 @@ package scalaz.effect
 import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.specification.AroundTimeout
-import scalaz.{Int, String, Unit, Void}
+import scalaz.{ Int, String, Unit, Void }
 
-import scala.{List, StringContext}
+import scala.{ List, StringContext }
 import scala.collection.immutable.Range
 import scala.concurrent.duration._
 
 class IOQueueSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeout with RTS {
 
-  def is = "IOQueueSpec".title ^ s2"""
+  def is =
+    "IOQueueSpec".title ^ s2"""
     Make an IOQueue and
     add values then call
       `take` to retrieve them in correct order. ${upTo(1.second)(e1)}
       `interruptTake`to interrupt fiber which is suspended on `take`. ${upTo(1.second)(e2)}
       `interruptPutter`to interrupt fiber which is suspended on `offer`. ${upTo(1.second)(e3)}
-    `take` is called by fiber waiting on values to be added to the queue and join the fiber to get the added values correctly. ${upTo(1.second)(e4)}
+    `take` is called by fiber waiting on values to be added to the queue and join the fiber to get the added values correctly. ${upTo(
+      1.second
+    )(e4)}
     fork 10 takers and offer 10 values, the values must be correct after join those fibers ${upTo(1.second)(e5)}
-    fork 10 putters and offer for each one 10 values then take the values 100 times, the values must be correct after join those fibers ${upTo(1.second)(e6)}
+    fork 10 putters and offer for each one 10 values then take the values 100 times, the values must be correct after join those fibers ${upTo(
+      1.second
+    )(e6)}
     make capacity = 10, then put 20 values then check if the size is 10 ${upTo(1.second)(e7)}
     the order is preserved even if we exceed the capacity of the queue ${upTo(1.second)(e8)}
     take can be interrupted and all resources are released ${upTo(1.second)(e9)}
