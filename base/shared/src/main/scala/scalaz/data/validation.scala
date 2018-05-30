@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import scalaz.core.EqClass
-import scalaz.algebra.{MonoidClass, SemigroupClass}
+import scalaz.algebra.{ MonoidClass, SemigroupClass }
 import scalaz.ct._
 import scalaz.debug.DebugClass
 
@@ -19,7 +19,7 @@ trait ValidationModule {
 
   final def fold[A, B, C](vab: Validation[A, B])(ia: A => C, vb: B => C): C = vab match {
     case Invalid(a) => ia(a)
-    case Valid(b) => vb(b)
+    case Valid(b)   => vb(b)
   }
 
   /* functions */
@@ -32,10 +32,10 @@ trait ValidationModule {
 private[data] object ValidationImpl extends ValidationModule {
   type Validation[A, B] = A \/ B
 
-  @inline def fromDisjunction[L, R](disj: L \/ R): Validation[L, R]  = disj
+  @inline def fromDisjunction[L, R](disj: L \/ R): Validation[L, R] = disj
 
-  @inline def invalid[L, R](value: L): Validation[L, R]  = -\/(value)
-  @inline def valid[L, R](value: R): Validation[L, R] = \/-(value)
+  @inline def invalid[L, R](value: L): Validation[L, R] = -\/(value)
+  @inline def valid[L, R](value: R): Validation[L, R]   = \/-(value)
 
   implicit def validationApplicative[L](implicit L: Semigroup[L]): Applicative[Validation[L, ?]] =
     instanceOf(new ApplicativeClass[Validation[L, ?]] {
@@ -58,23 +58,23 @@ private[data] object ValidationImpl extends ValidationModule {
 
   implicit def validationDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Validation[L, R]] =
     instanceOf[DebugClass[Validation[L, R]]] {
-      case Invalid(left)  => s"""Invalid(${L.debug(left)})"""
-      case Valid(right) => s"""Valid(${R.debug(right)})"""
+      case Invalid(left) => s"""Invalid(${L.debug(left)})"""
+      case Valid(right)  => s"""Valid(${R.debug(right)})"""
     }
 
   implicit val validationBifunctor: Bifunctor[Disjunction] =
     instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
       def bimap[A, B, S, T](fab: Validation[A, B])(as: A => S, bt: B => T): Validation[S, T] = fab match {
         case Invalid(a) => invalid(as(a))
-        case Valid(b) => valid(bt(b))
+        case Valid(b)   => valid(bt(b))
       }
     })
 
   implicit def validationEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Validation[A, B]] =
     instanceOf[EqClass[Validation[A, B]]] {
       case (Invalid(a1), Invalid(a2)) => A.equal(a1, a2)
-      case (Valid(b1)  , Valid(b2)  ) => B.equal(b1, b2)
-      case _                  => false
+      case (Valid(b1), Valid(b2))     => B.equal(b1, b2)
+      case _                          => false
     }
 
   implicit def validationMonoid[L, R](implicit L: Semigroup[L], R: Monoid[R]): Monoid[Validation[L, R]] =
@@ -83,9 +83,9 @@ private[data] object ValidationImpl extends ValidationModule {
       def append(a: Validation[L, R], b: => Validation[L, R]): Validation[L, R] =
         (a, b) match {
           case (Invalid(a), Invalid(b)) => invalid(L.append(a, b))
-          case (Invalid(a), Valid(_)) => invalid(a)
-          case (Valid(_), Invalid(b)) => invalid(b)
-          case (Valid(a), Valid(b)) => valid(R.append(a, b))
+          case (Invalid(a), Valid(_))   => invalid(a)
+          case (Valid(_), Invalid(b))   => invalid(b)
+          case (Valid(a), Valid(b))     => valid(R.append(a, b))
         }
     })
 
@@ -94,19 +94,20 @@ private[data] object ValidationImpl extends ValidationModule {
       def append(a: Validation[L, R], b: => Validation[L, R]): Validation[L, R] =
         (a, b) match {
           case (Invalid(a), Invalid(b)) => invalid(L.append(a, b))
-          case (Invalid(a), Valid(_)) => invalid(a)
-          case (Valid(_), Invalid(b)) => invalid(b)
-          case (Valid(a), Valid(b)) => valid(R.append(a, b))
+          case (Invalid(a), Valid(_))   => invalid(a)
+          case (Valid(_), Invalid(b))   => invalid(b)
+          case (Valid(a), Valid(b))     => valid(R.append(a, b))
         }
     })
 }
 
 trait ValidationSyntax {
-  implicit final class DisjunctionAsValidation[A, B](oa: A \/ B) { def asValidation: Validation[A, B] = Validation.fromDisjunction(oa) }
+  implicit final class DisjunctionAsValidation[A, B](oa: A \/ B) {
+    def asValidation: Validation[A, B] = Validation.fromDisjunction(oa)
+  }
 
   implicit final class ToValidationOps[A](a: A) {
-    def valid[B]: Validation[B, A] = Validation.valid(a)
+    def valid[B]: Validation[B, A]   = Validation.valid(a)
     def invalid[B]: Validation[A, B] = Validation.invalid(a)
   }
 }
-
