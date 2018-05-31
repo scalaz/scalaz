@@ -400,7 +400,7 @@ sealed abstract class IO[E, A] { self =>
    * a return value.
    */
   final def repeatNFold[B](n: Int)(b: B, f: (B, A) => B): IO[E, B] =
-    if (n <= 1) IO.now(b) else self.flatMap(a => repeatNFold(n - 1)(f(b, a), f))
+    if (n < 1) IO.now(b) else self.flatMap(a => repeatNFold(n - 1)(f(b, a), f))
 
   /**
    * Repeats this action continuously until the first error, with the specified
