@@ -509,7 +509,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
     Functor[Arbitrary].map(a)(Coproduct(_))
 
-  implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[W, F, A]] =
+  implicit def writerTArb[W, F[_], A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[W, F, A]] =
     Functor[Arbitrary].map(A)(WriterT[W, F, A](_))
 
   implicit def unwriterTArb[F[_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
