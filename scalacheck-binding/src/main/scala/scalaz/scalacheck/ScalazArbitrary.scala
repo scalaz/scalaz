@@ -538,7 +538,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   // backwards compatibility
   def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
-    indexedStateTArb[S, F, S, A](A)
+    indexedStateTArb[S, S, F, A](A)
 
   implicit def indexedReaderWriterStateTArb[F[_], R, W, S1, S2, A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
     Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[F, R, W, S1, S2, A](_))
