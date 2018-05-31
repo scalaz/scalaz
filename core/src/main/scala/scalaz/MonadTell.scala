@@ -27,6 +27,29 @@ object MonadTell {
     }
 
   ////
+  import Isomorphism.<~>
+  def fromIso[F[_], G[_], S](I: F <~> G)(implicit M: MonadTell[G, S]): MonadTell[F, S] =
+    new IsomorphismMonadTell[F, G, S] {
+      override implicit def G: MonadTell[G, S] = M
+      override def iso: F <~> G = I
+    }
 
+  /** The Free instruction set for MonadTell */
+  sealed abstract class Ast[S, A]
+  final case class Writer[S, A](s: S, a: A) extends Ast[S, A]
+
+  /** Extensible Effect */
+  def liftF[F[_], S](
+    implicit I: Ast[S, ?] :<: F
+  ): MonadTell[Free[F, ?], S] with BindRec[Free[F, ?]] =
+    new MonadTell[Free[F, ?], S] with BindRec[Free[F, ?]] {
+      val delegate = Free.freeMonad[F]
+      def point[A](a: =>A): Free[F, A] = delegate.point(a)
+      def bind[A, B](fa: Free[F, A])(f: A => Free[F, B]) = delegate.bind(fa)(f)
+      override def map[A, B](fa: Free[F, A])(f: A => B) = delegate.map(fa)(f)
+      override def tailrecM[A, B](f: A => Free[F, A \/ B])(a: A) = delegate.tailrecM(f)(a)
+
+      def writer[A](w: S, v: A): Free[F, A] = Free.liftF(I.inj(Writer[S, A](w, v)))
+    }
   ////
 }
