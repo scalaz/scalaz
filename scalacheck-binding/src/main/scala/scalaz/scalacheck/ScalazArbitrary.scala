@@ -537,7 +537,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
   // backwards compatibility
-  def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
+  def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
     indexedStateTArb[S, S, F, A](A)
 
   implicit def indexedReaderWriterStateTArb[F[_], R, W, S1, S2, A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
