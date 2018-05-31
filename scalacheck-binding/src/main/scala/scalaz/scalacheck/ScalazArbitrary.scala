@@ -549,7 +549,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, M, R, O, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
-  implicit def indexedStateTArb[S1, F[_], S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, S2, F, A]] =
+  implicit def indexedStateTArb[S1, S2, F[_], A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, S2, F, A]] =
     Functor[Arbitrary].map(A)(IndexedStateT[S1, S2, F, A](_))
 
   implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
