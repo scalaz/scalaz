@@ -546,7 +546,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def tracedTArb[W[_], A, B](implicit A: Arbitrary[W[A => B]]): Arbitrary[TracedT[W, A, B]] =
     Functor[Arbitrary].map(A)(TracedT(_))
 
-  implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, R, O, M, A]] =
+  implicit def indexedContsTArb[W[_], R, O, M[_], A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, R, O, M, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
   implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
