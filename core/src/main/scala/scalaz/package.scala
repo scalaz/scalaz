@@ -159,7 +159,7 @@ package object scalaz {
   type State[S, A] = StateT[S, Id, A]
 
   object StateT extends StateTInstances with StateTFunctions {
-    def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = StateT[S, F, A](f)
+    def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = IndexedStateT[S, S, F, A](f)
 
     def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, ?] ~> StateT[S, G, ?] =
       λ[StateT[S, F, ?] ~> StateT[S, G, ?]](st => StateT((s: S) => nat(st.run(s))))
