@@ -10,7 +10,7 @@ object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[S, List, A]
   type StateTListInt[A] = StateTList[Int, A]
-  type IStateTList[S, A] = IndexedStateT[S, List, Int, A]
+  type IStateTList[S, A] = IndexedStateT[S, Int, List, A]
 
   private[this] val stateTestInts = (-10 to 10).toList
 
@@ -34,7 +34,7 @@ object StateTTest extends SpecLite {
 
   object instances {
     def functor[S, F[_] : Applicative] = Functor[StateT[S, F, ?]]
-    def plus[S1, F[_]: Monad: Plus, S2] = Plus[IndexedStateT[S1, F, S2, ?]]
+    def plus[S1, S2, F[_]: Monad: Plus] = Plus[IndexedStateT[S1, S2, F, ?]]
     def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[S, F, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[S, F, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[S, F, ?]]

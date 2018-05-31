@@ -147,10 +147,10 @@ package object scalaz {
   }
 
   /** @template */
-  type StateT[S, F[_], A] = IndexedStateT[S, F, S, A]
+  type StateT[S, F[_], A] = IndexedStateT[S, S, F, A]
 
   /** @template */
-  type IndexedState[-S1, S2, A] = IndexedStateT[S1, Id, S2, A]
+  type IndexedState[-S1, S2, A] = IndexedStateT[S1, S2, Id, A]
   
   /** A state transition, representing a function `S => (S, A)`.
     *
@@ -165,7 +165,7 @@ package object scalaz {
       λ[StateT[S, F, ?] ~> StateT[S, G, ?]](st => StateT((s: S) => nat(st.run(s))))
   }
   object IndexedState extends StateFunctions {
-    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[S1, Id, S2, A](f)
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[S1, S2, Id, A](f)
   }
   object State extends StateFunctions {
     def apply[S, A](f: S => (S, A)): State[S, A] = StateT[S, Id, A](f)
@@ -293,7 +293,7 @@ package object scalaz {
   type @?>[A, B] = PLens[A, B]
 
   /** @template */
-  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[S1, F, S2, Option[A]]
+  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[S1, S2, F, Option[A]]
 
   /** @template */
   type PStateT[F[_], S, A] = PIndexedStateT[F, S, S, A]

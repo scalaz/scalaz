@@ -152,7 +152,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIndexedReaderWriterStateT[F[_]: Monad, R, W, S1, S2, A](implicit F: Cogen[(R, S1) => F[(W, A, S2)]]): Cogen[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
     F.contramap(_.run)
 
-  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[S1, F, S2, A]] =
+  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[S1, S2, F, A]] =
     F.contramap(s => s.apply(_))
 
   implicit def cogenWriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[F, A, B]] =
@@ -549,8 +549,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, M, R, O, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
-  implicit def indexedStateTArb[S1, F[_], S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, F, S2, A]] =
-    Functor[Arbitrary].map(A)(IndexedStateT[S1, F, S2, A](_))
+  implicit def indexedStateTArb[S1, F[_], S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, S2, F, A]] =
+    Functor[Arbitrary].map(A)(IndexedStateT[S1, S2, F, A](_))
 
   implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
       Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
