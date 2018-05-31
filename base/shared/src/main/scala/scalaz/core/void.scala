@@ -42,7 +42,7 @@ object VoidModule extends VoidSyntax {
 trait VoidInstances {
   implicit def voidSemigroup: Semigroup[Void] =
     instanceOf(new SemigroupClass[Void] {
-      override def append(a1: Void, a2: => Void): Void = a1
+      override def mappend(a1: Void, a2: => Void): Void = a1
     })
   implicit val voidDebug: Debug[Void] = DebugClass.instance[Void](Void.absurd)
 }

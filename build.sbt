@@ -94,6 +94,8 @@ lazy val example = project.module
   )
   .settings(
     scalacOptions -= "-Yno-imports",
+    scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
+    scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
     skip in publish := true,
     libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""

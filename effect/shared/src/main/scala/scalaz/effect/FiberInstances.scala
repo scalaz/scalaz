@@ -8,9 +8,9 @@ import scalaz.ct.ApplicativeClass
 trait FiberInstances {
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
     instanceOf(new MonoidClass[Fiber[E, A]] {
-      final def append(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1 <> a2
-      final def empty = new Fiber[E, A] {
-        def join: IO[E, A]                            = IO.now(A.empty)
+      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1 <> a2
+      def mempty = new Fiber[E, A] {
+        def join: IO[E, A]                            = IO.now(A.mempty)
         def interrupt[E2](t: Throwable): IO[E2, Unit] = IO.unit[E2]
       }
     })

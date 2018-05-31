@@ -29,7 +29,7 @@ object FoldableClass {
 
   trait DeriveFoldMap[F[_]] extends FoldableClass[F] with Alt[DeriveFoldMap[F]] {
     final override def foldMap[A, B](fa: F[A])(f: A => B)(implicit B: Monoid[B]) =
-      foldRight(fa, B.empty)((a, b) => B.append(f(a), b))
+      foldRight(fa, B.mempty)((a, b) => B.mappend(f(a), b))
   }
 
   trait Alt[D <: Alt[D]]

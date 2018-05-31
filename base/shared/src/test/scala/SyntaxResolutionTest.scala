@@ -49,7 +49,7 @@ object SyntaxResolutionTest {
     fab.dimap(ca)(bd): F[C, D]
   }
 
-  def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
+  def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.mappend(a2)
 
   def _debug[A: Debug](a: A) = {
     a.debugs: String

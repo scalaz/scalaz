@@ -9,7 +9,7 @@ title:  "Semigroup"
 
 A semigroup instance needs to satisfy the following law:
 
-- Associativity: `append(x, append(y, z)) === append(append(x, y), z)`
+- Associativity: `mappend(x, mappend(y, z)) === mappend(mappend(x, y), z)`
 
 **Typical imports**
 
@@ -24,13 +24,13 @@ import scalaz.Prelude._
 import scalaz.algebra.SemigroupClass
 
 implicit val StringSemigroup: Semigroup[String] = instanceOf(new SemigroupClass[String] {
-  def append(a1: String, a2: => String) = a1 + a2
+  def mappend(a1: String, a2: => String) = a1 + a2
 })
 ```
 
 # Usage
 
 ```tut
-Semigroup[String].append("hello", "world")
-"hello".append("world")
+Semigroup[String].mappend("hello", "world")
+"hello".mappend("world")
 ```

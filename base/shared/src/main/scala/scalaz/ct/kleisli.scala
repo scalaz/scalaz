@@ -77,11 +77,11 @@ trait KleisliInstances {
 
   implicit def monoid[M[_], A, B](implicit M: Monoid[M[B]]): Monoid[Kleisli[M, A, B]] =
     instanceOf(new MonoidClass[Kleisli[M, A, B]] {
-      override def empty: Kleisli[M, A, B] =
-        wrapKleisli(_ => M.empty)
+      override def mempty: Kleisli[M, A, B] =
+        wrapKleisli(_ => M.mempty)
 
-      override def append(a1: Kleisli[M, A, B], a2: => Kleisli[M, A, B]): Kleisli[M, A, B] =
-        wrapKleisli(a => M.append(runKleisli(a1)(a), runKleisli(a2)(a)))
+      override def mappend(a1: Kleisli[M, A, B], a2: => Kleisli[M, A, B]): Kleisli[M, A, B] =
+        wrapKleisli(a => M.mappend(runKleisli(a1)(a), runKleisli(a2)(a)))
     })
 
   implicit def strong[M[_], A, B](implicit M: Functor[M]): Strong[Kleisli[M, ?, ?]] =
