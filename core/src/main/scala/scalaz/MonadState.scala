@@ -24,6 +24,14 @@ trait MonadState[F[_], S] extends Monad[F] { self =>
 object MonadState {
   @inline def apply[F[_], S](implicit F: MonadState[F, S]): MonadState[F, S] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: MonadState[G, E]): MonadState[F, E] =
+    new IsomorphismMonadState[F, G, E] {
+      override def G: MonadState[G, E] = A
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

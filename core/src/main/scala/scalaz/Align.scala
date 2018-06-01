@@ -65,6 +65,14 @@ trait Align[F[_]] extends Functor[F] { self =>
 object Align {
   @inline def apply[F[_]](implicit F: Align[F]): Align[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Align[G]): Align[F] =
+    new IsomorphismAlign[F, G] {
+      override def G: Align[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

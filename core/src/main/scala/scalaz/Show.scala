@@ -19,6 +19,14 @@ trait Show[F]  { self =>
 object Show {
   @inline def apply[F](implicit F: Show[F]): Show[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Show[G]): Show[F] =
+    new IsomorphismShow[F, G] {
+      override def G: Show[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   def showFromToString[A]: Show[A] = new Show[A] {
@@ -42,12 +50,5 @@ object Show {
     }
   }
 
-  import Isomorphism.<=>
-
-  def fromIso[F, G](D: F <=> G)(implicit S: Show[G]): Show[F] =
-    new IsomorphismShow[F, G] {
-      override implicit def G: Show[G] = S
-      override def iso: F <=> G = D
-    }
   ////
 }

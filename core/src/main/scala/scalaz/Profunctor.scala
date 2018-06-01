@@ -43,6 +43,14 @@ trait Profunctor[=>:[_, _]]  { self =>
 object Profunctor {
   @inline def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Profunctor[G]): Profunctor[F] =
+    new IsomorphismProfunctor[F, G] {
+      override def G: Profunctor[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
   sealed trait UpStarF
   type UpStar[F[_], D, C] = (D => F[C]) @@ UpStarF

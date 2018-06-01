@@ -25,6 +25,14 @@ trait Resource[F]  { self =>
 object Resource {
   @inline def apply[F](implicit F: Resource[F]): Resource[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Resource[G]): Resource[F] =
+    new IsomorphismResource[F, G] {
+      override def G: Resource[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   def resource[A](closeAction: A => IO[Unit]): Resource[A] =

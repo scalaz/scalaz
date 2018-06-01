@@ -129,6 +129,14 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 object Bitraverse {
   @inline def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Bitraverse[G]): Bitraverse[F] =
+    new IsomorphismBitraverse[F, G] {
+      override def G: Bitraverse[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
   ////

@@ -50,6 +50,14 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
 object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Category[G]): Category[F] =
+    new IsomorphismCategory[F, G] {
+      override def G: Category[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
   ////
 }

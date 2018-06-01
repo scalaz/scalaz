@@ -332,6 +332,8 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
 object Foldable {
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
 
+
+
   ////
   /**
    * Template trait to define `Foldable` in terms of `foldMap`.

@@ -42,6 +42,14 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
 object ApplicativePlus {
   @inline def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: ApplicativePlus[G]): ApplicativePlus[F] =
+    new IsomorphismApplicativePlus[F, G] {
+      override def G: ApplicativePlus[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

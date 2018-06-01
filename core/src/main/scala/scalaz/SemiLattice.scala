@@ -25,6 +25,14 @@ trait SemiLattice[F] extends Band[F] { self =>
 object SemiLattice {
   @inline def apply[F](implicit F: SemiLattice[F]): SemiLattice[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: SemiLattice[G]): SemiLattice[F] =
+    new IsomorphismSemiLattice[F, G] {
+      override def G: SemiLattice[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   ////
