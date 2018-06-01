@@ -141,6 +141,14 @@ trait Semigroup[F]  { self =>
 object Semigroup {
   @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Semigroup[G]): Semigroup[F] =
+    new IsomorphismSemigroup[F, G] {
+      override def G: Semigroup[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
   /** Make an associative binary function into an instance. */
   def instance[A](f: (A, => A) => A): Semigroup[A] =
@@ -215,5 +223,17 @@ object Semigroup {
         }
     }
 
+  ////
+}
+
+trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
+  implicit def G: Semigroup[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <=> G
+
+  def append(f1: F, f2: => F): F =
+    iso.from(G.append(iso.to(f1), iso.to(f2)))
   ////
 }

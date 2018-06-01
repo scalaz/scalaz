@@ -18,7 +18,24 @@ trait MonadTell[F[_], S] extends Monad[F] { self =>
 object MonadTell {
   @inline def apply[F[_], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: MonadTell[G, E]): MonadTell[F, E] =
+    new IsomorphismMonadTell[F, G, E] {
+      override def G: MonadTell[G, E] = A
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismMonadTell[F[_], G[_], S] extends MonadTell[F, S] with IsomorphismMonad[F, G]{
+  implicit def G: MonadTell[G, S]
+  ////
+
+  override def writer[A](w: S, v: A): F[A] =
+    iso.from(G.writer(w, v))
   ////
 }

@@ -87,6 +87,21 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 object Monad {
   @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Monad[G]): Monad[F] =
+    new IsomorphismMonad[F, G] {
+      override def G: Monad[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+
+  ////
+}
+
+trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G]{
+  implicit def G: Monad[G]
   ////
 
   ////

@@ -66,6 +66,28 @@ trait Unzip[F[_]]  { self =>
 object Unzip {
   @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Unzip[G]): Unzip[F] =
+    new IsomorphismUnzip[F, G] {
+      override def G: Unzip[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+  ////
+}
+
+trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
+  implicit def G: Unzip[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  def unzip[A, B](a: F[(A, B)]): (F[A], F[B]) =
+    G.unzip(iso.to(a)) match {
+      case (f, s) => (iso.from(f), iso.from(s))
+    }
   ////
 }

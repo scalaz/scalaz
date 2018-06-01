@@ -227,7 +227,24 @@ trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
 object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Apply[G]): Apply[F] =
+    new IsomorphismApply[F, G] {
+      override def G: Apply[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] with IsomorphismApplyDivide[F, G]{
+  implicit def G: Apply[G]
+  ////
+
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
+    iso.from(G.ap(iso.to(fa))(iso.to(f)))
   ////
 }

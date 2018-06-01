@@ -20,6 +20,14 @@ trait LiftIO[F[_]]  { self =>
 object LiftIO {
   @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: LiftIO[G]): LiftIO[F] =
+    new IsomorphismLiftIO[F, G] {
+      override def G: LiftIO[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
   implicit def idTLiftIO[F[_]: LiftIO] =
     new LiftIO[IdT[F, ?]] {
@@ -67,5 +75,17 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = StateT(s => LiftIO[F].liftIO(ioa.map((s, _))))
     }
 
+  ////
+}
+
+trait IsomorphismLiftIO[F[_], G[_]] extends LiftIO[F] {
+  implicit def G: LiftIO[G]
+  ////
+
+  import Isomorphism._
+  def iso: F <~> G
+
+  override def liftIO[A](ioa: IO[A]): F[A] =
+    iso.from(G.liftIO(ioa))
   ////
 }

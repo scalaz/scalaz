@@ -75,6 +75,14 @@ trait Order[F] extends Equal[F] { self =>
 object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Order[G]): Order[F] =
+    new IsomorphismOrder[F, G] {
+      override def G: Order[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   implicit val orderInstance: Divisible[Order] = new Divisible[Order] {
@@ -114,5 +122,16 @@ object Order {
     }
   }
 
+  ////
+}
+
+trait IsomorphismOrder[F, G] extends Order[F] with IsomorphismEqual[F, G]{
+  implicit def G: Order[G]
+  ////
+  override def equal(x: F, y: F): Boolean =
+    super[IsomorphismEqual].equal(x, y)
+
+  override def order(x: F, y: F): Ordering =
+    G.order(iso.to(x), iso.to(y))
   ////
 }
