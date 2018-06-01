@@ -5,9 +5,12 @@ import std.option.{none, some}
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *
+ * This class is unsealed to allow downstream integration with alternative
+ * coproduct encodings, e.g. https://github.com/frees-io/iota
+ *
  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
  */
-sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
+abstract class Inject[F[_], G[_]] extends (F ~> G) {
   def apply[A](fa: F[A]): G[A] = inj(fa)
   def unapply[A](ga: G[A]): Option[F[A]] = prj(ga)
   def inj[A](fa: F[A]): G[A]
