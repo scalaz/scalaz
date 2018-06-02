@@ -32,12 +32,12 @@ object DisjunctionUsage extends App {
 
   val x = 5
   val expectingCorrect = infixNotation(x)
-  assert(expectingCorrect === \/-("Correct!"))
+  assert(expectingCorrect.toOption.get === "Correct!")
 
 
   val y = 6
   val expectingFalse = infixNotation(y)
-  assert(expectingFalse === -\/(false))
+  assert(expectingFalse.swap.toOption.get === false)
 
 
   /*
@@ -53,8 +53,8 @@ object DisjunctionUsage extends App {
     case _ => false.left
   }
 
-  assert(bracketNotation(1) === -\/(false))
-  assert(bracketNotation(5) === \/-("Correct!"))
+  assert(bracketNotation(1).swap.toOption.get === false)
+  assert(bracketNotation(5).toOption.get === "Correct!")
 
 
   // Create a value of A \/ B
