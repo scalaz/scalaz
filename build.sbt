@@ -227,6 +227,7 @@ lazy val testsJS  = tests.js
 // can't use "sbt test"
 // https://github.com/scala-native/scala-native/issues/339
 lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
+  .disablePlugins(sbt.plugins.BackgroundRunPlugin)
   .settings(
     standardSettings,
     nativeSettings,
