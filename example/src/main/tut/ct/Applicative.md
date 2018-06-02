@@ -3,7 +3,7 @@ layout: docs
 title:  "Applicative"
 ---
 
-# Applicative
+# Applicative [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/applicative.scala)
 
 *Whereas a [functor](./Functor.html) allows application of a pure function to a value in a context, an Applicative also allows application of a function in a context to a value in a context.*
 
@@ -13,7 +13,7 @@ title:  "Applicative"
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.Prelude._
@@ -26,7 +26,7 @@ implicit val listap: Applicative[List] = instanceOf(new ApplicativeClass[List] {
 })
 ```
 
-## Usage
+# Usage
 
 ```tut:reset
 import scalaz.Scalaz._
@@ -41,4 +41,3 @@ val fs: List[Int => Int] = List(_ * 2, _ * 3, _ * 4, _ * 5)
 
 l2.ap(fs)
 ```
-

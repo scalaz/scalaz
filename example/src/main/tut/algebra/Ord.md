@@ -3,13 +3,12 @@ layout: docs
 title:  "Ord"
 ---
 
-# Ord
+# Ord [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/algebra/ord.scala)
 
 *Ord is used for totally ordered datatypes.*
 
 Ord builds on top of [Eq](../core/Eq.html) in that it adds the concept of ordering values.
 A value can be "greater than", "less than" or "equal to" another value.
-
 
 **Typical imports**
 
@@ -17,7 +16,7 @@ A value can be "greater than", "less than" or "equal to" another value.
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.algebra.OrdClass
@@ -31,7 +30,7 @@ implicit val intOrd: Ord[Int] = instanceOf(new OrdClass[Int] {
 })
 ```
 
-## Usage
+# Usage
 
 ```tut
 val a = 5

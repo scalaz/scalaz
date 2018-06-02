@@ -3,7 +3,7 @@ layout: docs
 title:  "Eq"
 ---
 
-# Eq
+# Eq [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/core/eq.scala)
 
 *The `Eq` type class describes a type which can be compared for observational equality.*
 

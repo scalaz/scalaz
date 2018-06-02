@@ -3,10 +3,10 @@ layout: docs
 title:  "Bifunctor"
 ---
 
-# Bifunctor
+# Bifunctor [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/bifunctor.scala)
 
 *The `Bifunctor` type class describes a type which has two type parameters,
- each of which acts as a (covariant) [`Functor`](./Functor.html).*
+ each of which acts as a (covariant) [Functor](./Functor.html).*
 
 A `Bifunctor` must satisfy the following laws:
 

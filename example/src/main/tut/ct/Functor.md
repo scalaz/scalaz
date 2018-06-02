@@ -3,7 +3,7 @@ layout: docs
 title:  "Functor"
 ---
 
-# Functor
+# Functor [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/functor.scala)
 
 *The `Functor` type class represents a type that can be mapped over.*
 
@@ -18,7 +18,7 @@ A functor needs to satisfy the two functor laws:
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.Prelude._
@@ -32,7 +32,7 @@ val listFunctor: Functor[List] = instanceOf(new FunctorClass[List] {
 })
 ```
 
-## Usage
+# Usage
 
 [Maybe](../data/Maybe.html) does not have a `map` method. Instead its `Functor` is used, which is implicitly available from the above imports.
 

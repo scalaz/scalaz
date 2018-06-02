@@ -3,7 +3,7 @@ layout: docs
 title:  "Semigroup"
 ---
 
-# Semigroup
+# Semigroup [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/algebra/semigroup.scala)
 
 *A semigroup is an algebraic structure consisting of a set and an associative binary operation.*
 
@@ -12,11 +12,12 @@ A semigroup instance needs to satisfy the following law:
 - Associativity: `append(x, append(y, z)) === append(append(x, y), z)`
 
 **Typical imports**
+
 ```tut:silent
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.Prelude._
@@ -27,7 +28,7 @@ implicit val StringSemigroup: Semigroup[String] = instanceOf(new SemigroupClass[
 })
 ```
 
-## Usage
+# Usage
 
 ```tut
 Semigroup[String].append("hello", "world")
