@@ -88,7 +88,7 @@ lazy val example = project.module
   .settings(
     scalacOptions -= "-Yno-imports",
     skip in publish := true,
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),
