@@ -84,7 +84,12 @@ lazy val stdJS  = std.js
 
 lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
-  .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
+  .settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "scalaz",
+    buildInfoObject := "BuildInfo"
+  )
   .settings(
     scalacOptions -= "-Yno-imports",
     skip in publish := true,
