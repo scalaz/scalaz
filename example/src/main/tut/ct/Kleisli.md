@@ -133,4 +133,3 @@ k =<< List(3) // : List(false): List[Boolean]
 - `Monoid` for `Kleisli[M, A, B]` when `M[B]` is any `Monoid`
 
 - `Strong` for `Kleisli[M, ?, ?]` where `M` is any `Functor`
-

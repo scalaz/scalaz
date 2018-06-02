@@ -5,7 +5,7 @@ title:  "Maybe2"
 
 # Maybe2
 
-`Maybe2` is a specialized version of [Maybe](Maybe.html) that avoids allocation of `Tuple2` instances.
+`Maybe2` is a specialized version of [Maybe](./Maybe.html) that avoids allocation of `Tuple2` instances.
 
 **Typical imports**
 

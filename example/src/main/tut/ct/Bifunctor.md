@@ -31,8 +31,8 @@ val tuple2Bifunctor: Bifunctor[Tuple2] =
     def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))
     def rmap[A, B, T](fab: (A, B))(f: B => T): (A, T) = fab.copy(_2 = f(fab._2))
   })
-  
-val theseBifunctor: Bifunctor[These] = 
+
+val theseBifunctor: Bifunctor[These] =
   instanceOf(new BifunctorClass[These] with BifunctorClass.DeriveLmapRmap[These] {
     def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T = fab.bimap(as)(bt)
   })
