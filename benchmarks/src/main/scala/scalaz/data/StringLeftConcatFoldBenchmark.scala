@@ -29,7 +29,7 @@ class StringLeftConcatFoldBenchmark {
     def loop(i: Int, cord: scalaz.data.Cord): scalaz.data.Cord =
       if (i > 0) loop(i - 1, scalaz.data.Cord.cons(testString, cord))
       else cord
-    scalaz.data.Cord.fold(loop(size, scalaz.data.Cord.empty))
+    scalaz.data.Cord.toString(loop(size, scalaz.data.Cord.empty))
   }
 
   @Benchmark

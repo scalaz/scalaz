@@ -20,7 +20,7 @@ trait CordModule {
 
   def length(cord: Cord): Int
 
-  def fold(cord: Cord): String
+  def toString(cord: Cord): String
 }
 
 object CordModule {
@@ -31,20 +31,20 @@ object CordImpl extends CordModule {
   // Cord = (String | Concat, Int)
   // Concat = (String | Concat, String | Concat)
 
-  type Cord = CordRepr
-
-  final class CordRepr(val under: AnyRef, val length: Int, val depth: Int)
+  final class Cord(val under: AnyRef, val length: Int, val depth: Int) {
+    override def toString = CordImpl.this.toString(this)
+  }
   final class Concat(val left: AnyRef, val right: AnyRef)
 
-  def apply(string: String): Cord = new CordRepr(string, string.length, 1)
+  def apply(string: String): Cord = new Cord(string, string.length, 1)
 
   def concat(left: Cord, right: Cord): Cord =
-    new CordRepr(new Concat(left.under, right.under), left.length + right.length, Math.max(left.depth + 1, right.depth))
+    new Cord(new Concat(left.under, right.under), left.length + right.length, Math.max(left.depth + 1, right.depth))
   def cons(left: String, right: Cord): Cord =
-    new CordRepr(new Concat(left, right.under), left.length + right.length, right.depth)
+    new Cord(new Concat(left, right.under), left.length + right.length, right.depth)
   def snoc(left: Cord, right: String): Cord =
-    new CordRepr(new Concat(left.under, right), left.length + right.length, left.depth + 1)
-  val empty: Cord = new CordRepr("", 0, 1)
+    new Cord(new Concat(left.under, right), left.length + right.length, left.depth + 1)
+  val empty: Cord = new Cord("", 0, 1)
 
   def length(cord: Cord): Int = cord.length
 
@@ -72,7 +72,7 @@ object CordImpl extends CordModule {
     }
   }
 
-  def fold(cord: Cord): String = {
+  def toString(cord: Cord): String = {
     val rights = new Array[AnyRef](cord.depth)
     val out    = new Array[Char](cord.length)
     unsafeAppendToH(rights, out, cord.under)

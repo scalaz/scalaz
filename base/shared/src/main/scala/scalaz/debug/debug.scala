@@ -32,7 +32,7 @@ object DebugClass {
     override def debug(a: A): Cord = Cord(debugs(a))
   }
   trait DeriveDebugs[A] extends DebugClass[A] with Alt[DeriveDebugs[A]] {
-    override def debugs(a: A): String = debug(a).toString
+    override def debugs(a: A): String = Cord.toString(debug(a))
   }
 
   sealed trait Alt[A <: Alt[A]]
@@ -82,7 +82,7 @@ object DebugInterpolator extends DebugInterpolator {
           Cord.cons(escape(part), Cord.concat(arg, res))
         }
 
-    def zs(args: HasDebug*): String = z(args: _*).toString
+    def zs(args: HasDebug*): String = Cord.toString(z(args: _*))
   }
 }
 

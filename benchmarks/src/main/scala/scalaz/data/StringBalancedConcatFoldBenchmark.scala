@@ -29,7 +29,7 @@ class StringBalancedConcatFoldBenchmark {
     def loop(i: Int, cord: scalaz.data.Cord): scalaz.data.Cord =
       if (i > 0) loop(i - 1, scalaz.data.Cord.concat(cord, cord))
       else cord
-    scalaz.data.Cord.fold(loop(size, scalaz.data.Cord(testString)))
+    scalaz.data.Cord.toString(loop(size, scalaz.data.Cord(testString)))
   }
 
   @Benchmark
