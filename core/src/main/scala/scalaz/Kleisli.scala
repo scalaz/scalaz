@@ -66,7 +66,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
   def unliftId[N[_]](implicit M: Comonad[N], ev: this.type <~< Kleisli[N[?], A, B]): Reader[A, B] =
     unlift[N, Id]
 
-  def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[M, A, W, S, B] =
+  def rwst[W, S](implicit M: Functor[M], W: Monoid[W]): ReaderWriterStateT[A, W, S, M, B] =
     ReaderWriterStateT(
       (r, s) => M.map(self(r)) {
         b => (W.zero, b, s)

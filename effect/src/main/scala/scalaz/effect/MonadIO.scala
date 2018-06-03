@@ -46,7 +46,7 @@ object MonadIO {
 
   implicit def optionTMonadIO[F[_]: MonadIO] = fromLiftIO[OptionT[F, ?]]
 
-  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
+  implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[E, F, ?]]
 
   implicit def theseTMonadIO[F[_]: MonadIO, E: Semigroup] = fromLiftIO[TheseT[F, E, ?]]
 
@@ -54,7 +54,7 @@ object MonadIO {
 
   implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
 
-  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[F, W, ?]]
+  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] = fromLiftIO[WriterT[W, F, ?]]
 
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
 

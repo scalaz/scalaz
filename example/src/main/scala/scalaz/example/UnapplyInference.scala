@@ -19,9 +19,9 @@ object UnapplyInference extends App {
     import syntax.all._
 
     val either: (List[Int] \/ List[Int]) = \/.right(List(1))
-    val eitherT: EitherT[Option, List[Int], List[Int]] = EitherT(some(either))
+    val eitherT: EitherT[List[Int], Option, List[Int]] = EitherT(some(either))
 
-    val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]
+    val bisequence: List[EitherT[Int, Option, Int]] = eitherT.bisequence[List, Int, Int]
   }
 
   // Without Unapply

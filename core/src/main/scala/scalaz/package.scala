@@ -121,25 +121,28 @@ package object scalaz {
 
   type ∨[A, B] = A \/ B
 
-  type ReaderT[F[_], E, A] = Kleisli[F, E, A]
-  val ReaderT = Kleisli
+  type ReaderT[E, F[_], A] = Kleisli[F, E, A]
   type =?>[E, A] = Kleisli[Option, E, A]
   
   /** @template */
-  type Reader[E, A] = ReaderT[Id, E, A]
+  type Reader[E, A] = ReaderT[E, Id, A]
 
   /** @template */
-  type Writer[W, A] = WriterT[Id, W, A]
+  type Writer[W, A] = WriterT[W, Id, A]
 
   /** @template */
   type Unwriter[W, A] = UnwriterT[Id, W, A]
+
+  object ReaderT {
+    def apply[E, F[_], A](f: E => F[A]): ReaderT[E, F, A] = Kleisli[F, E, A](f)
+  }
 
   object Reader {
     def apply[E, A](f: E => A): Reader[E, A] = Kleisli[Id, E, A](f)
   }
 
   object Writer {
-    def apply[W, A](w: W, a: A): WriterT[Id, W, A] = WriterT[Id, W, A]((w, a))
+    def apply[W, A](w: W, a: A): WriterT[W, Id, A] = WriterT[W, Id, A]((w, a))
   }
 
   object Unwriter {
@@ -210,27 +213,27 @@ package object scalaz {
   def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
   /** @template */
-  type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A]
+  type ReaderWriterStateT[-R, W, S, F[_], A] = IndexedReaderWriterStateT[R, W, S, S, F, A]
   object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[F[_], R, W, S, A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] = IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+    def apply[R, W, S, F[_], A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[R, W, S, F, A] = IndexedReaderWriterStateT[R, W, S, S, F, A] { (r: R, s: S) => f(r, s) }
   }
 
   /** @template */
-  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
+  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A]
   object IndexedReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) => f(r, s) }
+    def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A] { (r: R, s: S1) => f(r, s) }
   }
 
   /** @template */
-  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[Id, R, W, S, A]
+  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[R, W, S, Id, A]
   object ReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
-    def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) => f(r, s) }
+    def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[R, W, S, S, Id, A] { (r: R, s: S) => f(r, s) }
   }
-  type IRWST[F[_], -R, W, -S1, S2, A] = IndexedReaderWriterStateT[F, R, W, S1, S2, A]
+  type IRWST[-R, W, -S1, S2, F[_], A] = IndexedReaderWriterStateT[R, W, S1, S2, F, A]
   val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
   type IRWS[-R, W, -S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
   val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
-  type RWST[F[_], -R, W, S, A] = ReaderWriterStateT[F, R, W, S, A]
+  type RWST[-R, W, S, F[_], A] = ReaderWriterStateT[R, W, S, F, A]
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
   type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
@@ -315,45 +318,45 @@ package object scalaz {
   type PState[S, A] = PStateT[Id, S, A]
 
   /** @template */
-  type IndexedConts[W[_], R, O, A] = IndexedContsT[W, Id, R, O, A]
+  type IndexedConts[W[_], R, O, A] = IndexedContsT[W, R, O, Id, A]
   object IndexedConts extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] = IndexedContsT[W, Id, R, O, A](f)
+    def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] = IndexedContsT[W, R, O, Id, A](f)
   }
 
   /** @template */
-  type IndexedContT[M[_], R, O, A] = IndexedContsT[Id, M, R, O, A]
+  type IndexedContT[R, O, M[_], A] = IndexedContsT[Id, R, O, M, A]
   object IndexedContT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[M, R, O, A] = IndexedContsT[Id, M, R, O, A](f)
+    def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[R, O, M, A] = IndexedContsT[Id, R, O, M, A](f)
   }
   
   /** @template */
-  type IndexedCont[R, O, A] = IndexedContT[Id, R, O, A]
+  type IndexedCont[R, O, A] = IndexedContT[R, O, Id, A]
   object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, Id, R, O, A](f)
+    def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] = IndexedContsT[Id, R, O, Id, A](f)
   }
 
   /** @template */
-  type ContsT[W[_], M[_], R, A] = IndexedContsT[W, M, R, R, A]
+  type ContsT[W[_], R, M[_], A] = IndexedContsT[W, R, R, M, A]
   object ContsT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], M[_], R, A](f: W[A => M[R]] => M[R]): ContsT[W, M, R, A] = IndexedContsT[W, M, R, R, A](f)
+    def apply[W[_], M[_], R, A](f: W[A => M[R]] => M[R]): ContsT[W, R, M, A] = IndexedContsT[W, R, R, M, A](f)
   }
 
   /** @template */
-  type Conts[W[_], R, A] = ContsT[W, Id, R, A]
+  type Conts[W[_], R, A] = ContsT[W, R, Id, A]
   object Conts extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[W[_], R, A](f: W[A => R] => R): Conts[W, R, A] = IndexedContsT[W, Id, R, R, A](f)
+    def apply[W[_], R, A](f: W[A => R] => R): Conts[W, R, A] = IndexedContsT[W, R, R, Id, A](f)
   }
 
   /** @template */
-  type ContT[M[_], R, A] = ContsT[Id, M, R, A]
+  type ContT[R, M[_], A] = ContsT[Id, R, M, A]
   object ContT extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[M[_], R, A](f: (A => M[R]) => M[R]): ContT[M, R, A] = IndexedContsT[Id, M, R, R, A](f)
+    def apply[M[_], R, A](f: (A => M[R]) => M[R]): ContT[R, M, A] = IndexedContsT[Id, R, R, M, A](f)
   }
 
   /** @template */
-  type Cont[R, A] = ContT[Id, R, A]
+  type Cont[R, A] = ContT[R, Id, A]
   object Cont extends IndexedContsTInstances with IndexedContsTFunctions {
-    def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
+    def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, R, R, Id, A](f)
   }
 
   /** [[scalaz.Inject]][F, G] */
@@ -374,6 +377,6 @@ package object scalaz {
   type DRight[A, B] = \/-[A, B]
   val DRight = \/-
 
-  type DisjunctionT[F[_], A, B] = EitherT[F, A, B]
+  type DisjunctionT[A, F[_], B] = EitherT[A, F, B]
   val DisjunctionT = EitherT
 }

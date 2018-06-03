@@ -37,7 +37,7 @@ object LiftIO {
     }
 
   implicit def eitherTLiftIO[F[_]: LiftIO, E] =
-    new LiftIO[EitherT[F, E, ?]] {
+    new LiftIO[EitherT[E, F, ?]] {
       def liftIO[A](ioa: IO[A]) = EitherT(LiftIO[F].liftIO(ioa.map(\/.right)))
     }
 
@@ -58,7 +58,7 @@ object LiftIO {
     }
 
   implicit def writerTLiftIO[F[_]: LiftIO, W: Monoid] =
-    new LiftIO[WriterT[F, W, ?]] {
+    new LiftIO[WriterT[W, F, ?]] {
       def liftIO[A](ioa: IO[A]) = WriterT(LiftIO[F].liftIO(ioa.map((Monoid[W].zero, _))))
     }
 
