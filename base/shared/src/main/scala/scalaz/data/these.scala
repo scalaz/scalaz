@@ -187,9 +187,11 @@ trait TheseInstances {
     )
 
   implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] =
-    instanceOf[DebugClass[These[L, R]]](
-      _.bimap(L.debug)(R.debug).toString
-    )
+    DebugClass.instance[These[L, R]] {
+      case This(l)    => Cord.wrap("This(", L.debug(l), ")")
+      case That(r)    => Cord.wrap("That(", R.debug(r), ")")
+      case Both(l, r) => Cord.wrap("Both(", Cord.concat(L.debug(l), Cord.cons(", ", R.debug(r))), ")")
+    }
 
   implicit final def theseEq[L, R](implicit L: Eq[L], R: Eq[R]): Eq[These[L, R]] =
     instanceOf[EqClass[These[L, R]]] {

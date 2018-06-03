@@ -55,9 +55,9 @@ trait DisjunctionInstances {
     })
 
   implicit def disjunctionDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[L \/ R] =
-    instanceOf[DebugClass[L \/ R]] {
-      case -\/(left)  => s"""-\/(${L.debug(left)})"""
-      case \/-(right) => s"""\/-(${R.debug(right)})"""
+    DebugClass.instance[L \/ R] {
+      case -\/(l) => Cord.wrap("-\\/(", L.debug(l), ")")
+      case \/-(r) => Cord.wrap("\\/-(", R.debug(r), ")")
     }
 
   implicit val disjunctionBifunctor: Bifunctor[Disjunction] =

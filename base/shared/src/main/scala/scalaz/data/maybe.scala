@@ -58,10 +58,11 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   def monad: Monad[Maybe]             = instanceOf(instance)
   def traversable: Traversable[Maybe] = instanceOf(instance)
 
-  def debug[A](implicit A: Debug[A]): Debug[Maybe[A]] = instanceOf[DebugClass[Maybe[A]]] {
-    case Some(a) => s"Just(${A.debug(a)})"
-    case _       => "Empty"
-  }
+  def debug[A](implicit A: Debug[A]): Debug[Maybe[A]] =
+    DebugClass.instance[Maybe[A]] {
+      case Some(a) => Cord.wrap("Just(", A.debug(a), ")")
+      case _       => Cord("Empty")
+    }
 
   def eq[A](implicit A: Eq[A]): Eq[Maybe[A]] = instanceOf[EqClass[Maybe[A]]] {
     case (Some(a), Some(b)) => A.equal(a, b)

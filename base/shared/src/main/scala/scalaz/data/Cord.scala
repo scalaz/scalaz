@@ -13,6 +13,7 @@ trait CordModule {
   def concat(left: Cord, right: Cord): Cord
   def cons(left: String, right: Cord): Cord
   def snoc(left: Cord, right: String): Cord
+  def wrap(left: String, it: Cord, right: String): Cord = cons(left, snoc(it, right))
   def empty: Cord
 
   def length(cord: Cord): Int

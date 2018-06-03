@@ -31,6 +31,6 @@ either2.bimap(
  right => right * 10
 )
 
-either1.debug
-either2.debug
+either1.debug.toString
+either2.debug.toString
 ```

@@ -3,42 +3,63 @@ package debug
 
 import scala.{ sys, AnyVal, StringContext }
 
-import scalaz.ct.ContravariantClass
-
 import scala.annotation.implicitAmbiguous
 import scala.language.experimental.macros
 import scala.language.implicitConversions
+
+import ct.ContravariantClass
+import data.Cord
 
 /** A typeclass describing types which can be meaningfully represented as a `String`.
  */
 trait DebugClass[A] {
 
-  /** Produce a `String` representation of `a`.
+  /** Produce a [[Cord]] representation of `a`.
    */
-  /* todo: when we have a `Cord`, change this to return that instead,
-   * todo: and add a `def debugs(a: A): String = debug(a).toString`
+  def debug(a: A): Cord
+
+  /** Produce a [[String]] representation of `a`.
+   *
+   * This should be equivalent to `debug(a).toString`.
    */
-  def debug(a: A): String
+  def debugs(a: A): String
 }
 
 object DebugClass {
 
-  /** A factory for `Debug` instances which delegates to Scala's `.toString` method.
+  // sorry
+  trait DeriveDebug[A] extends DebugClass[A] with Alt[DeriveDebug[A]] {
+    override def debug(a: A): Cord = Cord(debugs(a))
+  }
+  trait DeriveDebugs[A] extends DebugClass[A] with Alt[DeriveDebugs[A]] {
+    override def debugs(a: A): String = debug(a).toString
+  }
+
+  sealed trait Alt[A <: Alt[A]]
+
+  /** A factory for Debug` instances from functions to [[Cord]].
    */
-  def fromToString[A]: Debug[A] = instanceOf[DebugClass[A]](_.toString)
+  def instance[A](impl: A => Cord): Debug[A] =
+    instanceOf(new DebugClass[A] with DebugClass.DeriveDebugs[A] {
+      def debug(a: A) = impl(a)
+    })
 }
 
 trait DebugInstances {
   implicit final def contravariantDebug: Contravariant[DebugClass] =
     instanceOf(new ContravariantClass[DebugClass] {
       def contramap[A, B](r: DebugClass[A])(f: B => A): DebugClass[B] =
-        b => r.debug(f(b))
+        new DebugClass[B] {
+          override def debugs(b: B) = r.debugs(f(b))
+          override def debug(b: B)  = r.debug(f(b))
+        }
     })
 }
 
 trait DebugSyntax {
   implicit final class ToDebugOps[A](self: A) {
-    def debug(implicit ev: Debug[A]): String = macro meta.Ops.i_0
+    def debug(implicit ev: Debug[A]): Cord = macro meta.Ops.i_0
+    def debugs(implicit ev: Debug[A]): String = macro meta.Ops.i_0
   }
 
   implicit final def debugInterpolator(sc: StringContext): DebugInterpolator.Interpolator =
@@ -49,7 +70,8 @@ object DebugInterpolator {
   final class HasDebug private (override val toString: String) extends AnyVal
 
   object HasDebug extends HasDebug0 {
-    implicit def mat[A](x: A)(implicit D: Debug[A]): HasDebug = new HasDebug(D.debug(x))
+    implicit def mat[A](x: A)(implicit D: Debug[A]): HasDebug =
+      new HasDebug(D.debugs(x)) // todo: make this sexier
   }
 
   sealed abstract class HasDebug0 {

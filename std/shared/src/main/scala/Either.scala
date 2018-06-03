@@ -5,6 +5,7 @@ import scala.{ Either, Left, Right }
 
 import core.EqClass
 import ct.{ BifunctorClass, MonadClass }
+import data.Cord
 import debug.DebugClass
 
 trait EitherInstances {
@@ -41,12 +42,9 @@ trait EitherInstances {
       }
     })
 
-  // FIXME: https://github.com/scalaz/scalaz/pull/1633
-  implicit def eitherDebug[L, R](implicit X: Debug[L], Y: Debug[R]): Debug[Either[L, R]] =
-    instanceOf(new DebugClass[Either[L, R]] {
-      override def debug(e: Either[L, R]): String = e match {
-        case Left(x)  => "Left(" + X.debug(x) + ")"
-        case Right(y) => "Right(" + Y.debug(y) + ")"
-      }
-    })
+  implicit def eitherDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Either[L, R]] =
+    DebugClass.instance[Either[L, R]] {
+      case Left(l)  => Cord.wrap("Left(", L.debug(l), ")")
+      case Right(r) => Cord.wrap("Right(", R.debug(r), ")")
+    }
 }

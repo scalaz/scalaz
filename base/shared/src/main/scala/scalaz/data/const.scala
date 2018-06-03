@@ -85,9 +85,10 @@ trait ConstInstances {
     })
 
   implicit def constDebug[A, B](implicit A: DebugClass[A]): DebugClass[Const[A, B]] =
-    instanceOf[DebugClass[Const[A, B]]](
-      a => A.debug(a.getConst)
-    )
+    instanceOf[DebugClass[Const[A, B]]](new DebugClass[Const[A, B]] {
+      override def debugs(a: Const[A, B]) = A.debugs(a.getConst)
+      override def debug(a: Const[A, B])  = A.debug(a.getConst)
+    })
 
   implicit def constEq[A: Eq, B]: Eq[Const[A, B]] =
     instanceOf(new ConstEq[A, B] {

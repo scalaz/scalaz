@@ -3,9 +3,10 @@ package std
 
 import scala.{ None, Option, Some }
 
-import scalaz.core.EqClass
-import scalaz.debug.DebugClass
-import scalaz.ct.MonadClass
+import core.EqClass
+import data.Cord
+import debug.DebugClass
+import ct.MonadClass
 
 trait OptionInstances {
   implicit val optionMonad: Monad[Option] =
@@ -27,10 +28,8 @@ trait OptionInstances {
     })
 
   implicit def optionDebug[A](implicit X: Debug[A]): Debug[Option[A]] =
-    instanceOf(new DebugClass[Option[A]] {
-      override def debug(o: Option[A]): String = o match {
-        case Some(a) => "Some(" + X.debug(a) + ")"
-        case None    => "None"
-      }
-    })
+    DebugClass.instance[Option[A]] {
+      case Some(a) => Cord.wrap("Some(", X.debug(a), ")")
+      case None    => Cord("None")
+    }
 }

@@ -23,10 +23,12 @@ import scalaz.Scalaz._
 # Instance declaration
 
 ```tut
+import scalaz.data.Cord
 import scalaz.debug.DebugClass
 
 case class Foo(a: Int)
-implicit val fooDebug: Debug[Foo] = instanceOf[DebugClass[Foo]](f => s"Foo[${f.a}]")
+implicit val fooDebug: Debug[Foo] = 
+  DebugClass.instance[Foo](a => Cord.wrap("Foo[", Cord(a.toString), "]"))
 ```
 
 # Usage
