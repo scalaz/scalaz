@@ -233,8 +233,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         }
 
       override def traverseImpl[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Applicative[F]): F[NonEmptyList[B]] = {
-        val x = Traverse[IList].traverseImpl(fa.list)(f)(F)
-        F.map(x)(x => NonEmptyList.nel(x.headOption.get, x.tailOption.getOrElse(INil())))        
+        val fb = Traverse[IList].traverseImpl(fa.list)(f)(F)
+        F.map(fb)(fb => NonEmptyList.nel(fb.headOption.get, fb.tailOption.getOrElse(INil())))        
       }
     }
 
