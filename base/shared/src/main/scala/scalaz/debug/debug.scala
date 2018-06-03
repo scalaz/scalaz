@@ -90,10 +90,10 @@ private[debug] sealed class DebugInterpolator {
   type HasDebug // = Cord
 
   @implicitAmbiguous(
-    "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Show[${A}] instance is in scope."
+    "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Debug[${A}] instance is in scope."
   )
   implicit def ambiguousDebug1[A](a: A): HasDebug =
-    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
+    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope.")
   implicit def ambiguousDebug2[A](a: A): HasDebug =
-    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
+    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope.")
 }
