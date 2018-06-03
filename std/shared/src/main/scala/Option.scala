@@ -27,9 +27,11 @@ trait OptionInstances {
       }
     })
 
-  implicit def optionDebug[A](implicit X: Debug[A]): Debug[Option[A]] =
+  implicit def optionDebug[A](implicit X: Debug[A]): Debug[Option[A]] = {
+    import Scalaz.debugInterpolator
     DebugClass.instance[Option[A]] {
-      case Some(a) => Cord.wrap("Some(", X.debug(a), ")")
+      case Some(a) => z"Some($a)"
       case None    => Cord("None")
     }
+  }
 }

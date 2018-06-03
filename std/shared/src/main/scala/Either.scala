@@ -5,7 +5,6 @@ import scala.{ Either, Left, Right }
 
 import core.EqClass
 import ct.{ BifunctorClass, MonadClass }
-import data.Cord
 import debug.DebugClass
 
 trait EitherInstances {
@@ -42,9 +41,11 @@ trait EitherInstances {
       }
     })
 
-  implicit def eitherDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Either[L, R]] =
+  implicit def eitherDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Either[L, R]] = {
+    import Scalaz.debugInterpolator
     DebugClass.instance[Either[L, R]] {
-      case Left(l)  => Cord.wrap("Left(", L.debug(l), ")")
-      case Right(r) => Cord.wrap("Right(", R.debug(r), ")")
+      case Left(l)  => z"Left($l)"
+      case Right(r) => z"Right($r)"
     }
+  }
 }

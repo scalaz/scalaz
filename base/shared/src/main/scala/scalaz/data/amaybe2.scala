@@ -3,7 +3,8 @@ package data
 
 import scala.{ AnyVal, Nothing }
 
-import scalaz.types.Is
+import debug.DebugClass
+import types.Is
 
 /**
  * Isomorphic to `AMaybe[λ[(α, β) => APair[F[α, ?], G[?, β]]], A, B]`,
@@ -38,5 +39,17 @@ object AMaybe2 {
   private def none[F[_, _], G[_, _], A]: AMaybe2[F, G, A, A] = new AEmpty2[F, G, A, A] {
     def subst[H[_]](ha: H[A]): H[A]   = ha
     def unsubst[H[_]](hb: H[A]): H[A] = hb
+  }
+
+  implicit final def amaybe2Debug[F[_, _], G[_, _], A, B](implicit FAB: Debug[F[A, B]],
+                                                          GAB: Debug[G[A, B]]): Debug[AMaybe2[F, G, A, B]] = {
+    import Scalaz.debugInterpolator
+    import scala.unchecked
+    type FAB = F[A, B]
+    type GAB = G[A, B]
+    DebugClass.instance[AMaybe2[F, G, A, B]] {
+      case AJust2(fab: FAB @unchecked, gab: GAB @unchecked) => z"AJust2($fab, $gab)"
+      case AEmpty2()                                        => Cord("AEmpty2")
+    }
   }
 }

@@ -5,6 +5,7 @@ import java.lang.Math
 import scala.{ AnyRef, Char, Null }
 import scala.Predef.{ classOf, String }
 
+import algebra.MonoidClass
 import debug.DebugClass
 
 trait CordModule {
@@ -25,6 +26,12 @@ trait CordModule {
 
 object CordModule {
   implicit val cordDebug: Debug[Cord] = DebugClass.instance[Cord](identity)
+
+  implicit val cordMonoid: Monoid[Cord] =
+    instanceOf[MonoidClass[Cord]](new MonoidClass[Cord] {
+      val empty                         = Cord.empty
+      def append(a1: Cord, a2: => Cord) = Cord.concat(a1, a2)
+    })
 }
 
 object CordImpl extends CordModule {

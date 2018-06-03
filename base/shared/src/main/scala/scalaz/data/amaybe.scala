@@ -34,10 +34,12 @@ object AMaybe extends AMaybeInstances {
 }
 
 trait AMaybeInstances {
-  implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] =
+  implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] = {
+    import Scalaz.debugInterpolator
     DebugClass.instance[AMaybe[F, A, B]] {
-      case AJust(value) => Cord.wrap("AMaybe(", FAB.debug(value), ")")
+      case AJust(value) => z"AMaybe($value)"
       case AEmpty()     => Cord("AEmpty")
     }
+  }
 
 }

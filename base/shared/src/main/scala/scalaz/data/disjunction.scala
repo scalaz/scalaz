@@ -54,11 +54,13 @@ trait DisjunctionInstances {
         oa.fold(l => -\/(l), a => f(a))
     })
 
-  implicit def disjunctionDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[L \/ R] =
+  implicit def disjunctionDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[L \/ R] = {
+    import Scalaz.debugInterpolator
     DebugClass.instance[L \/ R] {
-      case -\/(l) => Cord.wrap("-\\/(", L.debug(l), ")")
-      case \/-(r) => Cord.wrap("\\/-(", R.debug(r), ")")
+      case -\/(l) => z"-\\/($l)"
+      case \/-(r) => z"\\/-($r)"
     }
+  }
 
   implicit val disjunctionBifunctor: Bifunctor[Disjunction] =
     instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {

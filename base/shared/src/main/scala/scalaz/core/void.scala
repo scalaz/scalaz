@@ -7,8 +7,9 @@ import scala.Nothing
 
 import com.github.ghik.silencer.silent
 
-import scalaz.algebra.SemigroupClass
-import scalaz.types.{ As, Is }
+import algebra.SemigroupClass
+import debug.DebugClass
+import types.{ As, Is }
 
 trait VoidModule {
   type Void
@@ -43,6 +44,7 @@ trait VoidInstances {
     instanceOf(new SemigroupClass[Void] {
       override def append(a1: Void, a2: => Void): Void = a1
     })
+  implicit val voidDebug: Debug[Void] = DebugClass.instance[Void](Void.absurd)
 }
 
 @silent

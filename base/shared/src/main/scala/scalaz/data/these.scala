@@ -186,12 +186,14 @@ trait TheseInstances {
       _.append(_)
     )
 
-  implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] =
+  implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] = {
+    import Scalaz.debugInterpolator
     DebugClass.instance[These[L, R]] {
-      case This(l)    => Cord.wrap("This(", L.debug(l), ")")
-      case That(r)    => Cord.wrap("That(", R.debug(r), ")")
-      case Both(l, r) => Cord.wrap("Both(", Cord.concat(L.debug(l), Cord.cons(", ", R.debug(r))), ")")
+      case This(l)    => z"This($l)"
+      case That(r)    => z"That($r)"
+      case Both(l, r) => z"Both($l, $r)"
     }
+  }
 
   implicit final def theseEq[L, R](implicit L: Eq[L], R: Eq[R]): Eq[These[L, R]] =
     instanceOf[EqClass[These[L, R]]] {

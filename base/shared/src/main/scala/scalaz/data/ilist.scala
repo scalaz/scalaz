@@ -1,8 +1,9 @@
 package scalaz
 package data
 
-import scalaz.core.EqClass
-import scalaz.types.IsCovariantClass
+import core.EqClass
+import debug.DebugClass
+import types.IsCovariantClass
 
 import scala.annotation.tailrec
 
@@ -28,6 +29,16 @@ trait IListInstances {
 
       go(a1, a2)
     }
+
+  implicit final def ilistDebug[A](implicit A: Debug[A]): Debug[IList[A]] =
+    DebugClass.instance(a => {
+      import Scalaz.debugInterpolator
+      def loop(rest: IList[A]): Cord = IList.uncons(rest) match {
+        case Maybe2.Just2(h, t) => z"$h, ${loop(t)}"
+        case _                  => Cord.empty
+      }
+      z"IList(${loop(a)})"
+    })
 }
 
 private[data] object IListImpl extends IListModule {
