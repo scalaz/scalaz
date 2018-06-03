@@ -5,6 +5,8 @@ import java.lang.Math
 import scala.{ AnyRef, Char, Null }
 import scala.Predef.{ classOf, String }
 
+import debug.DebugClass
+
 trait CordModule {
   type Cord >: Null <: AnyRef
 
@@ -19,6 +21,10 @@ trait CordModule {
   def length(cord: Cord): Int
 
   def fold(cord: Cord): String
+}
+
+object CordModule {
+  implicit val cordDebug: Debug[Cord] = DebugClass.instance[Cord](identity)
 }
 
 object CordImpl extends CordModule {

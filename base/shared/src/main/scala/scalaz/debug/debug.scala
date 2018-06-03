@@ -37,7 +37,7 @@ object DebugClass {
 
   sealed trait Alt[A <: Alt[A]]
 
-  /** A factory for Debug` instances from functions to [[Cord]].
+  /** A factory for `Debug` instances from functions to [[Cord]].
    */
   def instance[A](impl: A => Cord): Debug[A] =
     instanceOf(new DebugClass[A] with DebugClass.DeriveDebugs[A] {
@@ -66,25 +66,34 @@ trait DebugSyntax {
     new DebugInterpolator.Interpolator(sc)
 }
 
-object DebugInterpolator {
-  final class HasDebug private (override val toString: String) extends AnyVal
-
-  object HasDebug extends HasDebug0 {
-    implicit def mat[A](x: A)(implicit D: Debug[A]): HasDebug =
-      new HasDebug(D.debugs(x)) // todo: make this sexier
-  }
-
-  sealed abstract class HasDebug0 {
-    @implicitAmbiguous(
-      "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Show[${A}] instance is in scope."
-    )
-    implicit def ambiguousDebug1[A](a: A): HasDebug =
-      sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
-    implicit def ambiguousDebug2[A](a: A): HasDebug =
-      sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
-  }
+object DebugInterpolator extends DebugInterpolator {
+  implicit def mkHasDebug[A](x: A)(implicit D: Debug[A]): HasDebug =
+    D.debug(x).asInstanceOf[HasDebug]
 
   final class Interpolator(val sc: StringContext) extends AnyVal {
-    def z(args: HasDebug*): String = sc.s(args: _*)
+    import scala.{ Seq => VarArgs }
+    import StringContext.{ treatEscapes => escape }
+
+    def z(args: HasDebug*): Cord =
+      sc.parts
+        .zipAll(args.asInstanceOf[VarArgs[Cord]], "", Cord.empty)
+        .foldRight(Cord.empty) { (pa, res) =>
+          val (part, arg) = pa
+          Cord.cons(escape(part), Cord.concat(arg, res))
+        }
+
+    def zs(args: HasDebug*): String = z(args: _*).toString
   }
+}
+
+private[debug] sealed class DebugInterpolator {
+  type HasDebug // = Cord
+
+  @implicitAmbiguous(
+    "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Show[${A}] instance is in scope."
+  )
+  implicit def ambiguousDebug1[A](a: A): HasDebug =
+    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
+  implicit def ambiguousDebug2[A](a: A): HasDebug =
+    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Show instance is in scope.")
 }
