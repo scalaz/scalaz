@@ -203,7 +203,26 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 object Traverse {
   @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Traverse[G]): Traverse[F] =
+    new IsomorphismTraverse[F, G] {
+      override def G: Traverse[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] with IsomorphismFoldable[F, G]{
+  implicit def G: Traverse[G]
+  ////
+
+  protected[this] override final def naturalTrans: F ~> G = iso.to
+
+  override def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
+    Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
   ////
 }

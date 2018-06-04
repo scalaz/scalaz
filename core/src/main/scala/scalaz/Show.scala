@@ -19,6 +19,14 @@ trait Show[F]  { self =>
 object Show {
   @inline def apply[F](implicit F: Show[F]): Show[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Show[G]): Show[F] =
+    new IsomorphismShow[F, G] {
+      override def G: Show[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   def showFromToString[A]: Show[A] = new Show[A] {
@@ -54,5 +62,17 @@ object Show {
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
     def show(args: Shows*): String = sc.s(args: _*)
   }
+  ////
+}
+
+trait IsomorphismShow[F, G] extends Show[F] {
+  implicit def G: Show[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <=> G
+
+  override def show(f: F): Cord =
+    G.show(iso.to(f))
   ////
 }

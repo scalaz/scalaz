@@ -68,7 +68,28 @@ trait Coapplicative[F[_]] extends CoapplicativeCodivide[F] { self =>
 object Coapplicative {
   @inline def apply[F[_]](implicit F: Coapplicative[F]): Coapplicative[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Coapplicative[G]): Coapplicative[F] =
+    new IsomorphismCoapplicative[F, G] {
+      override def G: Coapplicative[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+
+  ////
+}
+
+trait IsomorphismCoapplicative[F[_], G[_]] extends Coapplicative[F] with IsomorphismCoapplicativeCodivide[F, G]{
+  implicit def G: Coapplicative[G]
+  ////
+
+  def coapply1[Z, A1](a1: => F[A1])(f: A1 => Z): F[Z] =
+    iso.from(G.coapply1(iso.to(a1))(f))
+
+  def coapply2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: A1 \/ A2 => Z): F[Z] =
+    iso.from(G.coapply2(iso.to(a1), iso.to(a2))(f))
 
   ////
 }

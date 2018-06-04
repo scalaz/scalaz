@@ -25,6 +25,14 @@ trait Resource[F]  { self =>
 object Resource {
   @inline def apply[F](implicit F: Resource[F]): Resource[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Resource[G]): Resource[F] =
+    new IsomorphismResource[F, G] {
+      override def G: Resource[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
 
   def resource[A](closeAction: A => IO[Unit]): Resource[A] =
@@ -44,5 +52,17 @@ object Resource {
         fa.contramap(f)
     }
 
+  ////
+}
+
+trait IsomorphismResource[F, G] extends Resource[F] {
+  implicit def G: Resource[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <=> G
+
+  override def close(f: F): IO[Unit] =
+    G.close(iso.to(f))
   ////
 }

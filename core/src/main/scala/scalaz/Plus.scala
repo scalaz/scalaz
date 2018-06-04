@@ -76,6 +76,14 @@ trait Plus[F[_]]  { self =>
 object Plus {
   @inline def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Plus[G]): Plus[F] =
+    new IsomorphismPlus[F, G] {
+      override def G: Plus[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   private[scalaz] trait LiftedPlus[G[_], F[_]] extends Plus[λ[a => G[F[a]]]] {
@@ -94,5 +102,17 @@ object Plus {
       def F = F0
     }
 
+  ////
+}
+
+trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
+  implicit def G: Plus[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  def plus[A](a: F[A], b: => F[A]): F[A] =
+    iso.from(G.plus(iso.to(a), iso.to(b)))
   ////
 }

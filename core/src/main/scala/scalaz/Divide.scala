@@ -43,15 +43,15 @@ trait Divide[F[_]] extends Contravariant[F] with ApplyDivide[F] { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = divide4(a1, a2, a3, a4)(f)
 
   // ApplyDivide impl
-  override final def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
+  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
     f: (A1, A2) => Z,
     g: Z => (A1, A2)
   ): F[Z] = divide2(a1, a2)(g)
-  override final def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
+  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
     f: (A1, A2, A3) => Z,
     g: Z => (A1, A2, A3)
   ): F[Z] = divide3(a1, a2, a3)(g)
-  override final def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
+  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
     f: (A1, A2, A3, A4) => Z,
     g: Z => (A1, A2, A3, A4)
   ): F[Z] = divide4(a1, a2, a3, a4)(g)
@@ -74,7 +74,24 @@ trait Divide[F[_]] extends Contravariant[F] with ApplyDivide[F] { self =>
 object Divide {
   @inline def apply[F[_]](implicit F: Divide[F]): Divide[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Divide[G]): Divide[F] =
+    new IsomorphismDivide[F, G] {
+      override def G: Divide[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravariant[F, G] with IsomorphismApplyDivide[F, G]{
+  implicit def G: Divide[G]
+  ////
+
+  override def divide2[A, B, C](fa: => F[A], fb: => F[B])(f: C => (A, B)): F[C] =
+    iso.from(G.divide(iso.to(fa), iso.to(fb))(f))
   ////
 }

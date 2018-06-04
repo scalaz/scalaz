@@ -70,7 +70,24 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
 object Arrow {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Arrow[G]): Arrow[F] =
+    new IsomorphismArrow[F, G] {
+      override def G: Arrow[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[F, G] with IsomorphismStrong[F, G] with IsomorphismCategory[F, G]{
+  implicit def G: Arrow[G]
+  ////
+
+  override def arr[A, B](f: A => B): F[A, B] =
+    iso.from(G.arr(f))
   ////
 }
