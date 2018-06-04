@@ -3,11 +3,11 @@ layout: docs
 title:  "Monoid"
 ---
 
-# Monoid
+# Monoid [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/algebra/monoid.scala)
 
 *A monoid is a semigroup with a unique identity element.*
 
-A monoid instance must satisfy the following laws in addition to those defined by [Semigroup](Semigroup.html):
+A monoid instance must satisfy the following laws in addition to those defined by [Semigroup](./Semigroup.html):
 
 - Left identity: `append(empty, x) === x`
 - Right identity: `append(x, empty) === x`
@@ -17,7 +17,7 @@ A monoid instance must satisfy the following laws in addition to those defined b
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 {
@@ -31,7 +31,7 @@ implicit def StringMonoid: Monoid[String] = instanceOf(new MonoidClass[String] {
 }
 ```
 
-## Usage
+# Usage
 
 ```tut
 val s1 = "Hello"

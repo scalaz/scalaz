@@ -3,9 +3,9 @@ layout: docs
 title:  "Debug"
 ---
 
-# Debug
+# Debug [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/debug/debug.scala)
 
-`Debug` presents a safe and explicit alternative to `Object.toString`.
+Debug presents a safe and explicit alternative to [Object#toString](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#toString--).
 By providing instances of this typeclass, a type explicitly defines that it can be converted into human-readable output.
 
 **Typical imports**
@@ -23,10 +23,11 @@ import scalaz.Scalaz._
 # Instance declaration
 
 ```tut
-import scalaz.data.Cord
 import scalaz.debug.DebugClass
+import scalaz.data.Cord
 
 case class Foo(a: Int)
+
 implicit val fooDebug: Debug[Foo] = 
   DebugClass.instance[Foo](a => Cord.wrap("Foo[", Cord(a.toString), "]"))
 ```
@@ -41,7 +42,7 @@ import scalaz.data.Maybe
 Maybe.just(Foo(1)).debug
 ```
 
-*Note that the `Debug` instance for `Maybe` resolves against the `Debug` instance for `Foo`.*
+*Note that the `Debug` instance for [Maybe](../data/Maybe.html) resolves against the `Debug` instance for `Foo`.*
 
 # String interpolator
 
