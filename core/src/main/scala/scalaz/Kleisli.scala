@@ -73,7 +73,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
       }
     )
 
-  def state(implicit M: Monad[M]): StateT[M, A, B] =
+  def state(implicit M: Monad[M]): StateT[A, M, B] =
     StateT(a => M.map(run(a))((a, _)))
 
   def liftMK[T[_[_], _]](implicit T: MonadTrans[T], M: Monad[M]): Kleisli[T[M, ?], A, B] =

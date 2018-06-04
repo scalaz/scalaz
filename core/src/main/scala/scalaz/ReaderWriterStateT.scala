@@ -10,7 +10,7 @@ sealed abstract class IndexedReaderWriterStateT[-R, W, -S1, S2, F[_], A] {
     F.join( F.map[(R, S1) => F[(W, A, S2)], F[(W, A, S2)]](getF(F))(f => f(r, s)) )
 
   /** Discards the writer component. */
-  def state(r: R)(implicit F: Monad[F]): IndexedStateT[F, S1, S2, A] =
+  def state(r: R)(implicit F: Monad[F]): IndexedStateT[S1, S2, F, A] =
     IndexedStateT((s: S1) => F.map(run(r, s)) {
       case (w, a, s1) => (s1, a)
     })

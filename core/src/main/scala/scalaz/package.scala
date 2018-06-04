@@ -150,28 +150,28 @@ package object scalaz {
   }
 
   /** @template */
-  type StateT[F[_], S, A] = IndexedStateT[F, S, S, A]
+  type StateT[S, F[_], A] = IndexedStateT[S, S, F, A]
 
   /** @template */
-  type IndexedState[-S1, S2, A] = IndexedStateT[Id, S1, S2, A]
+  type IndexedState[-S1, S2, A] = IndexedStateT[S1, S2, Id, A]
   
   /** A state transition, representing a function `S => (S, A)`.
     *
     * @template
     */
-  type State[S, A] = StateT[Id, S, A]
+  type State[S, A] = StateT[S, Id, A]
 
   object StateT extends StateTInstances with StateTFunctions {
-    def apply[F[_], S, A](f: S => F[(S, A)]): StateT[F, S, A] = IndexedStateT[F, S, S, A](f)
+    def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = IndexedStateT[S, S, F, A](f)
 
-    def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[F, S, ?] ~> StateT[G, S, ?] =
-      λ[StateT[F, S, ?] ~> StateT[G, S, ?]](st => StateT((s: S) => nat(st.run(s))))
+    def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, ?] ~> StateT[S, G, ?] =
+      λ[StateT[S, F, ?] ~> StateT[S, G, ?]](st => StateT((s: S) => nat(st.run(s))))
   }
   object IndexedState extends StateFunctions {
-    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[Id, S1, S2, A](f)
+    def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[S1, S2, Id, A](f)
   }
   object State extends StateFunctions {
-    def apply[S, A](f: S => (S, A)): State[S, A] = StateT[Id, S, A](f)
+    def apply[S, A](f: S => (S, A)): State[S, A] = StateT[S, Id, A](f)
 
     def united[S1, S2, A](s: State[S1, State[S2, A]]): State[(S1, S2), A] =
       State(
@@ -306,7 +306,7 @@ package object scalaz {
   type @?>[A, B] = PLens[A, B]
 
   /** @template */
-  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[F, S1, S2, Option[A]]
+  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[S1, S2, F, Option[A]]
 
   /** @template */
   type PStateT[F[_], S, A] = PIndexedStateT[F, S, S, A]

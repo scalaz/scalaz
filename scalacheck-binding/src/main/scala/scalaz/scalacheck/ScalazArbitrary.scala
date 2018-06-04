@@ -152,7 +152,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIndexedReaderWriterStateT[R, W, S1, S2, F[_]: Monad, A](implicit F: Cogen[(R, S1) => F[(W, A, S2)]]): Cogen[IndexedReaderWriterStateT[R, W, S1, S2, F, A]] =
     F.contramap(_.run)
 
-  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[F, S1, S2, A]] =
+  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[S1, S2, F, A]] =
     F.contramap(s => s.apply(_))
 
   implicit def cogenWriterT[A, F[_], B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[A, F, B]] =
@@ -537,8 +537,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
   // backwards compatibility
-  def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[F, S, A]] =
-    indexedStateTArb[F, S, S, A](A)
+  def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
+    indexedStateTArb[S, S, F, A](A)
 
   implicit def indexedReaderWriterStateTArb[R, W, S1, S2, F[_], A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[R, W, S1, S2, F, A]] =
     Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[R, W, S1, S2, F, A](_))
@@ -549,8 +549,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def indexedContsTArb[W[_], R, O, M[_], A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, R, O, M, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
-  implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
-    Functor[Arbitrary].map(A)(IndexedStateT[F, S1, S2, A](_))
+  implicit def indexedStateTArb[S1, S2, F[_], A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, S2, F, A]] =
+    Functor[Arbitrary].map(A)(IndexedStateT[S1, S2, F, A](_))
 
   implicit def eitherTArb[A, F[_], B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[A, F, B]] =
       Functor[Arbitrary].map(A)(EitherT[A, F, B](_))

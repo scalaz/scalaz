@@ -76,7 +76,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 
     State[S, G[F[C, D]]]{
       initial =>
-        val st = bitraverse[λ[α => StateT[Trampoline, S, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
+        val st = bitraverse[λ[α => StateT[S, Trampoline, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
         st(initial).run
     }
   }
