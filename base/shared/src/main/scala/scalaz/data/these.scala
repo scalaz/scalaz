@@ -186,10 +186,14 @@ trait TheseInstances {
       _.append(_)
     )
 
-  implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] =
-    instanceOf[DebugClass[These[L, R]]](
-      _.bimap(L.debug)(R.debug).toString
-    )
+  implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] = {
+    import Scalaz.debugInterpolator
+    DebugClass.instance[These[L, R]] {
+      case This(l)    => z"This($l)"
+      case That(r)    => z"That($r)"
+      case Both(l, r) => z"Both($l, $r)"
+    }
+  }
 
   implicit final def theseEq[L, R](implicit L: Eq[L], R: Eq[R]): Eq[These[L, R]] =
     instanceOf[EqClass[These[L, R]]] {

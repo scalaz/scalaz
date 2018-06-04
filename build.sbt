@@ -1,5 +1,7 @@
 import Scalaz._
 
+cancelable in Global := true
+
 organization in ThisBuild := "org.scalaz"
 
 publishTo in ThisBuild := {

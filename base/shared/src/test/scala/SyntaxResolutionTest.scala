@@ -51,7 +51,10 @@ object SyntaxResolutionTest {
 
   def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
 
-  def _debug[A: Debug](a: A): String = a.debug
+  def _debug[A: Debug](a: A) = {
+    a.debugs: String
+    a.debug: data.Cord
+  }
 
   def _eq[A: Eq](a: A): Boolean = a === a
 

@@ -3,8 +3,9 @@ package data
 
 import scala.AnyVal
 
-import scalaz.core.EqClass
-import scalaz.ct.MonadClass
+import core.EqClass
+import ct.MonadClass
+import debug.DebugClass
 
 final case class Identity[A](run: A) extends AnyVal
 
@@ -26,4 +27,9 @@ trait IdentityInstances {
           case _                            => false
       }
     )
+
+  implicit final def identityDebug[A: Debug]: Debug[Identity[A]] = {
+    import Scalaz.debugInterpolator
+    DebugClass.instance[Identity[A]](a => z"Identity($a)")
+  }
 }

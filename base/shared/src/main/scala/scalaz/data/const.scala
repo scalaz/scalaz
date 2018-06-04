@@ -84,10 +84,10 @@ trait ConstInstances {
       override val A = implicitly
     })
 
-  implicit def constDebug[A, B](implicit A: DebugClass[A]): DebugClass[Const[A, B]] =
-    instanceOf[DebugClass[Const[A, B]]](
-      a => A.debug(a.getConst)
-    )
+  implicit def constDebug[A, B](implicit A: Debug[A]): DebugClass[Const[A, B]] = {
+    import Scalaz.debugInterpolator
+    DebugClass.instance[Const[A, B]](a => z"Const(${a.getConst})")
+  }
 
   implicit def constEq[A: Eq, B]: Eq[Const[A, B]] =
     instanceOf(new ConstEq[A, B] {

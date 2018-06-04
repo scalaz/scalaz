@@ -1,12 +1,14 @@
 package scalaz
 package std
 
-import scala.List
+import scala.{ ::, List, Nil }
 
 import scala.Predef.$conforms
 
-import scalaz.core.EqClass
+import core.EqClass
 import ct.MonadClass
+import data.Cord
+import debug.DebugClass
 
 trait ListInstances {
   implicit val listMonad: Monad[List] = instanceOf(new MonadClass[List] {
@@ -22,19 +24,16 @@ trait ListInstances {
       def equal(first: List[A], second: List[A]): Boolean = (first.corresponds(second)(Eq[A].equal))
     })
 
-  /* https://github.com/scalaz/scalaz/pull/1633
-  implicit def listDebug[A: Debug]: Debug[List[A]] = instanceOf(new DebugClass[List[A]] {
-    override def show(as: List[A]) = {
+  implicit def listDebug[A: Debug]: Debug[List[A]] =
+    DebugClass.instance(as => {
       def commaSep(tail: List[A], acc: Cord): Cord = tail match {
-        case Nil => acc
-        case x :: xs => commaSep(xs, (acc :+ ",") ++ Debug[A].debug(x))
+        case Nil     => acc
+        case x :: xs => commaSep(xs, Cord.concat(acc, Cord.cons(",", Debug[A].debug(x))))
       }
 
-      "[" +: (as match {
-        case Nil => Cord()
+      Cord.wrap("List(", as match {
+        case Nil     => Cord.empty
         case x :: xs => commaSep(xs, Debug[A].debug(x))
-      }) :+ "]"
-    }
-  })
- */
+      }, ")")
+    })
 }

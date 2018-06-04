@@ -51,11 +51,13 @@ private[data] object Maybe2Impl extends Maybe2Module {
   implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = Scalaz.scalaCovariant[Option2[+?, B]]
   implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = Scalaz.scalaCovariant[Option2[A, +?]]
 
-  implicit def debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[Maybe2[A, B]] =
-    instanceOf[DebugClass[Maybe2[A, B]]] {
-      case Some2(_1, _2) => s"Just2(${A.debug(_1)}, ${B.debug(_2)})"
-      case _             => "Empty2"
+  implicit def debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[Maybe2[A, B]] = {
+    import Scalaz.debugInterpolator
+    DebugClass.instance[Maybe2[A, B]] {
+      case Some2(a, b) => z"Just2($a, $b)"
+      case _           => Cord("Empty2")
     }
+  }
 
   implicit def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
     instanceOf[EqClass[Maybe2[A, B]]] {
