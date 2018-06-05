@@ -1,5 +1,9 @@
 package scalaz.effect
 
+import scala.{ Array, Boolean, Int, Unit }
+
+import scalaz.Void
+
 object ScalazIOArray {
 
   def bubbleSort[A](lessThanEqual0: (A, A) => Boolean)(array: Array[A]): IO[Void, Unit] = {

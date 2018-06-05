@@ -4,6 +4,10 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 
+import scala.{ Array, Int, Unit }
+import scala.collection.immutable.Range
+import scala.Predef.{ genericArrayOps, genericWrapArray }
+
 import IOBenchmarks.unsafePerformIO
 
 @State(Scope.Thread)
@@ -13,10 +17,9 @@ class BubbleSortBenchmarks {
   @Param(Array("1000"))
   var size: Int = _
 
-  def createTestArray: Array[Int] = (1 to size).toArray.reverse
+  def createTestArray: Array[Int] = Range.inclusive(1, size).toArray.reverse
   def assertSorted(array: Array[Int]): Unit =
     if (!array.sorted.sameElements(array)) {
-      println("Actual array: " + array.toList)
       throw new Exception("Array not correctly sorted")
     }
 

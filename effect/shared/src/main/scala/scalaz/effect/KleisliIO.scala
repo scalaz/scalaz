@@ -1,5 +1,8 @@
 package scalaz.effect
 
+import scalaz.Void
+import scala.{ Boolean, Either, Left, PartialFunction, Right, Unit }
+
 /**
  * A `KleisliIO[E, A, B]` is an effectful function from `A` to `B`, which might
  * fail with an `E`.

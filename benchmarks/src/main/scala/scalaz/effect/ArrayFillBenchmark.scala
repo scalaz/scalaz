@@ -4,6 +4,12 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 
+import scala.{ Array, Boolean, Int, Unit }
+import scala.collection.immutable.Range
+import scala.Predef.{ genericArrayOps, genericWrapArray }
+
+import scalaz.Void
+
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -11,13 +17,13 @@ class ArrayFillBenchmarks {
   @Param(Array("10000"))
   var size: Int = _
 
-  def createTestArray: Array[Int] = (1 to size).toArray.reverse
+  def createTestArray: Array[Int] = Range.inclusive(1, size).toArray.reverse
 
   @Benchmark
   def scalazArrayFill() = {
     import IOBenchmarks.unsafePerformIO
 
-    def arrayFill(array: Array[Int]) = {
+    def arrayFill(array: Array[Int]): KleisliIO[Void, Int, Int] = {
       val condition = KleisliIO.lift[Void, Int, Boolean]((i: Int) => i < array.length)
 
       KleisliIO.whileDo(condition)(KleisliIO.impureVoid[Int, Int] { (i: Int) =>
