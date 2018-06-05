@@ -27,7 +27,8 @@ object BindClass {
 }
 
 trait BindFunctions {
-  def flatMap[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: Bind[M]): M[B] = M.flatMap(ma)(f)
+  @inline final def flatMap[F[_], A, B](fa: F[A])(f: A => F[B])(implicit F: Bind[F]): F[B] =
+    F.flatMap(fa)(f)
 }
 
 trait BindInstances {}

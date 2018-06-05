@@ -1,15 +1,24 @@
 package scalaz
 package ct
 
-import scala.{ Function0, Tuple2 }
-
 import scala.language.experimental.macros
+
+import data.~>
 
 trait ComonadClass[F[_]] extends CobindClass[F] {
   def copoint[A](fa: F[A]): A
 }
 
+trait ComonadFunctions {
+  @inline final def copoint[F[_], A](fa: F[A])(implicit F: Comonad[F]): A =
+    F.copoint(fa)
+  @inline final def copointNT[F[_]](implicit F: Comonad[F]): F ~> Id =
+    ∀.mk[F ~> Id].apply(F.copoint)
+}
+
 trait ComonadInstances { instances =>
+  import scala.{ Function0, Tuple2 }
+
   implicit def tuple2Cobind[A1]: Comonad[Tuple2[A1, ?]] =
     instanceOf(new ComonadClass[Tuple2[A1, ?]] with CobindClass.DeriveCojoin[Tuple2[A1, ?]] {
       override def map[A, B](fa: Tuple2[A1, A])(f: A => B): Tuple2[A1, B] = (fa._1, f(fa._2))

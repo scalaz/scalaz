@@ -1,9 +1,9 @@
 package scalaz
 package ct
 
-import scala.{ List, Option, Some }
-
 import scala.language.experimental.macros
+
+import data.~>
 
 trait CobindClass[F[_]] extends FunctorClass[F] {
 
@@ -26,7 +26,18 @@ object CobindClass {
 
 }
 
-trait CobindInstances {
+trait CobindFunctions {
+  @inline final def cobind[F[_], A, B](fa: F[A])(f: F[A] => B)(implicit F: Cobind[F]): F[B] =
+    F.cobind(fa)(f)
+  @inline final def cojoin[F[_], A](fa: F[A])(implicit F: Cobind[F]): F[F[A]] =
+    F.cojoin(fa)
+  @inline final def cojoinNT[F[_]](implicit F: Cobind[F]): F ~> λ[α => F[F[α]]] =
+    ∀.mk[F ~> λ[α => F[F[α]]]].apply(F.cojoin)
+}
+
+trait CobindInstances { // TODO: move to std module
+  import scala.{Option, List, Some}
+
   implicit val optionCobind: Cobind[Option] = instanceOf(new CobindClass.DeriveCojoin[Option] {
     override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa.map(f)
 

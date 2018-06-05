@@ -23,7 +23,20 @@ object ProfunctorClass {
   trait Alt[D <: Alt[D]]
 }
 
-trait ProfunctorInstances {}
+trait ProfunctorFunctions {
+  @inline final def dimap[F[_, _], A, B, C, D](fab: F[A, B])(
+    ca: C => A,
+    bd: B => D,
+  )(implicit F: Profunctor[F]): F[C, D] =
+    F.dimap(fab)(ca)(bd)
+
+  /* TODO: these clash with the bifunctor versions. Decide on a name for them.
+  @inline final def lmap[F[_, _], A, B, C](fab: F[A, B])(ca: C => A)(implicit F: Profunctor[F]): F[C, B] =
+    F.lmap(fab)(ca)
+  @inline final def rmap[F[_, _], A, B, D](fab: F[A, B])(bd: B => D)(implicit F: Profunctor[F]): F[A, D] =
+    F.rmap(fab(bd)
+ */
+}
 
 trait ProfunctorSyntax {
   implicit class ToProfunctorOps[F[_, _]: Profunctor, A, B](self: F[A, B]) {

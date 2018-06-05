@@ -93,3 +93,10 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 }
+
+package data {
+  trait DataFunctions
+    extends scala.AnyRef
+      with data.DisjunctionFunctions
+      with data.MaybeFunctions
+}
