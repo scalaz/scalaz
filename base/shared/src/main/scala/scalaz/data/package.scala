@@ -78,11 +78,17 @@ package object data {
   val AList: AListModule = AListImpl
   type AList[F[_, _], A, B] = AList.AList[F, A, B]
 
+  val Const: ConstModule = ConstImpl
+  type Const[A, B] = Const.Const[A, B]
+
   val Cord: CordModule = CordImpl
   type Cord = Cord.Cord
 
   val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
+
+  val Identity: IdentityModule = IdentityImpl
+  type Identity[A] = Identity.Identity[A]
 
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
