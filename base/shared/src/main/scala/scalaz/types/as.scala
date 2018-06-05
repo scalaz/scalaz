@@ -1,7 +1,8 @@
 package scalaz
 package types
 
-import scala.{ Any, AnyVal }
+import scala.{ Any, AnyVal, Predef }
+import Predef.<:<
 
 import scala.language.implicitConversions
 

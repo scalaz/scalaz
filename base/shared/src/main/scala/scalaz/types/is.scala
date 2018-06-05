@@ -1,7 +1,8 @@
 package scalaz
 package types
 
-import scala.{ Any, AnyVal }
+import scala.{ Any, AnyVal, Predef }
+import Predef.=:=
 
 /**
  * The data type `Is` is the encoding of Leibnitz’ law which states that

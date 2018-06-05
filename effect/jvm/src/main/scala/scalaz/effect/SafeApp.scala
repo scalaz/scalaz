@@ -2,7 +2,7 @@
 package scalaz
 package effect
 
-import scala.{ sys, List }
+import scala.{ sys, Array, List }
 import scala.concurrent.duration.Duration
 
 /**

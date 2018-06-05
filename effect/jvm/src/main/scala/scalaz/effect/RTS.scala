@@ -2,7 +2,7 @@
 package scalaz
 package effect
 
-import scala.{ ::, Any, AnyRef, Array, List, Nil, None, Nothing, Option, Some }
+import scala.{ ::, inline, Any, AnyRef, Array, List, Nil, None, Nothing, Option, Some }
 import scala.annotation.{ switch, tailrec }
 import scala.concurrent.duration.Duration
 
@@ -150,15 +150,15 @@ private object RTS {
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
     if (!stack.isEmpty) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
 
-  object Catcher extends Function[Any, IO[Any, Any]] {
+  object Catcher extends (Any => IO[Any, Any]) {
     final def apply(v: Any): IO[Any, Any] = IO.now(\/-(v))
   }
 
-  object IdentityCont extends Function[Any, IO[Any, Any]] {
+  object IdentityCont extends (Any => IO[Any, Any]) {
     final def apply(v: Any): IO[Any, Any] = IO.now(v)
   }
 
-  final case class Finalizer[E](finalizer: ExitResult[E, Any] => IO[Void, Unit]) extends Function[Any, IO[E, Any]] {
+  final case class Finalizer[E](finalizer: ExitResult[E, Any] => IO[Void, Unit]) extends (Any => IO[E, Any]) {
     final def apply(v: Any): IO[E, Any] = IO.now(v)
   }
 

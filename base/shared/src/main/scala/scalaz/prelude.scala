@@ -1,10 +1,12 @@
 package scalaz
 
-import ct._
+import scala.inline
+
 import algebra._
-import scalaz.core._
-import scalaz.debug._
-import scalaz.types._
+import core._
+import ct._
+import debug._
+import types._
 
 trait BaseTypeclasses {
   type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]

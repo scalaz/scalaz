@@ -1,6 +1,8 @@
 package scalaz
 package ct
 
+import scala.Singleton
+
 sealed abstract class Iso[A, B] { ab =>
   def to(a: A): B
   def from(b: B): A

@@ -1,8 +1,10 @@
 package scalaz
 package ct
 
-import scalaz.data.~>
-import scalaz.algebra.MonoidClass
+import scala.inline
+
+import algebra.MonoidClass
+import data.~>
 
 sealed trait KleisliModule {
   type Kleisli[F[_], A, B]
