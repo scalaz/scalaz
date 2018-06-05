@@ -3,7 +3,7 @@ layout: docs
 title:  "Monad"
 ---
 
-# Monad
+# Monad [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/monad.scala)
 
 *A monad is the combination of an Applicative with a Bind*
 
@@ -19,7 +19,7 @@ A monad instance needs to satisfy the monad laws in addition to those defined by
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.Prelude._
@@ -34,7 +34,7 @@ val listMonad: Monad[List] = instanceOf(new MonadClass[List] {
 })
 ```
 
-## Usage
+# Usage
 
 ```tut
 val l = List(1, 2, 3).flatMap(x => List(x + 5))

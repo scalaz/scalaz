@@ -1,7 +1,8 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scalaz.Void
+import scala.Nothing
 
 /**
  * The `Async` class describes the return value of an asynchronous effect

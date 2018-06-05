@@ -1,6 +1,5 @@
-package scalaz.effect
-
-import scalaz.IsCovariant
+package scalaz
+package effect
 
 class CovariantResolutionTest {
   implicitly[IsCovariant[IO[Int, ?]]]

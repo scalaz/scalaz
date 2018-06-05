@@ -1,4 +1,8 @@
-import scalaz.Scalaz._
+package scalaz
+
+import scala.List
+
+import Scalaz._
 
 /* Tests that the various syntax macros work for the typeclasses which use them. */
 object SyntaxResolutionTest {
@@ -16,7 +20,6 @@ object SyntaxResolutionTest {
   def _bind[F[_]: Bind, A, B](fa: F[A], f: A => F[B]): F[B] = fa.flatMap(f)
 
   def _choice[F[_, _]: Choice, A, B, C](fab: F[A, B]) = {
-    import scalaz.data.Disjunction._
     fab.leftchoice[C]: F[A \/ C, B \/ C]
     fab.rightchoice[C]: F[C \/ A, C \/ B]
   }
@@ -48,7 +51,10 @@ object SyntaxResolutionTest {
 
   def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
 
-  def _debug[A: Debug](a: A): String = a.debug
+  def _debug[A: Debug](a: A) = {
+    a.debugs: String
+    a.debug: data.Cord
+  }
 
   def _eq[A: Eq](a: A): Boolean = a === a
 

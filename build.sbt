@@ -1,5 +1,7 @@
 import Scalaz._
 
+cancelable in Global := true
+
 organization in ThisBuild := "org.scalaz"
 
 publishTo in ThisBuild := {
@@ -84,10 +86,16 @@ lazy val stdJS  = std.js
 
 lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
-  .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "scalaz",
+    buildInfoObject := "BuildInfo"
+  )
+  .settings(
+    scalacOptions -= "-Yno-imports",
     skip in publish := true,
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),
@@ -99,5 +107,15 @@ lazy val example = project.module
     micrositeGitHostingUrl := "https://github.com/scalaz/scalaz",
     micrositeGithubOwner := "scalaz",
     micrositeGithubRepo := "scalaz",
-    micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512"))
+    micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
+    micrositePalette := Map(
+      "brand-primary"   -> "#ED2124",
+      "brand-secondary" -> "#251605",
+      "brand-tertiary"  -> "#491119",
+      "gray-dark"       -> "#453E46",
+      "gray"            -> "#837F84",
+      "gray-light"      -> "#E3E2E3",
+      "gray-lighter"    -> "#F4F3F4",
+      "white-color"     -> "#FFFFFF"
+    )
   )

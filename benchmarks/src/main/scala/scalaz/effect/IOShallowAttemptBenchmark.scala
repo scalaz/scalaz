@@ -1,9 +1,14 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
 import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
+
+import scala.Array
 import scala.concurrent.Await
+import scala.math.BigInt
+
+import org.openjdk.jmh.annotations._
 
 import IOBenchmarks._
 
@@ -56,9 +61,9 @@ class IOShallowAttemptBenchmark {
   @Benchmark
   def scalazShallowAttempt(): BigInt = {
     def throwup(n: Int): IO[Error, BigInt] =
-      if (n == 0) throwup(n + 1).attempt.map(_.fold[BigInt](_ => 0)(a => a))
+      if (n == 0) throwup(n + 1).attempt.map(_.fold(_ => 0, a => a))
       else if (n == depth) IO.point(1)
-      else throwup(n + 1).attempt.map(_.fold[BigInt](_ => 0)(a => a)).flatMap(_ => IO.fail(new Error("Oh noes!")))
+      else throwup(n + 1).attempt.map(_.fold(_ => 0, a => a)).flatMap(_ => IO.fail(new Error("Oh noes!")))
 
     unsafePerformIO(throwup(0))
   }

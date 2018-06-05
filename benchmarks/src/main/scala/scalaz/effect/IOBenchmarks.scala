@@ -1,5 +1,8 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
+
+import scala.{ Either, Left, Right }
 
 object IOBenchmarks extends RTS {
   import monix.execution.Scheduler

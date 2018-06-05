@@ -1,14 +1,14 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
+import java.lang.{ Math, System }
+
+import scala.{ ::, Any, List, Nil, Nothing, PartialFunction }
 import scala.annotation.switch
 import scala.concurrent.duration._
 
 import scalaz.data.Disjunction
-import scalaz.data.Disjunction._
-import scalaz.data.Maybe
-import scalaz.Void
-import scalaz.<~<
 
 import scalaz.effect.Errors._
 
@@ -149,7 +149,7 @@ sealed abstract class IO[E, A] { self =>
    * otherwise executes the specified action.
    */
   final def orElse(that: => IO[E, A]): IO[E, A] =
-    self.attempt.flatMap(_.fold(_ => that)(IO.now))
+    self.attempt.flatMap(_.fold(_ => that, IO.now))
 
   /**
    * Maps over the error type. This can be used to lift a "smaller" error into
@@ -323,7 +323,7 @@ sealed abstract class IO[E, A] { self =>
     def tryRescue(t: E): IO[E, A] =
       if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
 
-    self.attempt[E].flatMap(_.fold(tryRescue)(IO.now))
+    self.attempt[E].flatMap(_.fold(tryRescue, IO.now))
   }
 
   /**
@@ -391,6 +391,18 @@ sealed abstract class IO[E, A] { self =>
     self *> IO.sleep(interval) *> repeat(interval)
 
   /**
+   * Repeats this action n time.
+   */
+  final def repeatN(n: Int): IO[E, A] = if (n <= 1) self else self *> repeatN(n - 1)
+
+  /**
+   * Repeats this action n time with a specified function, which computes
+   * a return value.
+   */
+  final def repeatNFold[B](n: Int)(b: B, f: (B, A) => B): IO[E, B] =
+    if (n < 1) IO.now(b) else self.flatMap(a => repeatNFold(n - 1)(f(b, a), f))
+
+  /**
    * Repeats this action continuously until the first error, with the specified
    * interval between the start of each full execution. Note that if the
    * execution of this action takes longer than the specified interval, then the
@@ -406,13 +418,19 @@ sealed abstract class IO[E, A] { self =>
 
       def tick[B](n: Int): IO[E, B] =
         self *> nanoTime[E].flatMap { now =>
-          val await = ((start + n * gapNs) - now).max(0L)
+          val await = Math.max(0L, (start + n * gapNs) - now)
 
           IO.sleep(await.nanoseconds) *> tick[B](n + 1)
         }
 
       tick(1)
     })
+
+  /**
+   * Repeats this action continuously until the function returns false.
+   */
+  final def doWhile(f: A => Boolean): IO[E, A] =
+    self.flatMap(a => if (f(a)) doWhile(f) else IO.now(a))
 
   /**
    * Maps this action to one producing unit, but preserving the effects of

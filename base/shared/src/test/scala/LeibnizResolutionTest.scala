@@ -1,4 +1,6 @@
-import scalaz.data.Leibniz
+package scalaz
+
+import scala.{ Any, AnyVal, Nothing }
 
 class LeibnizResolutionTest {
   implicitly[Leibniz[Nothing, Any, Int, Int]]

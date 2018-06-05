@@ -1,9 +1,14 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
 import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
+
+import scala.Array
 import scala.concurrent.Await
+import scala.math.BigInt
+
+import org.openjdk.jmh.annotations._
 
 import IOBenchmarks._
 
@@ -56,7 +61,7 @@ class IODeepAttemptBenchmark {
   def scalazDeepAttempt(): BigInt = {
     def descend(n: Int): IO[Error, BigInt] =
       if (n == depth) IO.fail(new Error("Oh noes!"))
-      else if (n == halfway) descend(n + 1).attempt.map(_.fold[BigInt](_ => 50)(a => a))
+      else if (n == halfway) descend(n + 1).attempt.map(_.fold(_ => 50, a => a))
       else descend(n + 1).map(_ + n)
 
     unsafePerformIO(descend(0))

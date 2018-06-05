@@ -8,31 +8,49 @@ options:
 
     nested_options:
     - title: Applicative
-      url: typeclass/Applicative.html
+      url: ct/Applicative.html
       menu_section: typeclass
     - title: Apply
-      url: typeclass/Apply.html
+      url: ct/Apply.html
       menu_section: typeclass
     - title: Bifunctor
-      url: typeclass/Bifunctor.html
+      url: ct/Bifunctor.html
+      menu_section: typeclass
+    - title: Bind
+      url: ct/Bind.html
+      menu_section: typeclass
+    - title: Category
+      url: ct/Category.html
+      menu_section: typeclass
+    - title: Compose
+      url: ct/Compose.html
       menu_section: typeclass
     - title: Debug
-      url: typeclass/Debug.html
+      url: debug/Debug.html
+      menu_section: typeclass
+    - title: Eq
+      url: core/Eq.html
       menu_section: typeclass
     - title: Functor
-      url: typeclass/Functor.html
+      url: ct/Functor.html
+      menu_section: typeclass
+    - title: Kleisli
+      url: ct/Kleisli.html
       menu_section: typeclass
     - title: Monad
-      url: typeclass/Monad.html
+      url: ct/Monad.html
       menu_section: typeclass
     - title: Monoid
-      url: typeclass/Monoid.html
+      url: algebra/Monoid.html
       menu_section: typeclass
     - title: Ord
-      url: typeclass/Ord.html
+      url: algebra/Ord.html
       menu_section: typeclass
     - title: Semigroup
-      url: typeclass/Semigroup.html
+      url: algebra/Semigroup.html
+      menu_section: typeclass
+    - title: Strong
+      url: ct/Strong.html
       menu_section: typeclass
 
   - title: Data classes
@@ -45,9 +63,6 @@ options:
       menu_section: data
     - title: Forall
       url: data/Forall.html
-      menu_section: data
-    - title: Kleisli
-      url: data/Kleisli.html
       menu_section: data
     - title: Maybe
       url: data/Maybe.html
