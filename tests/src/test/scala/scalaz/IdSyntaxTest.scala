@@ -7,6 +7,10 @@ object IdSyntaxTest extends SpecLite {
     import syntax.id._
     2 |> (_ * 3) must_===(6)
 
+    2 ?|> (_ > 2, _ * 3) must_===(2)
+
+    3 ?|> (_ > 2, _ * 3) must_===(9)
+
     1.squared must_===((1, 1))
 
     "foo" matchOrZero {
