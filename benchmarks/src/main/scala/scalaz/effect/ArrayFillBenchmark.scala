@@ -6,7 +6,7 @@ import org.openjdk.jmh.annotations._
 
 import scala.{ Array, Boolean, Int, Unit }
 import scala.collection.immutable.Range
-import scala.Predef.{ genericArrayOps, genericWrapArray }
+import scala.Predef.{ genericArrayOps }
 
 import scalaz.Void
 
