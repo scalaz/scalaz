@@ -16,8 +16,14 @@ final class IdOps[A](private val self: A) extends AnyVal {
   final def ▹[B](f: A => B): B =
     f(self)
 
+  /** Applies `self` to the provided function if the predicate is satisfied, otherwise return self. */
+  @inline def ?|>(p: A => Boolean, f: A => A): A = if (p(self)) f(self) else self
+
   /** Alternative syntax for the Thrush combinator or a total `match`. */
   @inline final def into[B](f: A => B): B = f(self)
+
+  /** Applies `self` to the provided function if the predicate is satisfied, otherwise return self. */
+  @inline def applyIf(p: A => Boolean)(f: A => A): A = if (p(self)) f(self) else self
 
   final def squared: (A, A) =
     (self, self)
