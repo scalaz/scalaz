@@ -17,21 +17,12 @@ final class IdOps[A](val self: A) extends AnyVal {
   /** Returns `Unit`. */
   def ignore: Unit = ()
 
-  /**
-    * @return the result of pf(self) if defined, otherwise the the empty element of `B`.
-    */
-  def applyOrEmpty[B: Monoid](pf: PartialFunction[A, B]): B =
-    pf.lift(self) match {
-      case None    => Monoid[B].empty
-      case Some(x) => x
-    }
-
   /** Repeatedly apply `f`, seeded with `self`, until a `B` is returned. */
-  def unfold[B](f: A => A Either B): B = {
+  def unfold[B](f: A => A \/ B): B = {
     @tailrec
     def loop(value: A): B = f(value) match {
-      case Right(r) => r
-      case Left(l) => loop(l)
+      case \/-(r) => r
+      case -\/(l) => loop(l)
     }
     loop(self)
   }
