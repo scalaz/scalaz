@@ -1,8 +1,6 @@
 package scalaz
 package ct
 
-import scala.Function
-
 import scala.language.experimental.macros
 
 trait StrongClass[P[_, _]] extends ProfunctorClass[P] {
@@ -27,8 +25,8 @@ object StrongClass {
 
 trait StrongInstances { instances =>
 
-  implicit val functionStrong: Strong[Function] = instanceOf(
-    new StrongClass[Function] with ProfunctorClass.DeriveDimap[Function] {
+  implicit val functionStrong: Strong[? => ?] = instanceOf(
+    new StrongClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
 
       override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
         fab compose ca

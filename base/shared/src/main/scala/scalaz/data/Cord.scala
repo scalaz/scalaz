@@ -2,7 +2,7 @@ package scalaz
 package data
 
 import java.lang.Math
-import scala.{ AnyRef, Char, Null }
+import scala.{ AnyRef, Array, Char, Null }
 import scala.Predef.{ classOf, String }
 
 import algebra.MonoidClass

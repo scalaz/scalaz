@@ -3,7 +3,7 @@ package core
 
 import java.lang.RuntimeException
 
-import scala.Nothing
+import scala.{ inline, Nothing }
 
 import com.github.ghik.silencer.silent
 

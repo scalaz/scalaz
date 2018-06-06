@@ -1,10 +1,12 @@
 package scalaz
 package data
 
-import scalaz.algebra.SemigroupClass
-import scalaz.core.EqClass
-import scalaz.ct._
-import scalaz.debug.DebugClass
+import scala.inline
+
+import algebra.SemigroupClass
+import core.EqClass
+import ct._
+import debug.DebugClass
 
 sealed abstract class These[L, R] {
 

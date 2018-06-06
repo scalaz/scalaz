@@ -1,8 +1,6 @@
 package scalaz
 package ct
 
-import scala.Function
-
 import data.Disjunction
 
 import data.Disjunction.swap
@@ -33,13 +31,13 @@ object ChoiceClass {
 
 trait ChoiceInstances {
 
-  implicit val functionChoice: Choice[Function] = instanceOf(
-    new ChoiceClass[Function] with ProfunctorClass.DeriveDimap[Function] {
+  implicit val functionChoice: Choice[? => ?] = instanceOf(
+    new ChoiceClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
 
-      override def lmap[A, B, C](fab: Function[A, B])(ca: C => A): Function[C, B] =
+      override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
         fab compose ca
 
-      override def rmap[A, B, C](fab: Function[A, B])(bc: B => C): Function[A, C] =
+      override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
         fab andThen bc
 
       override def leftchoice[A, B, C](ab: A => B): A \/ C => B \/ C =

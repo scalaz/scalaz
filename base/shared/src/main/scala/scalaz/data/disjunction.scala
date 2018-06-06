@@ -1,11 +1,11 @@
 package scalaz
 package data
 
-import scala.Either
+import scala.{ inline, Either }
 
-import scalaz.core.EqClass
-import scalaz.ct._
-import scalaz.debug.DebugClass
+import core.EqClass
+import ct._
+import debug.DebugClass
 
 sealed trait Disjunction[L, R] {
   final def fold[A](la: L => A, ra: R => A): A = this match {

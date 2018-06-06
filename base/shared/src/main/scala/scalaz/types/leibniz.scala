@@ -1,7 +1,8 @@
 package scalaz
 package types
 
-import scala.Any
+import scala.{ Any, Predef }
+import Predef.=:=
 
 /**
  * This particular version of Leibniz’ equality has been generalized to
