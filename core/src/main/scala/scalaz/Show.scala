@@ -54,13 +54,28 @@ object Show {
   }
   implicit val showContravariant: Contravariant[Show] = new ShowContravariant
 
-  final case class Shows(override val toString: String) extends AnyVal
-  object Shows {
-    implicit def mat[A](x: A)(implicit S: Show[A]): Shows = Shows(S.shows(x))
+  final class Shows private[Show] (override val toString: String) extends AnyVal
+  object Shows extends Shows0 {
+    implicit def mat[A](x: A)(implicit S: Show[A]): Shows = new Shows(S.shows(x))
+  }
+  sealed abstract class Shows0 { this: Shows.type =>
+    @compat.implicitAmbiguous("Cannot use value of type ${A} in the `show` interpolator, as no `Show[${A}]` instance could be found")
+    implicit def showsAmbig0[A](x: A): Shows = sys.error("showsAmbig0")
+    implicit def showsAmbig1[A](x: A): Shows = sys.error("showsAmbig1")
   }
 
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
-    def show(args: Shows*): String = sc.s(args: _*)
+
+    /** A string interpolator which uses the [[Show]] typeclass to convert
+      * its arguments to strings. At the call site, each interpolated expression
+      * must have a type with an implicit `Show` instance, which will be used
+      * to convert it to a string before using the standard `s""` interpolator.
+      *
+      * @note the name of this method is meant to pun on `s` being Scala's
+      *       basic string interpolator, whereas this is Scalaz's.
+      */
+    def z(args: Shows*): String = sc.s(args: _*)
+
   }
   ////
 }
