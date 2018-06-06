@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 
 import scala.{ Array, Int, Unit }
+import scala.concurrent.duration.Duration
 import scala.collection.immutable.Range
 import scala.Predef.{ genericArrayOps, genericWrapArray }
 
@@ -56,6 +57,6 @@ class BubbleSortBenchmarks {
       array <- Task.eval(createTestArray)
       _     <- bubbleSort[Int](_ <= _)(array)
       _     <- Task.eval(assertSorted(array))
-    } yield ()).toIO.unsafeRunSync()
+    } yield ()).runSyncUnsafe(Duration.Inf)
   }
 }
