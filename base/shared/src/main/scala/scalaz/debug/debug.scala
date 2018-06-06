@@ -12,36 +12,27 @@ import data.Cord
 
 /** A typeclass describing types which can be meaningfully represented as a `String`.
  */
+@meta.minimal("debug", "debugs")
 trait DebugClass[A] {
 
   /** Produce a [[Cord]] representation of `a`.
    */
-  def debug(a: A): Cord
+  def debug(a: A): Cord = Cord(debugs(a))
 
   /** Produce a [[String]] representation of `a`.
    *
    * This should be equivalent to `debug(a).toString`.
    */
-  def debugs(a: A): String
+  def debugs(a: A): String = Cord.toString(debug(a))
 }
 
 object DebugClass {
 
-  // sorry
-  trait DeriveDebug[A] extends DebugClass[A] with Alt[DeriveDebug[A]] {
-    override def debug(a: A): Cord = Cord(debugs(a))
-  }
-  trait DeriveDebugs[A] extends DebugClass[A] with Alt[DeriveDebugs[A]] {
-    override def debugs(a: A): String = Cord.toString(debug(a))
-  }
-
-  sealed trait Alt[A <: Alt[A]]
-
   /** A factory for `Debug` instances from functions to [[Cord]].
    */
   def instance[A](impl: A => Cord): Debug[A] =
-    instanceOf(new DebugClass[A] with DebugClass.DeriveDebugs[A] {
-      def debug(a: A) = impl(a)
+    instanceOf(new DebugClass[A] {
+      override def debug(a: A) = impl(a)
     })
 }
 

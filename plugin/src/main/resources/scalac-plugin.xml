@@ -1,0 +1,4 @@
+<plugin>
+  <name>scalaz-plugin</name>
+  <classname>scalaz.plugin.ScalazPlugin</classname>
+</plugin>

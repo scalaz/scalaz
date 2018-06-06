@@ -45,22 +45,20 @@ private[data] object ConstImpl extends ConstModule {
   def run[A, B](const: Const[A, B]): A = const
 
   def constTraverse[R]: Traversable[Const[R, ?]] =
-    instanceOf(
-      new TraversableClass.DeriveSequence[Const[R, ?]] with FoldableClass.DeriveFoldMap[Const[R, ?]]
-      with ConstPhantom[R] {
-        override def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
-          F.pure(ta)
+    instanceOf(new TraversableClass[Const[R, ?]] with ConstPhantom[R] {
 
-        override def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
+      override def traverse[F[_], A, B](ta: Const[R, A])(f: A => F[B])(implicit F: Applicative[F]): F[Const[R, B]] =
+        F.pure(ta)
 
-        override def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
+      override def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
 
-        override def toList[A](fa: Const[R, A]): List[A] = Nil
-      }
-    )
+      override def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
 
-  private trait ConstPhantom[R] extends PhantomClass[Const[R, ?]] with PhantomClass.DeriveMapContramap[Const[R, ?]] {
-    def pmap[A, B](ma: Const[R, A]): Const[R, B] = ma
+      override def toList[A](fa: Const[R, A]): List[A] = Nil
+    })
+
+  private trait ConstPhantom[R] extends PhantomClass[Const[R, ?]] {
+    override def pmap[A, B](ma: Const[R, A]): Const[R, B] = ma
   }
 
   private trait ConstApply[R] extends ApplyClass[Const[R, ?]] with ConstPhantom[R] {

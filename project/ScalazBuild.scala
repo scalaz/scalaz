@@ -58,4 +58,30 @@ object Scalaz {
       p.in(file(p.jvm.id.stripSuffix("JVM"))).settings(stdSettings(p.jvm.id.stripSuffix("JVM")))
   }
 
+  def partestDependency(version: String): ModuleID =
+    (CrossVersion.partialVersion(version): @unchecked) match {
+      case Some((2L, 12L)) =>
+        "org.scala-lang.modules" %% "scala-partest" % "1.1.8"
+      case Some((2L, 13L)) =>
+        "org.scala-lang" % "scala-partest" % version
+    }
+
+  val partestFramework = List(
+    fork in Test := true,
+    javaOptions in Test += s"-Dpartest.root=${(sourceDirectory in Test in LocalProject("plugin")).value}",
+    testFrameworks += new TestFramework("scala.tools.partest.sbt.Framework"),
+    definedTests in Test +=
+      new sbt.TestDefinition(
+        "partest",
+        new sbt.testing.AnnotatedFingerprint {
+          def isModule       = true
+          def annotationName = "partest"
+        },
+        true,
+        Array()
+      ),
+    testOptions in Test += Tests.Argument(
+      s"""-Dpartest.scalac_opts=-Xplugin:${(packageBin in Compile in LocalProject("plugin")).value} """.trim,
+    ),
+  )
 }

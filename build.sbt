@@ -26,11 +26,24 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks)
+  .aggregate(
+    baseJVM,
+    baseJS,
+    metaJVM,
+    metaJS,
+    effectJVM,
+    effectJS,
+    stdJVM,
+    stdJS,
+    example,
+    benchmarks,
+    plugin,
+  )
   .enablePlugins(ScalaJSPlugin)
 
 lazy val base = crossProject.module
   .dependsOn(meta)
+  .settings(PluginDependency)
 
 lazy val baseJVM = base.jvm
 
@@ -39,6 +52,7 @@ lazy val baseJS = base.js
 lazy val effect = crossProject
   .in(file("effect"))
   .settings(stdSettings("effect"))
+  .settings(PluginDependency)
   .settings(
     libraryDependencies ++=
       Seq("org.specs2" %%% "specs2-core"          % "4.2.0" % "test",
@@ -70,8 +84,25 @@ lazy val meta = crossProject.module
   .settings(
     libraryDependencies ++=
       Seq("org.scala-lang" % "scala-reflect"  % scalaVersion.value,
-          "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided")
+          "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided)
   )
+
+lazy val plugin = (project in file("plugin"))
+  .settings(
+    crossVersion := CrossVersion.full,
+    libraryDependencies ++= List(
+      "org.scala-lang"                      % "scala-compiler" % scalaVersion.value % Provided,
+      partestDependency(scalaVersion.value) % Test,
+    )
+  )
+  .settings(partestFramework)
+
+lazy val PluginDependency: List[Def.Setting[_]] = List(
+  scalacOptions ++= List(
+    s"-Xplugin:${(packageBin in Compile in plugin).value}",
+    s"-Jdummy=${(packageBin in Compile in plugin).value.lastModified}",
+  )
+)
 
 lazy val metaJVM = meta.jvm
 
@@ -80,6 +111,7 @@ lazy val metaJS = meta.js
 lazy val std = crossProject.module
   .in(file("std"))
   .dependsOn(base)
+  .settings(PluginDependency)
 
 lazy val stdJVM = std.jvm
 lazy val stdJS  = std.js
@@ -87,6 +119,7 @@ lazy val stdJS  = std.js
 lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
+  .settings(PluginDependency)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "scalaz",

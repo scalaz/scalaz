@@ -23,12 +23,12 @@ case class ZipList[A](val value: List[A]) extends AnyVal
 
 /* Note that this is _not_ the Applicative instance for List! */
 implicit val zipListAp: Applicative[ZipList] = instanceOf(new ApplicativeClass[ZipList] {
-  def pure[A](a: A): ZipList[A] = ZipList(List(a))
+  override def pure[A](a: A): ZipList[A] = ZipList(List(a))
 
-  def ap[A, B](fa: ZipList[A])(f: ZipList[A => B]): ZipList[B] =
+  override def ap[A, B](fa: ZipList[A])(f: ZipList[A => B]): ZipList[B] =
     ZipList((fa.value zip f.value).map(t => t._2(t._1)))
 
-  def map[A, B](fa: ZipList[A])(f: A => B): ZipList[B] =
+  override def map[A, B](fa: ZipList[A])(f: A => B): ZipList[B] =
     ZipList(fa.value map f)
 })
 ```

@@ -1,0 +1,7 @@
+not-a-trait.scala:3: error: @minimal annotations may only be applied to traits
+@minimal("foo")
+ ^
+not-a-trait.scala:8: error: @minimal annotations may only be applied to traits
+@minimal("foo")
+ ^
+two errors found

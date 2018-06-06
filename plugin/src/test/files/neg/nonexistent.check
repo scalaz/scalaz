@@ -1,0 +1,10 @@
+nonexistent.scala:3: error: not found: foo
+@minimal("foo", "bar", "baz")
+         ^
+nonexistent.scala:5: error: @minimal may only name methods, found variable bar
+  var bar = 1
+      ^
+nonexistent.scala:6: error: @minimal may only name methods, found value baz
+  val baz = 2
+      ^
+three errors found

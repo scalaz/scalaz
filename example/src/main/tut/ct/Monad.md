@@ -28,14 +28,14 @@ import scalaz.Scalaz._
 
 ```tut
 import scalaz.Prelude._
-import scalaz.ct.{BindClass, MonadClass}
+import scalaz.ct.MonadClass
 
 val listMonad: Monad[List] = 
-  instanceOf(new MonadClass[List] with BindClass.DeriveAp[List] {
-    def pure[A](a: A): List[A] = List(a)
-    def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
-    def flatten[A](ma: List[List[A]]): List[A] = ma.flatten
-    def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
+  instanceOf(new MonadClass[List] {
+    override def pure[A](a: A): List[A] = List(a)
+    override def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
+    override def flatten[A](ma: List[List[A]]): List[A] = ma.flatten
+    override def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
   })
 ```
 

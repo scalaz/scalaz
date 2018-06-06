@@ -1,0 +1,4 @@
+overloaded.scala:7: error: methods making up a minimal definition must not be overloaded
+  def multiplicious(s: String) = s
+      ^
+one error found
