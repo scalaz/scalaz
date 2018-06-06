@@ -1,8 +1,6 @@
 package scalaz
 package ct
 
-import scalaz.data.Const
-
 import scala.language.experimental.macros
 
 trait PhantomClass[F[_]] extends FunctorClass[F] with ContravariantClass[F] {
@@ -25,14 +23,6 @@ object PhantomClass {
 
 trait PhantomFunctions {
   def pmap[F[_], A, B](fa: F[A])(implicit F: Phantom[F]): F[B] = F.pmap(fa)
-}
-
-trait PhantomInstances {
-
-  implicit def const[R]: Phantom[Const[R, ?]] =
-    instanceOf(new PhantomClass.DeriveMapContramap[Const[R, ?]] {
-      def pmap[A, B](ma: Const[R, A]): Const[R, B] = ma.retag[B]
-    })
 }
 
 trait PhantomSyntax {

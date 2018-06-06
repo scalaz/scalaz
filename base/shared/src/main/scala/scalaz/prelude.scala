@@ -151,11 +151,9 @@ trait AllFunctions
 
 trait AllInstances
     extends data.AMaybeInstances
-    with data.ConstInstances
     with data.DisjunctionInstances
     with data.DownStarInstances
     with data.ForgetInstances
-    with data.IdentityInstances
     with data.IListInstances
     with data.TheseInstances
     with data.UpStarInstances
@@ -176,7 +174,6 @@ trait AllInstances
     with ct.FoldableInstances
     with ct.KleisliInstances
     with ct.MonadInstances
-    with ct.PhantomInstances
     with ct.ProfunctorInstances
     with ct.StrongInstances
     with ct.TraversableInstances
