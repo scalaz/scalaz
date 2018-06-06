@@ -1,0 +1,7 @@
+test_bifunctor.scala:14: error: missing implementation for methods: bimap OR (lmap AND rmap)
+  val eitherInst: Bifunctor[Either] = new Bifunctor[Either] {} // bad
+                                          ^
+test_bifunctor.scala:16: error: missing implementation for methods: bimap OR lmap
+  val tuple2Inst: Bifunctor[Tuple2] = new Bifunctor[Tuple2] { // bad
+                                          ^
+two errors found

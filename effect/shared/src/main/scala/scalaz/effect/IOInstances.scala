@@ -7,7 +7,7 @@ import scalaz.types.IsCovariantClass
 
 trait IOInstances {
   implicit def monad[E]: Monad[IO[E, ?]] =
-    instanceOf(new MonadClass[IO[E, ?]] with BindClass.DeriveFlatten[IO[E, ?]] {
+    instanceOf(new MonadClass[IO[E, ?]] {
       override final def map[A, B](ma: IO[E, A])(f: A => B): IO[E, B] =
         ma.map(f)
 
@@ -21,7 +21,7 @@ trait IOInstances {
     })
 
   implicit final val bifunctor: Bifunctor[IO] =
-    instanceOf(new BifunctorClass.DeriveBimap[IO] {
+    instanceOf(new BifunctorClass[IO] {
       override def lmap[A, B, S](fab: IO[A, B])(as: A => S): IO[S, B] = fab.leftMap(as)
       override def rmap[A, B, T](fab: IO[A, B])(bt: B => T): IO[A, T] = fab.map(bt)
     })

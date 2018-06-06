@@ -8,8 +8,8 @@ import scala.language.experimental.macros
 /** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
  *
  * Minimal definition:
- * - `bimap` (using [[BifunctorClass.DeriveLmapRmap]])
- * - `lmap` and `rmap` (using [[BifunctorClass.DeriveBimap]])
+ * - `bimap`, _or_
+ * - `lmap` _and_ `rmap`.
  *
  * The laws for a [[Bifunctor]] instance are:
  * - for all `A`, `Bifunctor[A, ?]` must be a lawful [[Functor]] (with `map == rmap`);
@@ -19,42 +19,26 @@ import scala.language.experimental.macros
  *       lmap(rmap(fab)(bt))(as) === rmap(lmap(fab)(as))(bt) === bimap(fab)(as, bt)
  *   ```
  */
+@meta.minimal("bimap", ("lmap", "rmap"))
 trait BifunctorClass[F[_, _]] {
 
-  def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T]
+  def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T] =
+    rmap(lmap(fab)(as))(bt)
 
-  def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B]
+  def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B] =
+    bimap(fab)(as, identity)
 
-  def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T]
+  def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T] =
+    bimap(fab)(identity, bt)
 
-}
-
-object BifunctorClass {
-
-  trait DeriveLmapRmap[F[_, _]] extends BifunctorClass[F] with Alt[DeriveLmapRmap[F]] {
-    def lmap[A, B, S](fab: F[A, B])(as: A => S): F[S, B] = bimap(fab)(as, identity)
-    def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T] = bimap(fab)(identity, bt)
-  }
-
-  trait DeriveBimap[F[_, _]] extends BifunctorClass[F] with Alt[DeriveBimap[F]] {
-    def bimap[A, B, S, T](fab: F[A, B])(as: A => S, bt: B => T): F[S, T] = rmap(lmap(fab)(as))(bt)
-  }
-
-  sealed trait Alt[D <: Alt[D]]
-
-  trait BifunctorFunctorTemplate[F[_, _], A] extends FunctorClass[F[A, ?]] {
-    val F: Bifunctor[F]
-
-    def map[B, BB](ma: F[A, B])(f: B => BB): F[A, BB] = F.rmap(ma)(f)
-  }
 }
 
 trait BifunctorInstances {
 
   implicit final val tuple2Bifunctor: Bifunctor[Tuple2] =
-    instanceOf(new BifunctorClass[Tuple2] with BifunctorClass.DeriveBimap[Tuple2] {
-      def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))
-      def rmap[A, B, T](fab: (A, B))(f: B => T): (A, T) = fab.copy(_2 = f(fab._2))
+    instanceOf(new BifunctorClass[Tuple2] {
+      override def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))
+      override def rmap[A, B, T](fab: (A, B))(f: B => T): (A, T) = fab.copy(_2 = f(fab._2))
     })
 }
 

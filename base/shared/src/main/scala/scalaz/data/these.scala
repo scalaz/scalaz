@@ -157,30 +157,28 @@ object Both {
 trait TheseInstances {
   implicit def bifunctor: Bifunctor[These] =
     instanceOf(new BifunctorClass[These] {
-      def bimap[A, B, S, T](fab: These[A, B])(as: A => S, bt: B => T) = fab.bimap(as)(bt)
+      override def bimap[A, B, S, T](fab: These[A, B])(as: A => S, bt: B => T) = fab.bimap(as)(bt)
 
-      def lmap[A, B, S](fab: These[A, B])(as: A => S) = fab.lmap(as)
-      def rmap[A, B, T](fab: These[A, B])(bt: B => T) = fab.rmap(bt)
+      override def lmap[A, B, S](fab: These[A, B])(as: A => S) = fab.lmap(as)
+      override def rmap[A, B, T](fab: These[A, B])(bt: B => T) = fab.rmap(bt)
     })
 
   implicit final def theseMonad[L: Semigroup]: Monad[These[L, ?]] =
-    instanceOf(
-      new MonadClass[These[L, ?]] with BindClass.DeriveAp[These[L, ?]] with BindClass.DeriveFlatten[These[L, ?]] {
-        override def map[A, B](ma: These[L, A])(f: A => B)      = ma.rmap(f)
-        def flatMap[A, B](ma: These[L, A])(f: A => These[L, B]) = ma.flatMap(f)
-        def pure[A](a: A)                                       = That(a)
-      }
-    )
+    instanceOf(new MonadClass[These[L, ?]] {
+      override def map[A, B](ma: These[L, A])(f: A => B)               = ma.rmap(f)
+      override def flatMap[A, B](ma: These[L, A])(f: A => These[L, B]) = ma.flatMap(f)
+      override def pure[A](a: A)                                       = That(a)
+    })
 
   implicit final def theseTraversable[L]: Traversable[These[L, ?]] =
-    instanceOf(new TraversableClass.DeriveSequence[These[L, ?]] with FoldableClass.DeriveToList[These[L, ?]] {
-      def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
-      def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
-      def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
+    instanceOf(new TraversableClass[These[L, ?]] {
+      override def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
+      override def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
+      override def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
 
       /* todo: remove these when default implementation in Traversable? */
-      def foldRight[A, B](fa: These[L, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
-      def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)        = fa.foldLeft(z)(f)
+      override def foldRight[A, B](fa: These[L, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
+      override def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)        = fa.foldLeft(z)(f)
     })
 
   implicit final def theseSemigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =

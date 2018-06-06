@@ -39,7 +39,7 @@ trait DisjunctionFunctions {
 
 trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
-    instanceOf(new MonadClass[L \/ ?] with BindClass.DeriveFlatten[L \/ ?] {
+    instanceOf(new MonadClass[L \/ ?] {
 
       override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
         ma.fold(l => -\/(l), r => \/-(f(r)))
@@ -63,8 +63,8 @@ trait DisjunctionInstances {
   }
 
   implicit val disjunctionBifunctor: Bifunctor[Disjunction] =
-    instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
-      def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
+    instanceOf(new BifunctorClass[Disjunction] {
+      override def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
         case -\/(a) => -\/(as(a))
         case \/-(b) => \/-(bt(b))
       }
