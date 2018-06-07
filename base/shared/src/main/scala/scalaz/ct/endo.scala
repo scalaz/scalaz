@@ -28,8 +28,8 @@ private[ct] object EndoImpl extends EndoModule {
 
   def endoMonoid[=>:[_, _], A](implicit F: Category[=>:]): Monoid[Endo[=>:, A]] =
     instanceOf(new MonoidClass[Endo[=>:, A]] with EndoSemigroup[=>:, A] {
-      val F0: Compose[=>:]    = Scalaz.categoryComposable[=>:](F)
-      def empty: Endo[=>:, A] = apply(F.id)
+      val F0: Compose[=>:]     = Scalaz.categoryComposable[=>:](F)
+      def mempty: Endo[=>:, A] = apply(F.id)
     })
 
   def endoSemigroup[=>:[_, _], A](implicit F: Compose[=>:]): Semigroup[Endo[=>:, A]] =
@@ -40,7 +40,7 @@ private[ct] object EndoImpl extends EndoModule {
   private trait EndoSemigroup[=>:[_, _], A] extends SemigroupClass[Endo[=>:, A]] {
     val F0: Compose[=>:]
 
-    def append(a1: Endo[=>:, A], a2: => Endo[=>:, A]): Endo[=>:, A] =
+    def mappend(a1: Endo[=>:, A], a2: => Endo[=>:, A]): Endo[=>:, A] =
       F0.compose(a1, a2)
   }
 }

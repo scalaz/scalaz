@@ -67,23 +67,23 @@ private[data] object ConstImpl extends ConstModule {
     def R: SemigroupClass[R]
 
     final override def ap[A, B](fa: Const[R, A])(f: Const[R, A => B]): Const[R, B] =
-      R.append(fa, f)
+      R.mappend(fa, f)
   }
 
   private trait ConstApplicative[R] extends ApplicativeClass[Const[R, ?]] with ConstApply[R] {
     override def R: MonoidClass[R]
-    final override def pure[A](a: A): Const[R, A] = R.empty
+    final override def pure[A](a: A): Const[R, A] = R.mempty
   }
 
   private trait ConstSemigroup[A, B] extends SemigroupClass[Const[A, B]] {
     def A: SemigroupClass[A]
-    final override def append(a1: Const[A, B], a2: => Const[A, B]): Const[A, B] =
-      A.append(a1, a2)
+    final override def mappend(a1: Const[A, B], a2: => Const[A, B]): Const[A, B] =
+      A.mappend(a1, a2)
   }
 
   private trait ConstMonoid[A, B] extends MonoidClass[Const[A, B]] with ConstSemigroup[A, B] {
     override def A: MonoidClass[A]
-    final override def empty: Const[A, B] = A.empty
+    final override def mempty: Const[A, B] = A.mempty
   }
 
   private trait ConstEq[A, B] extends EqClass[Const[A, B]] {

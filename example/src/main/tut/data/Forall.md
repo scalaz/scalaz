@@ -155,12 +155,12 @@ Here is an instance for list:
 import scalaz.algebra.SemigroupClass
 
 def listSemigroup[A]: Semigroup[List[A]] = instanceOf(new SemigroupClass[List[A]] {
-  def append(x: List[A], y: => List[A]) = x ++ y
+  def mappend(x: List[A], y: => List[A]) = x ++ y
 })
 
 val listPlus: Plus[List] = ∀.mk[Plus[List]].from(listSemigroup)
 
-listPlus[Int].append(List(1, 2), List(3, 4))
+listPlus[Int].mappend(List(1, 2), List(3, 4))
 ```
 
 
