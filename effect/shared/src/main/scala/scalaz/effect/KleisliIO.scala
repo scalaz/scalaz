@@ -214,13 +214,13 @@ object KleisliIO {
    * Returns a `KleisliIO` representing a failure with the specified `E`.
    */
   final def fail[E, A, B](e: E): KleisliIO[E, A, B] =
-    new Impure((a: A) => throw new KleisliIOError[E](e))
+    new Impure(_ => throw new KleisliIOError[E](e))
 
   /**
    * Returns the identity effectful function, which performs no effects and
    * merely returns its input unmodified.
    */
-  final def identity[E, A]: KleisliIO[E, A, A] = lift((a: A) => a)
+  final def identity[E, A]: KleisliIO[E, A, A] = lift(a => a)
 
   /**
    * Lifts a pure `A => IO[E, B]` into `KleisliIO`.
@@ -247,7 +247,7 @@ object KleisliIO {
       (a: A) =>
         try f(a)
         catch {
-          case t: Throwable if (catcher.isDefinedAt(t)) =>
+          case t: Throwable if catcher.isDefinedAt(t) =>
             throw new KleisliIOError(catcher(t))
       }
     )
