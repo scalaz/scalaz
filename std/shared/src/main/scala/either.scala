@@ -3,7 +3,7 @@ package std
 
 import scala.{ Either, Left, Right }
 
-import core.EqClass
+import core.EqAnyRef
 import ct.{ BifunctorClass, MonadClass }
 import debug.DebugClass
 
@@ -33,13 +33,11 @@ trait EitherInstances {
   })
 
   implicit def eitherEq[L, R](implicit X: Eq[L], Y: Eq[R]): Eq[Either[L, R]] =
-    instanceOf(new EqClass[Either[L, R]] {
-      def equal(first: Either[L, R], second: Either[L, R]): Boolean = (first, second) match {
-        case (Left(x), Left(y))   => X.equal(x, y)
-        case (Right(x), Right(y)) => Y.equal(x, y)
-        case _                    => false
-      }
-    })
+    instanceOf({
+      case (Left(x), Left(y))   => X.equal(x, y)
+      case (Right(x), Right(y)) => Y.equal(x, y)
+      case _                    => false
+    }: EqAnyRef[Either[L, R]])
 
   implicit def eitherDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[Either[L, R]] = {
     import Scalaz.debugInterpolator

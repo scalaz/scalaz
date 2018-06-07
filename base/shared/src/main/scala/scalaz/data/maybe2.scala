@@ -3,9 +3,9 @@ package data
 
 import scala.{ sys, AnyVal, Nothing }
 
-import scalaz.core.EqClass
-import scalaz.ct.BifunctorClass
-import scalaz.debug.DebugClass
+import ct.BifunctorClass
+import core.EqAnyRef
+import debug.DebugClass
 
 sealed trait Maybe2Module {
 
@@ -60,11 +60,11 @@ private[data] object Maybe2Impl extends Maybe2Module {
   }
 
   implicit def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
-    instanceOf[EqClass[Maybe2[A, B]]] {
+    instanceOf({
       case (Some2(a1, b1), Some2(a2, b2)) => A.equal(a1, a2) && B.equal(b1, b2)
       case (None2, None2)                 => true
       case _                              => false
-    }
+    }: EqAnyRef[Maybe2[A, B]])
 
   implicit def bifunctor: scalaz.Bifunctor[Maybe2] =
     instanceOf(new BifunctorClass[Maybe2] with BifunctorClass.DeriveLmapRmap[Maybe2] {

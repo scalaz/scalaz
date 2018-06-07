@@ -5,5 +5,5 @@ import utils._
 
 trait ShortInstances {
   implicit val shortDebug: Debug[Short] = toStringDebug[Short]
-  implicit val shortEq: Eq[Short]       = universalEq[Short]
+  implicit val shortEq: Eq[Short]       = universalEqAnyVal[Short]
 }

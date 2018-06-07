@@ -1,12 +1,13 @@
 package scalaz
 package data
 
+import scala.annotation.tailrec
+import scala.AnyRef
+import scala.PartialFunction.{ cond, condOpt }
+
 import core.EqClass
 import debug.DebugClass
 import types.IsCovariantClass
-
-import scala.annotation.tailrec
-import scala.PartialFunction.{ cond, condOpt }
 
 trait IListModule {
   type IList[A]
@@ -49,7 +50,7 @@ trait IListInstances {
           case _ => false
         }
 
-      go(a1, a2)
+      (a1.asInstanceOf[AnyRef] eq a2.asInstanceOf[AnyRef]) || go(a1, a2)
     }
 
   implicit final def ilistDebug[A](implicit A: Debug[A]): Debug[IList[A]] =

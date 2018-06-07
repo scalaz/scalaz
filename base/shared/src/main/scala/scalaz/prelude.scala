@@ -1,7 +1,5 @@
 package scalaz
 
-import scala.inline
-
 import algebra._
 import core._
 import ct._
@@ -178,7 +176,6 @@ trait AllInstances
     with ct.StrongInstances
     with ct.TraversableInstances
     with debug.DebugInstances
-    with core.EqInstances
     with types.AsInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances

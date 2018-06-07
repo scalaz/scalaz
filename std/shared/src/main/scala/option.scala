@@ -3,10 +3,10 @@ package std
 
 import scala.{ None, Option, Some }
 
-import core.EqClass
+import ct.MonadClass
+import core.EqAnyRef
 import data.Cord
 import debug.DebugClass
-import ct.MonadClass
 
 trait OptionInstances {
   implicit val optionMonad: Monad[Option] =
@@ -19,13 +19,11 @@ trait OptionInstances {
     })
 
   implicit def optionEq[A](implicit X: Eq[A]): Eq[Option[A]] =
-    instanceOf(new EqClass[Option[A]] {
-      def equal(first: Option[A], second: Option[A]): Boolean = (first, second) match {
-        case (None, None)       => true
-        case (Some(a), Some(b)) => X.equal(a, b)
-        case _                  => false
-      }
-    })
+    instanceOf({
+      case (None, None)       => true
+      case (Some(a), Some(b)) => X.equal(a, b)
+      case _                  => false
+    }: EqAnyRef[Option[A]])
 
   implicit def optionDebug[A](implicit X: Debug[A]): Debug[Option[A]] = {
     import Scalaz.debugInterpolator

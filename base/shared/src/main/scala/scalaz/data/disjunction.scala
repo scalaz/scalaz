@@ -3,9 +3,9 @@ package data
 
 import scala.{ inline, Either }
 
-import core.EqClass
-import ct._
-import debug.DebugClass
+import scalaz.core.EqAnyRef
+import scalaz.ct._
+import scalaz.debug.DebugClass
 
 sealed trait Disjunction[L, R] {
   final def fold[A](la: L => A, ra: R => A): A = this match {
@@ -71,11 +71,11 @@ trait DisjunctionInstances {
     })
 
   implicit def disjunctionEq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[A \/ B] =
-    instanceOf[EqClass[A \/ B]] {
+    instanceOf({
       case (-\/(a1), -\/(a2)) => A.equal(a1, a2)
       case (\/-(b1), \/-(b2)) => B.equal(b1, b2)
       case _                  => false
-    }
+    }: EqAnyRef[A \/ B])
 }
 
 trait DisjunctionSyntax {

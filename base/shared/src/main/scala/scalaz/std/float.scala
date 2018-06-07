@@ -7,5 +7,7 @@ import utils._
 
 trait FloatInstances {
   implicit val floatDebug: Debug[Float] = toStringDebug[Float]
-  implicit val floatEq: Eq[Float]       = instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
+  implicit val floatEq: Eq[Float] = instanceOf(
+    ((first, second) => floatToRawIntBits(first) == floatToRawIntBits(second)): EqClass[Float]
+  )
 }

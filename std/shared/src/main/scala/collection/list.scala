@@ -5,8 +5,8 @@ import scala.{ ::, List, Nil }
 
 import scala.Predef.$conforms
 
-import core.EqClass
 import ct.MonadClass
+import core.EqAnyRef
 import data.Cord
 import debug.DebugClass
 
@@ -19,10 +19,9 @@ trait ListInstances {
     override def flatten[A](ma: List[List[A]]): List[A]               = ma.flatten
   })
 
-  implicit def listEq[A: Eq]: Eq[List[A]] =
-    instanceOf(new EqClass[List[A]] {
-      def equal(first: List[A], second: List[A]): Boolean = (first.corresponds(second)(Eq[A].equal))
-    })
+  implicit def listEq[A: Eq]: Eq[List[A]] = instanceOf(((a, b) => (a corresponds b)(Eq[A].equal)): EqAnyRef[List[A]])
+
+  //instanceOf((first, second) => (first.corresponds(second)(Eq[A].equal)): EqAnyRef[List[A]])
 
   implicit def listDebug[A: Debug]: Debug[List[A]] =
     DebugClass.instance(as => {

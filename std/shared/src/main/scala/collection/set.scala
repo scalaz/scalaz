@@ -3,11 +3,9 @@ package std
 
 import scala.collection.immutable.Set
 
-import scalaz.core.EqClass
+import core.EqAnyRef
 
 trait SetInstances {
   implicit def setEq[A: Eq]: Eq[Set[A]] =
-    instanceOf(new EqClass[Set[A]] {
-      def equal(first: Set[A], second: Set[A]): Boolean = (first.toStream.corresponds(second.toStream)(Eq[A].equal))
-    })
+    instanceOf(((a, b) => (a.toStream corresponds b.toStream)(Eq[A].equal)): EqAnyRef[Set[A]])
 }
