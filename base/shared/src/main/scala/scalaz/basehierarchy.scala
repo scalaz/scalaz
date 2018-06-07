@@ -5,15 +5,16 @@ trait BaseHierarchy extends BaseHierarchy.BH0
 object BaseHierarchy {
 
   trait BH0 extends BH1 {
-    implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P]        = instanceOf(P)
-    implicit def monadBind[M[_]](implicit M: Monad[M]): Bind[M]                         = instanceOf(M)
-    implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M]           = instanceOf(M)
-    implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M]                       = instanceOf(M)
-    implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M]                   = instanceOf(M)
-    implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A]                = instanceOf(A)
-    implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T]     = instanceOf(T)
-    implicit def categoryComposable[=>:[_, _]](implicit C: Category[=>:]): Compose[=>:] = instanceOf(C)
-    implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F]                 = instanceOf(F)
+    implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P]                        = instanceOf(P)
+    implicit def monadBind[M[_]](implicit M: Monad[M]): Bind[M]                                         = instanceOf(M)
+    implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M]                           = instanceOf(M)
+    implicit def monadApply[M[_]](implicit M: Monad[M]): Apply[M]                                       = instanceOf(M)
+    implicit def monadFunctor[M[_]](implicit M: Monad[M]): Functor[M]                                   = instanceOf(M)
+    implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A]                                = instanceOf(A)
+    implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T]                     = instanceOf(T)
+    implicit def categoryComposable[=>:[_, _]](implicit C: Category[=>:]): Compose[=>:]                 = instanceOf(C)
+    implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F]                                 = instanceOf(F)
+    implicit def contravariantInvariantFunctor[F[_]](implicit F: Contravariant[F]): InvariantFunctor[F] = instanceOf(F)
   }
 
   trait BH1 extends BH2 {

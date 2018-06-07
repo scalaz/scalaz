@@ -4,7 +4,10 @@ package ct
 import scala.language.experimental.macros
 
 trait PhantomClass[F[_]] extends FunctorClass[F] with ContravariantClass[F] {
+
   def pmap[A, B](ma: F[A]): F[B]
+
+  override def imap[A, B](ma: F[A])(f: A => B)(g: B => A): F[B] = pmap(ma)
 }
 
 object PhantomClass {
