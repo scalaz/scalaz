@@ -9,7 +9,7 @@ Given a [Category](./Category.html) C, and a [Monad](./Monad.html) M over C, we 
 
 # Basics
 
-While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli[F, A, B]`. The `Kleisli[F, A, B]` type provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
+While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli[M, A, B]`. The `Kleisli[M, A, B]` type provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
 
 ```tut:silent
 import scalaz._
