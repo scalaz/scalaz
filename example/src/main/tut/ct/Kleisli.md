@@ -5,11 +5,11 @@ title:  "Kleisli"
 
 # Kleisli [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/kleisli.scala)
 
-Given a [Category](./Category.html) C, and a [Monad](./Monad.html) M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are arrows of the form `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
+Given a [Category](./Category.html) `C`, and a [Monad](./Monad.html) `F` over `C`, we can construct a new Category, called the `Kleisli Category` of `F`, whose objects are those of `C`, but whose morphisms are arrows of the form `A => F[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
 
 # Basics
 
-While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => M[B]` is a `Kleisli[F, A, B]`. The `Kleisli[F, A, B]` type provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
+While this may seem like a complicated topic, in practice, the notion of a `Kleisli` is simple. Any function `A => F[B]` is a `Kleisli[F, A, B]`. The `Kleisli[F, A, B]` type provides a succinct newtype wrapper for easy costless conversion between `Kleisli` and its corresponding function type via two special functions, `wrapKleisli`, and `runKleisli`:
 
 ```tut:silent
 import scalaz._
@@ -40,7 +40,7 @@ def hoist[F[_], G[_], A, B](k: Kleisli[F, A, B])(η: F ~> G): Kleisli[G, A, B]
 ```
 
 
-As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli[F, A, B]`. How do we compose `A => M[B]` and `B => M[C]`? This is where the magic begins. It turns out that when M is a `Bind`, then `Kleisli`s compose via M's `flatMap`:
+As with any function, the most important operations we can do, aside from application, is composition. Note that this poses a problem for `Kleisli[F, A, B]`. How do we compose `A => F[B]` and `B => F[C]`? This is where the magic begins. It turns out that when `F` is a `Bind`, then `Kleisli`s compose via `F`'s `flatMap`:
 
 ```scala
 def compose[F[_], A, B, C](
@@ -50,7 +50,7 @@ def compose[F[_], A, B, C](
   a => B.flatMap(k(a))(j)
 ```
 
-With a little imagination, we can see that the `Kleisli[F, ?, ?]` construction not only forms a new Category, but when M is a `Monad`, `Kleisli[F, A, ?]`s form a `Monad` as well!
+With a little imagination, we can see that the `Kleisli[F, ?, ?]` construction not only forms a new Category, but when `F` is a `Monad`, `Kleisli[F, A, ?]`s form a `Monad` as well!
 
 # Functions
 
@@ -60,7 +60,7 @@ We provide the following functions in addition to `wrapKleisli`, `runKleisli`, `
 // analogous to `andThen` for functions
 def andThen[C](
   j: Kleisli[F, B, C]
-)(implicit M: Monad[F]): Kleisli[F, A, C]
+)(implicit F: Monad[F]): Kleisli[F, A, C]
 
 // Converts an arrow `Kleisli[F, A, B]` into an arrow of pairs that is applied to the
 // first component in the pair, but leaves the second component untouched
@@ -70,16 +70,16 @@ def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
 def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
 
 // symbolic version of `andThen`
-def >=>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C]
+def >=>[C](j: Kleisli[F, B, C])(implicit F: Monad[F]): Kleisli[F, A, C]
 
 // symbolic version of `compose`
-def <=<[E](j: Kleisli[F, E, A])(implicit M: Monad[F]): Kleisli[F, E, B]
+def <=<[E](j: Kleisli[F, E, A])(implicit F: Monad[F]): Kleisli[F, E, B]
 
 // reverse version of `>>=`
-def =<<(fa: F[A])(implicit M: Monad[F]): F[B]
+def =<<(fa: F[A])(implicit F: Monad[F]): F[B]
 
 // Another symbolic version of `andThen`
-def >>>[C](j: Kleisli[F, B, C])(implicit M: Monad[F]): Kleisli[F, A, C]
+def >>>[C](j: Kleisli[F, B, C])(implicit F: Monad[F]): Kleisli[F, A, C]
 
 // Split the input between the two argument arrows and combine their output.
 def ***[C, D](j: Kleisli[F, C, D])(
@@ -121,7 +121,7 @@ k =<< List(3) // : List(false): List[Boolean]
 
 `Kleisli` arrows are especially interesting, and have an instance for many of the typeclasses in the Scalaz ecosystem. Some of these include:
 
-- [Monad](./Monad.html) for `Kleisli[M, A, ?]` when M is a `Monad`
-- [Compose](./Compose.html) for `Kleisli[M, ?, ?]` when M is a `Bind`
-- [Monoid](../algebra/Monoid.html) for `Kleisli[M, A, B]` when `M[B]` is any `Monoid`
-- [Strong](./Strong.html) for `Kleisli[M, ?, ?]` where `M` is any `Functor`
+- [Monad](./Monad.html) for `Kleisli[F, A, ?]` when `F` is a `Monad`
+- [Compose](./Compose.html) for `Kleisli[F, ?, ?]` when `F` is a `Bind`
+- [Monoid](../algebra/Monoid.html) for `Kleisli[F, A, B]` when `F[B]` is any `Monoid`
+- [Strong](./Strong.html) for `Kleisli[F, ?, ?]` where `F` is any `Functor`
