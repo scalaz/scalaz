@@ -13,7 +13,7 @@ sealed abstract class These[L, R] {
   /**
    * The canonical catamorphism from `These` values.
    */
-  final def fold[C](fl: L => C)(fr: R => C)(fboth: (L, R) => C): C = this match {
+  final def fold[C](fl: L => C, fr: R => C, fboth: (L, R) => C): C = this match {
     case This(left)        => fl(left)
     case That(right)       => fr(right)
     case Both(left, right) => fboth(left, right)

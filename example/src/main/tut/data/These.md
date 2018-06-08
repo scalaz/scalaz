@@ -38,7 +38,7 @@ and destructured by pattern matching:
 There is also a `fold` method which is equivalent to pattern matching:
 
 ```tut
-def myFold(t: IntAndOrString) = t.fold(_ => "This")(_ => "That")((_, _) => "Both")
+def myFold(t: IntAndOrString) = t.fold(_ => "This", _ => "That", (_, _) => "Both")
 (myFold(anInt), myFold(aString), myFold(both))
 ```
 
