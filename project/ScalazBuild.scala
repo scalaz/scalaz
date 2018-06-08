@@ -36,18 +36,31 @@ object Scalaz {
     "-Yno-imports"
   )
 
-  def stdSettings(prjName: String) = Seq(
-    name := s"scalaz-$prjName",
-    scalacOptions := stdOptions,
-    scalacOptions in (Compile, compile) ++=
-      Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
-    libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
-      compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.7"),
-      compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
-      compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "1.0")
-    ),
-    incOptions ~= (_.withLogRecompileOnMacro(false))
-  )
+  def stdSettings(prjName: String) =
+    Seq(
+      name := s"scalaz-$prjName",
+      scalacOptions := stdOptions,
+      scalacOptions in (Compile, compile) ++=
+        Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
+      libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
+        compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.7"),
+        compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
+        compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "1.0")
+      ),
+      incOptions ~= (_.withLogRecompileOnMacro(false))
+    ) ++ {
+      Seq(packageBin, packageDoc, packageSrc).flatMap {
+        // include LICENSE.txt in all packaged artifacts
+        inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+      }
+    }
+
+  val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+  val findLicense = licenseFile in Global := {
+    val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+    if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+    LICENSE_txt
+  }
 
   implicit class ModuleHelper(p: Project) {
     def module: Project = p.in(file(p.id)).settings(stdSettings(p.id))

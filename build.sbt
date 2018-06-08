@@ -21,6 +21,8 @@ lazy val sonataCredentials = for {
 
 credentials in ThisBuild ++= sonataCredentials.toSeq
 
+findLicense
+
 lazy val root = project
   .in(file("."))
   .settings(
