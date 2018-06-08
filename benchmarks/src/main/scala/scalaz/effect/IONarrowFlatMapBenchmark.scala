@@ -1,9 +1,13 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
 import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
+
+import scala.Array
 import scala.concurrent.Await
+
+import org.openjdk.jmh.annotations._
 
 import IOBenchmarks._
 

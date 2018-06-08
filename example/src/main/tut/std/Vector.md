@@ -1,0 +1,28 @@
+---
+layout: docs
+title:  "Vector"
+---
+
+# Vector [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/collection/vector.scala)
+
+Scalaz provides instances for Scala's built-in [Vector](https://www.scala-lang.org/api/current/scala/collection/immutable/Vector.html) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+
+**Typical imports**
+
+```tut:silent
+import scalaz.Scalaz._
+import scalaz.std._
+```
+
+## Use the type class instances
+
+```tut
+val vector1: Vector[Int] = Vector(1, 2, 3)
+val vector2: Vector[Int] = Vector(1, 2, 3)
+
+val fs: Vector[Int => Int] = Vector(_ * 2, _ + 2, _ - 1)
+
+vector1 === vector2
+
+vector1.ap(fs)
+```

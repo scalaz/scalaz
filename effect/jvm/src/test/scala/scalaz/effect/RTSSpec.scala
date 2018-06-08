@@ -1,14 +1,16 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
+
+import java.lang.Thread
 
 import scala.concurrent.duration._
+import scala.math.BigInt
+import scala.Predef.intWrapper
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.Specification
 import org.specs2.specification.AroundTimeout
-
-import scalaz.Void
-import scalaz.data.Disjunction._
 
 import scalaz.effect.Errors.UnhandledError
 
@@ -339,7 +341,6 @@ class RTSSpec(implicit ee: ExecutionEnv) extends Specification with AroundTimeou
     }
 
   def testDeadlockRegression = {
-    import scalaz._
     import java.util.concurrent.Executors
     import scalaz.effect.RTS
 

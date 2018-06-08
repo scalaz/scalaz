@@ -3,9 +3,9 @@ layout: docs
 title:  "Set"
 ---
 
-# Set
+# Set [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/collection/set.scala)
 
-Scalaz provides instances for Scala's built-in `Set` such as [Eq](../typeclass/Eq.html).
+Scalaz provides instances for Scala's built-in [Set](https://www.scala-lang.org/api/current/scala/collection/immutable/Set.html) such as [Eq](../core/Eq.html).
 
 **Typical imports**
 

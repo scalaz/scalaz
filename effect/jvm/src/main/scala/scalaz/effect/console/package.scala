@@ -1,7 +1,10 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
 import java.io.IOException
+
+import scala.PartialFunction
 
 package object console {
   private val ioException: PartialFunction[Throwable, IOException] = {

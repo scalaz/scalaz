@@ -1,9 +1,9 @@
 ---
 layout: docs
-title:  "Polymorphic values"
+title:  "Forall"
 ---
 
-# Polymorphic values
+# Forall [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/forall.scala)
 
 Scala has polymorphic types (`class Foo[A]`, `type Bar[A]`, ...)
 and polymorphic methods (`def foo[A]`), but it lacks polymorphic _values_.
@@ -29,15 +29,13 @@ represents values polymorphic in two type variables.
 Polymorphic values come up naturally in many circumstances,
 as is illustrated by the examples below.
 
-
 **Typical imports**
 
 ```tut:silent
 import scalaz._
 ```
 
-
-## Polymorphic identity function
+# Polymorphic identity function
 
 In Scala, we can define the polymorphic identity _method_:
 
@@ -94,7 +92,7 @@ identity[Int](5)
 ```
 
 
-## Empty data structures
+# Empty data structures
 
 Consider a generic data structure, such as `List[A]` or `Option[A]`.
 The empty case (like `Nil` or `None`) can be the same runtime object
@@ -135,7 +133,7 @@ val emptyMap: ∀∀[Map] = ∀∀.of[Map](Map())
 ```
 
 
-## Universally quantified Semigroup
+# Universally quantified Semigroup
 
 The typeclass
 
@@ -157,16 +155,16 @@ Here is an instance for list:
 import scalaz.algebra.SemigroupClass
 
 def listSemigroup[A]: Semigroup[List[A]] = instanceOf(new SemigroupClass[List[A]] {
-  def append(x: List[A], y: => List[A]) = x ++ y
+  def mappend(x: List[A], y: => List[A]) = x ++ y
 })
 
 val listPlus: Plus[List] = ∀.mk[Plus[List]].from(listSemigroup)
 
-listPlus[Int].append(List(1, 2), List(3, 4))
+listPlus[Int].mappend(List(1, 2), List(3, 4))
 ```
 
 
-## Natural transformation
+# Natural transformation
 
 Polymorphic functions are natural transformations.
 They are a generalization of the polymorphic identity function above.
@@ -198,7 +196,7 @@ implicit class NaturalTransformationOps[F[_], G[_]](trans: F ~> G) {
 headOption $ nil
 ```
 
-### Binatural transformation
+## Binatural transformation
 
 Function polymorphic in two type variables.
 
@@ -218,7 +216,7 @@ val none2: ∀∀[Option2] = pick $ emptyMap
 ```
 
 
-## Restrictions
+# Restrictions
 
 Since the same runtime object is shared among all instantiations
 of a polymorphic value, it is not a good idea to create polymorphic

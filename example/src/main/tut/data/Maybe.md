@@ -3,9 +3,9 @@ layout: docs
 title:  "Maybe"
 ---
 
-# Maybe
+# Maybe [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/maybe.scala)
 
-`Maybe` can either signal the presence or absence of a value and is a safer alternative to `scala.Option`.
+`Maybe` can either signal the presence or absence of a value and is a safer alternative to [scala.Option](https://www.scala-lang.org/api/current/scala/Option.html).
 `Maybe` does not provide unsafe methods such as `Option.get` and `Option.head`, both of which may throw exceptions.
 
 **Typical imports**
@@ -14,17 +14,17 @@ title:  "Maybe"
 import scalaz.Scalaz._
 ```
 
-## Creation
+# Creation
 
 ```tut
 "Hello World".just
 empty[Int]
 ```
 
-## Use the type class instances
+# Use the type class instances
 
 ```tut
-val x: Maybe[Long] = just(50L)
+val x = just(50L)
 val y = "Hello".pure[Maybe]
 
 y.map(_ + " World")
@@ -34,7 +34,7 @@ x.flatMap { y =>
 }
 ```
 
-## Pattern matching
+# Pattern matching
 
 ```tut
 x match {

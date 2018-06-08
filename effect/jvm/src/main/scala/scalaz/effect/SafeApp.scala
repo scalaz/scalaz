@@ -1,6 +1,8 @@
 // Copyright (C) 2017 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
+import scala.{ sys, Array, List }
 import scala.concurrent.duration.Duration
 
 /**
@@ -44,7 +46,7 @@ trait SafeApp extends RTS {
    * The Scala main function, intended to be called only by the Scala runtime.
    */
   final def main(args0: Array[String]): Unit =
-    unsafePerformIO(run(args0.toList)) match {
+    unsafePerformIO(run(SafeApp.array2list(args0))) match {
       case ExitStatus.ExitNow(code) =>
         sys.exit(code)
       case ExitStatus.ExitWhenDone(code, timeout) =>
@@ -53,4 +55,10 @@ trait SafeApp extends RTS {
       case ExitStatus.DoNotExit =>
     }
 
+}
+
+private[effect] object SafeApp {
+  import scala.collection.mutable.WrappedArray
+
+  def array2list(a: Array[String]) = WrappedArray.make(a).toList
 }

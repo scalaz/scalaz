@@ -3,10 +3,10 @@ layout: docs
 title:  "These"
 ---
 
-# These
+# These [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/these.scala)
 
 `These` (aliased as `\&/`) is an inclusive "or" of two data types, as opposed to
-`\/`, which is an exclusive "or". `These[A, B]` is isomorphic to
+[\/](./Disjunction.html), which is an exclusive "or". `These[A, B]` is isomorphic to
 `A \/ B \/ (A, B)`, but is significantly easier to use and has different
 typeclass instances.
 
@@ -15,7 +15,7 @@ import scalaz._
 import Scalaz._
 ```
 
-## Basics
+# Basics
 
 A value of type `A \&/ B` can be constructed in one of three ways:
 
@@ -42,11 +42,11 @@ def myFold(t: IntAndOrString) = t.fold(_ => "This")(_ => "That")((_, _) => "Both
 (myFold(anInt), myFold(aString), myFold(both))
 ```
 
-## Instances
+# Instances
 
-### Bifunctor
+## Bifunctor
 
-`These` is a functor in both of its type parameters:
+`These` is a [functor](../ct/Functor.html) in both of its type parameters:
 
 ```tut
 (anInt.lmap(_ + 1), aString.lmap(_ + 1), both.lmap(_ + 1))
@@ -60,9 +60,9 @@ Its `Functor` instance maps on the right:
 both.map(_ + " and others")
 ```
 
-### Monad
+## Monad
 
-`These` is a monad if `A` is a `Semigroup`. `pure` is `That`, and `flatMap`
+`These` is a [monad](../ct/Monad.html) if `A` is a [Semigroup](../algebra/Semigroup.html). `pure` is `That`, and `flatMap`
 collects `A` values in `This` or `Both` cases using the semigroupal `append`.
 
 ```tut
@@ -73,9 +73,9 @@ both.flatMap((s: String) => Both(789, s + s))
 aString.flatMap(_ => anInt)
 ```
 
-### Semigroup
+## Semigroup
 
-`These` is a `Semigroup` if both `A` and `B` are.
+`These` is a [Semigroup](../algebra/Semigroup.html) if both `A` and `B` are.
 
 ```tut
 anInt append aString
@@ -92,7 +92,7 @@ both lappend 1000
 ```
 
 
-## Other functions:
+# Other functions:
 
 `swap` swaps `This` and `That` (and therefore also swaps the type arguments):
 

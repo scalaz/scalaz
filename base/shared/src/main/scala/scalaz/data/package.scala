@@ -1,8 +1,8 @@
 package scalaz
 
-package object data {
-  val Void: VoidModule = VoidImpl
+import scala.{ Any, AnyVal, Option, Some }
 
+package object data {
   val Forall: ForallModule = ForallImpl
   val ∀ : Forall.type      = Forall
 
@@ -78,8 +78,17 @@ package object data {
   val AList: AListModule = AListImpl
   type AList[F[_, _], A, B] = AList.AList[F, A, B]
 
+  val Const: ConstModule = ConstImpl
+  type Const[A, B] = Const.Const[A, B]
+
+  val Cord: CordModule = CordImpl
+  type Cord = Cord.Cord
+
   val Fix: FixModule = FixImpl
   type Fix[F[_]] = Fix.Fix[F]
+
+  val Identity: IdentityModule = IdentityImpl
+  type Identity[A] = Identity.Identity[A]
 
   val IList: IListModule = IListImpl
   type IList[A] = IList.IList[A]
@@ -89,7 +98,4 @@ package object data {
 
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
-
-  val Kleisli: KleisliModule = KleisliImpl
-  type Kleisli[F[_], A, B] = Kleisli.Kleisli[F, A, B]
 }

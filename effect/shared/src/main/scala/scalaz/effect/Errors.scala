@@ -1,11 +1,12 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scalaz.data.Disjunction._
+import scala.Any
 
 object Errors {
   final case class LostRace(loser: Fiber[_, _] \/ Fiber[_, _])
-      extends Exception("Lost a race to " + loser.fold(_ => "right")(_ => "left"))
+      extends Exception("Lost a race to " + loser.fold(_ => "right", _ => "left"))
 
   final case class TerminatedException(value: Any)
       extends Exception("The action was interrupted due to a user-defined error: " + value.toString())
