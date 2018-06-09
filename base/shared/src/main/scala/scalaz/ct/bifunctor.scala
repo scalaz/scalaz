@@ -27,6 +27,11 @@ trait BifunctorClass[F[_, _]] {
 
   def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T]
 
+  def functor[A]: Functor[F[A, ?]] =
+    instanceOf(new FunctorClass[F[A, ?]] {
+      def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = rmap(fab)(f)
+    })
+
 }
 
 object BifunctorClass {
@@ -63,6 +68,5 @@ trait BifunctorSyntax {
     def bimap[S, T](f: A => S, g: B => T): F[S, T] = macro meta.Ops.f_2
 
     def lmap[S](f: A => S): F[S, B] = macro meta.Ops.f_1
-    def rmap[T](f: B => T): F[A, T] = macro meta.Ops.f_1
   }
 }

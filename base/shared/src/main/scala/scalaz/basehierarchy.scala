@@ -24,9 +24,13 @@ object BaseHierarchy {
     implicit def strongProfunctor[P[_, _]](implicit P: Strong[P]): Profunctor[P]                        = instanceOf(P)
   }
 
-  trait BH2 extends BH3 {}
+  trait BH2 extends BH3 {
+    implicit def bifunctorFunctor[F[_, _], A](implicit F: Bifunctor[F]): Functor[F[A, ?]] = F.functor
+  }
 
-  trait BH3 extends BH4 {}
+  trait BH3 extends BH4 {
+    implicit def profunctorFunctor[F[_, _], A](implicit F: Profunctor[F]): Functor[F[A, ?]] = F.functor
+  }
 
   trait BH4 {}
 }
