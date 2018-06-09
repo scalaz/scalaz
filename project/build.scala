@@ -112,10 +112,18 @@ object build {
     "-target:jvm-1.8"
   )
 
+  val unusedWarnOptions = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 11)) =>
+        Seq("-Ywarn-unused-import")
+      case _ =>
+        Seq("-Ywarn-unused:imports")
+    }
+  }
+
   val lintOptions = Seq(
     "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
     "-Ywarn-dead-code",
-    "-Ywarn-unused-import",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
@@ -129,7 +137,7 @@ object build {
 
   private[this] val buildInfoPackageName = "scalaz"
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
@@ -178,6 +186,10 @@ object build {
       }
     },
     scalacOptions ++= lintOptions,
+    scalacOptions ++= unusedWarnOptions.value,
+    Seq(Compile, Test).flatMap(c =>
+      scalacOptions in (c, console) --= unusedWarnOptions.value
+    ),
 
     scala213_pre_cross_setting,
 
