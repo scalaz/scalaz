@@ -82,18 +82,6 @@ object TraverseTest extends SpecLite {
       s.run must_===(("123", Stream(1, 2, 3)))
     }
 
-    // ghci> import Data.Traversable
-    // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
-    // Nothing
-    
-    /*
-    "allow partial traversal" in {
-      val stream = Stream.from(1)
-      val s: Option[Stream[Int]] = stream.traverseU((x: Int) => if (x < 3) some(x) else none)
-      s must_===(none)
-    }
-    */
-
     "be stack-safe and short-circuiting" in {
       val N = 10000
       val s: Maybe[Stream[Int]] = Stream.from(0) traverse { x =>
