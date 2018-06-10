@@ -5,6 +5,7 @@ import scala.language.experimental.macros
 
 trait EqClass[A] {
   def equal(first: A, second: A): Boolean
+  final def notEqual(first: A, second: A): Boolean = !equal(first, second)
 }
 
 trait EqInstances {
@@ -15,5 +16,7 @@ trait EqSyntax {
   implicit final class ToEqOps[A](a: A) {
     private[core] type equal
     def ===(f: A)(implicit ev: Eq[A]): Boolean = macro meta.Ops.nia_1[equal]
+    private[core] type notEqual
+    def =/=(f: A)(implicit ev: Eq[A]): Boolean = macro meta.Ops.nia_1[notEqual]
   }
 }

@@ -15,6 +15,11 @@ trait IListModule {
   def cons[A](a: A, as: IList[A]): IList[A]
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]]
 
+  def toFixpoint[A](as: IList[A]): Fix[Maybe2[A, ?]]
+  def fromFixpoint[A](as: Fix[Maybe2[A, ?]]): IList[A]
+
+  def isEmpty[A](as: IList[A]): Boolean
+
   object Cons {
     def apply[A](a: A, as: IList[A]): IList[A] = cons(a, as)
     def unapply[A](as: IList[A]): scala.Option[(A, IList[A])] =
@@ -80,6 +85,15 @@ private[data] object IListImpl extends IListModule {
 
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]] =
     Fix.unfix[Maybe2[A, ?]](as)
+
+  def toFixpoint[A](as: IList[A]): Fix[Maybe2[A, ?]] =
+    as
+
+  def fromFixpoint[A](as: Fix[Maybe2[A, ?]]): IList[A] =
+    as
+
+  def isEmpty[A](as: IList[A]): Boolean =
+    Maybe2.isEmpty2(Fix.unfix(as))
 
   implicit val isCovariantInstance: IsCovariant[IList] = instanceOf(new IsCovariantClass.LiftLiskov[IList] {
 

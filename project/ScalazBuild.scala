@@ -17,6 +17,7 @@ object Scalaz {
     "-Ypartial-unification",
     "-language:higherKinds",
     "-language:existentials",
+    "-language:implicitConversions",
     "-unchecked",
     "-Yno-adapted-args",
     "-opt-warnings",

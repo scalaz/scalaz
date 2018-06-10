@@ -13,6 +13,12 @@ trait ApplySyntax {
       macro meta.Ops.i_1
 
     def liftA2[B, C](fb: F[B])(f: (A, B) => C)(implicit ev: Apply[F]): F[C] =
-      fb.ap(Apply[F].map(fa)(a => f(a, _)))
+      fb.ap(ev.map(fa)(a => f(a, _)))
+
+    def *>[B](fb: F[B])(implicit ev: Apply[F]): F[B] =
+      ev.ap(fa)(ev.map(fb)((b: B) => (_: A) => b))
+
+    def <*[B](fb: F[B])(implicit ev: Apply[F]): F[A] =
+      ev.ap(fa)(ev.map(fb)((_: B) => (a: A) => a))
   }
 }

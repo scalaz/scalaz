@@ -36,4 +36,7 @@ trait BindSyntax {
   implicit final class ToBindOps[M[_], A](ma: M[A]) {
     def flatMap[B](f: A => M[B])(implicit ev: Bind[M]): M[B] = macro meta.Ops.i_1
   }
+  implicit final class ToJoinOps[M[_], A](ma: M[M[A]]) {
+    def join(implicit ev: Bind[M]): M[A] = ma.flatMap(identity)
+  }
 }

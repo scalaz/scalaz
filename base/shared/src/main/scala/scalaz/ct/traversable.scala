@@ -3,6 +3,8 @@ package ct
 
 import scala.{ List, Tuple2 }
 
+import scalaz.data.{ IList, Maybe2 }
+
 import scala.language.experimental.macros
 
 trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
@@ -31,24 +33,30 @@ trait TraversableFunctions {
 }
 
 trait TraversableInstances {
-  implicit val listTraversable: Traversable[List] = instanceOf(
-    new TraversableClass.DeriveSequence[List] with FoldableClass.DeriveFoldMap[List] {
-      override def traverse[F[_], A, B](ta: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] =
-        ta.foldLeft[F[List[B]]](F.pure(List.empty[B])) { (flb, a) =>
-          {
-            F.ap(flb)(F.map(f(a))(b => (xs: List[B]) => b :: xs))
-          }
+  implicit val ilistTraversable: Traversable[IList] = instanceOf(
+    new TraversableClass.DeriveSequence[IList] with FoldableClass.DeriveFoldMap[IList] {
+      override def traverse[F[_], A, B](ta: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+        foldRight(ta, F.pure(IList.empty[B])) { (a, flb) =>
+          F.ap(flb)(F.map(f(a))(b => IList.cons(b, _)))
         }
 
-      override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
-
-      override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z) { (a, b) =>
-        f(a, b)
+      @scala.annotation.tailrec
+      override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B = IList.uncons(fa) match {
+        case Maybe2.Just2(a, as) => foldLeft(as, f(z, a))(f)
+        case Maybe2.Empty2()     => z
       }
 
-      override def toList[A](xs: List[A]): List[A] = xs
+      def foldRightL[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): () => B = IList.uncons(fa) match {
+        // because `f` is lazy in its second argument, we don't stack-overflow.
+        case Maybe2.Just2(a, as) => () => f(a, foldRightL(as, z)(f)())
+        case Maybe2.Empty2()     => () => z
+      }
 
-      override def map[A, B](fa: List[A])(f: A => B) = fa.map(f)
+      override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B = foldRightL[A, B](fa, z)(f)()
+
+      override def toList[A](xs: IList[A]): List[A] = foldRight(xs, List.empty[A])(_ :: _)
+
+      override def map[A, B](fa: IList[A])(f: A => B) = foldRight(fa, IList.empty[B])((a, bs) => IList.cons(f(a), bs))
     }
   )
 

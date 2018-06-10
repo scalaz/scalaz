@@ -87,10 +87,12 @@ trait BaseTypes {
 trait BaseCt {
   type Iso[A, B]           = ct.Iso[A, B]
   type Kleisli[F[_], A, B] = ct.Kleisli[F, A, B]
+  type ReaderT[F[_], A, B] = ct.ReaderT[F, A, B]
 
-  val Iso = ct.Iso
+  final val Iso = ct.Iso
 
-  val Kleisli: ct.Kleisli.type = ct.Kleisli
+  final val Kleisli: ct.Kleisli.type = ct.Kleisli
+  final val ReaderT: ct.ReaderT.type = ct.ReaderT
 
 }
 
