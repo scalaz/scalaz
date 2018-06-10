@@ -256,6 +256,13 @@ sealed abstract class EphemeralStreamInstances {
   import std.list._
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+
+  implicit def ephemeralStreamSemigroup[A]: Semigroup[EphemeralStream[A]] = new Semigroup[EphemeralStream[A]] {
+    def append(f1: EphemeralStream[A], f2: => EphemeralStream[A]) = f1 ++ f2
+  }
+
+  implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
+    Contravariant[Show].contramap(IList.show[A])(_.toIList)
 }
 
 object EphemeralStream extends EphemeralStreamInstances {

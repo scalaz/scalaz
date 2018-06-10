@@ -185,7 +185,7 @@ sealed abstract class ReducerInstances {
 
   def ReverseEphemeralStreamReducer[C]: Reducer[C, EphemeralStream[C]] = {
     import EphemeralStream._
-    reducer(cons(_, EphemeralStream.emptyEphemeralStream), (c, cs) => cs ++ cons(c, EphemeralStream.emptyEphemeralStream), (cs, c) => c ##:: cs)
+    reducer(_ ##:: emptyEphemeralStream, (c, cs) => cs ++ cons(c, emptyEphemeralStream), (cs, c) => c ##:: cs)
   }
 
   /** Ignore `C`s. */
