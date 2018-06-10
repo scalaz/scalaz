@@ -203,16 +203,6 @@ sealed abstract class EphemeralStreamInstances {
     override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
     
-    /*
-    def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
-      val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
-
-      fa.foldRight(seed) {
-        (x , ys) => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
-      }
-    }
-    */
-
     def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]): F[EphemeralStream[B]] = {
       val revOpt: Maybe[F[EphemeralStream[B]]] =
         F.unfoldrOpt[EphemeralStream[A], B, EphemeralStream[B]](fa)(_ match {

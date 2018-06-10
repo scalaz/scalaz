@@ -180,12 +180,12 @@ sealed abstract class ReducerInstances {
   def ReverseStreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._
     import Stream._
-    reducer(cons(_, empty), (c, cs) => cs :+ c, (cs, c) => c #:: cs)
+    reducer(cons(_, empty), (c, cs) => cs :+ c, (cs, c) => cons(c, cs))    
   }
 
   def ReverseEphemeralStreamReducer[C]: Reducer[C, EphemeralStream[C]] = {
     import EphemeralStream._
-    reducer(_ ##:: emptyEphemeralStream, (c, cs) => cs ++ cons(c, emptyEphemeralStream), (cs, c) => c ##:: cs)
+    reducer(cons(_, emptyEphemeralStream), (c, cs) => cs ++ cons(c, emptyEphemeralStream), (cs, c) => cons(c, cs))    
   }
 
   /** Ignore `C`s. */

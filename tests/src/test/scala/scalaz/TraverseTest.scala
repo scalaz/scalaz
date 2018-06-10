@@ -67,7 +67,7 @@ object TraverseTest extends SpecLite {
   "ilist" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)) traverse { x =>
+      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N+1)) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
@@ -85,6 +85,7 @@ object TraverseTest extends SpecLite {
     // ghci> import Data.Traversable
     // ghci> traverse (\x -> if x < 3 then Just x else Nothing) [1 ..]
     // Nothing
+    
     /*
     "allow partial traversal" in {
       val stream = Stream.from(1)
@@ -119,7 +120,7 @@ object TraverseTest extends SpecLite {
   "nonemptylist" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[NonEmptyList[Int]] = NonEmptyList.nel(0, IList.fromList(List.range(1, 11000))) traverse { x =>      
+      val s: Maybe[NonEmptyList[Int]] = NonEmptyList.nel(0, IList.fromList(List.range(1, 10001))) traverse { x =>      
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
