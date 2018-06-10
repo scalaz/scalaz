@@ -53,7 +53,7 @@ object Digit extends DigitInstances {
 
   private val digitsArray: Array[Digit] = Array(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
-  val digits: IList[Digit] = IList(digitsArray : _*)
+  val digits: IList[Digit] = IList.fromSeq(digitsArray)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 
@@ -144,6 +144,7 @@ sealed abstract class DigitInstances {
 
     override def max = Some(Digit._9)
 
+    override def show(f: Digit): Cord = Cord(shows(f))
     override def shows(f: Digit) = f.toChar.toString
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)
     override def equal(x: Digit, y: Digit): Boolean = x == y

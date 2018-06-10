@@ -245,18 +245,6 @@ sealed abstract class \&/[A, B] extends Product with Serializable {
             false
         }
     }
-
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
-    this match {
-      case This(a) =>
-        "This(" +: SA.show(a) :+ ")"
-      case That(b) =>
-        "That(" +: SB.show(b) :+ ")"
-      case Both(a, b) =>
-        ("Both(" +: SA.show(a) :+ ",") ++ SB.show(b) :+ ")"
-    }
-
-
 }
 
 object \&/ extends TheseInstances {
@@ -455,6 +443,13 @@ sealed abstract class TheseInstances1 {
   implicit def TheseSemigroup[A, B](implicit SA: Semigroup[A], SB: Semigroup[B]): Semigroup[A \&/ B] =
     Semigroup.instance(_.append(_))
 
-  implicit def TheseShow[A, B](implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] =
-    Show.show(_.show)
+  implicit def TheseShow[A, B](implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case \&/.This(a)    => cord"This($a)"
+      case \&/.That(b)    => cord"That($b)"
+      case \&/.Both(a, b) => cord"Both($a,$b)"
+    }
+  }
+
 }

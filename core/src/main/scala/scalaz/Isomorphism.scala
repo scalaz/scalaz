@@ -203,6 +203,14 @@ trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G] 
   def zero: F = iso.from(G.zero)
 }
 
+trait IsomorphismBand[F, G] extends Band[F] with IsomorphismSemigroup[F, G] {
+  implicit def G: Band[G]
+}
+
+trait IsomorphismSemiLattice[F, G] extends SemiLattice[F] with IsomorphismBand[F, G] {
+  implicit def G: SemiLattice[G]
+}
+
 trait IsomorphismEqual[F, G] extends Equal[F] {
   implicit def G: Equal[G]
 
@@ -227,7 +235,7 @@ trait IsomorphismOrder[F, G] extends Order[F] {
   override def order(x: F, y: F): Ordering = G.order(iso.to(x), iso.to(y))
 }
 
-trait IsomorphismEnum[F, G] extends Enum[F] {
+trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G] {
   implicit def G: Enum[G]
 
   def iso: F <=> G

@@ -107,10 +107,11 @@ trait OptionInstances extends OptionInstances0 {
     implicit def A = A0
   }
 
-  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    override def show(o1: Option[A]) = o1 match {
-      case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
-      case None     => "None"
+  implicit def optionShow[A: Show]: Show[Option[A]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Some(a1) => cord"Some($a1)"
+      case None     => Cord("None")
     }
   }
 

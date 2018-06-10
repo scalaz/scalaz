@@ -22,6 +22,8 @@ import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
 
+import sbtdynver.DynVerPlugin.autoImport._
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -100,7 +102,6 @@ object build {
     "-encoding", "UTF-8",
     "-feature",
     "-Xfuture",
-    "-Ypartial-unification",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
@@ -122,6 +123,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.6"
+  private def Scala213 = "2.13.0-M4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -140,7 +142,13 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
+    crossScalaVersions := Seq(Scala211, Scala212),
+    commands += Command.command("setVersionUseDynver") { state =>
+      val extracted = Project extract state
+      val out = extracted get dynverGitDescribeOutput
+      val date = extracted get dynverCurrentDate
+      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+    },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.0",
@@ -148,6 +156,13 @@ object build {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
     }),
+    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
+      case Some((2, v)) if v <= 12 || scalaVersion.value == "2.13.0-M3" =>
+        Seq(
+          "-Ypartial-unification",
+          "-Yno-adapted-args"
+        )
+    }.toList.flatten,
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v >= 12 =>
@@ -162,8 +177,7 @@ object build {
           Nil
       }
     },
-    scalacOptions in (Compile, compile) ++= "-Yno-adapted-args" +: lintOptions,
-    scalacOptions in (Test, compile) ++= lintOptions,
+    scalacOptions ++= lintOptions,
 
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
@@ -225,6 +239,16 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      // TODO scalacheck for Scala 2.13
+      releaseStepCommandAndRemaining(
+        s"; ++ ${Scala213}! ; concurrent/publishSigned ; " + Seq(
+          "core", "effect", "iteratee"
+        ).flatMap{ p =>
+          Seq("JVM", "JS").map{ x =>
+            s" ${p}${x}/publishSigned "
+          }
+        }.mkString(" ; ")
+      ),
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -270,11 +294,20 @@ object build {
         }
         </developers>
       ),
+
+    licenseFile := {
+      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+      LICENSE_txt
+    },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.6",
+    kindProjectorVersion := "0.9.7",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ SbtOsgi.projectSettings ++ Seq[Sett](
+  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
+    // include LICENSE.txt in all packaged artifacts
+    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
@@ -294,7 +327,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
@@ -307,7 +339,7 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
-      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.3"
+      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.4"
     )
     .jvmSettings(
       jvm_js_settings,
@@ -326,7 +358,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -341,7 +372,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
@@ -376,6 +406,8 @@ object build {
         else Nil
     }
   }
+
+  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 

@@ -51,9 +51,9 @@ object SyntaxTest extends SpecLite {
     case object Result1T extends CoproductT
     case object Result2T extends CoproductT
     object CoproductT {
-      implicit val coproductTShow : Show[CoproductT] = Show.show[CoproductT]{
-        case Result1T => "Result1T"
-        case Result2T => "Result2T"
+      implicit val coproductTShow : Show[CoproductT] = Show.show {
+        case Result1T => Cord("Result1T")
+        case Result2T => Cord("Result2T")
       }
     }
 

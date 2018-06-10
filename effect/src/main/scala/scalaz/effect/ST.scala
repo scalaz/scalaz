@@ -85,7 +85,7 @@ sealed abstract class STArray[S, A] {
   def freeze: ST[S, ImmutableArray[A]] = st(() => ImmutableArray.fromArray(value))
 
   /**Fill this array from the given association list. */
-  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] = xs match {
+  def fill[B](f: (A, B) => A, xs: Iterable[(Int, B)]): ST[S, Unit] = xs.toList match {
     case Nil             => returnST(())
     case ((i, v) :: ivs) => for {
       _ <- update(f, i, v)

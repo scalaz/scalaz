@@ -8,7 +8,6 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
-  import collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -156,12 +155,16 @@ trait Foldable[F[_]]  { self =>
   def indexOr[A](fa: F[A], default: => A, i: Int): A =
     index(fa, i) getOrElse default
 
-  def toList[A](fa: F[A]): List[A] = to[A, List](fa)
-  def toVector[A](fa: F[A]): Vector[A] = to[A, Vector](fa)
-  def toSet[A](fa: F[A]): Set[A] = to[A, Set](fa)
+  def toList[A](fa: F[A]): List[A] = {
+    foldLeft(fa, List.newBuilder[A])(_ += _).result
+  }
+  def toVector[A](fa: F[A]): Vector[A] = {
+    foldLeft(fa, Vector.newBuilder[A])(_ += _).result
+  }
+  def toSet[A](fa: F[A]): Set[A] = {
+    foldLeft(fa, Set.newBuilder[A])(_ += _).result
+  }
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
-  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
-    foldLeft(fa, c())(_ += _).result
 
   def toIList[A](fa: F[A]): IList[A] =
     foldLeft(fa, IList.empty[A])((t, h) => h :: t).reverse

@@ -61,8 +61,10 @@ trait SetInstances {
       def zero: Set[A] = Set[A]()
     }
 
-  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
-    override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
+  implicit def setShow[A](implicit A: Show[A]): Show[Set[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[Set].intercalate(as.map(A.show), Cord(","))
+    cord"Set($content)"
   }
 
 }

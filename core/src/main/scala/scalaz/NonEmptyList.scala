@@ -139,17 +139,24 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 }
 
 object NonEmptyList extends NonEmptyListInstances {
-  def apply[A](h: A, t: A*): NonEmptyList[A] =
-    nels(h, t: _*)
+  // optimised versions of apply(A*)
+  @inline final def apply[A](a: A): NonEmptyList[A] = nel(a, IList.empty)
+  @inline final def apply[A](a: A, b: A): NonEmptyList[A] = nel(a, IList(b))
+  @inline final def apply[A](a: A, b: A, c: A): NonEmptyList[A] = nel(a, IList(b, c))
+  @inline final def apply[A](a: A, b: A, c: A, d: A): NonEmptyList[A] = nel(a, IList(b, c, d))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): NonEmptyList[A] = nel(a, IList(b, c, d, e))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): NonEmptyList[A] = nel(a, IList(b, c, d, e, f))
+
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A, as: A*): NonEmptyList[A] = a <:: b <:: c <:: d <:: e <:: fromSeq(f, as)
+
+  def fromSeq[A](h: A, t: Seq[A]): NonEmptyList[A] =
+    nel(h, IList.fromSeq(t))
 
   def unapply[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
     Some((v.head, v.tail))
 
   def nel[A](h: A, t: IList[A]): NonEmptyList[A] =
     new NonEmptyList(h, t)
-
-  def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, IList(t: _*))
 
   def lift[A, B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
     case INil() ⇒ None

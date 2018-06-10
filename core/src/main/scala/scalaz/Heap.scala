@@ -87,14 +87,14 @@ sealed abstract class Heap[A] {
 
   def toUnsortedList: List[A] = toUnsortedStream.toList
 
-  def toUnsortedIList: IList[A] = IList(toUnsortedStream: _*)
+  def toUnsortedIList: IList[A] = IList.fromSeq(toUnsortedStream)
 
   def toStream: Stream[A] =
     std.stream.unfold(this)(_.uncons)
 
   def toList: List[A] = toStream.toList
 
-  def toIList: IList[A] = IList(toStream: _*)
+  def toIList: IList[A] = IList.fromSeq(toStream)
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B): Heap[B] = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))

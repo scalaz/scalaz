@@ -131,13 +131,14 @@ sealed abstract class InputInstances {
      )
    }
 
-   implicit def inputShow[A](implicit A: Show[A]): Show[Input[A]] = new Show[Input[A]] {
-     override def shows(f: Input[A]) = f.fold(
-       empty = "empty-input"
-       , el = a => "el-input(" + A.shows(a) + ")"
-       , eof = "eof-input"
-     )
-   }
+  implicit def inputShow[A](implicit A: Show[A]): Show[Input[A]] = Show.show { i =>
+    import scalaz.syntax.show._
+    i.fold(
+      empty = Cord("empty-input"),
+      el = a => cord"el-input($a)",
+      eof = Cord("eof-input")
+    )
+  }
 }
 
 trait InputFunctions {

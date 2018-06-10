@@ -596,11 +596,11 @@ sealed abstract class FingerTreeInstances {
     new Show[FingerTree[V,A]] {
       import std.iterable._
       val AS = Show[List[A]]
-      import Cord._
+      import syntax.show._
       override def show(t: FingerTree[V,A]) = t.fold(
-        empty = v => Cord(V.show(v), " []"),
-        single = (v, x) => Cord(V.show(v), " [", A.show(x), "]"),
-        deep = (v, pf, m, sf) => Cord(V.show(v), " [", AS.show(pf.toList), ", ?, ", AS.show(sf.toList), "]")
+        empty = v => cord"$v []",
+        single = (v, x) => cord"$v [$x]",
+        deep = (v, pf, m, sf) => cord"$v [${AS.show(pf.toList)}, ?, ${AS.show(sf.toList)}]"
       )
     }
 

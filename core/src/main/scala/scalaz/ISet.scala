@@ -681,28 +681,13 @@ sealed abstract class ISetInstances {
       Order[IList[A]].order(x.toAscIList, y.toAscIList)
   }
 
-  implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
-    override def shows(f: ISet[A]) = {
-      if(f.isEmpty) {
-        "ISet()"
-      } else {
-        val buf = new java.lang.StringBuilder("ISet(")
-        val A = Show[A]
-        @tailrec
-        def go(list: List[A]): Unit = (list: @unchecked) match {
-          case x :: Nil =>
-            buf.append(A.shows(x))
-            buf.append(')')
-            ()
-          case x :: xs =>
-            buf.append(A.shows(x))
-            buf.append(',')
-            go(xs)
-        }
-        go(f.toAscList)
-        buf.toString
-      }
-    }
+  implicit def setShow[A](implicit A: Show[A]): Show[ISet[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = IList.instances.intercalate(
+      as.toIList.map(A.show),
+      Cord(",")
+    )
+    cord"ISet($content)"
   }
 
   implicit def setMonoid[A: Order]: Monoid[ISet[A]] with SemiLattice[ISet[A]] =

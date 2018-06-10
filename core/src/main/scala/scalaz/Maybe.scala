@@ -229,10 +229,12 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
         fa2.cata(_ => LT, EQ))
   }
 
-  implicit def maybeShow[A](implicit A: Show[A]): Show[Maybe[A]] =
+  implicit def maybeShow[A](implicit A: Show[A]): Show[Maybe[A]] = {
+    import scalaz.syntax.show._
     Show.show(_.cata(
-      a => Cord("Just(", A.show(a), ")"),
-      "Empty"))
+      a => cord"Just($a)",
+      Cord("Empty")))
+  }
 
   implicit def maybeMonoid[A: Semigroup]: Monoid[Maybe[A]] =
     new MaybeMonoid[A] {

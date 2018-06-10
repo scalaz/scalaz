@@ -31,11 +31,11 @@ object EnumTest extends SpecLite {
   }
 
   "pred" in {
-    TimeUnit.values.sliding(2) forall { case Array(tu1, tu2) => tu1 === tu2.pred }
+    TimeUnit.values.sliding(2).map(_.toList) forall { case List(tu1, tu2) => tu1 === tu2.pred }
   }
 
   "succ" in {
-    TimeUnit.values.sliding(2) forall { case Array(tu1, tu2) => tu1.succ === tu2 }
+    TimeUnit.values.sliding(2).map(_.toList) forall { case List(tu1, tu2) => tu1.succ === tu2 }
   }
 
   "order" in {
