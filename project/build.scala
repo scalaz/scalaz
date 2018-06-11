@@ -150,7 +150,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -253,16 +253,6 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommand(s"${rootNativeId}/publishSigned"),
-      // TODO scalacheck for Scala 2.13
-      releaseStepCommandAndRemaining(
-        s"; ++ ${Scala213}! ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee"
-        ).flatMap{ p =>
-          Seq("JVM", "JS").map{ x =>
-            s" ${p}${x}/publishSigned "
-          }
-        }.mkString(" ; ")
-      ),
       setNextVersion,
       commitNextVersion,
       pushChanges

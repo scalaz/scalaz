@@ -10,6 +10,7 @@ language: scala
 scala:
   - 2.12.6
   - 2.11.12
+  - 2.13.0-M4
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -42,13 +43,6 @@ addons:
 
 matrix:
   include:
-  - scala: 2.13.0-M4
-    env: TEST_PROJECT=""
-    script:
-    - sbt "++${TRAVIS_SCALA_VERSION}!" example/compile coreJS/compile effectJS/compile iterateeJS/compile
-    # TODO scalacheck for Scala 2.13.0-M4
-    - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
-      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreJVM/publish effectJVM/publish iterateeJVM/publish concurrent/publish coreJS/publish effectJS/publish iterateeJS/publish ; fi
   - scala: 2.12.6
     jdk: oraclejdk9
     env: TEST_PROJECT="rootJVM"

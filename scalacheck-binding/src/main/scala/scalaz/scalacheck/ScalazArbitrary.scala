@@ -3,7 +3,6 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Cogen, Gen, Arbitrary}
-import collection.mutable.ArraySeq
 import reflect.ClassTag
 
 /**
@@ -458,8 +457,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def MinMaybeArbitrary[A: Arbitrary]: Arbitrary[MinMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
   implicit def MaxMaybeArbitrary[A: Arbitrary]: Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
-
-  implicit def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
 
   import FingerTree._
 
