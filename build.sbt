@@ -119,8 +119,7 @@ def scalacheckBindingProject(
   id: String,
   base: String,
   scalacheckVersion: SettingKey[String],
-  versionSuffix: String,
-  previousVersion: (String, String => String) => Option[String]) = {
+  versionSuffix: String) = {
 
   def fullVersion(base: String) = base + "-scalacheck-" + versionSuffix
 
@@ -150,10 +149,8 @@ def scalacheckBindingProject(
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/jvm/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        scalazMimaBasis.?.value.flatMap { v =>
-          previousVersion(v, fullVersion).map { x =>
-            organization.value % s"${name.value}_${scalaBinaryVersion.value}" % x
-          }
+        scalazMimaBasis.?.value.map { v =>
+          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
         }.toSet
       }
     )
@@ -162,10 +159,8 @@ def scalacheckBindingProject(
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/js/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        scalazMimaBasis.?.value.flatMap { v =>
-          previousVersion(v, fullVersion).map { x =>
-            organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % x
-          }
+        scalazMimaBasis.?.value.map { v =>
+          organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
         }.toSet
       }
     )
@@ -175,8 +170,7 @@ lazy val scalacheckBinding_1_13 = scalacheckBindingProject(
   id = "scalacheck-binding_1_13",
   base = "scalacheck-binding_1_13",
   scalacheckVersion = scalaCheckVersion_1_13,
-  versionSuffix = "1.13",
-  previousVersion = (v, f) => Some(f(v))
+  versionSuffix = "1.13"
 )
 
 lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
@@ -186,8 +180,7 @@ lazy val scalacheckBinding_1_14 = scalacheckBindingProject(
   id = "scalacheck-binding_1_14",
   base = "scalacheck-binding_1_14",
   scalacheckVersion = scalaCheckVersion_1_14,
-  versionSuffix = "1.14",
-  previousVersion = (v, f) => None // TODO change after 7.2.22 released
+  versionSuffix = "1.14"
 )
 
 lazy val scalacheckBindingJVM_1_14 = scalacheckBinding_1_14.jvm
