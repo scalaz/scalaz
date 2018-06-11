@@ -47,10 +47,10 @@ final class ExhaustiveSuite extends PureSuite {
         exhaustiveS(ls)(i =>
           () => (i != 3)
         ).map(errs =>
-          if (errs =/= IList(true, true, false, true, true, true)) {
-            IList(Failure("not equal"))
+          if (errs === IList(true, true, false, true, true, true)) {
+            Success()
           } else {
-            IList()
+            Failure()
           }
         )
       }

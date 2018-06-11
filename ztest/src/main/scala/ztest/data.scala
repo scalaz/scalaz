@@ -32,31 +32,29 @@ package ztest
 
 import scala._, scala.Predef._
 
-import scalaz.data.IList
 import scalaz.Scalaz._, scalaz.core.EqClass
 
 trait Harness[F[_], G[_]] {
   def section[A](annotation: String)(test: G[A]): G[A]
   def shared[A](fa: F[A]): G[A]
-  def test(assertions: F[IList[TestError]]): G[Unit]
-  final def namedTest(annotation: String)(errs: F[IList[TestError]]): G[Unit] =
+  def test(assertion: F[TestResult]): G[Unit]
+  final def namedTest(annotation: String)(errs: F[TestResult]): G[Unit] =
     section(annotation)(test(errs))
 }
 
-sealed trait TestError
-final class Thrown(val thrown: Throwable) extends TestError
-final class Failure(val failureAsString: String) extends TestError
-
+sealed trait TestResult
+final class Thrown(val thrown: Throwable) extends TestResult
 object Thrown {
-  def apply(thrown: Throwable): TestError = new Thrown(thrown)
+  def apply(thrown: Throwable): TestResult = new Thrown(thrown)
 }
-
-object Failure {
-  def apply(failureAsString: String): TestError = new Failure(failureAsString)
+object Success extends TestResult {
+  def apply(): TestResult = this
 }
-
-object TestError {
-  implicit val equalTestError: Eq[TestError] = instanceOf(new EqClass[TestError] {
-    def equal(first: TestError, second: TestError) = first == second
+object Failure extends TestResult {
+  def apply(): TestResult = this
+}
+object TestResult {
+  implicit val equalTestResult: Eq[TestResult] = instanceOf(new EqClass[TestResult] {
+    def equal(first: TestResult, second: TestResult) = first == second
   })
 }

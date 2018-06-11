@@ -59,16 +59,21 @@ object Runner {
     case _ => Applicative[F].pure(())
   }
 
-  def configured(suites: IList[() => Suite], config: Config): IO[Void, Unit] = for {
+  def configured(suites: IList[() => Suite], config: Config): IO[Void, Boolean] = for {
     startTime <- IO.sync[Void, Long](System.currentTimeMillis)
-    _ <- suites.traverse { suite =>
-      suite().run.flatMap(printStrs(_, config.output))
-    }
+    succeededSuites <- suites.traverse(suite =>
+      suite().run.flatMap {
+        case SuiteOutput(lines, allSucceeded) =>
+          printStrs(lines, config.output).map(_ => allSucceeded)
+      }
+    )
     endTime <- IO.sync[Void, Long](System.currentTimeMillis)
     _ <- config.output(s"Testing took ${endTime - startTime} ms")
-  } yield ()
+  } yield
+    if (IList.isEmpty(succeededSuites)) false
+    else succeededSuites.foldRight(true)(_ && _)
 
-  def apply(suites: IList[() => Suite]): IO[Void, Unit] =
+  def apply(suites: IList[() => Suite]): IO[Void, Boolean] =
     configured(suites, defaultConfig)
 
 }

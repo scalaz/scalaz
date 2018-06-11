@@ -1,3 +1,2 @@
 package object ztest {
-
 }

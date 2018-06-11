@@ -99,14 +99,14 @@ test("say 1 + 1 == 2") { () =>
 
 And here's a test definition, using `test.apply`.
 The first parameter is the name of the test. The parameter in the
-second (curried) parameter list is a function `() => List[TestError]`.
+second (curried) parameter list is a function `() => List[TestResult]`.
 
 ```scala
 assertEqual(1 + 1, 2)
 ```
 
 Here's the only assertion we've got. Looks fairly self-explanatory.
-It'll give you a `List[TestError]` which contains an error if the two
+It'll give you a `List[TestResult]` which contains an error if the two
 arguments aren't equal using `==`.
 
 And we're done.

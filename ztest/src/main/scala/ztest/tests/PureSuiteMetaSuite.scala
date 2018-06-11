@@ -10,13 +10,18 @@ import scalaz.Scalaz._
 import scalaz.effect.IO
 
 final class PureSuiteMetaSuite extends IOSuite[Void] {
-  def printError(e: Void): IList[TestError] = e.absurd
+  def printError(e: Void): TestResult = e.absurd
   def doTests[G[_]: Monad](harness: Harness[IO[Void, ?], G]): G[Unit] = {
     val suiteUnderTest = new PureSuite { self =>
       def doTests[H[_]: Monad](harness: Harness[() => ?, H]): H[Unit] = {
         import harness._
-        namedTest("pure suite tests") { () =>
-          IList(Failure("hey"), Failure("there"))
+        section("top level") {
+          namedTest("pure suite tests") { () =>
+            Failure()
+          } *>
+          namedTest("pure suite tests 2") { () =>
+            Success()
+          }
         }
       }
     }
@@ -25,12 +30,13 @@ final class PureSuiteMetaSuite extends IOSuite[Void] {
     section("PureSuite meta-suite") {
       test(for {
         output <- suiteUnderTest.run
-        correctOutput =
-          IList(Suite.printTest(IList("pure suite tests"), IList(Failure("hey"), Failure("there"))))
+        correctOutput = SuiteOutput(
+          IList(Suite.printTest(IList("pure suite tests", "top level"), Failure()),
+                Suite.printTest(IList("pure suite tests 2", "top level"), Success())),
+          false)
       } yield
-        if (correctOutput === output) IList.empty
-        else IList(Failure("errors were incorrect")))
-
+        if (correctOutput === output) Success()
+        else Failure())
     }
   }
 }

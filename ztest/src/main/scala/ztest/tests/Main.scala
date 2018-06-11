@@ -41,10 +41,12 @@ object Main extends SafeApp {
   def run(args: List[String]): IO[Void, ExitStatus] = {
     val _ = args
     val suites: IList[() => Suite] = IList(
-      // () => new StdlibSuite,
       () => new ExhaustiveSuite,
-      () => new PureSuiteMetaSuite
+      () => new PureSuiteMetaSuite,
+      () => new SuiteUtilsSuite
     )
-    Runner(suites).map(_ => ExitStatus.ExitNow(0))
+    Runner(suites).map(succeeded =>
+      if (succeeded) ExitStatus.ExitNow(0) else ExitStatus.ExitNow(1)
+    )
   }
 }

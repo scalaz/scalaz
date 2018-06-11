@@ -56,7 +56,7 @@
 
 //   def makeHarness(buf: AtomicReference[List[String]]): Test[() => ?, List[String] => ?] =
 //     new Test[() => ?, List[String] => ?] {
-//       def apply(assertion: () => List[TestError]): List[String] => Unit =
+//       def apply(assertion: () => List[TestResult]): List[String] => Unit =
 //         { (ls: List[String]) =>
 //           add(buf, Suite.printTest(ls, assertion()))
 //         }
@@ -91,7 +91,7 @@
 //   def makeHarness(buf: AtomicReference[List[String]])(implicit ec: ExecutionContext)
 //   : Test[λ[A => () => Future[A]], λ[A => List[String] => Future[A]]] =
 //     new Test[λ[A => () => Future[A]], λ[A => List[String] => Future[A]]] {
-//       def apply(assertion: () => Future[List[TestError]]): List[String] => Future[Unit] =
+//       def apply(assertion: () => Future[List[TestResult]]): List[String] => Future[Unit] =
 //         (ls: List[String]) =>
 //           (try {
 //             assertion().transform {
@@ -117,12 +117,12 @@
 
 // object stdlib {
 //   object assertEqual {
-//     def apply[E](fst: E, snd: E): List[TestError] =
+//     def apply[E](fst: E, snd: E): List[TestResult] =
 //       if (fst == snd) Nil else Failure(s"$fst\n\nwas not equal to\n\n$snd") :: Nil
 //   }
 
 //   object assertNotEqual {
-//     def apply[E](fst: E, snd: E): List[TestError] =
+//     def apply[E](fst: E, snd: E): List[TestResult] =
 //       if (fst != snd) Nil else Failure(s"$fst\n\nwas equal to\n\n$snd") :: Nil
 //   }
 // }

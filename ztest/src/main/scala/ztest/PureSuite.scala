@@ -2,7 +2,7 @@ package ztest
 
 import scala._, scala.Predef._
 
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 import scalaz.Void
 import scalaz.data.IList
@@ -14,11 +14,14 @@ abstract class PureSuite extends Suite {
 
   type TestEff[A] = IList[String] => A
 
-  def run: IO[Void, IList[String]] = IO.sync {
+  def run: IO[Void, SuiteOutput] = IO.sync {
     val buf = new AtomicReference[IList[String]](IList.empty)
-    val tester = this.doTests(PureSuite.makeHarness(buf))
+    val done = new AtomicBoolean(true)
+    val tester = this.doTests(PureSuite.makeHarness(buf, done))
     tester(IList.empty)
-    buf.get
+    val lines = buf.get
+    val doneAndNonEmpty = done.get && !IList.isEmpty(lines)
+    SuiteOutput(lines, doneAndNonEmpty)
   }
 }
 
@@ -27,10 +30,12 @@ object PureSuite {
     val _ = buf.updateAndGet(IList.cons(str, _))
   }
 
-  def makeHarness(buf: AtomicReference[IList[String]]): Harness[() => ?, IList[String] => ?] =
+  def makeHarness(buf: AtomicReference[IList[String]], done: AtomicBoolean): Harness[() => ?, IList[String] => ?] =
     new Harness[() => ?, IList[String] => ?] {
-      def test(assertion: () => IList[TestError]): IList[String] => Unit =
+      def test(assertion: () => TestResult): IList[String] => Unit =
         { (ls: IList[String]) =>
+          val result = assertion()
+          if ((result ne Success) && done.get) done.set(false)
           add(buf, Suite.printTest(ls, assertion()))
         }
 
