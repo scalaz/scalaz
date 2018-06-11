@@ -29,6 +29,7 @@
  */
 
 package ztest
+package tests
 
 import scala._, scala.Predef._
 
@@ -41,7 +42,8 @@ object Main extends SafeApp {
     val _ = args
     val suites: IList[() => Suite] = IList(
       // () => new StdlibSuite,
-      () => new ExhaustiveSuite
+      () => new ExhaustiveSuite,
+      () => new PureSuiteMetaSuite
     )
     Runner(suites).map(_ => ExitStatus.ExitNow(0))
   }

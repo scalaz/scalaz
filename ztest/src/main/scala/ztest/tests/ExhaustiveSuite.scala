@@ -29,6 +29,7 @@
  */
 
 package ztest
+package tests
 
 import scala._
 

@@ -44,8 +44,17 @@ trait Harness[F[_], G[_]] {
 }
 
 sealed trait TestError
-final case class Thrown(thrown: Throwable) extends TestError
-final case class Failure(failureAsString: String) extends TestError
+final class Thrown(val thrown: Throwable) extends TestError
+final class Failure(val failureAsString: String) extends TestError
+
+object Thrown {
+  def apply(thrown: Throwable): TestError = new Thrown(thrown)
+}
+
+object Failure {
+  def apply(failureAsString: String): TestError = new Failure(failureAsString)
+}
+
 object TestError {
   implicit val equalTestError: Eq[TestError] = instanceOf(new EqClass[TestError] {
     def equal(first: TestError, second: TestError) = first == second
