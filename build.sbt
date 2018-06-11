@@ -79,6 +79,22 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects: _*)
 
+lazy val rootJS_213 = Project(
+  "rootJS_213",
+  file("rootJS_213")
+).settings(
+  standardSettings,
+  notPublish
+).aggregate(jsProjects.filter((scalacheckBindingJS_1_13: ProjectReference) != _): _*)
+
+lazy val rootJVM_213 = Project(
+  "rootJVM_213",
+  file("rootJVM_213")
+).settings(
+  standardSettings,
+  notPublish
+).aggregate(jvmProjects.filter((scalacheckBindingJVM_1_13: ProjectReference) != _): _*)
+
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 lazy val coreNative = core.native

@@ -162,24 +162,8 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion_1_13 := "1.13.5",
-    scalaCheckVersion_1_14 := {
-      val scalaV = scalaVersion.value
-      CrossVersion.partialVersion(scalaV) match {
-        case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
-          "1.14.0-newCollections"
-        case _ =>
-          "1.14.0"
-      }
-    },
-    scalaCheckGroupId := {
-      val scalaV = scalaVersion.value
-      CrossVersion.partialVersion(scalaV) match {
-        case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
-          "org.scala-lang.modules"
-        case _ =>
-          "org.scalacheck"
-      }
-    },
+    scalaCheckVersion_1_14 := "1.14.0",
+    scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -254,16 +238,7 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      // TODO scalacheck for Scala 2.13
-      releaseStepCommandAndRemaining(
-        s"; ++ ${Scala213} ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee"
-        ).flatMap{ p =>
-          Seq("JVM", "JS").map{ x =>
-            s" ${p}${x}/publishSigned "
-          }
-        }.mkString(" ; ")
-      ),
+      releaseStepCommandAndRemaining(s" ; ++ ${Scala213} ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
