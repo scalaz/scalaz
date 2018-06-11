@@ -21,12 +21,15 @@ final class PureSuiteMetaSuite extends IOSuite[Void] {
       }
     }
     import harness._
+
     section("PureSuite meta-suite") {
       test(for {
         output <- suiteUnderTest.run
         correctOutput =
           IList(Suite.printTest(IList("pure suite tests"), IList(Failure("hey"), Failure("there"))))
-      } yield if (correctOutput === output) IList.empty else IList(Failure("errors were incorrect")))
+      } yield
+        if (correctOutput === output) IList.empty
+        else IList(Failure("errors were incorrect")))
 
     }
   }
