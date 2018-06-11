@@ -1,4 +1,4 @@
-package ztest
+package scalaz.test
 
 import scala._, scala.Predef._
 
@@ -39,7 +39,7 @@ abstract class IOSuite[E] extends Suite {
               }.flatMap(eref.write).attempt
               result <- eref.read
               _ <- if (null eq result) {
-                scala.sys.error("Internal ztest error: assertion wasn't written to reference.")
+                scala.sys.error("Internal scalaz.test error: assertion wasn't written to reference.")
               } else {
                 IO.sync[E, Unit](add(buf, Suite.printTest(ls, result)))
               }

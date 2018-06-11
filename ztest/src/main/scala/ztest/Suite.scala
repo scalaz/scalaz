@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ztest
+package scalaz.test
 
 import java.lang.String
 import scala.Boolean
@@ -54,11 +54,10 @@ object SuiteOutput {
 }
 
 object Suite {
-  def flip[A, B, C](fun: (A, B) => C): (B, A) => C = (b, a) => fun(a, b)
-  def reverse[A](as: IList[A]): IList[A] = as.foldLeft(IList.empty[A])(flip(IList.cons))
-  def printScope(scope: IList[String]): String = {
+  def reverse[A](as: IList[A]): IList[A] =
+    as.foldLeft(IList.empty[A])((b, a) => IList.cons(a, b))
+  def printScope(scope: IList[String]): String =
     util.fastConcatDelim(reverse(scope), "->")
-  }
   def printTest(scope: IList[String], out: TestResult) = out match {
     case _: Success.type => printScope(IList.cons("succeeded\n", scope))
     case _: Failure.type => printScope(IList.cons("failed\n", scope))

@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ztest
+package scalaz.test
 
 import scala._, scala.Predef._
 
@@ -36,7 +36,7 @@ import java.lang.{Integer, StringBuilder}
 
 import scalaz.data.{IList, Maybe2}
 
-private[ztest] object util {
+private[test] object util {
   def fastConcat(strs: IList[String]): String =
     fastConcatDelim(strs, "")
 

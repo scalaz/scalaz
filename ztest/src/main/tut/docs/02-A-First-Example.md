@@ -6,13 +6,13 @@ title: A First Example
 # {{ page.title }}
 
 So, let’s start with a simple version of a pure test suite, using the most
-basic suite type provided. We'll be using `ztest-core`, `ztest-runner`, and
-`ztest-stdlib`.
+basic suite type provided. We'll be using `scalaz-test-core`, `scalaz-test-runner`, and
+`scalaz.test-stdlib`.
 
-It's provided in `ztest.stdlib.PureSuite`.
+It's provided in `scalaz.test.PureSuite`.
 
 ```tut:silent
-import ztest._
+import scalaz.test._
 
 final class MathTests extends PureSuite {
   def doTests[G[_]: Monad](harness: Harness[Function0, G]): G[Unit] = {
@@ -27,7 +27,7 @@ final class MathTests extends PureSuite {
 }
 ```
 
-To run this type of test suite using the default ztest runner, just
+To run this type of test suite using the default scalaz.test runner, just
 call `.run` and then `unsafePerformIO`.
 
 ```tut:book
@@ -37,15 +37,15 @@ new MathTests().run(global).unsafePerformIO
 I went through a lot up there; let's dissect that.
 
 ```tut:silent
-import ztest._
+import scalaz.test._
 ```
 
-Here I import `Harness[F[_], G[_]]`, the type of test harnesses in ztest.
+Here I import `Harness[F[_], G[_]]`, the type of test harnesses in scalaz.test.
 Conventionally, test suites are written to extend a test suite class
 with an abstract method that takes a `Harness` as a parameter.
 
-I also import `Success` and `Failure` from `ztest`; assertions are just values
-in ztest.  errors in ztest. `assertEqual` returns an empty list of errors if
+I also import `Success` and `Failure` from `scalaz.test`; assertions are just values
+in scalaz.test. `assertEqual` returns an empty list of errors if
 the two arguments are equal; otherwise it returns a single error.
 
 `PureSuite` is the test suite class I'm using. The type of test harness it uses
@@ -64,7 +64,7 @@ final class MathTests extends PureSuite {
 We're making a test suite class called `MathTests` extending the suite type
 `PureSuite`; `MathTests` is what will show up in the output while running the
 suite. This is pretty normal for a Scala test framework, but note that this is
-a class and not an object. ztest encourages you not to use singleton objects as
+a class and not an object. scalaz.test encourages you not to use singleton objects as
 test suites. Using objects will prevent fields of the test suites from being
 reachable for garbage collection while tests run. Instead, use a class to keep
 your working set small during the run.
@@ -77,7 +77,7 @@ def doTests[G[_]](harness: Harness[Function0, G]): G[Unit] = {
 Here we define a method from `PureSuite` which we will use to define our tests.
 Note that the type of the `doTests` method *entirely depends* on the suite type.
 Any suite type could have give it any signature. You can write your own suite
-type and give it any signature you want; you don't even need to use ztest's
+type and give it any signature you want; you don't even need to use scalaz.test's
 `Harness` test harness type.
 
 We also import all of the members of the harness - we're about to use them a
@@ -107,6 +107,6 @@ else Failure()
 
 Here's the only assertion we've got. Looks fairly self-explanatory.  It'll give
 you a `TestResult` which is `Failure` if math is broken. Note that there is no
-"assert-with-message" construct in ztest.
+"assert-with-message" construct in scalaz.test.
 
 And we're done.

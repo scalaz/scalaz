@@ -6,7 +6,7 @@ import scala.{ ::, List, Nil }
 import scala.Predef.$conforms
 
 import core.EqClass
-import ct.MonadClass
+import ct.{FoldableClass, MonadClass, TraversableClass}
 import data.Cord
 import debug.DebugClass
 

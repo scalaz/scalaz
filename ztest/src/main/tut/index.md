@@ -4,4 +4,4 @@ title:  "Home"
 section: "home"
 ---
 
-Welcome to the wonderful world of ztest.
+Welcome to the wonderful world of scalaz.test.

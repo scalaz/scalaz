@@ -1,4 +1,4 @@
-package ztest
+package scalaz.test
 package tests
 
 import scala.Unit

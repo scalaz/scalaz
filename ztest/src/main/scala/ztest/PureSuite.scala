@@ -1,4 +1,4 @@
-package ztest
+package scalaz.test
 
 import scala._, scala.Predef._
 

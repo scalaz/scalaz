@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ztest
+package scalaz.test
 package tests
 
 import scala._, scala.Predef._
