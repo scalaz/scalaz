@@ -27,11 +27,6 @@ trait BifunctorClass[F[_, _]] {
 
   def rmap[A, B, T](fab: F[A, B])(bt: B => T): F[A, T]
 
-  def functor[A]: Functor[F[A, ?]] =
-    instanceOf(new FunctorClass[F[A, ?]] {
-      def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = rmap(fab)(f)
-    })
-
 }
 
 object BifunctorClass {

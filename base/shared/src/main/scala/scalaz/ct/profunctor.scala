@@ -7,10 +7,6 @@ trait ProfunctorClass[F[_, _]] {
   def lmap[A, B, C](fab: F[A, B])(ca: C => A): F[C, B]
   def rmap[A, B, C](fab: F[A, B])(bc: B => C): F[A, C]
   def dimap[A, B, C, D](fab: F[A, B])(ca: C => A)(bd: B => D): F[C, D]
-  def functor[A]: Functor[F[A, ?]] =
-    instanceOf(new FunctorClass[F[A, ?]] {
-      def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = rmap(fab)(f)
-    })
 }
 
 object ProfunctorClass {

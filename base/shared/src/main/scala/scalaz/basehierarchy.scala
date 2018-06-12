@@ -1,5 +1,7 @@
 package scalaz
 
+import scalaz.ct.FunctorClass
+
 trait BaseHierarchy extends BaseHierarchy.BH0
 
 object BaseHierarchy {
@@ -25,11 +27,17 @@ object BaseHierarchy {
   }
 
   trait BH2 extends BH3 {
-    implicit def bifunctorFunctor[F[_, _], A](implicit F: Bifunctor[F]): Functor[F[A, ?]] = F.functor
+    implicit def bifunctorFunctor[F[_, _], A](implicit F: Bifunctor[F]): Functor[F[A, ?]] =
+      instanceOf(new FunctorClass[F[A, ?]] {
+        def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = F.rmap(fab)(f)
+      })
   }
 
   trait BH3 extends BH4 {
-    implicit def profunctorFunctor[F[_, _], A](implicit F: Profunctor[F]): Functor[F[A, ?]] = F.functor
+    implicit def profunctorFunctor[F[_, _], A](implicit F: Profunctor[F]): Functor[F[A, ?]] =
+      instanceOf(new FunctorClass[F[A, ?]] {
+        def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = F.rmap(fab)(f)
+      })
   }
 
   trait BH4 {}
