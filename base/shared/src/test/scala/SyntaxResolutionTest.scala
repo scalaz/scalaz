@@ -13,7 +13,7 @@ object SyntaxResolutionTest {
 
   def _bifunctor[F[_, _]: Bifunctor, A, B, S, T](fab: F[A, B], as: A => S, bt: B => T) = {
     fab.lmap(as): F[S, B]
-    fab.rmap(bt): F[A, T]
+    fab.map(bt): F[A, T]
     fab.bimap(as, bt): F[S, T]
   }
 
@@ -45,7 +45,7 @@ object SyntaxResolutionTest {
 
   def _profunctor[F[_, _]: Profunctor, A, B, C, D](fab: F[A, B], ca: C => A, bd: B => D) = {
     fab.lmap(ca): F[C, B]
-    fab.rmap(bd): F[A, D]
+    fab.map(bd): F[A, D]
     fab.dimap(ca)(bd): F[C, D]
   }
 
