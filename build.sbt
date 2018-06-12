@@ -26,7 +26,7 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks, ztest)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks, `scalaz-test`)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val base = crossProject.module
@@ -120,16 +120,16 @@ lazy val example = project.module
     )
   )
 
-lazy val ztest = project
+lazy val `scalaz-test` = project
   .dependsOn(baseJVM, effectJVM)
-  .in(file("ztest"))
-  .settings(stdSettings("ztest"))
+  .in(file("scalaz-test"))
+  .settings(stdSettings("scalaz-test"))
 
 /** A project just for the console.
   * Applies only the settings necessary for that purpose.
   */
 lazy val repl = project
-  .dependsOn(ztest % "compile->test")
+  .dependsOn(`scalaz-test` % "compile->test")
   .dependsOn(benchmarks)
   .settings(
     console := (console in Test).value,
