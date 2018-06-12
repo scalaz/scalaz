@@ -22,7 +22,6 @@ trait BaseTypeclasses {
   type Choice[P[_, _]]        = InstanceOf[ChoiceClass[P]]
   type Cobind[F[_]]           = InstanceOf[CobindClass[F]]
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
-  type Compose[P[_, _]]       = InstanceOf[ComposeClass[P]]
   type Contravariant[F[_]]    = InstanceOf[ContravariantClass[F]]
   type Debug[A]               = InstanceOf[DebugClass[A]]
   type Eq[A]                  = InstanceOf[EqClass[A]]
@@ -36,6 +35,7 @@ trait BaseTypeclasses {
   type Ord[T]                 = InstanceOf[OrdClass[T]]
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
+  type Semicategory[P[_, _]]  = InstanceOf[SemigroupoidClass[P]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
   type Strong[F[_, _]]        = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]      = InstanceOf[TraversableClass[T]]
@@ -48,7 +48,6 @@ trait BaseTypeclasses {
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
   final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F]                            = F
-  final def Compose[P[_, _]](implicit P: Compose[P]): Compose[P]                         = P
   final def Debug[A](implicit A: Debug[A]): Debug[A]                                     = A
   final def Eq[A](implicit P: Eq[A]): Eq[A]                                              = P
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
@@ -61,6 +60,7 @@ trait BaseTypeclasses {
   final def Ord[T](implicit T: Ord[T]): Ord[T]                                           = T
   final def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F]                            = F
   final def Profunctor[P[_, _]](implicit P: Profunctor[P]): Profunctor[P]                = P
+  final def Semicategory[P[_, _]](implicit P: Semicategory[P]): Semicategory[P]          = P
   final def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T]                         = T
   final def Strong[P[_, _]](implicit P: Strong[P]): Strong[P]                            = P
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                = T
@@ -199,13 +199,13 @@ trait AllSyntax
     with ct.ChoiceSyntax
     with ct.CobindSyntax
     with ct.ComonadSyntax
-    with ct.ComposeSyntax
     with ct.FoldableSyntax
     with ct.FunctorSyntax
     with ct.InvariantFunctorSyntax
     with ct.KleisliSyntax
     with ct.PhantomSyntax
     with ct.ProfunctorSyntax
+    with ct.SemigroupoidSyntax
     with ct.StrongSyntax
     with ct.TraversableSyntax
     with core.EqSyntax

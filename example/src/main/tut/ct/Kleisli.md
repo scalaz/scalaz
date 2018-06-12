@@ -122,6 +122,6 @@ k =<< List(3) // : List(false): List[Boolean]
 `Kleisli` arrows are especially interesting, and have an instance for many of the typeclasses in the Scalaz ecosystem. Some of these include:
 
 - [Monad](./Monad.html) for `Kleisli[F, A, ?]` when `F` is a `Monad`
-- [Compose](./Compose.html) for `Kleisli[F, ?, ?]` when `F` is a `Bind`
+- [Semicategory](./Semicategory.html) for `Kleisli[F, ?, ?]` when `F` is a `Bind`
 - [Monoid](../algebra/Monoid.html) for `Kleisli[F, A, B]` when `F[B]` is any `Monoid`
 - [Strong](./Strong.html) for `Kleisli[F, ?, ?]` where `F` is any `Functor`

@@ -48,7 +48,7 @@ package object data {
     def fromLeft[G[_], F[_, _]](act: LeftAction[G, F]): RightAction[G, λ[(α, β) => F[β, α]]] =
       ν[RightAction[G, λ[(α, β) => F[β, α]]]][α, β]((g, f) => act.apply(f, g))
 
-    def compose[F[_, _], A](implicit F: Compose[F]): RightAction[F[A, ?], F] =
+    def compose[F[_, _], A](implicit F: Semicategory[F]): RightAction[F[A, ?], F] =
       ν[RightAction[F[A, ?], F]][α, β]((fa, f) => F.compose(f, fa))
 
     implicit class Ops[G[_], F[_, _]](val action: RightAction[G, F]) extends AnyVal {
@@ -64,7 +64,7 @@ package object data {
     def fromRight[G[_], F[_, _]](act: RightAction[G, F]): LeftAction[G, λ[(α, β) => F[β, α]]] =
       ν[LeftAction[G, λ[(α, β) => F[β, α]]]][α, β]((f, g) => act.apply(g, f))
 
-    def compose[F[_, _], Z](implicit F: Compose[F]): LeftAction[F[?, Z], F] =
+    def compose[F[_, _], Z](implicit F: Semicategory[F]): LeftAction[F[?, Z], F] =
       ν[LeftAction[F[?, Z], F]][α, β]((f, fy) => F.compose(fy, f))
 
     implicit class Ops[G[_], F[_, _]](val action: LeftAction[G, F]) extends AnyVal {
