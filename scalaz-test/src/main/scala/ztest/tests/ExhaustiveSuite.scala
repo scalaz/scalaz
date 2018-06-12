@@ -14,13 +14,12 @@ final class ExhaustiveSuite extends PureSuite {
     section("exhaustiveS int range")(
       test {
         val ls = IList(1, 2, 3, 4, 5, 6)
-        exhaustiveS(ls)(i =>
-          () => (i != 3)
-        ).map(errs =>
-          if (errs === IList(true, true, false, true, true, true)) {
-            Success()
-          } else {
-            Failure()
+        exhaustiveS(ls)(i => () => (i != 3)).map(
+          errs =>
+            if (errs === IList(true, true, false, true, true, true)) {
+              Success()
+            } else {
+              Failure()
           }
         )
       }

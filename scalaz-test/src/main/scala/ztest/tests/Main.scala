@@ -5,7 +5,7 @@ import scala._, scala.Predef._
 
 import scalaz.Void
 import scalaz.data.IList
-import scalaz.effect.{IO, SafeApp}
+import scalaz.effect.{ IO, SafeApp }
 
 object Main extends SafeApp {
   def run(args: List[String]): IO[Void, ExitStatus] = {
@@ -15,8 +15,6 @@ object Main extends SafeApp {
       () => new PureSuiteMetaSuite,
       () => new SuiteUtilsSuite
     )
-    Runner(suites).map(succeeded =>
-      if (succeeded) ExitStatus.ExitNow(0) else ExitStatus.ExitNow(1)
-    )
+    Runner(suites).map(succeeded => if (succeeded) ExitStatus.ExitNow(0) else ExitStatus.ExitNow(1))
   }
 }

@@ -48,8 +48,12 @@ trait TraversableInstances {
 
       def foldRightL[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): () => B = IList.uncons(fa) match {
         // because `f` is lazy in its second argument, we don't stack-overflow.
-        case Maybe2.Just2(a, as) => () => f(a, foldRightL(as, z)(f)())
-        case Maybe2.Empty2()     => () => z
+        case Maybe2.Just2(a, as) =>
+          () =>
+            f(a, foldRightL(as, z)(f)())
+        case Maybe2.Empty2() =>
+          () =>
+            z
       }
 
       override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B = foldRightL[A, B](fa, z)(f)()

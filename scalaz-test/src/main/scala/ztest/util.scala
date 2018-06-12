@@ -2,9 +2,9 @@ package scalaz.test
 
 import scala._, scala.Predef._
 
-import java.lang.{Integer, StringBuilder}
+import java.lang.{ Integer, StringBuilder }
 
-import scalaz.data.{IList, Maybe2}
+import scalaz.data.{ IList, Maybe2 }
 
 private[test] object util {
   def fastConcat(strs: IList[String]): String =
@@ -12,7 +12,7 @@ private[test] object util {
 
   def fastConcatDelim(strs: IList[String], delim: String): String = {
     var totalLength: Integer = Int.box(0)
-    var numStrs: Integer = Int.box(0)
+    var numStrs: Integer     = Int.box(0)
     def go(cursor: IList[String]): Unit = IList.uncons(cursor) match {
       case Maybe2.Just2(s, ss) =>
         totalLength = Int.box(totalLength.intValue() + s.length + delim.length)
