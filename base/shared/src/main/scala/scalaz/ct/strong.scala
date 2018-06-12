@@ -23,28 +23,6 @@ object StrongClass {
   trait Alt[D <: Alt[D]]
 }
 
-trait StrongInstances { instances =>
-
-  implicit val functionStrong: Strong[? => ?] = instanceOf(
-    new StrongClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
-
-      override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
-        fab compose ca
-
-      override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
-        fab andThen bc
-
-      override def first[A, B, C](pab: A => B): ((A, C)) => (B, C) = {
-        case (a, c) => (pab(a), c)
-      }
-
-      override def second[A, B, C](pab: A => B): ((C, A)) => (C, B) = {
-        case (c, a) => (c, pab(a))
-      }
-    }
-  )
-}
-
 trait StrongSyntax {
   implicit final class ToStrongOps[F[_, _], A, B](self: F[A, B]) {
     def first[C](implicit ev: Strong[F]): F[(A, C), (B, C)] = macro meta.Ops.i_0

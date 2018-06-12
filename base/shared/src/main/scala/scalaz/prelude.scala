@@ -166,24 +166,10 @@ trait AllInstances
     with std.ShortInstances
     with std.StringInstances
     with std.UnitInstances
-    with ct.BifunctorInstances
-    with ct.BindInstances
-    with ct.ChoiceInstances
-    with ct.CobindInstances
-    with ct.ComonadInstances
-    with ct.FoldableInstances
-    with ct.KleisliInstances
-    with ct.MonadInstances
-    with ct.ProfunctorInstances
-    with ct.StrongInstances
-    with ct.TraversableInstances
     with debug.DebugInstances
-    with core.EqInstances
     with types.AsInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances
-    with algebra.MonoidInstances
-    with algebra.SemigroupInstances
 
 trait AllSyntax
     extends VoidSyntax

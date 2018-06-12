@@ -23,8 +23,6 @@ object ProfunctorClass {
   trait Alt[D <: Alt[D]]
 }
 
-trait ProfunctorInstances {}
-
 trait ProfunctorSyntax {
   implicit class ToProfunctorOps[F[_, _]: Profunctor, A, B](self: F[A, B]) {
     def lmap[C](f: C => A): F[C, B] = macro meta.Ops.f_1

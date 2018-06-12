@@ -40,6 +40,7 @@ object VoidModule extends VoidSyntax {
 }
 
 trait VoidInstances {
+  implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
   implicit def voidSemigroup: Semigroup[Void] =
     instanceOf(new SemigroupClass[Void] {
       override def mappend(a1: Void, a2: => Void): Void = a1
