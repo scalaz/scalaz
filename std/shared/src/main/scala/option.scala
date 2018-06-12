@@ -6,7 +6,7 @@ import scala.{ None, Option, Some }
 import core.EqClass
 import data.Cord
 import debug.DebugClass
-import ct.MonadClass
+import ct._
 
 trait OptionInstances {
   implicit val optionMonad: Monad[Option] =
@@ -17,6 +17,13 @@ trait OptionInstances {
       def flatten[A](ma: Option[Option[A]]): Option[A]               = ma.flatten
       def map[A, B](ma: Option[A])(f: A => B): Option[B]             = ma.map(f)
     })
+
+  implicit val optionCobind: Cobind[Option] = instanceOf(new CobindClass.DeriveCojoin[Option] {
+    override def map[A, B](fa: Option[A])(f: A => B): Option[B] = fa.map(f)
+
+    override def cobind[A, B](fa: Option[A])(f: Option[A] => B): Option[B] =
+      Some(f(fa))
+  })
 
   implicit def optionEq[A](implicit X: Eq[A]): Eq[Option[A]] =
     instanceOf(new EqClass[Option[A]] {

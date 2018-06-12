@@ -7,7 +7,7 @@ import scalaz.data.Disjunction
 
 trait Function0Instances {
 
-  implicit val functionMonad: Monad[Function0] = instanceOf(
+  implicit val function0Monad: Monad[Function0] = instanceOf(
     new MonadClass[Function0] with BindClass.DeriveFlatten[Function0] {
       override def ap[A, B](fab: Function0[A])(f: Function0[A => B]): Function0[B]      = () => f()(fab())
       override def map[A, B](fab: Function0[A])(f: A => B): Function0[B]                = () => f(fab())
@@ -40,14 +40,15 @@ trait Function1Instances {
       override def pure[A](a: A): Function1[C, A] = (c: C) => a
     })
 
-  implicit val functionChoice: Choice[? => ?] = instanceOf(
-    new ChoiceClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
+  trait Function1Profunctor extends ProfunctorClass.DeriveDimap[? => ?] {
+    override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
+      fab compose ca
+    override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
+      fab andThen bc
+  }
 
-      override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
-        fab compose ca
-
-      override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
-        fab andThen bc
+  implicit val function1Choice: Choice[? => ?] = instanceOf(
+    new ChoiceClass[? => ?] with Function1Profunctor {
 
       override def leftchoice[A, B, C](ab: A => B): A \/ C => B \/ C =
         _.fold(a => Disjunction.left(ab(a)), Disjunction.right)
@@ -57,14 +58,8 @@ trait Function1Instances {
     }
   )
 
-  implicit val functionStrong: Strong[? => ?] = instanceOf(
-    new StrongClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
-
-      override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
-        fab compose ca
-
-      override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
-        fab andThen bc
+  implicit val function1Strong: Strong[? => ?] = instanceOf(
+    new StrongClass[? => ?] with Function1Profunctor {
 
       override def first[A, B, C](pab: A => B): ((A, C)) => (B, C) = {
         case (a, c) => (pab(a), c)
