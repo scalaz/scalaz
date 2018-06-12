@@ -69,8 +69,8 @@ trait KleisliInstances {
       }
     )
 
-  implicit def semigroupoid[M[_]](implicit B: Bind[M]): Semicategory[Kleisli[M, ?, ?]] =
-    instanceOf(new SemigroupoidClass[Kleisli[M, ?, ?]] {
+  implicit def semicategory[M[_]](implicit B: Bind[M]): Semicategory[Kleisli[M, ?, ?]] =
+    instanceOf(new SemicategoryClass[Kleisli[M, ?, ?]] {
       def compose[A, B, C](f: Kleisli[M, B, C], g: Kleisli[M, A, B]): Kleisli[M, A, C] =
         wrapKleisli(a => B.flatMap(runKleisli(g)(a))(runKleisli(f)))
     })

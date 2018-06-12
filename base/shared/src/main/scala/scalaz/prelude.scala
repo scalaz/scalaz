@@ -35,7 +35,7 @@ trait BaseTypeclasses {
   type Ord[T]                 = InstanceOf[OrdClass[T]]
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
-  type Semicategory[P[_, _]]  = InstanceOf[SemigroupoidClass[P]]
+  type Semicategory[P[_, _]]  = InstanceOf[SemicategoryClass[P]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
   type Strong[F[_, _]]        = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]      = InstanceOf[TraversableClass[T]]
@@ -205,7 +205,7 @@ trait AllSyntax
     with ct.KleisliSyntax
     with ct.PhantomSyntax
     with ct.ProfunctorSyntax
-    with ct.SemigroupoidSyntax
+    with ct.SemicategorySyntax
     with ct.StrongSyntax
     with ct.TraversableSyntax
     with core.EqSyntax

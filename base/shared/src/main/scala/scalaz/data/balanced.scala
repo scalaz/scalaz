@@ -5,7 +5,7 @@ import scala.AnyVal
 
 import Prelude._
 import AList.aListOps
-import ct.SemigroupoidClass
+import ct.SemicategoryClass
 
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,
@@ -87,7 +87,7 @@ object PostComposeBalancer {
     ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
 
   private def flip[F[_, _]](F: Semicategory[F]): Semicategory[λ[(α, β) => F[β, α]]] =
-    instanceOf(new SemigroupoidClass[λ[(α, β) => F[β, α]]] {
+    instanceOf(new SemicategoryClass[λ[(α, β) => F[β, α]]] {
       def compose[A, B, C](f: F[C, B], g: F[B, A]): F[C, A] =
         F.compose(g, f)
     })

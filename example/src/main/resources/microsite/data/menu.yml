@@ -58,6 +58,9 @@ options:
     menu_section: data
 
     nested_options:
+    - title: Compose
+      url: ct/Compose.html
+      menu_section: data
     - title: Disjunction
       url: data/Disjunction.html
       menu_section: data
