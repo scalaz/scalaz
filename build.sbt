@@ -126,15 +126,13 @@ lazy val `scalaz-test` = project
   .settings(stdSettings("scalaz-test"))
 
 /** A project just for the console.
-  * Applies only the settings necessary for that purpose.
-  */
+ * Applies only the settings necessary for that purpose.
+ */
 lazy val repl = project
   .dependsOn(`scalaz-test` % "compile->test")
   .dependsOn(benchmarks)
   .settings(
     console := (console in Test).value,
     scalacOptions --= Seq("-Yno-imports", "-Ywarn-unused:imports", "-Xfatal-warnings"),
-    initialCommands in console += """
-      |import scalaz._, Scalaz._, scalaz.test._
-    """.stripMargin.trim
+    initialCommands in console += "import scalaz._, Scalaz._, scalaz.test._\n"
   )
