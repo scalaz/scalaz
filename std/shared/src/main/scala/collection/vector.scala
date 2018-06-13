@@ -4,7 +4,7 @@ package std
 import scala.Vector
 import scala.Predef.$conforms
 
-import core.EqClass
+import core.EqAnyRef
 import ct.MonadClass
 
 trait VectorInstances {
@@ -17,9 +17,7 @@ trait VectorInstances {
   })
 
   implicit def vectorEq[A: Eq]: Eq[Vector[A]] =
-    instanceOf(new EqClass[Vector[A]] {
-      def equal(first: Vector[A], second: Vector[A]): Boolean = (first.corresponds(second)(Eq[A].equal))
-    })
+    instanceOf(((a, b) => (a corresponds b)(Eq[A].equal)): EqAnyRef[Vector[A]])
 
   /* https://github.com/scalaz/scalaz/pull/1633
   implicit def vectorDebug[A: Debug]: Debug[Vector[A]] = instanceOf(new DebugClass[Vector[A]] {

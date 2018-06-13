@@ -44,7 +44,10 @@ trait VoidInstances {
     instanceOf(new SemigroupClass[Void] {
       override def mappend(a1: Void, a2: => Void): Void = a1
     })
+
   implicit val voidDebug: Debug[Void] = DebugClass.instance[Void](Void.absurd)
+
+  implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
 }
 
 @silent

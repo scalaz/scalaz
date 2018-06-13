@@ -3,9 +3,9 @@ package data
 
 import scala.{ List, None, Option, Some }
 
-import scalaz.core.EqClass
-import scalaz.ct._
-import scalaz.debug.DebugClass
+import core.EqAnyRef
+import ct._
+import debug.DebugClass
 
 sealed trait MaybeModule {
   type Maybe[A]
@@ -66,11 +66,13 @@ private[scalaz] object MaybeImpl extends MaybeModule {
     }
   }
 
-  def eq[A](implicit A: Eq[A]): Eq[Maybe[A]] = instanceOf[EqClass[Maybe[A]]] {
-    case (Some(a), Some(b)) => A.equal(a, b)
-    case (None, None)       => true
-    case _                  => false
-  }
+  def eq[A](implicit A: Eq[A]): Eq[Maybe[A]] =
+    instanceOf({
+      case (Some(a), Some(b)) => A.equal(a, b)
+      case (None, None)       => true
+      case _                  => false
+
+    }: EqAnyRef[Maybe[A]])
 
   private val instance =
     new MonadClass[Maybe] with BindClass.DeriveFlatten[Maybe] with TraversableClass[Maybe]

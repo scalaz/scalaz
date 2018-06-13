@@ -28,12 +28,19 @@ These laws entail symmetry and transitivity, which should be easier to test, sin
 ## Instance declaration
 
 ```tut
-import scalaz._, Prelude._, core.EqClass
+import scalaz._, Prelude._, core.{ EqAnyRef, EqClass }
 
 implicit final def optionEq[A](implicit A: Eq[A]): Eq[Option[A]] =
-  instanceOf[EqClass[Option[A]]] {
+  instanceOf(new EqAnyRef[Option[A]] {
+    def valueEqual(first: Option[A], second: Option[A]) = (first, second) match {
     case (None, None)         => true
     case (Some(a1), Some(a2)) => A.equal(a1, a2)
     case _                    => false
-  }
+  }}: EqClass[Option[A]])
 ```
+
+### EqClass vs EqAnyRef
+
+Scalaz contains two possible traits to extend when declaring an `Eq` instance: `EqClass` and `EqAnyRef`.
+`EqAnyRef` is a specialization of `EqClass` that will always run a reference check before handing control to the user-supplied equality logic.
+`EqAnyRef` should be preferred in most cases except for `AnyVal` subtypes. In those cases, the `@specialized` annotation can be used to avoid boxing.

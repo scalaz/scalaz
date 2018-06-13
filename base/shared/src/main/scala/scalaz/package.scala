@@ -21,6 +21,11 @@ package object scalaz
   // don't export this, but scala needs `StringContext` to be in scope with this name
   private[scalaz] val StringContext = scala.StringContext
 
+  type <:<[-A, +B] = scala.Predef.<:<[A, B]
+  type =:=[A, B]   = scala.Predef.=:=[A, B]
+
+  type inline = scala.inline
+
   // Functions
   @scala.inline
   def identity[T](t: T): T = t

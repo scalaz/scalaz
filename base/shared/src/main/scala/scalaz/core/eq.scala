@@ -1,14 +1,16 @@
 package scalaz
 package core
 
+import scala.AnyRef
 import scala.language.experimental.macros
 
 trait EqClass[A] {
   def equal(first: A, second: A): Boolean
 }
 
-trait EqInstances {
-  implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
+trait EqAnyRef[A <: AnyRef] extends EqClass[A] {
+  final override def equal(first: A, second: A): Boolean = (first eq second) || valueEqual(first, second)
+  def valueEqual(first: A, second: A): Boolean
 }
 
 trait EqSyntax {

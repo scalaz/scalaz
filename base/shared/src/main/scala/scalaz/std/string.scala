@@ -5,5 +5,5 @@ import utils._
 
 trait StringInstances {
   implicit val stringDebug: Debug[String] = toStringDebug[String]
-  implicit val stringEq: Eq[String]       = universalEq[String]
+  implicit val stringEq: Eq[String]       = universalEqAnyRef[String]
 }
