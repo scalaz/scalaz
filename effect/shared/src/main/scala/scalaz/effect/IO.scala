@@ -320,8 +320,7 @@ sealed abstract class IO[E, A] { self =>
    * }}}
    */
   final def catchSome(pf: PartialFunction[E, IO[E, A]]): IO[E, A] = {
-    def tryRescue(t: E): IO[E, A] =
-      if (pf.isDefinedAt(t)) pf(t) else IO.fail(t)
+    def tryRescue(t: E): IO[E, A] = pf.applyOrElse(t, (_: E) => IO.fail(t))
 
     self.attempt[E].flatMap(_.fold(tryRescue, IO.now))
   }
@@ -707,7 +706,7 @@ object IO extends IOInstances {
       val result = effect
 
       Disjunction.right(result)
-    } catch { case t: Throwable if f.isDefinedAt(t) => Disjunction.left(f(t)) }))
+    } catch f andThen (Disjunction.left[E, A](_))))
 
   /**
    * Imports an asynchronous effect into a pure `IO` value. See `async0` for
