@@ -71,7 +71,6 @@ trait BaseCore {
 
   val Void: core.Void.type = core.Void
 
-
 }
 
 trait BaseTypes {

@@ -3,14 +3,10 @@ package core
 
 import java.lang.Throwable
 
-import com.github.ghik.silencer.silent
-
 import algebra.MonoidClass
 import ct._
 import types.IsCovariantClass
-import zio.{ IO, Fiber }
-
-trait IOModule
+import zio.{ Fiber, IO }
 
 trait IOInstances {
   implicit def ioMonad[E]: Monad[IO[E, ?]] =
@@ -66,6 +62,3 @@ trait FiberInstances {
       }
     })
 }
-
-@silent
-private[core] object IOImpl extends IOModule with IOInstances with FiberInstances
