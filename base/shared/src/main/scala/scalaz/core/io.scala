@@ -1,12 +1,41 @@
-// Copyright (C) 2018 John A. De Goes. All rights reserved.
 package scalaz
-package effect
+package core
 
 import java.lang.Throwable
 
-import scalaz.algebra.MonoidClass
-import scalaz.ct.ApplicativeClass
-import scalaz.zio.{ IO, Fiber }
+import com.github.ghik.silencer.silent
+
+import algebra.MonoidClass
+import ct._
+import types.IsCovariantClass
+import zio.{ IO, Fiber }
+
+trait IOModule
+
+trait IOInstances {
+  implicit def ioMonad[E]: Monad[IO[E, ?]] =
+    instanceOf(new MonadClass[IO[E, ?]] with BindClass.DeriveFlatten[IO[E, ?]] {
+      override final def map[A, B](ma: IO[E, A])(f: A => B): IO[E, B] =
+        ma.map(f)
+
+      override final def ap[A, B](ma: IO[E, A])(mf: IO[E, A => B]): IO[E, B] =
+        ma.flatMap(a => mf.map(f => f(a)))
+
+      override final def pure[A](a: A): IO[E, A] = IO.now(a)
+
+      override final def flatMap[A, B](ma: IO[E, A])(f: A => IO[E, B]): IO[E, B] =
+        ma.flatMap(f)
+    })
+
+  implicit final val ioBifunctor: Bifunctor[IO] =
+    instanceOf(new BifunctorClass.DeriveBimap[IO] {
+      override def lmap[A, B, S](fab: IO[A, B])(as: A => S): IO[S, B] = fab.leftMap(as)
+      override def rmap[A, B, T](fab: IO[A, B])(bt: B => T): IO[A, T] = fab.map(bt)
+    })
+
+  implicit def ioIsCovariant[E]: IsCovariant[IO[E, ?]] = IsCovariantClass.unsafeForce[IO[E, ?]]
+
+}
 
 trait FiberInstances {
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
@@ -37,3 +66,6 @@ trait FiberInstances {
       }
     })
 }
+
+@silent
+private[core] object IOImpl extends IOModule with IOInstances with FiberInstances

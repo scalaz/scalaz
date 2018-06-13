@@ -71,6 +71,7 @@ trait BaseCore {
 
   val Void: core.Void.type = core.Void
 
+
 }
 
 trait BaseTypes {
@@ -179,6 +180,8 @@ trait AllInstances
     with ct.TraversableInstances
     with debug.DebugInstances
     with core.EqInstances
+    with core.IOInstances
+    with core.FiberInstances
     with types.AsInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances
