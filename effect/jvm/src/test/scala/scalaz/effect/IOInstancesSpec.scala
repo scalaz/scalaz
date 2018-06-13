@@ -1,11 +1,14 @@
 package scalaz
 package effect
 
+import java.lang.RuntimeException
 import scala.Predef.augmentString
 
 import org.specs2.Specification
 
-class IOInstancesSpec extends Specification with RTS {
+import scalaz.zio.{ IO, RTS }
+
+class IOInstancesSpec extends Specification with RTS with IOInstances {
 
   def is = s2"""
    IO instances for:

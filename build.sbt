@@ -38,12 +38,15 @@ lazy val baseJVM = base.jvm
 
 lazy val baseJS = base.js
 
+resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
 lazy val effect = crossProject
   .in(file("effect"))
   .settings(stdSettings("effect"))
   .settings(
     libraryDependencies ++=
-      Seq("org.specs2" %%% "specs2-core"          % "4.2.0" % "test",
+      Seq("org.scalaz" %%% "scalaz-zio"           % "0.1-SNAPSHOT",
+          "org.specs2" %%% "specs2-core"          % "4.2.0" % "test",
           "org.specs2" %%% "specs2-matcher-extra" % "4.2.0" % "test"),
     scalacOptions in Test ++= Seq("-Yrangepos")
   )

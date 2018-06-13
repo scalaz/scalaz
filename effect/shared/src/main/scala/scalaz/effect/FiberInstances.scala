@@ -2,13 +2,16 @@
 package scalaz
 package effect
 
+import java.lang.Throwable
+
 import scalaz.algebra.MonoidClass
 import scalaz.ct.ApplicativeClass
+import scalaz.zio.{ IO, Fiber }
 
 trait FiberInstances {
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
     instanceOf(new MonoidClass[Fiber[E, A]] {
-      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1 <> a2
+      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1.zipWith(a2)(A.mappend(_, _))
       def mempty = new Fiber[E, A] {
         def join: IO[E, A]                            = IO.now(A.mempty)
         def interrupt[E2](t: Throwable): IO[E2, Unit] = IO.unit[E2]

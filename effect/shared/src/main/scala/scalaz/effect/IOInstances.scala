@@ -4,6 +4,7 @@ package effect
 
 import scalaz.ct._
 import scalaz.types.IsCovariantClass
+import scalaz.zio.IO
 
 trait IOInstances {
   implicit def monad[E]: Monad[IO[E, ?]] =
