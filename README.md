@@ -7,6 +7,9 @@ It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corr
 a large number of data structures.
 
 [![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.3.x)](https://travis-ci.org/scalaz/scalaz)
+[![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
+[![Gitter](http://badges.gitter.im/scalaz/scalaz.png)](https://gitter.im/scalaz/scalaz)
+[![Discord](https://img.shields.io/discord/455164441852641282.svg?label=Discord)](https://discord.gg/cVHGnke)
 
 ## Getting Scalaz
 
