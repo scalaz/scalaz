@@ -2,8 +2,8 @@ package scalaz.syntax
 
 import scalaz._
 
-trait VoidSyntax {
-  implicit class Ops(v: Void) {
+trait VoidOps {
+  implicit class VoidOps(v: Void) {
     def absurd[A]: A = Void.absurd(v)
   }
 }

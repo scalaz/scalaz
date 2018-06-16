@@ -1,5 +1,3 @@
-import scalaz.syntax.VoidSyntax
-
 /**
  * '''Scalaz''': Type classes and pure functional data structures for Scala.
  *
@@ -379,6 +377,6 @@ package object scalaz {
   type DisjunctionT[F[_], A, B] = EitherT[F, A, B]
   val DisjunctionT = EitherT
 
-  val Void: VoidModule with VoidSyntax = VoidImpl
-  type Void = VoidModule
+  val Void: VoidModule = VoidImpl
+  type Void = Void.Void
 }

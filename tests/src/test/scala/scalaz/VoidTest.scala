@@ -1,5 +1,7 @@
 package scalaz
 
+import scalaz.Scalaz._
+
 object VoidTest {
 
   def _void(v: Void): Unit = {

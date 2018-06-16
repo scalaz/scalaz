@@ -1,7 +1,6 @@
 package scalaz
 
 import Liskov.<~<
-import scalaz.syntax.VoidSyntax
 
 trait VoidModule {
   type Void
@@ -15,7 +14,7 @@ trait VoidModule {
   def conforms[A]: Void <~< A
 }
 
-object VoidImpl extends VoidModule with VoidSyntax {
+object VoidImpl extends VoidModule {
   type Void = Nothing
 
   def absurd[A](v: Void): A = v
