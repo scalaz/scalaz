@@ -9,7 +9,7 @@ trait IntInstances {
   implicit val intEq: Eq[Int]       = universalEq[Int]
 
   implicit val intOrd: Ord[Int] = instanceOf(new OrdClass[Int] {
-    def comp(a: Int, b: Int) = java.lang.Integer.compare(a, b) match {
+    def comp(a: Int, b: Int) = _root_.java.lang.Integer.compare(a, b) match {
       case 0          => EQ
       case x if x < 0 => LT
       case _          => GT

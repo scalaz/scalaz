@@ -28,7 +28,7 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks, `scalaz-test`)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val base = crossProject.module
@@ -122,4 +122,21 @@ lazy val example = project.module
       "gray-lighter"    -> "#F4F3F4",
       "white-color"     -> "#FFFFFF"
     )
+  )
+
+lazy val `scalaz-test` = project
+  .dependsOn(baseJVM, effectJVM)
+  .in(file("scalaz-test"))
+  .settings(stdSettings("scalaz-test"))
+
+/** A project just for the console.
+ * Applies only the settings necessary for that purpose.
+ */
+lazy val repl = project
+  .dependsOn(`scalaz-test` % "compile->test")
+  .dependsOn(benchmarks)
+  .settings(
+    console := (console in Test).value,
+    scalacOptions --= Seq("-Yno-imports", "-Ywarn-unused:imports", "-Xfatal-warnings"),
+    initialCommands in console += "import scalaz._, Scalaz._, scalaz.test._\n"
   )

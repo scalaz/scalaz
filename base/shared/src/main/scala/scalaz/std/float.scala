@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import java.lang.Float.floatToRawIntBits
+import _root_.java.lang.Float.floatToRawIntBits
 import core.EqClass
 import utils._
 

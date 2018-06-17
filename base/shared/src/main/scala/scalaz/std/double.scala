@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import java.lang.Double.doubleToRawLongBits
+import _root_.java.lang.Double.doubleToRawLongBits
 
 import algebra.OrdClass
 import core.EqClass

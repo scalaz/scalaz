@@ -10,4 +10,6 @@ package object ct {
 
   val Kleisli: KleisliModule = KleisliImpl
   type Kleisli[F[_], A, B] = Kleisli.Kleisli[F, A, B]
+  val ReaderT: Kleisli.type = Kleisli
+  type ReaderT[F[_], A, B] = Kleisli[F, A, B]
 }

@@ -13,6 +13,8 @@ sealed trait KleisliModule {
 
   def wrapKleisli[F[_], A, B](k: A => F[B]): Kleisli[F, A, B]
 
+  def apply[F[_], A, B](k: A => F[B]): Kleisli[F, A, B] = wrapKleisli[F, A, B](k)
+
   def hoist[F[_], G[_], A, B](k: Kleisli[F, A, B])(η: F ~> G): Kleisli[G, A, B]
 
   def first[F[_], A, B, C](k: Kleisli[F, A, B])(implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)]
@@ -97,46 +99,49 @@ trait KleisliInstances {
     )
 }
 
-trait KleisliSyntax {
+final class KleisliOps[F[_], A, B](val k: Kleisli[F, A, B]) extends scala.AnyVal {
   import Kleisli.{ runKleisli, wrapKleisli }
 
-  implicit class ToKleisliOps[F[_], A, B](k: Kleisli[F, A, B]) {
+  def apply(a: A): F[B] = runKleisli(k)(a)
 
-    def hoist[G[_]](η: F ~> G): Kleisli[G, A, B] =
-      Kleisli.hoist(k)(η)
+  def hoist[G[_]](η: F ~> G): Kleisli[G, A, B] =
+    Kleisli.hoist(k)(η)
 
-    def andThen[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
-      Kleisli.compose(j, k)
+  def andThen[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
+    Kleisli.compose(j, k)
 
-    def compose[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
-      Kleisli.compose(k, j)
+  def compose[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
+    Kleisli.compose(k, j)
 
-    def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
-      Kleisli.first(k)
+  def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
+    Kleisli.first(k)
 
-    def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
-      Kleisli.second(k)
+  def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
+    Kleisli.second(k)
 
-    def >=>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
-      Kleisli.compose(j, k)
+  def >=>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
+    Kleisli.compose(j, k)
 
-    def <=<[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
-      Kleisli.compose(k, j)
+  def <=<[E](j: Kleisli[F, E, A])(implicit B: Bind[F]): Kleisli[F, E, B] =
+    Kleisli.compose(k, j)
 
-    def >>>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
-      Kleisli.compose(j, k)
+  def >>>[C](j: Kleisli[F, B, C])(implicit B: Bind[F]): Kleisli[F, A, C] =
+    Kleisli.compose(j, k)
 
-    def =<<(fa: F[A])(implicit B: Bind[F]): F[B] =
-      B.flatMap(fa)(runKleisli(k))
+  def =<<(fa: F[A])(implicit B: Bind[F]): F[B] =
+    B.flatMap(fa)(runKleisli(k))
 
-    def ***[C, D](j: Kleisli[F, C, D])(
-      implicit A: Apply[F]
-    ): Kleisli[F, (A, C), (B, D)] =
-      wrapKleisli(t => A.ap(runKleisli(j)(t._2))(A.map(runKleisli(k)(t._1))(a => (a, _))))
+  def ***[C, D](j: Kleisli[F, C, D])(
+    implicit A: Apply[F]
+  ): Kleisli[F, (A, C), (B, D)] =
+    wrapKleisli(t => A.ap(runKleisli(j)(t._2))(A.map(runKleisli(k)(t._1))(a => (a, _))))
 
-    def &&&[C](j: Kleisli[F, A, C])(
-      implicit A: Apply[F]
-    ): Kleisli[F, A, (B, C)] =
-      wrapKleisli(a => A.ap(runKleisli(j)(a))(A.map(runKleisli(k)(a))(a => (a, _))))
-  }
+  def &&&[C](j: Kleisli[F, A, C])(
+    implicit A: Apply[F]
+  ): Kleisli[F, A, (B, C)] =
+    wrapKleisli(a => A.ap(runKleisli(j)(a))(A.map(runKleisli(k)(a))(a => (a, _))))
+}
+
+trait KleisliSyntax {
+  implicit def toKleisliOps[F[_], A, B](k: Kleisli[F, A, B]): KleisliOps[F, A, B] = new KleisliOps(k)
 }
