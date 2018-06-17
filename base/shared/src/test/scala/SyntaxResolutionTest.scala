@@ -1,6 +1,7 @@
 package scalaz
 
 import scala.List
+import scala.Nothing
 
 import Scalaz._
 
