@@ -51,7 +51,7 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
    * Compose the leafs in a balanced binary fashion.
    */
   @tailrec
-  final def fold(implicit ev: Compose[=>:]): A =>: B = this match {
+  final def fold(implicit ev: Semicategory[=>:]): A =>: B = this match {
     case Chain(Chain(f, g), h) => (f >>> (g >>> h)).fold
     case Chain(Lift(f), g) =>
       g.foldLeft[PostComposeBalancer[=>:, A, ?]](PostComposeBalancer(f))(PostComposeBalancer.rightAction).result

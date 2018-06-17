@@ -22,9 +22,6 @@ options:
     - title: Category
       url: ct/Category.html
       menu_section: typeclass
-    - title: Compose
-      url: ct/Compose.html
-      menu_section: typeclass
     - title: Debug
       url: debug/Debug.html
       menu_section: typeclass
@@ -49,6 +46,9 @@ options:
     - title: Semigroup
       url: algebra/Semigroup.html
       menu_section: typeclass
+    - title: Semicategory
+      url: ct/Semicategory.html
+      menu_section: typeclass
     - title: Strong
       url: ct/Strong.html
       menu_section: typeclass
@@ -58,6 +58,9 @@ options:
     menu_section: data
 
     nested_options:
+    - title: Compose
+      url: ct/Compose.html
+      menu_section: data
     - title: Disjunction
       url: data/Disjunction.html
       menu_section: data

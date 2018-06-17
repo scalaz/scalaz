@@ -116,7 +116,7 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   /**
    * Compose the elements of this list in a balanced binary fashion.
    */
-  def foldMaybe(implicit F: Compose[F]): AMaybe[F, A, B] =
+  def foldMaybe(implicit F: Semicategory[F]): AMaybe[F, A, B] =
     self.uncons match {
       case AJust2(h, t) =>
         AJust(t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result)
@@ -137,7 +137,7 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   /**
    * Map and then compose the elements of this list in a balanced binary fashion.
    */
-  def foldMapMaybe[G[_, _]](φ: F ~~> G)(implicit G: Compose[G]): AMaybe[G, A, B] =
+  def foldMapMaybe[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): AMaybe[G, A, B] =
     self.uncons match {
       case AJust2(h, t) =>
         AJust(

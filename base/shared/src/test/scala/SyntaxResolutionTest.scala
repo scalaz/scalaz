@@ -29,8 +29,6 @@ object SyntaxResolutionTest {
 
   def _comonad[F[_]: Comonad, A](fa: F[A]): A = fa.copoint
 
-  def _compose[F[_, _]: Compose, A, B, C](fab: F[A, B], fbc: F[B, C]): F[A, C] = fbc.compose(fab)
-
   def _foldable[F[_]: Foldable, A, B, M: Monoid](fa: F[A], b: B, m: M) = {
     fa.foldMap((a: A) => m): M
     fa.foldLeft(b)((_, _) => b): B
@@ -58,6 +56,9 @@ object SyntaxResolutionTest {
   }
 
   def _eq[A: Eq](a: A): Boolean = a === a
+
+  def _semicategory[F[_, _]: Semicategory, A, B, C](fab: F[A, B], fbc: F[B, C]): F[A, C] =
+    fbc.compose(fab)
 
   def _strong[F[_, _]: Strong, A, B, C](fab: F[A, B]) = {
     fab.first[C]: F[(A, C), (B, C)]
