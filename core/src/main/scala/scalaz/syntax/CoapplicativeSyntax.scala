@@ -23,9 +23,9 @@ trait ToCoapplicativeOps0[TC[F[_]] <: Coapplicative[F]] extends ToCoapplicativeO
   ////
 }
 
-trait ToCoapplicativeOps[TC[F[_]] <: Coapplicative[F]] extends ToCoapplicativeOps0[TC] with ToCoapplicativeCodivideOps[TC]
+trait ToCoapplicativeOps[TC[F[_]] <: Coapplicative[F]] extends ToCoapplicativeOps0[TC] with ToCoapplicativeDecidableOps[TC]
 
-trait CoapplicativeSyntax[F[_]] extends CoapplicativeCodivideSyntax[F] {
+trait CoapplicativeSyntax[F[_]] extends CoapplicativeDecidableSyntax[F] {
   implicit def ToCoapplicativeOps[A](v: F[A]): CoapplicativeOps[F, A] = new CoapplicativeOps[F,A](v)(CoapplicativeSyntax.this.F)
 
   def F: Coapplicative[F]

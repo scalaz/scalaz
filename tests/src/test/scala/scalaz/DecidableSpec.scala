@@ -9,7 +9,7 @@ import examples.recgadt._
 
 import Scalaz._
 
-class ContravariantDerivesTest extends SpecLite {
+class DecidableTest extends SpecLite {
 
   val bar: Foo = Bar("hello")
   val baz: Foo = Baz

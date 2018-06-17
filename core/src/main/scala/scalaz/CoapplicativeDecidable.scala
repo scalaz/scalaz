@@ -4,11 +4,11 @@ package scalaz
 // Copyright: 2017 Sam Halliday
 // License: https://opensource.org/licenses/BSD-3-Clause
 
-/** Invariant parent of Coapplicative and Codivide
+/** Invariant parent of Coapplicative and Decidable
  *
  */
 ////
-trait CoapplicativeCodivide[F[_]]  { self =>
+trait CoapplicativeDecidable[F[_]]  { self =>
   ////
 
   def xcoproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z]
@@ -45,17 +45,17 @@ trait CoapplicativeCodivide[F[_]]  { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = xcoproduct4(a1, a2, a3, a4)(f, g)
 
   ////
-  val coapplicativeCodivideSyntax = new scalaz.syntax.CoapplicativeCodivideSyntax[F] { def F = CoapplicativeCodivide.this }
+  val coapplicativeDecidableSyntax = new scalaz.syntax.CoapplicativeDecidableSyntax[F] { def F = CoapplicativeDecidable.this }
 }
 
-object CoapplicativeCodivide {
-  @inline def apply[F[_]](implicit F: CoapplicativeCodivide[F]): CoapplicativeCodivide[F] = F
+object CoapplicativeDecidable {
+  @inline def apply[F[_]](implicit F: CoapplicativeDecidable[F]): CoapplicativeDecidable[F] = F
 
   import Isomorphism._
 
-  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: CoapplicativeCodivide[G]): CoapplicativeCodivide[F] =
-    new IsomorphismCoapplicativeCodivide[F, G] {
-      override def G: CoapplicativeCodivide[G] = E
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: CoapplicativeDecidable[G]): CoapplicativeDecidable[F] =
+    new IsomorphismCoapplicativeDecidable[F, G] {
+      override def G: CoapplicativeDecidable[G] = E
       override def iso: F <~> G = D
     }
 
@@ -64,8 +64,8 @@ object CoapplicativeCodivide {
   ////
 }
 
-trait IsomorphismCoapplicativeCodivide[F[_], G[_]] extends CoapplicativeCodivide[F] {
-  implicit def G: CoapplicativeCodivide[G]
+trait IsomorphismCoapplicativeDecidable[F[_], G[_]] extends CoapplicativeDecidable[F] {
+  implicit def G: CoapplicativeDecidable[G]
   ////
   import Isomorphism._
   def iso: F <~> G

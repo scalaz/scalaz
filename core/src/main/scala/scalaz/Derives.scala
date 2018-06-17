@@ -8,7 +8,7 @@ package scalaz
  *
  */
 ////
-trait Derives[F[_]] extends CoapplicativeCodivide[F] with ApplicativeDivisible[F] { self =>
+trait Derives[F[_]] extends CoapplicativeDecidable[F] with ApplicativeDivisible[F] { self =>
   ////
 
   ////
@@ -31,7 +31,7 @@ object Derives {
   ////
 }
 
-trait IsomorphismDerives[F[_], G[_]] extends Derives[F] with IsomorphismCoapplicativeCodivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
+trait IsomorphismDerives[F[_], G[_]] extends Derives[F] with IsomorphismCoapplicativeDecidable[F, G] with IsomorphismApplicativeDivisible[F, G]{
   implicit def G: Derives[G]
   ////
 

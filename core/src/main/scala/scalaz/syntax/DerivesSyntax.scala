@@ -23,9 +23,9 @@ trait ToDerivesOps0[TC[F[_]] <: Derives[F]] extends ToDerivesOpsU[TC] {
   ////
 }
 
-trait ToDerivesOps[TC[F[_]] <: Derives[F]] extends ToDerivesOps0[TC] with ToCoapplicativeCodivideOps[TC] with ToApplicativeDivisibleOps[TC]
+trait ToDerivesOps[TC[F[_]] <: Derives[F]] extends ToDerivesOps0[TC] with ToCoapplicativeDecidableOps[TC] with ToApplicativeDivisibleOps[TC]
 
-trait DerivesSyntax[F[_]] extends CoapplicativeCodivideSyntax[F] with ApplicativeDivisibleSyntax[F] {
+trait DerivesSyntax[F[_]] extends CoapplicativeDecidableSyntax[F] with ApplicativeDivisibleSyntax[F] {
   implicit def ToDerivesOps[A](v: F[A]): DerivesOps[F, A] = new DerivesOps[F,A](v)(DerivesSyntax.this.F)
 
   def F: Derives[F]

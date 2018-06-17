@@ -37,12 +37,11 @@ object TypeClass {
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val applyDivide = TypeClass("ApplyDivide", *->*, extendsList = Seq(invariantFunctor))
   lazy val applicativeDivisible = TypeClass("ApplicativeDivisible", *->*, extendsList = Seq(applyDivide))
-  lazy val derives = TypeClass("Derives", *->*, extendsList = Seq(coapplicativeCodivide, applicativeDivisible))
-  lazy val coapplicativeCodivide = TypeClass("CoapplicativeCodivide", *->*, extendsList = Seq())
-  lazy val codivide = TypeClass("Codivide", *->*, extendsList = Seq(coapplicativeCodivide))
-  lazy val contravariantDerives = TypeClass("ContravariantDerives", *->*, extendsList = Seq(derives, codivide, divisible))
+  lazy val derives = TypeClass("Derives", *->*, extendsList = Seq(coapplicativeDecidable, applicativeDivisible))
+  lazy val coapplicativeDecidable = TypeClass("CoapplicativeDecidable", *->*, extendsList = Seq())
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, coapplicativeDecidable))
   lazy val covariantDerives = TypeClass("CovariantDerives", *->*, extendsList = Seq(derives, coapplicative, applicative))
-  lazy val coapplicative = TypeClass("Coapplicative", *->*, extendsList = Seq(coapplicativeCodivide))
+  lazy val coapplicative = TypeClass("Coapplicative", *->*, extendsList = Seq(coapplicativeDecidable))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor, applyDivide))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, applicativeDivisible))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
@@ -121,8 +120,8 @@ object TypeClass {
     applyDivide,
     applicativeDivisible,
     derives,
-    coapplicativeCodivide,
-    codivide,
+    coapplicativeDecidable,
+    decidable,
     contravariantDerives,
     covariantDerives,
     coapplicative,

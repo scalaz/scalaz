@@ -592,6 +592,17 @@ object ScalazProperties {
       }
   }
 
+  object decidable {
+    def laws[F[_]](implicit
+                     F: Decidable[F],
+                     af: Arbitrary[F[Int]],
+                     axy: Arbitrary[Int => Int],
+                     ef: Equal[F[Int]]): Properties =
+      newProperties("decidable") { p =>
+        p.include(divisible.laws[F])
+      }
+  }
+
   object compose {
     def associative[=>:[_, _], A, B, C, D](implicit ab: Arbitrary[A =>: B], bc: Arbitrary[B =>: C],
                                            cd: Arbitrary[C =>: D], C: Compose[=>:], E: Equal[A =>: D]): Prop =

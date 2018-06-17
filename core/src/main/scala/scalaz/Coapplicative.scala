@@ -8,7 +8,7 @@ package scalaz
  * Coproduct analogue of Applicative
  */
 ////
-trait Coapplicative[F[_]] extends CoapplicativeCodivide[F] { self =>
+trait Coapplicative[F[_]] extends CoapplicativeDecidable[F] { self =>
   ////
 
   def coapply1[Z, A1](a1: =>F[A1])(f: A1 => Z): F[Z]
@@ -81,7 +81,7 @@ object Coapplicative {
   ////
 }
 
-trait IsomorphismCoapplicative[F[_], G[_]] extends Coapplicative[F] with IsomorphismCoapplicativeCodivide[F, G]{
+trait IsomorphismCoapplicative[F[_], G[_]] extends Coapplicative[F] with IsomorphismCoapplicativeDecidable[F, G]{
   implicit def G: Coapplicative[G]
   ////
 
