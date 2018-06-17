@@ -72,13 +72,6 @@ object MonadPlus {
     }
 
   ////
-  import Isomorphism.<~>
-  def fromIso[F[_], G[_]](D: F <~> G)(implicit MP: MonadPlus[G]): MonadPlus[F] =
-    new IsomorphismMonadPlus[F, G] {
-      override implicit def G: MonadPlus[G] = MP
-      override def iso: F <~> G = D
-    }
-
   /** The Free instruction set for MonadPlus */
   sealed abstract class Ast[A]
   final case class Plus[F[_], A](a: Free[F, A], b: () => Free[F, A]) extends Ast[A]

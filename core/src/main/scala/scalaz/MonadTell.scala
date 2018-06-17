@@ -27,13 +27,6 @@ object MonadTell {
     }
 
   ////
-  import Isomorphism.<~>
-  def fromIso[F[_], G[_], S](I: F <~> G)(implicit M: MonadTell[G, S]): MonadTell[F, S] =
-    new IsomorphismMonadTell[F, G, S] {
-      override implicit def G: MonadTell[G, S] = M
-      override def iso: F <~> G = I
-    }
-
   /** The Free instruction set for MonadTell */
   sealed abstract class Ast[S, A]
   final case class Writer[S, A](s: S, a: A) extends Ast[S, A]

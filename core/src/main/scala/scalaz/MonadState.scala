@@ -33,13 +33,6 @@ object MonadState {
     }
 
   ////
-  import Isomorphism.<~>
-  def fromIso[F[_], G[_], S](I: F <~> G)(implicit M: MonadState[G, S]): MonadState[F, S] =
-    new IsomorphismMonadState[F, G, S] {
-      override implicit def G: MonadState[G, S] = M
-      override def iso: F <~> G = I
-    }
-
   /** The Free instruction set for MonadState */
   sealed abstract class Ast[S, A]
   final case class Get[S]()     extends Ast[S, S]

@@ -29,13 +29,6 @@ object MonadReader {
     }
 
   ////
-  import Isomorphism.<~>
-  def fromIso[F[_], G[_], S](D: F <~> G)(implicit MR: MonadReader[G, S]): MonadReader[F, S] =
-    new IsomorphismMonadReader[F, G, S] {
-      override implicit def G: MonadReader[G, S] = MR
-      override def iso: F <~> G = D
-    }
-
   /** The Free instruction set for MonadReader */
   sealed abstract class Ast[S, A]
   final case class Ask[S]() extends Ast[S, S]
