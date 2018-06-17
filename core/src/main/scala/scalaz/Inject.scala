@@ -10,7 +10,7 @@ import std.option.{none, some}
  *
  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
  */
-abstract class Inject[F[_], G[_]] extends (F ~> G) {
+sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
   def apply[A](fa: F[A]): G[A] = inj(fa)
   def unapply[A](ga: G[A]): Option[F[A]] = prj(ga)
   def inj[A](fa: F[A]): G[A]
@@ -38,6 +38,18 @@ sealed abstract class InjectInstances {
 }
 
 object Inject extends InjectInstances {
+  /**
+   * This should only be used by third party coproduct encodings. If `G <:
+   * Coproduct` it is likely to break typeclass coherence. Caveat Emptor.
+   */
+  def instance[F[_], G[_]](
+    inj_ : F ~> G,
+    prj_ : G ~> λ[α => Option[F[α]]]
+  ): Inject[F, G] = new Inject[F, G] {
+    override def inj[A](fa: F[A]): G[A] = inj_(fa)
+    override def prj[A](ga: G[A]): Option[F[A]] = prj_(ga)
+  }
+
   def inject[F[_], G[_], A](ga: G[Free[F, A]])(implicit I: Inject[G, F]): Free[F, A] =
     Free[F, A](I.inj(ga))
 
