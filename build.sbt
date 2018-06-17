@@ -28,33 +28,21 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, effectJVM, effectJS, stdJVM, stdJS, example, benchmarks)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, stdJVM, stdJS, example, benchmarks)
   .enablePlugins(ScalaJSPlugin)
+
+resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 lazy val base = crossProject.module
   .dependsOn(meta)
+  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.1-SNAPSHOT")
 
 lazy val baseJVM = base.jvm
 
 lazy val baseJS = base.js
 
-lazy val effect = crossProject
-  .in(file("effect"))
-  .settings(stdSettings("effect"))
-  .settings(
-    libraryDependencies ++=
-      Seq("org.specs2" %%% "specs2-core"          % "4.2.0" % "test",
-          "org.specs2" %%% "specs2-matcher-extra" % "4.2.0" % "test"),
-    scalacOptions in Test ++= Seq("-Yrangepos")
-  )
-  .dependsOn(base)
-
-lazy val effectJVM = effect.jvm
-
-lazy val effectJS = effect.js
-
 lazy val benchmarks = project.module
-  .dependsOn(baseJVM, effectJVM)
+  .dependsOn(baseJVM)
   .enablePlugins(JmhPlugin)
   .settings(
     skip in publish := true,
@@ -63,8 +51,6 @@ lazy val benchmarks = project.module
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
         "org.scalaz"     %% "scalaz-core"   % "7.2.23",
-        "io.monix"       %% "monix"         % "3.0.0-RC1",
-        "org.typelevel"  %% "cats-effect"   % "1.0.0-RC"
       )
   )
 
