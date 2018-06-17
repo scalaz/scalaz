@@ -1,4 +1,8 @@
-import scalaz.Scalaz._
+package scalaz
+
+import scala.List
+
+import Scalaz._
 
 /* Tests that the various syntax macros work for the typeclasses which use them. */
 object SyntaxResolutionTest {
@@ -9,14 +13,13 @@ object SyntaxResolutionTest {
 
   def _bifunctor[F[_, _]: Bifunctor, A, B, S, T](fab: F[A, B], as: A => S, bt: B => T) = {
     fab.lmap(as): F[S, B]
-    fab.rmap(bt): F[A, T]
+    fab.map(bt): F[A, T]
     fab.bimap(as, bt): F[S, T]
   }
 
   def _bind[F[_]: Bind, A, B](fa: F[A], f: A => F[B]): F[B] = fa.flatMap(f)
 
   def _choice[F[_, _]: Choice, A, B, C](fab: F[A, B]) = {
-    import scalaz.data.Disjunction._
     fab.leftchoice[C]: F[A \/ C, B \/ C]
     fab.rightchoice[C]: F[C \/ A, C \/ B]
   }
@@ -42,13 +45,16 @@ object SyntaxResolutionTest {
 
   def _profunctor[F[_, _]: Profunctor, A, B, C, D](fab: F[A, B], ca: C => A, bd: B => D) = {
     fab.lmap(ca): F[C, B]
-    fab.rmap(bd): F[A, D]
+    fab.map(bd): F[A, D]
     fab.dimap(ca)(bd): F[C, D]
   }
 
-  def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.append(a2)
+  def _semigroup[A: Semigroup](a1: A, a2: A): A = a1.mappend(a2)
 
-  def _debug[A: Debug](a: A): String = a.debug
+  def _debug[A: Debug](a: A) = {
+    a.debugs: String
+    a.debug: data.Cord
+  }
 
   def _eq[A: Eq](a: A): Boolean = a === a
 

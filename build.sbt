@@ -1,5 +1,7 @@
 import Scalaz._
 
+cancelable in Global := true
+
 organization in ThisBuild := "org.scalaz"
 
 publishTo in ThisBuild := {
@@ -18,6 +20,8 @@ lazy val sonataCredentials = for {
 } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
 
 credentials in ThisBuild ++= sonataCredentials.toSeq
+
+findLicense
 
 lazy val root = project
   .in(file("."))
@@ -84,10 +88,18 @@ lazy val stdJS  = std.js
 
 lazy val example = project.module
   .dependsOn(baseJVM, stdJVM)
-  .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "scalaz",
+    buildInfoObject := "BuildInfo"
+  )
+  .settings(
+    scalacOptions -= "-Yno-imports",
+    scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
+    scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
     skip in publish := true,
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "0.6",
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),

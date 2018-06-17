@@ -3,9 +3,9 @@ layout: docs
 title:  "Either"
 ---
 
-# Either
+# Either [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/either.scala)
 
-Scalaz provides instances for Scala's built-in `Either` such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in [Either](https://www.scala-lang.org/api/current/scala/util/Either.html) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
 
 **Typical imports**
 
@@ -31,6 +31,6 @@ either2.bimap(
  right => right * 10
 )
 
-either1.debug
-either2.debug
+either1.debug.toString
+either2.debug.toString
 ```

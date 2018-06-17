@@ -1,7 +1,7 @@
-package scalaz.effect
+package scalaz
+package effect
 
 import org.specs2.Specification
-import scalaz.data.Disjunction.-\/
 
 class PromiseSpec extends Specification with RTS {
 

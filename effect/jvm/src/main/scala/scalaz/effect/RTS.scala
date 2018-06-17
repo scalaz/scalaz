@@ -1,16 +1,14 @@
 // Copyright (C) 2017-2018 John A. De Goes. All rights reserved.
-package scalaz.effect
+package scalaz
+package effect
 
-import scala.annotation.switch
-import scala.annotation.tailrec
+import scala.{ ::, inline, Any, AnyRef, Array, List, Nil, None, Nothing, Option, Some }
+import scala.annotation.{ switch, tailrec }
 import scala.concurrent.duration.Duration
+
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.{ Executors, TimeUnit }
-import java.lang.{ Runnable, Runtime }
-
-import scalaz.data.Disjunction._
-import scalaz.data.Maybe
-import scalaz.Void
+import java.lang.{ Math, Runnable, Runtime }
 
 /**
  * This trait provides a high-performance implementation of a runtime system for
@@ -72,6 +70,8 @@ trait RTS {
   }
 
   final def unsafeShutdownAndWait(timeout: Duration): Unit = {
+    scheduledExecutor.shutdown()
+    scheduledExecutor.awaitTermination(timeout.toMillis, TimeUnit.MILLISECONDS)
     threadPool.shutdown()
     threadPool.awaitTermination(timeout.toMillis, TimeUnit.MILLISECONDS)
     ()
@@ -87,7 +87,7 @@ trait RTS {
   /**
    * The main thread pool used for executing fibers.
    */
-  val threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().max(2))
+  val threadPool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors(), 2))
 
   /**
    * This determines the maximum number of resumptions placed on the stack
@@ -150,15 +150,15 @@ private object RTS {
   final def nextInstr[E](value: Any, stack: Stack): IO[E, Any] =
     if (!stack.isEmpty) stack.pop()(value).asInstanceOf[IO[E, Any]] else null
 
-  object Catcher extends Function[Any, IO[Any, Any]] {
+  object Catcher extends (Any => IO[Any, Any]) {
     final def apply(v: Any): IO[Any, Any] = IO.now(\/-(v))
   }
 
-  object IdentityCont extends Function[Any, IO[Any, Any]] {
+  object IdentityCont extends (Any => IO[Any, Any]) {
     final def apply(v: Any): IO[Any, Any] = IO.now(v)
   }
 
-  final case class Finalizer[E](finalizer: ExitResult[E, Any] => IO[Void, Unit]) extends Function[Any, IO[E, Any]] {
+  final case class Finalizer[E](finalizer: ExitResult[E, Any] => IO[Void, Unit]) extends (Any => IO[E, Any]) {
     final def apply(v: Any): IO[E, Any] = IO.now(v)
   }
 

@@ -3,9 +3,9 @@ layout: docs
 title:  "List"
 ---
 
-# List
+# List [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/collection/list.scala)
 
-Scalaz provides instances for Scala's built-in `List` such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in [List](https://www.scala-lang.org/api/current/scala/collection/immutable/List.html) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
 
 **Typical imports**
 

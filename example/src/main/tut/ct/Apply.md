@@ -3,7 +3,7 @@ layout: docs
 title:  "Apply"
 ---
 
-# Apply
+# Apply [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/ct/apply.scala)
 
 *A strong lax semi-monoidal endofunctor. This is equivalent to an [Applicative](./Applicative.html) without pure.*
 
@@ -17,7 +17,7 @@ In addition to the laws of a [Functor](./Functor.html), an Apply instance needs 
 import scalaz.Scalaz._
 ```
 
-## Instance declaration
+# Instance declaration
 
 ```tut
 import scalaz.ct.ApplyClass
@@ -28,7 +28,7 @@ val listApply: Apply[List] = instanceOf(new ApplyClass[List] {
 })
 ```
 
-## Usage
+# Usage
 
 ```tut
 val f1: Int => Int = _ + 3

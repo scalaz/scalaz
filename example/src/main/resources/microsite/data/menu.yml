@@ -16,14 +16,26 @@ options:
     - title: Bifunctor
       url: ct/Bifunctor.html
       menu_section: typeclass
+    - title: Bind
+      url: ct/Bind.html
+      menu_section: typeclass
+    - title: Category
+      url: ct/Category.html
+      menu_section: typeclass
+    - title: Compose
+      url: ct/Compose.html
+      menu_section: typeclass
     - title: Debug
-      url: typeclass/Debug.html
+      url: debug/Debug.html
       menu_section: typeclass
     - title: Eq
       url: core/Eq.html
       menu_section: typeclass
     - title: Functor
       url: ct/Functor.html
+      menu_section: typeclass
+    - title: Kleisli
+      url: ct/Kleisli.html
       menu_section: typeclass
     - title: Monad
       url: ct/Monad.html
@@ -37,6 +49,9 @@ options:
     - title: Semigroup
       url: algebra/Semigroup.html
       menu_section: typeclass
+    - title: Strong
+      url: ct/Strong.html
+      menu_section: typeclass
 
   - title: Data classes
     url: data/index.html
@@ -48,9 +63,6 @@ options:
       menu_section: data
     - title: Forall
       url: data/Forall.html
-      menu_section: data
-    - title: Kleisli
-      url: data/Kleisli.html
       menu_section: data
     - title: Maybe
       url: data/Maybe.html

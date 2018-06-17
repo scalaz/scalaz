@@ -57,11 +57,13 @@ Luckily, most of this ships in Scalaz by default.
 
 ```tut:reset
 import scalaz.Scalaz._
+import scalaz.data.Cord
 import scalaz.debug.DebugClass
 
 final case class BusinessObject(id: Long, value: Long)
 
-implicit val businessObjectDebug: Debug[BusinessObject] = instanceOf[DebugClass[BusinessObject]](b => s"BO[${b.id} = ${b.value}]")
+implicit val businessObjectDebug: Debug[BusinessObject] = 
+  DebugClass.instance[BusinessObject](b => Cord(s"BO[${b.id} = ${b.value}]"))
 
 BusinessObject(1234L, 1234567L).debug
 ```
@@ -71,7 +73,7 @@ After showing that we can add behaviour, it should now be easy to see how type c
 For example, we could define a function `loudDebug` as follows:
 
 ```tut:silent
-def loudDebug[A: Debug](a: A) = a.debug.toUpperCase
+def loudDebug[A: Debug](a: A) = a.debugs.toUpperCase
 ```
 
 Notice that the type parameter `A` now has a constraint that requires it have an instance of `Debug`.

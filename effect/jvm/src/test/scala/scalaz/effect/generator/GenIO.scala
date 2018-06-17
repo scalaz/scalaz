@@ -1,4 +1,6 @@
-package scalaz.effect.generator
+package scalaz
+package effect
+package generator
 
 import org.scalacheck._
 import scalaz.effect.{ ExitResult, IO, RTS }
