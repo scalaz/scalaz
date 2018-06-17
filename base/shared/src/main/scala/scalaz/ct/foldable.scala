@@ -36,8 +36,6 @@ object FoldableClass {
 
 }
 
-trait FoldableInstances {}
-
 trait FoldableSyntax {
   implicit final class ToFoldableOps[F[_], A](self: F[A]) {
     def foldLeft[B](f: B)(g: (B, A) => B)(implicit ev: Foldable[F]): B = macro meta.Ops.ia_1_1

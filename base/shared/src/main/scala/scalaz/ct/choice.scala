@@ -1,8 +1,6 @@
 package scalaz
 package ct
 
-import data.Disjunction
-
 import data.Disjunction.swap
 
 import scala.language.experimental.macros
@@ -27,26 +25,6 @@ object ChoiceClass {
   }
 
   trait Alt[D <: Alt[D]]
-}
-
-trait ChoiceInstances {
-
-  implicit val functionChoice: Choice[? => ?] = instanceOf(
-    new ChoiceClass[? => ?] with ProfunctorClass.DeriveDimap[? => ?] {
-
-      override def lmap[A, B, C](fab: A => B)(ca: C => A): C => B =
-        fab compose ca
-
-      override def rmap[A, B, C](fab: A => B)(bc: B => C): A => C =
-        fab andThen bc
-
-      override def leftchoice[A, B, C](ab: A => B): A \/ C => B \/ C =
-        _.fold(a => Disjunction.left(ab(a)), Disjunction.right)
-
-      override def rightchoice[A, B, C](ab: A => B): C \/ A => C \/ B =
-        _.fold(Disjunction.left, a => Disjunction.right(ab(a)))
-    }
-  )
 }
 
 trait ChoiceSyntax {

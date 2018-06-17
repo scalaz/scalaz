@@ -7,8 +7,6 @@ trait SemigroupClass[A] {
   def mappend(a1: A, a2: => A): A
 }
 
-trait SemigroupInstances {}
-
 trait SemigroupSyntax {
   implicit final class ToSemigroupOps[A](a: A) {
     def mappend(f: => A)(implicit ev: Semigroup[A]): A = macro meta.Ops.ia_1
