@@ -166,32 +166,6 @@ object FreeTest extends SpecLite {
     a != b
   }
 
-  "Free effects" should {
-    "exist for MonadState" in {
-      fail
-    }
-
-    "exist for MonadError" in {
-      fail
-    }
-
-    "exist for MonadReader" in {
-      fail
-    }
-
-    "exist for MonadPlus" in {
-      fail
-    }
-
-    "exist for MonadTell" in {
-      fail
-    }
-
-    "exist for MonadListen" in {
-      fail
-    }
-  }
-
   object instances {
     def bindRec[F[_]] = BindRec[Free[F, ?]]
     def monad[F[_]] = Monad[Free[F, ?]]
