@@ -13,7 +13,8 @@ trait Alt[F[_]] extends Applicative[F] with Derives[F] { self =>
 
   def alt[A](a1: =>F[A], a2: =>F[A]): F[A]
 
-  // FIXME: add some, many, optional
+  /** One or none */
+  def optional[A](fa: F[A]): F[Maybe[A]] = alt(map(fa)(Maybe.just(_)), pure(Maybe.empty))
 
   def altly1[Z, A1](a1: =>F[A1])(f: A1 => Z): F[Z] = map(a1)(f)
   def altly2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(f: A1 \/ A2 => Z): F[Z] =
