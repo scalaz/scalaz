@@ -261,6 +261,14 @@ object ScalazProperties {
       }
   }
 
+  object alt {
+    def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
+                   aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
+      newProperties("alt") { p =>
+        p.include(applicative.laws[F])
+      }
+  }
+
   object bind {
     def associativity[M[_], X, Y, Z](implicit M: Bind[M], amx: Arbitrary[M[X]], af: Arbitrary[(X => M[Y])],
                                      ag: Arbitrary[(Y => M[Z])], emz: Equal[M[Z]]): Prop =

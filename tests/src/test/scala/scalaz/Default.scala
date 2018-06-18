@@ -21,22 +21,14 @@ object Default {
   implicit val string: Default[String]   = instance("")
   implicit val boolean: Default[Boolean] = instance(false)
 
-  implicit val default_derives: Derives[Default] =
-    new ApplicativePlus[Default] {
+  implicit val default_alt: Alt[Default] =
+    new Alt[Default] {
       override def point[A](a: =>A): Default[A] = instance(a)
       override def ap[A, B](fa: =>Default[A])(
         f: =>Default[A => B]
       ): Default[B] = instance(f.default(fa.default))
 
-      override def empty[A]: Default[A] = ???
-      override def plus[A](a: Default[A], b: => Default[A]): Default[A] = a
-
-//      override def coapply1[Z, A1](a1: =>Default[A1])(f: A1 => Z): Default[Z] =
-//        instance(f(a1.default))
-//      override def coapply2[Z, A1, A2](a1: =>Default[A1], a2: =>Default[A2])(
-//        f: A1 \/ A2 => Z
-//      ): Default[Z] = instance(f(-\/(a1.default)))
-
+      override def alt[A](a: => Default[A], b: => Default[A]): Default[A] = a
     }
 
 }

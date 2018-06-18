@@ -37,6 +37,7 @@ object TypeClass {
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
   lazy val derives = TypeClass("Derives", *->*, fromIso = false) // FIXME fromIso
   lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, derives))
+  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, derives), fromIso = false) // FIXME fromIso
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
@@ -61,7 +62,7 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty, derives))
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val associative = TypeClass("Associative", *^*->*, iso = false, fromIso = false)
@@ -114,6 +115,7 @@ object TypeClass {
     applicative,
     derives,
     decidable,
+    alt,
     align,
     zip,
     unzip,

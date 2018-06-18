@@ -5,9 +5,6 @@ package syntax
 final class ApplicativePlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: ApplicativePlus[F]) extends Ops[F[A]] {
   ////
 
-  /** When using ApplicativePlus as an Alternative */
-  def <|>(that: => F[A]): F[A] = F.plus(self, that)
-
   ////
 }
 
@@ -26,9 +23,9 @@ trait ToApplicativePlusOps0[TC[F[_]] <: ApplicativePlus[F]] extends ToApplicativ
   ////
 }
 
-trait ToApplicativePlusOps[TC[F[_]] <: ApplicativePlus[F]] extends ToApplicativePlusOps0[TC] with ToApplicativeOps[TC] with ToPlusEmptyOps[TC] with ToDerivesOps[TC]
+trait ToApplicativePlusOps[TC[F[_]] <: ApplicativePlus[F]] extends ToApplicativePlusOps0[TC] with ToApplicativeOps[TC] with ToPlusEmptyOps[TC]
 
-trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusEmptySyntax[F] with DerivesSyntax[F] {
+trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusEmptySyntax[F] {
   implicit def ToApplicativePlusOps[A](v: F[A]): ApplicativePlusOps[F, A] = new ApplicativePlusOps[F,A](v)(ApplicativePlusSyntax.this.F)
 
   def F: ApplicativePlus[F]

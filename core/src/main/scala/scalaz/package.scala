@@ -238,18 +238,6 @@ package object scalaz {
   type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
 
-  /**
-   * Alternative and ApplicativePlus are ambiguous and lawless, so are typically
-   * handled by convention. There is a proposal to fix this:
-   *
-   * https://wiki.haskell.org/MonadPlus_reform_proposal
-   * https://github.com/scalaz/scalaz/issues/1882
-   *
-   * In the meantime, use this Alternative alias to assist your conventions.
-   */
-  type Alternative[F[_]] = ApplicativePlus[F]
-  val Alternative: ApplicativePlus.type = ApplicativePlus
-
   /** An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
     *
     * @template
