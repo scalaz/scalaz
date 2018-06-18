@@ -197,7 +197,24 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 object Nondeterminism {
   @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Nondeterminism[G]): Nondeterminism[F] =
+    new IsomorphismNondeterminism[F, G] {
+      override def G: Nondeterminism[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismNondeterminism[F[_], G[_]] extends Nondeterminism[F] with IsomorphismMonad[F, G]{
+  implicit def G: Nondeterminism[G]
+  ////
+
+  override def chooseAny[A](head: F[A], tail: IList[F[A]]): F[(A, IList[F[A]])] =
+    iso.from(G.map(G.chooseAny(iso.to(head), tail.map(iso.to.apply))){case (a, b) => (a, b.map(iso.from.apply))})
   ////
 }

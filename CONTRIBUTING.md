@@ -236,12 +236,6 @@ In the absence of a context specific name for the type parameters, use these:
  * Use `A`, `B`, `C`, `X` for kind `*`
  * Use `F`, `G` for kind `* -> *`.
 
-Declare type parameters requiring type constructors first in type parameter declarations. This is an arbitrary choice,
-but the consistency is worth it.
-
-    class Foo[F[_], A, B] // good
-    class Foo[A, F[_], B] // bad
-
 Define type lambdas using the kind-projector plugin. Raw type-lambdas should be defined with either lower case or greek
 letters as the type parameters. This helps to distinguish them from the applied types. Type Lambdas should use the
 kind-projector syntax. Here's some inline syntax examples:

@@ -101,7 +101,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
 
   import std.option._
 
-  def state: StateT[Option, A, B] =
+  def state: StateT[A, Option, B] =
     StateT(carry apply _)
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =

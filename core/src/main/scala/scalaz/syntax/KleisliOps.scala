@@ -16,7 +16,7 @@ final class KleisliFAOps[F[_], A](private val self: F[A]) extends AnyVal {
   def liftKleisli[R]: Kleisli[F, R, A] = Kleisli[F, R, A](_ => self)
 
   /** Lift the computation into a ReaderT. Alias for liftKleisli */
-  def liftReaderT[R]: ReaderT[F, R, A] = liftKleisli
+  def liftReaderT[R]: ReaderT[R, F, A] = liftKleisli
 }
 
 sealed trait ToKleisliOps0 {

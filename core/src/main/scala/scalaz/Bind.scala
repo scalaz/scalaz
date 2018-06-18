@@ -70,7 +70,24 @@ trait Bind[F[_]] extends Apply[F] { self =>
 object Bind {
   @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Bind[G]): Bind[F] =
+    new IsomorphismBind[F, G] {
+      override def G: Bind[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G]{
+  implicit def G: Bind[G]
+  ////
+
+  override def bind[A, B](fa: F[A])(f: A => F[B]): F[B] =
+    iso.from(G.bind(iso.to(fa))(f.andThen(iso.to.apply)))
   ////
 }

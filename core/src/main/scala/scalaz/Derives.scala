@@ -18,6 +18,21 @@ trait Derives[F[_]] extends CoapplicativeCodivide[F] with ApplicativeDivisible[F
 object Derives {
   @inline def apply[F[_]](implicit F: Derives[F]): Derives[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Derives[G]): Derives[F] =
+    new IsomorphismDerives[F, G] {
+      override def G: Derives[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+
+  ////
+}
+
+trait IsomorphismDerives[F[_], G[_]] extends Derives[F] with IsomorphismCoapplicativeCodivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
+  implicit def G: Derives[G]
   ////
 
   ////

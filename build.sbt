@@ -157,7 +157,7 @@ lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
 
 // can't use "sbt test"
-// https://github.com/scala-native/scala-native/issues/339
+// https://github.com/rickynils/scalacheck/issues/396
 lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
   .settings(
     standardSettings,

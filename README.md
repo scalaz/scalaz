@@ -7,22 +7,25 @@ It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corr
 a large number of data structures.
 
 [![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.3.x)](https://travis-ci.org/scalaz/scalaz)
+[![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
+[![Gitter](http://badges.gitter.im/scalaz/scalaz.png)](https://gitter.im/scalaz/scalaz)
+[![Discord](https://img.shields.io/discord/455164441852641282.svg?label=Discord)](https://discord.gg/cVHGnke)
 
 ## Getting Scalaz
 
-The current stable version is 7.2.23, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
+The current stable version is 7.2.24, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.23"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.24"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.2.23%22).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.2.24%22).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.23.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.24.jar`.
 
 ## Quick Start
 

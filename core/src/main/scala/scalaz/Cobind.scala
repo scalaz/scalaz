@@ -36,7 +36,27 @@ trait Cobind[F[_]] extends Functor[F] { self =>
 object Cobind {
   @inline def apply[F[_]](implicit F: Cobind[F]): Cobind[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Cobind[G]): Cobind[F] =
+    new IsomorphismCobind[F, G] {
+      override def G: Cobind[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G]{
+  implicit def G: Cobind[G]
+  ////
+
+  override def cobind[A, B](fa: F[A])(f: F[A] => B): F[B] =
+    iso.from(G.cobind(iso.to(fa))(f.compose(iso.from.apply)))
+
+  override def cojoin[A](a: F[A]): F[F[A]] =
+    iso.from(G.map(G.cojoin(iso.to(a)))(iso.from.apply))
   ////
 }

@@ -9,10 +9,10 @@ import org.scalacheck.Prop.forAll
 
 object EitherTTest extends SpecLite {
 
-  type EitherTList[A, B] = EitherT[List, A, B]
-  type EitherTListInt[A] = EitherT[List, Int, A]
-  type EitherTOptionInt[A] = EitherT[Option, Int, A]
-  type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
+  type EitherTList[A, B] = EitherT[A, List, B]
+  type EitherTListInt[A] = EitherT[Int, List, A]
+  type EitherTOptionInt[A] = EitherT[Int, Option, A]
+  type EitherTComputation[A] = EitherT[Int, Function0, A] // in lieu of IO
 
   checkAll(equal.laws[EitherTListInt[Int]])
   checkAll(bindRec.laws[EitherTListInt])
@@ -20,12 +20,12 @@ object EitherTTest extends SpecLite {
   checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
-  checkAll(monadTrans.laws[EitherT[?[_], Int, ?], List])
+  checkAll(monadTrans.laws[EitherT[Int, ?[_], ?], List])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
-    val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
-    b must_== EitherT.rightT[({type l[a] = String \/ a})#l, Boolean, Int](a)
+    val b: EitherT[Boolean, ({type l[a] = String \/ a})#l, Int] = EitherT.rightU[Boolean](a)
+    b must_== EitherT.rightT[Boolean, ({type l[a] = String \/ a})#l, Int](a)
   }
 
   "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
@@ -77,32 +77,32 @@ object EitherTTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
-    def bindRec[F[_] : Monad: BindRec, A] = BindRec[EitherT[F, A, ?]]
-    def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
-    def plus[F[_] : Monad, A: Semigroup] = Plus[EitherT[F, A, ?]]
-    def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[EitherT[F, A, ?]]
-    def foldable[F[_] : Foldable, A] = Foldable[EitherT[F, A, ?]]
-    def traverse[F[_] : Traverse, A] = Traverse[EitherT[F, A, ?]]
-    def bifunctor[F[_] : Functor] = Bifunctor[EitherT[F, ?, ?]]
-    def bifoldable[F[_] : Foldable] = Bifoldable[EitherT[F, ?, ?]]
-    def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
+    def functor[A, F[_] : Functor] = Functor[EitherT[A, F, ?]]
+    def bindRec[A, F[_] : Monad: BindRec] = BindRec[EitherT[A, F, ?]]
+    def monad[A, F[_] : Monad] = Monad[EitherT[A, F, ?]]
+    def plus[A: Semigroup, F[_] : Monad] = Plus[EitherT[A, F, ?]]
+    def monadPlus[A: Monoid, F[_] : Monad] = MonadPlus[EitherT[A, F, ?]]
+    def foldable[A, F[_] : Foldable] = Foldable[EitherT[A, F, ?]]
+    def traverse[A, F[_] : Traverse] = Traverse[EitherT[A, F, ?]]
+    def bifunctor[F[_] : Functor] = Bifunctor[EitherT[?, F, ?]]
+    def bifoldable[F[_] : Foldable] = Bifoldable[EitherT[?, F, ?]]
+    def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[?, F, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : BindRec, A] = Functor[EitherT[F, A, ?]]
-    def functor[F[_] : Monad, A: Monoid] = Functor[EitherT[F, A, ?]]
-    def functor[F[_] : Monad : BindRec, A: Monoid] = Functor[EitherT[F, A, ?]]
-    def apply[F[_] : Monad, A: Monoid] = Apply[EitherT[F, A, ?]]
-    def monad[F[_] : Monad, A: Monoid] = Monad[EitherT[F, A, ?]]
-    def plus[F[_] : Monad, A: Monoid] = Plus[EitherT[F, A, ?]]
-    def foldable[F[_] : Traverse, A] = Foldable[EitherT[F, A, ?]]
-    def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[F, ?, ?]]
-    def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[F, ?, ?]]
-    def monadError[F[_] : Monad, A] = MonadError[EitherT[F, A, ?], A]
-    def nondeterminism[F[_] : Nondeterminism, A] = Nondeterminism[EitherT[F, A, ?]]
-    def nondeterminismMonad[F[_] : Nondeterminism, A] = Monad[EitherT[F, A, ?]]
-    def nondeterminismFunctor[F[_] : Nondeterminism: BindRec: Traverse, A] = Functor[EitherT[F, A, ?]]
-    def nondeterminismMonad[F[_] : Nondeterminism: BindRec: Traverse, A] = Monad[EitherT[F, A, ?]]
+    def functor[A, F[_] : BindRec] = Functor[EitherT[A, F, ?]]
+    def functor[A: Monoid, F[_] : Monad] = Functor[EitherT[A, F, ?]]
+    def functor[A: Monoid, F[_] : Monad : BindRec] = Functor[EitherT[A, F, ?]]
+    def apply[A: Monoid, F[_] : Monad] = Apply[EitherT[A, F, ?]]
+    def monad[A: Monoid, F[_] : Monad] = Monad[EitherT[A, F, ?]]
+    def plus[A: Monoid, F[_] : Monad] = Plus[EitherT[A, F, ?]]
+    def foldable[A, F[_] : Traverse] = Foldable[EitherT[A, F, ?]]
+    def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[?, F, ?]]
+    def bifoldable[F[_] : Traverse] = Bifoldable[EitherT[?, F, ?]]
+    def monadError[A, F[_] : Monad] = MonadError[EitherT[A, F, ?], A]
+    def nondeterminism[A, F[_] : Nondeterminism] = Nondeterminism[EitherT[A, F, ?]]
+    def nondeterminismMonad[A, F[_] : Nondeterminism] = Monad[EitherT[A, F, ?]]
+    def nondeterminismFunctor[A, F[_] : Nondeterminism: BindRec: Traverse] = Functor[EitherT[A, F, ?]]
+    def nondeterminismMonad[A, F[_] : Nondeterminism: BindRec: Traverse] = Monad[EitherT[A, F, ?]]
   }
 
   def compilationTests() = {
@@ -118,7 +118,7 @@ object EitherTTest extends SpecLite {
         def append(f1: (ABC, Int), f2: => (ABC, Int)): (ABC, Int) = f1
       }
 
-      def brokenMethod: EitherT[Option, (ABC, Int), (ABC, String)] =
+      def brokenMethod: EitherT[(ABC, Int), Option, (ABC, String)] =
         EitherT(Some((ABC("abcData"),"Success").right))
 
       def filterComp =

@@ -19,7 +19,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
 
 import sbtdynver.DynVerPlugin.autoImport._
@@ -112,10 +112,18 @@ object build {
     "-target:jvm-1.8"
   )
 
+  val unusedWarnOptions = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 11)) =>
+        Seq("-Ywarn-unused-import")
+      case _ =>
+        Seq("-Ywarn-unused:imports")
+    }
+  }
+
   val lintOptions = Seq(
-    "-Xlint:_,-type-parameter-shadow",
+    "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
     "-Ywarn-dead-code",
-    "-Ywarn-unused-import",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
@@ -129,7 +137,7 @@ object build {
 
   private[this] val buildInfoPackageName = "scalaz"
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
@@ -142,7 +150,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -178,6 +186,12 @@ object build {
       }
     },
     scalacOptions ++= lintOptions,
+    scalacOptions ++= unusedWarnOptions.value,
+    Seq(Compile, Test).flatMap(c =>
+      scalacOptions in (c, console) --= unusedWarnOptions.value
+    ),
+
+    scala213_pre_cross_setting,
 
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
@@ -239,16 +253,6 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommand(s"${rootNativeId}/publishSigned"),
-      // TODO scalacheck for Scala 2.13
-      releaseStepCommandAndRemaining(
-        s"; ++ ${Scala213}! ; concurrent/publishSigned ; " + Seq(
-          "core", "effect", "iteratee"
-        ).flatMap{ p =>
-          Seq("JVM", "JS").map{ x =>
-            s" ${p}${x}/publishSigned "
-          }
-        }.mkString(" ; ")
-      ),
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -316,6 +320,19 @@ object build {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
+
+  private[this] val scala213_pre_cross_setting = {
+    // sbt wants `scala-2.13.0-M1`, `scala-2.13.0-M2`, ... (sbt/sbt#2819)
+    // @fommil tells me we could use sbt-sensible for this
+    unmanagedSourceDirectories in Compile ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2L, minor)) =>
+          Some((baseDirectory in Compile).value.getParentFile / s"src/main/scala-2.$minor")
+        case _               =>
+          None
+      }
+    }
+  }
 
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,

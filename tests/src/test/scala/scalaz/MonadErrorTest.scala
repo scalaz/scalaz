@@ -19,12 +19,12 @@ object MonadErrorTest extends SpecLite {
     // type aliases are needed to help with type inference, even kind-projector
     // fails us...
     type Out[a] = String \/ a
-    type MT[a] = ReaderT[Out, String, a]
+    type MT[a] = ReaderT[String, Out, a]
     implicit val string: Decoder[String] = instance(_.right)
     implicit val isoReaderT: Decoder <~> MT =
       new IsoFunctorTemplate[Decoder, MT] {
         def from[A](fa: MT[A]) = instance(fa.run(_))
-        def to[A](fa: Decoder[A]) = ReaderT[Out, String, A](fa.decode)
+        def to[A](fa: Decoder[A]) = ReaderT[String, Out, A](fa.decode)
       }
 
     implicit val monad: MonadError[Decoder, String] = MonadError.fromIso(isoReaderT)

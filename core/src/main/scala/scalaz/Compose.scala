@@ -42,6 +42,26 @@ trait Compose[=>:[_, _]]  { self =>
 object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Compose[G]): Compose[F] =
+    new IsomorphismCompose[F, G] {
+      override def G: Compose[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
+  ////
+}
+
+trait IsomorphismCompose[F[_, _], G[_, _]] extends Compose[F] {
+  implicit def G: Compose[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~~> G
+
+  override def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C] =
+    iso.from(G.compose(iso.to(f), iso.to(g)))
   ////
 }

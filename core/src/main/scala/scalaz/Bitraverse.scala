@@ -76,7 +76,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 
     State[S, G[F[C, D]]]{
       initial =>
-        val st = bitraverse[λ[α => StateT[Trampoline, S, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
+        val st = bitraverse[λ[α => StateT[S, Trampoline, G[α]]], A, B, C, D](fa)(f(_: A).lift[Trampoline])(g(_: B).lift[Trampoline])
         st(initial).run
     }
   }
@@ -129,7 +129,26 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
 object Bitraverse {
   @inline def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Bitraverse[G]): Bitraverse[F] =
+    new IsomorphismBitraverse[F, G] {
+      override def G: Bitraverse[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] with IsomorphismBifoldable[F, G]{
+  implicit def G: Bitraverse[G]
+  ////
+
+  override final protected[this] def biNaturalTrans: F ~~> G = iso.to
+
+  def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
+    Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
   ////
 }

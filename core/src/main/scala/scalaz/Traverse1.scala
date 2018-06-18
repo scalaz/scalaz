@@ -102,7 +102,24 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
 object Traverse1 {
   @inline def apply[F[_]](implicit F: Traverse1[F]): Traverse1[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Traverse1[G]): Traverse1[F] =
+    new IsomorphismTraverse1[F, G] {
+      override def G: Traverse1[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismTraverse1[F[_], G[_]] extends Traverse1[F] with IsomorphismTraverse[F, G] with IsomorphismFoldable1[F, G]{
+  implicit def G: Traverse1[G]
+  ////
+
+  override def traverse1Impl[H[_]: Apply, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
+    Apply[H].map(G.traverse1Impl(iso.to(fa))(f))(iso.from.apply)
   ////
 }

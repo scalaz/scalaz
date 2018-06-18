@@ -57,6 +57,14 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
 object PlusEmpty {
   @inline def apply[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: PlusEmpty[G]): PlusEmpty[F] =
+    new IsomorphismPlusEmpty[F, G] {
+      override def G: PlusEmpty[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
   implicit def liftPlusEmpty[M[_], N[_]](implicit M: Applicative[M], P: PlusEmpty[N]): PlusEmpty[λ[α => M[N[α]]]] =
     new Plus.LiftedPlus[M, N] with PlusEmpty[λ[α => M[N[α]]]] {
@@ -64,5 +72,13 @@ object PlusEmpty {
       def F = P
       def empty[A] = M.point(P.empty[A])
     }
+  ////
+}
+
+trait IsomorphismPlusEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus[F, G]{
+  implicit def G: PlusEmpty[G]
+  ////
+
+  def empty[A]: F[A] = iso.from(G.empty[A])
   ////
 }
