@@ -36,6 +36,7 @@ object MonadError {
       override def iso: F <~> G = D
     }
 
+  ////
   /** The Free instruction set for MonadError */
   sealed abstract class Ast[E, A]
   final case class RaiseError[E, A](e: E) extends Ast[E, A]
@@ -55,7 +56,5 @@ object MonadError {
       def raiseError[A](e: E): Free[F, A] = Free.liftF(I.inj(RaiseError[E, A](e)))
       def handleError[A](fa: Free[F, A])(f: E => Free[F, A]): Free[F, A] = Free.liftF(I.inj(HandleError[F, E, A](fa, f)))
     }
-
-  ////
   ////
 }
