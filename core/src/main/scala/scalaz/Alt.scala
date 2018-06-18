@@ -96,7 +96,13 @@ trait Alt[F[_]] extends Applicative[F] with Derives[F] { self =>
 object Alt {
   @inline def apply[F[_]](implicit F: Alt[F]): Alt[F] = F
 
+  import Isomorphism._
 
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Alt[G]): Alt[F] =
+    new IsomorphismAlt[F, G] {
+      override def G: Alt[G] = E
+      override def iso: F <~> G = D
+    }
 
   ////
 
@@ -106,6 +112,6 @@ object Alt {
 trait IsomorphismAlt[F[_], G[_]] extends Alt[F] with IsomorphismApplicative[F, G] with IsomorphismDerives[F, G]{
   implicit def G: Alt[G]
   ////
-
+  override def alt[A](a1: =>F[A], a2: =>F[A]): F[A] = iso.from(G.alt(iso.to(a1), iso.to(a2)))
   ////
 }

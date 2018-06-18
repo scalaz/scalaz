@@ -96,6 +96,9 @@ object Derives {
 trait IsomorphismDerives[F[_], G[_]] extends Derives[F] {
   implicit def G: Derives[G]
   ////
+  import Isomorphism._
+
+  def iso: F <~> G
 
   ////
 }
