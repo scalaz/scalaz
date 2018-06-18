@@ -35,15 +35,10 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
-  lazy val applyDivide = TypeClass("ApplyDivide", *->*, extendsList = Seq(invariantFunctor))
-  lazy val applicativeDivisible = TypeClass("ApplicativeDivisible", *->*, extendsList = Seq(applyDivide))
-  lazy val derives = TypeClass("Derives", *->*, extendsList = Seq(coapplicativeDecidable, applicativeDivisible))
-  lazy val coapplicativeDecidable = TypeClass("CoapplicativeDecidable", *->*, extendsList = Seq())
-  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, coapplicativeDecidable))
-  lazy val covariantDerives = TypeClass("CovariantDerives", *->*, extendsList = Seq(derives, coapplicative, applicative))
-  lazy val coapplicative = TypeClass("Coapplicative", *->*, extendsList = Seq(coapplicativeDecidable))
-  lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor, applyDivide))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, applicativeDivisible))
+  lazy val derives = TypeClass("Derives", *->*, fromIso = false) // FIXME fromIso
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, derives))
+  lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
@@ -55,8 +50,8 @@ object TypeClass {
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
-  lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant, applyDivide))
-  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide, applicativeDivisible))
+  lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant))
+  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
@@ -66,7 +61,7 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
-  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
+  lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty, derives))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val associative = TypeClass("Associative", *^*->*, iso = false, fromIso = false)
@@ -117,14 +112,8 @@ object TypeClass {
     divisible,
     apply,
     applicative,
-    applyDivide,
-    applicativeDivisible,
     derives,
-    coapplicativeDecidable,
     decidable,
-    contravariantDerives,
-    covariantDerives,
-    coapplicative,
     align,
     zip,
     unzip,

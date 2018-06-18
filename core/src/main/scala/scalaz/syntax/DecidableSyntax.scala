@@ -23,9 +23,9 @@ trait ToDecidableOps0[TC[F[_]] <: Decidable[F]] extends ToDecidableOpsU[TC] {
   ////
 }
 
-trait ToDecidableOps[TC[F[_]] <: Decidable[F]] extends ToDecidableOps0[TC] with ToDivisibleOps[TC] with ToCoapplicativeDecidableOps[TC]
+trait ToDecidableOps[TC[F[_]] <: Decidable[F]] extends ToDecidableOps0[TC] with ToDivisibleOps[TC] with ToDerivesOps[TC]
 
-trait DecidableSyntax[F[_]] extends DivisibleSyntax[F] with CoapplicativeDecidableSyntax[F] {
+trait DecidableSyntax[F[_]] extends DivisibleSyntax[F] with DerivesSyntax[F] {
   implicit def ToDecidableOps[A](v: F[A]): DecidableOps[F, A] = new DecidableOps[F,A](v)(DecidableSyntax.this.F)
 
   def F: Decidable[F]

@@ -23,9 +23,9 @@ trait ToDivisibleOps0[TC[F[_]] <: Divisible[F]] extends ToDivisibleOpsU[TC] {
   ////
 }
 
-trait ToDivisibleOps[TC[F[_]] <: Divisible[F]] extends ToDivisibleOps0[TC] with ToDivideOps[TC] with ToApplicativeDivisibleOps[TC]
+trait ToDivisibleOps[TC[F[_]] <: Divisible[F]] extends ToDivisibleOps0[TC] with ToDivideOps[TC]
 
-trait DivisibleSyntax[F[_]] extends DivideSyntax[F] with ApplicativeDivisibleSyntax[F] {
+trait DivisibleSyntax[F[_]] extends DivideSyntax[F] {
   implicit def ToDivisibleOps[A](v: F[A]): DivisibleOps[F, A] = new DivisibleOps[F,A](v)(DivisibleSyntax.this.F)
 
   def F: Divisible[F]
