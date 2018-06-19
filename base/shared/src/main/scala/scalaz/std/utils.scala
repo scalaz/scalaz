@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import kernel.instanceOf
 import core.EqClass
 import data.Cord
 import debug.DebugClass

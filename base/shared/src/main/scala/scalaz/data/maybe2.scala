@@ -3,6 +3,7 @@ package data
 
 import scala.{ sys, AnyVal, Nothing }
 
+import kernel.instanceOf
 import scalaz.core.EqClass
 import scalaz.ct.BifunctorClass
 import scalaz.debug.DebugClass

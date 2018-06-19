@@ -1,6 +1,8 @@
 package scalaz
 package algebra
 
+import kernel.instanceOf
+
 trait MonoidClass[A] extends SemigroupClass[A] {
   def mempty: A
 }

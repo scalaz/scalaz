@@ -3,8 +3,9 @@ package std
 
 import java.lang.Double.doubleToRawLongBits
 
-import algebra.OrdClass
+import kernel.instanceOf
 import core.EqClass
+import algebra.OrdClass
 import utils._
 
 trait DoubleInstances {

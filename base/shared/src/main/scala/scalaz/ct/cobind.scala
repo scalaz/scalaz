@@ -5,6 +5,8 @@ import scala.{ List, Option, Some }
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 trait CobindClass[F[_]] extends FunctorClass[F] {
 
   def cobind[A, B](fa: F[A])(f: F[A] => B): F[B]

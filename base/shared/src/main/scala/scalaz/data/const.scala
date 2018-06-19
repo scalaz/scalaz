@@ -3,6 +3,7 @@ package data
 
 import scala.{ List, Nil }
 
+import kernel.instanceOf
 import scalaz.algebra._
 import scalaz.core.EqClass
 import scalaz.ct._

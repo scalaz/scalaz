@@ -3,6 +3,7 @@ package data
 
 import scala.{ inline, Either }
 
+import kernel.instanceOf
 import core.EqClass
 import ct._
 import debug.DebugClass

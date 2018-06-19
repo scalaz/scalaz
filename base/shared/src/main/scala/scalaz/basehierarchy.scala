@@ -1,6 +1,7 @@
 package scalaz
 
-import scalaz.ct.FunctorClass
+import kernel.instanceOf
+import ct.FunctorClass
 
 trait BaseHierarchy extends BaseHierarchy.BH0
 

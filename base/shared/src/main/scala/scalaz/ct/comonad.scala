@@ -5,6 +5,8 @@ import scala.{ Function0, Tuple2 }
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 trait ComonadClass[F[_]] extends CobindClass[F] {
   def copoint[A](fa: F[A]): A
 }

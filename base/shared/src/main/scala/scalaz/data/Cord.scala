@@ -5,6 +5,7 @@ import java.lang.Math
 import scala.{ AnyRef, Array, Char, Null }
 import scala.Predef.{ classOf, String }
 
+import kernel.instanceOf
 import algebra.MonoidClass
 import debug.DebugClass
 

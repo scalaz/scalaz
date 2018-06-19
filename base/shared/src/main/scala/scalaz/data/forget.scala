@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import kernel.instanceOf
 import ct.StrongClass
 
 final case class Forget[A, B, C](forget: B => A) {

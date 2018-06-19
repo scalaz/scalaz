@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import kernel.instanceOf
 import core.EqClass
 import ct.MonadClass
 import debug.DebugClass

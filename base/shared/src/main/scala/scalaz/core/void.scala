@@ -7,6 +7,7 @@ import scala.{ inline, Nothing }
 
 import com.github.ghik.silencer.silent
 
+import kernel.instanceOf
 import algebra.SemigroupClass
 import debug.DebugClass
 import types.{ As, Is }

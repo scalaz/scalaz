@@ -7,6 +7,8 @@ import data.Disjunction.swap
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 trait ChoiceClass[P[_, _]] extends ProfunctorClass[P] {
 
   def leftchoice[A, B, C](pab: P[A, B]): P[A \/ C, B \/ C]

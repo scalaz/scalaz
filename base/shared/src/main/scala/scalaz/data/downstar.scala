@@ -3,6 +3,7 @@ package data
 
 import scala.AnyVal
 
+import kernel.instanceOf
 import scalaz.ct.ProfunctorClass
 
 final case class DownStar[F[_], A, B](run: F[A] => B) extends AnyVal

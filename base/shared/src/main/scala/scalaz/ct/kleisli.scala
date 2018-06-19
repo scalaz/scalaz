@@ -3,6 +3,7 @@ package ct
 
 import scala.inline
 
+import kernel.instanceOf
 import algebra.MonoidClass
 import data.~>
 

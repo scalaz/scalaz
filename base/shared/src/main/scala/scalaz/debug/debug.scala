@@ -7,6 +7,7 @@ import scala.annotation.implicitAmbiguous
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 
+import kernel.instanceOf
 import ct.ContravariantClass
 import data.Cord
 

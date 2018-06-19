@@ -3,6 +3,7 @@ package std
 
 import scala.{ Either, Left, Right }
 
+import scalaz.kernel.instanceOf
 import core.EqClass
 import ct.{ BifunctorClass, MonadClass }
 import debug.DebugClass
