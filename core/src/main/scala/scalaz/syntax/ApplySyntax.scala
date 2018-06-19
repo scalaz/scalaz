@@ -83,9 +83,9 @@ trait ToApplyOps0[TC[F[_]] <: Apply[F]] extends ToApplyOpsU[TC] {
   ////
 }
 
-trait ToApplyOps[TC[F[_]] <: Apply[F]] extends ToApplyOps0[TC] with ToFunctorOps[TC] with ToApplyDivideOps[TC]
+trait ToApplyOps[TC[F[_]] <: Apply[F]] extends ToApplyOps0[TC] with ToFunctorOps[TC]
 
-trait ApplySyntax[F[_]] extends FunctorSyntax[F] with ApplyDivideSyntax[F] {
+trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A](v)(ApplySyntax.this.F)
 
   def F: Apply[F]

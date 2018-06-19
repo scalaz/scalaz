@@ -23,9 +23,9 @@ trait ToDivideOps0[TC[F[_]] <: Divide[F]] extends ToDivideOpsU[TC] {
   ////
 }
 
-trait ToDivideOps[TC[F[_]] <: Divide[F]] extends ToDivideOps0[TC] with ToContravariantOps[TC] with ToApplyDivideOps[TC]
+trait ToDivideOps[TC[F[_]] <: Divide[F]] extends ToDivideOps0[TC] with ToContravariantOps[TC]
 
-trait DivideSyntax[F[_]] extends ContravariantSyntax[F] with ApplyDivideSyntax[F] {
+trait DivideSyntax[F[_]] extends ContravariantSyntax[F] {
   implicit def ToDivideOps[A](v: F[A]): DivideOps[F, A] = new DivideOps[F,A](v)(DivideSyntax.this.F)
 
   def F: Divide[F]

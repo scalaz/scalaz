@@ -66,6 +66,9 @@ trait Syntaxes {
   object applicativePlus0 extends ToApplicativePlusOps0[ApplicativePlus]
   object applicativePlus extends ToApplicativePlusOps[ApplicativePlus]
 
+  object alt0 extends ToAltOps0[Alt]
+  object alt extends ToAltOps[Alt]
+
   object monadPlus0 extends ToMonadPlusOps0[MonadPlus]
   object monadPlus extends ToMonadPlusOps[MonadPlus]
 
@@ -212,7 +215,7 @@ trait ToTypeClassOps
   with ToFunctorOps0[Functor] with ToContravariantOps0[Contravariant] with ToApplyOps0[Apply]
   with ToApplicativeOps0[Applicative] with ToBindOps0[Bind] with ToMonadOps0[Monad] with ToComonadOps0[Comonad]
   with ToBifoldableOps0[Bifoldable] with ToCozipOps0[Cozip]
-  with ToPlusOps0[Plus] with ToApplicativePlusOps0[ApplicativePlus] with ToMonadPlusOps0[MonadPlus] with ToTraverseOps0[Traverse] with ToBifunctorOps0[Bifunctor] with ToAssociativeOps0[Associative]
+  with ToPlusOps0[Plus] with ToApplicativePlusOps0[ApplicativePlus] with ToAltOps0[Alt] with ToMonadPlusOps0[MonadPlus] with ToTraverseOps0[Traverse] with ToBifunctorOps0[Bifunctor] with ToAssociativeOps0[Associative]
   with ToBitraverseOps0[Bitraverse] with ToComposeOps0[Compose] with ToCategoryOps0[Category]
   with ToArrowOps0[Arrow] with ToProfunctorOps0[Profunctor] with ToStrongOps0[Strong]
   with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError]

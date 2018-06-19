@@ -41,8 +41,6 @@ private sealed trait ConstApplyDivide[C] extends Apply[Const[C, ?]] with ConstTr
 private sealed trait ConstApplicativeDivisible[C] extends Applicative[Const[C, ?]] with ConstApplyDivide[C] with Divisible[Const[C, ?]] {
   def C: Monoid[C]
 
-  override def xproduct0[Z](z: =>Z): Const[C, Z] = pure(z)
-
   override def point[A](a: => A): Const[C, A] = Const(C.zero)
 
   override def conquer[A] = Const(C.zero)

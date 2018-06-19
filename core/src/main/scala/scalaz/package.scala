@@ -238,8 +238,6 @@ package object scalaz {
   type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
 
-  type Alternative[F[_]] = ApplicativePlus[F]
-
   /** An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
     *
     * @template
