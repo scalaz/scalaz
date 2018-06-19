@@ -83,7 +83,7 @@ object Equal {
       }
     }
   }
-  implicit val equal_decidable: Decidable[Equal] = new EqualDecidable
+  implicit val equalDecidable: Decidable[Equal] = new EqualDecidable
 
   /** Construct an instance, but prefer SAM types with scala 2.12+ */
   def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
