@@ -32,7 +32,7 @@ object MonadReader {
   /** The Free instruction set for MonadReader */
   sealed abstract class Ast[S, A]
   final case class Ask[S]() extends Ast[S, S]
-  final case class Local[F[_], S, A](f: S => S, fa: Free[F, A]) extends Ast[S, A]
+  final case class Local[F[_], S, A](f: S => S, fa: F[A]) extends Ast[S, A]
 
   /** Extensible Effect */
   def liftF[F[_], S](
@@ -46,7 +46,7 @@ object MonadReader {
       override def tailrecM[A, B](f: A => Free[F, A \/ B])(a: A) = delegate.tailrecM(f)(a)
 
       def ask: Free[F, S] = Free.liftF(I.inj(Ask[S]()))
-      def local[A](f: S => S)(fa: Free[F, A]): Free[F, A] = Free.liftF(I.inj(Local[F, S, A](f, fa)))
+      def local[A](f: S => S)(fa: Free[F, A]): Free[F, A] = Free.liftF(I.inj(Local[Free[F, ?], S, A](f, fa)))
     }
 
   ////

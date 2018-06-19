@@ -14,7 +14,7 @@ object MonadListen {
 
   /** The Free instruction set for MonadListen */
   sealed abstract class Ast[S, A]
-  final case class Listen[F[_], S, A](ma: Free[F, A]) extends Ast[S, (A, S)]
+  final case class Listen[F[_], S, A](ma: F[A]) extends Ast[S, (A, S)]
 
   /** Extensible Effect */
   def liftF[F[_], S](
@@ -31,6 +31,6 @@ object MonadListen {
 
       def writer[A](w: S, v: A): Free[F, A] = Free.liftF(T.inj(MonadTell.Writer[S, A](w, v)))
 
-      def listen[A](ma: Free[F, A]): Free[F, (A, S)] = Free.liftF(L.inj(Listen[F, S, A](ma)))
+      def listen[A](ma: Free[F, A]): Free[F, (A, S)] = Free.liftF(L.inj(Listen[Free[F, ?], S, A](ma)))
     }
 }

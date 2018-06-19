@@ -40,7 +40,7 @@ object MonadError {
   /** The Free instruction set for MonadError */
   sealed abstract class Ast[E, A]
   final case class RaiseError[E, A](e: E) extends Ast[E, A]
-  final case class HandleError[F[_], E, A](fa: Free[F, A], f: E => Free[F, A]) extends Ast[E, A]
+  final case class HandleError[F[_], E, A](fa: F[A], f: E => F[A]) extends Ast[E, A]
 
   /** Extensible Effect */
   def liftF[F[_], E](
@@ -54,7 +54,7 @@ object MonadError {
       override def tailrecM[A, B](f: A => Free[F, A \/ B])(a: A) = delegate.tailrecM(f)(a)
 
       def raiseError[A](e: E): Free[F, A] = Free.liftF(I.inj(RaiseError[E, A](e)))
-      def handleError[A](fa: Free[F, A])(f: E => Free[F, A]): Free[F, A] = Free.liftF(I.inj(HandleError[F, E, A](fa, f)))
+      def handleError[A](fa: Free[F, A])(f: E => Free[F, A]): Free[F, A] = Free.liftF(I.inj(HandleError[Free[F, ?], E, A](fa, f)))
     }
   ////
 }
