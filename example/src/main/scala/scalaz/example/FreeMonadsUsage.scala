@@ -36,32 +36,11 @@ object FreeMonadsUsage {
       _   <- F.put(update)
     } yield update
 
-  def withError[F[_]](C: Console[F])(implicit F: MonadError[F, String]): F[Int] =
-    for {
-      in <- C.read
-      parsed = in.parseInt
-      i <- parsed.fold(_ => F.raiseError(s"bad input '$in'"), F.pure(_))
-    } yield i
-
-  def withReader[F[_]](C: Console[F])(implicit F: MonadReader[F, String]): F[String] =
-    for {
-      in <- C.read
-      path <- F.local(p => s"$p/$in")(F.ask)
-    } yield path
-
-  def withPlus[F[_]](C: Console[F])(implicit F: MonadPlus[F]): F[Int] =
-    for {
-     in <- C.read
-     parsed = in.parseInt
-     i <- parsed.fold(_ => F.empty, F.pure(_))
-   } yield i
-
-  def withWriter[F[_]](C: Console[F])(implicit F: MonadListen[F, String]): F[String] =
+  def withWriter[F[_]](C: Console[F])(implicit F: MonadTell[F, String]): F[String] =
    for {
      in <- C.read
      _ <- F.tell(in)
-     out <- F.listen(F.pure(()))
-   } yield out._2
+   } yield in
 
   // now show that each can be converted into a Free program. Implementing the
   // interpreters is left as an exercise to the reader. Unfortunately there is a
@@ -82,51 +61,15 @@ object FreeMonadsUsage {
     withState[F](Console.liftF)
   }
 
-  def freeError = {
-    type ErrorAst[a] = MonadError.Ast[String, a]
-    type Ast[a] = Coproduct[ErrorAst, Console.Ast, a]
-    implicit val injecter: ErrorAst :<: Ast = Inject.leftInjectInstance
-
-    type F[a] = Free[Ast, a]
-    implicit val monad: MonadError[F, String] = MonadError.liftF
-
-    withError[F](Console.liftF)
-  }
-
-  def freeReader = {
-    type ReaderAst[a] = MonadReader.Ast[String, a]
-    type Ast[a] = Coproduct[ReaderAst, Console.Ast, a]
-    implicit val injecter: ReaderAst :<: Ast = Inject.leftInjectInstance
-
-    type F[a] = Free[Ast, a]
-    implicit val monad: MonadReader[F, String] = MonadReader.liftF
-
-    withReader[F](Console.liftF)
-  }
-
-  def freePlus = {
-    type Ast[a] = Coproduct[MonadPlus.Ast, Console.Ast, a]
-    implicit val injecter: MonadPlus.Ast :<: Ast = Inject.leftInjectInstance
-
-    type F[a] = Free[Ast, a]
-    implicit val monad: MonadPlus[F] = MonadPlus.liftF
-
-    withPlus[F](Console.liftF)
-  }
-
   def freeWriter = {
     type TellAst[a] = MonadTell.Ast[String, a]
-    type PartialAst[a] = Coproduct[TellAst, Console.Ast, a]
-    type ListenAst[a] = MonadListen.Ast[String, a]
-    type Ast[a] = Coproduct[ListenAst, PartialAst, a]
+    type Ast[a] = Coproduct[TellAst, Console.Ast, a]
 
     // omg SI-2712...
-    implicit val injector0: Console.Ast :<: PartialAst = Inject.rightInjectInstance
-    implicit val injecter1: ListenAst :<: Ast = Inject.leftInjectInstance
-    implicit val injecter2: TellAst :<: Ast = Inject.rightInjectInstance
+    implicit val injecter: TellAst :<: Ast = Inject.leftInjectInstance
 
     type F[a] = Free[Ast, a]
-    implicit val monadL: MonadListen[F, String] = MonadListen.liftF
+    implicit val monad: MonadTell[F, String] = MonadTell.liftF
 
     withWriter[F](Console.liftF)
   }
