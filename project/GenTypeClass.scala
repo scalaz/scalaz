@@ -35,7 +35,7 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
-  lazy val derives = TypeClass("Derives", *->*, fromIso = false)
+  lazy val derives = TypeClass("Derives", *->*)
   lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, derives))
   lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, derives))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
