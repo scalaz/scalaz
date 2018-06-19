@@ -5,9 +5,6 @@ import std.option.{none, some}
 /**
  * Inject type class as described in "Data types a la carte" (Swierstra 2008).
  *
- * This class is unsealed to allow downstream integration with alternative
- * coproduct encodings, e.g. https://github.com/frees-io/iota
- *
  * @see [[http://www.staff.science.uu.nl/~swier004/Publications/DataTypesALaCarte.pdf]]
  */
 sealed abstract class Inject[F[_], G[_]] extends (F ~> G) {
