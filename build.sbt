@@ -28,7 +28,7 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, stdJVM, stdJS, example, benchmarks)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, stdJVM, stdJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
 resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -72,7 +72,7 @@ lazy val std = crossProject.module
 lazy val stdJVM = std.jvm
 lazy val stdJS  = std.js
 
-lazy val example = project.module
+lazy val microsite = project.module
   .dependsOn(baseJVM, stdJVM)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
@@ -90,7 +90,7 @@ lazy val example = project.module
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),
     micrositeName := "Scalaz",
-    micrositeDescription := "Scalaz examples",
+    micrositeDescription := "Scalaz",
     micrositeAuthor := "Scalaz contributors",
     micrositeOrganizationHomepage := "https://github.com/scalaz/scalaz",
     micrositeGitterChannelUrl := "scalaz/scalaz",
