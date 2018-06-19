@@ -38,13 +38,13 @@ object MonadError {
 
   ////
   /** The Free instruction set for MonadError */
-  sealed abstract class Ast[E, A]
-  final case class RaiseError[E, A](e: E) extends Ast[E, A]
-  final case class HandleError[F[_], E, A](fa: F[A], f: E => F[A]) extends Ast[E, A]
+  sealed abstract class Ast[F[_], E, A]
+  final case class RaiseError[F[_], E, A](e: E) extends Ast[F, E, A]
+  final case class HandleError[F[_], E, A](fa: F[A], f: E => F[A]) extends Ast[F, E, A]
 
   /** Extensible Effect */
   def liftF[F[_], E](
-    implicit I: Ast[E, ?] :<: F
+    implicit I: Ast[Free[F, ?], E, ?] :<: F
   ): MonadError[Free[F, ?], E] with BindRec[Free[F, ?]] =
     new MonadError[Free[F, ?], E] with BindRec[Free[F, ?]] {
       val delegate = Free.freeMonad[F]
@@ -53,7 +53,7 @@ object MonadError {
       override def map[A, B](fa: Free[F, A])(f: A => B) = delegate.map(fa)(f)
       override def tailrecM[A, B](f: A => Free[F, A \/ B])(a: A) = delegate.tailrecM(f)(a)
 
-      def raiseError[A](e: E): Free[F, A] = Free.liftF(I.inj(RaiseError[E, A](e)))
+      def raiseError[A](e: E): Free[F, A] = Free.liftF(I.inj(RaiseError[Free[F, ?], E, A](e)))
       def handleError[A](fa: Free[F, A])(f: E => Free[F, A]): Free[F, A] = Free.liftF(I.inj(HandleError[Free[F, ?], E, A](fa, f)))
     }
   ////
