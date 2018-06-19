@@ -72,6 +72,25 @@ object MonadPlus {
     }
 
   ////
+  /** The Free instruction set for MonadPlus */
+  sealed abstract class Ast[A]
+  final case class Plus[F[_], A](a: Free[F, A], b: () => Free[F, A]) extends Ast[A]
+  final case class Empty[F[_], A]() extends Ast[A]
+
+  /** Extensible Effect */
+  def liftF[F[_]](
+    implicit I: Ast :<: F
+  ): MonadPlus[Free[F, ?]] with BindRec[Free[F, ?]] =
+    new MonadPlus[Free[F, ?]] with BindRec[Free[F, ?]] {
+      val delegate = Free.freeMonad[F]
+      def point[A](a: =>A): Free[F, A] = delegate.point(a)
+      def bind[A, B](fa: Free[F, A])(f: A => Free[F, B]) = delegate.bind(fa)(f)
+      override def map[A, B](fa: Free[F, A])(f: A => B) = delegate.map(fa)(f)
+      override def tailrecM[A, B](f: A => Free[F, A \/ B])(a: A) = delegate.tailrecM(f)(a)
+
+      def plus[A](a: Free[F, A], b: =>Free[F, A]): Free[F, A] = Free.liftF(I.inj(Plus[F, A](a, () => b)))
+      def empty[A]: Free[F, A] = Free.liftF(I.inj(Empty[F, A]()))
+    }
 
   ////
 }
