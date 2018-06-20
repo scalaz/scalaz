@@ -1,8 +1,9 @@
 package scalaz
-package core
+package external
 
 import java.lang.Throwable
 
+import kernel.instanceOf
 import algebra.MonoidClass
 import ct._
 import types.IsCovariantClass

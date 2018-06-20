@@ -5,6 +5,8 @@ import scala.{ List, Tuple2 }
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
 
   def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]]

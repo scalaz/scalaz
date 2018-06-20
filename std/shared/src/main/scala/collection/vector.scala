@@ -4,6 +4,7 @@ package std
 import scala.Vector
 import scala.Predef.$conforms
 
+import scalaz.kernel.instanceOf
 import core.EqClass
 import ct.MonadClass
 

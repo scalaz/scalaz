@@ -1,6 +1,7 @@
 package scalaz
 package ct
 
+import kernel.instanceOf
 import algebra.{ MonoidClass, SemigroupClass }
 
 sealed abstract class EndoModule {

@@ -3,6 +3,7 @@ package std
 
 import scala.{ None, Option, Some }
 
+import scalaz.kernel.instanceOf
 import core.EqClass
 import data.Cord
 import debug.DebugClass

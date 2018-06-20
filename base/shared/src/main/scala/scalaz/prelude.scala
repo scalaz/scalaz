@@ -1,7 +1,6 @@
 package scalaz
 
-import scala.inline
-
+import kernel._
 import algebra._
 import core._
 import ct._
@@ -9,10 +8,6 @@ import debug._
 import types._
 
 trait BaseTypeclasses {
-  type InstanceOf[T] = InstanceOfModule.impl.InstanceOf[T]
-
-  @inline
-  final def instanceOf[T](t: T): InstanceOf[T] = InstanceOfModule.impl.instanceOf(t)
 
   type Applicative[F[_]]      = InstanceOf[ApplicativeClass[F]]
   type Apply[F[_]]            = InstanceOf[ApplyClass[F]]
@@ -66,11 +61,14 @@ trait BaseTypeclasses {
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                = T
 }
 
+trait BaseKernel {
+  type InstanceOf[T] = kernel.InstanceOf[T]
+  final def instanceOf[T](t: T): InstanceOf[T] = kernel.instanceOf(t)
+}
+
 trait BaseCore {
   type Void = core.Void.Void
-
   val Void: core.Void.type = core.Void
-
 }
 
 trait BaseTypes {
@@ -91,7 +89,6 @@ trait BaseCt {
   val Iso = ct.Iso
 
   val Kleisli: ct.Kleisli.type = ct.Kleisli
-
 }
 
 trait BaseAlgebra {
@@ -179,8 +176,8 @@ trait AllInstances
     with ct.TraversableInstances
     with debug.DebugInstances
     with core.EqInstances
-    with core.IOInstances
-    with core.FiberInstances
+    with external.IOInstances
+    with external.FiberInstances
     with types.AsInstances
     with types.IsContravariantInstances
     with types.IsCovariantInstances
@@ -226,5 +223,6 @@ trait LowPriority
     with BaseTypes
     with BaseCt
     with BaseAlgebra
+    with BaseKernel
 
 object Scalaz extends LowPriority with AllFunctions with AllSyntax with AllInstances

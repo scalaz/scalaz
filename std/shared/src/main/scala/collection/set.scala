@@ -3,7 +3,8 @@ package std
 
 import scala.collection.immutable.Set
 
-import scalaz.core.EqClass
+import scalaz.kernel.instanceOf
+import core.EqClass
 
 trait SetInstances {
   implicit def setEq[A: Eq]: Eq[Set[A]] =

@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import kernel.instanceOf
 import core.EqClass
 import debug.DebugClass
 import types.IsCovariantClass

@@ -3,6 +3,8 @@ package core
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 trait EqClass[A] {
   def equal(first: A, second: A): Boolean
 }

@@ -5,6 +5,8 @@ import scala.Tuple2
 
 import scala.language.experimental.macros
 
+import kernel.instanceOf
+
 /** A typeclass for types which are (covariant) [[Functor]]s in both type parameters.
  *
  * Minimal definition:

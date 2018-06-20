@@ -3,6 +3,8 @@ package ct
 
 import scala.{ Option, Some }
 
+import kernel.instanceOf
+
 sealed abstract class ComposeModule {
   type Compose[F[_], G[_], X]
 

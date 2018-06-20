@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import kernel.instanceOf
 import algebra.OrdClass
 import utils._
 

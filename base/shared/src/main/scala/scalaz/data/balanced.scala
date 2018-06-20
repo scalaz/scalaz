@@ -3,6 +3,7 @@ package data
 
 import scala.AnyVal
 
+import kernel.instanceOf
 import Prelude._
 import AList.aListOps
 import ct.SemicategoryClass

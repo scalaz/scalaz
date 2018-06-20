@@ -3,6 +3,8 @@ package ct
 
 import scala.{ Function0, Function1, List, Option }
 
+import kernel.instanceOf
+
 trait MonadClass[M[_]] extends ApplicativeClass[M] with BindClass[M]
 
 object MonadClass {

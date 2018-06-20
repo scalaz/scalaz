@@ -3,6 +3,7 @@ package std
 
 import scala.{ Tuple1, Tuple2 }
 
+import scalaz.kernel.instanceOf
 import scalaz.core.EqClass
 
 trait TupleInstances {

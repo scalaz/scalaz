@@ -3,6 +3,7 @@ package data
 
 import scala.inline
 
+import kernel.instanceOf
 import algebra.SemigroupClass
 import core.EqClass
 import ct._

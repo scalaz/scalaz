@@ -1,4 +1,5 @@
 package scalaz
+package kernel
 
 sealed abstract class InstanceOfModule {
   type InstanceOf[T] <: T

@@ -3,6 +3,7 @@ package data
 
 import scala.{ List, None, Option, Some }
 
+import kernel.instanceOf
 import scalaz.core.EqClass
 import scalaz.ct._
 import scalaz.debug.DebugClass
