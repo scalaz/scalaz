@@ -54,7 +54,7 @@ object ListTTest extends SpecLite {
   "flatMap" ! forAll {
     (ass: List[List[Int]]) =>
       (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
-      must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
+        must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
   }
 
   // Exists to ensure that fromList and map don't stack overflow.
@@ -69,13 +69,13 @@ object ListTTest extends SpecLite {
       ListT.listT(ass).run == ass
   }
 
-	"mapF consistent with map" ! forAll { (fa: ListTOpt[Int], f: Int => Int) =>
-		fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[Option].point(i)))
-	}
+  "mapF consistent with map" ! forAll { (fa: ListTOpt[Int], f: Int => Int) =>
+    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[Option].point(i)))
+  }
 
-	"flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[List[String]]) =>
-		fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
-	}
+  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[List[String]]) =>
+    fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
+  }
 
   checkAll(equal.laws[ListTOpt[Int]])
   checkAll(monoid.laws[ListTOpt[Int]])
