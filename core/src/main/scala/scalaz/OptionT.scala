@@ -10,6 +10,13 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): OptionT[F, B] = new OptionT[F, B](mapO(_ map f))
 
+  def mapF[B](f: A => F[B])(implicit F: Monad[F]): OptionT[F, B] = new OptionT[F, B](
+    F.bind(self.run) {
+      case None    => F.point(none[B])
+      case Some(z) => F.map(f(z))(b => some(b))
+    }
+  )
+
   def mapT[G[_], B](f: F[Option[A]] => G[Option[B]]): OptionT[G, B] =
     OptionT(f(run))
 

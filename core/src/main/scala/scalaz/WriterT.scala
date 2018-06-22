@@ -48,6 +48,11 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def map[B](f: A => B)(implicit F: Functor[F]): WriterT[F, W, B] =
     writerT(F.map(run)(wa => (wa._1, f(wa._2))))
 
+	def mapF[B](f: A => F[B])(implicit F: Bind[F], s: Semigroup[W]): WriterT[F, W, B] = writerT {
+		F.bind(run)(wa => F.map(f(wa._2))(a => (wa._1, a)))
+	}
+
+
   def ap[B](f: => WriterT[F, W, A => B])(implicit F: Apply[F], W: Semigroup[W]): WriterT[F, W, B] = writerT {
     F.apply2(f.run, run) {
       case ((w1, fab), (w2, a)) => (W.append(w1, w2), fab(a))

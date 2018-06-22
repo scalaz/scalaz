@@ -9,6 +9,13 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): MaybeT[F, B] = new MaybeT[F, B](mapO(_ map f))
 
+	def mapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
+		F.bind(self.run) {
+				case Empty() => F.point(empty[B])
+				case Just(z) => F.map(f(z))(b => just(b))
+			}
+		)
+
   def mapT[G[_], B](f: F[Maybe[A]] => G[Maybe[B]]): MaybeT[G, B] =
     MaybeT(f(run))
 
@@ -150,6 +157,9 @@ object MaybeT extends MaybeTInstances {
     new MaybeTMonadListen[F, W] {
       def MT = ML0
     }
+
+  implicit def maybeTShow[F[_], A](implicit F0: Show[F[Maybe[A]]]): Show[MaybeT[F, A]] =
+		Contravariant[Show].contramap(F0)(_.run)
 }
 
 //
