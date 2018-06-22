@@ -1,6 +1,8 @@
 package scalaz
 package syntax
 
+import Tags.Parallel
+
 /** @see [[scalaz.syntax.ApplyOps]]`#|@|` */
 private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
   val a: M[A]
@@ -9,6 +11,12 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
   def apply[C](f: (A, B) => C)(implicit ap: Apply[M]): M[C] = ap.apply2(a, b)(f)
 
   def tupled(implicit ap: Apply[M]): M[(A, B)] = apply(Tuple2.apply)
+
+  def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
+    Parallel.unwrap(ap.apply2(Parallel(a), Parallel(b))(f))
+
+  def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
+    parApply(Tuple2.apply)
 
   def ⊛[C](cc: M[C]) = new ApplicativeBuilder3[C] {
     val c = cc

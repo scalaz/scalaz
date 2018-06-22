@@ -315,6 +315,8 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
   def point[A](a: => A): F[A] = iso.from(G.point(a))
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = iso.from(G.apply2(iso.to(fa), iso.to(fb))(f))
 }
 
 trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
