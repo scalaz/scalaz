@@ -149,9 +149,15 @@ package object scalaz {
 
   object StateT extends StateTInstances with StateTFunctions {
     def apply[F[_], S, A](f: S => F[(S, A)])(implicit F: Monad[F]): StateT[F, S, A] = IndexedStateT[F, S, S, A](f)
+    def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[F, S, A] = MonadTrans[StateT[?[_], S, ?]].liftM(fa)
 
     def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[F, S, ?] ~> StateT[G, S, ?] =
       λ[StateT[F, S, ?] ~> StateT[G, S, ?]](st => StateT((s: S) => nat(st.run(s))))
+
+    def get[F[_]: Monad, S]: StateT[F, S, S] = MonadState[StateT[F, S, ?], S].get
+    def gets[F[_]: Monad, S, A](f: S => A): StateT[F, S, A] = MonadState[StateT[F, S, ?], S].gets(f)
+    def put[F[_]: Monad, S](s: S): StateT[F, S, Unit] = MonadState[StateT[F, S, ?], S].put(s)
+    def modify[F[_]: Monad, S](f: S => S): StateT[F, S, Unit] = MonadState[StateT[F, S, ?], S].modify(f)
   }
   object IndexedState extends StateFunctions {
     def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[Id, S1, S2, A](f)
