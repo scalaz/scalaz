@@ -12,11 +12,11 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
   def tupled(implicit ap: Apply[M]): M[(A, B)] = apply(Tuple2.apply)
 
-  def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
-    Parallel.unwrap(ap.apply2(Parallel(a), Parallel(b))(f))
-
-  def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
-    parApply(Tuple2.apply)
+  // bincompat :-(
+  //def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
+  //  Parallel.unwrap(ap.apply2(Parallel(a), Parallel(b))(f))
+  //def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
+  //  parApply(Tuple2.apply)
 
   def ⊛[C](cc: M[C]) = new ApplicativeBuilder3[C] {
     val c = cc
