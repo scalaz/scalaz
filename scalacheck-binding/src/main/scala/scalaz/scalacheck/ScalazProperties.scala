@@ -226,6 +226,9 @@ object ScalazProperties {
     def composition[F[_], X, Y, Z](implicit ap: Apply[F], afx: Arbitrary[F[X]], au: Arbitrary[F[Y => Z]],
                                    av: Arbitrary[F[X => Y]], e: Equal[F[Z]]): Prop = forAll(ap.applyLaw.composition[X, Y, Z] _)
 
+    def apapply2[F[_], X, Y](implicit am: Apply[F], emz: Equal[F[Y]], ax: Arbitrary[F[X]], ay: Arbitrary[F[Y]], axyz: Arbitrary[(X, Y) => Y]): Prop =
+      forAll(am.applyLaw.apapply2[X, Y] _)
+
     def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
       newProperties("apply") { p =>
@@ -234,6 +237,7 @@ object ScalazProperties {
         p.include(functor.laws[F])
         p.include(reducer.laws[F[Int], F[Int]])
         p.property("composition") = self.composition[F, Int, Int, Int]
+        p.property("consistent apply2") = self.apapply2[F, Int, Int]
       }
   }
 
