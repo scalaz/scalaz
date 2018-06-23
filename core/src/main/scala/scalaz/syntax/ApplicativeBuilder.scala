@@ -1,8 +1,6 @@
 package scalaz
 package syntax
 
-import Tags.Parallel
-
 /** @see [[scalaz.syntax.ApplyOps]]`#|@|` */
 private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
   val a: M[A]
@@ -11,12 +9,6 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
   def apply[C](f: (A, B) => C)(implicit ap: Apply[M]): M[C] = ap.apply2(a, b)(f)
 
   def tupled(implicit ap: Apply[M]): M[(A, B)] = apply(Tuple2.apply)
-
-  // bincompat :-(
-  //def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
-  //  Parallel.unwrap(ap.apply2(Parallel(a), Parallel(b))(f))
-  //def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
-  //  parApply(Tuple2.apply)
 
   def ⊛[C](cc: M[C]) = new ApplicativeBuilder3[C] {
     val c = cc
@@ -169,4 +161,18 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 
   }
 
+}
+
+// outside of ApplicativeBuilder for bincompat
+abstract class ApplicativeBuilderSyntax {
+  import Tags.Parallel
+
+  implicit final class ApplicativeBuilderOps2[M[_], A, B](
+    private val self: ApplicativeBuilder[M, A, B]) {
+    def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
+      Parallel.unwrap(ap.apply2(Parallel(self.a), Parallel(self.b))(f))
+
+    def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
+      parApply(Tuple2.apply)
+  }
 }
