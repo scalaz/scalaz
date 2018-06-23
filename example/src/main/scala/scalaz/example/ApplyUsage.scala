@@ -162,18 +162,17 @@ object ApplyUsage extends App {
   import Task.taskParallelApplicativeInstance
 
   // sequential
-  (fa |@| fb) {
-    case (a, b) => a + b
-  }
+  (fa |@| fb).tupled: Task[(String, String)]
 
   // parallel
   import scalaz.syntax.parallel._
-  (fa |@| fb).parApply {
-    case (a, b) => a + b
-  }
 
-  // (fa |@| fb |@| fc).parApply {
-  //   case (a, b, c) => a + b + c
-  // }
+  (fa |@| fb).parTupled: Task[(String, String)]
+
+  // can't add syntax until 7.3 where we can break bincompat...
+  // (fa |@| fb |@| fc).parTupled: Task[(String, String, String)]
+
+  // yuck
+  (fa |@| (fb |@| fc).parTupled).parTupled: Task[(String, (String, String))]
 
 }
