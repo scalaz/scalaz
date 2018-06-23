@@ -146,4 +146,29 @@ object ApplyUsage extends App {
 
   assert(deepResult === expectedDeep)
 
+  ///////////////////////////////////
+  // PARALLELISM
+  import scalaz.Tags.Parallel
+  import scalaz.{ @@, Applicative }
+  import scalaz.Isomorphism.IsoFunctorTemplate
+  import scalaz.concurrent.Task
+
+  // imagine these were effectful, like hitting disk or network...
+  val fa: Task[String] = Task.delay("hello")
+  val fb: Task[String] = Task.delay("world")
+
+  // WORKAROUND https://github.com/scala/bug/issues/10954
+  import Task.taskParallelApplicativeInstance
+
+  // sequential
+  (fa |@| fb) {
+    case (a, b) => b + a
+  }
+
+  // parallel
+  import scalaz.syntax.parallel._
+  (fa |@| fb).parApply {
+    case (a, b) => b + a
+  }
+
 }
