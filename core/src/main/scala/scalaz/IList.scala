@@ -613,7 +613,7 @@ sealed abstract class IListInstances extends IListInstance0 {
 
         val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
-        F.map(rev)((rev) => rev.foldLeft(IList[B]())((r,c) => c +: r))
+        F.map(rev)((rev) => rev.foldLeft(IList[B]())((r, c) => c +: r))
       }
 
       def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =

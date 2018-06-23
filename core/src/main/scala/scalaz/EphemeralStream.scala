@@ -212,7 +212,7 @@ sealed abstract class EphemeralStreamInstances {
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
-      F.map(rev)((li) => li.foldLeft(EphemeralStream[B]())((r,c) => c ##:: r))
+      F.map(rev)((rev) => rev.foldLeft(EphemeralStream[B]())((r, c) => c ##:: r))
     }
 
     override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {

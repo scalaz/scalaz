@@ -117,7 +117,7 @@ trait StreamInstances {
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
-      F.map(rev)((li) => li.foldLeft(Stream[B]())((r, c) => c +: r))
+      F.map(rev)((rev) => rev.foldLeft(Stream[B]())((r, c) => c +: r))
     }
   }
 
