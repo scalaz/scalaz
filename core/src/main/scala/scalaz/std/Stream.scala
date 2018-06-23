@@ -108,16 +108,16 @@ trait StreamInstances {
       go(f(a))
     }
 
-    def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]): F[Stream[B]] = {
-      val revOpt: Maybe[F[Stream[B]]] =
-        F.unfoldrOpt[Stream[A], B, Stream[B]](fa)(_ match {
+    def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      val revOpt: Maybe[F[List[B]]] =
+        F.unfoldrOpt[Stream[A], B, List[B]](fa)(_ match {
           case a #:: as => Maybe.just((f(a), as))
           case Stream.Empty => Maybe.empty
-        })(Reducer.ReverseStreamReducer[B])
+        })(Reducer.ReverseListReducer[B])
 
-      val rev: F[Stream[B]] = revOpt getOrElse F.point(Stream.empty)
+      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
-      F.map(rev)(_.reverse)
+      F.map(rev)((li) => li.foldLeft(Stream[B]())((r, c) => c +: r))
     }
   }
 

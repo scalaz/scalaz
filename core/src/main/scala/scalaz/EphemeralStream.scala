@@ -203,16 +203,16 @@ sealed abstract class EphemeralStreamInstances {
     override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
     
-    def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]): F[EphemeralStream[B]] = {
-      val revOpt: Maybe[F[EphemeralStream[B]]] =
-        F.unfoldrOpt[EphemeralStream[A], B, EphemeralStream[B]](fa)(_ match {
+    def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      val revOpt: Maybe[F[List[B]]] =
+        F.unfoldrOpt[EphemeralStream[A], B, List[B]](fa)(_ match {
           case a ##:: as => Maybe.just((f(a), as))
           case emptyEphemeralStream => Maybe.empty
-        })(Reducer.ReverseEphemeralStreamReducer[B])
+        })(Reducer.ReverseListReducer[B])
 
-      val rev: F[EphemeralStream[B]] = revOpt getOrElse F.point(emptyEphemeralStream)
+      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
-      F.map(rev)(_.reverse)
+      F.map(rev)((li) => li.foldLeft(EphemeralStream[B]())((r,c) => c ##:: r))
     }
 
     override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
