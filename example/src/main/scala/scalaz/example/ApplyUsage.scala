@@ -156,19 +156,24 @@ object ApplyUsage extends App {
   // imagine these were effectful, like hitting disk or network...
   val fa: Task[String] = Task.delay("hello")
   val fb: Task[String] = Task.delay("world")
+  val fc: Task[String] = Task.delay("!")
 
   // WORKAROUND https://github.com/scala/bug/issues/10954
   import Task.taskParallelApplicativeInstance
 
   // sequential
   (fa |@| fb) {
-    case (a, b) => b + a
+    case (a, b) => a + b
   }
 
   // parallel
   import scalaz.syntax.parallel._
   (fa |@| fb).parApply {
-    case (a, b) => b + a
+    case (a, b) => a + b
   }
+
+  // (fa |@| fb |@| fc).parApply {
+  //   case (a, b, c) => a + b + c
+  // }
 
 }
