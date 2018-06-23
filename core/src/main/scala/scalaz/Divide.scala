@@ -6,7 +6,7 @@ package scalaz
  * @see [[https://github.com/ekmett/contravariant/issues/18]]
  */
 ////
-trait Divide[F[_]] extends Contravariant[F] with ApplyDivide[F] { self =>
+trait Divide[F[_]] extends Contravariant[F] { self =>
   ////
   final def divide[A, B, C](fa: =>F[A], fb: =>F[B])(f: C => (A, B)): F[C] =
     divide2(fa, fb)(f)
@@ -42,20 +42,6 @@ trait Divide[F[_]] extends Contravariant[F] with ApplyDivide[F] { self =>
     f: Z => (A1, A2, A3, A4)
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = divide4(a1, a2, a3, a4)(f)
 
-  // ApplyDivide impl
-  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
-    f: (A1, A2) => Z,
-    g: Z => (A1, A2)
-  ): F[Z] = divide2(a1, a2)(g)
-  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
-    f: (A1, A2, A3) => Z,
-    g: Z => (A1, A2, A3)
-  ): F[Z] = divide3(a1, a2, a3)(g)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
-    f: (A1, A2, A3, A4) => Z,
-    g: Z => (A1, A2, A3, A4)
-  ): F[Z] = divide4(a1, a2, a3, a4)(g)
-
   trait DivideLaw extends ContravariantLaw {
     protected[this] def delta[A]: A => (A, A) = a => (a, a)
     def composition[A](a1: F[A], a2: F[A], a3: F[A])(implicit E: Equal[F[A]]): Boolean = {
@@ -87,7 +73,7 @@ object Divide {
   ////
 }
 
-trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravariant[F, G] with IsomorphismApplyDivide[F, G]{
+trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravariant[F, G]{
   implicit def G: Divide[G]
   ////
 

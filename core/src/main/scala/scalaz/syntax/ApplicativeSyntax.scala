@@ -37,9 +37,9 @@ trait ToApplicativeOps0[TC[F[_]] <: Applicative[F]] extends ToApplicativeOpsU[TC
   }  ////
 }
 
-trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC] with ToApplicativeDivisibleOps[TC]
+trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC]
 
-trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with ApplicativeDivisibleSyntax[F] {
+trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
   implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A](v)(ApplicativeSyntax.this.F)
 
   def F: Applicative[F]

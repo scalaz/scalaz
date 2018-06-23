@@ -9,7 +9,7 @@ import scala.annotation.tailrec
  * @see [[scalaz.Apply.ApplyLaw]]
  */
 ////
-trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
+trait Apply[F[_]] extends Functor[F] { self =>
   ////
   /** Sequence `f`, then `fa`, combining their results by function
     * application.
@@ -138,18 +138,6 @@ trait Apply[F[_]] extends Functor[F] with ApplyDivide[F] { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] =
     apply4(a1, a2, a3, a4)(f)
 
-  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
-    f: (A1, A2) => Z, g: Z => (A1, A2)
-  ): F[Z] = apply2(a1, a2)(f)
-  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
-    f: (A1, A2, A3) => Z,
-    g: Z => (A1, A2, A3)
-  ): F[Z] = apply3(a1, a2, a3)(f)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
-    f: (A1, A2, A3, A4) => Z,
-    g: Z => (A1, A2, A3, A4)
-  ): F[Z] = apply4(a1, a2, a3, a4)(f)
-
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))
   def tuple3[A,B,C](fa: => F[A], fb: => F[B], fc: => F[C]): F[(A,B,C)] =
@@ -240,7 +228,7 @@ object Apply {
   ////
 }
 
-trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] with IsomorphismApplyDivide[F, G]{
+trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G]{
   implicit def G: Apply[G]
   ////
 

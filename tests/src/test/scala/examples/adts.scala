@@ -16,19 +16,19 @@ package adt {
   final case class Faz(b: Boolean, i: Int) extends Foo
   final case object Baz extends Foo {
     implicit val equal: Equal[Baz.type] =
-      Derives[Equal].xderiving0(Baz)
+      Decidable[Equal].xderiving0(Baz)
     implicit val default: Default[Baz.type] =
       Derives[Default].xderiving0(Baz)
   }
   object Bar {
     implicit val equal: Equal[Bar] =
-      Derives[Equal].xderiving1((s: String) => Bar(s), _.s)
+      Decidable[Equal].xderiving1((s: String) => Bar(s), _.s)
     implicit val default: Default[Bar] =
       Derives[Default].xderiving1((s: String) => Bar(s), _.s)
   }
   object Faz {
     implicit val equal: Equal[Faz] =
-      Derives[Equal]
+      Decidable[Equal]
         .xderiving2((b: Boolean, i: Int) => Faz(b, i), f => (f.b, f.i))
     implicit val default: Default[Faz] =
       Derives[Default]

@@ -261,6 +261,14 @@ object ScalazProperties {
       }
   }
 
+  object alt {
+    def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
+                   aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
+      newProperties("alt") { p =>
+        p.include(applicative.laws[F])
+      }
+  }
+
   object bind {
     def associativity[M[_], X, Y, Z](implicit M: Bind[M], amx: Arbitrary[M[X]], af: Arbitrary[(X => M[Y])],
                                      ag: Arbitrary[(Y => M[Z])], emz: Equal[M[Z]]): Prop =
@@ -589,6 +597,17 @@ object ScalazProperties {
         p.include(divide.laws[F])
         p.property("right identity") = rightIdentity[F, Int]
         p.property("left identity") = leftIdentity[F, Int]
+      }
+  }
+
+  object decidable {
+    def laws[F[_]](implicit
+                     F: Decidable[F],
+                     af: Arbitrary[F[Int]],
+                     axy: Arbitrary[Int => Int],
+                     ef: Equal[F[Int]]): Properties =
+      newProperties("decidable") { p =>
+        p.include(divisible.laws[F])
       }
   }
 

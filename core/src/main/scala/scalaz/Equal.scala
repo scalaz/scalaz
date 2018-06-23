@@ -62,7 +62,7 @@ object Equal {
   def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
 
   // scalaz-deriving provides a coherent n-arity extension
-  private[scalaz] class EqualDerives extends ContravariantDerives[Equal] {
+  private[scalaz] class EqualDecidable extends Decidable[Equal] {
     override def divide2[A1, A2, Z](a1: =>Equal[A1], a2: =>Equal[A2])(
       f: Z => (A1, A2)
     ): Equal[Z] = Equal.equal{ (z1, z2) =>
@@ -73,10 +73,7 @@ object Equal {
     }
     override def conquer[A]: Equal[A] = Equal.equal((_, _) => true)
 
-    override def codivide1[Z, A1](a1: =>Equal[A1])(f: Z => A1): Equal[Z] =
-      Equal.equal((z1, z2) => a1.equal(f(z1), f(z2)))
-
-    override def codivide2[Z, A1, A2](a1: =>Equal[A1], a2: =>Equal[A2])(
+    override def choose2[Z, A1, A2](a1: =>Equal[A1], a2: =>Equal[A2])(
       f: Z => A1 \/ A2
     ): Equal[Z] = Equal.equal{ (z1, z2) =>
       (f(z1), f(z2)) match {
@@ -86,7 +83,7 @@ object Equal {
       }
     }
   }
-  implicit val Derives: Derives[Equal] = new EqualDerives
+  implicit val equalDecidable: Decidable[Equal] = new EqualDecidable
 
   /** Construct an instance, but prefer SAM types with scala 2.12+ */
   def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
