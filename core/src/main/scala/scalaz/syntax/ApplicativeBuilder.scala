@@ -170,7 +170,7 @@ abstract class ApplicativeBuilderSyntax {
   implicit final class ApplicativeBuilderOps2[M[_], A, B](
     private val self: ApplicativeBuilder[M, A, B]) {
     def parApply[C](f: (A, B) => C)(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[C] =
-      Parallel.unwrap(ap.apply2(Parallel(self.a), Parallel(self.b))(f))
+      Tag.unwrap(ap.apply2(Tag[M[A], Parallel](self.a), Tag[M[B], Parallel](self.b))(f))
 
     def parTupled(implicit ap: Apply[λ[α => M[α] @@ Parallel]]): M[(A, B)] =
       parApply(Tuple2.apply)
