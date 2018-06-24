@@ -15,7 +15,7 @@ trait IListModule {
   def empty[A]: IList[A]
   def cons[A](a: A, as: IList[A]): IList[A]
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]]
-  def foldLeft[A, B](f: (B, A) => B, z: B, as: IList[A]): B
+  def foldLeft[A, B](f: (B, A) => B, z: => B, as: IList[A]): B
   def reverse[A](as: IList[A]): IList[A]
   def append[A](as: IList[A], aas: IList[A]): IList[A]
 
@@ -167,7 +167,7 @@ private[data] object IListImpl extends IListModule {
     Fix.unfix[Maybe2[A, ?]](as)
 
   @tailrec
-  def foldLeft[A, B](f: (B, A) => B, z: B, as: IList[A]): B =
+  def foldLeft[A, B](f: (B, A) => B, z: => B, as: IList[A]): B =
     uncons(as) match {
       case Maybe2.Empty2() => z
       case Maybe2.Just2(a, aas) =>
