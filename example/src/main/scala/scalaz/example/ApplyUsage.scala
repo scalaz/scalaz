@@ -148,9 +148,6 @@ object ApplyUsage extends App {
 
   ///////////////////////////////////
   // PARALLELISM
-  import scalaz.Tags.Parallel
-  import scalaz.{ @@, Applicative }
-  import scalaz.Isomorphism.IsoFunctorTemplate
   import scalaz.concurrent.Task
 
   // imagine these were effectful, like hitting disk or network...

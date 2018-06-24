@@ -127,6 +127,7 @@ object Applicative {
     }
 
   ////
+  type Par[F[_]] = Applicative[λ[α => F[α] @@ Tags.Parallel]]
 
   implicit def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
 
