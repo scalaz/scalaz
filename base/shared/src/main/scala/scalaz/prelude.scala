@@ -144,6 +144,7 @@ trait AllFunctions
     extends VoidFunctions
     with data.DisjunctionFunctions
     with data.MaybeFunctions
+    with data.IListFunctions
     with ct.KleisliFunctions
     with ct.InvariantFunctorFunctions
     with ct.PhantomFunctions
@@ -194,6 +195,7 @@ trait AllSyntax
     with data.Forall2Syntax
     with data.MaybeSyntax
     with data.Maybe2Syntax
+    with data.IListSyntax
     with ct.ApplicativeSyntax
     with ct.ApplySyntax
     with ct.BifunctorSyntax
