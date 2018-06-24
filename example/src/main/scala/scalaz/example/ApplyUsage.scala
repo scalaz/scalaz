@@ -166,10 +166,7 @@ object ApplyUsage extends App {
 
   (fa |@| fb).parTupled: Task[(String, String)]
 
-  // can't add syntax until 7.3 where we can break bincompat...
-  // (fa |@| fb |@| fc).parTupled: Task[(String, String, String)]
-
   // yuck
-  (fa |@| (fb |@| fc).parTupled).parTupled: Task[(String, (String, String))]
+  (fa |@| fb |@| fc).parTupled: Task[(String, String, String)]
 
 }
