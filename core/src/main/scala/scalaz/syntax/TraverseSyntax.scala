@@ -65,6 +65,15 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
     F.mapAccumL(self, z)(f)
   final def mapAccumR[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
     F.mapAccumR(self, z)(f)
+
+  import Tags.Parallel
+  final def parTraverse[G[_], B](f: A => G[B])(
+    implicit F: Traverse[F], G: Applicative.Par[G]
+  ): G[F[B]] = {
+    type ParG[a] = G[a] @@ Parallel
+    Tag.unwrap(F.traverse[ParG, A, B](self)(a => Tag(f(a))))
+  }
+
   ////
 }
 
