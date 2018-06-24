@@ -100,7 +100,7 @@ trait KleisliInstances {
 trait KleisliSyntax {
   import Kleisli.{ runKleisli, wrapKleisli }
 
-  implicit final class ToKleisliOps[F[_], A, B](val k: Kleisli[F, A, B]) {
+  implicit final class ToKleisliOps[F[_], A, B](k: Kleisli[F, A, B]) {
 
     def hoist[G[_]](η: F ~> G): Kleisli[G, A, B] =
       Kleisli.hoist(k)(η)
