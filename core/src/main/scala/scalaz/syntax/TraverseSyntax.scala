@@ -68,10 +68,10 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
 
   import Tags.Parallel
   final def parTraverse[G[_], B](f: A => G[B])(
-    implicit F: Traverse[F], G: Applicative[λ[α => G[α] @@ Parallel]]
+    implicit F: Traverse[F], G: Applicative.Par[G]
   ): G[F[B]] = {
-    type ParG[C] = G[C] @@ Parallel
-    Parallel.unwrap(F.traverse(self)(a => Parallel(f(a)): ParG[B]))
+    type ParG[a] = G[a] @@ Parallel
+    Tag.unwrap(F.traverse[ParG, A, B](self)(a => Tag(f(a))))
   }
 
   ////
