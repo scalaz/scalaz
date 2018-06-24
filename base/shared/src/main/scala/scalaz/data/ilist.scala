@@ -91,27 +91,25 @@ final class IListOps[A](val self: data.IList[A]) extends AnyVal {
   def take(n: Int): IList[A] = {
     @tailrec
     def go(m: Int, acc: IList[A], as: IList[A]): IList[A] =
-      if (m <= 0) IList.reverse(acc)
-      else
-        IList.uncons(as) match {
-          case Maybe2.Empty2() => IList.reverse(acc)
-          case Maybe2.Just2(a, aas) =>
-            go(m - 1, IList.cons(a, acc), aas)
-        }
-    go(n, IList.empty, self)
+      IList.uncons(as) match {
+        case Maybe2.Empty2() => IList.reverse(acc)
+        case Maybe2.Just2(a, aas) =>
+          go(m - 1, IList.cons(a, acc), aas)
+      }
+    if (n <= 0) IList.empty
+    else go(n, IList.empty, self)
   }
 
   def drop(n: Int): IList[A] = {
     @tailrec
     def go(m: Int, as: IList[A]): IList[A] =
-      if (m <= 0) as
-      else
-        IList.uncons(as) match {
-          case Maybe2.Empty2() => as
-          case Maybe2.Just2(_, aas) =>
-            go(m - 1, aas)
-        }
-    go(n, self)
+      IList.uncons(as) match {
+        case Maybe2.Empty2() => as
+        case Maybe2.Just2(_, aas) =>
+          go(m - 1, aas)
+      }
+    if (n <= 0) self
+    else go(n, self)
   }
 
   def size: Int =
