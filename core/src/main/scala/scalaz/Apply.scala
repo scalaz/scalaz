@@ -205,11 +205,6 @@ trait Apply[F[_]] extends Functor[F] { self =>
     def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]): Boolean =
       FC.equal(ap(ap(fa)(fab))(fbc),
                ap(fa)(ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc compose ab))))
-
-    /** `apply2` is consistent with `ap` (note that this ties apply2 into sequential Bind laws!). */
-    def apapply2[A, B](fa: F[A], fb: F[B], f: (A, B) => B)(implicit FB: Equal[F[B]]): Boolean =
-      FB.equal(apply2(fa, fb)(f), ap(fb)(map(fa)(f.curried)))
-
   }
   def applyLaw = new ApplyLaw {}
 
