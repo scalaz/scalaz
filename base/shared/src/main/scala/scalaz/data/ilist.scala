@@ -7,7 +7,7 @@ import types.IsCovariantClass
 
 import scala.annotation.tailrec
 import scala.PartialFunction.{ cond, condOpt }
-import scala.AnyVal
+import scala.inline
 
 trait IListModule {
   type IList[A]
@@ -41,79 +41,85 @@ trait IListModule {
   implicit def isCovariantInstance: IsCovariant[IList]
 }
 
-final class IListOps[A](val self: IList[A]) extends AnyVal {
+trait IListSyntax {
+  final class ToIListOps[A](self: IList[A]) {
 
-  def headOption: Maybe[A] =
-    IList.uncons(self) match {
-      case Maybe2.Empty2()    => Maybe.empty
-      case Maybe2.Just2(a, _) => Maybe.just(a)
+    def headOption: Maybe[A] =
+      IList.uncons(self) match {
+        case Maybe2.Empty2()    => Maybe.empty
+        case Maybe2.Just2(a, _) => Maybe.just(a)
+      }
+
+    def tailOption: Maybe[IList[A]] =
+      IList.uncons(self) match {
+        case Maybe2.Empty2()     => Maybe.empty
+        case Maybe2.Just2(_, as) => Maybe.just(as)
+      }
+
+    def ::(a: A): IList[A] = IList.cons(a, self)
+
+    def uncons: Maybe2[A, IList[A]] =
+      IList.uncons(self)
+
+    def foldLeft[B](z: B)(f: (B, A) => B) =
+      IList.foldLeft(f, z, self)
+
+    def append(that: IList[A]): IList[A] =
+      IList.append(self, that)
+
+    def :::[Z](that: IList[A]): IList[A] =
+      IList.foldLeft[A, IList[A]]((b, a) => IList.cons(a, b), self, IList.reverse(that))
+
+    def reverse: IList[A] =
+      IList.reverse(self)
+
+    def reverse_:::[Z](that: IList[A]): IList[A] =
+      IList.foldLeft[A, IList[A]]((as, a) => IList.cons(a, as), self, that)
+
+    def filter(p: A => Boolean): IList[A] =
+      IList.foldLeft[A, IList[A]]((b, a) => if (p(a)) IList.cons(a, b) else b, IList.empty, self)
+
+    def zip[B](that: IList[B]): IList[(A, B)] = {
+      @tailrec
+      def go(acc: IList[(A, B)], as: IList[A], bs: IList[B]): IList[(A, B)] =
+        (IList.uncons(as), IList.uncons(bs)) match {
+          case (Maybe2.Just2(a, aas), Maybe2.Just2(b, bbs)) => go(IList.cons((a, b), acc), aas, bbs)
+          case _                                            => acc
+        }
+
+      go(IList.empty, self, that)
     }
 
-  def tailOption: Maybe[IList[A]] =
-    IList.uncons(self) match {
-      case Maybe2.Empty2()     => Maybe.empty
-      case Maybe2.Just2(_, as) => Maybe.just(as)
+    def take(n: Int): IList[A] = {
+      @tailrec
+      def go(m: Int, acc: IList[A], as: IList[A]): IList[A] =
+        IList.uncons(as) match {
+          case Maybe2.Empty2() => IList.reverse(acc)
+          case Maybe2.Just2(a, aas) =>
+            go(m - 1, IList.cons(a, acc), aas)
+        }
+
+      if (n <= 0) IList.empty
+      else go(n, IList.empty, self)
     }
 
-  def ::(a: A): IList[A] = IList.cons(a, self)
+    def drop(n: Int): IList[A] = {
+      @tailrec
+      def go(m: Int, as: IList[A]): IList[A] =
+        IList.uncons(as) match {
+          case Maybe2.Empty2() => as
+          case Maybe2.Just2(_, aas) =>
+            go(m - 1, aas)
+        }
 
-  def uncons: Maybe2[A, IList[A]] =
-    IList.uncons(self)
+      if (n <= 0) self
+      else go(n, self)
+    }
 
-  def foldLeft[B](z: B)(f: (B, A) => B) =
-    IList.foldLeft(f, z, self)
-
-  def append(that: IList[A]): IList[A] =
-    IList.append(self, that)
-
-  def :::[Z](that: IList[A]): IList[A] =
-    IList.foldLeft[A, IList[A]]((b, a) => IList.cons(a, b), self, IList.reverse(that))
-
-  def reverse: IList[A] =
-    IList.reverse(self)
-
-  def reverse_:::[Z](that: IList[A]): IList[A] =
-    IList.foldLeft[A, IList[A]]((as, a) => IList.cons(a, as), self, that)
-
-  def filter(p: A => Boolean): IList[A] =
-    IList.foldLeft[A, IList[A]]((b, a) => if (p(a)) IList.cons(a, b) else b, IList.empty, self)
-
-  def zip[B](that: IList[B]): IList[(A, B)] = {
-    @tailrec
-    def go(acc: IList[(A, B)], as: IList[A], bs: IList[B]): IList[(A, B)] =
-      (IList.uncons(as), IList.uncons(bs)) match {
-        case (Maybe2.Just2(a, aas), Maybe2.Just2(b, bbs)) => go(IList.cons((a, b), acc), aas, bbs)
-        case _                                            => acc
-      }
-    go(IList.empty, self, that)
+    def size: Int =
+      IList.foldLeft[A, Int]((b, a) => 1 + b, 0, self)
   }
 
-  def take(n: Int): IList[A] = {
-    @tailrec
-    def go(m: Int, acc: IList[A], as: IList[A]): IList[A] =
-      IList.uncons(as) match {
-        case Maybe2.Empty2() => IList.reverse(acc)
-        case Maybe2.Just2(a, aas) =>
-          go(m - 1, IList.cons(a, acc), aas)
-      }
-    if (n <= 0) IList.empty
-    else go(n, IList.empty, self)
-  }
-
-  def drop(n: Int): IList[A] = {
-    @tailrec
-    def go(m: Int, as: IList[A]): IList[A] =
-      IList.uncons(as) match {
-        case Maybe2.Empty2() => as
-        case Maybe2.Just2(_, aas) =>
-          go(m - 1, aas)
-      }
-    if (n <= 0) self
-    else go(n, self)
-  }
-
-  def size: Int =
-    IList.foldLeft[A, Int]((b, a) => 1 + b, 0, self)
 }
 
 trait IListInstances {
@@ -182,4 +188,12 @@ private[data] object IListImpl extends IListModule {
       Fix.liftLiskov[Maybe2[A, ?], Maybe2[B, ?]](ev1.make)(Maybe2.isCovariant_2[A])
     }
   })
+}
+
+trait IListFunctions {
+  @inline def cons[A](a: A, as: IList[A]): IList[A] =
+    IList.cons(a, as)
+
+  @inline def uncons[A](as: IList[A]): Maybe2[A, IList[A]] =
+    IList.uncons(as)
 }
