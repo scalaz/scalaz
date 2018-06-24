@@ -2,7 +2,6 @@ package scalaz
 package ct
 
 import scala.inline
-
 import algebra.MonoidClass
 import data.~>
 
@@ -24,6 +23,7 @@ sealed trait KleisliModule {
 }
 
 private[ct] object KleisliImpl extends KleisliModule {
+
   type Kleisli[F[_], A, B] = A => F[B]
 
   override def runKleisli[F[_], A, B](k: Kleisli[F, A, B]): A => F[B] = k
@@ -36,12 +36,12 @@ private[ct] object KleisliImpl extends KleisliModule {
   override def first[F[_], A, B, C](
     k: Kleisli[F, A, B]
   )(implicit F: scalaz.Functor[F]): Kleisli[F, (A, C), (B, C)] =
-    wrapKleisli(t => F.map(runKleisli(k)(t._1))((_, t._2)))
+    t => F.map(k(t._1))((_, t._2))
 
   override def second[F[_], A, B, C](
     k: Kleisli[F, A, B]
   )(implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
-    wrapKleisli(t => F.map(runKleisli(k)(t._2))((t._1, _)))
+    t => F.map(k(t._2))((t._1, _))
 
   override def compose[F[_], A, B, C](
     j: Kleisli[F, B, C],
@@ -100,7 +100,7 @@ trait KleisliInstances {
 trait KleisliSyntax {
   import Kleisli.{ runKleisli, wrapKleisli }
 
-  implicit class ToKleisliOps[F[_], A, B](k: Kleisli[F, A, B]) {
+  implicit final class ToKleisliOps[F[_], A, B](val k: Kleisli[F, A, B]) {
 
     def hoist[G[_]](η: F ~> G): Kleisli[G, A, B] =
       Kleisli.hoist(k)(η)

@@ -65,10 +65,10 @@ def andThen[C](
 
 // Converts an arrow `Kleisli[F, A, B]` into an arrow of pairs that is applied to the
 // first component in the pair, but leaves the second component untouched
-def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
+def first[C](implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)]
 
 // The mirror image of `first`
-def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
+def second[C](implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)]
 
 // symbolic version of `andThen`
 def >=>[C](j: Kleisli[F, B, C])(implicit F: Monad[F]): Kleisli[F, A, C]
@@ -85,8 +85,7 @@ def >>>[C](j: Kleisli[F, B, C])(implicit F: Monad[F]): Kleisli[F, A, C]
 // Split the input between the two argument arrows and combine their output.
 def ***[C, D](j: Kleisli[F, C, D])(
   implicit A: Apply[F]
-): Kleisli[F, (A, C), (B, D)] =
-  wrapKleisli(t => A.ap(runKleisli(j)(t._2))(A.map(runKleisli(k)(t._1))(a => (a, _))))
+): Kleisli[F, (A, C), (B, D)]
 
 // Referred to as fanout, this function sends the input to both argument arrows and combine their output
 def &&&[C](j: Kleisli[F, A, C])(
