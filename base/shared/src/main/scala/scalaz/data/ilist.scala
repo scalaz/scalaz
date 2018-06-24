@@ -41,7 +41,7 @@ trait IListModule {
   implicit def isCovariantInstance: IsCovariant[IList]
 }
 
-final class IListOps[A](val self: data.IList[A]) extends AnyVal {
+final class IListOps[A](val self: IList[A]) extends AnyVal {
 
   def headOption: Maybe[A] =
     IList.uncons(self) match {
