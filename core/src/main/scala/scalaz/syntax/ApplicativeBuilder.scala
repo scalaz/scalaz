@@ -177,9 +177,9 @@ private[scalaz] trait ApplicativeBuilder[M[_], A, B] {
 }
 
 // outside of ApplicativeBuilder for bincompat
-abstract class ApplicativeBuilderSyntax {
+object ApplicativeBuilder {
   implicit final class ApplicativeBuilderOps2[M[_], A, B](
-    private val self: ApplicativeBuilder[M, A, B]) {
+      val self: ApplicativeBuilder[M, A, B]) extends AnyVal {
     def parApply[C](f: (A, B) => C)(implicit ap: Apply.Par[M]): M[C] =
       Tag.unwrap(ap.apply2(Tag[M[A], Parallel](self.a), Tag[M[B], Parallel](self.b))(f))
 

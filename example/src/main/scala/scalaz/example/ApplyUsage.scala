@@ -162,8 +162,9 @@ object ApplyUsage extends App {
   (fa |@| fb).tupled: Task[(String, String)]
 
   // parallel
-  import scalaz.syntax.parallel._
+  //import scalaz.syntax.parallel._
 
+  (fa |@| fb).parApply(_ ++ _): Task[String]
   (fa |@| fb).parTupled: Task[(String, String)]
 
   // yuck

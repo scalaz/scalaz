@@ -12,5 +12,4 @@ package object syntax extends Syntaxes {
   object contT extends ToContTOps
   object monadTrans extends ToMonadTransOps
   object eithert extends ToEitherTOps
-  object parallel extends ApplicativeBuilderSyntax
 }
