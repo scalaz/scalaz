@@ -15,6 +15,7 @@ trait IListModule {
   def empty[A]: IList[A]
   def cons[A](a: A, as: IList[A]): IList[A]
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]]
+  def foldLeft[A, B](f: (B, A) => B, z: B, as: IList[A]): B
 
   object Cons {
     def apply[A](a: A, as: IList[A]): IList[A] = cons(a, as)
@@ -58,16 +59,8 @@ trait IListSyntax {
     def uncons: Maybe2[A, IList[A]] =
       IList.uncons(self)
 
-    def foldLeft[B](z: B)(f: (B, A) => B): B = {
-      @tailrec
-      def go(acc: B, as: IList[A]): B =
-        IList.uncons(as) match {
-          case Maybe2.Empty2() => acc
-          case Maybe2.Just2(a, aas) =>
-            go(f(acc, a), aas)
-        }
-      go(z, self)
-    }
+    def foldLeft[B](z: B)(f: (B, A) => B): B =
+      IList.foldLeft(f, z, self)
 
     def foldRight[B](z: B)(f: (A, B) => B): B =
       self.foldLeft(z)((b, a) => f(a, b))
@@ -105,17 +98,17 @@ trait IListSyntax {
     def take(n: Int): IList[A] = {
       @tailrec
       def go(m: Int, acc: IList[A], as: IList[A]): IList[A] =
-        if (m == 0) acc
+        if (m == 0) acc.reverse
         else
           IList.uncons(as) match {
-            case Maybe2.Empty2() => acc
+            case Maybe2.Empty2() => acc.reverse
             case Maybe2.Just2(a, aas) =>
               go(m - 1, a :: acc, aas)
           }
 
       if (n <= 0) IList.empty
       else
-        go(n, IList.empty, self).reverse
+        go(n, IList.empty, self)
     }
 
     def drop(n: Int): IList[A] = {
@@ -182,6 +175,14 @@ private[data] object IListImpl extends IListModule {
 
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]] =
     Fix.unfix[Maybe2[A, ?]](as)
+
+  @tailrec
+  def foldLeft[A, B](f: (B, A) => B, z: B, as: IList[A]): B =
+    uncons(as) match {
+      case Maybe2.Empty2() => z
+      case Maybe2.Just2(a, aas) =>
+        foldLeft(f, f(z, a), aas)
+    }
 
   implicit val isCovariantInstance: IsCovariant[IList] = instanceOf(new IsCovariantClass.LiftLiskov[IList] {
 
