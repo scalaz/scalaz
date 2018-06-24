@@ -350,6 +350,8 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
     }
   }
 
+  def andThen[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] = fold(Failure(_), f)
+
 }
 
 final case class Success[E, A](a: A) extends Validation[E, A] {

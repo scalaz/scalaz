@@ -39,6 +39,13 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
     traverse(as)(a => a)
 
+  /**
+   * A lawful implementation of this that is isomorphic up to the methods
+   * defined on Applicative allowing for optimised parallel implementations that
+   * would otherwise violate laws of more specific typeclasses (e.g. Monad).
+   */
+  def par: Applicative.Par[F] = Tags.Parallel.subst1[Applicative, F](self)
+
   import std.list._
 
   override def xproduct0[Z](z: =>Z): F[Z] = point(z)
@@ -138,6 +145,7 @@ object Applicative {
     }
 
   ////
+  type Par[F[_]] = Applicative[λ[α => F[α] @@ Tags.Parallel]]
 
   ////
 }
