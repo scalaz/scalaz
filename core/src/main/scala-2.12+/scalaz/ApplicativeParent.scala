@@ -13,13 +13,7 @@ trait ApplicativeParent[F[_]] { self: Applicative[F] =>
    * defined on Applicative allowing for optimised parallel implementations that
    * would otherwise violate laws of more specific typeclasses (e.g. Monad).
    */
-  def par: Applicative.Par[F] =
-    Applicative.fromIso[λ[α => F[α] @@ Parallel], F](
-      new IsoFunctorTemplate[λ[α => F[α] @@ Parallel], F] {
-        override def from[A](ga: F[A]): F[A] @@ Parallel = Parallel(ga)
-        override def to[A](fa: F[A] @@ Parallel): F[A] = Parallel.unwrap(fa)
-      }
-    )(self)
+  def par: Applicative.Par[F] = Tags.Parallel.subst1[Applicative, F](self)
 
   ////
 }
