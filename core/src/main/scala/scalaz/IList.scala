@@ -1,7 +1,6 @@
 package scalaz
 
 import scala.annotation.tailrec
-import scala.annotation.unchecked.uncheckedVariance
 import std.option.{ cata, none, some }
 import std.stream.{ toZipper => sToZipper }
 import std.tuple.{ tuple2Bitraverse => BFT }
@@ -477,7 +476,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   // IList is invariant in behavior but covariant by nature, so we can safely widen to IList[B]
   // given evidence that A is a subtype of B.
   def widen[B](implicit ev: A <~< B): IList[B] =
-    ev.subst[λ[`-α` => IList[α @uncheckedVariance] <~< IList[B]]](refl)(this)
+    IList.covariant.widen(this)
 
   def zipWithIndex: IList[(A, Int)] =
     zip(IList.fromSeq(0 until length))
@@ -553,6 +552,7 @@ sealed abstract class IListInstance0 {
       val A = A0
     }
 
+  implicit final val covariant: IsCovariant[IList] = IsCovariant.force[IList]
 }
 
 sealed abstract class IListInstances extends IListInstance0 {

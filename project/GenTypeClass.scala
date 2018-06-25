@@ -95,6 +95,10 @@ object TypeClass {
 
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
 
+  lazy val isCovariant = TypeClass("IsCovariant", *->*, iso = false, fromIso = false)
+  lazy val isContravariant = TypeClass("IsContravariant", *->*, iso = false, fromIso = false)
+  //lazy val isBivariant = TypeClass("IsBivariant", *->*, extendsList = Seq(isCovariant, isContravariant), iso = false, fromIso = false)
+
   def core: List[TypeClass] = List(semigroup,
     monoid,
     band,
@@ -150,7 +154,10 @@ object TypeClass {
     monadTell,
     monadReader,
     comonadStore,
-    bindRec
+    bindRec,
+    isCovariant,
+    isContravariant,
+    //isBivariant,
   )
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource, monadCatchIO)

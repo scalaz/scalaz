@@ -3,12 +3,12 @@ package scalaz
 import scala.annotation.tailrec
 
 /** Call by name */
-sealed abstract class Name[+A] {
+sealed abstract class Name[A] {
   def value: A
 }
 
 /** Call by need */
-final class Need[+A] private(private[this] var eval: () => A) extends Name[A] {
+final class Need[A] private(private[this] var eval: () => A) extends Name[A] {
   lazy val value: A = {
     val value0 = eval()
     eval = null
@@ -17,7 +17,7 @@ final class Need[+A] private(private[this] var eval: () => A) extends Name[A] {
 }
 
 /** Call by value */
-final case class Value[+A](value: A) extends Name[A]
+final case class Value[A](value: A) extends Name[A]
 
 object Name {
   def apply[A](a: => A) = new Name[A] {
@@ -56,6 +56,7 @@ object Name {
   implicit def nameEqual[A: Equal]: Equal[Name[A]] = new Equal[Name[A]] {
     def equal(a1: Name[A], a2: Name[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Name] = IsCovariant.force
 }
 
 object Need {
@@ -94,6 +95,7 @@ object Need {
   implicit def needEqual[A: Equal]: Equal[Need[A]] = new Equal[Need[A]] {
     def equal(a1: Need[A], a2: Need[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Value] = IsCovariant.force
 }
 
 object Value {
@@ -125,4 +127,5 @@ object Value {
   implicit def valueEqual[A: Equal]: Equal[Value[A]] = new Equal[Value[A]] {
     def equal(a1: Value[A], a2: Value[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Value] = IsCovariant.force
 }

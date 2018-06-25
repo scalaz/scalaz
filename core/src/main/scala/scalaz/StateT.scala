@@ -3,7 +3,7 @@ package scalaz
 import scala.annotation.tailrec
 import Id._
 
-sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
+sealed abstract class IndexedStateT[S1, S2, F[_], A] { self =>
   import IndexedStateT._
 
   /** Run and return the final value and state in the context of `F` */
@@ -46,12 +46,12 @@ sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
   }
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZero[S <: S1](implicit S: Monoid[S], F: Bind[F]): F[(S2, A)] =
-    run(S.zero)
+  def runZero(implicit S1: Monoid[S1], F: Bind[F]): F[(S2, A)] =
+    run(S1.zero)
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZeroRec[S <: S1](implicit S: Monoid[S], F: BindRec[F]): F[(S2, A)] =
-    runRec(S.zero)
+  def runZeroRec(implicit S1: Monoid[S1], F: BindRec[F]): F[(S2, A)] =
+    runRec(S1.zero)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
   def eval(initial: S1)(implicit F: Bind[F]): F[A] =
@@ -62,12 +62,12 @@ sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
     F.map(runRec(initial))(_._2)
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
-  def evalZero[S <: S1](implicit F: Bind[F], S: Monoid[S]): F[A] =
-    eval(S.zero)
+  def evalZero(implicit F: Bind[F], S1: Monoid[S1]): F[A] =
+    eval(S1.zero)
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
-  def evalZeroRec[S <: S1](implicit F: BindRec[F], S: Monoid[S]): F[A] =
-    evalRec(S.zero)
+  def evalZeroRec(implicit F: BindRec[F], S1: Monoid[S1]): F[A] =
+    evalRec(S1.zero)
 
   /** Run, discard the final value, and return the final state in the context of `F` */
   def exec(initial: S1)(implicit F: Bind[F]): F[S2] =
@@ -78,12 +78,12 @@ sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
     F.map(runRec(initial))(_._1)
 
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
-  def execZero[S <: S1](implicit F: Bind[F], S: Monoid[S]): F[S2] =
-    exec(S.zero)
+  def execZero(implicit F: Bind[F], S1: Monoid[S1]): F[S2] =
+    exec(S1.zero)
 
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
-  def execZeroRec[S <: S1](implicit F: BindRec[F], S: Monoid[S]): F[S2] =
-    execRec(S.zero)
+  def execZeroRec(implicit F: BindRec[F], S1: Monoid[S1]): F[S2] =
+    execRec(S1.zero)
 
   def map[B](f: A => B)(implicit F: Applicative[F]): IndexedStateT[S1, S2, F, B] =
     flatMap(a => StateT[S2, F, B](s => F.point((s, f(a)))))
@@ -98,9 +98,9 @@ sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
   /** Alias for mapT */
   def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[S1, S, G, B] = mapT(f)
 
-  import BijectionT._
-  def bmap[X, S >: S2 <: S1](b: Bijection[S, X])(implicit F: Applicative[F]): StateT[X, F, A] =
-    xmap(b to)(b from)
+  import BijectionT._, Liskov._
+  def bmap[X, S](b: Bijection[S, X])(implicit F: Applicative[F], S1: S <~< S1, S2: S >~> S2): StateT[X, F, A] =
+    xmap(s => b.to(S2(s)))(s => S1(b.from(s)))
 
   def contramap[X](g: X => S1)(implicit F: Applicative[F]): IndexedStateT[X, S2, F, A] =
     IndexedStateT((s: X) => F.point((g(s), ()))).flatMap(_ => this)
@@ -137,8 +137,8 @@ sealed abstract class IndexedStateT[-S1, S2, F[_], A] { self =>
       this.contramap(l get (_: S0)).imap[S3](l.set(s0, _))
     )
 
-  def liftF[S <: S1]: Free[IndexedStateT[S, S2, F, ?], A] =
-    Free.liftF[IndexedStateT[S, S2, F, ?], A](self)
+  def liftF: Free[IndexedStateT[S1, S2, F, ?], A] =
+    Free.liftF[IndexedStateT[S1, S2, F, ?], A](self)
 
   private def flatMapS[S3, B](f: (S2, A) => IndexedStateT[S2, S3, F, B]): IndexedStateT[S1, S3, F, B] =
     FlatMap(this, f)
@@ -250,6 +250,9 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
 abstract class StateTInstances extends StateTInstances0 {
   implicit def stateMonad[S]: MonadState[State[S, ?], S] =
       StateT.stateTMonadState[S, Id](Id.id)
+
+  implicit def contravariantS1[S2, F[_], A]: IsContravariant[IndexedStateT[?, S2, F, A]] =
+    IsContravariant.force[IndexedStateT[?, S2, F, A]]
 }
 
 trait IndexedStateTFunctions {

@@ -5,7 +5,7 @@ import Id._
 /**
  * @see [[scalaz.Lens]]
  */
-final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
+final case class IndexedStoreT[F[_], I, A, B](run: (F[A => B], I)) {
   import StoreT._
   import BijectionT._
 
@@ -155,6 +155,9 @@ abstract class StoreTInstances extends StoreTInstances0 {
           s => f(fa.peek(s)).peek(s),
           S.append(fa.pos, f(fa.peek(S.zero)).pos))
     }
+
+  implicit final def covariantI[F[_], A, B]: IsCovariant[IndexedStoreT[F, ?, A, B]] =
+    IsCovariant.force[IndexedStoreT[F, ?, A, B]]
 }
 
 private trait IndexedStoreTFunctorLeft[F[_], A0, B0] extends Functor[IndexedStoreT[F, ?, A0, B0]]{
