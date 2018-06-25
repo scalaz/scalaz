@@ -1,6 +1,6 @@
 package scalaz
 
-import scalaz.zio.{Void => ZVoid}
+import scalaz.zio.{Void => ZioVoid}
 
 trait VoidModule {
   type Void
@@ -9,7 +9,7 @@ trait VoidModule {
 }
 
 object VoidImpl extends VoidModule {
-  type Void = ZVoid
+  type Void = ZioVoid
 
   def absurd[A](v: Void): A = v.absurd[A]
 }
