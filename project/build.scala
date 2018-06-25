@@ -238,7 +238,7 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining(s" ; ++ ${Scala213} ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
+      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
