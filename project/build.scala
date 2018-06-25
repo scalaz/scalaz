@@ -307,7 +307,10 @@ object build {
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.7",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary),
+    // zio
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.1-SNAPSHOT"
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
