@@ -11,6 +11,9 @@ trait MonadTrans[F[_[_], _]] {
 
   /** The [[scalaz.Monad]] implied by this transformer. */
   implicit def apply[G[_] : Monad]: Monad[F[G, ?]]
+
+  def mapF[G[_], A, B](fa: F[G, A])(f: A => G[B])(implicit M: Monad[G]): F[G, B] =
+    Monad[F[G, ?]].bind(fa)(a => liftM(f(a)))
 }
 
 object MonadTrans {

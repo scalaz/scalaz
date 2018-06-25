@@ -51,6 +51,11 @@ final case class ListT[M[_], A](run: M[List[A]]){
 
   def map[B](f: A => B)(implicit M: Functor[M]) : ListT[M, B] = new ListT(M.map(run)(_.map(f)))
 
+  def mapF[B](f: A => M[B])(implicit M: Monad[M]): ListT[M, B] =
+    flatMapF {
+      f andThen (mb => M.map(mb)(b => List(b)))
+    }
+
   def mapT[F[_], B](f: M[List[A]] => F[List[B]]): ListT[F, B] =
     ListT(f(run))
 

@@ -9,6 +9,13 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): MaybeT[F, B] = new MaybeT[F, B](mapO(_ map f))
 
+  def mapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
+    F.bind(self.run) {
+        case Empty() => F.point(empty[B])
+        case Just(z) => F.map(f(z))(b => just(b))
+      }
+    )
+
   def mapT[G[_], B](f: F[Maybe[A]] => G[Maybe[B]]): MaybeT[G, B] =
     MaybeT(f(run))
 
@@ -16,8 +23,11 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
     F.bind(self.run)(_.cata(f(_).run, F.point(empty)))
   )
 
-  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
-    F.bind(self.run)(_.cata((a => F.map(f(a))(just)), F.point(empty)))
+  def flatMapF[B](f: A => F[Maybe[B]])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
+    F.bind(self.run) {
+      case Empty() => F.point(empty[B])
+      case Just(z) => f(z)
+    }
   )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
@@ -150,6 +160,9 @@ object MaybeT extends MaybeTInstances {
     new MaybeTMonadListen[F, W] {
       def MT = ML0
     }
+
+  implicit def maybeTShow[F[_], A](implicit F0: Show[F[Maybe[A]]]): Show[MaybeT[F, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
 }
 
 //
