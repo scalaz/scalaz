@@ -299,8 +299,8 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
-    new Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
+  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
+    new Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 
       def point[A](a: => A) = just(a)
 
@@ -390,6 +390,21 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
       override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
         fa.filter(f)
+
+      override def alt[A](a1: => Maybe[A], a2: => Maybe[A]): Maybe[A] = a1 orElse a2
+
+      // performance optimisation
+      override def altly2[Z, A1, A2](a1: => Maybe[A1], a2: => Maybe[A2])(f: A1 \/ A2 => Z): Maybe[Z] = a1 match {
+          case Empty() => a2 match {
+            case Empty() => Empty()
+            case j => j.map(s => f(\/-(s)))
+          }
+          case j => j.map(s => f(-\/(s)))
+        }
+
+      // performance optimisation
+      override def apply2[A, B, C](fa: => Maybe[A], fb: => Maybe[B])(f: (A, B) => C): Maybe[C] =
+        fa.flatMap(a => fb.map(b => f(a, b)))
     }
 }
 
