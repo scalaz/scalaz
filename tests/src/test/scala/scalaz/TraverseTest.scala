@@ -108,7 +108,7 @@ object TraverseTest extends SpecLite {
   "nonemptylist" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[NonEmptyList[Int]] = NonEmptyList.nel(0, IList.fromList(List.range(1, 10000))) traverse { x =>      
+      val s: Maybe[NonEmptyList[Int]] = NonEmptyList.nel(0, IList.fromList(List.range(1, 10000))) traverse1 { x =>      
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
