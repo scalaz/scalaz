@@ -203,6 +203,7 @@ trait AllSyntax
     with ct.ChoiceSyntax
     with ct.CobindSyntax
     with ct.ComonadSyntax
+    with ct.ContravariantSyntax
     with ct.FoldableSyntax
     with ct.FunctorSyntax
     with ct.InvariantFunctorSyntax
