@@ -40,15 +40,13 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
       case ICons(x, xs) => nel(x, xs)
     }
 
-  def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {  
-    val revOpt: Maybe[F[NonEmptyList[B]]] =
-      F.unfoldrOpt[IList[A], B, NonEmptyList[B]](list)(_ match {
-        case ICons(a, as) => Maybe.just((f(a), as))
-        case INil() => Maybe.empty
-      })(Reducer.ReverseNonEmptyListReducer[B])
-
-    val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
-    F.map(rev)(_.reverse)
+  def traverse1[F[_], B](f: A => F[B])(implicit F: Apply[F]): F[NonEmptyList[B]] = {
+    tail match {
+      case INil() => F.map(f(head))(nel(_, IList.empty))
+      case ICons(b, bs) => F.apply2(f(head), OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
+        case (h, t) => nel(h, t.head :: t.tail)
+      }
+    }
   }
 
   def list: IList[A] = head :: tail
@@ -179,8 +177,19 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
         Foldable[IList].foldMap(fa.list)(f)(M)
 
+      override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
+        val revOpt: Maybe[F[NonEmptyList[B]]] =
+          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list)(_ match {
+            case ICons(a, as) => Maybe.just((f(a), as))
+            case INil() => Maybe.empty
+          })(Reducer.ReverseNonEmptyListReducer[B])
+
+        val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
+        F.map(rev)(_.reverse)
+      }
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
-        fa traverse1 f  
+        fa traverse1 f
 
       override def foldMapRight1[A, B](fa: NonEmptyList[A])(z: A => B)(f: (A, => B) => B): B = {
         val reversed = fa.reverse
