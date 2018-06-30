@@ -14,8 +14,6 @@ trait Derives[F[_]]  { self =>
   ////
 
   def xproduct0[Z](f: =>Z): F[Z]
-  final def xderiving0[Z](z: Z): F[Z] = xproduct0(z)
-
   def xproduct1[Z, A1](a1: F[A1])(f: A1 => Z, g: Z => A1): F[Z]
   def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
     f: (A1, A2) => Z,
@@ -46,6 +44,7 @@ trait Derives[F[_]]  { self =>
 
   // these methods fail for recursive ADTs, fixed in
   // https://github.com/scala/scala/pull/6050
+  final def xderiving0[Z](z: =>Z): F[Z] = xproduct0(z)
   final def xderiving1[Z, A1](
     f: A1 => Z,
     g: Z => A1
