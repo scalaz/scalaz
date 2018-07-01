@@ -47,7 +47,7 @@ trait Decidable[F[_]] extends Divisible[F] with Derives[F] { self =>
   // ... choosingX
 
   override def xproduct0[Z](z: =>Z): F[Z] = conquer
-  override def xproduct1[Z, A1](a1: F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
   override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
     f: (A1, A2) => Z,
     g: Z => (A1, A2)
@@ -127,7 +127,7 @@ trait IsomorphismDecidable[F[_], G[_]] extends Decidable[F] with IsomorphismDivi
   override def xcoproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: A1 \/ (A2 \/ (A3 \/ A4)) => Z, g: Z => A1 \/ (A2 \/ (A3 \/ A4))): F[Z] =
     super[Decidable].xcoproduct4(a1, a2, a3, a4)(f, g)
 
-  override def xproduct1[Z, A1](a1: F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
     super[Decidable].xproduct1(a1)(f, g)
   override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
     super[Decidable].xproduct2(a1, a2)(f, g)

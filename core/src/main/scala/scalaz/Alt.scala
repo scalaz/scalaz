@@ -52,7 +52,7 @@ trait Alt[F[_]] extends Applicative[F] with Derives[F] { self =>
   // ... altlyingX
 
   override def xproduct0[Z](z: =>Z): F[Z] = pure(z)
-  override def xproduct1[Z, A1](a1: F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
   override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
     f: (A1, A2) => Z, g: Z => (A1, A2)
   ): F[Z] = apply2(a1, a2)(f)
@@ -118,7 +118,7 @@ trait IsomorphismAlt[F[_], G[_]] extends Alt[F] with IsomorphismApplicative[F, G
   override def xproduct0[Z](z: => Z): F[Z] =
     super[Alt].xproduct0(z)
 
-  override def xproduct1[Z, A1](a1: F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
     super[Alt].xproduct1(a1)(f, g)
   override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
     super[Alt].xproduct2(a1, a2)(f, g)
