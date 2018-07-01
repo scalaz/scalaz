@@ -533,8 +533,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
-  implicit def constIdTArbitrary[A, F[_]](implicit A: Arbitrary[A], APP: Applicative[F]): Arbitrary[IdT[F, A]] =
-    Functor[Arbitrary].map(A)(a => IdT[F, A](APP.pure(a)))
+  implicit def idTArbitrary[A, F[_]](implicit A: Arbitrary[F[A]]): Arbitrary[IdT[F, A]] =
+    Functor[Arbitrary].map(A)(IdT[F, A])
 
   // backwards compatibility
   def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
