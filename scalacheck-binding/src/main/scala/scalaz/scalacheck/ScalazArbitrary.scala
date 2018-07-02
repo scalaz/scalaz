@@ -350,6 +350,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
+  implicit def idTArbitrary[A, F[_]](implicit A: Arbitrary[F[A]]): Arbitrary[IdT[F, A]] =
+    Functor[Arbitrary].map(A)(IdT[F, A])
+
   // backwards compatibility
   def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]], F: Monad[F]): Arbitrary[StateT[F, S, A]] =
     indexedStateTArb[F, S, S, A](A, F)
