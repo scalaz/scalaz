@@ -20,7 +20,21 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT(F.ap(run)(f.run))
 }
 
-sealed abstract class IdTInstances4 {
+sealed abstract class IdTInstances6 {
+  implicit def idTDivisible[F[_]](implicit F0: Divisible[F]): Divisible[IdT[F, ?]] =
+    new IdTDivisable[F] {
+      implicit def F: Divisible[F] = F0
+    }
+}
+
+sealed abstract class IdTInstances5 extends IdTInstances6 {
+  implicit def idTDecidable[F[_]](implicit F0: Decidable[F]): Decidable[IdT[F, ?]] =
+    new IdTDecidable[F] {
+      implicit def F: Decidable[F] = F0
+    }
+}
+
+sealed abstract class IdTInstances4 extends IdTInstances5 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, ?]] =
     new IdTFunctor[F] {
       implicit def F: Functor[F] = F0
@@ -97,6 +111,22 @@ private trait IdTApplicative[F[_]] extends Applicative[IdT[F, ?]] with IdTApply[
   implicit def F: Applicative[F]
 
   def point[A](a: => A) = new IdT[F, A](F.point(a))
+}
+
+private trait IdTDivisable[F[_]] extends Divisible[IdT[F, ?]] {
+  implicit def F: Divisible[F]
+
+  override def conquer[A]: IdT[F, A] = IdT(F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => IdT[F, A1], a2: => IdT[F, A2])(f: Z => (A1, A2)): IdT[F, Z] =
+    IdT(F.divide2(a1.run, a2.run)(f))
+}
+
+private trait IdTDecidable[F[_]] extends Decidable[IdT[F, ?]] with IdTDivisable[F] {
+  implicit def F: Decidable[F]
+
+  override def choose2[Z, A1, A2](a1: => IdT[F, A1], a2: => IdT[F, A2])(f: Z => A1 \/ A2): IdT[F, Z] =
+    IdT(F.choose2(a1.run, a2.run)(f))
 }
 
 private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
