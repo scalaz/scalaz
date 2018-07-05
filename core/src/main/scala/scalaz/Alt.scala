@@ -22,10 +22,10 @@ trait Alt[F[_]] extends Applicative[F] with Derives[F] { self =>
 
   def altly3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
     f: A1 \/ (A2 \/ A3) => Z
-  ): F[Z] = altly2(a1, either2(a2, a3))(f)
-  def altly4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3],a4: =>F[A4])(
+  ): F[Z] = altly2(a1, altly2(a2, a3)(identity))(f)
+  def altly4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
     f: A1 \/ (A2 \/ (A3 \/ A4)) => Z
-  ): F[Z] = altly2(a1, either2(a2, either2(a3, a4)))(f)
+  ): F[Z] = altly2(a1, altly3(a2, a3, a4)(identity))(f)
   // ... altlyN
 
   // equivalent of tupleN
