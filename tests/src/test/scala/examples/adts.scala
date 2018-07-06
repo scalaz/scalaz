@@ -18,20 +18,20 @@ package adt {
     implicit val equal: Equal[Baz.type] =
       Decidable[Equal].xderiving0(Baz)
     implicit val default: Default[Baz.type] =
-      Derives[Default].xderiving0(Baz)
+      InvariantAlt[Default].xderiving0(Baz)
   }
   object Bar {
     implicit val equal: Equal[Bar] =
       Decidable[Equal].xderiving1((s: String) => Bar(s), _.s)
     implicit val default: Default[Bar] =
-      Derives[Default].xderiving1((s: String) => Bar(s), _.s)
+      InvariantAlt[Default].xderiving1((s: String) => Bar(s), _.s)
   }
   object Faz {
     implicit val equal: Equal[Faz] =
       Decidable[Equal]
         .xderiving2((b: Boolean, i: Int) => Faz(b, i), f => (f.b, f.i))
     implicit val default: Default[Faz] =
-      Derives[Default]
+      InvariantAlt[Default]
         .xderiving2((b: Boolean, i: Int) => Faz(b, i), f => (f.b, f.i))
   }
   object Foo {
@@ -47,9 +47,9 @@ package adt {
     }
 
     implicit val equal: Equal[Foo] =
-      Derives[Equal].xcoderiving3(to, from)
+      InvariantAlt[Equal].xcoderiving3(to, from)
     implicit val default: Default[Foo] =
-      Derives[Default].xcoderiving3(to, from)
+      InvariantAlt[Default].xcoderiving3(to, from)
   }
 }
 
@@ -61,14 +61,14 @@ package recadt {
 
   object Leaf {
     implicit val equal: Equal[Leaf] = {
-      Derives[Equal].xderiving1((v: String) => Leaf(v), _.value)
+      InvariantAlt[Equal].xderiving1((v: String) => Leaf(v), _.value)
     }
     implicit val default: Default[Leaf] =
-      Derives[Default].xderiving1((v: String) => Leaf(v), _.value)
+      InvariantAlt[Default].xderiving1((v: String) => Leaf(v), _.value)
   }
   object Branch {
     implicit val equal: Equal[Branch] =
-      Derives[Equal].xproduct2(
+      InvariantAlt[Equal].xproduct2(
         implicitly[Equal[ATree]],
         implicitly[Equal[ATree]]
       )(
@@ -76,7 +76,7 @@ package recadt {
         b => (b.left, b.right)
       )
     implicit val default: Default[Branch] =
-      Derives[Default].xproduct2(
+      InvariantAlt[Default].xproduct2(
         implicitly[Default[ATree]],
         implicitly[Default[ATree]]
       )(
@@ -95,12 +95,12 @@ package recadt {
     }
 
     implicit val equal: Equal[ATree] =
-      Derives[Equal].xcoproduct2(
+      InvariantAlt[Equal].xcoproduct2(
         implicitly[Equal[Leaf]],
         implicitly[Equal[Branch]]
       )(to, from)
     implicit val default: Default[ATree] =
-      Derives[Default].xcoderiving2(to, from)
+      InvariantAlt[Default].xcoderiving2(to, from)
   }
 
 }
@@ -113,13 +113,13 @@ package recgadt {
 
   object GLeaf {
     implicit def equal[A: Equal]: Equal[GLeaf[A]] =
-      Derives[Equal].xderiving1((v: A) => GLeaf(v), _.value)
+      InvariantAlt[Equal].xderiving1((v: A) => GLeaf(v), _.value)
     implicit def default[A: Default]: Default[GLeaf[A]] =
-      Derives[Default].xderiving1((v: A) => GLeaf(v), _.value)
+      InvariantAlt[Default].xderiving1((v: A) => GLeaf(v), _.value)
   }
   object GBranch {
     implicit def equal[A: Equal]: Equal[GBranch[A]] =
-      Derives[Equal].xproduct2(
+      InvariantAlt[Equal].xproduct2(
         implicitly[Equal[GTree[A]]],
         implicitly[Equal[GTree[A]]]
       )(
@@ -127,7 +127,7 @@ package recgadt {
         b => (b.left, b.right)
       )
     implicit def default[A: Default]: Default[GBranch[A]] =
-      Derives[Default].xproduct2(
+      InvariantAlt[Default].xproduct2(
         implicitly[Default[GTree[A]]],
         implicitly[Default[GTree[A]]]
       )(
@@ -146,12 +146,12 @@ package recgadt {
     }
 
     implicit def equal[A: Equal]: Equal[GTree[A]] =
-      Derives[Equal].xcoproduct2(
+      InvariantAlt[Equal].xcoproduct2(
         implicitly[Equal[GLeaf[A]]],
         implicitly[Equal[GBranch[A]]]
       )(to, from)
     implicit def default[A: Default]: Default[GTree[A]] =
-      Derives[Default].xcoproduct2(
+      InvariantAlt[Default].xcoproduct2(
         implicitly[Default[GLeaf[A]]],
         implicitly[Default[GBranch[A]]]
       )(to, from)

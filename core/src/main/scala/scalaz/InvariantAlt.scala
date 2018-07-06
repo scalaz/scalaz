@@ -10,7 +10,7 @@ package scalaz
  * Used for typeclass derivation of products, coproducts and value types.
  */
 ////
-trait Derives[F[_]]  { self =>
+trait InvariantAlt[F[_]] extends InvariantFunctor[F] { self =>
   ////
 
   def xproduct0[Z](f: =>Z): F[Z]
@@ -79,17 +79,17 @@ trait Derives[F[_]]  { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = xcoproduct4(a1, a2, a3, a4)(f, g)
 
   ////
-  val derivesSyntax = new scalaz.syntax.DerivesSyntax[F] { def F = Derives.this }
+  val invariantAltSyntax = new scalaz.syntax.InvariantAltSyntax[F] { def F = InvariantAlt.this }
 }
 
-object Derives {
-  @inline def apply[F[_]](implicit F: Derives[F]): Derives[F] = F
+object InvariantAlt {
+  @inline def apply[F[_]](implicit F: InvariantAlt[F]): InvariantAlt[F] = F
 
   import Isomorphism._
 
-  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Derives[G]): Derives[F] =
-    new IsomorphismDerives[F, G] {
-      override def G: Derives[G] = E
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: InvariantAlt[G]): InvariantAlt[F] =
+    new IsomorphismInvariantAlt[F, G] {
+      override def G: InvariantAlt[G] = E
       override def iso: F <~> G = D
     }
 
@@ -98,8 +98,8 @@ object Derives {
   ////
 }
 
-trait IsomorphismDerives[F[_], G[_]] extends Derives[F] {
-  implicit def G: Derives[G]
+trait IsomorphismInvariantAlt[F[_], G[_]] extends InvariantAlt[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: InvariantAlt[G]
   ////
   import Isomorphism._
 
