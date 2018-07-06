@@ -23,9 +23,9 @@ trait ToInvariantAltOps0[TC[F[_]] <: InvariantAlt[F]] extends ToInvariantAltOpsU
   ////
 }
 
-trait ToInvariantAltOps[TC[F[_]] <: InvariantAlt[F]] extends ToInvariantAltOps0[TC]
+trait ToInvariantAltOps[TC[F[_]] <: InvariantAlt[F]] extends ToInvariantAltOps0[TC] with ToInvariantFunctorOps[TC]
 
-trait InvariantAltSyntax[F[_]]  {
+trait InvariantAltSyntax[F[_]] extends InvariantFunctorSyntax[F] {
   implicit def ToInvariantAltOps[A](v: F[A]): InvariantAltOps[F, A] = new InvariantAltOps[F,A](v)(InvariantAltSyntax.this.F)
 
   def F: InvariantAlt[F]

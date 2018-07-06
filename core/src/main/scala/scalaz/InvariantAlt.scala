@@ -10,7 +10,7 @@ package scalaz
  * Used for typeclass derivation of products, coproducts and value types.
  */
 ////
-trait InvariantAlt[F[_]]  { self =>
+trait InvariantAlt[F[_]] extends InvariantFunctor[F] { self =>
   ////
 
   def xproduct0[Z](f: =>Z): F[Z]
@@ -98,7 +98,7 @@ object InvariantAlt {
   ////
 }
 
-trait IsomorphismInvariantAlt[F[_], G[_]] extends InvariantAlt[F] {
+trait IsomorphismInvariantAlt[F[_], G[_]] extends InvariantAlt[F] with IsomorphismInvariantFunctor[F, G]{
   implicit def G: InvariantAlt[G]
   ////
   import Isomorphism._
