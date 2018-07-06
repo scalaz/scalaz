@@ -8,7 +8,7 @@ package scalaz
  * https://hackage.haskell.org/package/semigroupoids-5.2.2/docs/Data-Functor-Alt.html
  */
 ////
-trait Alt[F[_]] extends Applicative[F] with Derives[F] { self =>
+trait Alt[F[_]] extends Applicative[F] with InvariantAlt[F] { self =>
   ////
 
   def alt[A](a1: =>F[A], a2: =>F[A]): F[A]
@@ -110,7 +110,7 @@ object Alt {
   ////
 }
 
-trait IsomorphismAlt[F[_], G[_]] extends Alt[F] with IsomorphismApplicative[F, G] with IsomorphismDerives[F, G]{
+trait IsomorphismAlt[F[_], G[_]] extends Alt[F] with IsomorphismApplicative[F, G] with IsomorphismInvariantAlt[F, G]{
   implicit def G: Alt[G]
   ////
   override def alt[A](a1: =>F[A], a2: =>F[A]): F[A] = iso.from(G.alt(iso.to(a1), iso.to(a2)))

@@ -10,7 +10,7 @@ package scalaz
  * https://hackage.haskell.org/package/contravariant-1.4.1/docs/Data-Functor-Contravariant-Divisible.html#t:Decidable
  */
 ////
-trait Decidable[F[_]] extends Divisible[F] with Derives[F] { self =>
+trait Decidable[F[_]] extends Divisible[F] with InvariantAlt[F] { self =>
   ////
 
   final def choose[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(f: Z => A1 \/ A2): F[Z] = choose2(a1, a2)(f)
@@ -107,7 +107,7 @@ object Decidable {
   ////
 }
 
-trait IsomorphismDecidable[F[_], G[_]] extends Decidable[F] with IsomorphismDivisible[F, G] with IsomorphismDerives[F, G]{
+trait IsomorphismDecidable[F[_], G[_]] extends Decidable[F] with IsomorphismDivisible[F, G] with IsomorphismInvariantAlt[F, G]{
   implicit def G: Decidable[G]
   ////
 
