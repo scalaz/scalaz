@@ -17,7 +17,7 @@ package scalaz
  *  @see [[scalaz.Applicative.ApplicativeLaw]]
  */
 ////
-trait Applicative[F[_]] extends Apply[F] { self =>
+trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
   ////
   def point[A](a: => A): F[A]
 
@@ -40,6 +40,20 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     traverse(as)(a => a)
 
   import std.list._
+
+  override def xproduct0[Z](z: =>Z): F[Z] = point(z)
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
+  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
+    f: (A1, A2) => Z, g: Z => (A1, A2)
+  ): F[Z] = apply2(a1, a2)(f)
+  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
+    f: (A1, A2, A3) => Z,
+    g: Z => (A1, A2, A3)
+  ): F[Z] = apply3(a1, a2, a3)(f)
+  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
+    f: (A1, A2, A3, A4) => Z,
+    g: Z => (A1, A2, A3, A4)
+  ): F[Z] = apply4(a1, a2, a3, a4)(f)
 
   /** Performs the action `n` times, returning the list of results. */
   def replicateM[A](n: Int, fa: F[A]): F[IList[A]] =
@@ -128,7 +142,7 @@ object Applicative {
   ////
 }
 
-trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G]{
+trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] with IsomorphismInvariantApplicative[F, G]{
   implicit def G: Applicative[G]
   ////
 
@@ -137,5 +151,16 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
     iso.from(G.ap(iso.to(fa))(iso.to(f)))
+
+  override def xproduct0[Z](z: => Z): F[Z] =
+    super[Applicative].xproduct0(z)
+  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
+    super[Applicative].xproduct1(a1)(f, g)
+  override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
+    super[Applicative].xproduct2(a1, a2)(f, g)
+  override def xproduct3[Z, A1, A2, A3](a1: => F[A1], a2: => F[A2], a3: => F[A3])(f: (A1, A2, A3) => Z, g: Z => (A1, A2, A3)): F[Z] =
+    super[Applicative].xproduct3(a1, a2, a3)(f, g)
+  override def xproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: (A1, A2, A3, A4) => Z, g: Z => (A1, A2, A3, A4)): F[Z] =
+    super[Applicative].xproduct4(a1, a2, a3, a4)(f, g)
   ////
 }

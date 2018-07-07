@@ -51,20 +51,6 @@ trait Alt[F[_]] extends Applicative[F] with InvariantAlt[F] { self =>
     altly4(a1, a2, a3, a4)(f)
   // ... altlyingX
 
-  override def xproduct0[Z](z: =>Z): F[Z] = pure(z)
-  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
-  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
-    f: (A1, A2) => Z, g: Z => (A1, A2)
-  ): F[Z] = apply2(a1, a2)(f)
-  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
-    f: (A1, A2, A3) => Z,
-    g: Z => (A1, A2, A3)
-  ): F[Z] = apply3(a1, a2, a3)(f)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
-    f: (A1, A2, A3, A4) => Z,
-    g: Z => (A1, A2, A3, A4)
-  ): F[Z] = apply4(a1, a2, a3, a4)(f)
-
   override def xcoproduct1[Z, A1](a1: =>F[A1])(
     f: A1 => Z,
     g: Z => A1
@@ -114,18 +100,6 @@ trait IsomorphismAlt[F[_], G[_]] extends Alt[F] with IsomorphismApplicative[F, G
   implicit def G: Alt[G]
   ////
   override def alt[A](a1: =>F[A], a2: =>F[A]): F[A] = iso.from(G.alt(iso.to(a1), iso.to(a2)))
-
-  override def xproduct0[Z](z: => Z): F[Z] =
-    super[Alt].xproduct0(z)
-
-  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
-    super[Alt].xproduct1(a1)(f, g)
-  override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
-    super[Alt].xproduct2(a1, a2)(f, g)
-  override def xproduct3[Z, A1, A2, A3](a1: => F[A1], a2: => F[A2], a3: => F[A3])(f: (A1, A2, A3) => Z, g: Z => (A1, A2, A3)): F[Z] =
-    super[Alt].xproduct3(a1, a2, a3)(f, g)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: (A1, A2, A3, A4) => Z, g: Z => (A1, A2, A3, A4)): F[Z] =
-    super[Alt].xproduct4(a1, a2, a3, a4)(f, g)
 
   override def xcoproduct1[Z, A1](a1: => F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
     super[Alt].xcoproduct1(a1)(f, g)

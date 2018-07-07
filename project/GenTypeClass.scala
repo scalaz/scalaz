@@ -35,11 +35,12 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
-  lazy val derives = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantFunctor))
-  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, derives))
-  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, derives))
+  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
+  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
@@ -52,7 +53,7 @@ object TypeClass {
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant))
-  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide))
+  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide, invariantApplicative))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
@@ -113,7 +114,8 @@ object TypeClass {
     divisible,
     apply,
     applicative,
-    derives,
+    invariantAlt,
+    invariantApplicative,
     decidable,
     alt,
     align,
