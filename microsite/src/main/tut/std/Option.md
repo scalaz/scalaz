@@ -4,15 +4,15 @@ section: std
 title:  "Option"
 ---
 
-# Option [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/option.scala)
+# Option [![GitHub](../img/github.png)]
 
-Scalaz provides instances for Scala's built-in [Option](https://www.scala-lang.org/api/current/scala/Option.html) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in [Option](https://www.scala-lang.org/api/current/scala/Option.html) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 
 **Typical imports**
 
 ```tut:silent
+import scala.Option
 import scalaz.Scalaz._
-import scalaz.std._
 ```
 
 ## Use the type class instances

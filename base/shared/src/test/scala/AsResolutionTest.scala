@@ -2,7 +2,9 @@ package scalaz
 
 import scala.{ Any, AnyRef, AnyVal, Nothing, Null }
 
-import scalaz.Scalaz._
+import Predef._
+import prop.<~<
+import Scalaz._
 
 class AsResolutionTest {
   implicitly[Int <~< Int]

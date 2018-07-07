@@ -12,6 +12,8 @@ title:  "Maybe"
 **Typical imports**
 
 ```tut:silent
+import scalaz.Predef._
+import scalaz.data._
 import scalaz.Scalaz._
 ```
 
@@ -38,8 +40,9 @@ x.flatMap { y =>
 # Pattern matching
 
 ```tut
+import scala.Predef.println
 x match {
-  case Empty() => println("No value")
-  case Just(x) => println(x)
+  case Maybe.Empty() => println("No value")
+  case Maybe.Just(x) => println(x)
 }
 ```

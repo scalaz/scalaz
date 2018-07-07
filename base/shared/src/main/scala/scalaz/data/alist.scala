@@ -1,13 +1,15 @@
 package scalaz
 package data
 
-import Prelude._
-
 import java.lang.StringBuilder
 
 import scala.AnyVal
 import scala.annotation.tailrec
 import scala.language.implicitConversions
+
+import tc.{Category, Semicategory}
+import Predef._
+import Scalaz._
 
 sealed trait AListModule {
 

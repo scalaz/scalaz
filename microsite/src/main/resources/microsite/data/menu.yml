@@ -6,37 +6,37 @@ options:
 
     nested_options:
     - title: Applicative
-      url: ct/Applicative.html
+      url: tc/Applicative.html
     - title: Apply
-      url: ct/Apply.html
+      url: tc/Apply.html
     - title: Bifunctor
-      url: ct/Bifunctor.html
+      url: tc/Bifunctor.html
     - title: Bind
-      url: ct/Bind.html
+      url: tc/Bind.html
     - title: Category
-      url: ct/Category.html
+      url: tc/Category.html
     - title: Compose
-      url: ct/Compose.html
+      url: tc/Compose.html
     - title: Debug
-      url: debug/Debug.html
+      url: tc/Debug.html
     - title: Eq
-      url: core/Eq.html
+      url: tc/Eq.html
     - title: Functor
-      url: ct/Functor.html
+      url: tc/Functor.html
     - title: Kleisli
-      url: ct/Kleisli.html
+      url: tc/Kleisli.html
     - title: Monad
-      url: ct/Monad.html
+      url: tc/Monad.html
     - title: Monoid
-      url: algebra/Monoid.html
+      url: tc/Monoid.html
     - title: Ord
-      url: algebra/Ord.html
-    - title: Semigroup
-      url: algebra/Semigroup.html
+      url: tc/Ord.html
     - title: Semicategory
       url: ct/Semicategory.html
+    - title: Semigroup
+      url: tc/Semigroup.html
     - title: Strong
-      url: ct/Strong.html
+      url: tc/Strong.html
 
   - title: Data classes
     url: data/index.html

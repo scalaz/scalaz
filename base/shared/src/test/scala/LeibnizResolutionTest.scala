@@ -2,6 +2,9 @@ package scalaz
 
 import scala.{ Any, AnyVal, Nothing }
 
+import Predef._
+import prop.Leibniz
+
 class LeibnizResolutionTest {
   implicitly[Leibniz[Nothing, Any, Int, Int]]
   implicitly[Leibniz[Int, Any, Int, Int]]

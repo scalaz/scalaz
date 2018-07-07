@@ -3,6 +3,8 @@ package data
 
 import scala.annotation.tailrec
 
+import tc.Semicategory
+
 /**
  * Non-empty type-aligned sequence represented as a (non-balanced) binary tree,
  * supporting O(1) addition to either end and O(1) concatenation.

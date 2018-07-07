@@ -32,8 +32,9 @@ as is illustrated by the examples below.
 
 **Typical imports**
 
-```tut:silent
+```tut
 import scalaz._
+import Predef._, data._, tc._, Scalaz._
 ```
 
 # Polymorphic identity function
@@ -129,6 +130,9 @@ object INone {
 We can also create polymorphic versions of the standard empty structures:
 
 ```tut
+import scala.collection.immutable.List
+import scala.collection.Map
+
 val nil: ∀[List] = ∀.of[List](Nil)
 val emptyMap: ∀∀[Map] = ∀∀.of[Map](Map())
 ```
@@ -153,7 +157,7 @@ type Plus[F[_]] = ∀[λ[A => Semigroup[F[A]]]]
 Here is an instance for list:
 
 ```tut
-import scalaz.algebra.SemigroupClass
+import scalaz.tc.SemigroupClass
 
 def listSemigroup[A]: Semigroup[List[A]] = instanceOf(new SemigroupClass[List[A]] {
   def mappend(x: List[A], y: => List[A]) = x ++ y
@@ -207,7 +211,7 @@ type ~~>[F[_, _], G[_, _]] = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
 type Option2[A, B] = Option[(A, B)]
 val pick: Map ~~> Option2 = ∀∀.mk[Map ~~> Option2].from(_.headOption)
 
-pick[String, Int](Map("hi" -> 5))
+pick[String, Int](Map(("hi", 5)))
 
 implicit class BinaturalTransformationOps[F[_, _], G[_, _]](trans: F ~~> G) {
   def $(f: ∀∀[F]): ∀∀[G] = ∀∀.of[G](trans.apply.apply(f.apply))

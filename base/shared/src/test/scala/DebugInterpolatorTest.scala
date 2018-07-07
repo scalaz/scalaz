@@ -1,10 +1,11 @@
 package scalaz
 
+import Predef._
+import Scalaz._
+
 object DebugInterpolatorTest {
 
   // TODO: link up ztest and make this a real test
-
-  import Scalaz._, data._
 
   z"before ${1} after"
   z"before ${"foo"} after"

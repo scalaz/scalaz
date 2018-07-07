@@ -3,8 +3,10 @@ package data
 
 import scala.{ sys, Either, Left, Right }
 
-import Prelude._
 import AList.aListOps
+
+import Predef._
+import tc._
 
 /**
  * Type-aligned list with at least 1 element.

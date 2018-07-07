@@ -3,7 +3,8 @@ package data
 
 import scala.{ Any, AnyVal }
 
-import scalaz.types.As
+import prop._
+import Predef._
 
 trait ForallModule {
   type Forall[F[_]]

@@ -4,15 +4,15 @@ section: std
 title:  "Either"
 ---
 
-# Either [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/either.scala)
+# Either [![GitHub](../img/github.png)]
 
-Scalaz provides instances for Scala's built-in [Either](https://www.scala-lang.org/api/current/scala/util/Either.html) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in [Either](https://www.scala-lang.org/api/current/scala/util/Either.html) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 
 **Typical imports**
 
 ```tut:silent
-import scalaz.Scalaz._
-import scalaz.std._
+import scalaz.{Predef, Scalaz}
+import Predef._, Scalaz._
 ```
 
 ## Use the type class instances
@@ -32,6 +32,6 @@ either2.bimap(
  right => right * 10
 )
 
-either1.debug.toString
-either2.debug.toString
+either1.toString
+either2.toString
 ```

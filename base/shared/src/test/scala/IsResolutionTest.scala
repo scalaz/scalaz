@@ -2,6 +2,8 @@ package scalaz
 
 import scala.{ Any, Nothing }
 
+import Predef._
+import prop.===
 import Scalaz._
 
 class IsResolutionTest {

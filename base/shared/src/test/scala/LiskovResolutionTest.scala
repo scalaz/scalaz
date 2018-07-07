@@ -1,6 +1,9 @@
 package scalaz
 
-import scala.{ Any, AnyVal, Nothing }
+import scala.{ Any, AnyVal, Int, Nothing }
+
+import Predef._
+import prop.Liskov
 
 class LiskovResolutionTest {
   implicitly[Liskov[Nothing, Any, Int, AnyVal]]
