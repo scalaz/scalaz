@@ -30,7 +30,21 @@ import scalaz.Ordering.orderingInstance
   *
   * @since 7.0.3
   */
-final case class OneAnd[F[_], A](head: A, tail: F[A])
+final class OneAnd[F[_], A] private (
+  private val hd: Name[A],
+  private val tl: Name[F[A]]
+) {
+  def head: A = hd.value
+  def tail: F[A] = tl.value
+
+  // OneAnd used to be a case class...
+  override def toString: String = s"OneAnd($head,$tail)"
+  override def hashCode: Int = head.hashCode + 13*tail.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case that: OneAnd[_, _] => (this eq that) || ((head == that.head) && (tail == that.tail))
+    case _ => false
+  }
+}
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
   def F: Functor[F]
@@ -325,7 +339,18 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 }
 
 object OneAnd extends OneAndInstances {
-  def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
+  def apply[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = Strict(hd, tl)
+  def unapply[F[_], A](oa: OneAnd[F, A]): Some[(A, F[A])] = Some((oa.head, oa.tail))
+
+  object ByName {
+    def apply[F[_], A](hd: =>A, tl: => F[A]): OneAnd[F, A] = new OneAnd(Name(hd), Name(tl))
+  }
+  object Lazy {
+    def apply[F[_], A](hd: =>A, tl: => F[A]): OneAnd[F, A] = new OneAnd(Need(hd), Need(tl))
+  }
+  object Strict {
+    def apply[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = new OneAnd(Value(hd), Value(tl))
+  }
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[IList, ?] =
     new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, ?]] {
