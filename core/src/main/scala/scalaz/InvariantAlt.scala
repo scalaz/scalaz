@@ -13,7 +13,8 @@ package scalaz
 trait InvariantAlt[F[_]] extends InvariantApplicative[F] { self =>
   ////
 
-  def xcoproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z]
+  def xcoproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
+    xmap(a1, f, g)
   def xcoproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
     f: A1 \/ A2 => Z,
     g: Z => A1 \/ A2
@@ -21,11 +22,17 @@ trait InvariantAlt[F[_]] extends InvariantApplicative[F] { self =>
   def xcoproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
     f: A1 \/ (A2 \/ A3) => Z,
     g: Z => A1 \/ (A2 \/ A3)
-  ): F[Z]
+  ): F[Z] = {
+    val a23: F[A2 \/ A3] = xcoproduct2(a2, a3)(identity, identity)
+    xcoproduct2(a1, a23)(f, g)
+  }
   def xcoproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
     f: A1 \/ (A2 \/ (A3 \/ A4)) => Z,
     g: Z => A1 \/ (A2 \/ (A3 \/ A4))
-  ): F[Z]
+  ): F[Z] = {
+    val a234: F[A2 \/ (A3 \/ A4)] = xcoproduct3(a2, a3, a4)(identity, identity)
+    xcoproduct2(a1, a234)(f, g)
+  }
 
   // these methods fail for recursive ADTs, fixed in
   // https://github.com/scala/scala/pull/6050
@@ -73,14 +80,8 @@ trait IsomorphismInvariantAlt[F[_], G[_]] extends InvariantAlt[F] with Isomorphi
 
   def iso: F <~> G
 
-  def xcoproduct1[Z, A1](a1: => F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
-    iso.from(G.xcoproduct1(iso.to(a1))(f, g))
   def xcoproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: A1 \/ A2 => Z, g: Z => A1 \/ A2): F[Z] =
     iso.from(G.xcoproduct2(iso.to(a1), iso.to(a2))(f, g))
-  def xcoproduct3[Z, A1, A2, A3](a1: => F[A1], a2: => F[A2], a3: => F[A3])(f: A1 \/ (A2 \/ A3) => Z, g: Z => A1 \/ (A2 \/ A3)): F[Z] =
-    iso.from(G.xcoproduct3(iso.to(a1), iso.to(a2), iso.to(a3))(f, g))
-  def xcoproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: A1 \/ (A2 \/ (A3 \/ A4)) => Z, g: Z => A1 \/ (A2 \/ (A3 \/ A4))): F[Z] =
-    iso.from(G.xcoproduct4(iso.to(a1), iso.to(a2), iso.to(a3), iso.to(a4))(f, g))
 
   ////
 }

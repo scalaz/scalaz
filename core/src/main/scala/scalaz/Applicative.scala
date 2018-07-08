@@ -151,6 +151,8 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
     iso.from(G.ap(iso.to(fa))(iso.to(f)))
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
+    iso.from(G.apply2(iso.to(fa), iso.to(fb))(f))
 
   override def xproduct0[Z](z: => Z): F[Z] =
     super[Applicative].xproduct0(z)
