@@ -45,21 +45,6 @@ trait Decidable[F[_]] extends Divisible[F] with InvariantAlt[F] { self =>
     choose4(fa1, fa2, fa3, fa4)(f)
   // ... choosingX
 
-  override def xproduct0[Z](z: =>Z): F[Z] = conquer
-  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] = xmap(a1, f, g)
-  override def xproduct2[Z, A1, A2](a1: =>F[A1], a2: =>F[A2])(
-    f: (A1, A2) => Z,
-    g: Z => (A1, A2)
-  ): F[Z] = divide2(a1, a2)(g)
-  override def xproduct3[Z, A1, A2, A3](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3])(
-    f: (A1, A2, A3) => Z,
-    g: Z => (A1, A2, A3)
-  ): F[Z] = divide3(a1, a2, a3)(g)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: =>F[A1], a2: =>F[A2], a3: =>F[A3], a4: =>F[A4])(
-    f: (A1, A2, A3, A4) => Z,
-    g: Z => (A1, A2, A3, A4)
-  ): F[Z] = divide4(a1, a2, a3, a4)(g)
-
   override def xcoproduct1[Z, A1](a1: =>F[A1])(
     f: A1 => Z,
     g: Z => A1
@@ -114,9 +99,6 @@ trait IsomorphismDecidable[F[_], G[_]] extends Decidable[F] with IsomorphismDivi
   def choose2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: Z => A1 \/ A2): F[Z] =
     iso.from(G.choose2(iso.to(a1), iso.to(a2))(f))
 
-  override def xproduct0[Z](z: => Z): F[Z] =
-    super[Decidable].xproduct0(z)
-
   override def xcoproduct1[Z, A1](a1: => F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
     super[Decidable].xcoproduct1(a1)(f, g)
   override def xcoproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: A1 \/ A2 => Z, g: Z => A1 \/ A2): F[Z] =
@@ -125,15 +107,6 @@ trait IsomorphismDecidable[F[_], G[_]] extends Decidable[F] with IsomorphismDivi
     super[Decidable].xcoproduct3(a1, a2, a3)(f, g)
   override def xcoproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: A1 \/ (A2 \/ (A3 \/ A4)) => Z, g: Z => A1 \/ (A2 \/ (A3 \/ A4))): F[Z] =
     super[Decidable].xcoproduct4(a1, a2, a3, a4)(f, g)
-
-  override def xproduct1[Z, A1](a1: =>F[A1])(f: A1 => Z, g: Z => A1): F[Z] =
-    super[Decidable].xproduct1(a1)(f, g)
-  override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
-    super[Decidable].xproduct2(a1, a2)(f, g)
-  override def xproduct3[Z, A1, A2, A3](a1: => F[A1], a2: => F[A2], a3: => F[A3])(f: (A1, A2, A3) => Z, g: Z => (A1, A2, A3)): F[Z] =
-    super[Decidable].xproduct3(a1, a2, a3)(f, g)
-  override def xproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: (A1, A2, A3, A4) => Z, g: Z => (A1, A2, A3, A4)): F[Z] =
-    super[Decidable].xproduct4(a1, a2, a3, a4)(f, g)
 
   ////
 }
