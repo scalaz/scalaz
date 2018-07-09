@@ -99,6 +99,9 @@ object TraverseTest extends SpecLite {
         } yield i)
       val state: State[Int, List[Int]] = states.sequenceU
       state.run(0) must_===(2 -> List(0, 1))
+
+      List(some(List(1, 2)), some(List(3, 4, 5))).sequenceM must_===(some(List(1, 2, 3, 4, 5)))
+      List(some(List(1, 2)), none[List[Int]]).sequenceM must_===(none)
     }
 
     "reverse" in {
