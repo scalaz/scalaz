@@ -44,7 +44,7 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
