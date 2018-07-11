@@ -174,13 +174,10 @@ lazy val site = Project(
   name := "scalaz-site",
   notPublish,
   scalacOptions in (Compile, compile) -= "-Yno-adapted-args",
-  buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-  buildInfoPackage := "scalaz",
-  buildInfoObject := "BuildInfo"
 ).dependsOn(
   coreJVM
 ).enablePlugins(
-  MicrositesPlugin, BuildInfoPlugin
+  MicrositesPlugin
 ).settings(
   scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
   scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },

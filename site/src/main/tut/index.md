@@ -16,7 +16,7 @@ It provides purely functional data structures to complement those from the Scala
 Include Scalaz in your project by adding the following to your `build.sbt`:
 
 ```tut:evaluated
-println(s"""libraryDependencies += "org.scalaz" %% "scalaz-core" % "${scalaz.BuildInfo.version}"""")
+println(s"""libraryDependencies += "org.scalaz" %% "scalaz-core" % "${scalaz.ScalazBuildInfo.version}"""")
 ```
 
 # Modules
@@ -26,7 +26,7 @@ Scalaz provides additional modules for functionality beyond the basics included 
 - `scalaz-effect`: Effectful programs
 
 ```tut:evaluated
-println(s"""libraryDependencies += "org.scalaz" %% "scalaz-effect" % "${scalaz.BuildInfo.version}"""")
+println(s"""libraryDependencies += "org.scalaz" %% "scalaz-effect" % "${scalaz.ScalazBuildInfo.version}"""")
 ```
 
 # Community
