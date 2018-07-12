@@ -10,7 +10,7 @@ import scalaz.Id.Id
  * @see [[scalaz.Traverse.TraverseLaw]]
  */
 ////
-trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
+trait Traverse[F[_]] extends Functor[F] with Foldable[F] with TraverseParent[F] { self =>
   ////
 
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */

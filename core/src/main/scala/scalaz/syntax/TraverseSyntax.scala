@@ -32,6 +32,13 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
     G.TC.traverse(self)(x => G.apply(x))
   }
 
+  /** A version of `sequence` where a monadic join is applied to the inner result */
+  final def sequenceM[G[_], B](implicit ev: A === G[F[B]],
+                      G: Applicative[G],
+                      FM: Bind[F]): G[F[B]] = {
+    G.map(F.sequence(ev.subst[F](self)))(FM.join)
+  }
+
   /** A version of `traverse` specialized for `State` */
   final def traverseS[S, B](f: A => State[S, B]): State[S, F[B]] =
     F.traverseS[S, A, B](self)(f)
