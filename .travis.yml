@@ -5,15 +5,13 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/launchers
-dist: precise # trusty does not support java6 and java7 ?
 language: scala
 scala:
   - 2.11.11
   - 2.10.6
   - 2.9.3
 jdk:
-  - oraclejdk7
-  - openjdk6
+  - openjdk7
 
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
