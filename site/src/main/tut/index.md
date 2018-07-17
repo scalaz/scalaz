@@ -1,10 +1,9 @@
 ---
-layout: home
+layout: page
 position: 1
 section: home
 title: "Home"
 ---
-
 **Welcome to Scalaz 7.3**
 
 Scalaz is a Scala library for functional programming.

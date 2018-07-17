@@ -1,10 +1,9 @@
 ---
-layout: docs
+layout: scalaz
 section: data
+source: Either.scala
 title:  "Disjunction"
 ---
-
-# Disjunction [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Either.scala)
 
 `Disjunction` (or `\/`) is a data type used to signal multiple possible outcomes of a computation.
 It is often used when dealing with errors, but is not tied to that case.
