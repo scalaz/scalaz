@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title>Scalaz{% if page.title %}: {{page.title}}{% endif %}
+    </title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Scalaz contributors" />
+    <meta name="description" content="Scalaz" />
+    <meta name="og:image" content="{{site.url}}{{site.baseurl}}/img/poster.png" />
+    <meta name="og:title" content="Scalaz{% if page.title %}: {{page.title}}{% endif %}" />
+    <meta name="og:site_name" content="Scalaz" />
+    <meta name="og:url" content="" />
+    <meta name="og:type" content="website" />
+    <meta name="og:description" content="Scalaz" />
+    <link rel="icon" type="image/png" href="{{site.url}}{{site.baseurl}}/img/favicon.png" />
+    <meta name="twitter:title" content="Scalaz{% if page.title %}: {{page.title}}{% endif %}" />
+    <meta name="twitter:image" content="img/poster.png" />
+    <meta name="twitter:description" content="Scalaz" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/png" sizes="512x512" href="{{site.url}}{{site.baseurl}}/img/favicon.png" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="{{site.url}}{{site.baseurl}}/highlight/styles/default.css" />
+    <link rel="stylesheet" href="{{site.baseurl}}/css/style.css" />
+    <link rel="stylesheet" href="{{site.baseurl}}/css/palette.css" />
+    <link rel="stylesheet" href="{{site.baseurl}}/css/codemirror.css" />
+  </head>
+  <body class="docs">
+    <div id="wrapper">
+      <div id="sidebar-wrapper">
+        <ul id="sidebar" class="sidebar-nav">
+          <li class="sidebar-brand">
+            <a href="{{ site.baseurl }}/" class="brand">
+              <div class="brand-wrapper">
+                <span>Scalaz
+                </span>
+              </div>
+            </a>
+          </li>{% if site.data.menu.options %}{% assign items = site.data.menu.options %}{% for x in items %} {% if x.menu_type.size == false or x.menu_type == page.section %}
+          <li>
+            <a href="{{ site.baseurl }}/{{ x.url }}" class="{% if x.title == page.title %} active {% endif %}">{{x.title}}
+            </a>{% if x.nested_options %}
+            <ul class="sub_section">{% for sub in x.nested_options %}
+              <li>
+                <a href="{{ site.baseurl }}/{{ sub.url }}" class="{% if sub.title == page.title and x.section == sub.section %} active {% endif %}">{{sub.title}}
+                </a>
+              </li>{% endfor %}
+            </ul>{% endif %}
+          </li>{% endif %}{% endfor %}{% else %}{% assign items = site.pages | sort: 'weight' %}{% for x in items %}{% if x.section == page.section %}
+          <li>
+            <a href="{{ site.baseurl }}{{x.url}}" class="{% if x.title == page.title %} active {% endif %}">{{x.title}}
+            </a>
+          </li>{% endif %}{% endfor %}{% endif %}
+        </ul>
+      </div>
+      <div id="page-content-wrapper">
+        <div class="nav">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="action-menu pull-left clearfix">
+                  <a href="#menu-toggle" id="menu-toggle">
+                    <i class="fa fa-bars" aria-hidden="true">
+                    </i>
+                  </a>
+                </div>
+                <ul class="pull-right">
+                  <li id="gh-eyes-item" class="hidden-xs">
+                    <a href="https://github.com/scalaz/scalaz">
+                      <i class="fa fa-eye">
+                      </i>
+                      <span>WATCH
+                        <span id="eyes" class="label label-default">--
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                  <li id="gh-stars-item" class="hidden-xs">
+                    <a href="https://github.com/scalaz/scalaz">
+                      <i class="fa fa-star-o">
+                      </i>
+                      <span>STARS
+                        <span id="stars" class="label label-default">--
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" onclick="shareSiteTwitter('Scalaz Scalaz');">
+                      <i class="fa fa-twitter">
+                      </i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" onclick="shareSiteFacebook('Scalaz Scalaz');">
+                      <i class="fa fa-facebook">
+                      </i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" onclick="shareSiteGoogle();">
+                      <i class="fa fa-google-plus">
+                      </i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="content" data-github-owner="scalaz" data-github-repo="scalaz">
+          <div class="content-wrapper">
+            <section>
+              <a href="https://github.com/scalaz/scalaz/edit/series/7.3.x/site/src/main/tut/{{ page.path }}" style="float:right;">[edit]</a>
+              {% if page.source %}
+              <h1 id="{{ page.title }}-">{{ page.title }} <a href="https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/{{ page.source }}"><img src="../img/github.png" alt="GitHub"></a><a class="header-link" href="#{{ page.source }}-"><i class="fa fa-link"></i></a></h1>
+              {% endif %}
+              {{ content }}
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js">
+    </script>
+    <script src="{{site.url}}{{site.baseurl}}/highlight/highlight.pack.js">
+    </script>
+    <script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+    </script>
+    <script>((window.gitter = {}).chat = {}).options = {
+    room: 'scalaz/scalaz'};
+    </script>
+    <script src="https://sidecar.gitter.im/dist/sidecar.v1.js">
+    </script>
+    <script src="{{ site.baseurl }}/js/main.js">
+    </script>
+  </body>
+</html>ore

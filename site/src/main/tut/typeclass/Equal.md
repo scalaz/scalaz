@@ -1,10 +1,9 @@
 ---
-layout: docs
+layout: scalaz
 section: typeclass
+source: Equal.scala
 title:  "Equal"
 ---
-
-# Equal [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/7.3.x/core/src/main/scala/scalaz/Equal.scala)
 
 *The `Equal` type class describes a type which can be compared for observational equality.*
 
