@@ -97,8 +97,8 @@ object IListTest extends SpecLite {
     (n +: ns).toList must_=== n +: ns.toList
   }
 
-  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
-    (s /: ns)(f) == (s /: ns.toList)(f)
+  "foldLeft" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
+    ns.foldLeft(s)(f) == ns.toList.foldLeft(s)(f)
   }
 
   ":+" ! forAll { (n: Int, ns: IList[Int]) =>
@@ -113,8 +113,8 @@ object IListTest extends SpecLite {
     (ns ::: ms).toList must_=== ns.toList ::: ms.toList
   }
 
-  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
-    (ns :\ s)(f) == (ns.toList :\ s)(f)
+  "foldRight" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
+    ns.foldRight(s)(f) == ns.toList.foldRight(s)(f)
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
