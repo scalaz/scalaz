@@ -44,7 +44,7 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
@@ -165,3 +165,42 @@ lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(Sc
     notPublish
   )
   .dependsOn(iterateeNative)
+
+lazy val site = Project(
+  id = "site",
+  base = file("site")
+).settings(
+  standardSettings,
+  name := "scalaz-site",
+  notPublish,
+  scalacOptions in (Compile, compile) -= "-Yno-adapted-args",
+).dependsOn(
+  coreJVM
+).enablePlugins(
+  MicrositesPlugin
+).settings(
+  scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
+  scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
+  micrositeFooterText := Some("""
+                                |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
+                                |""".stripMargin),
+  micrositeName := "Scalaz",
+  micrositeDescription := "Scalaz",
+  micrositeAuthor := "Scalaz contributors",
+  micrositeOrganizationHomepage := "https://github.com/scalaz/scalaz",
+  micrositeGitterChannelUrl := "scalaz/scalaz",
+  micrositeGitHostingUrl := "https://github.com/scalaz/scalaz",
+  micrositeGithubOwner := "scalaz",
+  micrositeGithubRepo := "scalaz",
+  micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
+  micrositePalette := Map(
+    "brand-primary"   -> "#ED2124",
+    "brand-secondary" -> "#251605",
+    "brand-tertiary"  -> "#491119",
+    "gray-dark"       -> "#453E46",
+    "gray"            -> "#837F84",
+    "gray-light"      -> "#E3E2E3",
+    "gray-lighter"    -> "#F4F3F4",
+    "white-color"     -> "#FFFFFF"
+  )
+)
