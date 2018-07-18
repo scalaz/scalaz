@@ -377,4 +377,7 @@ package object scalaz {
 
   type DisjunctionT[A, F[_], B] = EitherT[A, F, B]
   val DisjunctionT = EitherT
+
+  val Void: VoidModule.type = VoidModule
+  type Void = Void.Void
 }
