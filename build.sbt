@@ -202,5 +202,8 @@ lazy val site = Project(
     "gray-light"      -> "#E3E2E3",
     "gray-lighter"    -> "#F4F3F4",
     "white-color"     -> "#FFFFFF"
-  )
+  ),
+  micrositePushSiteWith := GitHub4s,
+  micrositeGithubToken := getEnvVar("GITHUB_TOKEN"),
+  micrositeGitHostingUrl := "https://github.com/scalaz/scalaz.github.io"
 )
