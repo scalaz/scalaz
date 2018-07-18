@@ -9,7 +9,7 @@ sealed trait ApplicativeBuilderOps[F[_]] {
   def |@|[X](fx: F[X]): ApplicativeBuilderType[X] = ⊛(fx)
 }
 
-sealed trait ApplicativeBuilder[F[_]] {
+sealed abstract class ApplicativeBuilder[F[_]] {
   type Function[_]
   type Tuple <: Product
 
