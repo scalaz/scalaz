@@ -19,6 +19,7 @@ object IListTest extends SpecLite {
   checkAll(isEmpty.laws[IList])
   checkAll(cobind.laws[IList])
   checkAll(order.laws[IList[Int]])
+  checkAll(alt.laws[IList])
 
   // These tests hold for List, so they had better hold for IList
 
@@ -441,5 +442,6 @@ object IListTest extends SpecLite {
     def align = Align[IList]
     def isEmpty = IsEmpty[IList]
     def cobind = Cobind[IList]
+    def alt = Alt[IList]
   }
 }

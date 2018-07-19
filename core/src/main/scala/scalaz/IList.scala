@@ -704,17 +704,6 @@ sealed abstract class IListInstances extends IListInstance0 {
         if (a1.nonEmpty) a1 else a2
     }
 
-  implicit val contraInstances: Decidable[IList] =
-    new Decidable[IList] {
-      def conquer[A]: IList[A] = INil()
-
-      def choose2[Z, A1, A2](a1: => IList[A1], a2: => IList[A2])(f: Z => A1 \/ A2): IList[Z] =
-        ???
-
-      def divide2[A1, A2, Z](a1: => IList[A1], a2: => IList[A2])(f: Z => (A1, A2)): IList[Z] =
-        ???
-    }
-
   implicit def order[A](implicit A0: Order[A]): Order[IList[A]] =
     new IListOrder[A] {
       val A = A0
