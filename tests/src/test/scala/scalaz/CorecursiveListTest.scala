@@ -22,6 +22,7 @@ object CorecursiveListTest extends SpecLite {
   checkAll(zip.laws[CL])
   checkAll(monoid.laws[CL[Int]])
   checkAll(order.laws[CL[Int]])
+  checkAll(alt.laws[CL])
 
   "inequality exists" ! forAll {(a: CL[Int]) =>
     exists {(b: CL[Int]) =>
