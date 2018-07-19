@@ -557,9 +557,9 @@ sealed abstract class IListInstance0 {
 
 sealed abstract class IListInstances extends IListInstance0 {
 
-  implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
+  implicit val instances: Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
-    new Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
       override def findLeft[A](fa: IList[A])(f: A => Boolean) =
         fa.find(f)
 
@@ -699,8 +699,21 @@ sealed abstract class IListInstances extends IListInstance0 {
           }
         go(IList(f(a)), INil())
       }
+
+      def alt[A](a1: => IList[A], a2: => IList[A]): IList[A] =
+        if (a1.nonEmpty) a1 else a2
     }
 
+  implicit val contraInstances: Decidable[IList] =
+    new Decidable[IList] {
+      def conquer[A]: IList[A] = INil()
+
+      def choose2[Z, A1, A2](a1: => IList[A1], a2: => IList[A2])(f: Z => A1 \/ A2): IList[Z] =
+        ???
+
+      def divide2[A1, A2, Z](a1: => IList[A1], a2: => IList[A2])(f: Z => (A1, A2)): IList[Z] =
+        ???
+    }
 
   implicit def order[A](implicit A0: Order[A]): Order[IList[A]] =
     new IListOrder[A] {
