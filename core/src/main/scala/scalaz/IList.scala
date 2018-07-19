@@ -700,8 +700,9 @@ sealed abstract class IListInstances extends IListInstance0 {
         go(IList(f(a)), INil())
       }
 
+      @inline
       def alt[A](a1: => IList[A], a2: => IList[A]): IList[A] =
-        if (a1.nonEmpty) a1 else a2
+        plus(a1, a2)
     }
 
   implicit def order[A](implicit A0: Order[A]): Order[IList[A]] =

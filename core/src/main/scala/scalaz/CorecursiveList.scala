@@ -209,10 +209,9 @@ object CorecursiveList extends CorecursiveListInstances {
         }
       }
 
-      override def alt[A](la0: => CorecursiveList[A], ra: => CorecursiveList[A]): CorecursiveList[A] = {
-        val la = Need(la0).value
-        la.step(la.init).cata(Function const la, ra)
-      }
+      @inline
+      override def alt[A](la: => CorecursiveList[A], ra: => CorecursiveList[A]): CorecursiveList[A] =
+        plus(la, ra)
 
       override def isEmpty[A](fa: CorecursiveList[A]) =
         fa.step(fa.init).isEmpty
