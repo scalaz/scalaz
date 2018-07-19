@@ -100,10 +100,11 @@ sealed abstract class DListInstances {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonadPlus: MonadPlus[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
+  implicit val dlistMonadPlus: MonadPlus[DList] with Alt[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] = new MonadPlus[DList] with Alt[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
+    def alt[A](a: => DList[A], b: => DList[A]) = if (!a.isEmpty) a else b
     def empty[A] = DList()
     def isEmpty[A](fa: DList[A]) = fa.isEmpty
     def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
