@@ -21,6 +21,7 @@ object EitherTTest extends SpecLite {
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
   checkAll(monadTrans.laws[EitherT[Int, ?[_], ?], List])
+  checkAll(alt.laws[EitherTListInt])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
