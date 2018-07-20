@@ -33,6 +33,7 @@ object FreeTTest extends SpecLite {
 
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
+    checkAll(alt.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
     checkAll(monadTrans.laws[FreeTList, Option])
 
@@ -148,6 +149,7 @@ object FreeTTest extends SpecLite {
     def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, ?], E]
     def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, ?]]
     def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, ?]]
+    def alt[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Alt[FreeT[S, F, ?]]
     def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, ?[_], ?]]
 
     // checking absence of ambiguity
