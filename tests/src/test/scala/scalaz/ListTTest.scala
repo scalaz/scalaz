@@ -87,6 +87,7 @@ object ListTTest extends SpecLite {
   checkAll(plusEmpty.laws[ListTOpt])
   checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
+  checkAll(alt.laws[ListTOpt])
   checkAll(monadTrans.laws[ListT, Option])
 
   object instances {
@@ -94,6 +95,7 @@ object ListTTest extends SpecLite {
     def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
     def monad[F[_]: Monad] = Monad[ListT[F, ?]]
     def functor[F[_]: Functor] = Functor[ListT[F, ?]]
+    def alt[F[_]: Monad] = Alt[ListT[F, ?]]
 
     // checking absence of ambiguity
     def functor[F[_]: Monad] = Functor[ListT[F, ?]]
