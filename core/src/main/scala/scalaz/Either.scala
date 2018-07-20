@@ -475,8 +475,8 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         a1 +++ a2
     }
 
-  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
-    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Alt[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
+    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Alt[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
 
@@ -513,6 +513,10 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 
       def plus[A](a: L \/ A, b: => L \/ A) =
         a orElse b
+
+      @inline
+      def alt[A](a: => L \/ A, b: => L \/ A) =
+        plus(a, b)
 
       def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
         case l@ -\/(_) => -\/(l.coerceRight)
