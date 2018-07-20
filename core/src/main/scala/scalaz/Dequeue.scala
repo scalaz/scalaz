@@ -238,13 +238,14 @@ sealed abstract class DequeueInstances {
     def append(a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
   }
 
-  implicit val dequeueInstances: Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] =
-    new Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] {
+  implicit val dequeueInstances: Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] with Alt[Dequeue] =
+    new Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] with Alt[Dequeue] {
       override def foldRight[A,B](fa: Dequeue[A], b: => B)(f: (A, => B) =>B): B = fa.foldRight(b)((a,b) => f(a,b))
       override def foldLeft[A,B](fa: Dequeue[A], b: B)(f: (B,A)=>B): B = fa.foldLeft(b)(f)
       override def foldMap[A,B](fa: Dequeue[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldLeft(F.zero)((b,a) => F.append(b, f(a)))
       override def empty[A]: Dequeue[A] = Dequeue.empty
       override def plus[A](a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
+      override def alt[A](a: => Dequeue[A], b: => Dequeue[A]): Dequeue[A] = plus(a, b)
       override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
       override def length[A](fa: Dequeue[A]) = fa.size
       override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
