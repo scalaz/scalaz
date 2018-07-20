@@ -149,7 +149,7 @@ sealed abstract class EphemeralStream[A] {
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
     import EphemeralStream._
     override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
@@ -159,6 +159,7 @@ sealed abstract class EphemeralStreamInstances {
     }
     def cobind[A, B](fa: EphemeralStream[A])(f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
+    @inline def alt[A](a: => EphemeralStream[A], b: => EphemeralStream[A]) = plus(a, b)
     def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
     def empty[A] = EphemeralStream()
