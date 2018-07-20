@@ -20,8 +20,8 @@ sealed abstract class ApplicativeBuilder[F[_]] {
   def tupled: F[Tuple] = apply(toTuple)
 }
 
-final class ApplicativeBuilder2[F[_], A, B](fa: F[A], fb: F[B])
-                                           (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder2[F[_], A, B](fa: F[A], fb: F[B])
+                                                           (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[C] = (A, B) => C
   type Tuple = (A, B)
@@ -34,8 +34,8 @@ final class ApplicativeBuilder2[F[_], A, B](fa: F[A], fb: F[B])
 }
 
 
-final class ApplicativeBuilder3[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])
-                                              (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder3[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])
+                                                              (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[D] = (A, B, C) => D
   type Tuple = (A, B, C)
@@ -48,8 +48,8 @@ final class ApplicativeBuilder3[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])
 }
 
 
-final class ApplicativeBuilder4[F[_], A, B, C, D](fa: F[A], fb: F[B], fc: F[C], fd: F[D])
-                                                 (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder4[F[_], A, B, C, D](fa: F[A], fb: F[B], fc: F[C], fd: F[D])
+                                                                 (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[E] = (A, B, C, D) => E
   type Tuple = (A, B, C, D)
@@ -62,8 +62,8 @@ final class ApplicativeBuilder4[F[_], A, B, C, D](fa: F[A], fb: F[B], fc: F[C], 
 }
 
 
-final class ApplicativeBuilder5[F[_], A, B, C, D, E](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E])
-                                                    (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder5[F[_], A, B, C, D, E](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E])
+                                                                    (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[FF] = (A, B, C, D, E) => FF
   type Tuple = (A, B, C, D, E)
@@ -76,8 +76,8 @@ final class ApplicativeBuilder5[F[_], A, B, C, D, E](fa: F[A], fb: F[B], fc: F[C
 }
 
 
-final class ApplicativeBuilder6[F[_], A, B, C, D, E, FF](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF])
-                                                        (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder6[F[_], A, B, C, D, E, FF](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF])
+                                                                        (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[G] = (A, B, C, D, E, FF) => G
   type Tuple = (A, B, C, D, E, FF)
@@ -90,8 +90,8 @@ final class ApplicativeBuilder6[F[_], A, B, C, D, E, FF](fa: F[A], fb: F[B], fc:
 }
 
 
-final class ApplicativeBuilder7[F[_], A, B, C, D, E, FF, G](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G])
-                                                           (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder7[F[_], A, B, C, D, E, FF, G](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G])
+                                                                           (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[H] = (A, B, C, D, E, FF, G) => H
   type Tuple = (A, B, C, D, E, FF, G)
@@ -104,8 +104,8 @@ final class ApplicativeBuilder7[F[_], A, B, C, D, E, FF, G](fa: F[A], fb: F[B], 
 }
 
 
-final class ApplicativeBuilder8[F[_], A, B, C, D, E, FF, G, H](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H])
-                                                              (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder8[F[_], A, B, C, D, E, FF, G, H](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H])
+                                                                              (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[I] = (A, B, C, D, E, FF, G, H) => I
   type Tuple = (A, B, C, D, E, FF, G, H)
@@ -118,8 +118,8 @@ final class ApplicativeBuilder8[F[_], A, B, C, D, E, FF, G, H](fa: F[A], fb: F[B
 }
 
 
-final class ApplicativeBuilder9[F[_], A, B, C, D, E, FF, G, H, I](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I])
-                                                                 (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder9[F[_], A, B, C, D, E, FF, G, H, I](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I])
+                                                                                 (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[J] = (A, B, C, D, E, FF, G, H, I) => J
   type Tuple = (A, B, C, D, E, FF, G, H, I)
@@ -132,8 +132,8 @@ final class ApplicativeBuilder9[F[_], A, B, C, D, E, FF, G, H, I](fa: F[A], fb: 
 }
 
 
-final class ApplicativeBuilder10[F[_], A, B, C, D, E, FF, G, H, I, J](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J])
-                                                                     (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder10[F[_], A, B, C, D, E, FF, G, H, I, J](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J])
+                                                                                     (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[K] = (A, B, C, D, E, FF, G, H, I, J) => K
   type Tuple = (A, B, C, D, E, FF, G, H, I, J)
@@ -146,8 +146,8 @@ final class ApplicativeBuilder10[F[_], A, B, C, D, E, FF, G, H, I, J](fa: F[A], 
 }
 
 
-final class ApplicativeBuilder11[F[_], A, B, C, D, E, FF, G, H, I, J, K](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J], fk: F[K])
-                                                                        (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder11[F[_], A, B, C, D, E, FF, G, H, I, J, K](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J], fk: F[K])
+                                                                                        (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] with ApplicativeBuilderOps[F] {
   type Function[L] = (A, B, C, D, E, FF, G, H, I, J, K) => L
   type Tuple = (A, B, C, D, E, FF, G, H, I, J, K)
@@ -160,8 +160,8 @@ final class ApplicativeBuilder11[F[_], A, B, C, D, E, FF, G, H, I, J, K](fa: F[A
 }
 
 
-final class ApplicativeBuilder12[F[_], A, B, C, D, E, FF, G, H, I, J, K, L](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J], fk: F[K], fl: F[L])
-                                                                           (override protected[this] implicit val ap: Apply[F])
+private[scalaz] final class ApplicativeBuilder12[F[_], A, B, C, D, E, FF, G, H, I, J, K, L](fa: F[A], fb: F[B], fc: F[C], fd: F[D], fe: F[E], ff: F[FF], fg: F[G], fh: F[H], fi: F[I], fj: F[J], fk: F[K], fl: F[L])
+                                                                                           (override protected[this] implicit val ap: Apply[F])
   extends ApplicativeBuilder[F] {
   type Function[M] = (A, B, C, D, E, FF, G, H, I, J, K, L) => M
   type Tuple = (A, B, C, D, E, FF, G, H, I, J, K, L)
