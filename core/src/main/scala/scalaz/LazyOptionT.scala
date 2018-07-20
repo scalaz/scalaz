@@ -81,9 +81,13 @@ sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
   implicit def lazyOptionEqual[F[_], A](implicit FA: Equal[F[LazyOption[A]]]): Equal[LazyOptionT[F, A]] =
     Equal.equalBy((_: LazyOptionT[F, A]).run)
 
-  implicit def lazyOptionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[LazyOptionT[F, ?]] =
-    new LazyOptionTMonad[F] {
+  implicit def lazyOptionTMonadPlusAlt[F[_]](implicit F0: Monad[F]): MonadPlus[LazyOptionT[F, ?]] with Alt[LazyOptionT[F, ?]] =
+    new LazyOptionTMonad[F] with Alt[LazyOptionT[F, ?]] {
       implicit def F: Monad[F] = F0
+
+      @inline
+      def alt[A](a: => LazyOptionT[F, A], b: => LazyOptionT[F, A]): LazyOptionT[F, A] =
+        plus(a, b)
     }
 }
 
@@ -167,5 +171,5 @@ private trait LazyOptionTHoist extends Hoist[LazyOptionT] {
     )
 
   implicit def apply[G[_] : Monad]: Monad[LazyOptionT[G, ?]] =
-    LazyOptionT.lazyOptionTMonadPlus[G]
+    LazyOptionT.lazyOptionTMonadPlusAlt[G]
 }
