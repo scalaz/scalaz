@@ -46,10 +46,15 @@ sealed abstract class IStream[A] { self =>
 
   def reverse: IStream[A] = foldLeftByName(empty[A])((xs, x) => Lazy.cons(x, xs))
 
+  def headMaybe: Maybe[A] = self match {
+    case IStream.Nil() => Maybe.empty
+    case IStream.Cons(head, _) => Maybe.just(head.value)
+  }
+
 }
 object IStream {
 
-  private final case class Nil[A]() extends IStream
+  private final case class Nil[A]() extends IStream[A]
   private final case class Cons[A](
     head: Name[A],
     tail: Name[IStream[A]]

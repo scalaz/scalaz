@@ -95,7 +95,6 @@ object MixedBag extends App {
     import syntax.writer._
     import WriterT._
 
-    type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]
 
     implicit val pairFunctor: Functor[Pair] = new Functor[Pair] {
