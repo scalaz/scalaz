@@ -180,7 +180,6 @@ sealed abstract class KleisliInstances5 extends KleisliInstances6 {
     new KleisliApplicative[F, A] with Alt[Kleisli[F, A, ?]] {
       implicit def F = Applicative[F]
 
-      @inline
       def alt[B](f1: => Kleisli[F, A, B], f2: => Kleisli[F, A, B]) =
         Kleisli(a => Alt[F].alt(f1.run(a), f2.run(a)))
     }
