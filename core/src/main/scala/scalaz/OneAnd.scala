@@ -61,9 +61,18 @@ private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, ?]] with OneAndFu
 }
 
 private sealed trait OneAndApplicative[F[_]] extends Applicative[OneAnd[F, ?]] with OneAndApply[F] {
-  def F: ApplicativePlus[F]
+  def F: Applicative[F]
+  def G: PlusEmpty[F]
 
-  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, F.empty)
+  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, G.empty)
+}
+
+private sealed trait OneAndAlt[F[_]] extends Alt[OneAnd[F, ?]] with OneAndApplicative[F] {
+  def F: Alt[F]
+  def G: PlusEmpty[F]
+
+  def alt[A](a: => OneAnd[F, A], b: => OneAnd[F, A]): OneAnd[F, A] =
+    OneAnd(a.head, F.alt(F.alt(a.tail, F.point(b.head)), b.tail))
 }
 
 private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, ?]] with OneAndApply[F] {
@@ -234,6 +243,12 @@ sealed abstract class OneAndInstances2 extends OneAndInstances3 {
 }
 
 sealed abstract class OneAndInstances1 extends OneAndInstances2 {
+  implicit def oneAndAlt[F[_]: Alt: PlusEmpty]: Alt[OneAnd[F, ?]] =
+    new OneAndAlt[F] {
+      def F = implicitly
+      def G = implicitly
+    }
+
   implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, ?]] =
     new OneAndMonad[F] {
       def F = implicitly
