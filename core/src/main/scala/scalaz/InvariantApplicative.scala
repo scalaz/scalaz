@@ -91,13 +91,3 @@ object InvariantApplicative {
 
   ////
 }
-
-trait IsomorphismInvariantApplicative[F[_], G[_]] extends InvariantApplicative[F] with IsomorphismInvariantFunctor[F, G]{
-  implicit def G: InvariantApplicative[G]
-
-  def xproduct0[Z](f: => Z): F[Z] =
-    iso.from(G.xproduct0(f))
-  def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
-    iso.from(G.xproduct2(iso.to(a1), iso.to(a2))(f, g))
-
-}

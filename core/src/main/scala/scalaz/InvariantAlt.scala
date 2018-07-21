@@ -72,15 +72,3 @@ object InvariantAlt {
 
   ////
 }
-
-trait IsomorphismInvariantAlt[F[_], G[_]] extends InvariantAlt[F] with IsomorphismInvariantApplicative[F, G]{
-  implicit def G: InvariantAlt[G]
-
-  import Isomorphism._
-
-  def iso: F <~> G
-
-  def xcoproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: A1 \/ A2 => Z, g: Z => A1 \/ A2): F[Z] =
-    iso.from(G.xcoproduct2(iso.to(a1), iso.to(a2))(f, g))
-
-}
