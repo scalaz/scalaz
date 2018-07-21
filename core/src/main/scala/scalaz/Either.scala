@@ -514,7 +514,6 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
       def plus[A](a: L \/ A, b: => L \/ A) =
         a orElse b
 
-      @inline
       def alt[A](a: => L \/ A, b: => L \/ A) =
         plus(a, b)
 

@@ -85,7 +85,6 @@ sealed abstract class LazyOptionTInstances0 extends LazyOptionTInstances1 {
     new LazyOptionTMonad[F] with Alt[LazyOptionT[F, ?]] {
       implicit def F: Monad[F] = F0
 
-      @inline
       def alt[A](a: => LazyOptionT[F, A], b: => LazyOptionT[F, A]): LazyOptionT[F, A] =
         plus(a, b)
     }

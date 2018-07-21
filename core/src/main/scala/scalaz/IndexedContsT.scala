@@ -147,7 +147,6 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
       implicit val W: Comonad[W] = W0
       implicit val M: PlusEmpty[M] = M0
 
-      @inline
       override def alt[A](a: => ContsT[W, R, M, A], b: => ContsT[W, R, M, A]): ContsT[W, R, M, A] =
         plus(a, b)
     }

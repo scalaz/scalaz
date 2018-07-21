@@ -93,7 +93,6 @@ trait StreamInstances {
 
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
 
-    @inline
     def alt[A](a: => Stream[A], b: => Stream[A]) = plus(a, b)
 
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =

@@ -208,7 +208,6 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
 
-      @inline
       def alt[A](a: => NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = plus(a, b)
 
       def copoint[A](p: NonEmptyList[A]): A = p.head

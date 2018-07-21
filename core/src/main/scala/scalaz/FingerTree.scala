@@ -1106,7 +1106,7 @@ sealed abstract class IndSeqInstances {
         fa map f
       def plus[A](a: IndSeq[A], b: => IndSeq[A]) =
         a ++ b
-      @inline def alt[A](a: => IndSeq[A], b: => IndSeq[A]) =
+      def alt[A](a: => IndSeq[A], b: => IndSeq[A]) =
         plus(a, b)
       def empty[A] =
         IndSeq.apply()

@@ -286,7 +286,7 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
       override def M2 = implicitly
 
       override def empty[A] = FreeT.liftM[S, M, A](PlusEmpty[M].empty[A])(M)
-      @inline
+
       override def alt[A](a1: => FreeT[S, M, A], a2: => FreeT[S, M, A]): FreeT[S, M, A] =
         plus(a1, a2)
     }

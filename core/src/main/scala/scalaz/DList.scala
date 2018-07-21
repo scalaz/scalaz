@@ -104,7 +104,7 @@ sealed abstract class DListInstances {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
-    @inline def alt[A](a: => DList[A], b: => DList[A]) = plus(a, b)
+    def alt[A](a: => DList[A], b: => DList[A]) = plus(a, b)
     def empty[A] = DList()
     def isEmpty[A](fa: DList[A]) = fa.isEmpty
     def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b

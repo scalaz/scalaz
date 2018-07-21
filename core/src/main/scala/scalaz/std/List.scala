@@ -28,7 +28,6 @@ trait ListInstances extends ListInstances0 {
       override def plus[A](a: List[A], b: => List[A]): List[A] =
         a ++ b
 
-      @inline
       override def alt[A](a: => List[A], b: => List[A]): List[A] =
         plus(a, b)
 

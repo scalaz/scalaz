@@ -159,7 +159,7 @@ sealed abstract class EphemeralStreamInstances {
     }
     def cobind[A, B](fa: EphemeralStream[A])(f: EphemeralStream[A] => B): EphemeralStream[B] = map(cojoin(fa))(f)
     def plus[A](a: EphemeralStream[A], b: => EphemeralStream[A]) = a ++ b
-    @inline def alt[A](a: => EphemeralStream[A], b: => EphemeralStream[A]) = plus(a, b)
+    def alt[A](a: => EphemeralStream[A], b: => EphemeralStream[A]) = plus(a, b)
     def bind[A, B](fa: EphemeralStream[A])(f: A => EphemeralStream[B]) = fa flatMap f
     def point[A](a: => A) = EphemeralStream(a)
     def empty[A] = EphemeralStream()

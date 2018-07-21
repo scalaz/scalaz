@@ -143,7 +143,6 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
     new Alt[OptionT[F, ?]] with OptionTApply[F] with OptionTPoint[F] {
       def F = F0
 
-      @inline
       def alt[A](a: => OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
     }
 }

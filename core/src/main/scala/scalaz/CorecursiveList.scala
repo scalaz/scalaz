@@ -209,7 +209,6 @@ object CorecursiveList extends CorecursiveListInstances {
         }
       }
 
-      @inline
       override def alt[A](la: => CorecursiveList[A], ra: => CorecursiveList[A]): CorecursiveList[A] =
         plus(la, ra)
 

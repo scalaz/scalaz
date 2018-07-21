@@ -700,7 +700,6 @@ sealed abstract class IListInstances extends IListInstance0 {
         go(IList(f(a)), INil())
       }
 
-      @inline
       def alt[A](a1: => IList[A], a2: => IList[A]): IList[A] =
         plus(a1, a2)
     }

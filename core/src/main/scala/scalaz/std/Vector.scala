@@ -28,7 +28,6 @@ trait VectorInstances extends VectorInstances0 {
     override def plus[A](a: Vector[A], b: => Vector[A]): Vector[A] =
       a ++ b
 
-    @inline
     override def alt[A](a: => Vector[A], b: => Vector[A]): Vector[A] =
       plus(a, b)
 
