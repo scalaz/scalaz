@@ -27,6 +27,10 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
+  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor), parent = true)
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply), parent = true)
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
@@ -101,6 +105,10 @@ object TypeClass {
     divisible,
     apply,
     applicative,
+    invariantAlt,
+    invariantApplicative,
+    decidable,
+    alt,
     align,
     zip,
     unzip,

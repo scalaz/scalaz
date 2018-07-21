@@ -1,0 +1,33 @@
+package scalaz
+package syntax
+
+/** Wraps a value `self` and provides methods related to `Alt` */
+final class AltOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Alt[F]) extends Ops[F[A]] {
+  ////
+
+  ////
+}
+
+sealed trait ToAltOps0 {
+  implicit def ToAltOpsUnapply[FA](v: FA)(implicit F0: Unapply[Alt, FA]) =
+    new AltOps[F0.M,F0.A](F0(v))(F0.TC)
+
+}
+
+trait ToAltOps extends ToAltOps0 with ToApplicativeOps with ToInvariantAltOps {
+  implicit def ToAltOps[F[_],A](v: F[A])(implicit F0: Alt[F]) =
+    new AltOps[F,A](v)
+
+  ////
+
+  ////
+}
+
+trait AltSyntax[F[_]] extends ApplicativeSyntax[F] with InvariantAltSyntax[F] {
+  implicit def ToAltOps[A](v: F[A]): AltOps[F, A] = new AltOps[F,A](v)(AltSyntax.this.F)
+
+  def F: Alt[F]
+  ////
+
+  ////
+}
