@@ -495,8 +495,6 @@ object ScalazProperties {
   }
 
   object foldable1 {
-    type Pair[A] = (A, A)
-
     def leftFM1Consistent[F[_], A](implicit F: Foldable1[F], fa: Arbitrary[F[A]], ea: Equal[A]): Prop =
       forAll(F.foldable1Law.leftFM1Consistent[A] _)
 
