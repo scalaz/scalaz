@@ -240,15 +240,15 @@ sealed abstract class OneAndInstances2 extends OneAndInstances3 {
       def F = implicitly
       def G = implicitly
     }
-}
 
-sealed abstract class OneAndInstances1 extends OneAndInstances2 {
   implicit def oneAndAlt[F[_]: Alt: PlusEmpty]: Alt[OneAnd[F, ?]] =
     new OneAndAlt[F] {
       def F = implicitly
       def G = implicitly
     }
+}
 
+sealed abstract class OneAndInstances1 extends OneAndInstances2 {
   implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, ?]] =
     new OneAndMonad[F] {
       def F = implicitly
