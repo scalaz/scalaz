@@ -541,8 +541,8 @@ sealed abstract class ValidationInstances3 {
         fab.bitraverse(f, g)
     }
 
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, ?]] =
-    new Applicative[Validation[L, ?]] {
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, ?]] with Alt[Validation[L, ?]] =
+    new Applicative[Validation[L, ?]] with Alt[Validation[L, ?]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
 
@@ -551,6 +551,8 @@ sealed abstract class ValidationInstances3 {
 
       def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
         fa ap f
-    }
 
+      def alt[A](a: => Validation[L, A], b: => Validation[L, A]) =
+        a orElse b
+    }
 }
