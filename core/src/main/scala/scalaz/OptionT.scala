@@ -138,6 +138,14 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
     new OptionTMonadError[F, E] {
       def F = F0
     }
+
+  implicit def optionTAlt[F[_]](implicit F0: Monad[F]): Alt[OptionT[F, ?]] =
+    new Alt[OptionT[F, ?]] with OptionTApply[F] with OptionTPoint[F] {
+      def F = F0
+
+      @inline
+      def alt[A](a: => OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
+    }
 }
 
 sealed abstract class OptionTInstances0 extends OptionTInstances1 {
@@ -201,6 +209,12 @@ private trait OptionTApply[F[_]] extends Apply[OptionT[F, ?]] with OptionTFuncto
   override final def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
 }
 
+private trait OptionTPoint[F[_]] {
+  implicit def F: Applicative[F]
+
+  def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
+}
+
 private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[F]{
   implicit def F: Monad[F]
 
@@ -219,10 +233,8 @@ private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBi
     )
 }
 
-private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] {
+private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] with OptionTPoint[F] {
   implicit def F: Monad[F]
-
-  def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
 private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, ?], E] with OptionTMonad[F] {
