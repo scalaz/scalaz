@@ -11,7 +11,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
 
     override def point[A](a: => A): Vector[A] =
       Vector(a)
@@ -27,6 +27,10 @@ trait VectorInstances extends VectorInstances0 {
 
     override def plus[A](a: Vector[A], b: => Vector[A]): Vector[A] =
       a ++ b
+
+    @inline
+    override def alt[A](a: => Vector[A], b: => Vector[A]): Vector[A] =
+      plus(a, b)
 
     override def empty[A]: Vector[A] =
       Vector.empty[A]
