@@ -15,7 +15,8 @@ import scala.Some
  *
  * but more robust with respect to type inference.
  *
- * Notation is a blend of conjunction `/\` and natural transformation `~>`.
+ * Notation is conjunction `/\` blended with `~`, which is often used to
+ * indicate higher kindedness.
  */
 sealed abstract class /~\[A[_], B[_]] {
   type T
