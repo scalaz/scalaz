@@ -162,9 +162,9 @@ object Maybe extends MaybeInstances {
     def apply[A](): Maybe[A] = value.asInstanceOf[Empty[A]]
   }
 
-  final case class Just[A](a: A) extends Maybe[A] {
-    def get: A = a // for use in pattern matchers
-  }
+  // `get` is an intentional name as it is expected by the unapply
+  // logic in the scalac pattern matcher.
+  final case class Just[A](get: A) extends Maybe[A]
 
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {

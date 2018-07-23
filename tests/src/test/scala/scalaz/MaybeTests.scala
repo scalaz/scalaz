@@ -102,6 +102,15 @@ object MaybeTest extends SpecLite {
 
   "fromNullable(notNull) is just" ! forAll { (s: String) => Maybe.fromNullable(s) must_=== just(s) }
 
+  final class Unfoo(val s: String, val i: Int)
+  object Unfoo {
+    def apply(s: String, i: Int): Unfoo = new Unfoo(s, i)
+    def unapply(u: Unfoo): Maybe.Just[(String, Int)] = Maybe.Just((u.s, u.i))
+  }
+  "Just can be used in custom unapply" ! {
+    val Unfoo(_, _) = Unfoo("hello", 1)
+  }
+
   "Maybe addition should terminate when encountering the first Just" in {
     val P = PlusEmpty[Maybe]
 
