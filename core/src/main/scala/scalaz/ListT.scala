@@ -113,6 +113,11 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 
   implicit val listTHoist: Hoist[ListT] =
     new ListTHoist {}
+
+  implicit def listTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[ListT[F, ?]] =
+    new ListTDecidable[F] {
+      implicit def F: Divisible[F] = F0
+    }
 }
 
 object ListT extends ListTInstances {
