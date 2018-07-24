@@ -54,18 +54,16 @@ var cy = cytoscape({
   }
 });
 
-cy.on('tap', 'node', function(e){
-  var node = e.cyTarget;
-  var neighborhood = node.neighborhood().add(node);
-
-  cy.elements().addClass('faded');
-  neighborhood.removeClass('faded');
-});
-
 cy.on('tap', function(e){
   if( e.cyTarget === cy ){
     cy.elements().removeClass('faded');
   }
 })
+
+cy.on('tap', 'node', function() {
+  if (this.data('doc')) {
+    window.location.href = this.data('doc');
+  }
+});
 
 };
