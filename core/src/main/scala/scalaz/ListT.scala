@@ -135,6 +135,24 @@ object ListT extends ListTInstances {
 // Implementation traits for type class instances
 //
 
+private trait ListTDecidable[F[_]] extends Decidable[ListT[F, ?]] {
+  implicit def F: Divisible[F]
+  override def conquer[A]: ListT[F, A] = ListT(F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => ListT[F, A1], a2: => ListT[F, A2])(f: Z => (A1, A2)): ListT[F, Z] =
+    ListT(F.divide2(a1.run, a2.run)((z: IList[Z]) => Unzip[IList].unzip(z.map(f))))
+
+  override def choose2[Z, A1, A2](a1: => ListT[F, A1], a2: => ListT[F, A2])(f: Z => ∨[A1, A2]): ListT[F, Z] =
+    ListT(
+      F.divide2(a1.run, a2.run) (
+        (z: IList[Z]) => z.map(f)
+          ./:((IList.empty[A1], IList.empty[A2])) {
+            case (x, y) => y.fold(a1 => (x._1 :+ a1, x._2), a2 => (x._1, x._2 :+ a2))
+          }
+      )
+    )
+}
+
 private trait ListTFunctor[F[_]] extends Functor[ListT[F, ?]] {
  implicit def F: Functor[F]
  override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa map f
