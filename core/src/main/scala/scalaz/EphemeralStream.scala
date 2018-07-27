@@ -285,7 +285,7 @@ object EphemeralStream extends EphemeralStreamInstances {
 
   def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
     def iterator = new Iterator[A] {
-      var cur = e
+      private[this] var cur = e
 
       def next() = {
         val t = cur.head()
