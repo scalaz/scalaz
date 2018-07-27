@@ -284,9 +284,9 @@ object EphemeralStream extends EphemeralStreamInstances {
     case h #:: t  => cons(h, fromStream(t))
   }
 
-  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
-    def iterator = new Iterator[A] {
-      var cur = e
+  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new collection.AbstractIterable[A] {
+    def iterator = new collection.AbstractIterator[A] {
+      private[this] var cur = e
 
       def next() = {
         val t = cur.head()
