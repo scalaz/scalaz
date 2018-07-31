@@ -1,6 +1,5 @@
 import sbt._
 import Keys._
-import org.scalajs.sbtplugin.cross.CrossProject
 
 object Scalaz {
   val testDeps        = Seq("org.scalacheck"  %% "scalacheck"   % "1.14.0" % "test")
@@ -65,10 +64,4 @@ object Scalaz {
   implicit class ModuleHelper(p: Project) {
     def module: Project = p.in(file(p.id)).settings(stdSettings(p.id))
   }
-
-  implicit class CrossProjectModuleHelper(p: CrossProject.Builder) {
-    def module: CrossProject =
-      p.in(file(p.jvm.id.stripSuffix("JVM"))).settings(stdSettings(p.jvm.id.stripSuffix("JVM")))
-  }
-
 }

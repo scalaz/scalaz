@@ -1,3 +1,5 @@
+// shadow sbt-scalajs' crossProject from Scala.js 0.6.x
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import Scalaz._
 
 cancelable in Global := true
@@ -31,11 +33,16 @@ lazy val root = project
   .aggregate(baseJVM, baseJS, lawsJVM, lawsJS, tests, metaJVM, metaJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
-resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+def zioUri      = uri("git://github.com/scalaz/scalaz-zio.git#d315153469") // 2018/08/09
+lazy val zioJVM = ProjectRef(zioUri, "coreJVM")
+lazy val zioJS  = ProjectRef(zioUri, "coreJS")
 
-lazy val base = crossProject.module
+lazy val base = crossProject(JSPlatform, JVMPlatform)
+  .in(file("base"))
+  .settings(stdSettings("base"))
   .dependsOn(meta)
-  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.1-SNAPSHOT")
+  .jvmConfigure(_ dependsOn zioJVM)
+  .jsConfigure(_ dependsOn zioJS)
 
 lazy val baseJVM = base.jvm
 
@@ -54,7 +61,9 @@ lazy val benchmarks = project.module
       )
   )
 
-lazy val meta = crossProject.module
+lazy val meta = crossProject(JSPlatform, JVMPlatform)
+  .in(file("meta"))
+  .settings(stdSettings("meta"))
   .settings(
     libraryDependencies ++=
       Seq("org.scala-lang" % "scala-reflect"  % scalaVersion.value,
@@ -103,7 +112,9 @@ lazy val microsite = project.module
     )
   )
 
-lazy val laws = crossProject.module
+lazy val laws = crossProject(JSPlatform, JVMPlatform)
+  .in(file("laws"))
+  .settings(stdSettings("laws"))
   .dependsOn(base)
 
 lazy val lawsJVM = laws.jvm
