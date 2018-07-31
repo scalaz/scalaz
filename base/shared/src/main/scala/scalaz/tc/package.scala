@@ -31,6 +31,7 @@ package object tc {
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
   type Strong[F[_, _]]        = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]      = InstanceOf[TraversableClass[T]]
+  type Unfoldable[F[_]]       = InstanceOf[UnfoldableClass[F]]
 
   final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F]                = F
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                  = F
@@ -52,4 +53,5 @@ package object tc {
   final def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T]                         = T
   final def Strong[P[_, _]](implicit P: Strong[P]): Strong[P]                            = P
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                = T
+  final def Unfoldable[F[_]](implicit F: Unfoldable[F]): Unfoldable[F]                   = F
 }
