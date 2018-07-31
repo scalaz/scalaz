@@ -85,6 +85,11 @@ object IStream {
     case h #:: t  => Lazy.cons(h, fromStream(t))
   }
 
+  def fromMaybe[A](ma: Maybe[A]): IStream[A] = ma match {
+    case Maybe.Just(a) => Strict(a)
+    case Maybe.Empty() => empty[A]
+  }
+
   def fromFoldable[F[_]: Foldable, A](fa: F[A]): IStream[A] =
     Foldable[F].foldRight(fa, empty[A])((h, t) => Lazy.cons(h, t))
 
