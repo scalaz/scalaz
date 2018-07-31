@@ -7,7 +7,7 @@ import data.Void
 import java.lang.Double.doubleToRawLongBits
 import java.lang.Float.floatToRawIntBits
 import scala.collection.immutable.Set
-import scala.{Either, Left, List, None, Option, Right, Some, Tuple1, Vector}
+import scala.{ Either, Left, List, None, Option, Right, Some, Tuple1, Vector }
 
 import scala.language.experimental.macros
 
@@ -86,7 +86,7 @@ object EqClass {
   implicit val floatEq: Eq[Float]     = instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
   implicit val byteEq: Eq[Byte]       = Eq.fromEquals[Byte]
   implicit val booleanEq: Eq[Boolean] = Eq.fromEquals[Boolean]
-  implicit val doubleEq: Eq[Double]   =
+  implicit val doubleEq: Eq[Double] =
     instanceOf(new EqClass[Double] {
       def equal(a: Double, b: Double) = (a, b) match {
         case (NegZero, PosZero) => true
@@ -106,8 +106,8 @@ trait EqSyntax {
 }
 
 object Eq {
-  def always[A]: Eq[A] = instanceOf[EqClass[A]]((_, _) => true)
-  def never[A]: Eq[A] = instanceOf[EqClass[A]]((_, _) => false)
-  def fromEquals[A]: Eq[A] = instanceOf[EqClass[A]](_ == _)
+  def always[A]: Eq[A]                   = instanceOf[EqClass[A]]((_, _) => true)
+  def never[A]: Eq[A]                    = instanceOf[EqClass[A]]((_, _) => false)
+  def fromEquals[A]: Eq[A]               = instanceOf[EqClass[A]](_ == _)
   def apply[A](implicit P: Eq[A]): Eq[A] = P
 }

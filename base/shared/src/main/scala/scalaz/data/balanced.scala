@@ -5,7 +5,7 @@ import scala.AnyVal
 
 import Predef._
 import AList.aListOps
-import tc.{instanceOf, Semicategory, SemicategoryClass}
+import tc.{ instanceOf, Semicategory, SemicategoryClass }
 
 /**
  * Binary counter-like accumulator for type-aligned binary type constructors,

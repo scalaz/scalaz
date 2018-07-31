@@ -4,8 +4,8 @@ package data
 import scala.Nothing
 
 import Predef._
-import prop.{Is, ===}
-import tc.{Debug, DebugClass}
+import prop.{ ===, Is }
+import tc.{ Debug, DebugClass }
 
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.

@@ -38,8 +38,7 @@ object StrongClass {
       def second[A, B, C](pab: A => B): ((C, A)) => (C, B) = {
         case (c, a) => (c, pab(a))
       }
-    }
-  )
+    })
 }
 
 trait StrongSyntax {

@@ -52,14 +52,16 @@ object KleisliModule {
     })
 
   implicit def kleisliStrong[M[_], A, B](implicit M: Functor[M]): Strong[Kleisli[M, ?, ?]] =
-    instanceOf(new StrongClass[Kleisli[M, ?, ?]] with StrongClass.DeriveSecond[Kleisli[M, ?, ?]]
+    instanceOf(
+      new StrongClass[Kleisli[M, ?, ?]] with StrongClass.DeriveSecond[Kleisli[M, ?, ?]]
       with ProfunctorClass.DeriveLRMap[Kleisli[M, ?, ?]] {
         override def first[A, B, C](pab: Kleisli[M, A, B]): Kleisli[M, (A, C), (B, C)] =
           Kleisli.first(pab)
 
         override def dimap[A, B, C, D](fab: Kleisli[M, A, B])(ca: C => A)(bd: B => D): Kleisli[M, C, D] =
           wrapKleisli(c => M.map(runKleisli(fab)(ca(c)))(bd))
-    })
+      }
+    )
 }
 
 private[data] object KleisliImpl extends KleisliModule {

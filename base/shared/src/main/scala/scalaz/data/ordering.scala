@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scala.{Product, Serializable}
+import scala.{ Product, Serializable }
 
 sealed abstract class Ordering extends Product with Serializable
 final case object LT           extends Ordering

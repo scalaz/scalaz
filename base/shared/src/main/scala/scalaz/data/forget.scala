@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import tc.{instanceOf, Strong, StrongClass}
+import tc.{ instanceOf, Strong, StrongClass }
 
 final case class Forget[A, B, C](forget: B => A) {
   def retag[D]: Forget[A, B, D] = this.asInstanceOf[Forget[A, B, D]]

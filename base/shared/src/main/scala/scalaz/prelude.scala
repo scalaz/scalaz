@@ -1,7 +1,7 @@
 package scalaz
 
 trait BaseDataAliases {
-  type Id[X]     = X
+  type Id[X] = X
 }
 
 trait AllFunctions
@@ -42,8 +42,6 @@ trait AllSyntax
     with tc.SemigroupSyntax
     with tc.DebugSyntax
 
-trait LowPriority
-    extends BaseHierarchy
-    with BaseDataAliases
+trait LowPriority extends BaseHierarchy with BaseDataAliases
 
 object Scalaz extends LowPriority with AllFunctions with AllSyntax

@@ -44,7 +44,7 @@ object TraversableClass {
       override def toList[A](xs: List[A]): List[A] = xs
 
       override def map[A, B](fa: List[A])(f: A => B) = fa.map(f)
-  })
+    })
 
   implicit def tuple2Traversable[C]: Traversable[Tuple2[C, ?]] =
     instanceOf(new TraversableClass.DeriveSequence[Tuple2[C, ?]] with FoldableClass.DeriveFoldMap[Tuple2[C, ?]] {

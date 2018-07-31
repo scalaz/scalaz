@@ -5,7 +5,7 @@ import scala.{ AnyVal, Nothing }
 
 import Predef._
 import prop._
-import tc.{Debug, DebugClass}
+import tc.{ Debug, DebugClass }
 
 /**
  * Isomorphic to `AMaybe[λ[(α, β) => APair[F[α, ?], G[?, β]]], A, B]`,

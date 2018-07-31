@@ -1,7 +1,7 @@
 package scalaz
 package tc
 
-import scala.{Either, Left, Right, Tuple2}
+import scala.{ Either, Left, Right, Tuple2 }
 
 import scala.language.experimental.macros
 

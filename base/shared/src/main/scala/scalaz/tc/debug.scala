@@ -97,7 +97,7 @@ object DebugClass {
       }) :+ "]"
     }
   })
- */
+   */
 
   implicit final def contravariantDebug: Contravariant[DebugClass] =
     instanceOf(new ContravariantClass[DebugClass] {
@@ -110,7 +110,7 @@ object DebugClass {
 }
 
 object Debug {
-  def fromToString[A]: Debug[A] = DebugClass.instance[A](a => Cord(a.toString))
+  def fromToString[A]: Debug[A]                = DebugClass.instance[A](a => Cord(a.toString))
   def apply[A](implicit A: Debug[A]): Debug[A] = A
 }
 

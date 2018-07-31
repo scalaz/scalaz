@@ -3,7 +3,7 @@ package data
 
 import scala.AnyVal
 
-import tc.{instanceOf, Functor, Profunctor, ProfunctorClass}
+import tc.{ instanceOf, Functor, Profunctor, ProfunctorClass }
 
 final case class DownStar[F[_], A, B](run: F[A] => B) extends AnyVal
 
