@@ -161,6 +161,10 @@ sealed abstract class ReducerInstances {
   implicit def NonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
     unitConsReducer(NonEmptyList.nel(_, INil()),  _ <:: _)
   }
+  
+  def ReverseNonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
+    reducer(NonEmptyList.nel(_, INil()), (c, cs) => NonEmptyList.nel(cs.head, cs.tail :+ c), (cs, c) => c <:: cs)
+  }
 
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
@@ -168,7 +172,7 @@ sealed abstract class ReducerInstances {
     import Stream._
     unitLazyConsReducer(cons(_, empty): Stream[C], cons(_, _))
   }
-
+  
   /** Ignore `C`s. */
   implicit def UnitReducer[C]: Reducer[C, Unit] = {
     import std.anyVal._
