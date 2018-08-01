@@ -96,7 +96,7 @@ object TraverseTest extends SpecLite {
   "ephemeralstream" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromStream(Stream.from(0)) traverse { x =>      
+      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromStream(Stream.from(0)) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
@@ -109,7 +109,7 @@ object TraverseTest extends SpecLite {
     "be stack-safe and short-circuiting" in {
       val N = 10000
       val fa = NonEmptyList.nel(0, IList.fromList(List.range(1, N)))
-      val s: Maybe[NonEmptyList[Int]] = Traverse1[NonEmptyList].traverse1 (fa) ({ x =>      
+      val s: Maybe[NonEmptyList[Int]] = Traverse1[NonEmptyList].traverse1 (fa) ({ x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")

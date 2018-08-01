@@ -123,7 +123,7 @@ package object scalaz {
 
   type ReaderT[E, F[_], A] = Kleisli[F, E, A]
   type =?>[E, A] = Kleisli[Option, E, A]
-  
+
   /** @template */
   type Reader[E, A] = ReaderT[E, Id, A]
 
@@ -154,7 +154,7 @@ package object scalaz {
 
   /** @template */
   type IndexedState[-S1, S2, A] = IndexedStateT[S1, S2, Id, A]
-  
+
   /** A state transition, representing a function `S => (S, A)`.
     *
     * @template
@@ -326,7 +326,7 @@ package object scalaz {
   object IndexedContT extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[R, O, M, A] = IndexedContsT[Id, R, O, M, A](f)
   }
-  
+
   /** @template */
   type IndexedCont[R, O, A] = IndexedContT[R, O, Id, A]
   object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
