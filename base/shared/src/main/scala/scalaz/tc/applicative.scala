@@ -21,7 +21,7 @@ object ApplicativeClass {
     instanceOf(new ApplicativeClass[Fiber[E, ?]] {
       def pure[A](a: A): Fiber[E, A] = new Fiber[E, A] {
         def join: IO[E, A]                             = IO.point(a)
-        def interrupt(t: Throwable): IO[Nothing, Unit] = IO.now(())
+        def interrupt(t: Throwable): IO[Nothing, Unit] = IO.unit
       }
 
       def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] = new Fiber[E, B] {
