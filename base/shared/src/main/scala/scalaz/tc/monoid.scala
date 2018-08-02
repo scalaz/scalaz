@@ -4,7 +4,7 @@ package tc
 import Predef._
 
 import java.lang.Throwable
-import scala.{List, Nothing}
+import scala.{ List, Nothing }
 
 import zio.{ Fiber, IO }
 

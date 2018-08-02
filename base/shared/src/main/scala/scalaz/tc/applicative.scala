@@ -3,7 +3,7 @@ package tc
 
 import java.lang.Throwable
 import scala.language.experimental.macros
-import scala.{Nothing, Unit}
+import scala.{ Nothing, Unit }
 
 import zio.{ Fiber, IO }
 
@@ -25,7 +25,7 @@ object ApplicativeClass {
       }
 
       def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] = new Fiber[E, B] {
-        def join: IO[E, B] = fa.join.flatMap(a => f.join.map(f => f(a)))
+        def join: IO[E, B]                             = fa.join.flatMap(a => f.join.map(f => f(a)))
         def interrupt(t: Throwable): IO[Nothing, Unit] = fa.interrupt(t) *> f.interrupt(t)
       }
 
