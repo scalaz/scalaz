@@ -4,7 +4,7 @@ package tc
 import Predef._
 
 import java.lang.Throwable
-import scala.List
+import scala.{List, Nothing}
 
 import zio.{ Fiber, IO }
 
@@ -33,8 +33,8 @@ object MonoidClass {
     instanceOf(new MonoidClass[Fiber[E, A]] {
       def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1.zipWith(a2)(A.mappend(_, _))
       def mempty = new Fiber[E, A] {
-        def join: IO[E, A]                            = IO.now(A.mempty)
-        def interrupt[E2](t: Throwable): IO[E2, Unit] = IO.unit[E2]
+        def join: IO[E, A]                             = IO.now(A.mempty)
+        def interrupt(t: Throwable): IO[Nothing, Unit] = IO.now(())
       }
     })
 }
