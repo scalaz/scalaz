@@ -3,7 +3,7 @@ package scalaz
 import scala.{ AnyRef, AnyVal, Either }
 
 import Predef._
-import prop.{<~<, IsCovariant}
+import prop.{ <~<, IsCovariant }
 import Scalaz._
 
 class AsSyntaxTest {
