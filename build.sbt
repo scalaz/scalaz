@@ -102,3 +102,10 @@ lazy val microsite = project.module
       "white-color"     -> "#FFFFFF"
     )
   )
+
+lazy val tests = project.module
+  .dependsOn(baseJVM)
+  .settings(libraryDependencies ++= Seq(
+    "org.scalaz" %% "testz-core" % "0.0.3",
+    "org.scalaz" %% "testz-stdlib" % "0.0.3"))
+
