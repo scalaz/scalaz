@@ -1,6 +1,7 @@
 package scalaz
 
 import Predef._
+import data.IList
 import Scalaz._
 
 object DebugInterpolatorTest {
