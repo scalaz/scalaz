@@ -105,4 +105,3 @@ lazy val microsite = project.module
 
 lazy val laws = project.module
   .dependsOn(baseJVM)
-
