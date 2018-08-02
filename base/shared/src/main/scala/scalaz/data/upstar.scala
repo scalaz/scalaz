@@ -3,11 +3,11 @@ package data
 
 import scala.AnyVal
 
-import scalaz.ct.ProfunctorClass
+import tc.{ instanceOf, Functor, Profunctor, ProfunctorClass }
 
 final case class UpStar[F[_], A, B](run: A => F[B]) extends AnyVal
 
-trait UpStarInstances {
+object UpStar {
   implicit def upstarProfunctor[F[_]](implicit F: Functor[F]): Profunctor[UpStar[F, ?, ?]] =
     instanceOf(new ProfunctorClass[UpStar[F, ?, ?]] {
       override def lmap[A, B, C](fab: UpStar[F, A, B])(ca: C => A): UpStar[F, C, B] =

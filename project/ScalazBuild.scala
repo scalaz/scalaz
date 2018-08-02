@@ -33,7 +33,8 @@ object Scalaz {
     "-Ywarn-value-discard",
     "-opt:l:inline",
     "-opt-inline-from:<source>",
-    "-Yno-imports"
+    "-Yno-imports",
+    "-Yno-predef"
   )
 
   def stdSettings(prjName: String) =

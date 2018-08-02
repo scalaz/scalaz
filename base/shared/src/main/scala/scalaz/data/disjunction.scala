@@ -3,9 +3,11 @@ package data
 
 import scala.{ inline, Either }
 
-import core.EqClass
-import ct._
-import debug.DebugClass
+import Predef._
+import tc._
+
+final case class -\/[L, R](value: L) extends (L Disjunction R)
+final case class \/-[L, R](value: R) extends (L Disjunction R)
 
 sealed trait Disjunction[L, R] {
   final def fold[A](la: L => A, ra: R => A): A = this match {
@@ -14,30 +16,12 @@ sealed trait Disjunction[L, R] {
   }
 }
 
-object Disjunction extends DisjunctionInstances with DisjunctionFunctions {
+object Disjunction extends DisjunctionFunctions {
   object Syntax extends DisjunctionSyntax
-
-  type \/[L, R] = Disjunction[L, R]
-
-  case class -\/[L, R](value: L) extends (L \/ R)
-  case class \/-[L, R](value: R) extends (L \/ R)
-
   def swap[L, R](ab: L \/ R): R \/ L = ab.fold(\/-(_), -\/(_))
 
   def fromEither[L, R](ab: Either[L, R]): L \/ R = ab.fold(-\/(_), \/-(_))
-}
 
-trait DisjunctionFunctions {
-  @inline def left[L, R](value: L): Disjunction[L, R]  = -\/(value)
-  @inline def right[L, R](value: R): Disjunction[L, R] = \/-(value)
-
-  def either[A, B, C](ac: A => C)(bc: B => C): A \/ B => C = _ match {
-    case -\/(l) => ac(l)
-    case \/-(r) => bc(r)
-  }
-}
-
-trait DisjunctionInstances {
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
     instanceOf(new MonadClass[L \/ ?] with BindClass.DeriveFlatten[L \/ ?] {
 
@@ -62,8 +46,8 @@ trait DisjunctionInstances {
     }
   }
 
-  implicit val disjunctionBifunctor: Bifunctor[Disjunction] =
-    instanceOf(new BifunctorClass[Disjunction] with BifunctorClass.DeriveLmapRmap[Disjunction] {
+  implicit val disjunctionBifunctor: Bifunctor[\/] =
+    instanceOf(new BifunctorClass[\/] with BifunctorClass.DeriveLmapRmap[\/] {
       def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
         case -\/(a) => -\/(as(a))
         case \/-(b) => \/-(bt(b))
@@ -78,6 +62,16 @@ trait DisjunctionInstances {
     }
 }
 
+trait DisjunctionFunctions {
+  @inline def left[L, R](value: L): \/[L, R]  = -\/(value)
+  @inline def right[L, R](value: R): \/[L, R] = \/-(value)
+
+  def either[A, B, C](ac: A => C)(bc: B => C): A \/ B => C = _ match {
+    case -\/(l) => ac(l)
+    case \/-(r) => bc(r)
+  }
+}
+
 trait DisjunctionSyntax {
   implicit final class ToDisjunctionOps[A](a: A) {
     def left[B]: A \/ B  = -\/(a)
@@ -85,6 +79,6 @@ trait DisjunctionSyntax {
   }
 
   implicit final class EitherAsDisjunction[A, B](ab: Either[A, B]) {
-    def asDisjunction: A \/ B = Disjunction.fromEither(ab)
+    def asDisjunction: A \/ B = \/.fromEither(ab)
   }
 }

@@ -1,7 +1,7 @@
 package scalaz
 package data
 
-import scalaz.types.As
+import prop._
 
 trait FixModule {
   type Fix[F[_]]

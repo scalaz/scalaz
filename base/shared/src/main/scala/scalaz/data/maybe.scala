@@ -3,9 +3,9 @@ package data
 
 import scala.{ List, None, Option, Some }
 
-import scalaz.core.EqClass
-import scalaz.ct._
-import scalaz.debug.DebugClass
+import Predef._
+import prop.IsCovariant
+import tc._
 
 sealed trait MaybeModule {
   type Maybe[A]
@@ -54,7 +54,7 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   def fromOption[A](oa: Option[A]): Maybe[A] = oa
   def toOption[A](ma: Maybe[A]): Option[A]   = ma
 
-  def isCovariant: IsCovariant[Maybe] = Scalaz.scalaCovariant[Option]
+  def isCovariant: IsCovariant[Maybe] = IsCovariant.scalaCovariant[Option]
   def monad: Monad[Maybe]             = instanceOf(instance)
   def traversable: Traversable[Maybe] = instanceOf(instance)
 

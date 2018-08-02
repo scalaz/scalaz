@@ -21,5 +21,10 @@ The following types are considered primitives:
 - String
 - Unit
 
-For additional support of standard library classes, an additional module `scalaz-std` is available.
-Support for `List`, `Set`, `Option` and more have been added. For more information, consult the subpages to this document.
+It also includes instances for the standard library types:
+- Either
+- List
+- Option
+- Set
+- Tuple
+- Vector

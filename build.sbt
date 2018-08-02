@@ -28,7 +28,7 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, metaJVM, metaJS, stdJVM, stdJS, microsite, benchmarks)
+  .aggregate(baseJVM, baseJS, metaJVM, metaJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
 resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -65,15 +65,8 @@ lazy val metaJVM = meta.jvm
 
 lazy val metaJS = meta.js
 
-lazy val std = crossProject.module
-  .in(file("std"))
-  .dependsOn(base)
-
-lazy val stdJVM = std.jvm
-lazy val stdJS  = std.js
-
 lazy val microsite = project.module
-  .dependsOn(baseJVM, stdJVM)
+  .dependsOn(baseJVM)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),

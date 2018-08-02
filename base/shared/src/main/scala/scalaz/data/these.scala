@@ -3,10 +3,8 @@ package data
 
 import scala.inline
 
-import algebra.SemigroupClass
-import core.EqClass
-import ct._
-import debug.DebugClass
+import Predef._
+import tc._
 
 sealed abstract class These[L, R] {
 
@@ -112,7 +110,7 @@ sealed abstract class These[L, R] {
   }
 
   /* Semigroup */
-  final def append(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] = other match {
+  final def mappend(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] = other match {
     case This(left)        => lappend(left)
     case That(right)       => rappend(right)
     case Both(left, right) => lappend(left).rappend(right)
@@ -154,7 +152,7 @@ object Both {
   @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
 }
 
-trait TheseInstances {
+object These {
   implicit def bifunctor: Bifunctor[These] =
     instanceOf(new BifunctorClass[These] {
       def bimap[A, B, S, T](fab: These[A, B])(as: A => S, bt: B => T) = fab.bimap(as)(bt)
@@ -185,7 +183,7 @@ trait TheseInstances {
 
   implicit final def theseSemigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =
     instanceOf[SemigroupClass[These[L, R]]](
-      _.append(_)
+      _.mappend(_)
     )
 
   implicit final def theseDebug[L, R](implicit L: Debug[L], R: Debug[R]): Debug[These[L, R]] = {

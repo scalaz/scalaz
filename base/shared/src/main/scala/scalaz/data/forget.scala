@@ -1,13 +1,13 @@
 package scalaz
 package data
 
-import ct.StrongClass
+import tc.{ instanceOf, Strong, StrongClass }
 
 final case class Forget[A, B, C](forget: B => A) {
   def retag[D]: Forget[A, B, D] = this.asInstanceOf[Forget[A, B, D]]
 }
 
-trait ForgetInstances { self =>
+object Forget {
   implicit def strong[A]: Strong[Forget[A, ?, ?]] =
     instanceOf(new StrongClass[Forget[A, ?, ?]] {
       override def dimap[B, C, D, E](fbc: Forget[A, B, C])(fdb: D => B)(fce: C => E): Forget[A, D, E] =

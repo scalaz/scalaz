@@ -12,6 +12,7 @@ It is often used when dealing with errors, but is not tied to that case.
 **Typical imports**
 
 ```tut:silent
+import scalaz.data._
 import scalaz.Scalaz._
 ```
 
@@ -25,6 +26,7 @@ val r: Long \/ Int = 42.right
 # Pattern matching
 
 ```tut
+import scala.Predef.println
 l match {
   case -\/(left) => println(left)
   case \/-(right) => println(right)

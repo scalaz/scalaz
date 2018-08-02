@@ -3,8 +3,9 @@ package data
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
-import scala.{ Array, List, Nil, Predef }
-import Predef.{ wrapString, String }
+import scala.{ Array, List, Nil }
+import scala.Predef.{ wrapString, String }
+import scalaz.Predef._
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))

@@ -1,7 +1,5 @@
 ---
 layout: docs
-position: 2
-section: typeclass
 title:  "Type classes"
 ---
 
@@ -12,7 +10,7 @@ This is achieved by adding constraints to type variables in parametrically polym
 
 Type class instances allow us to add behaviour to types without changing the types themselves.
 
-As an example, let us look at the [Debug](./Debug.html) type class, a safe alternative to the JVM's `Object.toString`.
+As an example, let us look at the [Debug](./tc.html) type class, a safe alternative to the JVM's `Object.toString`.
 It defines that all its instances implement a method `debug` with the following signature:
 
 ```tut:silent
@@ -60,7 +58,7 @@ Luckily, most of this ships in Scalaz by default.
 ```tut:reset
 import scalaz.Scalaz._
 import scalaz.data.Cord
-import scalaz.debug.DebugClass
+import scalaz.tc.{Debug, DebugClass}
 
 final case class BusinessObject(id: Long, value: Long)
 

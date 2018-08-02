@@ -3,10 +3,8 @@ package data
 
 import scala.{ List, Nil }
 
-import scalaz.algebra._
-import scalaz.core.EqClass
-import scalaz.ct._
-import scalaz.debug.DebugClass
+import Predef._
+import tc._
 
 sealed abstract class ConstModule {
   type Const[A, B]

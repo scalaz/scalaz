@@ -3,9 +3,9 @@ package data
 
 import scala.{ sys, AnyVal, Nothing }
 
-import scalaz.core.EqClass
-import scalaz.ct.BifunctorClass
-import scalaz.debug.DebugClass
+import Predef._
+import prop._
+import tc._
 
 sealed trait Maybe2Module {
 
@@ -48,8 +48,8 @@ private[data] object Maybe2Impl extends Maybe2Module {
   def just2[A, B](a: A, b: B): Maybe2[A, B] = Maybe2Impl.fromOption2(Some2(a, b))
   def empty2[A, B]: Maybe2[A, B]            = None2
 
-  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = Scalaz.scalaCovariant[Option2[+?, B]]
-  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = Scalaz.scalaCovariant[Option2[A, +?]]
+  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
+  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
 
   implicit def debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[Maybe2[A, B]] = {
     import Scalaz.debugInterpolator
@@ -66,7 +66,7 @@ private[data] object Maybe2Impl extends Maybe2Module {
       case _                              => false
     }
 
-  implicit def bifunctor: scalaz.Bifunctor[Maybe2] =
+  implicit def bifunctor: Bifunctor[Maybe2] =
     instanceOf(new BifunctorClass[Maybe2] with BifunctorClass.DeriveLmapRmap[Maybe2] {
       def bimap[A, B, S, T](fab: Maybe2[A, B])(as: A => S, bt: B => T): Maybe2[S, T] =
         fab match {

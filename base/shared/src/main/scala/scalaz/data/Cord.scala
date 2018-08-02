@@ -5,8 +5,8 @@ import java.lang.Math
 import scala.{ AnyRef, Array, Char, Null }
 import scala.Predef.{ classOf, String }
 
-import algebra.MonoidClass
-import debug.DebugClass
+import Predef._
+import tc.{ instanceOf, Debug, DebugClass, Monoid, MonoidClass }
 
 trait CordModule {
   type Cord >: Null <: AnyRef

@@ -4,15 +4,14 @@ section: std
 title:  "Tuple"
 ---
 
-# Tuple [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/std/shared/src/main/scala/tuple.scala)
+# Tuple [![GitHub](../img/github.png)]
 
-Scalaz provides instances for Scala's built-in `Tuple` variants ([Tuple2](https://www.scala-lang.org/api/current/scala/Tuple2.html) through [Tuple22](https://www.scala-lang.org/api/current/scala/Tuple22.html)) such as [Monad](../ct/Monad.html) and [Eq](../core/Eq.html).
+Scalaz provides instances for Scala's built-in `Tuple` variants ([Tuple2](https://www.scala-lang.org/api/current/scala/Tuple2.html) through [Tuple22](https://www.scala-lang.org/api/current/scala/Tuple22.html)) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 
 **Typical imports**
 
 ```tut:silent
 import scalaz.Scalaz._
-import scalaz.std._
 ```
 
 ## Use the type class instances

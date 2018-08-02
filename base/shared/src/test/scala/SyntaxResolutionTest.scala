@@ -3,7 +3,8 @@ package scalaz
 import scala.List
 import scala.Nothing
 
-import Scalaz._
+import Predef._
+import data._, prop._, tc._, Scalaz._
 
 /* Tests that the various syntax macros work for the typeclasses which use them. */
 object SyntaxResolutionTest {
