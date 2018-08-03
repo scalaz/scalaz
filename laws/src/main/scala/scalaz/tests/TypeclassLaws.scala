@@ -149,6 +149,19 @@ object MonadLaws {
     assert(in, F.flatMap(in)(F.pure))
 }
 
+object CobindLaws {
+
+}
+
+object ComonadLaws {
+
+}
+
+object TraverseLaws {
+  @inline
+  def traverse
+}
+
 object SemicategoryLaws {
   @inline
   def composeAssoc[F[_, _], A, B, C, D, T](fst: F[C, D], snd: F[B, C], thd: F[A, B])(
