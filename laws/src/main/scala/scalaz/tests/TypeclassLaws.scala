@@ -1,5 +1,5 @@
 package scalaz
-package tests
+package laws
 
 import scala.{ inline, Boolean }
 import scala.Predef.identity
