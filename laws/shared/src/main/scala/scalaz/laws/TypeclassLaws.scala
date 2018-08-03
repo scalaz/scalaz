@@ -57,21 +57,19 @@ object StrongLaws {
   // assoc ((a,b),c) = (a,(b,c))
   // unassoc (a,(b,c)) = ((a,b),c)
   @inline
-  def firstAssoc[P[_, _], A, B, C, T]
-    (in: P[A, A])
-    (assert: (P[((A, B), C), ((A, B), C)], P[((A, B), C), ((A, B), C)]) => T)
-    (implicit P: Strong[P]): T = {
+  def firstAssoc[P[_, _], A, B, C, T](
+    in: P[A, A]
+  )(assert: (P[((A, B), C), ((A, B), C)], P[((A, B), C), ((A, B), C)]) => T)(implicit P: Strong[P]): T =
     assert(
       P.first(P.first(in)),
       P.dimap[(A, (B, C)), (A, (B, C)), ((A, B), C), ((A, B), C)](
         P.first(in)
-      ){
+      ) {
         case ((a, b), c) => (a, (b, c))
       } {
         case (a, (b, c)) => ((a, b), c)
       }
     )
-  }
 }
 
 object ChoiceLaws {
@@ -88,15 +86,14 @@ object ChoiceLaws {
   // unassocE (Right (Left b) = Left (Right b)
   // unassocE (Right (Right c)) = Right c)
   @inline
-  def leftAssoc[P[_, _], A, B, C, T]
-    (in: P[A, A])
-    (assert: (P[(A \/ B) \/ C, (A \/ B) \/ C], P[(A \/ B) \/ C, (A \/ B) \/ C]) => T)
-    (implicit P: Choice[P]): T = {
+  def leftAssoc[P[_, _], A, B, C, T](
+    in: P[A, A]
+  )(assert: (P[(A \/ B) \/ C, (A \/ B) \/ C], P[(A \/ B) \/ C, (A \/ B) \/ C]) => T)(implicit P: Choice[P]): T =
     assert(
       P.leftchoice(P.leftchoice(in)),
       P.dimap[A \/ (B \/ C), A \/ (B \/ C), (A \/ B) \/ C, (A \/ B) \/ C](
         P.leftchoice(in)
-      ){
+      ) {
         case -\/(-\/(a)) => -\/(a)
         case -\/(\/-(b)) => \/-(-\/(b))
         case \/-(c)      => \/-(\/-(c))
@@ -106,7 +103,6 @@ object ChoiceLaws {
         case \/-(\/-(b)) => \/-(b)
       }
     )
-  }
 }
 
 object ApplyLaws {
