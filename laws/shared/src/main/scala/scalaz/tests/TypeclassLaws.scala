@@ -150,16 +150,31 @@ object MonadLaws {
 }
 
 object CobindLaws {
-
+  @inline
+  def cobindAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A] => B,
+                                              snd: F[B] => C)(assert: (F[C], F[C]) => T)(implicit F: Cobind[F]): T = {
+    import F.cobind
+    assert(
+      cobind(cobind(in)(fst))(snd),
+      cobind(in)((b: F[A]) => snd(cobind(b)(fst)))
+    )
+  }
 }
 
 object ComonadLaws {
-
+  @inline
+  def cobindIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Comonad[F]): T = {
+    import F.{cobind, copoint}
+    assert(
+      in,
+      cobind(in)(copoint)
+    )
+  }
 }
 
 object TraverseLaws {
-  @inline
-  def traverse
+  // @inline
+  // def traverse
 }
 
 object SemicategoryLaws {

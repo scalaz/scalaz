@@ -4,13 +4,13 @@ package laws
 import tc._
 
 object HomomorphismLaws {
-  // To be a monoid homomorphism, a function must satisfy both `monoidZero`
+  // To be a monoid homomorphism, a function must satisfy both `monoidIdentity`
   // and `semigroupAppend`.
-  def monoidZero[A, B, T]
+  def monoidIdentity[A, B, T]
     (f: A => B)
     (assert: (B, B) => T)
     (implicit A: Monoid[A], B: Monoid[B]): T = {
-    assert(f(A.mzero), B.mzero),
+    assert(f(A.mempty), B.mempty)
   }
 
   def semigroupAppend[A, B, T]
@@ -30,15 +30,15 @@ object HomomorphismLaws {
   // and profunctor homomorphisms.
 
 
-  def applyAp
-  def applicativeIdentity
-  def bindFlatMap
-  def monadIdentity
-  def cobindCoflatMap
-  def comonadIdentity
-  def categoryIdentity
-  def semicategoryCompose
-  def strongFirst
-  def choiceLeft
+  // def applyAp
+  // def applicativeIdentity
+  // def bindFlatMap
+  // def monadIdentity
+  // def cobindCoflatMap
+  // def comonadIdentity
+  // def categoryIdentity
+  // def semicategoryCompose
+  // def strongFirst
+  // def choiceLeft
 
 }
