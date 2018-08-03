@@ -6,20 +6,12 @@ import tc._
 object HomomorphismLaws {
   // To be a monoid homomorphism, a function must satisfy both `monoidIdentity`
   // and `semigroupAppend`.
-  def monoidIdentity[A, B, T]
-    (f: A => B)
-    (assert: (B, B) => T)
-    (implicit A: Monoid[A], B: Monoid[B]): T = {
+  def monoidIdentity[A, B, T](f: A => B)(assert: (B, B) => T)(implicit A: Monoid[A], B: Monoid[B]): T =
     assert(f(A.mempty), B.mempty)
-  }
 
-  def semigroupAppend[A, B, T]
-    (fst: A, snd: A)
-    (f: A => B)
-    (assert: (B, B) => T)
-    (implicit A: Semigroup[A], B: Semigroup[B]): T = {
+  def semigroupAppend[A, B, T](fst: A, snd: A)(f: A => B)(assert: (B, B) => T)(implicit A: Semigroup[A],
+                                                                               B: Semigroup[B]): T =
     assert(B.mappend(f(fst), f(snd)), f(A.mappend(fst, snd)))
-  }
 
   // all natural transformations are Functor homomorphisms,
   // Contravariant homomorphisms,
@@ -28,8 +20,6 @@ object HomomorphismLaws {
 
   // all binatural transformations are Bifunctor homomorphisms
   // and profunctor homomorphisms.
-
-
   // def applyAp
   // def applicativeIdentity
   // def bindFlatMap
