@@ -22,7 +22,6 @@ object Scalaz {
     "-opt-warnings",
     "-Xlint:_,-type-parameter-shadow",
     "-Xsource:2.13",
-    "-Ywarn-dead-code",
     "-Ywarn-extra-implicit",
     "-Ywarn-inaccessible",
     "-Ywarn-infer-any",

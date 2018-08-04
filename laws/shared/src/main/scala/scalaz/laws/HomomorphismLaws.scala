@@ -1,6 +1,8 @@
 package scalaz
 package laws
 
+import scala.{Nothing, Unit}
+
 import data._, tc._, Scalaz._
 
 object HomomorphismLaws {
@@ -19,7 +21,7 @@ object HomomorphismLaws {
   // and Phantom homomorphisms.
 
   // all binatural transformations are Bifunctor homomorphisms
-  // and profunctor homomorphisms.
+  // and Profunctor homomorphisms.
 
   def applyAp[F[_], G[_], A, B, T](
     transform: F ~> G
@@ -80,26 +82,36 @@ object HomomorphismLaws {
     applicativeIdentity[F, G, A, T](transform)(in)(assert)
   }
 
-  // is there such thing as a comonad morphism made of a single natural transformation?
-  // the "contravariance" of F[A] => B is throwing me off.
-  // the code below doesn't type-check.
-  // def cobindCoflatMap[F[_], G[_], A, B, T](
-  //   transform: F ~> G
-  // )(
-  //   fa: F[A],
-  //   f: F[A] => B
-  // )(
-  //   assert: (G[B], G[B]) => T
-  // )(
-  //   implicit F: Cobind[F], G: Cobind[G]
-  // ): T = {
-  //   assert(
-  //     transform.of(F.cobind(fa)(f)),
-  //     G.cobind(transform.of(fa))(fa => f(fa))
-  //   )
-  // }
-  //
-  // def comonadIdentity
+  // the `G[A] => B` is odd, but it makes sense
+  // because like the `bindFlatMap` check,
+  // the `G[A] => B` is used to construct an
+  // `F[A] => G[B]`.
+  def cobindCoflatMap[F[_], G[_], A, B, T](
+    transform: F ~> G
+  )(
+    fa: F[A],
+    f: G[A] => B
+  )(
+    assert: (G[B], G[B]) => T
+  )(
+    implicit F: Cobind[F], G: Cobind[G]
+  ): T = {
+    assert(
+      transform.of(F.cobind(fa)(nfa => f(transform.of(nfa)))),
+      G.cobind(transform.of(fa))(f)
+    )
+  }
+
+  def comonadIdentity[F[_], G[_], A, T](
+    transform: F ~> G
+  )(
+    in: F[A]
+  )(
+    assert: (A, A) => T
+  )(
+    implicit F: Comonad[F], G: Comonad[G]
+  ): T =
+    assert(F.copoint(in), G.copoint(transform.of(in)))
 
   def semicategoryCompose[F[_, _], G[_, _], A, B, C, D, T](
     transform: F ~~> G
@@ -126,8 +138,54 @@ object HomomorphismLaws {
     assert(transform.of(F.id[A]), G.id[A])
   }
 
-  // def strongFirst
+  def strongFirst[F[_, _], G[_, _], A, B, C, T](
+    transform: F ~~> G
+  )(
+    in: F[A, B]
+  )(
+    assert: (G[A, B], G[A, B]) => T
+  )(
+    implicit F: Strong[F], G: Strong[G]
+  ): T = {
+    def elimUnit[A](tuple: (A, Unit)): A = tuple._1
+    def introUnit[A](a: A): (A, Unit) = (a, ())
+    assert(
+      transform.of(
+        F.dimap[(A, Unit), (B, Unit), A, B](
+          F.first(in)
+        ) { introUnit(_)
+        } { elimUnit(_) }
+      ),
+      G.dimap[(A, Unit), (B, Unit), A, B](
+        G.first(transform.of(in))
+      ) { introUnit(_)
+      } { elimUnit(_) }
+    )
+  }
 
-  // def choiceLeft
+  def choiceLeft[F[_, _], G[_, _], A, B, C, T](
+    transform: F ~~> G
+  )(
+    in: F[A, B]
+  )(
+    assert: (G[A, B], G[A, B]) => T
+  )(
+    implicit F: Choice[F], G: Choice[G]
+  ): T = {
+    def elimNothing[A](either: A \/ Nothing): A = either.fold(a => a, n => n)
+    def introNothing[A](a: A): A \/ Nothing = -\/(a)
+    assert(
+      transform.of(
+        F.dimap[A \/ Nothing, B \/ Nothing, A, B](
+          F.leftchoice(in)
+        ) { introNothing(_)
+        } { elimNothing(_) }
+      ),
+      G.dimap[A \/ Nothing, B \/ Nothing, A, B](
+        G.leftchoice(transform.of(in))
+      ) { introNothing(_)
+      } { elimNothing(_) }
+    )
+  }
 
 }
