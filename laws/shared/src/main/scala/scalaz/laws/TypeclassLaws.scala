@@ -113,8 +113,9 @@ object ComonadLaws {
 
 object TraverseLaws {
   @inline
-  def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](in: T[A])
-  (f: A => F[B], g: B => G[C])(assert: (F[G[T[C]]], F[G[T[C]]]) => Test): Test =
+  def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](
+    in: T[A]
+  )(f: A => F[B], g: B => G[C])(assert: (F[G[T[C]]], F[G[T[C]]]) => Test): Test =
     assert(
       in.traverse(f).map(_.traverse(g)),
       Compose.run(in.traverse(a => Compose(f(a).map(g))))
