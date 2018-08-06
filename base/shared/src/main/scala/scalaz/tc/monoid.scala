@@ -26,15 +26,15 @@ object MonoidClass {
   implicit def listMonoid[A]: Monoid[List[A]] =
     instanceOf(new MonoidClass[List[A]] {
       def mappend(a1: List[A], a2: => List[A]): List[A] = a1 ++ a2
-      def mempty                                        = List.empty
+      def mempty: List[Nothing]                         = List.empty
     })
 
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
     instanceOf(new MonoidClass[Fiber[E, A]] {
-      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]) = a1.zipWith(a2)(A.mappend(_, _))
-      def mempty = new Fiber[E, A] {
-        def join: IO[E, A]                             = IO.now(A.mempty)
-        def interrupt(t: Throwable): IO[Nothing, Unit] = IO.unit
+      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]): Fiber[E, A] = a1.zipWith(a2)(A.mappend(_, _))
+      def mempty: Fiber[E, A] = new Fiber[E, A] {
+        def join: IO[E, A]                                     = IO.now(A.mempty)
+        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = IO.unit
       }
     })
 }
