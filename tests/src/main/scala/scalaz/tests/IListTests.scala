@@ -3,12 +3,12 @@ package tests
 
 import scala.{ Int, List, Option }
 
-import data._, tc._, Scalaz._
+import data._, Scalaz._
 
 import laws._
 import laws.FunctorLaws.{Functor => FunctorLaws}
 
-import testz.{Harness, Result, assert}
+import testz.{Harness, assert}
 
 import z._
 
@@ -21,9 +21,6 @@ final class IListTests {
 
   def cross[A, B](l1: List[A], l2: List[B]): List[(A, B)] =
     l1.flatMap(a1 => l2.map(a2 => (a1, a2)))
-
-  def assertEqual[A: Eq](a1: A, a2: A): Result =
-    assert(a1 === a2)
 
   def tests[T](harness: Harness[T]): T = {
     import harness._
@@ -39,7 +36,7 @@ final class IListTests {
             case (l1, l2) =>
               EqLaws.identity(l1, l2)(_.foldRight(0)(_ + _))(
                 (equal, leftSum, rightSum) =>
-                  assert(equal == (leftSum == rightSum))
+                  assertEqual(equal, (leftSum == rightSum))
               )
           }
         }
