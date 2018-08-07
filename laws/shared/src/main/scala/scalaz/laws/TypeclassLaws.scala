@@ -111,7 +111,7 @@ object ComonadLaws {
     assert(in, F.cobind(in)(F.copoint))
 }
 
-object TraverseLaws {
+object TraversableLaws {
   @inline
   def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](
     in: T[A]
