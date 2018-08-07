@@ -113,5 +113,6 @@ lazy val lawsJS = laws.js
 lazy val tests = project.module
   .dependsOn(baseJVM, lawsJVM)
   .settings(
-    libraryDependencies += "org.scalaz" %% "testz-stdlib" % "0.0.3"
+    libraryDependencies += "org.scalaz" %% "testz-stdlib" % "0.0.3",
+    libraryDependencies += "org.scalaz" %% "testz-runner" % "0.0.3"
   )
