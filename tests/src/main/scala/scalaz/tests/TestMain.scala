@@ -10,7 +10,7 @@ import java.lang.String
 import testz._
 import testz.runner.Runner
 
-object Main {
+object TestMain {
   def main(args: Array[String]): Unit = {
     val harness: Harness[PureHarness.Uses[Unit]] =
       PureHarness.toHarness(

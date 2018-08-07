@@ -1,7 +1,7 @@
 package scalaz
 package tests
 
-import scala.{ Int, List }
+import scala.{ Int, List, Option }
 
 import data._, tc._, Scalaz._
 
@@ -59,6 +59,58 @@ final class IListTests {
               ApplyLaws.applyAssoc(i)(a, m)(
                 assertEqual[IList[Int]]
               )
+          }
+        },
+        test("applicative identity") { () =>
+          lists.foldMap {
+            ApplicativeLaws.applyIdentity(_)(assertEqual[IList[Int]])
+          }
+        },
+        test("bind associativity") { () =>
+          // non-overlapping
+          val fst = (a: Int) => IList(a + 10, a + 20, a + 30)
+          val snd = (a: Int) => IList(a + 100, a + 200, a + 300)
+
+          lists.foldMap {
+            BindLaws.bindAssoc(_)(fst, snd)(assertEqual[IList[Int]])
+          }
+        },
+        test("monad identity") { () =>
+          lists.foldMap {
+            MonadLaws.bindIdentity(_)(assertEqual[IList[Int]])
+          }
+        }
+      ),
+      section("traversable laws")(
+        test("traversable composition") { () =>
+          val fst = (a: Int) => if (a % 20 == 0) scala.None else scala.Some(a % 20)
+          val snd = (a: Int) => if (a % 5 == 0) scala.None else scala.Some(a % 20)
+
+          lists.foldMap {
+            TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Option[Option[IList[Int]]]])
+          }
+        },
+        test("traversable identity") { () =>
+          lists.foldMap {
+            TraversableLaws.traverseIdentity(_)(assertEqual[IList[Int]])
+          }
+        }
+      ),
+      section("monoid laws")(
+        test("mappend associativity") { () =>
+          cross(cross(lists, lists), lists).foldMap {
+            case ((l1, l2), l3) =>
+              SemigroupLaws.assoc(l1, l2, l3)(assertEqual[IList[Int]])
+          }
+        },
+        test("mappend left identity") { () =>
+          lists.foldMap {
+            MonoidLaws.leftIdentity(_)(assertEqual[IList[Int]])
+          }
+        },
+        test("mappend right identity") { () =>
+          lists.foldMap {
+            MonoidLaws.rightIdentity(_)(assertEqual[IList[Int]])
           }
         }
       )

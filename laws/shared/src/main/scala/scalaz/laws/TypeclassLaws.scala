@@ -66,13 +66,13 @@ object ApplyLaws {
 }
 
 object ApplicativeLaws {
-  // Combining with `F.pure(a)` doesn't mutate the `F[_]` context.
+  // Combining with `F.pure` doesn't mutate the `F[_]` context.
+  // Note that we don't need a left-handed and right-handed variation
+  // of this law because the `Apply` composition law guarantees
+  // that reversed function application doesn't change meaning.
   @inline
-  def applyIdentity[F[_], A, B, T](in: A)(f: A => B)(assert: (F[B], F[B]) => T)(implicit F: Applicative[F]) =
-    assert(
-      F.pure(f(in)),
-      F.ap(F.pure(in))(F.pure(f))
-    )
+  def applyIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Applicative[F]) =
+    assert(in, F.ap(in)(F.pure((a: A) => a)))
 }
 
 object BindLaws {
@@ -112,6 +112,9 @@ object ComonadLaws {
 }
 
 object TraversableLaws {
+  // it's okay to fuse multiple `traverse` calls
+  // that can be in different applicatives
+  // into a single call over the composite applicative.
   @inline
   def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](
     in: T[A]

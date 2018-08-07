@@ -83,8 +83,15 @@ object IListModule {
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
     })
 
-  implicit final def ilistFoldable: Foldable[IList] =
-    instanceOf(new FoldableClass[IList] {
+  implicit final def ilistMonoid[A]: Monoid[IList[A]] =
+    instanceOf(new MonoidClass[IList[A]] {
+      def mempty: IList[A] = IList.empty[A]
+      def mappend(l1: IList[A], l2: => IList[A]): IList[A] =
+        l1.append(l2)
+    })
+
+  implicit final def ilistTraversable: Traversable[IList] =
+    instanceOf(new TraversableClass[IList] {
       @tailrec
       def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
         IList.uncons(fa) match {
@@ -93,16 +100,31 @@ object IListModule {
             foldLeft(as, f(z, a))(f)
         }
 
-      def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: scalaz.tc.Monoid[B]): B = {
-        scala.Predef.???
-      }
+      def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: scalaz.tc.Monoid[B]): B =
+        foldLeft(fa, B.mempty)((b, a) => B.mappend(b, f(a)))
 
       def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B =
         fa.reverse.foldLeft(z)((b, a) => f(a, b))
 
       def toList[A](fa: IList[A]): scala.List[A] = {
-        foldRight[A, scala.List[A]](fa, scala.Nil)((a, b) => new scala.::(a, b))
+        import scala.{ ::, List,Nil }
+        foldRight[A, List[A]](fa, Nil)(new ::(_, _))
       }
+
+      def sequence[F[_], A](ta: IList[F[A]])(implicit F: Applicative[F]): F[IList[A]] =
+        traverse(ta)(fa => fa)
+
+      def traverse[F[_], A, B](ta: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+        ta.uncons match {
+          case Maybe2.Empty2() =>
+            F.pure(IList.empty[B])
+          case Maybe2.Just2(a, as) =>
+            F.ap(traverse(as)(f))(f(a).map(b => (ls: IList[B]) => IList.cons(b, ls)))
+        }
+
+      def map[A, B](ma: IList[A])(f: A => B): IList[B] =
+        ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
+
     })
 
   implicit final class ToIListOps[A](self: IList[A]) {
