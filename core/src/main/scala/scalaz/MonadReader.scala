@@ -13,8 +13,6 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
   def scope[A](k: S)(fa: F[A]): F[A] = local(_ => k)(fa)
   def asks[A](f: S => A): F[A] = map(ask)(f)
 
-  ////
-
   trait MonadReaderLaw extends MonadLaw {
     def localPoint[A](f: S => S)(a: A)(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(local(f)(point(a)), point(a))
@@ -36,6 +34,9 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
   }
 
   def monadReaderLaw = new MonadReaderLaw {}
+  
+  ////
+
 }
 
 object MonadReader {
