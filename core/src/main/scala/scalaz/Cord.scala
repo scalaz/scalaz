@@ -135,7 +135,7 @@ object Cord {
   @tailrec private def unsafeAppendTo(c: Cord, sb: StringBuilder): Unit = c match {
     case Branch(_, a, b) =>
       unsafeAppendTo_(a, sb) // not tail recursive, left legs need to be capped
-      unsafeAppendTo(b, sb) // tail recursive, right legs can be arbitrarilly long
+      unsafeAppendTo(b, sb) // tail recursive, right legs can be arbitrarily long
     case Leaf(s) =>
       val _ = sb.append(s)
   }
