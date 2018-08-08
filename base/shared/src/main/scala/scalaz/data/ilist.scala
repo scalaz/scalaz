@@ -16,6 +16,9 @@ trait IListModule {
   def empty[A]: IList[A]
   def cons[A](a: A, as: IList[A]): IList[A]
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]]
+  def foldLeft[A, B](as: IList[A], z: B)(f: (B, A) => B): B
+  def reverse[A](as: IList[A]): IList[A]
+  def unfoldRight[A, B](f: B => Maybe2[A, B])(b0: B): IList[A]
 
   object Cons {
     def apply[A](a: A, as: IList[A]): IList[A] = cons(a, as)
@@ -92,13 +95,8 @@ object IListModule {
 
   implicit final def ilistTraversable: Traversable[IList] =
     instanceOf(new TraversableClass[IList] {
-      @tailrec
       def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
-        IList.uncons(fa) match {
-          case Maybe2.Empty2() => z
-          case Maybe2.Just2(a, as) =>
-            foldLeft(as, f(z, a))(f)
-        }
+        IList.foldLeft(fa, z)(f)
 
       def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: scalaz.tc.Monoid[B]): B =
         foldLeft(fa, B.mempty)((b, a) => B.mappend(b, f(a)))
@@ -125,6 +123,13 @@ object IListModule {
       def map[A, B](ma: IList[A])(f: A => B): IList[B] =
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
 
+    })
+
+  implicit final val ilistUnfoldable: Unfoldable[IList] =
+    instanceOf[UnfoldableClass[IList]](new UnfoldableClass[IList] {
+      override def unfoldRight[A, B](f: B => Maybe2[A, B])(z: B): Maybe[IList[A]] =
+        fromList(IList.unfoldRight(f)(z))
+      override def fromList[A](as: IList[A]): Maybe[IList[A]] = Maybe.just[IList[A]](as)
     })
 
   implicit final class ToIListOps[A](self: IList[A]) {
@@ -155,16 +160,13 @@ object IListModule {
       IList.uncons(self)
 
     def append(that: IList[A]): IList[A] =
-      that.reverse.foldLeft(self)((b, a) => IList.cons(a, b))
+      IList.reverse(that).foldLeft(self)((b, a) => IList.cons(a, b))
 
     def :::(that: IList[A]): IList[A] =
       self.append(that)
 
     def ++(that: IList[A]): IList[A] =
       that.append(self)
-
-    def reverse: IList[A] =
-      self.foldLeft(IList.empty[A])((b, a) => a :: b)
 
     def reverse_:::[Z](that: IList[A]): IList[A] =
       that.foldLeft(self)((as, a) => a :: as)
@@ -211,7 +213,7 @@ object IListModule {
         (IList.uncons(as), IList.uncons(bs)) match {
           case (Maybe2.Just2(a, aas), Maybe2.Just2(b, bbs)) =>
             go((a, b) :: acc, aas, bbs)
-          case _ => acc.reverse
+          case _ => IList.reverse(acc)
         }
 
       go(IList.empty, self, that)
@@ -223,7 +225,7 @@ object IListModule {
         IList.uncons(as) match {
           case Maybe2.Just2(a, aas) =>
             go((m, a) :: acc, m + 1, aas)
-          case _ => acc.reverse
+          case _ => IList.reverse(acc)
         }
 
       go(IList.empty, 0, self)
@@ -232,10 +234,10 @@ object IListModule {
     def take(n: Int): IList[A] = {
       @tailrec
       def go(m: Int, acc: IList[A], as: IList[A]): IList[A] =
-        if (m == 0) acc.reverse
+        if (m == 0) IList.reverse(acc)
         else
           IList.uncons(as) match {
-            case Maybe2.Empty2() => acc.reverse
+            case Maybe2.Empty2() => IList.reverse(acc)
             case Maybe2.Just2(a, aas) =>
               go(m - 1, a :: acc, aas)
           }
@@ -244,6 +246,8 @@ object IListModule {
       else
         go(n, IList.empty, self)
     }
+
+    def reverse: IList[A] = IList.reverse(self)
 
     def drop(n: Int): IList[A] = {
       @tailrec
@@ -264,10 +268,10 @@ object IListModule {
       @tailrec
       def go(acc: IList[A], as: IList[A]): IList[A] =
         IList.uncons(as) match {
-          case Maybe2.Empty2() => acc.reverse
+          case Maybe2.Empty2() => IList.reverse(acc)
           case Maybe2.Just2(a, aas) =>
             if (p(a)) go(a :: acc, aas)
-            else acc.reverse
+            else IList.reverse(acc)
         }
       go(IList.empty, self)
     }
@@ -308,6 +312,41 @@ private[data] object IListImpl extends IListModule {
 
   def uncons[A](as: IList[A]): Maybe2[A, IList[A]] =
     Fix.unfix[Maybe2[A, ?]](as)
+
+  @tailrec
+  def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
+    uncons(fa) match {
+      case Maybe2.Empty2() =>
+        z
+      case Maybe2.Just2(a, as) =>
+        foldLeft(as, f(z, a))(f)
+    }
+
+  def reverse[A](as: IList[A]): IList[A] =
+    foldLeft[A, IList[A]](as, empty[A])((b, a) => cons(a, b))
+
+  /**
+   * Dual to `foldRight`: while `foldRight` reduces a list to a summary value, `unfoldRight` builds a list from
+   * a seed value.
+   * The function takes the element and returns `Empty2` if it is done producing the list or returns `Just2[A, B]`,
+   * in which case, `A` is a prepended to the list and `B` is used as the next element in a recursive call.
+   * For example,
+   *
+   *  unfoldRight[Int, Int](b => if (b == 0) empty2 else just2(b, b - 1))(10)
+   *  [10,9,8,7,6,5,4,3,2,1]
+   *
+   * In some cases, `unfoldRight` can undo a `foldRight` operation:
+   *
+   */
+  def unfoldRight[A, B](f: B => Maybe2[A, B])(b0: B): IList[A] = {
+    @tailrec
+    def go(b: B, acc: IList[A]): IList[A] =
+      f(b) match {
+        case Maybe2.Empty2()     => reverse(acc)
+        case Maybe2.Just2(a, b1) => go(b1, cons(a, acc))
+      }
+    go(b0, empty[A])
+  }
 
   implicit val isCovariantInstance: IsCovariant[IList] = new IsCovariant.LiftLiskov[IList] {
 
