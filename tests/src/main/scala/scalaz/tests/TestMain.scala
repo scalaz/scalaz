@@ -1,7 +1,7 @@
 package scalaz.tests
 
 import scala.{ Array, List, Unit }
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.global
 

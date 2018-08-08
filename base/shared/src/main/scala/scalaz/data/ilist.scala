@@ -105,7 +105,7 @@ object IListModule {
         fa.reverse.foldLeft(z)((b, a) => f(a, b))
 
       def toList[A](fa: IList[A]): scala.List[A] = {
-        import scala.{ ::, List,Nil }
+        import scala.{ ::, List, Nil }
         foldRight[A, List[A]](fa, Nil)(new ::(_, _))
       }
 
