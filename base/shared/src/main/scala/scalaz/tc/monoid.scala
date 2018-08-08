@@ -37,4 +37,10 @@ object MonoidClass {
         def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = IO.unit
       }
     })
+
+  implicit def ioMonoid[E, A](implicit A: Monoid[A]): Monoid[IO[E, A]] =
+    instanceOf(new MonoidClass[IO[E, A]] {
+      def mappend(a1: IO[E, A], a2: => IO[E, A]): IO[E, A] = a1.zipWith(a2)(A.mappend(_, _))
+      def mempty: IO[E, A]                                 = IO.now(A.mempty)
+    })
 }
