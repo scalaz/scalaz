@@ -10,7 +10,7 @@ package scalaz.example
  <string> ::= <cab> <string> | '.'
 
 
- So valid strings in the langauge would be:
+ So valid strings in the language would be:
  "."
  "A."
  "B."

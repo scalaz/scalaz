@@ -58,7 +58,7 @@ object TagUsage extends App {
 
   // tagging a value does not actually alter the value, it is merely
   // typecasting the value to a tagged type, all this is actually lost
-  // at runtime, so when we do a non-typesafe equal comparision, it
+  // at runtime, so when we do a non-typesafe equal comparison, it
   // actually works.
   @unchecked def equalsTrue(x: Any): Boolean = x == true
   assert(equalsTrue(Disjunction(true)))
