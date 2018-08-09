@@ -35,9 +35,8 @@ object CordModule {
 
   implicit val cordEq: Eq[Cord] =
     instanceOf[EqClass[Cord]](new EqClass[Cord] {
-      def equal(first: Cord, second: Cord): Boolean = {
+      def equal(first: Cord, second: Cord): Boolean =
         Cord.toString(first) == Cord.toString(second)
-      }
     })
 }
 

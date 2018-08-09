@@ -2,7 +2,7 @@ package scalaz
 package tests
 
 import Predef._
-import data.{Cord, IList}
+import data.{ Cord, IList }
 import Scalaz._
 
 import testz.Harness
@@ -24,6 +24,5 @@ object DebugInterpolatorTest {
       }
     )
   }
-
 
 }

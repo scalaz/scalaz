@@ -3,7 +3,7 @@ package tc
 
 import Predef._
 
-import zio.{Fiber, IO}
+import zio.{ Fiber, IO }
 
 import java.lang.Throwable
 import scala.{ List, Nothing, Unit }
