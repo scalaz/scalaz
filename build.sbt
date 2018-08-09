@@ -66,7 +66,7 @@ lazy val metaJVM = meta.jvm
 lazy val metaJS = meta.js
 
 lazy val microsite = project.module
-  .dependsOn(baseJVM)
+  .dependsOn(baseJVM, lawsJVM, tests)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),

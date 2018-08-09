@@ -5,12 +5,8 @@ title:  "Functor"
 
 # Functor [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/functor.scala)
 
-*The `Functor` type class represents a type that can be mapped over.*
-
-A functor needs to satisfy the two functor laws:
-
-- `Functor.map(elem)(identity) === elem`
-- `Functor.map(elem)(f.andThen(g)) === Functor.map(Functor.map(elem)(f))(g)`
+A way to map ordinary functions under type constructors,
+turning `A => B` to `F[A] => F[B]` with `Functor[F]`.
 
 **Typical imports**
 
@@ -39,3 +35,28 @@ val listFunctor: Functor[List] = instanceOf(new FunctorClass[List] {
 val x = just(50L)
 x.map(_ - 8L)
 ```
+
+# Law
+
+The sole law required for a valid `Functor` is the "identity" law:
+
+```tut
+def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Functor[F]): T =
+  assert(in, F.map(in)(identity))
+```
+
+The implication of this law, because `map` can't tell which function it's being called
+with, is that `map` doesn't modify the `F[_]` context.
+
+A free law implied by this law is that `map` respects composition of functions:
+
+```tut
+def freeLawComposition[F[_], A, B, C, T](in: F[A])(f: A => B, g: B => C)(assert: (F[C], F[C]) => T)(implicit F: Functor[F]): T =
+  assert(
+    F.map(in)(f.andThen(g)),
+    F.map(F.map(in)(f))(g)
+  )
+```
+
+That is to say, two `map` calls can be replaced by a single `map` call
+passed the composite of the mapped functions.

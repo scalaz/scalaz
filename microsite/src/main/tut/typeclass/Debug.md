@@ -17,7 +17,7 @@ import scalaz.Scalaz._
 
 # Built-in instances
 
-```tut
+```tut:book
 "Scalaz 8".debug
 ```
 
@@ -64,3 +64,9 @@ The following fails to compile as there is no `Debug` instance for `Bar`
 ```tut:fail
 z"${bar}"
 ```
+
+# Law
+
+There are no laws for `Debug`, unlike Haskell's `Show`.
+
+Just try to keep it readable.
