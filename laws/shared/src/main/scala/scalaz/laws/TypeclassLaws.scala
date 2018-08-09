@@ -2,60 +2,14 @@ package scalaz
 package laws
 
 import scala.{ inline, Boolean }
-import scala.Predef.identity
 
 import data._, tc._
-
-// the other "composition" laws for all kinds of functors are guaranteed by parametricity
-// in addition to the "identity" law.
-object FunctorLaws {
-  @inline
-  def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Functor[F]): T =
-    assert(in, F.map(in)(identity))
-}
-
-object ContravariantLaws {
-  @inline
-  def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Contravariant[F]): T =
-    assert(in, F.contramap(in)(identity))
-}
-
-object InvariantFunctorLaws {
-  @inline
-  def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: InvariantFunctor[F]): T =
-    assert(in, F.imap(in)(identity)(identity))
-}
-
-object PhantomLaws {
-  @inline
-  def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Phantom[F]): T =
-    assert(in, F.pmap(in))
-}
-
-object BifunctorLaws {
-  @inline
-  def bimapIdentityToIdentity[F[_, _], A, B, T](
-    in: F[A, B]
-  )(assert: (F[A, B], F[A, B]) => T)(implicit F: Bifunctor[F]): T =
-    assert(in, F.bimap(in)(identity, identity))
-}
-
-object ProfunctorLaws {
-  @inline
-  def identityToIdentity[P[_, _], A, B, T](in: P[A, B])(assert: (P[A, B], P[A, B]) => T)(implicit P: Profunctor[P]): T =
-    assert(
-      in,
-      P.dimap[A, B, A, B](in)(identity)(identity)
-    )
-}
+import Scalaz._
 
 object StrongLaws {
   // Nested `first` applications introducing multiple arguments
-  // can be replaced by a single `first` application introducing a tuple-full of arguments.
-  //
-  // first' . first' ≡ dimap assoc unassoc . first' where
-  // assoc ((a,b),c) = (a,(b,c))
-  // unassoc (a,(b,c)) = ((a,b),c)
+  // can be replaced by a single `first` application
+  // introducing a tuple-full of arguments.
   @inline
   def firstAssoc[P[_, _], A, B, C, T](
     in: P[A, A]
@@ -74,17 +28,8 @@ object StrongLaws {
 
 object ChoiceLaws {
   // Nested `leftchoice` applications introducing multiple cases
-  // can be replaced by a single `leftchoice` application introducing an `\/`-full of cases.
-  //
-  // left' . left' ≡ dimap assocE unassocE . left' where
-  // assocE :: Either (Either a b) c -> Either a (Either b c)
-  // assocE (Left (Left a)) = Left a
-  // assocE (Left (Right b)) = Right (Left b)
-  // assocE (Right c) = Right (Right c)
-  // unassocE :: Either a (Either b c) -> Either (Either a b) c
-  // unassocE (Left a) = Left (Left a)
-  // unassocE (Right (Left b) = Left (Right b)
-  // unassocE (Right (Right c)) = Right c)
+  // can be replaced by a single `leftchoice` application
+  // introducing an `\/`-full of cases.
   @inline
   def leftAssoc[P[_, _], A, B, C, T](
     in: P[A, A]
@@ -99,13 +44,15 @@ object ChoiceLaws {
         case \/-(c)      => \/-(\/-(c))
       } {
         case -\/(a)      => -\/(-\/(a))
-        case \/-(-\/(a)) => -\/(\/-(a))
-        case \/-(\/-(b)) => \/-(b)
+        case \/-(-\/(b)) => -\/(\/-(b))
+        case \/-(\/-(c)) => \/-(c)
       }
     )
 }
 
 object ApplyLaws {
+  // doing some reversed function composition doesn't break
+  // code using `Apply`.
   @inline
   def applyAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A => B],
                                              snd: F[B => C])(assert: (F[C], F[C]) => T)(implicit F: Apply[F]): T = {
@@ -144,6 +91,39 @@ object MonadLaws {
   @inline
   def bindIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
     assert(in, F.flatMap(in)(F.pure))
+}
+
+object CobindLaws {
+  @inline
+  def cobindAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A] => B,
+                                              snd: F[B] => C)(assert: (F[C], F[C]) => T)(implicit F: Cobind[F]): T = {
+    import F.cobind
+    assert(
+      cobind(cobind(in)(fst))(snd),
+      cobind(in)((b: F[A]) => snd(cobind(b)(fst)))
+    )
+  }
+}
+
+object ComonadLaws {
+  @inline
+  def cobindIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Comonad[F]): T =
+    assert(in, F.cobind(in)(F.copoint))
+}
+
+object TraversableLaws {
+  @inline
+  def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](
+    in: T[A]
+  )(f: A => F[B], g: B => G[C])(assert: (F[G[T[C]]], F[G[T[C]]]) => Test): Test =
+    assert(
+      in.traverse(f).map(_.traverse(g)),
+      Compose.run(in.traverse(a => Compose(f(a).map(g))))
+    )
+
+  @inline
+  def traverseIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Traversable[F]) =
+    assert(in, Identity.run(F.traverse(in)(Identity(_))))
 }
 
 object SemicategoryLaws {

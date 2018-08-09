@@ -6,7 +6,7 @@ import Scalaz._
 
 object DebugInterpolatorTest {
 
-  // TODO: link up ztest and make this a real test
+  // TODO: link up testz and make this a real test
 
   z"before ${1} after"
   z"before ${"foo"} after"
