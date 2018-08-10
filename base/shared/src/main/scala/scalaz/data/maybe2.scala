@@ -42,16 +42,24 @@ final class Just2Extractor[A, B] private[data] (private val value: Option2[A, B]
   def _2: B                     = value._2
 }
 
+object Maybe2Module {
+  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = Maybe2.isCovariant_1
+  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = Maybe2.isCovariant_2
+  implicit def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
+    Maybe2.eq[A, B]
+  implicit def bifunctor: Bifunctor[Maybe2] = Maybe2.bifunctor
+}
+
 private[data] object Maybe2Impl extends Maybe2Module {
   type Maybe2[A, B] = Option2[A, B]
 
   def just2[A, B](a: A, b: B): Maybe2[A, B] = Maybe2Impl.fromOption2(Some2(a, b))
   def empty2[A, B]: Maybe2[A, B]            = None2
 
-  implicit def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
-  implicit def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
+  def isCovariant_1[B]: IsCovariant[Maybe2[?, B]] = IsCovariant.scalaCovariant[Option2[+?, B]]
+  def isCovariant_2[A]: IsCovariant[Maybe2[A, ?]] = IsCovariant.scalaCovariant[Option2[A, +?]]
 
-  implicit def debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[Maybe2[A, B]] = {
+  def debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[Maybe2[A, B]] = {
     import Scalaz.debugInterpolator
     DebugClass.instance[Maybe2[A, B]] {
       case Some2(a, b) => z"Just2($a, $b)"
@@ -59,14 +67,14 @@ private[data] object Maybe2Impl extends Maybe2Module {
     }
   }
 
-  implicit def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
+  def eq[A, B](implicit A: Eq[A], B: Eq[B]): Eq[Maybe2[A, B]] =
     instanceOf[EqClass[Maybe2[A, B]]] {
       case (Some2(a1, b1), Some2(a2, b2)) => A.equal(a1, a2) && B.equal(b1, b2)
       case (None2, None2)                 => true
       case _                              => false
     }
 
-  implicit def bifunctor: Bifunctor[Maybe2] =
+  def bifunctor: Bifunctor[Maybe2] =
     instanceOf(new BifunctorClass[Maybe2] with BifunctorClass.DeriveLmapRmap[Maybe2] {
       def bimap[A, B, S, T](fab: Maybe2[A, B])(as: A => S, bt: B => T): Maybe2[S, T] =
         fab match {

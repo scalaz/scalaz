@@ -40,6 +40,7 @@ object MaybeModule extends MaybeSyntax {
   implicit def traversableMaybe: Traversable[Maybe]  = Maybe.traversable
   implicit def isCovariantMaybe: IsCovariant[Maybe]  = Maybe.isCovariant
   implicit def debugMaybe[A: Debug]: Debug[Maybe[A]] = Maybe.debug[A]
+  implicit def eqMaybe[A: Eq]: Eq[Maybe[A]]          = Maybe.eq[A]
 }
 
 private[scalaz] object MaybeImpl extends MaybeModule {

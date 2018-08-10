@@ -22,8 +22,18 @@ object TestMain {
     def runPure(name: String, tests: PureHarness.Uses[Unit]): Future[() => Unit] =
       Future.successful(tests((), List(name)))
 
+    def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
+      (r, ls) => {
+        val f = fst(r, ls)
+        val s = snd(r, ls)
+        () => {
+          f()
+          s()
+        }
+      }
+
     val suites: List[() => Future[() => Unit]] = List(
-      () => runPure("IList Tests", (new IListTests).tests(harness))
+      () => runPure("IList Tests", (new IListTests).tests(harness, combineUses))
     )
 
     Await.result(Runner(suites, global), Duration.Inf)
