@@ -159,8 +159,11 @@ object IListModule {
     def uncons: Maybe2[A, IList[A]] =
       IList.uncons(self)
 
-    def append(that: IList[A]): IList[A] =
+    def prepend(that: IList[A]): IList[A] =
       IList.reverse(that).foldLeft(self)((b, a) => IList.cons(a, b))
+
+    def append(that: IList[A]): IList[A] =
+      that.prepend(self)
 
     def :::(that: IList[A]): IList[A] =
       self.append(that)
