@@ -28,7 +28,7 @@ lazy val root = project
   .settings(
     skip in publish := true
   )
-  .aggregate(baseJVM, baseJS, lawsJVM, lawsJS, metaJVM, metaJS, microsite, benchmarks)
+  .aggregate(baseJVM, baseJS, lawsJVM, lawsJS, tests, metaJVM, metaJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
 resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -109,3 +109,10 @@ lazy val laws = crossProject.module
 lazy val lawsJVM = laws.jvm
 
 lazy val lawsJS = laws.js
+
+lazy val tests = project.module
+  .dependsOn(baseJVM, lawsJVM)
+  .settings(
+    libraryDependencies += "org.scalaz" %% "testz-stdlib" % "0.0.3",
+    libraryDependencies += "org.scalaz" %% "testz-runner" % "0.0.3"
+  )

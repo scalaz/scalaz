@@ -112,6 +112,9 @@ object ComonadLaws {
 }
 
 object TraversableLaws {
+  // it's okay to fuse multiple `traverse` calls
+  // that can be in different applicatives
+  // into a single call over the composite applicative.
   @inline
   def traverseComposition[T[_]: Traversable, F[_]: Applicative, G[_]: Applicative, A, B, C, Test](
     in: T[A]

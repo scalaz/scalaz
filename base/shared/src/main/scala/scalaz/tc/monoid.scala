@@ -3,10 +3,10 @@ package tc
 
 import Predef._
 
-import java.lang.Throwable
-import scala.{ List, Nothing }
-
 import zio.{ Fiber, IO }
+
+import java.lang.Throwable
+import scala.{ List, Nothing, Unit }
 
 trait MonoidClass[A] extends SemigroupClass[A] {
   def mempty: A
