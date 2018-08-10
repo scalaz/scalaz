@@ -66,7 +66,7 @@ object ApplyUsage extends App {
   val plus2: Int => Int = _ + 2
   assert(List(1,2,3) <*> List(plus1, plus2) === List(2,3,4,3,4,5))
 
-  // |@| is refered to as "applicative builder", it allows you to
+  // |@| is referred to as "applicative builder", it allows you to
   // evaluate a function of multiple arguments in a context, similar
   // to apply2, apply3, apply4, etc:
   assert((some(1) |@| some(2) |@| some(3))(_ + _ + _) === Some(6))
