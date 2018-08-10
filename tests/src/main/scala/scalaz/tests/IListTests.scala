@@ -105,6 +105,7 @@ final class IListTests {
           List(
             assertEqual(IList.empty[Int] reverse_::: IList.empty, IList.empty[Int]),
             assertEqual(IList(1, 2, 3) reverse_::: IList.empty, IList(3, 2, 1)),
+            assertEqual(IList.empty[Int] reverse_::: IList(1, 2, 3), IList(1, 2, 3)),
             assertEqual(IList(1, 2, 3) reverse_::: IList(4, 5, 6), IList(3, 2, 1, 4, 5, 6)),
           ).msuml
         },
