@@ -34,7 +34,7 @@ final class IListTests {
         test("identity") { () =>
           cross(lists, lists).foldMap {
             case (l1, l2) =>
-              EqLaws.identity(l1, l2)(_.foldRight(0)(_ + _))(
+              EqLaws.identity(l1, l2)(_.foldRight(1000)(_ / _))(
                 (equal, leftSum, rightSum) => assertEqual(equal, (leftSum == rightSum))
               )
           }
@@ -65,7 +65,7 @@ final class IListTests {
         test("bind associativity") { () =>
           // non-overlapping
           val fst = (a: Int) => IList(a + 10, a + 20, a + 30)
-          val snd = (a: Int) => IList(a + 100, a + 200, a + 300)
+          val snd = (a: Int) => IList(a * 100, a * 200, a * 300)
 
           lists.foldMap {
             BindLaws.bindAssoc(_)(fst, snd)(assertEqual[IList[Int]])
