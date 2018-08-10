@@ -26,10 +26,11 @@ object TestMain {
       (r, ls) => {
         val f = fst(r, ls)
         val s = snd(r, ls)
-        () => {
-          f()
-          s()
-        }
+        () =>
+          {
+            f()
+            s()
+          }
       }
 
     val suites: List[() => Future[() => Unit]] = List(
