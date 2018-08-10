@@ -146,7 +146,7 @@ def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 * A single implicit can define a number of type class instances for a type.
 * A type class definition can override methods (including derived methods) for efficiency.
 
-Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
+Here is an instance definition for `Option`. Notice that the method `map` has been overridden.
 
 ```scala
   implicit val option = new Traverse[Option] with MonadPlus[Option] {
