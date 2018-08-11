@@ -8,7 +8,7 @@ import data._, Scalaz._
 import laws._
 import laws.FunctorLaws.{ Functor => FunctorLaws }
 
-import testz.{ assert, Harness }
+import testz.{ assert, Harness, Result }
 
 import z._
 
@@ -22,17 +22,25 @@ final class IListTests {
   def cross[A, B](l1: List[A], l2: List[B]): List[(A, B)] =
     l1.flatMap(a1 => l2.map(a2 => (a1, a2)))
 
+  def testAppend(append: (IList[Int], IList[Int]) => IList[Int]): Result =
+    List(
+      assertEqual(append(IList(1, 2, 3), IList(4, 5, 6)), IList(1, 2, 3, 4, 5, 6)),
+      assertEqual(append(IList.empty, IList(4, 5, 6)), IList(4, 5, 6)),
+      assertEqual(append(IList(1, 2, 3), IList.empty), IList(1, 2, 3)),
+    ).msuml
+
   def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
     import harness._
     sequence(
       section("concrete")(
         test("append") { () =>
-          List(
-            assertEqual(
-              IList(1, 2, 3).append(IList(4, 5, 6)),
-              IList(1, 2, 3, 4, 5, 6)
-            )
-          ).msuml
+          testAppend(_.append(_))
+        },
+        test("++") { () =>
+          testAppend(_ ++ _)
+        },
+        test(":::") { () =>
+          testAppend(_ ::: _)
         },
         test("empty caching") { () =>
           val empty1 = IList.empty.asInstanceOf[scala.AnyRef]

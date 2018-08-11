@@ -166,10 +166,10 @@ object IListModule {
       self.foldRight(that)(_ :: _)
 
     def :::(that: IList[A]): IList[A] =
-      self.append(that)
+      that.append(self)
 
     def ++(that: IList[A]): IList[A] =
-      that.append(self)
+      self.append(that)
 
     def reverse_:::[Z](that: IList[A]): IList[A] =
       that.foldLeft(self)((as, a) => a :: as)
