@@ -23,7 +23,8 @@ object TestMain {
       Future.successful(tests((), List(name)))
 
     val suites: List[() => Future[() => Unit]] = List(
-      () => runPure("IList Tests", (new IListTests).tests(harness))
+      () => runPure("IList Tests", (new IListTests).tests(harness)),
+      () => runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness))
     )
 
     Await.result(Runner(suites, global), Duration.Inf)
