@@ -39,6 +39,10 @@ class Ops(val c: blackbox.Context) {
   def n_0[T: c.WeakTypeTag]: Tree            = q"$ev.${typeName[T]}($lhs)"
   def ni_0[T: c.WeakTypeTag](ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)"
 
+  /* def method(implicit g: B): R */
+  def i_0_1i(g: Tree, ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($g)"
+  def ni_0_1i[T: c.WeakTypeTag](g: Tree, ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($g)"
+
   /* def method(a: A): R */
   def f_1(f: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f)"
   def i_1(f: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)"
