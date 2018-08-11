@@ -34,7 +34,7 @@ object FoldableClass {
       foldRight(fa, B.mempty)((a, b) => B.mappend(f(a), b))
 
     final override def msuml[A](fa: F[A])(implicit A: Monoid[A]) =
-      foldLeft(fa, A.mempty)((a, s) => A.mappend(a, s))
+      foldLeft(fa, A.mempty)(A.mappend(_, _))
   }
 
   trait Alt[D <: Alt[D]]
