@@ -109,7 +109,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
     this match {
-      case b: \/-[_] => \/-(g(b.b))
+      case \/-(b) => \/-(g(b))
       case a => a.asInstanceOf[A \/ D]
     }
 
@@ -131,7 +131,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
     this match {
-      case b : \/-[_] => g(b.b)
+      case \/-(b) => g(b)
       case a => a.asInstanceOf[AA \/ D]
     }
 
@@ -478,9 +478,9 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 
       override def apply2[A, B, C](fa: => L \/ A, fb: => L \/ B)(f: (A, B) => C): L \/ C =
         fa match {
-          case a: \/-[_] =>
+          case \/-(a) =>
             fb match {
-              case b: \/-[_] => \/-(f(a.b, b.b))
+              case \/-(b) => \/-(f(a, b))
               case e => e.asInstanceOf[L \/ C]
             }
           case e => e.asInstanceOf[L \/ C]

@@ -66,20 +66,20 @@ trait EitherInstances extends EitherInstances0 {
   implicit def eitherMonad[L]: Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] =
     new Traverse[Either[L, ?]] with MonadError[Either[L, ?], L] with BindRec[Either[L, ?]] with Cozip[Either[L, ?]] {
       def bind[A, B](fa: Either[L, A])(f: A => Either[L, B]) = fa match {
-        case b: Right[_, _] => f(b.value)
+        case Right(b) => f(b)
         case a => a.asInstanceOf[Either[L, B]]
       }
 
       override def map[A, B](fa: Either[L, A])(f: A => B) = fa match {
-        case b: Right[_, _] => Right(f(b.value))
+        case Right(b) => Right(f(b))
         case a => a.asInstanceOf[Either[L, B]]
       }
 
       override def apply2[A, B, C](fa: => Either[L, A], fb: => Either[L, B])(f: (A, B) => C): Either[L, C] =
         fa match {
-          case a: Right[_, _] =>
+          case Right(a) =>
             fb match {
-              case b: Right[_, _] => Right(f(a.value, b.value))
+              case Right(b) => Right(f(a, b))
               case e => e.asInstanceOf[Either[L, C]]
             }
           case e => e.asInstanceOf[Either[L, C]]
