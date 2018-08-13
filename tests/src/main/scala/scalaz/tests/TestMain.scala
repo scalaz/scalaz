@@ -35,10 +35,10 @@ object TestMain {
 
     val suites: List[() => Future[() => Unit]] = List(
       () => runPure("IList Tests", (new IListTests).tests(harness, combineUses)),
-      () => runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness))
+      () => runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)),
+      () => runPure("Double Tests", (new DoubleTests).tests(harness))
     )
 
     Await.result(Runner(suites, global), Duration.Inf)
-
   }
 }

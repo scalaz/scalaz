@@ -210,6 +210,9 @@ object IListModule {
 
     def !!(n: Int): Maybe[A] = self.index(n)
 
+    def cross[B](b: IList[B]): IList[(A, B)] =
+      self.flatMap(a => b.map(b => (a, b)))
+
     def zip[B](that: IList[B]): IList[(A, B)] = {
       @tailrec
       def go(acc: IList[(A, B)], as: IList[A], bs: IList[B]): IList[(A, B)] =
