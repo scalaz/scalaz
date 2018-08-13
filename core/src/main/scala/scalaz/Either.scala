@@ -109,8 +109,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
     this match {
-      case \/-(a)     => \/-(g(a))
-      case b @ -\/(_) => b
+      case b: \/-[_] => \/-(g(b.b))
+      case a => a.asInstanceOf[A \/ D]
     }
 
   /** Traverse on the right of this disjunction. */
@@ -131,8 +131,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
     this match {
-      case a @ -\/(_) => a
-      case \/-(b) => g(b)
+      case b : \/-[_] => g(b.b)
+      case a => a.asInstanceOf[AA \/ D]
     }
 
   /** Fold on the right of this disjunction. */
