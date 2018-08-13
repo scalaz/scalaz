@@ -474,6 +474,18 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
 
+      override def ap[A,B](fa: => L \/ A)(f: => L \/ (A => B)): L \/ B = fa.ap(f)
+
+      override def apply2[A, B, C](fa: => L \/ A, fb: => L \/ B)(f: (A, B) => C): L \/ C =
+        fa match {
+          case a: \/-[_] =>
+            fb match {
+              case b: \/-[_] => \/-(f(a.b, b.b))
+              case e => e.asInstanceOf[L \/ C]
+            }
+          case e => e.asInstanceOf[L \/ C]
+        }
+
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
         f(a) match {

@@ -70,6 +70,16 @@ trait EitherInstances extends EitherInstances0 {
         case Right(b) => f(b)
       }
 
+      override def apply2[A, B, C](fa: => Either[L, A], fb: => Either[L, B])(f: (A, B) => C): Either[L, C] =
+        fa match {
+          case a: Right[_, _] =>
+            fb match {
+              case b: Right[_, _] => Right(f(a.value, b.value))
+              case e => e.asInstanceOf[Either[L, C]]
+            }
+          case e => e.asInstanceOf[Either[L, C]]
+        }
+
       def handleError[A](fa: Either[L, A])(f: L => Either[L, A]) =
         fa match {
           case a @ Right(_) => a
