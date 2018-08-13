@@ -70,7 +70,10 @@ trait EitherInstances extends EitherInstances0 {
         case a => a.asInstanceOf[Either[L, B]]
       }
 
-      override def map[A, B](fa: Either[L, A])(f: A => B) = fa.map(f)
+      override def map[A, B](fa: Either[L, A])(f: A => B) = fa match {
+        case b: Right[_, _] => Right(f(b.value))
+        case a => a.asInstanceOf[Either[L, B]]
+      }
 
       override def apply2[A, B, C](fa: => Either[L, A], fb: => Either[L, B])(f: (A, B) => C): Either[L, C] =
         fa match {
