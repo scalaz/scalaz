@@ -118,9 +118,11 @@ object ACatenable1Tests {
             Const[String, Int]("(hello|(world|(foobar|)))")
           )
         },
+
         test("fold") { () =>
           final class Fake[A, B](val str: String)
-          // not lawful, used to observe internal behavior of `fold`.
+          // not lawful, used to observe balanced binary tree shape of `fold`.
+          // not associative.
           implicit val fakeSemicategory: Semicategory[Fake] = instanceOf(new SemicategoryClass[Fake] {
             def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
               new Fake("(" + fst.str + "|" + snd.str + ")")
@@ -128,7 +130,8 @@ object ACatenable1Tests {
           assertEqual(
             (lift(new Fake[Int, Int]("hello")) :+ new Fake[Int, Int]("world") :+ new Fake[Int, Int]("foo") :+ new Fake[Int, Int]("bar")).fold.str,
             "((hello|world)|(foo|bar))"
-          ) |+| assertEqual(
+          ) |+|
+          assertEqual(
             (new Fake[Int, Int]("hello") +: new Fake[Int, Int]("world") +: new Fake[Int, Int]("foo") +: lift(new Fake[Int, Int]("bar"))).fold.str,
             "((hello|world)|(foo|bar))"
           )
