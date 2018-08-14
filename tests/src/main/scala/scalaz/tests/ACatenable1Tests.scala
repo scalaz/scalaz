@@ -20,9 +20,11 @@ object ACatenable1Tests {
   type R[A, B] = ACatenable1[Map, A, B] => Map[A, B]
   type L[A, B] = Map[A, B] => ACatenable1[Map, A, B]
   val foldF: ACatenable1[Map, ?, ?] ~~> Map = Forall2.of[R](_.fold)
-  val liftF: Map ~~> ACatenable1[Map, ?, ?] = Forall2.of[L](ACatenable1.lift(_))
+  val liftF: Map ~~> ACatenable1[Map, ?, ?] = Forall2.of[L](lift(_))
 
   // specified in `compose`-order
+  // while these are each similar to `(+) 3`,
+  // they are not commutative.
   val fst = Map(
     (6, 9),
     (7, 10),
