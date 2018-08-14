@@ -19,8 +19,8 @@ object TestMain {
         )
       )
 
-    def runPure(name: String, tests: PureHarness.Uses[Unit]): Future[() => Unit] =
-      Future.successful(tests((), List(name)))
+    def runPure(name: String, tests: PureHarness.Uses[Unit]): () => Unit =
+      tests((), List(name))
 
     def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
       (r, ls) => {
@@ -34,9 +34,11 @@ object TestMain {
       }
 
     val suites: List[() => Future[() => Unit]] = List(
-      () => runPure("IList Tests", (new IListTests).tests(harness, combineUses)),
-      () => runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness))
-    )
+      Future(runPure("IList Tests", (new IListTests).tests(harness, combineUses)))(global),
+      Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(global),
+      Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(global),
+      Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(global),
+    ).map(r => () => r)
 
     Await.result(Runner(suites, global), Duration.Inf)
 

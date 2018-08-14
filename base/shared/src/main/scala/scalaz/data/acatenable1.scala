@@ -3,7 +3,7 @@ package data
 
 import scala.annotation.tailrec
 
-import tc.Semicategory
+import tc.{instanceOf, Semicategory, SemicategoryClass}
 
 /**
  * Non-empty type-aligned sequence represented as a (non-balanced) binary tree,
@@ -15,17 +15,20 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
   def compose[Z](that: ACatenable1[=>:, Z, A]): ACatenable1[=>:, Z, B] =
     Chain(that, this)
 
+  def andThen[Z](that: ACatenable1[=>:, B, Z]): ACatenable1[=>:, A, Z] =
+    Chain(this, that)
+
   def <<<[Z](that: ACatenable1[=>:, Z, A]): ACatenable1[=>:, Z, B] =
     this compose that
 
   def >>>[C](that: ACatenable1[=>:, B, C]): ACatenable1[=>:, A, C] =
-    that compose this
+    this andThen that
 
-  def :+[C](f: B =>: C): ACatenable1[=>:, A, C] =
-    Chain(this, Lift(f))
+  def :+[Z](f: Z =>: A): ACatenable1[=>:, Z, B] =
+    compose(Lift(f))
 
-  def +:[Z](f: Z =>: A): ACatenable1[=>:, Z, B] =
-    Chain(Lift(f), this)
+  def +:[Z](f: B =>: Z): ACatenable1[=>:, A, Z] =
+    andThen(Lift(f))
 
   final def foldLeft[F[_]](fa: F[A])(φ: RightAction[F, =>:]): F[B] = {
     @tailrec def go[X](fx: F[X], tail: ACatenable1[=>:, X, B]): F[B] =
@@ -68,4 +71,13 @@ object ACatenable1 {
 
   def lift[F[_, _], A, B](f: F[A, B]): ACatenable1[F, A, B] =
     Lift(f)
+
+  // ACatenable1 is *the* free semicategory in lazy languages like Haskell.
+  // AList1 is fine for us, but ACatenable1 is probably faster asymptotically
+  // (depending on user code) and never asymptotically slower.
+  implicit def acatenable1FreeSemicategory[=>:[_, _]]: Semicategory[ACatenable1[=>:, ?, ?]] =
+    instanceOf(new SemicategoryClass[ACatenable1[=>:, ?, ?]] {
+      def compose[A, B, C](f: ACatenable1[=>:,B,C], g: ACatenable1[=>:,A,B]): ACatenable1[=>:,A,C] =
+        f.compose(g)
+    })
 }
