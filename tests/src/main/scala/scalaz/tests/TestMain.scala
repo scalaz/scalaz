@@ -1,9 +1,10 @@
 package scalaz.tests
 
+import java.util.concurrent.Executors
 import scala.{ Array, List, Unit }
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.global
+import scala.concurrent.ExecutionContext
 
 import java.lang.String
 
@@ -12,6 +13,10 @@ import testz.runner.Runner
 
 object TestMain {
   def main(args: Array[String]): Unit = {
+
+    val executor = Executors.newFixedThreadPool(2)
+    val ec = ExecutionContext.fromExecutor(executor)
+
     val harness: Harness[PureHarness.Uses[Unit]] =
       PureHarness.toHarness(
         PureHarness.make(
@@ -34,13 +39,15 @@ object TestMain {
       }
 
     val suites: List[() => Future[() => Unit]] = List(
-      Future(runPure("IList Tests", (new IListTests).tests(harness, combineUses)))(global),
-      Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(global),
-      Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(global),
-      Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(global),
+      Future(runPure("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
+      Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
+      Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
+      Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(ec),
     ).map(r => () => r)
 
-    Await.result(Runner(suites, global), Duration.Inf)
+    Await.result(Runner(suites, ec), Duration.Inf)
+
+    val _ = executor.shutdownNow()
 
   }
 }
