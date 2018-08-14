@@ -2,7 +2,7 @@ package scalaz
 package tests
 
 import scala.Int
-import scala.Predef.{ Map, String}
+import scala.Predef.{ Map, String }
 
 import data._
 import tc._
@@ -54,15 +54,18 @@ object ACatenable1Tests {
         section("free semicategory")(
           test("foldMap") { () =>
             HomomorphismLaws.semicategoryCompose(foldF)(
-              lift(fst) <<< lift(snd), lift(thd)
+              lift(fst) <<< lift(snd),
+              lift(thd)
             )(assertEqualNonEmptyMaps) |+|
-            HomomorphismLaws.semicategoryCompose(foldF)(
-              lift(fst), lift(snd) <<< lift(thd)
-            )(assertEqualNonEmptyMaps)
+              HomomorphismLaws.semicategoryCompose(foldF)(
+                lift(fst),
+                lift(snd) <<< lift(thd)
+              )(assertEqualNonEmptyMaps)
           },
           test("lift") { () =>
             HomomorphismLaws.semicategoryCompose(liftF)(
-              fst, snd
+              fst,
+              snd
             )((f, s) => assertEqualNonEmptyMaps(f.fold, s.fold))
           },
         ),
@@ -96,29 +99,26 @@ object ACatenable1Tests {
             Biconst[String, Int, Int]("helloworld")
           )
         },
-
         test("foldLeft") { () =>
-         assertEqual(
+          assertEqual(
             (const("hello") >>> const("world") >>> const("foobar")).foldLeft(Const[String, Int](""))(
-              ν[RightAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] {
-                (ga, fab) => Const("(" + Const.run(ga) + "|" + Biconst.run(fab) + ")")
+              ν[RightAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (ga, fab) =>
+                Const("(" + Const.run(ga) + "|" + Biconst.run(fab) + ")")
               }
             ),
             Const[String, Int]("(((|hello)|world)|foobar)")
           )
         },
-
         test("foldRight") { () =>
           assertEqual(
             (const("hello") >>> const("world") >>> const("foobar")).foldRight(Const[String, Int](""))(
-              ν[LeftAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] {
-                (fab, gb) => Const[String, α]("(" + Biconst.run(fab) + "|" + Const.run(gb) + ")")
+              ν[LeftAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (fab, gb) =>
+                Const[String, α]("(" + Biconst.run(fab) + "|" + Const.run(gb) + ")")
               }
             ),
             Const[String, Int]("(hello|(world|(foobar|)))")
           )
         },
-
         test("fold") { () =>
           final class Fake[A, B](val str: String)
           // not lawful, used to observe balanced binary tree shape of `fold`.
@@ -128,13 +128,18 @@ object ACatenable1Tests {
               new Fake("(" + fst.str + "|" + snd.str + ")")
           })
           assertEqual(
-            (lift(new Fake[Int, Int]("hello")) :+ new Fake[Int, Int]("world") :+ new Fake[Int, Int]("foo") :+ new Fake[Int, Int]("bar")).fold.str,
+            (lift(new Fake[Int, Int]("hello")) :+ new Fake[Int, Int]("world") :+ new Fake[Int, Int]("foo") :+ new Fake[
+              Int,
+              Int
+            ]("bar")).fold.str,
             "((hello|world)|(foo|bar))"
           ) |+|
-          assertEqual(
-            (new Fake[Int, Int]("hello") +: new Fake[Int, Int]("world") +: new Fake[Int, Int]("foo") +: lift(new Fake[Int, Int]("bar"))).fold.str,
-            "((hello|world)|(foo|bar))"
-          )
+            assertEqual(
+              (new Fake[Int, Int]("hello") +: new Fake[Int, Int]("world") +: new Fake[Int, Int]("foo") +: lift(
+                new Fake[Int, Int]("bar")
+              )).fold.str,
+              "((hello|world)|(foo|bar))"
+            )
         }
       )
     )

@@ -1,7 +1,7 @@
 package scalaz
 package tc
 
-import scala.Predef.{Map => SMap}
+import scala.Predef.{ Map => SMap }
 import scala.language.experimental.macros
 
 trait SemicategoryClass[=>:[_, _]] {
@@ -21,10 +21,11 @@ trait SemicategorySyntax {
 }
 
 object SemicategoryClass {
-  implicit def mapSemicategory: Semicategory[SMap] = instanceOf(new SemicategoryClass[SMap] {
-    def compose[A, B, C](f: B SMap C, g: A SMap B): A SMap C =
-      g.flatMap {
-        case (a, b) => f.get(b).map(c => (a, c))
-      }
-  })
+  implicit def mapSemicategory: Semicategory[SMap] =
+    instanceOf(new SemicategoryClass[SMap] {
+      def compose[A, B, C](f: B SMap C, g: A SMap B): A SMap C =
+        g.flatMap {
+          case (a, b) => f.get(b).map(c => (a, c))
+        }
+    })
 }

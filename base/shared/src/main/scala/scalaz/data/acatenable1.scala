@@ -3,7 +3,7 @@ package data
 
 import scala.annotation.tailrec
 
-import tc.{instanceOf, Semicategory, SemicategoryClass}
+import tc.{ instanceOf, Semicategory, SemicategoryClass }
 
 /**
  * Non-empty type-aligned sequence represented as a (non-balanced) binary tree,
@@ -77,7 +77,7 @@ object ACatenable1 {
   // (depending on user code) and never asymptotically slower.
   implicit def acatenable1FreeSemicategory[=>:[_, _]]: Semicategory[ACatenable1[=>:, ?, ?]] =
     instanceOf(new SemicategoryClass[ACatenable1[=>:, ?, ?]] {
-      def compose[A, B, C](f: ACatenable1[=>:,B,C], g: ACatenable1[=>:,A,B]): ACatenable1[=>:,A,C] =
+      def compose[A, B, C](f: ACatenable1[=>:, B, C], g: ACatenable1[=>:, A, B]): ACatenable1[=>:, A, C] =
         f.compose(g)
     })
 }
