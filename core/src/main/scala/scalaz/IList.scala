@@ -434,17 +434,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def toZipper: Option[Zipper[A]] =
     sToZipper(toStream)
 
-  // optimised specialisation of Traverse.traverse for disjunction, avoiding
-  // allocations for each element, approximately 20% faster than the default
-  // implementation.
-  def traverseDisjunction[E, B](f: A => E \/ B): E \/ IList[B] = \/-(
-    map { a =>
-      f(a) match {
-        case -\/(err) => return -\/(err)
-        case \/-(j)   => j
-      }
+  /**
+   * Referentially transparent replacement for traverse, specialised to
+   * disjunction.
+   */
+  def traverseDisjunction[E, B](f: A => E \/ B): E \/ IList[B] = {
+    @tailrec def go(lst: IList[A], acc: IList[B]): E \/ IList[B] = lst match {
+      case INil() => \/-(acc)
+      case ICons(head, tail) =>
+        f(head) match {
+          case \/-(b)       => go(tail, b :: acc)
+          case err @ -\/(_) => err
+        }
     }
-  )
+    go(this, IList.empty).map(_.reverse)
+  }
 
   def uncons[B](n: => B, c: (A, IList[A]) => B): B =
     this match {
