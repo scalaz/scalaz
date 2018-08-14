@@ -127,19 +127,13 @@ object ACatenable1Tests {
             def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
               new Fake("(" + fst.str + "|" + snd.str + ")")
           })
-          assertEqual(
-            (lift(new Fake[Int, Int]("hello")) :+ new Fake[Int, Int]("world") :+ new Fake[Int, Int]("foo") :+ new Fake[
-              Int,
-              Int
-            ]("bar")).fold.str,
-            "((hello|world)|(foo|bar))"
-          ) |+|
-            assertEqual(
-              (new Fake[Int, Int]("hello") +: new Fake[Int, Int]("world") +: new Fake[Int, Int]("foo") +: lift(
-                new Fake[Int, Int]("bar")
-              )).fold.str,
-              "((hello|world)|(foo|bar))"
-            )
+          def fake(str: String): Fake[Int, Int] = new Fake(str)
+          IList(
+            ((lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).fold.str,
+              "((hello|world)|(foo|bar))"),
+            ((fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).fold.str,
+              "((hello|world)|(foo|bar))")
+          ).foldMap(assertEqualTupled)
         }
       )
     )
