@@ -14,7 +14,13 @@ import testz.runner.Runner
 object TestMain {
   def main(args: Array[String]): Unit = {
 
-    val executor = Executors.newFixedThreadPool(2)
+    val isCI = try {
+      scala.sys.env("CI") == "true"
+    } catch {
+      case _: java.util.NoSuchElementException => false
+    }
+
+    val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
     val harness: Harness[PureHarness.Uses[Unit]] =
