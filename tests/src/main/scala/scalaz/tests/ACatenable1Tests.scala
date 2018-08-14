@@ -132,9 +132,8 @@ object ACatenable1Tests {
           def fake(str: String): Fake[Int, Int] = new Fake(str)
           IList(
             ((lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).fold.str,
-              "((hello|world)|(foo|bar))"),
-            ((fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).fold.str,
-              "((hello|world)|(foo|bar))")
+             "((hello|world)|(foo|bar))"),
+            ((fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).fold.str, "((hello|world)|(foo|bar))")
           ).foldMap(assertEqualTupled)
         }
       )

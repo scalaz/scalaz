@@ -15,7 +15,7 @@ object TestMain {
   def main(args: Array[String]): Unit = {
 
     val executor = Executors.newFixedThreadPool(2)
-    val ec = ExecutionContext.fromExecutor(executor)
+    val ec       = ExecutionContext.fromExecutor(executor)
 
     val harness: Harness[PureHarness.Uses[Unit]] =
       PureHarness.toHarness(
