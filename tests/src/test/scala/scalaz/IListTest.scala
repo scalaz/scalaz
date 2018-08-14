@@ -296,6 +296,14 @@ object IListTest extends SpecLite {
     (ns reverse_::: ms).toList must_=== (ns.toList reverse_::: ms.toList)
   }
 
+  "traverseDisjunction" ! forAll { (is: IList[Int]) =>
+    import syntax.traverse._
+
+    def f(i: Int): String \/ Int = if (i % 2 == 0) -\/(i.toString) else \/-(i)
+
+    is.traverseDisjunction(f).must_===(is.traverse[String \/ ?, Int](f))
+  }
+
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>
     ss.scanLeft(0)(f).toList must_=== ss.toList.scanLeft(0)(f)
     ss.scanLeft("z")(_ + _).toList must_=== ss.toList.scanLeft("z")(_ + _)

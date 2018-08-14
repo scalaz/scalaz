@@ -109,8 +109,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
     this match {
-      case \/-(a)     => \/-(g(a))
-      case b @ -\/(_) => b
+      case \/-(b) => \/-(g(b))
+      case a => a.asInstanceOf[A \/ D]
     }
 
   /** Traverse on the right of this disjunction. */
@@ -131,8 +131,8 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
     this match {
-      case a @ -\/(_) => a
       case \/-(b) => g(b)
+      case a => a.asInstanceOf[AA \/ D]
     }
 
   /** Fold on the right of this disjunction. */
@@ -473,6 +473,18 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
+
+      override def ap[A,B](fa: => L \/ A)(f: => L \/ (A => B)): L \/ B = fa.ap(f)
+
+      override def apply2[A, B, C](fa: => L \/ A, fb: => L \/ B)(f: (A, B) => C): L \/ C =
+        fa match {
+          case \/-(a) =>
+            fb match {
+              case \/-(b) => \/-(f(a, b))
+              case e => e.asInstanceOf[L \/ C]
+            }
+          case e => e.asInstanceOf[L \/ C]
+        }
 
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => L \/ (A \/ B))(a: A): L \/ B =
