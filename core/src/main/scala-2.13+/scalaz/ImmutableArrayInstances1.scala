@@ -11,7 +11,11 @@ abstract class ImmutableArrayInstances1 {
       override def newBuilder(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] =
         ImmutableArray.newBuilder(m)
 
-      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[T]): ImmutableArray[T] =
+      // for Scala 2.13.0-M4. TODO remove if Scala 2.13.0-M5 released
+      def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[T]): ImmutableArray[T] =
+        ImmutableArray.fromArray(it.toArray)
+
+      def fromSpecific(from: ImmutableArray[_])(it: IterableOnce[T]): ImmutableArray[T] =
         ImmutableArray.fromArray(it.toArray)
     }
 
@@ -20,7 +24,11 @@ abstract class ImmutableArrayInstances1 {
       override def newBuilder(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] =
         ImmutableArray.newStringArrayBuilder
 
-      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[Char]): ImmutableArray[Char] =
+      // for Scala 2.13.0-M4. TODO remove if Scala 2.13.0-M5 released
+      def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[Char]): ImmutableArray[Char] =
+        ImmutableArray.fromArray(it.toArray)
+
+      def fromSpecific(from: ImmutableArray[_])(it: IterableOnce[Char]): ImmutableArray[Char] =
         ImmutableArray.fromArray(it.toArray)
     }
 
