@@ -1,7 +1,7 @@
 package scalaz
 package tests
 
-import scala.{AnyRef, Int}
+import scala.{ AnyRef, Int }
 
 import data._
 
@@ -20,5 +20,5 @@ object AFixTests {
         assert(AFix.fix(empty).asInstanceOf[AnyRef] eq empty.asInstanceOf[AnyRef])
       },
     ),
- }
+  }
 }

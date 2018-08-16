@@ -1,7 +1,7 @@
 package scalaz.tests
 
 import java.util.concurrent.Executors
-import scala.{ Array, Char, Int, List, Unit, inline }
+import scala.{ inline, Array, Char, Int, List, Unit }
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
@@ -25,7 +25,9 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, cont: (String, T) => U)(ec: ExecutionContext): List[Future[U]] =
+    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, cont: (String, T) => U)(
+      ec: ExecutionContext
+    ): List[Future[U]] =
       List(
         Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
         Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
@@ -41,7 +43,7 @@ object TestMain {
         )
 
       @scala.annotation.tailrec
-      def times(ch: Char, i: Int, acc: Array[Char]): String = {
+      def times(ch: Char, i: Int, acc: Array[Char]): String =
         if (i == 0) {
           acc(i) = ch
           new String(acc)
@@ -49,7 +51,6 @@ object TestMain {
           acc(i) = ch
           times(ch, i - 1, acc)
         }
-      }
 
       @inline def printSuite(name: String, desc: DocHarness.Uses[Unit]): List[String] = {
         val sb = new ListBuffer[String]
@@ -66,7 +67,10 @@ object TestMain {
 
       val result =
         Await.result(
-          Future.sequence(suites[DocHarness.Uses[Unit], List[String]](harness, combineUses, printSuite)(ec))(scala.collection.breakOut, ec),
+          Future.sequence(suites[DocHarness.Uses[Unit], List[String]](harness, combineUses, printSuite)(ec))(
+            scala.collection.breakOut,
+            ec
+          ),
           Duration.Inf
         )
 
@@ -81,8 +85,7 @@ object TestMain {
       )
 
       @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
-        (r, ls) =>
-          TestOutput.combine(fst(r, ls), snd(r, ls))
+        (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
 
       @inline def runPure(name: String, tests: PureHarness.Uses[Unit]): TestOutput =
         tests((), List(name))
@@ -98,4 +101,3 @@ object TestMain {
 
   }
 }
-
