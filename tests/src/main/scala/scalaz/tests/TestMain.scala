@@ -34,7 +34,7 @@ object TestMain {
         Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
 
-    if (List(args: _*) == List("--show")) {
+    if (List(args: _*) == List("show")) {
       val harness =
         PureHarness.toHarness(
           new DocHarness
