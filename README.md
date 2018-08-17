@@ -21,7 +21,7 @@ If you're using SBT, add the following line to your build file:
 libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.26"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.2.26%22).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.2.26).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
