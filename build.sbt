@@ -91,6 +91,7 @@ lazy val microsite = project.module
     micrositeGithubOwner := "scalaz",
     micrositeGithubRepo := "scalaz",
     micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
+    micrositeBaseUrl := "/8",
     micrositePalette := Map(
       "brand-primary"   -> "#ED2124",
       "brand-secondary" -> "#251605",
