@@ -46,9 +46,9 @@ sealed trait AListModule {
    * }}}
    *
    * The first list has type `AList[=>, A, E]`, while
-   * the reversed list has type `Composed[=>, A, E]`.
+   * the reversed list has type `Flipped[=>, A, E]`.
    */
-  type Composed[F[_, _], A, B] = AList[λ[(α, β) => F[β, α]], B, A]
+  type Flipped[F[_, _], A, B] = AList[λ[(α, β) => F[β, α]], B, A]
 
   def empty[F[_, _], A]: AList[F, A, A]
   def cons[F[_, _], A, B, C](f: F[A, B], fs: AList[F, B, C]): AList[F, A, C]
@@ -72,21 +72,21 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   def :::[Z](that: AList[F, Z, A]): AList[F, Z, B] =
     that.reverse reverse_::: self
 
-  def reverse: Composed[F, A, B] = {
-    @tailrec def go[X](fs: AList[F, X, B], acc: Composed[F, A, X]): Composed[F, A, B] =
+  def reverse: Flipped[F, A, B] = {
+    @tailrec def go[X](fs: AList[F, X, B], acc: Flipped[F, A, X]): Flipped[F, A, B] =
       fs.uncons match {
         case AJust2(h, t)   => go(t, h :: acc)
-        case ev @ AEmpty2() => ev.subst[Composed[F, A, ?]](acc)
+        case ev @ AEmpty2() => ev.subst[Flipped[F, A, ?]](acc)
       }
 
     go(self, empty[λ[(α, β) => F[β, α]], A])
   }
 
-  def reverse_:::[Z](that: Composed[F, Z, A]): AList[F, Z, B] = {
-    @tailrec def go[G[_, _], X](gs: AList[G, X, Z], acc: Composed[G, B, X]): Composed[G, B, Z] =
+  def reverse_:::[Z](that: Flipped[F, Z, A]): AList[F, Z, B] = {
+    @tailrec def go[G[_, _], X](gs: AList[G, X, Z], acc: Flipped[G, B, X]): Flipped[G, B, Z] =
       gs.uncons match {
         case AJust2(g, gs)  => go(gs, g :: acc)
-        case ev @ AEmpty2() => ev.subst[Composed[G, B, ?]](acc)
+        case ev @ AEmpty2() => ev.subst[Flipped[G, B, ?]](acc)
       }
 
     go[λ[(α, β) => F[β, α]], A](that, self)

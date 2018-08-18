@@ -27,8 +27,11 @@ sealed abstract class AList1[F[_, _], A, B] {
   def ::[Z](fza: F[Z, A]): AList1[F, Z, B] =
     ACons1(fza, this.toList)
 
-  def :+[C](f: F[B, C]): AList1[F, A, C] =
-    this ::: AList1(f)
+  def :+[Z](fza: F[Z, A]): AList1[F, Z, B] =
+    ::(fza)
+
+  def +:[C](fbc: F[B, C]): AList1[F, A, C] =
+    this ::: AList1(fbc)
 
   def :::[Z](that: AList1[F, Z, A]): AList1[F, Z, B] =
     that.reverse reverse_::: this
@@ -39,10 +42,10 @@ sealed abstract class AList1[F[_, _], A, B] {
     foldRight1[AList1[F, ?, C]](∀.mk[FXB ~> FXC].from(_ +: that))(ν[LeftAction[FXC, F]][α, β](_ :: _))
   }
 
-  def reverse_:::[Z](that: Composed1[F, Z, A]): AList1[F, Z, B] =
+  def reverse_:::[Z](that: Flipped1[F, Z, A]): AList1[F, Z, B] =
     that.toList reverse_::: this
 
-  def reverse: Composed1[F, A, B] =
+  def reverse: Flipped1[F, A, B] =
     tail reverse_::: AList1[λ[(α, β) => F[β, α]], Pivot, A](head)
 
   def :::[Z](that: AList[F, Z, A]): AList1[F, Z, B] =
@@ -51,7 +54,7 @@ sealed abstract class AList1[F[_, _], A, B] {
       case AEmpty2()    => sys.error("unreachable code")
     }
 
-  def reverse_:::[Z](that: AList.Composed[F, Z, A]): AList1[F, Z, B] =
+  def reverse_:::[Z](that: AList.Flipped[F, Z, A]): AList1[F, Z, B] =
     (that reverse_::: this.toList).uncons match {
       case AJust2(h, t) => ACons1(h, t)
       case AEmpty2()    => sys.error("unreachable code")
@@ -134,10 +137,18 @@ object AList1 {
    * }}}
    *
    * The first list has type `AList1[=>, A, E]`, while
-   * the reversed list has type `Composed1[=>, A, E]`.
+   * the reversed list has type `Flipped1[=>, A, E]`.
    */
-  type Composed1[F[_, _], A, B] = AList1[λ[(α, β) => F[β, α]], B, A]
+  type Flipped1[F[_, _], A, B] = AList1[λ[(α, β) => F[β, α]], B, A]
 
   def apply[F[_, _], A, B](f: F[A, B]): AList1[F, A, B] = ACons1(f, AList.empty)
-  def op[F[_, _], A, B](f: F[A, B]): Composed1[F, A, B] = apply[λ[(α, β) => F[β, α]], B, A](f)
+  def lift[F[_, _], A, B](f: F[A, B]): AList1[F, A, B]  = ACons1(f, AList.empty)
+  def op[F[_, _], A, B](f: F[A, B]): Flipped1[F, A, B]  = apply[λ[(α, β) => F[β, α]], B, A](f)
+
+  // AList1 is a free semicategory in strict languages, like Scala.
+  implicit def alist1Semicategory[F[_, _]]: Semicategory[AList1[F, ?, ?]] =
+    instanceOf(new SemicategoryClass[AList1[F, ?, ?]] {
+      def compose[A, B, C](fst: AList1[F, B, C], snd: AList1[F, A, B]): AList1[F, A, C] =
+        snd :++ fst.toList
+    })
 }
