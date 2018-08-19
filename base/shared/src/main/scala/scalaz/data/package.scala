@@ -88,6 +88,9 @@ package object data {
   val AList: AListModule = AListImpl
   type AList[F[_, _], A, B] = AList.AList[F, A, B]
 
+  val Biconst: BiconstModule = BiconstImpl
+  type Biconst[A, B, C] = Biconst.Biconst[A, B, C]
+
   val Compose: ComposeModule = ComposeImpl
   type Compose[F[_], G[_], X] = Compose.Compose[F, G, X]
 

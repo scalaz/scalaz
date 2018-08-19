@@ -1,9 +1,10 @@
 package scalaz.tests
 
+import java.util.concurrent.Executors
 import scala.{ Array, List, Unit }
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.global
+import scala.concurrent.ExecutionContext
 
 import java.lang.String
 
@@ -12,6 +13,16 @@ import testz.runner.Runner
 
 object TestMain {
   def main(args: Array[String]): Unit = {
+
+    val isCI = try {
+      scala.sys.env("CI") == "true"
+    } catch {
+      case _: java.util.NoSuchElementException => false
+    }
+
+    val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
+    val ec       = ExecutionContext.fromExecutor(executor)
+
     val harness: Harness[PureHarness.Uses[Unit]] =
       PureHarness.toHarness(
         PureHarness.make(
@@ -19,8 +30,8 @@ object TestMain {
         )
       )
 
-    def runPure(name: String, tests: PureHarness.Uses[Unit]): Future[() => Unit] =
-      Future.successful(tests((), List(name)))
+    def runPure(name: String, tests: PureHarness.Uses[Unit]): () => Unit =
+      tests((), List(name))
 
     def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
       (r, ls) => {
@@ -34,11 +45,15 @@ object TestMain {
       }
 
     val suites: List[() => Future[() => Unit]] = List(
-      () => runPure("IList Tests", (new IListTests).tests(harness, combineUses)),
-      () => runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness))
-    )
+      Future(runPure("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
+      Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
+      Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
+      Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(ec),
+    ).map(r => () => r)
 
-    Await.result(Runner(suites, global), Duration.Inf)
+    Await.result(Runner(suites, ec), Duration.Inf)
+
+    val _ = executor.shutdownNow()
 
   }
 }
