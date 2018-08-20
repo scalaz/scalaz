@@ -49,6 +49,7 @@ object TestMain {
       Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
       Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
       Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(ec),
+      Future(runPure("Double Tests", (new DoubleTests).tests(harness)))(ec),
     ).map(r => () => r)
 
     Await.result(Runner(suites, ec), Duration.Inf)
