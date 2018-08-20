@@ -27,10 +27,10 @@ sealed abstract class AList1[F[_, _], A, B] {
   def ::[Z](fza: F[Z, A]): AList1[F, Z, B] =
     ACons1(fza, this.toList)
 
-  def :+[Z](fza: F[Z, A]): AList1[F, Z, B] =
+  def +:[Z](fza: F[Z, A]): AList1[F, Z, B] =
     ::(fza)
 
-  def +:[C](fbc: F[B, C]): AList1[F, A, C] =
+  def :+[C](fbc: F[B, C]): AList1[F, A, C] =
     this ::: AList1(fbc)
 
   def :::[Z](that: AList1[F, Z, A]): AList1[F, Z, B] =
@@ -81,7 +81,7 @@ sealed abstract class AList1[F[_, _], A, B] {
   /**
    * Compose the elements of this list in a balanced binary fashion.
    */
-  def fold(implicit F: Semicategory[F]): F[A, B] =
+  def foldBalanced(implicit F: Semicategory[F]): F[A, B] =
     tail.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(head))(PostComposeBalancer.rightAction).result
 
   /**
@@ -145,7 +145,7 @@ object AList1 {
   def lift[F[_, _], A, B](f: F[A, B]): AList1[F, A, B]  = ACons1(f, AList.empty)
   def op[F[_, _], A, B](f: F[A, B]): Flipped1[F, A, B]  = apply[λ[(α, β) => F[β, α]], B, A](f)
 
-  // AList1 is a free semicategory in strict languages, like Scala.
+  // AList1 is a valid free semicategory in strict languages, like Scala.
   implicit def alist1Semicategory[F[_, _]]: Semicategory[AList1[F, ?, ?]] =
     instanceOf(new SemicategoryClass[AList1[F, ?, ?]] {
       def compose[A, B, C](fst: AList1[F, B, C], snd: AList1[F, A, B]): AList1[F, A, C] =
