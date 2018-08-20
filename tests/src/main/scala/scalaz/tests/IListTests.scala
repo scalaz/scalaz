@@ -267,7 +267,9 @@ final class IListTests {
             val snd = (a: Int) => if (a % 5 == 0) scala.None else scala.Some(a  % 20)
 
             lists.foldMap {
-              TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Option[Option[IList[Int]]]])
+              TraversableLaws.traverseComposition(_)(fst, snd)(
+                assertEqual[Option[Option[IList[Int]]]]
+              )
             }
           },
           test("traversable identity") { () =>

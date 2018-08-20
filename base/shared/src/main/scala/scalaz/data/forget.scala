@@ -10,7 +10,9 @@ final case class Forget[A, B, C](forget: B => A) {
 object Forget {
   implicit def strong[A]: Strong[Forget[A, ?, ?]] =
     instanceOf(new StrongClass[Forget[A, ?, ?]] {
-      override def dimap[B, C, D, E](fbc: Forget[A, B, C])(fdb: D => B)(fce: C => E): Forget[A, D, E] =
+      override def dimap[B, C, D, E](
+        fbc: Forget[A, B, C]
+      )(fdb: D => B)(fce: C => E): Forget[A, D, E] =
         Forget[A, D, E](fdb andThen fbc.forget)
 
       override def lmap[B, C, D](fbc: Forget[A, B, C])(fdb: D => B): Forget[A, D, C] =

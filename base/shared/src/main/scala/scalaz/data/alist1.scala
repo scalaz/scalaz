@@ -36,7 +36,9 @@ sealed abstract class AList1[F[_, _], A, B] {
   def :++[C](that: AList[F, B, C]): AList1[F, A, C] = {
     type FXB[X] = F[X, B]
     type FXC[X] = AList1[F, X, C]
-    foldRight1[AList1[F, ?, C]](∀.mk[FXB ~> FXC].from(_ +: that))(ν[LeftAction[FXC, F]][α, β](_ :: _))
+    foldRight1[AList1[F, ?, C]](∀.mk[FXB ~> FXC].from(_ +: that))(
+      ν[LeftAction[FXC, F]][α, β](_ :: _)
+    )
   }
 
   def reverse_:::[Z](that: Composed1[F, Z, A]): AList1[F, Z, B] =
@@ -79,14 +81,20 @@ sealed abstract class AList1[F[_, _], A, B] {
    * Compose the elements of this list in a balanced binary fashion.
    */
   def fold(implicit F: Semicategory[F]): F[A, B] =
-    tail.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(head))(PostComposeBalancer.rightAction).result
+    tail
+      .foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(head))(
+        PostComposeBalancer.rightAction
+      )
+      .result
 
   /**
    * Map and then compose the elements of this list in a balanced binary fashion.
    */
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): G[A, B] =
     tail
-      .foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightAction(φ))
+      .foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(
+        PostComposeBalancer.rightAction(φ)
+      )
       .result
 
   def map[G[_, _]](φ: F ~~> G): AList1[G, A, B] =
@@ -107,7 +115,8 @@ sealed abstract class AList1[F[_, _], A, B] {
   override def toString: String = toList.mkString("AList1(", ", ", ")")
 }
 
-final case class ACons1[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B]) extends AList1[F, A, B] {
+final case class ACons1[F[_, _], A, X, B](head: F[A, X], tail: AList[F, X, B])
+    extends AList1[F, A, B] {
   type Pivot = X
 }
 

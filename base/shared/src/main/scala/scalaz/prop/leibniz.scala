@@ -49,7 +49,9 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
    *
    * @see [[compose]]
    */
-  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](bc: Leibniz[L2, H2, B, C]): Leibniz[L2, H2, A, C] =
+  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](
+    bc: Leibniz[L2, H2, B, C]
+  ): Leibniz[L2, H2, A, C] =
     Leibniz.compose[L2, H2, A, B, C](bc, ab)
 
   /**
@@ -58,7 +60,9 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
    *
    * @see [[andThen]]
    */
-  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2](za: Leibniz[L2, H2, Z, A]): Leibniz[L2, H2, Z, B] =
+  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2](
+    za: Leibniz[L2, H2, Z, A]
+  ): Leibniz[L2, H2, Z, B] =
     Leibniz.compose[L2, H2, Z, A, B](ab, za)
 
   /**
@@ -129,7 +133,9 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] { ab =>
 
 object Leibniz {
 
-  def apply[L, H >: L, A >: L <: H, B >: L <: H](implicit ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, B] = ab
+  def apply[L, H >: L, A >: L <: H, B >: L <: H](
+    implicit ab: Leibniz[L, H, A, B]
+  ): Leibniz[L, H, A, B] = ab
 
   private[this] final case class Refl[A]() extends Leibniz[A, A, A, A] {
     def subst[F[_ >: A <: A]](fa: F[A]): F[A] = fa
@@ -164,8 +170,10 @@ object Leibniz {
    * @see [[Leibniz.compose]]
    * @see [[Leibniz.andThen]]
    */
-  def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](bc: Leibniz[L, H, B, C],
-                                                                ab: Leibniz[L, H, A, B]): Leibniz[L, H, A, C] =
+  def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](
+    bc: Leibniz[L, H, B, C],
+    ab: Leibniz[L, H, A, B]
+  ): Leibniz[L, H, A, C] =
     bc.subst[λ[`α >: L <: H` => Leibniz[L, H, A, α]]](ab)
 
   /**
@@ -227,7 +235,8 @@ object Leibniz {
     A2 >: L2 <: H2,
     B2 >: L2 <: H2
   ](eq1: Leibniz[L1, H1, A1, B1], eq2: Leibniz[L2, H2, A2, B2]) {
-    def bounded[LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF]: Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
+    def bounded[LF, HF >: LF, F[_ >: L1 <: H1, _ >: L2 <: H2] >: LF <: HF]
+      : Leibniz[LF, HF, F[A1, A2], F[B1, B2]] = {
       type f1[α >: L1 <: H1] = Leibniz[LF, HF, F[A1, A2], F[α, A2]]
       type f2[α >: L2 <: H2] = Leibniz[LF, HF, F[A1, A2], F[B1, α]]
       eq2.subst[f2](eq1.subst[f1](refl_[LF, HF, F[A1, A2]]))

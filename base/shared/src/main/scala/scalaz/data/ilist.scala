@@ -115,7 +115,9 @@ object IListModule {
       def sequence[F[_], A](ta: IList[F[A]])(implicit F: Applicative[F]): F[IList[A]] =
         traverse(ta)(fa => fa)
 
-      def traverse[F[_], A, B](ta: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+      def traverse[F[_], A, B](
+        ta: IList[A]
+      )(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
         ta.uncons match {
           case Maybe2.Empty2() =>
             F.pure(IList.empty[B])

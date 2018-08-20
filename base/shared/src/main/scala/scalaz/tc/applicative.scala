@@ -25,8 +25,9 @@ object ApplicativeClass {
       }
 
       def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] = new Fiber[E, B] {
-        def join: IO[E, B]                                     = fa.join.flatMap(a => f.join.map(f => f(a)))
-        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = fa.interrupt0(ts) *> f.interrupt0(ts)
+        def join: IO[E, B] = fa.join.flatMap(a => f.join.map(f => f(a)))
+        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] =
+          fa.interrupt0(ts) *> f.interrupt0(ts)
       }
 
       def map[A, B](ma: Fiber[E, A])(f: A => B): Fiber[E, B] = new Fiber[E, B] {

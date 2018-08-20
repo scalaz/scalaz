@@ -47,7 +47,9 @@ private[data] object IdentityImpl extends IdentityModule {
   val traversable: Traversable[Identity] =
     instanceOf(new TraversableClass[Identity] {
       override def map[A, B](fa: Identity[A])(f: A => B): Identity[B] = f(fa)
-      override def traverse[G[_]: Applicative, A, B](fa: Identity[A])(f: A => G[B]): G[Identity[B]] =
+      override def traverse[G[_]: Applicative, A, B](
+        fa: Identity[A]
+      )(f: A => G[B]): G[Identity[B]] =
         f(fa)
       override def sequence[G[_]: Applicative, A](fa: Identity[G[A]]): G[Identity[A]] =
         fa

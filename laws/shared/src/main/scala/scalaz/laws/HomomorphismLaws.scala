@@ -75,7 +75,8 @@ object HomomorphismLaws {
 
   def semicategoryCompose[F[_, _], G[_, _], A, B, C, D, T](
     transform: F ~~> G
-  )(fst: F[B, C], snd: F[A, B])(assert: (G[A, C], G[A, C]) => T)(implicit F: Semicategory[F], G: Semicategory[G]): T =
+  )(fst: F[B, C], snd: F[A, B])(assert: (G[A, C], G[A, C]) => T)(implicit F: Semicategory[F],
+                                                                 G: Semicategory[G]): T =
     assert(
       G.compose(transform.of(fst), transform.of(snd)),
       transform.of(F.compose(fst, snd))

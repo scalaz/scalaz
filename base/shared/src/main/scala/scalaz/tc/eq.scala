@@ -41,12 +41,14 @@ object EqClass {
 
   implicit def setEq[A: Eq]: Eq[Set[A]] =
     instanceOf(new EqClass[Set[A]] {
-      def equal(first: Set[A], second: Set[A]): Boolean = (first.toStream.corresponds(second.toStream)(Eq[A].equal))
+      def equal(first: Set[A], second: Set[A]): Boolean =
+        (first.toStream.corresponds(second.toStream)(Eq[A].equal))
     })
 
   implicit def vectorEq[A: Eq]: Eq[Vector[A]] =
     instanceOf(new EqClass[Vector[A]] {
-      def equal(first: Vector[A], second: Vector[A]): Boolean = (first.corresponds(second)(Eq[A].equal))
+      def equal(first: Vector[A], second: Vector[A]): Boolean =
+        (first.corresponds(second)(Eq[A].equal))
     })
 
   implicit final def tuple1Eq[A](implicit A: Eq[A]): Eq[Tuple1[A]] =
@@ -68,7 +70,10 @@ object EqClass {
       case _ => false
     }
 
-  implicit final def tuple4Eq[A, B, C, D](implicit A: Eq[A], B: Eq[B], C: Eq[C], D: Eq[D]): Eq[(A, B, C, D)] =
+  implicit final def tuple4Eq[A, B, C, D](implicit A: Eq[A],
+                                          B: Eq[B],
+                                          C: Eq[C],
+                                          D: Eq[D]): Eq[(A, B, C, D)] =
     instanceOf[EqClass[(A, B, C, D)]] {
       case ((a1, b1, c1, d1), (a2, b2, c2, d2)) =>
         A.equal(a1, a2) && B.equal(b1, b2) && C.equal(c1, c2) && D.equal(d1, d2)
@@ -78,12 +83,13 @@ object EqClass {
   private[this] final val NegZero: Double = -0.0d
   private[this] final val PosZero: Double = 0.0d
 
-  implicit val intEq: Eq[Int]         = Eq.fromEquals[Int]
-  implicit val longEq: Eq[Long]       = Eq.fromEquals[Long]
-  implicit val stringEq: Eq[String]   = Eq.fromEquals[String]
-  implicit val unitEq: Eq[Unit]       = Eq.always[Unit]
-  implicit val shortEq: Eq[Short]     = Eq.fromEquals[Short]
-  implicit val floatEq: Eq[Float]     = instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
+  implicit val intEq: Eq[Int]       = Eq.fromEquals[Int]
+  implicit val longEq: Eq[Long]     = Eq.fromEquals[Long]
+  implicit val stringEq: Eq[String] = Eq.fromEquals[String]
+  implicit val unitEq: Eq[Unit]     = Eq.always[Unit]
+  implicit val shortEq: Eq[Short]   = Eq.fromEquals[Short]
+  implicit val floatEq: Eq[Float] =
+    instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
   implicit val byteEq: Eq[Byte]       = Eq.fromEquals[Byte]
   implicit val booleanEq: Eq[Boolean] = Eq.fromEquals[Boolean]
   implicit val doubleEq: Eq[Double] =

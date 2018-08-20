@@ -45,7 +45,9 @@ object PreComposeBalancer {
   def apply[F[_, _], A, B](f: F[A, B]): PreComposeBalancer[F, A, B] =
     new PreComposeBalancer(1, AList1(f))
 
-  def leftAction[F[_, _], Z](implicit F: Semicategory[F]): LeftAction[PreComposeBalancer[F, ?, Z], F] =
+  def leftAction[F[_, _], Z](
+    implicit F: Semicategory[F]
+  ): LeftAction[PreComposeBalancer[F, ?, Z], F] =
     ν[LeftAction[PreComposeBalancer[F, ?, Z], F]][X, Y]((f, acc) => f +: acc)
 
   def leftAction[G[_, _], F[_, _], Z](
@@ -58,8 +60,9 @@ object PreComposeBalancer {
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the left and addition of new elements (i.e. "increment") from the right.
  */
-final class PostComposeBalancer[F[_, _], A, B](private val repr: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A])
-    extends AnyVal {
+final class PostComposeBalancer[F[_, _], A, B](
+  private val repr: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A]
+) extends AnyVal {
   import PostComposeBalancer._
 
   /** Post-compose an element. */
@@ -75,10 +78,14 @@ object PostComposeBalancer {
   def apply[F[_, _], A, B](f: F[A, B]): PostComposeBalancer[F, A, B] =
     wrap(PreComposeBalancer[λ[(α, β) => F[β, α]], B, A](f))
 
-  def wrap[F[_, _], A, B](pre: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A]): PostComposeBalancer[F, A, B] =
+  def wrap[F[_, _], A, B](
+    pre: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A]
+  ): PostComposeBalancer[F, A, B] =
     new PostComposeBalancer[F, A, B](pre)
 
-  def rightAction[F[_, _], A](implicit F: Semicategory[F]): RightAction[PostComposeBalancer[F, A, ?], F] =
+  def rightAction[F[_, _], A](
+    implicit F: Semicategory[F]
+  ): RightAction[PostComposeBalancer[F, A, ?], F] =
     ν[RightAction[PostComposeBalancer[F, A, ?], F]][B, C]((acc, f) => acc :+ f)
 
   def rightAction[G[_, _], F[_, _], A](

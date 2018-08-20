@@ -71,7 +71,9 @@ private[data] object BiconstImpl extends BiconstModule {
       R.mappend(fa, f)
   }
 
-  private trait BiconstApplicative[R, A] extends ApplicativeClass[Biconst[R, A, ?]] with BiconstApply[R, A] {
+  private trait BiconstApplicative[R, A]
+      extends ApplicativeClass[Biconst[R, A, ?]]
+      with BiconstApply[R, A] {
     override def R: MonoidClass[R]
     final override def pure[B](b: B): Biconst[R, A, B] = R.mempty
   }
@@ -94,13 +96,14 @@ private[data] object BiconstImpl extends BiconstModule {
 
   def biconstTraversable[C, D]: Traversable[Biconst[C, D, ?]] =
     instanceOf(new TraversableClass[Biconst[C, D, ?]] with BiconstPhantom[C, D] {
-      def foldLeft[A, B](fa: C, z: B)(f: (B, A) => B): B                                        = z
-      def foldMap[A, B](fa: C)(f: A => B)(implicit B: Monoid[B]): B                             = B.mempty
-      def foldRight[A, B](fa: C, z: => B)(f: (A, => B) => B): B                                 = z
-      def msuml[A](fa: C)(implicit A: Monoid[A]): A                                             = A.mempty
-      def toList[A](fa: C): scala.List[A]                                                       = scala.Nil
-      def sequence[F[_], A](ta: C)(implicit F: scalaz.tc.Applicative[F]): F[C]                  = F.pure(ta)
-      def traverse[F[_], A, B](ta: C)(f: A => F[B])(implicit F: scalaz.tc.Applicative[F]): F[C] = F.pure(ta)
+      def foldLeft[A, B](fa: C, z: B)(f: (B, A) => B): B                       = z
+      def foldMap[A, B](fa: C)(f: A => B)(implicit B: Monoid[B]): B            = B.mempty
+      def foldRight[A, B](fa: C, z: => B)(f: (A, => B) => B): B                = z
+      def msuml[A](fa: C)(implicit A: Monoid[A]): A                            = A.mempty
+      def toList[A](fa: C): scala.List[A]                                      = scala.Nil
+      def sequence[F[_], A](ta: C)(implicit F: scalaz.tc.Applicative[F]): F[C] = F.pure(ta)
+      def traverse[F[_], A, B](ta: C)(f: A => F[B])(implicit F: scalaz.tc.Applicative[F]): F[C] =
+        F.pure(ta)
     })
 
   def biconstBifunctor[A]: Bifunctor[Biconst[A, ?, ?]] =

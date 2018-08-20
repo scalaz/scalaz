@@ -42,8 +42,10 @@ object AMaybe2 {
     def unsubst[H[_]](hb: H[A]): H[A] = hb
   }
 
-  implicit final def amaybe2Debug[F[_, _], G[_, _], A, B](implicit FAB: Debug[F[A, B]],
-                                                          GAB: Debug[G[A, B]]): Debug[AMaybe2[F, G, A, B]] = {
+  implicit final def amaybe2Debug[F[_, _], G[_, _], A, B](
+    implicit FAB: Debug[F[A, B]],
+    GAB: Debug[G[A, B]]
+  ): Debug[AMaybe2[F, G, A, B]] = {
     import Scalaz.debugInterpolator
     import scala.unchecked
     type FAB = F[A, B]

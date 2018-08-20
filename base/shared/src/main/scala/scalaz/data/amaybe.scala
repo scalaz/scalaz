@@ -33,7 +33,9 @@ object AMaybe {
     def unsubst[G[_]](gb: G[A]): G[A] = gb
   }
 
-  implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] = {
+  implicit final def amaybeDebug[F[_, _], A, B](
+    implicit FAB: Debug[F[A, B]]
+  ): Debug[AMaybe[F, A, B]] = {
     import Scalaz.debugInterpolator
     DebugClass.instance[AMaybe[F, A, B]] {
       case AJust(value) => z"AMaybe($value)"

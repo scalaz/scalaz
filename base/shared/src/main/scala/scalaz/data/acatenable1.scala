@@ -59,14 +59,19 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
   final def fold(implicit ev: Semicategory[=>:]): A =>: B = this match {
     case Chain(Chain(f, g), h) => (f >>> (g >>> h)).fold
     case Chain(Lift(f), g) =>
-      g.foldLeft[PostComposeBalancer[=>:, A, ?]](PostComposeBalancer(f))(PostComposeBalancer.rightAction).result
+      g.foldLeft[PostComposeBalancer[=>:, A, ?]](PostComposeBalancer(f))(
+          PostComposeBalancer.rightAction
+        )
+        .result
     case Lift(f) => f
   }
 }
 
 object ACatenable1 {
-  private[ACatenable1] final case class Lift[=>:[_, _], A, B](f: A =>: B) extends ACatenable1[=>:, A, B]
-  private[ACatenable1] final case class Chain[=>:[_, _], A, B, C](f: ACatenable1[=>:, A, B], g: ACatenable1[=>:, B, C])
+  private[ACatenable1] final case class Lift[=>:[_, _], A, B](f: A =>: B)
+      extends ACatenable1[=>:, A, B]
+  private[ACatenable1] final case class Chain[=>:[_, _], A, B, C](f: ACatenable1[=>:, A, B],
+                                                                  g: ACatenable1[=>:, B, C])
       extends ACatenable1[=>:, A, C]
 
   def lift[F[_, _], A, B](f: F[A, B]): ACatenable1[F, A, B] =
@@ -77,7 +82,8 @@ object ACatenable1 {
   // (depending on user code) and never asymptotically slower.
   implicit def acatenable1FreeSemicategory[=>:[_, _]]: Semicategory[ACatenable1[=>:, ?, ?]] =
     instanceOf(new SemicategoryClass[ACatenable1[=>:, ?, ?]] {
-      def compose[A, B, C](f: ACatenable1[=>:, B, C], g: ACatenable1[=>:, A, B]): ACatenable1[=>:, A, C] =
+      def compose[A, B, C](f: ACatenable1[=>:, B, C],
+                           g: ACatenable1[=>:, A, B]): ACatenable1[=>:, A, C] =
         f.compose(g)
     })
 }
