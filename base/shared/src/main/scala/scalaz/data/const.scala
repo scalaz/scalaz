@@ -14,7 +14,7 @@ sealed abstract class ConstModule {
 
   def constApply[A: Semigroup]: Apply[Const[A, ?]]
   def constApplicative[A: Monoid]: Applicative[Const[A, ?]]
-  def constTraverse[A]: Traversable[Const[A, ?]]
+  def constTraversable[A]: Traversable[Const[A, ?]]
   def constPhantom[A]: Phantom[Const[A, ?]]
 
   def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]]
@@ -26,7 +26,7 @@ sealed abstract class ConstModule {
 object ConstModule {
   implicit def constApply[A: Semigroup]: Apply[Const[A, ?]]          = Const.constApply
   implicit def constApplicative[A: Monoid]: Applicative[Const[A, ?]] = Const.constApplicative
-  implicit def constTraverse[A]: Traversable[Const[A, ?]]            = Const.constTraverse
+  implicit def constTraversable[A]: Traversable[Const[A, ?]]         = Const.constTraversable
   implicit def constPhantom[A]: Phantom[Const[A, ?]]                 = Const.constPhantom
 
   implicit def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] = Const.constSemigroup
@@ -42,7 +42,7 @@ private[data] object ConstImpl extends ConstModule {
 
   def run[A, B](const: Const[A, B]): A = const
 
-  def constTraverse[R]: Traversable[Const[R, ?]] =
+  def constTraversable[R]: Traversable[Const[R, ?]] =
     instanceOf(
       new TraversableClass.DeriveSequence[Const[R, ?]] with FoldableClass.DeriveFoldMap[Const[R, ?]]
       with ConstPhantom[R] {
@@ -73,23 +73,6 @@ private[data] object ConstImpl extends ConstModule {
     final override def pure[A](a: A): Const[R, A] = R.mempty
   }
 
-  private trait ConstSemigroup[A, B] extends SemigroupClass[Const[A, B]] {
-    def A: SemigroupClass[A]
-    final override def mappend(a1: Const[A, B], a2: => Const[A, B]): Const[A, B] =
-      A.mappend(a1, a2)
-  }
-
-  private trait ConstMonoid[A, B] extends MonoidClass[Const[A, B]] with ConstSemigroup[A, B] {
-    override def A: MonoidClass[A]
-    final override def mempty: Const[A, B] = A.mempty
-  }
-
-  private trait ConstEq[A, B] extends EqClass[Const[A, B]] {
-    def A: EqClass[A]
-    final override def equal(x: Const[A, B], y: Const[A, B]): Boolean =
-      A.equal(x, y)
-  }
-
   def constApply[R: Semigroup]: Apply[Const[R, ?]] =
     instanceOf(new ConstApply[R] {
       override val R = implicitly
@@ -100,25 +83,19 @@ private[data] object ConstImpl extends ConstModule {
       override val R = implicitly
     })
 
-  def constSemigroup[A: Semigroup, B]: Semigroup[Const[A, B]] =
-    instanceOf(new ConstSemigroup[A, B] {
-      override val A = implicitly
-    })
+  def constSemigroup[A, B](implicit A: Semigroup[A]): Semigroup[Const[A, B]] =
+    A
 
-  def constMonoid[A: Monoid, B]: Monoid[Const[A, B]] =
-    instanceOf(new ConstMonoid[A, B] {
-      override val A = implicitly
-    })
+  def constMonoid[A, B](implicit A: Monoid[A]): Monoid[Const[A, B]] =
+    A
 
   def constDebug[A, B](implicit A: Debug[A]): Debug[Const[A, B]] = {
     import Scalaz.debugInterpolator
     DebugClass.instance[Const[A, B]](a => z"Const($a)")
   }
 
-  def constEq[A: Eq, B]: Eq[Const[A, B]] =
-    instanceOf(new ConstEq[A, B] {
-      override val A = implicitly
-    })
+  def constEq[A, B](implicit A: Eq[A]): Eq[Const[A, B]] =
+    A
 
   def constPhantom[A]: Phantom[Const[A, ?]] =
     instanceOf(new ConstPhantom[A] {})

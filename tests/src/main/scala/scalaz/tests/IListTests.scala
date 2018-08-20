@@ -24,10 +24,10 @@ final class IListTests {
 
   def testAppend(append: (IList[Int], IList[Int]) => IList[Int]): Result =
     List(
-      assertEqual(append(IList(1, 2, 3), IList(4, 5, 6)), IList(1, 2, 3, 4, 5, 6)),
-      assertEqual(append(IList.empty, IList(4, 5, 6)), IList(4, 5, 6)),
-      assertEqual(append(IList(1, 2, 3), IList.empty), IList(1, 2, 3)),
-    ).msuml
+      (append(IList(1, 2, 3), IList(4, 5, 6)), IList(1, 2, 3, 4, 5, 6)),
+      (append(IList.empty, IList(4, 5, 6)), IList(4, 5, 6)),
+      (append(IList(1, 2, 3), IList.empty), IList(1, 2, 3)),
+    ).foldMap(assertEqualTupled)
 
   def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
     import harness._
@@ -54,17 +54,16 @@ final class IListTests {
           )
         },
         test("uncons") { () =>
-          val assertion = assertEqual[Maybe2[Int, IList[Int]]] _
           List(
-            assertion(IList.uncons(IList.cons(1, IList.empty)), Maybe2.just2(1, IList.empty)),
-            assertion(IList.uncons(IList.empty), Maybe2.empty2),
-          ).msuml
+            (IList.uncons(IList.cons(1, IList.empty)), Maybe2.just2(1, IList.empty[Int])),
+            (IList.uncons(IList.empty[Int]), Maybe2.empty2[Int, IList[Int]]),
+          ).foldMap(assertEqualTupled)
         },
         test("reverse") { () =>
           List(
-            assertEqual(IList.reverse(IList(1, 2, 3)), IList(3, 2, 1)),
-            assertEqual(IList.reverse(IList.empty[Int]), IList.empty[Int]),
-          ).msuml
+            (IList.reverse(IList(1, 2, 3)), IList(3, 2, 1)),
+            (IList.reverse(IList.empty[Int]), IList.empty[Int]),
+          ).foldMap(assertEqualTupled)
         },
         test("unfoldRight") { () =>
           def keepLess5(i: Int): Maybe2[Int, Int] =
@@ -72,9 +71,9 @@ final class IListTests {
             else Maybe2.empty2
 
           List(
-            assertEqual(IList.unfoldRight[Int, Int](_ => Maybe2.empty2)(0), IList.empty[Int]),
-            assertEqual(IList.unfoldRight[Int, Int](keepLess5)(0), IList(0, 1, 2, 3, 4)),
-          ).msuml
+            (IList.unfoldRight[Int, Int](_ => Maybe2.empty2)(0), IList.empty[Int]),
+            (IList.unfoldRight[Int, Int](keepLess5)(0), IList(0, 1, 2, 3, 4)),
+          ).foldMap(assertEqualTupled)
         },
         test("foldLeft") { () =>
           assertEqual(
@@ -84,130 +83,129 @@ final class IListTests {
         },
         test("head") { () =>
           List(
-            assertEqual(IList.empty[Int].head, Maybe.empty[Int]),
-            assertEqual(IList(1).head, Maybe.just(1)),
-            assertEqual(IList(1, 2).head, Maybe.just(1)),
-          ).msuml
+            (IList.empty[Int].head, Maybe.empty[Int]),
+            (IList(1).head, Maybe.just(1)),
+            (IList(1, 2).head, Maybe.just(1)),
+          ).foldMap(assertEqualTupled)
         },
         test("tail") { () =>
-          val assertion = assertEqual[Maybe[IList[Int]]] _
           List(
-            assertion(IList.empty.tail, Maybe.empty[IList[Int]]),
-            assertion(IList(1).tail, Maybe.just(IList.empty[Int])),
-            assertion(IList(1, 2).tail, Maybe.just(IList(2))),
-          ).msuml
+            (IList.empty[Int].tail, Maybe.empty[IList[Int]]),
+            (IList(1).tail, Maybe.just(IList.empty[Int])),
+            (IList(1, 2).tail, Maybe.just(IList(2))),
+          ).foldMap(assertEqualTupled)
         },
         test("isEmpty") { () =>
           List(
-            assert(IList.empty[Int].isEmpty),
-            assert(!IList(1).isEmpty),
-          ).msuml
+            IList.empty[Int].isEmpty,
+            !IList(1).isEmpty,
+          ).foldMap(assert)
         },
         test("nonEmpty") { () =>
           List(
-            assert(!IList.empty[Int].nonEmpty),
-            assert(IList(1).nonEmpty),
-          ).msuml
+            !IList.empty[Int].nonEmpty,
+            IList(1).nonEmpty,
+          ).foldMap(assert)
         },
         test("reverse_:::") { () =>
           List(
-            assertEqual(IList.empty[Int] reverse_::: IList.empty, IList.empty[Int]),
-            assertEqual(IList(1, 2, 3) reverse_::: IList.empty, IList(3, 2, 1)),
-            assertEqual(IList.empty[Int] reverse_::: IList(1, 2, 3), IList(1, 2, 3)),
-            assertEqual(IList(1, 2, 3) reverse_::: IList(4, 5, 6), IList(3, 2, 1, 4, 5, 6)),
-          ).msuml
+            (IList.empty[Int] reverse_::: IList.empty, IList.empty[Int]),
+            (IList(1, 2, 3) reverse_::: IList.empty, IList(3, 2, 1)),
+            (IList.empty[Int] reverse_::: IList(1, 2, 3), IList(1, 2, 3)),
+            (IList(1, 2, 3) reverse_::: IList(4, 5, 6), IList(3, 2, 1, 4, 5, 6)),
+          ).foldMap(assertEqualTupled)
         },
         test("filter") { () =>
           List(
-            assertEqual(IList.empty[Int].filter(_ => false), IList.empty[Int]),
-            assertEqual(IList(1, 2, 3).filter(_ => true), IList(1, 2, 3)),
-            assertEqual(IList(1, 2, 3).filter(_ => false), IList.empty[Int]),
-            assertEqual(IList(1, 2, 3).filter(i => i % 2 != 0), IList(1, 3)),
-          ).msuml
+            (IList.empty[Int].filter(_ => false), IList.empty[Int]),
+            (IList(1, 2, 3).filter(_ => true), IList(1, 2, 3)),
+            (IList(1, 2, 3).filter(_ => false), IList.empty[Int]),
+            (IList(1, 2, 3).filter(i => i % 2 != 0), IList(1, 3)),
+          ).foldMap(assertEqualTupled)
         },
         test("exists") { () =>
           List(
-            assert(!IList.empty[Int].exists(_ == 1)),
-            assert(IList(1).exists(_ == 1)),
-            assert(IList(1, 2).exists(_ == 2)),
-          ).msuml
+            (!IList.empty[Int].exists(_ == 1)),
+            (IList(1).exists(_ == 1)),
+            (IList(1, 2).exists(_ == 2)),
+          ).foldMap(assert)
         },
         test("forall") { () =>
           List(
-            assert(IList.empty[Int].forall(_ == 1)),
-            assert(IList(1).forall(_ == 1)),
-            assert(!IList(1, 2).forall(_ == 2)),
-          ).msuml
+            IList.empty[Int].forall(_ == 1),
+            IList(1).forall(_ == 1),
+            !IList(1, 2).forall(_ == 2),
+          ).foldMap(assert)
         },
         test("find") { () =>
           List(
-            assertEqual(IList.empty[Int].find(_ == 1), Maybe.empty[Int]),
-            assertEqual(IList(1).find(_ == 1), Maybe.just(1)),
-            assertEqual(IList(1, 2, 3).find(_ > 1), Maybe.just(2)),
-          ).msuml
+            (IList.empty[Int].find(_ == 1), Maybe.empty[Int]),
+            (IList(1).find(_ == 1), Maybe.just(1)),
+            (IList(1, 2, 3).find(_ > 1), Maybe.just(2)),
+          ).foldMap(assertEqualTupled)
         },
         test("index") { () =>
           List(
-            assertEqual(IList.empty[Int].index(0), Maybe.empty[Int]),
-            assertEqual(IList(0, 1).index(0), Maybe.just(0)),
-            assertEqual(IList(0, 1).index(1), Maybe.just(1)),
-          ).msuml
+            (IList.empty[Int].index(0), Maybe.empty[Int]),
+            (IList(0, 1).index(0), Maybe.just(0)),
+            (IList(0, 1).index(1), Maybe.just(1)),
+          ).foldMap(assertEqualTupled)
         },
         test("zip") { () =>
           List(
-            assertEqual(IList.empty[Int].zip[Int](IList.empty), IList.empty[(Int, Int)]),
-            assertEqual(IList(1, 2).zip[Int](IList.empty), IList.empty[(Int, Int)]),
-            assertEqual(IList(1, 2).zip[Int](IList(1)), IList((1, 1))),
-            assertEqual(IList(1).zip[Int](IList(1, 2)), IList((1, 1))),
-            assertEqual(IList(1, 2).zip[Int](IList(1, 2)), IList((1, 1), (2, 2))),
-          ).msuml
+            (IList.empty[Int].zip[Int](IList.empty), IList.empty[(Int, Int)]),
+            (IList(1, 2).zip[Int](IList.empty), IList.empty[(Int, Int)]),
+            (IList(1, 2).zip[Int](IList(1)), IList((1, 1))),
+            (IList(1).zip[Int](IList(1, 2)), IList((1, 1))),
+            (IList(1, 2).zip[Int](IList(1, 2)), IList((1, 1), (2, 2))),
+          ).foldMap(assertEqualTupled)
         },
         test("zipWithIndex") { () =>
           List(
-            assertEqual(IList.empty[Int].zipWithIndex, IList.empty[(Int, Int)]),
-            assertEqual(IList(1, 2, 3).zipWithIndex, IList((0, 1), (1, 2), (2, 3))),
-          ).msuml
+            (IList.empty[Int].zipWithIndex, IList.empty[(Int, Int)]),
+            (IList(1, 2, 3).zipWithIndex, IList((0, 1), (1, 2), (2, 3))),
+          ).foldMap(assertEqualTupled)
         },
         test("take") { () =>
           List(
-            assertEqual(IList.empty[Int].take(1), IList.empty[Int]),
-            assertEqual(IList(1).take(0), IList.empty[Int]),
-            assertEqual(IList(1, 2).take(2), IList(1, 2)),
-            assertEqual(IList(1, 2).take(3), IList(1, 2)),
-          ).msuml
+            (IList.empty[Int].take(1), IList.empty[Int]),
+            (IList(1).take(0), IList.empty[Int]),
+            (IList(1, 2).take(2), IList(1, 2)),
+            (IList(1, 2).take(3), IList(1, 2)),
+          ).foldMap(assertEqualTupled)
         },
         test("drop") { () =>
           List(
-            assertEqual(IList.empty[Int].drop(1), IList.empty[Int]),
-            assertEqual(IList(1).drop(0), IList(1)),
-            assertEqual(IList(1, 2).drop(2), IList.empty[Int]),
-            assertEqual(IList(1, 2, 3).drop(1), IList(2, 3)),
-          ).msuml
+            (IList.empty[Int].drop(1), IList.empty[Int]),
+            (IList(1).drop(0), IList(1)),
+            (IList(1, 2).drop(2), IList.empty[Int]),
+            (IList(1, 2, 3).drop(1), IList(2, 3)),
+          ).foldMap(assertEqualTupled)
         },
         test("takeWhile") { () =>
           List(
-            assertEqual(IList.empty[Int].takeWhile(_ => true), IList.empty[Int]),
-            assertEqual(IList.empty[Int].takeWhile(_ => false), IList.empty[Int]),
-            assertEqual(IList(1, 2).takeWhile(_ => true), IList(1, 2)),
-            assertEqual(IList(1, 2).takeWhile(_ => false), IList.empty[Int]),
-            assertEqual(IList(1, 2).takeWhile(_ === 1), IList(1)),
-          ).msuml
+            (IList.empty[Int].takeWhile(_ => true), IList.empty[Int]),
+            (IList.empty[Int].takeWhile(_ => false), IList.empty[Int]),
+            (IList(1, 2).takeWhile(_ => true), IList(1, 2)),
+            (IList(1, 2).takeWhile(_ => false), IList.empty[Int]),
+            (IList(1, 2).takeWhile(_ === 1), IList(1)),
+          ).foldMap(assertEqualTupled)
         },
         test("dropWhile") { () =>
           List(
-            assertEqual(IList.empty[Int].dropWhile(_ => true), IList.empty[Int]),
-            assertEqual(IList.empty[Int].dropWhile(_ => false), IList.empty[Int]),
-            assertEqual(IList(1, 2).dropWhile(_ => true), IList.empty[Int]),
-            assertEqual(IList(1, 2).dropWhile(_ => false), IList(1, 2)),
-            assertEqual(IList(1, 2).dropWhile(_ === 1), IList(2)),
-          ).msuml
+            (IList.empty[Int].dropWhile(_ => true), IList.empty[Int]),
+            (IList.empty[Int].dropWhile(_ => false), IList.empty[Int]),
+            (IList(1, 2).dropWhile(_ => true), IList.empty[Int]),
+            (IList(1, 2).dropWhile(_ => false), IList(1, 2)),
+            (IList(1, 2).dropWhile(_ === 1), IList(2)),
+          ).foldMap(assertEqualTupled)
         },
         test("size") { () =>
           List(
-            assertEqual(IList.empty.size, 0),
-            assertEqual(IList(1).size, 1),
-            assertEqual(IList(1, 2).size, 2),
-          ).msuml
+            (IList.empty.size, 0),
+            (IList(1).size, 1),
+            (IList(1, 2).size, 2),
+          ).foldMap(assertEqualTupled)
         },
       ),
       section("laws")(
