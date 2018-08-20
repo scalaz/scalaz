@@ -20,7 +20,7 @@ object ACatenable1Tests {
   type R[A, B] = ACatenable1[Map, A, B] => Map[A, B]
   type L[A, B] = Map[A, B] => ACatenable1[Map, A, B]
   val foldBalancedF: ACatenable1[Map, ?, ?] ~~> Map = Forall2.of[R](_.foldBalanced)
-  val liftF: Map ~~> ACatenable1[Map, ?, ?] = Forall2.of[L](lift(_))
+  val liftF: Map ~~> ACatenable1[Map, ?, ?]         = Forall2.of[L](lift(_))
 
   // specified in `compose`-order
   // while these are each similar to `(+) 3`,
@@ -131,7 +131,8 @@ object ACatenable1Tests {
             def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
               new Fake("(" + snd.str + "|" + fst.str + ")")
           })
-          def fake(str: String): Fake[Int, Int] = new Fake(str)
+          def fake(str: String): Fake[Int, Int] =
+            new Fake(str)
           val result = "((hello|world)|(foo|bar))"
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).foldBalanced.str,

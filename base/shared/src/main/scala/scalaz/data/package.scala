@@ -23,8 +23,8 @@ package object data {
   type Forall3[F[_, _, _]] = Forall3.Forall3[F]
   type ∀∀∀[F[_, _, _]]     = Forall3[F]
 
-  type ~>[F[_], G[_]]        = ∀[λ[α => F[α] => G[α]]]
-  type ~~>[F[_, _], G[_, _]] = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
+  type ~>[F[_], G[_]]               = ∀[λ[α => F[α] => G[α]]]
+  type ~~>[F[_, _], G[_, _]]        = ∀∀[λ[(α, β) => F[α, β] => G[α, β]]]
   type ~~~>[F[_, _, _], G[_, _, _]] = ∀∀∀[λ[(α, β, C) => F[α, β, C] => G[α, β, C]]]
 
   type \/[L, R] = data.Disjunction[L, R]

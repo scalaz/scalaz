@@ -82,9 +82,7 @@ object TestMain {
       } else {
         val harness: Harness[PureHarness.Uses[Unit]] =
           PureHarness.toHarness(
-            PureHarness.make((ls, tr) =>
-              Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print)
-            )
+            PureHarness.make((ls, tr) => Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print))
           )
 
         @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
