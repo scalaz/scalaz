@@ -2,17 +2,19 @@ package scalaz
 package tests
 
 import java.util.concurrent.Executors
+
 import scala.{ inline, Array, Char, Int, List, Unit }
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-
 import java.lang.String
 
 import testz._
 import runner.TestOutput
 import extras.DocHarness
+import scalaz.tests.IOTests.RTS
 
 object TestMain {
   def main(args: Array[String]): Unit = {
@@ -40,7 +42,9 @@ object TestMain {
         Future(run("Double Tests", DoubleTests.tests(harness)))(ec),
         Future(run("IList Tests", IListTests.tests(harness)))(ec),
         Future(run("Maybe Tests", MaybeTests.tests(harness)))(ec),
-        Future(run("IO Tests", IOTests.tests(harness)))(ec),
+        Future(run("IO Tests", IOTests.tests(harness, RTS)))(ec).andThen[Unit] {
+          case _ => RTS.unsafeShutdownAndWait(1.nano)
+        }(ec),
         Future(run("Ordering Tests", OrderingTests.tests(harness)))(ec),
         Future(run("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
