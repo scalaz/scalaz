@@ -56,20 +56,23 @@ class Ops(val c: blackbox.Context) {
   def nia_1[T: c.WeakTypeTag](f: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs, $f)"
 
   /* def method(f: A)(g: B): R */
-  def f_1_1(f: Tree)(g: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f)($g)"
-  def i_1_1(f: Tree)(g: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)($g)"
-  def n_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree            = q"$ev.${typeName[T]}($lhs)($f)($g)"
-  def ni_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)($g)"
+  def f_1_1(f: Tree)(g: Tree): Tree                   = q"$ev.$methodName   ($lhs)($f)($g)"
+  def i_1_1(f: Tree)(g: Tree)(ev: Tree): Tree         = q"$ev.$methodName   ($lhs)($f)($g)"
+  def n_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)($g)"
+  def ni_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree =
+    q"$ev.${typeName[T]}($lhs)($f)($g)"
 
   /* def method(f: A)(g: B): R */
-  def fa_1_1(f: Tree)(g: Tree): Tree                              = q"$ev.$methodName   ($lhs, $f)($g)"
-  def ia_1_1(f: Tree)(g: Tree)(ev: Tree): Tree                    = q"$ev.$methodName   ($lhs, $f)($g)"
-  def na_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree            = q"$ev.${typeName[T]}($lhs, $f)($g)"
-  def nia_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree = q"$ev.${typeName[T]}($lhs, $f)($g)"
+  def fa_1_1(f: Tree)(g: Tree): Tree                   = q"$ev.$methodName   ($lhs, $f)($g)"
+  def ia_1_1(f: Tree)(g: Tree)(ev: Tree): Tree         = q"$ev.$methodName   ($lhs, $f)($g)"
+  def na_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree): Tree = q"$ev.${typeName[T]}($lhs, $f)($g)"
+  def nia_1_1[T: c.WeakTypeTag](f: Tree)(g: Tree)(ev: Tree): Tree =
+    q"$ev.${typeName[T]}($lhs, $f)($g)"
 
   /* def method(f: A)(implicit g: B): R */
-  def i_1_1i(f: Tree)(g: Tree, ev: Tree): Tree                    = q"$ev.$methodName   ($lhs)($f)($g)"
-  def ni_1_1i[T: c.WeakTypeTag](f: Tree)(g: Tree, ev: Tree): Tree = q"$ev.${typeName[T]}($lhs)($f)($g)"
+  def i_1_1i(f: Tree)(g: Tree, ev: Tree): Tree = q"$ev.$methodName   ($lhs)($f)($g)"
+  def ni_1_1i[T: c.WeakTypeTag](f: Tree)(g: Tree, ev: Tree): Tree =
+    q"$ev.${typeName[T]}($lhs)($f)($g)"
 
   /* def method(f: A, g: B): R */
   def f_2(f: Tree, g: Tree): Tree                              = q"$ev.$methodName   ($lhs)($f, $g)"

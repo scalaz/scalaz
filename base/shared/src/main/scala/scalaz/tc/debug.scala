@@ -151,7 +151,11 @@ private[tc] sealed class DebugInterpolator {
     "Cannot use the `z` interpolator to interpolate a value of type ${A}, as no implicit Debug[${A}] instance is in scope."
   )
   implicit def ambiguousDebug1[A](a: A): HasDebug =
-    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope.")
+    sys.error(
+      s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope."
+    )
   implicit def ambiguousDebug2[A](a: A): HasDebug =
-    sys.error(s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope.")
+    sys.error(
+      s"Cannot use the `z` interpolator to interpolate ${a}, as no implicit Debug instance is in scope."
+    )
 }

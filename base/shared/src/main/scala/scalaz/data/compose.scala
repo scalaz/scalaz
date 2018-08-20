@@ -30,18 +30,22 @@ sealed abstract class ComposeModule {
 }
 
 object ComposeModule {
-  implicit def invariant[F[_]: InvariantFunctor, G[_]: InvariantFunctor]: InvariantFunctor[Compose[F, G, ?]] =
+  implicit def invariant[F[_]: InvariantFunctor, G[_]: InvariantFunctor]
+    : InvariantFunctor[Compose[F, G, ?]] =
     Compose.invariant
 
-  implicit def functor[F[_]: Functor, G[_]: Functor]: Functor[Compose[F, G, ?]]                 = Compose.functor
-  implicit def apply[F[_]: Apply, G[_]: Apply]: Apply[Compose[F, G, ?]]                         = Compose.apply
-  implicit def applicative[F[_]: Applicative, G[_]: Applicative]: Applicative[Compose[F, G, ?]] = Compose.applicative
+  implicit def functor[F[_]: Functor, G[_]: Functor]: Functor[Compose[F, G, ?]] = Compose.functor
+  implicit def apply[F[_]: Apply, G[_]: Apply]: Apply[Compose[F, G, ?]]         = Compose.apply
+  implicit def applicative[F[_]: Applicative, G[_]: Applicative]: Applicative[Compose[F, G, ?]] =
+    Compose.applicative
 
   implicit def contravariant1[F[_]: Contravariant, G[_]: Functor]: Contravariant[Compose[F, G, ?]] =
     Compose.contravariant1
 
-  implicit def foldable[F[_]: Foldable, G[_]: Foldable]: Foldable[Compose[F, G, ?]]             = Compose.foldable
-  implicit def traversable[F[_]: Traversable, G[_]: Traversable]: Traversable[Compose[F, G, ?]] = Compose.traversable
+  implicit def foldable[F[_]: Foldable, G[_]: Foldable]: Foldable[Compose[F, G, ?]] =
+    Compose.foldable
+  implicit def traversable[F[_]: Traversable, G[_]: Traversable]: Traversable[Compose[F, G, ?]] =
+    Compose.traversable
 }
 
 private[data] sealed abstract class ComposeModule0 { this: ComposeModule.type =>
@@ -74,19 +78,22 @@ private[data] object ComposeImpl extends ComposeModule {
       val G = G0
     })
 
-  def applicative[F[_], G[_]](implicit F0: Applicative[F], G0: Applicative[G]): Applicative[Compose[F, G, ?]] =
+  def applicative[F[_], G[_]](implicit F0: Applicative[F],
+                              G0: Applicative[G]): Applicative[Compose[F, G, ?]] =
     instanceOf(new ComposeApplicative[F, G] {
       val F = F0
       val G = G0
     })
 
-  def contravariant1[F[_], G[_]](implicit F0: Contravariant[F], G0: Functor[G]): Contravariant[Compose[F, G, ?]] =
+  def contravariant1[F[_], G[_]](implicit F0: Contravariant[F],
+                                 G0: Functor[G]): Contravariant[Compose[F, G, ?]] =
     instanceOf(new ComposeContravariant1[F, G] {
       val F = F0
       val G = G0
     })
 
-  def contravariant2[F[_], G[_]](implicit F0: Functor[F], G0: Contravariant[G]): Contravariant[Compose[F, G, ?]] =
+  def contravariant2[F[_], G[_]](implicit F0: Functor[F],
+                                 G0: Contravariant[G]): Contravariant[Compose[F, G, ?]] =
     instanceOf(new ComposeContravariant2[F, G] {
       val F = F0
       val G = G0
@@ -98,13 +105,15 @@ private[data] object ComposeImpl extends ComposeModule {
       val G = G0
     })
 
-  def traversable[F[_], G[_]](implicit F0: Traversable[F], G0: Traversable[G]): Traversable[Compose[F, G, ?]] =
+  def traversable[F[_], G[_]](implicit F0: Traversable[F],
+                              G0: Traversable[G]): Traversable[Compose[F, G, ?]] =
     instanceOf(new ComposeTraversable[F, G] {
       val F = F0
       val G = G0
     })
 
-  private trait ComposeInvariantFunctor[F[_], G[_]] extends InvariantFunctorClass[Compose[F, G, ?]] {
+  private trait ComposeInvariantFunctor[F[_], G[_]]
+      extends InvariantFunctorClass[Compose[F, G, ?]] {
     val F: InvariantFunctorClass[F]
     val G: InvariantFunctorClass[G]
 
@@ -120,7 +129,9 @@ private[data] object ComposeImpl extends ComposeModule {
       F.map(fa)(G.map(_)(f))
   }
 
-  private trait ComposeApply[F[_], G[_]] extends ComposeFunctor[F, G] with ApplyClass[Compose[F, G, ?]] {
+  private trait ComposeApply[F[_], G[_]]
+      extends ComposeFunctor[F, G]
+      with ApplyClass[Compose[F, G, ?]] {
     val F: ApplyClass[F]
     val G: ApplyClass[G]
 
@@ -128,7 +139,9 @@ private[data] object ComposeImpl extends ComposeModule {
       F.ap(fa)(F.map(f)(gab => G.ap(_)(gab)))
   }
 
-  private trait ComposeApplicative[F[_], G[_]] extends ComposeApply[F, G] with ApplicativeClass[Compose[F, G, ?]] {
+  private trait ComposeApplicative[F[_], G[_]]
+      extends ComposeApply[F, G]
+      with ApplicativeClass[Compose[F, G, ?]] {
     val F: ApplicativeClass[F]
     val G: ApplicativeClass[G]
 

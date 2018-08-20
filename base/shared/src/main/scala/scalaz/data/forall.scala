@@ -85,7 +85,9 @@ private[data] object ForallImpl extends ForallModule with ForallSyntax {
   def monotonicity[F[_], G[_]](ev: ∀[λ[α => F[α] <~< G[α]]]): ∀[F] <~< ∀[G] = As.unsafeForce
 }
 
-private[data] final class MkForallImpl[F[_]](val dummy: Boolean = false) extends AnyVal with ForallImpl.MkForall[F] {
+private[data] final class MkForallImpl[F[_]](val dummy: Boolean = false)
+    extends AnyVal
+    with ForallImpl.MkForall[F] {
   type T = Any
   def from(ft: F[T]): ForallImpl.∀[F] = ft
 }

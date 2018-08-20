@@ -13,7 +13,9 @@ object StrongLaws {
   @inline
   def firstAssoc[P[_, _], A, B, C, T](
     in: P[A, A]
-  )(assert: (P[((A, B), C), ((A, B), C)], P[((A, B), C), ((A, B), C)]) => T)(implicit P: Strong[P]): T =
+  )(
+    assert: (P[((A, B), C), ((A, B), C)], P[((A, B), C), ((A, B), C)]) => T
+  )(implicit P: Strong[P]): T =
     assert(
       P.first(P.first(in)),
       P.dimap[(A, (B, C)), (A, (B, C)), ((A, B), C), ((A, B), C)](
@@ -33,7 +35,9 @@ object ChoiceLaws {
   @inline
   def leftAssoc[P[_, _], A, B, C, T](
     in: P[A, A]
-  )(assert: (P[(A \/ B) \/ C, (A \/ B) \/ C], P[(A \/ B) \/ C, (A \/ B) \/ C]) => T)(implicit P: Choice[P]): T =
+  )(
+    assert: (P[(A \/ B) \/ C, (A \/ B) \/ C], P[(A \/ B) \/ C, (A \/ B) \/ C]) => T
+  )(implicit P: Choice[P]): T =
     assert(
       P.leftchoice(P.leftchoice(in)),
       P.dimap[A \/ (B \/ C), A \/ (B \/ C), (A \/ B) \/ C, (A \/ B) \/ C](
@@ -54,8 +58,9 @@ object ApplyLaws {
   // doing some reversed function composition doesn't break
   // code using `Apply`.
   @inline
-  def applyAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A => B],
-                                             snd: F[B => C])(assert: (F[C], F[C]) => T)(implicit F: Apply[F]): T = {
+  def applyAssoc[F[_], A, B, C, T](
+    in: F[A]
+  )(fst: F[A => B], snd: F[B => C])(assert: (F[C], F[C]) => T)(implicit F: Apply[F]): T = {
     import F.{ ap, map }
     def compose(f: B => C)(g: A => B): A => C = f compose g
     assert(
@@ -77,8 +82,9 @@ object ApplicativeLaws {
 
 object BindLaws {
   @inline
-  def bindAssoc[F[_], A, B, C, T](in: F[A])(fst: A => F[B],
-                                            snd: B => F[C])(assert: (F[C], F[C]) => T)(implicit F: Bind[F]): T = {
+  def bindAssoc[F[_], A, B, C, T](
+    in: F[A]
+  )(fst: A => F[B], snd: B => F[C])(assert: (F[C], F[C]) => T)(implicit F: Bind[F]): T = {
     import F.flatMap
     assert(
       flatMap(flatMap(in)(fst))(snd),
@@ -95,8 +101,9 @@ object MonadLaws {
 
 object CobindLaws {
   @inline
-  def cobindAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A] => B,
-                                              snd: F[B] => C)(assert: (F[C], F[C]) => T)(implicit F: Cobind[F]): T = {
+  def cobindAssoc[F[_], A, B, C, T](
+    in: F[A]
+  )(fst: F[A] => B, snd: F[B] => C)(assert: (F[C], F[C]) => T)(implicit F: Cobind[F]): T = {
     import F.cobind
     assert(
       cobind(cobind(in)(fst))(snd),
@@ -125,7 +132,9 @@ object TraversableLaws {
     )
 
   @inline
-  def traverseIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Traversable[F]) =
+  def traverseIdentity[F[_], A, T](
+    in: F[A]
+  )(assert: (F[A], F[A]) => T)(implicit F: Traversable[F]) =
     assert(in, Identity.run(F.traverse(in)(Identity(_))))
 }
 
@@ -144,11 +153,15 @@ object SemicategoryLaws {
 
 object CategoryLaws {
   @inline
-  def composeRightIdentity[F[_, _], A, B, T](in: F[A, B])(assert: (F[A, B], F[A, B]) => T)(implicit F: Category[F]): T =
+  def composeRightIdentity[F[_, _], A, B, T](
+    in: F[A, B]
+  )(assert: (F[A, B], F[A, B]) => T)(implicit F: Category[F]): T =
     assert(in, F.compose(in, F.id))
 
   @inline
-  def composeLeftIdentity[F[_, _], A, B, T](in: F[A, B])(assert: (F[A, B], F[A, B]) => T)(implicit F: Category[F]): T =
+  def composeLeftIdentity[F[_, _], A, B, T](
+    in: F[A, B]
+  )(assert: (F[A, B], F[A, B]) => T)(implicit F: Category[F]): T =
     assert(in, F.compose(F.id, in))
 }
 
@@ -158,7 +171,8 @@ object EqLaws {
   // and I'll tell you if the observations agree
   // with their equality.
   @inline
-  def identity[A, B, T](fst: A, snd: A)(f: A => B)(assert: (Boolean, B, B) => T)(implicit A: Eq[A]): T =
+  def identity[A, B, T](fst: A,
+                        snd: A)(f: A => B)(assert: (Boolean, B, B) => T)(implicit A: Eq[A]): T =
     assert(A.equal(fst, snd), f(fst), f(snd))
 
   @inline

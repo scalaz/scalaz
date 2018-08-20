@@ -111,7 +111,10 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   def fold(implicit F: Category[F]): F[A, B] =
     self.uncons match {
       case AJust2(h, t) =>
-        t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result
+        t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(
+            PostComposeBalancer.rightAction
+          )
+          .result
       case ev @ AEmpty2() => ev.subst[F[A, ?]](F.id[A])
     }
 
@@ -121,7 +124,12 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   def foldMaybe(implicit F: Semicategory[F]): AMaybe[F, A, B] =
     self.uncons match {
       case AJust2(h, t) =>
-        AJust(t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(PostComposeBalancer.rightAction).result)
+        AJust(
+          t.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(h))(
+              PostComposeBalancer.rightAction
+            )
+            .result
+        )
       case ev @ AEmpty2() => ev.subst[AMaybe[F, A, ?]](AMaybe.empty[F, A])
     }
 
@@ -131,7 +139,9 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Category[G]): G[A, B] =
     self.uncons match {
       case AJust2(h, t) =>
-        t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ))
+        t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(
+            PostComposeBalancer.rightAction(φ)
+          )
           .result
       case ev @ AEmpty2() => ev.subst[G[A, ?]](G.id[A])
     }
@@ -143,17 +153,23 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
     self.uncons match {
       case AJust2(h, t) =>
         AJust(
-          t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightAction(φ))
+          t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(
+              PostComposeBalancer.rightAction(φ)
+            )
             .result
         )
       case ev @ AEmpty2() => ev.subst[AMaybe[G, A, ?]](AMaybe.empty[G, A])
     }
 
   def map[G[_, _]](φ: F ~~> G): AList[G, A, B] =
-    foldRight[AList[G, ?, B]](AList.empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) :: gs))
+    foldRight[AList[G, ?, B]](AList.empty[G, B])(
+      ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) :: gs)
+    )
 
   def flatMap[G[_, _]](φ: F ~~> AList[G, ?, ?]): AList[G, A, B] =
-    foldRight[AList[G, ?, B]](AList.empty[G, B])(ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs))
+    foldRight[AList[G, ?, B]](AList.empty[G, B])(
+      ν[LeftAction[AList[G, ?, B], F]][α, β]((f, gs) => φ.apply(f) ::: gs)
+    )
 
   def size: Int = {
     @tailrec def go(acc: Int, fs: AList[F, _, _]): Int = fs.uncons match {
@@ -184,7 +200,9 @@ private[data] object AListImpl extends AListModule {
   type AList[F[_, _], A, B] = AFix[AMaybe2[F, ?[_, _], ?, ?], A, B]
 
   def empty[F[_, _], A]: AList[F, A, A] =
-    AFix.fix[AMaybe2[F, ?[_, _], ?, ?], A, A](AMaybe2.empty[F, AFix[AMaybe2[F, ?[_, _], ?, ?], ?, ?], A])
+    AFix.fix[AMaybe2[F, ?[_, _], ?, ?], A, A](
+      AMaybe2.empty[F, AFix[AMaybe2[F, ?[_, _], ?, ?], ?, ?], A]
+    )
 
   def cons[F[_, _], A, B, C](f: F[A, B], fs: AList[F, B, C]): AList[F, A, C] =
     AFix.fix(AMaybe2[F[?, ?], AList[F, ?, ?], A, B, C](f, fs))

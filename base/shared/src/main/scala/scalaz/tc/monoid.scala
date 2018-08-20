@@ -31,7 +31,8 @@ object MonoidClass {
 
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
     instanceOf(new MonoidClass[Fiber[E, A]] {
-      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]): Fiber[E, A] = a1.zipWith(a2)(A.mappend(_, _))
+      def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]): Fiber[E, A] =
+        a1.zipWith(a2)(A.mappend(_, _))
       def mempty: Fiber[E, A] = new Fiber[E, A] {
         def join: IO[E, A]                                     = IO.now(A.mempty)
         def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = IO.unit

@@ -52,7 +52,9 @@ object CordImpl extends CordModule {
   def apply(string: String): Cord = new Cord(string, string.length, 1)
 
   def concat(left: Cord, right: Cord): Cord =
-    new Cord(new Concat(left.under, right.under), left.length + right.length, Math.max(left.depth + 1, right.depth))
+    new Cord(new Concat(left.under, right.under),
+             left.length + right.length,
+             Math.max(left.depth + 1, right.depth))
   def cons(left: String, right: Cord): Cord =
     new Cord(new Concat(left, right.under), left.length + right.length, right.depth)
   def snoc(left: Cord, right: String): Cord =

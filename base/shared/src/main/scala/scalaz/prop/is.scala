@@ -195,7 +195,9 @@ object Is {
    * @see [[lift]]
    * @see [[lift2]]
    */
-  def lift3[F[_, _, _], A, B, I, J, M, N](ab: A === B, ij: I === J, mn: M === N): F[A, I, M] === F[B, J, N] = {
+  def lift3[F[_, _, _], A, B, I, J, M, N](ab: A === B,
+                                          ij: I === J,
+                                          mn: M === N): F[A, I, M] === F[B, J, N] = {
     type f1[α] = F[A, I, M] === F[α, I, M]
     type f2[α] = F[A, I, M] === F[B, α, M]
     type f3[α] = F[A, I, M] === F[B, J, α]

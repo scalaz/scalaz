@@ -47,7 +47,9 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
    * Subtyping is transitive and its witnesses can be composed in a
    * chain much like functions.
    */
-  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](bc: Liskov[L2, H2, B, C]): Liskov[L2, H2, A, C] =
+  final def andThen[L2 <: L, H2 >: H, C >: L2 <: H2](
+    bc: Liskov[L2, H2, B, C]
+  ): Liskov[L2, H2, A, C] =
     Liskov.compose[L2, H2, A, B, C](bc, ab)
 
   /**
@@ -56,7 +58,9 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
    *
    * @see [[andThen]]
    */
-  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2](za: Liskov[L2, H2, Z, A]): Liskov[L2, H2, Z, B] =
+  final def compose[L2 <: L, H2 >: H, Z >: L2 <: H2](
+    za: Liskov[L2, H2, Z, A]
+  ): Liskov[L2, H2, Z, B] =
     za.andThen(ab)
 
   /**
@@ -105,7 +109,9 @@ sealed abstract class Liskov[-L, +H >: L, -A >: L <: H, +B >: L <: H] { ab =>
 
 object Liskov {
 
-  def apply[L, H >: L, A >: L <: H, B >: L <: H](implicit ab: Liskov[L, H, A, B]): Liskov[L, H, A, B] = ab
+  def apply[L, H >: L, A >: L <: H, B >: L <: H](
+    implicit ab: Liskov[L, H, A, B]
+  ): Liskov[L, H, A, B] = ab
 
   private[this] final case class Refl[A]() extends Liskov[A, A, A, A] {
     def substCv[F[+ _ >: A <: A]](x: F[A]): F[A] = x
@@ -135,15 +141,22 @@ object Liskov {
    * @see [[Liskov.compose]]
    * @see [[Liskov.andThen]]
    */
-  def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](bc: Liskov[L, H, B, C],
-                                                                ab: Liskov[L, H, A, B]): Liskov[L, H, A, C] =
+  def compose[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](
+    bc: Liskov[L, H, B, C],
+    ab: Liskov[L, H, A, B]
+  ): Liskov[L, H, A, C] =
     bc.substCv[λ[`+α >: L <: H` => Liskov[L, H, A, α]]](ab)
 
-  implicit class LiskovOps[L, H >: L, A >: L <: H, B >: L <: H](val ab: Liskov[L, H, A, B]) extends AnyVal {
-    def liftCvF[LF, HF >: LF, F[_] >: LF <: HF](implicit F: IsCovariant[F]): Liskov[LF, HF, F[A], F[B]] =
+  implicit class LiskovOps[L, H >: L, A >: L <: H, B >: L <: H](val ab: Liskov[L, H, A, B])
+      extends AnyVal {
+    def liftCvF[LF, HF >: LF, F[_] >: LF <: HF](
+      implicit F: IsCovariant[F]
+    ): Liskov[LF, HF, F[A], F[B]] =
       fromAs[LF, HF, F[A], F[B]](F.liftLiskov(ab.toAs))
 
-    def liftCtF[LF, HF >: LF, F[_] >: LF <: HF](implicit F: IsContravariant[F]): Liskov[LF, HF, F[B], F[A]] =
+    def liftCtF[LF, HF >: LF, F[_] >: LF <: HF](
+      implicit F: IsContravariant[F]
+    ): Liskov[LF, HF, F[B], F[A]] =
       fromAs[LF, HF, F[B], F[A]](F.liftLiskov(ab.toAs))
 
     def substCoF[LF, HF >: LF, F[_] >: LF <: HF](fa: F[A])(implicit F: IsCovariant[F]): F[B] =

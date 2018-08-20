@@ -33,7 +33,8 @@ object TestMain {
     def runPure(name: String, tests: PureHarness.Uses[Unit]): () => Unit =
       tests((), List(name))
 
-    def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
+    def combineUses(fst: PureHarness.Uses[Unit],
+                    snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
       (r, ls) => {
         val f = fst(r, ls)
         val s = snd(r, ls)

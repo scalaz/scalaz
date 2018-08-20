@@ -92,7 +92,9 @@ private[scalaz] object MaybeImpl extends MaybeModule {
       override def pure[A](a: A): Maybe[A] =
         just(a)
 
-      override def traverse[F[_], A, B](ma: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]): F[Maybe[B]] =
+      override def traverse[F[_], A, B](
+        ma: Maybe[A]
+      )(f: A => F[B])(implicit F: Applicative[F]): F[Maybe[B]] =
         ma match {
           case Some(a) => F.map(f(a))(just)
           case _       => F.pure(None)
@@ -127,7 +129,9 @@ trait MaybeFunctions {
 }
 
 trait MaybeSyntax {
-  implicit final class OptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
+  implicit final class OptionAsMaybe[A](oa: Option[A]) {
+    def asMaybe: Maybe[A] = Maybe.fromOption(oa)
+  }
 
   implicit final class ToMaybeOps[A](a: A) {
     def just: Maybe[A] = Maybe.just(a)

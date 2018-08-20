@@ -202,43 +202,51 @@ object As {
    */
   implicit def witness[A, B](lt: A <~< B): A => B = lt(_)
 
-  def liftCvCv[F[+ _, + _], A1, B1, A2, B2](eq1: A1 <~< B1, eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] = {
+  def liftCvCv[F[+ _, + _], A1, B1, A2, B2](eq1: A1 <~< B1,
+                                            eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] = {
     type f1[+a1] = F[A1, A2] <~< F[a1, A2]
     type f2[+a2] = F[A1, A2] <~< F[B1, a2]
     eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
   }
 
-  def liftCvCt[F[+ _, - _], A1, B1, A2, B2](eq1: A1 <~< B1, eq2: A2 <~< B2): F[A1, B2] <~< F[B1, A2] = {
+  def liftCvCt[F[+ _, - _], A1, B1, A2, B2](eq1: A1 <~< B1,
+                                            eq2: A2 <~< B2): F[A1, B2] <~< F[B1, A2] = {
     type f1[+a1] = F[A1, A2] <~< F[a1, A2]
     type f2[+a2] = F[A1, a2] <~< F[B1, A2]
     eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
   }
 
-  def liftCtCv[F[- _, + _], A1, B1, A2, B2](eq1: A1 <~< B1, eq2: A2 <~< B2): F[B1, A2] <~< F[A1, B2] = {
+  def liftCtCv[F[- _, + _], A1, B1, A2, B2](eq1: A1 <~< B1,
+                                            eq2: A2 <~< B2): F[B1, A2] <~< F[A1, B2] = {
     type f1[+a1] = F[a1, A2] <~< F[A1, A2]
     type f2[+a2] = F[B1, A2] <~< F[A1, a2]
     eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
   }
 
-  def liftCtCt[F[- _, - _], A1, B1, A2, B2](eq1: A1 <~< B1, eq2: A2 <~< B2): F[B1, B2] <~< F[A1, A2] = {
+  def liftCtCt[F[- _, - _], A1, B1, A2, B2](eq1: A1 <~< B1,
+                                            eq2: A2 <~< B2): F[B1, B2] <~< F[A1, A2] = {
     type f1[+a1] = F[a1, A2] <~< F[A1, A2]
     type f2[+a2] = F[B1, a2] <~< F[A1, A2]
     eq2.substCv[f2](eq1.substCv[f1](refl[F[A1, A2]]))
   }
 
-  private[As] final class PartiallyAppliedLiftCvCv[F[+ _, + _], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+  private[As] final class PartiallyAppliedLiftCvCv[F[+ _, + _], -A1, +B1](val eq1: A1 <~< B1)
+      extends AnyVal {
     def apply[A2, B2](eq2: A2 <~< B2): F[A1, A2] <~< F[B1, B2] =
       liftCvCv[F, A1, B1, A2, B2](eq1, eq2)
   }
-  private[As] final class PartiallyAppliedLiftCvCt[F[+ _, - _], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+  private[As] final class PartiallyAppliedLiftCvCt[F[+ _, - _], -A1, +B1](val eq1: A1 <~< B1)
+      extends AnyVal {
     def apply[A2, B2](eq2: A2 <~< B2): F[A1, B2] <~< F[B1, A2] =
       liftCvCt[F, A1, B1, A2, B2](eq1, eq2)
   }
-  private[As] final class PartiallyAppliedLiftCtCv[F[- _, + _], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+  private[As] final class PartiallyAppliedLiftCtCv[F[- _, + _], -A1, +B1](val eq1: A1 <~< B1)
+      extends AnyVal {
     def apply[A2, B2](eq2: A2 <~< B2): F[B1, A2] <~< F[A1, B2] =
       liftCtCv[F, A1, B1, A2, B2](eq1, eq2)
   }
-  private[As] final class PartiallyAppliedLiftCtCt[F[- _, - _], -A1, +B1](val eq1: A1 <~< B1) extends AnyVal {
+  private[As] final class PartiallyAppliedLiftCtCt[F[- _, - _], -A1, +B1](val eq1: A1 <~< B1)
+      extends AnyVal {
     def apply[A2, B2](eq2: A2 <~< B2): F[B1, B2] <~< F[A1, A2] =
       liftCtCt[F, A1, B1, A2, B2](eq1, eq2)
   }

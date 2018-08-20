@@ -16,7 +16,9 @@ object FunctorLaws {
     // `A` it's parameterized with at runtime, one implication
     // of this law is that `fmap` does not modify its functorial context.
     @inline
-    def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Functor[F]): T =
+    def identityToIdentity[F[_], A, T](
+      in: F[A]
+    )(assert: (F[A], F[A]) => T)(implicit F: Functor[F]): T =
       assert(in, F.map(in)(identity))
   }
 
@@ -24,13 +26,17 @@ object FunctorLaws {
     // The same applies to `Contravariant`; in fact, to every
     // kind of functor from and products of `Scal` and `Scal^op` to `Scal`.
     @inline
-    def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Contravariant[F]): T =
+    def identityToIdentity[F[_], A, T](
+      in: F[A]
+    )(assert: (F[A], F[A]) => T)(implicit F: Contravariant[F]): T =
       assert(in, F.contramap(in)(identity))
   }
 
   object InvariantFunctor {
     @inline
-    def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: InvariantFunctor[F]): T =
+    def identityToIdentity[F[_], A, T](
+      in: F[A]
+    )(assert: (F[A], F[A]) => T)(implicit F: InvariantFunctor[F]): T =
       assert(in, F.imap(in)(identity)(identity))
   }
 
@@ -39,7 +45,9 @@ object FunctorLaws {
     // and because of the identity law it can't modify the `F[_]`
     // context, must do nothing at all but return its argument.
     @inline
-    def identityToIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Phantom[F]): T =
+    def identityToIdentity[F[_], A, T](
+      in: F[A]
+    )(assert: (F[A], F[A]) => T)(implicit F: Phantom[F]): T =
       assert(in, F.pmap(in))
   }
 

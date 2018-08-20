@@ -110,18 +110,20 @@ sealed abstract class These[L, R] {
   }
 
   /* Traversable (on the right) */
-  final def traverse[F[_], B](f: R => F[B])(implicit F: Applicative[F]): F[These[L, B]] = this match {
-    case thiz @ This(_)    => F.pure(thiz.pmap[B])
-    case That(right)       => F.map(f(right))(That(_))
-    case Both(left, right) => F.map(f(right))(Both(left, _))
-  }
+  final def traverse[F[_], B](f: R => F[B])(implicit F: Applicative[F]): F[These[L, B]] =
+    this match {
+      case thiz @ This(_)    => F.pure(thiz.pmap[B])
+      case That(right)       => F.map(f(right))(That(_))
+      case Both(left, right) => F.map(f(right))(Both(left, _))
+    }
 
   /* Semigroup */
-  final def mappend(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] = other match {
-    case This(left)        => lappend(left)
-    case That(right)       => rappend(right)
-    case Both(left, right) => lappend(left).rappend(right)
-  }
+  final def mappend(other: These[L, R])(implicit L: Semigroup[L], R: Semigroup[R]): These[L, R] =
+    other match {
+      case This(left)        => lappend(left)
+      case That(right)       => rappend(right)
+      case Both(left, right) => lappend(left).rappend(right)
+    }
 
   final def lappend(other: L)(implicit L: Semigroup[L]): These[L, R] = this match {
     case This(left)        => This(L.mappend(left, other))
@@ -156,7 +158,8 @@ object That {
 }
 
 object Both {
-  @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] = new Both[L, R](thisValue, thatValue)
+  @inline final def apply[L, R](thisValue: L, thatValue: R): These[L, R] =
+    new Both[L, R](thisValue, thatValue)
 }
 
 object These {
@@ -170,7 +173,8 @@ object These {
 
   implicit final def theseMonad[L: Semigroup]: Monad[These[L, ?]] =
     instanceOf(
-      new MonadClass[These[L, ?]] with BindClass.DeriveAp[These[L, ?]] with BindClass.DeriveFlatten[These[L, ?]] {
+      new MonadClass[These[L, ?]] with BindClass.DeriveAp[These[L, ?]]
+      with BindClass.DeriveFlatten[These[L, ?]] {
         override def map[A, B](ma: These[L, A])(f: A => B)      = ma.rmap(f)
         def flatMap[A, B](ma: These[L, A])(f: A => These[L, B]) = ma.flatMap(f)
         def pure[A](a: A)                                       = That(a)
@@ -178,16 +182,19 @@ object These {
     )
 
   implicit final def theseTraversable[L]: Traversable[These[L, ?]] =
-    instanceOf(new TraversableClass.DeriveSequence[These[L, ?]] with FoldableClass.DeriveToList[These[L, ?]] {
-      def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
-      def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
-      def msuml[A: Monoid](fa: These[L, A])                                = fa.msuml
-      def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
+    instanceOf(
+      new TraversableClass.DeriveSequence[These[L, ?]]
+      with FoldableClass.DeriveToList[These[L, ?]] {
+        def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
+        def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
+        def msuml[A: Monoid](fa: These[L, A])                                = fa.msuml
+        def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
 
-      /* todo: remove these when default implementation in Traversable? */
-      def foldRight[A, B](fa: These[L, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
-      def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)        = fa.foldLeft(z)(f)
-    })
+        /* todo: remove these when default implementation in Traversable? */
+        def foldRight[A, B](fa: These[L, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
+        def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)        = fa.foldLeft(z)(f)
+      }
+    )
 
   implicit final def theseSemigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =
     instanceOf[SemigroupClass[These[L, R]]](

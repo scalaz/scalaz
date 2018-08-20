@@ -103,21 +103,23 @@ object ACatenable1Tests {
         },
         test("foldLeft") { () =>
           assertEqual(
-            (const("hello") >>> const("world") >>> const("foobar")).foldLeft(Const[String, Int](""))(
-              ν[RightAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (ga, fab) =>
-                Const("(" + Const.run(ga) + "|" + Biconst.run(fab) + ")")
-              }
-            ),
+            (const("hello") >>> const("world") >>> const("foobar"))
+              .foldLeft(Const[String, Int](""))(
+                ν[RightAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (ga, fab) =>
+                  Const("(" + Const.run(ga) + "|" + Biconst.run(fab) + ")")
+                }
+              ),
             Const[String, Int]("(((|hello)|world)|foobar)")
           )
         },
         test("foldRight") { () =>
           assertEqual(
-            (const("hello") >>> const("world") >>> const("foobar")).foldRight(Const[String, Int](""))(
-              ν[LeftAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (fab, gb) =>
-                Const[String, α]("(" + Biconst.run(fab) + "|" + Const.run(gb) + ")")
-              }
-            ),
+            (const("hello") >>> const("world") >>> const("foobar"))
+              .foldRight(Const[String, Int](""))(
+                ν[LeftAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (fab, gb) =>
+                  Const[String, α]("(" + Biconst.run(fab) + "|" + Const.run(gb) + ")")
+                }
+              ),
             Const[String, Int]("(hello|(world|(foobar|)))")
           )
         },
@@ -125,15 +127,17 @@ object ACatenable1Tests {
           final class Fake[A, B](val str: String)
           // not lawful, used to observe balanced binary tree shape of `fold`.
           // not associative.
-          implicit val fakeSemicategory: Semicategory[Fake] = instanceOf(new SemicategoryClass[Fake] {
-            def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
-              new Fake("(" + fst.str + "|" + snd.str + ")")
-          })
+          implicit val fakeSemicategory: Semicategory[Fake] =
+            instanceOf(new SemicategoryClass[Fake] {
+              def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
+                new Fake("(" + fst.str + "|" + snd.str + ")")
+            })
           def fake(str: String): Fake[Int, Int] = new Fake(str)
           IList(
             ((lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).fold.str,
              "((hello|world)|(foo|bar))"),
-            ((fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).fold.str, "((hello|world)|(foo|bar))")
+            ((fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).fold.str,
+             "((hello|world)|(foo|bar))")
           ).foldMap(assertEqualTupled)
         }
       )
