@@ -51,10 +51,16 @@ private[data] object IdentityImpl extends IdentityModule {
         f(fa)
       override def sequence[G[_]: Applicative, A](fa: Identity[G[A]]): G[Identity[A]] =
         fa
-      override def foldLeft[A, B](fa: Identity[A], z: B)(f: (B, A) => B): B        = f(z, fa)
-      override def foldMap[A, B: Monoid](fa: Identity[A])(f: A => B): B            = f(fa)
-      override def foldRight[A, B](fa: Identity[A], z: => B)(f: (A, => B) => B): B = f(fa, z)
-      override def toList[A](fa: Identity[A]): List[A]                             = fa :: Nil
+      override def foldLeft[A, B](fa: Identity[A], z: B)(f: (B, A) => B): B =
+        f(z, fa)
+      override def foldMap[A, B: Monoid](fa: Identity[A])(f: A => B): B =
+        f(fa)
+      override def msuml[A: Monoid](fa: Identity[A]): A =
+        fa
+      override def foldRight[A, B](fa: Identity[A], z: => B)(f: (A, => B) => B): B =
+        f(fa, z)
+      override def toList[A](fa: Identity[A]): List[A] =
+        fa :: Nil
     })
 
   def monoid[A](implicit A: Monoid[A]): Monoid[Identity[A]] =

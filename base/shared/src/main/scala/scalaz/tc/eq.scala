@@ -75,25 +75,18 @@ object EqClass {
       case _ => false
     }
 
-  private[this] final val NegZero: Double = -0.0d
-  private[this] final val PosZero: Double = 0.0d
-
   implicit val intEq: Eq[Int]         = Eq.fromEquals[Int]
   implicit val longEq: Eq[Long]       = Eq.fromEquals[Long]
   implicit val stringEq: Eq[String]   = Eq.fromEquals[String]
   implicit val unitEq: Eq[Unit]       = Eq.always[Unit]
   implicit val shortEq: Eq[Short]     = Eq.fromEquals[Short]
-  implicit val floatEq: Eq[Float]     = instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
   implicit val byteEq: Eq[Byte]       = Eq.fromEquals[Byte]
   implicit val booleanEq: Eq[Boolean] = Eq.fromEquals[Boolean]
+
+  implicit val floatEq: Eq[Float] = instanceOf[EqClass[Float]]((a, b) => floatToRawIntBits(a) == floatToRawIntBits(b))
   implicit val doubleEq: Eq[Double] =
-    instanceOf(new EqClass[Double] {
-      def equal(a: Double, b: Double) = (a, b) match {
-        case (NegZero, PosZero) => true
-        case (PosZero, NegZero) => true
-        case (x, y)             => doubleToRawLongBits(x) == doubleToRawLongBits(y)
-      }
-    })
+    instanceOf[EqClass[Double]]((a, b) => doubleToRawLongBits(a) == doubleToRawLongBits(b))
+
   implicit final val voidEq: Eq[Void] = instanceOf[EqClass[Void]]((a, b) => a.absurd)
 
 }

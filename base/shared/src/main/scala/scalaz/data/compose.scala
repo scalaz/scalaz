@@ -158,6 +158,9 @@ private[data] object ComposeImpl extends ComposeModule {
     def foldMap[A, B](fa: F[G[A]])(f: A => B)(implicit B: Monoid[B]): B =
       F.foldMap(fa)(G.foldMap(_)(f))
 
+    def msuml[A](fa: F[G[A]])(implicit A: Monoid[A]): A =
+      F.foldMap(fa)(G.msuml(_))
+
     def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
       F.foldRight(fa, z)((ga, b) => G.foldRight(ga, b)(f))
 

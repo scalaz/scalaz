@@ -6,7 +6,7 @@ import scala.{ AnyRef, Array, Char, Null }
 import scala.Predef.{ classOf, String }
 
 import Predef._
-import tc.{ instanceOf, Debug, DebugClass, Monoid, MonoidClass }
+import tc._
 
 trait CordModule {
   type Cord >: Null <: AnyRef
@@ -31,6 +31,12 @@ object CordModule {
     instanceOf[MonoidClass[Cord]](new MonoidClass[Cord] {
       val mempty                         = Cord.empty
       def mappend(a1: Cord, a2: => Cord) = Cord.concat(a1, a2)
+    })
+
+  implicit val cordEq: Eq[Cord] =
+    instanceOf[EqClass[Cord]](new EqClass[Cord] {
+      def equal(first: Cord, second: Cord): Boolean =
+        Cord.toString(first) == Cord.toString(second)
     })
 }
 

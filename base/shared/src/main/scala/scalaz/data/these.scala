@@ -93,6 +93,13 @@ sealed abstract class These[L, R] {
     case Both(_, right) => f(right)
   }
 
+  /* Foldable (on the right) */
+  final def msuml(implicit R: Monoid[R]): R = this match {
+    case This(_)        => R.mempty
+    case That(right)    => right
+    case Both(_, right) => right
+  }
+
   final def foldRight[B](z: => B)(f: (R, => B) => B): B =
     foldLeft(z)((b, r) => f(r, b))
 
@@ -174,6 +181,7 @@ object These {
     instanceOf(new TraversableClass.DeriveSequence[These[L, ?]] with FoldableClass.DeriveToList[These[L, ?]] {
       def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
       def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
+      def msuml[A: Monoid](fa: These[L, A])                                = fa.msuml
       def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
 
       /* todo: remove these when default implementation in Traversable? */

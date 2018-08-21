@@ -77,11 +77,11 @@ object IListModule {
     instanceOf(new MonadClass[IList] {
       def pure[A](a: A): IList[A] = IList.cons(a, IList.empty)
       def ap[A, B](fa: IList[A])(ff: IList[A => B]): IList[B] =
-        flatten(map(fa)(a => map(ff)(f => f(a))))
+        flatMap(ff)(f => map(fa)(a => f(a)))
       def flatMap[A, B](ma: IList[A])(f: A => IList[B]): IList[B] =
         flatten(map(ma)(f))
       def flatten[A](nested: IList[IList[A]]): IList[A] =
-        nested.foldRight(IList.empty[A])((out, as) => as.append(out))
+        nested.foldRight(IList.empty[A])(_.append(_))
       def map[A, B](ma: IList[A])(f: A => B): IList[B] =
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
     })
@@ -98,8 +98,11 @@ object IListModule {
       def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
         IList.foldLeft(fa, z)(f)
 
-      def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: scalaz.tc.Monoid[B]): B =
+      def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: Monoid[B]): B =
         foldLeft(fa, B.mempty)((b, a) => B.mappend(b, f(a)))
+
+      def msuml[A](fa: IList[A])(implicit A: Monoid[A]): A =
+        foldLeft(fa, A.mempty)((s, a) => A.mappend(s, a))
 
       def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B =
         fa.reverse.foldLeft(z)((b, a) => f(a, b))
@@ -160,19 +163,19 @@ object IListModule {
       IList.uncons(self)
 
     def append(that: IList[A]): IList[A] =
-      IList.reverse(that).foldLeft(self)((b, a) => IList.cons(a, b))
+      self.foldRight(that)(_ :: _)
 
     def :::(that: IList[A]): IList[A] =
-      self.append(that)
+      that.append(self)
 
     def ++(that: IList[A]): IList[A] =
-      that.append(self)
+      self.append(that)
 
     def reverse_:::[Z](that: IList[A]): IList[A] =
       that.foldLeft(self)((as, a) => a :: as)
 
     def filter(p: A => Boolean): IList[A] =
-      self.foldLeft(IList.empty[A])((b, a) => if (p(a)) a :: b else b)
+      self.foldRight(IList.empty[A])((a, b) => if (p(a)) a :: b else b)
 
     def exists(p: A => Boolean): Boolean =
       self.foldLeft(false)((b, a) => p(a) || b)
@@ -185,9 +188,9 @@ object IListModule {
       def go(as: IList[A]): Maybe[A] =
         IList.uncons(as) match {
           case Maybe2.Empty2() => Maybe.empty
-          case Maybe2.Just2(a, aas) =>
+          case Maybe2.Just2(a, as) =>
             if (p(a)) Maybe.just(a)
-            else go(aas)
+            else go(as)
         }
       go(self)
     }
@@ -206,6 +209,9 @@ object IListModule {
     }
 
     def !!(n: Int): Maybe[A] = self.index(n)
+
+    def cross[B](b: IList[B]): IList[(A, B)] =
+      self.flatMap(a => b.map(b => (a, b)))
 
     def zip[B](that: IList[B]): IList[(A, B)] = {
       @tailrec
