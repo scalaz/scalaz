@@ -66,6 +66,16 @@ matrix:
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project rootJVM_213" test:compile mimaReportBinaryIssues
       - sbt ++$TRAVIS_SCALA_VERSION "project testsJVM" test
       - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "project rootJS_213" "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
+    - scala: 2.13.0-M5
+      jdk: oraclejdk8
+      env: TEST_PROJECT="rootJVM"
+      before_script:
+      - git clone -b v0.9.7 https://github.com/non/kind-projector.git
+      - cd kind-projector
+      - sbt "++$TRAVIS_SCALA_VERSION!" 'set resolvers in ThisBuild += "staging" at "https://oss.sonatype.org/content/repositories/staging"' publishLocal
+      - cd ..
+      script:
+      - sbt "++ ${TRAVIS_SCALA_VERSION}" 'set resolvers in ThisBuild += "staging" at "https://oss.sonatype.org/content/repositories/staging"' -J-Xmx3784m checkGenTypeClasses example/compile
 
 env:
   matrix:
