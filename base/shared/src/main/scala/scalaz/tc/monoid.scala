@@ -38,9 +38,11 @@ object MonoidClass {
       }
     })
 
-  implicit def ioMonoid[E, A](implicit A: Monoid[A]): Monoid[IO[E, A]] =
+  implicit def ioMonoid[E, A](implicit SE: Semigroup[E], A: Monoid[A]): Monoid[IO[E, A]] =
     instanceOf(new MonoidClass[IO[E, A]] {
-      def mappend(a1: IO[E, A], a2: => IO[E, A]): IO[E, A] = a1.zipWith(a2)(A.mappend(_, _))
-      def mempty: IO[E, A]                                 = IO.now(A.mempty)
+      def mappend(a1: IO[E, A], a2: => IO[E, A]): IO[E, A] =
+        a1.redeem(e1 => a2.redeem(e2 => IO.fail(SE.mappend(e1, e2)), _ => IO.fail(e1)),
+                  s1 => a2.redeem(e2 => IO.fail(e2), s2 => IO.point(A.mappend(s1, s2))))
+      def mempty: IO[E, A] = IO.now(A.mempty)
     })
 }
