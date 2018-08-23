@@ -270,6 +270,16 @@ object Kleisli extends KleisliInstances {
 
   def local[M[_], A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] =
     fa local f
+
+  import Isomorphism.{ <~>, IsoFunctorTemplate }
+  def iso[D[_], I, O[_]](
+    instance: λ[a => (I => O[a])] ~> D,
+    decode:  D ~> λ[a => (I => O[a])]
+  ): D <~> Kleisli[O, I, ?] =
+    new IsoFunctorTemplate[D, Kleisli[O, I, ?]] {
+      def from[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
+      def to[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
+    }
 }
 
 //
