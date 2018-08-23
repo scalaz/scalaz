@@ -97,7 +97,21 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) { self =>
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class KleisliInstances13 {
+sealed abstract class KleisliInstances15 {
+  implicit def kleisliDivisible[F[_], R](implicit F0: Divisible[F]): Divisible[Kleisli[F, R, ?]] =
+    new KleisliDivisible[F, R] {
+      implicit def F: Divisible[F] = F0
+    }
+}
+
+sealed abstract class KleisliInstances14 extends KleisliInstances15 {
+  implicit def kleisliDecidable[F[_], R](implicit F0: Decidable[F]): Decidable[Kleisli[F, R, ?]] =
+    new KleisliDecidable[F, R] {
+      implicit def F: Decidable[F] = F0
+    }
+}
+
+sealed abstract class KleisliInstances13 extends KleisliInstances14 {
   implicit def kleisliFunctor[F[_], R](implicit F0: Functor[F]): Functor[Kleisli[F, R, ?]] =
     new KleisliFunctor[F, R] {
       implicit def F: Functor[F] = F0
@@ -291,6 +305,22 @@ import Kleisli.kleisli
 //
 // * -> *
 //
+
+private trait KleisliDivisible[F[_], R] extends Divisible[Kleisli[F, R, ?]] {
+  implicit def F: Divisible[F]
+
+  override def conquer[Z]: Kleisli[F, R, Z] = Kleisli(_ => F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => Kleisli[F, R, A1], a2: => Kleisli[F, R, A2])(f: Z => (A1, A2)): Kleisli[F, R, Z] =
+    Kleisli( r => F.divide2(a1.run(r), a2.run(r))(f))
+}
+
+private trait KleisliDecidable[F[_], R] extends Decidable[Kleisli[F, R, ?]] with KleisliDivisible[F, R] {
+  implicit def F: Decidable[F]
+
+  override def choose2[Z, A1, A2](a1: => Kleisli[F, R, A1], a2: => Kleisli[F, R, A2])(f: Z => A1 \/ A2): Kleisli[F, R, Z] =
+    Kleisli( r => F.choose2(a1.run(r), a2.run(r))(f))
+}
 
 private trait KleisliFunctor[F[_], R] extends Functor[Kleisli[F, R, ?]] {
   implicit def F: Functor[F]

@@ -7,6 +7,7 @@ import org.scalacheck.Prop.forAll
 
 object ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
+  type ConstInt[A] = Const[Int, A]
 
   "fromList / toList" ! forAll {
     (ass: List[List[Int]]) =>
@@ -88,12 +89,14 @@ object ListTTest extends SpecLite {
   checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
   checkAll(monadTrans.laws[ListT, Option])
+  checkAll(decidable.laws[ListT[ConstInt, ?]])
 
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
     def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
     def monad[F[_]: Monad] = Monad[ListT[F, ?]]
     def functor[F[_]: Functor] = Functor[ListT[F, ?]]
+    def decidable[F[_] : Divisible] = Decidable[ListT[F, ?]]
 
     // checking absence of ambiguity
     def functor[F[_]: Monad] = Functor[ListT[F, ?]]
