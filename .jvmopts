@@ -1,2 +1,2 @@
 -XX:+UseCodeCacheFlushing
--XX:+UseConcMarkSweepGC
+-XX:+UseG1GC
