@@ -1,5 +1,6 @@
 package scalaz.tc
 
+import Predef._
 import scalaz.data.{ Const, Identity }
 
 /**
