@@ -41,6 +41,7 @@ package object tc {
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                  = F
   final def Bifunctor[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F]                   = F
   final def Bind[F[_]](implicit F: Bind[F]): Bind[F]                                     = F
+  final def Band[A](implicit A: Band[A]): Band[A]                                        = A
   final def Category[=>:[_, _]](implicit P: Category[=>:]): Category[=>:]                = P
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
@@ -48,6 +49,9 @@ package object tc {
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
   final def Functor[F[_]](implicit F: Functor[F]): Functor[F]                            = F
   final def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
+  final def JoinSemiLattice[A](implicit L: JoinSemiLattice[A]): JoinSemiLattice[A]       = L
+  final def Lattice[A](implicit L: Lattice[A]): Lattice[A]                               = L
+  final def MeetSemiLattice[A](implicit L: MeetSemiLattice[A]): MeetSemiLattice[A]       = L
   final def Monad[M[_]](implicit M: Monad[M]): Monad[M]                                  = M
   final def Monoid[T](implicit T: Monoid[T]): Monoid[T]                                  = T
   final def Ord[T](implicit T: Ord[T]): Ord[T]                                           = T

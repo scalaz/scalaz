@@ -36,7 +36,7 @@ object MeetSemiLatticeClass extends MeetSemiLatticeInstances
 trait MeetSemiLatticeInstances {
 
   implicit val bool: MeetSemiLatticeClass[Boolean] =
-    (a1, a2) => a1 || a2
+    (a1, a2) => a1 && a2
 
   implicit val unit: MeetSemiLatticeClass[Unit] =
     (_, _) => ()
