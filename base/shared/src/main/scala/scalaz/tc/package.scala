@@ -27,7 +27,7 @@ package object tc {
   type MeetSemiLattice[A]     = InstanceOf[MeetSemiLatticeClass[A]]
   type JoinSemiLattice[A]     = InstanceOf[JoinSemiLatticeClass[A]]
   type Lattice[A]             = InstanceOf[LatticeClass[A]]
-  type Band[A]                = InstanceOf[BindClass[A]]
+  type Band[A]                = InstanceOf[BandClass[A]]
   type Ord[T]                 = InstanceOf[OrdClass[T]]
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
