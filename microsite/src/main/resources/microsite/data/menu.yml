@@ -39,6 +39,8 @@ options:
       url: tc/Strong.html
     - title: Unfoldable
       url: tc/Unfoldable.html
+    - title: Unfoldable1
+      url: tc/Unfoldable1.html
 
   - title: Data classes
     url: data/index.html
