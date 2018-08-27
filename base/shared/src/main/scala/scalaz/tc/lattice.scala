@@ -61,3 +61,15 @@ object LatticeClass {
     })
 
 }
+
+trait LatticeSyntax {
+
+  implicit final class ToLatticeOps[A](a: A) {
+
+    def joinOrd(b: A)(implicit E: Eq[A], L: Lattice[A]): Boolean =
+      E.equal(L.join(a, b), b)
+
+    def meetOrd(b: A)(implicit E: Eq[A], L: Lattice[A]): Boolean =
+      E.equal(L.meet(a, b), a)
+  }
+}
