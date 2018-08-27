@@ -39,6 +39,7 @@ package object tc {
   type Strong[F[_, _]]           = InstanceOf[StrongClass[F]]
   type Traversable[T[_]]         = InstanceOf[TraversableClass[T]]
   type Unfoldable[F[_]]          = InstanceOf[UnfoldableClass[F]]
+  type Unfoldable1[F[_]]         = InstanceOf[Unfoldable1Class[F]]
 
   final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F]                               = F
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                                 = F
@@ -68,4 +69,6 @@ package object tc {
   final def Strong[P[_, _]](implicit P: Strong[P]): Strong[P]                                           = P
   final def Traversable[T[_]](implicit T: Traversable[T]): Traversable[T]                               = T
   final def Unfoldable[F[_]](implicit F: Unfoldable[F]): Unfoldable[F]                                  = F
+  final def Unfoldable1[F[_]](implicit F: Unfoldable1[F]): Unfoldable1[F]                               = F
+
 }
