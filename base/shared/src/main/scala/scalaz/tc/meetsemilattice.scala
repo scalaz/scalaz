@@ -1,11 +1,14 @@
 package scalaz.tc
 
-import scalaz.data.{ Const, Endo, Identity }
+import scala.{ Boolean, Unit }
+import scalaz.data.{ Const, Identity }
+import scalaz.meta
+
+import scala.language.experimental.macros
 
 /**
  * In abstract algebra (and order theory), a meet-semilattice is a partially ordered set S together with
- * with an operation "meet" which computes the infimum (greatest lower bound), for every pair of finite,
- * nonempty subsets of S.
+ * with an operation "meet" which computes the infimum (greatest lower bound), for every pair of elements of S.
  *
  * The "meet" operation must satisfy the following laws:
  *
@@ -26,14 +29,11 @@ import scalaz.data.{ Const, Endo, Identity }
  *
  * One can also view a meet-semilattice as a commutative Band.
  */
-trait MeetSemiLatticeClass[A] extends BandClass[A] {
-  def meet(a1: A, a2: => A): A =
-    mappend(a1, a2)
+trait MeetSemiLatticeClass[A] {
+  def meet(a1: A, a2: A): A
 }
 
-object MeetSemiLatticeClass extends MeetSemiLatticeInstances
-
-trait MeetSemiLatticeInstances {
+object MeetSemiLatticeClass {
 
   implicit val bool: MeetSemiLatticeClass[Boolean] =
     (a1, a2) => a1 && a2
@@ -55,4 +55,10 @@ trait MeetSemiLatticeInstances {
 
   implicit def const[A, B](implicit L: MeetSemiLatticeClass[A]): MeetSemiLatticeClass[Const[A, B]] =
     (c, d) => Const(L.meet(Const.run(c), Const.run(d)))
+}
+
+trait MeetSemiLatticeSyntax {
+  implicit final class ToMeetSemiLatticeOps[A](a: A) {
+    def meet(f: A)(implicit ev: MeetSemiLattice[A]): A = macro meta.Ops.ia_1
+  }
 }

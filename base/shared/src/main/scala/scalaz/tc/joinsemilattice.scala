@@ -1,12 +1,14 @@
 package scalaz.tc
 
-import Predef._
+import scala.{ Boolean, Unit }
 import scalaz.data.{ Const, Identity }
+import scalaz.meta
+
+import scala.language.experimental.macros
 
 /**
  * In abstract algebra (and order theory), a join-semilattice is a partially ordered set S together with
- * with an operation "join" which computes the supremum (least upper bound) for every pair of finite,
- * nonempty subsets of S.
+ * with an operation "join" which computes the supremum (least upper bound) for every pair of elements of S.
  *
  * The "join" operation must satisfy the following laws:
  *
@@ -27,14 +29,11 @@ import scalaz.data.{ Const, Identity }
  *
  * One can also view a join-semilattice as a commutative Band.
  */
-trait JoinSemiLatticeClass[A] extends BandClass[A] {
-  def join(a1: A, a2: => A): A =
-    mappend(a1, a2)
+trait JoinSemiLatticeClass[A] {
+  def join(a1: A, a2: A): A
 }
 
-object JoinSemiLatticeClass extends JoinSemiLatticeInstances
-
-trait JoinSemiLatticeInstances {
+object JoinSemiLatticeClass {
 
   implicit val bool: JoinSemiLatticeClass[Boolean] =
     (a1, a2) => a1 || a2
@@ -49,11 +48,17 @@ trait JoinSemiLatticeInstances {
     (f1, f2) => a => L.join(f1(a), f2(a))
 
   implicit def pair[A, B](
-    implicit L: JoinSemiLatticeClass[A],
-    M: JoinSemiLatticeClass[B]
+    implicit L: JoinSemiLattice[A],
+    M: JoinSemiLattice[B]
   ): JoinSemiLatticeClass[(A, B)] =
     (a, b) => (L.join(a._1, b._1), M.join(a._2, b._2))
 
-  implicit def const[A, B](implicit L: JoinSemiLatticeClass[A]): JoinSemiLatticeClass[Const[A, B]] =
+  implicit def const[A, B](implicit L: JoinSemiLattice[A]): JoinSemiLatticeClass[Const[A, B]] =
     (c, d) => Const(L.join(Const.run(c), Const.run(d)))
+}
+
+trait JoinSemiLatticeSyntax {
+  implicit final class ToJoinSemiLatticeOps[A](a: A) {
+    def join(f: A)(implicit ev: JoinSemiLattice[A]): A = macro meta.Ops.ia_1
+  }
 }

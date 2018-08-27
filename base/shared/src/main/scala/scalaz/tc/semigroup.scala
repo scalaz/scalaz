@@ -1,11 +1,21 @@
 package scalaz
 package tc
 
+import scala.Int
 import java.lang.String
+
+import scala.annotation.tailrec
 import scala.language.experimental.macros
 
 trait SemigroupClass[A] {
   def mappend(a1: A, a2: => A): A
+
+  def exponent(a: A, i: Int): A = {
+    @tailrec
+    def go(a0: A, j: Int): A =
+      if (j == 0) a0 else go(mappend(a, a), j - 1)
+    go(a, i)
+  }
 }
 
 object SemigroupClass {

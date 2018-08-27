@@ -41,6 +41,9 @@ trait AllSyntax
     with tc.OrdSyntax
     with tc.SemigroupSyntax
     with tc.DebugSyntax
+    with tc.JoinSemiLatticeSyntax
+    with tc.MeetSemiLatticeSyntax
+    with tc.BoundedLatticeSyntax
 
 trait LowPriority extends BaseHierarchy with BaseDataAliases
 
