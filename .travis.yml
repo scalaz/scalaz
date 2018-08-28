@@ -72,10 +72,10 @@ matrix:
       before_script:
       - git clone -b v0.9.7 https://github.com/non/kind-projector.git
       - cd kind-projector
-      - sbt "++$TRAVIS_SCALA_VERSION!" 'set resolvers in ThisBuild += "staging" at "https://oss.sonatype.org/content/repositories/staging"' publishLocal
+      - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
       - cd ..
       script:
-      - sbt "++ ${TRAVIS_SCALA_VERSION}" 'set resolvers in ThisBuild += "staging" at "https://oss.sonatype.org/content/repositories/staging"' -J-Xmx3784m checkGenTypeClasses example/compile
+      - sbt "++ ${TRAVIS_SCALA_VERSION}" -J-Xmx3784m checkGenTypeClasses example/compile
 
 env:
   matrix:
