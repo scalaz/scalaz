@@ -252,11 +252,17 @@ final class IListTests {
               BindLaws.bindAssoc(_)(fst, snd)(assertEqual[IList[Int]])
             }
           },
-          test("monad identity") { () =>
+          test("monad right identity") { () =>
             lists.foldMap {
-              MonadLaws.bindIdentity(_)(assertEqual[IList[Int]])
+              MonadLaws.bindRightIdentity(_)(assertEqual[IList[Int]])
             }
-          }
+          },
+          test("monad left identity") { () =>
+            def f(i: Int) = IList(i + 1, i + 2, i + 3)
+            List(1, 2, 3).foldMap {
+              MonadLaws.bindLeftIdentity(_)(f)(assertEqual[IList[Int]])
+            }
+          },
         ),
         section("traversable laws")(
           test("traversable composition") { () =>

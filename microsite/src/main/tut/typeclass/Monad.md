@@ -42,22 +42,19 @@ for {
 } yield x * y
 ```
 
-# Law
+# Laws
 
-A monad instance needs to satisfy the monad law stating `pure` is a right
-identity for `flatMap`, in addition to those defined by
-[`Applicative`](./Applicative.html) and [`Bind`](./Bind.html):
+A monad instance needs to satisfy the monad laws stating `pure` is a right and left
+identity for `flatMap`, in addition to those defined by [`Applicative`](./Applicative.html)
+and [`Bind`](./Bind.html):
 
 ```tut
-  def bindIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
+  def bindRightIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
     assert(in, F.flatMap(in)(F.pure))
+
+  def bindLeftIdentity[F[_], A, B, T](in: F[A])(f: A => F[B])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
+    assert(f(in), F.flatMap(F.pure(in))(f))
 ```
 
 That is to say; `pure` is an identity for `flatMap`,
 in a similar way to how it's an identity for `ap`.
-
-The "left identity law" is guaranteed by parametricity and the right identity law:
-```tut
-  def freeLeftBindIdentity[F[_], A, B, T](in: A)(f: A => F[B])(assert: (F[B], F[B]) => T)(implicit F: Monad[F]): T =
-    assert(f(in), F.flatMap(F.pure(in))(f))
-```
