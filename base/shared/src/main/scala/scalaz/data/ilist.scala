@@ -130,9 +130,9 @@ object IListModule {
 
   implicit final val ilistUnfoldable: Unfoldable[IList] =
     instanceOf[UnfoldableClass[IList]](new UnfoldableClass[IList] {
-      override def unfoldRight[A, B](f: B => Maybe2[A, B])(z: B): Maybe[IList[A]] =
+      override def unfoldRight[A, B](f: B => Maybe2[A, B])(z: B): IList[A] =
         fromList(IList.unfoldRight(f)(z))
-      override def fromList[A](as: IList[A]): Maybe[IList[A]] = Maybe.just[IList[A]](as)
+      override def fromList[A](as: IList[A]): IList[A] = as
     })
 
   implicit final class ToIListOps[A](self: IList[A]) {
@@ -209,6 +209,9 @@ object IListModule {
     }
 
     def !!(n: Int): Maybe[A] = self.index(n)
+
+    def cross[B](b: IList[B]): IList[(A, B)] =
+      self.flatMap(a => b.map(b => (a, b)))
 
     def zip[B](that: IList[B]): IList[(A, B)] = {
       @tailrec

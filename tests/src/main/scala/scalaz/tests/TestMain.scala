@@ -32,6 +32,7 @@ object TestMain {
         Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
         Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
         Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
+        Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
         Future(cont("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
         Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )

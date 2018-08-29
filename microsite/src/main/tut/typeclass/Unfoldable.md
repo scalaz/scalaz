@@ -9,7 +9,7 @@ title:  "Unfoldable"
 
 The generating function `f` in `unfoldr(f)(b)` is understood as follows:
 
-- if `f(b)` is `Empty2`, then `unfoldr(f)(b)` should be empty.
+- if `f(b)` is `Empty2`, then `unfoldr(f)(b)` should represent an empty structure.
 - if `f(b)` is `Just2(a, b1)`, then `unfoldr(f)(b)` should consist of an appended to the result of `unfoldr(f)(b1)`.
 
 **Typical imports**
