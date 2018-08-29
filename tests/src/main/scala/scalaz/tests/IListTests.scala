@@ -208,7 +208,6 @@ final class IListTests {
           ).foldMap(assertEqualTupled)
         },
       ),
-
       section("laws")(
         section("eq laws")(
           test("reflexivity") { () =>
