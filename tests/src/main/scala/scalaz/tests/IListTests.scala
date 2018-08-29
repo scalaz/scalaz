@@ -3,7 +3,7 @@ package tests
 
 import scala.{ Int, List, Option }
 
-import data._, Scalaz._
+import data._, Predef._, Scalaz._
 
 import laws._
 import laws.FunctorLaws.{ Functor => FunctorLaws }
@@ -31,6 +31,7 @@ final class IListTests {
 
   def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
     import harness._
+
     sequence(
       section("concrete")(
         test("append") { () =>
@@ -69,7 +70,6 @@ final class IListTests {
           def keepLess5(i: Int): Maybe2[Int, Int] =
             if (i < 5) Maybe2.just2(i, i + 1)
             else Maybe2.empty2
-
           List(
             (IList.unfoldRight[Int, Int](_ => Maybe2.empty2)(0), IList.empty[Int]),
             (IList.unfoldRight[Int, Int](keepLess5)(0), IList(0, 1, 2, 3, 4)),
@@ -208,6 +208,7 @@ final class IListTests {
           ).foldMap(assertEqualTupled)
         },
       ),
+
       section("laws")(
         section("eq laws")(
           test("reflexivity") { () =>
@@ -218,9 +219,8 @@ final class IListTests {
           test("identity") { () =>
             cross(lists, lists).foldMap {
               case (l1, l2) =>
-                EqLaws.identity(l1, l2)(_.foldLeft(10000)(_ / _))(
-                  (equal, leftSum, rightSum) => assertEqual(equal, (leftSum == rightSum))
-                )
+                def f(l: IList[Int]): Int = l.foldLeft(1000)(_ / _)
+                assertEqual(l1 === l2, f(l1) === f(l2))
             }
           }
         ),
@@ -233,7 +233,6 @@ final class IListTests {
           test("apply associativity") { () =>
             val listsAdd  = lists.map(_.map(i => (n: Int) => i + n))
             val listsMult = lists.map(_.map(i => (n: Int) => i * n))
-
             cross(cross(lists, listsAdd), listsMult).foldMap {
               case ((i, a), m) =>
                 ApplyLaws.applyAssoc(i)(a, m)(
@@ -250,7 +249,6 @@ final class IListTests {
             // non-overlapping
             val fst = (a: Int) => IList(a + 10, a + 20, a + 30)
             val snd = (a: Int) => IList(a * 100, a * 200, a * 300)
-
             lists.foldMap {
               BindLaws.bindAssoc(_)(fst, snd)(assertEqual[IList[Int]])
             }
@@ -265,7 +263,6 @@ final class IListTests {
           test("traversable composition") { () =>
             val fst = (a: Int) => if (a % 20 == 0) scala.None else scala.Some(a % 20)
             val snd = (a: Int) => if (a % 5 == 0) scala.None else scala.Some(a  % 20)
-
             lists.foldMap {
               TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Option[Option[IList[Int]]]])
             }

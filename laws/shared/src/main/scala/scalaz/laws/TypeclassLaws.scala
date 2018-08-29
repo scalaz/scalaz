@@ -153,18 +153,9 @@ object CategoryLaws {
 }
 
 object EqLaws {
-  // pass me two `A`'s
-  // and some way to observe an `A` as a `B`
-  // and I'll tell you if the observations agree
-  // with their equality.
-  @inline
-  def identity[A, B, T](fst: A, snd: A)(f: A => B)(assert: (Boolean, B, B) => T)(implicit A: Eq[A]): T =
-    assert(A.equal(fst, snd), f(fst), f(snd))
-
   @inline
   def reflexivity[A, T](in: A)(assert: Boolean => T)(implicit A: Eq[A]): T =
     assert(A.equal(in, in))
-
 }
 
 object OrdLaws {

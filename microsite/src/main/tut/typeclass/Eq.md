@@ -36,7 +36,11 @@ A `Eq` must satisfy the following [laws](https://en.wikipedia.org/wiki/Identity_
 
 *Indiscernability* formalizes the intuitive notion of two objects having the exact same
 properties. Two values `x, y: A` are indiscernable if for all functions `f: A => B`
-`f(x)` and `f(y)` are indiscernable.
+`f(x)` and `f(y)` are equal.
+
+Practically, the way we end up testing indiscernibility of identicals and identity of
+indiscernibles is by coming up with predicates that use all of the information inside
+`A` values.
 
 These laws entail symmetry and transitivity:
 
@@ -44,17 +48,6 @@ These laws entail symmetry and transitivity:
   - `x === y` if and only if `y === x`
 - Transitivity
   - if `x === y` and `y === z`, then `x === z`
-
-In code, indiscernability of identicals and identity of
-indiscernibles are written in a single law:
-
-```tut
-  def identity[A, B, T](fst: A, snd: A)(f: A => B)(assert: (Boolean, B, B) => T)(implicit A: Eq[A]): T =
-    assert(A.equal(fst, snd), f(fst), f(snd))
-```
-
-Essentially stating that `f(fst)` and `f(snd)` must agree
-with `fst === snd`.
 
 Reflexivity is written as:
 
