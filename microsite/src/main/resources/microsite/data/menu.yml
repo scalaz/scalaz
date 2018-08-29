@@ -40,7 +40,13 @@ options:
     - title: Strong
       url: typeclass/Strong.html
     - title: Unfoldable
+<<<<<<< HEAD
       url: typeclass/Unfoldable.html
+=======
+      url: tc/Unfoldable.html
+    - title: Unfoldable1
+      url: tc/Unfoldable1.html
+>>>>>>> upstream/series/8.0.x
 
   - title: Data classes
     url: data/index.html
