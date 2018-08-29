@@ -68,7 +68,7 @@ object TestMain {
 
       val result =
         Await.result(
-          Future.sequence(suites[DocHarness.Uses[Unit], List[String]](harness, combineUses, printSuite)(ec))(
+          Future.sequence(suites(harness, combineUses, printSuite)(ec))(
             scala.collection.breakOut,
             ec
           ),
@@ -91,7 +91,7 @@ object TestMain {
       @inline def runPure(name: String, tests: PureHarness.Uses[Unit]): TestOutput =
         tests((), List(name))
 
-      val mySuites = suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, runPure)(ec).map(r => () => r)
+      val mySuites = suites(harness, combineUses, runPure)(ec).map(r => () => r)
 
       val result = Await.result(Runner(mySuites, ec), Duration.Inf)
 
