@@ -158,7 +158,9 @@ object Maybe extends MaybeInstances {
 
   sealed abstract case class Empty[A] private() extends Maybe[A]
   object Empty {
-    private[this] val value: Empty[Nothing] = new Empty[Nothing]{}
+    // #1712: covariant subclass of `INil` makes the pattern matcher see it as covariant
+    private[this] final class _Empty[+A] extends Empty[A]
+    private[this] val value = new _Empty[Nothing]
     def apply[A](): Maybe[A] = value.asInstanceOf[Empty[A]]
   }
 
