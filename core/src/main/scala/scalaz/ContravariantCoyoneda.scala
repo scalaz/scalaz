@@ -21,7 +21,7 @@ package scalaz
   *   ContravariantCoyoneda(o)(g compose f).unlift
   * }}}
   *
-  * @see [[http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html]]
+  * @see [[https://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html]]
   */
 sealed abstract class ContravariantCoyoneda[F[_], A] {
   /** The pivot between `fi` and `k`, usually existential. */

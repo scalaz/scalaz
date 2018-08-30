@@ -1,6 +1,6 @@
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), parent: Boolean = false, createSyntax: Boolean = true) {
+case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), parent: Boolean = false, createSyntax: Boolean = true, fromIso: Boolean = true) {
   require(pack.head == "scalaz")
   def syntaxPack = {
     Seq("scalaz", "syntax") ++ pack.drop(1)
@@ -23,7 +23,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
-  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
+  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order), fromIso = false)
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
@@ -34,9 +34,9 @@ object TypeClass {
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply), parent = true)
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val foldable = TypeClass("Foldable", *->*, parent = true)
-  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
-  lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
+  lazy val foldable = TypeClass("Foldable", *->*, parent = true, fromIso = false)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable), fromIso = false)
+  lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable), parent = true)
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
@@ -47,16 +47,16 @@ object TypeClass {
   lazy val cozip = TypeClass("Cozip", *->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
-  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus), fromIso = false)
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus), parent = true)
 
-  lazy val associative = TypeClass("Associative", *^*->*)
+  lazy val associative = TypeClass("Associative", *^*->*, fromIso = false)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*, parent = true)
-  lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
+  lazy val bifoldable = TypeClass("Bifoldable", *^*->*, fromIso = false)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
@@ -76,7 +76,7 @@ object TypeClass {
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad), parent = true)
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
@@ -225,8 +225,19 @@ object GenTypeClass {
     val extendsList = tc.extendsList.toList.map(_.name)
 
     import TypeClass._
-    val classifiedTypeIdent = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
+    val arrowLike = Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)
+    val classifiedTypeIdent = if (arrowLike(tc)) "=>:"
     else "F"
+
+    val k: TypeClass => String = t => t.kind match {
+      case Kind.|*->*|->* =>
+        "F, S"
+      case _ =>
+        if (arrowLike(t)) "=>:"
+        else "F"
+    }
+
+    val classifiedTypeIdent0 = k(tc)
 
     val typeShape: String = kind match {
       case Kind.*      => ""
@@ -255,8 +266,15 @@ object GenTypeClass {
         }
     }
     val extendsLikeList = {
-      val parent = if(tc.parent) List(tc.parentName) else Nil
-      extendsListText(suffix = "", parents = extendsList ++ parent)
+      val parent = if(tc.parent) List(tc.parentName -> classifiedTypeIdent0) else Nil
+      val extendsList = tc.extendsList.toList.map(t => t.name -> k(t))
+      (extendsList ++ parent) match {
+        case Seq() => ""
+        case es =>
+          es.map{
+            case (n, cti) => n + "[" + cti + "]"
+          }.mkString("extends ", " with ", "")
+      }
     }
 
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
@@ -275,6 +293,49 @@ object GenTypeClass {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
+    val fromIso: String = if (tc.fromIso) {
+      kind match {
+        case Kind.* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = M
+      override def iso: F <=> G = D
+    }"""
+
+        case Kind.*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~> G = D
+    }"""
+
+        case Kind.*^*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~~> G = D
+    }"""
+
+        case Kind.|*->*|->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: $typeClassName[G, E]): $typeClassName[F, E] =
+    new Isomorphism$typeClassName[F, G, E] {
+      override def G: $typeClassName[G, E] = A
+      override def iso: F <~> G = D
+    }"""
+      }
+    } else {
+      ""
+    }
+
+
     val mainSource = s"""${tc.packageString0}
 
 ////
@@ -291,6 +352,8 @@ $syntaxMember
 
 object $typeClassName {
   $applyMethod
+
+$fromIso
 
   ////
 
@@ -459,18 +522,7 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
 
 ////
 ////
-trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent}] =>
-  ////
-
-  ////
-}
-"""
-      val emptyParent =
-        s"""${tc.packageString0}
-
-////
-////
-trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent}] =>
+trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTypeIdent0}] =>
   ////
 
   ////
@@ -481,7 +533,7 @@ trait ${tc.parentName}[$classifiedType] { self: ${typeClassName}[${classifiedTyp
           empty = SourceFile(
             packages = tc.pack,
             fileName = tc.parentName + ".scala",
-            source = emptyParent,
+            source = parent,
             baseDir = dir => dir.getParentFile / "scala-2.12-"
           ),
           parent = SourceFile(

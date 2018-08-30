@@ -151,6 +151,11 @@ sealed abstract class KleisliInstances7 extends KleisliInstances8 {
     new KleisliBindRec[F, R] {
       implicit def F: BindRec[F] = F0
     }
+
+  implicit def kleisliPlusEmpty0[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, ?]] =
+    new KleisliPlusEmpty[F, A] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class KleisliInstances6 extends KleisliInstances7 {
@@ -232,7 +237,8 @@ abstract class KleisliInstances extends KleisliInstances0 {
       implicit def FB = FB0
     }
 
-  implicit def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, ?]] =
+  // for binary compatibility
+  def kleisliPlusEmpty[F[_], A](implicit F0: PlusEmpty[F]): PlusEmpty[Kleisli[F, A, ?]] =
     new KleisliPlusEmpty[F, A] {
       implicit def F = F0
     }
@@ -270,6 +276,16 @@ object Kleisli extends KleisliInstances {
 
   def local[M[_], A, R](f: R => R)(fa: Kleisli[M, R, A]): Kleisli[M, R, A] =
     fa local f
+
+  import Isomorphism.{ <~>, IsoFunctorTemplate }
+  def iso[D[_], I, O[_]](
+    instance: λ[a => (I => O[a])] ~> D,
+    decode:  D ~> λ[a => (I => O[a])]
+  ): D <~> Kleisli[O, I, ?] =
+    new IsoFunctorTemplate[D, Kleisli[O, I, ?]] {
+      def from[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
+      def to[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
+    }
 }
 
 //

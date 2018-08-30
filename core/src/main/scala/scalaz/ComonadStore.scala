@@ -28,6 +28,14 @@ trait ComonadStore[F[_], S] extends Comonad[F] { self =>
 object ComonadStore {
   @inline def apply[F[_], S](implicit F: ComonadStore[F, S]): ComonadStore[F, S] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: ComonadStore[G, E]): ComonadStore[F, E] =
+    new IsomorphismComonadStore[F, G, E] {
+      override def G: ComonadStore[G, E] = A
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

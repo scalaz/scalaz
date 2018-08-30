@@ -3,7 +3,7 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
-import collection.mutable.ArraySeq
+import scala.collection.mutable.ArraySeq
 import reflect.ClassTag
 
 /**
@@ -17,6 +17,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   import ScalaCheckBinding._
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
+
+  implicit def tannenArbitrary[F[_], G[_, _], A, B](implicit F: Arbitrary[F[G[A, B]]]): Arbitrary[Tannen[F, G, A, B]] =
+    Functor[Arbitrary].map(F)(Tannen[F, G, A, B](_))
 
   implicit def apArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Ap[F, A]] =
     Functor[Arbitrary].map(F)(Ap[F, A](_))
@@ -84,6 +87,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
   implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
+
+  implicit val IntDualArbitrary: Arbitrary[Int @@ Dual] = Tag.subst(arb[Int])
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, IList[A], NonEmptyList[A]](arb[A], ilistArbitrary)(nel(_, _))
@@ -263,7 +268,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def EitherLastRightProjectionArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Either.RightProjection[A, B] @@ Last] = Functor[Arbitrary].map(arb[Either[A, B]])(x => Tag(x.right))
 
-  implicit def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
+  // for binary compatibility
+  private[scalaz] def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = {
+    import scala.language.reflectiveCalls
+    val method = ArraySeq.asInstanceOf[{def apply[B](xs: Seq[B]): ArraySeq[B]}]
+    Functor[Arbitrary].map(arb[List[A]])(method.apply(_))
+  }
 
   import FingerTree._
 
@@ -339,6 +349,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
+
+  implicit def idTArbitrary[A, F[_]](implicit A: Arbitrary[F[A]]): Arbitrary[IdT[F, A]] =
+    Functor[Arbitrary].map(A)(IdT[F, A])
 
   // backwards compatibility
   def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]], F: Monad[F]): Arbitrary[StateT[F, S, A]] =

@@ -215,8 +215,14 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances {
-
-  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
+  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = apply(a)
+  def either[F[_]: Applicative, A, B](d: A \/ B): EitherT[F, A, B] = apply(Applicative[F].point(d))
+  def leftT[F[_]: Functor, A, B](fa: F[A]): EitherT[F, A, B] = apply(Functor[F].map(fa)(-\/(_)))
+  def rightT[F[_]: Functor, A, B](fb: F[B]): EitherT[F, A, B] = apply(Functor[F].map(fb)(\/-(_)))
+  /** will be called `left` in scalaz 7.3 */
+  def pureLeft[F[_]: Applicative, A, B](a: A): EitherT[F, A, B] = apply(Applicative[F].point(-\/(a)))
+  /** will be called `right` in scalaz 7.3 */
+  def pure[F[_]: Applicative, A, B](b: B): EitherT[F, A, B] = apply(Applicative[F].point(\/-(b)))
 
   def fromDisjunction[F[_]]: FromDisjunctionAux[F] = new FromDisjunctionAux
 
@@ -238,10 +244,12 @@ object EitherT extends EitherTInstances {
   }
 
   /** Construct a left disjunction value. */
+  @deprecated("prefer leftT; this method's meaning will change in scalaz 7.3", since = "7.2.18")
   def left[F[_], A, B](a: F[A])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(a)(\/.left))
 
   /** Construct a right disjunction value. */
+  @deprecated("prefer rightT; this method's meaning will change in scalaz 7.3", since = "7.2.18")
   def right[F[_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(b)(\/.right))
 
@@ -259,12 +267,12 @@ object EitherT extends EitherTInstances {
 
   private[scalaz] final class EitherTLeft[B](val dummy: Boolean) extends AnyVal {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
-      left[F.M, F.A, B](F(fa))(F.TC)
+      leftT[F.M, F.A, B](F(fa))(F.TC)
   }
 
   private[scalaz] final class EitherTRight[A](val dummy: Boolean) extends AnyVal {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
-      right[F.M, A, F.A](F(fb))(F.TC)
+      rightT[F.M, A, F.A](F(fb))(F.TC)
   }
 
   /** Construct a disjunction value from a standard `scala.Either`. */
@@ -273,16 +281,16 @@ object EitherT extends EitherTInstances {
 
   def fromTryCatchThrowable[F[_], A, B <: Throwable](a: => F[A])(implicit F: Applicative[F], nn: NotNothing[B], ex: ClassTag[B]): EitherT[F, B, A] =
     try {
-      right(a)
+      rightT(a)
     } catch {
-      case e if ex.runtimeClass.isInstance(e) => left(F.point(e.asInstanceOf[B]))
+      case e if ex.runtimeClass.isInstance(e) => leftT(F.point(e.asInstanceOf[B]))
     }
 
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
     try {
-      right(a)
+      rightT(a)
     } catch {
-      case NonFatal(t) => left(F.point(t))
+      case NonFatal(t) => leftT(F.point(t))
     }
 
 }
@@ -310,7 +318,8 @@ sealed abstract class EitherTInstances2 extends EitherTInstances3 {
 }
 
 sealed abstract class EitherTInstances1 extends EitherTInstances2 {
-  implicit def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
+  // for binary compatibility
+  def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
     new EitherTMonad[F, L] {
       implicit def F = F0
     }
@@ -466,10 +475,10 @@ private[scalaz] trait EitherTMonadTell[F[_], W, A] extends MonadTell[EitherT[F, 
     liftM[F, B](MT.writer(w, v))
 
   def left[B](v: => A): EitherT[F, A, B] =
-    EitherT.left[F, A, B](MT.point(v))
+    EitherT.leftT[F, A, B](MT.point(v))
 
   def right[B](v: => B): EitherT[F, A, B] =
-    EitherT.right[F, A, B](MT.point(v))
+    EitherT.rightT[F, A, B](MT.point(v))
 }
 
 private[scalaz] trait EitherTMonadListen[F[_], W, A] extends MonadListen[EitherT[F, A, ?], W] with EitherTMonadTell[F, W, A] {

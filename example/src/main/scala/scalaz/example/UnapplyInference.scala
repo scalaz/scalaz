@@ -25,7 +25,7 @@ object UnapplyInference extends App {
   }
 
   // Without Unapply
-  def stateTraverse1: Unit = {
+  def stateTraverse1(): Unit = {
     import scalaz._, Scalaz._
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
@@ -33,7 +33,7 @@ object UnapplyInference extends App {
   }
 
   // With Unapply (in the signature of traverseU)
-  def stateTraverse2: Unit = {
+  def stateTraverse2(): Unit = {
     import scalaz._, Scalaz._
 
     val ls = List(1, 2, 3)

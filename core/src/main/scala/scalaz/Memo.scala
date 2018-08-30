@@ -25,7 +25,7 @@ object Memo extends MemoInstances {
   private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       val a = Need(new Array[V](n))
-      k => {
+      k => if (k < 0 || k >= n) f(k) else {
         val t = a.value(k)
         if (t == null) {
           val v = f(k)
@@ -45,9 +45,9 @@ object Memo extends MemoInstances {
           Array.fill(n)(sentinel)
         }
       }
-      k => {
+      k => if (k < 0 || k >= n) f(k) else {
         val t = a.value(k)
-        if (t == sentinel) {
+        if (t == sentinel || (sentinel.isNaN && t.isNaN)) {
           val v = f(k)
           a.value(k) = v
           v
@@ -64,22 +64,24 @@ object Memo extends MemoInstances {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
-  def mutableMapMemo[K, V](a: collection.mutable.Map[K, V]): Memo[K, V] =
+  @deprecated("removed in scalaz 7.3: leaks mutable state, not thread safe", since = "7.2.19")
+  def mutableMapMemo[K, V](a: scala.collection.mutable.Map[K, V]): Memo[K, V] =
     memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
   /** Cache results in a [[scala.collection.mutable.HashMap]].
     * Nonsensical if `K` lacks a meaningful `hashCode` and
     * `java.lang.Object.equals`.
     */
+  @deprecated("removed in scalaz 7.3: not thread safe, relies on Object", since = "7.2.19")
   def mutableHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.HashMap[K, V])
+    mutableMapMemo(new scala.collection.mutable.HashMap[K, V])
 
   /** As with `mutableHashMapMemo`, but forget elements according to
     * GC pressure.
     */
+  @deprecated("removed in scalaz 7.3: not thread safe, relies on Object, not efficient", since = "7.2.19")
   def weakHashMapMemo[K, V]: Memo[K, V] =
-    mutableMapMemo(new collection.mutable.WeakHashMap[K, V])
-
+    mutableMapMemo(new scala.collection.mutable.WeakHashMap[K, V])
 
   def immutableMapMemo[K, V](m: Map[K, V]): Memo[K, V] = {
     var a = m
@@ -92,17 +94,18 @@ object Memo extends MemoInstances {
       }))
   }
 
-  import collection.immutable.{HashMap, ListMap, TreeMap}
+  import scala.collection.immutable.{HashMap, ListMap, TreeMap}
 
   /** Cache results in a hash map.  Nonsensical unless `K` has
     * a meaningful `hashCode` and `java.lang.Object.equals`.
     * $immuMapNote
     */
-  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new HashMap[K, V])
+  def immutableHashMapMemo[K, V]: Memo[K, V] = immutableMapMemo(HashMap.empty[K, V])
 
   /** Cache results in a list map.  Nonsensical unless `K` has
     * a meaningful `java.lang.Object.equals`.  $immuMapNote
     */
+  @deprecated("removed in scalaz 7.3: not efficient", since = "7.2.19")
   def immutableListMapMemo[K, V]: Memo[K, V] = immutableMapMemo(new ListMap[K, V])
 
   /** Cache results in a tree map. $immuMapNote */

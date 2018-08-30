@@ -30,7 +30,7 @@ case class StrictTree[A](
     val stack = mutable.Stack[BottomUpStackElem[A, B]](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (here.hasNext) {
         val child = here.next()
         val nextStackElem = BottomUpStackElem[A, B](Some(here), child)
@@ -136,7 +136,7 @@ case class StrictTree[A](
     val stack = mutable.Stack[ZipStackElem[A, B]](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (here.hasNext) {
         val (childA, childB) = here.next()
         val nextStackElem = ZipStackElem[A, B](Some(here), childA, childB)
@@ -198,7 +198,7 @@ sealed abstract class StrictTreeInstances {
         val stack = mutable.Stack(root)
 
         while (stack.nonEmpty) {
-          val here = stack.elems.head
+          val here = stack.head
           if (here.hasNext) {
             val nextChildren = here.next()
             val nextStackElem = AlignStackElem[A, B, C](Some(here), nextChildren)
@@ -301,7 +301,7 @@ object StrictTree extends StrictTreeInstances {
   private def mapReducer[A, B](
     f: A => B
   )(rootLabel: A
-  )(subForest: Seq[StrictTree[B]]
+  )(subForest: scala.collection.Seq[StrictTree[B]]
   ): StrictTree[B] = {
     StrictTree[B](f(rootLabel), subForest.toVector)
   }
@@ -312,7 +312,7 @@ object StrictTree extends StrictTreeInstances {
   private def flatMapReducer[A, B](
     f: A => StrictTree[B]
   )(root: A
-  )(subForest: Seq[StrictTree[B]]
+  )(subForest: scala.collection.Seq[StrictTree[B]]
   ): StrictTree[B] = {
     val StrictTree(rootLabel0, subForest0) = f(root)
     StrictTree(rootLabel0, subForest0 ++ subForest)
@@ -332,7 +332,7 @@ object StrictTree extends StrictTreeInstances {
     Monoid[B].append(mappedRoot, foldedForest)
   }
 
-  private def hashCodeReducer[A](root: A)(subForest: Seq[Int]): Int = {
+  private def hashCodeReducer[A](root: A)(subForest: scala.collection.Seq[Int]): Int = {
     root.hashCode ^ subForest.hashCode
   }
 
@@ -422,7 +422,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
     val stack = mutable.Stack[EqualStackElem](root)
 
     while (stack.nonEmpty) {
-      val here = stack.elems.head
+      val here = stack.head
       if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
         val aNext = here.aSubIterator.hasNext
         val bNext = here.bSubIterator.hasNext
@@ -445,7 +445,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
 }
 
 final class StrictTreeUnzip[A1, A2](val root: StrictTree[(A1, A2)]) extends AnyVal {
-  private def unzipCombiner(rootLabel: (A1, A2))(accumulator: Seq[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
+  private def unzipCombiner(rootLabel: (A1, A2))(accumulator: scala.collection.Seq[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
     (StrictTree(rootLabel._1, accumulator.map(_._1).toVector), StrictTree(rootLabel._2, accumulator.map(_._2).toVector))
   }
 

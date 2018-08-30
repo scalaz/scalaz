@@ -139,6 +139,12 @@ object NonEmptyList extends NonEmptyListInstances {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
+  // optimised versions of apply(A*)
+  @inline final def apply[A](a: A, b: A, c: A): NonEmptyList[A] = nel(a, IList(b, c))
+  @inline final def apply[A](a: A, b: A, c: A, d: A): NonEmptyList[A] = nel(a, IList(b, c, d))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): NonEmptyList[A] = nel(a, IList(b, c, d, e))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): NonEmptyList[A] = nel(a, IList(b, c, d, e, f))
+
   def unapply[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
     Some((v.head, v.tail))
 

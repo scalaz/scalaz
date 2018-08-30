@@ -8,11 +8,6 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
 
 object FoldableTest extends SpecLite {
-  "to" ! forAll {
-    (xs: List[Int]) =>
-      val v: Vector[Int] = Foldable[List].to[Int, Vector](xs)
-      v.toList must_== xs
-  }
   "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)

@@ -95,6 +95,12 @@ object MaybeTest extends SpecLite {
 
   "fromNullable(notNull) is just" ! forAll { (s: String) => Maybe.fromNullable(s) must_=== just(s) }
 
+  "attempt" in {
+    Maybe.attempt("foo".toInt) must_=== Maybe.empty
+
+    Maybe.attempt("1".toInt) must_=== Maybe.just(1)
+  }
+
   object instances {
     def equal[A: Equal] = Equal[Maybe[A]]
     def order[A: Order] = Order[Maybe[A]]

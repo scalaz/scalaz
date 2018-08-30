@@ -135,7 +135,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * but with `TaskInterrupted` exception.
    *
    * Note 1: When Interrupted, the `f` callback will run in thread that called the `Interrupting` function () => Unit
-   * Note 2: If task has handler like attempt, it won't get consulted for handling TaskInterrupted excpetion
+   * Note 2: If task has handler like attempt, it won't get consulted for handling TaskInterrupted exception
    * @param f
    * @return
    */

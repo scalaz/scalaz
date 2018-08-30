@@ -12,6 +12,7 @@ object IdTTest extends SpecLite {
     def monad[F[_] : Monad] = Monad[IdT[F, ?]]
     def foldable[F[_] : Foldable] = Foldable[IdT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[IdT[F, ?]]
+    def divisible[F[_] : Divisible] = Divisible[IdT[F, ?]]
 
     // checking absence of ambiguity
     def equal[F[_], A](implicit F: Order[F[A]]) = Equal[IdT[F, A]]

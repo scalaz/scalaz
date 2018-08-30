@@ -19,12 +19,15 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters}
 
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
+
+import sbtdynver.DynVerPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
@@ -55,8 +58,9 @@ object build {
     reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
   }
 
-  val scalaCheckVersion_1_12 = SettingKey[String]("scalaCheckVersion_1_12")
   val scalaCheckVersion_1_13 = SettingKey[String]("scalaCheckVersion_1_13")
+  val scalaCheckVersion_1_14 = SettingKey[String]("scalaCheckVersion_1_14")
+  val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -76,6 +80,11 @@ object build {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
+    },
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % _
+      }.toSet
     }
   )
 
@@ -84,7 +93,8 @@ object build {
     publish := {},
     publishLocal := {},
     publishSigned := {},
-    publishLocalSigned := {}
+    publishLocalSigned := {},
+    mimaPreviousArtifacts := Set.empty
   )
 
   // avoid move files
@@ -108,21 +118,26 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  private def Scala211 = "2.11.11"
-  private def Scala212 = "2.12.4"
+  private def Scala211 = "2.11.12"
+  private def Scala212 = "2.12.6"
+  private def Scala213 = "2.13.0-M4"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   private[this] val buildInfoPackageName = "scalaz"
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
-    unmanagedSourceDirectories in Compile += {
-      val base = ScalazCrossType.shared(baseDirectory.value, "main").getParentFile
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v >= 12 =>
-          base / "scala-2.12+"
-        case _ =>
-          base / "scala-2.12-"
+  lazy val standardSettings: Seq[Sett] = Def.settings(
+    Seq(12, 13).flatMap { scalaV =>
+      Seq((Compile, "main"), (Test, "test")).map { case (scope, dir) =>
+        unmanagedSourceDirectories in scope += {
+          val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
+          CrossVersion.partialVersion(scalaVersion.value) match {
+            case Some((2, v)) if v >= scalaV =>
+              base / s"scala-2.${scalaV}+"
+            case _ =>
+              base / s"scala-2.${scalaV}-"
+          }
+        }
       }
     },
     organization := "org.scalaz",
@@ -137,18 +152,18 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq("2.10.6", Scala211, Scala212, "2.13.0-M2"),
+    crossScalaVersions := Seq("2.10.7", Scala211, Scala212),
+    commands += Command.command("setVersionUseDynver") { state =>
+      val extracted = Project extract state
+      val out = extracted get dynverGitDescribeOutput
+      val date = extracted get dynverCurrentDate
+      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+    },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_12 := {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v <= 11 =>
-          "1.12.5"
-        case _ =>
-          "1.12.6"
-      }
-    },
     scalaCheckVersion_1_13 := "1.13.5",
+    scalaCheckVersion_1_14 := "1.14.0",
+    scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -170,16 +185,8 @@ object build {
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += {
-      val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isScalaJSProject.value)
-          Seq("-minSuccessfulTests", "10")
-        else
-          Seq("-minSuccessfulTests", "33")
-      }
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
-    },
     genTypeClasses := {
+      val s = streams.value
       typeClasses.value.flatMap { tc =>
         val dir = name.value match {
           case ConcurrentName =>
@@ -187,7 +194,7 @@ object build {
           case _ =>
             ScalazCrossType.shared(baseDirectory.value, "main")
         }
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, streams.value.log))
+        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
       }
     },
     checkGenTypeClasses := {
@@ -224,13 +231,14 @@ object build {
       inquireVersions,
       runTest,
       SetScala211,
-      releaseStepCommand(s"${nativeTestId}/run"),
+      releaseStepCommandAndRemaining(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       publishSignedArtifacts,
       SetScala211,
-      releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
@@ -245,7 +253,7 @@ object build {
         <licenses>
           <license>
             <name>BSD-style</name>
-            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
             <distribution>repo</distribution>
           </license>
         </licenses>
@@ -271,12 +279,18 @@ object build {
               <developer>
                 <id>{id}</id>
                 <name>{name}</name>
-                <url>http://github.com/{id}</url>
+                <url>https://github.com/{id}</url>
               </developer>
           }
         }
         </developers>
       ),
+
+    licenseFile := {
+      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+      LICENSE_txt
+    },
     // kind-projector plugin
     libraryDependencies ++= (scalaBinaryVersion.value match {
       case "2.10" =>
@@ -285,21 +299,17 @@ object build {
         Nil
     }),
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.4",
+    kindProjectorVersion := "0.9.7",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ osgiSettings ++ Seq[Sett](
+  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
+    // include LICENSE.txt in all packaged artifacts
+    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  } ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
-      val artifactId =
-        if(isScalaJSProject.value) {
-          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
-        } else {
-          s"${name.value}_${scalaBinaryVersion.value}"
-        }
-
       scalazMimaBasis.?.value.map {
-        organization.value % artifactId % _
+        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
       }.toSet
     }
   )
@@ -312,6 +322,11 @@ object build {
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
+      mimaBinaryIssueFilters ++= {
+        import com.typesafe.tools.mima.core._
+        import com.typesafe.tools.mima.core.ProblemFilters._
+        Nil
+      },
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
@@ -364,28 +379,41 @@ object build {
       Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
-  lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password") map sys.props.get match {
-      case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+  lazy val credentialsSetting = credentials ++= {
+    val name = "Sonatype Nexus Repository Manager"
+    val realm = "oss.sonatype.org"
+    (
+      sys.props.get("build.publish.user"),
+      sys.props.get("build.publish.password"),
+      sys.env.get("SONATYPE_USERNAME"),
+      sys.env.get("SONATYPE_PASSWORD")
+    ) match {
+      case (Some(user), Some(pass), _, _)  => Seq(Credentials(name, realm, user, pass))
+      case (_, _, Some(user), Some(pass))  => Seq(Credentials(name, realm, user, pass))
       case _                           =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
+        val ivyFile = Path.userHome / ".ivy2" / ".credentials"
+        val m2File = Path.userHome / ".m2" / "credentials"
+        if (ivyFile.exists()) Seq(Credentials(ivyFile))
+        else if (m2File.exists()) Seq(Credentials(m2File))
+        else Nil
     }
   }
 
-  lazy val scalazMimaBasis = SettingKey[String]("scalazMimaBasis", "Version of scalaz against which to run MIMA.")
+  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
-  lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
+  lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
-  lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
+  lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
-  lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
+  lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
-  lazy val showDoc = TaskKey[Unit]("show-doc")
+  lazy val genToSyntax = taskKey[String]("")
 
-  lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+  lazy val showDoc = taskKey[Unit]("")
 
-  lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
+  lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
+
+  lazy val checkGenTypeClasses = taskKey[Unit]("")
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }

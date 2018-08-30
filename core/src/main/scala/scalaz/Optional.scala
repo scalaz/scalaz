@@ -53,6 +53,14 @@ trait Optional[F[_]]  { self =>
 object Optional {
   @inline def apply[F[_]](implicit F: Optional[F]): Optional[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Optional[G]): Optional[F] =
+    new IsomorphismOptional[F, G] {
+      override def G: Optional[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

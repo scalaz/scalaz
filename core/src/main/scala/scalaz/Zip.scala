@@ -68,6 +68,14 @@ trait Zip[F[_]]  { self =>
 object Zip {
   @inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Zip[G]): Zip[F] =
+    new IsomorphismZip[F, G] {
+      override def G: Zip[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =

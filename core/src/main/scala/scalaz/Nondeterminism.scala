@@ -194,6 +194,14 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 object Nondeterminism {
   @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Nondeterminism[G]): Nondeterminism[F] =
+    new IsomorphismNondeterminism[F, G] {
+      override def G: Nondeterminism[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

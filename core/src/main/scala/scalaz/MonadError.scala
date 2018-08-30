@@ -5,7 +5,7 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_], S] extends Monad[F] { self =>
+trait MonadError[F[_], S] extends Monad[F] with MonadErrorParent[F, S] { self =>
   ////
 
   def raiseError[A](e: S): F[A]
@@ -28,7 +28,14 @@ trait MonadError[F[_], S] extends Monad[F] { self =>
 object MonadError {
   @inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
 
-  ////
+  import Isomorphism._
 
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: MonadError[G, E]): MonadError[F, E] =
+    new IsomorphismMonadError[F, G, E] {
+      override def G: MonadError[G, E] = A
+      override def iso: F <~> G = D
+    }
+
+  ////
   ////
 }

@@ -57,7 +57,7 @@ object ConcurrentTest extends SpecLite{
         latch.countDown
       }
       if (latch.await(timeout, TimeUnit.MILLISECONDS)) result
-      else sys.error("Timeout occured, possible deadlock.")
+      else sys.error("Timeout occurred, possible deadlock.")
     }
   }
 

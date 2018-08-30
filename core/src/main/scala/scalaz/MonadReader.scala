@@ -20,7 +20,14 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
 object MonadReader {
   @inline def apply[F[_], S](implicit F: MonadReader[F, S]): MonadReader[F, S] = F
 
-  ////
+  import Isomorphism._
 
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: MonadReader[G, E]): MonadReader[F, E] =
+    new IsomorphismMonadReader[F, G, E] {
+      override def G: MonadReader[G, E] = A
+      override def iso: F <~> G = D
+    }
+
+  ////
   ////
 }

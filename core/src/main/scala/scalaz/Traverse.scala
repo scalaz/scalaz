@@ -10,7 +10,7 @@ import scalaz.Id.Id
  * @see [[scalaz.Traverse.TraverseLaw]]
  */
 ////
-trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
+trait Traverse[F[_]] extends Functor[F] with Foldable[F] with TraverseParent[F] { self =>
   ////
 
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
@@ -202,6 +202,14 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
 object Traverse {
   @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
+
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Traverse[G]): Traverse[F] =
+    new IsomorphismTraverse[F, G] {
+      override def G: Traverse[G] = E
+      override def iso: F <~> G = D
+    }
 
   ////
 

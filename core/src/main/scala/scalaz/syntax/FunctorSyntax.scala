@@ -8,8 +8,25 @@ final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: F
   import Liskov.<~<
 
   final def map[B](f: A => B): F[B] = F.map(self)(f)
+
+  /**
+    * Alias for [[map]], since [[map]] can't be injected as syntax if
+    * the implementing type already had a built-in `.map` method.
+    *
+    * Example:
+    * {{{
+    * scala> import scalaz.Scalaz._
+    *
+    * scala> val m: Map[Int, String] = Map(1 -> "hi", 2 -> "there", 3 -> "you")
+    *
+    * scala> m.fmap(_ ++ "!")
+    * res0: Map[Int,String] = Map(1 -> hi!, 2 -> there!, 3 -> you!)
+    * }}}
+    */
+  final def fmap[B](f: A => B): F[B] = F.map(self)(f)
+
   final def distribute[G[_], B](f: A => G[B])(implicit D: Distributive[G]): G[F[B]] = D.distribute(self)(f)
-  final def cosequence[G[_], B](implicit ev: A === G[B], D: Distributive[G]): G[F[B]] = D.distribute(self)(ev(_))
+  final def cosequence[G[_], B](implicit ev: A === G[B], D: Distributive[G]): G[F[B]] = D.distribute(self)(ev)
   final def cotraverse[G[_], B, C](f: F[B] => C)(implicit ev: A === G[B], D: Distributive[G]): G[C] = D.map(cosequence)(f)
   final def ∘[B](f: A => B): F[B] = F.map(self)(f)
   final def strengthL[B](b: B): F[(B, A)] = F.strengthL(b, self)

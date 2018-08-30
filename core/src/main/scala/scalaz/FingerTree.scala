@@ -1,6 +1,6 @@
 package scalaz
 
-import collection.Iterator
+import scala.collection.Iterator
 import syntax.Ops
 import std.option._
 

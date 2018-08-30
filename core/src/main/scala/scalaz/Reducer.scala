@@ -16,7 +16,8 @@ import scalaz.Tags.Conjunction
  *
  * Minimal definition: `unit` or `snoc`
  *
- * Based on a Haskell library by Edward Kmett
+ * Based on the Reducer Haskell library by Edward Kmett
+ * (https://hackage.haskell.org/package/reducers).
  */
 sealed abstract class Reducer[C, M] {
   implicit def monoid: Monoid[M]
@@ -70,6 +71,15 @@ sealed abstract class Reducer[C, M] {
     }
     rec(seed, zero)
   }
+
+  trait ReducerLaw {
+    def consCorrectness(c: C, m: M)(implicit E: Equal[M]): Boolean =
+      E.equal(cons(c, m), append(unit(c), m))
+
+    def snocCorrectness(m: M, c: C)(implicit E: Equal[M]): Boolean =
+      E.equal(snoc(m, c), append(m, unit(c)))
+  }
+  def reducerLaw = new ReducerLaw {}
 }
 sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   implicit def monoid: Monoid[M]
@@ -103,6 +113,10 @@ sealed abstract class ReducerInstances {
     import std.list._
     unitConsReducer(_ :: Nil, c => c :: _)
   }
+
+  /** Collect `C`s into an ilist, in order. */
+  implicit def IListReducer[C]: Reducer[C, IList[C]] =
+    unitConsReducer(_ :: INil(), c => c :: _)
 
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {

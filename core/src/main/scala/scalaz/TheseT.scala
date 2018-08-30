@@ -88,8 +88,14 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 
 }
 
+sealed abstract class TheseTInstances2 {
+  implicit def theseTFunctor0[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
+    new TheseTFunctor[F, L] {
+      override def F = implicitly
+    }
+}
 
-sealed abstract class TheseTInstances1 {
+sealed abstract class TheseTInstances1 extends TheseTInstances2 {
   implicit def TheseTInstance1[F[_]: Traverse, L]: Traverse[TheseT[F, L, ?]]
   = new Traverse[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
     override def F = implicitly
@@ -135,7 +141,8 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
 
 }
 sealed abstract class TheseTInstances extends TheseTInstances0 {
-  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
+  // for binary compatibility
+  def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
     new TheseTFunctor[F, L] {
       override def F = implicitly
     }

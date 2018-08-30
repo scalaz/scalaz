@@ -12,7 +12,10 @@ object ApTest extends SpecLite {
   checkAll("Ap[Maybe, Int]", monoid.laws[Ap[Maybe, Int]])
 
   object instances {
-    def semigroup[A: Monoid] = Semigroup[Ap[IList, A]]
-    def monoid[A: Monoid] = Monoid[Ap[Maybe, A]]
+    def semigroup[F[_]: Apply, A: Semigroup] = Semigroup[Ap[F, A]]
+    def semigroup[F[_]: Applicative, A: Semigroup] = Semigroup[Ap[F, A]]
+    def semigroup[F[_]: Apply, A: Monoid] = Semigroup[Ap[F, A]]
+    def semigroup[F[_]: Applicative, A: Monoid] = Semigroup[Ap[F, A]]
+    def monoid[F[_]: Applicative, A: Monoid] = Monoid[Ap[F, A]]
   }
 }

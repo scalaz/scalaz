@@ -1,6 +1,6 @@
 package scalaz
 
-import collection.immutable.IndexedSeq
+import scala.collection.immutable.IndexedSeq
 
 /** Given Injective[Foo]: If type Foo[A] = Foo[B] then A ~ B
   *

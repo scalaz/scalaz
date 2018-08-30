@@ -100,6 +100,8 @@ trait Bifoldable[F[_, _]]  { self =>
 object Bifoldable {
   @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 
+
+
   ////
   /**
    * Template trait to define `Bifoldable` in terms of `bifoldMap`.

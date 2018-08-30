@@ -150,7 +150,16 @@ trait Apply[F[_]] extends Functor[F] with ApplyParent[F] { self =>
 object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Apply[G]): Apply[F] =
+    new IsomorphismApply[F, G] {
+      override def G: Apply[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+  type Par[F[_]] = Apply[λ[α => F[α] @@ Tags.Parallel]]
 
   ////
 }

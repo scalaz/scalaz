@@ -223,6 +223,8 @@ trait Enum[F] extends Order[F] { self =>
 object Enum {
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
+
+
   ////
   def succn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
     var w = n
@@ -251,5 +253,13 @@ object Enum {
     }
     z
   }
+
+  import Isomorphism.<=>
+
+  def fromIso[F, G](D: F <=> G)(implicit E: Enum[G]): Enum[F] =
+    new IsomorphismEnum[F, G] with IsomorphismOrder[F, G] {
+      override implicit def G: Enum[G] = E
+      override def iso: F <=> G = D
+    }
   ////
 }

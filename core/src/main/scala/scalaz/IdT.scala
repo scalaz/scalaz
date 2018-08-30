@@ -20,7 +20,12 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT(F.ap(run)(f.run))
 }
 
-sealed abstract class IdTInstances4 {
+sealed abstract class IdTInstances5 {
+  implicit def idTDivisible[F[_]](implicit F0: Divisible[F]): Divisible[IdT[F, ?]] =
+    Divisible.fromIso[IdT[F, ?], F](IdT.iso[F])
+}
+
+sealed abstract class IdTInstances4 extends IdTInstances5 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, ?]] =
     new IdTFunctor[F] {
       implicit def F: Functor[F] = F0
@@ -50,6 +55,9 @@ sealed abstract class IdTInstances1 extends IdTInstances2 {
     new IdTBindRec[F] {
       implicit def F: BindRec[F] = F0
     }
+
+  implicit def idTEqual0[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
 }
 
 sealed abstract class IdTInstances0 extends IdTInstances1 {
@@ -70,11 +78,18 @@ sealed abstract class IdTInstances extends IdTInstances0 {
       implicit def F: Traverse[F] = F0
     }
 
-  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+  // for binary compatibility
+  def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
     F.contramap(_.run)
 }
 
-object IdT extends IdTInstances
+object IdT extends IdTInstances {
+  import Isomorphism._
+  def iso[F[_]]: IdT[F, ?] <~> F = new IsoFunctorTemplate[IdT[F, ?], F] {
+    def from[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
+    def to[A](fa: IdT[F, A]): F[A] = fa.run
+  }
+}
 
 //
 // Implementation traits for type class instances

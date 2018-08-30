@@ -8,7 +8,7 @@ package scalaz
 ////
 trait Foldable[F[_]] extends FoldableParent[F] { self =>
   ////
-  import collection.generic.CanBuildFrom
+  import scala.collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -153,12 +153,25 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
   def indexOr[A](fa: F[A], default: => A, i: Int): A =
     index(fa, i) getOrElse default
 
-  def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
-  def toVector[A](fa: F[A]): Vector[A] = foldLeft(fa, Vector[A]())(_ :+ _)
-  def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
+  def toList[A](fa: F[A]): List[A] = {
+    foldLeft(fa, List.newBuilder[A]){ (buf, a) => buf += a }.result
+  }
+  def toVector[A](fa: F[A]): Vector[A] = {
+    foldLeft(fa, Vector.newBuilder[A]){ (buf, a) => buf += a }.result
+  }
+  def toSet[A](fa: F[A]): Set[A] = {
+    foldLeft(fa, Set.newBuilder[A]){ (buf, a) => buf += a }.result
+  }
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
-  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
-    foldLeft(fa, c())(_ += _).result
+  /**
+    * @throws NoSuchMethodException if Scala 2.13 or later
+    */
+  @deprecated(message = "removed in scalaz 7.3", since = "7.2.22")
+  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] = {
+    import scala.language.reflectiveCalls
+    val builder = c.asInstanceOf[{def apply(): scala.collection.mutable.Builder[A, G[A]]}].apply()
+    foldLeft(fa, builder)(_ += _).result
+  }
 
   def toIList[A](fa: F[A]): IList[A] =
     foldLeft(fa, IList.empty[A])((t, h) => h :: t).reverse
@@ -318,6 +331,8 @@ trait Foldable[F[_]] extends FoldableParent[F] { self =>
 
 object Foldable {
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
+
+
 
   ////
   /**

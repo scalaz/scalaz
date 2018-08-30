@@ -11,8 +11,6 @@ object GenerateTupleW {
       file
     }
 
-    def double(s: String) = s + s
-
     val tuples: IndexedSeq[(String, String)] = for (arity: Int <- arities) yield {
       case class N(n: Int) {
         val alpha: String = ('A' + (n - 1)).toChar.toString
@@ -54,7 +52,7 @@ object GenerateTupleW {
       (pimp, conv)
     }
 
-    val source = "package scalaz\npackage syntax\npackage std\n\nimport collection.immutable.IndexedSeq\n\n" +
+    val source = "package scalaz\npackage syntax\npackage std\n\nimport scala.collection.immutable.IndexedSeq\n\n" +
       tuples.map(_._1).mkString("\n") +
       "\n\ntrait ToTupleOps {\n" +
          tuples.map("  " + _._2).mkString("\n") +

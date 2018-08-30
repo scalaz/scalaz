@@ -1,14 +1,18 @@
 scalacOptions += "-deprecation"
 
-addSbtPlugin("org.scala-native" % "sbt-scalajs-crossproject" % "0.2.2")
+addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.0.0")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.3")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.21")
+addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.0")
 
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.8")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.6")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.24")
+
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.1")
+
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.7.0")
 
@@ -16,7 +20,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.4.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.17")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.2.0")
 
 // https://github.com/ThoughtWorksInc/sbt-api-mappings/issues/8
 libraryDependencies ++= {

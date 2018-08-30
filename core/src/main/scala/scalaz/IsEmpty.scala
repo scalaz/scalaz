@@ -28,6 +28,14 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
 object IsEmpty {
   @inline def apply[F[_]](implicit F: IsEmpty[F]): IsEmpty[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: IsEmpty[G]): IsEmpty[F] =
+    new IsomorphismIsEmpty[F, G] {
+      override def G: IsEmpty[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

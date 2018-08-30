@@ -69,7 +69,7 @@ trait ListInstances extends ListInstances0 {
 
       override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
         State((s: S) => {
-          val buf = new collection.mutable.ListBuffer[B]
+          val buf = new scala.collection.mutable.ListBuffer[B]
           var cur = s
           l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
           (cur, buf.toList)
@@ -81,7 +81,7 @@ trait ListInstances extends ListInstances0 {
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
         val s = new ArrayStack[A]
-        fa.foreach(a => s += a)
+        fa.foreach(a => s push a)
         var r = z
         while (!s.isEmpty) {
           // force and copy the value of r to ensure correctness
@@ -264,10 +264,10 @@ trait ListFunctions {
   }
 
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
-  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
+  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = as.foldLeft(Map.empty[B, NonEmptyList[A]]) { (nels, a) =>
     val b = f(a)
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
-  } mapValues (_.reverse)
+  } map { case (k, v) => (k, v.reverse) }
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {

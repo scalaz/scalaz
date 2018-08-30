@@ -118,7 +118,16 @@ trait Applicative[F[_]] extends Apply[F] with ApplicativeParent[F] { self =>
 object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Applicative[G]): Applicative[F] =
+    new IsomorphismApplicative[F, G] {
+      override def G: Applicative[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+  type Par[F[_]] = Applicative[λ[α => F[α] @@ Tags.Parallel]]
 
   implicit def monoidApplicative[M:Monoid]: Applicative[λ[α => M]] = Monoid[M].applicative
 

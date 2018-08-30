@@ -74,9 +74,15 @@ object KleisliTest extends SpecLite {
     def bind[F[_] : BindRec, A] = Bind[Kleisli[F, A, ?]]
     def bind[F[_] : Monad: BindRec, A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
+    def plus[F[_] : MonadPlus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
+    def profunctor[F[_]: Apply] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Applicative] = Profunctor[Kleisli[F, ?, ?]]
+    def profunctor[F[_]: Bind] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]
+    def strong[F[_]: Apply] = Strong[Kleisli[F, ?, ?]]
+    def strong[F[_]: Applicative] = Strong[Kleisli[F, ?, ?]]
+    def strong[F[_]: Bind] = Strong[Kleisli[F, ?, ?]]
     def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
     def compose[F[_]: Monad] = Compose[Kleisli[F, ?, ?]]
@@ -89,7 +95,7 @@ object KleisliTest extends SpecLite {
       def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 
-      // Sigh, more tests needed, see http://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
+      // Sigh, more tests needed, see https://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
       trait X
       type ReaderX[A] = Reader[X, A]
       def readerXFunctor = Functor[ReaderX]
