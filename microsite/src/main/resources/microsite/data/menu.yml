@@ -41,9 +41,8 @@ options:
       url: typeclass/Strong.html
     - title: Unfoldable
       url: typeclass/Unfoldable.html
-      url: tc/Unfoldable.html
     - title: Unfoldable1
-      url: tc/Unfoldable1.html
+      url: typeclass/Unfoldable1.html
 
   - title: Data classes
     url: data/index.html
