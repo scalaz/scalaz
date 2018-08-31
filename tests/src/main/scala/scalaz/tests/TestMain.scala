@@ -1,7 +1,8 @@
 package scalaz.tests
 
 import java.util.concurrent.Executors
-import scala.{ Array, List, Unit }
+import scala.{ inline, Array, Char, Int, List, Unit }
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext
@@ -9,6 +10,7 @@ import scala.concurrent.ExecutionContext
 import java.lang.String
 
 import testz._
+import extras.DocHarness
 import testz.runner.Runner
 
 object TestMain {
@@ -23,36 +25,78 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    val harness: Harness[PureHarness.Uses[Unit]] =
-      PureHarness.toHarness(
+    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, cont: (String, T) => U)(
+      ec: ExecutionContext
+    ): List[Future[U]] =
+      List(
+        Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
+        Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
+        Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
+        Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
+        Future(cont("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
+        Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
+      )
+
+    if (List(args: _*) == List("show")) {
+      val harness =
+        PureHarness.toHarness(
+          new DocHarness
+        )
+
+      @scala.annotation.tailrec
+      def times(ch: Char, i: Int, acc: Array[Char]): String =
+        if (i == 0) {
+          acc(i) = ch
+          new String(acc)
+        } else {
+          acc(i) = ch
+          times(ch, i - 1, acc)
+        }
+
+      @inline def printSuite(name: String, desc: DocHarness.Uses[Unit]): List[String] = {
+        val sb = new ListBuffer[String]
+        harness.section(name)(desc)("", sb)
+        val outSb = new ListBuffer[String]
+        outSb += "\n"
+        outSb += times('=', name.length - 1, new Array[Char](name.length))
+        outSb ++= sb.result().map("\n" + _)
+        outSb.result()
+      }
+
+      @inline def combineUses(fst: DocHarness.Uses[Unit], snd: DocHarness.Uses[Unit]): DocHarness.Uses[Unit] =
+        (s, sb) => { fst(s, sb); snd(s, sb); }
+
+      val result =
+        Await.result(
+          Future.sequence(suites(harness, combineUses, printSuite)(ec))(
+            scala.collection.breakOut,
+            ec
+          ),
+          Duration.Inf
+        )
+
+      result.foreach(_.foreach(scala.Console.print))
+
+      scala.Console.println()
+    } else {
+      val harness = PureHarness.toHarness[PureHarness.Uses, Unit](
         PureHarness.make(
           (ls, tr) => Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print)
         )
       )
 
-    def runPure(name: String, tests: PureHarness.Uses[Unit]): () => Unit =
-      tests((), List(name))
+      @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
+        (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
 
-    def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
-      (r, ls) => {
-        val f = fst(r, ls)
-        val s = snd(r, ls)
-        () =>
-          {
-            f()
-            s()
-          }
-      }
+      @inline def runPure(name: String, tests: PureHarness.Uses[Unit]): TestOutput =
+        tests((), List(name))
 
-    val suites: List[() => Future[() => Unit]] = List(
-      Future(runPure("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
-      Future(runPure("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
-      Future(runPure("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
-      Future(runPure("Scala Map Tests", SMapTests.tests(harness)))(ec),
-      Future(runPure("Double Tests", (new DoubleTests).tests(harness)))(ec),
-    ).map(r => () => r)
+      val mySuites = suites(harness, combineUses, runPure)(ec).map(r => () => r)
 
-    Await.result(Runner(suites, ec), Duration.Inf)
+      val result = Await.result(Runner(mySuites, ec), Duration.Inf)
+
+      if (result.failed) throw new java.lang.Exception()
+    }
 
     val _ = executor.shutdownNow()
 
