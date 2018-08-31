@@ -131,7 +131,9 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
   def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Category[G]): G[A, B] =
     self.uncons match {
       case AJust2(h, t) =>
-        t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightActionMap(φ))
+        t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(
+            PostComposeBalancer.rightActionMap(φ)
+          )
           .result
       case ev @ AEmpty2() => ev.subst[G[A, ?]](G.id[A])
     }
@@ -143,7 +145,9 @@ final class AListOps[F[_, _], A, B](val self: AList[F, A, B]) extends AnyVal {
     self.uncons match {
       case AJust2(h, t) =>
         AJust(
-          t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(PostComposeBalancer.rightActionMap(φ))
+          t.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(h)))(
+              PostComposeBalancer.rightActionMap(φ)
+            )
             .result
         )
       case ev @ AEmpty2() => ev.subst[AMaybe[G, A, ?]](AMaybe.empty[G, A])

@@ -97,7 +97,7 @@ package object data {
 
   type ACons[F[_, _], G[_, _], α, β, γ] = (F[β, γ], G[α, β]) => G[α, γ]
   type ASnoc[F[_, _], G[_, _], α, β, γ] = (G[β, γ], F[α, β]) => G[α, γ]
-  type AComposition[F[_, _], α, β, γ] =   (F[β, γ], F[α, β]) => F[α, γ]
+  type AComposition[F[_, _], α, β, γ]   = (F[β, γ], F[α, β]) => F[α, γ]
 
   val AFix: AFixModule = AFixImpl
   type AFix[F[_[_, _], _, _], A, B] = AFix.AFix[F, A, B]

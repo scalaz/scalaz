@@ -20,7 +20,7 @@ object AList1Tests {
   type R[A, B] = AList1[Map, A, B] => Map[A, B]
   type L[A, B] = Map[A, B] => AList1[Map, A, B]
   val sfoldBalancedF: AList1[Map, ?, ?] ~~> Map = Forall2.of[R](_.sfoldBalanced)
-  val liftF: Map ~~> AList1[Map, ?, ?]         = Forall2.of[L](lift(_))
+  val liftF: Map ~~> AList1[Map, ?, ?]          = Forall2.of[L](lift(_))
 
   // specified in `compose`-order
   // while these are each similar to `(+) 3`,
@@ -48,14 +48,16 @@ object AList1Tests {
     def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
       new Fake("(" + snd.str + "|" + fst.str + ")")
   })
-  implicit def fakeEq[A, B]: Eq[Fake[A, B]] = instanceOf[EqClass[Fake[A, B]]] {
-    (f1, f2) => f1.str === f2.str
+  implicit def fakeEq[A, B]: Eq[Fake[A, B]] = instanceOf[EqClass[Fake[A, B]]] { (f1, f2) =>
+    f1.str === f2.str
   }
   def fake(str: String): Fake[Int, Int] =
     new Fake(str)
-  val bracketFake: Fake ~~> Fake = Forall2.from(ν[Forall2.Prototype[λ[(A, B) => Fake[A, B] => Fake[A, B]]]][α, β](
-    s => new Fake("[" + s.str + "]")
-  ))
+  val bracketFake: Fake ~~> Fake = Forall2.from(
+    ν[Forall2.Prototype[λ[(A, B) => Fake[A, B] => Fake[A, B]]]][α, β](
+      s => new Fake("[" + s.str + "]")
+    )
+  )
 
   def const(s: String): AList1[Biconst[String, ?, ?], Int, Int] = lift(Biconst(s))
 
