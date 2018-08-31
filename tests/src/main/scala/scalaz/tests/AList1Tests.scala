@@ -137,7 +137,7 @@ object AList1Tests {
             fake("((hello|world)|foo)")
           )
         },
-        test("sfoldLeft") { () =>
+        test("sfoldMapLeft") { () =>
           assertEqual(
             (lift(fake("hello")) >>> lift(fake("world")) >>> lift(fake("foo"))).sfoldMapLeft(bracketFake),
             fake("(([hello]|[world])|[foo])")
