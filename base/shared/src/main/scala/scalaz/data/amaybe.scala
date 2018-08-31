@@ -5,7 +5,7 @@ import scala.Nothing
 
 import Predef._
 import prop.{ ===, Is }
-import tc.{ Debug, DebugClass, Eq, EqClass, instanceOf }
+import tc.{ instanceOf, Debug, DebugClass, Eq, EqClass }
 
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.

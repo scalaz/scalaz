@@ -5,7 +5,7 @@ import Predef.Int
 import data._
 
 import Scalaz._
-import AMaybe.{empty, just}
+import AMaybe.{ empty, just }
 
 import testz._
 
