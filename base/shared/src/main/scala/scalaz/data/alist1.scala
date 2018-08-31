@@ -66,11 +66,20 @@ sealed abstract class AList1[F[_, _], A, B] {
       case AJust2(h, t)   => Right(APair.of[F[A, ?], AList1[F, ?, B]](head, ACons1(h, t)))
     }
 
+  def sfold(implicit F: Semicategory[F]): F[A, B] =
+    sfoldBalanced
+
   def foldLeft[G[_]](ga: G[A])(φ: RightAction[G, F]): G[B] =
     tail.foldLeft[G](φ.apply(ga, head))(φ)
 
+  def sfoldLeft(implicit F: Semicategory[F]): F[A, B] =
+    tail.foldLeft[F[A, ?]](head)(RightAction.scompose)
+
   def foldLeft1[G[_]](init: F[A, ?] ~> G)(φ: RightAction[G, F]): G[B] =
     tail.foldLeft[G](init.apply(head))(φ)
+
+  def sfoldMapLeft[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): G[A, B] =
+    tail.foldLeft[G[A, ?]](φ.apply(head))(RightAction.scomposeMap[F, G, A](φ))
 
   def foldRight[G[_]](gb: G[B])(φ: LeftAction[G, F]): G[A] =
     reverse.foldLeft(gb)(RightAction.fromLeft(φ))
@@ -78,18 +87,28 @@ sealed abstract class AList1[F[_, _], A, B] {
   def foldRight1[G[_]](init: F[?, B] ~> G)(φ: LeftAction[G, F]): G[A] =
     reverse.foldLeft1[G](init)(RightAction.fromLeft(φ))
 
-  /**
-   * Compose the elements of this list in a balanced binary fashion.
-   */
-  def foldBalanced(implicit F: Semicategory[F]): F[A, B] =
+  def sfoldRight(implicit F: Semicategory[F]): F[A, B] = {
+    val rev = reverse
+    rev.tail.foldLeft[F[?, B]](rev.head)(RightAction.fromLeft(LeftAction.scompose))
+  }
+
+  def sfoldMapRight[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): G[A, B] = {
+    val rev = reverse
+    rev.tail.foldLeft[G[?, B]](φ.apply(rev.head))(RightAction.fromLeft(LeftAction.scomposeMap[F, G, B](φ)))
+  }
+
+  def sfoldBalanced(implicit F: Semicategory[F]): F[A, B] =
     tail.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(head))(PostComposeBalancer.rightAction).result
+
+  def foldMapBalanced[G[_, _]: Semicategory](trans: F ~~> G): G[A, B] =
+    tail.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(trans.apply(head)))(PostComposeBalancer.rightActionMap(trans)).result
 
   /**
    * Map and then compose the elements of this list in a balanced binary fashion.
    */
-  def foldMap[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): G[A, B] =
+  def sfoldMapBalanced[G[_, _]](φ: F ~~> G)(implicit G: Semicategory[G]): G[A, B] =
     tail
-      .foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightAction(φ))
+      .foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(φ.apply(head)))(PostComposeBalancer.rightActionMap(φ))
       .result
 
   def map[G[_, _]](φ: F ~~> G): AList1[G, A, B] =
@@ -146,7 +165,7 @@ object AList1 {
   def op[F[_, _], A, B](f: F[A, B]): Flipped1[F, A, B]  = apply[λ[(α, β) => F[β, α]], B, A](f)
 
   // AList1 is a valid free semicategory in strict languages, like Scala.
-  implicit def alist1Semicategory[F[_, _]]: Semicategory[AList1[F, ?, ?]] =
+  implicit def alist1FreeSemicategory[F[_, _]]: Semicategory[AList1[F, ?, ?]] =
     instanceOf(new SemicategoryClass[AList1[F, ?, ?]] {
       def compose[A, B, C](fst: AList1[F, B, C], snd: AList1[F, A, B]): AList1[F, A, C] =
         snd :++ fst.toList

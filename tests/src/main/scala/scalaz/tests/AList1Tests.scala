@@ -19,7 +19,7 @@ object AList1Tests {
   // these type aliases unnerve me with their presence
   type R[A, B] = AList1[Map, A, B] => Map[A, B]
   type L[A, B] = Map[A, B] => AList1[Map, A, B]
-  val foldBalancedF: AList1[Map, ?, ?] ~~> Map = Forall2.of[R](_.foldBalanced)
+  val sfoldBalancedF: AList1[Map, ?, ?] ~~> Map = Forall2.of[R](_.sfoldBalanced)
   val liftF: Map ~~> AList1[Map, ?, ?]         = Forall2.of[L](lift(_))
 
   // specified in `compose`-order
@@ -51,17 +51,17 @@ object AList1Tests {
         section("lawful semicategory")(
           test("associativity") { () =>
             SemicategoryLaws.composeAssoc(lift(fst), lift(snd), lift(thd))(
-              (a, b) => assertEqualNonEmptyMaps(a.foldBalanced, b.foldBalanced)
+              (a, b) => assertEqualNonEmptyMaps(a.sfoldBalanced, b.sfoldBalanced)
             )
           },
         ),
         section("free semicategory")(
           test("foldMap") { () =>
-            HomomorphismLaws.semicategoryCompose(foldBalancedF)(
+            HomomorphismLaws.semicategoryCompose(sfoldBalancedF)(
               lift(fst) <<< lift(snd),
               lift(thd)
             )(assertEqualNonEmptyMaps) |+|
-              HomomorphismLaws.semicategoryCompose(foldBalancedF)(
+              HomomorphismLaws.semicategoryCompose(sfoldBalancedF)(
                 lift(fst),
                 lift(snd) <<< lift(thd)
               )(assertEqualNonEmptyMaps)
@@ -70,7 +70,7 @@ object AList1Tests {
             HomomorphismLaws.semicategoryCompose(liftF)(
               fst,
               snd
-            )((f, s) => assertEqualNonEmptyMaps(f.foldBalanced, s.foldBalanced))
+            )((f, s) => assertEqualNonEmptyMaps(f.sfoldBalanced, s.sfoldBalanced))
           },
         ),
       ),
@@ -78,28 +78,28 @@ object AList1Tests {
         // tests that order is correct.
         test("compose") { () =>
           assertEqual(
-            const("world").compose(const("hello")).foldBalanced,
+            const("world").compose(const("hello")).sfoldBalanced,
             Biconst[String, Int, Int]("helloworld")
           )
         },
         // also tests that order is correct.
         test("andThen") { () =>
           assertEqual(
-            const("hello").andThen(const("world")).foldBalanced,
+            const("hello").andThen(const("world")).sfoldBalanced,
             Biconst[String, Int, Int]("helloworld")
           )
         },
         // tests that order is correct.
         test(":+") { () =>
           assertEqual(
-            (const("hello") :+ Biconst[String, Int, Int]("world")).foldBalanced,
+            (const("hello") :+ Biconst[String, Int, Int]("world")).sfoldBalanced,
             Biconst[String, Int, Int]("helloworld")
           )
         },
         // also tests that order is correct.
         test("+:") { () =>
           assertEqual(
-            (Biconst[String, Int, Int]("hello") +: const("world")).foldBalanced,
+            (Biconst[String, Int, Int]("hello") +: const("world")).sfoldBalanced,
             Biconst[String, Int, Int]("helloworld")
           )
         },
@@ -123,9 +123,9 @@ object AList1Tests {
             Const[String, Int]("(hello|(world|(foobar|)))")
           )
         },
-        test("foldBalanced") { () =>
+        test("sfoldBalanced") { () =>
           final class Fake[A, B](val str: String)
-          // not lawful, used to observe balanced binary tree shape of `foldBalanced`.
+          // not lawful, used to observe balanced binary tree shape of `sfoldBalanced`.
           // not associative.
           implicit val fakeSemicategory: Semicategory[Fake] = instanceOf(new SemicategoryClass[Fake] {
             def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
@@ -135,8 +135,8 @@ object AList1Tests {
             new Fake(str)
           val result = "((hello|world)|(foo|bar))"
           IList(
-            (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).foldBalanced.str,
-            (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).foldBalanced.str
+            (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldBalanced.str,
+            (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldBalanced.str
           ).foldMap(assertEqual(_, result))
         }
       )

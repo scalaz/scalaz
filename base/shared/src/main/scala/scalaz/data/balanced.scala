@@ -11,14 +11,14 @@ import tc.{ instanceOf, Semicategory, SemicategoryClass }
  * Binary counter-like accumulator for type-aligned binary type constructors,
  * with the most significant bit on the right and addition of new elements (i.e. "increment") from the left.
  */
-final class PreComposeBalancer[F[_, _], A, B] private (count: Int, stack: AList1[F, A, B]) {
+final class PreComposeBalancer[F[_, _], A, B] private (val count: Int, val stack: AList1[F, A, B]) {
 
   /** Pre-compose an element. */
   def +:[Z](f: F[Z, A])(implicit F: Semicategory[F]): PreComposeBalancer[F, Z, B] =
     add(f, stack, 1, count)
 
   def result(implicit F: Semicategory[F]): F[A, B] =
-    stack.tail.foldLeft(stack.head)(RightAction.compose(F))
+    stack.tail.foldLeft(stack.head)(RightAction.scompose)
 
   private def add[X, Y](h: F[X, Y], t: AList1[F, Y, B], hcount: Int, tfactor: Int)(
     implicit F: Semicategory[F]
@@ -78,12 +78,12 @@ object PostComposeBalancer {
   def wrap[F[_, _], A, B](pre: PreComposeBalancer[λ[(α, β) => F[β, α]], B, A]): PostComposeBalancer[F, A, B] =
     new PostComposeBalancer[F, A, B](pre)
 
-  def rightAction[F[_, _], A](implicit F: Semicategory[F]): RightAction[PostComposeBalancer[F, A, ?], F] =
+  def rightAction[F[_, _]: Semicategory, A]: RightAction[PostComposeBalancer[F, A, ?], F] =
     ν[RightAction[PostComposeBalancer[F, A, ?], F]][B, C]((acc, f) => acc :+ f)
 
-  def rightAction[G[_, _], F[_, _], A](
+  def rightActionMap[G[_, _]: Semicategory, F[_, _], A](
     φ: F ~~> G
-  )(implicit G: Semicategory[G]): RightAction[PostComposeBalancer[G, A, ?], F] =
+  ): RightAction[PostComposeBalancer[G, A, ?], F] =
     ν[RightAction[PostComposeBalancer[G, A, ?], F]][B, C]((acc, f) => acc :+ φ.apply(f))
 
   // TODO: make this a newtype
@@ -92,4 +92,5 @@ object PostComposeBalancer {
       def compose[A, B, C](f: F[C, B], g: F[B, A]): F[C, A] =
         F.compose(g, f)
     })
+
 }
