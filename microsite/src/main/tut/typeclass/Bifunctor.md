@@ -8,17 +8,6 @@ title:  "Bifunctor"
 *The `Bifunctor` type class describes a type which has two type parameters,
  each of which acts as a (covariant) [Functor](./Functor.html).*
 
-A `Bifunctor` must satisfy the following laws:
-
-- the `Functor` laws on the left:
-  - `lmap(elem)(identity) === elem`
-  - `lmap(elem)(f compose g) === lmap(lmap(elem(g)))(f)`
-- the `Functor` laws on the right:
-  - `rmap(elem)(identity) === elem`
-  - `rmap(elem)(f compose g) === rmap(rmap(elem(g)))(f)`
-- and a coherency law:
-  - `rmap(lmap(elem)(f))(g) === lmap(rmap(elem)(g))(f) == bimap(elem)(f, g)`
-
 ## Instance declaration
 
 A `Bifunctor` can be declared by specifying either `bimap`, or both `lmap` and `rmap`.
@@ -39,3 +28,40 @@ val theseBifunctor: Bifunctor[These] =
     def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T = fab.bimap(as)(bt)
   })
 ```
+
+# Law
+
+A `Bifunctor` must satisfy the following law:
+
+```tut
+def identityToIdentity[F[_, _], A, B, T](
+  in: F[A, B]
+)(assert: (F[A, B], F[A, B]) => T)(implicit F: Bifunctor[F]): T =
+  assert(in, F.bimap(in)((a: A) => a, (b: B) => b))
+```
+
+This is analogous to the ordinary `Functor` law,
+which states that `Functor`s take `identity: A => B`
+to `identity: F[A] => F[B]`, but the identity in this case
+is a pair of `identity` functions and not a single `identity` function.
+
+It serves the same purpose as for ordinary `Functor`'s;
+`bimap` shouldn't modify the `F[_]` context.
+
+Here's a free law, implied by that law and the type of `bimap`:
+
+```tut
+def freeComposition[F[_, _], A, B, C, X, Y, Z, T](
+  in: F[A, X]
+)(f: A => B, g: B => C
+)(h: X => Y, i: Y => Z
+)(assert: (F[C, Z], F[C, Z]) => T
+)(implicit F: Bifunctor[F]): T =
+  assert(
+    F.bimap(in)(f.andThen(g), h.andThen(i)),
+    F.bimap(F.bimap(in)(f, h))(g, i)
+  )
+```
+
+This states that bifunctors respect function composition,
+but again, because it's free, it's not necessarily useful to test it.

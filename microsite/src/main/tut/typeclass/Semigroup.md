@@ -32,3 +32,18 @@ implicit val intSemigroup: Semigroup[Int] = instanceOf(new SemigroupClass[Int] {
 Semigroup[Int].mappend(1, 2)
 1.mappend(2)
 ```
+
+# Law
+
+The sole law for a valid `Semigroup` is that `mappend` is associative:
+
+```tut
+  @inline
+  def assoc[A, T](fst: A, snd: A, thd: A)(assert: (A, A) => T)(implicit A: Semigroup[A]): T = {
+    import A.mappend
+    assert(
+      mappend(fst, mappend(snd, thd)),
+      mappend(mappend(fst, snd), thd)
+    )
+  }
+```
