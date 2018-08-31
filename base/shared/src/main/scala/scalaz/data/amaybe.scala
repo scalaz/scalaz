@@ -5,7 +5,7 @@ import scala.Nothing
 
 import Predef._
 import prop.{ ===, Is }
-import tc.{ Debug, DebugClass }
+import tc.{ Debug, DebugClass, Eq, EqClass, instanceOf }
 
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.
@@ -25,7 +25,10 @@ sealed abstract case class AEmpty[F[_, _], A, B]() extends AMaybe[F, A, B] {
 }
 
 object AMaybe {
-  def empty[F[_, _], A]: AMaybe[F, A, A] = None.asInstanceOf[AMaybe[F, A, A]]
+  def empty[F[_, _], A]: AMaybe[F, A, A] =
+    None.asInstanceOf[AMaybe[F, A, A]]
+  def just[F[_, _], A, B](fab: F[A, B]): AMaybe[F, A, B] =
+    AJust(fab)
 
   private val None = none[Nothing, Nothing]
   private def none[F[_, _], A]: AMaybe[F, A, A] = new AEmpty[F, A, A] {
@@ -33,11 +36,17 @@ object AMaybe {
     def unsubst[G[_]](gb: G[A]): G[A] = gb
   }
 
-  implicit final def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] = {
+  implicit def amaybeDebug[F[_, _], A, B](implicit FAB: Debug[F[A, B]]): Debug[AMaybe[F, A, B]] = {
     import Scalaz.debugInterpolator
     DebugClass.instance[AMaybe[F, A, B]] {
-      case AJust(value) => z"AMaybe($value)"
+      case AJust(value) => z"AJust($value)"
       case AEmpty()     => Cord("AEmpty")
     }
   }
+
+  implicit def amaybeEq[F[_, _], A, B](implicit FAB: Eq[F[A, B]]): Eq[AMaybe[F, A, B]] =
+    instanceOf[EqClass[AMaybe[F, A, B]]]({
+      case (AJust(fab1), AJust(fab2)) => FAB.equal(fab1, fab2)
+      case (amaybeFab1, amaybeFab2)   => amaybeFab1 eq amaybeFab2
+    })
 }

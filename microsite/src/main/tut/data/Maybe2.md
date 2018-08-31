@@ -6,7 +6,11 @@ title:  "Maybe2"
 
 # Maybe2 [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/maybe2.scala)
 
-`Maybe2` is a specialized version of [Maybe](./Maybe.html) that avoids allocation of [Tuple2](https://www.scala-lang.org/api/current/scala/Tuple2.html) instances.
+`Maybe2[A, B]` is isomorphic to `Maybe[(A, B)]`.
+The only difference between `Maybe2[A, B]` and `Maybe[(A, B)]` is that the first takes less
+memory.
+
+`Maybe2` is used to implement `IList`; each cons cell is a `Maybe2`.
 
 **Typical imports**
 
