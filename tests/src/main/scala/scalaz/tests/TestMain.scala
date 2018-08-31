@@ -70,7 +70,7 @@ object TestMain {
 
         val result =
           Await.result(
-            Future.sequence(suites[DocHarness.Uses[Unit], List[String]](harness, combineUses, printSuite)(ec))(
+            Future.sequence(suites(harness, combineUses, printSuite)(ec))(
               scala.collection.breakOut,
               ec
             ),
@@ -81,16 +81,17 @@ object TestMain {
 
         scala.Console.println()
       } else {
-        val harness: Harness[PureHarness.Uses[Unit]] =
-          PureHarness.toHarness(
-            PureHarness.make((ls, tr) => Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print))
+        val harness = PureHarness.toHarness[PureHarness.Uses, Unit](
+          PureHarness.make(
+            (ls, tr) => Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print)
           )
-
-        @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
-          (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
+        )
 
         @inline def runPure(name: String, tests: PureHarness.Uses[Unit]): TestOutput =
           tests((), List(name))
+
+        @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
+          (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
 
         val mySuites = suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, runPure)(ec).map(r => () => r)
 
