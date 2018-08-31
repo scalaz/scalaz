@@ -65,8 +65,11 @@ package object data {
     def fromLeft[G[_], F[_, _]](act: LeftAction[G, F]): RightAction[G, λ[(α, β) => F[β, α]]] =
       ν[RightAction[G, λ[(α, β) => F[β, α]]]][α, β]((g, f) => act.apply(f, g))
 
-    def compose[F[_, _], A](implicit F: Semicategory[F]): RightAction[F[A, ?], F] =
+    def scompose[F[_, _], A](implicit F: Semicategory[F]): RightAction[F[A, ?], F] =
       ν[RightAction[F[A, ?], F]][α, β]((fa, f) => F.compose(f, fa))
+
+    def scomposeMap[F[_, _], G[_, _], A](trans: F ~~> G)(implicit G: Semicategory[G]): RightAction[G[A, ?], F] =
+      ν[RightAction[G[A, ?], F]][α, β]((fa, f) => G.compose(trans.apply(f), fa))
 
     implicit class Ops[G[_], F[_, _]](val action: RightAction[G, F]) extends AnyVal {
       def apply[A, B](g: G[A], f: F[A, B]): G[B] = action.apply(g, f)
@@ -81,13 +84,20 @@ package object data {
     def fromRight[G[_], F[_, _]](act: RightAction[G, F]): LeftAction[G, λ[(α, β) => F[β, α]]] =
       ν[LeftAction[G, λ[(α, β) => F[β, α]]]][α, β]((f, g) => act.apply(g, f))
 
-    def compose[F[_, _], Z](implicit F: Semicategory[F]): LeftAction[F[?, Z], F] =
+    def scompose[F[_, _], Z](implicit F: Semicategory[F]): LeftAction[F[?, Z], F] =
       ν[LeftAction[F[?, Z], F]][α, β]((f, fy) => F.compose(fy, f))
+
+    def scomposeMap[F[_, _], G[_, _], Z](trans: F ~~> G)(implicit G: Semicategory[G]): LeftAction[G[?, Z], F] =
+      ν[LeftAction[G[?, Z], F]][α, β]((f, fy) => G.compose(fy, trans.apply(f)))
 
     implicit class Ops[G[_], F[_, _]](val action: LeftAction[G, F]) extends AnyVal {
       def apply[A, B](f: F[A, B], g: G[B]): G[A] = action.apply(f, g)
     }
   }
+
+  type ACons[F[_, _], G[_, _], α, β, γ] = (F[β, γ], G[α, β]) => G[α, γ]
+  type ASnoc[F[_, _], G[_, _], α, β, γ] = (G[β, γ], F[α, β]) => G[α, γ]
+  type AComposition[F[_, _], α, β, γ]   = (F[β, γ], F[α, β]) => F[α, γ]
 
   val AFix: AFixModule = AFixImpl
   type AFix[F[_[_, _], _, _], A, B] = AFix.AFix[F, A, B]
