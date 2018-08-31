@@ -52,7 +52,7 @@ and [`Bind`](./Bind.html):
   def bindRightIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
     assert(in, F.flatMap(in)(F.pure))
 
-  def bindLeftIdentity[F[_], A, B, T](in: F[A])(f: A => F[B])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
+  def bindLeftIdentity[F[_], A, B, T](in: A)(f: A => F[B])(assert: (F[B], F[B]) => T)(implicit F: Monad[F]) =
     assert(f(in), F.flatMap(F.pure(in))(f))
 ```
 
