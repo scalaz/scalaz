@@ -41,6 +41,22 @@ object AList1Tests {
     (2, 5),
   )
 
+  final class Fake[A, B](val str: String)
+  // not lawful, used to observe balanced binary tree shape of `sfoldBalanced`.
+  // not associative.
+  implicit val fakeSemicategory: Semicategory[Fake] = instanceOf(new SemicategoryClass[Fake] {
+    def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
+      new Fake("(" + snd.str + "|" + fst.str + ")")
+  })
+  implicit def fakeEq[A, B]: Eq[Fake[A, B]] = instanceOf[EqClass[Fake[A, B]]] {
+    (f1, f2) => f1.str === f2.str
+  }
+  def fake(str: String): Fake[Int, Int] =
+    new Fake(str)
+  val bracketFake: Fake ~~> Fake = Forall2.from(ν[Forall2.Prototype[λ[(A, B) => Fake[A, B] => Fake[A, B]]]][α, β](
+    s => new Fake("[" + s.str + "]")
+  ))
+
   def const(s: String): AList1[Biconst[String, ?, ?], Int, Int] = lift(Biconst(s))
 
   def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
@@ -105,40 +121,76 @@ object AList1Tests {
         },
         test("foldLeft") { () =>
           assertEqual(
-            (const("hello") >>> const("world") >>> const("foobar")).foldLeft(Const[String, Int](""))(
+            (const("hello") >>> const("world") >>> const("foo")).foldLeft(Const[String, Int]("bar"))(
               ν[RightAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (ga, fab) =>
                 Const("(" + Const.run(ga) + "|" + Biconst.run(fab) + ")")
               }
             ),
-            Const[String, Int]("(((|hello)|world)|foobar)")
+            Const[String, Int]("(((bar|hello)|world)|foo)")
+          )
+        },
+        test("sfoldLeft") { () =>
+          assertEqual(
+            (lift(fake("hello")) >>> lift(fake("world")) >>> lift(fake("foo"))).sfoldLeft,
+            fake("((hello|world)|foo)")
+          )
+        },
+        test("sfoldLeft") { () =>
+          assertEqual(
+            (lift(fake("hello")) >>> lift(fake("world")) >>> lift(fake("foo"))).sfoldMapLeft(bracketFake),
+            fake("(([hello]|[world])|[foo])")
           )
         },
         test("foldRight") { () =>
           assertEqual(
-            (const("hello") >>> const("world") >>> const("foobar")).foldRight(Const[String, Int](""))(
+            (const("hello") >>> const("world") >>> const("foo")).foldRight(Const[String, Int]("bar"))(
               ν[LeftAction[Const[String, ?], Biconst[String, ?, ?]]][α, β] { (fab, gb) =>
                 Const[String, α]("(" + Biconst.run(fab) + "|" + Const.run(gb) + ")")
               }
             ),
-            Const[String, Int]("(hello|(world|(foobar|)))")
+            Const[String, Int]("(hello|(world|(foo|bar)))")
           )
         },
+        test("sfoldRight") { () =>
+          assertEqual(
+            (lift(fake("hello")) >>> lift(fake("world")) >>> lift(fake("foobar"))).sfoldRight,
+            fake("(hello|(world|foobar))")
+          )
+        },
+        test("sfoldMapRight") { () =>
+          assertEqual(
+            (lift(fake("hello")) >>> lift(fake("world")) >>> lift(fake("foobar"))).sfoldMapRight(bracketFake),
+            fake("([hello]|([world]|[foobar]))")
+          )
+        },
+        test("sfold") { () =>
+          val result = "((hello|world)|(foo|bar))"
+          IList(
+            (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfold.str,
+            (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfold.str
+          ).foldMap(assertEqual(_, result))
+        },
+        test("sfoldMap") { () =>
+          val result = "(([hello]|[world])|([foo]|[bar]))"
+          IList(
+            (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldMap(bracketFake).str,
+            (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldMap(bracketFake).str
+          ).foldMap(assertEqual(_, result))
+        },
         test("sfoldBalanced") { () =>
-          final class Fake[A, B](val str: String)
-          // not lawful, used to observe balanced binary tree shape of `sfoldBalanced`.
-          // not associative.
-          implicit val fakeSemicategory: Semicategory[Fake] = instanceOf(new SemicategoryClass[Fake] {
-            def compose[A, B, C](fst: Fake[B, C], snd: Fake[A, B]): Fake[A, C] =
-              new Fake("(" + snd.str + "|" + fst.str + ")")
-          })
-          def fake(str: String): Fake[Int, Int] =
-            new Fake(str)
           val result = "((hello|world)|(foo|bar))"
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldBalanced.str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldBalanced.str
           ).foldMap(assertEqual(_, result))
-        }
+        },
+        test("sfoldMapBalanced") { () =>
+          val result = "(([hello]|[world])|([foo]|[bar]))"
+          IList(
+            (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldMapBalanced(bracketFake).str,
+            (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldMapBalanced(bracketFake).str
+          ).foldMap(assertEqual(_, result))
+        },
       )
     )
   }

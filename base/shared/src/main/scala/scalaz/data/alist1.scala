@@ -69,6 +69,9 @@ sealed abstract class AList1[F[_, _], A, B] {
   def sfold(implicit F: Semicategory[F]): F[A, B] =
     sfoldBalanced
 
+  def sfoldMap[G[_, _]: Semicategory](φ: F ~~> G): G[A, B] =
+    sfoldMapBalanced(φ)
+
   def foldLeft[G[_]](ga: G[A])(φ: RightAction[G, F]): G[B] =
     tail.foldLeft[G](φ.apply(ga, head))(φ)
 
@@ -99,9 +102,6 @@ sealed abstract class AList1[F[_, _], A, B] {
 
   def sfoldBalanced(implicit F: Semicategory[F]): F[A, B] =
     tail.foldLeft[PostComposeBalancer[F, A, ?]](PostComposeBalancer(head))(PostComposeBalancer.rightAction).result
-
-  def foldMapBalanced[G[_, _]: Semicategory](trans: F ~~> G): G[A, B] =
-    tail.foldLeft[PostComposeBalancer[G, A, ?]](PostComposeBalancer(trans.apply(head)))(PostComposeBalancer.rightActionMap(trans)).result
 
   /**
    * Map and then compose the elements of this list in a balanced binary fashion.
