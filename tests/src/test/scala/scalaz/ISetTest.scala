@@ -24,7 +24,8 @@ object ISetTest extends SpecLite {
   checkAll(foldable.laws[ISet])
   checkAll(FoldableTests.anyAndAllLazy[ISet])
   checkAll(semilattice.laws[ISet[Int]])
-
+  checkAll(cofoldable.laws[ISet])
+  
   def structurallySound[A: Order: Show](s: ISet[A]) = {
     val al = s.toAscIList
     al must_===(al.sorted)(Order[A])

@@ -221,3 +221,4 @@ trait ToTypeClassOps
   with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError]
   with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps0[Optional] with ToCatchableOps0[Catchable] with ToAlignOps0[Align]
   with ToMonadTransOps
+  with ToCofoldableOps[Cofoldable]

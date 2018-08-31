@@ -65,6 +65,18 @@ trait MapInstances0 {
     new MapMonoid[K, V] with Band[Map[K, V]] {
       implicit override def V = S
     }
+  
+  implicit def mapCofoldable[F[_], K, A]: Cofoldable[λ[a => Map[K, a]], (K, A)] = new Cofoldable[λ[a => Map[K, a]], (K, A)] {
+    def unfoldr[B](b: B)(f: B => Option[(B, (K, A))]): Map[K, (K, A)] = {
+      def unfold(b: B, m: Map[K, (K, A)]): Map[K, (K, A)] =
+        f(b) match {
+          case Some((b, (k, a))) =>
+            unfold(b, m + (k -> ((k, a))))
+          case None => m
+        }
+      unfold(b, Map())
+    }
+  }
 }
 
 trait MapInstances extends MapInstances0 with MapFunctions {

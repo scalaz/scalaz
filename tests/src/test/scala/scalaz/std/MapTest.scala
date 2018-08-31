@@ -19,7 +19,6 @@ object MapTest extends SpecLite {
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
   checkAll(band.laws[Map[String, ISet[Int]]])
-
   checkAll("satisfy equals laws when not natural", equal.laws[Map[NotNatural, String]])
 
   "map ordering" ! forAll {
