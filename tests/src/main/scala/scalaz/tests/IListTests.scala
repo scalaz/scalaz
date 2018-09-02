@@ -32,8 +32,8 @@ final class IListTests {
   def tests[T](harness: Harness[T]): T = {
     import harness._
 
-    sequence(
-      section("concrete")(
+    section(
+      namedSection("concrete")(
         test("append") { () =>
           testAppend(_.append(_))
         },
