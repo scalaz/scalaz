@@ -9,7 +9,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import scalaz.syntax.either._
 
 trait Timeout
-object Timeout extends Timeout
+object Timeout extends Timeout {
+  def apply(): Timeout = this
+}
 
 case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextWorker") {
   val safeTickMs = if (timeoutTickMs > 5) timeoutTickMs else 5
@@ -99,12 +101,12 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   }
 
   def withTimeout[T](future: Future[T], timeout: Long): Future[Timeout \/ T] = {
-    val timeoutFuture = valueWait(Timeout, timeout)
+    val timeoutFuture = valueWait(Timeout(), timeout)
     futureNondeterminism.choose(timeoutFuture, future).map(_.fold(_._1.left, _._2.right))
   }
 
   def withTimeout[T](task: Task[T], timeout: Long): Task[Timeout \/ T] = {
-    val timeoutTask = new Task(valueWait(Timeout, timeout).map(_.right[Throwable]))
+    val timeoutTask = new Task(valueWait(Timeout(), timeout).map(_.right[Throwable]))
     taskNondeterminism.choose(timeoutTask, task).map(_.fold(_._1.left, _._2.right))
   }
 }

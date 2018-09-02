@@ -26,7 +26,7 @@ object SyntaxTest extends SpecLite {
 
     val x = "string"
     val resultString = s"""I've found a "$x""""
-    show"I've found a $x" must_===(resultString)
+    z"I've found a $x" must_===(resultString)
   }
 
   "show interpolator works with case classes" in {
@@ -39,7 +39,7 @@ object SyntaxTest extends SpecLite {
     val f = TestFoo("bar")
     val result = "I'd like a TestFoo(bar)"
 
-    show"I'd like a $f" must_===(result)
+    z"I'd like a $f" must_===(result)
   }
 
 
@@ -51,14 +51,14 @@ object SyntaxTest extends SpecLite {
     case object Result1T extends CoproductT
     case object Result2T extends CoproductT
     object CoproductT {
-      implicit val coproductTShow : Show[CoproductT] = Show.show[CoproductT]{
-        case Result1T => "Result1T"
-        case Result2T => "Result2T"
+      implicit val coproductTShow : Show[CoproductT] = Show.show {
+        case Result1T => Cord("Result1T")
+        case Result2T => Cord("Result2T")
       }
     }
 
     val r : CoproductT = Result1T
 
-    show"We have a $r" must_===("We have a Result1T")
+    z"We have a $r" must_===("We have a Result1T")
   }
 }

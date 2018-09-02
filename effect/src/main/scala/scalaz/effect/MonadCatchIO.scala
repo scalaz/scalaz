@@ -1,14 +1,31 @@
 package scalaz
 package effect
 
-trait MonadCatchIO[M[_]] extends MonadIO[M] {
+////
+/**
+ *
+ */
+////
+trait MonadCatchIO[F[_]] extends MonadIO[F] { self =>
+  ////
   /** Executes the handler if an exception is raised. */
-  def except[A](ma: M[A])(handler: Throwable => M[A]): M[A]
+  def except[A](ma: F[A])(handler: Throwable => F[A]): F[A]
+  ////
+
 }
 
-object MonadCatchIO extends MonadCatchIOFunctions {
-  @inline def apply[M[_]](implicit M: MonadCatchIO[M]): MonadCatchIO[M] = M
+object MonadCatchIO {
+  @inline def apply[F[_]](implicit F: MonadCatchIO[F]): MonadCatchIO[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: MonadCatchIO[G]): MonadCatchIO[F] =
+    new IsomorphismMonadCatchIO[F, G] {
+      override def G: MonadCatchIO[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
   implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup]: MonadCatchIO[TheseT[M, E, ?]] =
     new MonadCatchIO[TheseT[M, E, ?]] {
       val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
@@ -21,9 +38,6 @@ object MonadCatchIO extends MonadCatchIOFunctions {
       override def liftIO[A](ioa: IO[A]) = TheseTMonadIO.liftIO(ioa)
   }
 
-}
-
-sealed abstract class MonadCatchIOFunctions {
   def except[M[_], A](ma: M[A])(handler: Throwable => M[A])(implicit M: MonadCatchIO[M]): M[A] =
     M.except(ma)(handler)
 
@@ -95,4 +109,14 @@ sealed abstract class MonadCatchIOFunctions {
         Kleisli(r => F.except(k.run(r))(t => h(t).run(r)))
     }
 
+  ////
+}
+
+trait IsomorphismMonadCatchIO[F[_], G[_]] extends MonadCatchIO[F] with IsomorphismMonadIO[F, G]{
+  implicit def G: MonadCatchIO[G]
+  ////
+
+  override def except[A](ma: F[A])(handler: Throwable => F[A]): F[A] =
+    iso.from(G.except(iso.to(ma))(t => iso.to(handler(t))))
+  ////
 }

@@ -1,12 +1,18 @@
 package scalaz
 package std
 
+import _root_.java.math.{ BigDecimal, BigInteger }
+
+import scala.reflect.ClassTag
+import scala.util.control.NonFatal
+
 trait StringInstances {
   implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[λ[α => String]] {
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
-    override def show(f: String) = '"' + f + '"'
+    override def show(f: String): Cord = Cord("\"") :: Cord(f) :: Cord("\"")
+    override def shows(f: String): String = '"' + f + '"'
     def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
     override def equal(x: String, y: String) = x == y
     override def equalIsNatural: Boolean = true
@@ -17,6 +23,8 @@ trait StringInstances {
 }
 
 trait StringFunctions {
+  private[this] implicit val instance = new StringInstances {}.stringInstance
+
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
@@ -37,33 +45,57 @@ trait StringFunctions {
   def charsNel(s:String, e: => NonEmptyList[Char]) : NonEmptyList[Char] = charsNel(s) getOrElse e
 
   // Parsing functions.
+  private def intChars(s: String): Boolean = s.length == 1 && s.charAt(0).isDigit || ((s.length > 1) && s.stripPrefix("-").forall(_.isDigit))
 
-  def parseBoolean(s:String): Validation[IllegalArgumentException, Boolean] =
-    Validation.fromTryCatchThrowable[Boolean, IllegalArgumentException](s.toBoolean)
+  private def asNumber[T](f: String => T, lowerBound: T, upperBound: T, s: String)(implicit t: ClassTag[T]): Validation[String, T] =
+    try {
+      Success(f(s))
+    } catch {
+      case _: NumberFormatException if intChars(s) => Failure(s"${s} is outside of range for ${t} (${lowerBound} - ${upperBound})")
+      case _: NumberFormatException => Failure(s"${s} does not represent a valid ${t}")
+      case NonFatal(e) => Failure(e.getMessage)
+    }
 
-  def parseByte(s:String): Validation[NumberFormatException, Byte] =
-    Validation.fromTryCatchThrowable[Byte, NumberFormatException](s.toByte)
+  def parseLong(s: String): Validation[String, Long] = asNumber(_.toLong, Long.MinValue, Long.MaxValue, s)
+  def parseInt(s: String): Validation[String, Int] = asNumber(_.toInt, Int.MinValue, Int.MaxValue, s)
+  def parseByte(s: String): Validation[String, Byte] = asNumber(_.toByte, Byte.MinValue, Byte.MaxValue, s)
+  def parseShort(s: String): Validation[String, Short] = asNumber(_.toShort, Short.MinValue, Short.MaxValue, s)
 
-  def parseShort(s:String): Validation[NumberFormatException, Short] =
-    Validation.fromTryCatchThrowable[Short, NumberFormatException](s.toShort)
+  def parseDouble(s: String): Validation[String, Double] =
+    asNumber(_.toDouble, Double.MinValue, Double.MaxValue, s)
+      .filter(_ != Double.NegativeInfinity)
+      .filter(_ != Double.PositiveInfinity)
+      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Double" else e)
 
-  def parseInt(s:String): Validation[NumberFormatException, Int] =
-    Validation.fromTryCatchThrowable[Int, NumberFormatException](s.toInt)
+  def parseFloat(s: String): Validation[String, Float] =
+    asNumber(_.toFloat, Float.MinValue, Float.MaxValue, s)
+      .filter(_ != Float.NegativeInfinity)
+      .filter(_ != Float.PositiveInfinity)
+      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Float" else e)
 
-  def parseLong(s:String): Validation[NumberFormatException, Long] =
-    Validation.fromTryCatchThrowable[Long, NumberFormatException](s.toLong)
+  def parseBigInt(s: String): Validation[String, BigInteger] =
+    try {
+      Success(new BigInteger(s))
+    } catch {
+      case _: NumberFormatException => Failure(s"${s} does not represent a valid BigInteger")
+      case NonFatal(e) => Failure(e.getMessage)
+    }
 
-  def parseFloat(s:String): Validation[NumberFormatException, Float] =
-    Validation.fromTryCatchThrowable[Float, NumberFormatException](s.toFloat)
+  def parseBigDecimal(s: String): Validation[String, BigDecimal] =
+    try {
+      Success(new BigDecimal(s))
+    } catch {
+      case _: NumberFormatException => Failure(s"${s} does not represent a valid BigDecimal")
+      case NonFatal(e) => Failure(e.getMessage)
+    }
 
-  def parseDouble(s:String): Validation[NumberFormatException, Double] =
-    Validation.fromTryCatchThrowable[Double, NumberFormatException](s.toDouble)
-
-  def parseBigInt(s:String): Validation[NumberFormatException, BigInt] =
-    Validation.fromTryCatchThrowable[BigInt, NumberFormatException](BigInt(s))
-
-  def parseBigDecimal(s:String): Validation[NumberFormatException, BigDecimal] =
-    Validation.fromTryCatchThrowable[BigDecimal, NumberFormatException](BigDecimal(s))
+  def parseBoolean(s: String): Validation[String, Boolean] =
+    try {
+      Success(s.toBoolean)
+    } catch {
+      case _: IllegalArgumentException => Failure(s"${s} must be either 'true' or 'false'")
+      case NonFatal(e) => Failure(e.getMessage)
+    }
 }
 
 object string extends StringInstances with StringFunctions {

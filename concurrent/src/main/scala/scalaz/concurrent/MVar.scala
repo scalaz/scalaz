@@ -79,7 +79,7 @@ private[this] class MVarImpl[A](value: Atomic[Option[A]], readLatch: PhasedLatch
       case None =>
         value.compareAndSet(v, Some(a)) flatMap { set => // There is no value, so it's time to try and write one.
           if (!set) write(a, read)  // If the value has changed, the write will fail so we'll need to try it again.
-          else readLatch.release  // If the write succeeded, release a thread waiting for a value.
+          else readLatch.release()  // If the write succeeded, release a thread waiting for a value.
         }
     })
   }

@@ -1,7 +1,7 @@
 package scalaz
 
 /** @since 7.0.3 */
-sealed abstract class \&/[+A, +B] extends Product with Serializable {
+sealed abstract class \&/[A, B] extends Product with Serializable {
   import \&/._
 
   def isThis: Boolean =
@@ -136,10 +136,10 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def map[D](g: B => D): (A \&/ D) =
     bimap(identity, g)
 
-  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
+  def traverse[F[_]: Applicative, D](g: B => F[D]): F[A \&/ D] =
     this match {
       case a @ This(_) =>
-        Applicative[F].point(a)
+        Applicative[F].point(a.coerceThat)
       case That(b) =>
         Functor[F].map(g(b))(That(_))
       case Both(a, b) =>
@@ -149,10 +149,10 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
   def foreach(g: B => Unit): Unit =
     fold(_ => (), g, (_, b) => g(b))
 
-  def flatMap[AA >: A, D](g: B => (AA \&/ D))(implicit M: Semigroup[AA]): (AA \&/ D) =
+  def flatMap[D](g: B => (A \&/ D))(implicit M: Semigroup[A]): (A \&/ D) =
     this match {
       case a @ This(_) =>
-        a
+        a.coerceThat
       case That(b) =>
         g(b)
       case Both(a, b) =>
@@ -166,7 +166,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
         }
     }
 
-  def &&&[AA >: A, C](t: AA \&/ C)(implicit M: Semigroup[AA]): AA \&/ (B, C) =
+  def &&&[C](t: A \&/ C)(implicit M: Semigroup[A]): A \&/ (B, C) =
     for {
       b <- this
       c <- t
@@ -245,23 +245,15 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
             false
         }
     }
-
-  def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
-    this match {
-      case This(a) =>
-        "This(" +: SA.show(a) :+ ")"
-      case That(b) =>
-        "That(" +: SB.show(b) :+ ")"
-      case Both(a, b) =>
-        ("Both(" +: SA.show(a) :+ ",") ++ SB.show(b) :+ ")"
-    }
-
-
 }
 
 object \&/ extends TheseInstances {
-  final case class This[A](aa: A) extends (A \&/ Nothing)
-  final case class That[B](bb: B) extends (Nothing \&/ B)
+  final case class This[A, B](aa: A) extends (A \&/ B) {
+    def coerceThat[C]: A \&/ C = this.asInstanceOf[A \&/ C]
+  }
+  final case class That[A, B](bb: B) extends (A \&/ B) {
+    def coerceThis[C]: C \&/ B = this.asInstanceOf[C \&/ B]
+  }
   final case class Both[A, B](aa: A, bb: B) extends (A \&/ B)
 
   def apply[A, B](a: A, b: B): These[A, B] =
@@ -332,22 +324,21 @@ object \&/ extends TheseInstances {
         S.append(a1, a2)
     }
 
-  @annotation.tailrec
   def tailrecM[L, A, B](a: A)(f: A => L \&/ (A \/ B))(implicit L: Semigroup[L]): L \&/ B = {
-    def go(l0: L)(a0: A): L \&/ (A \/ B) =
-      f(a0) match {
-        case This(l1) => \&/.This(L.append(l0, l1))
-        case That(e) => \&/.Both(l0, e)
-        case Both(l1, e) => \&/.Both(L.append(l0, l1), e)
-      }
-
-    f(a) match {
-      case t @ This(l) => t
-      case That(-\/(a0)) => tailrecM(a0)(f)
+    @annotation.tailrec
+    def go(x: L \&/ (A \/ B)): L \&/ B = x match {
+      case t @ This(_) => t.coerceThat
+      case That(-\/(a)) => go(f(a))
       case That(\/-(b)) => \&/.That(b)
-      case Both(l, -\/(a0)) => tailrecM(a0)(go(l))
+      case Both(l, -\/(a)) => f(a) match {
+        case This(l1) => \&/.This(L.append(l, l1))
+        case That(ab) => go(\&/.Both(l, ab))
+        case Both(l1, ab) => go(\&/.Both(L.append(l, l1), ab))
+      }
       case Both(l, \/-(b)) => \&/.Both(l, b)
     }
+
+    go(f(a))
   }
 }
 
@@ -452,6 +443,13 @@ sealed abstract class TheseInstances1 {
   implicit def TheseSemigroup[A, B](implicit SA: Semigroup[A], SB: Semigroup[B]): Semigroup[A \&/ B] =
     Semigroup.instance(_.append(_))
 
-  implicit def TheseShow[A, B](implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] =
-    Show.show(_.show)
+  implicit def TheseShow[A, B](implicit SA: Show[A], SB: Show[B]): Show[A \&/ B] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case \&/.This(a)    => cord"This($a)"
+      case \&/.That(b)    => cord"That($b)"
+      case \&/.Both(a, b) => cord"Both($a,$b)"
+    }
+  }
+
 }

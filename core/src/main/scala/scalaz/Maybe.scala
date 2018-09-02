@@ -1,5 +1,6 @@
 package scalaz
 
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 import scala.reflect.ClassTag
 import Ordering._
@@ -145,15 +146,27 @@ sealed abstract class Maybe[A] {
   /**
    * Return the underlying value wrapped in type `F` if present, otherwise the
    * empty value for type `F` */
-  final def orEmpty[F[_]](implicit F: Applicative[F], G: PlusEmpty[F]): F[A] =
-    cata(F.point(_), G.empty)
+  final def orEmpty[F[_]](implicit F: ApplicativePlus[F]): F[A] =
+    cata(F.point(_), F.empty)
+
+  final def orError[F[_], E](e: E)(implicit F: MonadError[F, E]): F[A] =
+    cata(F.point(_), F.raiseError(e))
+
 }
 
 object Maybe extends MaybeInstances {
 
-  final case class Empty[A]() extends Maybe[A]
+  sealed abstract case class Empty[A] private() extends Maybe[A]
+  object Empty {
+    // #1712: covariant subclass of `INil` makes the pattern matcher see it as covariant
+    private[this] final class _Empty[+A] extends Empty[A]
+    private[this] val value = new _Empty[Nothing]
+    def apply[A](): Maybe[A] = value.asInstanceOf[Empty[A]]
+  }
 
-  final case class Just[A](a: A) extends Maybe[A]
+  // `get` is an intentional name as it is expected by the unapply
+  // logic in the scalac pattern matcher.
+  final case class Just[A](get: A) extends Maybe[A]
 
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {
@@ -172,17 +185,30 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Maybe[T] = try {
     just(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => empty
   }
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchNonFatal[T](a: => T): Maybe[T] = try {
     just(a)
   } catch {
     case NonFatal(t) => empty
   }
+
+  /**
+   * For interfacing with legacy, deterministic, partial functions. See
+   * [[\/.attempt]] for further details.
+   */
+  def attempt[T](a: => T): Maybe[T] = try {
+    just(a)
+  } catch {
+    case NonFatal(_) => empty
+  }
+
 }
 
 sealed abstract class MaybeInstances1 {
@@ -220,10 +246,12 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
         fa2.cata(_ => LT, EQ))
   }
 
-  implicit def maybeShow[A](implicit A: Show[A]): Show[Maybe[A]] =
+  implicit def maybeShow[A](implicit A: Show[A]): Show[Maybe[A]] = {
+    import scalaz.syntax.show._
     Show.show(_.cata(
-      a => Cord("Just(", A.show(a), ")"),
-      "Empty"))
+      a => cord"Just($a)",
+      Cord("Empty")))
+  }
 
   implicit def maybeMonoid[A: Semigroup]: Monoid[Maybe[A]] =
     new MaybeMonoid[A] {
@@ -288,8 +316,8 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] = Tags.Max.subst1[Monad, Maybe](Monad[Maybe])
 
-  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
-    new Traverse[Maybe] with MonadPlus[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
+  implicit val maybeInstance: Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] =
+    new Traverse[Maybe] with MonadPlus[Maybe] with Alt[Maybe] with BindRec[Maybe] with Cozip[Maybe] with Zip[Maybe] with Unzip[Maybe] with Align[Maybe] with IsEmpty[Maybe] with Cobind[Maybe] with Optional[Maybe] {
 
       def point[A](a: => A) = just(a)
 
@@ -298,8 +326,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
       def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
 
-      @scala.annotation.tailrec
-      def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
+      @tailrec def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
         f(a) match {
           case Empty() => Empty()
           case Just(-\/(a)) => tailrecM(a)(f)
@@ -314,6 +341,34 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
       def empty[A]: Maybe[A] = Maybe.empty
 
       def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
+
+      override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(Maybe[A], S)]): Maybe[Maybe[A]] = {
+        @tailrec def go(s: S): Maybe[A] = f(s) match {
+          case Just((ma, s)) => ma match {
+            case a @ Just(_) => a
+            case _ => go(s)
+          }
+          case Empty() => Empty()
+        }
+        f(seed) map { case (ma, s) => ma match {
+          case a @ Just(_) => a
+          case Empty() => go(s)
+        }}
+      }
+
+      override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(Maybe[A], S)])(implicit r: Reducer[A, B]): Maybe[Maybe[B]] = {
+        @tailrec def go(acc: B, s: S): Maybe[B] = f(s) match {
+          case Just((ma, s)) => ma match {
+            case Just(a) => go(r.snoc(acc, a), s)
+            case _ => Empty()
+          }
+          case _ => Just(acc)
+        }
+        f(seed) map { case (ma, s) => ma match {
+          case Just(a) => go(r.unit(a), s)
+          case _ => Empty()
+        }}
+      }
 
       override def foldRight[A, B](fa: Maybe[A], z: => B)(f: (A, => B) => B) =
         fa.cata(f(_, z), z)
@@ -352,6 +407,21 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
 
       override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
         fa.filter(f)
+
+      override def alt[A](a1: => Maybe[A], a2: => Maybe[A]): Maybe[A] = a1 orElse a2
+
+      // performance optimisation
+      override def altly2[Z, A1, A2](a1: => Maybe[A1], a2: => Maybe[A2])(f: A1 \/ A2 => Z): Maybe[Z] = a1 match {
+          case Empty() => a2 match {
+            case Empty() => Empty()
+            case j => j.map(s => f(\/-(s)))
+          }
+          case j => j.map(s => f(-\/(s)))
+        }
+
+      // performance optimisation
+      override def apply2[A, B, C](fa: => Maybe[A], fb: => Maybe[B])(f: (A, B) => C): Maybe[C] =
+        fa.flatMap(a => fb.map(b => f(a, b)))
     }
 }
 

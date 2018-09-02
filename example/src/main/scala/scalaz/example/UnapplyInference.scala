@@ -19,13 +19,13 @@ object UnapplyInference extends App {
     import syntax.all._
 
     val either: (List[Int] \/ List[Int]) = \/.right(List(1))
-    val eitherT: EitherT[Option, List[Int], List[Int]] = EitherT(some(either))
+    val eitherT: EitherT[List[Int], Option, List[Int]] = EitherT(some(either))
 
-    val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]
+    val bisequence: List[EitherT[Int, Option, Int]] = eitherT.bisequence[List, Int, Int]
   }
 
   // Without Unapply
-  def stateTraverse1: Unit = {
+  def stateTraverse1(): Unit = {
     import scalaz._, Scalaz._
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
@@ -33,7 +33,7 @@ object UnapplyInference extends App {
   }
 
   // With Unapply (in the signature of traverseU)
-  def stateTraverse2: Unit = {
+  def stateTraverse2(): Unit = {
     import scalaz._, Scalaz._
 
     val ls = List(1, 2, 3)
@@ -55,8 +55,12 @@ object UnapplyInference extends App {
 
   def kleisliU(): Unit = {
     import scalaz._
+    import scalaz.syntax.either._
     val k: Kleisli[NumberFormatException \/ ?, String, Int] =
-      Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
+      Kleisli.kleisliU { s: String =>
+        try s.toInt.right[NumberFormatException]
+        catch { case e: NumberFormatException => e.left[Int] }
+      }
   }
 
   def functorSyntaxChaining(): Unit = {

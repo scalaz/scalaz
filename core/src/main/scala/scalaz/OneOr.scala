@@ -237,21 +237,21 @@ object OneOr extends OneOrInstances {
 }
 
 sealed abstract class OneOrInstances extends OneOrInstances0 {
-  implicit def OneOrFunctor[F[_]: Functor]: Functor[OneOr[F, ?]] =
-    new OneOrFunctor[F] {
-      def F = implicitly
-    }
-
-  implicit def OneOrEqual[F[_], A](implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
-    new OneOrEqual[F, A] {
-      def OA = implicitly
-      def OFA = implicitly
-    }
-
   implicit def OneOrShow[F[_], A](implicit oa: Show[A], ofa: Show[F[A]]): Show[OneOr[F, A]] =
     new OneOrShow[F, A] {
       def OA = implicitly
       def OFA = implicitly
+    }
+
+  implicit def OneOrOrder[F[_], A](implicit oa: Order[A], ofa: Order[F[A]]): Order[OneOr[F, A]] =
+    new OneOrOrder[F, A] {
+      def OA = implicitly
+      def OFA = implicitly
+    }
+
+  implicit def OneOrComonad[F[_]: Comonad]: Comonad[OneOr[F, ?]] =
+    new OneOrComonad[F] {
+      def F = implicitly
     }
 }
 
@@ -261,52 +261,51 @@ sealed abstract class OneOrInstances0 extends OneOrInstances1 {
       def F = implicitly
     }
 
-  implicit def OneOrOrder[F[_], A](implicit oa: Order[A], ofa: Order[F[A]]): Order[OneOr[F, A]] =
-    new OneOrOrder[F, A] {
+  implicit def OneOrEqual[F[_], A](implicit oa: Equal[A], ofa: Equal[F[A]]): Equal[OneOr[F, A]] =
+    new OneOrEqual[F, A] {
       def OA = implicitly
       def OFA = implicitly
     }
 }
 
 sealed abstract class OneOrInstances1 extends OneOrInstances2 {
-  implicit def OneOrComonad[F[_]: Comonad]: Comonad[OneOr[F, ?]] =
-    new OneOrComonad[F] {
-      def F = implicitly
-    }
-
-}
-
-sealed abstract class OneOrInstances2 extends OneOrInstances3 {
   implicit def OneOrApplicative[F[_]: Apply]: Applicative[OneOr[F, ?]] =
     new OneOrApplicative[F] {
       def F = implicitly
     }
 }
 
-sealed abstract class OneOrInstances3 extends OneOrInstances4 {
-  implicit def OneOrFoldable[F[_]: Foldable]: Foldable[OneOr[F, ?]] =
-    new OneOrFoldable[F] {
+sealed abstract class OneOrInstances2 extends OneOrInstances3 {
+  implicit def OneOrTraverse1[F[_]: Traverse1]: Traverse1[OneOr[F, ?]] =
+    new OneOrTraverse1[F] {
       def F = implicitly
     }
 }
 
-sealed abstract class OneOrInstances4 extends OneOrInstances5 {
+sealed abstract class OneOrInstances3 extends OneOrInstances4 {
   implicit def OneOrFoldable1[F[_]: Foldable1]: Foldable1[OneOr[F, ?]] =
     new OneOrFoldable1[F] {
       def F = implicitly
     }
 }
 
-sealed abstract class OneOrInstances5 extends OneOrInstances6 {
+sealed abstract class OneOrInstances4 extends OneOrInstances5 {
   implicit def OneOrTraverse[F[_]: Traverse]: Traverse[OneOr[F, ?]] =
     new OneOrTraverse[F] {
       def F = implicitly
     }
 }
 
+sealed abstract class OneOrInstances5 extends OneOrInstances6 {
+  implicit def OneOrFoldable[F[_]: Foldable]: Foldable[OneOr[F, ?]] =
+    new OneOrFoldable[F] {
+      def F = implicitly
+    }
+}
+
 sealed abstract class OneOrInstances6 {
-  implicit def OneOrTraverse1[F[_]: Traverse1]: Traverse1[OneOr[F, ?]] =
-    new OneOrTraverse1[F] {
+  implicit def OneOrFunctor[F[_]: Functor]: Functor[OneOr[F, ?]] =
+    new OneOrFunctor[F] {
       def F = implicitly
     }
 }

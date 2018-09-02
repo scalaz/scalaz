@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scala.annotation.tailrec
+
 /**
  * [[scalaz.Applicative]] without `point`.
  *
@@ -32,6 +34,20 @@ trait Apply[F[_]] extends Functor[F] { self =>
    * Repeats an applicative action infinitely
    */
   def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
+
+  /**
+   * Unfold `seed` to the right and combine effects left-to-right,
+   * using the given [[Reducer]] to combine values.
+   * Implementations may override this method to not unfold more
+   * than is necessary to determine the result.
+   */
+  def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(F[A], S)])(implicit R: Reducer[A, B]): Maybe[F[B]] = {
+    @tailrec def go(acc: F[B], s: S): F[B] = f(s) match {
+      case Maybe.Just((fa, s)) => go(apply2(acc, fa)(R.snoc), s)
+      case _ => acc
+    }
+    f(seed) map { case (fa, s) => go(map(fa)(R.unit), s) }
+  }
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
@@ -106,6 +122,22 @@ trait Apply[F[_]] extends Functor[F] { self =>
                                           fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): F[R] =
     ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))
 
+  final def applying1[Z, A1](f: A1 => Z)(
+    implicit a1: F[A1]
+  ): F[Z] = map(a1)(f)
+  final def applying2[Z, A1, A2](
+    f: (A1, A2) => Z
+  )(implicit a1: F[A1], a2: F[A2]): F[Z] =
+    apply2(a1, a2)(f)
+  final def applying3[Z, A1, A2, A3](
+    f: (A1, A2, A3) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3]): F[Z] =
+    apply3(a1, a2, a3)(f)
+  final def applying4[Z, A1, A2, A3, A4](
+    f: (A1, A2, A3, A4) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] =
+    apply4(a1, a2, a3, a4)(f)
+
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))
   def tuple3[A,B,C](fa: => F[A], fb: => F[B], fc: => F[C]): F[(A,B,C)] =
@@ -157,6 +189,17 @@ trait Apply[F[_]] extends Functor[F] { self =>
       }
     }
 
+  def liftReducer[A, B](implicit r: Reducer[A, B]): Reducer[F[A], F[B]] =
+    new Reducer[F[A], F[B]] {
+      def semigroup: Semigroup[F[B]] = Semigroup.liftSemigroup(Apply.this, r.semigroup)
+      def unit(fa: F[A]): F[B] = map(fa)(r.unit)
+      def cons(fa: F[A], fb: F[B]): F[B] = apply2(fa, fb)(r.cons)
+      def snoc(fb: F[B], fa: F[A]): F[B] = apply2(fb, fa)(r.snoc)
+
+      override def unfoldrOpt[S](seed: S)(f: S => Maybe[(F[A], S)]): Maybe[F[B]] =
+        Apply.this.unfoldrOpt(seed)(f)
+    }
+
   trait ApplyLaw extends FunctorLaw {
     /** Lifted functions can be fused. */
     def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]): Boolean =
@@ -172,7 +215,28 @@ trait Apply[F[_]] extends Functor[F] { self =>
 object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Apply[G]): Apply[F] =
+    new IsomorphismApply[F, G] {
+      override def G: Apply[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+  type Par[F[_]] = Apply[λ[α => F[α] @@ Tags.Parallel]]
+
+  ////
+}
+
+trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G]{
+  implicit def G: Apply[G]
   ////
 
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
+    iso.from(G.ap(iso.to(fa))(iso.to(f)))
+
+  // for performance, used a lot
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = iso.from(G.apply2(iso.to(fa), iso.to(fb))(f))
   ////
 }

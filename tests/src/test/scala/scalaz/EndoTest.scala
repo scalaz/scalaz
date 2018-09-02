@@ -10,6 +10,13 @@ object EndoTest extends SpecLite {
       Iterator.fill(20)(util.Random.nextInt).forall(n => a(n) == b(n))
     )
 
+  implicit val endoByNameIntEqual: Equal[EndoByName[Int]] =
+    Equal.equal( (a, b) =>
+      Iterator.fill(20)(util.Random.nextInt).forall(n => a(n) == b(n))
+    )
+
   checkAll(invariantFunctor.laws[Endo])
+
+  checkAll(invariantFunctor.laws[EndoByName])
 
 }

@@ -1,7 +1,7 @@
 package scalaz
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
+ * @see [[https://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Map/Base.hs]]
  */
 import Ordering.{ EQ, LT, GT }
@@ -532,7 +532,7 @@ sealed abstract class ==>>[A, B] {
         some((r._1._2, r._2))
     }
 
-  def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
+  private def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, l, Tip()) =>
         ((k,x), l)
@@ -541,7 +541,7 @@ sealed abstract class ==>>[A, B] {
         (km, balanceL(k, x, l, r2))
     }
 
-  def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
+  private def deleteFindMin(t: Bin[A, B]): ((A, B), A ==>> B) =
     t match {
       case Bin(k, x, Tip(), r) =>
         ((k, x), r)
@@ -1218,12 +1218,12 @@ private[scalaz] sealed trait MapEqual[A, B] extends Equal[A ==>> B] {
 }
 
 object ==>> extends MapInstances {
-  private[scalaz] case object Tip extends (Nothing ==>> Nothing) {
+  private[scalaz] sealed abstract case class Tip[A, B] private () extends (A ==>> B) {
     val size = 0
-
-    def unapply[A, B](a: A ==>> B): Boolean = a eq this
-
-    def apply[A, B](): A ==>> B = this.asInstanceOf[A ==>> B]
+  }
+  private[scalaz] object Tip {
+    private[this] val value: Tip[Nothing, Nothing] = new Tip[Nothing, Nothing]{}
+    def apply[A, B](): A ==>> B = value.asInstanceOf[A ==>> B]
   }
 
   private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {

@@ -6,23 +6,26 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
-[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.3.x)](http://travis-ci.org/scalaz/scalaz)
+[![Build Status](https://secure.travis-ci.org/scalaz/scalaz.png?branch=series/7.3.x)](https://travis-ci.org/scalaz/scalaz)
+[![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
+[![Gitter](http://badges.gitter.im/scalaz/scalaz.png)](https://gitter.im/scalaz/scalaz)
+[![Discord](https://img.shields.io/discord/455164441852641282.svg?label=Discord)](https://discord.gg/cVHGnke)
 
 ## Getting Scalaz
 
-The current stable version is 7.2.17, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
+The current stable version is 7.2.26, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.17"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.26"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.2.17%22).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.2.26).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.17.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.26.jar`.
 
 ## Quick Start
 
@@ -70,15 +73,15 @@ res2: Option[Int] = Some(1)
 
 ## Resources
 
-Let the types speak for themselves via the [Scalaz Scaladocs](http://scalaz.github.io/scalaz/#scaladoc)!
+Let the types speak for themselves via the [Scalaz Scaladocs](https://scalaz.github.io/scalaz/#scaladoc)!
 
 The [examples module](https://github.com/scalaz/scalaz/tree/series/7.3.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
-Talk with us by joining [IRC: irc.freenode.net channel #scalaz](http://webchat.freenode.net/?channels=%23scalaz&uio=d4), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
+Talk with us by joining [IRC: irc.freenode.net channel #scalaz](https://webchat.freenode.net/?channels=%23scalaz&uio=d4), or join [the Scalaz mailing list on Google Groups](https://groups.google.com/group/scalaz).
 
-The [typelevel blog](http://typelevel.org/blog/) has some great posts such as [Towards Scalaz](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
+The [typelevel blog](https://typelevel.org/blog/) has some great posts such as [Towards Scalaz](https://typelevel.org/blog/2013/10/13/towards-scalaz-1.html) by [Adelbert Chang](https://twitter.com/adelbertchang).
 
 [Learning Scalaz](http://eed3si9n.com/learning-scalaz/index.html) is a great series of blog posts by [Eugene Yokota](https://twitter.com/eed3si9n). Thanks, Eugene!
 
@@ -136,14 +139,14 @@ def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 
 * *Constructive* implicits, which create a type class instance automatically based on instances of
   all parent type classes, are removed. These led to subtle errors with ambiguous implicits, such as
-  this problem with [FunctorBindApply](http://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111)
+  this problem with [FunctorBindApply](https://stackoverflow.com/questions/7447591/how-do-i-use-name-as-an-applicative/7448111#7448111)
 * Type class instances are no longer declared in fragments in the companion objects of the type class. Instead, they
   are defined in the package `scalaz.std`, and must be imported. These instances are defined in traits which will be
   mixed together into an object for importing *en-masse*, if desired.
 * A single implicit can define a number of type class instances for a type.
 * A type class definition can override methods (including derived methods) for efficiency.
 
-Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
+Here is an instance definition for `Option`. Notice that the method `map` has been overridden.
 
 ```scala
   implicit val option = new Traverse[Option] with MonadPlus[Option] {
@@ -310,6 +313,6 @@ type Id[A] = A
 
 ## Credits
 
-Support for Scalaz development is provided by [Jetbrains](http://www.jetbrains.com/idea/).
+Support for Scalaz development is provided by [Jetbrains](https://www.jetbrains.com/idea/).
 
-Thanks to Mark Harrah and the sbt contributors for providing [our build tool](http://www.scala-sbt.org).
+Thanks to Mark Harrah and the sbt contributors for providing [our build tool](https://www.scala-sbt.org).

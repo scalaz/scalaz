@@ -79,7 +79,10 @@ trait OptionInstances extends OptionInstances0 {
         a map (Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-        fa map \/.right getOrElse -\/(None)
+        fa match {
+          case Some(a) => \/-(a)
+          case None    => -\/(None)
+        }
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
       override def toOption[A](fa: Option[A]): Option[A] = fa
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
@@ -104,10 +107,11 @@ trait OptionInstances extends OptionInstances0 {
     implicit def A = A0
   }
 
-  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    override def show(o1: Option[A]) = o1 match {
-      case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
-      case None     => "None"
+  implicit def optionShow[A: Show]: Show[Option[A]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Some(a1) => cord"Some($a1)"
+      case None     => Cord("None")
     }
   }
 

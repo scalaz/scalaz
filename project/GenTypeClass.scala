@@ -1,6 +1,15 @@
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true) {
+case class TypeClass(
+  name: String,
+  kind: Kind,
+  pack: Seq[String] = Seq("scalaz"),
+  extendsList: Seq[TypeClass] = Seq(),
+  createSyntax: Boolean = true,
+  iso: Boolean = true,
+  fromIso: Boolean = true
+) {
+
   require(pack.head == "scalaz")
   def syntaxPack = {
     Seq("scalaz", "syntax") ++ pack.drop(1)
@@ -26,21 +35,25 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
+  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val foldable = TypeClass("Foldable", *->*)
-  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
+  lazy val foldable = TypeClass("Foldable", *->*, fromIso = false)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable), fromIso = false)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant))
-  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide))
+  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide, invariantApplicative))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
@@ -53,12 +66,11 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val associative = TypeClass("Associative", *^*->*)
+  lazy val associative = TypeClass("Associative", *^*->*, iso = false, fromIso = false)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
-  lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
+  lazy val bifoldable = TypeClass("Bifoldable", *^*->*, fromIso = false)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
-  lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
@@ -73,6 +85,7 @@ object TypeClass {
   lazy val liftControlIO = TypeClass("LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadControlIO = TypeClass("MonadControlIO", *->*, extendsList = Seq(liftControlIO, monad), pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
+  lazy val monadCatchIO = TypeClass("MonadCatchIO", *->*, pack = Seq("scalaz", "effect"), extendsList = Seq(monadIO), createSyntax = false)
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
@@ -100,6 +113,10 @@ object TypeClass {
     divisible,
     apply,
     applicative,
+    invariantAlt,
+    invariantApplicative,
+    decidable,
+    alt,
     align,
     zip,
     unzip,
@@ -119,7 +136,6 @@ object TypeClass {
     bifunctor,
     bifoldable,
     bitraverse,
-    catchable,
     nondeterminism,
     compose,
     category,
@@ -137,7 +153,7 @@ object TypeClass {
     bindRec
   )
   lazy val concurrent = Seq[TypeClass]()
-  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
+  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource, monadCatchIO)
 }
 
 sealed abstract class Kind(val multipleParam: Boolean)
@@ -272,6 +288,101 @@ object GenTypeClass {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
+    val iso = if (tc.iso) {
+      val extendsList = tc.extendsList match {
+        case Seq() =>
+          ""
+        case values =>
+          values.map(t => s"Isomorphism${t.name}[F, G]").mkString("with ", " with ", "")
+      }
+
+      kind match {
+        case Kind.* =>
+s"""
+trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+        case Kind.*->* =>
+s"""
+trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+
+        case Kind.*^*->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+
+       case Kind.|*->*|->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
+  implicit def G: ${typeClassName}[G, S]
+  ////
+
+  ////
+}
+"""
+     }
+    } else {
+      ""
+    }
+
+    val fromIso: String = if (tc.fromIso) {
+      kind match {
+        case Kind.* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = M
+      override def iso: F <=> G = D
+    }"""
+
+        case Kind.*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~> G = D
+    }"""
+
+        case Kind.*^*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~~> G = D
+    }"""
+
+        case Kind.|*->*|->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: $typeClassName[G, E]): $typeClassName[F, E] =
+    new Isomorphism$typeClassName[F, G, E] {
+      override def G: $typeClassName[G, E] = A
+      override def iso: F <~> G = D
+    }"""
+      }
+    } else {
+      ""
+    }
+
+
     val mainSource = s"""${tc.packageString0}
 
 ////
@@ -289,11 +400,14 @@ $syntaxMember
 object $typeClassName {
   $applyMethod
 
+$fromIso
+
   ////
 
   ////
 }
-"""
+""" + iso
+
     val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {

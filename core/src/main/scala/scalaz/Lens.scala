@@ -7,7 +7,7 @@ import scala.collection.immutable
  * A Lens Family, offering a purely functional means to access and retrieve
  * a field transitioning from type `B1` to type `B2` in a record simultaneously
  * transitioning from type `A1` to type `A2`.  [[scalaz.Lens]] is a convenient
- * alias for when `A1 =:= A2`, and `B1 =:= B2`.
+ * alias for when `A1 === A2`, and `B1 === B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a lens
  * family can address membership of a `Set`.
@@ -468,16 +468,16 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem1 + elem2 ++ elems)
 
     def ++=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ ++ xs)
+      lens %= (_ ++ xs.toIterable)
 
     def -=(elem: K): IndexedState[S1, S2, Set[K]] =
       lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ - elem1 - elem2 -- elems)
+      lens %= (_ - elem1 - elem2 diff elems.toSet)
 
     def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ -- xs)
+      lens %= (_ diff xs.toSet)
   }
 
   /** A lens that views a Set can provide the appearance of in place mutation */
@@ -507,7 +507,7 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ + elem)
 
     def ++=(xs: TraversableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
-      lens %= (_ ++ xs)
+      lens %= (_ ++ xs.toIterable)
 
     def update(key: K, value: V): IndexedState[S1, S2, Unit] =
       lens %== (_.updated(key, value))

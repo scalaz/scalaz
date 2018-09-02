@@ -116,7 +116,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     ))
   }
 
-  def joinI[I, B](implicit outer: IterateeT[E, F, A] =:= IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
+  def joinI[I, B](implicit outer: IterateeT[E, F, A] === IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
     val M0 = IterateeT.IterateeTMonad[E, F]
     def check: StepT[I, F, B] => IterateeT[E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {

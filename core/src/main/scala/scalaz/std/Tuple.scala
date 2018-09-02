@@ -816,23 +816,25 @@ private trait Tuple8Equal[A1, A2, A3, A4, A5, A6, A7, A8] extends Equal[(A1, A2,
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) && _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7, f2._7) && _8.equal(f1._8, f2._8)
   override val equalIsNatural: Boolean = _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural && _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural && _7.equalIsNatural && _8.equalIsNatural
 }
+
+import scalaz.syntax.show._
 private trait Tuple1Show[A1] extends Show[Tuple1[A1]] {
   implicit def _1 : Show[A1]
   override def show(f: Tuple1[A1]) =
-    Cord("(", _1.show(f._1), ")")
+    cord"(${f._1})"
 }
 private trait Tuple2Show[A1, A2] extends Show[(A1, A2)] {
   implicit def _1 : Show[A1]
   implicit def _2 : Show[A2]
   override def show(f: (A1, A2)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ")")
+    cord"(${f._1},${f._2})"
 }
 private trait Tuple3Show[A1, A2, A3] extends Show[(A1, A2, A3)] {
   implicit def _1 : Show[A1]
   implicit def _2 : Show[A2]
   implicit def _3 : Show[A3]
   override def show(f: (A1, A2, A3)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ")")
+    cord"(${f._1},${f._2},${f._3})"
 }
 private trait Tuple4Show[A1, A2, A3, A4] extends Show[(A1, A2, A3, A4)] {
   implicit def _1 : Show[A1]
@@ -840,7 +842,7 @@ private trait Tuple4Show[A1, A2, A3, A4] extends Show[(A1, A2, A3, A4)] {
   implicit def _3 : Show[A3]
   implicit def _4 : Show[A4]
   override def show(f: (A1, A2, A3, A4)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ")")
+    cord"(${f._1},${f._2},${f._3},${f._4})"
 }
 private trait Tuple5Show[A1, A2, A3, A4, A5] extends Show[(A1, A2, A3, A4, A5)] {
   implicit def _1 : Show[A1]
@@ -849,7 +851,7 @@ private trait Tuple5Show[A1, A2, A3, A4, A5] extends Show[(A1, A2, A3, A4, A5)] 
   implicit def _4 : Show[A4]
   implicit def _5 : Show[A5]
   override def show(f: (A1, A2, A3, A4, A5)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ",", _5.show(f._5), ")")
+    cord"(${f._1},${f._2},${f._3},${f._4},${f._5})"
 }
 private trait Tuple6Show[A1, A2, A3, A4, A5, A6] extends Show[(A1, A2, A3, A4, A5, A6)] {
   implicit def _1 : Show[A1]
@@ -859,7 +861,7 @@ private trait Tuple6Show[A1, A2, A3, A4, A5, A6] extends Show[(A1, A2, A3, A4, A
   implicit def _5 : Show[A5]
   implicit def _6 : Show[A6]
   override def show(f: (A1, A2, A3, A4, A5, A6)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ",", _5.show(f._5), ",", _6.show(f._6), ")")
+    cord"(${f._1},${f._2},${f._3},${f._4},${f._5},${f._6})"
 }
 private trait Tuple7Show[A1, A2, A3, A4, A5, A6, A7] extends Show[(A1, A2, A3, A4, A5, A6, A7)] {
   implicit def _1 : Show[A1]
@@ -870,7 +872,7 @@ private trait Tuple7Show[A1, A2, A3, A4, A5, A6, A7] extends Show[(A1, A2, A3, A
   implicit def _6 : Show[A6]
   implicit def _7 : Show[A7]
   override def show(f: (A1, A2, A3, A4, A5, A6, A7)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ",", _5.show(f._5), ",", _6.show(f._6), ",", _7.show(f._7), ")")
+    cord"(${f._1},${f._2},${f._3},${f._4},${f._5},${f._6},${f._7})"
 }
 private trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] extends Show[(A1, A2, A3, A4, A5, A6, A7, A8)] {
   implicit def _1 : Show[A1]
@@ -882,7 +884,7 @@ private trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8] extends Show[(A1, A2, A
   implicit def _7 : Show[A7]
   implicit def _8 : Show[A8]
   override def show(f: (A1, A2, A3, A4, A5, A6, A7, A8)) =
-    Cord("(", _1.show(f._1), ",", _2.show(f._2), ",", _3.show(f._3), ",", _4.show(f._4), ",", _5.show(f._5), ",", _6.show(f._6), ",", _7.show(f._7), ",", _8.show(f._8), ")")
+    cord"(${f._1},${f._2},${f._3},${f._4},${f._5},${f._6},${f._7},${f._8})"
 }
 
 private trait Tuple1Order[A1] extends Order[Tuple1[A1]] with Tuple1Equal[A1] {

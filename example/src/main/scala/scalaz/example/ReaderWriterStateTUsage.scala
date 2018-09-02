@@ -10,7 +10,7 @@ package scalaz.example
  <string> ::= <cab> <string> | '.'
 
 
- So valid strings in the langauge would be:
+ So valid strings in the language would be:
  "."
  "A."
  "B."
@@ -51,7 +51,7 @@ object CABRunLengthEncoder {
    "CAAAAAB."
    "C5AB."
    "C3AAAB."
-   "1C5CB."
+   "1C5AB."
    */
 
   // The State we will carry in the Monad during our computation
@@ -82,7 +82,7 @@ object CABRunLengthEncoder {
   import Token._
   import Free.Trampoline
 
-  type RunLength[A] = ReaderWriterStateT[Trampoline, RunLengthConfig, Cord, RunLengthState, A]
+  type RunLength[A] = ReaderWriterStateT[RunLengthConfig, Cord, RunLengthState, Trampoline, A]
 
   // At its essence the RWST monad transformer is a wrap around a function with the following shape:
   // (ReaderType, StateType) => Monad[WriterType, Result, StateType]
@@ -103,7 +103,7 @@ object CABRunLengthEncoder {
   // modify -- alter the current state
   // tell   -- append to the writer
   // ask    -- read from the reader
-  val rle = ReaderWriterStateT.rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
+  val rle = ReaderWriterStateT.rwstMonad[RunLengthConfig, Cord, RunLengthState, Trampoline]
   import rle._
 
   /**
@@ -140,7 +140,7 @@ object CABRunLengthEncoder {
     if(length <= minRun)
       tell(Monoid[Cord].multiply(token.show, length))
     else
-      tell(length.show ++ token.show)
+      tell(length.show :: token.show)
 
 
   /**
@@ -178,7 +178,7 @@ object CABRunLengthEncoder {
     val config = RunLengthConfig(minRun)
     val initialState = RunLengthState.initial(input)
     val (output, result, finalState) = untilM_(maybeEmit, done).run(config, initialState).run
-    output.shows
+    output.toString
   }
 }
 

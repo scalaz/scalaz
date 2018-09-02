@@ -47,14 +47,14 @@ object FutureTest extends SpecLite {
   "Nondeterminism[Future]" should {
     import scalaz.concurrent.Future._
     implicit val es = Executors.newFixedThreadPool(1)
-    val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
+    implicit val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
     "correctly process reduceUnordered for >1 futures in non-blocking way" in {
       val f1 = fork(now(1))(es)
       val f2 = delay(7).flatMap(_=>fork(now(2))(es))
       val f3 = fork(now(3))(es)
 
-      val f = fork(Future.reduceUnordered(Seq(f1,f2,f3))(intSetReducer))(es)
+      val f = fork(Future.reduceUnordered(IList(f1,f2,f3)))(es)
 
       f.unsafePerformSync must_== Set(1,2,3)
     }
@@ -63,13 +63,13 @@ object FutureTest extends SpecLite {
     "correctly process reduceUnordered for 1 future in non-blocking way" in {
       val f1 = fork(now(1))(es)
 
-      val f = fork(Future.reduceUnordered(Seq(f1))(intSetReducer))(es)
+      val f = fork(Future.reduceUnordered(IList(f1)))(es)
 
       f.unsafePerformSync must_== Set(1)
     }
 
     "correctly process reduceUnordered for empty seq of futures in non-blocking way" in {
-      val f = fork(Future.reduceUnordered(Seq())(intSetReducer))(es)
+      val f = fork(Future.reduceUnordered(IList.empty[Future[Int]]))(es)
 
       f.unsafePerformSync must_== Set()
     }
@@ -77,8 +77,7 @@ object FutureTest extends SpecLite {
 
   "Timed Future" should {
     "not run futures sequentially" in {
-      val times = Stream.iterate(100)(_ + 100).take(10)
-
+      val times = IList.fill(10)(100).map(_ + 100)
       val start  = System.currentTimeMillis()
       val result = Future.fork(Future.gatherUnordered(times.map { time =>
         Future.fork {
@@ -88,7 +87,7 @@ object FutureTest extends SpecLite {
       })).unsafePerformSync
       val duration = System.currentTimeMillis() - start
 
-      result.length must_== times.size and duration.toInt mustBe_< times.fold(0)(_ + _)
+      result.length must_== times.length and duration.toInt mustBe_< times.foldLeft(0) { case (a, b) => a + b }
     }
   }
 

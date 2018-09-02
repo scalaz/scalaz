@@ -85,7 +85,7 @@ sealed abstract class STArray[S, A] {
   def freeze: ST[S, ImmutableArray[A]] = st(() => ImmutableArray.fromArray(value))
 
   /**Fill this array from the given association list. */
-  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] = xs match {
+  def fill[B](f: (A, B) => A, xs: Iterable[(Int, B)]): ST[S, Unit] = xs.toList match {
     case Nil             => returnST(())
     case ((i, v) :: ivs) => for {
       _ <- update(f, i, v)
@@ -134,8 +134,7 @@ object ST extends STInstances {
     private[effect] def run = f()
   }
 
-  // Implicit conversions between IO and ST
-  implicit def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
+  def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
     IO.io(rw => Free.return_((rw, st.run)))
 
   /**Put a value in a state thread */

@@ -8,9 +8,9 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def mapT[G[_], C, D](f: F[A \&/ B] => G[C \&/ D]): TheseT[G, C, D] =
     TheseT(f(run))
 
-  def flatMap[AA >: A, C](f: B => TheseT[F, AA, C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
+  def flatMap[C](f: B => TheseT[F, A, C])(implicit M: Monad[F], S: Semigroup[A]): TheseT[F, A, C]
   = TheseT(M.bind(run) {
-    case a @ \&/.This(_) => M.point(a)
+    case a @ \&/.This(_) => M.point(a.coerceThat)
     case \&/.That(b)     => f(b).run
     case \&/.Both(aa, b) => M.map(f(b).run) {
       case \&/.This(a)    => \&/.This(S.append(aa, a))
@@ -18,8 +18,8 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
       case \&/.Both(a, c) => \&/.Both(S.append(aa, a), c)
     }
   })
-  def flatMapF[AA >: A, C](f: B => F[AA \&/ C])(implicit M: Monad[F], S: Semigroup[AA]): TheseT[F, AA, C]
-  = flatMap[AA, C](f andThen (x => TheseT(x)))
+  def flatMapF[C](f: B => F[A \&/ C])(implicit M: Monad[F], S: Semigroup[A]): TheseT[F, A, C]
+  = flatMap[C](f andThen (x => TheseT(x)))
 
 
   def swap(implicit F: Functor[F]): TheseT[F, B, A]
@@ -71,18 +71,18 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def bimap[C, D](f: A => C, g: B => D)(implicit F: Functor[F]): TheseT[F, C, D]
   = TheseT(F.map(run)(_.bimap(f, g)))
 
-  def traverse[G[_], AA >: A, D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, AA, D]]
-  = G.map(F.traverse(run)(o => Traverse[AA \&/ ?].traverse(o)(g)))(TheseT(_))
+  def traverse[G[_], D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, A, D]]
+  = G.map(F.traverse(run)(o => Traverse[A \&/ ?].traverse(o)(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]
   = G.map(F.traverse(run)(Bitraverse[\&/].bitraverseF(f, g)))(TheseT(_: F[C \&/ D]))
 
-  def &&&[AA >: A, C](t: TheseT[F, AA, C])(implicit M: Semigroup[AA], F: Apply[F]): TheseT[F, AA, (B, C)]
+  def &&&[C](t: TheseT[F, A, C])(implicit M: Semigroup[A], F: Apply[F]): TheseT[F, A, (B, C)]
   = TheseT(F.apply2(run, t.run)(_ &&& _))
 
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord]
-  = F.map(run)(_.show)
+  = F.map(run)(\&/.TheseShow[A, B].show(_))
 
   def foldRight[Z](z: => Z)(f: (B, => Z) => Z)(implicit F: Foldable[F]): Z
   = F.foldRight[A \&/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
@@ -91,6 +91,13 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 }
 
 sealed abstract class TheseTInstances1 {
+  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
+    new TheseTFunctor[F, L] {
+      override def F = implicitly
+    }
+}
+
+sealed abstract class TheseTInstances0 extends TheseTInstances1 {
   implicit def TheseTInstance1[F[_]: Traverse, L]: Traverse[TheseT[F, L, ?]]
   = new Traverse[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
     override def F = implicitly
@@ -100,17 +107,15 @@ sealed abstract class TheseTInstances1 {
 
   implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[?[_], A, ?]] = new Hoist[TheseT[?[_], A, ?]] {
     override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-      λ[TheseT[M, A, ?] ~> TheseT[N, A, ?]](_ mapT f)
+      λ[TheseT[M, A, ?] ~> TheseT[N, A, ?]](_ mapT f.apply)
 
     override def liftM[G[_]: Monad, B](a: G[B]): TheseT[G, A, B] = TheseT(Monad[G].map(a)(x => \&/.That(x)))
 
     override implicit def apply[G[_]: Monad]: Monad[TheseT[G, A, ?]] = TheseT.theseTMonad[G, A]
   }
-
-
 }
 
-sealed abstract class TheseTInstances0 extends TheseTInstances1 {
+sealed abstract class TheseTInstances extends TheseTInstances0 {
   implicit def theseTMonad[F[_]: Monad, L: Semigroup]: Monad[TheseT[F, L, ?]]
   = new Monad[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
     override def F = implicitly
@@ -132,13 +137,6 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
   }
   implicit def theseTEqual[F[_], A, B](implicit F0: Equal[F[A \&/ B]]): Equal[TheseT[F, A, B]] =
     F0.contramap((_: TheseT[F, A, B]).run)
-
-}
-sealed abstract class TheseTInstances extends TheseTInstances0 {
-  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
-    new TheseTFunctor[F, L] {
-      override def F = implicitly
-    }
 }
 
 object TheseT extends TheseTInstances {

@@ -17,26 +17,26 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   def fromK: Kleisli[G, B, A] =
     Kleisli(_from)
 
-  def lens(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Lens[A, B] =
-    Lens(a => Store(from(_), to(a)))
+  def lens(implicit evF: F[B] === Id[B], evG: G[A] === Id[A]): Lens[A, B] =
+    Lens(a => Store(b => evG(from(b)), evF(to(a))))
 
-  def partial(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): PLens[A, B] =
+  def partial(implicit evF: F[B] === Id[B], evG: G[A] === Id[A]): PLens[A, B] =
     lens.partial
 
   /** alias for `partial` */
-  def unary_~(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]) : PLens[A, B] =
+  def unary_~(implicit evF: F[B] === Id[B], evG: G[A] === Id[A]) : PLens[A, B] =
     partial
 
-  def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[X[A, C], X[B, D]] =
+  def bimap[C, X[_, _], D](g: Bijection[C, D])(implicit F: Bifunctor[X], evF: F[B] === Id[B], evG: G[A] === Id[A]): Bijection[X[A, C], X[B, D]] =
     bijection(
       F.bimap(_)(_to andThen evF, g.to(_)): Id[X[B, D]]
     , F.bimap(_)(_from andThen evG, g.from(_)): Id[X[A, C]]
     )
 
-  def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[(A, C), (B, D)] =
+  def ***[C, D](g: Bijection[C, D])(implicit evF: F[B] === Id[B], evG: G[A] === Id[A]): Bijection[(A, C), (B, D)] =
     bimap[C, Tuple2, D](g)
 
-  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]): Bijection[A \/ C, B \/ D] =
+  def ^^^[C, D](g: Bijection[C, D])(implicit evF: F[B] === Id[B], evG: G[A] === Id[A]): Bijection[A \/ C, B \/ D] =
     bimap[C, \/, D](g)
 
   def compose[C](g: BijectionT[F, G, C, A])(implicit FM: Bind[F], GM: Bind[G]): BijectionT[F, G, C, B] =

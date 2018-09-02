@@ -26,13 +26,15 @@ private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
 private sealed trait ConstApplyDivide[C] extends Apply[Const[C, ?]] with ConstTraverse[C] with ConstContravariant[C] with Divide[Const[C, ?]] {
   def C: Semigroup[C]
 
+  override def tuple2[A, B](fa: =>Const[C, A], fb: =>Const[C, B]): Const[C, (A, B)] = apply2(fa, fb)((_,_))
+
   override def xmap[A, B](fa: Const[C, A], f: A => B, g: B => A) =
     Const(fa.getConst)
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
     Const(C.append(f.getConst, fa.getConst))
 
-  override def divide[A, B, Z](fa: Const[C, A], fb: Const[C, B])(f: Z => (A, B)) =
+  override def divide2[A, B, Z](fa: =>Const[C, A], fb: =>Const[C, B])(f: Z => (A, B)) =
     Const(C.append(fa.getConst, fb.getConst))
 }
 

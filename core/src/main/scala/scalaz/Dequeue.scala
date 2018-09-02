@@ -217,13 +217,14 @@ private[scalaz] final case class FullDequeue[A](front: NonEmptyList[A], fsize: I
 /**
   * a queue which has no elements
   */
-private[scalaz] final case object EmptyDequeue extends Dequeue[Nothing] {
+private[scalaz] sealed abstract case class EmptyDequeue[A] private() extends Dequeue[A] {
   override val isEmpty = true
-  override val frontMaybe = Maybe.empty
-  override val backMaybe = Maybe.empty
-
-  def apply[A]() = this.asInstanceOf[Dequeue[A]]
-  def unapply[A](q: Dequeue[A]) = q.isEmpty
+  override val frontMaybe = Maybe.empty[A]
+  override val backMaybe = Maybe.empty[A]
+}
+object EmptyDequeue {
+  private[this] val value: Dequeue[Nothing] = new EmptyDequeue[Nothing]{}
+  def apply[A](): Dequeue[A] = value.asInstanceOf[Dequeue[A]]
 }
 
 sealed abstract class DequeueInstances {
@@ -237,16 +238,22 @@ sealed abstract class DequeueInstances {
     def append(a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
   }
 
-  implicit val dequeueInstances: Foldable[Dequeue] with IsEmpty[Dequeue] with Functor[Dequeue] = new Foldable[Dequeue] with IsEmpty[Dequeue] with Functor[Dequeue] {
-    override def foldRight[A,B](fa: Dequeue[A], b: => B)(f: (A, => B) =>B): B = fa.foldRight(b)((a,b) => f(a,b))
-    override def foldLeft[A,B](fa: Dequeue[A], b: B)(f: (B,A)=>B): B = fa.foldLeft(b)(f)
-    override def foldMap[A,B](fa: Dequeue[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldLeft(F.zero)((b,a) => F.append(b, f(a)))
-    override def empty[A]: Dequeue[A] = Dequeue.empty
-    override def plus[A](a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
-    override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
-    override def length[A](fa: Dequeue[A]) = fa.size
-    override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
-  }
+  implicit val dequeueInstances: Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] =
+    new Traverse[Dequeue] with IsEmpty[Dequeue] with MonadPlus[Dequeue] {
+      override def foldRight[A,B](fa: Dequeue[A], b: => B)(f: (A, => B) =>B): B = fa.foldRight(b)((a,b) => f(a,b))
+      override def foldLeft[A,B](fa: Dequeue[A], b: B)(f: (B,A)=>B): B = fa.foldLeft(b)(f)
+      override def foldMap[A,B](fa: Dequeue[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldLeft(F.zero)((b,a) => F.append(b, f(a)))
+      override def empty[A]: Dequeue[A] = Dequeue.empty
+      override def plus[A](a: Dequeue[A], b: => Dequeue[A]): Dequeue[A] = a ++ b
+      override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
+      override def length[A](fa: Dequeue[A]) = fa.size
+      override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
+      override def point[A](a: => A): Dequeue[A] = Dequeue(a)
+      override def bind[A, B](fa: Dequeue[A])(f: A => Dequeue[B]): Dequeue[B] = foldMap(fa)(f)
+      override def traverseImpl[F[_], A, B](fa: Dequeue[A])(f: A => F[B])(implicit F: Applicative[F]): F[Dequeue[B]] =
+        fa.foldRight(F.point(Dequeue.empty[B]))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
+
+    }
 }
 
 private[scalaz] trait DequeueEqual[A] extends Equal[Dequeue[A]] {

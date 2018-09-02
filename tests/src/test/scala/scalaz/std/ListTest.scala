@@ -66,7 +66,7 @@ object ListTest extends SpecLite {
   "groupBy1" ! forAll {
       (a: List[String]) =>
       val strlen = (_ : String).length
-      (a groupBy strlen) must_===((a groupBy1 strlen) mapValues (_.list.toList))
+      (a groupBy strlen) must_=== ((a groupBy1 strlen).map{ case (k, v) => k -> v.list.toList})
   }
 
   "groupWhen.flatten is identity" ! forAll {
@@ -135,6 +135,10 @@ object ListTest extends SpecLite {
       must_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 
+  "foldMap" ! forAll { xs: List[Int] =>
+    xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)
+  }
+
   "index" ! forAll { (xs: List[Int], n: Int) =>
     (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
@@ -156,6 +160,20 @@ object ListTest extends SpecLite {
       val f = (_: Int) + 1
       xs.mapAccumRight(List[Int](), (c: List[Int], a) =>
         (c :+ a, f(a))) must_===(xs.reverse -> xs.map(f))
+  }
+
+  "psumMap should be lazy" in {
+    import scalaz.syntax.show._
+    import Maybe.just
+
+    var called = 0
+    def foo(s: Int): Maybe[String] = {
+      called += 1
+      just(s.shows)
+    }
+
+    (1 to 10).toList.psumMap(foo) must_=== just("1")
+    called must_=== 1
   }
 
   checkAll(FoldableTests.anyAndAllLazy[List])

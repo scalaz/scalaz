@@ -11,7 +11,7 @@ object FoldableUsage extends App {
   import scalaz.syntax.std.option._
   import scalaz.syntax.equal._
 
-  // a continous stream of true, true, true, true, true, …
+  // a continuous stream of true, true, true, true, true, …
   val trues: Stream[Boolean] = Stream.continually(true)
 
   // we cannot use foldRight from the standard library with an

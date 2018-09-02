@@ -48,8 +48,8 @@ object ValidationTest extends SpecLite {
   "ap2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNel
-      val fail2 = Failure("2").toValidationNel
+      val fail1 = Failure[String, Int]("1").toValidationNel
+      val fail2 = Failure[String, Int]("2").toValidationNel
       val f = (_:Int) + (_:Int)
       Apply[ValidationNel[String, ?]].ap2(fail1, fail2)(Success(f)).shows must_===("""Failure(["1","2"])""")
     }
@@ -90,12 +90,6 @@ object ValidationTest extends SpecLite {
     (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], 2.success[String], 3.success[String]))
 
     (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
-
-    implicit val ShowAny: Show[Any] = Show.showA; implicit val EqualAny: Equal[Any] = Equal.equalA
-    def errmsgA(i: Int): Any = errmsg(i)
-    (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsgA(i) })) must_===(List(1.success[Any], 2.success[Any], 3.success[Any]))
-
-    (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsgA(i) })) must_===(List(1.success[Any], errmsgA(-2).failure[Int], 3.success[Any]))
   }
 
   "ensure" in {

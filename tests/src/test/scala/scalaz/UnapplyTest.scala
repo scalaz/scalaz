@@ -1,6 +1,5 @@
 package scalaz
 
-import Leibniz.===
 
 object UnapplyTest extends SpecLite {
   def teq[A[_], B[X] >: A[X] <: A[X]]: Unit = ()

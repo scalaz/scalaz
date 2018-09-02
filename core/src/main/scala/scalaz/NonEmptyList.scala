@@ -139,17 +139,24 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 }
 
 object NonEmptyList extends NonEmptyListInstances {
-  def apply[A](h: A, t: A*): NonEmptyList[A] =
-    nels(h, t: _*)
+  // optimised versions of apply(A*)
+  @inline final def apply[A](a: A): NonEmptyList[A] = nel(a, IList.empty)
+  @inline final def apply[A](a: A, b: A): NonEmptyList[A] = nel(a, IList(b))
+  @inline final def apply[A](a: A, b: A, c: A): NonEmptyList[A] = nel(a, IList(b, c))
+  @inline final def apply[A](a: A, b: A, c: A, d: A): NonEmptyList[A] = nel(a, IList(b, c, d))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): NonEmptyList[A] = nel(a, IList(b, c, d, e))
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): NonEmptyList[A] = nel(a, IList(b, c, d, e, f))
+
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A, as: A*): NonEmptyList[A] = a <:: b <:: c <:: d <:: e <:: fromSeq(f, as)
+
+  def fromSeq[A](h: A, t: Seq[A]): NonEmptyList[A] =
+    nel(h, IList.fromSeq(t))
 
   def unapply[A](v: NonEmptyList[A]): Option[(A, IList[A])] =
     Some((v.head, v.tail))
 
   def nel[A](h: A, t: IList[A]): NonEmptyList[A] =
     new NonEmptyList(h, t)
-
-  def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, IList(t: _*))
 
   def lift[A, B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
     case INil() ⇒ None
@@ -167,6 +174,20 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
 
+      override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
+        Foldable[IList].foldMap(fa.list)(f)(M)
+
+      override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
+        val revOpt: Maybe[F[NonEmptyList[B]]] =
+          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list)(_ match {
+            case ICons(a, as) => Maybe.just((f(a), as))
+            case INil() => Maybe.empty
+          })(Reducer.ReverseNonEmptyListReducer[B])
+
+        val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
+        F.map(rev)(_.reverse)
+      }
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -181,6 +202,12 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def foldMap1[A, B](fa: NonEmptyList[A])(f: A => B)(implicit F: Semigroup[B]): B = {
         fa.tail.foldLeft(f(fa.head))((x, y) => F.append(x, f(y)))
       }
+
+      override def psumMap1[A, B, G[_]](fa: NonEmptyList[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
+        fa.tail match {
+          case INil() => f(fa.head)
+          case ICons(snd, rest) => G.plus(f(fa.head), psumMap1(NonEmptyList.nel(snd, rest))(f)(G))
+        }
 
       // would otherwise use traverse1Impl
       override def foldLeft[A, B](fa: NonEmptyList[A], z: B)(f: (B, A) => B): B =

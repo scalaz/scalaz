@@ -54,12 +54,12 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
       case -\/(a) => apply(a) map (\/.left)
-      case c @ \/-(_) => Some(c)
+      case c @ \/-(_) => Some(c.coerceLeft)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
-      case c @ -\/(_) => Some(c)
+      case c @ -\/(_) => Some(c.coerceRight)
       case \/-(a) => apply(a) map (\/.right)
     }
 
@@ -101,7 +101,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
 
   import std.option._
 
-  def state: StateT[Option, A, B] =
+  def state: StateT[A, Option, B] =
     StateT(carry apply _)
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =

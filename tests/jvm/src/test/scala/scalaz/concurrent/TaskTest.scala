@@ -34,7 +34,7 @@ object TaskTest extends SpecLite {
   }
 
   "gather-based map == sequential map" ! forAll { (xs: IList[Int]) =>
-    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1)).toList).unsafePerformSync
+    xs.map(_ + 1) == Nondeterminism[Task].gather(xs.map(x => Task(x + 1))).unsafePerformSync
   }
 
   case object FailWhale extends RuntimeException {
@@ -122,7 +122,7 @@ object TaskTest extends SpecLite {
   }
 
   "catches exceptions thrown in handleWith" ! {
-    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay(throw SadTrombone) }.unsafePerformSyncAttempt ==
+    Task { Thread.sleep(10); throw FailWhale; 42 }.handleWith { case FailWhale => Task.delay[Int](throw SadTrombone) }.unsafePerformSyncAttempt ==
       -\/(SadTrombone)
   }
 
@@ -142,13 +142,13 @@ object TaskTest extends SpecLite {
   "Nondeterminism[Task]" should {
     import scalaz.concurrent.Task._
     val es = Executors.newFixedThreadPool(1)
-    val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
+    implicit val intSetReducer = Reducer.unitReducer[Int, Set[Int]](Set(_))
 
     "correctly process reduceUnordered for >1 tasks in non-blocking way" in {
       val t1 = fork(now(1))(es)
       val t2 = delay(7).flatMap(_=>fork(now(2))(es))
       val t3 = fork(now(3))(es)
-      val t = fork(Task.reduceUnordered(Seq(t1,t2,t3))(intSetReducer))(es)
+      val t = fork(Task.reduceUnordered(IList(t1,t2,t3)))(es)
 
       t.unsafePerformSync must_== Set(1,2,3)
     }
@@ -157,13 +157,13 @@ object TaskTest extends SpecLite {
     "correctly process reduceUnordered for 1 task in non-blocking way" in {
       val t1 = fork(now(1))(es)
 
-      val t = fork(Task.reduceUnordered(Seq(t1))(intSetReducer))(es)
+      val t = fork(Task.reduceUnordered(IList(t1)))(es)
 
       t.unsafePerformSync must_== Set(1)
     }
 
     "correctly process reduceUnordered for empty seq of tasks in non-blocking way" in {
-      val t = fork(Task.reduceUnordered(Seq())(intSetReducer))(es)
+      val t = fork(Task.reduceUnordered(IList.empty[Task[Int]]))(es)
 
       t.unsafePerformSync must_== Set()
     }
@@ -179,10 +179,10 @@ object TaskTest extends SpecLite {
 
       // NB: Task can only be interrupted in between steps (before the `map`)
       val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { now(throw ex) }
+      val t2 = fork { now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
-      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+      val t = fork(Task.gatherUnordered(IList(t1,t2,t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
@@ -203,10 +203,10 @@ object TaskTest extends SpecLite {
 
       // NB: Task can only be interrupted in between steps (before the `map`)
       val t1 = fork { sleep(1000); now(()) }.map { _ => t1v.set(1) }
-      val t2 = fork { sleep(100); now(throw ex) }
+      val t2 = fork { sleep(100); now[Unit](throw ex) }
       val t3 = fork { sleep(1000); now(()) }.map { _ => t3v.set(3) }
 
-      val t = fork(Task.gatherUnordered(Seq(t1,t2,t3), exceptionCancels = true))(es3)
+      val t = fork(Task.gatherUnordered(IList(t1,t2,t3), exceptionCancels = true))(es3)
 
       t.unsafePerformSyncAttempt mustMatch {
         case -\/(e) => e must_== ex; true
@@ -278,7 +278,7 @@ object TaskTest extends SpecLite {
     }
   }
 
-  "retries a retriable task n times" ! forAll { xs: List[Byte] =>
+  "retries a retriable task n times" ! forAll { xs: IList[Byte] =>
     import scala.concurrent.duration._
     var x = 0
     Task.delay {x += 1; sys.error("oops")}.retry(xs.map(_ => 0.milliseconds)).attempt.unsafePerformSync

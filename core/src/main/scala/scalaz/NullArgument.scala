@@ -42,14 +42,14 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     NullArgument {
       case None => -\/(apply(None))
       case Some(-\/(a)) => -\/(apply(Some(a)))
-      case Some(c @ \/-(_)) => c
+      case Some(c @ \/-(_)) => c.coerceLeft
     }
 
   def right[C]: (C \/ A) ?=> (C \/ B) =
     NullArgument {
       case None => \/-(apply(None))
       case Some(\/-(a)) => \/-(apply(Some(a)))
-      case Some(c @ -\/(_)) => c
+      case Some(c @ -\/(_)) => c.coerceRight
     }
 
   def compose[C](f: C ?=> A): C ?=> B =

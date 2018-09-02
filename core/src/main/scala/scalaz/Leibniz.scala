@@ -6,7 +6,7 @@ import Id._
  * Leibnizian equality: a better `=:=`
  *
  * This technique was first used in
- * [[http://portal.acm.org/citation.cfm?id=583852.581494  Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
+ * [[https://portal.acm.org/citation.cfm?id=583852.581494  Typing Dynamic Typing]] (Baars and Swierstra, ICFP 2002).
  *
  * It is generalized here to handle subtyping so that it can be used with constrained type constructors.
  *
@@ -35,7 +35,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
 }
 
 sealed abstract class LeibnizInstances {
-  import Leibniz._
+  import Leibniz.{=== => _, _}
 
   implicit val leibniz: Category[===] = new Category[===] {
     def id[A]: (A === A) = refl[A]
@@ -69,7 +69,8 @@ sealed abstract class LeibnizInstances {
 object Leibniz extends LeibnizInstances {
 
   /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
-  type ===[A,B] = Leibniz[⊥, ⊤, A, B]
+  @deprecated("Use scalaz's package's type alias instead", "7.3.x")
+  type ===[A,B] = scalaz.===[A, B]
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
   implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A] {
@@ -79,10 +80,10 @@ object Leibniz extends LeibnizInstances {
   /** We can witness equality by using it to convert between types
    * We rely on subtyping to enable this to work for any Leibniz arrow
    */
-  implicit def witness[A, B](f: A === B): A => B =
+  implicit def witness[A, B](f: scalaz.===[A, B]): A => B =
     f.subst[A => ?](identity)
 
-  implicit def subst[A, B](a: A)(implicit f: A === B): B = f.subst[Id](a)
+  implicit def subst[A, B](a: A)(implicit f: scalaz.===[A, B]): B = f.subst[Id](a)
 
   /** Equality is transitive */
   def trans[L, H >: L, A >: L <: H, B >: L <: H, C >: L <: H](
@@ -164,7 +165,7 @@ object Leibniz extends LeibnizInstances {
     T[_ >: LA <: HA] /*: Injective*/,
     A >: LA <: HA, A2 >: LA <: HA
   ](
-    t: T[A] === T[A2]
+    t: scalaz.===[T[A], T[A2]]
   ): Leibniz[LA, HA, A, A2] = force[LA, HA, A, A2]
 
   def lower2[
@@ -174,6 +175,6 @@ object Leibniz extends LeibnizInstances {
     A >: LA <: HA, A2 >: LA <: HA,
     B >: LB <: HB, B2 >: LB <: HB
   ](
-   t: T[A, B] === T[A2, B2]
+   t: scalaz.===[T[A, B], T[A2, B2]]
   ): (Leibniz[LA, HA, A, A2], Leibniz[LB, HB, B, B2]) = (force[LA, HA, A, A2], force[LB, HB, B, B2])
 }

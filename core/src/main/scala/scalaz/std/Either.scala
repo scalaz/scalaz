@@ -31,6 +31,21 @@ trait EitherInstances extends EitherInstances0 {
         case Right(b) => f(b)
       }
 
+      override def map[A, B](fa: Either[L, A])(f: A => B) = fa match {
+        case Right(b) => Right(f(b))
+        case a => a.asInstanceOf[Either[L, B]]
+      }
+
+      override def apply2[A, B, C](fa: => Either[L, A], fb: => Either[L, B])(f: (A, B) => C): Either[L, C] =
+        fa match {
+          case Right(a) =>
+            fb match {
+              case Right(b) => Right(f(a, b))
+              case e => e.asInstanceOf[Either[L, C]]
+            }
+          case e => e.asInstanceOf[Either[L, C]]
+        }
+
       def handleError[A](fa: Either[L, A])(f: L => Either[L, A]) =
         fa match {
           case a @ Right(_) => a
@@ -97,10 +112,11 @@ trait EitherInstances extends EitherInstances0 {
 
   }
 
-  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = new Show[Either[A,B]] {
-    override def show(f: Either[A, B]): Cord = f match {
-      case Left(a) => ("Left(" : Cord) ++ SA.show(a) :- ')'
-      case Right(b) => ("Right(" : Cord) ++ SB.show(b) :- ')'
+  implicit def eitherShow[A,B](implicit SA: Show[A], SB: Show[B]) : Show[Either[A,B]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Left(a) => cord"Left($a)"
+      case Right(b) => cord"Right($b)"
     }
   }
 }

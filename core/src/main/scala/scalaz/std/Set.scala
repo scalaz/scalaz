@@ -11,7 +11,7 @@ trait SetInstances {
     override def foldRight[A, B](fa: Set[A], z: => B)(f: (A, => B) => B) = {
       import scala.collection.mutable.ArrayStack
       val s = new ArrayStack[A]
-      fa.foreach(a => s += a)
+      fa.foreach(a => s push a)
       var r = z
       while (!s.isEmpty) {
         // Fixes stack overflow issue (#866)
@@ -61,8 +61,10 @@ trait SetInstances {
       def zero: Set[A] = Set[A]()
     }
 
-  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
-    override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
+  implicit def setShow[A](implicit A: Show[A]): Show[Set[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[Set].intercalate(as.map(A.show), Cord(","))
+    cord"Set($content)"
   }
 
 }

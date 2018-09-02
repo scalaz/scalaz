@@ -88,11 +88,21 @@ object ScalazProperties {
   }
 
   object semigroup {
+    import ScalazArbitrary.Arbitrary_Maybe
+
     def associative[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]): Prop = forAll(A.semigroupLaw.associative _)
+
+    def unfoldlSumOptConsistency[A, S](implicit A: Semigroup[A], eqa: Equal[A], aa: Arbitrary[A], as: Arbitrary[S], cs: Cogen[S]): Prop =
+      forAll(A.semigroupLaw.unfoldlSumOptConsistency[S] _)
+
+    def unfoldrSumOptConsistency[A, S](implicit A: Semigroup[A], eqa: Equal[A], aa: Arbitrary[A], as: Arbitrary[S], cs: Cogen[S]): Prop =
+      forAll(A.semigroupLaw.unfoldrSumOptConsistency[S] _)
 
     def laws[A](implicit A: Semigroup[A], eqa: Equal[A], arb: Arbitrary[A]): Properties =
       newProperties("semigroup") { p =>
         p.property("associative") = associative[A]
+        p.property("unfoldlSumOpt consistency") = unfoldlSumOptConsistency[A, Int]
+        p.property("unfoldrSumOpt consistency") = unfoldrSumOptConsistency[A, Int]
       }
   }
 
@@ -128,6 +138,30 @@ object ScalazProperties {
         p.include(band.laws[A])
         p.property("commutative") = commutative[A]
     }
+  }
+
+  object reducer {
+    import ScalazArbitrary.Arbitrary_Maybe
+
+    def consCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.consCorrectness _)
+
+    def snocCorrectness[C, M](implicit R: Reducer[C, M], ac: Arbitrary[C], am: Arbitrary[M], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.snocCorrectness _)
+
+    def unfoldlOptConsistency[C, M, S](implicit R: Reducer[C, M], ac: Arbitrary[C], as: Arbitrary[S], cs: Cogen[S], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.unfoldlOptConsistency[S] _)
+
+    def unfoldrOptConsistency[C, M, S](implicit R: Reducer[C, M], ac: Arbitrary[C], as: Arbitrary[S], cs: Cogen[S], eqm: Equal[M]): Prop =
+      forAll(R.reducerLaw.unfoldrOptConsistency[S] _)
+
+    def laws[C: Arbitrary, M: Arbitrary: Equal](implicit R: Reducer[C, M]): Properties =
+      newProperties("reducer") { p =>
+        p.property("cons correctness") = consCorrectness[C, M]
+        p.property("snoc correctness") = snocCorrectness[C, M]
+        p.property("unfoldlOpt consistency") = unfoldlOptConsistency[C, M, Int]
+        p.property("unfoldrOpt consistency") = unfoldrOptConsistency[C, M, Int]
+      }
   }
 
   object invariantFunctor {
@@ -195,7 +229,10 @@ object ScalazProperties {
     def laws[F[_]](implicit F: Apply[F], af: Arbitrary[F[Int]],
                    aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
       newProperties("apply") { p =>
+        implicit val r: Reducer[F[Int], F[Int]] = F.liftReducer(Reducer.identityReducer[Int])
+
         p.include(functor.laws[F])
+        p.include(reducer.laws[F[Int], F[Int]])
         p.property("composition") = self.composition[F, Int, Int, Int]
       }
   }
@@ -221,6 +258,14 @@ object ScalazProperties {
         p.property("homomorphism") = applicative.homomorphism[F, Int, Int]
         p.property("interchange") = applicative.interchange[F, Int, Int]
         p.property("map consistent with ap") = applicative.mapApConsistency[F, Int, Int]
+      }
+  }
+
+  object alt {
+    def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
+                   aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
+      newProperties("alt") { p =>
+        p.include(applicative.laws[F])
       }
   }
 
@@ -450,8 +495,6 @@ object ScalazProperties {
   }
 
   object foldable1 {
-    type Pair[A] = (A, A)
-
     def leftFM1Consistent[F[_], A](implicit F: Foldable1[F], fa: Arbitrary[F[A]], ea: Equal[A]): Prop =
       forAll(F.foldable1Law.leftFM1Consistent[A] _)
 
@@ -552,6 +595,17 @@ object ScalazProperties {
         p.include(divide.laws[F])
         p.property("right identity") = rightIdentity[F, Int]
         p.property("left identity") = leftIdentity[F, Int]
+      }
+  }
+
+  object decidable {
+    def laws[F[_]](implicit
+                     F: Decidable[F],
+                     af: Arbitrary[F[Int]],
+                     axy: Arbitrary[Int => Int],
+                     ef: Equal[F[Int]]): Properties =
+      newProperties("decidable") { p =>
+        p.include(divisible.laws[F])
       }
   }
 

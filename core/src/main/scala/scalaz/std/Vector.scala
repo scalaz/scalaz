@@ -11,9 +11,34 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] with StrictSeqSubtypeCovariant[Vector] {
-    protected[this] override val Factory = Vector
-    protected[this] override def canBuildFrom[A] = Vector.canBuildFrom
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
+
+    override def point[A](a: => A): Vector[A] =
+      Vector(a)
+
+    override def bind[A, B](fa: Vector[A])(f: A => Vector[B]): Vector[B] =
+      fa flatMap f
+
+    override def createNewBuilder[A]() =
+      Vector.newBuilder[A]
+
+    override def isEmpty[A](fa: Vector[A]): Boolean =
+      fa.isEmpty
+
+    override def plus[A](a: Vector[A], b: => Vector[A]): Vector[A] =
+      a ++ b
+
+    override def empty[A]: Vector[A] =
+      Vector.empty[A]
+
+    override def unzip[A, B](a: Vector[(A, B)]): (Vector[A], Vector[B]) =
+      a.unzip
+
+    override def zip[A, B](a: => Vector[A],b: => Vector[B]): Vector[(A, B)] = {
+      val _a = a
+      if(_a.isEmpty) empty
+      else _a zip b
+    }
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       v.foldLeft(F.point(empty[B])) { (fvb, a) =>
@@ -48,11 +73,9 @@ trait VectorInstances extends VectorInstances0 {
   // Vector concat was reduced to O(n) in Scala 2.11 - ideally it would be O(log n)
   // https://issues.scala-lang.org/browse/SI-4442
   implicit def vectorMonoid[A]: Monoid[Vector[A]] = vectorInstance.monoid[A]
- 
-  implicit def vectorShow[A: Show]: Show[Vector[A]] = new Show[Vector[A]] {
-    import Cord._
-    override def show(as: Vector[A]) =
-      Cord("[", mkCord(",", as.map(Show[A].show(_)):_*), "]")
+
+  implicit def vectorShow[A: Show]: Show[Vector[A]] = Show.show { as =>
+    list.listShow[A].show(as.toList)
   }
 
   implicit def vectorOrder[A](implicit A0: Order[A]): Order[Vector[A]] = new VectorOrder[A] {
@@ -143,8 +166,8 @@ trait VectorFunctions {
     if (as.isEmpty)
       Monad[M].point(empty)
     else {
-      val stateP = (i: A) => StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
-      Monad[M].bind(spanM[A, StateT[M, A, ?]](as.tail)(stateP).eval(as.head)) {
+      val stateP = (i: A) => StateT[A, M, Boolean](s => Monad[M].map(p(s, i))(i ->))
+      Monad[M].bind(spanM[A, StateT[A, M, ?]](as.tail)(stateP).eval(as.head)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))((g: Vector[Vector[A]]) => (as.head +: x) +: g)
       }

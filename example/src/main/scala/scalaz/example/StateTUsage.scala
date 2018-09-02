@@ -40,13 +40,10 @@ object FibStateExample extends App {
   * to maintain this invariant.
   */
 object LaunchburyInterpreter extends App {
-  import scala.collection.immutable.HashMap
-  import scalaz.std.function._
   import scalaz.std.list._
   import scalaz.std.string._
   import scalaz.syntax.monad._
   import scalaz.syntax.traverse._
-  import scalaz.syntax.arrow._
 
   val S = scalaz.StateT.stateMonad[ReduceState]
   import S._

@@ -5,7 +5,7 @@ import Ordering._
 import std.option._
 
 /**
- * @see [[http://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
+ * @see [[https://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-Set.html]]
  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Set/Base.hs]]
  */
 sealed abstract class ISet[A] {
@@ -164,24 +164,47 @@ sealed abstract class ISet[A] {
   final def insert(x: A)(implicit o: Order[A]): ISet[A] =
     this match {
       case Tip() => singleton(x)
-      case Bin(y, l, r) =>
+      case self @ Bin(y, l, r) =>
         o.order(x, y) match {
-          case LT => balanceL(y, l.insert(x), r)
-          case GT => balanceR(y, l, r.insert(x))
-          case EQ => Bin(x, l, r)
+          case LT =>
+            val left = l.insert(x)
+            if (left eq l) {
+              self
+            } else {
+              balanceL(y, left, r)
+            }
+          case GT =>
+            val right = r.insert(x)
+            if (right eq r) {
+              self
+            } else {
+              balanceR(y, l, right)
+            }
+          case EQ =>
+            self
         }
     }
 
   final def delete(x: A)(implicit o: Order[A]): ISet[A] =
     this match {
       case Tip() =>
-        Tip()
-      case Bin(y, l, r) =>
+        this
+      case self @ Bin(y, l, r) =>
         o.order(x, y) match {
           case LT =>
-            balanceR(y, l.delete(x), r)
+            val left = l.delete(x)
+            if (left eq l) {
+              self
+            } else {
+              balanceR(y, left, r)
+            }
           case GT =>
-            balanceL(y, l, r.delete(x))
+            val right = r.delete(x)
+            if (right eq r) {
+              self
+            } else {
+              balanceL(y, l, right)
+            }
           case EQ =>
             glue(l, r)
         }
@@ -282,7 +305,17 @@ sealed abstract class ISet[A] {
     this match {
       case Tip() => this
       case Bin(x, l, r) =>
-        if (p(x)) join(x, l.filter(p), r.filter(p)) else l.filter(p) merge r.filter(p)
+        if (p(x)) {
+          val left = l.filter(p)
+          val right = r.filter(p)
+          if ((left eq l) && (right eq r)) {
+            this
+          } else {
+            join(x, left, right)
+          }
+        } else {
+          l.filter(p) merge r.filter(p)
+        }
     }
 
   final def partition(p: A => Boolean): (ISet[A], ISet[A]) =
@@ -648,28 +681,13 @@ sealed abstract class ISetInstances {
       Order[IList[A]].order(x.toAscIList, y.toAscIList)
   }
 
-  implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
-    override def shows(f: ISet[A]) = {
-      if(f.isEmpty) {
-        "ISet()"
-      } else {
-        val buf = new java.lang.StringBuilder("ISet(")
-        val A = Show[A]
-        @tailrec
-        def go(list: List[A]): Unit = (list: @unchecked) match {
-          case x :: Nil =>
-            buf.append(A.shows(x))
-            buf.append(')')
-            ()
-          case x :: xs =>
-            buf.append(A.shows(x))
-            buf.append(',')
-            go(xs)
-        }
-        go(f.toAscList)
-        buf.toString
-      }
-    }
+  implicit def setShow[A](implicit A: Show[A]): Show[ISet[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = IList.instances.intercalate(
+      as.toIList.map(A.show),
+      Cord(",")
+    )
+    cord"ISet($content)"
   }
 
   implicit def setMonoid[A: Order]: Monoid[ISet[A]] with SemiLattice[ISet[A]] =
@@ -874,11 +892,12 @@ object ISet extends ISetInstances {
         }
     }
 
-  private[scalaz] abstract case class Tip[A] private() extends ISet[A] {
+  private[scalaz] sealed abstract case class Tip[A] private() extends ISet[A] {
     val size = 0
   }
-  private[scalaz] object Tip extends Tip[Nothing] {
-    def apply[A](): ISet[A] = this.asInstanceOf[ISet[A]]
+  private[scalaz] object Tip {
+    private[this] val value: Tip[Nothing] = new Tip[Nothing]{}
+    def apply[A](): ISet[A] = value.asInstanceOf[ISet[A]]
   }
 
   private[scalaz] final case class Bin[A](a: A, l: ISet[A], r: ISet[A]) extends ISet[A] {

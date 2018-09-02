@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.annotation._
-import Leibniz.{===, refl}
+import Leibniz.refl
 
 /**
  * Represents a type `MA` that has been destructured into as a type constructor `M[_]`
@@ -59,7 +59,7 @@ trait Unapply[TC[_[_]], MA] {
   /** The instance of the type class */
   def TC: TC[M]
 
-  /** Evidence that MA =:= M[A] */
+  /** Evidence that MA === M[A] */
   def leibniz: MA === M[A]
 
   /** Compatibility. */
@@ -162,7 +162,7 @@ trait Unapply2[TC[_[_, _]], MAB] {
   /** The instance of the type class */
   def TC: TC[M]
 
-  /** Evidence that MAB =:= M[A, B] */
+  /** Evidence that MAB === M[A, B] */
   def leibniz: MAB === M[A, B]
 
   /** Compatibility. */
@@ -185,6 +185,20 @@ object Unapply2 {
   } =
     new Unapply2[TC, M0[A0, B0]] {
       type M[X, Y] = M0[X, Y]
+      type A = A0
+      type B = B0
+      def TC = TC0
+      def leibniz = refl
+    }
+
+  /**Unpack a value of type `M0[A0, F0, B0]` into types `M0`, `A`, `F0`, and 'B', given an instance of `TC` */
+  implicit def unapplyMAFB[TC[_[_, _]], M0[_, _[_], _], A0, F0[_], B0](implicit TC0: TC[M0[?, F0, ?]]): Unapply2[TC, M0[A0, F0, B0]] {
+    type M[X, Y] = M0[X, F0, Y]
+    type A = A0
+    type B = B0
+  } =
+    new Unapply2[TC, M0[A0, F0, B0]] {
+      type M[X, Y] = M0[X, F0, Y]
       type A = A0
       type B = B0
       def TC = TC0

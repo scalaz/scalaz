@@ -107,7 +107,7 @@ object LazyEitherT extends LazyEitherTInstances {
   def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
                                               u1: Unapply[Functor, FAB]{type A = AB},
                                               @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-                                              l: Leibniz.===[AB, LazyEither[A0, B0]]
+                                              l: AB === LazyEither[A0, B0]
   ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
 
   import LazyEither._
@@ -202,12 +202,6 @@ sealed abstract class LazyEitherTInstances1 {
       override def F = F0
       override def E = L
     }
-
-  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
-    new LazyEitherTBindRec[F, L] {
-      implicit def F = F0
-      implicit def B = B0
-    }
 }
 
 sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
@@ -228,7 +222,7 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
     }
 
-  implicit def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
+  def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
     new LazyEitherTMonad[F, L] {
       implicit def F = F0
     }
@@ -250,6 +244,12 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
       implicit def G = lazyEitherTFoldable[F, L]
 
       def naturalTrans = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L].to
+    }
+
+  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
+    new LazyEitherTBindRec[F, L] {
+      implicit def F = F0
+      implicit def B = B0
     }
 }
 

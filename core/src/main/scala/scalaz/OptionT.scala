@@ -99,12 +99,12 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
     orElse(a)
 
   /** @since 7.0.3 */
-  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
+  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[E, F, A] = EitherT(F.map(run)(std.option.toRight(_)(e)))
 
   def toListT(implicit F: Functor[F]) : ListT[F, A] =  ListT[F,A](F.map(run)(IList.fromOption))
 
   /** @since 7.0.3 */
-  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
+  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[A, F, B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
 
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
@@ -160,6 +160,11 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
 
   implicit def optionTShow[F[_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     Contravariant[Show].contramap(F0)(_.run)
+
+  implicit def optionTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[OptionT[F, ?]] =
+    new OptionTDecidable[F] {
+      implicit def F: Divisible[F] = F0
+    }
 }
 
 object OptionT extends OptionTInstances {
@@ -188,6 +193,23 @@ object OptionT extends OptionTInstances {
 //
 // Implementation traits for type class instances
 //
+
+private trait OptionTDecidable[F[_]] extends Decidable[OptionT[F, ?]] {
+  implicit def F: Divisible[F]
+
+  override final def conquer[A]: OptionT[F, A] = OptionT(F.conquer)
+
+  override final def divide2[A1, A2, Z](a1: => OptionT[F, A1], a2: => OptionT[F, A2])(f: Z => (A1, A2)): OptionT[F, Z] =
+    OptionT(F.divide2(a1.run, a2.run)(z => Unzip[Option].unzip(z.map(f))))
+
+  override final def choose2[Z, A1, A2](a1: => OptionT[F, A1], a2: => OptionT[F, A2])(f: Z => A1 \/ A2): OptionT[F, Z] =
+    OptionT(
+      F.divide2(a1.run, a2.run)(_.map(f)
+        .fold[(Option[A1], Option[A2])]((Option.empty, Option.empty))(
+          _.fold(a1 => (Some(a1), Option.empty), a2 => (Option.empty, Some(a2)))
+      ))
+    )
+}
 
 private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
   implicit def F: Functor[F]
@@ -252,7 +274,7 @@ private trait OptionTHoist extends Hoist[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    λ[OptionT[M, ?] ~> OptionT[N, ?]](_ mapT f)
+    λ[OptionT[M, ?] ~> OptionT[N, ?]](_ mapT f.apply)
 
   implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G]
 }
