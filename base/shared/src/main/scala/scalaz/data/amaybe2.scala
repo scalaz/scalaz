@@ -53,7 +53,7 @@ object AMaybe2 {
   }
 
   implicit def amaybe2Debug[F[_, _], G[_, _], A, B](implicit FAB: Debug[F[A, B]],
-                                                          GAB: Debug[G[A, B]]): Debug[AMaybe2[F, G, A, B]] = {
+                                                    GAB: Debug[G[A, B]]): Debug[AMaybe2[F, G, A, B]] = {
     import Scalaz.debugInterpolator
     import scala.unchecked
     type FAB = F[A, B]
@@ -65,15 +65,16 @@ object AMaybe2 {
   }
 
   implicit def amaybe2Eq[F[_, _], G[_, _], A, B](implicit FAB: Eq[F[A, B]],
-                                                          GAB: Eq[G[A, B]]): Eq[AMaybe2[F, G, A, B]] = {
+                                                 GAB: Eq[G[A, B]]): Eq[AMaybe2[F, G, A, B]] = {
     import scala.unchecked
     type FAB = F[A, B]
     type GAB = G[A, B]
     instanceOf[EqClass[AMaybe2[F, G, A, B]]] {
       case (
-        AJust2(fab1: FAB @unchecked, gab1: GAB @unchecked),
-        AJust2(fab2: FAB @unchecked, gab2: GAB @unchecked)
-      ) => FAB.equal(fab1, fab2) && GAB.equal(gab1, gab2)
+          AJust2(fab1: FAB @unchecked, gab1: GAB @unchecked),
+          AJust2(fab2: FAB @unchecked, gab2: GAB @unchecked)
+          ) =>
+        FAB.equal(fab1, fab2) && GAB.equal(gab1, gab2)
       case (AEmpty2(), AEmpty2()) =>
         true
       case _ => false

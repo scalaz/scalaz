@@ -29,7 +29,10 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, combineAllUses: IList[T] => T, cont: (String, T) => U)(
+    @inline def suites[T, U](harness: Harness[T],
+                             combineUses: (T, T) => T,
+                             combineAllUses: IList[T] => T,
+                             cont: (String, T) => U)(
       ec: ExecutionContext
     ): List[Future[U]] =
       List(
@@ -104,10 +107,13 @@ object TestMain {
           (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
 
         @inline def combineAllUses(fst: IList[PureHarness.Uses[Unit]]): PureHarness.Uses[Unit] =
-          (r, ls) => TestOutput.combineAll1(Maybe.toOption(fst.head).get(r, ls), Maybe.toOption(fst.tail).get.map(_(r, ls)).toList: _*)
+          (r, ls) =>
+            TestOutput.combineAll1(Maybe.toOption(fst.head).get(r, ls),
+                                   Maybe.toOption(fst.tail).get.map(_(r, ls)).toList: _*)
 
         val mySuites =
-          suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, combineAllUses, runPure)(ec).map(r => () => r)
+          suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, combineAllUses, runPure)(ec)
+            .map(r => () => r)
 
         val result = Await.result(Runner(mySuites, ec), Duration.Inf)
 
