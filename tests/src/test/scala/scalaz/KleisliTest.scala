@@ -11,6 +11,7 @@ object KleisliTest extends SpecLite {
   type KleisliOptInt[B] = KleisliOpt[Int, B]
   type IntOr[A] = Int \/ A
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
+  type ConstInt[A] = Const[Int, A]
 
   implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
     def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
@@ -34,6 +35,7 @@ object KleisliTest extends SpecLite {
   checkAll(category.laws[KleisliOpt])
   checkAll(profunctor.laws[KleisliOpt])
   checkAll(monadTrans.laws[Kleisli[?[_], Int, ?], List])
+  checkAll(divisible.laws[Kleisli[ConstInt, Int, ?]])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -56,6 +58,8 @@ object KleisliTest extends SpecLite {
     def category[F[_]: Monad] = Category[Kleisli[F, ?, ?]]
     def arrow[F[_]: Monad] = Arrow[Kleisli[F, ?, ?]]
     def choice[F[_]: Monad] = Choice[Kleisli[F, ?, ?]]
+    def decidable[A, F[_] : Decidable] = Decidable[Kleisli[F, A, ?]]
+    def divisible[A, F[_] : Divisible] = Divisible[Kleisli[F, A, ?]]
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -90,6 +94,7 @@ object KleisliTest extends SpecLite {
     def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
     def compose[F[_]: Monad] = Compose[Kleisli[F, ?, ?]]
+    def divisible[A, F[_] : Decidable] = Divisible[Kleisli[F, A, ?]]
 
     object reader {
       // F = Id

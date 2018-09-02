@@ -177,6 +177,17 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
         Foldable[IList].foldMap(fa.list)(f)(M)
 
+      override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
+        val revOpt: Maybe[F[NonEmptyList[B]]] =
+          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list)(_ match {
+            case ICons(a, as) => Maybe.just((f(a), as))
+            case INil() => Maybe.empty
+          })(Reducer.ReverseNonEmptyListReducer[B])
+
+        val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
+        F.map(rev)(_.reverse)
+      }
+
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 

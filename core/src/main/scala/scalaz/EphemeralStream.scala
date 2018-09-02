@@ -203,13 +203,19 @@ sealed abstract class EphemeralStreamInstances {
     }
     override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
-    def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
-      val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
-      fa.foldRight(seed) {
-        (x , ys) => G.apply2(f(x), ys)((b, bs) => EphemeralStream.cons(b, bs))
-      }
+    def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      val revOpt: Maybe[F[List[B]]] =
+        F.unfoldrOpt[EphemeralStream[A], B, List[B]](fa)(_ match {
+          case a ##:: as => Maybe.just((f(a), as))
+          case emptyEphemeralStream => Maybe.empty
+        })(Reducer.ReverseListReducer[B])
+
+      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+      F.map(rev)((rev) => rev.foldLeft(EphemeralStream[B]())((r, c) => c ##:: r))
     }
+
     override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
       if(i < 0)
         None
@@ -241,6 +247,13 @@ sealed abstract class EphemeralStreamInstances {
   import std.list._
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+
+  implicit def ephemeralStreamSemigroup[A]: Semigroup[EphemeralStream[A]] = new Semigroup[EphemeralStream[A]] {
+    def append(f1: EphemeralStream[A], f2: => EphemeralStream[A]) = f1 ++ f2
+  }
+
+  implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
+    Contravariant[Show].contramap(IList.show[A])(_.toIList)
 }
 
 object EphemeralStream extends EphemeralStreamInstances {
@@ -285,9 +298,9 @@ object EphemeralStream extends EphemeralStreamInstances {
     case h #:: t  => cons(h, fromStream(t))
   }
 
-  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
-    def iterator = new Iterator[A] {
-      var cur = e
+  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new collection.AbstractIterable[A] {
+    def iterator = new collection.AbstractIterator[A] {
+      private[this] var cur = e
 
       def next() = {
         val t = cur.head()

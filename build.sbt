@@ -184,6 +184,8 @@ lazy val site = Project(
   micrositeFooterText := Some("""
                                 |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                 |""".stripMargin),
+  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.12/${(version in Compile).value}",
+  micrositeDocumentationLabelDescription := "Scaladoc",
   micrositeName := "Scalaz",
   micrositeDescription := "Scalaz",
   micrositeAuthor := "Scalaz contributors",
@@ -193,6 +195,7 @@ lazy val site = Project(
   micrositeGithubOwner := "scalaz",
   micrositeGithubRepo := "scalaz",
   micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
+  micrositeBaseUrl := "/7",
   micrositePalette := Map(
     "brand-primary"   -> "#ED2124",
     "brand-secondary" -> "#251605",

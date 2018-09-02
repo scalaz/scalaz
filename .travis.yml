@@ -51,3 +51,13 @@ matrix:
     - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
     - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
       then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreNative/publish effectNative/publish iterateeNative/publish ; fi
+  - scala: 2.13.0-M5
+    jdk: oraclejdk8
+    env: TEST_PROJECT="rootJVM"
+    before_script:
+    - git clone -b v0.9.7 https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - sbt "++ ${TRAVIS_SCALA_VERSION}!" publishLocal
+    - cd ..
+    script:
+    - sbt "++ ${TRAVIS_SCALA_VERSION}!" -J-Xmx3784m checkGenTypeClasses example/compile

@@ -107,7 +107,14 @@ final case class WriterT[W, F[_], A](run: F[(W, A)]) { self =>
 
 object WriterT extends WriterTInstances with WriterTFunctions
 
-sealed abstract class WriterTInstances15 {
+sealed abstract class WriterTInstances16 {
+  implicit def writerTDivisible[F[_], W, A](implicit F0: Divisible[F]): Divisible[WriterT[W, F, ?]] =
+    new WriterTDivisible[F, W] {
+      implicit def F: Divisible[F] = F0
+    }
+}
+
+sealed abstract class WriterTInstances15 extends WriterTInstances16 {
   implicit def writerTMonoid[W, F[_], A](implicit M: Monoid[F[(W,A)]]): Monoid[WriterT[W, F, A]] =
     new Monoid[WriterT[W, F, A]] {
       def zero = WriterT(M.zero)
@@ -117,6 +124,11 @@ sealed abstract class WriterTInstances15 {
   implicit def writerTPlus[W, F[_]](implicit F0: Plus[F]): Plus[WriterT[W, F, ?]] =
     new WriterTPlus[F, W] {
       def F = F0
+    }
+
+  implicit def writerTDecidable[F[_], W, A](implicit F0: Decidable[F]): Decidable[WriterT[W, F, ?]] =
+    new WriterTDecidable[F, W] {
+      implicit def F: Decidable[F] = F0
     }
 }
 
@@ -308,6 +320,32 @@ trait WriterTFunctions {
 // Type class implementation traits
 //
 import WriterT.writerT
+
+private trait WriterTDivisible[F[_], W] extends Divisible[WriterT[W, F, ?]] {
+  implicit def F: Divisible[F]
+
+  override def conquer[Z]: WriterT[W, F, Z] = WriterT(F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => WriterT[W, F, A1], a2: => WriterT[W, F, A2])(f: Z => (A1, A2)): WriterT[W, F, Z] =
+    WriterT(
+      F.divide2[(W, A1), (W, A2), (W, Z)](a1.run, a2.run) ( (z: (W, Z)) =>
+        (z._1, f(z._2)) match {
+          case (w, (l, r)) => ((w, l), (w, r))
+        }
+      )
+    )
+}
+
+private trait WriterTDecidable[F[_], W] extends Decidable[WriterT[W, F, ?]] with WriterTDivisible[F, W] {
+  implicit def F: Decidable[F]
+
+  override def choose2[Z, A1, A2](a1: => WriterT[W, F, A1], a2: => WriterT[W, F, A2])(f: Z => A1 \/ A2): WriterT[W, F, Z] =
+    WriterT(
+      F.choose2[(W, Z), (W, A1), (W, A2)](a1.run, a2.run)( (z: (W, Z)) =>
+        f(z._2).fold(l => -\/((z._1, l)), r => \/-((z._1, r)))
+      )
+    )
+}
 
 private trait WriterTPlus[F[_], W] extends Plus[WriterT[W, F, ?]] {
   def F: Plus[F]
