@@ -26,8 +26,7 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    @inline def suites[T, U](harness: Harness[T],
-                             cont: (String, T) => U)(
+    @inline def suites[T, U](harness: Harness[T], cont: (String, T) => U)(
       ec: ExecutionContext
     ): List[Future[U]] =
       List(
