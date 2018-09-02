@@ -43,8 +43,8 @@ class DoubleTests {
   def tests[T](harness: Harness[T]): T = {
     import harness._
 
-    section("laws")(
-      section("eq laws")(
+    namedSection("laws")(
+      namedSection("eq laws")(
         test("reflexivity") { () =>
           doubles.foldMap(
             EqLaws.reflexivity(_)(assert)

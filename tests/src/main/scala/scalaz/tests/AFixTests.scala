@@ -10,7 +10,7 @@ import testz._
 object AFixTests {
   def tests[T](harness: Harness[T]): T = {
     import harness._
-    section("optimizations")(
+    namedSection("optimizations")(
       test("unfix should be an identity") { () =>
         val empty = AFix.fix(AList.empty[AFix[AList, ?, ?], Int])
         assert(AFix.unfix(empty).asInstanceOf[AnyRef] eq empty.asInstanceOf[AnyRef])

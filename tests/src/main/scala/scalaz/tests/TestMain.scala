@@ -10,12 +10,9 @@ import scala.concurrent.ExecutionContext
 
 import java.lang.String
 
-import data._
-import Scalaz._
-
 import testz._
+import runner.TestOutput
 import extras.DocHarness
-import testz.runner.Runner
 
 object TestMain {
   def main(args: Array[String]): Unit = {
@@ -30,29 +27,25 @@ object TestMain {
     val ec       = ExecutionContext.fromExecutor(executor)
 
     @inline def suites[T, U](harness: Harness[T],
-                             combineUses: (T, T) => T,
-                             combineAllUses: IList[T] => T,
                              cont: (String, T) => U)(
       ec: ExecutionContext
     ): List[Future[U]] =
       List(
-        Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
+        Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness)))(ec),
         Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
-        Future(cont("AList1 Tests", AList1Tests.tests(harness, combineUses)))(ec),
-        Future(cont("AMaybe Tests", AMaybeTests.tests(harness, combineAllUses)))(ec),
-        Future(cont("AMaybe2 Tests", AMaybe2Tests.tests(harness, combineAllUses)))(ec),
+        Future(cont("AList1 Tests", AList1Tests.tests(harness)))(ec),
+        Future(cont("AMaybe Tests", AMaybeTests.tests(harness)))(ec),
+        Future(cont("AMaybe2 Tests", AMaybe2Tests.tests(harness)))(ec),
         Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
         Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
-        Future(cont("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
+        Future(cont("IList Tests", (new IListTests).tests(harness)))(ec),
         Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
 
     try {
       if (List(args: _*) == List("show")) {
         val harness =
-          PureHarness.toHarness(
-            new DocHarness
-          )
+          DocHarness.make
 
         @scala.annotation.tailrec
         def times(ch: Char, i: Int, acc: Array[Char]): String =
@@ -66,7 +59,7 @@ object TestMain {
 
         @inline def printSuite(name: String, desc: DocHarness.Uses[Unit]): List[String] = {
           val sb = new ListBuffer[String]
-          harness.section(name)(desc)("", sb)
+          harness.namedSection(name)(desc)("", sb)
           val outSb = new ListBuffer[String]
           outSb += "\n"
           outSb += times('=', name.length - 1, new Array[Char](name.length))
@@ -74,16 +67,9 @@ object TestMain {
           outSb.result()
         }
 
-        // both of these are transitional: remove after testz 0.0.5 comes out.
-        @inline def combineUses(fst: DocHarness.Uses[Unit], snd: DocHarness.Uses[Unit]): DocHarness.Uses[Unit] =
-          (s, sb) => { fst(s, sb); snd(s, sb); }
-
-        @inline def combineAllUses(fst: IList[DocHarness.Uses[Unit]]): DocHarness.Uses[Unit] =
-          (s, sb) => { val _ = fst.toList.foreach(_(s, sb)) }
-
         val result =
           Await.result(
-            Future.sequence(suites(harness, combineUses, combineAllUses, printSuite)(ec))(
+            Future.sequence(suites(harness, printSuite)(ec))(
               scala.collection.breakOut,
               ec
             ),
@@ -94,28 +80,19 @@ object TestMain {
 
         scala.Console.println()
       } else {
-        val harness = PureHarness.toHarness[PureHarness.Uses, Unit](
-          PureHarness.make(
-            (ls, tr) => Runner.printStrs(Runner.printTest(ls, tr), scala.Console.print)
+        val harness =
+          PureHarness.makeFromPrinter(
+            (ls, tr) => runner.printStrs(runner.printTest(ls, tr), scala.Console.print)
           )
-        )
 
         @inline def runPure(name: String, tests: PureHarness.Uses[Unit]): TestOutput =
           tests((), List(name))
 
-        @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
-          (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
-
-        @inline def combineAllUses(fst: IList[PureHarness.Uses[Unit]]): PureHarness.Uses[Unit] =
-          (r, ls) =>
-            TestOutput.combineAll1(Maybe.toOption(fst.head).get(r, ls),
-                                   Maybe.toOption(fst.tail).get.map(_(r, ls)).toList: _*)
-
         val mySuites =
-          suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, combineAllUses, runPure)(ec)
+          suites[PureHarness.Uses[Unit], TestOutput](harness, runPure)(ec)
             .map(r => () => r)
 
-        val result = Await.result(Runner(mySuites, ec), Duration.Inf)
+        val result = Await.result(runner(mySuites, scala.Console.print, ec), Duration.Inf)
 
         if (result.failed) throw new java.lang.Exception() {
           override def fillInStackTrace(): java.lang.Throwable = this

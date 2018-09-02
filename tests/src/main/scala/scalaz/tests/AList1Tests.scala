@@ -61,19 +61,19 @@ object AList1Tests {
 
   def const(s: String): AList1[Biconst[String, ?, ?], Int, Int] = lift(Biconst(s))
 
-  def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
+  def tests[T](harness: Harness[T]): T = {
     import harness._
 
-    sequence(
-      section("laws")(
-        section("lawful semicategory")(
+    section(
+      namedSection("laws")(
+        namedSection("lawful semicategory")(
           test("associativity") { () =>
             SemicategoryLaws.composeAssoc(lift(fst), lift(snd), lift(thd))(
               (a, b) => assertEqualNonEmptyMaps(a.sfoldBalanced, b.sfoldBalanced)
             )
           },
         ),
-        section("free semicategory")(
+        namedSection("free semicategory")(
           test("foldMap") { () =>
             HomomorphismLaws.semicategoryCompose(sfoldBalancedF)(
               lift(fst) <<< lift(snd),
@@ -92,7 +92,7 @@ object AList1Tests {
           },
         ),
       ),
-      section("tests")(
+      namedSection("tests")(
         // tests that order is correct.
         test("compose") { () =>
           assertEqual(

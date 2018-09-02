@@ -29,10 +29,10 @@ final class IListTests {
       (append(IList(1, 2, 3), IList.empty), IList(1, 2, 3)),
     ).foldMap(assertEqualTupled)
 
-  def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
+  def tests[T](harness: Harness[T]): T = {
     import harness._
-    sequence(
-      section("concrete")(
+    section(
+      namedSection("concrete")(
         test("append") { () =>
           testAppend(_.append(_))
         },
@@ -208,8 +208,8 @@ final class IListTests {
           ).foldMap(assertEqualTupled)
         },
       ),
-      section("laws")(
-        section("eq laws")(
+      namedSection("laws")(
+        namedSection("eq laws")(
           test("reflexivity") { () =>
             lists.foldMap(
               EqLaws.reflexivity(_)(assert)
@@ -224,7 +224,7 @@ final class IListTests {
             }
           }
         ),
-        section("monad laws")(
+        namedSection("monad laws")(
           test("functor identity") { () =>
             lists.foldMap(
               FunctorLaws.identityToIdentity(_)(assertEqual[IList[Int]])
@@ -261,7 +261,7 @@ final class IListTests {
             }
           }
         ),
-        section("traversable laws")(
+        namedSection("traversable laws")(
           test("traversable composition") { () =>
             val fst = (a: Int) => if (a % 20 == 0) scala.None else scala.Some(a % 20)
             val snd = (a: Int) => if (a % 5 == 0) scala.None else scala.Some(a  % 20)
@@ -276,7 +276,7 @@ final class IListTests {
             }
           }
         ),
-        section("monoid laws")(
+        namedSection("monoid laws")(
           test("mappend associativity") { () =>
             cross(cross(lists, lists), lists).foldMap {
               case ((l1, l2), l3) =>
