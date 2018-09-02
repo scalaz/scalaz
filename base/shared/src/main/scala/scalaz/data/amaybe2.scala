@@ -16,18 +16,14 @@ sealed abstract class AMaybe2[F[_, _], G[_, _], A, B] {
 }
 
 final case class AJust2[F[_, _], G[_, _], A, X, B](f: F[A, X], g: G[X, B]) extends AMaybe2[F, G, A, B] {
-  override def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z = {
-    val _ = empty
+  override def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z =
     just.apply(f, g)
-  }
   type Pivot = X
 }
 
 abstract case class AEmpty2[F[_, _], G[_, _], A, B]() extends AMaybe2[F, G, A, B] {
-  override final def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z = {
-    val _ = just
+  override final def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z =
     empty(leibniz)
-  }
   def subst[H[_]](ha: H[A]): H[B]
   def unsubst[H[_]](hb: H[B]): H[A]
   def leibniz: A === B = subst[A === ?](Is.refl)
