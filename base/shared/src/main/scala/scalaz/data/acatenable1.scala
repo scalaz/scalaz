@@ -67,7 +67,7 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
    * Allows you to view the internal structure of an ACatenable1.
    * Not stack-safe.
    */
-  final def fold[G[_, _]](f: Forall3.Prototype[λ[(X, Y, Z) => (G[X, Y], G[Y, Z]) => G[X, Z]]])(z: =>: ~~> G): G[A, B] =
+  final def fold[G[_, _]](f: Forall3[λ[(X, Y, Z) => (G[X, Y], G[Y, Z]) => G[X, Z]]])(z: =>: ~~> G): G[A, B] =
     this match {
       case Chain(a, b) => f.apply(a.fold[G](f)(z), b.fold[G](f)(z))
       case Lift(a)     => z.apply(a)

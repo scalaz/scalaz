@@ -19,7 +19,7 @@ import scalaz.Scalaz._
 
 # Usage
 
-TBD A sample with NonEmptyList (when they'll be availlable in scalaz 8), like:
+TBD A sample with NonEmptyList (when they're available in scalaz 8), like:
 
 ```scala
 Unfoldable[NonEmptyList].unfoldRight1[Int, Int](b => if (b == 0) (b, empty) else (b, just(b - 1)))(10)

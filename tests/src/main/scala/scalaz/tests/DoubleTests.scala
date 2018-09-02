@@ -3,13 +3,11 @@ package tests
 
 import Scalaz._
 
-import scala.{ Double, Long }
-import scala.Predef.double2Double
 import data.IList
 import laws.EqLaws
 import tests.z.resultMonoid
 import tests.z.assertEqual
-import testz.{ assert, Harness, Succeed }
+import testz.{ assert, Harness }
 
 class DoubleTests {
   final val doubleNaN           = java.lang.Double.longBitsToDouble(0x7ff8000000000000L)
@@ -30,15 +28,7 @@ class DoubleTests {
                             java.lang.Double.MAX_VALUE,
                             doubleMinusInfinity)
 
-  val observations = IList[Double => Long](
-    x => if (x > 0) 1 else 0,
-    x => if (x == 0) 1 else 0,
-    x => if (java.lang.Double.isNaN(x)) 1 else 0,
-    x => if (java.lang.Double.isInfinite(x) && x > 0) 1 else 0,
-    x => if (java.lang.Double.isInfinite(x) && x < 0) 1 else 0,
-    x => x.longValue(),
-    x => if ((1.0 / x) > 0) 1 else 0
-  )
+  val obs = java.lang.Double.doubleToRawLongBits _
 
   def tests[T](harness: Harness[T]): T = {
     import harness._
@@ -51,11 +41,9 @@ class DoubleTests {
           )
         },
         test("identity") { () =>
-          doubles.cross(doubles).cross(observations).foldMap {
-            case ((a, b), obs) =>
-              EqLaws.identity(a, b)(obs)(
-                (equal, leftObs, rightObs) => if (equal) assertEqual(leftObs, rightObs) else Succeed()
-              )
+          doubles.cross(doubles).foldMap {
+            case (a, b) =>
+              assertEqual(a === b, obs(a) === obs(b))
           }
         }
       )

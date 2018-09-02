@@ -5,12 +5,7 @@ title:  "Monoid"
 
 # Monoid [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/monoid.scala)
 
-*A monoid is a semigroup with a unique identity element.*
-
-A monoid instance must satisfy the following laws in addition to those defined by [Semigroup](./Semigroup.html):
-
-- Left identity: `append(empty, x) === x`
-- Right identity: `append(x, empty) === x`
+A monoid is a semigroup with identity.
 
 **Typical imports**
 ```tut:silent
@@ -39,4 +34,17 @@ val s2 = " World"
 
 val s = s1.mappend(s2)
 s.mappend(Monoid[String].mempty)
+```
+
+# Law
+
+A monoid instance must satisfy laws that make `mempty` into an identity for
+`mappend`, in addition to the [Semigroup](./Semigroup.html) law:
+
+```tut
+def leftIdentity[A, T](in: A)(assert: (A, A) => T)(implicit A: Monoid[A]): T =
+  assert(in, A.mappend(A.mempty, in))
+
+def rightIdentity[A, T](in: A)(assert: (A, A) => T)(implicit A: Monoid[A]): T =
+  assert(in, A.mappend(in, A.mempty))
 ```

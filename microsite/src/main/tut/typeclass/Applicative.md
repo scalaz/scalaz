@@ -7,6 +7,8 @@ title:  "Applicative"
 
 *Whereas a [functor](./Functor.html) allows application of a pure function to a value in a context, an Applicative also allows application of a function in a context to a value in a context.*
 
+`Applicative` is a subclass of `Apply`, which adds an identity, `pure`.
+
 **Typical imports**
 
 ```tut:silent
@@ -45,3 +47,26 @@ val fs: ZipList[Int => Int] = ZipList(List(_ * 2, _ * 3, _ * 4, _ * 5))
 
 l2.ap(fs)
 ```
+
+# Law
+
+The only law introduced by `Applicative` in addition to `Apply`'s laws is:
+
+```tut
+  def applyIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Applicative[F]) =
+    assert(in, F.ap(in)(F.pure((a: A) => a)))
+```
+
+That is to say, `pure(identity)` is an identity for `ap`.
+
+`pure` does not "modify" the `F[_]` context.
+
+Note that a free law (derived for "free" from the type of `pure`) states:
+
+```tut
+def freePureMap[F[_]: Applicative, A, B, T](a: A, f: A => B)(assert: (F[B], F[B]) => T): T =
+  assert(f(a).pure[F], a.pure[F].map(f))
+```
+
+As long as no casting or `isInstanceOf` is done by the implementor,
+this law is guaranteed and doesn't necessarily need to be tested.
