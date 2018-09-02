@@ -55,7 +55,7 @@ private[data] object BiconstImpl extends BiconstModule {
 
   private trait BiconstSemicategory[A] extends SemicategoryClass[Biconst[A, ?, ?]] {
     def A: SemigroupClass[A]
-    def compose[B, C, D](f: A, g: A): A = A.mappend(f, g)
+    def compose[B, C, D](f: A, g: A): A = A.mappend(g, f)
   }
 
   private trait BiconstPhantom[R, A]

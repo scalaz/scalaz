@@ -12,28 +12,22 @@ import tc.{ instanceOf, Semicategory, SemicategoryClass }
 sealed abstract class ACatenable1[=>:[_, _], A, B] {
   import ACatenable1._
 
-  def compose[Z](that: ACatenable1[=>:, Z, A]): ACatenable1[=>:, Z, B] =
+  def :::[Z](that: ACatenable1[=>:, Z, A]): ACatenable1[=>:, Z, B] =
     Chain(that, this)
 
-  def andThen[Z](that: ACatenable1[=>:, B, Z]): ACatenable1[=>:, A, Z] =
+  def :++[Z](that: ACatenable1[=>:, B, Z]): ACatenable1[=>:, A, Z] =
     Chain(this, that)
 
-  def <<<[Z](that: ACatenable1[=>:, Z, A]): ACatenable1[=>:, Z, B] =
-    this compose that
+  def +:[Z](f: Z =>: A): ACatenable1[=>:, Z, B] =
+    :::(Lift(f))
 
-  def >>>[C](that: ACatenable1[=>:, B, C]): ACatenable1[=>:, A, C] =
-    this andThen that
-
-  def :+[Z](f: Z =>: A): ACatenable1[=>:, Z, B] =
-    compose(Lift(f))
-
-  def +:[Z](f: B =>: Z): ACatenable1[=>:, A, Z] =
-    andThen(Lift(f))
+  def :+[Z](f: B =>: Z): ACatenable1[=>:, A, Z] =
+    :++(Lift(f))
 
   final def foldLeft[F[_]](fa: F[A])(φ: RightAction[F, =>:]): F[B] = {
     @tailrec def go[X](fx: F[X], tail: ACatenable1[=>:, X, B]): F[B] =
       tail match {
-        case Chain(Chain(f, g), h) => go(fx, f >>> (g >>> h))
+        case Chain(Chain(f, g), h) => go(fx, f :++ (g :++ h))
         case Chain(Lift(f), g)     => go(φ.apply(fx, f), g)
         case Lift(f)               => φ.apply(fx, f)
       }
@@ -44,7 +38,7 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
   def foldRight[F[_]](fb: F[B])(φ: LeftAction[F, =>:]): F[A] = {
     @tailrec def go[X](init: ACatenable1[=>:, A, X], fx: F[X]): F[A] =
       init match {
-        case Chain(f, Chain(g, h)) => go((f >>> g) >>> h, fx)
+        case Chain(f, Chain(g, h)) => go((f :++ g) :++ h, fx)
         case Chain(f, Lift(g))     => go(f, φ.apply(g, fx))
         case Lift(f)               => φ.apply(f, fx)
       }
@@ -54,14 +48,31 @@ sealed abstract class ACatenable1[=>:[_, _], A, B] {
 
   /**
    * Compose the leafs in a balanced binary fashion.
+   *
+   * Implementation is easiest to understand in terms of `AList1.foldBalanced`;
+   * first, we reassociate all left-nested trees to be right-nested. Second,
+   * we do exactly what `AList1.foldBalanced` does by folding from the left
+   * with `PostComposeBalancer`, because a right-nested `ACatenable1` *is*
+   * an `AList1`.
    */
   @tailrec
-  final def fold(implicit ev: Semicategory[=>:]): A =>: B = this match {
-    case Chain(Chain(f, g), h) => (f >>> (g >>> h)).fold
+  final def foldBalanced(implicit ev: Semicategory[=>:]): A =>: B = this match {
+    case Chain(Chain(f, g), h) => (f :++ (g :++ h)).foldBalanced
     case Chain(Lift(f), g) =>
       g.foldLeft[PostComposeBalancer[=>:, A, ?]](PostComposeBalancer(f))(PostComposeBalancer.rightAction).result
     case Lift(f) => f
   }
+
+  /**
+   * Allows you to view the internal structure of an ACatenable1.
+   * Not stack-safe.
+   */
+  final def fold[G[_, _]](f: Forall3[λ[(X, Y, Z) => (G[X, Y], G[Y, Z]) => G[X, Z]]])(z: =>: ~~> G): G[A, B] =
+    this match {
+      case Chain(a, b) => f.apply(a.fold[G](f)(z), b.fold[G](f)(z))
+      case Lift(a)     => z.apply(a)
+    }
+
 }
 
 object ACatenable1 {
@@ -78,6 +89,6 @@ object ACatenable1 {
   implicit def acatenable1FreeSemicategory[=>:[_, _]]: Semicategory[ACatenable1[=>:, ?, ?]] =
     instanceOf(new SemicategoryClass[ACatenable1[=>:, ?, ?]] {
       def compose[A, B, C](f: ACatenable1[=>:, B, C], g: ACatenable1[=>:, A, B]): ACatenable1[=>:, A, C] =
-        f.compose(g)
+        g ::: f
     })
 }
