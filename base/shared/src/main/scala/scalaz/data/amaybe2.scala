@@ -5,19 +5,29 @@ import scala.{ AnyVal, Nothing }
 
 import Predef._
 import prop._
-import tc.{ Debug, DebugClass }
+import tc.{ instanceOf, Debug, DebugClass, Eq, EqClass }
 
 /**
  * Isomorphic to `AMaybe[λ[(α, β) => APair[F[α, ?], G[?, β]]], A, B]`,
  * but avoids allocating an `APair` instance.
  */
-sealed abstract class AMaybe2[F[_, _], G[_, _], A, B]
+sealed abstract class AMaybe2[F[_, _], G[_, _], A, B] {
+  def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z
+}
 
-case class AJust2[F[_, _], G[_, _], A, X, B](f: F[A, X], g: G[X, B]) extends AMaybe2[F, G, A, B] {
+final case class AJust2[F[_, _], G[_, _], A, X, B](f: F[A, X], g: G[X, B]) extends AMaybe2[F, G, A, B] {
+  override def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z = {
+    val _ = empty
+    just.apply(f, g)
+  }
   type Pivot = X
 }
 
 abstract case class AEmpty2[F[_, _], G[_, _], A, B]() extends AMaybe2[F, G, A, B] {
+  override final def fold[Z](empty: (A === B) => Z)(just: Forall[λ[γ => (F[A, γ], G[γ, B]) => Z]]): Z = {
+    val _ = just
+    empty(leibniz)
+  }
   def subst[H[_]](ha: H[A]): H[B]
   def unsubst[H[_]](hb: H[B]): H[A]
   def leibniz: A === B = subst[A === ?](Is.refl)
@@ -42,7 +52,7 @@ object AMaybe2 {
     def unsubst[H[_]](hb: H[A]): H[A] = hb
   }
 
-  implicit final def amaybe2Debug[F[_, _], G[_, _], A, B](implicit FAB: Debug[F[A, B]],
+  implicit def amaybe2Debug[F[_, _], G[_, _], A, B](implicit FAB: Debug[F[A, B]],
                                                           GAB: Debug[G[A, B]]): Debug[AMaybe2[F, G, A, B]] = {
     import Scalaz.debugInterpolator
     import scala.unchecked
@@ -51,6 +61,22 @@ object AMaybe2 {
     DebugClass.instance[AMaybe2[F, G, A, B]] {
       case AJust2(fab: FAB @unchecked, gab: GAB @unchecked) => z"AJust2($fab, $gab)"
       case AEmpty2()                                        => Cord("AEmpty2")
+    }
+  }
+
+  implicit def amaybe2Eq[F[_, _], G[_, _], A, B](implicit FAB: Eq[F[A, B]],
+                                                          GAB: Eq[G[A, B]]): Eq[AMaybe2[F, G, A, B]] = {
+    import scala.unchecked
+    type FAB = F[A, B]
+    type GAB = G[A, B]
+    instanceOf[EqClass[AMaybe2[F, G, A, B]]] {
+      case (
+        AJust2(fab1: FAB @unchecked, gab1: GAB @unchecked),
+        AJust2(fab2: FAB @unchecked, gab2: GAB @unchecked)
+      ) => FAB.equal(fab1, fab2) && GAB.equal(gab1, gab2)
+      case (AEmpty2(), AEmpty2()) =>
+        true
+      case _ => false
     }
   }
 }

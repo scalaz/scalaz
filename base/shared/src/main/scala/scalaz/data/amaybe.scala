@@ -10,15 +10,20 @@ import tc.{ instanceOf, Debug, DebugClass, Eq, EqClass }
 /** Similar to `Option[F[A, B]]`, except that
  * the empty case witnesses type equality between `A` and `B`.
  */
-sealed abstract class AMaybe[F[_, _], A, B]
+sealed abstract class AMaybe[F[_, _], A, B] {
+  def fold[Z](empty: (A Is B) => Z)(just: F[A, B] => Z): Z
+}
 
-final case class AJust[F[_, _], A, B](value: F[A, B]) extends AMaybe[F, A, B]
+final case class AJust[F[_, _], A, B](value: F[A, B]) extends AMaybe[F, A, B] {
+  def fold[Z](empty: (A Is B) => Z)(just: F[A, B] => Z): Z = just(value)
+}
 
 /**
  * The empty case contains evidence of type equality
  * to overcome the limitations of pattern-matching on GADTs.
  */
 sealed abstract case class AEmpty[F[_, _], A, B]() extends AMaybe[F, A, B] {
+  def fold[Z](empty: (A Is B) => Z)(just: F[A, B] => Z): Z = empty(leibniz)
   def subst[G[_]](ga: G[A]): G[B]
   def unsubst[G[_]](gb: G[B]): G[A]
   def leibniz: A Is B = subst[A === ?](Is.refl)

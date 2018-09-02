@@ -1,4 +1,5 @@
-package scalaz.tests
+package scalaz
+package tests
 
 import java.util.concurrent.Executors
 import scala.{ inline, Array, Char, Int, List, Unit }
@@ -8,6 +9,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext
 
 import java.lang.String
+
+import data._
+import Scalaz._
 
 import testz._
 import extras.DocHarness
@@ -25,14 +29,15 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, cont: (String, T) => U)(
+    @inline def suites[T, U](harness: Harness[T], combineUses: (T, T) => T, combineAllUses: IList[T] => T, cont: (String, T) => U)(
       ec: ExecutionContext
     ): List[Future[U]] =
       List(
         Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness, combineUses)))(ec),
         Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
         Future(cont("AList1 Tests", AList1Tests.tests(harness, combineUses)))(ec),
-        Future(cont("AMaybe Tests", AMaybeTests.tests(harness, combineUses)))(ec),
+        Future(cont("AMaybe Tests", AMaybeTests.tests(harness, combineAllUses)))(ec),
+        Future(cont("AMaybe2 Tests", AMaybe2Tests.tests(harness, combineAllUses)))(ec),
         Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
         Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
         Future(cont("IList Tests", (new IListTests).tests(harness, combineUses)))(ec),
@@ -66,12 +71,16 @@ object TestMain {
           outSb.result()
         }
 
+        // both of these are transitional: remove after testz 0.0.5 comes out.
         @inline def combineUses(fst: DocHarness.Uses[Unit], snd: DocHarness.Uses[Unit]): DocHarness.Uses[Unit] =
           (s, sb) => { fst(s, sb); snd(s, sb); }
 
+        @inline def combineAllUses(fst: IList[DocHarness.Uses[Unit]]): DocHarness.Uses[Unit] =
+          (s, sb) => { val _ = fst.toList.foreach(_(s, sb)) }
+
         val result =
           Await.result(
-            Future.sequence(suites(harness, combineUses, printSuite)(ec))(
+            Future.sequence(suites(harness, combineUses, combineAllUses, printSuite)(ec))(
               scala.collection.breakOut,
               ec
             ),
@@ -94,7 +103,11 @@ object TestMain {
         @inline def combineUses(fst: PureHarness.Uses[Unit], snd: PureHarness.Uses[Unit]): PureHarness.Uses[Unit] =
           (r, ls) => TestOutput.combine(fst(r, ls), snd(r, ls))
 
-        val mySuites = suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, runPure)(ec).map(r => () => r)
+        @inline def combineAllUses(fst: IList[PureHarness.Uses[Unit]]): PureHarness.Uses[Unit] =
+          (r, ls) => TestOutput.combineAll1(Maybe.toOption(fst.head).get(r, ls), Maybe.toOption(fst.tail).get.map(_(r, ls)).toList: _*)
+
+        val mySuites =
+          suites[PureHarness.Uses[Unit], TestOutput](harness, combineUses, combineAllUses, runPure)(ec).map(r => () => r)
 
         val result = Await.result(Runner(mySuites, ec), Duration.Inf)
 
