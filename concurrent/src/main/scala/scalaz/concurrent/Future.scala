@@ -8,6 +8,7 @@ import scalaz.Tags.Parallel
 
 import scalaz._
 import scalaz.Free.Trampoline
+import scalaz.Isomorphism.<~>
 import scalaz.syntax.monad._
 
 import scala.concurrent.SyncVar
@@ -239,6 +240,18 @@ object Future {
   case class BindSuspend[A,B](thunk: () => Future[A], f: A => Future[B]) extends Future[B]
   case class BindAsync[A,B](onFinish: (A => Trampoline[Unit]) => Unit,
                             f: A => Future[B]) extends Future[B]
+
+  val FutureIsomorphism: Future <~> ContT[Trampoline, Unit, ?] = new scalaz.Isomorphism.IsoFunctorTemplate[Future, ContT[Trampoline, Unit, ?]] {
+    override def to[A](fa: Future[A]): ContT[Trampoline, Unit, A] = ContT[Trampoline, Unit, A] { continue =>
+      Trampoline.delay(fa.unsafePerformListen(continue))
+    }
+
+    override def from[A](ga: ContT[Trampoline, Unit, A]): Future[A] = {
+      Future.Async { continue =>
+        ga(continue).run
+      }
+    }
+  }
 
   // NB: considered implementing Traverse and Comonad, but these would have
   // to run the Future; leaving out for now
