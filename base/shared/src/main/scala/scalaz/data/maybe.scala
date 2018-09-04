@@ -33,14 +33,16 @@ sealed trait MaybeModule {
   def traversable: Traversable[Maybe]
   def debug[A: Debug]: Debug[Maybe[A]]
   def eq[A: Eq]: Eq[Maybe[A]]
+  def monoid[A: Semigroup]: Monoid[Maybe[A]]
 }
 
 object MaybeModule extends MaybeSyntax {
-  implicit def monadMaybe: Monad[Maybe]              = Maybe.monad
-  implicit def traversableMaybe: Traversable[Maybe]  = Maybe.traversable
-  implicit def isCovariantMaybe: IsCovariant[Maybe]  = Maybe.isCovariant
-  implicit def debugMaybe[A: Debug]: Debug[Maybe[A]] = Maybe.debug[A]
-  implicit def eqMaybe[A: Eq]: Eq[Maybe[A]]          = Maybe.eq[A]
+  implicit def monadMaybe: Monad[Maybe]                    = Maybe.monad
+  implicit def traversableMaybe: Traversable[Maybe]        = Maybe.traversable
+  implicit def isCovariantMaybe: IsCovariant[Maybe]        = Maybe.isCovariant
+  implicit def debugMaybe[A: Debug]: Debug[Maybe[A]]       = Maybe.debug[A]
+  implicit def eqMaybe[A: Eq]: Eq[Maybe[A]]                = Maybe.eq[A]
+  implicit def monoidMaybe[A: Semigroup]: Monoid[Maybe[A]] = Maybe.monoid[A]
 }
 
 private[scalaz] object MaybeImpl extends MaybeModule {
@@ -72,6 +74,16 @@ private[scalaz] object MaybeImpl extends MaybeModule {
     case (None, None)       => true
     case _                  => false
   }
+
+  def monoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] = instanceOf(new MonoidClass[Maybe[A]] {
+    def mempty = None
+    def mappend(ma1: Maybe[A], ma2: => Maybe[A]) = {
+      lazy val ma2l = ma2
+      ma1.fold(ma2)(a1 =>
+        ma2l.fold(ma1)(a2 => Some(A.mappend(a1, a2)))
+      )
+    }
+  })
 
   private val instance =
     new MonadClass[Maybe] with BindClass.DeriveFlatten[Maybe] with TraversableClass[Maybe]
@@ -127,6 +139,8 @@ trait MaybeFunctions {
 }
 
 trait MaybeSyntax {
+  implicit final class MaybeCata[A](ma: Maybe[A]) { def cata[B](f: A => B)(b: B): B = Maybe.toOption(ma).fold(b)(f) }
+
   implicit final class OptionAsMaybe[A](oa: Option[A]) { def asMaybe: Maybe[A] = Maybe.fromOption(oa) }
 
   implicit final class ToMaybeOps[A](a: A) {

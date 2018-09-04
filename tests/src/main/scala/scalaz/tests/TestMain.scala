@@ -26,19 +26,20 @@ object TestMain {
     val executor = Executors.newFixedThreadPool(if (isCI) 1 else 2)
     val ec       = ExecutionContext.fromExecutor(executor)
 
-    @inline def suites[T, U](harness: Harness[T], cont: (String, T) => U)(
+    @inline def suites[T, U](harness: Harness[T], run: (String, T) => U)(
       ec: ExecutionContext
     ): List[Future[U]] =
       List(
-        Future(cont("ACatenable1 Tests", ACatenable1Tests.tests(harness)))(ec),
-        Future(cont("AFix Tests", AFixTests.tests(harness)))(ec),
-        Future(cont("AList1 Tests", AList1Tests.tests(harness)))(ec),
-        Future(cont("AMaybe Tests", AMaybeTests.tests(harness)))(ec),
-        Future(cont("AMaybe2 Tests", AMaybe2Tests.tests(harness)))(ec),
-        Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
-        Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
-        Future(cont("IList Tests", (new IListTests).tests(harness)))(ec),
-        Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
+        Future(run("ACatenable1 Tests", ACatenable1Tests.tests(harness)))(ec),
+        Future(run("AFix Tests", AFixTests.tests(harness)))(ec),
+        Future(run("AList1 Tests", AList1Tests.tests(harness)))(ec),
+        Future(run("AMaybe Tests", AMaybeTests.tests(harness)))(ec),
+        Future(run("AMaybe2 Tests", AMaybe2Tests.tests(harness)))(ec),
+        Future(run("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
+        Future(run("Double Tests", DoubleTests.tests(harness)))(ec),
+        Future(run("IList Tests", IListTests.tests(harness)))(ec),
+        Future(run("Maybe Tests", MaybeTests.tests(harness)))(ec),
+        Future(run("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
 
     try {
@@ -88,7 +89,7 @@ object TestMain {
           tests((), List(name))
 
         val mySuites =
-          suites[PureHarness.Uses[Unit], TestOutput](harness, runPure)(ec)
+          suites(harness, runPure)(ec)
             .map(r => () => r)
 
         val result = Await.result(runner(mySuites, scala.Console.print, ec), Duration.Inf)
