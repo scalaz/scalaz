@@ -241,12 +241,12 @@ object Future {
   case class BindAsync[A,B](onFinish: (A => Trampoline[Unit]) => Unit,
                             f: A => Future[B]) extends Future[B]
 
-  val FutureIsomorphism: Future <~> ContT[Trampoline, Unit, ?] = new scalaz.Isomorphism.IsoFunctorTemplate[Future, ContT[Trampoline, Unit, ?]] {
-    override def to[A](fa: Future[A]): ContT[Trampoline, Unit, A] = ContT[Trampoline, Unit, A] { continue =>
+  val FutureIsomorphism: Future <~> ContT[Unit, Trampoline, ?] = new scalaz.Isomorphism.IsoFunctorTemplate[Future, ContT[Unit, Trampoline, ?]] {
+    override def to[A](fa: Future[A]): ContT[Unit, Trampoline, A] = ContT[Trampoline, Unit, A] { continue =>
       Trampoline.delay(fa.unsafePerformListen(continue))
     }
 
-    override def from[A](ga: ContT[Trampoline, Unit, A]): Future[A] = {
+    override def from[A](ga: ContT[Unit, Trampoline, A]): Future[A] = {
       Future.Async { continue =>
         ga(continue).run
       }
