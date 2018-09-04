@@ -138,4 +138,6 @@ package object data {
   val Maybe2: Maybe2Module = Maybe2Impl
   type Maybe2[A, B] = Maybe2.Maybe2[A, B]
 
+  val FixFree: FixFreeModule = FixFreeImpl
+  type FixFree[F[_], A] = FixFree.FixFree[F, A]
 }
