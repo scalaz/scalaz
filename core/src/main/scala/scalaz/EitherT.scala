@@ -342,11 +342,26 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
     new EitherTBifoldable[F] {
       implicit def F = F0
     }
-  implicit def eitherTMonadPlus[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, ?]] =
-    new EitherTMonadPlus[F, L] {
+
+  implicit def eitherTMonadPlusAlt[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, ?]] with Alt[EitherT[L, F, ?]] =
+    new EitherTMonadPlus[F, L] with Alt[EitherT[L, F, ?]] {
       implicit def F = F0
       implicit def G = L0
+
+      def alt[A](a1: => EitherT[L, F, A], a2: => EitherT[L, F, A]): EitherT[L, F, A] =
+        EitherT(
+          F.bind(a1.run)(_ match {
+            case -\/(l) =>
+              F.map(a2.run)(
+                _.leftMap(G.append(l, _))
+              )
+
+            case r: \/-[L, A] =>
+              F.point(r)
+          })
+        )
     }
+
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[EitherT[L, F, ?]] =
     new EitherTFoldable[F, L] {
       implicit def F = F0

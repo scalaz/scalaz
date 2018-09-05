@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
 
     override def point[A](a: => A): Stream[A] =
       Stream(a)
@@ -85,6 +85,8 @@ trait StreamInstances {
       zipWithL(fb, fa)((b, a) => f(a, b))
 
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
+
+    def alt[A](a: => Stream[A], b: => Stream[A]) = plus(a, b)
 
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
       (a, b) =>

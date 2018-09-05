@@ -18,6 +18,8 @@ object OneAndTest extends SpecLite {
   checkAll("OneAnd List", monad.laws[OneAndList])
   checkAll("OneAnd Option", monad.laws[OneAndOption])
   checkAll("OneAnd Nel", plus.laws[OneAndNel])
+  checkAll("OneAnd List", alt.laws[OneAndList])
+  checkAll("OneAnd Option", alt.laws[OneAndOption])
   checkAll("OneAnd List", traverse1.laws[OneAndList])
   checkAll("OneAnd Nel", traverse1.laws[OneAndNel])
   checkAll("OneAnd List", zip.laws[OneAndList])
@@ -105,6 +107,7 @@ object OneAndTest extends SpecLite {
     def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, ?]]
     def align[F[_]: Align] = Align[OneAnd[F, ?]]
     def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, ?]]
+    def alt[F[_]: Alt: PlusEmpty] = Alt[OneAnd[F, ?]]
     def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, ?]]
     def monad[F[_]: MonadPlus] = Monad[OneAnd[F, ?]]
     def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, ?]]

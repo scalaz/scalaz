@@ -29,6 +29,7 @@ object KleisliTest extends SpecLite {
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(alt.laws[KleisliOptInt])
   checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
@@ -48,6 +49,7 @@ object KleisliTest extends SpecLite {
     def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, ?]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, A, ?], A]
     def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
+    def alt[F[_] : Alt : Applicative, A] = Alt[Kleisli[F, A, ?]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Functor] = Strong[Kleisli[F, ?, ?]]

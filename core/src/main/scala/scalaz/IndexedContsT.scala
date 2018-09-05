@@ -142,10 +142,13 @@ abstract class IndexedContsTInstances extends IndexedContsTInstances0 {
       implicit val M: Functor[M] = M0
     }
 
-  implicit def ContsTMonadPlus[W[_], R, M[_]](implicit W0: Comonad[W], M0: PlusEmpty[M]): MonadPlus[ContsT[W, R, M, ?]] =
-    new ContsTMonadPlus[W, M, R] {
+  implicit def ContsTMonadPlusAlt[W[_], R, M[_]](implicit W0: Comonad[W], M0: PlusEmpty[M]): MonadPlus[ContsT[W, R, M, ?]] with Alt[ContsT[W, R, M, ?]] =
+    new ContsTMonadPlus[W, M, R] with Alt[ContsT[W, R, M, ?]] {
       implicit val W: Comonad[W] = W0
       implicit val M: PlusEmpty[M] = M0
+
+      override def alt[A](a: => ContsT[W, R, M, A], b: => ContsT[W, R, M, A]): ContsT[W, R, M, A] =
+        plus(a, b)
     }
 }
 

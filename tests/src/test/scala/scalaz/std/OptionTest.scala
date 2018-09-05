@@ -21,6 +21,7 @@ object OptionTest extends SpecLite {
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", zip.laws[Option])
+  checkAll("Option", alt.laws[Option])
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
@@ -60,6 +61,7 @@ object OptionTest extends SpecLite {
     def semiLattice[A: SemiLattice] = SemiLattice[Option[A]]
     def bindRec[A] = BindRec[Option]
     def monad[A] = Monad[Option]
+    def alt[A] = Alt[Option]
 
     def monoidFirst[A] = Monoid[Option[A] @@ First]
     def monoidLast[A] = Monoid[Option[A] @@ Last]

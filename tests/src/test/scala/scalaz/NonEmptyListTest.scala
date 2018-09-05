@@ -9,6 +9,7 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
   checkAll("NonEmptyList", bindRec.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
+  checkAll("NonEmptyList", alt.laws[NonEmptyList])
   checkAll("NonEmptyList", semigroup.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", order.laws[NonEmptyList[Int]])
@@ -115,4 +116,7 @@ object NonEmptyListTest extends SpecLite {
     called must_=== 1
   }
 
+  object instances {
+    def alt: Alt[NonEmptyList] = Alt[NonEmptyList]
+  }
 }

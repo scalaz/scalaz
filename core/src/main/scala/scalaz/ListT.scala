@@ -100,9 +100,12 @@ sealed abstract class ListTInstances1 extends ListTInstances2 {
 }
 
 sealed abstract class ListTInstances extends ListTInstances1 {
-  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, ?]] =
-    new ListTMonadPlus[F] {
+  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, ?]] with Alt[ListT[F, ?]] =
+    new ListTMonadPlus[F] with Alt[ListT[F, ?]] {
       implicit def F: Monad[F] = F0
+
+    def alt[A](a: => ListT[F, A], b: => ListT[F, A]): ListT[F, A] =
+      plus(a, b)
     }
 
   implicit def listTEqual[F[_], A](implicit E: Equal[F[IList[A]]]): Equal[ListT[F, A]] =

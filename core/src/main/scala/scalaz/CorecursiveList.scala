@@ -124,10 +124,10 @@ object CorecursiveList extends CorecursiveListInstances {
     }
 
   implicit val covariantInstance:
-      MonadPlus[CorecursiveList] with Foldable[CorecursiveList]
+      MonadPlus[CorecursiveList] with Alt[CorecursiveList] with Foldable[CorecursiveList]
       with IsEmpty[CorecursiveList] with Align[CorecursiveList]
       with Zip[CorecursiveList] =
-    new MonadPlus[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
+    new MonadPlus[CorecursiveList] with Alt[CorecursiveList] with Foldable.FromFoldr[CorecursiveList]
         with IsEmpty[CorecursiveList] with Align[CorecursiveList]
         with Zip[CorecursiveList] {
       override def map[A, B](fa: CorecursiveList[A])(f: A => B) =
@@ -198,7 +198,7 @@ object CorecursiveList extends CorecursiveListInstances {
       override def plus[A](la: CorecursiveList[A], ra0: => CorecursiveList[A]) = {
         val ra = Need(ra0)
         type SS = la.S \/ ra.value.S
-        def rightStep(rs: ra.value.S) =
+        def rightStep(rs: ra.value.S): Maybe[(SS, A)] =
           ra.value.step(rs) map {case (rs, a) => (\/-(rs): SS, a)}
         CorecursiveList(-\/(la.init): SS){
           case -\/(ls) =>
@@ -208,6 +208,9 @@ object CorecursiveList extends CorecursiveListInstances {
             rightStep(rs)
         }
       }
+
+      override def alt[A](la: => CorecursiveList[A], ra: => CorecursiveList[A]): CorecursiveList[A] =
+        plus(la, ra)
 
       override def isEmpty[A](fa: CorecursiveList[A]) =
         fa.step(fa.init).isEmpty

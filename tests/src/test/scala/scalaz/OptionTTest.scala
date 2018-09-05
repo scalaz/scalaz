@@ -17,6 +17,7 @@ object OptionTTest extends SpecLite {
   checkAll(equal.laws[OptionTList[Int]])
   checkAll(bindRec.laws[OptionTList])
   checkAll(monadPlus.laws[OptionTList])
+  checkAll(alt.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
   checkAll(monadError.laws[OptionTEither, Int])
   checkAll(decidable.laws[OptionT[ConstInt, ?]])
@@ -43,6 +44,7 @@ object OptionTTest extends SpecLite {
     def functor[F[_] : Functor] = Functor[OptionT[F, ?]]
     def bindRec[F[_] : Monad: BindRec] = BindRec[OptionT[F, ?]]
     def monad[F[_] : Monad] = MonadPlus[OptionT[F, ?]]
+    def alt[F[_] : Monad] = Alt[OptionT[F, ?]]
     def monadError[F[_], E](implicit F: MonadError[F, E]) = MonadError[OptionT[F, ?], E]
     def foldable[F[_] : Foldable] = Foldable[OptionT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[OptionT[F, ?]]

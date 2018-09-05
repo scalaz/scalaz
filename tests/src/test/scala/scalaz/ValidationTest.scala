@@ -14,6 +14,7 @@ object ValidationTest extends SpecLite {
   checkAll("Validation", semigroup.laws[ValidationInt[Int]])
   checkAll("Validation", monoid.laws[ValidationInt[Int]])
   checkAll("Validation", plus.laws[ValidationInt])
+  checkAll("Validation", alt.laws[ValidationInt])
   checkAll("Validation", applicative.laws[ValidationInt])
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
@@ -112,6 +113,7 @@ object ValidationTest extends SpecLite {
     def applicative[E: Semigroup] = Applicative[Validation[E, ?]]
     def traverse[E: Semigroup] = Traverse[Validation[E, ?]]
     def plus[E: Semigroup] = Plus[Validation[E, ?]]
+    def alt[E: Semigroup] = Alt[Validation[E, ?]]
     def bitraverse = Bitraverse[Validation]
 
     // checking absence of ambiguity

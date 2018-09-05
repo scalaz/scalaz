@@ -14,6 +14,7 @@ object LazyEitherTest extends SpecLite {
 
   checkAll(equal.laws[LazyEither[Int,Int]])
   checkAll(monad.laws[LazyEither[Int, ?]])
+  checkAll(alt.laws[LazyEither[Int, ?]])
   checkAll(monadError.laws[LazyEither[Int, ?], Int])
   checkAll(bindRec.laws[LazyEither[Int, ?]])
   checkAll(traverse.laws[LazyEither[Int, ?]])

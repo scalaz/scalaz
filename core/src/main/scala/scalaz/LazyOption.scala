@@ -108,8 +108,8 @@ private final case class LazyNone[A] private() extends LazyOption[A]
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
-    new Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
+  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
+    new Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
       def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
       override def cojoin[A](a: LazyOption[A]) = a match {
         case LazyNone() => lazyNone
@@ -119,6 +119,7 @@ sealed abstract class LazyOptionInstances {
       override def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
       override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f
       def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = a orElse b
+      def alt[A](a: => LazyOption[A], b: => LazyOption[A]): LazyOption[A] = plus(a, b)
       def bind[A, B](fa: LazyOption[A])(f: A => LazyOption[B]): LazyOption[B] = fa flatMap (a => f(a))
       def point[A](a: => A): LazyOption[A] = lazySome(a)
       def empty[A]: LazyOption[A] = lazyNone
