@@ -75,15 +75,14 @@ private[scalaz] object MaybeImpl extends MaybeModule {
     case _                  => false
   }
 
-  def monoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] = instanceOf(new MonoidClass[Maybe[A]] {
-    def mempty = None
-    def mappend(ma1: Maybe[A], ma2: => Maybe[A]) = {
-      lazy val ma2l = ma2
-      ma1.fold(ma2)(a1 =>
-        ma2l.fold(ma1)(a2 => Some(A.mappend(a1, a2)))
-      )
-    }
-  })
+  def monoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] =
+    instanceOf(new MonoidClass[Maybe[A]] {
+      def mempty = None
+      def mappend(ma1: Maybe[A], ma2: => Maybe[A]) = {
+        lazy val ma2l = ma2
+        ma1.fold(ma2)(a1 => ma2l.fold(ma1)(a2 => Some(A.mappend(a1, a2))))
+      }
+    })
 
   private val instance =
     new MonadClass[Maybe] with BindClass.DeriveFlatten[Maybe] with TraversableClass[Maybe]

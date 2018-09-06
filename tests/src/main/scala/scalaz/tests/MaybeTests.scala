@@ -25,15 +25,16 @@ object MaybeTests {
     section(
       namedSection("concrete")(
         namedSection("empty")(
-          test("is cached")(() =>
-            assert(Maybe.empty.asInstanceOf[scala.AnyRef] eq Maybe.empty.asInstanceOf[scala.AnyRef])),
-          test("is `None`")(() =>
-            assert(Maybe.empty.asInstanceOf[scala.AnyRef] eq scala.None)),
+          test("is cached")(
+            () => assert(Maybe.empty.asInstanceOf[scala.AnyRef] eq Maybe.empty.asInstanceOf[scala.AnyRef])
+          ),
+          test("is `None`")(() => assert(Maybe.empty.asInstanceOf[scala.AnyRef] eq scala.None)),
         ),
         test("just is Some")(() => assert(Maybe.just(1) == scala.Some(1))),
-        test("toOption is identity")(() =>
-          maybes.foldMap {
-            m => assert(m.asInstanceOf[scala.AnyRef] eq Maybe.toOption(m))
+        test("toOption is identity")(
+          () =>
+            maybes.foldMap { m =>
+              assert(m.asInstanceOf[scala.AnyRef] eq Maybe.toOption(m))
           }
         ),
       ),
@@ -95,7 +96,9 @@ object MaybeTests {
               else -\/("unrecognized")
             val fun2 = (i: Int) => if (i < 4) IList(1, 2, 3) else IList(4, 5, 6)
             maybes.foldMap {
-              TraversableLaws.traverseComposition[Maybe, String \/ ?, IList, String, Int, Int, Result](_)(fun1, fun2)(assertEqual(_, _))
+              TraversableLaws.traverseComposition[Maybe, String \/ ?, IList, String, Int, Int, Result](_)(fun1, fun2)(
+                assertEqual(_, _)
+              )
             }
           },
           test("traversable identity") { () =>
