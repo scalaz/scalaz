@@ -47,7 +47,7 @@ object ACatenable1Tests {
     import harness._
 
     section(
-      namedSection("laws")(
+      namedSection("instances")(
         namedSection("lawful semicategory")(
           test("associativity") { () =>
             SemicategoryLaws.composeAssoc(lift(fst), lift(snd), lift(thd))(

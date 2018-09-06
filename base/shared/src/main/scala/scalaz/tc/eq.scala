@@ -102,5 +102,8 @@ object Eq {
   def always[A]: Eq[A]                   = instanceOf[EqClass[A]]((_, _) => true)
   def never[A]: Eq[A]                    = instanceOf[EqClass[A]]((_, _) => false)
   def fromEquals[A]: Eq[A]               = instanceOf[EqClass[A]](_ == _)
+  def byReference[A]: Eq[A]              = instanceOf[EqClass[A]](
+    (a1, a2) => a1.asInstanceOf[scala.AnyRef] eq a2.asInstanceOf[scala.AnyRef]
+  )
   def apply[A](implicit P: Eq[A]): Eq[A] = P
 }

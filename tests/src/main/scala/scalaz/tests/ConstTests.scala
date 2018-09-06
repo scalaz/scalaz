@@ -24,7 +24,7 @@ final class ConstTests {
   def tests[T](harness: Harness[T]): T = {
     import harness._
     section(
-      namedSection("concrete")(
+      namedSection("functions")(
         test("run . apply") { () =>
           val testValue: Int = 1234
           assertEqual(Const.run(Const[Int, List[Int]](testValue)), testValue)
@@ -35,8 +35,8 @@ final class ConstTests {
           assertEqual(Const[Int, List[Int]](Const.run(testValue)), testValue)
         }
       ),
-      namedSection("laws")(
-        namedSection("eq laws")(
+      namedSection("instances")(
+        namedSection("eq")(
           test("reflexivity") { () =>
             consts.foldMap(
               EqLaws.reflexivity(_)(assert)
@@ -49,7 +49,7 @@ final class ConstTests {
             }
           }
         ),
-        namedSection("applicative laws")(
+        namedSection("applicative")(
           test("apply associativity") { () =>
             consts.foldMap(
               ApplyLaws.applyAssoc(_)(
@@ -64,7 +64,7 @@ final class ConstTests {
             }
           }
         ),
-        namedSection("traversable laws")(
+        namedSection("traversable")(
           test("traversable composition") { () =>
             val fst = (a: List[Double]) => a.headOption
             val snd = (a: Double) => if (a > 0.0) scala.Some(a) else scala.None
@@ -79,7 +79,7 @@ final class ConstTests {
             }
           }
         ),
-        namedSection("monoid laws")(
+        namedSection("monoid")(
           test("mappend associativity") { () =>
             cross(cross(consts, consts), consts).foldMap {
               case ((l1, l2), l3) =>
