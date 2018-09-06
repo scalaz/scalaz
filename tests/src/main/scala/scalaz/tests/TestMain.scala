@@ -35,6 +35,7 @@ object TestMain {
         Future(run("AList1 Tests", AList1Tests.tests(harness)))(ec),
         Future(run("AMaybe Tests", AMaybeTests.tests(harness)))(ec),
         Future(run("AMaybe2 Tests", AMaybe2Tests.tests(harness)))(ec),
+        Future(run("Const Tests", ConstTests.tests(harness)))(ec),
         Future(run("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
         Future(run("Double Tests", DoubleTests.tests(harness)))(ec),
         Future(run("IList Tests", IListTests.tests(harness)))(ec),
