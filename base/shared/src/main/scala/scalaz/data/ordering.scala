@@ -11,6 +11,6 @@ final case object GT           extends Ordering
 final case object EQ           extends Ordering
 
 object Ordering {
-  implicit val orderingEq: Eq[Ordering] = Eq.byReference[Ordering]
+  implicit val orderingEq: Eq[Ordering]       = Eq.byReference[Ordering]
   implicit val orderingDebug: Debug[Ordering] = Debug.fromToString[Ordering]
 }

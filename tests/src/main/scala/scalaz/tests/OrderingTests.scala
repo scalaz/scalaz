@@ -14,7 +14,9 @@ object OrderingTests {
     import harness._
 
     val allValues = IList(
-      EQ, LT, GT
+      EQ,
+      LT,
+      GT
     )
 
     namedSection("instances")(
