@@ -261,6 +261,10 @@ object build {
     pomIncludeRepository := {
       x => false
     },
+    scmInfo := Some(ScmInfo(
+      browseUrl = url("https://github.com/scalaz/scalaz"),
+      connection = "scm:git:git@github.com:scalaz/scalaz.git"
+    )),
     pomExtra := (
       <url>http://scalaz.org</url>
         <licenses>
@@ -270,10 +274,6 @@ object build {
             <distribution>repo</distribution>
           </license>
         </licenses>
-        <scm>
-          <url>git@github.com:scalaz/scalaz.git</url>
-          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
-        </scm>
         <developers>
           {
           Seq(
