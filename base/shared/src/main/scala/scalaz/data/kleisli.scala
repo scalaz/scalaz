@@ -18,7 +18,11 @@ sealed trait KleisliModule {
 
   def second[F[_], A, B, C](k: Kleisli[F, A, B])(implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)]
 
+  def dimap[F[_], A, B, C, D](k: Kleisli[F, A, B])(ca: C => A)(bd: B => D)(implicit F: Functor[F]): Kleisli[F, C, D]
+
   def compose[F[_], A, B, C](j: Kleisli[F, B, C], k: Kleisli[F, A, B])(implicit B: Bind[F]): Kleisli[F, A, C]
+
+  def lift[F[_], A, B](fb: F[B]): Kleisli[F, A, B]
 
 }
 
@@ -77,18 +81,30 @@ private[data] object KleisliImpl extends KleisliModule {
   override def first[F[_], A, B, C](
     k: Kleisli[F, A, B]
   )(implicit F: Functor[F]): Kleisli[F, (A, C), (B, C)] =
-    wrapKleisli(t => F.map(runKleisli(k)(t._1))((_, t._2)))
+    t => F.map(k(t._1))((_, t._2))
 
   override def second[F[_], A, B, C](
     k: Kleisli[F, A, B]
   )(implicit F: Functor[F]): Kleisli[F, (C, A), (C, B)] =
-    wrapKleisli(t => F.map(runKleisli(k)(t._2))((t._1, _)))
+    t => F.map(k(t._2))((t._1, _))
+
+  override def dimap[F[_], A, B, C, D](
+    k: Kleisli[F, A, B]
+  )(
+    ca: C => A
+  )(
+    bd: B => D
+  )(implicit F: Functor[F]): Kleisli[F, C, D] =
+    c => F.map(k(ca(c)))(bd)
 
   override def compose[F[_], A, B, C](
     j: Kleisli[F, B, C],
     k: Kleisli[F, A, B]
   )(implicit B: Bind[F]): Kleisli[F, A, C] =
     a => B.flatMap(k(a))(j)
+
+  override def lift[F[_], A, B](fb: F[B]): Kleisli[F, A, B] =
+    _ => fb
 }
 
 trait KleisliFunctions {
