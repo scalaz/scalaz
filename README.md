@@ -225,7 +225,7 @@ oi.join
 
 For some degree of backwards compatibility with Scalaz 6, the über-import of `import scalaz.Scalaz._`
 will import *all* implicit conversions that provide syntax (as well as type class instances and other
-functions). However, we recommend to review usage of this and replace with more focussed imports.
+functions). However, we recommend to review usage of this and replace with more focused imports.
 
 ### Standalone Type Class Usage
 
