@@ -4,6 +4,8 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazArbitrary.ilistArbitrary
 import scalaz.std.int._
+import scalaz.std.string._
+
 
 object ApplicativeTest extends SpecLite {
 
@@ -38,13 +40,15 @@ object ApplicativeTest extends SpecLite {
   }
 
   "+++" in {
-    val o = List(
-      Option(5) +++ Option(3),
-      None +++ Option(3),
-      Option(5) +++ None,
-      Option.empty[Int] +++ Option.empty[Int]
-    )
-    println(o)
+    Option(5) +++ Option(3)                   must_=== Option(8)
+    None +++ Option(3)                        must_=== Option.empty[Int]
+    Option(5) +++ None                        must_=== Option.empty[Int]
+    Option.empty[Int] +++ Option.empty[Int]   must_=== Option.empty[Int]
+
+    List("Gurren ") +++ List("Lagann")        must_=== List("Gurren Lagann")
+    List("Gurren ") +++ List.empty            must_=== List.empty[String]
+    List.empty +++ List("Lagann")             must_=== List.empty[String]
+    List.empty[String] +++ List.empty[String] must_=== List.empty[String]
   }
 
 }
