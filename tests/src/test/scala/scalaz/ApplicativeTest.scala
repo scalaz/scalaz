@@ -3,6 +3,7 @@ package scalaz
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazArbitrary.ilistArbitrary
+import scalaz.std.int._
 
 object ApplicativeTest extends SpecLite {
 
@@ -34,6 +35,16 @@ object ApplicativeTest extends SpecLite {
     // don't make `None` too likely
     def pred(n: Int) = if (n < 0 && n % 2 == 0) None else Some(n % 2 == 0)
     l.filterM(pred) must_===(filterM(l, pred))
+  }
+
+  "+++" in {
+    val o = List(
+      Option(5) +++ Option(3),
+      None +++ Option(3),
+      Option(5) +++ None,
+      Option.empty[Int] +++ Option.empty[Int]
+    )
+    println(o)
   }
 
 }
