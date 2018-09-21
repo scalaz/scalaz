@@ -112,6 +112,12 @@ object ApplyTest extends SpecLite {
     some(9) <*> some({(_: Int) + 3}) must_===(some(12))
   }
 
+  "have syntax" in {
+    import syntax.apply._
+    (some("1") ⊛ some("2") ⊛ some("3") ⊛ some("4") ⊛ some("5") ⊛ some("6") ⊛ some("7") ⊛ some("8") ⊛ some("9") ⊛ some("A") ⊛ some("B") ⊛ some("C") ⊛ some("D") ⊛ some("E") ⊛ some("F") ⊛ some("G") ⊛ some("H") ⊛ some("I") ⊛ some("J") ⊛ some("K") ⊛ some("L") ⊛ some("M"))((_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String)) must_===(some("123456789ABCDEFGHIJKLM"))
+    ^^^^^^^^^^^^^^^^^^^^^(some("1"), some("2"), some("3"), some("4"), some("5"), some("6"), some("7"), some("8"), some("9"), some("A"), some("B"), some("C"), some("D"), some("E"), some("F"), some("G"), some("H"), some("I"), some("J"), some("K"), some("L"), some("M"))((_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String) + (_: String)) must_===(some("123456789ABCDEFGHIJKLM"))
+  }
+
   import Scalaz.none
 
   def err: Option[String] = sys.error("should be non-strict!")
