@@ -24,6 +24,9 @@ object IOTests {
       IO.unit.map(_ => "unit"),
       IO.point("point"),
       IO.fail(Error("error")),
+      IO.sync("sync"),
+      IO.async[Error, String](_(ExitResult.Completed("async success"))),
+      IO.async[Error, String](_(ExitResult.Failed(Error("async failüre")))),
       //IO.sleep(scala.concurrent.duration.Duration.fromNanos(1)).map(_ => "slept")
     )
     val endos0: List[Endo] =
