@@ -86,10 +86,10 @@ object IOTests {
       namedSection("monad")(
         namedSection("bindLeftIdentity")(
           test("success") { () =>
-            MonadLaws.bindLeftIdentity("mxyplyzyk")(fns.s1)(ioEql)
+            MonadLaws.bindLeftIdentity("mxyzptlk")(fns.s1)(ioEql)
           },
           test("failure") { () =>
-            MonadLaws.bindLeftIdentity("mxyplyzyk")(fns.f)(ioEql)
+            MonadLaws.bindLeftIdentity("mxyzptlk")(fns.f)(ioEql)
           },
         ),
         namedSection("bindRightIdentity")(
