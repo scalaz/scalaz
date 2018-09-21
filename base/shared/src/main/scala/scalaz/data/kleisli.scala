@@ -27,11 +27,10 @@ object KleisliModule {
 
   implicit def kleisliMonad[M[_], A0](implicit M: Monad[M]): Monad[Kleisli[M, A0, ?]] =
     instanceOf(
-      new MonadClass[Kleisli[M, A0, ?]] with MonadClass.DeriveMap[Kleisli[M, A0, ?]]
-      with BindClass.DeriveFlatten[Kleisli[M, A0, ?]] with BindClass.DeriveAp[Kleisli[M, A0, ?]] {
-        def pure[A](a: A): Kleisli[M, A0, A] =
+      new MonadClass[Kleisli[M, A0, ?]] {
+        override def pure[A](a: A): Kleisli[M, A0, A] =
           wrapKleisli(_ => M.pure(a))
-        def flatMap[A, B](ma: Kleisli[M, A0, A])(f: A => Kleisli[M, A0, B]): Kleisli[M, A0, B] =
+        override def flatMap[A, B](ma: Kleisli[M, A0, A])(f: A => Kleisli[M, A0, B]): Kleisli[M, A0, B] =
           wrapKleisli(a0 => M.flatMap(runKleisli(ma)(a0))(a => runKleisli(f(a))(a0)))
       }
     )
@@ -53,8 +52,7 @@ object KleisliModule {
 
   implicit def kleisliStrong[M[_], A, B](implicit M: Functor[M]): Strong[Kleisli[M, ?, ?]] =
     instanceOf(
-      new StrongClass[Kleisli[M, ?, ?]] with StrongClass.DeriveSecond[Kleisli[M, ?, ?]]
-      with ProfunctorClass.DeriveLRMap[Kleisli[M, ?, ?]] {
+      new StrongClass[Kleisli[M, ?, ?]] {
         override def first[A, B, C](pab: Kleisli[M, A, B]): Kleisli[M, (A, C), (B, C)] =
           Kleisli.first(pab)
 

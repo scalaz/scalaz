@@ -74,8 +74,7 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   }
 
   private val instance =
-    new MonadClass[Maybe] with BindClass.DeriveFlatten[Maybe] with TraversableClass[Maybe]
-    with FoldableClass.DeriveFoldMap[Maybe] {
+    new MonadClass[Maybe] with TraversableClass[Maybe] {
 
       override def ap[A, B](ma: Maybe[A])(mf: Maybe[A => B]): Maybe[B] =
         mf match {

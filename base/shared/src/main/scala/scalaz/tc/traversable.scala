@@ -9,25 +9,14 @@ import scala.language.experimental.macros
 
 trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
 
-  def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]]
+  def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]] = sequence(map(ta)(f))
 
-  def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]]
+  def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
 }
 
 object TraversableClass {
-
-  trait DeriveSequence[T[_]] extends TraversableClass[T] with Alt[DeriveSequence[T]] {
-    final override def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
-  }
-
-  trait DeriveTraverse[T[_]] extends TraversableClass[T] with Alt[DeriveTraverse[T]] {
-    final override def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]] = sequence(map(ta)(f))
-  }
-
-  trait Alt[D <: Alt[D]]
-
   implicit val listTraversable: Traversable[List] =
-    instanceOf(new TraversableClass.DeriveSequence[List] with FoldableClass.DeriveFoldMap[List] {
+    instanceOf(new TraversableClass[List] {
       override def traverse[F[_], A, B](ta: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] =
         ta.foldLeft[F[List[B]]](F.pure(List.empty[B])) { (flb, a) =>
           {
@@ -47,8 +36,8 @@ object TraversableClass {
     })
 
   implicit def tuple2Traversable[C]: Traversable[Tuple2[C, ?]] =
-    instanceOf(new TraversableClass.DeriveSequence[Tuple2[C, ?]] with FoldableClass.DeriveFoldMap[Tuple2[C, ?]] {
-      def traverse[F[_], A, B](ta: Tuple2[C, A])(f: A => F[B])(implicit F: Applicative[F]): F[Tuple2[C, B]] =
+    instanceOf(new TraversableClass[Tuple2[C, ?]] {
+      override def traverse[F[_], A, B](ta: Tuple2[C, A])(f: A => F[B])(implicit F: Applicative[F]): F[Tuple2[C, B]] =
         F.map(f(ta._2))(b => (ta._1, b))
 
       override def foldLeft[A, B](ta: Tuple2[C, A], z: B)(f: (B, A) => B): B = f(z, ta._2)
@@ -69,6 +58,6 @@ trait TraversableFunctions {
 trait TraversableSyntax {
   implicit final class ToTraversableOps[T[_], A](self: T[A]) {
     def traverse[F[_], B](f: A => F[B])(implicit g: Applicative[F], ev: Traversable[T]): F[T[B]] =
-      macro meta.Ops.i_1_1i
+      macro ops.Ops.i_1_1i
   }
 }

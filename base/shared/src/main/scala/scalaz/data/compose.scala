@@ -108,7 +108,7 @@ private[data] object ComposeImpl extends ComposeModule {
     val F: InvariantFunctorClass[F]
     val G: InvariantFunctorClass[G]
 
-    final def imap[A, B](ma: F[G[A]])(f: A => B)(g: B => A): F[G[B]] =
+    final override def imap[A, B](ma: F[G[A]])(f: A => B)(g: B => A): F[G[B]] =
       F.imap[G[A], G[B]](ma)(G.imap(_)(f)(g))(G.imap(_)(g)(f))
   }
 
@@ -116,23 +116,23 @@ private[data] object ComposeImpl extends ComposeModule {
     val F: FunctorClass[F]
     val G: FunctorClass[G]
 
-    final def map[A, B](fa: F[G[A]])(f: A => B): F[G[B]] =
+    final override def map[A, B](fa: F[G[A]])(f: A => B): F[G[B]] =
       F.map(fa)(G.map(_)(f))
   }
 
-  private trait ComposeApply[F[_], G[_]] extends ComposeFunctor[F, G] with ApplyClass[Compose[F, G, ?]] {
+  private trait ComposeApply[F[_], G[_]] extends ApplyClass[Compose[F, G, ?]] with ComposeFunctor[F, G] {
     val F: ApplyClass[F]
     val G: ApplyClass[G]
 
-    final def ap[A, B](fa: F[G[A]])(f: F[G[A => B]]): F[G[B]] =
+    final override def ap[A, B](fa: F[G[A]])(f: F[G[A => B]]): F[G[B]] =
       F.ap(fa)(F.map(f)(gab => G.ap(_)(gab)))
   }
 
-  private trait ComposeApplicative[F[_], G[_]] extends ComposeApply[F, G] with ApplicativeClass[Compose[F, G, ?]] {
+  private trait ComposeApplicative[F[_], G[_]] extends ApplicativeClass[Compose[F, G, ?]] with ComposeApply[F, G] {
     val F: ApplicativeClass[F]
     val G: ApplicativeClass[G]
 
-    final def pure[A](a: A): F[G[A]] = F.pure(G.pure(a))
+    final override def pure[A](a: A): F[G[A]] = F.pure(G.pure(a))
   }
 
   private trait ComposeContravariant1[F[_], G[_]] extends ContravariantClass[Compose[F, G, ?]] {
@@ -155,19 +155,19 @@ private[data] object ComposeImpl extends ComposeModule {
     val F: FoldableClass[F]
     val G: FoldableClass[G]
 
-    def foldMap[A, B](fa: F[G[A]])(f: A => B)(implicit B: Monoid[B]): B =
+    override def foldMap[A, B](fa: F[G[A]])(f: A => B)(implicit B: Monoid[B]): B =
       F.foldMap(fa)(G.foldMap(_)(f))
 
-    def msuml[A](fa: F[G[A]])(implicit A: Monoid[A]): A =
+    override def msuml[A](fa: F[G[A]])(implicit A: Monoid[A]): A =
       F.foldMap(fa)(G.msuml(_))
 
-    def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
       F.foldRight(fa, z)((ga, b) => G.foldRight(ga, b)(f))
 
-    def foldLeft[A, B](fa: F[G[A]], z: B)(f: (B, A) => B): B =
+    override def foldLeft[A, B](fa: F[G[A]], z: B)(f: (B, A) => B): B =
       F.foldLeft(fa, z)((b, ga) => G.foldLeft(ga, b)(f))
 
-    def toList[A](fa: F[G[A]]): scala.List[A] =
+    override def toList[A](fa: F[G[A]]): scala.List[A] =
       F.toList(fa).flatMap(G.toList)
   }
 
@@ -178,10 +178,10 @@ private[data] object ComposeImpl extends ComposeModule {
     val F: TraversableClass[F]
     val G: TraversableClass[G]
 
-    def sequence[Z[_], A](ta: F[G[Z[A]]])(implicit Z: Applicative[Z]): Z[F[G[A]]] =
+    override def sequence[Z[_], A](ta: F[G[Z[A]]])(implicit Z: Applicative[Z]): Z[F[G[A]]] =
       F.traverse(ta)(G.sequence(_))
 
-    def traverse[Z[_], A, B](ta: F[G[A]])(f: A => Z[B])(implicit Z: Applicative[Z]): Z[F[G[B]]] =
+    override def traverse[Z[_], A, B](ta: F[G[A]])(f: A => Z[B])(implicit Z: Applicative[Z]): Z[F[G[B]]] =
       F.traverse(ta)(G.traverse(_)(f))
   }
 

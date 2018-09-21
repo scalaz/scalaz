@@ -75,8 +75,8 @@ private[data] object Maybe2Impl extends Maybe2Module {
     }
 
   def bifunctor: Bifunctor[Maybe2] =
-    instanceOf(new BifunctorClass[Maybe2] with BifunctorClass.DeriveLmapRmap[Maybe2] {
-      def bimap[A, B, S, T](fab: Maybe2[A, B])(as: A => S, bt: B => T): Maybe2[S, T] =
+    instanceOf(new BifunctorClass[Maybe2] {
+      override def bimap[A, B, S, T](fab: Maybe2[A, B])(as: A => S, bt: B => T): Maybe2[S, T] =
         fab match {
           case Some2(_1, _2) => Some2(as(_1), bt(_2))
           case None2         => None2

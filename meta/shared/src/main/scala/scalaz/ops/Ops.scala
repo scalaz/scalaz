@@ -1,5 +1,5 @@
 package scalaz
-package meta
+package ops
 
 import scala.{ List, StringContext }
 import scala.reflect.macros.blackbox
