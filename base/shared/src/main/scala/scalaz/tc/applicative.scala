@@ -19,9 +19,7 @@ object ApplicativeClass {
     instanceOf(new ApplicativeClass[Fiber[E, ?]] {
       def pure[A](a: A): Fiber[E, A] = Fiber.point(a)
       def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] =
-        (fa zipWith f) { (a, f) =>
-          f(a)
-        }
+        (f zipWith fa)(_(_))
       def map[A, B](fa: Fiber[E, A])(f: A => B): Fiber[E, B] =
         fa.map(f)
     })
