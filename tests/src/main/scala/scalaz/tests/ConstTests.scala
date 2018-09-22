@@ -1,7 +1,7 @@
 package scalaz
 package tests
 
-import scala.{ Boolean, Double, Int, List, Option }
+import scala.{ Boolean, Double, Int }
 
 import data._, Scalaz._
 
@@ -11,15 +11,12 @@ import testz.{ assert, Harness }
 
 import z._
 
-final class ConstTests {
+object ConstTests {
 
-  val consts = List(
-    Const[List[Int], List[Double]](List(1)),
-    Const[List[Int], List[Double]](List())
+  val consts = IList(
+    Const[IList[Int], IList[Double]](IList(1)),
+    Const[IList[Int], IList[Double]](IList())
   )
-
-  def cross[A, B](l1: List[A], l2: List[B]): List[(A, B)] =
-    l1.flatMap(a1 => l2.map(a2 => (a1, a2)))
 
   def tests[T](harness: Harness[T]): T = {
     import harness._
@@ -27,12 +24,12 @@ final class ConstTests {
       namedSection("concrete")(
         test("run . apply") { () =>
           val testValue: Int = 1234
-          assertEqual(Const.run(Const[Int, List[Int]](testValue)), testValue)
+          assertEqual(Const.run(Const[Int, IList[Int]](testValue)), testValue)
         },
         test("apply . run") { () =>
-          val testValue: Const[Int, List[Int]] =
-            Const[Int, List[Int]](2134)
-          assertEqual(Const[Int, List[Int]](Const.run(testValue)), testValue)
+          val testValue: Const[Int, IList[Int]] =
+            Const[Int, IList[Int]](2134)
+          assertEqual(Const[Int, IList[Int]](Const.run(testValue)), testValue)
         }
       ),
       namedSection("laws")(
@@ -43,7 +40,7 @@ final class ConstTests {
             )
           },
           test("identity") { () =>
-            cross(consts, consts).foldMap {
+            consts.cross(consts).foldMap {
               case (c1, c2) =>
                 assert((c1 === c2) === (Const.run(c1) === Const.run(c2)))
             }
@@ -53,47 +50,47 @@ final class ConstTests {
           test("apply associativity") { () =>
             consts.foldMap(
               ApplyLaws.applyAssoc(_)(
-                Const[List[Int], List[Double] => List[Boolean]](List(0)),
-                Const[List[Int], List[Boolean] => Int](List(1))
-              )(assertEqual[Const[List[Int], Int]](_, _))
+                Const[IList[Int], IList[Double] => IList[Boolean]](IList(0)),
+                Const[IList[Int], IList[Boolean] => Int](IList(1))
+              )(assertEqual[Const[IList[Int], Int]](_, _))
             )
           },
           test("applicative identity") { () =>
             consts.foldMap {
-              ApplicativeLaws.applyIdentity(_)(assertEqual[Const[List[Int], List[Double]]])
+              ApplicativeLaws.applyIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }
         ),
         namedSection("traversable laws")(
           test("traversable composition") { () =>
-            val fst = (a: List[Double]) => a.headOption
-            val snd = (a: Double) => if (a > 0.0) scala.Some(a) else scala.None
+            val fst = (_: IList[Double]).head
+            val snd = (a: Double) => if (a > 0.0) Maybe.just(a) else Maybe.empty[Double]
 
             consts.foldMap {
-              TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Option[Option[Const[List[Int], Double]]]])
+              TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Maybe[Maybe[Const[IList[Int], Double]]]])
             }
           },
           test("traversable identity") { () =>
             consts.foldMap {
-              TraversableLaws.traverseIdentity(_)(assertEqual[Const[List[Int], List[Double]]])
+              TraversableLaws.traverseIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }
         ),
         namedSection("monoid laws")(
           test("mappend associativity") { () =>
-            cross(cross(consts, consts), consts).foldMap {
+            consts.cross(consts).cross(consts).foldMap {
               case ((l1, l2), l3) =>
-                SemigroupLaws.assoc(l1, l2, l3)(assertEqual[Const[List[Int], List[Double]]])
+                SemigroupLaws.assoc(l1, l2, l3)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           },
           test("mappend left identity") { () =>
             consts.foldMap {
-              MonoidLaws.leftIdentity(_)(assertEqual[Const[List[Int], List[Double]]])
+              MonoidLaws.leftIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           },
           test("mappend right identity") { () =>
             consts.foldMap {
-              MonoidLaws.rightIdentity(_)(assertEqual[Const[List[Int], List[Double]]])
+              MonoidLaws.rightIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }
         )

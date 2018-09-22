@@ -9,7 +9,6 @@ import testz.Harness
 import z._
 
 object DebugInterpolatorTest {
-
   def tests[T](harness: Harness[T]): T = {
     import harness._
     namedSection("debug instance resolution")(
@@ -24,5 +23,4 @@ object DebugInterpolatorTest {
       }
     )
   }
-
 }
