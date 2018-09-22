@@ -36,6 +36,7 @@ object TreeTestJVM extends SpecLite {
 
   "deep Tree toStrictTree should not cause a stack overflow" ! {
     val expectedTree = StrictTreeTestJVM.deepTree
+    try { deepTree.toStrictTree } catch { case e: Throwable => e.printStackTrace() }
     val actualTree = deepTree.toStrictTree
     StrictTreeTestJVM.E.equal(actualTree, expectedTree) must_== true
   }

@@ -375,18 +375,18 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
         A.arbitrary.map(a => StrictTree.Leaf(a))
       case 2 =>
         arb[(A, A)].arbitrary.map{ case (a1, a2) =>
-          StrictTree(a1, Vector(StrictTree.Leaf(a2)))
+          StrictTree(a1, List(StrictTree.Leaf(a2)))
         }
       case 3 =>
         arb[(A, A, A)].arbitrary.flatMap{ case (a1, a2, a3) =>
           Gen.oneOf(
-            StrictTree(a1, Vector(StrictTree.Leaf(a2), StrictTree.Leaf(a3))),
-            StrictTree(a1, Vector(StrictTree(a2, Vector(StrictTree.Leaf(a3)))))
+            StrictTree(a1, List(StrictTree.Leaf(a2), StrictTree.Leaf(a3))),
+            StrictTree(a1, List(StrictTree(a2, List(StrictTree.Leaf(a3)))))
           )
         }
       case _ =>
         withSize(size - 1)(strictTreeGenSized[A]).flatMap{ as =>
-          A.arbitrary.map(a => StrictTree(a, as.toVector))
+          A.arbitrary.map(a => StrictTree(a, as.toList))
         }
     }
 

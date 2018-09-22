@@ -16,7 +16,7 @@ object StrictTreeTestJVM extends SpecLite {
   }
 
   def genTree(size: Int): StrictTree[Int] =
-    (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, Vector(x)))
+    (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, List(x)))
 
   val size = 100000
 

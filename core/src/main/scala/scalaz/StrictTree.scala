@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.collection.mutable
-import std.vector.{vectorInstance, vectorMonoid}
+import std.list.{listInstance, listMonoid}
 
 /**
   *
@@ -11,7 +11,7 @@ import std.vector.{vectorInstance, vectorMonoid}
   */
 case class StrictTree[A](
   rootLabel: A,
-  subForest: Vector[StrictTree[A]]
+  subForest: List[StrictTree[A]]
 ) {
 
   import StrictTree._
@@ -51,7 +51,7 @@ case class StrictTree[A](
     runBottomUp(foldMapReducer(f))
 
   def foldRight[B](z: B)(f: (A, => B) => B): B =
-    Foldable[Vector].foldRight(flatten, z)(f)
+    Foldable[List].foldRight(flatten, z)(f)
 
   /** A 2D String representation of this StrictTree. */
   def drawTree(implicit sh: Show[A]): String = {
@@ -62,11 +62,11 @@ case class StrictTree[A](
     * is a function of the corresponding element in this tree
     * and the histomorphic transform of its children.
     */
-  def scanr[B](g: (A, Vector[StrictTree[B]]) => B): StrictTree[B] =
+  def scanr[B](g: (A, List[StrictTree[B]]) => B): StrictTree[B] =
     runBottomUp(scanrReducer(g))
 
   /** Pre-order traversal. */
-  def flatten: Vector[A] = {
+  def flatten: List[A] = {
     val stack = mutable.Stack(this)
 
     val result = mutable.Buffer.empty[A]
@@ -77,7 +77,7 @@ case class StrictTree[A](
       popped.subForest.reverseIterator.foreach(stack.push)
     }
 
-    result.toVector
+    result.toList
   }
 
   def size: Int = {
@@ -95,11 +95,23 @@ case class StrictTree[A](
   }
 
   /** Breadth-first traversal. */
-  def levels: Vector[Vector[A]] = {
-    val f = (s: Vector[StrictTree[A]]) => {
-      Foldable[Vector].foldMap(s)((_: StrictTree[A]).subForest)
+  def levels: List[List[A]] = {
+    val f = (s: List[StrictTree[A]]) => {
+      Foldable[List].foldMap(s)((_: StrictTree[A]).subForest)
     }
-    Vector.iterate(Vector(this), size)(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
+    List.iterate(List(this), depth)(f) map { _ map (_.rootLabel) }
+  }
+
+  def depth: Int = {
+    var level = List(this)
+    var result = 0
+
+    while (level.nonEmpty) {
+      level = Foldable[List].foldMap(level)(_.subForest)
+      result += 1
+    }
+
+    result
   }
 
   def toTree: Tree[A] = {
@@ -109,7 +121,7 @@ case class StrictTree[A](
   /** Binds the given function across all the subtrees of this tree. */
   def cobind[B](f: StrictTree[A] => B): StrictTree[B] = unfoldTree(this)(t => (f(t), t.subForest))
 
-  def foldNode[Z](f: A => Vector[StrictTree[A]] => Z): Z =
+  def foldNode[Z](f: A => List[StrictTree[A]] => Z): Z =
     f(rootLabel)(subForest)
 
   def map[B](f: A => B): StrictTree[B] = {
@@ -124,9 +136,9 @@ case class StrictTree[A](
     val G = Apply[G]
 
     subForest match {
-      case Vector() => G.map(f(rootLabel))(Leaf(_))
-      case x +: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromFoldable(xs)).traverse1(_.traverse1(f))) {
-        case (h, t) => Node(h, t.list.toVector)
+      case Nil => G.map(f(rootLabel))(Leaf(_))
+      case x :: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs)).traverse1(_.traverse1(f))) {
+        case (h, t) => Node(h, t.list.toList)
       }
     }
   }
@@ -143,13 +155,13 @@ case class StrictTree[A](
         stack.push(nextStackElem)
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
-        val result = StrictTree((here.a.rootLabel, here.b.rootLabel), here.mappedSubForest.toVector)
+        val result = StrictTree((here.a.rootLabel, here.b.rootLabel), here.mappedSubForest.toList)
         here.parent.foreach(_.mappedSubForest += result)
         stack.pop()
       }
     }
 
-    StrictTree((rootLabel, b.rootLabel), root.mappedSubForest.toVector)
+    StrictTree((rootLabel, b.rootLabel), root.mappedSubForest.toList)
   }
 
   /**
@@ -205,13 +217,13 @@ sealed abstract class StrictTreeInstances {
             stack.push(nextStackElem)
           } else {
             //The "here" node is completed, so add its result to its parents completed children.
-            val result = StrictTree[C](f(here.trees.bimap(_.rootLabel, _.rootLabel)), here.mappedSubForest.toVector)
+            val result = StrictTree[C](f(here.trees.bimap(_.rootLabel, _.rootLabel)), here.mappedSubForest.toList)
             here.parent.foreach(_.mappedSubForest += result)
             stack.pop()
           }
         }
 
-        StrictTree(f(root.trees.bimap(_.rootLabel, _.rootLabel)), root.mappedSubForest.toVector)
+        StrictTree(f(root.trees.bimap(_.rootLabel, _.rootLabel)), root.mappedSubForest.toList)
     }
 
     override def zip[A, B](a: => StrictTree[A], b: => StrictTree[B]): StrictTree[(A, B)] = {
@@ -224,12 +236,12 @@ sealed abstract class StrictTreeInstances {
 
   implicit def treeOrder[A](implicit A0: Order[A]): Order[StrictTree[A]] =
     new Order[StrictTree[A]] with StrictTreeEqual[A] {
+      import std.list.listOrder
       def A = A0
-      import std.vector._
       override def order(x: StrictTree[A], y: StrictTree[A]) =
         A.order(x.rootLabel, y.rootLabel) match {
           case Ordering.EQ =>
-            Order[Vector[StrictTree[A]]].order(x.subForest, y.subForest)
+            Order[List[StrictTree[A]]].order(x.subForest, y.subForest)
           case x => x
         }
     }
@@ -248,11 +260,11 @@ object StrictTree extends StrictTreeInstances {
    * You can use Node for tree construction or pattern matching.
    */
   object Node {
-    def apply[A](root: A, forest: Vector[StrictTree[A]]): StrictTree[A] = {
+    def apply[A](root: A, forest: List[StrictTree[A]]): StrictTree[A] = {
       StrictTree[A](root, forest)
     }
 
-    def unapply[A](t: StrictTree[A]): Option[(A, Vector[StrictTree[A]])] = Some((t.rootLabel, t.subForest))
+    def unapply[A](t: StrictTree[A]): Option[(A, List[StrictTree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
   /**
@@ -262,12 +274,12 @@ object StrictTree extends StrictTreeInstances {
    */
   object Leaf {
     def apply[A](root: A): StrictTree[A] = {
-      Node(root, Vector.empty)
+      Node(root, Nil)
     }
 
     def unapply[A](t: StrictTree[A]): Option[A] = {
       t match {
-        case Node(root, Vector()) =>
+        case Node(root, List()) =>
           Some(root)
         case _ =>
           None
@@ -275,10 +287,10 @@ object StrictTree extends StrictTreeInstances {
     }
   }
 
-  def unfoldForest[A, B](s: Vector[A])(f: A => (B, Vector[A])): Vector[StrictTree[B]] =
+  def unfoldForest[A, B](s: List[A])(f: A => (B, List[A])): List[StrictTree[B]] =
     s.map(unfoldTree(_)(f))
 
-  def unfoldTree[A, B](v: A)(f: A => (B, Vector[A])): StrictTree[B] =
+  def unfoldTree[A, B](v: A)(f: A => (B, List[A])): StrictTree[B] =
     f(v) match {
       case (a, bs) => Node(a, unfoldForest(bs)(f))
     }
@@ -294,12 +306,12 @@ object StrictTree extends StrictTreeInstances {
     * This implementation is 16x faster than the trampolined implementation for StrictTreeTestJVM's scanr test.
     */
   private def scanrReducer[A, B](
-    f: (A, Vector[StrictTree[B]]) => B
+    f: (A, List[StrictTree[B]]) => B
   )(rootLabel: A
   )(subForest: mutable.Buffer[StrictTree[B]]
   ): StrictTree[B] = {
-    val subForestVector = subForest.toVector
-    StrictTree[B](f(rootLabel, subForestVector), subForestVector)
+    val subForestList = subForest.toList
+    StrictTree[B](f(rootLabel, subForestList), subForestList)
   }
 
   /**
@@ -310,7 +322,7 @@ object StrictTree extends StrictTreeInstances {
   )(rootLabel: A
   )(subForest: scala.collection.Seq[StrictTree[B]]
   ): StrictTree[B] = {
-    StrictTree[B](f(rootLabel), subForest.toVector)
+    StrictTree[B](f(rootLabel), subForest.toList)
   }
 
   /**
@@ -334,7 +346,7 @@ object StrictTree extends StrictTreeInstances {
   )(subForest: mutable.Buffer[B]
   ): B = {
     val mappedRoot = f(rootLabel)
-    val foldedForest = Foldable[Vector].fold[B](subForest.toVector)
+    val foldedForest = Foldable[List].fold[B](subForest.toList)
 
     Monoid[B].append(mappedRoot, foldedForest)
   }
@@ -453,7 +465,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
 
 final class StrictTreeUnzip[A1, A2](private val root: StrictTree[(A1, A2)]) extends AnyVal {
   private def unzipCombiner(rootLabel: (A1, A2))(accumulator: scala.collection.Seq[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
-    (StrictTree(rootLabel._1, accumulator.map(_._1).toVector), StrictTree(rootLabel._2, accumulator.map(_._2).toVector))
+    (StrictTree(rootLabel._1, accumulator.map(_._1).toList), StrictTree(rootLabel._2, accumulator.map(_._2).toList))
   }
 
   /** Turns a tree of pairs into a pair of trees. */

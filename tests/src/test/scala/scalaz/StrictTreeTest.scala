@@ -25,7 +25,7 @@ object StrictTreeTest extends SpecLite {
   }
 
   "A tree must can be rendered as an ASCII string" ! {
-    Node(1, Vector(Node(2, Vector(Leaf(3))), Leaf(4))).drawTree must_== Seq(
+    Node(1, List(Node(2, List(Leaf(3))), Leaf(4))).drawTree must_== Seq(
       "1",
       "|",
       "+- 2",
@@ -46,7 +46,7 @@ object StrictTreeTest extends SpecLite {
   }
 
   "flatten is the same as the lazy Tree's flatten" ! forAll { (s: StrictTree[Byte]) =>
-    s.flatten must_=== s.toTree.flatten.toVector
+    s.flatten must_=== s.toTree.flatten.toList
   }
 
   "StrictTree#toTree and Tree#toStrictTree are inverses" ! forAll { (s: StrictTree[Byte]) =>
