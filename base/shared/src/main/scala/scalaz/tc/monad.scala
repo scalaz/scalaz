@@ -25,12 +25,16 @@ object MonadClass {
       def map[A, B](ma: Either[L, A])(f: A => B): Either[L, B]                = ma.map(f)
     })
 
-  implicit val functionMonad: Monad[Function0] = instanceOf(
+  implicit val function0Monad: Monad[Function0] = instanceOf(
     new MonadClass[Function0] with BindClass.DeriveFlatten[Function0] {
-      override def ap[A, B](fab: Function0[A])(f: Function0[A => B]): Function0[B]      = () => f()(fab())
-      override def map[A, B](fab: Function0[A])(f: A => B): Function0[B]                = () => f(fab())
-      override def flatMap[A, B](fab: Function0[A])(f: A => Function0[B]): Function0[B] = () => f(fab())()
-      override def pure[A](a: A): Function0[A]                                          = () => a
+      override def ap[A, B](fab: () => A)(f: () => A => B): () => B      =
+        () => f()(fab())
+      override def map[A, B](fab: () => A)(f: A => B): () => B           =
+        () => f(fab())
+      override def flatMap[A, B](fab: () => A)(f: A => () => B): () => B =
+        () => f(fab())()
+      override def pure[A](a: A): () => A                                =
+        () => a
     }
   )
 
