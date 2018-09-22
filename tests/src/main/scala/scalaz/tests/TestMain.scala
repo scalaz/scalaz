@@ -41,6 +41,7 @@ object TestMain {
         Future(run("IList Tests", IListTests.tests(harness)))(ec),
         Future(run("Maybe Tests", MaybeTests.tests(harness)))(ec),
         Future(run("IO Tests", IOTests.tests(harness)))(ec),
+        Future(run("Ordering Tests", OrderingTests.tests(harness)))(ec),
         Future(run("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
 

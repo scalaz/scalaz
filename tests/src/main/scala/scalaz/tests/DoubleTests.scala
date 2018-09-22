@@ -33,8 +33,8 @@ object DoubleTests {
 
     val obs = java.lang.Double.doubleToRawLongBits _
 
-    namedSection("laws")(
-      namedSection("eq laws")(
+    namedSection("instances")(
+      namedSection("eq")(
         test("reflexivity") { () =>
           doubles.foldMap(
             EqLaws.reflexivity(_)(assert)
