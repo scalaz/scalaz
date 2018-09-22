@@ -12,13 +12,7 @@ import testz.{ assert, Harness, Result }
 
 import z._
 
-final class IListTests {
-  val lists = List(
-    IList.empty[Int],
-    IList.cons(20, IList.empty),
-    IList.cons(20, IList.cons(30, IList.empty))
-  )
-
+object IListTests {
   def cross[A, B](l1: List[A], l2: List[B]): List[(A, B)] =
     l1.flatMap(a1 => l2.map(a2 => (a1, a2)))
 
@@ -31,6 +25,12 @@ final class IListTests {
 
   def tests[T](harness: Harness[T]): T = {
     import harness._
+
+    val lists = List(
+      IList.empty[Int],
+      IList.cons(20, IList.empty),
+      IList.cons(20, IList.cons(30, IList.empty))
+    )
 
     section(
       namedSection("concrete")(
