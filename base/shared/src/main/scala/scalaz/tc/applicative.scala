@@ -1,11 +1,9 @@
 package scalaz
 package tc
 
-import java.lang.Throwable
 import scala.language.experimental.macros
-import scala.{ List, Nothing, Unit }
 
-import zio.{ Fiber, IO }
+import zio.Fiber
 
 trait ApplicativeClass[F[_]] extends ApplyClass[F] {
   def pure[A](a: A): F[A]
@@ -19,20 +17,11 @@ object ApplicativeClass {
 
   implicit def fiberApplicative[E]: Applicative[Fiber[E, ?]] =
     instanceOf(new ApplicativeClass[Fiber[E, ?]] {
-      def pure[A](a: A): Fiber[E, A] = new Fiber[E, A] {
-        def join: IO[E, A]                                     = IO.point(a)
-        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = IO.unit
-      }
-
-      def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] = new Fiber[E, B] {
-        def join: IO[E, B]                                     = fa.join.flatMap(a => f.join.map(f => f(a)))
-        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = fa.interrupt0(ts) *> f.interrupt0(ts)
-      }
-
-      def map[A, B](ma: Fiber[E, A])(f: A => B): Fiber[E, B] = new Fiber[E, B] {
-        def join: IO[E, B]                                     = ma.join.map(f)
-        def interrupt0(ts: List[Throwable]): IO[Nothing, Unit] = ma.interrupt0(ts)
-      }
+      def pure[A](a: A): Fiber[E, A] = Fiber.point(a)
+      def ap[A, B](fa: Fiber[E, A])(f: Fiber[E, A => B]): Fiber[E, B] =
+        (f zipWith fa)(_(_))
+      def map[A, B](fa: Fiber[E, A])(f: A => B): Fiber[E, B] =
+        fa.map(f)
     })
 }
 
