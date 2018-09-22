@@ -31,11 +31,11 @@ lazy val root = project
   .aggregate(baseJVM, baseJS, lawsJVM, lawsJS, tests, metaJVM, metaJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
-resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers in ThisBuild += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
 
 lazy val base = crossProject.module
   .dependsOn(meta)
-  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.1-SNAPSHOT")
+  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.2.7")
 
 lazy val baseJVM = base.jvm
 
