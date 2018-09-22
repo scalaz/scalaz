@@ -2,8 +2,8 @@ package scalaz
 package tc
 
 /**
-  * Given `Delay[A]`, one can suspend execution of an `A` inside of the `A` itself.
-  */
+ * Given `Delay[A]`, one can suspend execution of an `A` inside of the `A` itself.
+ */
 trait DelayClass[A] {
   def delay(fa: () => A): A
 }

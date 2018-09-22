@@ -27,13 +27,13 @@ object MonadClass {
 
   implicit val function0Monad: Monad[Function0] = instanceOf(
     new MonadClass[Function0] with BindClass.DeriveFlatten[Function0] {
-      override def ap[A, B](fab: () => A)(f: () => A => B): () => B      =
+      override def ap[A, B](fab: () => A)(f: () => A => B): () => B =
         () => f()(fab())
-      override def map[A, B](fab: () => A)(f: A => B): () => B           =
+      override def map[A, B](fab: () => A)(f: A => B): () => B =
         () => f(fab())
       override def flatMap[A, B](fab: () => A)(f: A => () => B): () => B =
         () => f(fab())()
-      override def pure[A](a: A): () => A                                =
+      override def pure[A](a: A): () => A =
         () => a
     }
   )
