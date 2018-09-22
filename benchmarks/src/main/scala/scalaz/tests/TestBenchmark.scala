@@ -15,9 +15,6 @@ import scalaz.Predef._
 @Measurement(iterations = 1, batchSize = 1, time = 1, timeUnit = TimeUnit.MILLISECONDS)
 class TestBenchmark {
   @Benchmark
-  def allTests(): Unit = {
+  def allTests(): Unit =
     TestMain.main(Array.empty)
-  }
 }
-
-
