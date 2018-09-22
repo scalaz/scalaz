@@ -39,6 +39,7 @@ object TestMain {
         Future(cont("Debug Interpolator Tests", DebugInterpolatorTest.tests(harness)))(ec),
         Future(cont("Double Tests", (new DoubleTests).tests(harness)))(ec),
         Future(cont("IList Tests", (new IListTests).tests(harness)))(ec),
+        Future(cont("IO Tests", IOTests.tests(harness)))(ec),
         Future(cont("Ordering Tests", OrderingTests.tests(harness)))(ec),
         Future(cont("Scala Map Tests", SMapTests.tests(harness)))(ec),
       )
