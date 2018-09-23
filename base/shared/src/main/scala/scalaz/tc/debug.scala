@@ -123,8 +123,8 @@ object Debug {
 
 trait DebugSyntax {
   implicit final class ToDebugOps[A](self: A) {
-    def debug(implicit ev: Debug[A]): Cord = macro meta.Ops.i_0
-    def debugs(implicit ev: Debug[A]): String = macro meta.Ops.i_0
+    def debug(implicit ev: Debug[A]): Cord = macro ops.Ops.i_0
+    def debugs(implicit ev: Debug[A]): String = macro ops.Ops.i_0
   }
 
   implicit final def debugInterpolator(sc: StringContext): DebugInterpolator.Interpolator =

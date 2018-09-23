@@ -94,7 +94,7 @@ object EqClass {
 trait EqSyntax {
   implicit final class ToEqOps[A](a: A) {
     private[tc] type equal
-    def ===(f: A)(implicit ev: Eq[A]): Boolean = macro meta.Ops.nia_1[equal]
+    def ===(f: A)(implicit ev: Eq[A]): Boolean = macro ops.Ops.nia_1[equal]
   }
 }
 

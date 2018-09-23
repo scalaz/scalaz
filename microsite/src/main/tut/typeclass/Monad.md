@@ -22,11 +22,11 @@ import scalaz.Scalaz._
 
 ```tut
 val listMonad: Monad[List] =
-  instanceOf(new MonadClass[List] with BindClass.DeriveAp[List] {
-    def pure[A](a: A): List[A] = List(a)
-    def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
-    def flatten[A](ma: List[List[A]]): List[A] = ma.flatMap(x => x)
-    def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
+  instanceOf(new MonadClass[List] {
+    override def pure[A](a: A): List[A] = List(a)
+    override def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
+    override def flatten[A](ma: List[List[A]]): List[A] = ma.flatMap(x => x)
+    override def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
   })
 ```
 

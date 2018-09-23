@@ -31,8 +31,9 @@ import scalaz.Predef._
 import scalaz.tc._
 
 val listApply: Apply[List] = instanceOf(new ApplyClass[List] {
-  def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = fa.zip(f).map(t => t._2(t._1))
-  def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
+  override def ap[A, B](fa: List[A])(f: List[A => B]): List[B] = 
+    fa.zip(f).map(t => t._2(t._1))
+  override def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
 })
 ```
 
