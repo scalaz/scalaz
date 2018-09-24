@@ -78,7 +78,10 @@ lazy val microsite = project.module
     scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
     scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
     skip in publish := true,
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.2",
+    // Don't update silencer, the new versions print stuff that ends up in the generated code blocks
+    libraryDependencies -= Scalaz.silencerPlugin,
+    libraryDependencies += compilerPlugin("com.github.ghik" %% "silencer-plugin" % "1.0"),
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),
