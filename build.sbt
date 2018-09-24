@@ -50,7 +50,7 @@ lazy val benchmarks = project.module
       Seq(
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-        "org.scalaz"     %% "scalaz-core"   % "7.2.23",
+        "org.scalaz"     %% "scalaz-core"   % "7.2.26",
       )
   )
 
@@ -78,7 +78,7 @@ lazy val microsite = project.module
     scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
     scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
     skip in publish := true,
-    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
+    libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.2",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                   |""".stripMargin),

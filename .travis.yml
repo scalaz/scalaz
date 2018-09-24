@@ -7,10 +7,10 @@ jdk:
 before_install:
 - export PATH=${PATH}:./vendor/bundle
 install:
-- rvm use 2.4.4 --install --fuzzy
+- rvm use 2.5.1 --install --fuzzy
 - gem update --system
 - gem install sass
-- gem install jekyll -v 3.8.2
+- gem install jekyll -v 3.8.4
 script:
 - sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck tests/run microsite/makeMicrosite
 - if [[ "$TRAVIS_PULL_REQUEST" = "false" && "$TRAVIS_BRANCH" = "series/8.0.x" ]]; then sbt publish; fi
