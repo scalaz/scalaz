@@ -42,7 +42,7 @@ lazy val baseJVM = base.jvm
 lazy val baseJS = base.js
 
 lazy val benchmarks = project.module
-  .dependsOn(baseJVM)
+  .dependsOn(baseJVM, tests)
   .enablePlugins(JmhPlugin)
   .settings(
     skip in publish := true,
