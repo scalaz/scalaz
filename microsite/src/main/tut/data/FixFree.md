@@ -1,5 +1,6 @@
 ---
 layout: docs
+section: data
 title: "FixFree"
 ---
 
@@ -10,7 +11,7 @@ another `FixFree`. FixFree can be summarized with following signature:
 
 `type FixFree[F[_], A] = A \/ F[FixFree[F,A]]`
 
-If F is a functor, FixFree[F, A] is a freely-generated monad. FixFree can also be used as fix point defining recursive data 
+If F is a functor, FixFree[F, A] is a freely-generated monad. FixFree can also be used as fix point defining recursive data
 structures.
 
 ## Basics

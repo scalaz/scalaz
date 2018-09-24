@@ -1,5 +1,6 @@
 ---
 layout: docs
+section: typeclass
 title:  "Bifunctor"
 ---
 
@@ -25,7 +26,7 @@ val tuple2Bifunctor: Bifunctor[Tuple2] =
 
 val theseBifunctor: Bifunctor[These] =
   instanceOf(new BifunctorClass[These] {
-    override def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T = 
+    override def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T =
       fab.bimap(as)(bt)
   })
 ```
