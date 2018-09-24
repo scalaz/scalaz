@@ -23,6 +23,9 @@ credentials in ThisBuild ++= sonataCredentials.toSeq
 
 findLicense
 
+addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
+
 lazy val root = project
   .in(file("."))
   .settings(
