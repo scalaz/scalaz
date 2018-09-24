@@ -49,6 +49,8 @@ object Scalaz {
         compilerPlugin("org.scalaz"             %% "scalaz-plugin"   % "0.0.6" cross CrossVersion.full),
         "org.scalaz" %% "scalaz-plugin-library" % "0.0.6"
       ),
+      // FIXME: remove once scalacdoc compatibility issue is fixed.
+      scalacOptions += "-P:scalaz-plugin:-resolution",
       incOptions ~= (_.withLogRecompileOnMacro(false))
     ) ++ {
       Seq(packageBin, packageDoc, packageSrc).flatMap {
