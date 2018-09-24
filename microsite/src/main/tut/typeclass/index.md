@@ -1,5 +1,7 @@
 ---
 layout: docs
+position: 2
+section: typeclass
 title:  "Type classes"
 ---
 
