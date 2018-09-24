@@ -1,5 +1,6 @@
 ---
 layout: docs
+section: typeclass
 title:  "Category"
 ---
 
@@ -13,4 +14,3 @@ associative composition of any `F[A, B]` and `F[B, C]`, with `id[A]: F[A, A]`
 provided as the identity.
 
 # Law
-

@@ -1,5 +1,6 @@
 ---
 layout: docs
+section: typeclass
 title:  "Strong"
 ---
 

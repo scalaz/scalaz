@@ -1,5 +1,6 @@
 ---
 layout: docs
+section: data
 title:  "Kleisli"
 ---
 
