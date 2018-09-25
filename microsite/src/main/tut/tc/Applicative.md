@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: typeclass
+source: tc/applicative.scala
 title: "Applicative"
 ---
-
-# Applicative [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/applicative.scala)
 
 *Whereas a [functor](./Functor.html) allows application of a pure function to a value in a context, an Applicative also allows application of a function in a context to a value in a context.*
 

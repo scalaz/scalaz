@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: typeclass
+source: tc/monoid.scala
 title:  "Monoid"
 ---
-
-# Monoid [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/monoid.scala)
 
 A monoid is a semigroup with identity.
 

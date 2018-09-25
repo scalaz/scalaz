@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: typeclass
+source: tc/apply.scala
 title:  "Apply"
 ---
-
-# Apply [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/apply.scala)
 
 Equivalent to [Applicative](./Applicative.html) without the `pure` method.
 

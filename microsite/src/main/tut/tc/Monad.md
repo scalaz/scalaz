@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: typeclass
+source: tc/monad.scala
 title:  "Monad"
 ---
-
-# Monad [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/monad.scala)
 
 A monad is a subclass of `Bind`, which adds an identity, `pure`,
 by also being a subclass of `Applicative`.
