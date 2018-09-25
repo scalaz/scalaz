@@ -1,48 +1,46 @@
 options:
   - title: Type classes
-    url: typeclass/index.html
+    url: tc/index.html
     menu_section: typeclass
     menu_type: typeclass
 
     nested_options:
     - title: Laws
-      url: typeclass/Laws.html
+      url: tc/Laws.html
     - title: Applicative
-      url: typeclass/Applicative.html
+      url: tc/Applicative.html
     - title: Apply
-      url: typeclass/Apply.html
+      url: tc/Apply.html
     - title: Bifunctor
-      url: typeclass/Bifunctor.html
+      url: tc/Bifunctor.html
     - title: Bind
-      url: typeclass/Bind.html
+      url: tc/Bind.html
     - title: Category
-      url: typeclass/Category.html
-    - title: Compose
-      url: typeclass/Compose.html
+      url: tc/Category.html
     - title: Debug
-      url: typeclass/Debug.html
+      url: tc/Debug.html
     - title: Eq
-      url: typeclass/Eq.html
+      url: tc/Eq.html
     - title: Functor
-      url: typeclass/Functor.html
+      url: tc/Functor.html
     - title: Kleisli
-      url: typeclass/Kleisli.html
+      url: tc/Kleisli.html
     - title: Monad
-      url: typeclass/Monad.html
+      url: tc/Monad.html
     - title: Monoid
-      url: typeclass/Monoid.html
+      url: tc/Monoid.html
     - title: Ord
-      url: typeclass/Ord.html
+      url: tc/Ord.html
     - title: Semicategory
-      url: typeclass/Semicategory.html
+      url: tc/Semicategory.html
     - title: Semigroup
-      url: typeclass/Semigroup.html
+      url: tc/Semigroup.html
     - title: Strong
-      url: typeclass/Strong.html
+      url: tc/Strong.html
     - title: Unfoldable
-      url: typeclass/Unfoldable.html
+      url: tc/Unfoldable.html
     - title: Unfoldable1
-      url: typeclass/Unfoldable1.html
+      url: tc/Unfoldable1.html
 
   - title: Data classes
     url: data/index.html

@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: data
+source: data/forall.scala
 title:  "Forall"
 ---
-
-# Forall [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/forall.scala)
 
 Scala has polymorphic types (`class Foo[A]`, `type Bar[A]`, ...)
 and polymorphic methods (`def foo[A]`), but it lacks polymorphic _values_.

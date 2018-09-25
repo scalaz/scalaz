@@ -16,6 +16,7 @@ It provides purely functional data structures to complement those from the Scala
 Include Scalaz in your project by adding the following to your `build.sbt`:
 
 ```tut:evaluated
+if (scalaz.zio.BuildInfo.isSnapshot) scala.Console.println(s"""resolvers += Resolver.sonatypeRepo("snapshots")""")
 scala.Console.println(s"""libraryDependencies += "org.scalaz" %% "scalaz-base" % "${scalaz.BuildInfo.version}"""")
 ```
 

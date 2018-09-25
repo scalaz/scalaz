@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: data
+source: data/these.scala
 title:  "These"
 ---
-
-# These [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/data/these.scala)
 
 `These` (aliased as `\&/`) is an inclusive "or" of two data types, as opposed to
 [\/](./Disjunction.html), which is an exclusive "or". `These[A, B]` is isomorphic to

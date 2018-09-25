@@ -1,10 +1,8 @@
 ---
-layout: docs
+layout: scalaz
 section: std
 title:  "Option"
 ---
-
-# Option [![GitHub](../img/github.png)]
 
 Scalaz provides instances for Scala's built-in [Option](https://www.scala-lang.org/api/current/scala/Option.html) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 

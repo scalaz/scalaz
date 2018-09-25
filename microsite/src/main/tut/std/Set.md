@@ -1,10 +1,8 @@
 ---
-layout: docs
+layout: scalaz
 section: std
 title:  "Set"
 ---
-
-# Set [![GitHub](../img/github.png)]
 
 Scalaz provides instances for Scala's built-in [Set](https://www.scala-lang.org/api/current/scala/collection/immutable/Set.html) such as [Eq](../tc/Eq.html).
 

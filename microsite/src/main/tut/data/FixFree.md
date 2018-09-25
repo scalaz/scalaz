@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: data
+source: data/tree.scala
 title: "FixFree"
 ---
-
-# FixFree
 
 FixFree is a recursive data structure that either returns a value `A` or returns an effect computation in `F[_]` that yields
 another `FixFree`. FixFree can be summarized with following signature:
