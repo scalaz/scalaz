@@ -49,6 +49,8 @@ object ApplicativeTest extends SpecLite {
     List("Gurren ") +++ List.empty            must_=== List.empty[String]
     List.empty +++ List("Lagann")             must_=== List.empty[String]
     List.empty[String] +++ List.empty[String] must_=== List.empty[String]
+
+    Const(5) +++ Const(3)                     must_=== Const(8)
   }
 
 }
