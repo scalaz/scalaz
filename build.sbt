@@ -4,23 +4,6 @@ cancelable in Global := true
 
 organization in ThisBuild := "org.scalaz"
 
-publishTo in ThisBuild := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-dynverSonatypeSnapshots in ThisBuild := true
-
-lazy val sonataCredentials = for {
-  username <- sys.env.get("SONATYPE_USERNAME")
-  password <- sys.env.get("SONATYPE_PASSWORD")
-} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
-
-credentials in ThisBuild ++= sonataCredentials.toSeq
-
 findLicense
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
@@ -72,7 +55,7 @@ lazy val microsite = project.module
   .dependsOn(baseJVM, lawsJVM, tests)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, isSnapshot),
     buildInfoPackage := "scalaz",
     buildInfoObject := "BuildInfo"
   )
@@ -98,6 +81,8 @@ lazy val microsite = project.module
     micrositeGithubRepo := "scalaz",
     micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
     micrositeBaseUrl := "/8",
+    micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-base_2.12/${(version in Compile).value}",
+    micrositeDocumentationLabelDescription := "Scaladoc",
     micrositePalette := Map(
       "brand-primary"   -> "#ED2124",
       "brand-secondary" -> "#251605",
