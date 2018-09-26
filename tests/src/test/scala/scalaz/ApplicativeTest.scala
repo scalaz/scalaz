@@ -50,7 +50,8 @@ object ApplicativeTest extends SpecLite {
     List.empty +++ List("Lagann")             must_=== List.empty[String]
     List.empty[String] +++ List.empty[String] must_=== List.empty[String]
 
-    Const(5) +++ Const(3)                     must_=== Const(8)
+    def const(i: Int) = Const[Int, String](i) // won't compile w/o known B
+    const(5) +++ const(3)                     must_=== const(8)
   }
 
 }
