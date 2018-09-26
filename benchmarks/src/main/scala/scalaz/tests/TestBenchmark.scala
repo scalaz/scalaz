@@ -4,7 +4,6 @@ package tests
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import scala.Array
-import scala.Predef.{ wrapString, String }
 import scalaz.Predef._
 
 @State(Scope.Thread)
