@@ -451,7 +451,6 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
         Success(Monoid[A].zero)
     }
 
-
   implicit def ValidationAssociative: Associative[Validation] = new Associative[Validation] {
     override def reassociateLeft[A, B, C](f: Validation[A, Validation[B, C]]): Validation[Validation[A, B], C] =
       f.fold(
@@ -470,7 +469,6 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
         ),
         c => Success(Success(c))
       )
-
   }
 }
 
