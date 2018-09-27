@@ -11,6 +11,7 @@ object DisjunctionTest extends SpecLite {
   checkAll(monoid.laws[Int \/ Int])
   checkAll(bindRec.laws[Int \/ ?])
   checkAll(monad.laws[Int \/ ?])
+  checkAll(applicativeError.laws[Int \/ ?, Int])
   checkAll(monadError.laws[Int \/ ?, Int])
   checkAll(plus.laws[Int \/ ?])
   checkAll(traverse.laws[Int \/ ?])
