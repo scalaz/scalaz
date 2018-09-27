@@ -397,6 +397,10 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
+  /** Construct a disjunction value from a standard `scala.Option`. */
+  def fromOption[A, B](ifNone: => A)(o: Option[B]): A \/ B =
+    o.fold(left[A, B](ifNone))(right)
+
   @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
     \/-(a)
