@@ -35,6 +35,7 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val distributive = TypeClass("Distributive", *->*, extendsList = Seq(functor))
   lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
   lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
   lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
@@ -108,6 +109,7 @@ object TypeClass {
     optional,
     invariantFunctor,
     functor,
+    distributive,
     contravariant,
     divide,
     divisible,
