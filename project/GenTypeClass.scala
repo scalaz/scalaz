@@ -235,9 +235,18 @@ object GenTypeClass {
     val kind = tc.kind
     val extendsList = tc.extendsList.toList.map(_.name)
 
+
     import TypeClass._
     val classifiedTypeIdent = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
     else "F"
+
+    def extensionIdent(parent:TypeClass) = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
+    else parent.kind match {
+      case Kind.*      => "F"
+      case Kind.*->*   => "F"
+      case Kind.*^*->* => "F"
+      case Kind.|*->*|->* => "F, S"
+    }
 
     val typeShape: String = kind match {
       case Kind.*      => ""
@@ -249,9 +258,9 @@ object GenTypeClass {
 
     val classifiedTypeF = "F" +  typeShape
 
-    def extendsListText(suffix: String, parents: Seq[String] = extendsList, cti: String = classifiedTypeIdent) = parents match {
+    def extendsListText(suffix: String, parents: Seq[TypeClass] = tc.extendsList, cti: Map[Kind, String] = Map.empty[Kind, String]) = parents match {
       case Seq() => ""
-      case es    => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
+      case es    => es.map(n => n.name + suffix + "[" + cti.getOrElse(n.kind, extensionIdent(n)) + "]").mkString("extends ", " with ", "")
     }
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
@@ -260,10 +269,13 @@ object GenTypeClass {
           case es    => es.map(n => "To" + n + "Ops[TC]").mkString(" with ", " with ", "")
         })
       case Kind.|*->*|->* =>
-        "extends To" + typeClassName + "Ops0[TC]" + (extendsList match {
+        "extends To" + typeClassName + "Ops0[TC]" + (tc.extendsList match {
           case Seq() => ""
-          case es    => es.map(n =>
-            "To" + n + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+          case es    => es.map(n => n.kind match {
+            case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
+            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+          }
+
           ).mkString(" with ", " with ", "")
         })
       case _    =>
@@ -295,7 +307,12 @@ object GenTypeClass {
         case Seq() =>
           ""
         case values =>
-          values.map(t => s"Isomorphism${t.name}[F, G]").mkString("with ", " with ", "")
+          values.map(
+            t => s"Isomorphism${t.name}" + (t.kind match {
+              case Kind.|*->*|->* => "[F, G, S]"
+              case _ => "[F, G]"
+            })
+          ).mkString("with ", " with ", "")
       }
 
       kind match {
@@ -432,7 +449,7 @@ trait To${typeClassName}Ops $extendsToSyntaxListText {
   ////
 }
 
-trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
+trait ${typeClassName}Syntax[F] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
@@ -473,7 +490,7 @@ $ToVMA
 
 trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] $extendsToSyntaxListText
 
-trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
+trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
@@ -523,7 +540,7 @@ trait To${typeClassName}Ops0[TC[F[_, _]] <: ${typeClassName}[F]] extends To${typ
 
 trait To${typeClassName}Ops[TC[F[_, _]] <: ${typeClassName}[F]] ${extendsToSyntaxListText}
 
-trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
+trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = Map(Kind.*^*->* -> "F"))} {
   implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
@@ -558,7 +575,7 @@ trait To${typeClassName}Ops0[TC[F[_], S] <: ${typeClassName}[F, S]] {
 
 trait To${typeClassName}Ops[TC[F[_], S] <: ${typeClassName}[F, S]] ${extendsToSyntaxListText}
 
-trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
+trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, S, A] =
     new ${typeClassName}Ops[F, S, A](v)(${typeClassName}Syntax.this.F)
 
