@@ -41,6 +41,7 @@ object TypeClass {
   lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative))
+  lazy val applicativeError = TypeClass("ApplicativeError", |*->*|->*, extendsList = Seq(applicative))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
@@ -88,7 +89,7 @@ object TypeClass {
   lazy val monadCatchIO = TypeClass("MonadCatchIO", *->*, pack = Seq("scalaz", "effect"), extendsList = Seq(monadIO), createSyntax = false)
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad, applicativeError))
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
@@ -113,6 +114,7 @@ object TypeClass {
     divisible,
     apply,
     applicative,
+    applicativeError,
     invariantAlt,
     invariantApplicative,
     decidable,

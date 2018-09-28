@@ -695,7 +695,6 @@ object ScalazProperties {
     def laws[F[_], E](implicit me: MonadError[F, E], am: Arbitrary[F[Int]], afap: Arbitrary[F[Int => Int]], aeq: Equal[F[Int]], ae: Arbitrary[E], afea: Arbitrary[E => F[Int]]): Properties =
       newProperties("monad error"){ p =>
         p.include(monad.laws[F])
-        p.include(applicativeError.laws[F, E])
         p.property("errorsRaised") = errorsRaised[F, E, Int]
         p.property("errorsStopComputation") = errorsStopComputation[F, E, Int]
       }
