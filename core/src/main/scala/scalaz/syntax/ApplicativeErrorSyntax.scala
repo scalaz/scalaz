@@ -4,7 +4,14 @@ package syntax
 /** Wraps a value `self` and provides methods related to `ApplicativeError` */
 final class ApplicativeErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit val F: ApplicativeError[F, S]) {
   ////
+  final def handleError(f: S => F[A]): F[A] =
+    F.handleError(self)(f)
 
+  final def recover(f: S => A): F[A] =
+    F.handleError(self)(s => F.point(f(s)))
+
+  final def attempt: F[S \/ A] =
+    F.handleError(F.map(self)(a => \/.right[S, A](a)))(e => F.point(-\/(e)))
   ////
 }
 

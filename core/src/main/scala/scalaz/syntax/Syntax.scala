@@ -145,6 +145,9 @@ trait Syntaxes {
   object monadError0 extends ToMonadErrorOps0[MonadError]
   object monadError extends ToMonadErrorOps[MonadError]
 
+  object applicativeError0 extends ToApplicativeErrorOps0[ApplicativeError]
+  object applicativeError extends ToApplicativeErrorOps[ApplicativeError]
+
   //
   // Type classes over (* -> *) -> * -> *
   //
