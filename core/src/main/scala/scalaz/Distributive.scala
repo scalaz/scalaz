@@ -1,11 +1,15 @@
 package scalaz
 
+////
 /** Dual of [[scalaz.Traverse]].  To transform `F[G[B]]` to `G[F[B]]`,
   * you may use `Traverse[F]` and `Applicative[G]`, but alternatively
   * `Functor[F]` and `Distributive[G]`, which permits greater sharing
   * and nonstrictness.
   */
+////
 trait Distributive[F[_]] extends Functor[F] { self =>
+  ////
+
   def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => F[B]): F[G[B]]
 
 
@@ -36,12 +40,27 @@ trait Distributive[F[_]] extends Functor[F] { self =>
   def cosequence[G[_]:Functor,A](fa: G[F[A]]): F[G[A]] =
     distributeImpl(fa)(x => x)
 
+
+  ////
+
 }
 
 object Distributive {
   @inline def apply[F[_]](implicit F: Distributive[F]): Distributive[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Distributive[G]): Distributive[F] =
+    new IsomorphismDistributive[F, G] {
+      override def G: Distributive[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+
   // Distributive is the dual of Traverse.
   type Cotraverse[F[_]] =
   Distributive[F]
+
+  ////
 }

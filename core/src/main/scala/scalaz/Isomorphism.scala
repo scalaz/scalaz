@@ -263,6 +263,13 @@ trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] {
   override def map[A, B](fa: F[A])(f: A => B): F[B] = iso.from(G.map(iso.to(fa))(f))
 }
 
+trait IsomorphismDistributive[F[_], G[_]] extends Distributive[F] with IsomorphismFunctor[F, G]{
+  def G: Distributive[G]
+
+  def distributeImpl[H[_]: Functor, A, B](a: H[A])(f: A => F[B]): F[H[B]] =
+    iso.from(G.distributeImpl(a)(x => iso.to(f(x))))
+}
+
 trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] {
   implicit def G: Contravariant[G]
 
