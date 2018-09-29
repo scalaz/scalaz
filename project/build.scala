@@ -306,7 +306,10 @@ object build {
     },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.7",
+    kindProjectorVersion := {
+      if (scalaVersion.value == "2.13.0-M4") "0.9.7"
+      else "0.9.8"
+    },
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
