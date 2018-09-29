@@ -101,7 +101,7 @@ sealed abstract class Tree[A] {
   }
 
   def toStrictTree: StrictTree[A] = {
-    //import std.list.listInstance
+    import std.list.listInstance
 
     def trampolined(t: Tree[A]): Trampoline[StrictTree[A]] = {
       t match {
@@ -109,7 +109,7 @@ sealed abstract class Tree[A] {
           Trampoline.done(StrictTree.Leaf(root))
         case Tree.Node(root, forest) =>
           for {
-            strictForest <- Applicative[Trampoline].traverse(forest)(trampolined)
+            strictForest <- Applicative[Trampoline].traverse(forest.toList)(trampolined)
           } yield StrictTree(root, strictForest.toList)
       }
     }

@@ -67,16 +67,11 @@ trait ListInstances extends ListInstances0 {
         }
         (a, b) => loop(a, b, Nil)
       }
+
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-        val revOpt: Maybe[F[List[B]]] =
-          F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
-            case a :: as => Maybe.just((f(a), as))
-            case Nil => Maybe.empty
-          })(Reducer.ReverseListReducer[B])
-
-        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
-
-        F.map(rev)(_.reverse)
+        l.foldLeft(F.point(empty[B])) { (flb, a) =>
+          F.apply2(flb, f(a))(_ :+ _)
+        }
       }
 
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
