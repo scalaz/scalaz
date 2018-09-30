@@ -35,7 +35,7 @@ resolvers in ThisBuild += "Sonatype OSS Releases" at "https://oss.sonatype.org/c
 
 lazy val base = crossProject.module
   .dependsOn(meta)
-  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.2.7")
+  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.2.8")
 
 lazy val baseJVM = base.jvm
 
