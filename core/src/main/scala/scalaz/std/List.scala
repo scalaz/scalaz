@@ -68,10 +68,14 @@ trait ListInstances extends ListInstances0 {
         (a, b) => loop(a, b, Nil)
       }
 
-      def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) =
-        F.map(l.reverse.foldRight(F.point(empty[B])) { (a, flb) =>
-          F.apply2(flb, f(a))((lb, b) => b :: lb)
-        })(_.reverse)
+      def traverseImpl[F[_], A, B](la: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+        var flb = F.point(empty[B])
+        la foreach { a =>
+          val flbz = flb // copy to avoid by-name peril
+          flb = F.apply2(flbz, f(a))((lb, b) => b :: lb)
+        }
+        F.map(flb)(_.reverse)
+      }
 
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
