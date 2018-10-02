@@ -69,11 +69,6 @@ matrix:
     - scala: 2.13.0-M5
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-      before_script:
-      - git clone -b v0.9.7 https://github.com/non/kind-projector.git
-      - cd kind-projector
-      - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
-      - cd ..
       script:
       - sbt "++ ${TRAVIS_SCALA_VERSION}" -J-Xmx3784m checkGenTypeClasses example/compile
 
