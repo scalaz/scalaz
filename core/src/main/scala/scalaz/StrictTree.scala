@@ -291,7 +291,9 @@ object StrictTree extends StrictTreeInstances {
 
   //Only used for .equals.
   private def badEqInstance[A] = new StrictTreeEqual[A] {
-    override def A: Equal[A] = _ equals _
+    override def A: Equal[A] = new Equal[A] {
+      override def equal(a1: A, a2: A): Boolean = a1.equals(a2)
+    }
   }
 
   /**
