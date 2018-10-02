@@ -24,22 +24,22 @@ case class StrictTree[A](
     * @param reduce is a function from a label and its mapped children to the new result.
     */
   private[scalaz] def runBottomUp[B](
-    reduce: A => mutable.Buffer[B] => B
+    reduce: A => mutable.ListBuffer[B] => B
   ): B = {
     val root = BottomUpStackElem[A, B](None, this)
-    val stack = mutable.Stack[BottomUpStackElem[A, B]](root)
+    var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
         val child = here.next()
         val nextStackElem = BottomUpStackElem[A, B](Some(here), child)
-        stack.push(nextStackElem)
+        stack = nextStackElem :: stack
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
         val result = reduce(here.rootLabel)(here.mappedSubForest)
         here.parent.foreach(_.mappedSubForest += result)
-        stack.pop()
+        stack = stack.tail
       }
     }
 
@@ -67,28 +67,28 @@ case class StrictTree[A](
 
   /** Pre-order traversal. */
   def flatten: List[A] = {
-    val stack = mutable.Stack(this)
+    var stack = this :: Nil
 
-    val result = mutable.Buffer.empty[A]
+    val result = mutable.ListBuffer.empty[A]
 
     while (stack.nonEmpty) {
-      val popped = stack.pop()
-      result += popped.rootLabel
-      popped.subForest.reverseIterator.foreach(stack.push)
+      val head :: tail = stack
+      result += head.rootLabel
+      stack = head.subForest ::: tail
     }
 
     result.toList
   }
 
   def size: Int = {
-    val stack = mutable.Stack(this.subForest)
+    var stack = this.subForest :: Nil
 
     var result = 1
 
     while (stack.nonEmpty) {
-      val popped = stack.pop()
-      result += popped.size
-      stack.pushAll(popped.map(_.subForest))
+      val head :: tail = stack
+      result += head.size
+      stack = head.map(_.subForest) ::: tail
     }
 
     result
@@ -96,22 +96,16 @@ case class StrictTree[A](
 
   /** Breadth-first traversal. */
   def levels: List[List[A]] = {
-    val f = (s: List[StrictTree[A]]) => {
-      Foldable[List].foldMap(s)((_: StrictTree[A]).subForest)
-    }
-    List.iterate(List(this), depth)(f) map { _ map (_.rootLabel) }
-  }
-
-  def depth: Int = {
     var level = List(this)
-    var result = 0
+
+    val result = mutable.ListBuffer.empty[List[A]]
 
     while (level.nonEmpty) {
+      result += level.map(_.rootLabel)
       level = Foldable[List].foldMap(level)(_.subForest)
-      result += 1
     }
 
-    result
+    result.toList
   }
 
   def toTree: Tree[A] = {
@@ -145,19 +139,19 @@ case class StrictTree[A](
 
   def zip[B](b: StrictTree[B]): StrictTree[(A, B)] = {
     val root = ZipStackElem[A, B](None, this, b)
-    val stack = mutable.Stack[ZipStackElem[A, B]](root)
+    var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
         val (childA, childB) = here.next()
         val nextStackElem = ZipStackElem[A, B](Some(here), childA, childB)
-        stack.push(nextStackElem)
+        stack = nextStackElem :: stack
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
         val result = StrictTree((here.a.rootLabel, here.b.rootLabel), here.mappedSubForest.toList)
         here.parent.foreach(_.mappedSubForest += result)
-        stack.pop()
+        stack = stack.tail
       }
     }
 
@@ -203,23 +197,23 @@ sealed abstract class StrictTreeInstances {
     override def foldMap[A, B](fa: StrictTree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
 
     //This implementation is 14x faster than the trampolined implementation for StrictTreeTestJVM's align test.
-    override def alignWith[A, B, C](f: (\&/[A, B]) => C): (StrictTree[A], StrictTree[B]) => StrictTree[C] = {
+    override def alignWith[A, B, C](f: A \&/ B => C): (StrictTree[A], StrictTree[B]) => StrictTree[C] = {
       (a, b) =>
         import StrictTree.AlignStackElem
         val root = AlignStackElem[A, B, C](None, \&/(a, b))
-        val stack = mutable.Stack(root)
+        var stack = root :: Nil
 
         while (stack.nonEmpty) {
           val here = stack.head
           if (here.hasNext) {
             val nextChildren = here.next()
             val nextStackElem = AlignStackElem[A, B, C](Some(here), nextChildren)
-            stack.push(nextStackElem)
+            stack = nextStackElem :: stack
           } else {
             //The "here" node is completed, so add its result to its parents completed children.
             val result = StrictTree[C](f(here.trees.bimap(_.rootLabel, _.rootLabel)), here.mappedSubForest.toList)
             here.parent.foreach(_.mappedSubForest += result)
-            stack.pop()
+            stack = stack.tail
           }
         }
 
@@ -297,9 +291,7 @@ object StrictTree extends StrictTreeInstances {
 
   //Only used for .equals.
   private def badEqInstance[A] = new StrictTreeEqual[A] {
-    override def A: Equal[A] = new Equal[A] {
-      override def equal(a1: A, a2: A): Boolean = a1.equals(a2)
-    }
+    override def A: Equal[A] = _ equals _
   }
 
   /**
@@ -308,7 +300,7 @@ object StrictTree extends StrictTreeInstances {
   private def scanrReducer[A, B](
     f: (A, List[StrictTree[B]]) => B
   )(rootLabel: A
-  )(subForest: mutable.Buffer[StrictTree[B]]
+  )(subForest: mutable.ListBuffer[StrictTree[B]]
   ): StrictTree[B] = {
     val subForestList = subForest.toList
     StrictTree[B](f(rootLabel, subForestList), subForestList)
@@ -320,7 +312,7 @@ object StrictTree extends StrictTreeInstances {
   private def mapReducer[A, B](
     f: A => B
   )(rootLabel: A
-  )(subForest: scala.collection.Seq[StrictTree[B]]
+  )(subForest: mutable.ListBuffer[StrictTree[B]]
   ): StrictTree[B] = {
     StrictTree[B](f(rootLabel), subForest.toList)
   }
@@ -331,7 +323,7 @@ object StrictTree extends StrictTreeInstances {
   private def flatMapReducer[A, B](
     f: A => StrictTree[B]
   )(root: A
-  )(subForest: scala.collection.Seq[StrictTree[B]]
+  )(subForest: mutable.ListBuffer[StrictTree[B]]
   ): StrictTree[B] = {
     val StrictTree(rootLabel0, subForest0) = f(root)
     StrictTree(rootLabel0, subForest0 ++ subForest)
@@ -343,7 +335,7 @@ object StrictTree extends StrictTreeInstances {
   private def foldMapReducer[A, B: Monoid](
     f: A => B
   )(rootLabel: A
-  )(subForest: mutable.Buffer[B]
+  )(subForest: mutable.ListBuffer[B]
   ): B = {
     val mappedRoot = f(rootLabel)
     val foldedForest = Foldable[List].fold[B](subForest.toList)
@@ -351,67 +343,72 @@ object StrictTree extends StrictTreeInstances {
     Monoid[B].append(mappedRoot, foldedForest)
   }
 
-  private def hashCodeReducer[A](root: A)(subForest: scala.collection.Seq[Int]): Int = {
+  private def hashCodeReducer[A](root: A)(subForest: mutable.ListBuffer[Int]): Int = {
     root.hashCode ^ subForest.hashCode
   }
 
-  private case class BottomUpStackElem[A, B](
+  private final case class BottomUpStackElem[A, B](
     parent: Option[BottomUpStackElem[A, B]],
     tree: StrictTree[A]
   ) extends Iterator[StrictTree[A]] {
-    private[this] val subIterator = tree.subForest.iterator
+    private[this] var subPosition = tree.subForest
 
-    def rootLabel = tree.rootLabel
+    private[scalaz] def rootLabel = tree.rootLabel
 
-    val mappedSubForest: mutable.Buffer[B] = mutable.Buffer.empty
+    private[scalaz] val mappedSubForest = mutable.ListBuffer.empty[B]
 
-    override def hasNext: Boolean = subIterator.hasNext
+    override def hasNext: Boolean = subPosition.nonEmpty
 
-    override def next(): StrictTree[A] = subIterator.next()
+    override def next(): StrictTree[A] = {
+      val head = subPosition.head
+      subPosition = subPosition.tail
+      head
+    }
   }
 
-  private case class ZipStackElem[A, B](
+  private final case class ZipStackElem[A, B](
     parent: Option[ZipStackElem[A, B]],
     a: StrictTree[A],
     b: StrictTree[B]
   ) extends Iterator[(StrictTree[A], StrictTree[B])] {
-    private[this] val zippedSubIterator =
-      a.subForest.iterator.zip(b.subForest.iterator)
+    private[this] var subPosition = STreeZip(a.subForest, b.subForest)
 
-    val mappedSubForest: mutable.Buffer[StrictTree[(A, B)]] = mutable.Buffer.empty
+    private[scalaz] val mappedSubForest = mutable.ListBuffer.empty[StrictTree[(A, B)]]
 
-    override def hasNext: Boolean = zippedSubIterator.hasNext
+    override def hasNext: Boolean = subPosition.as.nonEmpty && subPosition.bs.nonEmpty
 
-    override def next(): (StrictTree[A], StrictTree[B]) = zippedSubIterator.next()
+    override def next(): (StrictTree[A], StrictTree[B]) = {
+      val head = (subPosition.as.head, subPosition.bs.head)
+      subPosition = STreeZip(subPosition.as.tail, subPosition.bs.tail)
+      head
+    }
   }
 
-  private[scalaz] case class AlignStackElem[A, B, C](
+  private[scalaz] final case class AlignStackElem[A, B, C](
     parent: Option[AlignStackElem[A, B, C]],
     trees: \&/[StrictTree[A], StrictTree[B]]
   ) extends Iterator[\&/[StrictTree[A], StrictTree[B]]] {
-    private[this] val iterators =
-      trees.bimap(_.subForest.iterator, _.subForest.iterator)
+    private[this] var subPosition = STreeZip(
+      trees.a.map(_.subForest).getOrElse(List.empty),
+      trees.b.map(_.subForest).getOrElse(List.empty)
+    )
 
-    val mappedSubForest: mutable.Buffer[StrictTree[C]] = mutable.Buffer.empty
+    private[scalaz] val mappedSubForest = mutable.ListBuffer.empty[StrictTree[C]]
 
-    def whichHasNext: \&/[Boolean, Boolean] =
-      iterators.bimap(_.hasNext, _.hasNext)
-
-    override def hasNext: Boolean =
-      whichHasNext.fold(identity, identity, _ || _)
+    override def hasNext: Boolean = subPosition.as.nonEmpty || subPosition.bs.nonEmpty
 
     override def next(): \&/[StrictTree[A], StrictTree[B]] =
-      whichHasNext match {
-        case \&/(true, true) =>
-          iterators.bimap(_.next(), _.next())
-
-        case \&/(true, false) | \&/.This(true) =>
-          \&/.This(iterators.onlyThis.get.next())
-
-        case \&/(false, true) | \&/.That(true) =>
-          \&/.That(iterators.onlyThat.get.next())
-
-        case _ =>
+      subPosition match {
+        case STreeZip(a :: aTail, b :: bTail) =>
+          subPosition = STreeZip(aTail, bTail)
+          \&/.Both(a, b)
+        case STreeZip(a :: aTail, Nil) =>
+          subPosition = STreeZip(aTail, Nil)
+          \&/.This(a)
+        case STreeZip(Nil, b :: bTail) =>
+          subPosition = STreeZip(Nil, bTail)
+          \&/.That(b)
+        case STreeZip(Nil, Nil) =>
           throw new NoSuchElementException("reached iterator end")
       }
   }
@@ -424,39 +421,26 @@ object StrictTree extends StrictTreeInstances {
 private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
   def A: Equal[A]
 
-  private case class EqualStackElem(
-    a: StrictTree[A],
-    b: StrictTree[A]
-  ) {
-    val aSubIterator =
-      a.subForest.iterator
-
-    val bSubIterator =
-      b.subForest.iterator
-  }
-
   //This implementation is 4.5x faster than the trampolined implementation for StrictTreeTestJVM's equal test.
   override final def equal(a1: StrictTree[A], a2: StrictTree[A]): Boolean = {
-    val root = EqualStackElem(a1, a2)
-    val stack = mutable.Stack[EqualStackElem](root)
+    import StrictTree.Node
+
+    if (!A.equal(a1.rootLabel, a2.rootLabel))
+      return false
+
+    var stack = STreeZip(a1.subForest, a2.subForest) :: Nil
 
     while (stack.nonEmpty) {
-      val here = stack.head
-      if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
-        val aNext = here.aSubIterator.hasNext
-        val bNext = here.bSubIterator.hasNext
-        (aNext, bNext) match {
-          case (true, true) =>
-            val childA = here.aSubIterator.next()
-            val childB = here.bSubIterator.next()
-            val nextStackElem = EqualStackElem(childA, childB)
-            stack.push(nextStackElem)
-          case (false, false) =>
-            stack.pop()
-          case _ =>
+      stack match {
+        case STreeZip(Node(childA1, childrenA1) :: a1Tail, Node(childA2, childrenA2) :: a2Tail) :: tail=>
+          if (!A.equal(childA1, childA2))
             return false
-        }
-      } else return false
+          stack = STreeZip(a1Tail, a2Tail) :: STreeZip(childrenA1, childrenA2) :: tail
+        case STreeZip(Nil, Nil) :: tail =>
+          stack = tail
+        case _ =>
+          return false
+      }
     }
 
     true
@@ -464,7 +448,7 @@ private trait StrictTreeEqual[A] extends Equal[StrictTree[A]] {
 }
 
 final class StrictTreeUnzip[A1, A2](private val root: StrictTree[(A1, A2)]) extends AnyVal {
-  private def unzipCombiner(rootLabel: (A1, A2))(accumulator: scala.collection.Seq[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
+  private def unzipCombiner(rootLabel: (A1, A2))(accumulator: mutable.ListBuffer[(StrictTree[A1], StrictTree[A2])]): (StrictTree[A1], StrictTree[A2]) = {
     (StrictTree(rootLabel._1, accumulator.map(_._1).toList), StrictTree(rootLabel._2, accumulator.map(_._2).toList))
   }
 
@@ -473,3 +457,8 @@ final class StrictTreeUnzip[A1, A2](private val root: StrictTree[(A1, A2)]) exte
     root.runBottomUp[(StrictTree[A1], StrictTree[A2])](unzipCombiner)
   }
 }
+
+private[scalaz] final case class STreeZip[A, B](
+  as: List[StrictTree[A]],
+  bs: List[StrictTree[B]]
+)

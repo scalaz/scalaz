@@ -49,6 +49,10 @@ object StrictTreeTest extends SpecLite {
     s.flatten must_=== s.toTree.flatten.toList
   }
 
+  "levels is the same as the lazy Tree's levels" ! forAll { (s: StrictTree[Byte]) =>
+    s.levels must_=== s.toTree.levels.map(_.toList).toList
+  }
+
   "StrictTree#toTree and Tree#toStrictTree are inverses" ! forAll { (s: StrictTree[Byte]) =>
     Equal[StrictTree[Byte]].equal(s, s.toTree.toStrictTree) must_=== true
   }
