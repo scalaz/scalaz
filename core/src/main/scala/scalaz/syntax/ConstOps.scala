@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Provides [[Const]]-related methods for any value. */
-final class ConstOps[A](val self: A) extends AnyVal {
+final class ConstOps[A](private val self: A) extends AnyVal {
   /** Wrap `self` in a [[Const]].
     *
     * Can have better type inference than the [[Const.apply]] constructor.
