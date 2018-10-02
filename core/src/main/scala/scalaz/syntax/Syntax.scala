@@ -185,6 +185,8 @@ trait Syntaxes {
 
   object contT extends ToContTOps
 
+  object const extends ToConstOps
+
   //
   // Mixed
   //
@@ -208,6 +210,7 @@ trait ToDataOps
   with ToTheseOps
   with ToMaybeOps
   with ToContTOps
+  with ToConstOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToBandOps with ToEqualOps with ToShowOps
