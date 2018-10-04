@@ -50,8 +50,27 @@ case class StrictTree[A](
   def foldMap[B: Monoid](f: A => B): B =
     runBottomUp(foldMapReducer(f))
 
-  def foldRight[B](z: B)(f: (A, => B) => B): B =
-    Foldable[List].foldRight(flatten, z)(f)
+  def foldLeft[B](z: B)(f: (A, B) => B): B = {
+    var stack = this :: Nil
+    var result = z
+    while (stack.nonEmpty) {
+      val head :: tail = stack
+      result = f(head.rootLabel, result)
+      stack = head.subForest ::: tail
+    }
+    result
+  }
+
+  def foldRight[B](z: B)(f: (A, => B) => B): B = {
+    var stack = this :: Nil
+    var result: List[A] = Nil
+    while (stack.nonEmpty) {
+      val head :: tail = stack
+      result ::= head.rootLabel
+      stack = head.subForest ::: tail
+    }
+    result.foldLeft(z)((a, b) => f(b, a))
+  }
 
   /** A 2D String representation of this StrictTree. */
   def drawTree(implicit sh: Show[A]): String = {
@@ -66,19 +85,7 @@ case class StrictTree[A](
     runBottomUp(scanrReducer(g))
 
   /** Pre-order traversal. */
-  def flatten: List[A] = {
-    var stack = this :: Nil
-
-    val result = mutable.ListBuffer.empty[A]
-
-    while (stack.nonEmpty) {
-      val head :: tail = stack
-      result += head.rootLabel
-      stack = head.subForest ::: tail
-    }
-
-    result.toList
-  }
+  def flatten: List[A] = foldLeft(List.empty[A])(_ :: _)
 
   def size: Int = {
     var stack = this.subForest :: Nil
@@ -102,7 +109,7 @@ case class StrictTree[A](
 
     while (level.nonEmpty) {
       result += level.map(_.rootLabel)
-      level = Foldable[List].foldMap(level)(_.subForest)
+      level = level.flatMap(_.subForest)
     }
 
     result.toList
