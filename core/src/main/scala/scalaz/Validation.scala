@@ -530,7 +530,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
         fa.fold(l => -\/(Failure(l)), \/.right)
     }
 
-  implicit def ValidationPlus[E: Semigroup, A]: Plus[Validation[E, ?]] = new Plus[Validation[E, ?]] {
+  implicit def ValidationPlus[E: Semigroup]: Plus[Validation[E, ?]] = new Plus[Validation[E, ?]] {
     override def plus[A](a1: Validation[E, A], a2: => Validation[E, A]) =
       a1 findSuccess a2
   }
