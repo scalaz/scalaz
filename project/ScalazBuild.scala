@@ -46,11 +46,9 @@ object Scalaz {
         compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.7"),
         compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
         compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "1.0"),
-        compilerPlugin("org.scalaz"             %% "scalaz-plugin"   % "0.0.6" cross CrossVersion.full),
-        "org.scalaz" %% "scalaz-plugin-library" % "0.0.6"
+        compilerPlugin("org.scalaz"             %% "scalaz-plugin"   % "0.0.7" cross CrossVersion.full),
+        "org.scalaz" %% "scalaz-plugin-library" % "0.0.7"
       ),
-      // FIXME: remove once scalacdoc compatibility issue is fixed.
-      scalacOptions += "-P:scalaz-plugin:-resolution",
       incOptions ~= (_.withLogRecompileOnMacro(false))
     ) ++ {
       Seq(packageBin, packageDoc, packageSrc).flatMap {
