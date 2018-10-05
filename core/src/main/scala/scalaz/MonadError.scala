@@ -5,18 +5,13 @@ package scalaz
  *
  */
 ////
-trait MonadError[F[_], S] extends Monad[F] { self =>
+trait MonadError[F[_], S] extends Monad[F] with ApplicativeError[F, S] { self =>
   ////
-
-  def raiseError[A](e: S): F[A]
-  def handleError[A](fa: F[A])(f: S => F[A]): F[A]
 
   def emap[A, B](fa: F[A])(f: A => S \/ B): F[B] =
     bind(fa)(a => f(a).fold(raiseError(_), pure(_)))
 
-  trait MonadErrorLaw {
-    def raisedErrorsHandled[A](e: S, f: S => F[A])(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(handleError(raiseError(e))(f), f(e))
+  trait MonadErrorLaw extends ApplicativeErrorLaws {
     def errorsRaised[A](a: A, e: S)(implicit FEA: Equal[F[A]]): Boolean =
       FEA.equal(bind(point(a))(_ => raiseError(e)), raiseError(e))
     def errorsStopComputation[A](e: S, a: A)(implicit FEA: Equal[F[A]]): Boolean =
@@ -44,14 +39,8 @@ object MonadError {
   ////
 }
 
-trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] with IsomorphismMonad[F, G]{
+trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] with IsomorphismMonad[F, G] with IsomorphismApplicativeError[F, G, S]{
   implicit def G: MonadError[G, S]
   ////
-
-  override def raiseError[A](e: S): F[A] =
-    iso.from(G.raiseError(e))
-
-  override def handleError[A](fa: F[A])(f: S => F[A]): F[A] =
-    iso.from(G.handleError(iso.to(fa))(s => iso.to(f(s))))
   ////
 }
