@@ -20,6 +20,7 @@ object ValidationTest extends SpecLite {
   checkAll("Validation", bifunctor.laws[Validation])
   checkAll("Validation", bitraverse.laws[Validation])
   checkAll("Validation", associative.laws[Validation])
+  checkAll("Validation", applicativeError.laws[ValidationInt, Int])
 
   "fpoint and point" in {
 
