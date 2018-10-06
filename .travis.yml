@@ -30,10 +30,10 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
     - scala: 2.11.12
@@ -45,14 +45,14 @@ matrix:
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run
       - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver rootNative/publish ; fi
-    - scala: 2.12.6
+    - scala: 2.12.7
       jdk: oraclejdk9
       env: TEST_PROJECT=""
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
     - scala: 2.13.0-M4
       jdk: oraclejdk8
-      env: TEST_PROJECT="rootJS"
+      env: TEST_PROJECT="rootJS" SCALA_JS_VERSION=0.6.24
       script:
       - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project rootJS_213" test:fastOptJS mimaReportBinaryIssues
@@ -60,7 +60,7 @@ matrix:
       - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "project rootJVM_213" "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
     - scala: 2.13.0-M4
       jdk: oraclejdk8
-      env: TEST_PROJECT="rootJVM"
+      env: TEST_PROJECT="rootJVM" SCALA_JS_VERSION=0.6.24
       script:
       - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
       - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project rootJVM_213" test:compile mimaReportBinaryIssues
