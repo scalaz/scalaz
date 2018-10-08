@@ -67,7 +67,14 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
 
-object Arrow {
+abstract class ArrowInstances {
+
+  implicit def arrowApply[F[_, _], A](implicit A0: Arrow[F]): Apply[F[A, ?]] = new ArrowApply[F, A] {
+    implicit def A: Arrow[F] = A0
+  }
+}
+
+object Arrow extends ArrowInstances {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
   import Isomorphism._
@@ -90,4 +97,13 @@ trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[
   override def arr[A, B](f: A => B): F[A, B] =
     iso.from(G.arr(f))
   ////
+}
+
+private trait ArrowApply[F[_, _], A] extends Apply[F[A, ?]] {
+  implicit def A: Arrow[F]
+
+  def map[B, C](fa: F[A, B])(f: B => C): F[A, C] = A.compose(A.arr(f), fa)
+
+  def ap[B,C](fa: => F[A, B])(f: => F[A, B => C]): F[A, C] =
+    A.mapsnd(A.combine(f, fa))(t => t._1(t._2))
 }
