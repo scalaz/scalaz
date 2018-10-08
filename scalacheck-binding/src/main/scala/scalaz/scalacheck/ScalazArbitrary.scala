@@ -612,4 +612,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     ))
   }
 
+  implicit def CodensityArbitrary[F[_], A](implicit A: Arbitrary[F[A]], M: Monad[F]): Arbitrary[Codensity[F, A]] =
+    Functor[Arbitrary].map(A)(Codensity.rep(_))
 }

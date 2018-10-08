@@ -26,7 +26,14 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
   val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
 }
 
-object ApplicativePlus {
+abstract class ApplicativePlusInstances {
+
+  implicit def applicativePlusAlt[F[_]](implicit A0: ApplicativePlus[F]): Alt[F] = new ApplicativePlusAlt[F] {
+    implicit def A: ApplicativePlus[F] = A0
+  }
+}
+
+object ApplicativePlus extends ApplicativePlusInstances {
   @inline def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
 
   import Isomorphism._
@@ -47,4 +54,14 @@ trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with Iso
   ////
 
   ////
+}
+
+private trait ApplicativePlusAlt[F[_]] extends Alt[F] {
+  implicit def A: ApplicativePlus[F]
+
+  def point[A](a: => A): F[A] = A.point(a)
+
+  def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = A.ap(fa)(f)
+
+  def alt[A](a1: =>F[A], a2: =>F[A]): F[A] = A.plus(a1, a2)
 }
