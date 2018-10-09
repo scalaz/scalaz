@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.collection.mutable
-import std.list.listInstance
+import scala.util.hashing.MurmurHash3
 
 /**
   *
@@ -48,7 +48,7 @@ case class StrictTree[A](
 
   /** Maps the elements of the StrictTree into a Monoid and folds the resulting StrictTree. */
   def foldMap[B: Monoid](f: A => B): B =
-    runBottomUp(foldMapReducer(f))
+    foldLeft(Monoid[B].zero)((a, b) => Monoid[B].append(b, f(a)))
 
   def foldLeft[B](z: B)(f: (A, B) => B): B = {
     var stack = this :: Nil
@@ -61,16 +61,8 @@ case class StrictTree[A](
     result
   }
 
-  def foldRight[B](z: B)(f: (A, => B) => B): B = {
-    var stack = this :: Nil
-    var result: List[A] = Nil
-    while (stack.nonEmpty) {
-      val head :: tail = stack
-      result ::= head.rootLabel
-      stack = head.subForest ::: tail
-    }
-    result.foldLeft(z)((a, b) => f(b, a))
-  }
+  def foldRight[B](z: B)(f: (A, => B) => B): B =
+    rflatten.foldLeft(z)((a, b) => f(b, a))
 
   /** A 2D String representation of this StrictTree. */
   def drawTree(implicit sh: Show[A]): String = {
@@ -85,21 +77,12 @@ case class StrictTree[A](
     runBottomUp(scanrReducer(g))
 
   /** Pre-order traversal. */
-  def flatten: List[A] = foldLeft(List.empty[A])(_ :: _).reverse
+  def flatten: List[A] = rflatten.reverse
 
-  def size: Int = {
-    var stack = this.subForest :: Nil
+  /** Reverse pre-order traversal. */
+  def rflatten: List[A] = foldLeft(List.empty[A])(_ :: _)
 
-    var result = 1
-
-    while (stack.nonEmpty) {
-      val head :: tail = stack
-      result += head.size
-      stack = head.map(_.subForest) ::: tail
-    }
-
-    result
-  }
+  def size: Int = foldLeft(0)((_, b) => b + 1)
 
   /** Breadth-first traversal. */
   def levels: List[List[A]] = {
@@ -170,9 +153,8 @@ case class StrictTree[A](
     *
     * @return
     */
-  override def hashCode(): Int = {
-    runBottomUp(hashCodeReducer)
-  }
+  override def hashCode(): Int =
+    MurmurHash3.listHash(rflatten, "StrictTree".hashCode)
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
@@ -336,24 +318,6 @@ object StrictTree extends StrictTreeInstances {
   ): StrictTree[B] = {
     val StrictTree(rootLabel0, subForest0) = f(root)
     StrictTree(rootLabel0, subForest0 ++ subForest)
-  }
-
-  /**
-    * This implementation is 9x faster than the trampolined implementation for StrictTreeTestJVM's foldMap test.
-    */
-  private def foldMapReducer[A, B: Monoid](
-    f: A => B
-  )(rootLabel: A
-  )(subForest: mutable.ListBuffer[B]
-  ): B = {
-    val mappedRoot = f(rootLabel)
-    val foldedForest = Foldable[List].fold[B](subForest.toList)
-
-    Monoid[B].append(mappedRoot, foldedForest)
-  }
-
-  private def hashCodeReducer[A](root: A)(subForest: mutable.ListBuffer[Int]): Int = {
-    root.hashCode ^ subForest.hashCode
   }
 
   private final case class BottomUpStackElem[A, B](
