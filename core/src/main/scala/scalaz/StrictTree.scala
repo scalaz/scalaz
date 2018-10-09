@@ -1,7 +1,7 @@
 package scalaz
 
 import scala.collection.mutable
-import std.list.{listInstance, listMonoid}
+import std.list.listInstance
 
 /**
   *
@@ -85,7 +85,7 @@ case class StrictTree[A](
     runBottomUp(scanrReducer(g))
 
   /** Pre-order traversal. */
-  def flatten: List[A] = foldLeft(List.empty[A])(_ :: _)
+  def flatten: List[A] = foldLeft(List.empty[A])(_ :: _).reverse
 
   def size: Int = {
     var stack = this.subForest :: Nil
