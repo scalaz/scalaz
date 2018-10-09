@@ -51,12 +51,17 @@ case class StrictTree[A](
     foldLeft(Monoid[B].zero)((a, b) => Monoid[B].append(b, f(a)))
 
   def foldLeft[B](z: B)(f: (A, B) => B): B = {
-    var stack = this :: Nil
+    var stack = List(this) :: Nil
     var result = z
     while (stack.nonEmpty) {
       val head :: tail = stack
-      result = f(head.rootLabel, result)
-      stack = head.subForest ::: tail
+      if (head.isEmpty) {
+        stack = tail
+      } else {
+        val h2 :: t2 = head
+        result = f(h2.rootLabel, result)
+        stack = h2.subForest :: t2 :: tail
+      }
     }
     result
   }
