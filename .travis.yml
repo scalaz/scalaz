@@ -25,8 +25,9 @@ stages:
 - name: microsite
 - name: release
   if: (branch = series/8.0.x AND type = push) OR (tag IS present)
-- name: publishMicrosite
-  if: tag IS present
+# TODO: Figure out where to deploy!
+#- name: publishMicrosite
+#  if: tag IS present
 
 jobs:
   include:
@@ -47,17 +48,17 @@ jobs:
       name: "Release artifacts"
       before_script: export PGP_SECRET="$(<./project/zecret)"
       script: sbt ci-release || sbt sonatypeReleaseAll
-    - &publishSite
-      stage: publishMicrosite
-      name: "Publish microsite"
-      before_script:
-      - cp ./project/travis-deploy-key ~/.ssh/id_ed25519
-      - chmod 600 ~/.ssh/id_ed25519
-      script:
-      - git config --global user.email "tim@nequissimus.com"
-      - git config --global user.name "Tim Steinbach"
-      - git config --global push.default simple
-      - sbt ++$TRAVIS_SCALA_VERSION microsite/publishMicrosite
+#    - &publishSite
+#      stage: publishMicrosite
+#      name: "Publish microsite"
+#      before_script:
+#      - cp ./project/travis-deploy-key ~/.ssh/id_ed25519
+#      - chmod 600 ~/.ssh/id_ed25519
+#      script:
+#      - git config --global user.email "tim@nequissimus.com"
+#      - git config --global user.name "Tim Steinbach"
+#      - git config --global push.default simple
+#      - sbt ++$TRAVIS_SCALA_VERSION microsite/publishMicrosite
 
 env:
   global:
