@@ -51,13 +51,11 @@ matrix:
     - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
       then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreNative/publish effectNative/publish iterateeNative/publish ; fi
   - scala: 2.13.0-M4
-    env: TEST_PROJECT="rootJVM" SCALA_JS_VERSION=0.6.24
-  - scala: 2.13.0-M4
     env: TEST_PROJECT="rootJS" SCALA_JS_VERSION=0.6.24
   - scala: 2.13.0-M5
     jdk: oraclejdk8
     env: TEST_PROJECT="rootJVM"
     script:
-    - sbt "++ ${TRAVIS_SCALA_VERSION}!" -J-Xmx3784m checkGenTypeClasses example/compile
+    - sbt "++ ${TRAVIS_SCALA_VERSION}!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test
     - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
-      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreJVM/publish effectJVM/publish iterateeJVM/publish concurrent/publish ; fi
+      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver rootJVM/publish ; fi
