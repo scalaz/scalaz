@@ -101,6 +101,20 @@ object ValidationTest extends SpecLite {
     List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], "Fail".failure[Int]))
   }
 
+  "Plus accumulates errors" in {
+    import syntax.plus._
+
+    val succ1 = Validation.success[String, Int](1)
+    val succ2 = Validation.success[String, Int](2)
+    val fail1 = Validation.failure[String, Int]("3")
+    val fail2 = Validation.failure[String, Int]("4")
+
+    succ1 <+> succ2 must_=== succ1
+    succ1 <+> fail1 must_=== succ1
+    fail2 <+> succ2 must_=== succ2
+    fail1 <+> fail2 must_=== Validation.failure[String, Int]("34")
+  }
+
   "toMaybe" ! forAll { x: Validation[String, Int] =>
     val m = x.toMaybe
     if (x.isSuccess) m.isJust else m.isEmpty
