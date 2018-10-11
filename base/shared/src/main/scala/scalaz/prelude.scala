@@ -29,6 +29,7 @@ trait AllSyntax
     with tc.ChoiceSyntax
     with tc.CobindSyntax
     with tc.ComonadSyntax
+    with tc.DelaySyntax
     with tc.FoldableSyntax
     with tc.FunctorSyntax
     with tc.InvariantFunctorSyntax
