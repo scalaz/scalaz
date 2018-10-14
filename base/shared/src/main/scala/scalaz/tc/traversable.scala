@@ -2,8 +2,9 @@ package scalaz
 package tc
 
 import Predef._
+import Scalaz._
 
-import scala.{ List, Tuple2 }
+import scala.{ ::, List, Tuple2 }
 
 import scala.language.experimental.macros
 
@@ -26,9 +27,13 @@ object TraversableClass {
 
       override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
-      override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z) { (a, b) =>
-        f(a, b)
-      }
+      override def foldRight[A, B: Delay](fa: List[A], z: B)(f: (A, B) => B): B =
+        (fa match {
+          case a :: as => f(a, foldRight(as, z)(f))
+          case _       => z
+        }).d
+
+      override def foldRightStrict[A, B](fa: List[A], z: B)(f: (A, B) => B): B = fa.foldRight(z)(f)
 
       override def toList[A](xs: List[A]): List[A] = xs
 
@@ -42,7 +47,9 @@ object TraversableClass {
 
       override def foldLeft[A, B](ta: Tuple2[C, A], z: B)(f: (B, A) => B): B = f(z, ta._2)
 
-      override def foldRight[A, B](ta: Tuple2[C, A], z: => B)(f: (A, => B) => B): B = f(ta._2, z)
+      override def foldRight[A, B: Delay](ta: Tuple2[C, A], z: B)(f: (A, B) => B): B = f(ta._2, z)
+
+      override def foldRightStrict[A, B](ta: Tuple2[C, A], z: B)(f: (A, B) => B): B = f(ta._2, z)
 
       override def toList[A](ta: Tuple2[C, A]): List[A] = List(ta._2)
 

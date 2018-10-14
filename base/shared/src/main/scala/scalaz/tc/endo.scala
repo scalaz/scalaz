@@ -40,7 +40,7 @@ private[data] object EndoImpl extends EndoModule {
   private trait EndoSemigroup[=>:[_, _], A] extends SemigroupClass[Endo[=>:, A]] {
     val F0: Semicategory[=>:]
 
-    def mappend(a1: Endo[=>:, A], a2: => Endo[=>:, A]): Endo[=>:, A] =
+    def mappend(a1: Endo[=>:, A], a2: Endo[=>:, A]): Endo[=>:, A] =
       F0.compose(a1, a2)
   }
 }

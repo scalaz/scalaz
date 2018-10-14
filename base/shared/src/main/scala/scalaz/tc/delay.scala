@@ -1,6 +1,8 @@
 package scalaz
 package tc
 
+import zio.IO
+
 import scala.language.experimental.macros
 
 /**
@@ -9,6 +11,10 @@ import scala.language.experimental.macros
 trait DelayClass[A] {
   def delay(a: () => A): A
   final def d(a: => A): A = delay(() => a)
+}
+
+object DelayClass {
+  implicit def ioDelay[E, A]: Delay[IO[E, A]] = instanceOf[DelayClass[IO[E, A]]](io => IO.suspend[E, A](io()))
 }
 
 trait DelaySyntax {

@@ -155,14 +155,17 @@ private[data] object ComposeImpl extends ComposeModule {
     val F: FoldableClass[F]
     val G: FoldableClass[G]
 
-    override def foldMap[A, B](fa: F[G[A]])(f: A => B)(implicit B: Monoid[B]): B =
+    override def foldMap[A, B: Delay](fa: F[G[A]])(f: A => B)(implicit B: Monoid[B]): B =
       F.foldMap(fa)(G.foldMap(_)(f))
 
     override def msuml[A](fa: F[G[A]])(implicit A: Monoid[A]): A =
-      F.foldMap(fa)(G.msuml(_))
+      F.foldMapStrict(fa)(G.msuml(_))
 
-    override def foldRight[A, B](fa: F[G[A]], z: => B)(f: (A, => B) => B): B =
+    override def foldRight[A, B: Delay](fa: F[G[A]], z: B)(f: (A, B) => B): B =
       F.foldRight(fa, z)((ga, b) => G.foldRight(ga, b)(f))
+
+    override def foldRightStrict[A, B](fa: F[G[A]], z: B)(f: (A, B) => B): B =
+      F.foldRightStrict(fa, z)((ga, b) => G.foldRightStrict(ga, b)(f))
 
     override def foldLeft[A, B](fa: F[G[A]], z: B)(f: (B, A) => B): B =
       F.foldLeft(fa, z)((b, ga) => G.foldLeft(ga, b)(f))

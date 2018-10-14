@@ -29,7 +29,7 @@ object AMaybe2Tests {
             just[(?, ?), (?, ?), Int, Int, Int]((0, 1), (2, 3)),
             just[(?, ?), (?, ?), Int, Int, Int]((2, 3), (4, 5)),
           )
-        testData.cross(testData).foldMap {
+        testData.cross(testData).foldMapStrict {
           case (a, b) =>
             assert((a === b) == (a eq b))
         }

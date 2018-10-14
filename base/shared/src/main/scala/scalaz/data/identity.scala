@@ -1,6 +1,7 @@
 package scalaz
 package data
 
+import Scalaz._
 import scala.{ inline, List, Nil }
 
 import Predef._
@@ -53,11 +54,13 @@ private[data] object IdentityImpl extends IdentityModule {
         fa
       override def foldLeft[A, B](fa: Identity[A], z: B)(f: (B, A) => B): B =
         f(z, fa)
-      override def foldMap[A, B: Monoid](fa: Identity[A])(f: A => B): B =
-        f(fa)
+      override def foldMap[A, B: Delay: Monoid](fa: Identity[A])(f: A => B): B =
+        f(fa).d
       override def msuml[A: Monoid](fa: Identity[A]): A =
         fa
-      override def foldRight[A, B](fa: Identity[A], z: => B)(f: (A, => B) => B): B =
+      override def foldRight[A, B: Delay](fa: Identity[A], z: B)(f: (A, B) => B): B =
+        f(fa, z).d
+      override def foldRightStrict[A, B](fa: Identity[A], z: B)(f: (A, B) => B): B =
         f(fa, z)
       override def toList[A](fa: Identity[A]): List[A] =
         fa :: Nil

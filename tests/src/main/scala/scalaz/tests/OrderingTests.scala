@@ -22,13 +22,13 @@ object OrderingTests {
     namedSection("instances")(
       namedSection("eq")(
         test("identity") { () =>
-          allValues.cross(allValues).foldMap {
+          allValues.cross(allValues).foldMapStrict {
             case (o1, o2) =>
               assert((o1 == o2) == (o1 === o2))
           }
         },
         test("reflexivity") { () =>
-          allValues.foldMap {
+          allValues.foldMapStrict {
             EqLaws.reflexivity(_)(assert)
           }
         },
@@ -39,7 +39,7 @@ object OrderingTests {
           (LT, "LT"),
           (GT, "GT"),
         )
-        table.foldMap {
+        table.foldMapStrict {
           case (i, o) => assert(i.debugs == o)
         }
       },

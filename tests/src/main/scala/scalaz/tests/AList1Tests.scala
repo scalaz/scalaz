@@ -170,28 +170,28 @@ object AList1Tests {
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfold.str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfold.str
-          ).foldMap(assertEqual(_, result))
+          ).foldMapStrict(assertEqual(_, result))
         },
         test("sfoldMap") { () =>
           val result = "(([hello]|[world])|([foo]|[bar]))"
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldMap(bracketFake).str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldMap(bracketFake).str
-          ).foldMap(assertEqual(_, result))
+          ).foldMapStrict(assertEqual(_, result))
         },
         test("sfoldBalanced") { () =>
           val result = "((hello|world)|(foo|bar))"
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldBalanced.str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldBalanced.str
-          ).foldMap(assertEqual(_, result))
+          ).foldMapStrict(assertEqual(_, result))
         },
         test("sfoldMapBalanced") { () =>
           val result = "(([hello]|[world])|([foo]|[bar]))"
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).sfoldMapBalanced(bracketFake).str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).sfoldMapBalanced(bracketFake).str
-          ).foldMap(assertEqual(_, result))
+          ).foldMapStrict(assertEqual(_, result))
         },
       )
     )

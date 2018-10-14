@@ -100,7 +100,7 @@ sealed abstract class These[L, R] {
     case Both(_, right) => right
   }
 
-  final def foldRight[B](z: => B)(f: (R, => B) => B): B =
+  final def foldRight[B](z: B)(f: (R, B) => B): B =
     foldLeft(z)((b, r) => f(r, b))
 
   final def foldLeft[B](z: B)(f: (B, R) => B): B = this match {
@@ -180,13 +180,14 @@ object These {
   implicit final def theseTraversable[L]: Traversable[These[L, ?]] =
     instanceOf(new TraversableClass[These[L, ?]] {
       override def traverse[F[_]: Applicative, A, B](ta: These[L, A])(f: A => F[B]) = ta.traverse(f)
-      override def foldMap[A, B: Monoid](fa: These[L, A])(f: A => B)                = fa.foldMap(f)
+      override def foldMap[A, B: Delay: Monoid](fa: These[L, A])(f: A => B)         = fa.foldMap(f)
       override def msuml[A: Monoid](fa: These[L, A])                                = fa.msuml
       override def map[A, B](ma: These[L, A])(f: A => B)                            = ma.rmap(f)
 
       /* todo: remove these when default implementation in Traversable? */
-      override def foldRight[A, B](fa: These[L, A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
-      override def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)        = fa.foldLeft(z)(f)
+      override def foldRight[A, B: Delay](fa: These[L, A], z: B)(f: (A, B) => B) = fa.foldRight(z)(f)
+      override def foldRightStrict[A, B](fa: These[L, A], z: B)(f: (A, B) => B)  = fa.foldRight(z)(f)
+      override def foldLeft[A, B](fa: These[L, A], z: B)(f: (B, A) => B)         = fa.foldLeft(z)(f)
     })
 
   implicit final def theseSemigroup[L: Semigroup, R: Semigroup]: Semigroup[These[L, R]] =

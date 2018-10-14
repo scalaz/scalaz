@@ -30,10 +30,12 @@ object SyntaxResolutionTest {
 
   def _comonad[F[_]: Comonad, A](fa: F[A]): A = fa.copoint
 
-  def _foldable[F[_]: Foldable, A, B, M: Monoid](fa: F[A], b: B, m: M) = {
+  def _foldable[F[_]: Foldable, A, B: Delay, M: Delay: Monoid](fa: F[A], b: B, m: M) = {
     fa.foldMap((a: A) => m): M
+    fa.foldMapStrict((a: A) => m): M
     fa.foldLeft(b)((_, _) => b): B
     fa.foldRight(b)((_, _) => b): B
+    fa.foldRightStrict(b)((_, _) => b): B
     fa.toList: List[A]
   }
 

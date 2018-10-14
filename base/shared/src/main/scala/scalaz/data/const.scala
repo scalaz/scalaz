@@ -50,7 +50,9 @@ private[data] object ConstImpl extends ConstModule {
 
         override def foldLeft[A, B](fa: Const[R, A], z: B)(f: (B, A) => B): B = z
 
-        override def foldRight[A, B](fa: Const[R, A], z: => B)(f: (A, => B) => B): B = z
+        override def foldRight[A, B: Delay](fa: Const[R, A], z: B)(f: (A, B) => B): B = z
+
+        override def foldRightStrict[A, B](fa: Const[R, A], z: B)(f: (A, B) => B): B = z
 
         override def toList[A](fa: Const[R, A]): List[A] = Nil
       }

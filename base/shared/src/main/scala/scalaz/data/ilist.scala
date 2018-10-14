@@ -95,7 +95,7 @@ object IListModule {
   implicit final def ilistMonoid[A]: Monoid[IList[A]] =
     instanceOf(new MonoidClass[IList[A]] {
       def mempty: IList[A] = IList.empty[A]
-      def mappend(l1: IList[A], l2: => IList[A]): IList[A] =
+      def mappend(l1: IList[A], l2: IList[A]): IList[A] =
         l1.append(l2)
     })
 
@@ -104,18 +104,21 @@ object IListModule {
       override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
         IList.foldLeft(fa, z)(f)
 
-      override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: Monoid[B]): B =
-        foldLeft(fa, B.mempty)((b, a) => B.mappend(b, f(a)))
-
       override def msuml[A](fa: IList[A])(implicit A: Monoid[A]): A =
         foldLeft(fa, A.mempty)((s, a) => A.mappend(s, a))
 
-      override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B =
+      override def foldRight[A, B: Delay](fa: IList[A], z: B)(f: (A, B) => B): B =
+        (IList.uncons(fa) match {
+          case Maybe2.Just2(a, as) => f(a, foldRight(as, z)(f))
+          case _                   => z
+        }).d
+
+      override def foldRightStrict[A, B](fa: IList[A], z: B)(f: (A, B) => B): B =
         fa.reverse.foldLeft(z)((b, a) => f(a, b))
 
       override def toList[A](fa: IList[A]): scala.List[A] = {
         import scala.{ ::, List, Nil }
-        foldRight[A, List[A]](fa, Nil)(new ::(_, _))
+        foldRightStrict[A, List[A]](fa, Nil)(new ::(_, _))
       }
 
       override def sequence[F[_], A](ta: IList[F[A]])(implicit F: Applicative[F]): F[IList[A]] =

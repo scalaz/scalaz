@@ -33,7 +33,7 @@ object MaybeTests {
         test("just is Some")(() => assert(Maybe.just(1) == scala.Some(1))),
         test("toOption is identity")(
           () =>
-            maybes.foldMap { m =>
+            maybes.foldMapStrict { m =>
               assert(m.asInstanceOf[scala.AnyRef] eq Maybe.toOption(m))
           }
         ),
@@ -41,49 +41,49 @@ object MaybeTests {
       namedSection("laws")(
         namedSection("eq laws")(
           test("reflexivity") { () =>
-            maybes.foldMap(
+            maybes.foldMapStrict(
               EqLaws.reflexivity(_)(assert)
             )
           },
           test("identity") { () =>
-            maybes.cross(maybes).foldMap {
+            maybes.cross(maybes).foldMapStrict {
               case (m1, m2) => assert((m1 === m2) == (m1 == m2))
             }
           }
         ),
         namedSection("monad laws")(
           test("functor identity") { () =>
-            maybes.foldMap(
+            maybes.foldMapStrict(
               FunctorLaws.Functor.identityToIdentity(_)(assertEqual[Maybe[String]])
             )
           },
           test("apply associativity") { () =>
             val funs = maybes.map(_.map(i => (x: String) => x + i))
-            maybes.cross(funs).cross(funs).foldMap {
+            maybes.cross(funs).cross(funs).foldMapStrict {
               case ((m, f1), f2) =>
                 ApplyLaws.applyAssoc(m)(f1, f2)(assertEqual[Maybe[String]])
             }
           },
           test("applicative identity") { () =>
-            maybes.foldMap {
+            maybes.foldMapStrict {
               ApplicativeLaws.applyIdentity(_)(assertEqual[Maybe[String]])
             }
           },
           test("bind associativity") { () =>
             val fun1 = (s: String) => Maybe.just(s + s)
             val fun2 = (s: String) => if (s.length != "hellohello".length) Maybe.empty[String] else Maybe.just(s)
-            maybes.foldMap {
+            maybes.foldMapStrict {
               BindLaws.bindAssoc(_)(fun1, fun2)(assertEqual[Maybe[String]])
             }
           },
           test("monad right identity") { () =>
-            maybes.foldMap {
+            maybes.foldMapStrict {
               MonadLaws.bindRightIdentity(_)(assertEqual[Maybe[String]])
             }
           },
           test("monad left identity") { () =>
             val fun = (i: Int) => if (i < 2) Maybe.empty[Int] else Maybe.just(i * 2)
-            IList(1, 2, 3, 4, 5).foldMap {
+            IList(1, 2, 3, 4, 5).foldMapStrict {
               MonadLaws.bindLeftIdentity(_)(fun)(assertEqual[Maybe[Int]])
             }
           },
@@ -95,32 +95,32 @@ object MaybeTests {
               else if (s == "world") \/-(3)
               else -\/("unrecognized")
             val fun2 = (i: Int) => if (i < 4) IList(1, 2, 3) else IList(4, 5, 6)
-            maybes.foldMap {
+            maybes.foldMapStrict {
               TraversableLaws.traverseComposition[Maybe, String \/ ?, IList, String, Int, Int, Result](_)(fun1, fun2)(
                 assertEqual(_, _)
               )
             }
           },
           test("traversable identity") { () =>
-            maybes.foldMap {
+            maybes.foldMapStrict {
               TraversableLaws.traverseIdentity(_)(assertEqual[Maybe[String]])
             }
           },
         ),
         namedSection("monoid laws")(
           test("mappend associativity") { () =>
-            maybes.cross(maybes).cross(maybes).foldMap {
+            maybes.cross(maybes).cross(maybes).foldMapStrict {
               case ((m1, m2), m3) =>
                 SemigroupLaws.assoc(m1, m2, m3)(assertEqual[Maybe[String]])
             }
           },
           test("mappend left identity") { () =>
-            maybes.foldMap {
+            maybes.foldMapStrict {
               MonoidLaws.leftIdentity(_)(assertEqual[Maybe[String]])
             }
           },
           test("mappend right identity") { () =>
-            maybes.foldMap {
+            maybes.foldMapStrict {
               MonoidLaws.rightIdentity(_)(assertEqual[Maybe[String]])
             }
           },
