@@ -38,6 +38,3 @@ addons:
   # https://github.com/travis-ci/travis-ci/issues/5227
   hosts: workaround-travis-ci-issue-5227
   hostname: workaround-travis-ci-issue-5227
-  apt:
-    packages:
-      - oracle-java8-installer
