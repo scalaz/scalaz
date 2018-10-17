@@ -41,7 +41,7 @@ matrix:
       env: SCALA_NATIVE
       sudo: required
       before_install:
-      - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -
+      - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.8/scripts/travis_setup.sh | bash -
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run
       - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver rootNative/publish ; fi
