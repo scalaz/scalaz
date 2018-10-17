@@ -165,9 +165,14 @@ def scalacheckBindingProject(
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/jvm/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        scalazMimaBasis.?.value.map { v =>
-          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
-        }.toSet
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, v)) if v <= 12 =>
+            scalazMimaBasis.?.value.map { v =>
+              organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
+            }.toSet
+          case _ =>
+            Set.empty
+        }
       }
     )
     .jsSettings(
@@ -175,9 +180,14 @@ def scalacheckBindingProject(
         (baseDirectory in LocalRootProject).value / "scalacheck-binding/js/src/main/scala"
       },
       mimaPreviousArtifacts := {
-        scalazMimaBasis.?.value.map { v =>
-          organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
-        }.toSet
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, v)) if v <= 12 =>
+            scalazMimaBasis.?.value.map { v =>
+              organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
+            }.toSet
+          case _ =>
+            Set.empty
+        }
       }
     )
 }

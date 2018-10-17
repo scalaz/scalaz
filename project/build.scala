@@ -120,7 +120,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.7"
-  private def Scala213 = "2.13.0-M4"
+  private def Scala213 = "2.13.0-M5"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -152,7 +152,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq("2.10.7", Scala211, Scala212),
+    crossScalaVersions := Seq("2.10.7", Scala211, Scala212, Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -299,10 +299,7 @@ object build {
         Nil
     }),
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := {
-      if (scalaVersion.value == "2.13.0-M4") "0.9.7"
-      else "0.9.8"
-    },
+    kindProjectorVersion := "0.9.8",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts

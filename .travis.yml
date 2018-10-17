@@ -17,11 +17,11 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
-  - if [[ "${JAVA_HOME}" != $(jdk_switcher home openjdk11) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
+  - if [[ "${JAVA_HOME}" != $(jdk_switcher home openjdk11) && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${PUBLISH_SONATYPE}" != "true" && "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
-  - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test $(if [[ "${PUBLISH_SONATYPE}" != "true" ]]; then echo "publishLocal"; fi)
+  - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver "project $TEST_PROJECT" publish ; fi
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -50,21 +50,12 @@ matrix:
       env: TEST_PROJECT=""
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
-    - scala: 2.13.0-M4
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJS" SCALA_JS_VERSION=0.6.24
-      script:
-      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
-      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project rootJS_213" test:fastOptJS mimaReportBinaryIssues
-      - sbt ++$TRAVIS_SCALA_VERSION "project testsJS" test
-      - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "project rootJS_213" "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
     - scala: 2.13.0-M5
       jdk: oraclejdk8
-      env: TEST_PROJECT="rootJVM"
-      script:
-      - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
-      - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project rootJVM_213" test:compile "project testsJVM" test
-      - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "project rootJVM_213" "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver publish ; fi
+      env: TEST_PROJECT="rootJVM_213"
+    - scala: 2.13.0-M5
+      jdk: oraclejdk8
+      env: TEST_PROJECT="rootJS_213"
 
 env:
   matrix:
