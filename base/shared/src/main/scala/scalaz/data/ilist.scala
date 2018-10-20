@@ -123,6 +123,12 @@ object IListModule {
             F.ap(traverse(as)(f))(f(a).map(b => (ls: IList[B]) => IList.cons(b, ls)))
         }
 
+      override def traverse_[T[_], A, B](ta: IList[A])(f: A => T[B])(implicit T: Applicative[T]): T[Unit] =
+        traverse(ta)(f).void
+
+      override def sequence_[T[_]: Applicative, A](ta: IList[T[A]]): T[Unit] =
+        traverse_(ta)(identity)
+
       override def map[A, B](ma: IList[A])(f: A => B): IList[B] =
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
 
