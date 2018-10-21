@@ -140,4 +140,6 @@ package object data {
 
   val FixFree: FixFreeModule = FixFreeImpl
   type FixFree[F[_], A] = FixFree.FixFree[F, A]
+
+  type Eval[A] = Eval.module.Eval[A]
 }

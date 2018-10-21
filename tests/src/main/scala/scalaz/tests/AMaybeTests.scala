@@ -30,7 +30,7 @@ object AMaybeTests {
               just[(?, ?), Int, Int]((0, 1)),
               just[(?, ?), Int, Int]((2, 3)),
             )
-          testData.zipWithIndex.cross(testData.zipWithIndex).foldMap {
+          testData.zipWithIndex.cross(testData.zipWithIndex).foldMapStrict {
             case ((i, a), (j, b)) =>
               assert((a === b) == (i == j))
           }

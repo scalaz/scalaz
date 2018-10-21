@@ -78,10 +78,8 @@ private[scalaz] object MaybeImpl extends MaybeModule {
   def monoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] =
     instanceOf(new MonoidClass[Maybe[A]] {
       def mempty = None
-      def mappend(ma1: Maybe[A], ma2: => Maybe[A]) = {
-        lazy val ma2l = ma2
-        ma1.fold(ma2)(a1 => ma2l.fold(ma1)(a2 => Some(A.mappend(a1, a2))))
-      }
+      def mappend(ma1: Maybe[A], ma2: Maybe[A]) =
+        ma1.fold(ma2)(a1 => ma2.fold(ma1)(a2 => Some(A.mappend(a1, a2))))
     })
 
   private val instance =
@@ -120,7 +118,10 @@ private[scalaz] object MaybeImpl extends MaybeModule {
           case _       => b
         }
 
-      override def foldRight[A, B](ma: Maybe[A], b: => B)(f: (A, => B) => B): B =
+      override def foldRight[A, B: Delay](ma: Maybe[A], b: B)(f: (A, B) => B): B =
+        foldRightStrict(ma, b)(f)
+
+      override def foldRightStrict[A, B](ma: Maybe[A], b: B)(f: (A, B) => B): B =
         ma match {
           case Some(a) => f(a, b)
           case _       => b

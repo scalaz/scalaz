@@ -38,7 +38,7 @@ object VoidModule extends VoidSyntax {
   implicit def void_<~<[A]: Void <~< A = Void.conforms[A]
   implicit def voidSemigroup: Semigroup[Void] =
     instanceOf(new SemigroupClass[Void] {
-      override def mappend(a1: Void, a2: => Void): Void = a1
+      override def mappend(a1: Void, a2: Void): Void = a1
     })
   implicit val voidDebug: Debug[Void] = DebugClass.instance[Void](Void.absurd)
 }

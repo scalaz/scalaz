@@ -67,32 +67,32 @@ object IOTests {
       namedSection("zio.IO instances")(
         namedSection("bifunctor")(
           test("identityToIdentity") { () =>
-            ios.foldMap(Bifunctor.identityToIdentity(_)(ioEql))
+            ios.foldMapStrict(Bifunctor.identityToIdentity(_)(ioEql))
           },
         ),
         namedSection("functor")(
           test("identity") { () =>
-            ios.foldMap(Functor.identityToIdentity(_)(ioEql))
+            ios.foldMapStrict(Functor.identityToIdentity(_)(ioEql))
           },
         ),
         namedSection("applicative")(
           test("applyIdentity") { () =>
-            ios.foldMap(ApplicativeLaws.applyIdentity(_)(ioEql))
+            ios.foldMapStrict(ApplicativeLaws.applyIdentity(_)(ioEql))
           },
         ),
         namedSection("bind")(
           namedSection("bindAssoc")(
             test("success/success") { () =>
-              ios.foldMap(BindLaws.bindAssoc(_)(fns.s1, fns.s2)(ioEql))
+              ios.foldMapStrict(BindLaws.bindAssoc(_)(fns.s1, fns.s2)(ioEql))
             },
             test("failure/success") { () =>
-              ios.foldMap(BindLaws.bindAssoc(_)(fns.f, fns.s2)(ioEql))
+              ios.foldMapStrict(BindLaws.bindAssoc(_)(fns.f, fns.s2)(ioEql))
             },
             test("failure/failure") { () =>
-              ios.foldMap(BindLaws.bindAssoc(_)(fns.f, fns.f)(ioEql))
+              ios.foldMapStrict(BindLaws.bindAssoc(_)(fns.f, fns.f)(ioEql))
             },
             test("success/failure") { () =>
-              ios.foldMap(BindLaws.bindAssoc(_)(fns.s1, fns.f)(ioEql))
+              ios.foldMapStrict(BindLaws.bindAssoc(_)(fns.s1, fns.f)(ioEql))
             },
           )
         ),
@@ -107,10 +107,10 @@ object IOTests {
           ),
           namedSection("bindRightIdentity")(
             test("success") { () =>
-              ios.foldMap(MonadLaws.bindRightIdentity(_)(ioEql))
+              ios.foldMapStrict(MonadLaws.bindRightIdentity(_)(ioEql))
             },
             test("failure") { () =>
-              ios.foldMap(MonadLaws.bindRightIdentity(_)(ioEql))
+              ios.foldMapStrict(MonadLaws.bindRightIdentity(_)(ioEql))
             },
           ),
         )

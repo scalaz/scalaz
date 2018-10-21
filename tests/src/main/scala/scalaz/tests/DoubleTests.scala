@@ -36,12 +36,12 @@ object DoubleTests {
     namedSection("instances")(
       namedSection("eq")(
         test("reflexivity") { () =>
-          doubles.foldMap(
+          doubles.foldMapStrict(
             EqLaws.reflexivity(_)(assert)
           )
         },
         test("identity") { () =>
-          doubles.cross(doubles).foldMap {
+          doubles.cross(doubles).foldMapStrict {
             case (a, b) =>
               assertEqual(a === b, obs(a) === obs(b))
           }

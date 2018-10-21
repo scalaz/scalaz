@@ -52,7 +52,7 @@ object KleisliModule {
       override def mempty: Kleisli[M, A, B] =
         wrapKleisli(_ => M.mempty)
 
-      override def mappend(a1: Kleisli[M, A, B], a2: => Kleisli[M, A, B]): Kleisli[M, A, B] =
+      override def mappend(a1: Kleisli[M, A, B], a2: Kleisli[M, A, B]): Kleisli[M, A, B] =
         wrapKleisli(a => M.mappend(runKleisli(a1)(a), runKleisli(a2)(a)))
     })
 

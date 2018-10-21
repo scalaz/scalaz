@@ -18,6 +18,7 @@ package object tc {
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
   type Contravariant[F[_]]    = InstanceOf[ContravariantClass[F]]
   type Debug[A]               = InstanceOf[DebugClass[A]]
+  type Delay[A]               = InstanceOf[DelayClass[A]]
   type Eq[A]                  = InstanceOf[EqClass[A]]
   type Foldable[T[_]]         = InstanceOf[FoldableClass[T]]
   type Functor[F[_]]          = InstanceOf[FunctorClass[F]]
@@ -42,11 +43,13 @@ package object tc {
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
   final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F]                            = F
+  final def Delay[A](implicit A: Delay[A]): Delay[A]                                     = A
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
   final def Functor[F[_]](implicit F: Functor[F]): Functor[F]                            = F
   final def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
   final def Monad[M[_]](implicit M: Monad[M]): Monad[M]                                  = M
   final def Monoid[T](implicit T: Monoid[T]): Monoid[T]                                  = T
+  final def Name[N](implicit N: Delay[N]): Delay[N]                                      = N
   final def Ord[T](implicit T: Ord[T]): Ord[T]                                           = T
   final def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F]                            = F
   final def Profunctor[P[_, _]](implicit P: Profunctor[P]): Profunctor[P]                = P

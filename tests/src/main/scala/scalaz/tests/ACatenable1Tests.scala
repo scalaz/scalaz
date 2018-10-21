@@ -137,7 +137,7 @@ object ACatenable1Tests {
           IList(
             (lift(fake("hello")) :+ fake("world") :+ fake("foo") :+ fake("bar")).foldBalanced.str,
             (fake("hello") +: fake("world") +: fake("foo") +: lift(fake("bar"))).foldBalanced.str,
-          ).foldMap(assertEqual(_, result))
+          ).foldMapStrict(assertEqual(_, result))
         }
       )
     )

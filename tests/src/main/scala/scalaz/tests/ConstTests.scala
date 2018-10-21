@@ -35,12 +35,12 @@ object ConstTests {
       namedSection("instances")(
         namedSection("eq")(
           test("reflexivity") { () =>
-            consts.foldMap(
+            consts.foldMapStrict(
               EqLaws.reflexivity(_)(assert)
             )
           },
           test("identity") { () =>
-            consts.cross(consts).foldMap {
+            consts.cross(consts).foldMapStrict {
               case (c1, c2) =>
                 assert((c1 === c2) === (Const.run(c1) === Const.run(c2)))
             }
@@ -48,7 +48,7 @@ object ConstTests {
         ),
         namedSection("applicative")(
           test("apply associativity") { () =>
-            consts.foldMap(
+            consts.foldMapStrict(
               ApplyLaws.applyAssoc(_)(
                 Const[IList[Int], IList[Double] => IList[Boolean]](IList(0)),
                 Const[IList[Int], IList[Boolean] => Int](IList(1))
@@ -56,7 +56,7 @@ object ConstTests {
             )
           },
           test("applicative identity") { () =>
-            consts.foldMap {
+            consts.foldMapStrict {
               ApplicativeLaws.applyIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }
@@ -66,30 +66,30 @@ object ConstTests {
             val fst = (_: IList[Double]).head
             val snd = (a: Double) => if (a > 0.0) Maybe.just(a) else Maybe.empty[Double]
 
-            consts.foldMap {
+            consts.foldMapStrict {
               TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Maybe[Maybe[Const[IList[Int], Double]]]])
             }
           },
           test("traversable identity") { () =>
-            consts.foldMap {
+            consts.foldMapStrict {
               TraversableLaws.traverseIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }
         ),
         namedSection("monoid")(
           test("mappend associativity") { () =>
-            consts.cross(consts).cross(consts).foldMap {
+            consts.cross(consts).cross(consts).foldMapStrict {
               case ((l1, l2), l3) =>
                 SemigroupLaws.assoc(l1, l2, l3)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           },
           test("mappend left identity") { () =>
-            consts.foldMap {
+            consts.foldMapStrict {
               MonoidLaws.leftIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           },
           test("mappend right identity") { () =>
-            consts.foldMap {
+            consts.foldMapStrict {
               MonoidLaws.rightIdentity(_)(assertEqual[Const[IList[Int], IList[Double]]])
             }
           }

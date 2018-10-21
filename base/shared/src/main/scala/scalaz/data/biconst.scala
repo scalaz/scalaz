@@ -93,8 +93,9 @@ private[data] object BiconstImpl extends BiconstModule {
   def biconstTraversable[C, D]: Traversable[Biconst[C, D, ?]] =
     instanceOf(new TraversableClass[Biconst[C, D, ?]] with BiconstPhantom[C, D] {
       override def foldLeft[A, B](fa: C, z: B)(f: (B, A) => B): B                                        = z
-      override def foldMap[A, B](fa: C)(f: A => B)(implicit B: Monoid[B]): B                             = B.mempty
-      override def foldRight[A, B](fa: C, z: => B)(f: (A, => B) => B): B                                 = z
+      override def foldMap[A, B: Delay](fa: C)(f: A => B)(implicit B: Monoid[B]): B                      = B.mempty
+      override def foldRight[A, B: Delay](fa: C, z: B)(f: (A, B) => B): B                                = z
+      override def foldRightStrict[A, B](fa: C, z: B)(f: (A, B) => B): B                                 = z
       override def msuml[A](fa: C)(implicit A: Monoid[A]): A                                             = A.mempty
       override def toList[A](fa: C): scala.List[A]                                                       = scala.Nil
       override def sequence[F[_], A](ta: C)(implicit F: scalaz.tc.Applicative[F]): F[C]                  = F.pure(ta)

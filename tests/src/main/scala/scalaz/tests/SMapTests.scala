@@ -24,7 +24,7 @@ object SMapTests {
             (Map((0, 1)), Map.empty[Int, Int], Map.empty[Int, Int]),
             (Map.empty[Int, Int], Map((0, 1)), Map.empty[Int, Int]),
             (Map.empty[Int, Int], Map.empty[Int, Int], Map((0, 1))),
-          ).foldMap {
+          ).foldMapStrict {
             case (fst, snd, thd) =>
               SemicategoryLaws.composeAssoc(fst, snd, thd)(assertEqualMaps)
           }

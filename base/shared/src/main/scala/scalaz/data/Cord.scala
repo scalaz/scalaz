@@ -29,8 +29,8 @@ object CordModule {
 
   implicit val cordMonoid: Monoid[Cord] =
     instanceOf[MonoidClass[Cord]](new MonoidClass[Cord] {
-      val mempty                         = Cord.empty
-      def mappend(a1: Cord, a2: => Cord) = Cord.concat(a1, a2)
+      val mempty                      = Cord.empty
+      def mappend(a1: Cord, a2: Cord) = Cord.concat(a1, a2)
     })
 
   implicit val cordEq: Eq[Cord] =
