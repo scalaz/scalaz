@@ -5,7 +5,7 @@ package syntax
 final class ComonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Comonad[F]) extends Ops[F[A]] {
   ////
   def copoint: A = F.copoint(self)
-
+  def extract: A = F.copoint(self)
   ////
 }
 
