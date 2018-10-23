@@ -4,7 +4,7 @@ package concurrent
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import java.util.concurrent._
+import java.util.concurrent.Executors
 import ConcurrentTest._
 
 object FutureTest extends SpecLite {

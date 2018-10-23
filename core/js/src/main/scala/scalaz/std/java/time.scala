@@ -1,5 +1,4 @@
 package scalaz
 package std.java
 
-trait TimeInstances0 {
-}
+trait TimeInstances
