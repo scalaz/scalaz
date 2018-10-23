@@ -29,108 +29,54 @@ trait Day[F[_], G[_], A] { self =>
   val gy: G[Y]
   def xya: (X, Y) => A
 
-  def map[B](f: A => B): Day[F, G, B] =
-    new Day[F, G, B] {
-      type X = self.X
-      type Y = self.Y
-      val fx: F[X] = self.fx
-      val gy: G[Y] = self.gy
-      def xya: (X, Y) => B = (x, y) => f(self.xya(x, y))
-    }
+  def map[B](f: A => B): Day[F, G, B] = Day[F, G, B, X, Y](fx, gy, (x, y) => f(self.xya(x, y)))
 
   /** Swap type constructors order */
-  def swapped: Day[G, F, A] = new Day[G, F, A] {
-    type X = self.Y
-    type Y = self.X
-    val fx: G[X] = self.gy
-    val gy: F[Y] = self.fx
-    def xya: (X, Y) => A = (x, y) => self.xya(y, x)
-  }
+  def swapped: Day[G, F, A] = Day[G, F, A, Y, X](gy, fx, (x, y) => self.xya(y, x))
 
   /** Apply a natural transformation to the left-hand side of a Day convolution. */
-  def trans1[H[_]](nat: F ~> H): Day[H, G, A] = new Day[H, G, A] {
-    type X = self.X
-    type Y = self.Y
-    val fx: H[X] = nat.apply(self.fx)
-    val gy: G[Y] = self.gy
-    def xya: (X, Y) => A = self.xya
-  }
+  def trans1[H[_]](nat: F ~> H): Day[H, G, A] = Day(nat.apply(fx), gy, xya)
 
   /** Apply a natural transformation to the right-hand side of a Day convolution. */
-  def trans2[H[_]](nat: G ~> H): Day[F, H, A] = new Day[F, H, A] {
-    type X = self.X
-    type Y = self.Y
-    val fx: F[X] = self.fx
-    val gy: H[Y] = nat.apply(self.gy)
-    def xya: (X, Y) => A = self.xya
-  }
+  def trans2[H[_]](nat: G ~> H): Day[F, H, A] = Day(fx, nat.apply(gy), xya)
 }
 
 object Day {
-  import Id._
+
+  def apply[F[_], G[_], A, XX, YY](fa: F[XX], gb: G[YY], abc: (XX, YY) => A): Day[F, G, A] =
+    new Day[F, G, A] {
+      type X = XX
+      type Y = YY
+      val fx: F[X] = fa
+      val gy: G[Y] = gb
+
+      def xya: (X, Y) => A = abc
+    }
 
   /** Construct the Day convolution */
-  def day[F[_], G[_], A, B](fab: F[A => B], ga: G[A]): Day[F, G, B] = new Day[F, G, B] {
-    type X = A => B
-    type Y = A
-    val fx: F[X] = fab
-    val gy: G[Y] = ga
-    def xya: (X, Y) => B = (x, y) => x(y)
-  }
+  def day[F[_], G[_], A, B](fab: F[A => B], ga: G[A]): Day[F, G, B] = Day[F, G, B, A => B, A](fab, ga, (x, y) => x(y))
 
-  def intro1[F[_], A](fa: F[A]): Day[Id, F, A] = new Day[Id, F, A] {
-    type X = Unit
-    type Y = A
-    val fx: Id[X] = ()
-    val gy: F[Y] = fa
-    def xya: (X, Y) => A = (_, a) => a
-  }
+  def intro1[F[_], A](fa: F[A]): Day[Id, F, A] = Day[Id, F, A, Unit, A]((), fa, (_, a) => a)
 
-  def intro2[F[_], A](fa: F[A]): Day[F, Id, A] = new Day[F, Id, A] {
-    type X = A
-    type Y = Unit
-    val fx: F[X] = fa
-    val gy: Id[Y] = ()
-    def xya: (X, Y) => A = (a, _) => a
-  }
+  def intro2[F[_], A](fa: F[A]): Day[F, Id, A] = Day[F, Id, A, A, Unit](fa, (), (a, _) => a)
 
   /** Collapse to second type constructor if first one is Identity */
-  def elim1[F[_], A](d: Day[Id, F, A])(implicit FunF: Functor[F]): F[A] = FunF.map(d.gy)(d.xya(d.fx, _))
+  def elim1[F[_], A](d: Day[Id, F, A])(implicit FF: Functor[F]): F[A] = FF.map(d.gy)(d.xya(d.fx, _))
 
   /** Collapse to first type constructor if second one is Identity */
-  def elim2[F[_], A](d: Day[F, Id, A])(implicit FunF: Functor[F]): F[A] = FunF.map(d.fx)(d.xya(_, d.gy))
+  def elim2[F[_], A](d: Day[F, Id, A])(implicit FF: Functor[F]): F[A] = FF.map(d.fx)(d.xya(_, d.gy))
 
   /** Collapse to type constructor if both of them are the same */
   def dap[F[_], A](d: Day[F, F, A])(implicit AF: Applicative[F]): F[A] = AF.apply2(d.fx, d.gy)(d.xya)
 
   def assoc[F[_], G[_], H[_], A, B](d: Day[F, Day[G, H, ?], A]): Day[Day[F, G, ?], H, A] = {
-    new Day[Day[F, G, ?], H, A] {
-      type X = (d.X, d.gy.X)
-      type Y = d.gy.Y
-      val fx: Day[F, G, (d.X, d.gy.X)] = new Day[F, G,(d.X, d.gy.X)] {
-        type X = d.X
-        type Y = d.gy.X
-        val fx: F[X] = d.fx
-        val gy: G[Y] = d.gy.fx
-        def xya: (X, Y) => (d.X, d.gy.X) = (x, y) => (x, y)
-      }
-      val gy: H[Y] = d.gy.gy
-      def xya: (X, Y) => A = (a, e) => d.xya(a._1, d.gy.xya(a._2, e))
-    }
+    val fx = Day[F, G, (d.X, d.gy.X), d.X, d.gy.X](d.fx, d.gy.fx, (x, y) => (x, y))
+    Day[Day[F, G, ?], H, A, (d.X, d.gy.X), d.gy.Y](fx, d.gy.gy, (a, e) => d.xya(a._1, d.gy.xya(a._2, e)))
   }
 
-  def disassoc[F[_], G[_], H[_], A](d: Day[Day[F, G, ?], H, A]): Day[F, Day[G, H, ?], A] = new Day[F, Day[G, H, ?], A] {
-    type X = d.fx.X
-    type Y = (d.fx.Y, d.Y)
-    val fx: F[X] = d.fx.fx
-    val gy:  Day[G, H, (d.fx.Y, d.Y)] = new Day[G, H, (d.fx.Y, d.Y)] {
-      type X = d.fx.Y
-      type Y = d.Y
-      val fx: G[X] = d.fx.gy
-      val gy: H[Y] = d.gy
-      def xya: (X, Y) => (d.fx.Y, d.Y) = (x, y) => (x,y)
-    }
-    def xya: (X, Y) => A = (x: d.fx.X, y: (d.fx.Y, d.Y) ) => d.xya(d.fx.xya(x, y._1), y._2)
+  def disassoc[F[_], G[_], H[_], A](d: Day[Day[F, G, ?], H, A]): Day[F, Day[G, H, ?], A] = {
+    val gyy:  Day[G, H, (d.fx.Y, d.Y)] = Day[G, H, (d.fx.Y, d.Y), d.fx.Y, d.Y](d.fx.gy, d.gy, (x,y) => (x,y))
+    Day[F, Day[G, H, ?], A, d.fx.X, (d.fx.Y, d.Y)](d.fx.fx, gyy, (x: d.fx.X, y: (d.fx.Y, d.Y)) => d.xya(d.fx.xya(x, y._1), y._2))
   }
 }
 
@@ -144,10 +90,7 @@ object DayInstances extends DayInstances1 {
 
 sealed abstract class DayInstances1 extends DayInstances2 {
 
-  implicit def cobindDay[F[_], G[_]](implicit CF0: Cobind[F], CG0: Cobind[G]): Cobind[Day[F, G, ?]] = new DayCobind[F, G] {
-    def CF: Cobind[F] = CF0
-    def CG: Cobind[G] = CG0
-  }
+  implicit def cobindDay[F[_], G[_]]: Cobind[Day[F, G, ?]] = new DayCobind[F, G] {}
 }
 
 sealed abstract class DayInstances2 extends DayInstances3 {
@@ -176,30 +119,8 @@ private trait DayFunctor[F[_], G[_]] extends Functor[Day[F, G, ?]] {
 }
 
 private trait DayCobind[F[_], G[_]] extends Cobind[Day[F, G, ?]] with DayFunctor[F, G] {
-  def CF: Cobind[F]
-  def CG: Cobind[G]
-
-  override def cobind[A, B](fa: Day[F, G, A])(f: Day[F, G, A] => B): Day[F, G, B] = new Day[F, G, B] {
-    type X = fa.X
-    type Y = fa.Y
-    val fx: F[X] = fa.fx
-    val gy: G[Y] = fa.gy
-    def xya: (X, Y) => B = (_, _) => f(fa)
-  }
-
-  override def cojoin[C](wa: Day[F, G, C]): Day[F, G, Day[F, G, C]] = new Day[F, G, Day[F, G, C]] {
-    type X = F[wa.X]
-    type Y = G[wa.Y]
-    val fx: F[X] = CF.cojoin(wa.fx)
-    val gy: G[Y] = CG.cojoin(wa.gy)
-    def xya: (X, Y) => Day[F, G, C] = (x,y) => {new Day[F, G, C] {
-      type X = wa.X
-      type Y = wa.Y
-      val fx: F[X] = x
-      val gy: G[Y] = y
-      def xya: (X, Y) => C = (x,y) => wa.xya(x,y)
-    }}
-  }
+  override def cobind[A, B](fa: Day[F, G, A])(f: Day[F, G, A] => B): Day[F, G, B] =
+    Day[F, G, B, fa.X, fa.Y](fa.fx, fa.gy, (_, _) => f(fa))
 }
 
 private trait DayComonad[F[_], G[_]] extends Comonad[Day[F, G, ?]] with DayCobind[F, G] {
@@ -209,20 +130,18 @@ private trait DayComonad[F[_], G[_]] extends Comonad[Day[F, G, ?]] with DayCobin
   def copoint[C](w: Day[F, G, C]): C = w.xya(CF.copoint(w.fx), CG.copoint(w.gy))
 }
 
-/** Applicative instance for Day convolution */
 private trait DayApply[F[_], G[_]] extends Apply[Day[F, G, ?]] with DayFunctor[F, G] {
   def AF: Apply[F]
   def AG: Apply[G]
 
-  def ap[A,B](d: => Day[F, G, A])(f: => Day[F, G, A => B]): Day[F, G, B] = ap(d, f)
+  def ap[A,B](d: => Day[F, G, A])(f: => Day[F, G, A => B]): Day[F, G, B] = strictAp(d)(f)
 
   /* Workaround for: stable identifier required, but d found */
-  private def ap[A,B](d: Day[F, G, A], f: Day[F, G, A => B]): Day[F, G, B] = new Day[F, G, B] {
-    type X = (f.X, d.X)
-    type Y = (f.Y, d.Y)
-    val fx: F[X] = AF.ap(d.fx)(AF.map(f.fx)(a => b => (a, b)))
-    val gy: G[Y] = AG.ap(d.gy)(AG.map(f.gy)(a => b => (a, b)))
-    def xya: (X, Y) => B = (a, b) => f.xya(a._1, b._1)(d.xya(a._2, b._2))
+  private def strictAp[A,B](d: Day[F, G, A])(f: Day[F, G, A => B]): Day[F, G, B] = {
+    val fxx: F[(f.X, d.X)] = AF.ap(d.fx)(AF.map(f.fx)(a => b => (a, b)))
+    val gyy: G[(f.Y, d.Y)] = AG.ap(d.gy)(AG.map(f.gy)(a => b => (a, b)))
+    val abc: ((f.X, d.X), (f.Y, d.Y)) => B = (a, b) => f.xya(a._1, b._1)(d.xya(a._2, b._2))
+    Day(fxx, gyy, abc)
   }
 }
 
@@ -230,11 +149,5 @@ private trait DayApplicative[F[_], G[_]] extends Applicative[Day[F, G, ?]] with 
   def AF: Applicative[F]
   def AG: Applicative[G]
 
-  override def point[A](a: => A): Day[F, G, A] = new Day[F, G, A] {
-    type X = Unit
-    type Y = Unit
-    val fx: F[X] = AF.pure(())
-    val gy: G[Y] = AG.pure(())
-    def xya: (X, Y) => A = (_, _) => a
-  }
+  override def point[A](a: => A): Day[F, G, A] = Day[F, G, A, Unit, Unit](AF.pure(()), AG.pure(()), (_, _) => a)
 }
