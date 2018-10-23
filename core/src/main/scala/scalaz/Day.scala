@@ -5,7 +5,9 @@ import scala.language.higherKinds
 /**
   * Covariant Day Convolution
   *
-  * It is a special form of Functor multiplication.
+  * Based on Edward Kmett implementation in Haskell: http://hackage.haskell.org/package/kan-extensions/docs/Data-Functor-Day.html
+  *
+  * Day convolution is a special form of Functor multiplication.
   * In monoidal category of endofunctors Applicative is a monoid object when Day covolution is used as tensor.
   * If we use Functor composition as tensor then then monoid form a Monad instead of Applicative.
   *
@@ -20,7 +22,11 @@ import scala.language.higherKinds
   *   def xya: (X, Y) => A
   * }
   *
-  * http://hackage.haskell.org/package/kan-extensions/docs/Data-Functor-Day.html
+  *
+  * Bartosz Milewski talk, derive Day from multiplying Functors and using Coyoneda: https://www.youtube.com/watch?v=lIWCxRBaQG8
+  * Edward Kmett talk, explains Divisible and Decidable in context of contravariant Day: https://www.youtube.com/watch?v=cB8DapKQz-I
+  * Phil Freeman blog, connections between Day and Comonads, Comonads transformers, optics: https://blog.functorial.com/posts/2016-08-08-Comonad-And-Day-Convolution.html
+  * Discussion on Reddit with mention about usage for stream processing and intuition based on liftA2 from Applicative and Day: https://www.reddit.com/r/haskell/comments/4wvae2/functorial_blog_comonads_and_day_convolution/
   */
 trait Day[F[_], G[_], A] { self =>
   type X
@@ -44,6 +50,7 @@ trait Day[F[_], G[_], A] { self =>
 }
 
 object Day {
+  import scalaz.Id.Id
 
   def apply[F[_], G[_], A, XX, YY](fa: F[XX], gb: G[YY], abc: (XX, YY) => A): Day[F, G, A] =
     new Day[F, G, A] {
