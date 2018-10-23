@@ -31,6 +31,8 @@ trait Day[F[_], G[_], A] { self =>
 
   def map[B](f: A => B): Day[F, G, B] = Day[F, G, B, X, Y](fx, gy, (x, y) => f(self.xya(x, y)))
 
+  def cobind[B](f: Day[F, G, A] => B): Day[F, G, B] = Day[F, G, B, X, Y](fx, gy, (_, _) => f(self))
+
   /** Swap type constructors order */
   def swapped: Day[G, F, A] = Day[G, F, A, Y, X](gy, fx, (x, y) => self.xya(y, x))
 
@@ -49,7 +51,6 @@ object Day {
       type Y = YY
       val fx: F[X] = fa
       val gy: G[Y] = gb
-
       def xya: (X, Y) => A = abc
     }
 
@@ -119,8 +120,7 @@ private trait DayFunctor[F[_], G[_]] extends Functor[Day[F, G, ?]] {
 }
 
 private trait DayCobind[F[_], G[_]] extends Cobind[Day[F, G, ?]] with DayFunctor[F, G] {
-  override def cobind[A, B](fa: Day[F, G, A])(f: Day[F, G, A] => B): Day[F, G, B] =
-    Day[F, G, B, fa.X, fa.Y](fa.fx, fa.gy, (_, _) => f(fa))
+  override def cobind[A, B](fa: Day[F, G, A])(f: Day[F, G, A] => B): Day[F, G, B] = fa.cobind(f)
 }
 
 private trait DayComonad[F[_], G[_]] extends Comonad[Day[F, G, ?]] with DayCobind[F, G] {
