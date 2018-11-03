@@ -1,10 +1,8 @@
 ---
-layout: docs
+layout: scalaz
 section: std
 title:  "Vector"
 ---
-
-# Vector [![GitHub](../img/github.png)]
 
 Scalaz provides instances for Scala's built-in [Vector](https://www.scala-lang.org/api/current/scala/collection/immutable/Vector.html) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 

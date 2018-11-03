@@ -58,10 +58,8 @@ private[data] object BiconstImpl extends BiconstModule {
     def compose[B, C, D](f: A, g: A): A = A.mappend(g, f)
   }
 
-  private trait BiconstPhantom[R, A]
-      extends PhantomClass[Biconst[R, A, ?]]
-      with PhantomClass.DeriveMapContramap[Biconst[R, A, ?]] {
-    def pmap[B, C](ma: Biconst[R, A, B]): Biconst[R, A, C] = ma
+  private trait BiconstPhantom[R, A] extends PhantomClass[Biconst[R, A, ?]] {
+    override def pmap[B, C](ma: Biconst[R, A, B]): Biconst[R, A, C] = ma
   }
 
   private trait BiconstApply[R, A] extends ApplyClass[Biconst[R, A, ?]] with BiconstPhantom[R, A] {
@@ -94,20 +92,20 @@ private[data] object BiconstImpl extends BiconstModule {
 
   def biconstTraversable[C, D]: Traversable[Biconst[C, D, ?]] =
     instanceOf(new TraversableClass[Biconst[C, D, ?]] with BiconstPhantom[C, D] {
-      def foldLeft[A, B](fa: C, z: B)(f: (B, A) => B): B                                        = z
-      def foldMap[A, B](fa: C)(f: A => B)(implicit B: Monoid[B]): B                             = B.mempty
-      def foldRight[A, B](fa: C, z: => B)(f: (A, => B) => B): B                                 = z
-      def msuml[A](fa: C)(implicit A: Monoid[A]): A                                             = A.mempty
-      def toList[A](fa: C): scala.List[A]                                                       = scala.Nil
-      def sequence[F[_], A](ta: C)(implicit F: scalaz.tc.Applicative[F]): F[C]                  = F.pure(ta)
-      def traverse[F[_], A, B](ta: C)(f: A => F[B])(implicit F: scalaz.tc.Applicative[F]): F[C] = F.pure(ta)
+      override def foldLeft[A, B](fa: C, z: B)(f: (B, A) => B): B                                        = z
+      override def foldMap[A, B](fa: C)(f: A => B)(implicit B: Monoid[B]): B                             = B.mempty
+      override def foldRight[A, B](fa: C, z: => B)(f: (A, => B) => B): B                                 = z
+      override def msuml[A](fa: C)(implicit A: Monoid[A]): A                                             = A.mempty
+      override def toList[A](fa: C): scala.List[A]                                                       = scala.Nil
+      override def sequence[F[_], A](ta: C)(implicit F: scalaz.tc.Applicative[F]): F[C]                  = F.pure(ta)
+      override def traverse[F[_], A, B](ta: C)(f: A => F[B])(implicit F: scalaz.tc.Applicative[F]): F[C] = F.pure(ta)
     })
 
   def biconstBifunctor[A]: Bifunctor[Biconst[A, ?, ?]] =
     instanceOf(new BifunctorClass[Biconst[A, ?, ?]] {
-      def bimap[B, C, S, T](fab: A)(as: B => S, bt: C => T): A = fab
-      def lmap[B, C, S](fab: A)(as: B => S): A                 = fab
-      def rmap[B, C, T](fab: A)(bt: C => T): A                 = fab
+      override def bimap[B, C, S, T](fab: A)(as: B => S, bt: C => T): A = fab
+      override def lmap[B, C, S](fab: A)(as: B => S): A                 = fab
+      override def rmap[B, C, T](fab: A)(bt: C => T): A                 = fab
     })
 
   def biconstPhantom[A, B]: Phantom[Biconst[A, B, ?]] =

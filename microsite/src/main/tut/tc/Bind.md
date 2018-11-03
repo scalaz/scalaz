@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/bind.scala
 title:  "Bind"
 ---
-
-# Bind [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/bind.scala)
 
 Equivalent to [Monad](./Monad.html) without the `pure` method.
 

@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/bifunctor.scala
 title:  "Bifunctor"
 ---
-
-# Bifunctor [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/bifunctor.scala)
 
 *The `Bifunctor` type class describes a type which has two type parameters,
  each of which acts as a (covariant) [Functor](./Functor.html).*
@@ -18,14 +19,15 @@ import scalaz._, tc._, data.{\&/, These}
 import Scalaz._
 
 val tuple2Bifunctor: Bifunctor[Tuple2] =
-  instanceOf(new BifunctorClass[Tuple2] with BifunctorClass.DeriveBimap[Tuple2] {
-    def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))
-    def rmap[A, B, T](fab: (A, B))(f: B => T): (A, T) = fab.copy(_2 = f(fab._2))
+  instanceOf(new BifunctorClass[Tuple2] {
+    override def lmap[A, B, S](fab: (A, B))(f: A => S): (S, B) = fab.copy(_1 = f(fab._1))
+    override def rmap[A, B, T](fab: (A, B))(f: B => T): (A, T) = fab.copy(_2 = f(fab._2))
   })
 
 val theseBifunctor: Bifunctor[These] =
-  instanceOf(new BifunctorClass[These] with BifunctorClass.DeriveLmapRmap[These] {
-    def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T = fab.bimap(as)(bt)
+  instanceOf(new BifunctorClass[These] {
+    override def bimap[A, B, S, T](fab: A \&/ B)(as: A => S, bt: B => T): S \&/ T =
+      fab.bimap(as)(bt)
   })
 ```
 

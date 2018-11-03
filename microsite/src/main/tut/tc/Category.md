@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/category.scala
 title:  "Category"
 ---
-
-# Category [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/category.scala)
-
 
 A semicategory with identity.
 
@@ -13,4 +13,3 @@ associative composition of any `F[A, B]` and `F[B, C]`, with `id[A]: F[A, A]`
 provided as the identity.
 
 # Law
-

@@ -18,7 +18,7 @@ trait FunctorFunctions {
 
 trait FunctorSyntax {
   implicit final class ToFunctorOps[F[_], A](self: F[A]) {
-    def map[B](f: A => B)(implicit ev: Functor[F]): F[B] = macro meta.Ops.i_1
+    def map[B](f: A => B)(implicit ev: Functor[F]): F[B] = macro ops.Ops.i_1
 
     /**
      * Alias for [[map]], since [[map]] can't be injected as syntax if

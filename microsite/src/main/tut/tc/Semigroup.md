@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/semigroup.scala
 title:  "Semigroup"
 ---
-
-# Semigroup [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/semigroup.scala)
 
 *A semigroup is an algebraic structure consisting of a set and an associative binary operation.*
 

@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/ord.scala
 title:  "Ord"
 ---
-
-# Ord [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/ord.scala)
 
 *Ord is used for totally ordered datatypes.*
 

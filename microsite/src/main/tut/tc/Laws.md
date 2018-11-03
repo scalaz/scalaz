@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+section: typeclass
 title:  "Laws"
 ---
 
-# Laws [![GitHub](../img/github.png)]
+# Laws
 
 Laws accompany most type classes in scalaz.
 

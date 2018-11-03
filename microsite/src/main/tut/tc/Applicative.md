@@ -1,9 +1,10 @@
 ---
-layout: docs
-title:  "Applicative"
+layout: scalaz
+module: base
+section: typeclass
+source: tc/applicative.scala
+title: "Applicative"
 ---
-
-# Applicative [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/applicative.scala)
 
 *Whereas a [functor](./Functor.html) allows application of a pure function to a value in a context, an Applicative also allows application of a function in a context to a value in a context.*
 
@@ -24,12 +25,12 @@ case class ZipList[A](val value: List[A]) extends AnyVal
 
 /* Note that this is _not_ the Applicative instance for List! */
 implicit val zipListAp: Applicative[ZipList] = instanceOf(new ApplicativeClass[ZipList] {
-  def pure[A](a: A): ZipList[A] = ZipList(List(a))
+  override def pure[A](a: A): ZipList[A] = ZipList(List(a))
 
-  def ap[A, B](fa: ZipList[A])(f: ZipList[A => B]): ZipList[B] =
+  override def ap[A, B](fa: ZipList[A])(f: ZipList[A => B]): ZipList[B] =
     ZipList((fa.value zip f.value).map(t => t._2(t._1)))
 
-  def map[A, B](fa: ZipList[A])(f: A => B): ZipList[B] =
+  override def map[A, B](fa: ZipList[A])(f: A => B): ZipList[B] =
     ZipList(fa.value map f)
 })
 ```

@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/unfoldable.scala
 title:  "Unfoldable"
 ---
-
-# Unfoldable [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/unfoldable.scala)
 
 Whereas a `Foldable` allows folding data structures to values, `Unfoldable` identifies data
 structures which can be unfolded.

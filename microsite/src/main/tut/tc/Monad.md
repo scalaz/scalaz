@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/monad.scala
 title:  "Monad"
 ---
-
-# Monad [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/monad.scala)
 
 A monad is a subclass of `Bind`, which adds an identity, `pure`,
 by also being a subclass of `Applicative`.
@@ -22,11 +23,11 @@ import scalaz.Scalaz._
 
 ```tut
 val listMonad: Monad[List] =
-  instanceOf(new MonadClass[List] with BindClass.DeriveAp[List] {
-    def pure[A](a: A): List[A] = List(a)
-    def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
-    def flatten[A](ma: List[List[A]]): List[A] = ma.flatMap(x => x)
-    def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
+  instanceOf(new MonadClass[List] {
+    override def pure[A](a: A): List[A] = List(a)
+    override def flatMap[A, B](ma: List[A])(f: A => List[B]): List[B] = ma.flatMap(f)
+    override def flatten[A](ma: List[List[A]]): List[A] = ma.flatMap(x => x)
+    override def map[A, B](ma: List[A])(f: A => B): List[B] = ma.map(f)
   })
 ```
 

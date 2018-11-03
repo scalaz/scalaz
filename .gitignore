@@ -1,2 +1,6 @@
 target
 .idea
+project/secret
+project/zecret
+project/travis-deploy-key
+project/secrets.tar.xz

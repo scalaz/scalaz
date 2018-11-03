@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/functor.scala
 title:  "Functor"
 ---
-
-# Functor [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/functor.scala)
 
 A way to map ordinary functions under type constructors,
 turning `A => B` to `F[A] => F[B]` with `Functor[F]`.
