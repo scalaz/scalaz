@@ -7,7 +7,7 @@ package scalaz
   * and nonstrictness.
   */
 ////
-trait Distributive[F[_]] extends Functor[F] { self =>
+trait Distributive[F[_]] extends Functor[F] with DistributiveParent[F] { self =>
   ////
 
   def distributeImpl[G[_]:Functor,A,B](fa: G[A])(f: A => F[B]): F[G[B]]
