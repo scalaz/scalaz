@@ -27,7 +27,7 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
-  lazy val distributive = TypeClass("Distributive", *->*, extendsList = Seq(functor), createSyntax = false)
+  lazy val distributive = TypeClass("Distributive", *->*, extendsList = Seq(functor), createSyntax = false, parent = true)
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor), parent = true)
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply), parent = true)
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
