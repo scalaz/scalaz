@@ -49,7 +49,7 @@ trait Day[F[_], G[_], A] { self =>
   def trans2[H[_]](nat: G ~> H): Day[F, H, A] = Day(fx, nat.apply(gy), xya)
 }
 
-object Day {
+object Day extends DayInstances {
   import scalaz.Id.Id
 
   def apply[F[_], G[_], A, XX, YY](fa: F[XX], gb: G[YY], abc: (XX, YY) => A): Day[F, G, A] =
@@ -88,7 +88,7 @@ object Day {
   }
 }
 
-object DayInstances extends DayInstances1 {
+sealed abstract class DayInstances extends DayInstances1 {
 
   implicit def comonadDay[F[_], G[_]](implicit CF0: Comonad[F], CG0: Comonad[G]): Comonad[Day[F, G, ?]] = new DayComonad[F, G] {
     def CF: Comonad[F] = CF0
