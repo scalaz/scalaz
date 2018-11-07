@@ -5,14 +5,14 @@ import scala.language.higherKinds
 /**
   * Covariant Day Convolution
   *
-  * Based on Edward Kmett implementation in Haskell: http://hackage.haskell.org/package/kan-extensions/docs/Data-Functor-Day.html
+  * Based on Edward Kmett implementation in Haskell: [[https://hackage.haskell.org/package/kan-extensions/docs/Data-Functor-Day.html]]
   *
   * Day convolution is a special form of Functor multiplication.
   * In monoidal category of endofunctors Applicative is a monoid object when Day covolution is used as tensor.
   * If we use Functor composition as tensor then then monoid form a Monad instead of Applicative.
   *
   * Can be seen as generalization of method apply2 from Apply:
-  *
+  * {{{
   * def apply2(fa => F[A], fb => F[B])(f: (A, B) => C): F[C]
   *
   * trait Day[F[_], G[_], A] { self =>
@@ -21,12 +21,12 @@ import scala.language.higherKinds
   *   val gy: G[Y]
   *   def xya: (X, Y) => A
   * }
+  * }}}
   *
-  *
-  * Bartosz Milewski talk, derive Day from multiplying Functors and using Coyoneda: https://www.youtube.com/watch?v=lIWCxRBaQG8
-  * Edward Kmett talk, explains Divisible and Decidable in context of contravariant Day: https://www.youtube.com/watch?v=cB8DapKQz-I
-  * Phil Freeman blog, connections between Day and Comonads, Comonads transformers, optics: https://blog.functorial.com/posts/2016-08-08-Comonad-And-Day-Convolution.html
-  * Discussion on Reddit with mention about usage for stream processing and intuition based on liftA2 from Applicative and Day: https://www.reddit.com/r/haskell/comments/4wvae2/functorial_blog_comonads_and_day_convolution/
+  * @see [[https://www.youtube.com/watch?v=lIWCxRBaQG8 Bartosz Milewski talk, derive Day from multiplying Functors and using Coyoneda]]
+  * @see [[https://www.youtube.com/watch?v=cB8DapKQz-I Edward Kmett talk, explains Divisible and Decidable in context of contravariant Day]]
+  * @see [[https://blog.functorial.com/posts/2016-08-08-Comonad-And-Day-Convolution.html Phil Freeman blog, connections between Day and Comonads, Comonads transformers, optics]]
+  * @see [[https://www.reddit.com/r/haskell/comments/4wvae2/functorial_blog_comonads_and_day_convolution/ Discussion on Reddit with mention about usage for stream processing and intuition based on liftA2 from Applicative and Day]]
   */
 trait Day[F[_], G[_], A] { self =>
   type X
