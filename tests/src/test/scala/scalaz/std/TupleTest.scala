@@ -100,6 +100,7 @@ object TupleTest extends SpecLite {
       // checking absence of ambiguity
       def equal[A: Order] = Equal[Tuple1[A]]
       def semigroup[A: Monoid: Band] = Semigroup[Tuple1[A]]
+      def semigroup[A: Monoid: SemiLattice] = Semigroup[Tuple1[A]]
     }
     object tuple2 {
       def show[A: Show, B: Show] = Show[(A, B)]
@@ -119,6 +120,7 @@ object TupleTest extends SpecLite {
       // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]
       def semigroup[A: Monoid: Band, B: Monoid: Band] = Semigroup[(A, B)]
+      def semigroup[A: Monoid: SemiLattice, B: Monoid: SemiLattice] = Semigroup[(A, B)]
       def functor[A: Monoid] = Functor[(A, ?)]
     }
     object tuple3 {
@@ -128,6 +130,10 @@ object TupleTest extends SpecLite {
       def semigroup[A: Semigroup, B: Semigroup, C: Semigroup] = Semigroup[(A, B, C)]
       def band[A: Band, B: Band, C: Band] = Band[(A, B, C)]
       def monoid[A: Monoid, B: Monoid, C: Monoid] = Monoid[(A, B, C)]
+
+      // checking absence of ambiguity
+      def semigroup[A: Monoid: Band, B: Monoid: Band, C: Monoid: Band] = Semigroup[(A, B, C)]
+      def semigroup[A: Monoid: SemiLattice, B: Monoid: SemiLattice, C: Monoid: SemiLattice] = Semigroup[(A, B, C)]
     }
   }
 }
