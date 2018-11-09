@@ -1081,8 +1081,8 @@ sealed abstract class IndSeqInstances {
   implicit def indSeqEqual[A: Equal]: Equal[IndSeq[A]] =
     Equal.equalBy(_.self)
 
-  implicit val indSeqInstance: MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
-    new MonadPlus[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
+  implicit val indSeqInstance: MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
+    new MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
       def G = implicitly
       override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
@@ -1106,6 +1106,8 @@ sealed abstract class IndSeqInstances {
         fa map f
       def plus[A](a: IndSeq[A], b: => IndSeq[A]) =
         a ++ b
+      def alt[A](a: => IndSeq[A], b: => IndSeq[A]) =
+        plus(a, b)
       def empty[A] =
         IndSeq.apply()
     }

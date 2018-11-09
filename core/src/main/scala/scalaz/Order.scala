@@ -85,20 +85,34 @@ object Order {
 
   ////
 
-  implicit val orderInstance: Divisible[Order] = new Divisible[Order] {
-    override def contramap[A, B](r: Order[A])(f: B => A) = r.contramap(f)
+  implicit val orderInstance: Decidable[Order] = new OrderDecidableInstance
 
-    override def conquer[A] = order((_, _) => Ordering.EQ)
+  private[scalaz] class OrderDecidableInstance extends Decidable[Order] with Divisible[Order] {
+    override def contramap[A, B](r: Order[A])(f: B => A): Order[B] = r.contramap(f)
 
-    override def divide2[A, B, C](fa: =>Order[A], fb: =>Order[B])(f: C => (A, B)) =
-      order[C]{ (c1, c2) =>
-        val (a1, b1) = f(c1)
-        val (a2, b2) = f(c2)
-        fa.order(a1, a2) match {
-          case Ordering.EQ => fb.order(b1, b2)
-          case o => o
+    override def choose2[Z, A1, A2](order1: => Order[A1], order2: => Order[A2])(f: Z => A1 \/ A2): Order[Z] = order[Z] { (c1, c2) =>
+      f(c1) match {
+        case -\/(c) => f(c2) match {
+          case -\/(d) => order1(c, d)
+          case _ => Ordering.LT
+        }
+        case \/-(c) => f(c2) match {
+          case \/-(d) => order2(c, d)
+          case _ => Ordering.GT
         }
       }
+    }
+
+    override def conquer[A]: Order[A] = order((_, _) => Ordering.EQ)
+
+    override def divide2[A1, A2, Z](a1: => Order[A1], a2: => Order[A2])(f: Z => (A1, A2)): Order[Z] = order[Z] { (c1, c2) =>
+      val (x1, y1) = f(c1)
+      val (x2, y2) = f(c2)
+      a1.order(x1, x2) match {
+        case Ordering.EQ => a2.order(y1, y2)
+        case o => o
+      }
+    }
   }
 
   def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {

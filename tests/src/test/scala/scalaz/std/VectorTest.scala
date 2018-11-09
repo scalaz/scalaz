@@ -15,6 +15,7 @@ object VectorTest extends SpecLite {
   import std.vector._
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])
+  checkAll(alt.laws[Vector])
   checkAll(monadPlus.strongLaws[Vector])
   checkAll(bindRec.laws[Vector])
   checkAll(traverse.laws[Vector])
@@ -116,6 +117,7 @@ object VectorTest extends SpecLite {
     def semigroup[A: Semigroup] = Monoid[Vector[A]]
     def bindRec = BindRec[Vector]
     def monadPlus = MonadPlus[Vector]
+    def alt = Alt[Vector]
     def traverse = Traverse[Vector]
     def zip = Zip[Vector]
     def unzip = Unzip[Vector]

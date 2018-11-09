@@ -169,13 +169,24 @@ sealed abstract class NonEmptyListInstances0 {
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
-  implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
-    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
+  implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
         if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
 
       override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
         Foldable[IList].foldMap(fa.list)(f)(M)
+
+      override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
+        val revOpt: Maybe[F[NonEmptyList[B]]] =
+          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list)(_ match {
+            case ICons(a, as) => Maybe.just((f(a), as))
+            case INil() => Maybe.empty
+          })(Reducer.ReverseNonEmptyListReducer[B])
+
+        val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
+        F.map(rev)(_.reverse)
+      }
 
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
@@ -207,6 +218,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def point[A](a: => A): NonEmptyList[A] = NonEmptyList(a)
 
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
+
+      def alt[A](a: => NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = plus(a, b)
 
       def copoint[A](p: NonEmptyList[A]): A = p.head
 

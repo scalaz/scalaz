@@ -278,6 +278,11 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[A, F, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
+  /** Construct a disjunction value from a standard `scala.Option`. */
+  def fromOption[F[_], A, B](ifNone: => A)(fo: F[Option[B]])(implicit F: Functor[F]): EitherT[A, F, B] =
+    apply(F.map(fo)(o => \/.fromOption(ifNone)(o)))
+
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[F[_], A, B <: Throwable: NotNothing](a: => F[A])(implicit F: Applicative[F], ex: ClassTag[B]): EitherT[B, F, A] =
     try {
       rightT(a)
@@ -285,6 +290,7 @@ object EitherT extends EitherTInstances {
       case e if ex.runtimeClass.isInstance(e) => leftT(F.point(e.asInstanceOf[B]))
     }
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[Throwable, F, A] =
     try {
       rightT(a)
@@ -340,11 +346,26 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
     new EitherTBifoldable[F] {
       implicit def F = F0
     }
-  implicit def eitherTMonadPlus[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, ?]] =
-    new EitherTMonadPlus[F, L] {
+
+  implicit def eitherTMonadPlusAlt[F[_], L](implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[L, F, ?]] with Alt[EitherT[L, F, ?]] =
+    new EitherTMonadPlus[F, L] with Alt[EitherT[L, F, ?]] {
       implicit def F = F0
       implicit def G = L0
+
+      def alt[A](a1: => EitherT[L, F, A], a2: => EitherT[L, F, A]): EitherT[L, F, A] =
+        EitherT(
+          F.bind(a1.run)(_ match {
+            case -\/(l) =>
+              F.map(a2.run)(
+                _.leftMap(G.append(l, _))
+              )
+
+            case r: \/-[L, A] =>
+              F.point(r)
+          })
+        )
     }
+
   implicit def eitherTFoldable[F[_], L](implicit F0: Foldable[F]): Foldable[EitherT[L, F, ?]] =
     new EitherTFoldable[F, L] {
       implicit def F = F0

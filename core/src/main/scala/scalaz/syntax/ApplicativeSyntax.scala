@@ -11,6 +11,9 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 
   final def replicateM_(n: Int): F[Unit] =
     F.replicateM_(n, self)
+  final def +++(that: F[A])(implicit M1: Semigroup[A]): F[A] = {
+    F.apply2(self, that)((a1, a2) => M1.append(a1, a2))
+  }
   ////
 }
 
@@ -37,9 +40,9 @@ trait ToApplicativeOps0[TC[F[_]] <: Applicative[F]] extends ToApplicativeOpsU[TC
   }  ////
 }
 
-trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC]
+trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC] with ToInvariantApplicativeOps[TC]
 
-trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
+trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with InvariantApplicativeSyntax[F] {
   implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A](v)(ApplicativeSyntax.this.F)
 
   def F: Applicative[F]

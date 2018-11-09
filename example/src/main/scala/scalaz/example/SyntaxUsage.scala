@@ -172,14 +172,14 @@ object SyntaxUsage extends App {
       // doesn't include Monad syntax (monadError0).
       import scalaz.syntax.monadTell._
       import scalaz.syntax.monadError0._
-
+      import scalaz.syntax.applicativeError0._
       // Monad syntax
       fa flatMap (_ => fa)
 
       // MonadTell syntax
       fa :++> "foo"
 
-      // MonadError syntax
+      // ApplicativeError syntax
       fa handleError (e => fa)
     }
   }

@@ -7,7 +7,7 @@ import examples.adt._
 import examples.recadt._
 import examples.recgadt._
 
-class CovariantDerivesTest extends SpecLite {
+class AltTest extends SpecLite {
 
   "products" should {
     "behave as expected" in {

@@ -13,19 +13,19 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.2.24, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
+The current stable version is 7.2.27, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.24"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.27"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scalaz%22%20AND%20v%3A%227.2.24%22).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.2.27).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.24.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.27.jar`.
 
 ## Quick Start
 
@@ -146,7 +146,7 @@ def foo[M[_]: Monad] = bar[M] // Monad[M] is a subtype of Functor[M]
 * A single implicit can define a number of type class instances for a type.
 * A type class definition can override methods (including derived methods) for efficiency.
 
-Here is an instance definition for `Option`. Notice that the method `map` has been overriden.
+Here is an instance definition for `Option`. Notice that the method `map` has been overridden.
 
 ```scala
   implicit val option = new Traverse[Option] with MonadPlus[Option] {

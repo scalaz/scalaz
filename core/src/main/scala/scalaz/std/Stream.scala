@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
 
     override def point[A](a: => A): Stream[A] =
       Stream(a)
@@ -28,13 +28,6 @@ trait StreamInstances {
 
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
-    def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
-      val seed: G[Stream[B]] = G.point(Stream[B]())
-
-      foldRight(fa, seed) {
-        (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
-      }
-    }
 
     override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
@@ -93,6 +86,8 @@ trait StreamInstances {
 
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
 
+    def alt[A](a: => Stream[A], b: => Stream[A]) = plus(a, b)
+
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
       (a, b) =>
         if(b.isEmpty)
@@ -113,6 +108,18 @@ trait StreamInstances {
         rec(s)
       }
       go(f(a))
+    }
+
+    def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      val revOpt: Maybe[F[List[B]]] =
+        F.unfoldrOpt[Stream[A], B, List[B]](fa)(_ match {
+          case a #:: as => Maybe.just((f(a), as))
+          case Stream.Empty => Maybe.empty
+        })(Reducer.ReverseListReducer[B])
+
+      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+      F.map(rev)((rev) => rev.foldLeft(Stream[B]())((r, c) => c +: r))
     }
   }
 

@@ -19,6 +19,7 @@ object IListTest extends SpecLite {
   checkAll(isEmpty.laws[IList])
   checkAll(cobind.laws[IList])
   checkAll(order.laws[IList[Int]])
+  checkAll(alt.laws[IList])
 
   // These tests hold for List, so they had better hold for IList
 
@@ -101,8 +102,8 @@ object IListTest extends SpecLite {
     (n +: ns).toList must_=== n +: ns.toList
   }
 
-  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
-    (s /: ns)(f) == (s /: ns.toList)(f)
+  "foldLeft" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
+    ns.foldLeft(s)(f) == ns.toList.foldLeft(s)(f)
   }
 
   ":+" ! forAll { (n: Int, ns: IList[Int]) =>
@@ -117,8 +118,8 @@ object IListTest extends SpecLite {
     (ns ::: ms).toList must_=== ns.toList ::: ms.toList
   }
 
-  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
-    (ns :\ s)(f) == (ns.toList :\ s)(f)
+  "foldRight" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
+    ns.foldRight(s)(f) == ns.toList.foldRight(s)(f)
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -304,6 +305,14 @@ object IListTest extends SpecLite {
     (ns reverse_::: ms).toList must_=== (ns.toList reverse_::: ms.toList)
   }
 
+  "traverseDisjunction" ! forAll { (is: IList[Int]) =>
+    import syntax.traverse._
+
+    def f(i: Int): String \/ Int = if (i % 2 == 0) -\/(i.toString) else \/-(i)
+
+    is.traverseDisjunction(f).must_===(is.traverse[String \/ ?, Int](f))
+  }
+
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>
     ss.scanLeft(0)(f).toList must_=== ss.toList.scanLeft(0)(f)
     ss.scanLeft("z")(_ + _).toList must_=== ss.toList.scanLeft("z")(_ + _)
@@ -441,5 +450,6 @@ object IListTest extends SpecLite {
     def align = Align[IList]
     def isEmpty = IsEmpty[IList]
     def cobind = Cobind[IList]
+    def alt = Alt[IList]
   }
 }

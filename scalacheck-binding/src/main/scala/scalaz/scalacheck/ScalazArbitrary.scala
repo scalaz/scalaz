@@ -243,6 +243,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def EphemeralStreamArbitrary[A : Arbitrary]: Arbitrary[EphemeralStream[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
+  implicit def IStreamArbitrary[A : Arbitrary]: Arbitrary[IStream[A]] =
+    Functor[Arbitrary].map(arb[Stream[A]])(IStream.fromStream[A](_))
+
   implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
 
@@ -532,6 +535,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
+
+  implicit def idTArbitrary[A, F[_]](implicit A: Arbitrary[F[A]]): Arbitrary[IdT[F, A]] =
+    Functor[Arbitrary].map(A)(IdT[F, A])
 
   // backwards compatibility
   def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =

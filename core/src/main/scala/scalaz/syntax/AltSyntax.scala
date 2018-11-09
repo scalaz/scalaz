@@ -26,9 +26,9 @@ trait ToAltOps0[TC[F[_]] <: Alt[F]] extends ToAltOpsU[TC] {
   ////
 }
 
-trait ToAltOps[TC[F[_]] <: Alt[F]] extends ToAltOps0[TC] with ToApplicativeOps[TC] with ToDerivesOps[TC]
+trait ToAltOps[TC[F[_]] <: Alt[F]] extends ToAltOps0[TC] with ToApplicativeOps[TC] with ToInvariantAltOps[TC]
 
-trait AltSyntax[F[_]] extends ApplicativeSyntax[F] with DerivesSyntax[F] {
+trait AltSyntax[F[_]] extends ApplicativeSyntax[F] with InvariantAltSyntax[F] {
   implicit def ToAltOps[A](v: F[A]): AltOps[F, A] = new AltOps[F,A](v)(AltSyntax.this.F)
 
   def F: Alt[F]

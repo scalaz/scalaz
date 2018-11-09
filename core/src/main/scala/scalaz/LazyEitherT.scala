@@ -202,6 +202,20 @@ sealed abstract class LazyEitherTInstances1 {
       override def F = F0
       override def E = L
     }
+
+  implicit def lazyEitherTAlt[F[_], L](implicit F0: Monad[F]): Alt[LazyEitherT[F, L, ?]] =
+    new Alt[LazyEitherT[F, L, ?]] with LazyEitherTMonad[F, L] {
+      implicit def F = F0
+
+      def alt[A](a: => LazyEitherT[F, L, A], b: => LazyEitherT[F, L, A]): LazyEitherT[F, L, A] =
+        LazyEitherT(
+          F.bind(a.run) { leA =>
+            F.map(b.run) {
+              Alt[LazyEither[L, ?]].alt(leA, _)
+            }
+          }
+        )
+    }
 }
 
 sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {

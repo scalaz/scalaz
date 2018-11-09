@@ -5,6 +5,8 @@ package syntax
 final class BindRecOps[F[_],A] private[syntax](val self: F[A])(implicit val F: BindRec[F]) extends Ops[F[A]] {
   ////
 
+  def forever[B]: F[B] = F.forever(self)
+
   ////
 }
 

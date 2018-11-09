@@ -138,6 +138,13 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
     new OptionTMonadError[F, E] {
       def F = F0
     }
+
+  implicit def optionTAlt[F[_]](implicit F0: Monad[F]): Alt[OptionT[F, ?]] =
+    new Alt[OptionT[F, ?]] with OptionTApply[F] with OptionTPoint[F] {
+      def F = F0
+
+      def alt[A](a: => OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
+    }
 }
 
 sealed abstract class OptionTInstances0 extends OptionTInstances1 {
@@ -160,6 +167,11 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
 
   implicit def optionTShow[F[_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     Contravariant[Show].contramap(F0)(_.run)
+
+  implicit def optionTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[OptionT[F, ?]] =
+    new OptionTDecidable[F] {
+      implicit def F: Divisible[F] = F0
+    }
 }
 
 object OptionT extends OptionTInstances {
@@ -189,6 +201,23 @@ object OptionT extends OptionTInstances {
 // Implementation traits for type class instances
 //
 
+private trait OptionTDecidable[F[_]] extends Decidable[OptionT[F, ?]] {
+  implicit def F: Divisible[F]
+
+  override final def conquer[A]: OptionT[F, A] = OptionT(F.conquer)
+
+  override final def divide2[A1, A2, Z](a1: => OptionT[F, A1], a2: => OptionT[F, A2])(f: Z => (A1, A2)): OptionT[F, Z] =
+    OptionT(F.divide2(a1.run, a2.run)(z => Unzip[Option].unzip(z.map(f))))
+
+  override final def choose2[Z, A1, A2](a1: => OptionT[F, A1], a2: => OptionT[F, A2])(f: Z => A1 \/ A2): OptionT[F, Z] =
+    OptionT(
+      F.divide2(a1.run, a2.run)(_.map(f)
+        .fold[(Option[A1], Option[A2])]((Option.empty, Option.empty))(
+          _.fold(a1 => (Some(a1), Option.empty), a2 => (Option.empty, Some(a2)))
+      ))
+    )
+}
+
 private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
   implicit def F: Functor[F]
 
@@ -199,6 +228,12 @@ private trait OptionTApply[F[_]] extends Apply[OptionT[F, ?]] with OptionTFuncto
   implicit def F: Monad[F]
 
   override final def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
+}
+
+private trait OptionTPoint[F[_]] {
+  implicit def F: Applicative[F]
+
+  def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
 private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[F]{
@@ -219,10 +254,8 @@ private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBi
     )
 }
 
-private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] {
+private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] with OptionTPoint[F] {
   implicit def F: Monad[F]
-
-  def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
 private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, ?], E] with OptionTMonad[F] {

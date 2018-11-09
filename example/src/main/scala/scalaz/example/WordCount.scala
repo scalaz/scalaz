@@ -4,7 +4,7 @@ import scalaz.{Monoid, StateT}
 
 
 /**
- * Character/Line/Word Count from "The Essense of the Iterator Pattern".
+ * Character/Line/Word Count from "The Essence of the Iterator Pattern".
  *
  * @see [[http://www.comlab.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf]]
  */

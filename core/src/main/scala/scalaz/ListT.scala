@@ -100,9 +100,12 @@ sealed abstract class ListTInstances1 extends ListTInstances2 {
 }
 
 sealed abstract class ListTInstances extends ListTInstances1 {
-  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, ?]] =
-    new ListTMonadPlus[F] {
+  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, ?]] with Alt[ListT[F, ?]] =
+    new ListTMonadPlus[F] with Alt[ListT[F, ?]] {
       implicit def F: Monad[F] = F0
+
+    def alt[A](a: => ListT[F, A], b: => ListT[F, A]): ListT[F, A] =
+      plus(a, b)
     }
 
   implicit def listTEqual[F[_], A](implicit E: Equal[F[IList[A]]]): Equal[ListT[F, A]] =
@@ -113,6 +116,11 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 
   implicit val listTHoist: Hoist[ListT] =
     new ListTHoist {}
+
+  implicit def listTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[ListT[F, ?]] =
+    new ListTDecidable[F] {
+      implicit def F: Divisible[F] = F0
+    }
 }
 
 object ListT extends ListTInstances {
@@ -134,6 +142,24 @@ object ListT extends ListTInstances {
 //
 // Implementation traits for type class instances
 //
+
+private trait ListTDecidable[F[_]] extends Decidable[ListT[F, ?]] {
+  implicit def F: Divisible[F]
+  override def conquer[A]: ListT[F, A] = ListT(F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => ListT[F, A1], a2: => ListT[F, A2])(f: Z => (A1, A2)): ListT[F, Z] =
+    ListT(F.divide2(a1.run, a2.run)((z: IList[Z]) => Unzip[IList].unzip(z.map(f))))
+
+  override def choose2[Z, A1, A2](a1: => ListT[F, A1], a2: => ListT[F, A2])(f: Z => A1 \/ A2): ListT[F, Z] =
+    ListT(
+      F.divide2(a1.run, a2.run) (
+        (z: IList[Z]) => z.map(f)
+          ./:((IList.empty[A1], IList.empty[A2])) {
+            case (x, y) => y.fold(a1 => (x._1 :+ a1, x._2), a2 => (x._1, x._2 :+ a2))
+          }
+      )
+    )
+}
 
 private trait ListTFunctor[F[_]] extends Functor[ListT[F, ?]] {
  implicit def F: Functor[F]

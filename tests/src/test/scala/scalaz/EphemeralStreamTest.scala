@@ -16,6 +16,7 @@ object EphemeralStreamTest extends SpecLite {
   checkAll(zip.laws[EphemeralStream])
   checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
+  checkAll(alt.laws[EphemeralStream])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
