@@ -206,7 +206,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
       def _7 = A7
       def _8 = A8
     }
-    /** `Tuple1[A]` is isomorphic to `Id[X]` */
+  /** `Tuple1[A]` is isomorphic to `Id[X]` */
   implicit val tuple1Instance: Traverse[Tuple1] with Monad[Tuple1] with Comonad[Tuple1] = new Tuple1Monad with Tuple1Functor with Comonad[Tuple1] {
     override def cojoin[A](a: Tuple1[A]) = Tuple1(a)
     def copoint[A](p: Tuple1[A]) = p._1
