@@ -18,6 +18,8 @@ object OneAndTest extends SpecLite {
   checkAll("OneAnd List", monad.laws[OneAndList])
   checkAll("OneAnd Option", monad.laws[OneAndOption])
   checkAll("OneAnd Nel", plus.laws[OneAndNel])
+  checkAll("OneAnd List", alt.laws[OneAndList])
+  checkAll("OneAnd Option", alt.laws[OneAndOption])
   checkAll("OneAnd List", traverse1.laws[OneAndList])
   checkAll("OneAnd Nel", traverse1.laws[OneAndNel])
   checkAll("OneAnd List", zip.laws[OneAndList])
@@ -102,9 +104,10 @@ object OneAndTest extends SpecLite {
 
   object instances {
     def functor[F[_]: Functor] = Functor[OneAnd[F, ?]]
-    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[OneAnd[F, ?]]
     def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, ?]]
+    def align[F[_]: Align] = Align[OneAnd[F, ?]]
     def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, ?]]
+    def alt[F[_]: Alt: PlusEmpty] = Alt[OneAnd[F, ?]]
     def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, ?]]
     def monad[F[_]: MonadPlus] = Monad[OneAnd[F, ?]]
     def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, ?]]
@@ -113,5 +116,23 @@ object OneAndTest extends SpecLite {
     def traverse[F[_]: Traverse] = Traverse1[OneAnd[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[OneAnd[F, ?]]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
+
+    // checking absence of ambiguity
+    def functor[F[_]: Traverse] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: Traverse1] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: Apply] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: Applicative] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: Bind] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: BindRec] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: Monad] = Functor[OneAnd[F, ?]]
+    def functor[F[_]: MonadPlus] = Functor[OneAnd[F, ?]]
+    def apply[F[_]: ApplicativePlus] = Apply[OneAnd[F, ?]]
+    def apply[F[_]: Applicative: PlusEmpty] = Apply[OneAnd[F, ?]]
+    def apply[F[_]: Monad: PlusEmpty] = Apply[OneAnd[F, ?]]
+    def apply[F[_]: MonadPlus] = Apply[OneAnd[F, ?]]
+    def bind[F[_]: MonadPlus] = Bind[OneAnd[F, ?]]
+    def plus[F[_]: ApplicativePlus] = Plus[OneAnd[F, ?]]
+    def plus[F[_]: Monad: Plus] = Plus[OneAnd[F, ?]]
+    def plus[F[_]: MonadPlus] = Plus[OneAnd[F, ?]]
   }
 }

@@ -1,12 +1,15 @@
 package scalaz
 package std
 
-import scalaz._
+import scala.annotation.tailrec
+
+import Maybe.Just
 import Id._
 
 trait AnyValInstances {
 
   implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] = new Monoid[Unit] with Enum[Unit] with Show[Unit] with SemiLattice[Unit] {
+    override def show(f: Unit): Cord = Cord()
     override def shows(f: Unit) = ().toString
 
     def append(f1: Unit, f2: => Unit) = ()
@@ -30,7 +33,10 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
+  import Tags.{Conjunction, Disjunction}
+
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
+    override def show(f: Boolean): Cord = Cord(shows(f))
     override def shows(f: Boolean) = f.toString
 
     def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -49,21 +55,13 @@ trait AnyValInstances {
 
     override def equalIsNatural: Boolean = true
 
-    object conjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 && f2
+    val conjunction: Monoid[Boolean] =
+      Conjunction.unsubst[Monoid, Boolean](booleanConjunctionNewTypeInstance)
 
-      def zero: Boolean = true
-    }
-
-    object disjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 || f2
-
-      def zero = false
-    }
+    val disjunction: Monoid[Boolean] =
+      Disjunction.unsubst[Monoid, Boolean](booleanDisjunctionNewTypeInstance)
 
   }
-
-  import Tags.{Conjunction, Disjunction}
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] with Band[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(Tag.unwrap(f1) || Tag.unwrap(f2))
@@ -83,6 +81,26 @@ trait AnyValInstances {
     override def min = Disjunction.subst(Enum[Boolean].min)
 
     override def max = Disjunction.subst(Enum[Boolean].max)
+
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Boolean @@ Disjunction, S)]): Maybe[Boolean @@ Disjunction] = {
+      val f0 = Disjunction.unsubst[λ[x => S => Maybe[(x, S)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((b, s)) => b || go(s)
+        case _ => false
+      }
+      f0(s) map { case (b, s) => Disjunction(b || go(s)) }
+    }
+
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Disjunction)]): Maybe[Boolean @@ Disjunction] = {
+      val f0 = Disjunction.unsubst[λ[x => S => Maybe[(S, x)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((s, b)) => b || go(s)
+        case _ => false
+      }
+      f0(s) map { case (s, b) => Disjunction(b || go(s)) }
+    }
 
   }
 
@@ -105,9 +123,30 @@ trait AnyValInstances {
 
     override def max = Conjunction.subst(Enum[Boolean].max)
 
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Boolean @@ Conjunction, S)]): Maybe[Boolean @@ Conjunction] = {
+      val f0 = Conjunction.unsubst[λ[x => S => Maybe[(x, S)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((b, s)) => b && go(s)
+        case _ => true
+      }
+      f0(s) map { case (b, s) => Conjunction(b && go(s)) }
+    }
+
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Conjunction)]): Maybe[Boolean @@ Conjunction] = {
+      val f0 = Conjunction.unsubst[λ[x => S => Maybe[(S, x)]], Boolean](f)
+
+      @tailrec def go(s: S): Boolean = f0(s) match {
+        case Just((s, b)) => b && go(s)
+        case _ => true
+      }
+      f0(s) map { case (s, b) => Conjunction(b && go(s)) }
+    }
+
   }
 
   implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
+    override def show(f: Byte): Cord = Cord(shows(f))
     override def shows(f: Byte) = f.toString
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
@@ -126,7 +165,7 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
   }
 
-  import Tags.{Multiplication}
+  import Tags.Multiplication
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toByte)
@@ -152,6 +191,7 @@ trait AnyValInstances {
   }
 
   implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
+    override def show(f: Char): Cord = Cord(shows(f))
     override def shows(f: Char) = f.toString
 
     def append(f1: Char, f2: => Char) = (f1 + f2).toChar
@@ -193,6 +233,7 @@ trait AnyValInstances {
   }
 
   implicit val shortInstance: Monoid[Short] with Enum[Short] with Show[Short] = new Monoid[Short] with Enum[Short] with Show[Short] {
+    override def show(f: Short): Cord = Cord(shows(f))
     override def shows(f: Short) = f.toString
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
@@ -232,6 +273,7 @@ trait AnyValInstances {
   }
 
   implicit val intInstance: Monoid[Int] with Enum[Int] with Show[Int] = new Monoid[Int] with Enum[Int] with Show[Int] {
+    override def show(f: Int): Cord = Cord(shows(f))
     override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
@@ -268,9 +310,26 @@ trait AnyValInstances {
     override def max = Multiplication.subst(Enum[Int].max)
 
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(Tag.unwrap(a1), Tag.unwrap(a2))
+
+    override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Int @@ Multiplication)]) = {
+      val f0 = Multiplication.unsubst[λ[x => S => Maybe[(S, x)]], Int](f)
+
+      @tailrec def go(s: S, acc: Int): Int =
+        if (acc == 0) 0
+        else f0(s) match {
+          case Just((s, i)) => go(s, i * acc)
+          case _ => acc
+        }
+
+      f0(s) map { case (s, i) => Multiplication(go(s, i)) }
+    }
+
+    override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Int @@ Multiplication, S)]) =
+      unfoldlSumOpt[S](s)(f(_) map (_.swap))
   }
 
   implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {
+    override def show(f: Long): Cord = Cord(shows(f))
     override def shows(f: Long) = f.toString
 
     def append(f1: Long, f2: => Long) = f1 + f2
@@ -310,6 +369,7 @@ trait AnyValInstances {
   }
 
   implicit val floatInstance: Order[Float] with Show[Float] = new Order[Float] with Show[Float] {
+    override def show(f: Float): Cord = Cord(shows(f))
     override def shows(f: Float) = f.toString
 
     override def equalIsNatural: Boolean = true
@@ -318,6 +378,7 @@ trait AnyValInstances {
   }
 
   implicit val doubleInstance: Order[Double] with Show[Double] = new Order[Double] with Show[Double] {
+    override def show(f: Double): Cord = Cord(shows(f))
     override def shows(f: Double) = f.toString
 
     override def equalIsNatural: Boolean = true
@@ -492,21 +553,32 @@ trait BooleanFunctions {
     if (cond) M.point(a) else M0.empty
 
   /**
+    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
+    * for `M`.
+    */
+  final def emptyOrPoint[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+    if (!cond) M.point(a) else M0.empty
+
+  /**
    * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
    * for `M`.
    */
+  @deprecated("use emptyOrPoint instead", since = "7.3.0")
   final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
-    new (Id ~> M) {
-      def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
-    }
+  /** [[pointOrEmpty]] curried into a natural transformation. */
+  final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
+    λ[Id ~> M](pointOrEmpty(cond)(_)(M, M0))
 
-  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
-    new (Id ~> M) {
-      def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
-    }
+  /** [[emptyOrPoint]] curried into a natural transformation. */
+  final def emptyOrPointNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
+    λ[Id ~> M](emptyOrPoint(cond)(_)(M, M0))
+
+  @deprecated("use emptyOrPointNT instead", since = "7.3.0")
+  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
+    λ[Id ~> M](emptyOrPoint(cond)(_)(M, M0))
+
 }
 
 trait IntFunctions {

@@ -18,6 +18,23 @@ trait Split[=>:[_, _]] extends Compose[=>:] { self =>
 object Split {
   @inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Split[G]): Split[F] =
+    new IsomorphismSplit[F, G] {
+      override def G: Split[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
+  ////
+}
+
+trait IsomorphismSplit[F[_, _], G[_, _]] extends Split[F] with IsomorphismCompose[F, G]{
+  implicit def G: Split[G]
+  ////
+
+  override def split[A, B, C, D](f: F[A, B], g: F[C, D]): F[(A,  C), (B, D)] =
+    iso.from(G.split(iso.to(f), iso.to(g)))
   ////
 }

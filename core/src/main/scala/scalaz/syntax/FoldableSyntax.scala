@@ -4,8 +4,6 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Foldable` */
 final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
   ////
-  import collection.generic.CanBuildFrom
-  import Leibniz.===
   import Liskov.<~<
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
@@ -43,7 +41,6 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def toStream: Stream[A] = F.toStream(self)
   final def toIList: IList[A] = F.toIList(self)
   final def toEphemeralStream: EphemeralStream[A] = F.toEphemeralStream(self)
-  final def to[G[_]](implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] = F.to[A, G](self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)
   final def ∀(p: A => Boolean): Boolean = F.all(self)(p)
   final def allM[G[_]: Monad](p: A => G[Boolean]): G[Boolean] = F.allM(self)(p)
@@ -81,25 +78,33 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def sequence_[G[_], B](implicit ev: A === G[B], G: Applicative[G]): G[Unit] = F.sequence_(ev.subst[F](self))(G)
   final def sequenceS_[S, B](implicit ev: A === State[S,B]): State[S,Unit] = F.sequenceS_(ev.subst[F](self))
   def sequenceF_[M[_],B](implicit ev: F[A] <~< F[Free[M,B]]): Free[M, Unit] = F.sequenceF_(ev(self))
+  final def asum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.asum(ev.subst[F](self))(G)
+  final def psum[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.psum(ev.subst[F](self))(G)
+  final def psumMap[G[_], B](f: A => G[B])(implicit G: PlusEmpty[G]): G[B] = F.psumMap(self)(f)(G)
+
+  @deprecated("use psum", "7.3.0")
   final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.msuml(ev.subst[F](self))
+  @deprecated("use psum", "7.3.0")
   final def msumlU(implicit G: Unapply[PlusEmpty, A]): G.M[G.A] = F.msumlU(self)
   ////
 }
 
-sealed trait ToFoldableOps0 {
-  implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
+sealed trait ToFoldableOpsU[TC[F[_]] <: Foldable[F]] {
+  implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new FoldableOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToFoldableOps extends ToFoldableOps0 {
-  implicit def ToFoldableOps[F[_],A](v: F[A])(implicit F0: Foldable[F]) =
+trait ToFoldableOps0[TC[F[_]] <: Foldable[F]] extends ToFoldableOpsU[TC] {
+  implicit def ToFoldableOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new FoldableOps[F,A](v)
 
   ////
 
   ////
 }
+
+trait ToFoldableOps[TC[F[_]] <: Foldable[F]] extends ToFoldableOps0[TC]
 
 trait FoldableSyntax[F[_]]  {
   implicit def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] = new FoldableOps[F,A](v)(FoldableSyntax.this.F)

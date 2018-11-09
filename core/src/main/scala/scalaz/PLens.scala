@@ -4,7 +4,7 @@ package scalaz
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is
  * simultaneously transitioning from type `A1` to type `A2`.  [[scalaz.PLens]] is a
- * convenient alias for when `A1 =:= A2`, and `B1 =:= B2`.
+ * convenient alias for when `A1 === A2`, and `B1 === B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a partial lens
  * family can address the nth element of a `List`.
@@ -421,11 +421,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _     , Nil)       => None
-        case (l, x     , r::rs)     => lookupr(x::l, r, rs)
+        case (l, x     , r::rs)     => lookupr((x :: l, r, rs))
       }
     plens {
       case Nil => None
-      case h :: t => lookupr(Nil, h, t) map {
+      case h :: t => lookupr((Nil, h, t)) map {
         case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
       }
     }
@@ -433,6 +433,45 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
     listLookupByPLens(Equal[K].equal(k, _))
+
+  def iListHeadPLens[A]: IList[A] @?> A =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(_ :: t, h))
+    }
+
+  def iListTailPLens[A]: IList[A] @?> IList[A] =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(h :: _, t))
+    }
+
+  def iListNthPLens[A](n: Int): IList[A] @?> A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      iListHeadPLens
+    else
+      iListNthPLens(n - 1) compose iListTailPLens
+
+  def iListLookupByPLens[K, V](p: K => Boolean): IList[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (IList[(K, V)], (K, V), IList[(K, V)])): Option[(IList[(K, V)], (K, V), IList[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)   => Some(t)
+        case (_, _     , INil())      => None
+        case (l, x     , ICons(r, rs)) => lookupr((x::l, r, rs))
+      }
+    plens {
+      case INil() => None
+      case ICons(h, t) => lookupr((IList.empty, h, t)) map {
+        case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
+      }
+    }
+  }
+
+  def iListLookupPLens[K: Equal, V](k: K): IList[(K, V)] @?> V =
+    iListLookupByPLens(Equal[K].equal(k, _))
 
   def vectorHeadPLens[A]: Vector[A] @?> A =
     vectorNthPLens(0)
@@ -473,11 +512,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k)    => Some(t)
         case (_, _     , Stream.Empty) => None
-        case (l, x     , r #:: rs)     => lookupr(x #:: l, r, rs)
+        case (l, x     , r #:: rs)     => lookupr((x #:: l, r, rs))
       }
     plens {
       case Stream.Empty => None
-      case h #:: t => lookupr(Stream.empty, h, t) map {
+      case h #:: t => lookupr((Stream.empty, h, t)) map {
         case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
       }
     }

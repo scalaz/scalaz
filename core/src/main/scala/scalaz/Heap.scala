@@ -87,10 +87,14 @@ sealed abstract class Heap[A] {
 
   def toUnsortedList: List[A] = toUnsortedStream.toList
 
+  def toUnsortedIList: IList[A] = IList.fromSeq(toUnsortedStream)
+
   def toStream: Stream[A] =
     std.stream.unfold(this)(_.uncons)
 
   def toList: List[A] = toStream.toList
+
+  def toIList: IList[A] = IList.fromSeq(toStream)
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B): Heap[B] = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
@@ -209,9 +213,9 @@ sealed abstract class Heap[A] {
   override def toString = "<heap>"
 }
 
-case class Ranked[A](rank: Int, value: A)
-
 object Heap extends HeapInstances {
+  final case class Ranked[A](rank: Int, value: A)
+
   type Forest[A] = Stream[Tree[Ranked[A]]]
   type ForestZipper[A] = (Forest[A], Forest[A])
 
@@ -236,10 +240,10 @@ object Heap extends HeapInstances {
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
 
   /**Heap sort */
-  def sort[F[_] : Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
+  def sort[F[_] : Foldable, A: Order](xs: F[A]): IList[A] = fromData(xs).toIList
 
   /**Heap sort */
-  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
+  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): IList[A] = fromDataWith(f, xs).toIList
 
   /**A heap with one element. */
   def singleton[A: Order](a: A): Heap[A] = singletonWith[A](Order[A].lessThanOrEqual, a)

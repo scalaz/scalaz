@@ -205,16 +205,6 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   final def <\-(q: => Boolean): Boolean = b.negInverseConditional(self, q)
 
   /**
-   * Executes the given side-effect if this boolean value is `false`.
-   */
-  final def unless(f: => Unit): Unit = b.unless(self)(f)
-
-  /**
-   * Executes the given side-effect if this boolean value is `true`.
-   */
-  final def when(f: => Unit): Unit = b.when(self)(f)
-
-  /**
    * Returns the given argument if `cond` is `false`, otherwise, unit lifted into M.
    */
   final def unlessM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.unlessM(self)(f)
@@ -274,11 +264,13 @@ final class BooleanOps2(self: Boolean) {
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.pointOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
+      b.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.emptyOrPure[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
+      b.emptyOrPoint[M, A](self)(a)
   }
 
   final class ConditionalEither[A] private[BooleanOps2] (a: => A) {
@@ -290,7 +282,7 @@ final class BooleanOps2(self: Boolean) {
    * Returns the first argument in `\/-` if this is `true`, otherwise the second argument in
    * `-\/`.
    */
-  final def either[A, B](a: => A): ConditionalEither[A] = new ConditionalEither(a)
+  final def either[A](a: => A): ConditionalEither[A] = new ConditionalEither(a)
 }
 
 trait ToBooleanOps {

@@ -16,6 +16,7 @@ object EphemeralStreamTest extends SpecLite {
   checkAll(zip.laws[EphemeralStream])
   checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
+  checkAll(alt.laws[EphemeralStream])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
@@ -51,7 +52,7 @@ object EphemeralStreamTest extends SpecLite {
         ex.getMessage must_=== "head of empty stream"
     }
 
-    es.foldLeft(Need(0))(x => y => Need(y)).value must_=== 10
+    es.foldLeft(Need(0))((x, y) => Need(y)).value must_=== 10
   }
 
   "unzip zip" ! forAll { xs: EphemeralStream[(Int, Int)] =>

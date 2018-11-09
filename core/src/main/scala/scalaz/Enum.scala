@@ -142,10 +142,10 @@ trait Enum[F] extends Order[F] { self =>
         fromTo(if(lessThan(a, z)) succ(a) else pred(a), z)
     )
 
-  def fromToL(a: F, z: F): List[F] = {
-    def fromToLT(a: F, z: F): Trampoline[List[F]] =
+  def fromToL(a: F, z: F): IList[F] = {
+    def fromToLT(a: F, z: F): Trampoline[IList[F]] =
       if(equal(a, z))
-        return_(a :: Nil)
+        return_(a :: INil())
       else
         suspend(fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
@@ -169,8 +169,8 @@ trait Enum[F] extends Order[F] { self =>
     })
   }
 
-  def fromStepToL(n: Int, a: F, z: F): List[F] = {
-    def fromStepToLT(n: Int, a: F, z: F): Trampoline[List[F]] = {
+  def fromStepToL(n: Int, a: F, z: F): IList[F] = {
+    def fromStepToLT(n: Int, a: F, z: F): Trampoline[IList[F]] = {
       val cmp = Need {
         if(n > 0)
           greaterThan(_, _)
@@ -181,7 +181,7 @@ trait Enum[F] extends Order[F] { self =>
       }
       val k = succn(n, a)
       if (cmp.value(k, z))
-        return_(a :: Nil)
+        return_(a :: INil())
       else
         suspend(fromStepToLT(n, k, z) map (a :: _))
     }
@@ -223,6 +223,14 @@ trait Enum[F] extends Order[F] { self =>
 object Enum {
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Enum[G]): Enum[F] =
+    new IsomorphismEnum[F, G] {
+      override def G: Enum[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
   def succn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
     var w = n
@@ -251,5 +259,17 @@ object Enum {
     }
     z
   }
+  ////
+}
+
+trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G]{
+  implicit def G: Enum[G]
+  ////
+
+  override def succ(a: F): F =
+    iso.from(G.succ(iso.to(a)))
+
+  override def pred(a: F): F =
+    iso.from(G.pred(iso.to(a)))
   ////
 }

@@ -31,7 +31,24 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
 object Comonad {
   @inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Comonad[G]): Comonad[F] =
+    new IsomorphismComonad[F, G] {
+      override def G: Comonad[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismComonad[F[_], G[_]] extends Comonad[F] with IsomorphismCobind[F, G]{
+  implicit def G: Comonad[G]
+  ////
+
+  override def copoint[A](p: F[A]): A =
+    G.copoint(iso.to(p))
   ////
 }

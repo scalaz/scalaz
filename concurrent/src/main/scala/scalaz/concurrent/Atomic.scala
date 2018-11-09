@@ -4,6 +4,7 @@ package concurrent
 import effect._
 
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.UnaryOperator
 
 trait Atomic[A] {
   def compareAndSet(expected: A, newValue: A): IO[Boolean]
@@ -30,5 +31,9 @@ trait Atomics {
     def get = IO(value.get)
     def getAndSet(a: A) = IO(value.getAndSet(a))
     def set(a: => A) = IO(value.set(a))
+
+    override def update(f: (A) => A): IO[A] = IO(value.updateAndGet(new UnaryOperator[A] {
+      override def apply(a: A): A = f(a)
+    }))
   })
 }

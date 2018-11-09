@@ -6,7 +6,7 @@ import annotation.tailrec
 final class IdOps[A](private val self: A) extends AnyVal {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
-    if (self == null) d else self
+    if (self == ev(null)) d else self
 
   /**Applies `self` to the provided function. The Thrush combinator. */
   final def |>[B](f: A => B): B =
@@ -15,6 +15,15 @@ final class IdOps[A](private val self: A) extends AnyVal {
   /**Applies `self` to the provided function. The Thrush combinator. */
   final def ▹[B](f: A => B): B =
     f(self)
+
+  /** Applies `self` to the provided function if the predicate is satisfied, otherwise return self. */
+  @inline def ?|>(p: A => Boolean, f: A => A): A = if (p(self)) f(self) else self
+
+  /** Alternative syntax for the Thrush combinator or a total `match`. */
+  @inline final def into[B](f: A => B): B = f(self)
+
+  /** Applies `self` to the provided function if the predicate is satisfied, otherwise return self. */
+  @inline def applyIf(p: A => Boolean)(f: A => A): A = if (p(self)) f(self) else self
 
   final def squared: (A, A) =
     (self, self)

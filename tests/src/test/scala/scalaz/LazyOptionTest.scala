@@ -9,6 +9,7 @@ object LazyOptionTest extends SpecLite {
   checkAll(equal.laws[LazyOption[Int]])
   checkAll(bindRec.laws[LazyOption])
   checkAll(monadPlus.strongLaws[LazyOption])
+  checkAll(alt.laws[LazyOption])
   checkAll(cobind.laws[LazyOption])
   checkAll(traverse.laws[LazyOption])
   checkAll(zip.laws[LazyOption])
@@ -25,7 +26,7 @@ object LazyOptionTest extends SpecLite {
 
     val result =
       BindRec[LazyOption].tailrecM(0) {
-        i => LazyOption.lazySome(if (i < 10000) \/.left(i + 1) else \/.right(i))
+        i => LazyOption.lazySome[Int \/ Int](if (i < 10000) \/.left(i + 1) else \/.right(i))
       }
     result.getOrElse(0) must_=== times
   }
@@ -33,6 +34,7 @@ object LazyOptionTest extends SpecLite {
   object instances {
     def equal[A: Equal] = Equal[LazyOption[A]]
     def monadPlus = MonadPlus[LazyOption]
+    def alt = Alt[LazyOption]
     def bindrec = BindRec[LazyOption]
     def cobind = Cobind[LazyOption]
     def traverse = Traverse[LazyOption]

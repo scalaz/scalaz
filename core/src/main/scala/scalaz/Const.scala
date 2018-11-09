@@ -26,13 +26,15 @@ private sealed trait ConstTraverse[C] extends Traverse[Const[C, ?]] {
 private sealed trait ConstApplyDivide[C] extends Apply[Const[C, ?]] with ConstTraverse[C] with ConstContravariant[C] with Divide[Const[C, ?]] {
   def C: Semigroup[C]
 
+  override def tuple2[A, B](fa: =>Const[C, A], fb: =>Const[C, B]): Const[C, (A, B)] = apply2(fa, fb)((_,_))
+
   override def xmap[A, B](fa: Const[C, A], f: A => B, g: B => A) =
     Const(fa.getConst)
 
   override def ap[A, B](fa: => Const[C, A])(f: => Const[C, A => B]): Const[C, B] =
     Const(C.append(f.getConst, fa.getConst))
 
-  override def divide[A, B, Z](fa: Const[C, A], fb: Const[C, B])(f: Z => (A, B)) =
+  override def divide2[A, B, Z](fa: =>Const[C, A], fb: =>Const[C, B])(f: Z => (A, B)) =
     Const(C.append(fa.getConst, fb.getConst))
 }
 
@@ -63,6 +65,13 @@ private sealed trait ConstOrder[A, B] extends Order[Const[A, B]] with ConstEqual
 private trait ConstContravariant[C] extends Contravariant[Const[C, ?]] {
   def contramap[A, B](r: Const[C, A])(f: B => A) =
     Const(r.getConst)
+}
+
+private sealed trait ConstShow[A, B] extends Show[Const[A, B]] {
+  implicit def A: Show[A]
+
+  import syntax.show._
+  def show(f: Const[A, B]): Cord = cord"Const(${f.getConst})"
 }
 
 sealed abstract class ConstInstances1 {
@@ -104,6 +113,11 @@ sealed abstract class ConstInstances extends ConstInstances0 {
   implicit def constInstance2[C: Monoid]: Applicative[Const[C, ?]] with Divisible[Const[C, ?]] =
     new ConstApplicativeDivisible[C] {
       val C: Monoid[C] = implicitly
+    }
+
+  implicit def constShow[A: Show, B]: Show[Const[A, B]] =
+    new ConstShow[A, B] {
+      val A: Show[A] = implicitly
     }
 }
 

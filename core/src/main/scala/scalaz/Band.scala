@@ -36,6 +36,21 @@ trait Band[F] extends Semigroup[F] { self =>
 object Band {
   @inline def apply[F](implicit F: Band[F]): Band[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Band[G]): Band[F] =
+    new IsomorphismBand[F, G] {
+      override def G: Band[G] = M
+      override def iso: F <=> G = D
+    }
+
+  ////
+
+  ////
+}
+
+trait IsomorphismBand[F, G] extends Band[F] with IsomorphismSemigroup[F, G]{
+  implicit def G: Band[G]
   ////
 
   ////

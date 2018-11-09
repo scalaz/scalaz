@@ -9,6 +9,7 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
   checkAll("NonEmptyList", bindRec.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
+  checkAll("NonEmptyList", alt.laws[NonEmptyList])
   checkAll("NonEmptyList", semigroup.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", order.laws[NonEmptyList[Int]])
@@ -36,6 +37,11 @@ object NonEmptyListTest extends SpecLite {
     val a = NonEmptyList(1, 2, 3, 4, 5)
     Foldable[NonEmptyList].findLeft(a)(_ % 2 == 0) must_=== Some(2)
     Foldable[NonEmptyList].findRight(a)(_ % 2 == 0) must_=== Some(4)
+  }
+
+  "foldMap" in {
+    val a = NonEmptyList(1, 2, 3, 4, 5)
+    Foldable[NonEmptyList].foldMap(a)(identity) must_=== 15
   }
 
   "findLeft" ! forAll{ a: NonEmptyList[Int] =>
@@ -87,5 +93,30 @@ object NonEmptyListTest extends SpecLite {
   }
   "zipWithIndex" ! forAll { xs: NonEmptyList[Int] =>
     xs.zipWithIndex.list must_== xs.list.zipWithIndex
+  }
+
+  "show should look like IList" in {
+    import scalaz.syntax.show._
+
+    NonEmptyList(1, 2, 3).shows.must_===("[1,2,3]")
+  }
+
+  "psumMap should be lazy" in {
+    import scalaz.syntax.either._
+    import scalaz.syntax.foldable1._
+    import scalaz.syntax.show._
+
+    var called = 0
+    def foo(s: Int): Int \/ String = {
+      called += 1
+      s.shows.right
+    }
+
+    NonEmptyList(1, 2, 3, 4, 5).psumMap1(foo) must_=== "1".right
+    called must_=== 1
+  }
+
+  object instances {
+    def alt: Alt[NonEmptyList] = Alt[NonEmptyList]
   }
 }

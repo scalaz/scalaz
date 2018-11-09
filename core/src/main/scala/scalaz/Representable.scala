@@ -47,7 +47,7 @@ sealed abstract class RepresentableInstances {
 object Representable extends RepresentableInstances
 
 /** Corepresentable functors */
-abstract class Corepresentable[F[_], X](implicit F: Contravariant[F]) {
+abstract class Corepresentable[F[_]: Contravariant, X]() {
   def corep[A](f: A => X): F[A]
   def uncorep[A](f: F[A]): A => X
 

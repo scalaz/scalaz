@@ -54,12 +54,12 @@ object MapTest extends SpecLite {
 
   "findLeft" ! forAll{ (a: Int ==>> Int) =>
     val f = (_: Int) % 3 == 0
-    Foldable[Int ==>> ?].findLeft(a)(f) must_=== Foldable[List].findLeft(a.values)(f)
+    Foldable[Int ==>> ?].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.values)(f)
   }
 
   "findRight" ! forAll{ (a: Int ==>> Int) =>
     val f = (_: Int) % 3 == 0
-    Foldable[Int ==>> ?].findRight(a)(f) must_=== Foldable[List].findRight(a.values)(f)
+    Foldable[Int ==>> ?].findRight(a)(f) must_=== Foldable[IList].findRight(a.values)(f)
   }
 
   "index" ! forAll { (a: Int ==>> Int, i: Byte) =>
@@ -143,7 +143,7 @@ object MapTest extends SpecLite {
       val b = a.deleteAt(n)
       structurallySound(b)
       (a.size - 1) must_=== b.size
-      b.member(a.keys(n)) must_=== false
+      b.member(Foldable[IList].index(a.keys, n).get) must_=== false
       (b + a.elemAt(n).get) must_=== a
     }
   }
@@ -258,7 +258,7 @@ object MapTest extends SpecLite {
 
     "lookupIndex" ! forAll { (a: Byte ==>> Int, n: Byte) =>
       val x = a.keys.indexOf(n)
-      a.lookupIndex(n) must_=== (if(x < 0) None else Some(x))
+      a.lookupIndex(n) must_=== x
       a.lookupIndex(n).foreach{ b =>
         a.elemAt(b).map(_._1) must_=== Some(n)
       }
@@ -270,7 +270,7 @@ object MapTest extends SpecLite {
         a.lookupLT(r) must_=== None
       }
       else {
-        (0 until a.keys.size).foreach { i =>
+        (0 until a.keys.length).foreach { i =>
           val (k, v) = a.elemAt(i).get
 
           a.lookupLT(k) must_=== a.elemAt(i-1)
@@ -287,7 +287,7 @@ object MapTest extends SpecLite {
         a.lookupGT(r) must_=== None
       }
       else {
-        (0 until a.keys.size).foreach { i =>
+        (0 until a.keys.length).foreach { i =>
           val (k, v) = a.elemAt(i).get
 
           a.lookupGT(k) must_=== a.elemAt(i+1)
@@ -304,7 +304,7 @@ object MapTest extends SpecLite {
         a.lookupLE(r) must_=== None
       }
       else {
-        (0 until a.keys.size).foreach { i =>
+        (0 until a.keys.length).foreach { i =>
           val (k, v) = a.elemAt(i).get
 
           a.lookupLE(k) must_=== Some((k, v))
@@ -321,7 +321,7 @@ object MapTest extends SpecLite {
         a.lookupGE(r) must_=== None
       }
       else {
-        (0 until a.keys.size).foreach { i =>
+        (0 until a.keys.length).foreach { i =>
           val (k, v) = a.elemAt(i).get
 
           a.lookupGE(k) must_=== Some((k, v))
@@ -337,9 +337,9 @@ object MapTest extends SpecLite {
     "splitRoot" ! forAll { a: Int ==>> Int =>
       a match {
         case Tip() =>
-          a.splitRoot must_=== List.empty[Int ==>> Int]
+          a.splitRoot must_=== IList.empty[Int ==>> Int]
         case Bin(k, x, l, r) =>
-          val List(l2, kv, r2) = a.splitRoot
+          val ICons(l2, ICons(kv, ICons(r2, INil()))) = a.splitRoot
           structurallySound(l2)
           structurallySound(r2)
           l2 must_=== l
@@ -468,13 +468,13 @@ object MapTest extends SpecLite {
     }
 
     "unions" in {
-      unions(List(
+      unions(IList(
         fromList(List((5, "a"), (3, "b"))),
         fromList(List((5, "A"), (7, "C"))),
         fromList(List((5, "A3"), (3, "B3")))
       )) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
 
-      unions(List(fromList(List(5 -> "A3", 3 -> "B3")), fromList(List(5 -> "A", 7 -> "C")), fromList(List(5 -> "a", 3 -> "b")))) must_== fromList(List(3 -> "B3", 5 -> "A3", 7 -> "C"))
+      unions(IList(fromList(List(5 -> "A3", 3 -> "B3")), fromList(List(5 -> "A", 7 -> "C")), fromList(List(5 -> "a", 3 -> "b")))) must_== fromList(List(3 -> "B3", 5 -> "A3", 7 -> "C"))
     }
 
     "unionWith" in {
@@ -706,12 +706,12 @@ object MapTest extends SpecLite {
 
     "mapAccum" in {
       val f = (a: String, b: String) => (a + b, b + "X")
-      fromList(List(5 -> "a", 3 -> "b")).mapAccum("Everything: ")(f) must_===("Everything: ba", fromList(List(3 -> "bX", 5 -> "aX")))
+      fromList(List(5 -> "a", 3 -> "b")).mapAccum("Everything: ")(f) must_===("Everything: ba" -> fromList(List(3 -> "bX", 5 -> "aX")))
     }
 
     "mapAccumWithKey" in {
       val f = (a: String, k: Int, b: String) => (a + " " + k.toString + "-" + b, b + "X")
-      fromList(List(5 -> "a", 3 -> "b")).mapAccumWithKey("Everything:")(f) must_===("Everything: 3-b 5-a", fromList(List(3 -> "bX", 5 -> "aX")))
+      fromList(List(5 -> "a", 3 -> "b")).mapAccumWithKey("Everything:")(f) must_===("Everything: 3-b 5-a" -> fromList(List(3 -> "bX", 5 -> "aX")))
     }
 
     "mapKeys" in {
@@ -746,19 +746,19 @@ object MapTest extends SpecLite {
     }
 
     "mapEither" in {
-      val f = (a: String) => if (a < "c") \/.left(a) else \/.right(a)
+      val f: String => (String \/ String) = a => if (a < "c") \/.left(a) else \/.right(a)
       val lst = fromList(List(5 -> "a", 3 -> "b", 1 -> "x", 7 -> "z"))
 
       lst.mapEither(f) must_===((fromList(List(3 -> "b", 5 -> "a")), fromList(List(1 -> "x", 7 -> "z"))))
-      lst.mapEither((a: String) => \/.right(a)) must_===((empty[Int, String], lst))
+      lst.mapEither((a: String) => \/-[String, String](a)) must_===((empty[Int, String], lst))
     }
 
     "mapEitherWithKey" in {
-      val f = (k: Int, a: String) => if (k < 5) \/.left(k * 2) else \/.right(a + a)
+      val f: (Int, String) => (Int \/ String) = (k, a) => if (k < 5) \/.left(k * 2) else \/.right(a + a)
       val lst = fromList(List(5 -> "a", 3 -> "b", 1 -> "x", 7 -> "z"))
 
-      lst.mapEitherWithKey(f) must_===(fromList(List(1 -> 2, 3 -> 6)), fromList(List(5 -> "aa", 7 -> "zz")))
-      lst.mapEitherWithKey((_: Int, a: String) => \/.right(a)) must_===(empty[Int, String], lst)
+      lst.mapEitherWithKey(f) must_===(fromList(List(1 -> 2, 3 -> 6)) -> fromList(List(5 -> "aa", 7 -> "zz")))
+      lst.mapEitherWithKey((_: Int, a: String) => \/-[String, String](a)) must_===(empty[Int, String] -> lst)
     }
   }
 
@@ -863,7 +863,7 @@ object MapTest extends SpecLite {
 
         val t1 = a.lookup(lk)
         val t2 = trim(Some(lk), hk, a)
-        (x, m) must_=== (t1, t2)
+        (x, m) must_=== (t1 -> t2)
       }
 
       a match {
@@ -908,11 +908,11 @@ object MapTest extends SpecLite {
 
   "==>> list operations" should {
     "values" in {
-      fromList(List(5 -> "a", 3 -> "b")).values must_===(List("b", "a"))
+      fromList(List(5 -> "a", 3 -> "b")).values must_===(IList("b", "a"))
     }
 
     "keys" in {
-      fromList(List(5 -> "a", 3 -> "b")).keys must_===(List(3, 5))
+      fromList(List(5 -> "a", 3 -> "b")).keys must_===(IList(3, 5))
     }
 
     "keySet" in {

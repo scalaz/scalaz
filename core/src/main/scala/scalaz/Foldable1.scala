@@ -127,6 +127,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def suml1[A](fa: F[A])(implicit A: Semigroup[A]): A =
     foldLeft1(fa)(A.append(_, _))
 
+  def psum1[G[_], A](fa: F[G[A]])(implicit G: Plus[G]): G[A] =
+    foldRight1[G[A]](fa)(G.plus[A](_, _))
+
+  def psumMap1[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: Plus[G]): G[B] =
+    foldMapRight1(fa)(f)((a, as) => G.plus(f(a), as))
+
   def msuml1[G[_], A](fa: F[G[A]])(implicit G: Plus[G]): G[A] =
     foldLeft1[G[A]](fa)(G.plus[A](_, _))
 
@@ -184,7 +190,29 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 object Foldable1 {
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F
 
+
+
   ////
 
+  def fromIso[F[_], G[_]](D: F ~> G)(implicit E: Foldable1[G]): Foldable1[F] =
+    new IsomorphismFoldable1[F, G] {
+      override def G: Foldable1[G] = E
+      override def naturalTrans: F ~> G = D
+    }
+
+  ////
+}
+
+trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFoldable[F, G]{
+  implicit def G: Foldable1[G]
+  ////
+  override final def foldMap1[A, B: Semigroup](fa: F[A])(f: A => B): B =
+    G.foldMap1(naturalTrans(fa))(f)
+
+  override final def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B =
+    G.foldMapLeft1(naturalTrans(fa))(z)(f)
+
+  override final def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B =
+    G.foldMapRight1(naturalTrans(fa))(z)(f)
   ////
 }

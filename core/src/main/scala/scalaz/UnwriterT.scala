@@ -11,11 +11,11 @@ import Id._
 final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   import UnwriterT._
 
-  def on: WriterT[F, U, A] =
+  def on: WriterT[U, F, A] =
     WriterT(run)
 
   /** alias for `on` */
-  def unary_+ : WriterT[F, U, A] =
+  def unary_+ : WriterT[U, F, A] =
     WriterT(run)
 
   def mapValue[X, B](f: ((U, A)) => (X, B))(implicit F: Functor[F]): UnwriterT[F, X, B] =

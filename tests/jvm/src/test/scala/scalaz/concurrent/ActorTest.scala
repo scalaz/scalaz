@@ -46,7 +46,7 @@ object ActorTest extends SpecLite {
     val actor = countingDownActor(latch)
     for (j <- 1 to NumOfThreads) fork {
       for (i <- 1 to NumOfMessagesPerThread) {
-        actor ! (j, i)
+        actor ! (j -> i)
       }
     }
     assertCountDown(latch, "Should process " + NumOfMessages + " messages")

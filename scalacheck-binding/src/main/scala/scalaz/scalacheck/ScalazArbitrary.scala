@@ -3,7 +3,6 @@ package scalacheck
 
 import java.math.BigInteger
 import org.scalacheck.{Cogen, Gen, Arbitrary}
-import collection.mutable.ArraySeq
 import reflect.ClassTag
 
 /**
@@ -101,7 +100,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIndexedStoreT[F[_], I: Cogen, A, B](implicit F: Cogen[F[A => B]]): Cogen[IndexedStoreT[F, I, A, B]] =
     Cogen[(F[A => B], I)].contramap(_.run)
 
-  implicit def cogenIndexedContsT[W[_], M[_], R, O, A](implicit F: Cogen[W[A => M[O]] => M[R]]): Cogen[IndexedContsT[W, M, R, O, A]] =
+  implicit def cogenIndexedContsT[W[_], R, O, M[_], A](implicit F: Cogen[W[A => M[O]] => M[R]]): Cogen[IndexedContsT[W, R, O, M, A]] =
     F.contramap(_.run)
 
   implicit def cogenEndo[A](implicit A: Cogen[A => A]): Cogen[Endo[A]] =
@@ -125,7 +124,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenContravariantCoyoneda[F[_]: Contravariant, A](implicit F: Cogen[F[A]]): Cogen[ContravariantCoyoneda[F, A]] =
     Cogen[F[A]].contramap(_.run)
 
-  implicit def cogenEitherT[F[_], A, B](implicit F: Cogen[F[A \/ B]]): Cogen[EitherT[F, A, B]] =
+  implicit def cogenEitherT[A, F[_], B](implicit F: Cogen[F[A \/ B]]): Cogen[EitherT[A, F, B]] =
     F.contramap(_.run)
 
   implicit def cogenLazyEitherT[F[_], A, B](implicit F: Cogen[F[LazyEither[A, B]]]): Cogen[LazyEitherT[F, A, B]] =
@@ -149,13 +148,13 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenIdT[F[_], A](implicit F: Cogen[F[A]]): Cogen[IdT[F, A]] =
     F.contramap(_.run)
 
-  implicit def cogenIndexedReaderWriterStateT[F[_]: Monad, R, W, S1, S2, A](implicit F: Cogen[(R, S1) => F[(W, A, S2)]]): Cogen[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
+  implicit def cogenIndexedReaderWriterStateT[R, W, S1, S2, F[_]: Monad, A](implicit F: Cogen[(R, S1) => F[(W, A, S2)]]): Cogen[IndexedReaderWriterStateT[R, W, S1, S2, F, A]] =
     F.contramap(_.run)
 
-  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[F, S1, S2, A]] =
+  implicit def cogenIndexedStateT[F[_]: Monad, S1, S2, A](implicit F: Cogen[S1 => F[(S2, A)]]): Cogen[IndexedStateT[S1, S2, F, A]] =
     F.contramap(s => s.apply(_))
 
-  implicit def cogenWriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[F, A, B]] =
+  implicit def cogenWriterT[A, F[_], B](implicit F: Cogen[F[(A, B)]]): Cogen[WriterT[A, F, B]] =
     F.contramap(_.run)
 
   implicit def cogenUnwriterT[F[_], A, B](implicit F: Cogen[F[(A, B)]]): Cogen[UnwriterT[F, A, B]] =
@@ -165,7 +164,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Cogen[List[A]].contramap(_.toList)
 
   implicit def cogenTreeLoc[A: Cogen]: Cogen[TreeLoc[A]] =
-    Divide[Cogen].deriving4(Function.unlift(TreeLoc.unapply))
+    Divide[Cogen].dividing4(Function.unlift(TreeLoc.unapply))
 
   implicit def cogenStrictTree[A: Cogen]: Cogen[StrictTree[A]] =
     Cogen[List[A]].contramap(_.toList)
@@ -206,6 +205,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenAp[F[_], A](implicit F: Cogen[F[A]]): Cogen[Ap[F, A]] =
     F.contramap(_.f)
 
+  implicit def cogenTannen[F[_], G[_, _], A, B](implicit F: Cogen[F[G[A, B]]]): Cogen[Tannen[F, G, A, B]] =
+    F.contramap(_.f)
+
+  implicit def tannenArbitrary[F[_], G[_, _], A, B](implicit F: Arbitrary[F[G[A, B]]]): Arbitrary[Tannen[F, G, A, B]] =
+    Functor[Arbitrary].map(F)(Tannen[F, G, A, B](_))
+
   implicit def apArbitrary[F[_], A](implicit F: Arbitrary[F[A]]): Arbitrary[Ap[F, A]] =
     Functor[Arbitrary].map(F)(Ap[F, A](_))
 
@@ -222,18 +227,24 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
       ^(arbitrary[A], arbitrary[B])(\&/.Both(_, _)),
-      arbitrary[A].map(\&/.This(_)),
-      arbitrary[B].map(\&/.That(_))
+      arbitrary[A].map(\&/.This[A, B](_)),
+      arbitrary[B].map(\&/.That[A, B](_))
     ))
 
   implicit def endoArb[A](implicit A: Arbitrary[A => A]): Arbitrary[Endo[A]] =
     Functor[Arbitrary].map(A)(Endo.endo)
+
+  implicit def endoByNameArb[A](implicit A: Arbitrary[A => A]): Arbitrary[EndoByName[A]] =
+    Functor[Arbitrary].map(A)(f => Endo.endoByName(f(_)))
 
   implicit def endomorphicArbitrary[F[_, _], A](implicit F: Arbitrary[F[A, A]]): Arbitrary[Endomorphic[F, A]] =
     Functor[Arbitrary].map(F)(Endomorphic[F, A](_))
 
   implicit def EphemeralStreamArbitrary[A : Arbitrary]: Arbitrary[EphemeralStream[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
+
+  implicit def IStreamArbitrary[A : Arbitrary]: Arbitrary[IStream[A]] =
+    Functor[Arbitrary].map(arb[Stream[A]])(IStream.fromStream[A](_))
 
   implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
@@ -247,7 +258,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val UnitArbitrary: Arbitrary[Unit] = Arbitrary(const(()))
 
-  implicit val AlphaArbitrary: Arbitrary[Alpha] = Arbitrary(oneOf(Alpha.alphas))
+  implicit val AlphaArbitrary: Arbitrary[Alpha] = {
+    val alphaList = Alpha.alphas.toList
+    Arbitrary(oneOf(alphaList))
+  }
 
   implicit val BooleanConjunctionArbitrary: Arbitrary[Boolean @@ Conjunction] = Functor[Arbitrary].map(arb[Boolean])(_.conjunction)
 
@@ -274,7 +288,12 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit val DoubleMultiplicationArbitrary: Arbitrary[Double @@ Multiplication] = Tag.subst(arb[Double])
 
-  implicit val DigitArbitrary: Arbitrary[Digit] = Arbitrary(oneOf(Digit.digits))
+  implicit val IntDualArbitrary: Arbitrary[Int @@ Dual] = Tag.subst(arb[Int])
+
+  implicit val DigitArbitrary: Arbitrary[Digit] = {
+    val digitList = Digit.digits.toList
+    Arbitrary(oneOf(digitList))
+  }
 
   import NonEmptyList._
   implicit def NonEmptyListArbitrary[A: Arbitrary]: Arbitrary[NonEmptyList[A]] = Apply[Arbitrary].apply2[A, IList[A], NonEmptyList[A]](arb[A], ilistArbitrary)(nel(_, _))
@@ -442,23 +461,21 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def MaxMaybeArbitrary[A: Arbitrary]: Arbitrary[MaxMaybe[A]] = Tag.subst(arb[Maybe[A]])
 
-  implicit def ArraySeqArbitrary[A: Arbitrary]: Arbitrary[ArraySeq[A]] = Functor[Arbitrary].map(arb[List[A]])(x => ArraySeq(x: _*))
-
   import FingerTree._
 
-  implicit def FingerArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
+  implicit def FingerArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Finger[V, A]] = Arbitrary(oneOf(
     arbitrary[A].map(one(_): Finger[V, A]),
     ^(arbitrary[A], arbitrary[A])(two(_, _): Finger[V, A]),
     ^^(arbitrary[A], arbitrary[A], arbitrary[A])(three(_, _, _): Finger[V, A]),
     ^^^(arbitrary[A], arbitrary[A], arbitrary[A], arbitrary[A])(four(_, _, _, _): Finger[V, A])
   ))
 
-  implicit def NodeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
+  implicit def NodeArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[Node[V, A]] = Arbitrary(oneOf(
     ^(arbitrary[A], arbitrary[A])(node2[V, A](_, _)),
     ^^(arbitrary[A], arbitrary[A], arbitrary[A])(node3[V, A](_, _, _))
   ))
 
-  implicit def FingerTreeArbitrary[V, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
+  implicit def FingerTreeArbitrary[V: Monoid, A](implicit a: Arbitrary[A], measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
     def fingerTree[A](n: Int)(implicit a1: Arbitrary[A], measure1: Reducer[A, V]): Gen[FingerTree[V, A]] = n match {
       case 0 => empty[V, A]
       case 1 => arbitrary[A].map(single[V, A](_))
@@ -492,8 +509,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def CoproductArbitrary[F[_], G[_], A](implicit a: Arbitrary[F[A] \/ G[A]]): Arbitrary[Coproduct[F, G, A]] =
     Functor[Arbitrary].map(a)(Coproduct(_))
 
-  implicit def writerTArb[F[_], W, A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[F, W, A]] =
-    Functor[Arbitrary].map(A)(WriterT[F, W, A](_))
+  implicit def writerTArb[W, F[_], A](implicit A: Arbitrary[F[(W, A)]]): Arbitrary[WriterT[W, F, A]] =
+    Functor[Arbitrary].map(A)(WriterT[W, F, A](_))
 
   implicit def unwriterTArb[F[_], U, A](implicit A: Arbitrary[F[(U, A)]]): Arbitrary[UnwriterT[F, U, A]] =
     Functor[Arbitrary].map(A)(UnwriterT[F, U, A](_))
@@ -519,24 +536,27 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def lazyEitherTArb[F[_], A, B](implicit A: Arbitrary[F[LazyEither[A, B]]]): Arbitrary[LazyEitherT[F, A, B]] =
     Functor[Arbitrary].map(A)(LazyEitherT[F, A, B](_))
 
-  // backwards compatibility
-  def stateTArb[F[+_], S, A](implicit A: Arbitrary[S => F[(S, A)]], F: Monad[F]): Arbitrary[StateT[F, S, A]] =
-    indexedStateTArb[F, S, S, A](A, F)
+  implicit def idTArbitrary[A, F[_]](implicit A: Arbitrary[F[A]]): Arbitrary[IdT[F, A]] =
+    Functor[Arbitrary].map(A)(IdT[F, A])
 
-  implicit def indexedReaderWriterStateTArb[F[_], R, W, S1, S2, A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
-    Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[F, R, W, S1, S2, A](_))
+  // backwards compatibility
+  def stateTArb[S, F[+_], A](implicit A: Arbitrary[S => F[(S, A)]]): Arbitrary[StateT[S, F, A]] =
+    indexedStateTArb[S, S, F, A](A)
+
+  implicit def indexedReaderWriterStateTArb[R, W, S1, S2, F[_], A](implicit A: Arbitrary[(R, S1) => F[(W, A, S2)]]): Arbitrary[IndexedReaderWriterStateT[R, W, S1, S2, F, A]] =
+    Functor[Arbitrary].map(A)(IndexedReaderWriterStateT[R, W, S1, S2, F, A](_))
 
   implicit def tracedTArb[W[_], A, B](implicit A: Arbitrary[W[A => B]]): Arbitrary[TracedT[W, A, B]] =
     Functor[Arbitrary].map(A)(TracedT(_))
 
-  implicit def indexedContsTArb[W[_], M[_], R, O, A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, M, R, O, A]] =
+  implicit def indexedContsTArb[W[_], R, O, M[_], A](implicit A: Arbitrary[W[A => M[O]] => M[R]]): Arbitrary[IndexedContsT[W, R, O, M, A]] =
     Functor[Arbitrary].map(A)(IndexedContsT(_))
 
-  implicit def indexedStateTArb[F[_], S1, S2, A](implicit A: Arbitrary[S1 => F[(S2, A)]], F: Monad[F]): Arbitrary[IndexedStateT[F, S1, S2, A]] =
-    Functor[Arbitrary].map(A)(IndexedStateT[F, S1, S2, A](_))
+  implicit def indexedStateTArb[S1, S2, F[_], A](implicit A: Arbitrary[S1 => F[(S2, A)]]): Arbitrary[IndexedStateT[S1, S2, F, A]] =
+    Functor[Arbitrary].map(A)(IndexedStateT[S1, S2, F, A](_))
 
-  implicit def eitherTArb[F[_], A, B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[F, A, B]] =
-      Functor[Arbitrary].map(A)(EitherT[F, A, B](_))
+  implicit def eitherTArb[A, F[_], B](implicit A: Arbitrary[F[A \/ B]]): Arbitrary[EitherT[A, F, B]] =
+      Functor[Arbitrary].map(A)(EitherT[A, F, B](_))
 
   implicit def theseTArb[F[_], A, B](implicit A: Arbitrary[F[A \&/ B]]): Arbitrary[TheseT[F, A, B]] =
     Functor[Arbitrary].map(A)(TheseT[F, A, B](_))
@@ -568,7 +588,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def indexedStoreTArb[F[_], I, A, B](implicit A: Arbitrary[(F[A => B], I)]): Arbitrary[IndexedStoreT[F, I, A, B]] = Functor[Arbitrary].map(A)(IndexedStoreT[F, I, A, B](_))
 
-  implicit def listTArb[F[_], A](implicit FA: Arbitrary[F[List[A]]], F: Applicative[F]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromList(_))
+  implicit def listTArb[F[_]: Applicative, A](implicit FA: Arbitrary[F[IList[A]]]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
 
   implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
 

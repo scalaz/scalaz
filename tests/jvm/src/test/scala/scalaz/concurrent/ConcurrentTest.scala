@@ -30,7 +30,6 @@ object ConcurrentTest extends SpecLite{
     "fail when timeout occurs" in {
       (withTimeout(100) {
         Thread.sleep(2000)
-        ()
       }).mustThrowA[RuntimeException]
     }
   }
@@ -57,7 +56,7 @@ object ConcurrentTest extends SpecLite{
         latch.countDown
       }
       if (latch.await(timeout, TimeUnit.MILLISECONDS)) result
-      else sys.error("Timeout occured, possible deadlock.")
+      else sys.error("Timeout occurred, possible deadlock.")
     }
   }
 

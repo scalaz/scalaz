@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scala.annotation.tailrec
+
 /**
  * [[scalaz.Applicative]] without `point`.
  *
@@ -33,6 +35,20 @@ trait Apply[F[_]] extends Functor[F] { self =>
    */
   def forever[A, B](fa: F[A]): F[B] = discardLeft(fa, forever(fa))
 
+  /**
+   * Unfold `seed` to the right and combine effects left-to-right,
+   * using the given [[Reducer]] to combine values.
+   * Implementations may override this method to not unfold more
+   * than is necessary to determine the result.
+   */
+  def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(F[A], S)])(implicit R: Reducer[A, B]): Maybe[F[B]] = {
+    @tailrec def go(acc: F[B], s: S): F[B] = f(s) match {
+      case Maybe.Just((fa, s)) => go(apply2(acc, fa)(R.snoc), s)
+      case _ => acc
+    }
+    f(seed) map { case (fa, s) => go(map(fa)(R.unit), s) }
+  }
+
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[λ[α => F[G[α]]]] =
     new CompositionApply[F, G] {
@@ -64,47 +80,63 @@ trait Apply[F[_]] extends Functor[F] { self =>
   def ap2[A,B,C](fa: => F[A], fb: => F[B])(f: F[(A,B) => C]): F[C] =
     ap(fb)(ap(fa)(map(f)(_.curried)))
   def ap3[A,B,C,D](fa: => F[A], fb: => F[B], fc: => F[C])(f: F[(A,B,C) => D]): F[D] =
-    ap(fc)(ap2(fa,fb)(map(f)(f => ((a:A,b:B) => (c:C) => f(a,b,c)))))
+    ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))
   def ap4[A,B,C,D,E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: F[(A,B,C,D) => E]): F[E] =
-    ap2(fc, fd)(ap2(fa,fb)(map(f)(f => ((a:A,b:B) => (c:C, d:D) => f(a,b,c,d)))))
+    ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))
   def ap5[A,B,C,D,E,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(f: F[(A,B,C,D,E) => R]): F[R] =
-    ap2(fd, fe)(ap3(fa,fb,fc)(map(f)(f => ((a:A,b:B,c:C) => (d:D, e:E) => f(a,b,c,d,e)))))
+    ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))
   def ap6[A,B,C,D,E,FF, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF])(f: F[(A,B,C,D,E,FF) => R]): F[R] =
-    ap3(fd, fe, ff)(ap3(fa,fb,fc)(map(f)(f => ((a:A,b:B,c:C) => (d:D, e:E, ff: FF) => f(a,b,c,d,e,ff)))))
+    ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))
   def ap7[A,B,C,D,E,FF,G,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G])(f: F[(A,B,C,D,E,FF,G) => R]): F[R] =
-    ap3(fe, ff, fg)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G) => f(a,b,c,d,e,ff,g)))))
+    ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried))))))))
   def ap8[A,B,C,D,E,FF,G,H,R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: F[(A,B,C,D,E,FF,G,H) => R]): F[R] =
-    ap4(fe, ff, fg, fh)(ap4(fa,fb,fc,fd)(map(f)(f => ((a:A,b:B,c:C,d: D) => (e:E, ff: FF, g: G, h: H) => f(a,b,c,d,e,ff,g,h)))))
+    ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(ap(fa)(map(f)(_.curried)))))))))
 
   def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
     ap(fb)(map(fa)(f.curried))
   def apply3[A, B, C, D](fa: => F[A], fb: => F[B], fc: => F[C])(f: (A, B, C) => D): F[D] =
-    apply2(tuple2(fa, fb), fc)((ab, c) => f(ab._1, ab._2, c))
+    ap(fc)(ap(fb)(map(fa)(f.curried)))
   def apply4[A, B, C, D, E](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(f: (A, B, C, D) => E): F[E] =
-    apply2(tuple2(fa, fb), tuple2(fc, fd))((t, d) => f(t._1, t._2, d._1, d._2))
+    ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))
   def apply5[A, B, C, D, E, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(f: (A, B, C, D, E) => R): F[R] =
-    apply2(tuple3(fa, fb, fc), tuple2(fd, fe))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2))
+    ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))
   def apply6[A, B, C, D, E, FF, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF])(f: (A, B, C, D, E, FF) => R): F[R] =
-    apply2(tuple3(fa, fb, fc), tuple3(fd, fe, ff))((t, t2) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3))
+    ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))
   def apply7[A, B, C, D, E, FF, G, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G])(f: (A, B, C, D, E, FF, G) => R): F[R] =
-    apply2(tuple4(fa, fb, fc, fd), tuple3(fe, ff, fg))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3))
+    ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))
   def apply8[A, B, C, D, E, FF, G, H, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H])(f: (A, B, C, D, E, FF, G, H) => R): F[R] =
-    apply2(tuple4(fa, fb, fc, fd), tuple4(fe, ff, fg, fh))((t, t2) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4))
+    ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))
   def apply9[A, B, C, D, E, FF, G, H, I, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H], fi: => F[I])(f: (A, B, C, D, E, FF, G, H, I) => R): F[R] =
-    apply3(tuple3(fa, fb, fc), tuple3(fd, fe, ff), tuple3(fg, fh, fi))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3))
+    ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))
   def apply10[A, B, C, D, E, FF, G, H, I, J, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J])(f: (A, B, C, D, E, FF, G, H, I, J) => R): F[R] =
-    apply3(tuple3(fa, fb, fc), tuple3(fd, fe, ff), tuple4(fg, fh, fi, fj))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t3._1, t3._2, t3._3, t3._4))
+    ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))
   def apply11[A, B, C, D, E, FF, G, H, I, J, K, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K])(f: (A, B, C, D, E, FF, G, H, I, J, K) => R): F[R] =
-    apply3(tuple3(fa, fb, fc), tuple4(fd, fe, ff, fg), tuple4(fh, fi, fj, fk))((t, t2, t3) => f(t._1, t._2, t._3, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
+    ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried)))))))))))
   def apply12[A, B, C, D, E, FF, G, H, I, J, K, L, R](fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D],
                                           fe: => F[E], ff: => F[FF], fg: => F[G], fh: => F[H],
                                           fi: => F[I], fj: => F[J], fk: => F[K], fl: => F[L])(f: (A, B, C, D, E, FF, G, H, I, J, K, L) => R): F[R] =
-    apply3(tuple4(fa, fb, fc, fd), tuple4(fe, ff, fg, fh), tuple4(fi, fj, fk, fl))((t, t2, t3) => f(t._1, t._2, t._3, t._4, t2._1, t2._2, t2._3, t2._4, t3._1, t3._2, t3._3, t3._4))
+    ap(fl)(ap(fk)(ap(fj)(ap(fi)(ap(fh)(ap(fg)(ap(ff)(ap(fe)(ap(fd)(ap(fc)(ap(fb)(map(fa)(f.curried))))))))))))
+
+  final def applying1[Z, A1](f: A1 => Z)(
+    implicit a1: F[A1]
+  ): F[Z] = map(a1)(f)
+  final def applying2[Z, A1, A2](
+    f: (A1, A2) => Z
+  )(implicit a1: F[A1], a2: F[A2]): F[Z] =
+    apply2(a1, a2)(f)
+  final def applying3[Z, A1, A2, A3](
+    f: (A1, A2, A3) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3]): F[Z] =
+    apply3(a1, a2, a3)(f)
+  final def applying4[Z, A1, A2, A3, A4](
+    f: (A1, A2, A3, A4) => Z
+  )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] =
+    apply4(a1, a2, a3, a4)(f)
 
   def tuple2[A,B](fa: => F[A], fb: => F[B]): F[(A,B)] =
     apply2(fa, fb)((_,_))
@@ -157,6 +189,17 @@ trait Apply[F[_]] extends Functor[F] { self =>
       }
     }
 
+  def liftReducer[A, B](implicit r: Reducer[A, B]): Reducer[F[A], F[B]] =
+    new Reducer[F[A], F[B]] {
+      def semigroup: Semigroup[F[B]] = Semigroup.liftSemigroup(Apply.this, r.semigroup)
+      def unit(fa: F[A]): F[B] = map(fa)(r.unit)
+      def cons(fa: F[A], fb: F[B]): F[B] = apply2(fa, fb)(r.cons)
+      def snoc(fb: F[B], fa: F[A]): F[B] = apply2(fb, fa)(r.snoc)
+
+      override def unfoldrOpt[S](seed: S)(f: S => Maybe[(F[A], S)]): Maybe[F[B]] =
+        Apply.this.unfoldrOpt(seed)(f)
+    }
+
   trait ApplyLaw extends FunctorLaw {
     /** Lifted functions can be fused. */
     def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]): Boolean =
@@ -172,7 +215,28 @@ trait Apply[F[_]] extends Functor[F] { self =>
 object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Apply[G]): Apply[F] =
+    new IsomorphismApply[F, G] {
+      override def G: Apply[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+  type Par[F[_]] = Apply[λ[α => F[α] @@ Tags.Parallel]]
+
+  ////
+}
+
+trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G]{
+  implicit def G: Apply[G]
   ////
 
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
+    iso.from(G.ap(iso.to(fa))(iso.to(f)))
+
+  // for performance, used a lot
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = iso.from(G.apply2(iso.to(fa), iso.to(fb))(f))
   ////
 }

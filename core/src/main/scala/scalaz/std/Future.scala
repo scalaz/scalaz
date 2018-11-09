@@ -21,20 +21,20 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   def cobind[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
   override def cojoin[A](a: Future[A]): Future[Future[A]] = Future.successful(a)
 
-  def chooseAny[A](head: Future[A], tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
-    val fs = (head +: tail).iterator.zipWithIndex.toIndexedSeq
-    val counter = new AtomicInteger(fs.size)
+  def chooseAny[A](head: Future[A], tail: IList[Future[A]]): Future[(A, IList[Future[A]])] = {
+    val fs = (head +: tail).zipWithIndex
+    val counter = new AtomicInteger(fs.length)
     val result = Promise[(A, Int)]()
     def attemptComplete(t: Try[(A, Int)]): Unit = {
       val remaining = counter.decrementAndGet
       t match {
-        case TSuccess(_) => result tryComplete t
-        case _ if remaining == 0 => result tryComplete t
+        case TSuccess(_) => val _ = result tryComplete t
+        case _ if remaining == 0 => val _ = result tryComplete t
         case _ =>
       }
     }
 
-    fs foreach { case (fa, i) =>
+    fs map { case (fa, i) =>
       fa.onComplete { t => attemptComplete(t.map(_ -> i)) }
     }
 
@@ -49,15 +49,15 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
   override def both[A,B](a: Future[A], b: Future[B]): Future[(A,B)] =
     a zip b
 
-  override def gather[A](fs: Seq[Future[A]]): Future[List[A]] =
-    Future.sequence(fs.toList)
+  override def gather[A](fs: IList[Future[A]]): Future[IList[A]] =
+    sequence(fs)
 
   // override for actual parallel execution
   override def ap[A, B](fa: => Future[A])(fab: => Future[A => B]) =
     fab zip fa map { case (fa, a) => fa(a) }
 
   def attempt[A](f: Future[A]): Future[Throwable \/ A] =
-    f.map(\/.right).recover { case e => -\/(e) }
+    f.map(\/.right[Throwable, A]).recover { case e => -\/(e) }
 
   def fail[A](e: Throwable): Future[A] =
     Future.failed(e)
@@ -66,7 +66,7 @@ private class FutureInstance(implicit ec: ExecutionContext) extends Nondetermini
     fail(e)
 
   def handleError[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
-    fa.recoverWith(PartialFunction(f))
+    fa.recoverWith { case e => f(e) }
 }
 
 object scalaFuture extends FutureInstances

@@ -178,16 +178,6 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
   private def downParents = (lefts, tree.rootLabel, rights) #:: parents
 
-  private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
-    ls.foldLeft(t #:: rs)((a, b) => b #:: a)
-
-  @tailrec
-  private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
-    (acc, xs, n) match {
-      case (acc, xs, 0)                 => Some((acc, xs))
-      case (acc, Stream.cons(x, xs), n) => splitChildren(Stream.cons(x, acc), xs, n - 1)
-      case _                            => None
-    }
 }
 
 sealed abstract class TreeLocInstances {
@@ -422,7 +412,7 @@ sealed abstract class TreeLocInstances {
       import std.stream._, std.tuple._
 
       override def order(a: TreeLoc[A], b: TreeLoc[A]) =
-        Divide[Order].deriving4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
+        Divide[Order].dividing4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
     }
 }
 
@@ -443,6 +433,17 @@ object TreeLoc extends TreeLocInstances {
     case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))
     case _ => None
   }
+
+  private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
+    ls.foldLeft(t #:: rs)((a, b) => b #:: a)
+
+  @tailrec
+  private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
+    (acc, xs, n) match {
+      case (acc, xs, 0)                 => Some((acc, xs))
+      case (acc, Stream.cons(x, xs), n) => splitChildren(Stream.cons(x, acc), xs, n - 1)
+      case _                            => None
+    }
 }
 
 private trait TreeLocEqual[A] extends Equal[TreeLoc[A]] {

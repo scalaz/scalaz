@@ -73,7 +73,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
 object Adjunction extends AdjunctionInstances {
   type -|[F[_], G[_]] = Adjunction[F, G]
 
-  def apply[F[_], G[_]](implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A
+  def apply[F[_], G[_]](implicit A: F -| G): F -| G = A
 }
 
 sealed abstract class AdjunctionInstances {
@@ -88,7 +88,7 @@ sealed abstract class AdjunctionInstances {
 
   implicit def curryUncurryAdjunction[S]: (S, ?) -| (S => ?) =
     new Adjunction[(S, ?), (S => ?)] {
-      override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f(s, a)
+      override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f((s, a))
       override def rightAdjunct[A, B](a: (S, A))(f: A => S => B): B = f(a._2)(a._1)
     }
 

@@ -15,6 +15,7 @@ object VectorTest extends SpecLite {
   import std.vector._
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])
+  checkAll(alt.laws[Vector])
   checkAll(monadPlus.strongLaws[Vector])
   checkAll(bindRec.laws[Vector])
   checkAll(traverse.laws[Vector])
@@ -86,13 +87,13 @@ object VectorTest extends SpecLite {
   "mapAccumLeft" ! forAll {
     (xs: Vector[Int]) =>
       mapAccumLeft(xs)(Vector[Int](), (c: Vector[Int], a) =>
-        (c :+ a, a)) must_===(xs, xs)
+        (c :+ a, a)) must_===(xs -> xs)
   }
 
   "mapAccumRight" ! forAll {
     (xs: Vector[Int]) =>
       mapAccumRight(xs)(Vector[Int](), (c: Vector[Int], a) =>
-        (c :+ a, a)) must_===(xs.reverse, xs)
+        (c :+ a, a)) must_===(xs.reverse -> xs)
   }
 
   "Issue #266" in {
@@ -116,6 +117,7 @@ object VectorTest extends SpecLite {
     def semigroup[A: Semigroup] = Monoid[Vector[A]]
     def bindRec = BindRec[Vector]
     def monadPlus = MonadPlus[Vector]
+    def alt = Alt[Vector]
     def traverse = Traverse[Vector]
     def zip = Zip[Vector]
     def unzip = Unzip[Vector]

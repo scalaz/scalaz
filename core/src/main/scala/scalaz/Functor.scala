@@ -113,7 +113,28 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 object Functor {
   @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Functor[G]): Functor[F] =
+    new IsomorphismFunctor[F, G] {
+      override def G: Functor[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+
+  ////
+}
+
+trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: Functor[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def map[A, B](fa: F[A])(f: A => B): F[B] =
+    iso.from(G.map(iso.to(fa))(f))
 
   ////
 }

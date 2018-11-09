@@ -40,6 +40,8 @@ sealed abstract class Diev[A] {
   def toSet(): Set[A]
 
   def toList(): List[A]
+
+  def toIList(): IList[A]
 }
 
 object DievInterval {
@@ -142,7 +144,7 @@ trait DievImplementation {
       }
     }
 
-    def +(value: A): Diev[A] = this + (value, value)
+    def +(value: A): Diev[A] = this + ((value, value))
 
     def -(interval: (A, A)): Diev[A] = {
       val orderedInterval = fixIntervalOrder(interval)
@@ -166,7 +168,7 @@ trait DievImplementation {
       }
     }
 
-    def -(value: A): Diev[A] = this - (value, value)
+    def -(value: A): Diev[A] = this - ((value, value))
 
     def ++(other: Diev[A]): Diev[A] = other.intervals.foldLeft(this: Diev[A])(_ + _)
 
@@ -197,9 +199,18 @@ trait DievImplementation {
       }
     }
 
+    def foldRight[B](z: B)(f: (A, B) => B): B = {
+      intervals.foldRight(z){(interval, z1) =>
+        val range = interval._1 |-> interval._2
+        range.foldRight(z1)(f)
+      }
+    }
+
     def toSet(): Set[A] = foldLeft[Set[A]](Set[A]())(_ + _)
 
     def toList(): List[A] = foldLeft[ListBuffer[A]](new ListBuffer())(_ += _).toList
+
+    def toIList(): IList[A] = foldRight[IList[A]](INil())(_ :: _)
 
     override def toString(): String = intervals.foldLeft(new StringBuilder().append("("))(_.append(_)).append(")").toString
   }

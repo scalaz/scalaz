@@ -12,14 +12,17 @@ import sbtrelease.Utilities._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi._
+import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
+
+import sbtdynver.DynVerPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
@@ -37,8 +40,9 @@ object build {
       // getPublishTo fails if no publish repository is set up.
       val ex = st.extract
       val ref = ex.get(thisProjectRef)
-      Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
-      st
+      val (newState, value) = ex.runTask(publishTo in Global in ref, st)
+      Classpaths.getPublishTo(value)
+      newState
     },
     enableCrossBuild = true
   )
@@ -46,7 +50,7 @@ object build {
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -92,40 +96,102 @@ object build {
       Some(shared(projectBase, conf))
   }
 
+  private val stdOptions = Seq(
+    // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
+    "-deprecation",
+    "-encoding", "UTF-8",
+    "-feature",
+    "-Xfuture",
+    "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+    "-unchecked"
+  )
+
   private val Scala211_jvm_and_js_options = Seq(
     "-Ybackend:GenBCode",
     "-Ydelambdafy:method",
     "-target:jvm-1.8"
   )
 
-  private def Scala211 = "2.11.11"
-  private def Scala212 = "2.12.3"
+  val unusedWarnOptions = Def.setting {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 11)) =>
+        Seq("-Ywarn-unused-import")
+      case _ =>
+        Seq("-Ywarn-unused:imports")
+    }
+  }
+
+  val lintOptions = Seq(
+    "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
+    "-Ywarn-dead-code",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard",
+    // "-Yrangepos" https://github.com/scala/bug/issues/10706
+  )
+
+  private def Scala211 = "2.11.12"
+  private def Scala212 = "2.12.7"
+  private def Scala213 = "2.13.0-M5"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
+  private[this] val buildInfoPackageName = "scalaz"
+
+  lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
-      (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
+      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
+      val buildInfoDir = "sbt-buildinfo"
+      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
+        (file(buildInfoPackageName) / f.relativeTo((sourceManaged in Compile).value / buildInfoDir).get.getPath).getPath
+      } else {
+        f.relativeTo((sourceManaged in Compile).value).get.getPath
+      }
+      (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M1"),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    commands += Command.command("setVersionUseDynver") { state =>
+      val extracted = Project extract state
+      val out = extracted get dynverGitDescribeOutput
+      val date = extracted get dynverCurrentDate
+      s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
+    },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.13.5",
-    scalacOptions ++= Seq(
-      // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-      "-deprecation",
-      "-encoding", "UTF-8",
-      "-feature",
-      "-Xfuture",
-      "-Ypartial-unification",
-      "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
-      "-unchecked"
-    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    scalaCheckVersion := "1.14.0",
+    scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
     }),
+    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
+      case Some((2, v)) if v <= 12 || scalaVersion.value == "2.13.0-M3" =>
+        Seq(
+          "-Ypartial-unification",
+          "-Yno-adapted-args"
+        )
+    }.toList.flatten,
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 12 =>
+          Seq(
+            "-opt:l:method,inline",
+            "-opt-inline-from:scalaz.**"
+          )
+
+        case Some((2, 11)) =>
+          Seq("-Xsource:2.12")
+        case _ =>
+          Nil
+      }
+    },
+    scalacOptions ++= lintOptions,
+    scalacOptions ++= unusedWarnOptions.value,
+    Seq(Compile, Test).flatMap(c =>
+      scalacOptions in (c, console) --= unusedWarnOptions.value
+    ),
+
+    scala213_pre_cross_setting,
 
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
@@ -134,16 +200,8 @@ object build {
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
-    testOptions in Test += {
-      val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isScalaJSProject.value)
-          Seq("-minSuccessfulTests", "10")
-        else
-          Seq("-minSuccessfulTests", "33")
-      }
-      Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
-    },
     genTypeClasses := {
+      val s = streams.value
       typeClasses.value.flatMap { tc =>
         val dir = name.value match {
           case ConcurrentName =>
@@ -151,7 +209,7 @@ object build {
           case _ =>
             ScalazCrossType.shared(baseDirectory.value, "main")
         }
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, streams.value.log))
+        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
       }
     },
     checkGenTypeClasses := {
@@ -203,19 +261,19 @@ object build {
     pomIncludeRepository := {
       x => false
     },
+    scmInfo := Some(ScmInfo(
+      browseUrl = url("https://github.com/scalaz/scalaz"),
+      connection = "scm:git:git@github.com:scalaz/scalaz.git"
+    )),
     pomExtra := (
       <url>http://scalaz.org</url>
         <licenses>
           <license>
             <name>BSD-style</name>
-            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
             <distribution>repo</distribution>
           </license>
         </licenses>
-        <scm>
-          <url>git@github.com:scalaz/scalaz.git</url>
-          <connection>scm:git:git@github.com:scalaz/scalaz.git</connection>
-        </scm>
         <developers>
           {
           Seq(
@@ -234,17 +292,26 @@ object build {
               <developer>
                 <id>{id}</id>
                 <name>{name}</name>
-                <url>http://github.com/{id}</url>
+                <url>https://github.com/{id}</url>
               </developer>
           }
         }
         </developers>
       ),
+
+    licenseFile := {
+      val LICENSE_txt = (baseDirectory in ThisBuild).value / "LICENSE.txt"
+      if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
+      LICENSE_txt
+    },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.4",
+    kindProjectorVersion := "0.9.8",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ osgiSettings ++ Seq[Sett](
+  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
+    // include LICENSE.txt in all packaged artifacts
+    inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
+  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
@@ -253,6 +320,19 @@ object build {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
+
+  private[this] val scala213_pre_cross_setting = {
+    // sbt wants `scala-2.13.0-M1`, `scala-2.13.0-M2`, ... (sbt/sbt#2819)
+    // @fommil tells me we could use sbt-sensible for this
+    unmanagedSourceDirectories in Compile ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2L, minor)) =>
+          Some((baseDirectory in Compile).value.getParentFile / s"src/main/scala-2.$minor")
+        case _               =>
+          None
+      }
+    }
+  }
 
   val nativeSettings = Seq(
     scalacOptions --= Scala211_jvm_and_js_options,
@@ -268,7 +348,7 @@ object build {
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := "scalaz",
+      buildInfoPackage := buildInfoPackageName,
       buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
@@ -276,12 +356,11 @@ object build {
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
-      libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.2.2"
     )
     .jvmSettings(
       jvm_js_settings,
       libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
       }.toList,
       typeClasses := TypeClass.core
     )
@@ -324,26 +403,39 @@ object build {
       Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
-  lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password") map sys.props.get match {
-      case Seq(Some(user), Some(pass)) =>
-        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+  lazy val credentialsSetting = credentials ++= {
+    val name = "Sonatype Nexus Repository Manager"
+    val realm = "oss.sonatype.org"
+    (
+      sys.props.get("build.publish.user"),
+      sys.props.get("build.publish.password"),
+      sys.env.get("SONATYPE_USERNAME"),
+      sys.env.get("SONATYPE_PASSWORD")
+    ) match {
+      case (Some(user), Some(pass), _, _)  => Seq(Credentials(name, realm, user, pass))
+      case (_, _, Some(user), Some(pass))  => Seq(Credentials(name, realm, user, pass))
       case _                           =>
-        Credentials(Path.userHome / ".ivy2" / ".credentials")
+        val ivyFile = Path.userHome / ".ivy2" / ".credentials"
+        val m2File = Path.userHome / ".m2" / "credentials"
+        if (ivyFile.exists()) Seq(Credentials(ivyFile))
+        else if (m2File.exists()) Seq(Credentials(m2File))
+        else Nil
     }
   }
 
-  lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
+  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
-  lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
+  lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 
-  lazy val genToSyntax = TaskKey[String]("gen-to-syntax")
+  lazy val typeClasses = taskKey[Seq[TypeClass]]("")
 
-  lazy val showDoc = TaskKey[Unit]("show-doc")
+  lazy val genToSyntax = taskKey[String]("")
 
-  lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+  lazy val showDoc = taskKey[Unit]("")
 
-  lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
+  lazy val typeClassTree = taskKey[String]("Generates scaladoc formatted tree of type classes.")
+
+  lazy val checkGenTypeClasses = taskKey[Unit]("")
 
   def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }

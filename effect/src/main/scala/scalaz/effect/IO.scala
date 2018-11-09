@@ -63,7 +63,7 @@ sealed abstract class IO[A] {
     })
 
   /** Lift this action to a given IO-like monad. */
-  def liftIO[M[_]](implicit m: MonadIO[M]): M[A] =
+  def liftIO[M[_]](implicit m: LiftIO[M]): M[A] =
     m.liftIO(this)
 
   /** Executes the handler if an exception is raised. */
@@ -187,37 +187,32 @@ object IO extends IOInstances {
   }
 
   /** Writes a character to standard output. */
-  def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
+  def putChar(c: Char): IO[Unit] = io(rw => return_(rw ->
     print(c)
-    ()
-  }))
+  ))
 
   /** Writes a string to standard output. */
-  def putStr(s: String): IO[Unit] = io(rw => return_(rw -> {
+  def putStr(s: String): IO[Unit] = io(rw => return_(rw ->
     print(s)
-    ()
-  }))
+  ))
 
   /** Writes a string to standard output, followed by a newline.*/
-  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw -> {
+  def putStrLn(s: String): IO[Unit] = io(rw => return_(rw ->
     println(s)
-    ()
-  }))
+  ))
 
   /** Reads a line of standard input. */
   def readLn: IO[String] = IO(scala.Console.in.readLine())
 
   def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
-    io(rw => return_(rw -> {
+    io(rw => return_(rw ->
       print(S shows a)
-      ()
-    }))
+    ))
 
   def putLn[A](a: A)(implicit S: Show[A]): IO[Unit] =
-    io(rw => return_(rw -> {
+    io(rw => return_(rw ->
       println(S shows a)
-      ()
-    }))
+    ))
 
   type RunInBase[M[_], Base[_]] =
   Forall[λ[α => M[α] => Base[M[α]]]]
@@ -225,7 +220,7 @@ object IO extends IOInstances {
   import scalaz.Isomorphism.<~>
 
   /** Hoist RunInBase given a natural isomorphism between the two functors */
-  def hoistRunInBase[F[_], G[_]](r: RunInBase[G, IO])(implicit iso: F <~> G): RunInBase[F, IO] =
+  def hoistRunInBase[F[_], G[_]](iso: F <~> G)(r: RunInBase[G, IO]): RunInBase[F, IO] =
     new RunInBase[F, IO] {
       def apply[B] = (x: F[B]) => r.apply(iso.to(x)).map(iso.from(_))
     }
@@ -272,16 +267,16 @@ object IO extends IOInstances {
    * The Forall quantifier prevents resources from being returned by this function.
    */
   def runRegionT[P[_] : MonadControlIO, A](r: Forall[RegionT[?, P, A]]): P[A] = {
-    def after(hsIORef: IORef[List[RefCountedFinalizer]]) = for {
+    def after(hsIORef: IORef[IList[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {
         case (r, o) => for {
           refCnt <- r.refcount.mod(_ - 1)
-          _ <- if (refCnt == 0) r.finalizer else IO.ioUnit
+
         } yield ()
       }
     } yield ()
-    newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
+    newIORef(IList[RefCountedFinalizer]()).bracketIO(after)(s => r.apply.value.run(s))
   }
 
   def tailrecM[A, B](a: A)(f: A => IO[A \/ B]): IO[B] =

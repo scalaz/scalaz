@@ -22,6 +22,7 @@ object CorecursiveListTest extends SpecLite {
   checkAll(zip.laws[CL])
   checkAll(monoid.laws[CL[Int]])
   checkAll(order.laws[CL[Int]])
+  checkAll(alt.laws[CL])
 
   "inequality exists" ! forAll {(a: CL[Int]) =>
     exists {(b: CL[Int]) =>
@@ -81,7 +82,7 @@ object CorecursiveListTest extends SpecLite {
     val sa = oneAndDie(a, "sa too strict")
     val sb = oneAndDie(b, "sb too strict")
     val sab = Apply[CL].tuple2(sa, sb)
-    sab.step(sab.init).map(_._2) must_===(just(a, b))
+    sab.step(sab.init).map(_._2) must_===(just((a, b)))
   }
 
   "bind is nonstrict" in {
@@ -95,7 +96,7 @@ object CorecursiveListTest extends SpecLite {
     val sa = oneAndDie(a)
     val sb = oneAndDie(b)
     val sab = Bind[CL].bind(sa){a => Functor[CL].map(sb)((a, _))}
-    sab.step(sab.init).map(_._2) must_===(just(a, b))
+    sab.step(sab.init).map(_._2) must_===(just((a, b)))
   }
 
   "filter identity" ! forAll {a: CL[Int] =>

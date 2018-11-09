@@ -11,6 +11,7 @@ object KleisliTest extends SpecLite {
   type KleisliOptInt[B] = KleisliOpt[Int, B]
   type IntOr[A] = Int \/ A
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
+  type ConstInt[A] = Const[Int, A]
 
   implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
     def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
@@ -28,11 +29,13 @@ object KleisliTest extends SpecLite {
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(bindRec.laws[KleisliOptInt])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(alt.laws[KleisliOptInt])
   checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
   checkAll(profunctor.laws[KleisliOpt])
   checkAll(monadTrans.laws[Kleisli[?[_], Int, ?], List])
+  checkAll(divisible.laws[Kleisli[ConstInt, Int, ?]])
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -46,6 +49,7 @@ object KleisliTest extends SpecLite {
     def bindRec[F[_] : BindRec, A] = BindRec[Kleisli[F, A, ?]]
     def monadReader[F[_] : Monad, A] = MonadReader[Kleisli[F, A, ?], A]
     def zip[F[_] : Zip, A] = Zip[Kleisli[F, A, ?]]
+    def alt[F[_] : Alt : Applicative, A] = Alt[Kleisli[F, A, ?]]
 
     def profunctor[F[_]: Functor] = Profunctor[Kleisli[F, ?, ?]]
     def strong[F[_]: Functor] = Strong[Kleisli[F, ?, ?]]
@@ -54,6 +58,8 @@ object KleisliTest extends SpecLite {
     def category[F[_]: Monad] = Category[Kleisli[F, ?, ?]]
     def arrow[F[_]: Monad] = Arrow[Kleisli[F, ?, ?]]
     def choice[F[_]: Monad] = Choice[Kleisli[F, ?, ?]]
+    def decidable[A, F[_] : Decidable] = Decidable[Kleisli[F, A, ?]]
+    def divisible[A, F[_] : Divisible] = Divisible[Kleisli[F, A, ?]]
 
     // checking absence of ambiguity
     def semigroup[F[_], A, B](implicit FB: Monoid[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -76,12 +82,19 @@ object KleisliTest extends SpecLite {
     def bind[F[_] : BindRec, A] = Bind[Kleisli[F, A, ?]]
     def bind[F[_] : Monad: BindRec, A] = Bind[Kleisli[F, A, ?]]
     def plus[F[_] : PlusEmpty, A] = Plus[Kleisli[F, A, ?]]
+    def plus[F[_] : MonadPlus, A] = Plus[Kleisli[F, A, ?]]
     def empty[F[_] : MonadPlus, A] = PlusEmpty[Kleisli[F, A, ?]]
+    def profunctor[F[_]: Apply] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Applicative] = Profunctor[Kleisli[F, ?, ?]]
+    def profunctor[F[_]: Bind] = Profunctor[Kleisli[F, ?, ?]]
     def profunctor[F[_]: Monad] = Profunctor[Kleisli[F, ?, ?]]
+    def strong[F[_]: Apply] = Strong[Kleisli[F, ?, ?]]
+    def strong[F[_]: Applicative] = Strong[Kleisli[F, ?, ?]]
+    def strong[F[_]: Bind] = Strong[Kleisli[F, ?, ?]]
     def strong[F[_]: Monad] = Strong[Kleisli[F, ?, ?]]
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
     def compose[F[_]: Monad] = Compose[Kleisli[F, ?, ?]]
+    def divisible[A, F[_] : Decidable] = Divisible[Kleisli[F, A, ?]]
 
     object reader {
       // F = Id
@@ -91,7 +104,7 @@ object KleisliTest extends SpecLite {
       def readerCategory = Category[Reader]
       def readerArrow = Arrow[Reader]
 
-      // Sigh, more tests needed, see http://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
+      // Sigh, more tests needed, see https://stackoverflow.com/questions/11913128/scalaz-7-why-using-type-alias-results-in-ambigous-typeclass-resolution-for-rea
       trait X
       type ReaderX[A] = Reader[X, A]
       def readerXFunctor = Functor[ReaderX]

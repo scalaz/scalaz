@@ -106,4 +106,81 @@ object SyntaxUsage extends App {
 
     List(some(0)).sequence
   }
+
+  def unambiguousFunctorSyntax(): Unit = {
+    import scalaz._
+
+    def foo[F[_]: Monad: Traverse, A, B](fa: F[A], f: A => B): F[B] = {
+      // Importing Functor syntax (import scalaz.syntax.functor._) would
+      // give ambiguous implicit values for Functor[F] when trying to use
+      // Functor syntax.
+      // Monad syntax however requires a Monad even for functor operations,
+      // and there is a unique Monad[F] in scope.
+      import scalaz.syntax.monad._
+
+      fa map f
+    }
+  }
+
+  def mixingMonadAndTraverseSyntax(): Unit = {
+    import scalaz._
+
+    def foo[F[_]: Monad: Traverse, A, B](fa: F[A], f: A => B): Unit = {
+      // Here we want to use both Monad and Traverse syntax, as well as
+      // Functor syntax. Since F is both Monad and Traverse, there are
+      // two ways to get Functor syntax for F. To avoid ambiguity,
+      // import Traverse syntax that doesn't include Functor syntax (traverse0).
+      import scalaz.syntax.monad._
+      import scalaz.syntax.traverse0._
+
+      // Functor syntax
+      fa map f
+
+      // Monad syntax
+      fa flatMap (a => f(a).point[F])
+
+      // Traverse and Applicative syntax
+      fa traverse (a => f(a).point[F])
+    }
+  }
+
+  def mixingApplicativeAndBindSyntax(): Unit = {
+    import scalaz._
+
+    def foo[F[_]: Applicative: Bind, A, B](fa: F[A], fb: F[B]): F[(A, B)] = {
+      // To avoid ambiguity, import Applicative syntax that
+      // doesn't include Apply syntax (applicative0).
+      import scalaz.syntax.bind._
+      import scalaz.syntax.applicative0._
+
+      // Bind syntax
+      fa flatMap (_ => fb)
+
+      // Applicative syntax
+      1.point[F]
+
+      // Apply syntax
+      (fa |@| fb).tupled
+    }
+  }
+
+  def mixingMonadTellAndMonadErrorSyntax(): Unit = {
+    import scalaz._
+
+    def foo[F[_], E](fa: F[Int])(implicit mt: MonadTell[F, String], me: MonadError[F, E]) = {
+      // To avoid ambiguity, import MonadError syntax that
+      // doesn't include Monad syntax (monadError0).
+      import scalaz.syntax.monadTell._
+      import scalaz.syntax.monadError0._
+      import scalaz.syntax.applicativeError0._
+      // Monad syntax
+      fa flatMap (_ => fa)
+
+      // MonadTell syntax
+      fa :++> "foo"
+
+      // ApplicativeError syntax
+      fa handleError (e => fa)
+    }
+  }
 }

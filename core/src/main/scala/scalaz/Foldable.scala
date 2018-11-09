@@ -8,7 +8,6 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
-  import collection.generic.CanBuildFrom
 
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -156,12 +155,16 @@ trait Foldable[F[_]]  { self =>
   def indexOr[A](fa: F[A], default: => A, i: Int): A =
     index(fa, i) getOrElse default
 
-  def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
-  def toVector[A](fa: F[A]): Vector[A] = foldLeft(fa, Vector[A]())(_ :+ _)
-  def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
+  def toList[A](fa: F[A]): List[A] = {
+    foldLeft(fa, List.newBuilder[A])(_ += _).result
+  }
+  def toVector[A](fa: F[A]): Vector[A] = {
+    foldLeft(fa, Vector.newBuilder[A])(_ += _).result
+  }
+  def toSet[A](fa: F[A]): Set[A] = {
+    foldLeft(fa, Set.newBuilder[A])(_ += _).result
+  }
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
-  def to[A, G[_]](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
-    foldLeft(fa, c())(_ += _).result
 
   def toIList[A](fa: F[A]): IList[A] =
     foldLeft(fa, IList.empty[A])((t, h) => h :: t).reverse
@@ -283,9 +286,31 @@ trait Foldable[F[_]]  { self =>
   def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
     foldLeft1Opt(fa)(A.append(_, _))
 
-  def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
-    foldLeft(fa, G.empty[A])(G.plus[A](_, _))
+  /**
+   * Map elements to `G[B]` and sum using a polymorphic monoid ([[PlusEmpty]]).
+   * Should support early termination, i.e. mapping and summing
+   * no more elements than is needed to determine the result.
+   */
+  def psumMap[A, B, G[_]](fa: F[A])(f: A => G[B])(implicit G: PlusEmpty[G]): G[B] =
+    foldMap(fa)(f)(G.monoid)
 
+  /**
+   * Sum using a polymorphic monoid ([[PlusEmpty]]).
+   * Should support early termination, i.e. summing no more
+   * elements than is needed to determine the result.
+   */
+  def psum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+    fold(fa)(G.monoid)
+
+  /** Alias for [[psum]]. `asum` is the name used in Haskell. */
+  final def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+    psum(fa)
+
+  @deprecated("use psum", "7.3.0")
+  def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
+    psum(fa)
+
+  @deprecated("use psum", "7.3.0")
   def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
     msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
 
@@ -396,7 +421,16 @@ trait Foldable[F[_]]  { self =>
 object Foldable {
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
 
+
+
   ////
+
+  def fromIso[F[_], G[_]](D: F ~> G)(implicit E: Foldable[G]): Foldable[F] =
+    new IsomorphismFoldable[F, G] {
+      override def G: Foldable[G] = E
+      override def naturalTrans: F ~> G = D
+    }
+
   /**
    * Template trait to define `Foldable` in terms of `foldMap`.
    *
@@ -412,17 +446,17 @@ object Foldable {
    */
   trait FromFoldMap[F[_]] extends Foldable[F] {
     override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-      foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+      foldMap(fa)((a: A) => Endo.endoByName[B](f(a, _))) apply z
   }
 
   /**
-   * Template trait to define `Foldable` in terms of `foldr`
+   * Template trait to define `Foldable` in terms of `foldRight`
    *
    * Example:
    * {{{
    * new Foldable[Option] with Foldable.FromFoldr[Option] {
-   *   def foldr[A, B](fa: Option[A], z: B)(f: (A) => (=> B) => B) = fa match {
-   *     case Some(a) => f(a)(z)
+   *   def foldRight[A, B](fa: Option[A], z: B)(f: (A, => B) => B) = fa match {
+   *     case Some(a) => f(a, z)
    *     case None => z
    *   }
    * }
@@ -430,8 +464,24 @@ object Foldable {
    */
   trait FromFoldr[F[_]] extends Foldable[F] {
     override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) =
-        foldr[A, B](fa, F.zero)( x => y => F.append(f(x),  y))
+      foldRight[A, B](fa, F.zero)((x, y) => F.append(f(x),  y))
   }
 
+  ////
+}
+
+trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
+  implicit def G: Foldable[G]
+  ////
+  protected[this] def naturalTrans: F ~> G
+
+  override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B =
+    G.foldMap(naturalTrans(fa))(f)
+
+  override def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B =
+    G.foldLeft(naturalTrans(fa), z)(f)
+
+  override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
+    G.foldRight[A, B](naturalTrans(fa), z)(f)
   ////
 }

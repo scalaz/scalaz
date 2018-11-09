@@ -39,6 +39,14 @@ trait Equal[F]  { self =>
 object Equal {
   @inline def apply[F](implicit F: Equal[F]): Equal[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Equal[G]): Equal[F] =
+    new IsomorphismEqual[F, G] {
+      override def G: Equal[G] = M
+      override def iso: F <=> G = D
+    }
+
   ////
   /** Creates an Equal instance based on universal equality, `a1 == a2` */
   def equalA[A]: Equal[A] = new Equal[A] {
@@ -53,22 +61,46 @@ object Equal {
 
   def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
 
-  implicit val equalContravariant: Divisible[Equal] = new Divisible[Equal] {
-    def contramap[A, B](r: Equal[A])(f: B => A) = r.contramap(f)
+  // scalaz-deriving provides a coherent n-arity extension
+  private[scalaz] class EqualDecidable extends Decidable[Equal] {
+    override def divide2[A1, A2, Z](a1: =>Equal[A1], a2: =>Equal[A2])(
+      f: Z => (A1, A2)
+    ): Equal[Z] = Equal.equal{ (z1, z2) =>
+      val (s1, s2) = f(z1)
+      val (t1, t2) = f(z2)
+      ((s1.asInstanceOf[AnyRef] eq t1.asInstanceOf[AnyRef]) || a1.equal(s1, t1)) &&
+      ((s2.asInstanceOf[AnyRef] eq t2.asInstanceOf[AnyRef]) || a2.equal(s2, t2))
+    }
+    override def conquer[A]: Equal[A] = Equal.equal((_, _) => true)
 
-    override def conquer[A] = Equal.equal((_, _) => true)
-
-    override def divide[A, B, C](fa: Equal[A], fb: Equal[B])(f: C => (A, B)) =
-      Equal.equal[C] { (c1, c2) =>
-        val (a1, b1) = f(c1)
-        val (a2, b2) = f(c2)
-        fa.equal(a1, a2) && fb.equal(b1, b2)
+    override def choose2[Z, A1, A2](a1: =>Equal[A1], a2: =>Equal[A2])(
+      f: Z => A1 \/ A2
+    ): Equal[Z] = Equal.equal{ (z1, z2) =>
+      (f(z1), f(z2)) match {
+        case (-\/(s), -\/(t)) => (s.asInstanceOf[AnyRef] eq t.asInstanceOf[AnyRef]) || a1.equal(s, t)
+        case (\/-(s), \/-(t)) => (s.asInstanceOf[AnyRef] eq t.asInstanceOf[AnyRef]) || a2.equal(s, t)
+        case _                => false
       }
+    }
   }
+  implicit val equalDecidable: Decidable[Equal] = new EqualDecidable
 
+  /** Construct an instance, but prefer SAM types with scala 2.12+ */
   def equal[A](f: (A, A) => Boolean): Equal[A] = new Equal[A] {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
+  ////
+}
+
+trait IsomorphismEqual[F, G] extends Equal[F] {
+  implicit def G: Equal[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <=> G
+
+  def equal(a1: F, a2: F): Boolean =
+    G.equal(iso.to(a1), iso.to(a2))
   ////
 }

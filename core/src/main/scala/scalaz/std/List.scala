@@ -10,9 +10,38 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] {
-      import Liskov.<~<
+  implicit val listInstance: Traverse[List] with MonadPlus[List] with Alt[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
+    new Traverse[List] with MonadPlus[List] with Alt[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
+
+      override def point[A](a: => A): List[A] =
+        List(a)
+
+      override def bind[A, B](fa: List[A])(f: A => List[B]): List[B] =
+        fa flatMap f
+
+      override def createNewBuilder[A]() =
+        List.newBuilder[A]
+
+      override def isEmpty[A](fa: List[A]): Boolean =
+        fa.isEmpty
+
+      override def plus[A](a: List[A], b: => List[A]): List[A] =
+        a ++ b
+
+      override def alt[A](a: => List[A], b: => List[A]): List[A] =
+        plus(a, b)
+
+      override def empty[A]: List[A] =
+        Nil
+
+      override def unzip[A, B](a: List[(A, B)]): (List[A], List[B]) =
+        a.unzip
+
+      override def zip[A, B](a: => List[A], b: => List[B]): List[(A, B)] = {
+        val _a = a
+        if(_a.isEmpty) empty
+        else _a zip b
+      }
 
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
@@ -25,22 +54,7 @@ trait ListInstances extends ListInstances0 {
           }
         loop(fa, None)
       }
-      override def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
-      override def length[A](fa: List[A]) = fa.length
-      def point[A](a: => A) = a :: Nil
-      def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
-      def empty[A] = Nil
-      def plus[A](a: List[A], b: => List[A]) = a ++ b
-      override def map[A, B](l: List[A])(f: A => B) = l map f
-      override def widen[A, B](l: List[A])(implicit ev: A <~< B) = Liskov.co(ev)(l)
-      override def filter[A](fa: List[A])(p: A => Boolean): List[A] = fa filter p
 
-      def zip[A, B](a: => List[A], b: => List[B]) = {
-        val _a = a
-        if(_a.isEmpty) Nil
-        else _a zip b
-      }
-      def unzip[A, B](a: List[(A, B)]) = a.unzip
       def alignWith[A, B, C](f: A \&/ B => C) = {
         @annotation.tailrec
         def loop(aa: List[A], bb: List[B], accum: List[C]): List[C] = (aa, bb) match {
@@ -54,34 +68,21 @@ trait ListInstances extends ListInstances0 {
         (a, b) => loop(a, b, Nil)
       }
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-        // implementation with `foldRight` leads to SOE in:
-        //
-        //  def wc(c: Char) = State[Boolean, Int]{(inWord) =>
-        //    val s = c != ' '
-        //    (test(!(inWord && s)), s)
-        //  }
-        //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
+        val revOpt: Maybe[F[List[B]]] =
+          F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
+            case a :: as => Maybe.just((f(a), as))
+            case Nil => Maybe.empty
+          })(Reducer.ReverseListReducer[B])
 
-        l.reverse.foldLeft(F.point(Nil: List[B])) { (flb: F[List[B]], a: A) =>
-          F.apply2(f(a), flb)(_ :: _)
-        }
+        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+        F.map(rev)(_.reverse)
       }
-
-      override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
-        State((s: S) => {
-          val buf = new collection.mutable.ListBuffer[B]
-          var cur = s
-          l.foreach { a => val bs = f(a)(cur); buf += bs._2; cur = bs._1 }
-          (cur, buf.toList)
-        })
-      }
-
-      override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
         val s = new ArrayStack[A]
-        fa.foreach(a => s += a)
+        fa.foreach(a => s push a)
         var r = z
         while (!s.isEmpty) {
           // force and copy the value of r to ensure correctness
@@ -91,9 +92,11 @@ trait ListInstances extends ListInstances0 {
         r
       }
 
-      override def toList[A](fa: List[A]) = fa
-
-      def isEmpty[A](fa: List[A]) = fa.isEmpty
+      override def foldMap[A, B](fa: List[A])(f: A => B)(implicit M: Monoid[B]) =
+        M.unfoldrSum(fa)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tail))
+          case None => Maybe.empty
+        })
 
       def cobind[A, B](fa: List[A])(f: List[A] => B) =
         fa match {
@@ -106,49 +109,14 @@ trait ListInstances extends ListInstances0 {
           case Nil => Nil
           case _::t => a :: cojoin(t)
         }
-
-      override def any[A](fa: List[A])(p: A => Boolean): Boolean =
-        fa.exists(p)
-
-      override def all[A](fa: List[A])(p: A => Boolean): Boolean =
-        fa.forall(p)
-
-      def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
-        val bs = List.newBuilder[B]
-        @scala.annotation.tailrec
-        def go(xs: List[List[A \/ B]]): Unit =
-          xs match {
-            case (\/-(b) :: tail) :: rest =>
-              bs += b
-              go(tail :: rest)
-            case (-\/(a0) :: tail) :: rest =>
-              go(f(a0) :: tail :: rest)
-            case Nil :: rest =>
-              go(rest)
-            case Nil =>
-          }
-        go(List(f(a)))
-        bs.result
-      }
     }
 
-  implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
-    def append(f1: List[A], f2: => List[A]) = f1 ::: f2
-    def zero: List[A] = Nil
-  }
+  implicit def listMonoid[A]: Monoid[List[A]] = listInstance.monoid[A]
 
-  implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
-    override def show(as: List[A]) = {
-      def commaSep(rest: List[A], acc: Cord): Cord =
-        rest match {
-          case Nil => acc
-          case x::xs => commaSep(xs, (acc :+ ",") ++ Show[A].show(x))
-        }
-      "[" +: (as match {
-        case Nil => Cord()
-        case x::xs => commaSep(xs, Show[A].show(x))
-      }) :+ "]"
-    }
+  implicit def listShow[A](implicit A: Show[A]): Show[List[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[List].intercalate(as.map(A.show), Cord(","))
+    cord"[$content]"
   }
 
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
@@ -230,7 +198,7 @@ trait ListFunctions {
 
   /** A pair of passing and failing values of `as` against `p`. */
   final def partitionM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(List[A], List[A])] = as match {
-    case Nil    => F.point(Nil: List[A], Nil: List[A])
+    case Nil    => F.point((Nil: List[A], Nil: List[A]))
     case h :: t =>
       F.ap(partitionM(t)(p))(F.map(p(h))(b => {
           case (x, y) => if (b) (h :: x, y) else (x, h :: y)
@@ -240,11 +208,11 @@ trait ListFunctions {
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
-    case Nil    => Monad[M].point(Nil, Nil)
+    case Nil    => Monad[M].point((Nil, Nil))
     case h :: t =>
       Monad[M].bind(p(h))(b =>
         if (b) Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) => (h :: k._1, k._2))
-        else Monad[M].point(Nil, as))
+        else Monad[M].point((Nil, as)))
 
   }
 
@@ -256,18 +224,18 @@ trait ListFunctions {
   final def groupWhenM[A, M[_] : Monad](as: List[A])(p: (A, A) => M[Boolean]): M[List[NonEmptyList[A]]] = as match {
     case Nil    => Monad[M].point(Nil)
     case h :: t =>
-      val stateP = (i: A) => StateT[M, A, Boolean](s => Monad[M].map(p(s, i))(i ->))
-      Monad[M].bind(spanM[A, StateT[M, A, ?]](t)(stateP).eval(h)) {
+      val stateP = (i: A) => StateT[A, M, Boolean](s => Monad[M].map(p(s, i))(i ->))
+      Monad[M].bind(spanM[A, StateT[A, M, ?]](t)(stateP).eval(h)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))(g => NonEmptyList.nel(h, IList.fromList(x)) :: g)
       }
   }
 
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
-  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
+  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = as.foldLeft(Map.empty[B, NonEmptyList[A]]) { (nels, a) =>
     val b = f(a)
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
-  } mapValues (_.reverse)
+  } map { case (k, v) => k -> v.reverse }
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {

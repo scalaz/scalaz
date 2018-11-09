@@ -124,11 +124,12 @@ sealed abstract class Tree[A] {
   def loc: TreeLoc[A] = TreeLoc.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
 
   /** Turns a tree of pairs into a pair of trees. */
-  def unzip[A1, A2](implicit p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
-    val uz = Need(subForest.map(_.unzip))
+  def unzip[A1, A2](p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
+    val uz = Need(subForest.map(_.unzip(p)))
     val fst = Need(uz.value map (_._1))
     val snd = Need(uz.value map (_._2))
-    (Node(rootLabel._1, fst.value), Node(rootLabel._2, snd.value))
+    val (a, b) = p(rootLabel)
+    (Node(a, fst.value), Node(b, snd.value))
   }
 
   def foldNode[Z](f: A => Stream[Tree[A]] => Z): Z =

@@ -1,6 +1,6 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
+import java.util.concurrent.{ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
 
 import scala.collection.JavaConverters._
@@ -8,6 +8,7 @@ import scalaz.Tags.Parallel
 
 import scalaz._
 import scalaz.Free.Trampoline
+import scalaz.Isomorphism.<~>
 import scalaz.syntax.monad._
 
 import scala.concurrent.SyncVar
@@ -51,7 +52,7 @@ import scala.concurrent.duration._
  * `Future[Throwable \/ A]` with a number of additional
  * convenience functions.
  */
-sealed abstract class Future[+A] {
+sealed abstract class Future[A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
@@ -233,12 +234,24 @@ sealed abstract class Future[+A] {
 }
 
 object Future {
-  case class Now[+A](a: A) extends Future[A]
-  case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
-  case class Suspend[+A](thunk: () => Future[A]) extends Future[A]
+  case class Now[A](a: A) extends Future[A]
+  case class Async[A](onFinish: (A => Trampoline[Unit]) => Unit) extends Future[A]
+  case class Suspend[A](thunk: () => Future[A]) extends Future[A]
   case class BindSuspend[A,B](thunk: () => Future[A], f: A => Future[B]) extends Future[B]
   case class BindAsync[A,B](onFinish: (A => Trampoline[Unit]) => Unit,
                             f: A => Future[B]) extends Future[B]
+
+  val FutureIsomorphism: Future <~> ContT[Unit, Trampoline, ?] = new scalaz.Isomorphism.IsoFunctorTemplate[Future, ContT[Unit, Trampoline, ?]] {
+    override def to[A](fa: Future[A]): ContT[Unit, Trampoline, A] = ContT[Trampoline, Unit, A] { continue =>
+      Trampoline.delay(fa.unsafePerformListen(continue))
+    }
+
+    override def from[A](ga: ContT[Unit, Trampoline, A]): Future[A] = {
+      Future.Async { continue =>
+        ga(continue).run
+      }
+    }
+  }
 
   // NB: considered implementing Traverse and Comonad, but these would have
   // to run the Future; leaving out for now
@@ -248,7 +261,7 @@ object Future {
       fa flatMap f
     def point[A](a: => A): Future[A] = delay(a)
 
-    def chooseAny[A](h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+    def chooseAny[A](h: Future[A], t: IList[Future[A]]): Future[(A, IList[Future[A]])] = {
       Async { cb =>
         // The details of this implementation are a bit tricky, but the general
         // idea is to run all futures in parallel, returning whichever result
@@ -260,7 +273,7 @@ object Future {
         // then revert back to running the original Future.
         val won = new AtomicBoolean(false) // threads race to set this
 
-        val fs = (h +: t).view.zipWithIndex.map { case (f, ind) =>
+        val fs = (h +: t).zipWithIndex.map { case (f, ind) =>
           val used = new AtomicBoolean(false)
           val ref = new AtomicReference[A]
           val listener = new AtomicReference[A => Trampoline[Unit]](null)
@@ -273,9 +286,9 @@ object Future {
                f.unsafePerformListen(cb)
           }
           (ind, f, residual, listener, ref)
-        }.toIndexedSeq
+        }
 
-        fs.foreach { case (ind, f, residual, listener, ref) =>
+        foreach(fs) { case (ind, f, residual, listener, ref) =>
           f.unsafePerformListen { a =>
             ref.set(a)
             val notifyWinner =
@@ -302,15 +315,15 @@ object Future {
 
     // implementation runs all threads, dumping to a shared queue
     // last thread to finish invokes the callback with the results
-    override def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+    override def reduceUnordered[A, M](fs: IList[Future[A]])(implicit R: Reducer[A, M], M: Monoid[M]): Future[M] =
       fs match {
-      case Seq() => Future.now(R.zero)
-      case Seq(f) => f.map(R.unit)
+      case INil() => Future.now(M.zero)
+      case ICons(f, INil()) => f.map(R.unit)
       case other => Async { cb =>
         val results = new ConcurrentLinkedQueue[M]
-        val c = new AtomicInteger(fs.size)
+        val c = new AtomicInteger(fs.length)
 
-        fs.foreach { f =>
+        foreach(fs){ f =>
           f.unsafePerformListen { a =>
             // Try to reduce number of values in the queue
             val front = results.poll()
@@ -321,11 +334,15 @@ object Future {
 
             // only last completed f will hit the 0 here.
             if (c.decrementAndGet() == 0)
-              cb(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b)))
+              cb(results.asScala.foldLeft(M.zero)((a, b) => R.append(a, b)))
             else Trampoline.done(())
           }
         }
       }
+    }
+
+    private def foreach[A](list: IList[A])(f: A => Unit): Unit = {
+      list.foldLeft(())((_, a) => f(a))
     }
   }
 
@@ -379,24 +396,24 @@ object Future {
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(implicit pool: ExecutorService = Strategy.DefaultExecutorService): Future[A] = Async { cb =>
-    pool.submit { new Callable[Unit] { def call = cb(a).run }}
+    pool.execute { new Runnable { def run = cb(a).run }}
   }
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
       Strategy.DefaultTimeoutScheduler): Future[A] =
     Async { cb =>
-      pool.schedule(new Callable[Unit] {
-        def call = cb(a).run
+      val _ = pool.schedule(new Runnable {
+        def run = cb(a).run
       }, delay.toMillis, TimeUnit.MILLISECONDS)
     }
 
   /** Calls `Nondeterminism[Future].gatherUnordered`.
    * @since 7.0.3
    */
-  def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
+  def gatherUnordered[A](fs: IList[Future[A]]): Future[IList[A]] =
     futureInstance.gatherUnordered(fs)
 
-  def reduceUnordered[A, M](fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+  def reduceUnordered[A, M: Reducer[A, ?]: Monoid](fs: IList[Future[A]]): Future[M] =
     futureInstance.reduceUnordered(fs)
 }

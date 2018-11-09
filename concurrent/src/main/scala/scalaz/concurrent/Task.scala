@@ -26,13 +26,13 @@ import scala.concurrent.duration._
  * are responsible for ensuring the exception safety of the provided
  * `Future`.
  */
-class Task[+A](val get: Future[Throwable \/ A]) {
+class Task[A](val get: Future[Throwable \/ A]) {
 
   def flatMap[B](f: A => Task[B]): Task[B] =
     new Task(get flatMap {
       case -\/(e) => Future.now(-\/(e))
       case \/-(a) => Task.Try(f(a)) match {
-        case e @ -\/(_) => Future.now(e)
+        case e @ -\/(_) => Future.now(e.coerceRight)
         case \/-(task) => task.get
       }
     })
@@ -83,7 +83,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * This is rather coarse-grained. Use `attempt`, `handle`, and
    * `flatMap` for more fine grained control of exception handling.
    */
-  def or[B>:A](t2: Task[B]): Task[B] =
+  def or(t2: Task[A]): Task[A] =
     new Task(this.get flatMap {
       case -\/(e) => t2.get
       case a => Future.now(a)
@@ -123,7 +123,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * but with `TaskInterrupted` exception.
    *
    * Note 1: When Interrupted, the `f` callback will run in thread that called the `Interrupting` function () => Unit
-   * Note 2: If task has handler like attempt, it won't get consulted for handling TaskInterrupted excpetion
+   * Note 2: If task has handler like attempt, it won't get consulted for handling TaskInterrupted exception
    * @param f
    * @return
    */
@@ -193,7 +193,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * errors into a list.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retryAccumulating(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
+  def retryAccumulating(delays: IList[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[(A, IList[Throwable])] =
     retryInternal(delays, p, true)
 
   /**
@@ -201,24 +201,26 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * each retry delayed by the corresponding duration.
    * A retriable failure is one for which the predicate `p` returns `true`.
    */
-  def retry(delays: Seq[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
+  def retry(delays: IList[Duration], p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
     retryInternal(delays, p, false).map(_._1)
 
-  private def retryInternal(delays: Seq[Duration],
+  private def retryInternal(delays: IList[Duration],
                             p: (Throwable => Boolean),
-                            accumulateErrors: Boolean): Task[(A, List[Throwable])] = {
-      def help(ds: Seq[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, List[Throwable])] = {
-        def acc = if (accumulateErrors) es.toList else Nil
-          ds match {
-            case Seq() => get map (_. map(_ -> acc))
-            case Seq(t, ts @_*) => get flatMap {
-              case -\/(e) if p(e) =>
-                help(ts, e #:: es) after t
-              case x => Future.now(x.map(_ -> acc))
-            }
+                            accumulateErrors: Boolean): Task[(A, IList[Throwable])] = {
+      def help(ds: IList[Duration], es: => Stream[Throwable]): Future[Throwable \/ (A, Stream[Throwable])] = {
+        def acc: Stream[Throwable] = if (accumulateErrors) es else Stream.empty
+
+        ds match {
+          case INil() => get map (_.map(_ -> acc))
+          case ICons(t, ts) => get flatMap {
+            case -\/(e) if p(e) =>
+              help(ts, e #:: es) after t
+            case x => Future.now(x.map(_ -> acc))
+          }
         }
       }
-      Task.async { help(delays, Stream()).unsafePerformAsync }
+
+    Task.async { help(delays, Stream()).unsafePerformAsync }.map(tup => (tup._1, IList.fromSeq(tup._2)))
     }
 
   /** Ensures that the result of this Task satisfies the given predicate, or fails with the given value. */
@@ -240,20 +242,20 @@ object Task {
       def point[A](a: => A) = Task.point(a)
       def bind[A,B](a: Task[A])(f: A => Task[B]): Task[B] =
         a flatMap f
-      def chooseAny[A](h: Task[A], t: Seq[Task[A]]): Task[(A, Seq[Task[A]])] =
+      def chooseAny[A](h: Task[A], t: IList[Task[A]]): Task[(A, IList[Task[A]])] =
         new Task ( F.map(F.chooseAny(h.get, t map (_ get))) { case (a, residuals) =>
           a.map((_, residuals.map(new Task(_))))
         })
       val AE = Apply[Throwable \/ ?]
-      override def reduceUnordered[A, M](fs: Seq[Task[A]])(implicit R: Reducer[A, M]): Task[M] = {
-        import R.monoid
-        val RR: Reducer[Throwable \/ A, Throwable \/ M] =
+      override def reduceUnordered[A, M](fs: IList[Task[A]])(implicit R: Reducer[A, M], M: Monoid[M]): Task[M] = {
+        implicit val MM: Monoid[Throwable \/ M] = Monoid.liftMonoid[Throwable \/ ?, M]
+        implicit val RR: Reducer[Throwable \/ A, Throwable \/ M] =
           Reducer[Throwable \/ A, Throwable \/ M](
             _.map(R.unit),
-            c => AE.apply2(c, _)(R.cons(_, _)),
-            m => AE.apply2(m, _)(R.snoc(_, _))
-          )(Monoid.liftMonoid[Throwable \/ ?, M])
-        new Task(F.reduceUnordered(fs.map(_.get))(RR))
+            AE.apply2(_, _)(R.cons),
+            AE.apply2(_, _)(R.snoc)
+          )
+        new Task(F.reduceUnordered[Throwable \/ A, Throwable \/ M](fs.map(_.get)))
       }
       def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
       def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
@@ -271,7 +273,7 @@ object Task {
   def point[A](a: => A) = new Task(Future.delay(Try(a)))
 
   /** A `Task` which fails with the given `Throwable`. */
-  def fail(e: Throwable): Task[Nothing] = new Task(Future.now(-\/(e)))
+  def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
 
   /** Convert a strict value to a `Task`. Also see `delay`. */
   def now[A](a: A): Task[A] = new Task(Future.now(\/-(a)))
@@ -338,26 +340,26 @@ object Task {
    * before the error is returned.
    * @since 7.0.3
    */
-  def gatherUnordered[A](tasks: Seq[Task[A]], exceptionCancels: Boolean = false): Task[List[A]] =
+  def gatherUnordered[A](tasks: IList[Task[A]], exceptionCancels: Boolean = false): Task[IList[A]] =
     if (!exceptionCancels)
       Nondeterminism[Task].gatherUnordered(tasks)
     else
-      reduceUnordered[A, List[A]](tasks, exceptionCancels)
+      reduceUnordered[A, IList[A]](tasks, exceptionCancels)
 
-  def reduceUnordered[A, M](tasks: Seq[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M]): Task[M] =
+  def reduceUnordered[A, M](tasks: IList[Task[A]], exceptionCancels: Boolean = false)(implicit R: Reducer[A, M], M: Monoid[M]): Task[M] =
     if (!exceptionCancels) taskInstance.reduceUnordered(tasks)
     else tasks match {
       // Unfortunately we cannot reuse the future's combinator
       // due to early terminating requirement on task
       // when task fails.  This also makes implementation a bit trickier
-      case Seq() => Task.now(R.zero)
-      case Seq(t) => t.map(R.unit)
+      case INil() => Task.now(M.zero)
+      case ICons(t, INil()) => t.map(R.unit)
       case _ => new Task(Future.Async { cb =>
         val interrupt = new AtomicBoolean(false)
         val results = new ConcurrentLinkedQueue[M]
-        val togo = new AtomicInteger(tasks.size)
+        val togo = new AtomicInteger(tasks.length)
 
-        tasks.foreach { t =>
+        foreach(tasks) { t =>
           val handle: (Throwable \/ A) => Trampoline[Unit] = {
             case \/-(success) =>
               // Try to reduce number of values in the queue
@@ -369,7 +371,7 @@ object Task {
 
               // only last completed f will hit the 0 here.
               if (togo.decrementAndGet() == 0)
-                cb(\/-(results.asScala.foldLeft(R.zero)((a, b) => R.append(a, b))))
+                cb(\/-(results.asScala.foldLeft(M.zero)((a, b) => R.append(a, b))))
               else
                 Trampoline.done(())
             case e@(-\/(failure)) =>
@@ -390,7 +392,7 @@ object Task {
                 // food for thought - might be safe to set the interrupt first
                 // but, this may also kill `cb(e)`
                 // could have separate AtomicBooleans for each task
-                cb(e) *> Trampoline.delay { interrupt.set(true); () }
+                cb(e.coerceRight) *> Trampoline.delay { interrupt.set(true) }
               else
                 Trampoline.done(())
           }
@@ -398,6 +400,10 @@ object Task {
         }
       })
     }
+
+  private def foreach[A](list: IList[A])(f: A => Unit): Unit = {
+    list.foldLeft(())((_, a) => f(a))
+  }
 
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
@@ -425,4 +431,3 @@ object Task {
   implicit val taskParallelApplicativeInstance: Applicative[ParallelTask] =
     taskInstance.parallel
 }
-

@@ -26,8 +26,8 @@ object ISetTest extends SpecLite {
   checkAll(semilattice.laws[ISet[Int]])
 
   def structurallySound[A: Order: Show](s: ISet[A]) = {
-    val al = s.toAscList
-    al must_===(al.sorted)(Order[A].toScalaOrdering)
+    val al = s.toAscIList
+    al must_===(al.sorted)(Order[A])
   }
 
   private[this] case class Foo(a: Int)
@@ -112,9 +112,9 @@ object ISetTest extends SpecLite {
   "splitRoot" ! forAll { a: ISet[Int] =>
     a match {
       case Tip() =>
-        a.splitRoot must_=== List.empty[ISet[Int]]
+        a.splitRoot must_=== IList.empty[ISet[Int]]
       case s@Bin(_, _, _) =>
-        val List(l, x, r) = s.splitRoot
+        val ICons(l, ICons(x, ICons(r, INil()))) = s.splitRoot
         structurallySound(l)
         structurallySound(r)
         l must_=== s.l

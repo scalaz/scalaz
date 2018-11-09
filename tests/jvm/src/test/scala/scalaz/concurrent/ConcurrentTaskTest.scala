@@ -53,8 +53,8 @@ object ConcurrentTaskTest extends SpecLite {
       val runned = q.toList
 
       //trampoline should be evaluated at the head before anything else gets evaluated
-      runned(0) must_== (1,current)
-      runned(1) must_== (2,current)
+      runned(0) must_== (1 -> current)
+      runned(1) must_== (2 -> current)
 
       //the after async must not be the last ever
       (runned.last._1 != 9) must_==(true)

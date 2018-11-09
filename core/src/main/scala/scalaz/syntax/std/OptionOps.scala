@@ -9,11 +9,6 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
 
   /**
-   * Executes the provided side effect if the Option if it is undefined.
-   */
-  final def ifNone(n: => Unit): Unit = if (self.isEmpty) n
-
-  /**
    * Returns the item contained in the Option if it is defined, otherwise, raises an error with the provided message.
    */
   final def err(message: => String): A = self.getOrElse(sys.error(message))
@@ -65,6 +60,8 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   final def foldLiftOpt[B](b: => B, k: Option[A] => B): B = o.foldLiftOpt[A, B](self)(b, k)
 
   final def toMaybe: Maybe[A] = o.toMaybe(self)
+
+  final def toIList: IList[A] = IList.fromOption(self)
 }
 
 final class OptionOps2[A](self: Option[A]) {

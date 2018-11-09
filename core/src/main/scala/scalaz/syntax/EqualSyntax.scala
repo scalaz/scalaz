@@ -5,10 +5,10 @@ package syntax
 final class EqualOps[F] private[syntax](val self: F)(implicit val F: Equal[F]) extends Ops[F] {
   ////
 
-  final def ===(other: F): Boolean = F.equal(self, other)
+  final def ===(other: F): Boolean = (self.asInstanceOf[AnyRef] eq other.asInstanceOf[AnyRef]) || F.equal(self, other)
   final def /==(other: F): Boolean = !F.equal(self, other)
   final def =/=(other: F): Boolean = /==(other)
-  final def ≟(other: F): Boolean = F.equal(self, other)
+  final def ≟(other: F): Boolean = (self.asInstanceOf[AnyRef] eq other.asInstanceOf[AnyRef]) || F.equal(self, other)
   final def ≠(other: F): Boolean = !F.equal(self, other)
 
   /** Raises an exception unless self === other. */

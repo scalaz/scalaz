@@ -64,7 +64,9 @@ trait PhasedLatches {
     val sync = new QueuedSynchronizer
 
     /** Release the current phase. */
-    def release = IO { sync releaseShared 1 }
+    def release = IO {
+      val _ = sync releaseShared 1
+    }
 
     /** Await for the specified phase.*/
     @throws(classOf[InterruptedException])

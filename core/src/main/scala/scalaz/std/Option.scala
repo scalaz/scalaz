@@ -20,8 +20,8 @@ sealed trait OptionInstances1 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
-    new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+    new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
@@ -38,6 +38,8 @@ trait OptionInstances extends OptionInstances0 {
         fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
       def empty[A]: Option[A] = None
       def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+      override def alt[A](a: => Option[A], b: => Option[A]): Option[A] =
+        plus(a, b)
       override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
         case Some(a) => f(a, z)
         case None    => z
@@ -79,7 +81,10 @@ trait OptionInstances extends OptionInstances0 {
         a map (Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-        fa map \/.right getOrElse -\/(None)
+        fa match {
+          case Some(a) => \/-(a)
+          case None    => -\/(None)
+        }
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
       override def toOption[A](fa: Option[A]): Option[A] = fa
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
@@ -104,10 +109,11 @@ trait OptionInstances extends OptionInstances0 {
     implicit def A = A0
   }
 
-  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    override def show(o1: Option[A]) = o1 match {
-      case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
-      case None     => "None"
+  implicit def optionShow[A: Show]: Show[Option[A]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Some(a1) => cord"Some($a1)"
+      case None     => Cord("None")
     }
   }
 

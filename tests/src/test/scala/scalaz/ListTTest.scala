@@ -7,10 +7,16 @@ import org.scalacheck.Prop.forAll
 
 object ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
+  type ConstInt[A] = Const[Int, A]
 
   "fromList / toList" ! forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).toList must_===(ass)
+  }
+
+  "fromIList / toIList" ! forAll {
+    (ass: IList[IList[Int]]) =>
+    ListT.fromIList(ass).toIList must_===(ass)
   }
 
   "filter all" ! forAll {
@@ -61,7 +67,7 @@ object ListTTest extends SpecLite {
       must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
   }
 
-  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[List[String]]) =>
+  "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[IList[String]]) =>
     fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
   }
 
@@ -73,7 +79,7 @@ object ListTTest extends SpecLite {
   }
 
   "listT" ! forAll {
-    (ass: Option[List[Int]]) =>
+    (ass: Option[IList[Int]]) =>
       ListT.listT(ass).run == ass
   }
 
@@ -82,13 +88,17 @@ object ListTTest extends SpecLite {
   checkAll(plusEmpty.laws[ListTOpt])
   checkAll(monad.laws[ListTOpt])
   checkAll(monadPlus.laws[ListTOpt])
+  checkAll(alt.laws[ListTOpt])
   checkAll(monadTrans.laws[ListT, Option])
+  checkAll(decidable.laws[ListT[ConstInt, ?]])
 
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
     def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
     def monad[F[_]: Monad] = Monad[ListT[F, ?]]
     def functor[F[_]: Functor] = Functor[ListT[F, ?]]
+    def alt[F[_]: Monad] = Alt[ListT[F, ?]]
+    def decidable[F[_] : Divisible] = Decidable[ListT[F, ?]]
 
     // checking absence of ambiguity
     def functor[F[_]: Monad] = Functor[ListT[F, ?]]

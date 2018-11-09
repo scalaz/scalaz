@@ -22,7 +22,7 @@ object Free extends FreeInstances {
   def roll[S[_], A](value: S[Free[S, A]]): Free[S, A] =
     liftF(value).flatMap(x => x)
 
-  private val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
+  private[this] val pointUnitCache: Free[Id.Id, Unit] = point[Id.Id, Unit](())
 
   // Cache `point(())` to avoid frequent allocation
   @inline private def pointUnit[S[_]]: Free[S, Unit] = pointUnitCache.asInstanceOf[Free[S, Unit]]
@@ -192,7 +192,7 @@ sealed abstract class Free[S[_], A] {
   final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
     B.tailrecM(this)(_.resume match {
       case -\/(sf) => M.map(f(sf))(\/.left)
-      case a @ \/-(_) => M.point(a)
+      case a @ \/-(_) => M.point(a.coerceLeft)
     })
   }
 
@@ -293,7 +293,7 @@ sealed abstract class Free[S[_], A] {
     }
 
   /** Runs a trampoline all the way to the end, tail-recursively. */
-  final def run(implicit ev: Free[S, A] =:= Trampoline[A]): A =
+  final def run(implicit ev: Free[S, A] === Trampoline[A]): A =
     ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
@@ -311,7 +311,7 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Runs a `Source` all the way to the end, tail-recursively, collecting the produced values. */
-  def collect[B](implicit ev: Free[S, A] =:= Source[B, A]): (Vector[B], A) = {
+  def collect[B](implicit ev: Free[S, A] === Source[B, A]): (Vector[B], A) = {
     @tailrec def go(c: Source[B, A], v: Vector[B] = Vector()): (Vector[B], A) =
       c.resume match {
         case -\/((b, cont)) => go(cont, v :+ b)
@@ -321,19 +321,19 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Drive this `Source` with the given Sink. */
-  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] =:= Source[E, A]): (A, B) = {
+  def drive[E, B](sink: Sink[Option[E], B])(implicit ev: Free[S, A] === Source[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (-\/((e, c)), -\/(f)) => go(c, f(Some(e)))
-        case (-\/((e, c)), \/-(y)) => go(c, Sink.sinkMonad[Option[E]].pure(y))
-        case (\/-(x), -\/(f))      => go(Source.sourceMonad[E].pure(x), f(None))
+        case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[Option[E], ?]].pure(y))
+        case (\/-(x), -\/(f))      => go(Monad[Source[E, ?]].pure(x), f(None))
         case (\/-(x), \/-(y))      => (x, y)
       }
     go(ev(this), sink)
   }
 
   /** Feed the given stream to this `Source`. */
-  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] =:= Sink[E, A]): A = {
+  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] === Sink[E, A]): A = {
     @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
       case (x #:: xs, -\/(f)) => go(f(x), xs)
       case (Stream(), -\/(f)) => go(f(sys.error("No more values.")), Stream())
@@ -343,10 +343,10 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Feed the given source to this `Sink`. */
-  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] =:= Sink[E, A]): (A, B) = {
+  def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] === Sink[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (-\/((e, c)), -\/(f)) => go(c, f(e))
-      case (-\/((e, c)), \/-(y)) => go(c, Sink.sinkMonad[E].pure(y))
+      case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[E, ?]].pure(y))
       case (\/-(x), -\/(f))      => sys.error("Not enough values in source.")
       case (\/-(x), \/-(y))      => (y, x)
     }
@@ -373,7 +373,7 @@ sealed abstract class Free[S[_], A] {
     }
 }
 
-object Trampoline extends TrampolineInstances {
+object Trampoline {
 
   def done[A](a: A): Trampoline[A] =
     Free.pure[Function0,A](a)
@@ -385,40 +385,17 @@ object Trampoline extends TrampolineInstances {
     Free.suspend(a)
 }
 
-sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
-    new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
-      override def point[A](a: => A) = return_[Function0, A](a)
-      def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
+sealed abstract class FreeInstances4 {
+  implicit val trampolineInstance: Comonad[Trampoline] =
+    new Comonad[Trampoline] {
+      override def map[A, B](fa: Trampoline[A])(f: A => B) = fa map f
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
-      def tailrecM[A, B](a: A)(f: A => Trampoline[A \/ B]): Trampoline[B] =
-        f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 }
 
-object Sink extends SinkInstances
-
-sealed trait SinkInstances {
-  implicit def sinkMonad[S]: Monad[Sink[S, ?]] =
-    new Monad[Sink[S, ?]] {
-      def point[A](a: => A) = liftF[(=> S) => ?, Unit](s => ()).map(_ => a)
-      def bind[A, B](s: Sink[S, A])(f: A => Sink[S, B]) = s flatMap f
-    }
-}
-
-object Source extends SourceInstances
-
-sealed trait SourceInstances {
-  implicit def sourceMonad[S]: Monad[Source[S, ?]] =
-    new Monad[Source[S, ?]] {
-      override def point[A](a: => A) = Free.point[(S, ?), A](a)
-      def bind[A, B](s: Source[S, A])(f: A => Source[S, B]) = s flatMap f
-    }
-}
-
-sealed abstract class FreeInstances3 {
+sealed abstract class FreeInstances3 extends FreeInstances4 {
   implicit def freeFoldable[F[_]: Foldable]: Foldable[Free[F, ?]] =
     new FreeFoldable[F] {
       def F = implicitly
@@ -449,9 +426,7 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
     Semigroup.liftSemigroup[Free[S, ?], A]
 }
 
-// Trampoline, Sink, and Source are type aliases. We need to add their type class instances
-// to Free to be part of the implicit scope.
-sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
+sealed abstract class FreeInstances extends FreeInstances0 {
   implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
     new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
