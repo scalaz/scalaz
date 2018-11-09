@@ -2,7 +2,7 @@ scalacOptions += "-deprecation"
 
 val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("0.6.25")
 
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.0.0")
+addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.1.0")
 
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
@@ -14,13 +14,13 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.1")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.7.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.4.0")
 
-addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
+addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.2")
 
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.2.0")
 
