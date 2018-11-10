@@ -4,10 +4,13 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Cobind` */
 final class CobindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Cobind[F]) extends Ops[F[A]] {
   ////
-  final def cojoin: F[F[A]] = F.cojoin(self)
-  final def coflatten: F[F[A]] = F.cojoin(self)
-  final def cobind[B](f: F[A] => B): F[B] = F.cobind(self)(f)
-  final def coflatMap[B](f: F[A] => B): F[B] = F.cobind(self)(f)
+  def cojoin: F[F[A]] = F.cojoin(self)
+  def coflatten: F[F[A]] = F.cojoin(self)
+  def duplicate: F[F[A]] = F.cojoin(self)
+
+  def cobind[B](f: F[A] => B): F[B] = F.cobind(self)(f)
+  def extend[B](f: F[A] => B): F[B] = F.cobind(self)(f)
+  def coflatMap[B](f: F[A] => B): F[B] = F.cobind(self)(f)
   ////
 }
 
