@@ -145,7 +145,7 @@ sealed trait TupleInstances2 extends TupleInstances1 {
     def reassociateLeft[A, B, C](f: (A, (B, C))): ((A, B), C) = ((f._1, f._2._1), f._2._2)
     def reassociateRight[A, B, C](f: ((A, B), C)): (A, (B, C)) = (f._1._1, (f._1._2, f._2))
   }
-  
+
   implicit def tuple1Band[A1](implicit A1: Band[A1]): Band[Tuple1[A1]] =
     new Tuple1Semigroup[A1] with Band[Tuple1[A1]] {
       def _1 = A1
@@ -441,7 +441,7 @@ sealed trait TupleInstances3 extends TupleInstances2 {
       implicit def _7 = A7
       implicit def _8 = A8
     }
-  
+
 
   implicit val tuple1Cozip: Cozip[Tuple1] = new Tuple1Cozip {}
   implicit def tuple2Cozip[A1]: Cozip[(A1, ?)] = new Tuple2Cozip[A1] {}
