@@ -278,6 +278,10 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[A, F, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
+  /** Construct a disjunction value from a standard `scala.Option`. */
+  def fromOption[F[_], A, B](ifNone: => A)(fo: F[Option[B]])(implicit F: Functor[F]): EitherT[A, F, B] =
+    apply(F.map(fo)(o => \/.fromOption(ifNone)(o)))
+
   @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[F[_], A, B <: Throwable: NotNothing](a: => F[A])(implicit F: Applicative[F], ex: ClassTag[B]): EitherT[B, F, A] =
     try {

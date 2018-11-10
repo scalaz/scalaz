@@ -469,7 +469,6 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
         ),
         c => Success(Success(c))
       )
-
   }
 }
 
@@ -505,8 +504,8 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] =
-    new Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Plus[Validation[L, ?]] with Optional[Validation[L, ?]] {
+  implicit def ValidationInstances1[L]: Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Optional[Validation[L, ?]] =
+    new Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Optional[Validation[L, ?]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
@@ -526,13 +525,15 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
           }
         }
 
-      def plus[A](a: Validation[L, A], b: => Validation[L, A]) =
-        a orElse b
-
       def pextract[B, A](fa: Validation[L,A]): Validation[L,B] \/ A =
         fa.fold(l => -\/(Failure(l)), \/.right)
     }
+
+  implicit def ValidationPlus[E: Semigroup]: Plus[Validation[E, ?]] = new Plus[Validation[E, ?]] {
+    override def plus[A](a1: Validation[E, A], a2: => Validation[E, A]) =
+      a1 findSuccess a2
   }
+}
 
 sealed abstract class ValidationInstances3 {
   implicit val ValidationInstances0 : Bitraverse[Validation] =
@@ -545,8 +546,8 @@ sealed abstract class ValidationInstances3 {
         fab.bitraverse(f, g)
     }
 
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[Validation[L, ?]] with Alt[Validation[L, ?]] =
-    new Applicative[Validation[L, ?]] with Alt[Validation[L, ?]] {
+  implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, ?], L] with Alt[Validation[L, ?]] =
+    new ApplicativeError[Validation[L, ?], L] with Alt[Validation[L, ?]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
 
@@ -558,5 +559,13 @@ sealed abstract class ValidationInstances3 {
 
       def alt[A](a: => Validation[L, A], b: => Validation[L, A]) =
         a orElse b
+
+      override def raiseError[A](e: L): Validation[L, A] = Failure(e)
+
+      override def handleError[A](fa: Validation[L, A])(f: L => Validation[L, A]): Validation[L, A] = fa match {
+        case x@Success(_) => x
+        case Failure(e) => f(e)
+      }
     }
+
 }
