@@ -35,7 +35,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   }
 
   /** Pass `C` through untouched. */
-  def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
+  override def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
     >>>(<<<(first[A, B, C](f), swap), swap)
   }
 

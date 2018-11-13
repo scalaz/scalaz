@@ -9,7 +9,9 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
   ////
   def first[A, B, C](fa: A =>: B): (A, C) =>: (B, C)
 
-  def second[A, B, C](fa: A =>: B): (C, A) =>: (C, B)
+  def second[A, B, C](fa: A =>: B): (C, A) =>: (C, B) = {
+    dimap(first(fa): (A, C) =>: (B, C))((ac: (C,A)) => ac.swap)((bc: (B, C)) => bc.swap)
+  }
 
   ////
   val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
