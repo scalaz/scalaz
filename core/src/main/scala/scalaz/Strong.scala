@@ -13,6 +13,23 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
     dimap(first(fa): (A, C) =>: (B, C))((ac: (C,A)) => ac.swap)((bc: (B, C)) => bc.swap)
   }
 
+  trait StrongLaws extends ProfunctorLaw {
+
+    def swapTuple[X,Y]: Tuple2[X,Y] => Tuple2[Y,X] = _.swap
+
+    def firstIsSwappedSecond[A, B, C](a: A =>: B)(implicit E: Equal[(A, C) =>: (B, C)]): Boolean = {
+      val sa: (C, A) =>: (C, B) = second(a)
+      E.equal(first(a), dimap(sa)(swapTuple[A,C])(swapTuple[C,B]))
+    }
+
+    def secondIsSwappedFirst[A, B, C](a: A =>: B)(implicit E: Equal[(C, A) =>: (C, B)]): Boolean = {
+      val fa: (A, C) =>: (B, C) = first(a)
+      E.equal(second(a),dimap(fa)(swapTuple[C,A])(swapTuple[B,C]))
+    }
+  }
+
+  def strongLaw: StrongLaws = new StrongLaws {}
+
   ////
   val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
 }
