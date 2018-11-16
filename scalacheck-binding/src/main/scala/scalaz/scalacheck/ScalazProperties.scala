@@ -211,6 +211,20 @@ object ScalazProperties {
       }
   }
 
+  object strong {
+    def firstIsSwappedSecond[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], ef: Equal[M[(A, C),(B, C)]]): Prop =
+      forAll(M.strongLaw.firstIsSwappedSecond[A, B, C] _)
+
+    def secondIsSwappedFirst[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], ef: Equal[M[(C, A),(C, B)]]): Prop =
+      forAll(M.strongLaw.secondIsSwappedFirst[A, B, C] _)
+
+    def laws[M[_,_]](implicit F: Strong[M], af: Arbitrary[M[Int, Int]], e: Equal[M[(Int,Int), (Int, Int)]]): Properties =
+      newProperties("strong") { p =>
+        p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
+        p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
+      }
+  }
+
   object align {
     def collapse[F[_], A](implicit F: Align[F], E: Equal[F[A \&/ A]], A: Arbitrary[F[A]]): Prop =
       forAll(F.alignLaw.collapse[A] _)
