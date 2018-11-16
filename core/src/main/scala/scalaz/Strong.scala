@@ -28,6 +28,12 @@ object Strong {
       override def iso: F <~~> G = D
     }
 
+  def uncurry[F[_,_],A,B,C](fa: F[A, B => C])(implicit F: Strong[F]): F[(A,B),C] = {
+    val fabc: F[(A, B), (B => C, B)] = F.first(fa)
+    val f = (bc: (B => C, B)) => bc._1(bc._2)
+    F.mapsnd(fabc)(f)
+  }
+
   ////
 
   ////
