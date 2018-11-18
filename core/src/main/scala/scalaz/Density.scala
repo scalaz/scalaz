@@ -3,9 +3,12 @@ package scalaz
 import scala.language.higherKinds
 
 /**
-  * Density Comonad for a Functor.
+  * Density Comonad.
+  *
+  * Density is Left Kan Extension where both Functors are the same.
   *
   * @see [[https://hackage.haskell.org/package/kan-extensions/docs/Control-Comonad-Density.html]]
+  * @see [[http://comonad.com/reader/2011/a-product-of-an-imperfect-union/]]
   */
 trait Density[F[_], Y] { self =>
   type X
