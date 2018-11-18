@@ -24,6 +24,13 @@ trait Density[F[_], Y] { self =>
 
   def map[A](fab: Y => A): Density[F, A] = Density[F,A,X](fb, f andThen fab)
 
+  /**
+    * The natural isomorphism between a Comonad F and the Density F.
+    *
+    * d.lowerDensity andThen liftDensity = d
+    */
+  def lowerDensity(implicit C: Comonad[F]): F[Y] = C.extend(fb)(f)
+
   def densityToCoyoneda: Coyoneda[F,X] = Coyoneda[F,X,X](fb)(identity[X])
 
   /**
@@ -69,7 +76,7 @@ object Density extends DensityInstances {
     Density[F, Y, lan.I](lan.v, lan.f)
 }
 
-sealed abstract class DensityInstances extends DensityInstances0 {
+sealed abstract class DensityInstances {
 
   implicit def comonadInstance[F[_]]: Comonad[Density[F, ?]] = new DensityComonad[F] {}
 }
