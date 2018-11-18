@@ -7,6 +7,9 @@ import scala.language.higherKinds
   *
   * Density is Left Kan Extension where both Functors are the same.
   *
+  * Without any restrictions on F we can define Functor, Cobind, Comonad for Density[F].
+  * Density is Comonad for free.
+  *
   * @see [[https://hackage.haskell.org/package/kan-extensions/docs/Control-Comonad-Density.html]]
   * @see [[http://comonad.com/reader/2011/a-product-of-an-imperfect-union/]]
   */
@@ -68,26 +71,15 @@ object Density extends DensityInstances {
 
 sealed abstract class DensityInstances extends DensityInstances0 {
 
-  /** Density is a Comonad for Free */
   implicit def comonadInstance[F[_]]: Comonad[Density[F, ?]] = new DensityComonad[F] {}
 }
 
-sealed abstract class DensityInstances0 extends DensityInstances1 {
-
-  /** Density is a Cobind for free */
-  implicit def cobindInstance[K[_]]: Cobind[Density[K, ?]] = new DensityCobind[K] {}
-}
-
-sealed abstract class DensityInstances1 {
-
-  /** Density is a Functor for free */
-  implicit def functorInstance[F[_]]: Functor[Density[F, ?]] = new DensityFunctor[F]{}
-}
-
+/** Density is a free Comonad */
 private trait DensityComonad[F[_]] extends Comonad[Density[F, ?]] with DensityCobind[F] {
   def copoint[A](p: Density[F, A]): A = p.runDensity
 }
 
+/** Density is a free Cobind */
 private trait DensityCobind[F[_]] extends Cobind[Density[F, ?]] with DensityFunctor[F] {
   def cobind[A, B](fa: Density[F, A])(ff: Density[F, A] => B): Density[F, B] =
     cojoin(fa).map(ff)
@@ -96,6 +88,7 @@ private trait DensityCobind[F[_]] extends Cobind[Density[F, ?]] with DensityFunc
     Density[F, Density[F, A], fa.X](fa.fb, kx => Density[F, A, fa.X](kx, fa.f))
 }
 
+/** Density is a free Functor */
 private trait DensityFunctor[F[_]] extends Functor[Density[F, ?]] {
   def map[A, B](fa: Density[F, A])(f: A => B): Density[F, B] = fa.map(f)
 }
