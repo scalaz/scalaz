@@ -212,16 +212,28 @@ object ScalazProperties {
   }
 
   object strong {
-    def firstIsSwappedSecond[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], ef: Equal[M[(A, C),(B, C)]]): Prop =
+    def firstIsSwappedSecond[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),(B,C)]]): Prop =
       forAll(M.strongLaw.firstIsSwappedSecond[A, B, C] _)
 
-    def secondIsSwappedFirst[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], ef: Equal[M[(C, A),(C, B)]]): Prop =
+    def secondIsSwappedFirst[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),(C,B)]]): Prop =
       forAll(M.strongLaw.secondIsSwappedFirst[A, B, C] _)
 
-    def laws[M[_,_]](implicit F: Strong[M], af: Arbitrary[M[Int, Int]], e: Equal[M[(Int,Int), (Int, Int)]]): Properties =
+    def mapfstEqualsFirstAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsFirstAndThenMapsnd[A, B, C] _)
+
+    def mapfstEqualsSecondAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsSecondAndThenMapsnd[A, B, C] _)
+
+    def laws[M[_,_]](implicit
+         F: Strong[M],
+         af: Arbitrary[M[Int, Int]],
+         eq1: Equal[M[(Int,Int), (Int,Int)]],
+         eq2: Equal[M[(Int,Int), Int]]): Properties =
       newProperties("strong") { p =>
         p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
         p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
+        p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
+        p.property("mapfstEqualsSecondAndThenMapsnd") = mapfstEqualsSecondAndThenMapsnd[M, Int, Int, Int]
       }
   }
 

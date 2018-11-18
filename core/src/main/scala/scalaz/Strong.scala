@@ -1,5 +1,9 @@
 package scalaz
 
+import scalaz.syntax.StrongSyntax
+
+import scala.language.higherKinds
+
 ////
 /**
  * Strength on a product.
@@ -17,21 +21,31 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
 
     def swapTuple[X,Y]: Tuple2[X,Y] => Tuple2[Y,X] = _.swap
 
-    def firstIsSwappedSecond[A, B, C](a: A =>: B)(implicit E: Equal[(A, C) =>: (B, C)]): Boolean = {
-      val sa: (C, A) =>: (C, B) = second(a)
-      E.equal(first(a), dimap(sa)(swapTuple[A,C])(swapTuple[C,B]))
+    def firstIsSwappedSecond[A, B, C](fab: A =>: B)(implicit E: Equal[(A, C) =>: (B, C)]): Boolean = {
+      val fa: (C, A) =>: (C, B) = second(fab)
+      E.equal(first(fab), dimap(fa)(swapTuple[A,C])(swapTuple[C,B]))
     }
 
-    def secondIsSwappedFirst[A, B, C](a: A =>: B)(implicit E: Equal[(C, A) =>: (C, B)]): Boolean = {
-      val fa: (A, C) =>: (B, C) = first(a)
-      E.equal(second(a),dimap(fa)(swapTuple[C,A])(swapTuple[B,C]))
+    def secondIsSwappedFirst[A, B, C](fab: A =>: B)(implicit E: Equal[(C, A) =>: (C, B)]): Boolean = {
+      val fa: (A, C) =>: (B, C) = first(fab)
+      E.equal(second(fab),dimap(fa)(swapTuple[C,A])(swapTuple[B,C]))
+    }
+
+    def mapfstEqualsFirstAndThenMapsnd[A, B, C](fab: A =>: B)(implicit E: Equal[(A,C) =>: B]): Boolean = {
+      val fa: (A,C) =>: (B, C) = first(fab)
+      E.equal(mapfst(fab)(_._1), mapsnd(fa)(_._1))
+    }
+
+    def mapfstEqualsSecondAndThenMapsnd[A, B, C](fab: A =>: B)(implicit E: Equal[(C,A) =>: B]): Boolean = {
+      val fa: (C,A) =>: (C, B)  = second(fab)
+      E.equal(mapfst(fab)(_._2), mapsnd(fa)(_._2))
     }
   }
 
   def strongLaw: StrongLaws = new StrongLaws {}
 
   ////
-  val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
+  val strongSyntax: StrongSyntax[=>:] = new scalaz.syntax.StrongSyntax[=>:] { def F: Strong[=>:] = Strong.this }
 }
 
 object Strong {
