@@ -1,9 +1,5 @@
 package scalaz
 
-import scalaz.syntax.StrongSyntax
-
-import scala.language.higherKinds
-
 ////
 /**
  * Strength on a product.
@@ -45,7 +41,7 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
   def strongLaw: StrongLaws = new StrongLaws {}
 
   ////
-  val strongSyntax: StrongSyntax[=>:] = new scalaz.syntax.StrongSyntax[=>:] { def F: Strong[=>:] = Strong.this }
+  val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
 }
 
 object Strong {
