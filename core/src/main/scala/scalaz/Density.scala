@@ -29,7 +29,7 @@ trait Density[F[_], Y] { self =>
     *
     * d.lowerDensity andThen liftDensity = d
     */
-  def lowerDensity(implicit C: Comonad[F]): F[Y] = C.extend(fb)(f)
+  def lowerDensity(implicit C: Cobind[F]): F[Y] = C.extend(fb)(f)
 
   def densityToCoyoneda: Coyoneda[F,X] = Coyoneda[F,X,X](fb)(identity[X])
 
@@ -44,6 +44,9 @@ trait Density[F[_], Y] { self =>
     def v: F[X] = self.fb
     def f(gi: F[X]): Y = self.f(gi)
   }
+
+  def densityToAdjunction[X[_]](implicit F: Functor[F], A: Adjunction[F,X]): F[X[Y]] =
+    F.map(fb)(A.leftAdjunct(_)(f))
 
   trait DensityLaw {
     def densityIsLeftKan(kb: F[X], kba: F[X] => Y)(implicit F: Equal[Y]): Boolean = {
@@ -76,9 +79,18 @@ object Density extends DensityInstances {
     Density[F, Y, lan.I](lan.v, lan.f)
 }
 
-sealed abstract class DensityInstances {
+sealed abstract class DensityInstances extends DensityInstances0 {
 
   implicit def comonadInstance[F[_]]: Comonad[Density[F, ?]] = new DensityComonad[F] {}
+}
+
+sealed abstract class DensityInstances0 {
+
+  /** Density is a free ComonadTrans */
+  implicit val comonadTransInstance: ComonadTrans[Density] = new ComonadTrans[Density] {
+    def lower[G[_], A](a: Density[G, A])(implicit C: Cobind[G]): G[A] =
+      a.lowerDensity
+  }
 }
 
 /** Density is a free Comonad */
