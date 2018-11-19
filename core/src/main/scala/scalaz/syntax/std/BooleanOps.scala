@@ -264,11 +264,13 @@ final class BooleanOps2(self: Boolean) {
   }
 
   final def guard[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.pointOrEmpty[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
+      b.pointOrEmpty[M, A](self)(a)
   }
 
   final def prevent[M[_]] = new GuardPrevent[M] {
-    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) = b.emptyOrPure[M, A](self)(a)
+    def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
+      b.emptyOrPoint[M, A](self)(a)
   }
 
   final class ConditionalEither[A] private[BooleanOps2] (a: => A) {

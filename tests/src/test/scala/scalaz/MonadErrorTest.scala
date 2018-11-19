@@ -8,26 +8,34 @@ import Isomorphism.{ <~>, IsoFunctorTemplate }
 object MonadErrorTest extends SpecLite {
 
   trait Decoder[A] {
-    def decode(s: String): String \/ A
+    def decode(s: String): Int \/ A
   }
   object Decoder {
     @inline def apply[A](implicit A: Decoder[A]): Decoder[A] = A
-    @inline def instance[A](f: String => String \/ A): Decoder[A] = new Decoder[A] {
-      override def decode(s: String): String \/ A = f(s)
+    @inline def instance[A](f: String => Int \/ A): Decoder[A] = new Decoder[A] {
+      override def decode(s: String): Int \/ A = f(s)
     }
 
-    // type aliases are needed to help with type inference, even kind-projector
-    // fails us...
-    type Out[a] = String \/ a
-    type MT[a] = ReaderT[String, Out, a]
     implicit val string: Decoder[String] = instance(_.right)
-    implicit val isoReaderT: Decoder <~> MT =
-      new IsoFunctorTemplate[Decoder, MT] {
-        def from[A](fa: MT[A]) = instance(fa.run(_))
-        def to[A](fa: Decoder[A]) = ReaderT[String, Out, A](fa.decode)
-      }
 
-    implicit val monad: MonadError[Decoder, String] = MonadError.fromIso(isoReaderT)
+    // type ascriptions are needed for type inference
+    type I = String
+    type O[a] = Int \/ a
+    type MT[a] = Kleisli[O, I, a]
+    val iso: Decoder <~> MT = Kleisli.iso[Decoder, I, O](
+      instance = λ[λ[a => (I => O[a])] ~> Decoder](instance(_)),
+      decode   = λ[Decoder ~> λ[a => (I => O[a])]](_.decode)
+    )
+    // with `-Ypartial-unification` we could write
+    //
+    // val iso: Decoder <~> Kleisli[Int \/ ?, String, ?] = Kleisli.iso(
+    //   λ[λ[a => (String => Int \/ a)] ~> Decoder](instance(_)),
+    //   λ[Decoder ~> λ[a => (String => Int \/ a)]](_.decode)
+    // )
+    //
+    // or introduce `type Decode[a] = String => Int \/ a` to keep it terse.
+
+    implicit val monad: MonadError[Decoder, Int] = MonadError.fromIso(iso)
   }
 
   "fromIsoWithMonadError" in {
@@ -35,11 +43,11 @@ object MonadErrorTest extends SpecLite {
   }
 
   "emap syntax" in {
-    def f(s: String): String \/ Char =
+    def f(s: String): Int \/ Char =
       if (s.length == 1) s(0).right
-      else s"not a char: $s".left
+      else 1.left
 
-    Decoder[String].emap(f).decode("hello") must_=== "not a char: hello".left
+    Decoder[String].emap(f).decode("hello") must_=== 1.left
     Decoder[String].emap(f).decode("g") must_=== 'g'.right
   }
 

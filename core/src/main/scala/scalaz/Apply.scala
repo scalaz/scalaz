@@ -224,6 +224,7 @@ object Apply {
     }
 
   ////
+  type Par[F[_]] = Apply[λ[α => F[α] @@ Tags.Parallel]]
 
   ////
 }
@@ -234,5 +235,8 @@ trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
     iso.from(G.ap(iso.to(fa))(iso.to(f)))
+
+  // for performance, used a lot
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = iso.from(G.apply2(iso.to(fa), iso.to(fb))(f))
   ////
 }

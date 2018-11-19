@@ -243,6 +243,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def EphemeralStreamArbitrary[A : Arbitrary]: Arbitrary[EphemeralStream[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
 
+  implicit def IStreamArbitrary[A : Arbitrary]: Arbitrary[IStream[A]] =
+    Functor[Arbitrary].map(arb[Stream[A]])(IStream.fromStream[A](_))
+
   implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
 

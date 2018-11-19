@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.{Cogen, Arbitrary}
+import org.scalacheck.{Arbitrary, Cogen}
 import Id._
 import org.scalacheck.Prop.forAll
 
@@ -14,6 +14,7 @@ object WriterTTest extends SpecLite {
   type WriterTOptInt[A] = WriterTOpt[Int, A]
   type IntOr[A] = Int \/ A
   type WriterTEither[A] = WriterT[Int, IntOr, A]
+  type ConstInt[A] = Const[Int, A]
 
   checkAll(equal.laws[WriterTOptInt[Int]])
   checkAll(monoid.laws[WriterTOptInt[Int]])
@@ -25,6 +26,7 @@ object WriterTTest extends SpecLite {
   checkAll(functor.laws[WriterT[Int, NonEmptyList, ?]])
   checkAll(bitraverse.laws[WriterTOpt])
   checkAll(monadTrans.laws[WriterT[Int, ?[_], ?], List])
+  checkAll(divisible.laws[WriterT[Int, ConstInt, ?]])
 
   implicit def writerArb[W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
@@ -64,6 +66,8 @@ object WriterTTest extends SpecLite {
     def monadError[W: Monoid, F[_], E](implicit F: MonadError[F, E]) = MonadError[WriterT[W, F, ?], E]
     def foldable[W, F[_]: Foldable] = Foldable[WriterT[W, F, ?]]
     def traverse[W, F[_]: Traverse] = Traverse[WriterT[W, F, ?]]
+    def decidable[W, F[_] : Decidable] = Decidable[WriterT[W, F, ?]]
+    def divisible[W, F[_] : Divisible] = Divisible[WriterT[W, F, ?]]
 
     // checking absence of ambiguity
     def plus[W, F[_]: PlusEmpty] = Plus[WriterT[W, F, ?]]
@@ -98,6 +102,7 @@ object WriterTTest extends SpecLite {
     def bindRec[W: Monoid, F[_]: BindRec: MonadPlus] = BindRec[WriterT[W, F, ?]]
     def monad[W: Monoid, F[_]: MonadPlus] = Monad[WriterT[W, F, ?]]
     def foldable[W, F[_]: Traverse] = Foldable[WriterT[W, F, ?]]
+    def divisible[W, F[_] : Decidable] = Divisible[WriterT[W, F, ?]]
 
     object writer {
       def functor[W] = Functor[Writer[W, ?]]

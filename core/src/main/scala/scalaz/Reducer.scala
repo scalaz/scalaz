@@ -162,6 +162,10 @@ sealed abstract class ReducerInstances {
     unitConsReducer(NonEmptyList.nel(_, INil()),  _ <:: _)
   }
 
+  def ReverseNonEmptyListReducer[C]: Reducer[C, NonEmptyList[C]] = {
+    reducer(NonEmptyList.nel(_, INil()), (c, cs) => NonEmptyList.nel(cs.head, cs.tail :+ c), (cs, c) => c <:: cs)
+  }
+
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._

@@ -108,6 +108,10 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ =
     G.TC.traverse(self)(x => G.apply(x))(this)
 
+  /** A version of `sequence` where a subsequent monadic join is applied to the inner result */
+  def sequenceM[A, G[_]](fgfa: F[G[F[A]]])(implicit G: Applicative[G], F: Bind[F]): G[F[A]] =
+    G.map(sequence(fgfa))(F.join)
+
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
 

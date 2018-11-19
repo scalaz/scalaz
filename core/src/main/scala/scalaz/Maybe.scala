@@ -158,11 +158,15 @@ object Maybe extends MaybeInstances {
 
   sealed abstract case class Empty[A] private() extends Maybe[A]
   object Empty {
-    private[this] val value: Empty[Nothing] = new Empty[Nothing]{}
+    // #1712: covariant subclass of `INil` makes the pattern matcher see it as covariant
+    private[this] final class _Empty[+A] extends Empty[A]
+    private[this] val value = new _Empty[Nothing]
     def apply[A](): Maybe[A] = value.asInstanceOf[Empty[A]]
   }
 
-  final case class Just[A](a: A) extends Maybe[A]
+  // `get` is an intentional name as it is expected by the unapply
+  // logic in the scalac pattern matcher.
+  final case class Just[A](get: A) extends Maybe[A]
 
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {
@@ -181,17 +185,30 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Maybe[T] = try {
     just(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => empty
   }
 
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchNonFatal[T](a: => T): Maybe[T] = try {
     just(a)
   } catch {
     case NonFatal(t) => empty
   }
+
+  /**
+   * For interfacing with legacy, deterministic, partial functions. See
+   * [[\/.attempt]] for further details.
+   */
+  def attempt[T](a: => T): Maybe[T] = try {
+    just(a)
+  } catch {
+    case NonFatal(_) => empty
+  }
+
 }
 
 sealed abstract class MaybeInstances1 {

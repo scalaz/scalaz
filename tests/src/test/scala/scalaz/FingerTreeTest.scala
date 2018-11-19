@@ -27,6 +27,7 @@ object FingerTreeTest extends SpecLite {
   checkAll("IndSeq", monadPlus.strongLaws[IndSeq])
   checkAll("IndSeq", traverse.laws[IndSeq])
   checkAll("IndSeq", isEmpty.laws[IndSeq])
+  checkAll("IndSeq", alt.laws[IndSeq])
 
   val intStream = Stream.from(1)
 

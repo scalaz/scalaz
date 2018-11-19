@@ -123,7 +123,7 @@ package object scalaz {
 
   type ReaderT[E, F[_], A] = Kleisli[F, E, A]
   type =?>[E, A] = Kleisli[Option, E, A]
-  
+
   /** @template */
   type Reader[E, A] = ReaderT[E, Id, A]
 
@@ -154,7 +154,7 @@ package object scalaz {
 
   /** @template */
   type IndexedState[-S1, S2, A] = IndexedStateT[S1, S2, Id, A]
-  
+
   /** A state transition, representing a function `S => (S, A)`.
     *
     * @template
@@ -163,9 +163,15 @@ package object scalaz {
 
   object StateT extends StateTInstances with StateTFunctions {
     def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = IndexedStateT[S, S, F, A](f)
+    def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[StateT[S, ?[_], ?]].liftM(fa)
 
     def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, ?] ~> StateT[S, G, ?] =
       λ[StateT[S, F, ?] ~> StateT[S, G, ?]](st => StateT((s: S) => nat(st.run(s))))
+
+    def get[F[_]: Monad, S]: StateT[S, F, S] = MonadState[StateT[S, F, ?], S].get
+    def gets[F[_]: Monad, S, A](f: S => A): StateT[S, F, A] = MonadState[StateT[S, F, ?], S].gets(f)
+    def put[F[_]: Monad, S](s: S): StateT[S, F, Unit] = MonadState[StateT[S, F, ?], S].put(s)
+    def modify[F[_]: Monad, S](f: S => S): StateT[S, F, Unit] = MonadState[StateT[S, F, ?], S].modify(f)
   }
   object IndexedState extends StateFunctions {
     def apply[S1, S2, A](f: S1 => (S2, A)): IndexedState[S1, S2, A] = IndexedStateT[S1, S2, Id, A](f)
@@ -326,7 +332,7 @@ package object scalaz {
   object IndexedContT extends IndexedContsTInstances with IndexedContsTFunctions {
     def apply[M[_], R, O, A](f: (A => M[O]) => M[R]): IndexedContT[R, O, M, A] = IndexedContsT[Id, R, O, M, A](f)
   }
-  
+
   /** @template */
   type IndexedCont[R, O, A] = IndexedContT[R, O, Id, A]
   object IndexedCont extends IndexedContsTInstances with IndexedContsTFunctions {
@@ -377,4 +383,6 @@ package object scalaz {
 
   type DisjunctionT[A, F[_], B] = EitherT[A, F, B]
   val DisjunctionT = EitherT
+
+  type Pair[A] = (A, A)
 }

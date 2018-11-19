@@ -145,6 +145,9 @@ trait Syntaxes {
   object monadError0 extends ToMonadErrorOps0[MonadError]
   object monadError extends ToMonadErrorOps[MonadError]
 
+  object applicativeError0 extends ToApplicativeErrorOps0[ApplicativeError]
+  object applicativeError extends ToApplicativeErrorOps[ApplicativeError]
+
   //
   // Type classes over (* -> *) -> * -> *
   //
@@ -185,6 +188,8 @@ trait Syntaxes {
 
   object contT extends ToContTOps
 
+  object const extends ToConstOps
+
   //
   // Mixed
   //
@@ -208,6 +213,7 @@ trait ToDataOps
   with ToTheseOps
   with ToMaybeOps
   with ToContTOps
+  with ToConstOps
 
 trait ToTypeClassOps
   extends ToSemigroupOps with ToMonoidOps with ToBandOps with ToEqualOps with ToShowOps
@@ -220,4 +226,4 @@ trait ToTypeClassOps
   with ToArrowOps0[Arrow] with ToProfunctorOps0[Profunctor] with ToStrongOps0[Strong]
   with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError]
   with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps0[Optional] with ToCatchableOps0[Catchable] with ToAlignOps0[Align]
-  with ToMonadTransOps
+  with ToMonadTransOps with ToProChoiceOps0[ProChoice]

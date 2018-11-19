@@ -20,8 +20,8 @@ sealed trait OptionInstances1 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
-    new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+    new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
@@ -38,6 +38,8 @@ trait OptionInstances extends OptionInstances0 {
         fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
       def empty[A]: Option[A] = None
       def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+      override def alt[A](a: => Option[A], b: => Option[A]): Option[A] =
+        plus(a, b)
       override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
         case Some(a) => f(a, z)
         case None    => z

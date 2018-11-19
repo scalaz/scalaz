@@ -163,8 +163,8 @@ object LazyEither extends LazyEitherInstances {
 
 // TODO more instances
 sealed abstract class LazyEitherInstances {
-  implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] =
-    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] {
+  implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Alt[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] =
+    new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]] with Alt[LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] {
 
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(f: A => G[B]): G[LazyEither[E, B]] =
         fa traverse f
@@ -174,6 +174,9 @@ sealed abstract class LazyEitherInstances {
 
       def bind[A, B](fa: LazyEither[E, A])(f: A => LazyEither[E, B]): LazyEither[E, B] =
         fa flatMap (a => f(a))
+
+      def alt[A](a1: => LazyEither[E, A], a2: => LazyEither[E, A]): LazyEither[E, A] =
+        a1 orElse a2
 
       override def ap[A, B](fa: => LazyEither[E, A])(f: => LazyEither[E, A => B]): LazyEither[E, B] =
         fa ap f

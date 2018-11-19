@@ -10,8 +10,8 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
+  implicit val listInstance: Traverse[List] with MonadPlus[List] with Alt[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
+    new Traverse[List] with MonadPlus[List] with Alt[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
       override def point[A](a: => A): List[A] =
         List(a)
@@ -27,6 +27,9 @@ trait ListInstances extends ListInstances0 {
 
       override def plus[A](a: List[A], b: => List[A]): List[A] =
         a ++ b
+
+      override def alt[A](a: => List[A], b: => List[A]): List[A] =
+        plus(a, b)
 
       override def empty[A]: List[A] =
         Nil
@@ -229,7 +232,7 @@ trait ListFunctions {
   }
 
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
-  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
+  final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = as.foldLeft(Map.empty[B, NonEmptyList[A]]) { (nels, a) =>
     val b = f(a)
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
   } map { case (k, v) => k -> v.reverse }

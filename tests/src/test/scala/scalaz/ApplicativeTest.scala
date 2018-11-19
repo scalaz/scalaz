@@ -4,6 +4,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazArbitrary.ilistArbitrary
 
+
 object ApplicativeTest extends SpecLite {
 
   // In c44c206461fe, the functions `replicateM`, `replicateM_`, `filterM`
@@ -12,6 +13,7 @@ object ApplicativeTest extends SpecLite {
 
   import std.list._
   import std.option._
+  import std.string._
   import std.anyVal._
   import syntax.applicative._
   import syntax.traverse._
@@ -34,6 +36,42 @@ object ApplicativeTest extends SpecLite {
     // don't make `None` too likely
     def pred(n: Int) = if (n < 0 && n % 2 == 0) None else Some(n % 2 == 0)
     l.filterM(pred) must_===(filterM(l, pred))
+  }
+
+  "plusA" in {
+    Applicative[List].plusA(1 :: 2 :: Nil, 10 :: 20 :: Nil) must_== 11 :: 21 :: 12 :: 22 :: Nil
+    Applicative[List].plusA("1" :: "2" :: Nil, "10" :: "20" :: Nil) must_== "110" :: "120" :: "210" :: "220" :: Nil
+    Applicative[List].plusA("1" :: Nil, Nil) must_== Nil
+    Applicative[List].plusA(Nil, "1" :: Nil) must_== Nil
+    Applicative[List].plusA[String](Nil, Nil) must_== Nil
+
+    Applicative[Option].plusA(Option(1), Option(2)) must_== Some(3)
+    Applicative[Option].plusA(Option("1"), Option("2")) must_== Some("12")
+    Applicative[Option].plusA(Option("1"), Option.empty[String]) must_== None
+    Applicative[Option].plusA(Option.empty[String], Some("1")) must_== None
+    Applicative[Option].plusA(Option.empty[String], Option.empty[String]) must_== None
+
+    //Const is an applicative that is not a monad
+    def const[A](a: A) = Const[A, String](a) // won't compile w/o known B
+    Applicative[Const[Int, ?]].plusA(const(1), const(2)) must_== const(3)
+    Applicative[Const[String, ?]].plusA(const("1"), const("2")) must_== const("12")
+
+    // check +++ syntax
+
+    (1 :: Nil) +++ (10 :: Nil) must_== 11 :: Nil
+    List("Gurren ") +++ List("Lagann") must_=== List("Gurren Lagann")
+    List("Gurren ") +++ List.empty must_=== List.empty[String]
+    List.empty +++ List("Lagann") must_=== List.empty[String]
+    List.empty[String] +++ List.empty[String] must_=== List.empty[String]
+
+    Option("Gurren ") +++ Option("Lagann") must_=== Option("Gurren Lagann")
+    Option(5) +++ Option(3) must_=== Option(8)
+    None +++ Option(3) must_=== Option.empty[Int]
+    Option(5) +++ None must_=== Option.empty[Int]
+    Option.empty[Int] +++ Option.empty[Int] must_=== Option.empty[Int]
+
+    const(5) +++ const(3) must_=== const(8)
+    const("5") +++ const("3") must_=== const("53")
   }
 
 }

@@ -21,6 +21,7 @@ object EitherTTest extends SpecLite {
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
   checkAll(monadTrans.laws[EitherT[Int, ?[_], ?], List])
+  checkAll(alt.laws[EitherTListInt])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
@@ -43,6 +44,10 @@ object EitherTTest extends SpecLite {
 
   "fromDisjunction" ! forAll { (a: String \/ Int) =>
     Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
+  }
+
+  "fromOption" ! forAll { (o: Option[String], s: String) =>
+    List(o.isEmpty) must_=== EitherT.fromOption(s)(List(o)).isLeft
   }
 
   "either, left, right" ! forAll { (a: String \/ Int) =>

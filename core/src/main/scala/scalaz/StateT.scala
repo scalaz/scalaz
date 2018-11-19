@@ -199,7 +199,14 @@ sealed abstract class IndexedStateTInstances extends IndexedStateTInstances0 {
     }
 }
 
-sealed abstract class StateTInstances3 extends IndexedStateTInstances {
+sealed abstract class StateTInstances4 extends IndexedStateTInstances {
+  implicit def stateTDivisible[S, F[_]](implicit F0: Divisible[F], F1: Bind[F]): Divisible[StateT[S, F, ?]] = new StateTDivisible[F, S] {
+    implicit def F: Divisible[F] = F0
+    implicit def G: Bind[F] = F1
+  }
+}
+
+sealed abstract class StateTInstances3 extends StateTInstances4 {
   implicit def stateTBindRec[S, F[_]](implicit F0: Applicative[F]): BindRec[StateT[S, F, ?]] =
     new StateTBindRec[S, F] {
       implicit def F: Applicative[F] = F0
@@ -209,6 +216,11 @@ sealed abstract class StateTInstances3 extends IndexedStateTInstances {
     new StateTMonadError[S, F, E] {
       implicit def F: MonadError[F, E] = F0
     }
+
+  implicit def stateTDecidable[S, F[_]](implicit F0: Decidable[F], F1: Bind[F]): Decidable[StateT[S, F, ?]] = new StateTDecidable[F, S] {
+    implicit def F: Decidable[F] = F0
+    implicit def G: Bind[F] = F1
+  }
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
@@ -268,6 +280,34 @@ trait StateTFunctions extends IndexedStateTFunctions {
 //
 // Implementation traits for type class instances
 //
+
+private trait StateTDivisible[F[_], S] extends Divisible[StateT[S, F, ?]] {
+  implicit def F: Divisible[F]
+  implicit def G: Bind[F]
+
+  override def conquer[Z]: StateT[S, F, Z] = StateT(_ => F.conquer)
+
+  override def divide2[A1, A2, Z](a1: => StateT[S, F, A1], a2: => StateT[S, F, A2])(f: Z => (A1, A2)): StateT[S, F, Z] =
+    StateT(
+      s => F.divide2[(S, A1), (S, A2), (S, Z)](a1.run(s), a2.run(s)) ( (z: (S, Z)) =>
+        (z._1, f(z._2)) match {
+          case (w, (l, r)) => ((w, l), (w, r))
+        }
+      )
+    )
+}
+
+private trait StateTDecidable[F[_], S] extends Decidable[StateT[S, F, ?]] with StateTDivisible[F, S] {
+  implicit def F: Decidable[F]
+  implicit def G: Bind[F]
+
+  override def choose2[Z, A1, A2](a1: => StateT[S, F, A1], a2: => StateT[S, F, A2])(f: Z => A1 \/ A2): StateT[S, F, Z] =
+    StateT( s =>
+      F.choose2[(S, Z), (S, A1), (S, A2)](a1.run(s), a2.run(s))( (z: (S, Z)) =>
+        f(z._2).fold(l => -\/((z._1, l)), r => \/-((z._1, r)))
+      )
+    )
+}
 
 private trait IndexedStateTContravariant[S2, A0, F[_]] extends Contravariant[IndexedStateT[?, S2, F, A0]] {
   implicit def F: Applicative[F]

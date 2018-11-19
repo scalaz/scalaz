@@ -4,7 +4,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import syntax.std.option._
-
 import org.scalacheck.Prop.forAll
 
 object OptionTTest extends SpecLite {
@@ -13,12 +12,15 @@ object OptionTTest extends SpecLite {
   type OptionTOption[A] = OptionT[Option, A]
   type IntOr[A] = Int \/ A
   type OptionTEither[A] = OptionT[IntOr, A]
+  type ConstInt[A] = Const[Int, A]
 
   checkAll(equal.laws[OptionTList[Int]])
   checkAll(bindRec.laws[OptionTList])
   checkAll(monadPlus.laws[OptionTList])
+  checkAll(alt.laws[OptionTList])
   checkAll(traverse.laws[OptionTList])
   checkAll(monadError.laws[OptionTEither, Int])
+  checkAll(decidable.laws[OptionT[ConstInt, ?]])
 
   "show" ! forAll { a: OptionTList[Int] =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
@@ -42,9 +44,11 @@ object OptionTTest extends SpecLite {
     def functor[F[_] : Functor] = Functor[OptionT[F, ?]]
     def bindRec[F[_] : Monad: BindRec] = BindRec[OptionT[F, ?]]
     def monad[F[_] : Monad] = MonadPlus[OptionT[F, ?]]
+    def alt[F[_] : Monad] = Alt[OptionT[F, ?]]
     def monadError[F[_], E](implicit F: MonadError[F, E]) = MonadError[OptionT[F, ?], E]
     def foldable[F[_] : Foldable] = Foldable[OptionT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[OptionT[F, ?]]
+    def decidable[F[_] : Divisible] = Decidable[OptionT[F, ?]]
 
     // checking absence of ambiguity
     def functor[F[_] : Monad] = Functor[OptionT[F, ?]]

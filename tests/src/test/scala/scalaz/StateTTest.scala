@@ -11,6 +11,7 @@ object StateTTest extends SpecLite {
   type StateTList[S, A] = StateT[S, List, A]
   type StateTListInt[A] = StateTList[Int, A]
   type IStateTList[S, A] = IndexedStateT[S, Int, List, A]
+  type ConstInt[A] = Const[Int, A]
 
   private[this] val stateTestInts = (-10 to 10).toList
 
@@ -38,6 +39,8 @@ object StateTTest extends SpecLite {
     def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[S, F, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[S, F, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[S, F, ?]]
+    def decidable[S, F[_] : Decidable: Bind] = Decidable[StateT[S, F, ?]]
+    def divisible[S, F[_] : Divisible: Bind] = Divisible[StateT[S, F, ?]]
 
     // F = Id
     def functor[S] = Functor[State[S, ?]]
@@ -46,6 +49,7 @@ object StateTTest extends SpecLite {
     // checking absence of ambiguity
     def functor[S, F[_] : Monad] = Functor[StateT[S, F, ?]]
     def plus[S, F[_]: MonadPlus] = Plus[StateT[S, F, ?]]
+    def divisible[S, F[_] : Decidable: Bind] = Divisible[StateT[S, F, ?]]
   }
 
   "monadState.point" in {

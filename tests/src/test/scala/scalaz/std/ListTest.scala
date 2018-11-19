@@ -13,6 +13,7 @@ object ListTest extends SpecLite {
   checkAll(monadPlus.strongLaws[List])
   checkAll(traverse.laws[List])
   checkAll(zip.laws[List])
+  checkAll(alt.laws[List])
   checkAll(align.laws[List])
   checkAll(isEmpty.laws[List])
   checkAll(cobind.laws[List])
@@ -185,6 +186,7 @@ object ListTest extends SpecLite {
     def monoid[A] = Monoid[List[A]]
     def bindRec = BindRec[List]
     def monadPlus = MonadPlus[List]
+    def alt = Alt[List]
     def traverse = Traverse[List]
     def zip = Zip[List]
     def unzip = Unzip[List]
