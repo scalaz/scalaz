@@ -49,7 +49,7 @@ trait Density[F[_], Y] { self =>
     F.map(fb)(A.leftAdjunct(_)(f))
 
   trait DensityLaw {
-    def densityIsLeftKan(kb: F[X], kba: F[X] => Y)(implicit F: Equal[Y]): Boolean = {
+    def densityIsLeftKan[A,B](kb: F[A], kba: F[A] => B)(implicit F: Equal[B]): Boolean = {
       val d = Density(kb, kba)
       F.equal(Density.lanToDensity(d.densityToLan).runDensity, d.runDensity)
     }
