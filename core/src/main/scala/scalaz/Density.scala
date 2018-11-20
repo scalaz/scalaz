@@ -94,20 +94,15 @@ sealed abstract class DensityInstances0 {
 }
 
 /** Density is a free Comonad */
-private trait DensityComonad[F[_]] extends Comonad[Density[F, ?]] with DensityCobind[F] {
-  def copoint[A](p: Density[F, A]): A = p.runDensity
-}
+private trait DensityComonad[F[_]] extends Comonad[Density[F, ?]] {
 
-/** Density is a free Cobind */
-private trait DensityCobind[F[_]] extends Cobind[Density[F, ?]] with DensityFunctor[F] {
+  def map[A, B](fa: Density[F, A])(f: A => B): Density[F, B] = fa.map(f)
+
   def cobind[A, B](fa: Density[F, A])(ff: Density[F, A] => B): Density[F, B] =
     cojoin(fa).map(ff)
 
   override def cojoin[A](fa: Density[F, A]): Density[F, Density[F, A]] =
     Density[F, Density[F, A], fa.X](fa.fb, kx => Density[F, A, fa.X](kx, fa.f))
-}
 
-/** Density is a free Functor */
-private trait DensityFunctor[F[_]] extends Functor[Density[F, ?]] {
-  def map[A, B](fa: Density[F, A])(f: A => B): Density[F, B] = fa.map(f)
+  def copoint[A](p: Density[F, A]): A = p.runDensity
 }
