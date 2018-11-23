@@ -18,8 +18,14 @@ object StrongSpec extends SpecLite {
       uncurried(pair) must_=== (f(pair._1)(pair._2))
   }
 
-  implicit def EqualFunction1Tuple2 = Equal.equalBy[((Int, Int)) => (Int, Int), (Int,Int)](_.apply((0, 0)))
-  implicit def EqualFunction1Tuple1 = Equal.equalBy[((Int, Int)) => Int, Int](_.apply((0, 0)))
+  implicit def EqualFunction1Tuple2Fun: Equal[((Int, Int)) => (Int, Int)] =
+    Equal.equalBy[((Int, Int)) => (Int, Int), (Int,Int)](_.apply((0, 0)))
+  implicit def EqualFunction1Tuple2: Equal[((Int, Int)) => Int] =
+    Equal.equalBy[((Int, Int)) => Int, Int](_.apply((0, 0)))
+  implicit def EqualFunction1Tuple21Fun: Equal[(((Int, Int),Int)) => ((Int, Int), Int)] =
+    Equal.equalBy[(((Int, Int),Int)) => ((Int, Int), Int), ((Int, Int), Int)]{_.apply(((0, 0),0))}
+  implicit def EqualFunction1Tuple12Fun: Equal[((Int, (Int, Int))) => (Int, (Int, Int))] =
+    Equal.equalBy[((Int, (Int, Int))) => (Int, (Int, Int)), (Int, (Int, Int))]{_.apply((0,(0,0)))}
 
   checkAll("Strong Function1", strong.laws[? => ?])
 }

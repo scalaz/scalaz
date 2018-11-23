@@ -224,16 +224,25 @@ object ScalazProperties {
     def mapfstEqualsSecondAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),B]]): Prop =
       forAll(M.strongLaw.mapfstEqualsSecondAndThenMapsnd[A, B, C] _)
 
+    def firstFirstIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[((A,C),D),((B,C),D)]]): Prop =
+      forAll(M.strongLaw.firstFirstIsDimap[A, B, C, D] _)
+
+    def secondSecondIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(D,(C,A)),(D,(C,B))]]): Prop =
+      forAll(M.strongLaw.secondSecondIsDimap[A, B, C, D] _)
+
     def laws[M[_,_]](implicit
          F: Strong[M],
          af: Arbitrary[M[Int, Int]],
          eq1: Equal[M[(Int,Int), (Int,Int)]],
-         eq2: Equal[M[(Int,Int), Int]]): Properties =
+         eq2: Equal[M[(Int,Int), Int]],
+         eq3: Equal[M[((Int,Int),Int),((Int,Int),Int)]],
+         eq4: Equal[M[(Int,(Int,Int)),(Int,(Int,Int))]]): Properties =
       newProperties("strong") { p =>
         p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
         p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
         p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
-        p.property("mapfstEqualsSecondAndThenMapsnd") = mapfstEqualsSecondAndThenMapsnd[M, Int, Int, Int]
+        p.property("firstFirstIsDimap") = firstFirstIsDimap[M, Int, Int, Int, Int]
+        p.property("secondSecondIsDimap") = secondSecondIsDimap[M, Int, Int, Int, Int]
       }
   }
 
