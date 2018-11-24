@@ -5,6 +5,8 @@ import org.scalacheck._
 import Prop.forAll
 import Scalaz._
 
+import scala.language.higherKinds
+
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
@@ -233,11 +235,13 @@ object ScalazProperties {
     def laws[M[_,_]](implicit
          F: Strong[M],
          af: Arbitrary[M[Int, Int]],
+         eq0: Equal[M[Int,Int]],
          eq1: Equal[M[(Int,Int), (Int,Int)]],
          eq2: Equal[M[(Int,Int), Int]],
          eq3: Equal[M[((Int,Int),Int),((Int,Int),Int)]],
          eq4: Equal[M[(Int,(Int,Int)),(Int,(Int,Int))]]): Properties =
       newProperties("strong") { p =>
+        p.include(ScalazProperties.profunctor.laws[M])
         p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
         p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
         p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
