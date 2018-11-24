@@ -2,7 +2,6 @@ package scalaz
 
 import scalaz.Scalaz._
 import scalaz.Strong.uncurry
-import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
 
 object StrongSpec extends SpecLite {
@@ -17,15 +16,4 @@ object StrongSpec extends SpecLite {
       val uncurried: ((String, Int)) => String = uncurry(f)
       uncurried(pair) must_=== (f(pair._1)(pair._2))
   }
-
-  implicit def EqualFunction1Tuple2Fun: Equal[((Int, Int)) => (Int, Int)] =
-    Equal.equalBy[((Int, Int)) => (Int, Int), (Int,Int)](_.apply((0, 0)))
-  implicit def EqualFunction1Tuple2: Equal[((Int, Int)) => Int] =
-    Equal.equalBy[((Int, Int)) => Int, Int](_.apply((0, 0)))
-  implicit def EqualFunction1Tuple21Fun: Equal[(((Int, Int),Int)) => ((Int, Int), Int)] =
-    Equal.equalBy[(((Int, Int),Int)) => ((Int, Int), Int), ((Int, Int), Int)]{_.apply(((0, 0),0))}
-  implicit def EqualFunction1Tuple12Fun: Equal[((Int, (Int, Int))) => (Int, (Int, Int))] =
-    Equal.equalBy[((Int, (Int, Int))) => (Int, (Int, Int)), (Int, (Int, Int))]{_.apply((0,(0,0)))}
-
-  checkAll("Strong Function1", strong.laws[? => ?])
 }

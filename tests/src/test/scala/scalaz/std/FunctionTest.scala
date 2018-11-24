@@ -6,6 +6,7 @@ import std.AllFunctions.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
+import scalaz.StrongSpec.checkAll
 
 object FunctionTest extends SpecLite {
   type A = Int
@@ -28,6 +29,12 @@ object FunctionTest extends SpecLite {
   implicit def EqualFunction3 = Equal.equalBy[(Int, Int, Int) => Int, Int](_.apply(0, 0, 0))
   implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
   implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
+  implicit def EqualFunction1Tuple2Fun: Equal[((Int, Int)) => (Int, Int)] = Equal.equalBy[((Int, Int)) => (Int, Int), (Int,Int)](_.apply((0, 0)))
+  implicit def EqualFunction1Tuple2: Equal[((Int, Int)) => Int] = Equal.equalBy[((Int, Int)) => Int, Int](_.apply((0, 0)))
+  implicit def EqualFunction1Tuple21Fun: Equal[(((Int, Int),Int)) => ((Int, Int), Int)] = Equal.equalBy[(((Int, Int),Int)) => ((Int, Int), Int), ((Int, Int), Int)]{_.apply(((0, 0),0))}
+  implicit def EqualFunction1Tuple12Fun: Equal[((Int, (Int, Int))) => (Int, (Int, Int))] = Equal.equalBy[((Int, (Int, Int))) => (Int, (Int, Int)), (Int, (Int, Int))]{_.apply((0,(0,0)))}
+
+  checkAll("Strong Function1", strong.laws[? => ?])
 
   checkAll("Function1", monoid.laws[Int => Int])
 
@@ -48,7 +55,7 @@ object FunctionTest extends SpecLite {
 
   checkAll("Function1", zip.laws[Int => ?])
 
-  checkAll("Function1", profunctor.laws[? => ?])
+  checkAll("Function1", strong.laws[? => ?])
 
   // Likely could be made to cover all the FunctionN types.
   "Function0 map eagerness" ! forAll{(number: Int) =>
