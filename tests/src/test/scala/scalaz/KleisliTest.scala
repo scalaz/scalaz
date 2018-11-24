@@ -5,6 +5,8 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
+import scala.language.higherKinds
+
 object KleisliTest extends SpecLite {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
@@ -20,6 +22,26 @@ object KleisliTest extends SpecLite {
     }
   }
 
+  implicit def KleisliEqual21[M[_]](implicit M: Equal[Option[Int]]): Equal[KleisliOpt[(Int, Int), Int]] = new Equal[KleisliOpt[(Int, Int),Int]] {
+    def equal(a1: KleisliOpt[(Int, Int), Int], a2: KleisliOpt[(Int, Int), Int]): Boolean =
+      M.equal(a1.run((0,0)), a2.run((0,0)))
+  }
+
+  implicit def KleisliEqual22[M[_]](implicit M: Equal[Option[(Int,Int)]]): Equal[KleisliOpt[(Int, Int),(Int, Int)]] = new Equal[KleisliOpt[(Int, Int),(Int, Int)]] {
+    def equal(a1: KleisliOpt[(Int, Int), (Int, Int)], a2: KleisliOpt[(Int, Int), (Int, Int)]): Boolean =
+      M.equal(a1.run((0,0)), a2.run((0,0)))
+  }
+
+  implicit def KleisliEqual3[M[_]](implicit M: Equal[Option[((Int,Int),Int)]]): Equal[KleisliOpt[((Int, Int),Int),((Int, Int),Int)]] = new Equal[KleisliOpt[((Int, Int),Int),((Int, Int),Int)]] {
+    def equal(a1: KleisliOpt[((Int, Int), Int), ((Int, Int), Int)], a2: KleisliOpt[((Int, Int), Int), ((Int, Int), Int)]): Boolean =
+      M.equal(a1.run(((0,0),0)), a2.run(((0,0),0)))
+  }
+
+  implicit def KleisliEqual2[M[_]](implicit M: Equal[Option[(Int,(Int,Int))]]): Equal[KleisliOpt[(Int, (Int, Int)),(Int, (Int, Int))]] = new Equal[KleisliOpt[(Int, (Int, Int)),(Int, (Int, Int))]] {
+    def equal(a1: KleisliOpt[(Int, (Int, Int)), (Int, (Int, Int))], a2: KleisliOpt[(Int, (Int, Int)), (Int, (Int, Int))]): Boolean =
+      M.equal(a1.run((0,(0,0))), a2.run((0,(0,0))))
+  }
+
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
@@ -31,7 +53,7 @@ object KleisliTest extends SpecLite {
   checkAll(monadError.laws[KleisliEither, Int])
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
-  checkAll(profunctor.laws[KleisliOpt])
+  checkAll(strong.laws[KleisliOpt])
   checkAll(monadTrans.laws[Kleisli[?[_], Int, ?], List])
 
   object instances {
@@ -188,7 +210,5 @@ object KleisliTest extends SpecLite {
     "properly handle success" in {
       C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
     }
-
   }
-
 }
