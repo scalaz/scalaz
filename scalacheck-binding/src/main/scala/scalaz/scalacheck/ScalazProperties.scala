@@ -251,6 +251,8 @@ object ScalazProperties {
         p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
         p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
         p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
+        p.property("dinaturalityFirst") = dinaturalityFirst[M, Int, Int, Int, Int]
+        p.property("dinaturalitySecond") = dinaturalitySecond[M, Int, Int, Int, Int]
         p.property("firstFirstIsDimap") = firstFirstIsDimap[M, Int, Int, Int, Int]
         p.property("secondSecondIsDimap") = secondSecondIsDimap[M, Int, Int, Int, Int]
       }
