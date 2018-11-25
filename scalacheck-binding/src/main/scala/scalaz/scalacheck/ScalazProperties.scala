@@ -226,6 +226,12 @@ object ScalazProperties {
     def mapfstEqualsSecondAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),B]]): Prop =
       forAll(M.strongLaw.mapfstEqualsSecondAndThenMapsnd[A, B, C] _)
 
+    def dinaturalityFirst[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(A,C),(B,D)]]): Prop =
+      forAll(M.strongLaw.dinaturalityFirst[A, B, C, D] _)
+
+    def dinaturalitySecond[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(C,A), (D,B)]]): Prop =
+      forAll(M.strongLaw.dinaturalitySecond[A, B, C, D] _)
+
     def firstFirstIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[((A,C),D),((B,C),D)]]): Prop =
       forAll(M.strongLaw.firstFirstIsDimap[A, B, C, D] _)
 

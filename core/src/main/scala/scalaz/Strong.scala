@@ -41,6 +41,24 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
       E.equal(mapfst(fab)(_._2), mapsnd(fa)(_._2))
     }
 
+    /** lmap (second f) . first == rmap (second f) . first */
+    def dinaturalityFirst[A, B, C, D](fab: A =>: B, f: C => D)(implicit E: Equal[(A,C) =>: (B,D)], PF: Strong[Function1]): Boolean = {
+      val fc: (A,C) =>: (B,C) = first(fab)
+      val idbf: ((B,C)) => (B,D) = PF.second(f)
+      val fcc: (A,D) =>: (B,D) = first(fab)
+      val idaf: ((A,C)) => (A,D) = PF.second(f)
+      E.equal(mapsnd(fc)(idbf),mapfst(fcc)(idaf))
+    }
+
+    /** lmap (first f) . second == rmap (first f) . second */
+    def dinaturalitySecond[A, B, C, D](fab: A =>: B, f: C => D)(implicit E: Equal[(C,A) =>: (D,B)], PF: Strong[Function1]): Boolean = {
+      val fc: (C, A) =>: (C, B) = second(fab)
+      val idbf: ((C,B)) => (D,B) = PF.first(f)
+      val fcc: (D, A) =>: (D, B) = second(fab)
+      val idaf: ((C,A)) => (D,A) = PF.first(f)
+      E.equal(mapsnd(fc)(idbf),mapfst(fcc)(idaf))
+    }
+
     private def assoc[A,B,C]: (((A,B), C)) => (A, (B,C))  = { case ((a,c),d) => (a,(c,d)) }
     private def unassoc[A,B,C]: ((A, (B,C))) => ((A,B), C) = { case (a,(c,d)) => ((a,c),d) }
 
