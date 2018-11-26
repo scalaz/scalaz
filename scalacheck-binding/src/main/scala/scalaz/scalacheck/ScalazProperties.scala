@@ -5,6 +5,8 @@ import org.scalacheck._
 import Prop.forAll
 import Scalaz._
 
+import scala.language.higherKinds
+
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
@@ -208,6 +210,51 @@ object ScalazProperties {
       newProperties("profunctor") { p =>
         p.property("identity") = identity[M, Int, Int]
         p.property("composite") = compose[M, Int, Int, Int, Int, Int, Int]
+      }
+  }
+
+  object strong {
+    def firstIsSwappedSecond[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),(B,C)]]): Prop =
+      forAll(M.strongLaw.firstIsSwappedSecond[A, B, C] _)
+
+    def secondIsSwappedFirst[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),(C,B)]]): Prop =
+      forAll(M.strongLaw.secondIsSwappedFirst[A, B, C] _)
+
+    def mapfstEqualsFirstAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsFirstAndThenMapsnd[A, B, C] _)
+
+    def mapfstEqualsSecondAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsSecondAndThenMapsnd[A, B, C] _)
+
+    def dinaturalityFirst[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(A,C),(B,D)]]): Prop =
+      forAll(M.strongLaw.dinaturalityFirst[A, B, C, D] _)
+
+    def dinaturalitySecond[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(C,A), (D,B)]]): Prop =
+      forAll(M.strongLaw.dinaturalitySecond[A, B, C, D] _)
+
+    def firstFirstIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[((A,C),D),((B,C),D)]]): Prop =
+      forAll(M.strongLaw.firstFirstIsDimap[A, B, C, D] _)
+
+    def secondSecondIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(D,(C,A)),(D,(C,B))]]): Prop =
+      forAll(M.strongLaw.secondSecondIsDimap[A, B, C, D] _)
+
+    def laws[M[_,_]](implicit
+         F: Strong[M],
+         af: Arbitrary[M[Int, Int]],
+         eq0: Equal[M[Int,Int]],
+         eq1: Equal[M[(Int,Int), (Int,Int)]],
+         eq2: Equal[M[(Int,Int), Int]],
+         eq3: Equal[M[((Int,Int),Int),((Int,Int),Int)]],
+         eq4: Equal[M[(Int,(Int,Int)),(Int,(Int,Int))]]): Properties =
+      newProperties("strong") { p =>
+        p.include(ScalazProperties.profunctor.laws[M])
+        p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
+        p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
+        p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
+        p.property("dinaturalityFirst") = dinaturalityFirst[M, Int, Int, Int, Int]
+        p.property("dinaturalitySecond") = dinaturalitySecond[M, Int, Int, Int, Int]
+        p.property("firstFirstIsDimap") = firstFirstIsDimap[M, Int, Int, Int, Int]
+        p.property("secondSecondIsDimap") = secondSecondIsDimap[M, Int, Int, Int, Int]
       }
   }
 
