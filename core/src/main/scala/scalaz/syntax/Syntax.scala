@@ -224,6 +224,6 @@ trait ToTypeClassOps
   with ToPlusOps0[Plus] with ToApplicativePlusOps0[ApplicativePlus] with ToAltOps0[Alt] with ToMonadPlusOps0[MonadPlus] with ToTraverseOps0[Traverse] with ToBifunctorOps0[Bifunctor] with ToAssociativeOps0[Associative]
   with ToBitraverseOps0[Bitraverse] with ToComposeOps0[Compose] with ToCategoryOps0[Category]
   with ToArrowOps0[Arrow] with ToProfunctorOps0[Profunctor] with ToStrongOps0[Strong]
-  with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError]
+  with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError] with ToApplicativeErrorOps0[ApplicativeError]
   with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps0[Optional] with ToCatchableOps0[Catchable] with ToAlignOps0[Align]
   with ToMonadTransOps with ToProChoiceOps0[ProChoice]
