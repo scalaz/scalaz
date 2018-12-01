@@ -3,6 +3,7 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {
@@ -12,13 +13,13 @@ object KleisliTest extends SpecLite {
   type IntOr[A] = Int \/ A
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
-  implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
-    def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
-      val mb1: M[Int] = a1.run(0)
-      val mb2: M[Int] = a2.run(0)
-      M.equal(mb1, mb2)
+  implicit def KleisliEqual[M[_], A, B](implicit A: Arbitrary[A], M: Equal[M[B]]): Equal[Kleisli[M, A, B]] =
+    Equal.equal{ (x, y) =>
+      val values = Stream.continually(A.arbitrary.sample).flatten.take(5)
+      values.forall { z =>
+        M.equal(x(z), y(z))
+      }
     }
-  }
 
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
