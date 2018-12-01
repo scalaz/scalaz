@@ -3,6 +3,7 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 import scala.language.higherKinds
@@ -15,33 +16,13 @@ object KleisliTest extends SpecLite {
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
   type ConstInt[A] = Const[Int, A]
 
-  implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
-    def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
-      val mb1: M[Int] = a1.run(0)
-      val mb2: M[Int] = a2.run(0)
-      M.equal(mb1, mb2)
+  implicit def KleisliEqual[M[_], A, B](implicit A: Arbitrary[A], M: Equal[M[B]]): Equal[Kleisli[M, A, B]] =
+    Equal.equal{ (x, y) =>
+      val values = Stream.continually(A.arbitrary.sample).flatten.take(5)
+      values.forall { z =>
+        M.equal(x(z), y(z))
+      }
     }
-  }
-
-  implicit def KleisliEqual21[M[_]](implicit M: Equal[Option[Int]]): Equal[KleisliOpt[(Int, Int), Int]] = new Equal[KleisliOpt[(Int, Int),Int]] {
-    def equal(a1: KleisliOpt[(Int, Int), Int], a2: KleisliOpt[(Int, Int), Int]): Boolean =
-      M.equal(a1.run((0,0)), a2.run((0,0)))
-  }
-
-  implicit def KleisliEqual22[M[_]](implicit M: Equal[Option[(Int,Int)]]): Equal[KleisliOpt[(Int, Int),(Int, Int)]] = new Equal[KleisliOpt[(Int, Int),(Int, Int)]] {
-    def equal(a1: KleisliOpt[(Int, Int), (Int, Int)], a2: KleisliOpt[(Int, Int), (Int, Int)]): Boolean =
-      M.equal(a1.run((0,0)), a2.run((0,0)))
-  }
-
-  implicit def KleisliEqual3[M[_]](implicit M: Equal[Option[((Int,Int),Int)]]): Equal[KleisliOpt[((Int, Int),Int),((Int, Int),Int)]] = new Equal[KleisliOpt[((Int, Int),Int),((Int, Int),Int)]] {
-    def equal(a1: KleisliOpt[((Int, Int), Int), ((Int, Int), Int)], a2: KleisliOpt[((Int, Int), Int), ((Int, Int), Int)]): Boolean =
-      M.equal(a1.run(((0,0),0)), a2.run(((0,0),0)))
-  }
-
-  implicit def KleisliEqual2[M[_]](implicit M: Equal[Option[(Int,(Int,Int))]]): Equal[KleisliOpt[(Int, (Int, Int)),(Int, (Int, Int))]] = new Equal[KleisliOpt[(Int, (Int, Int)),(Int, (Int, Int))]] {
-    def equal(a1: KleisliOpt[(Int, (Int, Int)), (Int, (Int, Int))], a2: KleisliOpt[(Int, (Int, Int)), (Int, (Int, Int))]): Boolean =
-      M.equal(a1.run((0,(0,0))), a2.run((0,(0,0))))
-  }
 
   "mapK" ! forAll {
     (f: Int => Option[Int], a: Int) =>
