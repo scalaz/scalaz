@@ -5,8 +5,8 @@ import std.AllInstances._
 import std.AllFunctions.fix
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
-import scalaz.StrongSpec.checkAll
 
 object FunctionTest extends SpecLite {
   type A = Int
@@ -23,16 +23,21 @@ object FunctionTest extends SpecLite {
 
   checkAll("Function0", equal.laws[() => Int])
 
-  implicit def EqualFunction0 = Equal.equalBy[() => Int, Int](_.apply())
-  implicit def EqualFunction1 = Equal.equalBy[Int => Int, Int](_.apply(0))
-  implicit def EqualFunction2 = Equal.equalBy[(Int, Int) => Int, Int](_.apply(0, 0))
-  implicit def EqualFunction3 = Equal.equalBy[(Int, Int, Int) => Int, Int](_.apply(0, 0, 0))
-  implicit def EqualFunction4 = Equal.equalBy[(Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0))
-  implicit def EqualFunction5 = Equal.equalBy[(Int, Int, Int, Int, Int) => Int, Int](_.apply(0, 0, 0, 0, 0))
-  implicit def EqualFunction1Tuple2Fun: Equal[((Int, Int)) => (Int, Int)] = Equal.equalBy[((Int, Int)) => (Int, Int), (Int,Int)](_.apply((0, 0)))
-  implicit def EqualFunction1Tuple2: Equal[((Int, Int)) => Int] = Equal.equalBy[((Int, Int)) => Int, Int](_.apply((0, 0)))
-  implicit def EqualFunction1Tuple21Fun: Equal[(((Int, Int),Int)) => ((Int, Int), Int)] = Equal.equalBy[(((Int, Int),Int)) => ((Int, Int), Int), ((Int, Int), Int)]{_.apply(((0, 0),0))}
-  implicit def EqualFunction1Tuple12Fun: Equal[((Int, (Int, Int))) => (Int, (Int, Int))] = Equal.equalBy[((Int, (Int, Int))) => (Int, (Int, Int)), (Int, (Int, Int))]{_.apply((0,(0,0)))}
+  implicit def EqualFunction1[A, B: Equal](implicit A: Arbitrary[A], B: Equal[B]): Equal[A => B] =
+    Equal.equal { (x, y) =>
+      val values = Stream.continually(A.arbitrary.sample).flatten.take(3)
+      values.forall { z =>
+        B.equal(x(z), y(z))
+      }
+    }
+  implicit def EqualFunction2[A1: Arbitrary, A2: Arbitrary, B: Equal]: Equal[(A1, A2) => B] =
+    EqualFunction1[(A1, A2), B].contramap(_.tupled)
+  implicit def EqualFunction3[A1: Arbitrary, A2: Arbitrary, A3: Arbitrary, B: Equal]: Equal[(A1, A2, A3) => B] =
+    EqualFunction1[(A1, A2, A3), B].contramap(_.tupled)
+  implicit def EqualFunction4[A1: Arbitrary, A2: Arbitrary, A3: Arbitrary, A4: Arbitrary, B: Equal]: Equal[(A1, A2, A3, A4) => B] =
+    EqualFunction1[(A1, A2, A3, A4), B].contramap(_.tupled)
+  implicit def EqualFunction5[A1: Arbitrary, A2: Arbitrary, A3: Arbitrary, A4: Arbitrary, A5: Arbitrary, B: Equal]: Equal[(A1, A2, A3, A4, A5) => B] =
+    EqualFunction1[(A1, A2, A3, A4, A5), B].contramap(_.tupled)
 
   checkAll("Strong Function1", strong.laws[? => ?])
 
