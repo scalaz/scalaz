@@ -50,6 +50,7 @@ trait PlusClass[F[_]] { self =>
 }
 
 trait PlusFunctions {
+
   def plus[F[_], A](f1: F[A], f2: => F[A])(implicit F: Plus[F]): F[A] =
     F.plus(f1, f2)
 

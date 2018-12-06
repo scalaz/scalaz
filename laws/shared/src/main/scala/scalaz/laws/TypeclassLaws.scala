@@ -211,6 +211,21 @@ object PlusLaws {
     )
 }
 
+object PlusEmptyLaws {
+
+  @inline
+  def rightPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(f1, F.empty[A]), f1)
+    )
+
+  @inline
+  def leftPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(F.empty[A], f1), f1)
+    )
+}
+
 object SemigroupLaws {
   @inline
   def assoc[A, T](fst: A, snd: A, thd: A)(assert: (A, A) => T)(implicit A: Semigroup[A]): T = {

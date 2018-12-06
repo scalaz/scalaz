@@ -27,6 +27,7 @@ package object tc {
   type Ord[T]                 = InstanceOf[OrdClass[T]]
   type Phantom[F[_]]          = InstanceOf[PhantomClass[F]]
   type Plus[F[_]]             = InstanceOf[PlusClass[F]]
+  type PlusEmpty[F[_]]        = InstanceOf[PlusEmptyClass[F]]
   type Profunctor[F[_, _]]    = InstanceOf[ProfunctorClass[F]]
   type Semicategory[P[_, _]]  = InstanceOf[SemicategoryClass[P]]
   type Semigroup[T]           = InstanceOf[SemigroupClass[T]]
@@ -51,6 +52,7 @@ package object tc {
   final def Ord[T](implicit T: Ord[T]): Ord[T]                                           = T
   final def Phantom[F[_]](implicit F: Phantom[F]): Phantom[F]                            = F
   final def Plus[F[_]](implicit F: Plus[F]): Plus[F]                                     = F
+  final def PlusEmpty[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F]                      = F
   final def Profunctor[P[_, _]](implicit P: Profunctor[P]): Profunctor[P]                = P
   final def Semicategory[P[_, _]](implicit P: Semicategory[P]): Semicategory[P]          = P
   final def Semigroup[T](implicit T: Semigroup[T]): Semigroup[T]                         = T

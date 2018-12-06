@@ -13,6 +13,7 @@ object BaseHierarchy {
     implicit def monadBind[M[_]](implicit M: Monad[M]): Bind[M]                                = instanceOf(M)
     implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M]                  = instanceOf(M)
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A]                       = instanceOf(A)
+    implicit def plusemptyPlus[F[_]](implicit F: PlusEmpty[F]): Plus[F]                        = instanceOf(F)
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T]            = instanceOf(T)
     implicit def categorySemicategory[=>:[_, _]](implicit C: Category[=>:]): Semicategory[=>:] = instanceOf(C)
     implicit def comonadCobind[F[_]](implicit F: Comonad[F]): Cobind[F]                        = instanceOf(F)
