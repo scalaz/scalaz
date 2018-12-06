@@ -187,7 +187,6 @@ object OrdLaws {
       else true
     assert(satisfiesTransitivity)
   }
-
 }
 
 object MonoidLaws {
@@ -198,6 +197,18 @@ object MonoidLaws {
   @inline
   def rightIdentity[A, T](in: A)(assert: (A, A) => T)(implicit A: Monoid[A]): T =
     assert(in, A.mappend(in, A.mempty))
+}
+
+object PlusLaws {
+
+  @inline
+  def associative[F[_], A, T](f1: F[A], f2: F[A], f3: F[A])(assert: Boolean => T)(implicit F: Plus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(
+        F.plus(f1, F.plus(f2, f3)),
+        F.plus(F.plus(f1, f2), f3)
+      )
+    )
 }
 
 object SemigroupLaws {
