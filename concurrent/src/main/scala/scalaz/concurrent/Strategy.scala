@@ -68,7 +68,7 @@ trait StrategysLow {
   /**
    * A strategy that evaluates its arguments using an implicit ExecutorService.
    */
-  implicit def Executor(implicit s: ExecutorService) = new Strategy {
+  implicit def Executor(implicit s: ExecutorService): Strategy = new Strategy {
 
     import java.util.concurrent.Callable
 
