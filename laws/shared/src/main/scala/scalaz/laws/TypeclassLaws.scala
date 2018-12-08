@@ -97,6 +97,23 @@ object MonadLaws {
     assert(f(in), F.flatMap(F.pure(in))(f))
 }
 
+object MonadPlusLaws {
+
+  /** `empty[A]` is a polymorphic value over `A`. */
+  @inline
+  def emptyMap[F[_], A, T](f1: A => A)(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.map(F.empty[A])(f1), F.empty[A])
+    )
+
+  /** `empty` short-circuits its right. */
+  @inline
+  def leftZero[F[_], A, T](f: A => F[A])(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.flatMap(F.empty[A])(f), F.empty[A])
+    )
+}
+
 object CobindLaws {
   @inline
   def cobindAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A] => B,

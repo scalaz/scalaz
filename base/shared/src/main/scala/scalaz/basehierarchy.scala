@@ -8,10 +8,14 @@ object BaseHierarchy {
 
   trait BH0 extends BH1 {
     implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P]               = instanceOf(P)
+    implicit def applctvplusApplicative[M[_]](implicit M: ApplicativePlus[M]): Applicative[M]  = instanceOf(M)
+    implicit def applctvplusPlusempty[M[_]](implicit M: ApplicativePlus[M]): PlusEmpty[M]      = instanceOf(M)
     implicit def applyFunctor[M[_]](implicit M: Apply[M]): Functor[M]                          = instanceOf(M)
     implicit def bindApply[M[_]](implicit M: Bind[M]): Apply[M]                                = instanceOf(M)
     implicit def monadBind[M[_]](implicit M: Monad[M]): Bind[M]                                = instanceOf(M)
     implicit def monadApplicative[M[_]](implicit M: Monad[M]): Applicative[M]                  = instanceOf(M)
+    implicit def monadplusApplicativeplus[M[_]](implicit M: MonadPlus[M]): ApplicativePlus[M]  = instanceOf(M)
+    implicit def monadplusMonad[M[_]](implicit M: MonadPlus[M]): Monad[M]                      = instanceOf(M)
     implicit def monoidSemigroup[A](implicit A: Monoid[A]): Semigroup[A]                       = instanceOf(A)
     implicit def plusemptyPlus[F[_]](implicit F: PlusEmpty[F]): Plus[F]                        = instanceOf(F)
     implicit def traversableFoldable[T[_]](implicit T: Traversable[T]): Foldable[T]            = instanceOf(T)
