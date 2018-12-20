@@ -7,6 +7,9 @@ import scala.language.experimental.macros
 trait ApplyClass[F[_]] extends FunctorClass[F] {
   def ap[A, B](fa: F[A])(f: F[A => B]): F[B] = map(zip(f, fa)) { case (f, a) => f(a) }
 
+  def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] =
+    ap(fb)(map(fa)(f.curried))
+
   def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] = ap(fa)(map(fb)(b => a => (a, b)))
 }
 

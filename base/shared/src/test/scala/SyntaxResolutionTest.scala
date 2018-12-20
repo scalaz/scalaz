@@ -68,6 +68,10 @@ object SyntaxResolutionTest {
 
   def _traversable[F[_]: Traversable, G[_]: Applicative, A, B](fa: F[A], f: A => G[B]): G[F[B]] = fa.traverse(f)
 
+  def _traverse_[F[_]: Foldable, G[_]: Applicative, A, B](fa: F[A], f: A => G[B]): G[Unit] = fa.traverse_(f)
+
+  def _sequence_[F[_]: Foldable, G[_]: Applicative, A](fa: F[G[A]]): G[Unit] = fa.sequence_
+
   def _void(v: Void): Unit = {
     v.absurd[Int]
     v.absurd[Nothing]
