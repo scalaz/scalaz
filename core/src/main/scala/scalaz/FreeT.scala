@@ -154,7 +154,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
     */
   def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] =
     M0.tailrecM(this)(ft => M0.bind(ft.resume) {
-      case \/-(a) => M1.point(\/-(a))
+      case a @ \/-(_) => M1.point(a.coerceLeft)
       case -\/(fc) => M0.map(interp(fc))(\/.left)
     })
 

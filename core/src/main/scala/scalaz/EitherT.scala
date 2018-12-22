@@ -508,7 +508,7 @@ private[scalaz] trait EitherTMonadListen[F[_], W, A] extends MonadListen[EitherT
 
   def listen[B](ma: EitherT[A, F, B]): EitherT[A, F, (B, W)] = {
     val tmp = MT.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
-      case (-\/(a), _) => MT.point(-\/(a))
+      case (a @ -\/(_), _) => MT.point(a.coerceRight)
       case (\/-(b), w) => MT.point(\/-((b, w)))
     }
 

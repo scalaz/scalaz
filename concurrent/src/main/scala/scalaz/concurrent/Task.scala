@@ -30,7 +30,7 @@ class Task[A](val get: Future[Throwable \/ A]) {
 
   def flatMap[B](f: A => Task[B]): Task[B] =
     new Task(get flatMap {
-      case -\/(e) => Future.now(-\/(e))
+      case e @ -\/(_) => Future.now(e.coerceRight)
       case \/-(a) => Task.Try(f(a)) match {
         case e @ -\/(_) => Future.now(e.coerceRight)
         case \/-(task) => task.get
@@ -42,10 +42,7 @@ class Task[A](val get: Future[Throwable \/ A]) {
 
   /** 'Catches' exceptions in the given task and returns them as values. */
   def attempt: Task[Throwable \/ A] =
-    new Task(get map {
-      case -\/(e) => \/-(-\/(e))
-      case \/-(a) => \/-(\/-(a))
-    })
+    new Task(get.map(\/.right))
 
   /**
    * Returns a new `Task` in which `f` is scheduled to be run on completion.
@@ -54,8 +51,8 @@ class Task[A](val get: Future[Throwable \/ A]) {
    */
   def onFinish(f: Option[Throwable] => Task[Unit]): Task[A] =
     new Task(get flatMap {
-      case -\/(e) =>
-        Task.Try(f(Some(e))).fold(e2 => Future.now(-\/(e2)), _.get *> Future.now(-\/(e)))
+      case e0 @ -\/(e) =>
+        Task.Try(f(Some(e))).fold(e2 => Future.now(-\/(e2)), _.get *> Future.now(e0))
       case r =>
         Task.Try(f(None)).fold(e => Future.now(-\/(e)), _.get *> Future.now(r))
     })
@@ -294,7 +291,7 @@ object Task {
    */
   def suspend[A](a: => Task[A]): Task[A] = new Task(Future.suspend(
     Try(a.get) match {
-      case -\/(e) => Future.now(-\/(e))
+      case e @ -\/(_) => Future.now(e.coerceRight)
       case \/-(f) => f
   }))
 

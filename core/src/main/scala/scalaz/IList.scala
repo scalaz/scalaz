@@ -450,7 +450,7 @@ sealed abstract class IList[A] extends Product with Serializable {
       case ICons(head, tail) =>
         f(head) match {
           case \/-(b) => go(tail, b :: acc)
-          case -\/(err) => -\/(err)
+          case e @ -\/(_) => e.coerceRight
         }
     }
     go(this, IList.empty).map(_.reverse)
