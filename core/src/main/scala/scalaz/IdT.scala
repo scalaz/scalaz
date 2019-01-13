@@ -69,6 +69,15 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 
   implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
     BindRec.fromIso(IdT.iso[F])
+
+  implicit val idTCohoist: Cohoist[IdT] =
+    new Cohoist[IdT] {
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+        Lambda[IdT[M, ?] ~> IdT[N, ?]](x => IdT(f(x.run)))
+
+      override def lower[G[_]: Cobind, A](a: IdT[G, A]) =
+        a.run
+    }
 }
 
 object IdT extends IdTInstances {
