@@ -81,6 +81,15 @@ sealed abstract class IdTInstances extends IdTInstances0 {
   // for binary compatibility
   def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
     F.contramap(_.run)
+
+  implicit val idTCohoist: Cohoist[IdT] =
+    new Cohoist[IdT] {
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+        Lambda[IdT[M, ?] ~> IdT[N, ?]](x => IdT(f(x.run)))
+
+      override def lower[G[_]: Cobind, A](a: IdT[G, A]) =
+        a.run
+    }
 }
 
 object IdT extends IdTInstances {
