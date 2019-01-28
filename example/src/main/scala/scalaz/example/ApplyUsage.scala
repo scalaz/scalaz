@@ -145,25 +145,4 @@ object ApplyUsage extends App {
                                  Some("3a"), Some("3b"), Some("3c")))
 
   assert(deepResult === expectedDeep)
-
-  ///////////////////////////////////
-  // PARALLELISM
-  import scalaz.concurrent.Task
-
-  // imagine these were effectful, like hitting disk or network...
-  val fa: Task[String] = Task.delay("hello")
-  val fb: Task[String] = Task.delay("world")
-  val fc: Task[String] = Task.delay("!")
-
-  // WORKAROUND https://github.com/scala/bug/issues/10954
-  import Task.taskParallelApplicativeInstance
-
-  // sequential
-  (fa |@| fb).tupled: Task[(String, String)]
-
-  // parallel
-  (fa |@| fb).parApply(_ ++ _): Task[String]
-  (fa |@| fb).parTupled: Task[(String, String)]
-  (fa |@| fb |@| fc).parTupled: Task[(String, String, String)]
-
 }
