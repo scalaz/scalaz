@@ -19,7 +19,7 @@ lazy val jsProjects = Seq[ProjectReference](
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, example
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
@@ -79,19 +79,6 @@ lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
-lazy val concurrent = Project(
-  id = "concurrent",
-  base = file("concurrent")
-).settings(
-  standardSettings,
-  name := ConcurrentName,
-  typeClasses := TypeClass.concurrent,
-  osgiExport("scalaz.concurrent"),
-  OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-).dependsOn(
-  coreJVM, effectJVM
-)
-
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
 lazy val effectNative = effect.native
@@ -109,7 +96,7 @@ lazy val example = Project(
   notPublish,
   scalacOptions in (Compile, compile) -= "-Yno-adapted-args"
 ).dependsOn(
-  coreJVM, iterateeJVM, concurrent
+  coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
@@ -122,7 +109,6 @@ lazy val scalacheckBinding =
       osgiExport("scalaz.scalacheck")
     )
     .dependsOn(core, iteratee)
-    .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
@@ -150,7 +136,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
     minSuccessfulTests := 10
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
-  .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
 
 lazy val testsJVM = tests.jvm
