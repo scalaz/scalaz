@@ -14,10 +14,10 @@ object IterateeUsage extends App {
 
   def iter123 = enumIterator[Int, IO](Iterator(1, 2, 3))
 
-  ((head[Int, IO]   &= iter123).run unsafePerformIO()) assert_=== Some(1)
-  ((length[Int, IO] &= iter123).run unsafePerformIO()) assert_=== 3
-  ((peek[Int, IO]   &= iter123).run unsafePerformIO()) assert_=== Some(1)
-  ((head[Int, IO]   &= enumIterator[Int, IO](Iterator())).run unsafePerformIO()) assert_=== None
+  ((head[Int, IO]   &= iter123).run.unsafePerformIO()) assert_=== Some(1)
+  ((length[Int, IO] &= iter123).run.unsafePerformIO()) assert_=== 3
+  ((peek[Int, IO]   &= iter123).run.unsafePerformIO()) assert_=== Some(1)
+  ((head[Int, IO]   &= enumIterator[Int, IO](Iterator())).run.unsafePerformIO()) assert_=== None
 
   val stream1_10 = enumStream[Int, Id]((1 to 10).toStream)
 
@@ -42,7 +42,7 @@ object IterateeUsage extends App {
   ((head[IoExceptionOr[Char], IO] &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== Some('f')
   ((length[ IoExceptionOr[Char], IO] &= r).run.unsafePerformIO()) assert_=== 13
   ((peek[IoExceptionOr[Char], IO]   &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== Some('f')
-  ((head[IoExceptionOr[Char], IO]  &= enumReader[IO](new StringReader(""))).map(_ flatMap (_.toOption)).run unsafePerformIO()) assert_=== None
+  ((head[IoExceptionOr[Char], IO]  &= enumReader[IO](new StringReader(""))).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== None
 
   // As a monad
   val m1 = head[Int, Id] flatMap (b => head[Int, Id] map (b2 => (b tuple b2)))
@@ -56,7 +56,7 @@ object IterateeUsage extends App {
   (m2 &= stream123).run assert_=== Some(1 -> 2)
 
   val colc = takeWhile[IoExceptionOr[Char], List](_.fold(_ => false, _ != ' ')).up[IO]
-  ((colc &= r).map(_ flatMap (_.toOption)).run unsafePerformIO()) assert_=== List('f', 'i', 'l', 'e')
+  ((colc &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== List('f', 'i', 'l', 'e')
 
   val take10And5ThenHead = take[Int, List](10) zip take[Int, List](5) flatMap (ab => head[Int, Id] map (h => (ab, h)))
   (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_=== (((1 to 10).toList -> (1 to 5).toList) -> Some(11))
