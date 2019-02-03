@@ -203,12 +203,7 @@ object build {
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
-        val dir = name.value match {
-          case ConcurrentName =>
-            (scalaSource in Compile).value
-          case _ =>
-            ScalazCrossType.shared(baseDirectory.value, "main")
-        }
+        val dir = ScalazCrossType.shared(baseDirectory.value, "main")
         typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
       }
     },
@@ -367,8 +362,6 @@ object build {
     .nativeSettings(
       nativeSettings
     )
-
-  final val ConcurrentName = "scalaz-concurrent"
 
   lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)

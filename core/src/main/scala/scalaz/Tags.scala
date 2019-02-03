@@ -86,7 +86,7 @@ object Tags {
 
   val Conjunction = Tag.of[Conjunction]
 
-  /** Type tag to choose a [[scalaz.Applicative]] instance that runs scalaz.concurrent.Futures in parallel. */
+  /** Type tag to choose a [[scalaz.Applicative]] instance that runs in parallel. */
   sealed trait Parallel
 
   val Parallel = Tag.of[Parallel]

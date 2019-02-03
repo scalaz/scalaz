@@ -156,7 +156,6 @@ object TypeClass {
     comonadStore,
     bindRec
   )
-  lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource, monadCatchIO)
 }
 

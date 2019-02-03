@@ -93,7 +93,7 @@ employ the implicit scope.
 
 ### At a glance
 
-* `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
+* `scalaz.{effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
 * Refined and expanded the type class hierarchy.
 * Type class instances are no longer defined in the companion objects of the type class.
   Instances for standard library types are defined under `scalaz.std`, and instances for
@@ -116,7 +116,6 @@ Scalaz has been modularised.
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
-* **scalaz-concurrent**: Actor and Future implementation
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 
 ### Type Class Hierarchy
