@@ -97,6 +97,23 @@ object MonadLaws {
     assert(f(in), F.flatMap(F.pure(in))(f))
 }
 
+object MonadPlusLaws {
+
+  /** `empty[A]` is a polymorphic value over `A`. */
+  @inline
+  def emptyMap[F[_], A, T](f1: A => A)(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.map(F.empty[A])(f1), F.empty[A])
+    )
+
+  /** `empty` short-circuits its right. */
+  @inline
+  def leftZero[F[_], A, T](f: A => F[A])(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.flatMap(F.empty[A])(f), F.empty[A])
+    )
+}
+
 object CobindLaws {
   @inline
   def cobindAssoc[F[_], A, B, C, T](in: F[A])(fst: F[A] => B,
@@ -187,7 +204,6 @@ object OrdLaws {
       else true
     assert(satisfiesTransitivity)
   }
-
 }
 
 object MonoidLaws {
@@ -198,6 +214,33 @@ object MonoidLaws {
   @inline
   def rightIdentity[A, T](in: A)(assert: (A, A) => T)(implicit A: Monoid[A]): T =
     assert(in, A.mappend(in, A.mempty))
+}
+
+object PlusLaws {
+
+  @inline
+  def associative[F[_], A, T](f1: F[A], f2: F[A], f3: F[A])(assert: Boolean => T)(implicit F: Plus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(
+        F.plus(f1, F.plus(f2, f3)),
+        F.plus(F.plus(f1, f2), f3)
+      )
+    )
+}
+
+object PlusEmptyLaws {
+
+  @inline
+  def rightPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(f1, F.empty[A]), f1)
+    )
+
+  @inline
+  def leftPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(F.empty[A], f1), f1)
+    )
 }
 
 object SemigroupLaws {

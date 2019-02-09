@@ -33,6 +33,7 @@ trait AllSyntax
     with tc.FunctorSyntax
     with tc.InvariantFunctorSyntax
     with tc.PhantomSyntax
+    with tc.PlusSyntax
     with tc.ProfunctorSyntax
     with tc.SemicategorySyntax
     with tc.StrongSyntax
