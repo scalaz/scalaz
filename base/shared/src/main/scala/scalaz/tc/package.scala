@@ -17,6 +17,7 @@ package object tc {
   type Choice[P[_, _]]        = InstanceOf[ChoiceClass[P]]
   type Cobind[F[_]]           = InstanceOf[CobindClass[F]]
   type Comonad[F[_]]          = InstanceOf[ComonadClass[F]]
+  type Delay[A]               = InstanceOf[DelayClass[A]]
   type Contravariant[F[_]]    = InstanceOf[ContravariantClass[F]]
   type Debug[A]               = InstanceOf[DebugClass[A]]
   type Eq[A]                  = InstanceOf[EqClass[A]]
@@ -47,6 +48,7 @@ package object tc {
   final def Choice[P[_, _]](implicit P: Choice[P]): Choice[P]                            = P
   final def Cobind[F[_]](implicit F: Cobind[F]): Cobind[F]                               = F
   final def Comonad[F[_]](implicit F: Comonad[F]): Comonad[F]                            = F
+  final def Delay[A](implicit A: Delay[A]): Delay[A]                                     = A
   final def Foldable[F[_]](implicit F: Foldable[F]): Foldable[F]                         = F
   final def Functor[F[_]](implicit F: Functor[F]): Functor[F]                            = F
   final def InvariantFunctor[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
