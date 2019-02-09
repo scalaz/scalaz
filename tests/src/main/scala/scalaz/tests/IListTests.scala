@@ -3,7 +3,7 @@ package tests
 
 import scala.{ Int, List, Option }
 
-import data._, Scalaz._
+import data._, Predef._, Scalaz._
 
 import laws._
 import laws.FunctorLaws.{ Functor => FunctorLaws }
@@ -12,13 +12,7 @@ import testz.{ assert, Harness, Result }
 
 import z._
 
-final class IListTests {
-  val lists = List(
-    IList.empty[Int],
-    IList.cons(20, IList.empty),
-    IList.cons(20, IList.cons(30, IList.empty))
-  )
-
+object IListTests {
   def cross[A, B](l1: List[A], l2: List[B]): List[(A, B)] =
     l1.flatMap(a1 => l2.map(a2 => (a1, a2)))
 
@@ -29,10 +23,17 @@ final class IListTests {
       (append(IList(1, 2, 3), IList.empty), IList(1, 2, 3)),
     ).foldMap(assertEqualTupled)
 
-  def tests[T](harness: Harness[T], sequence: (T, T) => T): T = {
+  def tests[T](harness: Harness[T]): T = {
     import harness._
-    sequence(
-      section("concrete")(
+
+    val lists = List(
+      IList.empty[Int],
+      IList.cons(20, IList.empty),
+      IList.cons(20, IList.cons(30, IList.empty))
+    )
+
+    section(
+      namedSection("functions")(
         test("append") { () =>
           testAppend(_.append(_))
         },
@@ -69,7 +70,6 @@ final class IListTests {
           def keepLess5(i: Int): Maybe2[Int, Int] =
             if (i < 5) Maybe2.just2(i, i + 1)
             else Maybe2.empty2
-
           List(
             (IList.unfoldRight[Int, Int](_ => Maybe2.empty2)(0), IList.empty[Int]),
             (IList.unfoldRight[Int, Int](keepLess5)(0), IList(0, 1, 2, 3, 4)),
@@ -208,8 +208,8 @@ final class IListTests {
           ).foldMap(assertEqualTupled)
         },
       ),
-      section("laws")(
-        section("eq laws")(
+      namedSection("instances")(
+        namedSection("eq")(
           test("reflexivity") { () =>
             lists.foldMap(
               EqLaws.reflexivity(_)(assert)
@@ -218,13 +218,12 @@ final class IListTests {
           test("identity") { () =>
             cross(lists, lists).foldMap {
               case (l1, l2) =>
-                EqLaws.identity(l1, l2)(_.foldLeft(10000)(_ / _))(
-                  (equal, leftSum, rightSum) => assertEqual(equal, (leftSum == rightSum))
-                )
+                def f(l: IList[Int]): Int = l.foldLeft(1000)(_ / _)
+                assertEqual(l1 === l2, f(l1) === f(l2))
             }
           }
         ),
-        section("monad laws")(
+        namedSection("monad")(
           test("functor identity") { () =>
             lists.foldMap(
               FunctorLaws.identityToIdentity(_)(assertEqual[IList[Int]])
@@ -233,7 +232,6 @@ final class IListTests {
           test("apply associativity") { () =>
             val listsAdd  = lists.map(_.map(i => (n: Int) => i + n))
             val listsMult = lists.map(_.map(i => (n: Int) => i * n))
-
             cross(cross(lists, listsAdd), listsMult).foldMap {
               case ((i, a), m) =>
                 ApplyLaws.applyAssoc(i)(a, m)(
@@ -250,22 +248,26 @@ final class IListTests {
             // non-overlapping
             val fst = (a: Int) => IList(a + 10, a + 20, a + 30)
             val snd = (a: Int) => IList(a * 100, a * 200, a * 300)
-
             lists.foldMap {
               BindLaws.bindAssoc(_)(fst, snd)(assertEqual[IList[Int]])
             }
           },
-          test("monad identity") { () =>
+          test("monad right identity") { () =>
             lists.foldMap {
-              MonadLaws.bindIdentity(_)(assertEqual[IList[Int]])
+              MonadLaws.bindRightIdentity(_)(assertEqual[IList[Int]])
             }
-          }
+          },
+          test("monad left identity") { () =>
+            def f(i: Int) = IList(i + 1, i + 2, i + 3)
+            List(1, 2, 3).foldMap {
+              MonadLaws.bindLeftIdentity(_)(f)(assertEqual[IList[Int]])
+            }
+          },
         ),
-        section("traversable laws")(
+        namedSection("traversable")(
           test("traversable composition") { () =>
             val fst = (a: Int) => if (a % 20 == 0) scala.None else scala.Some(a % 20)
             val snd = (a: Int) => if (a % 5 == 0) scala.None else scala.Some(a  % 20)
-
             lists.foldMap {
               TraversableLaws.traverseComposition(_)(fst, snd)(assertEqual[Option[Option[IList[Int]]]])
             }
@@ -276,7 +278,7 @@ final class IListTests {
             }
           }
         ),
-        section("monoid laws")(
+        namedSection("monoid")(
           test("mappend associativity") { () =>
             cross(cross(lists, lists), lists).foldMap {
               case ((l1, l2), l3) =>

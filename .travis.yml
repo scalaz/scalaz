@@ -1,27 +1,83 @@
 language: scala
+
 sudo: false
+
 scala:
 - 2.12.6
+
 jdk:
-- oraclejdk8
+- openjdk8
+
 before_install:
+- "[ -z \"${encrypted_4b8f574fdd75_iv}\" ] || openssl aes-256-cbc -K $encrypted_4b8f574fdd75_key -iv $encrypted_4b8f574fdd75_iv -in ./project/secrets.tar.xz.enc -out ./project/secrets.tar.xz -d"
+- "[ -z \"${encrypted_4b8f574fdd75_iv}\" ] || tar xfvJ project/secrets.tar.xz -C project"
+- git fetch --tags
 - export PATH=${PATH}:./vendor/bundle
+
 install:
-- rvm use 2.4.4 --install --fuzzy
+- rvm use 2.5.1 --install --fuzzy
 - gem update --system
 - gem install sass
-- gem install jekyll -v 3.8.2
-script:
-- sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck tests/run microsite/makeMicrosite
-- if [[ "$TRAVIS_PULL_REQUEST" = "false" && "$TRAVIS_BRANCH" = "series/8.0.x" ]]; then sbt publish; fi
+- gem install jekyll -v 3.8.4
+
+stages:
+- name: test
+- name: microsite
+- name: release
+  if: (branch = series/8.0.x AND type = push) OR (tag IS present)
+# TODO: Figure out where to deploy!
+#- name: publishMicrosite
+#  if: tag IS present
+
+jobs:
+  include:
+    - &lint
+      stage: test
+      name: "Lint"
+      script: sbt ++$TRAVIS_SCALA_VERSION scalafmtCheck test:scalafmtCheck scalafmtSbtCheck
+    - &test
+      stage: test
+      name: "Test for 2.12"
+      script: sbt ++$TRAVIS_SCALA_VERSION tests/run
+    - &microsite
+      stage: microsite
+      name: "Generate microsite"
+      script: sbt ++$TRAVIS_SCALA_VERSION microsite/makeMicrosite
+    - &release
+      stage: release
+      name: "Release artifacts"
+      before_script: export PGP_SECRET="$(<./project/zecret)"
+      script: sbt ci-release || sbt sonatypeReleaseAll
+#    - &publishSite
+#      stage: publishMicrosite
+#      name: "Publish microsite"
+#      before_script:
+#      - cp ./project/travis-deploy-key ~/.ssh/id_ed25519
+#      - chmod 600 ~/.ssh/id_ed25519
+#      script:
+#      - git config --global user.email "tim@nequissimus.com"
+#      - git config --global user.name "Tim Steinbach"
+#      - git config --global push.default simple
+#      - sbt ++$TRAVIS_SCALA_VERSION microsite/publishMicrosite
+
 env:
   global:
   - secure: f9sDrym/MfYK1hBBSaILMxn4VCfyzJREqpuGXhEggrdZpYTNjp8GMXrqKfla3AwVAuWCveXk9u+skUYqKQ6LTG7RdQS5PzA2I9kx8afNRA5nxMmVQjuCKYM0/aF4egY5i98tGXG0NiMO3t72XuxtR+OeWLysUVB8hoNghpOOVMw=
   - secure: PPURD7/Lj6+kqE342Ty99XhO5SR7GlrakSbZeKm5RKXS2Q5yFrexdf+UcS3KUbq6LaWnH75q+UgC2mcRMIspRmz37CtVXkGbJYp3VBYFJbmIga+w0bBVvlSw8QWIGhdz3xnOOuiEYpgeOKnAzShr59HYKG2O90jlMdt4cPRUrwg=
+  - secure: "ckyEAZURmq1liflbGWyOLAlbaAFTEpUpVvNMhFR/j2nNYOFGS/DA/5s/krGBfg3CLrTxiTcslRaFjZz2eqfZfkOvTCBp11TD+49LhcUMkcT++yAlXTrLiu3uHGj2lezuoVzQq0PR+SaYDwFy+K31RUffGnhqfhIz1R1A3XCOGQo="
+
 cache:
   directories:
-  - "$HOME/.ivy2/cache"
-  - "$HOME/.sbt/launchers"
+  - $HOME/.sbt/1.0/dependency
+  - $HOME/.sbt/boot/scala*
+  - $HOME/.sbt/launchers
+  - $HOME/.rvm
+
+before_cache:
+- find $HOME/.sbt -name "*.lock" -type f -delete
+- find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+- rm -rf $HOME/.ivy2/local
+
 before_cache:
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf

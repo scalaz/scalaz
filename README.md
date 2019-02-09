@@ -10,6 +10,5 @@ It provides purely functional data structures to complement those from the Scala
 ## Documentation
 
 Scalaz provides a website with examples and documentation for a large subset of its capabilities.
-It can be found [here](https://nequissimus.com/scalaz/).
+It can be found [here](https://scalaz.github.io/8/).
 
-<!-- Update this to where the page will be published -->

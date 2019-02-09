@@ -4,24 +4,10 @@ cancelable in Global := true
 
 organization in ThisBuild := "org.scalaz"
 
-publishTo in ThisBuild := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-dynverSonatypeSnapshots in ThisBuild := true
-
-lazy val sonataCredentials = for {
-  username <- sys.env.get("SONATYPE_USERNAME")
-  password <- sys.env.get("SONATYPE_PASSWORD")
-} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
-
-credentials in ThisBuild ++= sonataCredentials.toSeq
-
 findLicense
+
+addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
 lazy val root = project
   .in(file("."))
@@ -31,18 +17,18 @@ lazy val root = project
   .aggregate(baseJVM, baseJS, lawsJVM, lawsJS, tests, metaJVM, metaJS, microsite, benchmarks)
   .enablePlugins(ScalaJSPlugin)
 
-resolvers in ThisBuild += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers in ThisBuild += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
 
 lazy val base = crossProject.module
   .dependsOn(meta)
-  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.1-SNAPSHOT")
+  .settings(libraryDependencies += "org.scalaz" %%% "scalaz-zio" % "0.2.9")
 
 lazy val baseJVM = base.jvm
 
 lazy val baseJS = base.js
 
 lazy val benchmarks = project.module
-  .dependsOn(baseJVM)
+  .dependsOn(baseJVM, tests)
   .enablePlugins(JmhPlugin)
   .settings(
     skip in publish := true,
@@ -50,7 +36,7 @@ lazy val benchmarks = project.module
       Seq(
         "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
         "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-        "org.scalaz"     %% "scalaz-core"   % "7.2.23",
+        "org.scalaz"     %% "scalaz-core"   % "7.2.26",
       )
   )
 
@@ -66,10 +52,10 @@ lazy val metaJVM = meta.jvm
 lazy val metaJS = meta.js
 
 lazy val microsite = project.module
-  .dependsOn(baseJVM)
+  .dependsOn(baseJVM, lawsJVM, tests)
   .enablePlugins(MicrositesPlugin, BuildInfoPlugin)
   .settings(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, isSnapshot),
     buildInfoPackage := "scalaz",
     buildInfoObject := "BuildInfo"
   )
@@ -78,6 +64,9 @@ lazy val microsite = project.module
     scalacOptions ~= { _ filterNot (_ startsWith "-Ywarn") },
     scalacOptions ~= { _ filterNot (_ startsWith "-Xlint") },
     skip in publish := true,
+    // Don't update silencer, the new versions print stuff that ends up in the generated code blocks
+    libraryDependencies -= Scalaz.silencerPlugin,
+    libraryDependencies += compilerPlugin("com.github.ghik" %% "silencer-plugin" % "1.0"),
     libraryDependencies += "com.github.ghik" %% "silencer-lib" % "1.0",
     micrositeFooterText := Some("""
                                   |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
@@ -92,6 +81,8 @@ lazy val microsite = project.module
     micrositeGithubRepo := "scalaz",
     micrositeFavicons := Seq(microsites.MicrositeFavicon("favicon.png", "512x512")),
     micrositeBaseUrl := "/8",
+    micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-base_2.12/${(version in Compile).value}",
+    micrositeDocumentationLabelDescription := "Scaladoc",
     micrositePalette := Map(
       "brand-primary"   -> "#ED2124",
       "brand-secondary" -> "#251605",
@@ -114,6 +105,7 @@ lazy val lawsJS = laws.js
 lazy val tests = project.module
   .dependsOn(baseJVM, lawsJVM)
   .settings(
-    libraryDependencies += "org.scalaz" %% "testz-stdlib" % "0.0.3",
-    libraryDependencies += "org.scalaz" %% "testz-runner" % "0.0.3"
+    libraryDependencies += "org.scalaz" %% "testz-stdlib" % "0.0.5",
+    libraryDependencies += "org.scalaz" %% "testz-runner" % "0.0.5",
+    libraryDependencies += "org.scalaz" %% "testz-extras" % "0.0.5",
   )

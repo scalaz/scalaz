@@ -1,9 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
+section: typeclass
+source: tc/kleisli.scala
 title:  "Kleisli"
 ---
-
-# Kleisli [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/kleisli.scala)
 
 Given a [Category](./Category.html) C, and a [Monad](./Monad.html) M over C, we can construct a new Category, called the `Kleisli Category` of M, whose objects are those of C, but whose morphisms are arrows of the form `A => M[B]`. The arrows of this new category are called `Kleisli Arrows`, or, more succinctly, `Kleisli`s.
 

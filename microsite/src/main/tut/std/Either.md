@@ -1,10 +1,8 @@
 ---
-layout: docs
+layout: scalaz
 section: std
 title:  "Either"
 ---
-
-# Either [![GitHub](../img/github.png)]
 
 Scalaz provides instances for Scala's built-in [Either](https://www.scala-lang.org/api/current/scala/util/Either.html) such as [Monad](../tc/Monad.html) and [Eq](../tc/Eq.html).
 

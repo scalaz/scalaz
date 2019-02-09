@@ -94,13 +94,15 @@ object EqClass {
 trait EqSyntax {
   implicit final class ToEqOps[A](a: A) {
     private[tc] type equal
-    def ===(f: A)(implicit ev: Eq[A]): Boolean = macro meta.Ops.nia_1[equal]
+    def ===(f: A)(implicit ev: Eq[A]): Boolean = macro ops.Ops.nia_1[equal]
   }
 }
 
 object Eq {
-  def always[A]: Eq[A]                   = instanceOf[EqClass[A]]((_, _) => true)
-  def never[A]: Eq[A]                    = instanceOf[EqClass[A]]((_, _) => false)
-  def fromEquals[A]: Eq[A]               = instanceOf[EqClass[A]](_ == _)
+  def always[A]: Eq[A]     = instanceOf[EqClass[A]]((_, _) => true)
+  def fromEquals[A]: Eq[A] = instanceOf[EqClass[A]](_ == _)
+  def byReference[A]: Eq[A] = instanceOf[EqClass[A]](
+    (a1, a2) => a1.asInstanceOf[scala.AnyRef] eq a2.asInstanceOf[scala.AnyRef]
+  )
   def apply[A](implicit P: Eq[A]): Eq[A] = P
 }

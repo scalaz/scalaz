@@ -3,8 +3,10 @@ import Keys._
 import org.scalajs.sbtplugin.cross.CrossProject
 
 object Scalaz {
+  val silencerPlugin = compilerPlugin("com.github.ghik" %% "silencer-plugin" % "1.2")
+
   val testDeps        = Seq("org.scalacheck"  %% "scalacheck"   % "1.14.0" % "test")
-  val compileOnlyDeps = Seq("com.github.ghik" %% "silencer-lib" % "1.0"    % "provided")
+  val compileOnlyDeps = Seq("com.github.ghik" %% "silencer-lib" % "1.2"    % "provided")
 
   private val stdOptions = Seq(
     "-deprecation",
@@ -43,9 +45,11 @@ object Scalaz {
       scalacOptions in (Compile, compile) ++=
         Seq("-Ywarn-unused:imports", "-Xfatal-warnings"),
       libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
-        compilerPlugin("org.spire-math"         %% "kind-projector"  % "0.9.7"),
-        compilerPlugin("com.github.tomasmikula" %% "pascal"          % "0.2.1"),
-        compilerPlugin("com.github.ghik"        %% "silencer-plugin" % "1.0")
+        compilerPlugin("org.spire-math"         %% "kind-projector" % "0.9.7"),
+        compilerPlugin("com.github.tomasmikula" %% "pascal"         % "0.3"),
+        silencerPlugin,
+        compilerPlugin("org.scalaz" %% "scalaz-plugin" % "0.0.7" cross CrossVersion.full),
+        "org.scalaz" %% "scalaz-plugin-library" % "0.0.7"
       ),
       incOptions ~= (_.withLogRecompileOnMacro(false))
     ) ++ {

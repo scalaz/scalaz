@@ -1,10 +1,10 @@
 ---
-layout: docs
+layout: scalaz
+module: base
 section: typeclass
+source: tc/debug.scala
 title:  "Debug"
 ---
-
-# Debug [![GitHub](../img/github.png)](https://github.com/scalaz/scalaz/blob/series/8.0.x/base/shared/src/main/scala/scalaz/tc/debug.scala)
 
 Debug presents a safe and explicit alternative to [Object#toString](https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#toString--).
 By providing instances of this typeclass, a type explicitly defines that it can be converted into human-readable output.
@@ -17,7 +17,7 @@ import scalaz.Scalaz._
 
 # Built-in instances
 
-```tut
+```tut:book
 "Scalaz 8".debug
 ```
 
@@ -64,3 +64,9 @@ The following fails to compile as there is no `Debug` instance for `Bar`
 ```tut:fail
 z"${bar}"
 ```
+
+# Law
+
+There are no laws for `Debug`, unlike Haskell's `Show`.
+
+Just try to keep it readable.

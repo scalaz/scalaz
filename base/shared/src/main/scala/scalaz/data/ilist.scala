@@ -75,14 +75,14 @@ object IListModule {
 
   implicit final def ilistMonad: Monad[IList] =
     instanceOf(new MonadClass[IList] {
-      def pure[A](a: A): IList[A] = IList.cons(a, IList.empty)
-      def ap[A, B](fa: IList[A])(ff: IList[A => B]): IList[B] =
+      override def pure[A](a: A): IList[A] = IList.cons(a, IList.empty)
+      override def ap[A, B](fa: IList[A])(ff: IList[A => B]): IList[B] =
         flatMap(ff)(f => map(fa)(a => f(a)))
-      def flatMap[A, B](ma: IList[A])(f: A => IList[B]): IList[B] =
+      override def flatMap[A, B](ma: IList[A])(f: A => IList[B]): IList[B] =
         flatten(map(ma)(f))
-      def flatten[A](nested: IList[IList[A]]): IList[A] =
+      override def flatten[A](nested: IList[IList[A]]): IList[A] =
         nested.foldRight(IList.empty[A])(_.append(_))
-      def map[A, B](ma: IList[A])(f: A => B): IList[B] =
+      override def map[A, B](ma: IList[A])(f: A => B): IList[B] =
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
     })
 
@@ -95,27 +95,27 @@ object IListModule {
 
   implicit final def ilistTraversable: Traversable[IList] =
     instanceOf(new TraversableClass[IList] {
-      def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
+      override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B): B =
         IList.foldLeft(fa, z)(f)
 
-      def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: Monoid[B]): B =
+      override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit B: Monoid[B]): B =
         foldLeft(fa, B.mempty)((b, a) => B.mappend(b, f(a)))
 
-      def msuml[A](fa: IList[A])(implicit A: Monoid[A]): A =
+      override def msuml[A](fa: IList[A])(implicit A: Monoid[A]): A =
         foldLeft(fa, A.mempty)((s, a) => A.mappend(s, a))
 
-      def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B =
+      override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B): B =
         fa.reverse.foldLeft(z)((b, a) => f(a, b))
 
-      def toList[A](fa: IList[A]): scala.List[A] = {
+      override def toList[A](fa: IList[A]): scala.List[A] = {
         import scala.{ ::, List, Nil }
         foldRight[A, List[A]](fa, Nil)(new ::(_, _))
       }
 
-      def sequence[F[_], A](ta: IList[F[A]])(implicit F: Applicative[F]): F[IList[A]] =
+      override def sequence[F[_], A](ta: IList[F[A]])(implicit F: Applicative[F]): F[IList[A]] =
         traverse(ta)(fa => fa)
 
-      def traverse[F[_], A, B](ta: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+      override def traverse[F[_], A, B](ta: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
         ta.uncons match {
           case Maybe2.Empty2() =>
             F.pure(IList.empty[B])
@@ -123,7 +123,13 @@ object IListModule {
             F.ap(traverse(as)(f))(f(a).map(b => (ls: IList[B]) => IList.cons(b, ls)))
         }
 
-      def map[A, B](ma: IList[A])(f: A => B): IList[B] =
+      override def traverse_[T[_], A, B](ta: IList[A])(f: A => T[B])(implicit T: Applicative[T]): T[Unit] =
+        traverse(ta)(f).void
+
+      override def sequence_[T[_]: Applicative, A](ta: IList[T[A]]): T[Unit] =
+        traverse_(ta)(identity)
+
+      override def map[A, B](ma: IList[A])(f: A => B): IList[B] =
         ma.foldRight(IList.empty[B])((a, bs) => IList.cons(f(a), bs))
 
     })

@@ -89,8 +89,29 @@ object BindLaws {
 
 object MonadLaws {
   @inline
-  def bindIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
+  def bindRightIdentity[F[_], A, T](in: F[A])(assert: (F[A], F[A]) => T)(implicit F: Monad[F]) =
     assert(in, F.flatMap(in)(F.pure))
+
+  @inline
+  def bindLeftIdentity[F[_], A, B, T](in: A)(f: A => F[B])(assert: (F[B], F[B]) => T)(implicit F: Monad[F]) =
+    assert(f(in), F.flatMap(F.pure(in))(f))
+}
+
+object MonadPlusLaws {
+
+  /** `empty[A]` is a polymorphic value over `A`. */
+  @inline
+  def emptyMap[F[_], A, T](f1: A => A)(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.map(F.empty[A])(f1), F.empty[A])
+    )
+
+  /** `empty` short-circuits its right. */
+  @inline
+  def leftZero[F[_], A, T](f: A => F[A])(assert: Boolean => T)(implicit F: MonadPlus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.flatMap(F.empty[A])(f), F.empty[A])
+    )
 }
 
 object CobindLaws {
@@ -153,18 +174,9 @@ object CategoryLaws {
 }
 
 object EqLaws {
-  // pass me two `A`'s
-  // and some way to observe an `A` as a `B`
-  // and I'll tell you if the observations agree
-  // with their equality.
-  @inline
-  def identity[A, B, T](fst: A, snd: A)(f: A => B)(assert: (Boolean, B, B) => T)(implicit A: Eq[A]): T =
-    assert(A.equal(fst, snd), f(fst), f(snd))
-
   @inline
   def reflexivity[A, T](in: A)(assert: Boolean => T)(implicit A: Eq[A]): T =
     assert(A.equal(in, in))
-
 }
 
 object OrdLaws {
@@ -192,7 +204,6 @@ object OrdLaws {
       else true
     assert(satisfiesTransitivity)
   }
-
 }
 
 object MonoidLaws {
@@ -203,6 +214,33 @@ object MonoidLaws {
   @inline
   def rightIdentity[A, T](in: A)(assert: (A, A) => T)(implicit A: Monoid[A]): T =
     assert(in, A.mappend(in, A.mempty))
+}
+
+object PlusLaws {
+
+  @inline
+  def associative[F[_], A, T](f1: F[A], f2: F[A], f3: F[A])(assert: Boolean => T)(implicit F: Plus[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(
+        F.plus(f1, F.plus(f2, f3)),
+        F.plus(F.plus(f1, f2), f3)
+      )
+    )
+}
+
+object PlusEmptyLaws {
+
+  @inline
+  def rightPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(f1, F.empty[A]), f1)
+    )
+
+  @inline
+  def leftPlusIdentity[F[_], A, T](f1: F[A])(assert: Boolean => T)(implicit F: PlusEmpty[F], E: Eq[F[A]]): T =
+    assert(
+      E.equal(F.plus(F.empty[A], f1), f1)
+    )
 }
 
 object SemigroupLaws {

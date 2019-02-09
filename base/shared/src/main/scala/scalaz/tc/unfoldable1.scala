@@ -1,4 +1,5 @@
-package scalaz.tc
+package scalaz
+package tc
 
 import scalaz.data.Maybe
 

@@ -12,6 +12,6 @@ trait ContravariantClass[F[_]] extends InvariantFunctorClass[F] {
 
 trait ContravariantSyntax {
   implicit final class ToContravariantOps[F[_], A](fa: F[A]) {
-    def contramap[B](f: B => A)(implicit ev: Contravariant[F]): F[B] = macro meta.Ops.i_1
+    def contramap[B](f: B => A)(implicit ev: Contravariant[F]): F[B] = macro ops.Ops.i_1
   }
 }

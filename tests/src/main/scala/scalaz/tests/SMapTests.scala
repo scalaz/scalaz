@@ -15,8 +15,8 @@ object SMapTests {
   def tests[T](harness: Harness[T]): T = {
     import harness._
 
-    section("laws")(
-      section("semicategory laws")(
+    namedSection("instances")(
+      namedSection("semicategory")(
         test("compose associativity") { () =>
           IList(
             (Map((2, 3)), Map((1, 2)), Map((0, 1))),

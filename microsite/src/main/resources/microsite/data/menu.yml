@@ -1,10 +1,12 @@
 options:
   - title: Type classes
-    url: typeclass/index.html
+    url: tc/index.html
     menu_section: typeclass
     menu_type: typeclass
 
     nested_options:
+    - title: Laws
+      url: tc/Laws.html
     - title: Applicative
       url: tc/Applicative.html
     - title: Apply
@@ -15,8 +17,6 @@ options:
       url: tc/Bind.html
     - title: Category
       url: tc/Category.html
-    - title: Compose
-      url: tc/Compose.html
     - title: Debug
       url: tc/Debug.html
     - title: Eq
@@ -32,7 +32,7 @@ options:
     - title: Ord
       url: tc/Ord.html
     - title: Semicategory
-      url: ct/Semicategory.html
+      url: tc/Semicategory.html
     - title: Semigroup
       url: tc/Semigroup.html
     - title: Strong
@@ -52,6 +52,8 @@ options:
       url: data/Disjunction.html
     - title: Forall
       url: data/Forall.html
+    - title: FixFree
+      url: data/FixFree.html
     - title: Maybe
       url: data/Maybe.html
     - title: Maybe2

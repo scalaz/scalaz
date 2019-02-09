@@ -13,6 +13,6 @@ trait InvariantFunctorFunctions {
 
 trait InvariantFunctorSyntax {
   implicit final class ToInvariantFunctorOps[F[_], A](self: F[A]) {
-    def imap[B](f: A => B)(g: B => A)(implicit ev: InvariantFunctor[F]): F[B] = macro meta.Ops.i_1_1
+    def imap[B](f: A => B)(g: B => A)(implicit ev: InvariantFunctor[F]): F[B] = macro ops.Ops.i_1_1
   }
 }

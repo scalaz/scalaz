@@ -9,10 +9,9 @@ import testz.Harness
 import z._
 
 object DebugInterpolatorTest {
-
   def tests[T](harness: Harness[T]): T = {
     import harness._
-    section("debug instance resolution")(
+    namedSection("debug instance resolution")(
       test("int") { () =>
         assertEqual(z"before ${1} after", Cord("before 1 after"))
       },
@@ -24,5 +23,4 @@ object DebugInterpolatorTest {
       }
     )
   }
-
 }

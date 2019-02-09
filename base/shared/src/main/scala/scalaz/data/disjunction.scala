@@ -23,7 +23,7 @@ object Disjunction extends DisjunctionFunctions {
   def fromEither[L, R](ab: Either[L, R]): L \/ R = ab.fold(-\/(_), \/-(_))
 
   implicit def disjunctionMonad[L]: Monad[L \/ ?] =
-    instanceOf(new MonadClass[L \/ ?] with BindClass.DeriveFlatten[L \/ ?] {
+    instanceOf(new MonadClass[L \/ ?] {
 
       override def map[A, B](ma: L \/ A)(f: A => B): L \/ B =
         ma.fold(l => -\/(l), r => \/-(f(r)))
@@ -47,8 +47,8 @@ object Disjunction extends DisjunctionFunctions {
   }
 
   implicit val disjunctionBifunctor: Bifunctor[\/] =
-    instanceOf(new BifunctorClass[\/] with BifunctorClass.DeriveLmapRmap[\/] {
-      def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
+    instanceOf(new BifunctorClass[\/] {
+      override def bimap[A, B, S, T](fab: A \/ B)(as: A => S, bt: B => T): S \/ T = fab match {
         case -\/(a) => -\/(as(a))
         case \/-(b) => \/-(bt(b))
       }

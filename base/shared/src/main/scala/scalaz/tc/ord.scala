@@ -59,6 +59,6 @@ object OrdClass {
 
 trait OrdSyntax {
   implicit final class ToOrdOps[A](a: A) {
-    def comp(f: A)(implicit ev: Ord[A]): Ordering = macro meta.Ops.ia_1
+    def comp(f: A)(implicit ev: Ord[A]): Ordering = macro ops.Ops.ia_1
   }
 }

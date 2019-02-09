@@ -83,6 +83,13 @@ object DebugClass {
     }
   }
 
+  implicit def tuple2Debug[A, B](implicit A: Debug[A], B: Debug[B]): Debug[(A, B)] = {
+    import Scalaz.debugInterpolator
+    DebugClass.instance[(A, B)] {
+      case (a, b) => z"($a, $b)"
+    }
+  }
+
   /* https://github.com/scalaz/scalaz/pull/1633
   implicit def vectorDebug[A: Debug]: Debug[Vector[A]] = instanceOf(new DebugClass[Vector[A]] {
     override def show(as: Vector[A]) = {
@@ -99,7 +106,7 @@ object DebugClass {
   })
    */
 
-  implicit final def contravariantDebug: Contravariant[DebugClass] =
+  implicit final def debugContravariant: Contravariant[DebugClass] =
     instanceOf(new ContravariantClass[DebugClass] {
       def contramap[A, B](r: DebugClass[A])(f: B => A): DebugClass[B] =
         new DebugClass[B] {
@@ -116,8 +123,8 @@ object Debug {
 
 trait DebugSyntax {
   implicit final class ToDebugOps[A](self: A) {
-    def debug(implicit ev: Debug[A]): Cord = macro meta.Ops.i_0
-    def debugs(implicit ev: Debug[A]): String = macro meta.Ops.i_0
+    def debug(implicit ev: Debug[A]): Cord = macro ops.Ops.i_0
+    def debugs(implicit ev: Debug[A]): String = macro ops.Ops.i_0
   }
 
   implicit final def debugInterpolator(sc: StringContext): DebugInterpolator.Interpolator =
