@@ -404,6 +404,21 @@ object ScalazProperties {
       }
   }
 
+  object density {
+    def densityIsLeftKan[F[_], A, B](implicit F: Density[F, A], F0: Equal[B], fa: Arbitrary[F[A]], fab: Arbitrary[F[A] => B]): Prop =
+      forAll(F.densityLaw.densityIsLeftKan[A,B] _)
+
+    def leftKanIsDensity[F[_], A, B](implicit F: Density[F, A], F0: Equal[F[A]], fa: Arbitrary[F[A]], fab: Arbitrary[F[A] => B]): Prop =
+      forAll(F.densityLaw.leftKanIsDensity[A,B] _)
+
+    def laws[F[_]](implicit a: Density[F, Int], am: Arbitrary[F[Int]],
+                   af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]): Properties =
+      newProperties("density") { p =>
+        p.property("density is left kan") = densityIsLeftKan[F, Int, Int]
+        p.property("left kan is density") = leftKanIsDensity[F, Int, Int]
+      }
+  }
+
   private def resizeProp(p: Prop, max: Int): Prop = new PropFromFun(
     params => p(params.withSize(params.size % (max + 1)))
   )
