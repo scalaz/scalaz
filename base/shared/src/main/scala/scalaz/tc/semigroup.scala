@@ -18,7 +18,7 @@ trait SemigroupClass[A] {
   def exponent(a: A, i: Int): A = {
     @tailrec
     def go(a0: A, j: Int): A =
-      if (j == 0) a0 else go(mappend(a, a), j - 1)
+      if (j == 0) a0 else go(mappend(a0, a0), j - 1)
     go(a, i)
   }
 }
