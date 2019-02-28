@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Liskov.<~<
 /**
  * Functors, covariant by nature if not by Scala type.  Their key
  * operation is `map`, whose behavior is constrained only by type and
@@ -122,6 +123,11 @@ object Functor {
     }
 
   ////
+
+  trait OverrideWiden[F[+ _]] extends Functor[F] {
+    override final def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
+      Liskov.co[F, A, B](ev).apply(fa)
+  }
 
   ////
 }
