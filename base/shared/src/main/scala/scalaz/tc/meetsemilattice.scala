@@ -2,7 +2,7 @@ package scalaz.tc
 
 import scala.{ Boolean, Unit }
 import scalaz.data.{ Const, Identity }
-import scalaz.meta
+import scalaz.ops
 
 import scala.language.experimental.macros
 
@@ -59,6 +59,6 @@ object MeetSemiLatticeClass {
 
 trait MeetSemiLatticeSyntax {
   implicit final class ToMeetSemiLatticeOps[A](a: A) {
-    def meet(f: A)(implicit ev: MeetSemiLattice[A]): A = macro meta.Ops.ia_1
+    def meet(f: A)(implicit ev: MeetSemiLattice[A]): A = macro ops.Ops.ia_1
   }
 }
