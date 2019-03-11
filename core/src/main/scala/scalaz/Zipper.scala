@@ -9,7 +9,7 @@ import annotation.tailrec
  * <p/>
  * Based on the pointedlist library by Jeff Wheeler.
  */
-final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
+final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   import Zipper._
 
   def map[B](f: A => B): Zipper[B] =
@@ -25,14 +25,14 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Update the focus in this zipper.
    */
-  def update[AA >: A](focus: AA): Zipper[AA] = {
+  def update(focus: A): Zipper[A] = {
     this.copy(this.lefts, focus, this.rights)
   }
 
   /**
    * Apply f to the focus and update with the result.
    */
-  def modify[AA >: A](f: A => AA): Zipper[AA] = this.update(f(this.focus))
+  def modify(f: A => A): Zipper[A] = this.update(f(this.focus))
 
   /**
    * Possibly moves to next element to the right of focus.
@@ -45,7 +45,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to next element to the right of focus.
    */
-  def nextOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def nextOr(z: => Zipper[A]): Zipper[A] =
     next getOrElse z
 
   /**
@@ -59,7 +59,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to previous element to the left of focus.
    */
-  def previousOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def previousOr(z: => Zipper[A]): Zipper[A] =
     previous getOrElse z
 
   /**
@@ -70,17 +70,17 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * An alias for insertRight
    */
-  def insert[AA >: A]: (AA => Zipper[AA]) = insertRight(_: AA)
+  def insert(a: A): Zipper[A] = insertRight(a)
 
   /**
    * Inserts an element to the left of focus and focuses on the new element.
    */
-  def insertLeft[AA >: A](y: AA): Zipper[AA] = zipper(lefts, y, focus #:: rights)
+  def insertLeft(y: A): Zipper[A] = zipper(lefts, y, focus #:: rights)
 
   /**
    * Inserts an element to the right of focus and focuses on the new element.
    */
-  def insertRight[AA >: A](y: AA): Zipper[AA] = zipper(focus #:: lefts, y, rights)
+  def insertRight(y: A): Zipper[A] = zipper(focus #:: lefts, y, rights)
 
   /**
    * An alias for `deleteRight`
@@ -103,7 +103,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
    * focus is moved to the right.
    */
-  def deleteLeftOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def deleteLeftOr(z: => Zipper[A]): Zipper[A] =
     deleteLeft getOrElse z
 
   /**
@@ -122,7 +122,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
    * focus is moved to the left.
    */
-  def deleteRightOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def deleteRightOr(z: => Zipper[A]): Zipper[A] =
     deleteRight getOrElse z
 
   /**
@@ -190,7 +190,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Moves focus to the nth element of the zipper, or the default if there is no such element.
    */
-  def moveOr[AA >: A](n: Int, z: => Zipper[AA]): Zipper[AA] =
+  def moveOr(n: Int, z: => Zipper[A]): Zipper[A] =
     move(n) getOrElse z
 
   /**
@@ -208,15 +208,15 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Moves focus to the nearest element matching the given predicate, preferring the left,
    * or the default if no element matches.
    */
-  def findZor[AA >: A](p: A => Boolean, z: => Zipper[AA]): Zipper[AA] =
+  def findZor(p: A => Boolean, z: => Zipper[A]): Zipper[A] =
     findZ(p) getOrElse z
 
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
    */
-  def findBy[AA >: A](f: Zipper[AA] => Option[Zipper[AA]])(p: AA => Boolean): Option[Zipper[AA]] = {
+  def findBy(f: Zipper[A] => Option[Zipper[A]])(p: A => Boolean): Option[Zipper[A]] = {
     @tailrec
-    def go(zopt: Option[Zipper[AA]]): Option[Zipper[AA]] = {
+    def go(zopt: Option[Zipper[A]]): Option[Zipper[A]] = {
       zopt match {
         case Some(z) => if (p(z.focus)) Some(z) else go(f(z))
         case None    => None
@@ -291,7 +291,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the left. If the focus was on the first element,
    * focus is moved to the last element.
    */
-  def deleteLeftCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def deleteLeftCOr(z: => Zipper[A]): Zipper[A] =
     deleteLeftC getOrElse z
 
   /**
@@ -315,7 +315,7 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
    * focus is moved to the first element.
    */
-  def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
+  def deleteRightCOr(z: => Zipper[A]): Zipper[A] =
     deleteRightC getOrElse z
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
@@ -439,4 +439,6 @@ sealed abstract class ZipperInstances {
     val right = Show[Stream[A]].show(f.rights)
     cord"Zipper($left,${f.focus},$right)"
   }
+
+  implicit val covariant: IsCovariant[Zipper] = IsCovariant.force 
 }

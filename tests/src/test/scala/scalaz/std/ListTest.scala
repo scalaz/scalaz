@@ -118,7 +118,7 @@ object ListTest extends SpecLite {
         val j = i + (if (f(a)) 0 else 1)
         val done = j >= n
         (j, !done)
-    }).evalZero[Int]
+    }).evalZero
 
     val actual = takeWhileN("/abc/def/hij/klm".toList, 4)(_ != '/').mkString
     actual must_===("/abc/def/hij")

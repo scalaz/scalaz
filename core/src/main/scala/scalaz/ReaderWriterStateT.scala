@@ -1,7 +1,7 @@
 package scalaz
 
 /** A monad transformer stack yielding `(R, S1) => F[(W, A, S2)]`. */
-sealed abstract class IndexedReaderWriterStateT[-R, W, -S1, S2, F[_], A] {
+sealed abstract class IndexedReaderWriterStateT[R, W, S1, S2, F[_], A] {
   self =>
 
   def getF[S <: S1, RR <: R]: Monad[F] => F[(RR, S) => F[(W, A, S2)]]
@@ -128,6 +128,12 @@ abstract class ReaderWriterStateTInstances extends ReaderWriterStateTInstances0 
     new ReaderWriterStateTHoist[R, W, S] {
       implicit def W = W0
     }
+
+  implicit def rwstContravariantR[W, S1, S2, F[_], A]: IsContravariant[IRWST[?, W, S1, S2, F, A]] =
+    IsContravariant.force[IRWST[?, W, S1, S2, F, A]]
+
+  implicit def rwstContravariantS1[R, W, S2, F[_], A]: IsContravariant[IRWST[R, W, ?, S2, F, A]] =
+    IsContravariant.force[IRWST[R, W, ?, S2, F, A]]
 
 }
 

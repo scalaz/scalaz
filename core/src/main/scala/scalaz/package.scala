@@ -108,10 +108,10 @@ package object scalaz {
   type @@[T, Tag] = scalaz.Tag.k.@@[T, Tag]
 
   /** A [[scalaz.NaturalTransformation]][F, G]. */
-  type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
+  type ~>[F[_], G[_]] = NaturalTransformation[F, G]
   /** A [[scalaz.NaturalTransformation]][G, F]. */
-  type <~[+F[_], -G[_]] = NaturalTransformation[G, F]
-  type ~~>[-F[_,_], +G[_,_]] = BiNaturalTransformation[F, G]
+  type <~[F[_], G[_]] = NaturalTransformation[G, F]
+  type ~~>[F[_,_], G[_,_]] = BiNaturalTransformation[F, G]
 
   /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
   type ===[A,B] = Leibniz[⊥, ⊤, A, B]
@@ -153,7 +153,7 @@ package object scalaz {
   type StateT[S, F[_], A] = IndexedStateT[S, S, F, A]
 
   /** @template */
-  type IndexedState[-S1, S2, A] = IndexedStateT[S1, S2, Id, A]
+  type IndexedState[S1, S2, A] = IndexedStateT[S1, S2, Id, A]
 
   /** A state transition, representing a function `S => (S, A)`.
     *
@@ -219,29 +219,29 @@ package object scalaz {
   def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
   /** @template */
-  type ReaderWriterStateT[-R, W, S, F[_], A] = IndexedReaderWriterStateT[R, W, S, S, F, A]
+  type ReaderWriterStateT[R, W, S, F[_], A] = IndexedReaderWriterStateT[R, W, S, S, F, A]
   object ReaderWriterStateT extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[R, W, S, F[_], A](f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[R, W, S, F, A] = IndexedReaderWriterStateT[R, W, S, S, F, A] { (r: R, s: S) => f(r, s) }
   }
 
   /** @template */
-  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A]
+  type IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A]
   object IndexedReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[R, W, S1, S2, A](f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] = IndexedReaderWriterStateT[R, W, S1, S2, Id, A] { (r: R, s: S1) => f(r, s) }
   }
 
   /** @template */
-  type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[R, W, S, Id, A]
+  type ReaderWriterState[R, W, S, A] = ReaderWriterStateT[R, W, S, Id, A]
   object ReaderWriterState extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
     def apply[R, W, S, A](f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] = IndexedReaderWriterStateT[R, W, S, S, Id, A] { (r: R, s: S) => f(r, s) }
   }
-  type IRWST[-R, W, -S1, S2, F[_], A] = IndexedReaderWriterStateT[R, W, S1, S2, F, A]
+  type IRWST[R, W, S1, S2, F[_], A] = IndexedReaderWriterStateT[R, W, S1, S2, F, A]
   val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
-  type IRWS[-R, W, -S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
+  type IRWS[R, W, S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
   val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
-  type RWST[-R, W, S, F[_], A] = ReaderWriterStateT[R, W, S, F, A]
+  type RWST[R, W, S, F[_], A] = ReaderWriterStateT[R, W, S, F, A]
   val RWST: ReaderWriterStateT.type = ReaderWriterStateT
-  type RWS[-R, W, S, A] = ReaderWriterState[R, W, S, A]
+  type RWS[R, W, S, A] = ReaderWriterState[R, W, S, A]
   val RWS: ReaderWriterState.type = ReaderWriterState
 
   /** An [[scalaz.Validation]] with a [[scalaz.NonEmptyList]] as the failure type.
@@ -310,13 +310,13 @@ package object scalaz {
   type @?>[A, B] = PLens[A, B]
 
   /** @template */
-  type PIndexedStateT[F[_], -S1, S2, A] = IndexedStateT[S1, S2, F, Option[A]]
+  type PIndexedStateT[F[_], S1, S2, A] = IndexedStateT[S1, S2, F, Option[A]]
 
   /** @template */
   type PStateT[F[_], S, A] = PIndexedStateT[F, S, S, A]
 
   /** @template */
-  type PIndexedState[-S1, S2, A] = PIndexedStateT[Id, S1, S2, A]
+  type PIndexedState[S1, S2, A] = PIndexedStateT[Id, S1, S2, A]
 
   /** @template */
   type PState[S, A] = PStateT[Id, S, A]
