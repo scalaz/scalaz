@@ -66,7 +66,7 @@ object MixedBag extends App {
     import syntax.equal._
     import syntax.strictTree._
     import syntax.traverse._
-    import std.vector._
+    import std.list._
 
     val tree: StrictTree[Int] = 1.strictNode(2.strictNode(3.strictLeaf), 4.strictLeaf, 5.strictLeaf)
     val r = tree.foldRight(".")((i, s) => i.toString |+| s)
