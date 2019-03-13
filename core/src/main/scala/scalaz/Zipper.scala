@@ -440,5 +440,5 @@ sealed abstract class ZipperInstances {
     cord"Zipper($left,${f.focus},$right)"
   }
 
-  implicit val covariant: IsCovariant[Zipper] = IsCovariant.force 
+  implicit val covariant: IsCovariant[Zipper] = IsCovariant.force
 }
