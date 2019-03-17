@@ -8,7 +8,6 @@ object BaseHierarchy {
 
   trait BH0 extends BH1 {
     implicit def choiceProfunctor[P[_, _]](implicit P: Choice[P]): Profunctor[P]               = instanceOf(P)
-    implicit def applctvplusApplicative[M[_]](implicit M: ApplicativePlus[M]): Applicative[M]  = instanceOf(M)
     implicit def applctvplusPlusempty[M[_]](implicit M: ApplicativePlus[M]): PlusEmpty[M]      = instanceOf(M)
     implicit def applyFunctor[M[_]](implicit M: Apply[M]): Functor[M]                          = instanceOf(M)
     implicit def bindApply[M[_]](implicit M: Bind[M]): Apply[M]                                = instanceOf(M)
@@ -25,6 +24,7 @@ object BaseHierarchy {
   }
 
   trait BH1 extends BH2 {
+    implicit def applctverrorApplicative[M[_], E](implicit M: ApplicativeError[M, E]): Applicative[M]   = instanceOf(M)
     implicit def contravariantInvariantFunctor[F[_]](implicit F: Contravariant[F]): InvariantFunctor[F] = instanceOf(F)
     implicit def traversableFunctor[T[_]](implicit T: Traversable[T]): Functor[T]                       = instanceOf(T)
     implicit def applicativeApply[M[_]](implicit M: Applicative[M]): Apply[M]                           = instanceOf(M)
@@ -32,6 +32,7 @@ object BaseHierarchy {
   }
 
   trait BH2 extends BH3 {
+    implicit def applctvplusApplicative[M[_]](implicit M: ApplicativePlus[M]): Applicative[M] = instanceOf(M)
     implicit def bifunctorFunctor[F[_, _], A](implicit F: Bifunctor[F]): Functor[F[A, ?]] =
       instanceOf(new FunctorClass[F[A, ?]] {
         def map[B, C](fab: F[A, B])(f: B => C): F[A, C] = F.rmap(fab)(f)

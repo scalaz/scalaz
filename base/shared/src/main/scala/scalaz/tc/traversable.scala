@@ -12,6 +12,9 @@ trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
   def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]] = sequence(map(ta)(f))
 
   def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
+
+  def compose[G[_]](implicit G: TraversableClass[G]): Traversable[λ[α => T[G[α]]]] =
+    instanceOf(new CompositionTraversableClass[T, G]()(this, G))
 }
 
 object TraversableClass {
@@ -19,9 +22,7 @@ object TraversableClass {
     instanceOf(new TraversableClass[List] {
       override def traverse[F[_], A, B](ta: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] =
         ta.foldLeft[F[List[B]]](F.pure(List.empty[B])) { (flb, a) =>
-          {
-            F.ap(flb)(F.map(f(a))(b => (xs: List[B]) => b :: xs))
-          }
+          F.ap(flb)(F.map(f(a))(b => (xs: List[B]) => b :: xs))
         }
 
       override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
