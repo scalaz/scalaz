@@ -63,7 +63,7 @@ trait TraversableSyntax {
   }
 }
 
-class CompositionTraversableClass[F[_], G[_]](implicit F: TraversableClass[F], G: TraversableClass[G])
+private class CompositionTraversableClass[F[_], G[_]](implicit F: TraversableClass[F], G: TraversableClass[G])
     extends CompositionFunctorClass[F, G]
     with TraversableClass[λ[α => F[G[α]]]] {
 
