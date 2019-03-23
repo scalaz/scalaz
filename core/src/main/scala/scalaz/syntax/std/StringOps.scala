@@ -2,9 +2,11 @@ package scalaz
 package syntax
 package std
 
+import _root_.java.math.{ BigDecimal, BigInteger }
+
 import scalaz.std.{string => s}
 
-final class StringOps(val self: String) extends AnyVal {
+final class StringOps(private val self: String) extends AnyVal {
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
    * this String ends with "y" and not one of ["ay", "ey", "iy", "oy", "uy"] in which case the 'y' character is chopped and "ies"
@@ -24,23 +26,23 @@ final class StringOps(val self: String) extends AnyVal {
 
   // Parsing functions.
 
-  def parseBoolean: Validation[IllegalArgumentException, Boolean] = s.parseBoolean(self)
+  def parseBoolean: Validation[String, Boolean] = s.parseBoolean(self)
 
-  def parseByte: Validation[NumberFormatException, Byte] = s.parseByte(self)
+  def parseByte: Validation[String, Byte] = s.parseByte(self)
 
-  def parseShort: Validation[NumberFormatException, Short] = s.parseShort(self)
+  def parseShort: Validation[String, Short] = s.parseShort(self)
 
-  def parseInt: Validation[NumberFormatException, Int] = s.parseInt(self)
+  def parseInt: Validation[String, Int] = s.parseInt(self)
 
-  def parseLong: Validation[NumberFormatException, Long] = s.parseLong(self)
+  def parseLong: Validation[String, Long] = s.parseLong(self)
 
-  def parseFloat: Validation[NumberFormatException, Float] = s.parseFloat(self)
+  def parseFloat: Validation[String, Float] = s.parseFloat(self)
 
-  def parseDouble: Validation[NumberFormatException, Double] = s.parseDouble(self)
+  def parseDouble: Validation[String, Double] = s.parseDouble(self)
 
-  def parseBigInt: Validation[NumberFormatException, BigInt] = s.parseBigInt(self)
+  def parseBigInt: Validation[String, BigInteger] = s.parseBigInt(self)
 
-  def parseBigDecimal: Validation[NumberFormatException, BigDecimal] = s.parseBigDecimal(self)
+  def parseBigDecimal: Validation[String, BigDecimal] = s.parseBigDecimal(self)
 }
 
 trait ToStringOps {

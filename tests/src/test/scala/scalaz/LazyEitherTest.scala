@@ -3,6 +3,7 @@ package scalaz
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import syntax.either._
 
 object LazyEitherTest extends SpecLite {
   implicit def LazyEitherEqual[A: Equal, B: Equal]: Equal[LazyEither[A, B]] = new Equal[LazyEither[A, B]] {
@@ -13,6 +14,7 @@ object LazyEitherTest extends SpecLite {
 
   checkAll(equal.laws[LazyEither[Int,Int]])
   checkAll(monad.laws[LazyEither[Int, ?]])
+  checkAll(alt.laws[LazyEither[Int, ?]])
   checkAll(monadError.laws[LazyEither[Int, ?], Int])
   checkAll(bindRec.laws[LazyEither[Int, ?]])
   checkAll(traverse.laws[LazyEither[Int, ?]])
@@ -24,7 +26,7 @@ object LazyEitherTest extends SpecLite {
 
     val result =
       BindRec[LazyEither[Int, ?]].tailrecM(0) {
-        i => LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i))
+        i => LazyEither.lazyRight(if (i < 10000) (i + 1).left[Int] else i.right[Int])
       }
     result.getOrElse(0) must_=== times
   }

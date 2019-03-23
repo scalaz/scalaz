@@ -5,6 +5,7 @@ import java.math.BigInteger
 
 trait BigIntegerInstances {
   implicit val bigIntegerInstance: Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] = new Monoid[BigInteger] with Enum[BigInteger] with Show[BigInteger] {
+    override def show(f: BigInteger): Cord = Cord(shows(f))
     override def shows(f: BigInteger) = f.toString
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
@@ -13,8 +14,8 @@ trait BigIntegerInstances {
 
     def succ(b: BigInteger) = b add BigInteger.ONE
     def pred(b: BigInteger) = b subtract BigInteger.ONE
-    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a)
-    override def predn(a: Int, b: BigInteger) = b subtract BigInteger.valueOf(a)
+    override def succn(a: Int, b: BigInteger) = b add BigInteger.valueOf(a.toLong)
+    override def predn(a: Int, b: BigInteger) = b subtract BigInteger.valueOf(a.toLong)
     override def min = None
     override def max = None
 
@@ -28,7 +29,8 @@ trait BigIntegerInstances {
   import Tags.Multiplication
 
   implicit val bigIntegerMultiplication: Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] = new Monoid[BigInteger @@ Multiplication] with Order[BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] {
-    override def shows(f: scalaz.@@[BigInteger, Multiplication]) = f.toString
+    override def show(f: BigInteger @@ Multiplication): Cord = Cord(shows(f))
+    override def shows(f: BigInteger @@ Multiplication) = f.toString
 
     def append(f1: BigInteger @@ Multiplication, f2: => BigInteger @@ Multiplication) = Multiplication(Tag.unwrap(f1) multiply Tag.unwrap(f2))
 

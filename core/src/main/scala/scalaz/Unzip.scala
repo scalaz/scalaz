@@ -14,7 +14,7 @@ trait Unzip[F[_]]  { self =>
   def firsts[A, B](a: F[(A, B)]): F[A] = unzip(a)._1
   def seconds[A, B](a: F[(A, B)]): F[B] = unzip(a)._2
 
-  /**The composition of Unzips `F` and `G`, `[x]F[G[x]]`, is a Unzip */
+  /**The composition of Unzips `F` and `G`, `[x]F[G[x]]`, is an Unzip */
   def compose[G[_]](implicit T0: Functor[F], G0: Unzip[G]): Unzip[λ[α => F[G[α]]]] =
     new CompositionUnzip[F, G] {
       implicit def F = self
@@ -22,7 +22,7 @@ trait Unzip[F[_]]  { self =>
       implicit def G = G0
     }
 
-  /**The product of Unzips `F` and `G`, `[x](F[x], G[x]])`, is a Unzip */
+  /**The product of Unzips `F` and `G`, `[x](F[x], G[x]])`, is an Unzip */
   def product[G[_]](implicit G0: Unzip[G]): Unzip[λ[α => (F[α], G[α])]] =
     new ProductUnzip[F, G] {
       implicit def F = self
@@ -66,6 +66,28 @@ trait Unzip[F[_]]  { self =>
 object Unzip {
   @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Unzip[G]): Unzip[F] =
+    new IsomorphismUnzip[F, G] {
+      override def G: Unzip[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+  ////
+}
+
+trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
+  implicit def G: Unzip[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  def unzip[A, B](a: F[(A, B)]): (F[A], F[B]) =
+    G.unzip(iso.to(a)) match {
+      case (f, s) => (iso.from(f), iso.from(s))
+    }
   ////
 }

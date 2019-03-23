@@ -14,26 +14,25 @@ import Liskov.<~<
  * `NumberFormatException` [[\/]] `Int`. However, since there is no need to actually throw an exception, the type (`A`)
  * chosen for the "left" could be any type representing an error and has no need to actually extend `Exception`.
  *
- * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased, so methods such as `map` and
- * `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more convenient to use
- * than `scala.Either` in a monadic context. Methods such as `swap`, `swapped`, and `leftMap` provide functionality
- * that `scala.Either` exposes through left projections.
+ * `A` [[\/]] `B` is isomorphic to `scala.Either[A, B]`, but [[\/]] is right-biased for all Scala versions, so methods
+ * such as `map` and `flatMap` apply only in the context of the "right" case. This right bias makes [[\/]] more
+ * convenient to use than `scala.Either` in a monadic context in Scala versions <2.12. Methods such as `swap`,
+ * `swapped`, and `leftMap` provide functionality that `scala.Either` exposes through left projections.
  *
  * `A` [[\/]] `B` is also isomorphic to [[Validation]]`[A, B]`. The subtle but important difference is that [[Applicative]]
  * instances for [[Validation]] accumulates errors ("lefts") while [[Applicative]] instances for [[\/]] fail fast on the
  * first "left" they evaluate. This fail-fast behavior allows [[\/]] to have lawful [[Monad]] instances that are consistent
  * with their [[Applicative]] instances, while [[Validation]] cannot.
  */
-sealed abstract class \/[+A, +B] extends Product with Serializable {
+sealed abstract class \/[A, B] extends Product with Serializable {
   final class SwitchingDisjunction[X](r: => X) {
-    def <<?:(left: => X): X =
-      \/.this match {
-        case -\/(_) => left
-        case \/-(_) => r
-      }
+    def <<?:(left: X): X =
+      foldConst(left, r)
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
+  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
+              since = "7.3.0")
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
     new SwitchingDisjunction[X](right)
 
@@ -58,12 +57,19 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case \/-(b) => r(b)
     }
 
+  /** Evaluate `l` and return if left, otherwise, `r`. */
+  def foldConst[X](l: => X, r: => X): X =
+    this match {
+      case -\/(a) => l
+      case \/-(b) => r
+    }
+
   /** Spin in tail-position on the right value of this disjunction. */
-  def loopr[AA >: A, BB >: B, X](left: AA => X, right: BB => X \/ (AA \/ BB)): X =
+  def loopr[X](left: A => X, right: B => X \/ (A \/ B)): X =
     \/.loopRight(this, left, right)
 
   /** Spin in tail-position on the left value of this disjunction. */
-  def loopl[AA >: A, BB >: B, X](left: AA => X \/ (AA \/ BB), right: BB => X): X =
+  def loopl[X](left: A => X \/ (A \/ B), right: B => X): X =
     \/.loopLeft(this, left, right)
 
   /** Flip the left/right values in this disjunction. Alias for `unary_~` */
@@ -96,7 +102,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def leftMap[C](f: A => C): (C \/ B) =
     this match {
       case -\/(a) => -\/(f(a))
-      case b @ \/-(_) => b
+      case b @ \/-(_) => b.coerceLeft
     }
 
   /** Binary functor traverse on this disjunction. */
@@ -109,29 +115,29 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   /** Map on the right of this disjunction. */
   def map[D](g: B => D): (A \/ D) =
     this match {
-      case \/-(a)     => \/-(g(a))
-      case b @ -\/(_) => b
+      case \/-(b)     => \/-(g(b))
+      case a @ -\/(_) => a.coerceRight
     }
 
   /** Traverse on the right of this disjunction. */
-  def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \/ D] =
+  def traverse[F[_]: Applicative, D](g: B => F[D]): F[A \/ D] =
     this match {
-      case a @ -\/(_) => Applicative[F].point(a)
+      case a @ -\/(_) => Applicative[F].point(a.coerceRight)
       case \/-(b) => Functor[F].map(g(b))(\/.right)
     }
 
   /** Run the side-effect on the right of this disjunction. */
   def foreach(g: B => Unit): Unit =
-    bimap(_ => (), g)
+    fold(_ => (), g)
 
   /** Apply a function in the environment of the right of this disjunction. */
-  def ap[AA >: A, C](f: => AA \/ (B => C)): (AA \/ C) =
+  def ap[C](f: => A \/ (B => C)): (A \/ C) =
     f flatMap (ff => map(ff(_)))
 
   /** Bind through the right of this disjunction. */
-  def flatMap[AA >: A, D](g: B => (AA \/ D)): (AA \/ D) =
+  def flatMap[D](g: B => (A \/ D)): (A \/ D) =
     this match {
-      case a @ -\/(_) => a
+      case a @ -\/(_) => a.coerceRight
       case \/-(b) => g(b)
     }
 
@@ -143,7 +149,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Filter on the right of this disjunction. */
-  def filter[AA >: A](p: B => Boolean)(implicit M: Monoid[AA]): (AA \/ B) =
+  def filter(p: B => Boolean)(implicit M: Monoid[A]): (A \/ B) =
     this match {
       case -\/(_) => this
       case \/-(b) => if(p(b)) this else -\/(M.zero)
@@ -169,6 +175,14 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       case -\/(_) => Nil
       case \/-(b) => b :: Nil
     }
+
+  /** Return an empty list or list with one element on the right of this disjunction. */
+  def toIList[BB >: B]: IList[BB] =
+    this match {
+      case -\/(_) => INil()
+      case \/-(b) => b :: INil()
+    }
+
 
   /** Return an empty stream or stream with one element on the right of this disjunction. */
   def toStream: Stream[B] =
@@ -217,14 +231,14 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
-  def orElse[C, BB >: B](x: => C \/ BB): C \/ BB =
+  def orElse[C](x: => C \/ B): C \/ B =
     this match {
       case -\/(_) => x
-      case right@ \/-(_) => right
+      case right@ \/-(_) => right.coerceLeft
     }
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `orElse` */
-  def |||[C, BB >: B](x: => C \/ BB): C \/ BB =
+  def |||[C](x: => C \/ B): C \/ B =
     orElse(x)
 
   /**
@@ -236,7 +250,7 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
    * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
    * }}}
    */
-  def +++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M1: Semigroup[BB], M2: Semigroup[AA]): AA \/ BB =
+  def +++(x: => A \/ B)(implicit M1: Semigroup[B], M2: Semigroup[A]): A \/ B =
     this match {
       case -\/(a1) => x match {
         case -\/(a2) => -\/(M2.append(a1, a2))
@@ -249,19 +263,19 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
     }
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
-  def ensure[AA >: A](onLeft: => AA)(f: B => Boolean): (AA \/ B) = this match {
+  def ensure(onLeft: => A)(f: B => Boolean): (A \/ B) = this match {
     case \/-(b) => if (f(b)) this else -\/(onLeft)
     case -\/(_) => this
   }
 
   /** Run the given function on the left and return right with the result. */
-  def recover[BB >: B](pf: PartialFunction[A, BB]): (A \/ BB) = this match {
+  def recover(pf: PartialFunction[A, B]): (A \/ B) = this match {
     case -\/(a) if (pf isDefinedAt a) => \/-(pf(a))
     case _ => this
   }
 
   /** Run the given function on the left and return the result. */
-  def recoverWith[AA >: A, BB >: B](pf: PartialFunction[AA, AA \/ BB]): (AA \/ BB) = this match {
+  def recoverWith(pf: PartialFunction[A, A \/ B]): (A \/ B) = this match {
     case -\/(a) if (pf isDefinedAt a) => pf(a)
     case _ => this
   }
@@ -292,11 +306,12 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       }
     }
 
+  import syntax.show._
   /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB]): Cord =
     this match {
-      case -\/(a) => ("-\\/(": Cord) ++ SA.show(a) :- ')'
-      case \/-(b) => ("\\/-(": Cord) ++ SB.show(b) :- ')'
+      case -\/(a) => cord"-\\/(${SA.show(a)})"
+      case \/-(b) => cord"\\/-(${SB.show(b)})"
     }
 
   /** Convert to a Validation. */
@@ -335,19 +350,38 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
       b => \&/.That(b)
     )
 
+  def orRaiseError[F[_]](implicit F: MonadError[F, A]): F[B] =
+    fold(
+      a => F.raiseError(a),
+      b => F.point(b)
+    )
 }
 
 /** A left disjunction
  *
  * Often used to represent the failure case of a result
  */
-final case class -\/[+A](a: A) extends (A \/ Nothing)
+final case class -\/[A, B](a: A) extends (A \/ B) {
+  def coerceRight[C]: A \/ C = this.asInstanceOf[A \/ C]
+}
+
+object -\/ {
+  /** Override smart constructor to return less specific type. */
+  def apply[A, B](a: A): A \/ B = new -\/(a)
+}
 
 /** A right disjunction
  *
  * Often used to represent the success case of a result
  */
-final case class \/-[+B](b: B) extends (Nothing \/ B)
+final case class \/-[A, B](b: B) extends (A \/ B) {
+  def coerceLeft[C]: C \/ B = this.asInstanceOf[C \/ B]
+}
+
+object \/- {
+  /** Override smart constructor to return less specific type. */
+  def apply[A, B](b: B): A \/ B = new \/-(b)
+}
 
 object \/ extends DisjunctionInstances {
 
@@ -363,17 +397,46 @@ object \/ extends DisjunctionInstances {
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): E \/ T = try {
+  /** Construct a disjunction value from a standard `scala.Option`. */
+  def fromOption[A, B](ifNone: => A)(o: Option[B]): A \/ B =
+    o.fold(left[A, B](ifNone))(right)
+
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
+  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
     \/-(a)
   } catch {
     case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
   }
 
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = try {
-    \/-(a)
-  } catch {
-    case NonFatal(t) => -\/(t)
-  }
+  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
+  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = attempt(a)(identity)
+
+  /**
+   * Wrap a call to a deterministic partial function, making a total function.
+   * May be used to interface with legacy methods that do not have an FP
+   * equivalent.
+   *
+   * The `err` callback must convert the non-referentially transparent
+   * `Throwable` (which is anything caught by the `NonFatal` construct) into a
+   * data type. The caller is trusted not to allow the stack trace to escape
+   * into the `A` data type.
+   *
+   * Note that exceptions are extremely inefficient. Callers should consider
+   * validating the input to their partial function and exiting early.
+   *
+   * If no useful information can be obtained from the `Throwable`, prefer
+   * [[scalaz.Maybe#attempt]].
+   *
+   * For interfacing with non-deterministic blocks of code that may or may not
+   * throw `Throwable`, use [[scalaz.effect.IO]].
+   *
+   * For interfacing with deterministic functions that violate the type system
+   * by returning `null`, use [[scalaz.Maybe#fromNullable]].
+   */
+  def attempt[A, B](f: => B)(err: Throwable => A): A \/ B =
+    try \/-(f) catch {
+      case NonFatal(t) => -\/(err(t))
+    }
 
   /** Spin in tail-position on the right value of the given disjunction. */
   @annotation.tailrec
@@ -435,21 +498,41 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
-    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
+  implicit def DisjunctionBand[A: Band, B: Band]: Band[A \/ B] =
+    new Band[A \/ B] {
+      def append(a1: A \/ B, a2: => A \/ B) =
+        a1 +++ a2
+    }
+
+  implicit def DisjunctionInstances1[L]: Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Alt[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] =
+    new Traverse[L \/ ?] with Monad[L \/ ?] with BindRec[L \/ ?] with Cozip[L \/ ?] with Plus[L \/ ?] with Alt[L \/ ?] with Optional[L \/ ?] with MonadError[L \/ ?, L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
+
+      override def ap[A,B](fa: => L \/ A)(f: => L \/ (A => B)): L \/ B = fa.ap(f)
+
+      override def apply2[A, B, C](fa: => L \/ A, fb: => L \/ B)(f: (A, B) => C): L \/ C =
+        fa match {
+          case \/-(a) =>
+            fb match {
+              case \/-(b) => \/-(f(a, b))
+              case e => e.asInstanceOf[L \/ C]
+            }
+          case e => e.asInstanceOf[L \/ C]
+        }
 
       @scala.annotation.tailrec
       def tailrecM[A, B](a: A)(f: A => L \/ (A \/ B)): L \/ B =
         f(a) match {
-          case l @ -\/(_) => l
+          case l @ -\/(_) => l.coerceRight
           case \/-(-\/(a0)) => tailrecM(a0)(f)
-          case \/-(rb @ \/-(_)) => rb
+          case \/-(rb @ \/-(_)) => rb.coerceLeft
         }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
         fa flatMap f
+
+      override def emap[A, B](fa: L \/ A)(f: A => L \/ B) = bind(fa)(f)
 
       def point[A](a: => A) =
         \/-(a)
@@ -462,19 +545,22 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
 
       def cozip[A, B](x: L \/ (A \/ B)) =
         x match {
-          case l @ -\/(_) => -\/(l)
+          case l @ -\/(_) => -\/(l.coerceRight)
           case \/-(e) => e match {
             case -\/(a) => -\/(\/-(a))
-            case b @ \/-(_) => \/-(b)
+            case b @ \/-(_) => \/-(b.coerceLeft)
           }
         }
 
       def plus[A](a: L \/ A, b: => L \/ A) =
         a orElse b
 
+      def alt[A](a: => L \/ A, b: => L \/ A) =
+        plus(a, b)
+
       def pextract[B, A](fa: L \/ A): (L \/ B) \/ A = fa match {
-        case l@ -\/(_) => -\/(l)
-        case r@ \/-(_) => r
+        case l@ -\/(_) => -\/(l.coerceRight)
+        case r@ \/-(_) => r.coerceLeft
       }
 
       def raiseError[A](e: L): L \/ A =

@@ -4,7 +4,7 @@ import scalaz.{Monoid, StateT}
 
 
 /**
- * Character/Line/Word Count from "The Essense of the Iterator Pattern".
+ * Character/Line/Word Count from "The Essence of the Iterator Pattern".
  *
  * @see [[http://www.comlab.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf]]
  */
@@ -13,12 +13,12 @@ object WordCount {
     wordCount
   }
 
-  def wordCount {
+  def wordCount(): Unit = {
     import scalaz.State
 
     val text = "the cat in the hat\n sat on the mat\n".toList
 
-    import scalaz.std.anyVal._, scalaz.std.list._, scalaz.std.boolean.test, scalaz.std.int.heaviside
+    import scalaz.std.anyVal._, scalaz.std.list._, scalaz.std.boolean.test
 
     // To count words, we need to detect transitions from whitespace to non-whitespace.
     // atWordStart_{i} = heaviside( test(isSpace(c_{i}) - test(isSpace(c_{i-1})) )

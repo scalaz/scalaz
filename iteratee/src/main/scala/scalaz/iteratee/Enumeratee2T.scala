@@ -18,7 +18,7 @@ trait Enumeratee2TFunctions {
   @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, IterateeT[K, F, ?], A] =
     IterateeT.IterateeTMonadTrans[J].liftM[IterateeT[K, F, ?], A](iter)
 
-  def cogroupI[J, K, F[_]](implicit M: Monad[F], order: (J, K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
+  def cogroupI[J, K, F[_]](compare: (J, K) => Ordering)(implicit M: Monad[F]): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
     new Enumeratee2T[J, K, Either3[J, (J, K), K], F] {
       def apply[A] = {
         // Used to 'replay' values from the right for when values from the left order equal
@@ -27,8 +27,8 @@ trait Enumeratee2TFunctions {
         def advance(j: J, buf: List[K], s: StepT[Either3[J, (J, K), K], F, A]): IterateeT[Either3[J,(J, K),K],F,A] = {
           s mapCont { contf =>
             buf match {
-              case k :: Nil if order(j, k) == EQ => contf(elInput(Middle3((j, k))))
-              case k :: ks  if order(j, k) == EQ => contf(elInput(Middle3((j, k)))) >>== (advance(j, ks, _))
+              case k :: Nil if compare(j, k) == EQ => contf(elInput(Middle3((j, k))))
+              case k :: ks  if compare(j, k) == EQ => contf(elInput(Middle3((j, k)))) >>== (advance(j, ks, _))
               case _ => contf(elInput(Left3(j)))
             }
           }
@@ -41,13 +41,13 @@ trait Enumeratee2TFunctions {
                 leftOpt  <- peek[J, IterateeM]
                 rightOpt <- lift[J, K, F, Option[K]](peek[K, F])
                 a <- (leftOpt, rightOpt) match {
-                  case (left, Some(right)) if left.forall(order(_, right) == GT) =>
+                  case (left, Some(right)) if left.forall(compare(_, right) == GT) =>
                     for {
                       _ <- lift[J, K, F, Option[K]](head[K, F])
                       a <- iterateeT[J, IterateeM, StepM[A]](contf(elInput(Right3(right))) >>== (step(_, Nil).value))
                     } yield a
 
-                  case (Some(left), right) if right.forall(order(left, _) == LT) =>
+                  case (Some(left), right) if right.forall(compare(left, _) == LT) =>
                     for {
                       _ <- head[J, IterateeM]
                       a <- iterateeT[J, IterateeM, StepM[A]](advance(left, rbuf, scont(contf)) >>== (step(_, rbuf).value))
@@ -56,7 +56,7 @@ trait Enumeratee2TFunctions {
                   case (Some(left), Some(right)) =>
                     for {
                       _ <- lift[J, K, F, Option[K]](head[K, F])
-                      a <- step(s, if (rbuf.headOption.exists(order(left, _) == EQ)) right :: rbuf else right :: Nil)
+                      a <- step(s, if (rbuf.headOption.exists(compare(left, _) == EQ)) right :: rbuf else right :: Nil)
                     } yield a
 
                   case _ => done[J, IterateeM, StepM[A]](s, eofInput)
@@ -71,7 +71,7 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def joinI[J, K, F[_]](implicit M: Monad[F], ord: (J, K) => Ordering): Enumeratee2T[J, K, (J, K), F] =
+  def joinI[J, K, F[_]](compare: (J, K) => Ordering)(implicit M: Monad[F]): Enumeratee2T[J, K, (J, K), F] =
     new Enumeratee2T[J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[(J, K), F, A]): StepT[Either3[J, (J, K), K], F, StepT[(J, K), F, A]] = step.fold(
@@ -83,7 +83,7 @@ trait Enumeratee2TFunctions {
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[(J, K), F, A]) => cogroupI[J, K, F].apply(cstep(step)) flatMap { endStep[J, K, (J, K), F, A] }
+        (step: StepT[(J, K), F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)) flatMap { endStep[J, K, (J, K), F, A] }
       }
     }
 
@@ -120,7 +120,7 @@ trait Enumeratee2TFunctions {
       }
     }
 
-  def parFoldI[J, K, F[_]](f: K => J)(implicit order: (J, K) => Ordering, m: Monoid[J], M: Monad[F]): Enumeratee2T[J, K, J, F] =
+  def parFoldI[J, K, F[_]](compare: (J, K) => Ordering)(f: K => J)(implicit m: Monoid[J], M: Monad[F]): Enumeratee2T[J, K, J, F] =
     new Enumeratee2T[J, K, J, F] {
       def apply[A] = {
         def cstep(step: StepT[J, F, A]): StepT[Either3[J, (J, K), K], F, StepT[J, F, A]]  = step.fold(
@@ -136,7 +136,7 @@ trait Enumeratee2TFunctions {
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[J, F, A]) => cogroupI[J, K, F].apply(cstep(step)) flatMap { endStep[J, K, J, F, A] }
+        (step: StepT[J, F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)) flatMap { endStep[J, K, J, F, A] }
       }
     }
 

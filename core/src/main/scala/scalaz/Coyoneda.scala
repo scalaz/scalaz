@@ -177,7 +177,7 @@ sealed abstract class CoyonedaInstances5 extends CoyonedaInstances6 {
     }
 
   implicit def coyonedaPlusEmpty[F[_]: PlusEmpty: Functor]: PlusEmpty[Coyoneda[F, ?]] =
-    new IsomorphismEmpty[Coyoneda[F, ?], F] {
+    new IsomorphismPlusEmpty[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }

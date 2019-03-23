@@ -1,19 +1,22 @@
 package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
-import org.scalacheck.Arbitrary
+import scalaz.scalacheck.ScalazArbitrary._
 
 object EndoTest extends SpecLite {
-
-  implicit def endoArb[A](implicit A: Arbitrary[A => A]): Arbitrary[Endo[A]] =
-    Functor[Arbitrary].map(A)(Endo.endo)
 
   implicit val endoIntEqual: Equal[Endo[Int]] =
     Equal.equal( (a, b) =>
       Iterator.fill(20)(util.Random.nextInt).forall(n => a(n) == b(n))
     )
 
+  implicit val endoByNameIntEqual: Equal[EndoByName[Int]] =
+    Equal.equal( (a, b) =>
+      Iterator.fill(20)(util.Random.nextInt).forall(n => a(n) == b(n))
+    )
+
   checkAll(invariantFunctor.laws[Endo])
+
+  checkAll(invariantFunctor.laws[EndoByName])
 
 }

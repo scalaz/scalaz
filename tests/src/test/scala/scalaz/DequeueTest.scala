@@ -8,9 +8,10 @@ import org.scalacheck.Prop.forAll
 object DequeueTest extends SpecLite {
   checkAll(monoid.laws[Dequeue[Int]])
   checkAll(isEmpty.laws[Dequeue])
-  checkAll(foldable.laws[Dequeue])
+  checkAll(traverse.laws[Dequeue])
   checkAll(plusEmpty.laws[Dequeue])
-  checkAll(functor.laws[Dequeue])
+  checkAll(monadPlus.laws[Dequeue])
+  checkAll(alt.laws[Dequeue])
 
   "fromList works" ! forAll{ (l: List[Int]) ⇒
     Dequeue.fromFoldable(l).toStream must_===(l.toStream)

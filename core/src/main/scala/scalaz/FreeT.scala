@@ -105,63 +105,76 @@ sealed abstract class FreeT[S[_], M[_], A] {
     * Runs to completion, mapping the suspension with the given transformation
     * at each step and accumulating into the monad `M`.
     */
-  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] =
-    M0.tailrecM(this){
-      case Suspend(ma) => M0.bind(ma) {
-        case -\/(a) => M1.point(\/-(a))
-        case \/-(sa) => M0.map(f(sa))(\/.right)
-      }
-      case g @ Gosub(_, _) => g.a match {
-        case Suspend(mx) => M0.bind(mx) {
-          case -\/(x) => M1.point(-\/(g.f(x)))
-          case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+  def foldMap(f: S ~> M)(implicit M0: BindRec[M], M1: Applicative[M]): M[A] = {
+    @tailrec
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ A] =
+      ft match {
+        case Suspend(ma) => M0.bind(ma) {
+          case -\/(a) => M1.point(\/-(a))
+          case \/-(sa) => M0.map(f(sa))(\/.right)
         }
-        case g0 @ Gosub(_, _) => M1.point(-\/(g0.a.flatMap(g0.f(_).flatMap(g.f))))
+        case g @ Gosub(_, _) => g.a match {
+          case Suspend(mx) => M0.bind(mx) {
+            case -\/(x) => M1.point(-\/(g.f(x)))
+            case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+          }
+          case g0 @ Gosub(_, _) => go(g0.a.flatMap(g0.f(_).flatMap(g.f)))
+        }
       }
-    }
+
+    M0.tailrecM(this)(go)
+  }
 
   /** Evaluates a single layer of the free monad **/
-  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A \/ S[FreeT[S, M, A]]] =
-    M0.tailrecM(this){
-      case Suspend(f) => M0.map(f)(as => \/-(as.map(S.map(_)(point(_)))))
-      case g1 @ Gosub(_, _) => g1.a match {
-        case Suspend(m1) => M0.map(m1) {
-          case -\/(a) => -\/(g1.f(a))
-          case \/-(fc) => \/-(\/-(S.map(fc)(g1.f(_))))
+  def resume(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[S[FreeT[S, M, A]] \/ A] =
+    M0.map(resumeC)(_.leftMap(_.run))
+
+  def resumeC(implicit M0: BindRec[M], M1: Applicative[M]): M[Coyoneda[S, FreeT[S, M, A]] \/ A] = {
+    @tailrec
+    def go(ft: FreeT[S, M, A]): M[FreeT[S, M, A] \/ (Coyoneda[S, FreeT[S, M, A]] \/ A)] =
+      ft match {
+        case Suspend(f) => M0.map(f) {
+          case -\/(a) => \/-(\/-(a))
+          case \/-(sa) => \/-(-\/(Coyoneda(sa)(point(_))))
         }
-        case g2 @ Gosub(_, _) => M1.point(-\/(g2.a.flatMap(g2.f(_).flatMap(g1.f))))
+        case g1 @ Gosub(_, _) => g1.a match {
+          case Suspend(m1) => M0.map(m1) {
+            case -\/(a) => -\/(g1.f(a))
+            case \/-(fc) => \/-(-\/(Coyoneda(fc)(g1.f(_))))
+          }
+          case g2 @ Gosub(_, _) => go(g2.a.flatMap(g2.f(_).flatMap(g1.f)))
+        }
       }
-    }
+
+    M0.tailrecM(this)(go)
+  }
 
   /**
     * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
     */
   def runM(interp: S[FreeT[S, M, A]] => M[FreeT[S, M, A]])(implicit S: Functor[S], M0: BindRec[M], M1: Applicative[M]): M[A] =
     M0.tailrecM(this)(ft => M0.bind(ft.resume) {
-      case -\/(a) => M1.point(\/-(a))
-      case \/-(fc) => M0.map(interp(fc))(\/.left)
+      case a @ \/-(_) => M1.point(a.coerceLeft)
+      case -\/(fc) => M0.map(interp(fc))(\/.left)
     })
 
   /**
-   * Finds the first `M` instance, `m`, and maps it to contain the rest
-   * of the computation. Since only `map` is used on `m`, its structure
-   * is preserved.
+   * Perform recursive binds on `M` until first suspension is reached.
    */
-  @tailrec
-  private[scalaz] final def toM(implicit M: Applicative[M]): M[FreeT[S, M, A]] =
-    this match {
+  private[scalaz] final def toM(implicit M0: BindRec[M], M: Applicative[M]): M[FreeT[S, M, A]] =
+    M0.tailrecM(this)(_.step match {
       case Suspend(m) => M.map(m) {
-        case -\/(a) => point(a)
-        case \/-(s) => liftF(s)
+        case -\/(a) => \/-(point(a))
+        case \/-(s) => \/-(liftF(s))
       }
       case g1 @ Gosub(_, _) => g1.a match {
         case Suspend(m) => M.map(m) {
-          case -\/(a) => g1.f(a)
-          case \/-(s) => liftF[S, M, g1.A](s).flatMap(g1.f)
+          case -\/(a) => -\/(g1.f(a))
+          case \/-(s) => \/-(liftF[S, M, g1.A](s).flatMap(g1.f))
         }
-        case g0 @ Gosub(_, _) => g0.a.flatMap(g0.f(_).flatMap(g1.f)).toM
+        case g0 @ Gosub(_, _) => sys.error("Unreachable code: `Gosub` returned from `step` has `Suspend` on the left")
       }
-    }
+    })
 
   @tailrec
   private def step: FreeT[S, M, A] =
@@ -232,9 +245,8 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
         Monad[FreeT[S, G, ?]]
     }
 
-  implicit def freeTFoldable[S[_]: Foldable: Functor, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, ?]] =
+  implicit def freeTFoldable[S[_]: Foldable, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, ?]] =
     new FreeTFoldable[S, M] {
-      override def S = implicitly
       override def F = implicitly
       override def M = implicitly
       override def M1 = implicitly
@@ -267,13 +279,16 @@ sealed abstract class FreeTInstances0 extends FreeTInstances1 {
 }
 
 sealed abstract class FreeTInstances extends FreeTInstances0 {
-  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, ?]] =
-    new MonadPlus[FreeT[S, M, ?]] with FreeTPlus[S, M] with FreeTMonad[S, M] {
+  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, ?]] with Alt[FreeT[S, M, ?]] =
+    new MonadPlus[FreeT[S, M, ?]] with Alt[FreeT[S, M, ?]] with FreeTPlus[S, M] with FreeTMonad[S, M] {
       override def M = implicitly
       override def M1 = implicitly
       override def M2 = implicitly
 
       override def empty[A] = FreeT.liftM[S, M, A](PlusEmpty[M].empty[A])(M)
+
+      override def alt[A](a1: => FreeT[S, M, A], a2: => FreeT[S, M, A]): FreeT[S, M, A] =
+        plus(a1, a2)
     }
 }
 
@@ -302,23 +317,21 @@ private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, ?]] {
 }
 
 private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, ?]] with Foldable.FromFoldMap[FreeT[S, M, ?]] {
-  implicit def S: Functor[S]
   implicit def M: Applicative[M]
   implicit def M1: BindRec[M]
   def F: Foldable[S]
   def M2: Foldable[M]
 
   override final def foldMap[A, B: Monoid](fa: FreeT[S, M, A])(f: A => B): B =
-    M2.foldMap(fa.resume){
-      case \/-(a) =>
-        F.foldMap(a)(foldMap(_)(f))
+    M2.foldMap(fa.resumeC){
       case -\/(a) =>
+        F.foldMap(a.fi)(i => foldMap(a.k(i))(f))
+      case \/-(a) =>
         f(a)
     }
 }
 
 private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with FreeTFoldable[S, M] with FreeTBind[S, M] {
-  override final def S: Functor[S] = F
   override implicit def F: Traverse[S]
   override def M2: Traverse[M]
   override implicit def M: Applicative[M]
@@ -327,9 +340,9 @@ private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with Fr
   override final def traverseImpl[G[_], A, B](fa: FreeT[S, M, A])(f: A => G[B])(implicit G: Applicative[G]) =
     G.map(
       M2.traverseImpl(fa.resume){
-        case \/-(a) =>
-          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
         case -\/(a) =>
+          G.map(F.traverseImpl(a)(traverseImpl(_)(f)))(FreeT.roll(_)(M))
+        case \/-(a) =>
           G.map(f(a))(FreeT.point[S, M, B])
       }
     )(FreeT.liftM(_)(M).flatMap(identity))

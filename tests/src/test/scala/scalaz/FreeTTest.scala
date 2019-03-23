@@ -21,7 +21,7 @@ object FreeTTest extends SpecLite {
     def equal(a: FreeTListOption[A], b: FreeTListOption[A]) = Equal[Option[A]].equal(a.runM(_.headOption), b.runM(_.headOption))
   }
 
-  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F], G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
+  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
     Gen.frequency(
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)
@@ -33,8 +33,28 @@ object FreeTTest extends SpecLite {
 
   "ListOption" should {
     checkAll(monadPlus.laws[FreeTListOption])
+    checkAll(alt.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
     checkAll(monadTrans.laws[FreeTList, Option])
+
+    "lawful MonadPlus" in {
+      // give names to some expressions
+      val f: Unit => FreeTListOption[Unit] = _ => FreeT.liftM(MonadPlus[Option].empty)
+      val a = ()
+      val g = ().point[FreeTListOption]
+
+      // by the monad laws, f1 = f2
+      val f1 = a.point[FreeTListOption] flatMap f
+      val f2 = f(a)
+
+      // by the substitution property of equality,
+      // when f1 = f2, then also fg1 = fg2
+      val fg1 = MonadPlus[FreeTListOption].plus(f1, g)
+      val fg2 = MonadPlus[FreeTListOption].plus(f2, g)
+
+      // so let's check that
+      Equal[FreeTListOption[Unit]].equal(fg1, fg2)
+    }
 
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeTListOption].point(())
@@ -115,7 +135,7 @@ object FreeTTest extends SpecLite {
 
   private def compilationTest = {
     val a: String \/ Int = \/-(42)
-    val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU(a)
+    val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
   }
 
   object instances {
@@ -129,6 +149,7 @@ object FreeTTest extends SpecLite {
     def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, ?], E]
     def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, ?]]
     def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, ?]]
+    def alt[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Alt[FreeT[S, F, ?]]
     def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, ?[_], ?]]
 
     // checking absence of ambiguity
@@ -136,5 +157,11 @@ object FreeTTest extends SpecLite {
     def foldable[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Foldable[FreeT[S, F, ?]]
     def monad[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Monad[FreeT[S, F, ?]]
     def plus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Plus[FreeT[S, F, ?]]
+
+    object issue_1308 {
+      type G[A] = State[Byte, A]
+      type F[A] = FreeT[Id.Id, G, A]
+      MonadState[F, Byte]
+    }
   }
 }

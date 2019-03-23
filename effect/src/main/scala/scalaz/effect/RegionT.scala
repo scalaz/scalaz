@@ -14,9 +14,9 @@ import Kleisli._
  * resources is possible.
  */
 sealed abstract class RegionT[S, P[_], A] {
-  def value: Kleisli[P, IORef[List[RefCountedFinalizer]], A]
+  def value: Kleisli[P, IORef[IList[RefCountedFinalizer]], A]
 
-  def runT(r: IORef[List[RefCountedFinalizer]]): P[A] =
+  def runT(r: IORef[IList[RefCountedFinalizer]]): P[A] =
     value.run(r)
 
   def mapT[Q[_], B](f: P[A] => Q[B]): RegionT[S, Q, B] =
@@ -24,11 +24,11 @@ sealed abstract class RegionT[S, P[_], A] {
 }
 
 object RegionT extends RegionTInstances {
-  def apply[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
+  def apply[S, P[_], A](k: Kleisli[P, IORef[IList[RefCountedFinalizer]], A]): RegionT[S, P, A] = new RegionT[S, P, A] {
     val value = k
   }
 
-  def regionT[S, P[_], A](k: Kleisli[P, IORef[List[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
+  def regionT[S, P[_], A](k: Kleisli[P, IORef[IList[RefCountedFinalizer]], A]): RegionT[S, P, A] = RegionT(k)
 
 }
 
@@ -72,4 +72,3 @@ trait RegionTLiftIO[S, M[_]] extends LiftIO[RegionT[S, M, ?]] {
 
   def liftIO[A](ioa: IO[A]) = RegionT.regionT(kleisli(_ => L.liftIO(ioa)))
 }
-

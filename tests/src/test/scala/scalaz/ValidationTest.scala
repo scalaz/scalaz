@@ -14,11 +14,13 @@ object ValidationTest extends SpecLite {
   checkAll("Validation", semigroup.laws[ValidationInt[Int]])
   checkAll("Validation", monoid.laws[ValidationInt[Int]])
   checkAll("Validation", plus.laws[ValidationInt])
+  checkAll("Validation", alt.laws[ValidationInt])
   checkAll("Validation", applicative.laws[ValidationInt])
   checkAll("Validation", traverse.laws[ValidationInt])
   checkAll("Validation", bifunctor.laws[Validation])
   checkAll("Validation", bitraverse.laws[Validation])
   checkAll("Validation", associative.laws[Validation])
+  checkAll("Validation", applicativeError.laws[ValidationInt, Int])
 
   "fpoint and point" in {
 
@@ -36,7 +38,6 @@ object ValidationTest extends SpecLite {
       import syntax.functor._
       val voi2: Validation[String, Option[Int]] = vi.fpoint[Option]
       voi2 must_===(Validation.success[String, Option[Int]](Some(0)))
-      println("hi")
     }
   }
 
@@ -49,8 +50,8 @@ object ValidationTest extends SpecLite {
   "ap2" should {
     "accumulate failures in order" in {
       import syntax.show._
-      val fail1 = Failure("1").toValidationNel
-      val fail2 = Failure("2").toValidationNel
+      val fail1 = Failure[String, Int]("1").toValidationNel
+      val fail2 = Failure[String, Int]("2").toValidationNel
       val f = (_:Int) + (_:Int)
       Apply[ValidationNel[String, ?]].ap2(fail1, fail2)(Success(f)).shows must_===("""Failure(["1","2"])""")
     }
@@ -91,12 +92,6 @@ object ValidationTest extends SpecLite {
     (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], 2.success[String], 3.success[String]))
 
     (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsg(i) })) must_===(List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
-
-    implicit val ShowAny: Show[Any] = Show.showA; implicit val EqualAny: Equal[Any] = Equal.equalA
-    def errmsgA(i: Int): Any = errmsg(i)
-    (List("1", "2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsgA(i) })) must_===(List(1.success[Any], 2.success[Any], 3.success[Any]))
-
-    (List("1", "-2", "3") map (_.parseInt.leftMap(_.toString) excepting { case i if i < 0 => errmsgA(i) })) must_===(List(1.success[Any], errmsgA(-2).failure[Int], 3.success[Any]))
   }
 
   "ensure" in {
@@ -104,6 +99,20 @@ object ValidationTest extends SpecLite {
     import syntax.validation._
     List("1", "2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], 2.success[String]))
     List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===(List(1.success[String], "Fail".failure[Int]))
+  }
+
+  "Plus accumulates errors" in {
+    import syntax.plus._
+
+    val succ1 = Validation.success[String, Int](1)
+    val succ2 = Validation.success[String, Int](2)
+    val fail1 = Validation.failure[String, Int]("3")
+    val fail2 = Validation.failure[String, Int]("4")
+
+    succ1 <+> succ2 must_=== succ1
+    succ1 <+> fail1 must_=== succ1
+    fail2 <+> succ2 must_=== succ2
+    fail1 <+> fail2 must_=== Validation.failure[String, Int]("34")
   }
 
   "toMaybe" ! forAll { x: Validation[String, Int] =>
@@ -119,6 +128,7 @@ object ValidationTest extends SpecLite {
     def applicative[E: Semigroup] = Applicative[Validation[E, ?]]
     def traverse[E: Semigroup] = Traverse[Validation[E, ?]]
     def plus[E: Semigroup] = Plus[Validation[E, ?]]
+    def alt[E: Semigroup] = Alt[Validation[E, ?]]
     def bitraverse = Bitraverse[Validation]
 
     // checking absence of ambiguity

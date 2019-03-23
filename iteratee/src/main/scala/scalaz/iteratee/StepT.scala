@@ -52,7 +52,7 @@ sealed abstract class StepT[E, F[_], A] {
   def doneValueOr(a: => A): A =
     doneValue getOrElse a
 
-  def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z) =
+  def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z): Z =
     fold(
       _ => z
       , (a, _) => k(a)
@@ -67,7 +67,7 @@ sealed abstract class StepT[E, F[_], A] {
   def doneInputOr(a: => Input[E]): Input[E] =
     doneInput getOrElse a
 
-  def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z) =
+  def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z): Z =
     fold(
       _ => z
       , (_, i) => k(i)

@@ -5,7 +5,7 @@ package std
 import scalaz.std.{vector => v}
 
 
-final class VectorOps[A](val self: Vector[A]) extends AnyVal {
+final class VectorOps[A](private val self: Vector[A]) extends AnyVal {
   final def intersperse(a: A): Vector[A] = v.intersperse(self, a)
 
   final def toNel: Option[NonEmptyList[A]] = v.toNel(self)

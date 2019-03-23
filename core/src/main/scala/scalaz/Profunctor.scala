@@ -53,6 +53,14 @@ trait Profunctor[=>:[_, _]]  { self =>
 object Profunctor {
   @inline def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Profunctor[G]): Profunctor[F] =
+    new IsomorphismProfunctor[F, G] {
+      override def G: Profunctor[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
   sealed trait UpStarF
   type UpStar[F[_], D, C] = (D => F[C]) @@ UpStarF
@@ -89,5 +97,21 @@ object Profunctor {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
         DownStar(k compose Tag.unwrap(f))
     }
+  ////
+}
+
+trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
+  implicit def G: Profunctor[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~~> G
+
+  override def mapfst[A, B, C](fab: F[A, B])(f: C => A): F[C, B] =
+    iso.from(G.mapfst(iso.to(fab))(f))
+
+  override def mapsnd[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
+    iso.from(G.mapsnd(iso.to(fab))(f))
+
   ////
 }

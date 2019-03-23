@@ -10,6 +10,7 @@ object LazyOptionTTest extends SpecLite {
 
   checkAll(equal.laws[LazyOptionTList[Int]])
   checkAll(monadPlus.laws[LazyOptionTList])
+  checkAll(alt.laws[LazyOptionTList])
   checkAll(bindRec.laws[LazyOptionTList])
 
   "tail recursive tailrecM" in {
@@ -28,6 +29,7 @@ object LazyOptionTTest extends SpecLite {
   object instances {
     def functor[F[_] : Functor] = Functor[LazyOptionT[F, ?]]
     def monad[F[_] : Monad] = Monad[LazyOptionT[F, ?]]
+    def alt[F[_] : Monad] = Alt[LazyOptionT[F, ?]]
     def bindRec[F[_] : Monad: BindRec] = BindRec[LazyOptionT[F, ?]]
 
     // checking absence of ambiguity

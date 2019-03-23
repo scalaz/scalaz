@@ -8,14 +8,14 @@ final class DivisibleOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
   ////
 }
 
-sealed trait ToDivisibleOps0 {
-  implicit def ToDivisibleOpsUnapply[FA](v: FA)(implicit F0: Unapply[Divisible, FA]) =
+sealed trait ToDivisibleOpsU[TC[F[_]] <: Divisible[F]] {
+  implicit def ToDivisibleOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new DivisibleOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToDivisibleOps extends ToDivisibleOps0 with ToDivideOps {
-  implicit def ToDivisibleOps[F[_],A](v: F[A])(implicit F0: Divisible[F]) =
+trait ToDivisibleOps0[TC[F[_]] <: Divisible[F]] extends ToDivisibleOpsU[TC] {
+  implicit def ToDivisibleOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new DivisibleOps[F,A](v)
 
   ////
@@ -23,7 +23,9 @@ trait ToDivisibleOps extends ToDivisibleOps0 with ToDivideOps {
   ////
 }
 
-trait DivisibleSyntax[F[_]] extends DivideSyntax[F] {
+trait ToDivisibleOps[TC[F[_]] <: Divisible[F]] extends ToDivisibleOps0[TC] with ToDivideOps[TC] with ToInvariantApplicativeOps[TC]
+
+trait DivisibleSyntax[F[_]] extends DivideSyntax[F] with InvariantApplicativeSyntax[F] {
   implicit def ToDivisibleOps[A](v: F[A]): DivisibleOps[F, A] = new DivisibleOps[F,A](v)(DivisibleSyntax.this.F)
 
   def F: Divisible[F]

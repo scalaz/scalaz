@@ -5,9 +5,8 @@ package syntax
 final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Traverse[F]) extends Ops[F[A]] {
   ////
 
-  import Leibniz.===
 
-  final def tmap[B](f: A => B) =
+  final def tmap[B](f: A => B): F[B] =
     F.map(self)(f)
 
   final def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G]): G[F[B]] =
@@ -30,6 +29,14 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   /** A version of `sequence` that infers the nested type constructor */
   final def sequenceU(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
     G.TC.traverse(self)(x => G.apply(x))
+  }
+
+  /** A version of `sequence` where a monadic join is applied to the inner result */
+  final def sequenceM[G[_], B](implicit ev: A === G[F[B]],
+                      G: Applicative[G],
+                      FM: Bind[F]): G[F[B]] = {
+    val fgfb: F[G[F[B]]] = ev.subst[F](self)
+    F.sequenceM[B, G](fgfb)
   }
 
   /** A version of `traverse` specialized for `State` */
@@ -65,23 +72,34 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
     F.mapAccumL(self, z)(f)
   final def mapAccumR[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
     F.mapAccumR(self, z)(f)
+
+  import Tags.Parallel
+  final def parTraverse[G[_], B](f: A => G[B])(
+    implicit F: Traverse[F], G: Applicative.Par[G]
+  ): G[F[B]] = {
+    type ParG[a] = G[a] @@ Parallel
+    Tag.unwrap(F.traverse[ParG, A, B](self)(a => Tag(f(a))))
+  }
+
   ////
 }
 
-sealed trait ToTraverseOps0 {
-  implicit def ToTraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse, FA]) =
+sealed trait ToTraverseOpsU[TC[F[_]] <: Traverse[F]] {
+  implicit def ToTraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new TraverseOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToTraverseOps extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
-  implicit def ToTraverseOps[F[_],A](v: F[A])(implicit F0: Traverse[F]) =
+trait ToTraverseOps0[TC[F[_]] <: Traverse[F]] extends ToTraverseOpsU[TC] {
+  implicit def ToTraverseOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new TraverseOps[F,A](v)
 
   ////
 
   ////
 }
+
+trait ToTraverseOps[TC[F[_]] <: Traverse[F]] extends ToTraverseOps0[TC] with ToFunctorOps[TC] with ToFoldableOps[TC]
 
 trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
   implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] = new TraverseOps[F,A](v)(TraverseSyntax.this.F)

@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Liskov.<~<
 /**
  * Functors, covariant by nature if not by Scala type.  Their key
  * operation is `map`, whose behavior is constrained only by type and
@@ -113,7 +114,33 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 object Functor {
   @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Functor[G]): Functor[F] =
+    new IsomorphismFunctor[F, G] {
+      override def G: Functor[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
+
+  trait OverrideWiden[F[+ _]] extends Functor[F] {
+    override final def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
+      Liskov.co[F, A, B](ev).apply(fa)
+  }
+
+  ////
+}
+
+trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: Functor[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def map[A, B](fa: F[A])(f: A => B): F[B] =
+    iso.from(G.map(iso.to(fa))(f))
 
   ////
 }

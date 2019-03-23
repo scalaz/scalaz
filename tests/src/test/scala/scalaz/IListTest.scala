@@ -3,7 +3,6 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
 
@@ -20,20 +19,9 @@ object IListTest extends SpecLite {
   checkAll(isEmpty.laws[IList])
   checkAll(cobind.laws[IList])
   checkAll(order.laws[IList[Int]])
+  checkAll(alt.laws[IList])
 
   // These tests hold for List, so they had better hold for IList
-
-  implicit val intBooleanArb: Arbitrary[Int => Boolean] = {
-    val intGen = implicitly[Arbitrary[Int]].arbitrary
-    Arbitrary(Gen.oneOf(
-      Gen.const((_: Int) => true),
-      Gen.const((_: Int) => false),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
-      intGen.map(n => (_: Int) > n),
-      intGen.map(n => (_: Int) < n)
-    ))
-  }
 
   "intercalate empty list is flatten" ! forAll { (a: IList[IList[Int]]) =>
     a.intercalate(IList[Int]()) must_===(a.flatten)
@@ -79,14 +67,18 @@ object IListTest extends SpecLite {
     ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
+  "foldMap" ! forAll { xs: IList[Int]  =>
+    xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)
+  }
+
   "mapAccumLeft" ! forAll { xs: IList[Int] =>
     val f = (_: Int) + 1
-    xs.mapAccumLeft(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs, xs.map(f))
+    xs.mapAccumLeft(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs -> xs.map(f))
   }
 
   "mapAccumRight" ! forAll { xs: IList[Int] =>
     val f = (_: Int) + 1
-    xs.mapAccumRight(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs.reverse, xs.map(f))
+    xs.mapAccumRight(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs.reverse -> xs.map(f))
   }
 
   // And some other tests that List doesn't have
@@ -110,8 +102,8 @@ object IListTest extends SpecLite {
     (n +: ns).toList must_=== n +: ns.toList
   }
 
-  "/:" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
-    (s /: ns)(f) == (s /: ns.toList)(f)
+  "foldLeft" ! forAll { (ns: IList[Int], s: String, f: (String, Int) => String) =>
+    ns.foldLeft(s)(f) == ns.toList.foldLeft(s)(f)
   }
 
   ":+" ! forAll { (n: Int, ns: IList[Int]) =>
@@ -126,8 +118,8 @@ object IListTest extends SpecLite {
     (ns ::: ms).toList must_=== ns.toList ::: ms.toList
   }
 
-  ":\\" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
-    (ns :\ s)(f) == (ns.toList :\ s)(f)
+  "foldRight" ! forAll { (ns: IList[Int], s: String, f: (Int, String) => String) =>
+    ns.foldRight(s)(f) == ns.toList.foldRight(s)(f)
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -260,7 +252,7 @@ object IListTest extends SpecLite {
   }
 
   "lastIndexOfSlice" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    ns.lastIndexOfSlice(ms).getOrElse(-1) must_=== ns.toList.lastIndexOfSlice(ms.toList)
+    ns.lastIndexOfSlice(ms).getOrElse(-1) must_=== ns.toList.lastIndexOfSlice(ms.toList, ns.length)
   }
 
   "lastIndexWhere" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
@@ -311,6 +303,14 @@ object IListTest extends SpecLite {
 
   "reverse_:::" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
     (ns reverse_::: ms).toList must_=== (ns.toList reverse_::: ms.toList)
+  }
+
+  "traverseDisjunction" ! forAll { (is: IList[Int]) =>
+    import syntax.traverse._
+
+    def f(i: Int): String \/ Int = if (i % 2 == 0) -\/(i.toString) else \/-(i)
+
+    is.traverseDisjunction(f).must_===(is.traverse[String \/ ?, Int](f))
   }
 
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>
@@ -374,31 +374,31 @@ object IListTest extends SpecLite {
   }
 
   "toEphemeralStream" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
+    IList.fromSeq(ns).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
   }
 
   "toList" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toList must_=== ns
+    IList.fromSeq(ns).toList must_=== ns
   }
 
   "toMap" ! forAll { ps: List[(String, Int)] =>
-    IList(ps: _*).toMap must_=== ==>>(ps: _*)
+    IList.fromSeq(ps).toMap must_=== ==>>(ps: _*)
   }
 
   "toNel" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
+    IList.fromSeq(ns).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
   "toStream" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toStream must_=== ns.toStream
+    IList.fromSeq(ns).toStream must_=== ns.toStream
   }
 
   "toVector" ! forAll { ns: Vector[Int] =>
-    IList(ns: _*).toVector must_=== ns
+    IList.fromSeq(ns).toVector must_=== ns
   }
 
   "toZipper" ! forAll { ns: List[Int] =>
-    IList(ns: _*).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
+    IList.fromSeq(ns).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
   }
 
   // uncons is tested everywhere
@@ -422,6 +422,21 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
+  "psumMap should be lazy" in {
+    import scalaz.syntax.enum._
+    import scalaz.syntax.show._
+    import Maybe.just
+
+    var called = 0
+    def foo(s: Int): Maybe[String] = {
+      called += 1
+      just(s.shows)
+    }
+
+    (1 |-> 10).psumMap(foo) must_=== just("1")
+    called must_=== 1
+  }
+
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
   object instances {
@@ -435,5 +450,6 @@ object IListTest extends SpecLite {
     def align = Align[IList]
     def isEmpty = IsEmpty[IList]
     def cobind = Cobind[IList]
+    def alt = Alt[IList]
   }
 }

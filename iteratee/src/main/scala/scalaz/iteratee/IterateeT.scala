@@ -71,12 +71,12 @@ sealed abstract class IterateeT[E, F[_], A] {
    * The monad for G must perform all the effects of F as part of its evaluation; in the trivial case, of course
    * F and G will have the same monad.
    */
-  def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA])(implicit MO: G |>=| F): IterateeT[EE, G, AA] = {
-    iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
+  def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA], trans: F ~> G)(implicit G: Bind[G]): IterateeT[EE, G, AA] = {
+    iterateeT(G.bind(trans(value))(s => f(s).value))
   }
 
-  def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]])(implicit MO: G |>=| F): G[StepT[EE, F, AA]] = {
-    MO.MG.bind(MO.promote(value))(s => f(s))
+  def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]], trans: F ~> G)(implicit G: Bind[G]): G[StepT[EE, F, AA]] = {
+    G.bind(trans(value))(s => f(s))
   }
 
   /**
@@ -116,7 +116,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     ))
   }
 
-  def joinI[I, B](implicit outer: IterateeT[E, F, A] =:= IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
+  def joinI[I, B](implicit outer: IterateeT[E, F, A] === IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
     val M0 = IterateeT.IterateeTMonad[E, F]
     def check: StepT[I, F, B] => IterateeT[E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {

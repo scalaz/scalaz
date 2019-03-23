@@ -10,7 +10,7 @@ object MixedBag extends App {
   kleisiArrow()
   dListExample()
 
-  def monoid() {
+  def monoid(): Unit = {
     import std.anyVal._
     import std.option._
 
@@ -24,17 +24,16 @@ object MixedBag extends App {
     intInstance.semigroupSyntax.mappend(1, 2)
   }
 
-  def traverseBigList() {
+  def traverseBigList(): Unit = {
     import std.option._
     import std.list._
     import syntax.traverse._
 
-    //    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
-    //    println(xs map (_ take 10))
-    ()
+    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
+    println(xs map (_ take 10))
   }
 
-  def traverseBigStream() {
+  def traverseBigStream(): Unit = {
     import std.option._
     import std.stream._
     import syntax.traverse._
@@ -44,7 +43,7 @@ object MixedBag extends App {
     ()
   }
 
-  def tree() {
+  def tree(): Unit = {
     import std.string._
     import syntax.semigroup._
     import syntax.equal._
@@ -61,7 +60,7 @@ object MixedBag extends App {
     m assert_=== "12345"
   }
 
-  def strictTree() {
+  def strictTree(): Unit = {
     import std.string._
     import syntax.semigroup._
     import syntax.equal._
@@ -78,7 +77,7 @@ object MixedBag extends App {
     m assert_=== "12345"
   }
 
-  def kleisiArrow() {
+  def kleisiArrow(): Unit = {
     import Kleisli._
     import std.option._
     import syntax.compose._
@@ -90,13 +89,12 @@ object MixedBag extends App {
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
   }
 
-  def dListExample() {
+  def dListExample(): Unit = {
     import DList._
     import syntax.monad._
     import syntax.writer._
     import WriterT._
 
-    type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]
 
     implicit val pairFunctor: Functor[Pair] = new Functor[Pair] {
@@ -118,7 +116,7 @@ object MixedBag extends App {
     flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
   }
 
-  def zipper() {
+  def zipper(): Unit = {
     import scalaz.std.list
 
     val fileName = "abc.txt"

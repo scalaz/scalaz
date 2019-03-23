@@ -113,7 +113,7 @@ object Alpha extends AlphaInstances {
     val toChar = 'z'
   }
 
-  val alphas: List[Alpha] = List(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
+  val alphas: IList[Alpha] = IList(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z)
 
   implicit def ToCharFromAlpha(a: Alpha): Char = a.toChar
 

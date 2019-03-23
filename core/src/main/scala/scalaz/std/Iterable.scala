@@ -1,10 +1,12 @@
 package scalaz
 package std
 
+import collection.immutable.Seq
+
 trait IterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
-    override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
+  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = Show.show {
+    as => list.listShow[A].show(as.toList)
   }
 
   /** Lexicographical ordering */
@@ -46,28 +48,61 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
-    def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
+  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] =
+    new IterableSubtypeFoldable[I] {}
+}
 
-    def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
+private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable[I] {
 
-    override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+  override def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
 
-    override def length[A](a: I[A]) = {
-      var n = 0
-      val i = a.iterator
-      while (i.hasNext) {
-        n = n + 1
-        i.next
-      }
-      n
+  override def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))
+
+  override def foldLeft[A, B](fa: I[A], b: B)(f: (B, A) => B): B = fa.foldLeft(b)(f)
+
+  override def length[A](a: I[A]) = {
+    var n = 0
+    val i = a.iterator
+    while (i.hasNext) {
+      n = n + 1
+      i.next
     }
+    n
+  }
 
-    override def any[A](fa: I[A])(p: A => Boolean): Boolean =
-      fa.exists(p)
+  override final def toList[A](fa: I[A]) = fa.toList
+  override final def toVector[A](fa: I[A]) = fa.toVector
+  override final def toSet[A](fa: I[A]) = fa.toSet
+  override final def toStream[A](fa: I[A]) = fa.toStream
 
-    override def all[A](fa: I[A])(p: A => Boolean): Boolean =
-      fa.forall(p)
+  override final def empty[A](fa: I[A]) = fa.isEmpty
+
+  override final def any[A](fa: I[A])(p: A => Boolean): Boolean =
+    fa exists p
+
+  override final def all[A](fa: I[A])(p: A => Boolean): Boolean =
+    fa forall p
+}
+
+private[std] trait IterableBindRec[F[X] <: Seq[X]] extends BindRec[F] {
+  protected[this] def createNewBuilder[A](): collection.mutable.Builder[A, F[A]]
+
+  override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
+    val bs = createNewBuilder[B]()
+    @scala.annotation.tailrec
+    def go(xs: List[Seq[A \/ B]]): Unit =
+      xs match {
+        case (\/-(b) +: tail) :: rest =>
+          bs += b
+          go(tail :: rest)
+        case (-\/(a0) +: tail) :: rest =>
+          go(f(a0) :: tail :: rest)
+        case _ :: rest =>
+          go(rest)
+        case Nil =>
+      }
+    go(List(f(a)))
+    bs.result
   }
 }
 

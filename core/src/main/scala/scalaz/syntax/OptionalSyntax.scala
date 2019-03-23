@@ -41,20 +41,22 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   ////
 }
 
-sealed trait ToOptionalOps0 {
-  implicit def ToOptionalOpsUnapply[FA](v: FA)(implicit F0: Unapply[Optional, FA]) =
+sealed trait ToOptionalOpsU[TC[F[_]] <: Optional[F]] {
+  implicit def ToOptionalOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new OptionalOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
-trait ToOptionalOps extends ToOptionalOps0 {
-  implicit def ToOptionalOps[F[_],A](v: F[A])(implicit F0: Optional[F]) =
+trait ToOptionalOps0[TC[F[_]] <: Optional[F]] extends ToOptionalOpsU[TC] {
+  implicit def ToOptionalOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new OptionalOps[F,A](v)
 
   ////
 
   ////
 }
+
+trait ToOptionalOps[TC[F[_]] <: Optional[F]] extends ToOptionalOps0[TC]
 
 trait OptionalSyntax[F[_]]  {
   implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] = new OptionalOps[F,A](v)(OptionalSyntax.this.F)

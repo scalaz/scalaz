@@ -21,7 +21,7 @@ trait Foralls {
   /** Construct a universal quantifier by continuation-passing. */
   def apply[P[_]](p: CPS[P]): Forall[P] = new Forall[P] {
     def apply[A]: P[A] = {
-      case class Control(arg: P[A]) extends Throwable
+      case class Control(arg: P[A]) extends Throwable(null, null, true, false)
       try {
         p((arg: P[A]) => throw new Control(arg))
       } catch {

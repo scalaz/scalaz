@@ -20,7 +20,7 @@ object InjectTest extends SpecLite {
   }
 
   sealed trait Test1AlgebraFunctions {
-    def test1[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test1Algebra :<: F): Free[F, Int] =
+    def test1[F[_]](keys: Seq[String])(implicit I: Test1Algebra :<: F): Free[F, Int] =
       inject[F, Test1Algebra, Int](Test1(keys, Free.pure(_)))
   }
 
@@ -39,7 +39,7 @@ object InjectTest extends SpecLite {
   }
 
   sealed trait Test2AlgebraFunctions {
-    def test2[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test2Algebra :<: F): Free[F, Int] =
+    def test2[F[_]](keys: Seq[String])(implicit I: Test2Algebra :<: F): Free[F, Int] =
       inject[F, Test2Algebra, Int](Test2(keys, Free.pure(_)))
   }
 
@@ -58,7 +58,7 @@ object InjectTest extends SpecLite {
   }
 
   sealed trait Test3AlgebraFunctions {
-    def test3[F[_]](keys: Seq[String])(implicit F: Functor[F], I: Test3Algebra :<: F): Free[F, Int] =
+    def test3[F[_]](keys: Seq[String])(implicit I: Test3Algebra :<: F): Free[F, Int] =
       inject[F, Test3Algebra, Int](Test3(keys, Free.pure(_)))
   }
 
@@ -107,11 +107,31 @@ object InjectTest extends SpecLite {
 
   "apply in left" in {
     val fa = Test1(Seq("a"), Free.pure[Test1Algebra, Int](_))
-    (Inject[Test1Algebra, C0].inj(fa) == Coproduct(-\/(fa))) must_===(true)
+    (Inject[Test1Algebra, C0].inj(fa).run == -\/(fa)) must_===(true)
   }
 
   "apply in right" in {
     val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
-    (Inject[Test2Algebra, C0].inj(fa) == Coproduct(\/-(fa))) must_===(true)
+    (Inject[Test2Algebra, C0].inj(fa).run == \/-(fa)) must_===(true)
+  }
+
+  "unapply from left" in {
+    val fa = Test1(Seq("a"), Free.pure[Test1Algebra, Int](_))
+    val T1A = Inject[Test1Algebra, C0]
+
+    T1A(fa) match {
+      case T1A(check) => check must_== fa
+      case _          => fail("Wrong coproduct")
+    }
+  }
+
+  "unapply from right" in {
+    val fa = Test2(Seq("a"), Free.pure[Test2Algebra, Int](_))
+    val T2A = Inject[Test2Algebra, C0]
+
+    T2A(fa) match {
+      case T2A(check) => check must_== fa
+      case _          => fail("Wrong coproduct")
+    }
   }
 }

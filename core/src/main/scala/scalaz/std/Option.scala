@@ -1,15 +1,27 @@
 package scalaz
 package std
 
-sealed trait OptionInstances0 {
+sealed trait OptionInstances0 extends OptionInstances1 {
   implicit def optionEqual[A](implicit A0: Equal[A]): Equal[Option[A]] = new OptionEqual[A] {
     implicit def A = A0
   }
+
+  implicit def optionSemiLattice[A: SemiLattice]: SemiLattice[Option[A]] =
+    new OptionSemigroup[A] with SemiLattice[Option[A]] {
+      override def B = implicitly
+    }
+}
+
+sealed trait OptionInstances1 {
+  implicit def optionBand[A: Band]: Band[Option[A]] =
+    new OptionSemigroup[A] with Band[Option[A]] {
+      override def B = implicitly
+    }
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
-    new Traverse[Option] with MonadPlus[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+    new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
       override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
@@ -26,6 +38,8 @@ trait OptionInstances extends OptionInstances0 {
         fa map (a => F.map(f(a))(Some(_): Option[B])) getOrElse F.point(None)
       def empty[A]: Option[A] = None
       def plus[A](a: Option[A], b: => Option[A]) = a orElse b
+      override def alt[A](a: => Option[A], b: => Option[A]): Option[A] =
+        plus(a, b)
       override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) = fa match {
         case Some(a) => f(a, z)
         case None    => z
@@ -67,7 +81,10 @@ trait OptionInstances extends OptionInstances0 {
         a map (Some(_))
 
       def pextract[B, A](fa: Option[A]): Option[B] \/ A =
-        fa map \/.right getOrElse -\/(None)
+        fa match {
+          case Some(a) => \/-(a)
+          case None    => -\/(None)
+        }
       override def isDefined[A](fa: Option[A]): Boolean = fa.isDefined
       override def toOption[A](fa: Option[A]): Option[A] = fa
       override def getOrElse[A](o: Option[A])(d: => A) = o getOrElse d
@@ -81,30 +98,26 @@ trait OptionInstances extends OptionInstances0 {
         }
     }
 
-  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] = new Monoid[Option[A]] {
-    def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
-      case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
-      case (Some(a1), None)     => f1
-      case (None, sa2 @ Some(a2)) => sa2
-      case (None, None)         => None
+  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
+    new OptionSemigroup[A] with Monoid[Option[A]] {
+      override def B = implicitly
+      override def zero = None
     }
-
-    def zero: Option[A] = None
-  }
 
   /** Add `None` as an element less than all `A`s. */
   implicit def optionOrder[A](implicit A0: Order[A]): Order[Option[A]] = new OptionOrder[A] {
     implicit def A = A0
   }
 
-  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
-    override def show(o1: Option[A]) = o1 match {
-      case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
-      case None     => "None"
+  implicit def optionShow[A: Show]: Show[Option[A]] = {
+    import scalaz.syntax.show._
+    Show.show {
+      case Some(a1) => cord"Some($a1)"
+      case None     => Cord("None")
     }
   }
 
-  implicit def optionFirst[A] = new Monoid[FirstOption[A]] {
+  implicit def optionFirst[A]: Monoid[FirstOption[A]] with Band[FirstOption[A]] = new Monoid[FirstOption[A]] with Band[FirstOption[A]] {
     def zero: FirstOption[A] = Tag(None)
 
     def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
@@ -116,7 +129,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionFirstMonad: Monad[FirstOption] = Tags.First.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionLast[A] = new Monoid[LastOption[A]] {
+  implicit def optionLast[A]: Monoid[LastOption[A]] with Band[LastOption[A]] = new Monoid[LastOption[A]] with Band[LastOption[A]] {
     def zero: LastOption[A] = Tag(None)
 
     def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
@@ -128,7 +141,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionLastMonad: Monad[LastOption] = Tags.Last.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {
+  implicit def optionMin[A](implicit o: Order[A]): Monoid[MinOption[A]] with Band[MinOption[A]] = new Monoid[MinOption[A]] with Band[MinOption[A]] {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -145,7 +158,7 @@ trait OptionInstances extends OptionInstances0 {
 
   implicit def optionMinMonad: Monad[MinOption] = Tags.Min.subst1[Monad, Option](Monad[Option])
 
-  implicit def optionMax[A](implicit o: Order[A]) = new Monoid[MaxOption[A]] {
+  implicit def optionMax[A](implicit o: Order[A]): Monoid[MaxOption[A]] with Band[MaxOption[A]] = new Monoid[MaxOption[A]] with Band[MaxOption[A]] {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
@@ -284,5 +297,16 @@ private trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
     case (None, Some(_))      => LT
     case (Some(_), None)      => GT
     case (None, None)         => EQ
+  }
+}
+
+private trait OptionSemigroup[A] extends Semigroup[Option[A]] {
+  def B: Semigroup[A]
+
+  def append(a: Option[A], b: => Option[A]): Option[A] = (a, b) match {
+    case (Some(aa), Some(bb)) => Some(B.append(aa, bb))
+    case (Some(_), None) => a
+    case (None, b2 @ Some(_)) => b2
+    case (None, None) => None
   }
 }

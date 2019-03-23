@@ -15,14 +15,24 @@ trait Bind[F[_]] extends Apply[F] { self =>
   /** Equivalent to `join(map(fa)(f))`. */
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
 
+  // Derived combinators with big consequences:
+  //
+  // - ap must be sequential, f first then fa.
+  // - apply2 must be sequential, fa first then fb.
+  //
+  // These are why IO is not parallel by default, by design.
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = {
     val fa0 = Need(fa)
     bind(f)(x => map(fa0.value)(x))
   }
+  override def apply2[A, B, C](fa: => F[A], fb: => F[B])(f: (A, B) => C): F[C] = {
+    val fb0 = Need(fb)
+    bind(fa)(a => map(fb0.value)(b => f(a, b)))
+  }
 
   /** Sequence the inner `F` of `FFA` after the outer `F`, forming a
    * single `F[A]`. */
-  def join[A](ffa: F[F[A]]) = bind(ffa)(a => a)
+  def join[A](ffa: F[F[A]]): F[A] = bind(ffa)(a => a)
 
   // derived functions
 
@@ -70,7 +80,24 @@ trait Bind[F[_]] extends Apply[F] { self =>
 object Bind {
   @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Bind[G]): Bind[F] =
+    new IsomorphismBind[F, G] {
+      override def G: Bind[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G]{
+  implicit def G: Bind[G]
+  ////
+
+  override def bind[A, B](fa: F[A])(f: A => F[B]): F[B] =
+    iso.from(G.bind(iso.to(fa))(f.andThen(iso.to.apply)))
   ////
 }

@@ -20,111 +20,72 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT(F.ap(run)(f.run))
 }
 
-sealed abstract class IdTInstances4 {
+sealed abstract class IdTInstances6 {
+  implicit def idTDivisible[F[_]](implicit F0: Divisible[F]): Divisible[IdT[F, ?]] =
+    Divisible.fromIso(IdT.iso[F])
+}
+
+sealed abstract class IdTInstances5 extends IdTInstances6 {
+  implicit def idTDecidable[F[_]](implicit F0: Decidable[F]): Decidable[IdT[F, ?]] =
+    Decidable.fromIso(IdT.iso[F])
+}
+
+sealed abstract class IdTInstances4 extends IdTInstances5 {
   implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, ?]] =
-    new IdTFunctor[F] {
-      implicit def F: Functor[F] = F0
-    }
+    Functor.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances3 extends IdTInstances4 {
   implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[IdT[F, ?]] =
-    new IdTApply[F] {
-      implicit def F: Apply[F] = F0
-    }
+    Apply.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances2 extends IdTInstances3 {
   implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[IdT[F, ?]] =
-    new IdTApplicative[F] {
-      implicit def F: Applicative[F] = F0
-    }
+    Applicative.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances1 extends IdTInstances2 {
   implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[IdT[F, ?]] =
-    new IdTFoldable[F] {
-      implicit def F: Foldable[F] = F0
-    }
-  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
-    new IdTBindRec[F] {
-      implicit def F: BindRec[F] = F0
-    }
+    Foldable.fromIso(IdT.iso[F].to)
+
+  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
+    F.contramap(_.run)
+
+  implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[IdT[F, ?]] =
+    Monad.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances0 extends IdTInstances1 {
-  implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[IdT[F, ?]] =
-    new IdTMonad[F] {
-      implicit def F: Monad[F] = F0
-    }
-
   implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
     F.contramap(_.run)
+
+  implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, ?]] =
+    Traverse.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances extends IdTInstances0 {
   implicit val idTHoist: Hoist[IdT] = IdTHoist
 
-  implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, ?]] =
-    new IdTTraverse[F] {
-      implicit def F: Traverse[F] = F0
+  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
+    BindRec.fromIso(IdT.iso[F])
+
+  implicit val idTCohoist: Cohoist[IdT] =
+    new Cohoist[IdT] {
+      override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
+        Lambda[IdT[M, ?] ~> IdT[N, ?]](x => IdT(f(x.run)))
+
+      override def lower[G[_]: Cobind, A](a: IdT[G, A]) =
+        a.run
     }
-
-  implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
-    F.contramap(_.run)
 }
 
-object IdT extends IdTInstances
-
-//
-// Implementation traits for type class instances
-//
-
-private trait IdTFunctor[F[_]] extends Functor[IdT[F, ?]] {
-  implicit def F: Functor[F]
-
-  override def map[A, B](fa: IdT[F, A])(f: A => B) = fa map f
-}
-
-private trait IdTApply[F[_]] extends Apply[IdT[F, ?]] with IdTFunctor[F] {
-  implicit def F: Apply[F]
-
-  override def ap[A, B](fa: => IdT[F, A])(f: => IdT[F, A => B]): IdT[F, B] = fa ap f
-}
-
-private trait IdTApplicative[F[_]] extends Applicative[IdT[F, ?]] with IdTApply[F] {
-  implicit def F: Applicative[F]
-
-  def point[A](a: => A) = new IdT[F, A](F.point(a))
-}
-
-private trait IdTBind[F[_]] extends Bind[IdT[F, ?]] with IdTApply[F] {
-  implicit def F: Bind[F]
-
-  final def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f
-}
-
-private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
-  implicit def F: BindRec[F]
-
-  final def tailrecM[A, B](a: A)(f: A => IdT[F, A \/ B]): IdT[F, B] =
-    IdT(F.tailrecM[A, B](a)(a => F.map(f(a).run)(identity)))
-}
-
-private trait IdTMonad[F[_]] extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {
-  implicit def F: Monad[F]
-}
-
-private trait IdTFoldable[F[_]] extends Foldable.FromFoldr[IdT[F, ?]] {
-  implicit def F: Foldable[F]
-
-  override def foldRight[A, B](fa: IdT[F, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-}
-
-private trait IdTTraverse[F[_]] extends Traverse[IdT[F, ?]] with IdTFoldable[F] with IdTFunctor[F]{
-  implicit def F: Traverse[F]
-
-  def traverseImpl[G[_] : Applicative, A, B](fa: IdT[F, A])(f: A => G[B]): G[IdT[F, B]] = fa traverse f
+object IdT extends IdTInstances {
+  import Isomorphism._
+  def iso[F[_]]: IdT[F, ?] <~> F = new IsoFunctorTemplate[IdT[F, ?], F] {
+    def from[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
+    def to[A](fa: IdT[F, A]): F[A] = fa.run
+  }
 }
 
 private object IdTHoist extends Hoist[IdT] {

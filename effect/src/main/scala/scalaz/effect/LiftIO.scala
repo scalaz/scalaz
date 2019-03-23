@@ -20,6 +20,14 @@ trait LiftIO[F[_]]  { self =>
 object LiftIO {
   @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: LiftIO[G]): LiftIO[F] =
+    new IsomorphismLiftIO[F, G] {
+      override def G: LiftIO[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
   implicit def idTLiftIO[F[_]: LiftIO] =
     new LiftIO[IdT[F, ?]] {
@@ -28,7 +36,7 @@ object LiftIO {
 
   implicit def listTLiftIO[F[_]: LiftIO] =
     new LiftIO[ListT[F, ?]] {
-      def liftIO[A](ioa: IO[A]) = ListT(LiftIO[F].liftIO(ioa.map(_ :: Nil)))
+      def liftIO[A](ioa: IO[A]) = ListT(LiftIO[F].liftIO(ioa.map(_ :: INil())))
     }
 
   implicit def optionTLiftIO[F[_]: LiftIO] =
@@ -37,7 +45,7 @@ object LiftIO {
     }
 
   implicit def eitherTLiftIO[F[_]: LiftIO, E] =
-    new LiftIO[EitherT[F, E, ?]] {
+    new LiftIO[EitherT[E, F, ?]] {
       def liftIO[A](ioa: IO[A]) = EitherT(LiftIO[F].liftIO(ioa.map(\/.right)))
     }
 
@@ -49,7 +57,8 @@ object LiftIO {
 
   implicit def streamTLiftIO[F[_]: LiftIO: Applicative] =
     new LiftIO[StreamT[F, ?]] {
-      def liftIO[A](ioa: IO[A]) = StreamT(LiftIO[F].liftIO(ioa.map(StreamT.Yield(_, StreamT.empty))))
+      def liftIO[A](ioa: IO[A]) =
+        StreamT(LiftIO[F].liftIO(ioa.map(StreamT.Yield(_, StreamT.empty[F, A]))))
     }
 
   implicit def kleisliLiftIO[F[_]: LiftIO, E] =
@@ -58,14 +67,26 @@ object LiftIO {
     }
 
   implicit def writerTLiftIO[F[_]: LiftIO, W: Monoid] =
-    new LiftIO[WriterT[F, W, ?]] {
+    new LiftIO[WriterT[W, F, ?]] {
       def liftIO[A](ioa: IO[A]) = WriterT(LiftIO[F].liftIO(ioa.map((Monoid[W].zero, _))))
     }
 
-  implicit def stateTLiftIO[F[_]: LiftIO, S](implicit F: Monad[F]) =
-    new LiftIO[StateT[F, S, ?]] {
+  implicit def stateTLiftIO[F[_]: LiftIO, S] =
+    new LiftIO[StateT[S, F, ?]] {
       def liftIO[A](ioa: IO[A]) = StateT(s => LiftIO[F].liftIO(ioa.map((s, _))))
     }
 
+  ////
+}
+
+trait IsomorphismLiftIO[F[_], G[_]] extends LiftIO[F] {
+  implicit def G: LiftIO[G]
+  ////
+
+  import Isomorphism._
+  def iso: F <~> G
+
+  override def liftIO[A](ioa: IO[A]): F[A] =
+    iso.from(G.liftIO(ioa))
   ////
 }

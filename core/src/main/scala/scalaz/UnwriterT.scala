@@ -11,11 +11,11 @@ import Id._
 final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   import UnwriterT._
 
-  def on: WriterT[F, U, A] =
+  def on: WriterT[U, F, A] =
     WriterT(run)
 
   /** alias for `on` */
-  def unary_+ : WriterT[F, U, A] =
+  def unary_+ : WriterT[U, F, A] =
     WriterT(run)
 
   def mapValue[X, B](f: ((U, A)) => (X, B))(implicit F: Functor[F]): UnwriterT[F, X, B] =
@@ -58,12 +58,12 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
     })(UnwriterT(_))
   }
 
-  def foldRight[B](z: => B)(f: (A, => B) => B)(implicit F: Foldable[F]) =
+  def foldRight[B](z: => B)(f: (A, => B) => B)(implicit F: Foldable[F]): B =
     F.foldr(run, z) { a => b =>
       f(a._2, b)
     }
 
-  def bimap[C, D](f: U => C, g: A => D)(implicit F: Functor[F]) =
+  def bimap[C, D](f: U => C, g: A => D)(implicit F: Functor[F]): UnwriterT[F, C, D] =
     unwriterT[F, C, D](F.map(run)({
       case (a, b) => (f(a), g(b))
     }))
@@ -71,7 +71,7 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
   def leftMap[C](f: U => C)(implicit F: Functor[F]): UnwriterT[F, C, A] =
     bimap(f, identity)
 
-  def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
+  def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]): G[UnwriterT[F, C, D]] =
     G.map(F.traverse[G, (U, A), (C, D)](run) {
       case (a, b) => G.tuple2(f(a), g(b))
     })(unwriterT(_))

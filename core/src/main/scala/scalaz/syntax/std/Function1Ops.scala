@@ -2,9 +2,8 @@ package scalaz
 package syntax
 package std
 
-import Leibniz.===
 
-final class Function1Ops[T, R](val self: T => R) extends AnyVal {
+final class Function1Ops[T, R](private val self: T => R) extends AnyVal {
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 
@@ -16,8 +15,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
 
   def unary_!(implicit m: Memo[T, R]): T => R = m(self)
 
-  def toValidation[E](e: => E)(implicit ev: R =:= Boolean): T => Validation[NonEmptyList[E], T] =
-    (t: T) => (if (self(t): Boolean) Success(t) else Failure(NonEmptyList(e)))
+  def toValidation[E](e: => E)(implicit ev: R === Boolean): T => Validation[NonEmptyList[E], T] =
+    (t: T) => (if (ev(self(t))) Success(t) else Failure(NonEmptyList(e)))
 
   def byName: (=> T) => R = t => self(t)
 

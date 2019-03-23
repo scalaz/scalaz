@@ -1,7 +1,6 @@
 package scalaz
 
 import scala.annotation.tailrec
-import scala.annotation.unchecked.uncheckedVariance
 import std.option.{ cata, none, some }
 import std.stream.{ toZipper => sToZipper }
 import std.tuple.{ tuple2Bitraverse => BFT }
@@ -120,6 +119,12 @@ sealed abstract class IList[A] extends Product with Serializable {
   def filter(f: A => Boolean): IList[A] =
     foldRight(IList.empty[A])((a, as) => if (f(a)) a :: as else as)
 
+  def filterM[F[_]](f: A => F[Boolean])(implicit F: Applicative[F]): F[IList[A]] =
+    this match {
+      case INil() => F.point(INil())
+      case ICons(h, t) => F.ap(t.filterM(f))(F.map(f(h))(b => t => if (b) h :: t else t))
+    }
+
   def filterNot(f: A => Boolean): IList[A] =
     filter(a => !f(a))
 
@@ -237,8 +242,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def length: Int =
     foldLeft(0)((n, _) => n + 1)
 
-  def map[B](f: A => B): IList[B] =
-    foldRight(IList.empty[B])(f(_) :: _)
+  def map[B](f: A => B): IList[B] = reverse.reverseMap(f)
 
   // private helper for mapAccumLeft/Right below
   private[this] def mapAccum[B, C](as: IList[A])(c: C, f: (C, A) => (C, B)): (C, IList[B]) =
@@ -293,11 +297,21 @@ sealed abstract class IList[A] extends Product with Serializable {
   def reduceRightOption(f: (A, A) => A): Option[A] =
     reverse.reduceLeftOption((a, b) => f(b, a))
 
-  def reverse: IList[A] =
-    foldLeft(IList.empty[A])((as, a) => a :: as)
+  def reverse: IList[A] = {
+    @tailrec def go(as: IList[A], acc: IList[A]): IList[A] = as match {
+      case c : ICons[_] => go(c.tail, ICons(c.head, acc))
+      case _ : INil[_] => acc
+    }
+    go(this, IList.empty)
+  }
 
-  def reverseMap[B](f: A => B): IList[B] =
-    foldLeft(IList.empty[B])((bs, a) => f(a) :: bs)
+  def reverseMap[B](f: A => B): IList[B] = {
+    @tailrec def go(as: IList[A], acc: IList[B]): IList[B] = as match {
+      case c : ICons[_] => go(c.tail, ICons(f(c.head), acc))
+      case _ : INil[_] => acc
+    }
+    go(this, IList.empty)
+  }
 
   def reverse_:::(as: IList[A]): IList[A] =
     as.foldLeft(this)((as, a) => a :: as)
@@ -323,7 +337,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     drop(from).take((until max 0)- (from max 0))
 
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
-    IList(toList.sortBy(f)(B.toScalaOrdering): _*)
+    IList.fromSeq(toList.sortBy(f)(B.toScalaOrdering))
 
   def sorted(implicit ev: Order[A]): IList[A] =
     sortBy(identity)
@@ -405,7 +419,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     uncons(EphemeralStream(), (h, t) => EphemeralStream.cons(h, t.toEphemeralStream))
 
   def toList: List[A] =
-    foldRight(Nil : List[A])(_ :: _)
+    Foldable[IList].toList(this)
 
   def toNel: Option[NonEmptyList[A]] =
     uncons(None, (h, t) => Some(NonEmptyList.nel(h, t)))
@@ -420,10 +434,26 @@ sealed abstract class IList[A] extends Product with Serializable {
     IList.show(Show.showA).shows(this) // lame, but helpful for debugging
 
   def toVector: Vector[A] =
-    foldRight(Vector[A]())(_ +: _)
+    Foldable[IList].toVector(this)
 
   def toZipper: Option[Zipper[A]] =
     sToZipper(toStream)
+
+  /**
+   * Referentially transparent replacement for traverse, specialised to
+   * disjunction.
+   */
+  def traverseDisjunction[E, B](f: A => E \/ B): E \/ IList[B] = {
+    @tailrec def go(lst: IList[A], acc: IList[B]): E \/ IList[B] = lst match {
+      case INil() => \/-(acc)
+      case ICons(head, tail) =>
+        f(head) match {
+          case \/-(b) => go(tail, b :: acc)
+          case e @ -\/(_) => e.coerceRight
+        }
+    }
+    go(this, IList.empty).map(_.reverse)
+  }
 
   def uncons[B](n: => B, c: (A, IList[A]) => B): B =
     this match {
@@ -462,29 +492,48 @@ sealed abstract class IList[A] extends Product with Serializable {
   // IList is invariant in behavior but covariant by nature, so we can safely widen to IList[B]
   // given evidence that A is a subtype of B.
   def widen[B](implicit ev: A <~< B): IList[B] =
-    ev.subst[λ[`-α` => IList[α @uncheckedVariance] <~< IList[B]]](refl)(this)
+    IList.covariant.widen(this)
 
   def zipWithIndex: IList[(A, Int)] =
-    zip(IList(0 until length : _*))
+    zip(IList.fromSeq(0 until length))
 
 }
 
-// In order to get exhaustiveness checking and a sane unapply in both 2.9 and 2.10 it seems
-// that we need to use bare case classes. Sorry. Suggestions welcome.
-final case class INil[A]() extends IList[A]
+sealed abstract case class INil[A] private() extends IList[A]
+object INil {
+  // #1712: covariant subclass of `INil` makes the pattern matcher see it as covariant
+  private[this] final class _INil[+A] extends INil[A]
+  private[this] val value = new _INil[Nothing]
+  def apply[A](): IList[A] = value.asInstanceOf[IList[A]]
+}
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListInstances {
-  private[this] val nil: IList[Nothing] = INil()
 
-  def apply[A](as: A*): IList[A] =
+  // optimised versions of apply(A*)
+  @inline final def apply[A](): IList[A] = INil()
+  @inline final def apply[A](a: A): IList[A] = ICons(a, INil())
+  @inline final def apply[A](a: A, b: A): IList[A] = a :: apply(b)
+  @inline final def apply[A](a: A, b: A, c: A): IList[A] = a :: apply(b, c)
+  @inline final def apply[A](a: A, b: A, c: A, d: A): IList[A] = a :: apply(b, c, d)
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A): IList[A] = a :: apply(b, c, d, e)
+  @inline final def apply[A](a: A, b: A, c: A, d: A, e: A, f: A): IList[A] = a :: apply(b, c, d, e, f)
+
+  def apply[A](a: A, b: A, c: A, d: A, e: A, f: A, as: A*): IList[A] =
+    a :: b :: c :: d :: e :: f :: fromSeq(as)
+
+  /**
+   * For compatibility with the scala varargs language feature. Note that
+   * varargs are inefficient as they incur the overhead of a Seq creation.
+   */
+  def fromSeq[A](as: Seq[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
-  def single[A](a: A): IList[A] =
+  @inline def single[A](a: A): IList[A] =
     ICons(a, empty)
 
   def empty[A]: IList[A] =
-    nil.asInstanceOf[IList[A]]
+    INil()
 
   def fromList[A](as: List[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
@@ -493,7 +542,7 @@ object IList extends IListInstances {
     Foldable[F].foldRight(as, empty[A])(ICons(_, _))
 
   def fromOption[A](a: Option[A]): IList[A] =
-    cata(a)(single(_), IList.empty[A])
+    cata(a)(single, IList.empty[A])
 
   def fill[A](n: Int)(a: A): IList[A] = {
     @tailrec def go(i: Int, list: IList[A]): IList[A] = {
@@ -511,6 +560,7 @@ object IList extends IListInstances {
       def to[A](fa: List[A]) = fromList(fa)
       def from[A](fa: IList[A]) = fa.toList
     }
+
 }
 
 sealed abstract class IListInstance0 {
@@ -520,13 +570,14 @@ sealed abstract class IListInstance0 {
       val A = A0
     }
 
+  implicit final val covariant: IsCovariant[IList] = IsCovariant.force[IList]
 }
 
 sealed abstract class IListInstances extends IListInstance0 {
 
-  implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
+  implicit val instances: Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
-    new Traverse[IList] with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
       override def findLeft[A](fa: IList[A])(f: A => Boolean) =
         fa.find(f)
 
@@ -571,8 +622,17 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def cojoin[A](a: IList[A]) =
         a.uncons(empty, (_, t) => a :: cojoin(t))
 
-      def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
-        fa.foldRight(F.point(IList.empty[B]))((a, fbs) => F.apply2(f(a), fbs)(_ :: _))
+      def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+        val revOpt: Maybe[F[List[B]]] =
+          F.unfoldrOpt[IList[A], B, List[B]](fa)(_ match {
+            case ICons(a, as) => Maybe.just((f(a), as))
+            case INil() => Maybe.empty
+          })(Reducer.ReverseListReducer[B])
+
+        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+        F.map(rev)((rev) => rev.foldLeft(IList[B]())((r, c) => c +: r))
+      }
 
       def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =
         a.unzip
@@ -589,6 +649,8 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def toIList[A](fa: IList[A]) = fa
 
+      override def toStream[A](fa: IList[A]) = fa.toStream
+
       override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)
 
@@ -599,7 +661,10 @@ sealed abstract class IListInstances extends IListInstance0 {
         foldMapLeft1Opt(fa.reverse)(z)((b, a) => f(a, b))
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
-        fa.foldLeft(M.zero)((b, a) => M.append(b, f(a)))
+        M.unfoldrSum(fa)(as => as.headOption match {
+          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
+          case None => Maybe.empty
+        })
 
       override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
         fa match {
@@ -661,8 +726,10 @@ sealed abstract class IListInstances extends IListInstance0 {
           }
         go(IList(f(a)), INil())
       }
-    }
 
+      def alt[A](a1: => IList[A], a2: => IList[A]): IList[A] =
+        plus(a1, a2)
+    }
 
   implicit def order[A](implicit A0: Order[A]): Order[IList[A]] =
     new IListOrder[A] {
@@ -675,20 +742,11 @@ sealed abstract class IListInstances extends IListInstance0 {
       def zero: IList[A] = empty
     }
 
-  implicit def show[A](implicit A: Show[A]): Show[IList[A]] =
-    new Show[IList[A]] {
-      override def show(as: IList[A]) = {
-        @tailrec def commaSep(rest: IList[A], acc: Cord): Cord =
-          rest match {
-            case INil() => acc
-            case ICons(x, xs) => commaSep(xs, (acc :+ ",") ++ A.show(x))
-          }
-        "[" +: (as match {
-          case INil() => Cord()
-          case ICons(x, xs) => commaSep(xs, A.show(x))
-        }) :+ "]"
-      }
-    }
+  implicit def show[A](implicit A: Show[A]): Show[IList[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = instances.intercalate(as.map(A.show), Cord(","))
+    cord"[$content]"
+  }
 
 }
 
@@ -697,10 +755,20 @@ private trait IListEqual[A] extends Equal[IList[A]] {
   implicit def A: Equal[A]
 
   @tailrec final override def equal(a: IList[A], b: IList[A]): Boolean =
-    (a, b) match {
-      case (INil(), INil()) => true
-      case (ICons(a, as), ICons(b, bs)) if A.equal(a, b) => equal(as, bs)
-      case _ => false
+    (a eq b) || {
+      a match {
+        case ac: ICons[A] => b match {
+          case bc: ICons[A] =>
+            ((ac.head.asInstanceOf[AnyRef] eq bc.head.asInstanceOf[AnyRef])
+               || A.equal(ac.head, bc.head)) &&
+            equal(ac.tail, bc.tail)
+          case _ => false
+        }
+        case INil() => b match {
+          case INil() => true
+          case _ => false
+        }
+      }
     }
 
 }

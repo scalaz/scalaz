@@ -21,14 +21,21 @@ object OptionTest extends SpecLite {
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", zip.laws[Option])
+  checkAll("Option", alt.laws[Option])
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cobind.laws[Option])
   checkAll("Option", align.laws[Option])
+  checkAll("Option", semilattice.laws[Option[ISet[Int]]])
 
   checkAll("Option @@ First", monoid.laws[FirstOption[Int]])
   checkAll("Option @@ Last", monoid.laws[LastOption[Int]])
   checkAll("Option @@ Min", monoid.laws[MinOption[Int]])
   checkAll("Option @@ Max", monoid.laws[MaxOption[Int]])
+
+  checkAll("Band[Option @@ First]", band.laws[FirstOption[Int]])
+  checkAll("Band[Option @@ Last]", band.laws[LastOption[Int]])
+  checkAll("Band[Option @@ Min]", band.laws[MinOption[Int]])
+  checkAll("Band[Option @@ Max]", band.laws[MaxOption[Int]])
 
   checkAll("Option @@ First", monad.laws[FirstOption])
   checkAll("Option @@ Last", monad.laws[LastOption])
@@ -51,13 +58,16 @@ object OptionTest extends SpecLite {
     def equal[A: Equal] = Equal[Option[A]]
     def order[A: Order] = Order[Option[A]]
     def semigroup[A: Semigroup] = Monoid[Option[A]]
+    def semiLattice[A: SemiLattice] = SemiLattice[Option[A]]
     def bindRec[A] = BindRec[Option]
     def monad[A] = Monad[Option]
+    def alt[A] = Alt[Option]
 
     def monoidFirst[A] = Monoid[Option[A] @@ First]
     def monoidLast[A] = Monoid[Option[A] @@ Last]
 
     // checking absence of ambiguity
     def equal[A: Order] = Equal[Option[A]]
+    def monoid[A: SemiLattice] = Monoid[Option[A]]
   }
 }

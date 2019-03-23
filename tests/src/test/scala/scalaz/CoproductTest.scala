@@ -23,7 +23,11 @@ object CoproductTest extends SpecLite {
     // checking absence of ambiguity
     def invariantfunctor[F[_]: Comonad: Traverse: Contravariant, G[_]: Comonad: Traverse: Contravariant] = InvariantFunctor[Coproduct[F, G, ?]]
     def invariantfunctor[F[_]: Functor: Contravariant, G[_]: Functor: Contravariant] = InvariantFunctor[Coproduct[F, G, ?]]
+    def functor[F[_]: Traverse, G[_]: Traverse] = Functor[Coproduct[F, G, ?]]
+    def functor[F[_]: Comonad, G[_]: Comonad] = Functor[Coproduct[F, G, ?]]
+    def functor[F[_]: Traverse1, G[_]: Traverse1] = Functor[Coproduct[F, G, ?]]
     def functor[F[_]: Comonad: Traverse, G[_]: Comonad: Traverse] = Functor[Coproduct[F, G, ?]]
+    def functor[F[_]: Comonad: Traverse1, G[_]: Comonad: Traverse1] = Functor[Coproduct[F, G, ?]]
     def foldable[F[_]: Traverse, G[_]: Traverse] = Foldable[Coproduct[F, G, ?]]
     def foldable[F[_]: Traverse1, G[_]: Traverse1] = Foldable[Coproduct[F, G, ?]]
     def traverse[F[_]: Traverse1, G[_]: Traverse1] = Traverse[Coproduct[F, G, ?]]

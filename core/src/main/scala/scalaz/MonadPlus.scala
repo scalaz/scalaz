@@ -13,7 +13,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     * expression `filter(filter(fa)(f))(g)`, `g` will never be invoked
     * for any `a` where `f(a)` returns false.
     */
-  def filter[A](fa: F[A])(f: A => Boolean) =
+  def filter[A](fa: F[A])(f: A => Boolean): F[A] =
     bind(fa)(a => if (f(a)) point(a) else empty[A])
 
   /** Generalized version of Haskell's `catMaybes` */
@@ -67,6 +67,21 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
 object MonadPlus {
   @inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: MonadPlus[G]): MonadPlus[F] =
+    new IsomorphismMonadPlus[F, G] {
+      override def G: MonadPlus[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+
+  ////
+}
+
+trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismMonad[F, G] with IsomorphismApplicativePlus[F, G]{
+  implicit def G: MonadPlus[G]
   ////
 
   ////

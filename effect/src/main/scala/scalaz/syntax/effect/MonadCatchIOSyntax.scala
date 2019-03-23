@@ -21,7 +21,7 @@ sealed abstract class MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
     MonadCatchIO.bracket_(self)(after)(during)
   def bracketOnError[B, C](after: A => F[B])(during: A => F[C]): F[C] =
     MonadCatchIO.bracketOnError(self)(after)(during)
-  def using[B](f: A => F[B])(implicit resource: Resource[A]) = MonadCatchIO.using(self)(f)
+  def using[B](f: A => F[B])(implicit resource: Resource[A]): F[B] = MonadCatchIO.using(self)(f)
   ////
 }
 

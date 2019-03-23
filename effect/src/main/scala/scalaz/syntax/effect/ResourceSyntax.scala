@@ -8,7 +8,7 @@ import scalaz.effect.Resource
 final class ResourceOps[F] private[syntax](val self: F)(implicit val F: Resource[F]) extends Ops[F] {
   ////
 
-  def close = F.close(self)
+  def close: scalaz.effect.IO[Unit] = F.close(self)
 
   ////
 }

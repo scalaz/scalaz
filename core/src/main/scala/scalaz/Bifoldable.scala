@@ -82,6 +82,7 @@ trait Bifoldable[F[_, _]]  { self =>
 
   trait BifoldableLaw {
     import std.vector._
+    import syntax.either._
 
     def leftFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
@@ -89,7 +90,7 @@ trait Bifoldable[F[_, _]]  { self =>
 
     def rightFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
       Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
-                                  bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
+                                  bifoldRight(fa, Vector.empty[B \/ A])(_.right[B] +: _)(_.left[A] +: _))
   }
 
   def bifoldableLaw = new BifoldableLaw {}
@@ -100,13 +101,22 @@ trait Bifoldable[F[_, _]]  { self =>
 object Bifoldable {
   @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 
+
+
   ////
+
+  def fromIso[F[_, _], G[_, _]](D: F ~~> G)(implicit E: Bifoldable[G]): Bifoldable[F] =
+    new IsomorphismBifoldable[F, G] {
+      override def G: Bifoldable[G] = E
+      override def biNaturalTrans: F ~~> G = D
+    }
+
   /**
    * Template trait to define `Bifoldable` in terms of `bifoldMap`.
    */
   trait FromBifoldMap[F[_, _]] extends Bifoldable[F] {
     override def bifoldRight[A,B,C](fa: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
-      bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))((b: B) => (Endo.endo(g(b, _: C)))) apply z
+      bifoldMap(fa)((a: A) => Endo.endoByName[C](f(a, _)))((b: B) => Endo.endoByName[C](g(b, _))) apply z
   }
 
   /**
@@ -117,5 +127,22 @@ object Bifoldable {
       bifoldR(fa, F.zero)(x => y => F.append(f(x),  y))(x => y => F.append(g(x),  y))
   }
 
+  ////
+}
+
+trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
+  implicit def G: Bifoldable[G]
+  ////
+
+  protected[this] def biNaturalTrans: F ~~> G
+
+  override def bifoldMap[A, B, M: Monoid](fab: F[A, B])(f: A => M)(g: B => M): M =
+    G.bifoldMap(biNaturalTrans(fab))(f)(g)
+
+  override def bifoldRight[A, B, C](fab: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+    G.bifoldRight(biNaturalTrans(fab), z)(f)(g)
+
+  override def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C =
+    G.bifoldLeft(biNaturalTrans(fa), z)(f)(g)
   ////
 }

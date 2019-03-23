@@ -1,17 +1,14 @@
 package scalaz
 
 import std.AllInstances._
+import syntax.apply._
 import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
+//import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
-  "to" ! forAll {
-    (xs: List[Int]) =>
-      val v: Vector[Int] = Foldable[List].to[Int, Vector](xs)
-      v.toList must_== xs
-  }
   "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
@@ -58,6 +55,27 @@ object FoldableTest extends SpecLite {
       else
         (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
   }
+  "extrema" ! forAll {
+    (xs: List[Int]) =>
+      (xs.extrema) must_== xs.minimum.tuple(xs.maximum)
+  }
+  "extremaOf" ! forAll {
+    (xs: List[Int]) =>
+      val f: Int => Double = 1D + _
+      (xs extremaOf f) must_== (xs minimumOf f).tuple(xs maximumOf f)
+  }
+  "extremaBy" ! forAll {
+    (xs: List[Int], f: Int => Int) =>
+      (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+  }
+  "extremaBy consistent with minimumBy/maximumBy" ! {
+    val xs = (1 to 6).toList
+    val f: Int => Int = _ % 3
+    (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+
+    val g: Int => Int = _ => 0
+    (xs extremaBy g) must_== (xs minimumBy g).tuple(xs maximumBy g)
+  }
 
   "distinct" ! forAll {
     (xs: List[Int]) =>
@@ -70,6 +88,13 @@ object FoldableTest extends SpecLite {
     (xs: List[Int]) =>
       xs.distinctE.toList must_== xs.distinct
       if (xs.length > 0) xs.distinctE(Equal.equal((_,_) => true)).length must_== 1
+  }
+
+  "distinctBy" ! {
+    case class Foo(a: Int, b: String)
+    val xs = IList(Foo(1, "x"), Foo(2, "x"), Foo(1, "y"))
+    xs.distinctBy(_.a) must_== IList(Foo(1, "x"), Foo(2, "x"))
+    xs.distinctBy(_.b) must_== IList(Foo(1, "x"), Foo(1, "y"))
   }
 
   "sumr1Opt" ! forAll {
@@ -86,13 +111,81 @@ object FoldableTest extends SpecLite {
     }
   }
 
+  "psum should be stack-safe and short-circuiting" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    Stream.from(1).map(i =>
+      if(i < N)
+        empty[String]
+      else if(i < N+2)
+        // put two "Stop" elements before "BOOM!",
+        // because Stream always evaluates the first element
+        just("Stop")
+      else
+        sys.error("BOOM!")
+    ).psum must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with Stream" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    Stream.from(1).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with EphemeralStream" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    val xs = EphemeralStream.fromStream(Stream.from(1))
+    xs.psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with List" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    List.range(1, 11000).psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be stack-safe and short-circuiting with IList" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    val xs = IList.fromList(List.range(1, 11000))
+    xs.psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
+  "psumMap should be short-circuiting with NonEmptyList" in {
+    import Maybe.{empty, just}
+    val N = 10000
+    val xs = NonEmptyList.nel(1, IList.fromList(List.range(2, 11000)))
+    xs.psumMap(i =>
+      if(i < N) empty[String]
+      else if(i == N) just("Stop")
+      else sys.error("BOOM!")
+    ) must_=== just("Stop")
+  }
+
   "non-empty folding" should {
 
     val gt1: (Int, Int)    => Int = (i, j) => i - j
     val gt2: (Int, => Int) => Int = (i, j) => i - j
     val strlen = (_ : String).length
 
-    import syntax.foldable1._
+    import syntax.foldable10._
     import syntax.std.list._
 
     "foldLeft1Opt" ! forAll {
@@ -187,6 +280,24 @@ object FoldableTest extends SpecLite {
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
   }
+
+  /*
+  "foldRight from foldMap" should {
+
+    val fromFoldMap: Foldable[EphemeralStream] = new FromFoldMap[EphemeralStream] {
+      override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Monoid[B]): B = EphemeralStream.ephemeralStreamInstance.foldMap(fa)(f)
+    }
+
+    "foldRight is Lazy" in {
+      val infiniteStream = EphemeralStream.iterate(0)(_ + 1)
+
+      // This would failed with a StackOverflowError if foldRight was not lazy, which was the case with strict Endo:
+      val stream: Stream[Int] = fromFoldMap.foldRight(infiniteStream, Stream.empty[Int]){ (i, is) => Stream.cons(i, is)}
+
+      stream.take(100) must_=== infiniteStream.take(100).toStream
+    }
+  }
+  */
 }
 
 object FoldableTests {

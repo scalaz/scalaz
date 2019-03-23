@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class StrictTreeOps[A](val self: A) extends AnyVal {
+final class StrictTreeOps[A](private val self: A) extends AnyVal {
   def strictNode(subForest: StrictTree[A]*): StrictTree[A] = StrictTree(self, subForest.toVector)
 
   def strictLeaf: StrictTree[A] = StrictTree.Leaf(self)

@@ -9,6 +9,7 @@ object StreamTest extends SpecLite {
   checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
+  checkAll(alt.laws[Stream])
   checkAll(bindRec.laws[Stream])
   checkAll(traverse.laws[Stream])
   checkAll(cobind.laws[Stream])
@@ -130,6 +131,7 @@ object StreamTest extends SpecLite {
     def monoid[A] = Monoid[Stream[A]]
     def bindRec = BindRec[Stream]
     def monadPlus = MonadPlus[Stream]
+    def alt = Alt[Stream]
     def traverse = Traverse[Stream]
     def zip = Zip[Stream]
     def unzip = Unzip[Stream]

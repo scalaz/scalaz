@@ -22,19 +22,19 @@ sealed abstract class Heap[A] {
   def fold[B](empty: => B, nonempty: (Int, (A, A) => Boolean, Tree[Ranked[A]]) => B): B
 
   /**Is the heap empty? O(1)*/
-  def isEmpty = fold(true, (_, _, _) => false)
+  def isEmpty: Boolean = fold(true, (_, _, _) => false)
 
   /**Is the heap populated? O(1)*/
-  final def nonEmpty = !isEmpty
+  final def nonEmpty: Boolean = !isEmpty
 
   /**The number of elements in the heap. O(1)*/
-  def size = fold(0, (s, _, _) => s)
+  def size: Int = fold(0, (s, _, _) => s)
 
   /**Insert a new value into the heap. O(1)*/
-  def insert(a: A)(implicit o: Order[A]) = insertWith(o.lessThanOrEqual, a)
+  def insert(a: A)(implicit o: Order[A]): Heap[A] = insertWith(o.lessThanOrEqual, a)
 
   /** Alias for insert */
-  final def +(a: A)(implicit o: Order[A]) = this insert a
+  final def +(a: A)(implicit o: Order[A]): Heap[A] = this insert a
 
   def insertAll(as: TraversableOnce[A])(implicit o: Order[A]): Heap[A] =
     (this /: as)((h,a) => h insert a)
@@ -43,7 +43,7 @@ sealed abstract class Heap[A] {
     F.foldLeft(as, this)((h,a) => h insert a)
 
   /**Meld the values from two heaps into one heap. O(1)*/
-  def union(as: Heap[A]) = (this, as) match {
+  def union(as: Heap[A]): Heap[A] = (this, as) match {
     case (Empty(), q)                         => q
     case (q, Empty())                         => q
     case (Heap(s1, leq, t1@Node(Ranked(r1, x1), f1)),
@@ -87,19 +87,23 @@ sealed abstract class Heap[A] {
 
   def toUnsortedList: List[A] = toUnsortedStream.toList
 
+  def toUnsortedIList: IList[A] = IList.fromSeq(toUnsortedStream)
+
   def toStream: Stream[A] =
     std.stream.unfold(this)(_.uncons)
 
   def toList: List[A] = toStream.toList
 
+  def toIList: IList[A] = IList.fromSeq(toStream)
+
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
-  def map[B: Order](f: A => B) = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
+  def map[B: Order](f: A => B): Heap[B] = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
 
-  def forall(f: A => Boolean) = toStream.forall(f)
+  def forall(f: A => Boolean): Boolean = toStream.forall(f)
 
-  def exists(f: A => Boolean) = toStream.exists(f)
+  def exists(f: A => Boolean): Boolean = toStream.exists(f)
 
-  def foreach(f: A => Unit) = toStream.foreach(f)
+  def foreach(f: A => Unit): Unit = toStream.foreach(f)
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
@@ -126,14 +130,14 @@ sealed abstract class Heap[A] {
   }
 
   /**Return a heap consisting of the least n elements of this heap. O(n log n) */
-  def take(n: Int) = withList(_.take(n))
+  def take(n: Int): Heap[A] = withList(_.take(n))
 
   /**Return a heap consisting of all the members of this heap except for the least n. O(n log n) */
-  def drop(n: Int) = withList(_.drop(n))
+  def drop(n: Int): Heap[A] = withList(_.drop(n))
 
   /**Split into two heaps, the first containing the n least elements, the second containing the n
    * greatest elements. O(n log n) */
-  def splitAt(n: Int) = splitWithList(_.splitAt(n))
+  def splitAt(n: Int): (Heap[A], Heap[A]) = splitWithList(_.splitAt(n))
 
   /**Returns a tuple where the first element is a heap consisting of the longest prefix of least elements
    * in this heap that do not satisfy the given predicate, and the second element is the remainder
@@ -149,12 +153,12 @@ sealed abstract class Heap[A] {
 
   /**Returns a heap consisting of the longest prefix of least elements of this heap that satisfy the predicate.
    * O(n log n) */
-  def takeWhile(p: A => Boolean) =
+  def takeWhile(p: A => Boolean): Heap[A] =
     withList(_.takeWhile(p))
 
   /**Returns a heap consisting of the longest prefix of least elements of this heap that do not
    * satisfy the predicate. O(n log n) */
-  def dropWhile(p: A => Boolean) =
+  def dropWhile(p: A => Boolean): Heap[A] =
     withList(_.dropWhile(p))
 
   /**Remove duplicate entries from the heap. O(n log n)*/
@@ -209,9 +213,9 @@ sealed abstract class Heap[A] {
   override def toString = "<heap>"
 }
 
-case class Ranked[A](rank: Int, value: A)
-
 object Heap extends HeapInstances {
+  final case class Ranked[A](rank: Int, value: A)
+
   type Forest[A] = Stream[Tree[Ranked[A]]]
   type ForestZipper[A] = (Forest[A], Forest[A])
 
@@ -236,10 +240,10 @@ object Heap extends HeapInstances {
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
 
   /**Heap sort */
-  def sort[F[_] : Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
+  def sort[F[_] : Foldable, A: Order](xs: F[A]): IList[A] = fromData(xs).toIList
 
   /**Heap sort */
-  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] = fromDataWith(f, xs).toList
+  def sortWith[F[_] : Foldable, A](f: (A, A) => Boolean, xs: F[A]): IList[A] = fromDataWith(f, xs).toIList
 
   /**A heap with one element. */
   def singleton[A: Order](a: A): Heap[A] = singletonWith[A](Order[A].lessThanOrEqual, a)
@@ -415,7 +419,7 @@ object Heap extends HeapInstances {
 }
 
 sealed abstract class HeapInstances {
-  implicit val heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
+  implicit val heapInstance: Foldable[Heap] = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
     def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
   }
 

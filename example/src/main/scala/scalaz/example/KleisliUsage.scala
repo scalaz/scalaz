@@ -63,7 +63,7 @@ object KleisliUsage extends App {
   // with mapK you can map a kleisli function into
   // another monadic structure, e.g. provide a function
   // M[A] => N[B]
-  // Note : the example is not particularily useful here.
+  // Note : the example is not particularly useful here.
   val getandSave = (allCities mapK save)
   getandSave("America").map(println)
 

@@ -1,26 +1,30 @@
 package scalaz
 
-import Id._
 
 object Tag {
+  @inline val k: TagKind = IdTagKind
+
   /** `subst` specialized to `Id`.
     *
     * @todo According to Miles, @specialized doesn't help here. Maybe manually specialize.
     */
-  @inline def apply[@specialized A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
+  @inline def apply[@specialized A, T](a: A): A @@ T = k(a)
 
   /** `unsubst` specialized to `Id`. */
-  @inline def unwrap[@specialized A, T](a: A @@ T): A = unsubst[A, Id, T](a)
+  @inline def unwrap[@specialized A, T](a: A @@ T): A = k unwrap a
 
   /** Add a tag `T` to `A`.
     *
-    * NB: It is unsafe to `subst` or `unsubst` a tag in an `F` that is
+    * NB: It is unwise to `subst` or `unsubst` a tag in an `F` that is
     * sensitive to the `A` type within.  For example, if `F` is a
-    * GADT, rather than a normal ADT, it is probably unsafe.  For
-    * "normal" types like `List` and function types, it is safe.  More
-    * broadly, if it is possible to write a ''legal''
-    * [[scalaz.InvariantFunctor]] over the parameter, `subst` of that
-    * parameter is safe.
+    * GADT, rather than a normal ADT, it will be type-correct, but
+    * probably not what you expect.  For "normal" types like `List`
+    * and function types, it is safe.  More broadly, if it is possible
+    * to write a ''legal'' [[scalaz.InvariantFunctor]] over the
+    * parameter, `subst` of that parameter is safe.  This is because
+    * `subst` effectively provides evidence that a type and all its
+    * tagged variants are equal; tagging works to discriminate types
+    * because that fact is not implicit to the compiler.
     *
     * We do not have a
     * <a href="https://ghc.haskell.org/trac/ghc/wiki/Roles">type role</a>
@@ -29,13 +33,16 @@ object Tag {
     * is safe if and only if the parameter has "representational" or
     * "phantom" role.
     */
-  def subst[A, F[_], T](fa: F[A]): F[A @@ T] = fa.asInstanceOf[F[A @@ T]]
+  @inline def subst[A, F[_], T](fa: F[A]): F[A @@ T] = k subst fa
 
   /** Add a tag `T` to `G[_]` */
-  def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]] = fa.asInstanceOf[F[λ[α => G[α] @@ T]]]
+  def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]] = k subst1 fa
 
   /** Remove the tag `T`, leaving `A`. */
-  def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
+  @inline def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = k unsubst fa
+
+  /** Remove the tag `T`, leaving `G` */
+  @inline def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G] = k unsubst1 fa
 
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
@@ -51,6 +58,9 @@ object Tag {
 
     /** Like `Tag.subst1`, but specify only the `T`. */
     def subst1[F[_[_]], G[_]](fa: F[G]): F[λ[α => G[α] @@ T]] = Tag.subst1[G, F, T](fa)
+
+    /** Like `Tag.unsubst1`, but specify only the `T`. */
+    def unsubst1[G[_], F[_[_]]](fa: F[λ[α => G[α] @@ T]]): F[G] = Tag.unsubst1[G, F, T](fa)
 
     /** Tag `fa`'s return type.  Allows inference of `A` to "flow through" from
       * the enclosing context.
@@ -78,4 +88,26 @@ object Tag {
     * type parameters.
     */
   def of[T]: TagOf[T] = new TagOf[T]
+}
+
+sealed abstract class TagKind {
+  type @@[A, T]
+
+  def subst[A, F[_], T](fa: F[A]): F[A @@ T]
+  def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]]
+  def unsubst[A, F[_], T](fa: F[A @@ T]): F[A]
+  def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G]
+  def apply[@specialized A, T](a: A): A @@ T
+  def unwrap[@specialized A, T](a: A @@ T): A
+}
+
+private[scalaz] object IdTagKind extends TagKind {
+  type @@[A, T] = A
+
+  @inline override def subst[A, F[_], T](fa: F[A]): F[A] = fa
+  @inline override def unsubst[A, F[_], T](fa: F[A]): F[A] = fa
+  @inline override def subst1[G[_], F[_[_]], T](fa: F[G]): F[G] = fa
+  @inline override def unsubst1[G[_], F[_[_]], T](fa: F[G]): F[G] = fa
+  @inline override def apply[@specialized A, T](a: A): A = a
+  @inline override def unwrap[@specialized A, T](a: A): A = a
 }

@@ -11,7 +11,7 @@ import Id._
   * from [[scalaz.Distributive]] give rise to `([a]T[A[a]]) ~>
   * ([a]A[T[a]])`, for varying `A` and `T` constraints.
   */
-trait NaturalTransformation[-F[_], +G[_]] {
+trait NaturalTransformation[F[_], G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
 
@@ -21,6 +21,23 @@ trait NaturalTransformation[-F[_], +G[_]] {
 
   def andThen[H[_]](f: G ~> H): F ~> H =
     f compose self
+
+  /**
+    * Combines this [[scalaz.NaturalTransformation]] with another one to create one
+    * that can transform [[scalaz.Coproduct]].
+    *
+    * The current NaturalTransformation will be used to transform the Left (`F`) value of
+    * the [[scalaz.Coproduct]] while the other one will be used to transform the Right (`H`) value.
+    */
+  def or[H[_]](hg: H ~> G): Coproduct[F, H, ?] ~> G =
+    λ[Coproduct[F, H, ?] ~> G](_.fold(self, hg))
+
+  import LiskovF._
+
+  def widen[GG[_]](implicit ev: GG >~~> G): F ~> GG =
+    ev.substCo[F ~> ?[_]](this)
+  def narrow[FF[_]](implicit ev: FF <~~< F): FF ~> G =
+    ev.substCt[?[_] ~> G](this)
 }
 
 trait NaturalTransformations {
@@ -30,18 +47,28 @@ trait NaturalTransformations {
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
-  def id =
+  def id: Id ~> Id =
     λ[Id ~> Id](a => a)
 
   /** A universally quantified identity function */
-  def refl[F[_]] =
+  def refl[F[_]]: F ~> F =
     λ[F ~> F](fa => fa)
-
-  /** Reify a `NaturalTransformation`. */
-  implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
 
-object NaturalTransformation extends NaturalTransformations
+object NaturalTransformation extends NaturalTransformations {
+  /**
+   * Construct a natural transformation over a coproduct from its parts.
+   * Useful for combining Free interpreters.
+   */
+  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, ?] ~> G =
+    λ[Coproduct[F, H, ?] ~> G](_.fold(fg, hg))
+
+  /**
+   * Like Hoist, for Functors, when we already know how to transform `F ~> G`.
+   */
+  def liftMap[F[_], G[_], H[_]: Functor](in: F ~> G): λ[α => H[F[α]]] ~> λ[α => H[G[α]]] =
+    λ[λ[α => H[F[α]]] ~> λ[α => H[G[α]]]](fa => Functor[H].map(fa)(in.apply))
+}
 
 /** A function universally quantified over two parameters. */
 trait BiNaturalTransformation[-F[_, _], +G[_, _]] {
