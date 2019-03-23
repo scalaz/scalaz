@@ -109,7 +109,7 @@ sealed abstract class Tree[A] {
           Trampoline.done(StrictTree.Leaf(root))
         case Tree.Node(root, forest) =>
           for {
-            strictForest <- Applicative[Trampoline].traverse(forest.toVector)(trampolined)
+            strictForest <- Trampoline.suspend(Applicative[Trampoline].traverse(forest.toVector)(trampolined))
           } yield StrictTree(root, strictForest)
       }
     }
