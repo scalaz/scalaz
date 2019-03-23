@@ -10,6 +10,9 @@ trait FunctorClass[F[_]] extends InvariantFunctorClass[F] {
   def map[A, B](ma: F[A])(f: A => B): F[B]
 
   override def imap[A, B](ma: F[A])(f: A => B)(g: B => A): F[B] = map(ma)(f)
+
+  def compose[G[_]](implicit G: FunctorClass[G]): Functor[λ[α => F[G[α]]]] =
+    instanceOf(new CompositionFunctorClass[F, G]()(this, G))
 }
 
 trait FunctorFunctions {
@@ -37,4 +40,11 @@ trait FunctorSyntax {
     def fmap[B](f: A => B)(implicit ev: Functor[F]): F[B] = ev.map[A, B](self)(f)
     def void(implicit ev: Functor[F]): F[Unit]            = ev.map[A, Unit](self)(_ => ())
   }
+}
+
+private class CompositionFunctorClass[F[_], G[_]](implicit F: FunctorClass[F], G: FunctorClass[G])
+    extends FunctorClass[λ[α => F[G[α]]]] {
+
+  def map[A, B](fga: F[G[A]])(f: A => B): F[G[B]] =
+    F.map(fga)(G.map(_)(f))
 }

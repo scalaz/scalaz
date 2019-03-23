@@ -12,6 +12,9 @@ trait TraversableClass[T[_]] extends FunctorClass[T] with FoldableClass[T] {
   def traverse[F[_]: Applicative, A, B](ta: T[A])(f: A => F[B]): F[T[B]] = sequence(map(ta)(f))
 
   def sequence[F[_]: Applicative, A](ta: T[F[A]]): F[T[A]] = traverse(ta)(identity)
+
+  def compose[G[_]](implicit G: TraversableClass[G]): Traversable[λ[α => T[G[α]]]] =
+    instanceOf(new CompositionTraversableClass[T, G]()(this, G))
 }
 
 object TraversableClass {
@@ -19,9 +22,7 @@ object TraversableClass {
     instanceOf(new TraversableClass[List] {
       override def traverse[F[_], A, B](ta: List[A])(f: A => F[B])(implicit F: Applicative[F]): F[List[B]] =
         ta.foldLeft[F[List[B]]](F.pure(List.empty[B])) { (flb, a) =>
-          {
-            F.ap(flb)(F.map(f(a))(b => (xs: List[B]) => b :: xs))
-          }
+          F.ap(flb)(F.map(f(a))(b => (xs: List[B]) => b :: xs))
         }
 
       override def foldLeft[A, B](fa: List[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
@@ -60,4 +61,22 @@ trait TraversableSyntax {
     def traverse[F[_], B](f: A => F[B])(implicit g: Applicative[F], ev: Traversable[T]): F[T[B]] =
       macro ops.Ops.i_1_1i
   }
+}
+
+private class CompositionTraversableClass[F[_], G[_]](implicit F: TraversableClass[F], G: TraversableClass[G])
+    extends CompositionFunctorClass[F, G]
+    with TraversableClass[λ[α => F[G[α]]]] {
+
+  def foldLeft[A, B](fga: F[G[A]], z: B)(f: (B, A) => B): B =
+    F.foldLeft(fga, z) { (b, ga) =>
+      G.foldLeft(ga, b)(f)
+    }
+
+  def foldRight[A, B](fga: F[G[A]], z: => B)(f: (A, => B) => B): B =
+    F.foldRight(fga, z) { (ga, b) =>
+      G.foldRight(ga, b)(f)
+    }
+
+  override def traverse[H[_]: Applicative, A, B](fga: F[G[A]])(f: A => H[B]): H[F[G[B]]] =
+    F.traverse(fga)(G.traverse(_)(f))
 }

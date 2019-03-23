@@ -9,6 +9,7 @@ package object tc {
   final def instanceOf[T](t: T): InstanceOf[T] = InstanceOfModule.impl.instanceOf(t)
 
   type Applicative[F[_]]         = InstanceOf[ApplicativeClass[F]]
+  type ApplicativeError[F[_], E] = InstanceOf[ApplicativeErrorClass[F, E]]
   type ApplicativePlus[F[_]]     = InstanceOf[ApplicativePlusClass[F]]
   type Apply[F[_]]               = InstanceOf[ApplyClass[F]]
   type Bifunctor[F[_, _]]        = InstanceOf[BifunctorClass[F]]
@@ -46,6 +47,7 @@ package object tc {
   type Unfoldable1[F[_]]         = InstanceOf[Unfoldable1Class[F]]
 
   final def Applicative[F[_]](implicit F: Applicative[F]): Applicative[F]                               = F
+  final def ApplicativeError[F[_], S](implicit F: ApplicativeError[F, S]): ApplicativeError[F, S]       = F
   final def ApplicativePlus[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F]                   = F
   final def Apply[F[_]](implicit F: Apply[F]): Apply[F]                                                 = F
   final def Bifunctor[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F]                                  = F
