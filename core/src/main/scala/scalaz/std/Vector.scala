@@ -2,7 +2,7 @@ package scalaz
 package std
 
 import vector._
-import annotation.tailrec
+import annotation.{switch, tailrec}
 
 sealed trait VectorInstances0 {
   implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new VectorEqual[A] {
@@ -44,9 +44,18 @@ trait VectorInstances extends VectorInstances0 {
     }
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      v.foldLeft(F.point(empty[B])) { (fvb, a) =>
-        F.apply2(fvb, f(a))(_ :+ _)
+      // invariant: 0 <= s <= e <= v.size
+      def rec(s: Int, e: Int): F[Vector[B]] = (e - s: @switch) match {
+        case 0 => F.point(Vector())
+        case 1 => F.map(f(v(s)))(Vector(_))
+        // cases >1 but the inductive case are just optimizations; the
+        // returns diminish pretty rapidly, so only '2' is here
+        case 2 => F.apply2(f(v(s)), f(v(s + 1)))(Vector(_, _))
+        case n =>
+          val pivot = s + n / 2
+          F.apply2(rec(s, pivot), rec(pivot, e))(_ ++ _)
       }
+      rec(0, v.size)
     }
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
