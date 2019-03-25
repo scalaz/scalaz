@@ -20,12 +20,7 @@ object CobindClass {
       Some(f(fa))
   })
 
-  implicit val listCobind: Cobind[List] = instanceOf(new CobindClass[List] {
-    override def map[A, B](fa: List[A])(f: A => B): List[B] = fa.map(f)
-
-    override def cobind[A, B](fa: List[A])(f: List[A] => B): List[B] =
-      List(f(fa))
-  })
+  implicit val instanceList: Cobind[List] = instanceOf(instances.list.control)
 }
 
 trait CobindSyntax {

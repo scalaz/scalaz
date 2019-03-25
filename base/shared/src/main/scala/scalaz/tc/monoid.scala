@@ -23,10 +23,7 @@ object MonoidClass {
   })
 
   implicit def listMonoid[A]: Monoid[List[A]] =
-    instanceOf(new MonoidClass[List[A]] {
-      def mappend(a1: List[A], a2: => List[A]): List[A] = a1 ++ a2
-      def mempty: List[A]                               = List.empty
-    })
+    instanceOf(instances.list.data[A])
 
   implicit def fiberMonoid[E, A](implicit A: Monoid[A]): Monoid[Fiber[E, A]] =
     instanceOf(new MonoidClass[Fiber[E, A]] {

@@ -49,12 +49,7 @@ object MonadClass {
       override final def pure[A](a: A): IO[E, A] = IO.now(a)
     })
 
-  implicit val listMonad: Monad[List] = instanceOf(new MonadClass[List] {
-    override def ap[A, B](xs: List[A])(f: List[A => B]): List[B]      = xs.flatMap(a => f.map(_(a)))
-    override def flatMap[A, B](xs: List[A])(f: A => List[B]): List[B] = xs.flatMap(f)
-    override def map[A, B](xs: List[A])(f: A => B): List[B]           = xs.map(f)
-    override def pure[A](a: A): List[A]                               = List(a)
-  })
+  implicit val instanceList: Monad[List] = instanceOf(instances.list.control)
 
   implicit val optionMonad: Monad[Option] =
     instanceOf(new MonadClass[Option] {

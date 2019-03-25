@@ -1,9 +1,10 @@
 package scalaz
 package tc
 
-import Predef._
-
+import scala.List
 import scala.language.experimental.macros
+
+import Predef._
 
 @meta.minimal("flatMap", "flatten")
 trait BindClass[M[_]] extends ApplyClass[M] {
@@ -12,6 +13,11 @@ trait BindClass[M[_]] extends ApplyClass[M] {
   def flatten[A](ma: M[M[A]]): M[A] = flatMap(ma)(identity)
 
   override def ap[A, B](fa: M[A])(f: M[A => B]): M[B] = flatMap(f)(map(fa))
+}
+
+object BindClass {
+
+  implicit val instanceList: Bind[List] = instanceOf(instances.list.control)
 }
 
 trait BindFunctions {

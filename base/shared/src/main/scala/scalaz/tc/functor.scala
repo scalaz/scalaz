@@ -1,6 +1,7 @@
 package scalaz
 package tc
 
+import scala.List
 import scala.language.experimental.macros
 
 import Predef._
@@ -13,6 +14,10 @@ trait FunctorClass[F[_]] extends InvariantFunctorClass[F] {
 
   def compose[G[_]](implicit G: FunctorClass[G]): Functor[λ[α => F[G[α]]]] =
     instanceOf(new CompositionFunctorClass[F, G]()(this, G))
+}
+
+object FunctorClass {
+  implicit val instanceList: Functor[List] = instanceOf(instances.list.control)
 }
 
 trait FunctorFunctions {

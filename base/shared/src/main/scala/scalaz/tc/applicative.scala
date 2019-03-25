@@ -1,8 +1,8 @@
 package scalaz
 package tc
 
+import scala.List
 import scala.Unit
-
 import scala.language.experimental.macros
 
 import zio.Fiber
@@ -17,6 +17,8 @@ trait ApplicativeClass[F[_]] extends ApplyClass[F] {
 }
 
 object ApplicativeClass {
+
+  implicit val instanceList: Applicative[List] = instanceOf(instances.list.control)
 
   implicit def fiberApplicative[E]: Applicative[Fiber[E, ?]] =
     instanceOf(new ApplicativeClass[Fiber[E, ?]] {
