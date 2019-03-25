@@ -28,6 +28,10 @@ trait FoldableClass[F[_]] {
     foldLeft(fa, List[A]())((t, h) => h :: t).reverse
 }
 
+object FoldableClass {
+  implicit val instanceList: Foldable[List] = instanceOf(instances.list.control)
+}
+
 trait FoldableSyntax {
   implicit final class ToFoldableOps[F[_], A](self: F[A]) {
     def foldLeft[B](f: B)(g: (B, A) => B)(implicit ev: Foldable[F]): B = macro ops.Ops.ia_1_1

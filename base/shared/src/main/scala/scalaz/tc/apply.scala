@@ -1,6 +1,7 @@
 package scalaz
 package tc
 
+import scala.List
 import scala.language.experimental.macros
 
 @meta.minimal("ap", "zip")
@@ -11,6 +12,10 @@ trait ApplyClass[F[_]] extends FunctorClass[F] {
     ap(fb)(map(fa)(f.curried))
 
   def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] = ap(fa)(map(fb)(b => a => (a, b)))
+}
+
+object ApplyClass {
+  implicit val instanceList: Apply[List] = instanceOf(instances.list.control)
 }
 
 trait ApplySyntax {

@@ -1,8 +1,10 @@
 package scalaz
 package tc
 
-import scala.Int
 import java.lang.String
+
+import scala.Int
+import scala.List
 
 import scala.annotation.tailrec
 import scala.language.experimental.macros
@@ -24,6 +26,10 @@ trait SemigroupClass[A] {
 }
 
 object SemigroupClass {
+
+  implicit def listSemigroup[A]: Semigroup[List[A]] =
+    instanceOf(instances.list.data[A])
+
   implicit val StringSemigroup: Semigroup[String] = instanceOf(new SemigroupClass[String] {
     def mappend(a1: String, a2: => String) = a1 + a2
   })
