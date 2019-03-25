@@ -685,10 +685,14 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /**
    * Splits this tree into a pair of subtrees at the point where the given predicate, based on the measure,
-   * changes from `true` to `false`. O(log(min(i,n-i)))
+   * changes from `false` to `true`. O(log(min(i,n-i)))
    *
-   * @return `(as, bs)` `as`: the subtree containing elements before the point where `pred` first holds
-   *                    `fs` the subtree containing element at and after the point where `pred` first holds. Empty if `pred` never holds.
+   * @param pred predicate on node measures. Must be a semigroup homomorphism from the semigroup `V` of
+   *             node measures to the semigroup of `Boolean`s with `||` as the semigroup operation.
+   *             Namely, it must hold that `pred(v1 |+| v2) = pred(v1) || pred(v2)`.
+   * @return `(as, bs)`, where
+   *          - `as`: the subtree containing elements before the point where `pred` first holds
+   *          - `bs`: the subtree containing elements at and after the point where `pred` first holds. Empty if `pred` never holds.
    */
   def split(pred: V => Boolean): (FingerTree[V, A], FingerTree[V, A]) =
     if (!isEmpty && pred(measure)) {
