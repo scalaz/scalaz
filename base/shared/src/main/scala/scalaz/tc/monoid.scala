@@ -3,7 +3,7 @@ package tc
 
 import Predef._
 
-import zio.Fiber
+import zio.{ Fiber, Schedule }
 
 import scala.{ List, Unit }
 
@@ -33,5 +33,13 @@ object MonoidClass {
       def mappend(a1: Fiber[E, A], a2: => Fiber[E, A]): Fiber[E, A] =
         a1.zipWith(a2)(A.mappend(_, _))
       def mempty: Fiber[E, A] = Fiber.point(A.mempty)
+    })
+
+  implicit def strategyMonoid[E, A](implicit A: Monoid[A]): Monoid[Schedule[E, A]] =
+    instanceOf(new MonoidClass[Schedule[E, A]] {
+      override def mempty: Schedule[E, A] = Schedule.point(A.mempty)
+
+      override def mappend(a1: Schedule[E, A], a2: => Schedule[E, A]): Schedule[E, A] =
+        (a1 && a2).map(tup => A.mappend(tup._1, tup._2))
     })
 }
