@@ -1,7 +1,8 @@
 package scalaz
 
+import scalaz.Free.Trampoline
+import scalaz.Trampoline._
 import std.stream.{streamInstance, streamMonoid}
-import Free.Trampoline
 
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
@@ -16,9 +17,16 @@ sealed abstract class Tree[A] {
   /** The child nodes of this tree. */
   def subForest: Stream[Tree[A]]
 
+  def foldMapTrampoline[B: Monoid](f: A => B): Trampoline[B] = {
+    for {
+      root <- delay(f(rootLabel))
+      subForests <- Foldable[Stream].foldMap[Tree[A], Trampoline[B]](subForest)(_.foldMapTrampoline(f))
+    } yield Monoid[B].append(root, subForests)
+  }
+
   /** Maps the elements of the Tree into a Monoid and folds the resulting Tree. */
   def foldMap[B: Monoid](f: A => B): B =
-    Monoid[B].append(f(rootLabel), Foldable[Stream].foldMap[Tree[A], B](subForest)((_: Tree[A]).foldMap(f)))
+    foldMapTrampoline[B](f).run
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B =
     Foldable[Stream].foldRight(flatten, z)(f)
@@ -28,8 +36,8 @@ sealed abstract class Tree[A] {
     val reversedLines = draw.run
     val first = new StringBuilder(reversedLines.head.toString.reverse)
     val rest = reversedLines.tail
-    rest.foldLeft(first) { (acc, elem) => 
-      acc.append("\n").append(elem.toString.reverse) 
+    rest.foldLeft(first) { (acc, elem) =>
+      acc.append("\n").append(elem.toString.reverse)
     }.append("\n").toString
   }
 
@@ -38,11 +46,11 @@ sealed abstract class Tree[A] {
    * and the histomorphic transform of its children.
    **/
   def scanr[B](g: (A, Stream[Tree[B]]) => B): Tree[B] = {
-    lazy val c = subForest.map(_.scanr(g))
-    Node(g(rootLabel, c), c)
+    val c = Need(subForest.map(_.scanr(g)))
+    Node(g(rootLabel, c.value), c.value)
   }
 
-  /** A 2D String representation of this Tree, separated into lines. 
+  /** A 2D String representation of this Tree, separated into lines.
     * Uses reversed StringBuilders for performance, because they are
     * prepended to.
     **/
@@ -70,8 +78,8 @@ sealed abstract class Tree[A] {
       }
       s
     }
-    
-    drawSubTrees(subForest).map { subtrees => 
+
+    drawSubTrees(subForest).map { subtrees =>
       new StringBuilder(sh.shows(rootLabel).reverse) +: subtrees
     }
   }
@@ -92,6 +100,23 @@ sealed abstract class Tree[A] {
     Stream.iterate(Stream(this))(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
   }
 
+  def toStrictTree: StrictTree[A] = {
+    import std.vector.vectorInstance
+
+    def trampolined(t: Tree[A]): Trampoline[StrictTree[A]] = {
+      t match {
+        case Tree.Leaf(root) =>
+          Trampoline.done(StrictTree.Leaf(root))
+        case Tree.Node(root, forest) =>
+          for {
+            strictForest <- Trampoline.suspend(Applicative[Trampoline].traverse(forest.toVector)(trampolined))
+          } yield StrictTree(root, strictForest)
+      }
+    }
+
+    trampolined(this).run
+  }
+
   /** Binds the given function across all the subtrees of this tree. */
   def cobind[B](f: Tree[A] => B): Tree[B] = unfoldTree(this)(t => (f(t), () => t.subForest))
 
@@ -99,11 +124,12 @@ sealed abstract class Tree[A] {
   def loc: TreeLoc[A] = TreeLoc.loc(this, Stream.Empty, Stream.Empty, Stream.Empty)
 
   /** Turns a tree of pairs into a pair of trees. */
-  def unzip[A1, A2](implicit p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
-    lazy val uz = subForest.map(_.unzip)
-    lazy val fst = uz map (_._1)
-    lazy val snd = uz map (_._2)
-    (Node(rootLabel._1, fst), Node(rootLabel._2, snd))
+  def unzip[A1, A2](p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
+    val uz = Need(subForest.map(_.unzip(p)))
+    val fst = Need(uz.value map (_._1))
+    val snd = Need(uz.value map (_._2))
+    val (a, b) = p(rootLabel)
+    (Node(a, fst.value), Node(b, snd.value))
   }
 
   def foldNode[Z](f: A => Stream[Tree[A]] => Z): Z =
@@ -127,6 +153,7 @@ sealed abstract class Tree[A] {
       }
     }
   }
+
 }
 
 sealed abstract class TreeInstances {
@@ -147,14 +174,14 @@ sealed abstract class TreeInstances {
       case h #:: t => t.foldLeft(z(h))(f)
     }
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
-    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = { 
+    def alignWith[A, B, C](f: (\&/[A, B]) ⇒ C) = {
       def align(ta: Tree[A], tb: Tree[B]): Tree[C] =
         Tree.Node(f(\&/(ta.rootLabel, tb.rootLabel)), Align[Stream].alignWith[Tree[A], Tree[B], Tree[C]]({
           case \&/.This(sta) ⇒ sta map {a ⇒ f(\&/.This(a))}
           case \&/.That(stb) ⇒ stb map {b ⇒ f(\&/.That(b))}
           case \&/(sta, stb) ⇒ align(sta, stb)
         })(ta.subForest, tb.subForest))
-      align _
+      align
     }
     def zip[A, B](aa: => Tree[A], bb: => Tree[B]) = {
       val a = aa
@@ -195,8 +222,10 @@ object Tree extends TreeInstances {
   object Node {
     def apply[A](root: => A, forest: => Stream[Tree[A]]): Tree[A] = {
       new Tree[A] {
-        lazy val rootLabel = root
-        lazy val subForest = forest
+        private[this] val rootc = Need(root)
+        private[this] val forestc = Need(forest)
+        def rootLabel = rootc.value
+        def subForest = forestc.value
 
         override def toString = "<tree>"
       }
@@ -206,7 +235,7 @@ object Tree extends TreeInstances {
   }
 
   /**
-   *  Leaf represents a a tree node with no children.
+   *  Leaf represents a tree node with no children.
    *
    *  You can use Leaf for tree construction or pattern matching.
    */
@@ -236,6 +265,28 @@ object Tree extends TreeInstances {
 
 private trait TreeEqual[A] extends Equal[Tree[A]] {
   def A: Equal[A]
-  override final def equal(a1: Tree[A], a2: Tree[A]) =
-    A.equal(a1.rootLabel, a2.rootLabel) && a1.subForest.corresponds(a2.subForest)(equal _)
+
+  override final def equal(a1: Tree[A], a2: Tree[A]) = {
+    def corresponds[B](a1: Stream[Tree[A]], a2: Stream[Tree[A]]): Trampoline[Boolean] = {
+      (a1.isEmpty, a2.isEmpty) match {
+        case (true, true) => Trampoline.done(true)
+        case (_, true) | (true, _) => Trampoline.done(false)
+        case _ =>
+          for {
+            heads <- trampolined(a1.head, a2.head)
+            tails <- corresponds(a1.tail, a2.tail)
+          } yield heads && tails
+      }
+    }
+
+    def trampolined(a1: Tree[A], a2: Tree[A]): Trampoline[Boolean] = {
+      for {
+        roots <- Trampoline.done(A.equal(a1.rootLabel, a2.rootLabel))
+        subForests <- corresponds(a1.subForest, a2.subForest)
+      } yield roots && subForests
+    }
+
+    trampolined(a1, a2).run
+  }
+
 }

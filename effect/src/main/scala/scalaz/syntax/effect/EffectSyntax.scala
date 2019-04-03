@@ -7,7 +7,7 @@ trait EffectSyntaxes {
   object resource extends ToResourceOps
 
   object monadCatchIO extends ToMonadCatchIOOps
-  
+
   object all extends ToAllEffectTypeClassOps
 
 }

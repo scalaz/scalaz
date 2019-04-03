@@ -4,16 +4,16 @@ import reflect.ClassTag
 
 import org.scalacheck._
 
-abstract class SpecLite extends Properties("") with SpecLitePlatform {
-  updateName
+abstract class SpecLite extends Properties("") {
+  override val name = this.getClass.getName.stripSuffix("$")
 
-  def checkAll(name: String, props: Properties) {
+  def checkAll(name: String, props: Properties): Unit = {
     for ((name2, prop) <- props.properties) yield {
       property(name + ":" + name2) = prop
     }
   }
 
-  def checkAll(props: Properties) {
+  def checkAll(props: Properties): Unit = {
     for ((name, prop) <- props.properties) yield {
       property(name) = prop
     }
@@ -38,8 +38,9 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 
-    def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
-      property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
+    def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = Prop { prms =>
+      ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
+    }
   }
 
   implicit def enrichString(s: String) = new StringOps(s)
@@ -107,14 +108,4 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
   implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
   implicit def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
 
-  /**
-   * Most of our scalacheck tests use (Int => Int). This generator includes non-constant
-   * functions (id, inc), to have a better chance at catching bugs.
-   */
-  implicit def Function1IntInt[A](implicit A: Arbitrary[Int]): Arbitrary[Int => Int] =
-    Arbitrary(Gen.frequency[Int => Int](
-      (1, Gen.const((x: Int) => x)),
-      (1, Gen.const((x: Int) => x + 1)),
-      (3, A.arbitrary.map(a => (_: Int) => a))
-    ))
 }

@@ -16,6 +16,7 @@ object LazyEitherTTest extends SpecLite {
 
   checkAll(equal.laws[LazyEitherTListInt[Int]])
   checkAll(monadPlus.laws[LazyEitherTListInt])
+  checkAll(alt.laws[LazyEitherTListInt])
   checkAll(traverse.laws[LazyEitherTListInt])
   checkAll(bitraverse.laws[LazyEitherTList])
   checkAll(bindRec.laws[LazyEitherTListInt])
@@ -27,13 +28,13 @@ object LazyEitherTTest extends SpecLite {
 
     val times = 10000
 
-    val result = 
-      BindRec[LazyEitherId].tailrecM[Int, Int] { 
-        i => LazyEitherT[Id, Int, Int \/ Int](LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i))) 
-      }(0)
+    val result =
+      BindRec[LazyEitherId].tailrecM(0) {
+        i => LazyEitherT[Id, Int, Int \/ Int](LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i)))
+      }
     result.getOrElse(0) must_=== times
   }
-  
+
   private def lazyEitherTUcompilationTest: Unit = {
     val a: String \/ LazyEither[Int, Boolean] = null
     LazyEitherT.lazyEitherTU(a)
@@ -44,6 +45,7 @@ object LazyEitherTTest extends SpecLite {
     def plus[F[_] : Monad, A: Semigroup] = Plus[LazyEitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[LazyEitherT[F, A, ?]]
     def monadPlus[F[_] : Monad, A: Monoid] = MonadPlus[LazyEitherT[F, A, ?]]
+    def alt[F[_] : Monad, A] = Alt[LazyEitherT[F, A, ?]]
     def bind[F[_] : Monad, A] = Bind[LazyEitherT[F, A, ?]]
     def foldable[F[_] : Foldable, A] = Foldable[LazyEitherT[F, A, ?]]
     def traverse[F[_] : Traverse, A] = Traverse[LazyEitherT[F, A, ?]]

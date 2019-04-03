@@ -1,6 +1,6 @@
 package scalaz.example
 
-import scalaz.{ Free, Monad, ~> }
+import scalaz.{ Free, ~> }
 import scalaz.std.function._
 import scalaz.syntax.monad._
 import scalaz.effect.IO
@@ -25,9 +25,8 @@ object FreeUsage extends App {
     case class  SetSeed(seed: Long)      extends RngOp[Unit]
   }
 
-  // Free monad over the free functor of RngOp. The instance is not inferrable.
+  // Free monad over the free functor of RngOp.
   type Rng[A] = Free[RngOp, A]
-  implicit val MonadRng: Monad[Rng] = Free.freeMonad[RngOp]
 
   // Smart constructors for Rng[A]
   val nextBoolean              = Free.liftF(RngOp.NextBoolean)
@@ -42,7 +41,7 @@ object FreeUsage extends App {
   def setSeed(seed: Long)      = Free.liftF(RngOp.SetSeed(seed))
 
   // You can of course derive new operations from the primitives
-  def nextNonNegativeInt       = nextInt.map(_.abs)
+  def nextNonNegativeInt       = nextInt.map(n => if(n == Int.MinValue) 0 else n.abs)
   def choose[A](h: A, tl: A*)  = nextIntInRange(tl.length + 1).map((h +: tl).apply)
 
   // Natural transformation to (Random => A)

@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Liskov.<~<
 /**
  * Contravariant functors.  For example, functions provide a
  * [[scalaz.Functor]] in their result type, but a
@@ -25,6 +26,9 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   def contramap[A, B](r: F[A])(f: B => A): F[B]
 
   // derived functions
+
+  def narrow[A, B](fa: F[A])(implicit ev: B <~< A): F[B] =
+    contramap(fa)(ev.apply)
 
   def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
     contramap(fa)(g)
@@ -75,7 +79,27 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
 object Contravariant {
   @inline def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Contravariant[G]): Contravariant[F] =
+    new IsomorphismContravariant[F, G] {
+      override def G: Contravariant[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: Contravariant[G]
+  ////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def contramap[A, B](r: F[A])(f: B => A): F[B] =
+    iso.from(G.contramap(iso.to(r))(f))
   ////
 }

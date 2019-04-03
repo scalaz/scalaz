@@ -80,9 +80,7 @@ sealed abstract class TracedTInstances0 extends TracedTInstances1 {
   implicit final def tracedTCohoist[C: Monoid]: Cohoist[Lambda[(w[_], b) => TracedT[w, C, b]]] =
     new Cohoist[Lambda[(w[_], b) => TracedT[w, C, b]]] {
       override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-        new (TracedT[M, C, ?] ~> TracedT[N, C, ?]) {
-          def apply[A](fa: TracedT[M, C, A]) = fa.trans(f)
-        }
+        λ[TracedT[M, C, ?] ~> TracedT[N, C, ?]](_ trans f)
       override def lower[G[_], A](a: TracedT[G, C, A])(implicit G: Cobind[G]) =
         a.lower
     }
@@ -109,9 +107,9 @@ sealed abstract class TracedTInstances extends TracedTInstances0 {
 object TracedT extends TracedTInstances {
 
   def tracedTU[WAB, AB, A0, B0](wab: WAB)(implicit
-    U1: Unapply[Functor, WAB]{type A = AB},
-    U2: Unapply2[Profunctor, AB]{type A = A0; type B = B0},
-    L: Leibniz.===[AB, A0 => B0]
+                                          U1: Unapply[Functor, WAB]{type A = AB},
+                                          @deprecated("scala/bug#5075", "") U2: Unapply2[Profunctor, AB]{type A = A0; type B = B0},
+                                          L: AB === (A0 => B0)
   ): TracedT[U1.M, A0, B0] = TracedT(L.subst[U1.M](U1(wab)))
 
   import scalaz.Isomorphism._

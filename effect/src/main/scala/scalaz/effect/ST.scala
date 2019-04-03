@@ -3,7 +3,6 @@ package effect
 
 import reflect.ClassTag
 
-import IvoryTower._
 import STRef._
 import STArray._
 import ST._
@@ -18,15 +17,15 @@ sealed abstract class STRef[S, A] {
   def read: ST[S, A] = returnST(value)
 
   /**Modifies the value at this reference with the given function. */
-  def mod[B](f: A => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
+  def mod[B](f: A => A): ST[S, STRef[S, A]] = st(() => {
     value = f(value);
-    (s, this)
+    this
   })
 
   /**Associates this reference with the given value. */
-  def write(a: => A): ST[S, STRef[S, A]] = st((s: Tower[S]) => {
+  def write(a: => A): ST[S, STRef[S, A]] = st(() => {
     value = a;
-    (s, this)
+    this
   })
 
   /**Synonym for write*/
@@ -55,7 +54,7 @@ object STRef extends STRefInstances {
 }
 
 sealed abstract class STRefInstances {
-  
+
   /**Equality for STRefs is reference equality */
   implicit def STRefEqual[S, A]: Equal[STRef[S, A]] =
     Equal.equalA // todo reference equality?
@@ -67,7 +66,9 @@ sealed abstract class STArray[S, A] {
   def z: A
   implicit def tag: ClassTag[A]
 
-  private lazy val value: Array[A] = Array.fill(size)(z)
+  private[this] val arr = Need(Array.fill(size)(z))
+
+  private def value: Array[A] = arr.value
 
   import ST._
 
@@ -75,16 +76,16 @@ sealed abstract class STArray[S, A] {
   def read(i: Int): ST[S, A] = returnST(value(i))
 
   /**Writes the given value to the array, at the given offset. */
-  def write(i: Int, a: A): ST[S, STArray[S, A]] = st(s => {
+  def write(i: Int, a: A): ST[S, STArray[S, A]] = st(() => {
     value(i) = a;
-    (s, this)
+    this
   })
 
   /**Turns a mutable array into an immutable one which is safe to return. */
-  def freeze: ST[S, ImmutableArray[A]] = st(s => (s, ImmutableArray.fromArray(value)))
+  def freeze: ST[S, ImmutableArray[A]] = st(() => ImmutableArray.fromArray(value))
 
   /**Fill this array from the given association list. */
-  def fill[B](f: (A, B) => A, xs: Traversable[(Int, B)]): ST[S, Unit] = xs match {
+  def fill[B](f: (A, B) => A, xs: Iterable[(Int, B)]): ST[S, Unit] = xs.toList match {
     case Nil             => returnST(())
     case ((i, v) :: ivs) => for {
       _ <- update(f, i, v)
@@ -93,7 +94,7 @@ sealed abstract class STArray[S, A] {
   }
 
   /**Combine the given value with the value at the given index, using the given function. */
-  def update[B](f: (A, B) => A, i: Int, v: B) = for {
+  def update[B](f: (A, B) => A, i: Int, v: B): ST[S, Unit] = for {
     x <- read(i)
     _ <- write(i, f(x, v))
   } yield ()
@@ -114,55 +115,50 @@ object STArray {
  * Based on JL and SPJ's paper "Lazy Functional State Threads"
  */
 sealed abstract class ST[S, A] {
-  private[effect] def apply(s: Tower[S]): (Tower[S], A)
+  private[effect] def run: A
 
   import ST._
 
   def flatMap[B](g: A => ST[S, B]): ST[S, B] =
-    st(s => apply(s) match {
-      case (ns, a) => g(a)(ns)
-    })
+    st(() => g(run).run)
 
   def map[B](g: A => B): ST[S, B] =
-    st(s => apply(s) match {
-      case (ns, a) => (ns, g(a))
-    })
+    st(() => g(run))
 }
 
 object ST extends STInstances {
   def apply[S, A](a: => A): ST[S, A] =
     returnST(a)
 
-  def st[S, A](f: Tower[S] => (Tower[S], A)): ST[S, A] = new ST[S, A] {
-    private[effect] def apply(s: Tower[S]) = f(s)
+  def st[S, A](f: () => A): ST[S, A] = new ST[S, A] {
+    private[effect] def run = f()
   }
 
-  // Implicit conversions between IO and ST
-  implicit def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
-    IO.io(rw => Free.return_(st(rw)))
+  def STToIO[A](st: ST[IvoryTower, A]): IO[A] =
+    IO.io(rw => Free.return_((rw, st.run)))
 
   /**Put a value in a state thread */
   def returnST[S, A](a: => A): ST[S, A] =
-    st(s => (s, a))
+    st(() => a)
 
   /**Run a state thread */
   def runST[A](f: Forall[ST[?, A]]): A =
-    f.apply.apply(ivoryTower)._2
+    f.apply.run
 
   /**Allocates a fresh mutable reference. */
   def newVar[S]: Id ~> λ[α => ST[S, STRef[S, α]]] =
-    new (Id ~> λ[α => ST[S, STRef[S, α]]]) {
-      def apply[A](a: A) = returnST(stRef[S](a))
-    }
+    λ[Id ~> λ[α => ST[S, STRef[S, α]]]](
+      a => returnST(stRef[S](a))
+    )
 
   /**Allocates a fresh mutable array. */
   def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
     returnST(stArray[S, A](size, z))
 
   /**Allows the result of a state transformer computation to be used lazily inside the computation. */
-  def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = st(s => {
-    lazy val ans: (Tower[S], A) = k(r)(s)
-    lazy val (_, r) = ans
+  def fixST[S, A](k: (=> A) => ST[S, A]): ST[S, A] = ST({
+    lazy val ans: A = k(r).run
+    lazy val r = ans
     ans
   })
 
@@ -191,7 +187,7 @@ sealed abstract class STInstances extends STInstance0 {
   implicit def stMonoid[S, A](implicit A: Monoid[A]): Monoid[ST[S, A]] =
     Monoid.liftMonoid[ST[S, ?], A](stMonad[S], A)
 
-  implicit def stMonad[S]: Monad[ST[S, ?]] = 
+  implicit def stMonad[S]: Monad[ST[S, ?]] =
     new Monad[ST[S, ?]] {
       def point[A](a: => A): ST[S, A] = returnST(a)
       def bind[A, B](fa: ST[S, A])(f: A => ST[S, B]): ST[S, B] = fa flatMap f

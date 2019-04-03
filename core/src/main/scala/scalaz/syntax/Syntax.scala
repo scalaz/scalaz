@@ -11,6 +11,8 @@ trait Syntaxes {
 
   object monoid extends ToMonoidOps
 
+  object band extends ToBandOps
+
   object equal extends ToEqualOps
 
   object show extends ToShowOps
@@ -19,87 +21,138 @@ trait Syntaxes {
 
   object enum extends ToEnumOps
 
-  object isEmpty extends ToIsEmptyOps
+  object isEmpty0 extends ToIsEmptyOps0[IsEmpty]
+  object isEmpty extends ToIsEmptyOps[IsEmpty]
 
-  object plusEmpty extends ToPlusEmptyOps
+  object plusEmpty0 extends ToPlusEmptyOps0[PlusEmpty]
+  object plusEmpty extends ToPlusEmptyOps[PlusEmpty]
 
-  object functor extends ToFunctorOps
+  object functor0 extends ToFunctorOps0[Functor]
+  object functor extends ToFunctorOps[Functor]
 
-  object invariantFunctor extends ToInvariantFunctorOps
+  object invariantFunctor0 extends ToInvariantFunctorOps0[InvariantFunctor]
+  object invariantFunctor extends ToInvariantFunctorOps[InvariantFunctor]
 
-  object contravariant extends ToContravariantOps
+  object contravariant0 extends ToContravariantOps0[Contravariant]
+  object contravariant extends ToContravariantOps[Contravariant]
 
-  object align extends ToAlignOps
+  object align0 extends ToAlignOps0[Align]
+  object align extends ToAlignOps[Align]
 
-  object apply extends ToApplyOps
+  object apply0 extends ToApplyOps0[Apply]
+  object apply extends ToApplyOps[Apply]
 
-  object applicative extends ToApplicativeOps
+  object applicative0 extends ToApplicativeOps0[Applicative]
+  object applicative extends ToApplicativeOps[Applicative]
 
-  object bind extends ToBindOps
+  object bind0 extends ToBindOps0[Bind]
+  object bind extends ToBindOps[Bind]
 
-  object monad extends ToMonadOps
+  object monad0 extends ToMonadOps0[Monad]
+  object monad extends ToMonadOps[Monad]
 
-  object cobind extends ToCobindOps
+  object cobind0 extends ToCobindOps0[Cobind]
+  object cobind extends ToCobindOps[Cobind]
 
-  object comonad extends ToComonadOps
+  object comonad0 extends ToComonadOps0[Comonad]
+  object comonad extends ToComonadOps[Comonad]
 
-  object cozip extends ToCozipOps
+  object cozip0 extends ToCozipOps0[Cozip]
+  object cozip extends ToCozipOps[Cozip]
 
-  object plus extends ToPlusOps
+  object plus0 extends ToPlusOps0[Plus]
+  object plus extends ToPlusOps[Plus]
 
-  object applicativePlus extends ToApplicativePlusOps
+  object applicativePlus0 extends ToApplicativePlusOps0[ApplicativePlus]
+  object applicativePlus extends ToApplicativePlusOps[ApplicativePlus]
 
-  object monadPlus extends ToMonadPlusOps
+  object alt0 extends ToAltOps0[Alt]
+  object alt extends ToAltOps[Alt]
 
-  object foldable extends ToFoldableOps
+  object monadPlus0 extends ToMonadPlusOps0[MonadPlus]
+  object monadPlus extends ToMonadPlusOps[MonadPlus]
 
-  object foldable1 extends ToFoldable1Ops
+  object foldable0 extends ToFoldableOps0[Foldable]
+  object foldable extends ToFoldableOps[Foldable]
 
-  object traverse extends ToTraverseOps
+  object foldable10 extends ToFoldable1Ops0[Foldable1]
+  object foldable1 extends ToFoldable1Ops[Foldable1]
 
-  object traverse1 extends ToTraverse1Ops
+  object traverse0 extends ToTraverseOps0[Traverse]
+  object traverse extends ToTraverseOps[Traverse]
 
-  object zip extends ToZipOps
+  object traverse10 extends ToTraverse1Ops0[Traverse1]
+  object traverse1 extends ToTraverse1Ops[Traverse1]
 
-  object unzip extends ToUnzipOps
+  object zip0 extends ToZipOps0[Zip]
+  object zip extends ToZipOps[Zip]
 
-  object optional extends ToOptionalOps
+  object unzip0 extends ToUnzipOps0[Unzip]
+  object unzip extends ToUnzipOps[Unzip]
 
-  object catchable extends ToCatchableOps
+  object optional0 extends ToOptionalOps0[Optional]
+  object optional extends ToOptionalOps[Optional]
+
+  object catchable0 extends ToCatchableOps0[Catchable]
+  object catchable extends ToCatchableOps[Catchable]
 
   //
   // Type classes over * * -> *
   //
 
-  object associative extends ToAssociativeOps
+  object associative0 extends ToAssociativeOps0[Associative]
+  object associative extends ToAssociativeOps[Associative]
 
-  object bifunctor extends ToBifunctorOps
+  object bifunctor0 extends ToBifunctorOps0[Bifunctor]
+  object bifunctor extends ToBifunctorOps[Bifunctor]
 
-  object bifoldable extends ToBifoldableOps
+  object bifoldable0 extends ToBifoldableOps0[Bifoldable]
+  object bifoldable extends ToBifoldableOps[Bifoldable]
 
-  object bitraverse extends ToBitraverseOps
+  object bitraverse0 extends ToBitraverseOps0[Bitraverse]
+  object bitraverse extends ToBitraverseOps[Bitraverse]
 
-  object compose extends ToComposeOps
+  object compose0 extends ToComposeOps0[Compose]
+  object compose extends ToComposeOps[Compose]
 
-  object profunctor extends ToProfunctorOps
+  object profunctor0 extends ToProfunctorOps0[Profunctor]
+  object profunctor extends ToProfunctorOps[Profunctor]
 
-  object strong extends ToStrongOps
+  object strong0 extends ToStrongOps0[Strong]
+  object strong extends ToStrongOps[Strong]
 
-  object proChoice extends ToProChoiceOps
+  object proChoice0 extends ToProChoiceOps0[ProChoice]
+  object proChoice extends ToProChoiceOps[ProChoice]
 
-  object category extends ToCategoryOps
+  object category0 extends ToCategoryOps0[Category]
+  object category extends ToCategoryOps[Category]
 
-  object arrow extends ToArrowOps
+  object arrow0 extends ToArrowOps0[Arrow]
+  object arrow extends ToArrowOps[Arrow]
 
-  object choice extends ToChoiceOps
+  object choice0 extends ToChoiceOps0[Choice]
+  object choice extends ToChoiceOps[Choice]
 
-  object split extends ToSplitOps
+  object split0 extends ToSplitOps0[Split]
+  object split extends ToSplitOps[Split]
 
-  object monadTell extends ToMonadTellOps
+  object monadTell0 extends ToMonadTellOps0[MonadTell]
+  object monadTell extends ToMonadTellOps[MonadTell]
 
-  object monadListen extends ToMonadListenOps
+  object monadListen0 extends ToMonadListenOps0[MonadListen]
+  object monadListen extends ToMonadListenOps[MonadListen]
 
-  object monadError extends ToMonadErrorOps
+  object monadError0 extends ToMonadErrorOps0[MonadError]
+  object monadError extends ToMonadErrorOps[MonadError]
+
+  object applicativeError0 extends ToApplicativeErrorOps0[ApplicativeError]
+  object applicativeError extends ToApplicativeErrorOps[ApplicativeError]
+
+  //
+  // Type classes over (* -> *) -> * -> *
+  //
+
+  object monadTrans extends ToMonadTransOps
 
   //
   // Data
@@ -108,6 +161,8 @@ trait Syntaxes {
   object id extends ToIdOps
 
   object tree extends ToTreeOps
+
+  object strictTree extends ToStrictTreeOps
 
   object reducer extends ToReducerOps
 
@@ -121,6 +176,8 @@ trait Syntaxes {
 
   object either extends ToEitherOps
 
+  object eithert extends ToEitherTOps
+
   object nel extends ToNelOps
 
   object these extends ToTheseOps
@@ -128,6 +185,10 @@ trait Syntaxes {
   object maybe extends ToMaybeOps
 
   object tag extends ToTagOps
+
+  object contT extends ToContTOps
+
+  object const extends ToConstOps
 
   //
   // Mixed
@@ -140,23 +201,29 @@ trait Syntaxes {
 trait ToDataOps
   extends ToIdOps
   with ToTreeOps
+  with ToStrictTreeOps
   with ToReducerOps
   with ToWriterOps
   with ToStateOps
   with ToValidationOps
   with ToKleisliOps
   with ToEitherOps
+  with ToEitherTOps
   with ToNelOps
   with ToTheseOps
   with ToMaybeOps
+  with ToContTOps
+  with ToConstOps
 
 trait ToTypeClassOps
-  extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
-  with ToOrderOps with ToEnumOps with ToPlusEmptyOps
-  with ToFunctorOps with ToContravariantOps with ToApplyOps
-  with ToApplicativeOps with ToBindOps with ToMonadOps with ToComonadOps
-  with ToBifoldableOps with ToCozipOps
-  with ToPlusOps with ToApplicativePlusOps with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps with ToAssociativeOps
-  with ToBitraverseOps with ToComposeOps with ToCategoryOps
-  with ToArrowOps with ToFoldableOps with ToChoiceOps with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps with ToMonadListenOps with ToMonadErrorOps
-  with ToFoldable1Ops with ToTraverse1Ops with ToOptionalOps with ToCatchableOps with ToAlignOps
+  extends ToSemigroupOps with ToMonoidOps with ToBandOps with ToEqualOps with ToShowOps
+  with ToOrderOps with ToEnumOps with ToPlusEmptyOps0[PlusEmpty]
+  with ToFunctorOps0[Functor] with ToContravariantOps0[Contravariant] with ToApplyOps0[Apply]
+  with ToApplicativeOps0[Applicative] with ToBindOps0[Bind] with ToMonadOps0[Monad] with ToComonadOps0[Comonad]
+  with ToBifoldableOps0[Bifoldable] with ToCozipOps0[Cozip]
+  with ToPlusOps0[Plus] with ToApplicativePlusOps0[ApplicativePlus] with ToAltOps0[Alt] with ToMonadPlusOps0[MonadPlus] with ToTraverseOps0[Traverse] with ToBifunctorOps0[Bifunctor] with ToAssociativeOps0[Associative]
+  with ToBitraverseOps0[Bitraverse] with ToComposeOps0[Compose] with ToCategoryOps0[Category]
+  with ToArrowOps0[Arrow] with ToProfunctorOps0[Profunctor] with ToStrongOps0[Strong]
+  with ToFoldableOps0[Foldable] with ToChoiceOps0[Choice] with ToSplitOps0[Split] with ToZipOps0[Zip] with ToUnzipOps0[Unzip] with ToMonadTellOps0[MonadTell] with ToMonadListenOps0[MonadListen] with ToMonadErrorOps0[MonadError] with ToApplicativeErrorOps0[ApplicativeError]
+  with ToFoldable1Ops0[Foldable1] with ToTraverse1Ops0[Traverse1] with ToOptionalOps0[Optional] with ToCatchableOps0[Catchable] with ToAlignOps0[Align]
+  with ToMonadTransOps with ToProChoiceOps0[ProChoice]

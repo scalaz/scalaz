@@ -54,12 +54,12 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
       case -\/(a) => apply(a) map (\/.left)
-      case c @ \/-(_) => Some(c)
+      case c @ \/-(_) => Some(c.coerceLeft)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
-      case c @ -\/(_) => Some(c)
+      case c @ -\/(_) => Some(c.coerceRight)
       case \/-(a) => apply(a) map (\/.right)
     }
 
@@ -101,7 +101,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
 
   import std.option._
 
-  def state: StateT[Option, A, B] =
+  def state: StateT[A, Option, B] =
     StateT(carry apply _)
 
   def traverse[F[_]](a: F[A])(implicit T: Traverse[F]): Option[F[B]] =
@@ -131,6 +131,17 @@ object NullResult extends NullResultInstances {
 
   def zero[A, B](implicit M: Monoid[B]): A =>? B =
     always(M.zero)
+
+  object ilist {
+    def head[A]: IList[A] =>? A =
+      NullResult(_.headOption)
+
+    def tail[A]: IList[A] =>? IList[A] =
+      NullResult {
+        case INil() => None
+        case ICons(_, t) => Some(t)
+      }
+  }
 
   object list {
     def head[A]: List[A] =>? A =
@@ -197,11 +208,11 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         }
     }
 
-  implicit def nullResultMonadPlus[X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
-    new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
+  implicit def nullResultMonadPlusAlt[X]: MonadPlus[NullResult[X, ?]] with Alt[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
+    new MonadPlus[NullResult[X, ?]] with Alt[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
-      override def tailrecM[A, B](f: A => NullResult[X, A \/ B])(a: A) =
-        NullResult(r => BindRec[Option].tailrecM(f(_: A)(r))(a))
+      override def tailrecM[A, B](a: A)(f: A => NullResult[X, A \/ B]) =
+        NullResult(r => BindRec[Option].tailrecM(a)(f(_)(r)))
       override def map[A, B](a: NullResult[X, A])(f: A => B) =
         a map f
       override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
@@ -214,6 +225,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         NullResult.never[X, A]
       override def plus[A](a: NullResult[X, A], b: => NullResult[X, A]) =
         NullResult[X, A](x => a(x) orElse b(x))
+      override def alt[A](a: => NullResult[X, A], b: => NullResult[X, A]) =
+        plus(a, b)
     }
 
   implicit def nullResultContravariant[X]: Contravariant[NullResult[?, X]] =

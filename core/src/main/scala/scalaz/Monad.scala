@@ -19,8 +19,8 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    * Collects the results into an arbitrary `MonadPlus` value, such as a `List`.
    */
   def whileM[G[_], A](p: F[Boolean], body: => F[A])(implicit G: MonadPlus[G]): F[G[A]] = {
-    lazy val f = body
-    ifM(p, bind(f)(x => map(whileM(p, f))(xs => G.plus(G.point(x), xs))), point(G.empty))
+    val f = Need(body)
+    ifM(p, bind(f.value)(x => map(whileM(p, f.value))(xs => G.plus(G.point(x), xs))), point(G.empty))
   }
 
   /**
@@ -29,8 +29,8 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    * Discards results.
    */
   def whileM_[A](p: F[Boolean], body: => F[A]): F[Unit] = {
-    lazy val f = body
-    ifM(p, bind(f)(_ => whileM_(p, f)), point(()))
+    val f = Need(body)
+    ifM(p, bind(f.value)(_ => whileM_(p, f.value)), point(()))
   }
 
   /**
@@ -39,8 +39,8 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    * arbitrary `MonadPlus` value, such as a `List`.
    */
   def untilM[G[_], A](f: F[A], cond: => F[Boolean])(implicit G: MonadPlus[G]): F[G[A]] = {
-    lazy val p = cond
-    bind(f)(x => map(whileM(map(p)(!_), f))(xs => G.plus(G.point(x), xs)))
+    val p = Need(cond)
+    bind(f)(x => map(whileM(map(p.value)(!_), f))(xs => G.plus(G.point(x), xs)))
   }
 
   /**
@@ -48,8 +48,8 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
    * The condition is evaluated after the loop body. Discards results.
    */
   def untilM_[A](f: F[A], cond: => F[Boolean]): F[Unit] = {
-    lazy val p = cond
-    bind(f)(_ => whileM_(map(p)(!_), f))
+    val p = Need(cond)
+    bind(f)(_ => whileM_(map(p.value)(!_), f))
   }
 
   /**
@@ -87,10 +87,22 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 object Monad {
   @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Monad[G]): Monad[F] =
+    new IsomorphismMonad[F, G] {
+      override def G: Monad[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
-  implicit def monadMTMAB[MT[_[_], _], MAB[_, _], A](implicit t: MonadTrans[MT], m: Monad[MAB[A, ?]]): Monad[MT[MAB[A, ?], ?]] = 
-    t.apply[MAB[A, ?]]
-  
+  ////
+}
+
+trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G]{
+  implicit def G: Monad[G]
+  ////
+
   ////
 }

@@ -105,9 +105,7 @@ object Coyoneda extends CoyonedaInstances {
 
   /** Turns a natural transformation F ~> G into CF ~> CG */
   def liftT[F[_], G[_]](fg: F ~> G): Coyoneda[F, ?] ~> Coyoneda[G, ?] =
-    new (Coyoneda[F, ?] ~> Coyoneda[G, ?]) {
-      def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
-    }
+    λ[Coyoneda[F, ?] ~> Coyoneda[G, ?]](_.trans(fg))
 
 }
 
@@ -179,7 +177,7 @@ sealed abstract class CoyonedaInstances5 extends CoyonedaInstances6 {
     }
 
   implicit def coyonedaPlusEmpty[F[_]: PlusEmpty: Functor]: PlusEmpty[Coyoneda[F, ?]] =
-    new IsomorphismEmpty[Coyoneda[F, ?], F] {
+    new IsomorphismPlusEmpty[Coyoneda[F, ?], F] {
       def G = implicitly
       def iso = Coyoneda.iso
     }

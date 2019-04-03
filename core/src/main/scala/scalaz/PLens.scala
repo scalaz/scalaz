@@ -4,7 +4,7 @@ package scalaz
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is
  * simultaneously transitioning from type `A1` to type `A2`.  [[scalaz.PLens]] is a
- * convenient alias for when `A1 =:= A2`, and `B1 =:= B2`.
+ * convenient alias for when `A1 === A2`, and `B1 === B2`.
  *
  * The term ''field'' should not be interpreted restrictively to mean a member of a class. For example, a partial lens
  * family can address the nth element of a `List`.
@@ -26,25 +26,25 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   import PLensFamily._
 
   def kleisli: Kleisli[Option, A1, IndexedStore[B1, B2, A2]] =
-    Kleisli[Option, A1, IndexedStore[B1, B2, A2]](apply(_))
+    Kleisli[Option, A1, IndexedStore[B1, B2, A2]](apply)
 
   def xmapA[X1, X2](f: A2 => X2)(g: X1 => A1): PLensFamily[X1, X2, B1, B2] =
     plensFamily(x => apply(g(x)) map (_ map (f)))
 
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): PLensFamily[X, X, B1, B2] =
-    xmapA(b to _)(b from _)
+    xmapA(b to)(b from)
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): PLensFamily[A1, A2, X1, X2] =
     plensFamily(a => apply(a) map (_.xmap(f)(g)))
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): PLensFamily[A1, A2, X, X] =
-    xmapB(b to _)(b from _)
+    xmapB(b to)(b from)
 
   def get(a: A1): Option[B1] =
     run(a) map (_.pos)
 
   def getK: Kleisli[Option, A1, B1] =
-    Kleisli[Option, A1, B1](get(_))
+    Kleisli[Option, A1, B1](get)
 
   /** If the Partial Lens is null, then return the given default value. */
   def getOr(a: A1, b: => B1): B1 =
@@ -69,7 +69,7 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     run(a) map (c => c put _)
 
   def trySetK: Kleisli[Option, A1, B2 => A2] =
-    Kleisli[Option, A1, B2 => A2](trySet(_))
+    Kleisli[Option, A1, B2 => A2](trySet)
 
   def trySetOr(a: A1, d: => B2 => A2): B2 => A2 =
     trySet(a) getOrElse d
@@ -421,11 +421,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _     , Nil)       => None
-        case (l, x     , r::rs)     => lookupr(x::l, r, rs)
+        case (l, x     , r::rs)     => lookupr((x :: l, r, rs))
       }
     plens {
       case Nil => None
-      case h :: t => lookupr(Nil, h, t) map {
+      case h :: t => lookupr((Nil, h, t)) map {
         case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
       }
     }
@@ -433,6 +433,45 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
     listLookupByPLens(Equal[K].equal(k, _))
+
+  def iListHeadPLens[A]: IList[A] @?> A =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(_ :: t, h))
+    }
+
+  def iListTailPLens[A]: IList[A] @?> IList[A] =
+    plens {
+      case INil() => None
+      case ICons(h, t) => Some(Store(h :: _, t))
+    }
+
+  def iListNthPLens[A](n: Int): IList[A] @?> A =
+    if(n < 0)
+      nil
+    else if(n == 0)
+      iListHeadPLens
+    else
+      iListNthPLens(n - 1) compose iListTailPLens
+
+  def iListLookupByPLens[K, V](p: K => Boolean): IList[(K, V)] @?> V = {
+    @annotation.tailrec
+    def lookupr(t: (IList[(K, V)], (K, V), IList[(K, V)])): Option[(IList[(K, V)], (K, V), IList[(K, V)])] =
+      t match {
+        case (_, (k, _), _) if p(k)   => Some(t)
+        case (_, _     , INil())      => None
+        case (l, x     , ICons(r, rs)) => lookupr((x::l, r, rs))
+      }
+    plens {
+      case INil() => None
+      case ICons(h, t) => lookupr((IList.empty, h, t)) map {
+        case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
+      }
+    }
+  }
+
+  def iListLookupPLens[K: Equal, V](k: K): IList[(K, V)] @?> V =
+    iListLookupByPLens(Equal[K].equal(k, _))
 
   def vectorHeadPLens[A]: Vector[A] @?> A =
     vectorNthPLens(0)
@@ -473,11 +512,11 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       t match {
         case (_, (k, _), _) if p(k)    => Some(t)
         case (_, _     , Stream.Empty) => None
-        case (l, x     , r #:: rs)     => lookupr(x #:: l, r, rs)
+        case (l, x     , r #:: rs)     => lookupr((x #:: l, r, rs))
       }
     plens {
       case Stream.Empty => None
-      case h #:: t => lookupr(Stream.empty, h, t) map {
+      case h #:: t => lookupr((Stream.empty, h, t)) map {
         case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
       }
     }
@@ -586,7 +625,7 @@ abstract class PLensInstances {
       lens %= (num.times(_, that))
   }
 
-  implicit def numericPLens[S, N: Numeric](lens: S @?> N) =
+  implicit def numericPLens[S, N: Numeric](lens: S @?> N): NumericPLens[S, N] =
     NumericPLens[S, N](lens, implicitly[Numeric[N]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -595,7 +634,7 @@ abstract class PLensInstances {
       lens %= (frac.div(_, that))
   }
 
-  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F) =
+  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F): FractionalPLens[S, F] =
     FractionalPLens[S, F](lens, implicitly[Fractional[F]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -604,7 +643,7 @@ abstract class PLensInstances {
       lens %= (ig.quot(_, that))
   }
 
-  implicit def integralPLens[S, I: Integral](lens: S @?> I) =
+  implicit def integralPLens[S, I: Integral](lens: S @?> I): IntegralPLens[S, I] =
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 
 }

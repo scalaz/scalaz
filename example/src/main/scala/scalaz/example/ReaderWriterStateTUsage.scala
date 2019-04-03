@@ -10,7 +10,7 @@ package scalaz.example
  <string> ::= <cab> <string> | '.'
 
 
- So valid strings in the langauge would be:
+ So valid strings in the language would be:
  "."
  "A."
  "B."
@@ -51,7 +51,7 @@ object CABRunLengthEncoder {
    "CAAAAAB."
    "C5AB."
    "C3AAAB."
-   "1C5CB."
+   "1C5AB."
    */
 
   // The State we will carry in the Monad during our computation
@@ -82,7 +82,7 @@ object CABRunLengthEncoder {
   import Token._
   import Free.Trampoline
 
-  type RunLength[A] = ReaderWriterStateT[Trampoline, RunLengthConfig, Cord, RunLengthState, A]
+  type RunLength[A] = ReaderWriterStateT[RunLengthConfig, Cord, RunLengthState, Trampoline, A]
 
   // At its essence the RWST monad transformer is a wrap around a function with the following shape:
   // (ReaderType, StateType) => Monad[WriterType, Result, StateType]
@@ -90,7 +90,7 @@ object CABRunLengthEncoder {
   /**
     *  read a token from the input
     */
-  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) => 
+  val readToken: RunLength[Token] = ReaderWriterStateT { (config: RunLengthConfig, oldState: RunLengthState) =>
     val (nextTok, newState) = oldState.uncons
     Applicative[Trampoline].point((Monoid[Cord].zero, nextTok, newState))
   }
@@ -103,14 +103,14 @@ object CABRunLengthEncoder {
   // modify -- alter the current state
   // tell   -- append to the writer
   // ask    -- read from the reader
-  val rle = ReaderWriterStateT.rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
+  val rle = ReaderWriterStateT.rwstMonad[RunLengthConfig, Cord, RunLengthState, Trampoline]
   import rle._
 
-  /** 
+  /**
     * with the above syntax imported, we can perform the same
     * computation as above, but use a for comprehension
     */
-  val readToken2: RunLength[Token] = 
+  val readToken2: RunLength[Token] =
     for {
       oldState <- get            // fetch the current state
 
@@ -140,7 +140,7 @@ object CABRunLengthEncoder {
     if(length <= minRun)
       tell(Monoid[Cord].multiply(token.show, length))
     else
-      tell(length.show ++ token.show)
+      tell(length.show :: token.show)
 
 
   /**
@@ -157,13 +157,13 @@ object CABRunLengthEncoder {
 
   /**
     emit tokens if the next input token is different than the last
-    */ 
+    */
   def maybeEmit: RunLength[Unit] =
     for {
       state <- get
        next <- readToken
            _ <- { if(state.lastToken.map(_ == next) getOrElse(false))
-                 // Same token as last, so we just increment our counter 
+                 // Same token as last, so we just increment our counter
                  modify(_.incLength)
                else
                  // its a new token, so emit the previous, then change
@@ -178,12 +178,12 @@ object CABRunLengthEncoder {
     val config = RunLengthConfig(minRun)
     val initialState = RunLengthState.initial(input)
     val (output, result, finalState) = untilM_(maybeEmit, done).run(config, initialState).run
-    output.shows
+    output.toString
   }
 }
 
 object ReaderWriterStateTUsage extends App {
-  
+
   val inputTokens = List(A,B,C,A,A,B,B,B,B,C,A,A,A,C,C,C,C,B)
   val encoded = CABRunLengthEncoder.encode(2, inputTokens)
 

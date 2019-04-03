@@ -29,12 +29,13 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   def >>>[A, B, C](fab: (A =>: B), fbc: (B =>: C)): (A =>: C) =
     compose(fbc, fab)
 
-  /** Pass `C` through untouched. */
-  def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
-    def swap[X, Y] = arr[(X, Y), (Y, X)] {
-      case (x, y) => (y, x)
-    }
+  /** Swaps a pair. */
+  def swap[X, Y]: ((X, Y) =>: (Y, X)) = arr[(X, Y), (Y, X)] {
+    case (x, y) => (y, x)
+  }
 
+  /** Pass `C` through untouched. */
+  override def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
     >>>(<<<(first[A, B, C](f), swap), swap)
   }
 
@@ -69,7 +70,24 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
 object Arrow {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Arrow[G]): Arrow[F] =
+    new IsomorphismArrow[F, G] {
+      override def G: Arrow[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[F, G] with IsomorphismStrong[F, G] with IsomorphismCategory[F, G]{
+  implicit def G: Arrow[G]
+  ////
+
+  override def arr[A, B](f: A => B): F[A, B] =
+    iso.from(G.arr(f))
   ////
 }

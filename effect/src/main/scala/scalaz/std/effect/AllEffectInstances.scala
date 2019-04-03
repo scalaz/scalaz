@@ -1,10 +1,6 @@
 package scalaz.std.effect
 
-trait AllEffectInstances 
-    extends CloseableInstances
-    with sql.ConnectionInstances
-    with sql.StatementInstances
-    with sql.PreparedStatementInstances
-    with sql.ResultSetInstances
+trait AllEffectInstances
+    extends AutoCloseableInstances
 
 object AllEffectInstances extends AllEffectInstances

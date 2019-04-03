@@ -3,18 +3,32 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
-    override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
-    def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
-    def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
-      val seed: G[Stream[B]] = G.point(Stream[B]())
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] with Functor.OverrideWiden[Stream] {
 
-      foldRight(fa, seed) {
-        (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
-      }
+    override def point[A](a: => A): Stream[A] =
+      Stream(a)
+
+    override def bind[A, B](fa: Stream[A])(f: A => Stream[B]): Stream[B] =
+      fa flatMap f
+
+    override def isEmpty[A](fa: Stream[A]): Boolean =
+      fa.isEmpty
+
+    override def empty[A]: Stream[A] =
+      Stream.empty[A]
+
+    override def unzip[A, B](a: Stream[(A, B)]): (Stream[A], Stream[B]) =
+      a.unzip
+
+    override def zip[A, B](a: => Stream[A],b: => Stream[B]): Stream[(A, B)] = {
+      val _a = a
+      if(_a.isEmpty) empty
+      else _a zip b
     }
 
-    override def length[A](fa: Stream[A]) = fa.length
+    override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
+    def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
+
     override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
@@ -30,15 +44,35 @@ trait StreamInstances {
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
+    override def foldMapLeft1Opt[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Option[B] = fa match {
+      case Stream.Empty => None
+      case hd #:: tl => Some(tl.foldLeft(z(hd))(f))
+    }
+
     override def foldMap[A, B](fa: Stream[A])(f: A => B)(implicit M: Monoid[B]) =
-      this.foldLeft(fa, M.zero)((b, a) => M.append(b, f(a)))
+      M.unfoldrSum(fa)(as => as.headOption match {
+        case Some(a) => Maybe.just((f(a), as.tail))
+        case None => Maybe.empty
+      })
+
+    override def foldMap1Opt[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
+      foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))
+
+    override def foldMapRight1Opt[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+      def rec(hd: A, tl: Stream[A]): B = tl match {
+        case Stream.Empty => z(hd)
+        case h #:: t => f(hd, rec(h, t))
+      }
+      fa match {
+        case Stream.Empty => None
+        case hd #:: tl => Some(rec(hd, tl))
+      }
+    }
 
     override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B = if (fa.isEmpty)
       z
     else
       f(fa.head, foldRight(fa.tail, z)(f))
-
-    override def toStream[A](fa: Stream[A]) = fa
 
     override def zipWithL[A, B, C](fa: Stream[A], fb: Stream[B])(f: (A, Option[B]) => C) =
       if(fa.isEmpty) Stream.Empty
@@ -50,19 +84,9 @@ trait StreamInstances {
     override def zipWithR[A, B, C](fa: Stream[A], fb: Stream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
-    override def filter[A](fa: Stream[A])(p: A => Boolean): Stream[A] = fa filter p
-
-    def bind[A, B](fa: Stream[A])(f: A => Stream[B]) = fa flatMap f
-    def empty[A]: Stream[A] = scala.Stream.empty
     def plus[A](a: Stream[A], b: => Stream[A]) = a #::: b
-    def isEmpty[A](s: Stream[A]) = s.isEmpty
-    def point[A](a: => A) = scala.Stream(a)
-    def zip[A, B](a: => Stream[A], b: => Stream[B]) = {
-      val _a = a
-      if(_a.isEmpty) Stream.Empty
-      else _a zip b
-    }
-    def unzip[A, B](a: Stream[(A, B)]) = a.unzip
+
+    def alt[A](a: => Stream[A], b: => Stream[A]) = plus(a, b)
 
     def alignWith[A, B, C](f: A \&/ B => C): (Stream[A], Stream[B]) => Stream[C] =
       (a, b) =>
@@ -73,9 +97,9 @@ trait StreamInstances {
         else
           f(\&/.Both(a.head, b.head)) #:: alignWith(f)(a.tail, b.tail)
 
-    def tailrecM[A, B](f: A => Stream[A \/ B])(a: A): Stream[B] = {
+    def tailrecM[A, B](a: A)(f: A => Stream[A \/ B]): Stream[B] = {
       def go(s: Stream[A \/ B]): Stream[B] = {
-        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] = 
+        @annotation.tailrec def rec(abs: Stream[A \/ B]): Stream[B] =
           abs match {
             case \/-(b) #:: tail => b #:: go(tail)
             case -\/(a) #:: tail => rec(f(a) #::: tail)
@@ -84,6 +108,18 @@ trait StreamInstances {
         rec(s)
       }
       go(f(a))
+    }
+
+    def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
+      val revOpt: Maybe[F[List[B]]] =
+        F.unfoldrOpt[Stream[A], B, List[B]](fa)(_ match {
+          case a #:: as => Maybe.just((f(a), as))
+          case Stream.Empty => Maybe.empty
+        })(Reducer.ReverseListReducer[B])
+
+      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+
+      F.map(rev)((rev) => rev.foldLeft(Stream[B]())((r, c) => c +: r))
     }
   }
 
@@ -108,10 +144,7 @@ trait StreamInstances {
       }
     }
 
-  implicit def streamMonoid[A] = new Monoid[Stream[A]] {
-    def append(f1: Stream[A], f2: => Stream[A]) = f1 #::: f2
-    def zero: Stream[A] = scala.Stream.empty
-  }
+  implicit def streamMonoid[A]: Monoid[Stream[A]] = streamInstance.monoid[A]
 
   implicit def streamEqual[A](implicit A0: Equal[A]): Equal[Stream[A]] =
     new StreamEqual[A] { def A = A0 }
@@ -134,11 +167,11 @@ trait StreamInstances {
           }
         }
     }
-  implicit def streamShow[A](implicit A0: Show[A]) =
-    new Show[Stream[A]] {
-      override def show(as: Stream[A]) = "Stream(" +: stream.intersperse(as.map(A0.show), Cord(",")).foldLeft(Cord())(_ ++ _) :+ ")"
-    }
-
+  implicit def streamShow[A](implicit A0: Show[A]): Show[Stream[A]] = Show.show { as =>
+    import scalaz.syntax.show._
+    val content = Foldable[Stream].intercalate(as.map(A0.show), Cord(","))
+    cord"Stream($content)"
+  }
 
 }
 
@@ -164,14 +197,14 @@ trait StreamFunctions {
     }
 
   /** `[as take 1, as take 2, ..., as]` */
-  final def heads[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def heads[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
       case _       => empty
     }
 
   /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
-  final def tails[A](as: Stream[A]): Stream[Stream[A]] = 
+  final def tails[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => as #:: tails(t)
       case _       => empty

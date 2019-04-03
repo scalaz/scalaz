@@ -7,7 +7,7 @@ import Id._
 trait IterateeFunctions {
   def iteratee[E, A](s: Step[E, A]): Iteratee[E, A] =
     iterateeT[E, Id, A](s)
-  
+
   /**
    * Repeats the given iteratee by appending with the given monoid.
    */
@@ -40,8 +40,8 @@ trait IterateeFunctions {
    *
    * This iteratee is useful for F[_] with efficient cons, i.e. List.
    */
-  def reversed[A, F[_]](implicit r: Reducer[A, F[A]]): Iteratee[A, F[A]] = {
-    fold[A, Id, F[A]](r.monoid.zero)((acc, e) => r.cons(e, acc))
+  def reversed[A, F[_]](implicit r: Reducer[A, F[A]], m: Monoid[F[A]]): Iteratee[A, F[A]] = {
+    fold[A, Id, F[A]](m.zero)((acc, e) => r.cons(e, acc))
   }
 
   /**

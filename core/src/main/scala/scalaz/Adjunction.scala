@@ -4,7 +4,7 @@ package scalaz
  * An adjunction formed by two functors `F` and `G` such that `F` is left-adjoint to `G`.
  * The composite functor GF is a monad and the composite functor FG is a comonad.
  *
- * The minimal defition is either (unit, counit) or (leftAdjunct, rightAdjunct)
+ * The minimal definition is either (unit, counit) or (leftAdjunct, rightAdjunct)
  */
 abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor[G]) { self =>
 
@@ -73,7 +73,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
 object Adjunction extends AdjunctionInstances {
   type -|[F[_], G[_]] = Adjunction[F, G]
 
-  def apply[F[_], G[_]](implicit A: F -| G, F: Functor[F], G: Functor[F]): F -| G = A
+  def apply[F[_], G[_]](implicit A: F -| G): F -| G = A
 }
 
 sealed abstract class AdjunctionInstances {
@@ -88,11 +88,11 @@ sealed abstract class AdjunctionInstances {
 
   implicit def curryUncurryAdjunction[S]: (S, ?) -| (S => ?) =
     new Adjunction[(S, ?), (S => ?)] {
-      override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f(s, a)
+      override def leftAdjunct[A, B](a: => A)(f: ((S, A)) => B): S => B = s => f((s, a))
       override def rightAdjunct[A, B](a: (S, A))(f: A => S => B): B = f(a._2)(a._1)
     }
 
-  implicit val identityAdjunction: Id -| Id = 
+  implicit val identityAdjunction: Id -| Id =
     new Adjunction[Id, Id] {
       override def leftAdjunct[A, B](a: => A)(f: A => B): B = f(a)
       override def rightAdjunct[A, B](a: A)(f: A => B): B = f(a)
@@ -104,19 +104,19 @@ sealed abstract class AdjunctionInstances {
       override def rightAdjunct[A, B](a: () => A)(f: A => () => B): B = f(a())()
     }
 
-  implicit val idF0Adjunction: Id -| Function0 = 
+  implicit val idF0Adjunction: Id -| Function0 =
     new Adjunction[Id, Function0] {
       override def leftAdjunct[A, B](a: => A)(f: A => B): () => B = () => f(a)
       override def rightAdjunct[A, B](a: A)(f: A => () => B): B = f(a)()
     }
 
-  implicit val f0IdAdjunction: Function0 -| Id = 
+  implicit val f0IdAdjunction: Function0 -| Id =
     new Adjunction[Function0, Id] {
       override def leftAdjunct[A, B](a: => A)(f: (() => A) => B): B = f(() => a)
       override def rightAdjunct[A, B](a: () => A)(f: A => B): B = f(a())
     }
 
-  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] = 
+  implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] =
     new Adjunction[Writer[E, ?], Reader[E, ?]] {
       override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
         Reader(e => f(Writer(e, a)))

@@ -39,9 +39,9 @@ sealed abstract class FreeAp[F[_],A] {
    * }}}
    */
   def analyze[M:Monoid](f: F ~> λ[α => M]): M =
-    foldMap[Const[M, ?]](new (F ~> Const[M, ?]) {
-      def apply[X](x: F[X]): Const[M,X] = Const(f(x))
-    }).getConst
+    foldMap[Const[M, ?]](
+      λ[F ~> Const[M, ?]](x => Const(f(x)))
+    ).getConst
 
   /**
    * The natural transformation from `FreeAp[F,_]` to `FreeAp[G,_]`
@@ -64,9 +64,7 @@ sealed abstract class FreeAp[F[_],A] {
    * Embeds this program in the free monad on `F`.
    */
   def monadic: Free[F,A] =
-    foldMap[Free[F,?]](new (F ~> Free[F,?]) {
-      def apply[B](fb: F[B]) = Free.liftF(fb)
-    })
+    foldMap[Free[F,?]](λ[F ~> Free[F,?]](Free.liftF(_)))
 
   /** Idiomatic function application */
   def ap[B](f: FreeAp[F, A => B]): FreeAp[F,B] = f match {

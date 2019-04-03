@@ -1,5 +1,6 @@
 package scalaz
 
+
 /**
   * monad transformer for Maybe
   */
@@ -9,12 +10,25 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
 
   def map[B](f: A => B)(implicit F: Functor[F]): MaybeT[F, B] = new MaybeT[F, B](mapO(_ map f))
 
+  def mapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
+    F.bind(self.run) {
+      case Empty() => F.point(empty[B])
+      case Just(z) => F.map(f(z))(b => just(b))
+    }
+  )
+
+  def mapT[G[_], B](f: F[Maybe[A]] => G[Maybe[B]]): MaybeT[G, B] =
+    MaybeT(f(run))
+
   def flatMap[B](f: A => MaybeT[F, B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
     F.bind(self.run)(_.cata(f(_).run, F.point(empty)))
   )
 
-  def flatMapF[B](f: A => F[B])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
-    F.bind(self.run)(_.cata((a => F.map(f(a))(just)), F.point(empty)))
+  def flatMapF[B](f: A => F[Maybe[B]])(implicit F: Monad[F]): MaybeT[F, B] = new MaybeT[F, B](
+    F.bind(self.run) {
+      case Empty() => F.point(empty[B])
+      case Just(z) => f(z)
+    }
   )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
@@ -69,9 +83,9 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) {
   def |||(a: => MaybeT[F, A])(implicit F: Monad[F]): MaybeT[F, A] =
     orElse(a)
 
-  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[F,E,A] = EitherT(F.map(run)(_.toRight(e)))
+  def toRight[E](e: => E)(implicit F: Functor[F]): EitherT[E, F, A] = EitherT(F.map(run)(_.toRight(e)))
 
-  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(_.toLeft(b)))
+  def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[A, F, B] = EitherT(F.map(run)(_.toLeft(b)))
 
   private def mapO[B](f: Maybe[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
@@ -124,13 +138,21 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
 
   implicit def maybeTEqual[F[_], A](implicit F0: Equal[F[Maybe[A]]]): Equal[MaybeT[F, A]] =
     F0.contramap((_: MaybeT[F, A]).run)
+
+  implicit def maybeTShow[F[_], A](implicit F0: Show[F[Maybe[A]]]): Show[MaybeT[F, A]] =
+    Contravariant[Show].contramap(F0)(_.run)
+
+  implicit def maybeTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[MaybeT[F, ?]] =
+    new MaybeTDecidable[F] {
+      implicit def F: Divisible[F] = F0
+    }
 }
 
 object MaybeT extends MaybeTInstances {
-  def maybeT[M[_]] = 
-    new (λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]) {
-      def apply[A](a: M[Maybe[A]]) = new MaybeT[M, A](a)
-    }
+  def maybeT[M[_]]: λ[α => M[Maybe[α]]] ~> MaybeT[M, ?] =
+    λ[λ[α => M[Maybe[α]]] ~> MaybeT[M, ?]](
+      new MaybeT(_)
+    )
 
   def just[M[_], A](v: => A)(implicit M: Applicative[M]): MaybeT[M, A] =
     MaybeT.maybeT[M].apply[A](M.point(Maybe.just(v)))
@@ -153,6 +175,23 @@ object MaybeT extends MaybeTInstances {
 // Implementation traits for type class instances
 //
 
+private trait MaybeTDecidable[F[_]] extends Decidable[MaybeT[F, ?]] {
+  implicit def F: Divisible[F]
+
+  override final def conquer[A]: MaybeT[F, A] = MaybeT(F.conquer)
+
+  override final def divide2[A1, A2, Z](a1: => MaybeT[F, A1], a2: => MaybeT[F, A2])(f: Z => (A1, A2)): MaybeT[F, Z] =
+    MaybeT(F.divide2(a1.run, a2.run)(z => Unzip[Maybe].unzip(z.map(f))))
+
+  override final def choose2[Z, A1, A2](a1: => MaybeT[F, A1], a2: => MaybeT[F, A2])(f: Z => A1 \/ A2): MaybeT[F, Z] =
+    MaybeT(
+      F.divide2(a1.run, a2.run)(_.map(f).cata(
+        _.fold(a1 => (Maybe.just(a1), Maybe.empty), a2 => (Maybe.empty, Maybe.just(a2))),
+        (Maybe.empty, Maybe.empty)
+      ))
+    )
+}
+
 private trait MaybeTFunctor[F[_]] extends Functor[MaybeT[F, ?]] {
   implicit def F: Functor[F]
 
@@ -170,11 +209,11 @@ private trait MaybeTMonad[F[_]] extends Monad[MaybeT[F, ?]] {
 private trait MaybeTBindRec[F[_]] extends BindRec[MaybeT[F, ?]] with MaybeTMonad[F] {
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => MaybeT[F, A \/ B])(a: A): MaybeT[F, B] =
+  final def tailrecM[A, B](a: A)(f: A => MaybeT[F, A \/ B]): MaybeT[F, B] =
     MaybeT(
-      B.tailrecM[A, Maybe[B]](a => F.map(f(a).run) {
-        _.cata(_.map(Maybe.just), \/.right(Maybe.empty))
-      })(a)
+      B.tailrecM[A, Maybe[B]](a)(a => F.map(f(a).run) {
+        _.cata(_.map(Maybe.just), \/-(Maybe.empty))
+      })
     )
 }
 
@@ -195,9 +234,7 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
     MaybeT[G, A](G.map[A, Maybe[A]](a)((a: A) => Maybe.just(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    new (MaybeT[M, ?] ~> MaybeT[N, ?]) {
-      def apply[A](fa: MaybeT[M, A]): MaybeT[N, A] = MaybeT(f.apply(fa.run))
-    }
+    λ[MaybeT[M, ?] ~> MaybeT[N, ?]](_ mapT f.apply)
 
   implicit def apply[G[_] : Monad]: Monad[MaybeT[G, ?]] =
     MaybeT.maybeTMonadPlus[G]

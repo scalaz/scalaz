@@ -81,7 +81,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](s => {
-      val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
+      val st = traverse[λ[α => StateT[S, Trampoline, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
       st.run(s).run
     })
   }
@@ -105,8 +105,12 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     traverseS(fga)(x => x)
 
   /** A version of `sequence` that infers the nested type constructor. */
-  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = 
+  final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ =
     G.TC.traverse(self)(x => G.apply(x))(this)
+
+  /** A version of `sequence` where a subsequent monadic join is applied to the inner result */
+  def sequenceM[A, G[_]](fgfa: F[G[F[A]]])(implicit G: Applicative[G], F: Bind[F]): G[F[A]] =
+    G.map(sequence(fgfa))(F.join)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
     traversal[Id](Id.id).run(fa)(f)
@@ -119,7 +123,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B = foldLShape(fa, F.zero)((b, a) => F.append(b, f(a)))._1
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
-    foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
+    foldMap(fa)((a: A) => Endo.endoByName[B](f(a, _))) apply z
 
   def reverse[A](fa: F[A]): F[A] = {
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t,h) => (h :: t,h))
@@ -155,7 +159,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   trait TraverseLaw extends FunctorLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
-    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
+    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]): Boolean = {
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
     }
 
@@ -203,7 +207,26 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 object Traverse {
   @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: Traverse[G]): Traverse[F] =
+    new IsomorphismTraverse[F, G] {
+      override def G: Traverse[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
+  ////
+}
+
+trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] with IsomorphismFoldable[F, G]{
+  implicit def G: Traverse[G]
+  ////
+
+  protected[this] override final def naturalTrans: F ~> G = iso.to
+
+  override def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
+    Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
   ////
 }

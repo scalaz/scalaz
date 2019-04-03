@@ -19,7 +19,7 @@ object CoyonedaTest extends SpecLite {
   checkAll(cobind.laws[CoyonedaOption])
   checkAll(traverse.laws[CoyonedaOption])
   checkAll(order.laws[Coyoneda[Option, Int]])
-  checkAll(foldable.laws[CoyonedaOption](implicitly, Coyoneda.coyonedaFoldable, implicitly))
+  checkAll(foldable.laws[CoyonedaOption](implicitly, Coyoneda.coyonedaFoldable))
 
   checkAll(monad.laws[CoyonedaNel])
   checkAll(bindRec.laws[CoyonedaNel])
@@ -27,7 +27,7 @@ object CoyonedaTest extends SpecLite {
   checkAll(comonad.laws[CoyonedaNel])
   checkAll(traverse1.laws[CoyonedaNel])
   checkAll(order.laws[Coyoneda[NonEmptyList, Int]])
-  checkAll(foldable1.laws[CoyonedaNel](implicitly, Coyoneda.coyonedaFoldable1, implicitly))
+  checkAll(foldable1.laws[CoyonedaNel](implicitly, Coyoneda.coyonedaFoldable1))
 
   object instances {
     def functor[F[_]] = Functor[Coyoneda[F, ?]]

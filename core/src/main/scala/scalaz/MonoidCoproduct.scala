@@ -11,17 +11,17 @@ import scalaz.std.vector._
  * the identity as the empty list, and composition as list concatenation that
  * combines adjacent elements when possible.
  */
-sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
+sealed class :+:[M, N](private val rep: Vector[M \/ N]) {
   /** The associative operation of the monoid coproduct */
-  def |+|[A >: M : Monoid, B >: N : Monoid](m: A :+: B): A :+: B = {
+  def |+|(m: M :+: N)(implicit M: Monoid[M], N: Monoid[N]): M :+: N = {
     @annotation.tailrec
-    def go(r1: Vector[A \/ B], r2: Vector[A \/ B]): Vector[A \/ B] =
+    def go(r1: Vector[M \/ N], r2: Vector[M \/ N]): Vector[M \/ N] =
        (r1, r2) match {
          case (Vector(), es) => es
          case (es, Vector()) => es
          case (v1, v2) => (v1.last, v2.head) match {
-           case (-\/(m1), -\/(m2)) => go(v1.init, -\/(m1 |+| m2) +: v2.tail)
-           case (\/-(n1), \/-(n2)) => go(v1.init, \/-(n1 |+| n2) +: v2.tail)
+           case (-\/(m1), -\/(m2)) => go(v1.init, -\/[M, N](m1 |+| m2) +: v2.tail)
+           case (\/-(n1), \/-(n2)) => go(v1.init, \/-[M, N](n1 |+| n2) +: v2.tail)
            case _ => (v1 ++ v2)
          }
        }
@@ -29,20 +29,20 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
   }
 
   /** Append a value from the left monoid */
-  def appendLeft[A >: M : Monoid, B >: N : Monoid](m: A) : A :+: B =
-    |+|[A,B](:+:.inL(m))
+  def appendLeft(m: M)(implicit M: Monoid[M], N: Monoid[N]) : M :+: N =
+    |+|(:+:.inL(m))
 
   /** Append a value from the right monoid */
-  def appendRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
-    |+|[A,B](:+:.inR(n))
+  def appendRight(n: N)(implicit M: Monoid[M], N: Monoid[N]): M :+: N =
+    |+|(:+:.inR(n))
 
   /** Prepend a value from the left monoid */
-  def prependLeft[A >: M : Monoid, B >: N : Monoid](m: A): A :+: B =
-    :+:.inL(m) |+| (this:(A :+: B))
+  def prependLeft(m: M)(implicit M: Monoid[M], N: Monoid[N]): M :+: N =
+    :+:.inL[M, N](m) |+| this
 
   /** Prepend a value from the right monoid */
-  def prependRight[A >: M : Monoid, B >: N : Monoid](n: B): A :+: B =
-    :+:.inR(n) |+| (this:(A :+: B))
+  def prependRight(n: N)(implicit M: Monoid[M], N: Monoid[N]): M :+: N =
+    :+:.inR[M, N](n) |+| this
 
   /** Project out the value in the left monoid */
   def left[A >: M : Monoid]: A =
@@ -100,8 +100,8 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
 object :+: {
   import \/._
 
-  def inL[A](a: A): A :+: Nothing = new :+:(Vector(left(a)))
-  def inR[A](a: A): Nothing :+: A = new :+:(Vector(right(a)))
+  def inL[A, B](a: A): A :+: B = new :+:(Vector(left(a)))
+  def inR[A, B](b: B): A :+: B = new :+:(Vector(right(b)))
 
   /** The identity of the monoid coproduct */
   def empty[M,N]: M :+: N = new :+:(Vector())
@@ -110,7 +110,7 @@ object :+: {
     Equal.equalBy(_.rep)
 
   implicit def instance[M:Monoid,N:Monoid]: Monoid[M :+: N] = new Monoid[M :+: N] {
-    val zero = empty
+    val zero = empty[M, N]
     def append(a: M :+: N, b: => M :+: N) = a |+| b
   }
 }

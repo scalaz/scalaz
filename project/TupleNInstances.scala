@@ -41,7 +41,7 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
     (${(1 until n).map(i => s"_$i.append(fa._$i, t._$i)").mkString(", ")}, t._$n)
   }
 
-  override def tailrecM[A, B](f: A => ($tparams, A \\/ B))(a: A): ($tparams, B) = {
+  override def tailrecM[A, B](a: A)(f: A => ($tparams, A \\/ B)): ($tparams, B) = {
     @annotation.tailrec
     def go(${(1 until n).map(i => s"s$i: A$i").mkString(", ")})(z: A): ($tparams, B) =
       f(z) match {

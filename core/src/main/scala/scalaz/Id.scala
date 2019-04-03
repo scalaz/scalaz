@@ -10,10 +10,10 @@ trait IdInstances {
   /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
    *  runtime representation.
    */
-  type Id[+X] = X
+  type Id[X] = X
 
   // TODO Review!
-  type Identity[+X] = Need[X]
+  type Identity[X] = Need[X]
 
   val id: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] =
     new Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] {
@@ -68,9 +68,9 @@ trait IdInstances {
       override def toMaybe[A](a: Id[A])           : Maybe[A]   = Maybe.Just(a)
 
       @tailrec
-      def tailrecM[A, B](f: A => A \/ B)(a: A): B =
+      def tailrecM[A, B](a: A)(f: A => A \/ B): B =
         f(a) match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => b
         }
     }

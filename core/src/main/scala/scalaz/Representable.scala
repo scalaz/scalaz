@@ -11,10 +11,10 @@ abstract class Representable[F[_], X](implicit val F: Functor[F]) {
 
   trait RepresentableLaw {
     /** `rep compose unrep` is vacuous. */
-    def repUnrep[A](f: F[A])(implicit E: Equal[F[A]]) =
+    def repUnrep[A](f: F[A])(implicit E: Equal[F[A]]): Boolean =
       E.equal(rep(unrep(f)), f)
     /** `unrep compose rep` is vacuous. */
-    def unrepRep[A](f: X => A, x: X)(implicit E: Equal[A]) =
+    def unrepRep[A](f: X => A, x: X)(implicit E: Equal[A]): Boolean =
       E.equal(unrep(rep(f))(x), f(x))
   }
 
@@ -47,7 +47,7 @@ sealed abstract class RepresentableInstances {
 object Representable extends RepresentableInstances
 
 /** Corepresentable functors */
-abstract class Corepresentable[F[_], X](implicit F: Contravariant[F]) {
+abstract class Corepresentable[F[_]: Contravariant, X]() {
   def corep[A](f: A => X): F[A]
   def uncorep[A](f: F[A]): A => X
 

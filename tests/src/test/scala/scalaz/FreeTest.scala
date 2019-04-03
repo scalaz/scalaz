@@ -30,8 +30,8 @@ object FreeList extends FreeListInstances {
     def bind[A, B](fa: FreeList[A])(f: A => FreeList[B]): FreeList[B] =
       FreeList(Monad[Free[List, ?]].bind(fa.f) { a => f(a).f })
 
-    def tailrecM[A, B](f: A => FreeList[A \/ B])(a: A): FreeList[B] =
-      FreeList(BindRec[Free[List, ?]].tailrecM((x: A) => f(x).f)(a))
+    def tailrecM[A, B](a: A)(f: A => FreeList[A \/ B]): FreeList[B] =
+      FreeList(BindRec[Free[List, ?]].tailrecM(a)(f(_).f))
   }
 
   implicit def freeListArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeList[A]] =
@@ -63,8 +63,8 @@ object FreeOption {
     def map[A, B](fa: FreeOption[A])(f: A => B): FreeOption[B] =
       FreeOption(Functor[Free[Option, ?]].map(fa.f)(f))
 
-    def tailrecM[A, B](f: A => FreeOption[A \/ B])(a: A): FreeOption[B] =
-      FreeOption(BindRec[Free[Option, ?]].tailrecM[A, B] { a => f(a).f }(a))
+    def tailrecM[A, B](a: A)(f: A => FreeOption[A \/ B]): FreeOption[B] =
+      FreeOption(BindRec[Free[Option, ?]].tailrecM(a) { f(_).f })
 
     def bind[A, B](fa: FreeOption[A])(f: A => FreeOption[B]): FreeOption[B] =
       FreeOption(Bind[Free[Option, ?]].bind(fa.f) { a => f(a).f })
@@ -80,6 +80,52 @@ object FreeOption {
   }
 }
 
+object FreeState {
+  /** stack-safe state monad */
+  type FreeState[S, A] = Free[λ[α => S => (S, α)], A]
+
+  def apply[S, A](f: S => (S, A)): FreeState[S, A] = Free.liftF[λ[α => S => (S, α)], A](f)
+
+  implicit def monadState[S]: MonadState[FreeState[S, ?], S] = new MonadState[FreeState[S, ?], S] {
+    type F[A] = S => (S, A)
+
+    def point[A](a: => A): FreeState[S, A] = Free.liftF[F, A](s => (s, a))
+    def bind[A, B](fa: FreeState[S, A])(f: A => FreeState[S, B]): FreeState[S, B] = fa.flatMap(f)
+
+    def get: FreeState[S, S] = Free.liftF[F, S](s => (s, s))
+    def put(s: S): FreeState[S, Unit] = Free.liftF[F, Unit](_ => (s, ()))
+  }
+
+  def run[S, A](fs: FreeState[S, A])(s: S): (S, A) = {
+    type F[X] = (S, S => (S, X))
+    fs.foldRun(s)(λ[F ~> (S, ?)] { case (s, f) => f(s) })
+  }
+}
+
+object FreeStateT {
+  /** stack-safe state monad transformer */
+  type FreeStateT[M[_], S, A] = Free[λ[α => S => M[(S, α)]], A]
+
+  def apply[M[_], S, A](f: S => M[(S, A)]): FreeStateT[M, S, A] = Free.liftF[λ[α => S => M[(S, α)]], A](f)
+
+  implicit def monadState[M[_], S](implicit M: Applicative[M]): MonadState[FreeStateT[M, S, ?], S] =
+    new MonadState[FreeStateT[M, S, ?], S] {
+      type F[A] = S => M[(S, A)]
+
+      def point[A](a: => A): FreeStateT[M, S, A] = Free.liftF[F, A](s => M.point((s, a)))
+      def bind[A, B](fa: FreeStateT[M, S, A])(f: A => FreeStateT[M, S, B]): FreeStateT[M, S, B] = fa.flatMap(f)
+
+      def get: FreeStateT[M, S, S] = Free.liftF[F, S](s => M.point((s, s)))
+      def put(s: S): FreeStateT[M, S, Unit] = Free.liftF[F, Unit](_ => M.point((s, ())))
+    }
+
+  def run[M[_]: Applicative: BindRec, S, A](fs: FreeStateT[M, S, A])(s: S): M[(S, A)] = {
+    type F[X] = (S, S => M[(S, X)])
+    type G[X] = M[(S, X)]
+    fs.foldRunM(s)(λ[F ~> G] { case (s, f) => f(s) })
+  }
+}
+
 object FreeTest extends SpecLite {
   def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
     Gen.frequency(
@@ -91,35 +137,16 @@ object FreeTest extends SpecLite {
     checkAll(bindRec.laws[FreeOption])
   }
 
-  "foldMapRec is stack safe" ! {
-    val n = 1000000
-    trait FTestApi[A]
-    case class TB(i: Int) extends FTestApi[Int]
-
-    def a(i: Int): Free[FTestApi, Int] = for {
-      j <- Free.liftF(TB(i))
-      z <- if (j < n) a(j) else Free.pure[FTestApi, Int](j)
-    } yield z
-
-    val runner = new (FTestApi ~> Id.Id) {
-      def apply[A](fa: FTestApi[A]) = fa match {
-        case TB(i) => i + 1
-      }
-    }
-
-    a(0).foldMapRec(runner) must_=== n
-  }
-
   "List" should {
     "not stack overflow with 50k binds" in {
       val expected = Applicative[FreeList].point(())
       val result =
-        BindRec[FreeList].tailrecM((i: Int) =>
+        BindRec[FreeList].tailrecM(0)(i =>
           if (i < 50000)
             Applicative[FreeList].point(\/.left[Int, Unit](i + 1))
           else
             Applicative[FreeList].point(\/.right[Int, Unit](()))
-        )(0)
+        )
 
       Equal[FreeList[Unit]].equal(expected, result)
     }
@@ -132,6 +159,56 @@ object FreeTest extends SpecLite {
     checkAll(zip.laws[FreeList])
   }
 
+  "FreeState" should {
+    import FreeState._
+
+    val ms: MonadState[FreeState[Int, ?], Int] = FreeState.monadState
+
+    "be stack-safe on left-associated binds" in {
+      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
+
+      10000 must_=== FreeState.run(go)(0)._1
+    }
+
+    "be stack-safe on right-associated (i.e. recursive) binds" in {
+      def go: FreeState[Int, Int] =
+        ms.state(n => (n-1, n-1)).flatMap(i =>
+          if(i > 0) go
+          else ms.state(n => (n, n))
+        )
+
+      0 must_=== FreeState.run(go)(10000)._2
+    }
+  }
+
+  "FreeStateT" should {
+    import FreeStateT._
+
+    val ms: MonadState[FreeStateT[Option, Int, ?], Int] = FreeStateT.monadState
+
+    "be stack-safe on left-associated binds" in {
+      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
+
+      Option((10000, 10000)) must_=== FreeStateT.run(go)(0)
+    }
+
+    "be stack-safe on right-associated (i.e. recursive) binds" in {
+      def go: FreeStateT[Option, Int, Int] =
+        ms.state(n => (n-1, n-1)).flatMap(i =>
+          if(i > 0) go
+          else ms.state(n => (n, n))
+        )
+
+      Option((0, 0)) must_=== FreeStateT.run(go)(10000)
+    }
+  }
+
+  "#1156: equals should not return true for obviously unequal instances" in {
+    val a = Free.point[List, Int](1).flatMap(x => Free.point(2))
+    val b = Free.point[List, Int](3).flatMap(x => Free.point(4))
+    a != b
+  }
+
   object instances {
     def bindRec[F[_]] = BindRec[Free[F, ?]]
     def monad[F[_]] = Monad[Free[F, ?]]
@@ -141,6 +218,17 @@ object FreeTest extends SpecLite {
     def traverse1[F[_]: Traverse1] = Traverse1[Free[F, ?]]
     def monoid[F[_], A: Monoid] = Monoid[Free[F, A]]
     def semigroup[F[_], A: Semigroup] = Semigroup[Free[F, A]]
+
+    object trampoline {
+      def comonad = Comonad[Free.Trampoline]
+      def monad = Monad[Free.Trampoline]
+    }
+    object sink {
+      def monad[S] = Monad[Free.Sink[S, ?]]
+    }
+    object source {
+      def monad[S] = Monad[Free.Source[S, ?]]
+    }
 
     // checking absence of ambiguity
     def functor[F[_]: Traverse1] = Functor[Free[F, ?]]

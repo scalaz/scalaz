@@ -16,27 +16,11 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     }
 
   /**The product of ApplicativePlus `F` and `G`, `[x](F[x], G[x]])`, is a ApplicativePlus */
-  def product[G[_]](implicit G0: ApplicativePlus[G]): ApplicativePlus[λ[α => (F[α], G[α])]] = 
+  def product[G[_]](implicit G0: ApplicativePlus[G]): ApplicativePlus[λ[α => (F[α], G[α])]] =
     new ProductApplicativePlus[F, G] {
       implicit def F = self
       implicit def G = G0
     }
-
-  /** `empty` or a non-empty list of results acquired by repeating `a`. */
-  def some[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
-    z.run
-  }
-
-  /** A list of results acquired by repeating `a`.  Never `empty`;
-    * initial failure is an empty list instead.
-    */
-  def many[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
-    y.run
-  }
 
   ////
   val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
@@ -45,6 +29,21 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
 object ApplicativePlus {
   @inline def apply[F[_]](implicit F: ApplicativePlus[F]): ApplicativePlus[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: ApplicativePlus[G]): ApplicativePlus[F] =
+    new IsomorphismApplicativePlus[F, G] {
+      override def G: ApplicativePlus[G] = E
+      override def iso: F <~> G = D
+    }
+
+  ////
+
+  ////
+}
+
+trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with IsomorphismApplicative[F, G] with IsomorphismPlusEmpty[F, G]{
+  implicit def G: ApplicativePlus[G]
   ////
 
   ////

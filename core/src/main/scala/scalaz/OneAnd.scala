@@ -30,7 +30,21 @@ import scalaz.Ordering.orderingInstance
   *
   * @since 7.0.3
   */
-final case class OneAnd[F[_], A](head: A, tail: F[A])
+final class OneAnd[F[_], A] private (
+  private val hd: Name[A],
+  private val tl: Name[F[A]]
+) {
+  def head: A = hd.value
+  def tail: F[A] = tl.value
+
+  // OneAnd used to be a case class...
+  override def toString: String = s"OneAnd($head,$tail)"
+  override def hashCode: Int = head.hashCode + 13*tail.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case that: OneAnd[_, _] => (this eq that) || ((head == that.head) && (tail == that.tail))
+    case _ => false
+  }
+}
 
 private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
   def F: Functor[F]
@@ -61,9 +75,18 @@ private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, ?]] with OneAndFu
 }
 
 private sealed trait OneAndApplicative[F[_]] extends Applicative[OneAnd[F, ?]] with OneAndApply[F] {
-  def F: ApplicativePlus[F]
+  def F: Applicative[F]
+  def G: PlusEmpty[F]
 
-  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, F.empty)
+  def point[A](a: => A): OneAnd[F, A] = OneAnd(a, G.empty)
+}
+
+private sealed trait OneAndAlt[F[_]] extends Alt[OneAnd[F, ?]] with OneAndApplicative[F] {
+  def F: Alt[F]
+  def G: PlusEmpty[F]
+
+  def alt[A](a: => OneAnd[F, A], b: => OneAnd[F, A]): OneAnd[F, A] =
+    OneAnd(a.head, F.alt(F.alt(a.tail, F.point(b.head)), b.tail))
 }
 
 private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, ?]] with OneAndApply[F] {
@@ -175,7 +198,7 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, ?]] with O
   def F: Traverse[F]
 
   def traverse1Impl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Apply[G]) =
-    G.applyApplicative.traverse(fa.tail)(f andThen \/.left)(F)
+    G.applyApplicative.traverse(fa.tail)(f andThen \/.left[G[B], B])(F)
      .fold(ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply),
            tl => G.map(f(fa.head))(OneAnd(_, tl)))
 
@@ -228,6 +251,12 @@ sealed abstract class OneAndInstances3 extends OneAndInstances4 {
 sealed abstract class OneAndInstances2 extends OneAndInstances3 {
   implicit def oneAndBind[F[_]: Monad: Plus]: Bind[OneAnd[F, ?]] =
     new OneAndBind[F] {
+      def F = implicitly
+      def G = implicitly
+    }
+
+  implicit def oneAndAlt[F[_]: Alt: PlusEmpty]: Alt[OneAnd[F, ?]] =
+    new OneAndAlt[F] {
       def F = implicitly
       def G = implicitly
     }
@@ -288,11 +317,10 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
       def F = implicitly
     }
 
-  implicit def oneAndShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OneAnd[F, A]] =
-    new Show[OneAnd[F, A]] {
-      override def show(f: OneAnd[F, A]) =
-        Cord("OneAnd(", A.show(f.head), ",", FA.show(f.tail), ")")
-    }
+  implicit def oneAndShow[F[_], A](implicit A: Show[A], FA: Show[F[A]]): Show[OneAnd[F, A]] = {
+    import scalaz.syntax.show._
+    Show.show { f => cord"OneAnd(${f.head},${f.tail})" }
+  }
 
   implicit def oneAndOrder[F[_], A](implicit A: Order[A], FA: Order[F[A]]): Order[OneAnd[F, A]] =
     new Order[OneAnd[F, A]] with OneAndEqual[F, A] {
@@ -326,11 +354,22 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
 }
 
 object OneAnd extends OneAndInstances {
-  def oneAnd[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = OneAnd(hd, tl)
+  def apply[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = Strict(hd, tl)
+  def unapply[F[_], A](oa: OneAnd[F, A]): Some[(A, F[A])] = Some((oa.head, oa.tail))
 
-  val oneAndNelIso: NonEmptyList <~> OneAnd[List, ?] =
-    new IsoFunctorTemplate[NonEmptyList, OneAnd[List, ?]] {
-      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail.toList)
-      def from[A](ga: OneAnd[List, A]) = NonEmptyList.nel(ga.head, IList.fromList(ga.tail))
+  object ByName {
+    def apply[F[_], A](hd: =>A, tl: => F[A]): OneAnd[F, A] = new OneAnd(Name(hd), Name(tl))
+  }
+  object Lazy {
+    def apply[F[_], A](hd: =>A, tl: => F[A]): OneAnd[F, A] = new OneAnd(Need(hd), Need(tl))
+  }
+  object Strict {
+    def apply[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = new OneAnd(Value(hd), Value(tl))
+  }
+
+  val oneAndNelIso: NonEmptyList <~> OneAnd[IList, ?] =
+    new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, ?]] {
+      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
+      def from[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
     }
 }

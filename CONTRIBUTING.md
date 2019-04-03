@@ -8,7 +8,7 @@ but may also be of interest to users.
 `scalaz-core` should be kept lean and mean: type classes and instances, important data structures, and functions
 related to these.
 
-`scala.{iteratee, effect, concurrent}` have each been moved a dedicated sub-project. Consider the same approach
+`scalaz.{iteratee, effect, concurrent}` have each been moved a dedicated sub-project. Consider the same approach
 when adding large new features.
 
 ## Type Classes
@@ -89,6 +89,15 @@ Define type class instances in the same files as the data structure. Type class 
     trait MyDataStructureFunctions {
         final def emptyMds[A]: MyDataStructure[A] = ...
     }
+    
+### Variance
+
+Avoid using variant type parameters in defining data structures, even if they
+behave variantly. Instead, provide `widen` or `narrow` methods which allow for
+explicit use of variance.
+
+If there are branches without type parameters, use a `sealed abstract case class`
+to enable easy pattern matching support. See `IList.scala` for an example.
 
 ## Type Class Instances
 
@@ -236,14 +245,8 @@ In the absence of a context specific name for the type parameters, use these:
  * Use `A`, `B`, `C`, `X` for kind `*`
  * Use `F`, `G` for kind `* -> *`.
 
-Declare type parameters requiring type constructors first in type parameter declarations. This is an arbitrary choice,
-but the consistency is worth it.
-
-    class Foo[F[_], A, B] // good
-    class Foo[A, F[_], B] // bad
-
 Define type lambdas using the kind-projector plugin. Raw type-lambdas should be defined with either lower case or greek
-letters as the type parameters. This helps to distinguish them from the applied types. Type Lambdas should use the 
+letters as the type parameters. This helps to distinguish them from the applied types. Type Lambdas should use the
 kind-projector syntax. Here's some inline syntax examples:
 
     F[X, ?]     ===  ({type λ[α] = F[X, α]})#λ
@@ -251,7 +254,7 @@ kind-projector syntax. Here's some inline syntax examples:
     F[X, ?]     ===  ({type l[a] = F[X, a]})#l
     F[X, ?, ?]  ===  ({type l[a, b] = F[X, a, b]})#l
 
-If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficent), use greek letters for
+If using Lambda Type Function syntax (ie. when the kind-projector's inline syntax is insufficient), use greek letters for
 parameters.
 
     λ[α => (α, α)]  ===  ({type λ[α] = (α, α)})#λ
@@ -311,6 +314,15 @@ the osgiExport method:
  * Documentation
     * Class level documentation for each type class.
     * Brief method documentation welcome
-    * `core/show-doc` in SBT will build and pop up the scaladoc.
+    * `coreJVM/showDoc` in SBT will build and pop up the scaladoc.
  * Review code base for consistency problems
  * Review type class hierarchy
+
+## Building and Testing Scalaz Locally
+
+ * Navigate to the root directory of scalaz on your local machine
+ * Start SBT by entering `sbt`
+ * To compile the entire project, enter `compile`
+    * If there is a requirement to only compile certain directories such as `example`, specify it like this: `example/compile`
+ * After any changes are made, run all the tests in the project by entering `test`
+    * If there is a requirement to only run tests in certain directories such as `example`, specify it like this: `example/test`

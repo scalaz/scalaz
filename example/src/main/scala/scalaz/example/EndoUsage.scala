@@ -40,7 +40,7 @@ object EndoUsage extends App {
   // endomorphisms for some type, and squash that down into a single
   // function:
 
-  case class Person(first: String, last: String, age: Int) 
+  case class Person(first: String, last: String, age: Int)
 
   val lowercaseFirst: Endo[Person] = Endo(p ⇒ p.copy(first=p.first.toLowerCase))
   val lowercaseLast: Endo[Person] = Endo(p ⇒ p.copy(last=p.last.toLowerCase))

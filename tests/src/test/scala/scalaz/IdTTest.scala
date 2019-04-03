@@ -1,7 +1,14 @@
 package scalaz
 
+import std.AllInstances._
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary._
 
 object IdTTest extends SpecLite {
+
+  type ConstInt[A] = Const[Int, A]
+
+  checkAll(divisible.laws[IdT[ConstInt,?]])
 
   object instances {
     def equal[F[_], A](implicit F: Equal[F[A]]) = Equal[IdT[F, A]]
@@ -12,6 +19,8 @@ object IdTTest extends SpecLite {
     def monad[F[_] : Monad] = Monad[IdT[F, ?]]
     def foldable[F[_] : Foldable] = Foldable[IdT[F, ?]]
     def traverse[F[_] : Traverse] = Traverse[IdT[F, ?]]
+    def decidable[F[_] : Decidable] = Decidable[IdT[F,?]]
+    def divisible[F[_] : Divisible] = Divisible[IdT[F,?]]
 
     // checking absence of ambiguity
     def equal[F[_], A](implicit F: Order[F[A]]) = Equal[IdT[F, A]]
@@ -27,5 +36,6 @@ object IdTTest extends SpecLite {
     def apply[F[_] : ApplicativePlus: BindRec] = Apply[IdT[F, ?]]
     def apply[F[_] : Monad: BindRec] = Apply[IdT[F, ?]]
     def foldable[F[_] : Traverse] = Foldable[IdT[F, ?]]
+    def divisible[F[_] : Decidable] = Divisible[IdT[F,?]]
   }
 }

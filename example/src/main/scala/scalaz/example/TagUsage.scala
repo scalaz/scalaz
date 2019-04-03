@@ -7,11 +7,12 @@ package example
   from it, and allow us to create new typeclass instances for our
   newly created type to get different behaviors.  The same thing could
   be done with scala 2.10's Value Classes:
-  http://docs.scala-lang.org/overviews/core/value-classes.html however
+  https://docs.scala-lang.org/overviews/core/value-classes.html however
   one has to be very careful when using value classes, because there
   are a lot of instances in which using a value class will incur a
   runtime boxing/unboxing of your value, which incurs a runtime
-  cost. The scalaz tagged types will never cause boxing of a value.
+  cost. The scalaz tagged types will never cause boxing of a value
+  that is already `AnyRef`.
   */
 object TagUsage extends App {
   import Tags._
@@ -57,7 +58,7 @@ object TagUsage extends App {
 
   // tagging a value does not actually alter the value, it is merely
   // typecasting the value to a tagged type, all this is actually lost
-  // at runtime, so when we do a non-typesafe equal comparision, it
+  // at runtime, so when we do a non-typesafe equal comparison, it
   // actually works.
   @unchecked def equalsTrue(x: Any): Boolean = x == true
   assert(equalsTrue(Disjunction(true)))

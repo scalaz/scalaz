@@ -71,12 +71,12 @@ sealed abstract class IterateeT[E, F[_], A] {
    * The monad for G must perform all the effects of F as part of its evaluation; in the trivial case, of course
    * F and G will have the same monad.
    */
-  def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA])(implicit MO: G |>=| F): IterateeT[EE, G, AA] = {
-    iterateeT(MO.MG.bind(MO.promote(value))(s => f(s).value))
+  def advance[EE, AA, G[_]](f: StepT[E, F, A] => IterateeT[EE, G, AA], trans: F ~> G)(implicit G: Bind[G]): IterateeT[EE, G, AA] = {
+    iterateeT(G.bind(trans(value))(s => f(s).value))
   }
 
-  def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]])(implicit MO: G |>=| F): G[StepT[EE, F, AA]] = {
-    MO.MG.bind(MO.promote(value))(s => f(s))
+  def advanceT[EE, AA, G[_]](f: StepT[E, F, A] => G[StepT[EE, F, AA]], trans: F ~> G)(implicit G: Bind[G]): G[StepT[EE, F, AA]] = {
+    G.bind(trans(value))(s => f(s))
   }
 
   /**
@@ -98,7 +98,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     (this >>== e[A]).joinI[E, A]
 
   def &=(e: EnumeratorT[E, F])(implicit F: Bind[F]): IterateeT[E, F, A] =
-    this >>== e[A] 
+    this >>== e[A]
 
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[E, G, A] = {
     def step: StepT[E, F, A] => StepT[E, G, A] =
@@ -111,12 +111,12 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   def up[G[_]](implicit G: Applicative[G], F: Comonad[F]): IterateeT[E, G, A] = {
-    mapI(new (F ~> G) {
-      def apply[A](a: F[A]) = G.point(F.copoint(a))
-    })
+    mapI(λ[F ~> G](a =>
+      G.point(F.copoint(a))
+    ))
   }
 
-  def joinI[I, B](implicit outer: IterateeT[E, F, A] =:= IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
+  def joinI[I, B](implicit outer: IterateeT[E, F, A] === IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
     val M0 = IterateeT.IterateeTMonad[E, F]
     def check: StepT[I, F, B] => IterateeT[E, F, B] = _.fold(
       cont = k => k(eofInput) >>== {
@@ -129,7 +129,7 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   /**
-   * Feeds input elements to this iteratee until it is done, feeds the produced value to the 
+   * Feeds input elements to this iteratee until it is done, feeds the produced value to the
    * inner iteratee.  Then this iteratee will start over, looping until the inner iteratee is done.
    */
   def sequenceI(implicit m: Monad[F]): EnumerateeT[E, A, F] =
@@ -192,7 +192,7 @@ sealed abstract class IterateeTInstances0 {
 }
 
 sealed abstract class IterateeTInstances extends IterateeTInstances0 {
-  implicit def IterateeTMonadTrans[E]: Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] = 
+  implicit def IterateeTMonadTrans[E]: Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] =
     new IterateeTHoist[E] { }
 
   implicit def IterateeTHoistT[E, H[_[_], _]](implicit T0: Hoist[H]): Hoist[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] =
@@ -221,7 +221,7 @@ trait IterateeTFunctions {
 
   def done[E, F[_] : Applicative, A](d: => A, r: => Input[E]): IterateeT[E, F, A] =
     StepT.sdone(d, r).pointI
-    
+
   /**
    * An iteratee that writes input to the output stream as it comes in.  Useful for debugging.
    */
@@ -239,7 +239,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) <+> a)
         , eof = done(PlusEmpty[A].empty, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -250,7 +250,7 @@ trait IterateeTFunctions {
       e.fold(empty = cont(step)
         , el = e => cont(step).map(a => Applicative[A].point(e) |+| a)
         , eof = done(Monoid[A[E]].zero, eofInput[E])
-      )   
+      )
 
     cont(step)
   }
@@ -361,9 +361,7 @@ private trait IterateeTHoist[E] extends Hoist[λ[(β[_], α) => IterateeT[E, β,
     type λ[α] = IterateeT[E, F, α]
   }
 
-  def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
-    def apply[A](fa: IterateeT[E, F, A]): IterateeT[E, G, A] = fa mapI f
-  }
+  override def hoist[F[_]: Monad, G[_]](f: F ~> G) = λ[IterateeTF[F]#λ ~> IterateeTF[G]#λ](_ mapI f)
 
   def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[E, G, A] =
     iterateeT(Monad[G].map(ga)(sdone[E, G, A](_, emptyInput)))
@@ -373,7 +371,7 @@ private trait IterateeTHoist[E] extends Hoist[λ[(β[_], α) => IterateeT[E, β,
 
 private trait IterateeTMonadIO[E, F[_]] extends MonadIO[IterateeT[E, F, ?]] with IterateeTMonad[E, F] {
   implicit def F: MonadIO[F]
-  
+
   def liftIO[A](ioa: IO[A]) = MonadTrans[λ[(α[_], β) => IterateeT[E, α, β]]].liftM(F.liftIO(ioa))
 }
 
@@ -390,8 +388,7 @@ private trait IterateeTMonadTransT[E, H[_[_], _]] extends MonadTrans[λ[(α[_], 
 private trait IterateeTHoistT[E, H[_[_], _]] extends Hoist[λ[(α[_], β) => IterateeT[E, H[α, ?], β]]] with IterateeTMonadTransT[E, H] {
   implicit def T: Hoist[H]
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (IterateeT[E, H[M, ?], ?] ~> IterateeT[E, H[N, ?], ?]) {
-    def apply[A](fa: IterateeT[E, H[M, ?], A]): IterateeT[E, H[N, ?], A] =
-      fa.mapI[H[N, ?]](T.hoist[M, N](f))(T[M])
-  }
+  override def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[IterateeT[E, H[M, ?], ?] ~> IterateeT[E, H[N, ?], ?]](
+    _.mapI[H[N, ?]](T.hoist[M, N](f))(T[M])
+  )
 }

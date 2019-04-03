@@ -27,10 +27,11 @@ object FingerTreeTest extends SpecLite {
   checkAll("IndSeq", monadPlus.strongLaws[IndSeq])
   checkAll("IndSeq", traverse.laws[IndSeq])
   checkAll("IndSeq", isEmpty.laws[IndSeq])
+  checkAll("IndSeq", alt.laws[IndSeq])
 
   val intStream = Stream.from(1)
 
-  def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty(SizeReducer[A])) {
+  def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty[Int, A]) {
     case (t, x) => (t :+ x)
   }
 
@@ -65,26 +66,24 @@ object FingerTreeTest extends SpecLite {
   }
 
   "head and tail work correctly"  ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
     !tree.isEmpty ==> ((tree.head === tree.toStream.head) && (tree.tail.toStream === tree.toStream.tail))
   }
 
   "last and init work correctly" ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
     !tree.isEmpty ==> ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
   }
 
   "foldLeft snoc is identity" ! forAll {
-    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))(_ :+ _).toStream must_==(tree.toStream)
+    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])(_ :+ _).toStream must_==(tree.toStream)
   }
 
-  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty(SizeReducer[Int]))((x, y) => y +: x).toStream must_==(tree.toStream.reverse)}
+  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])((x, y) => y +: x).toStream must_==(tree.toStream.reverse)}
 
   "Fingertree" should {
 
     "apply effects in order" in {
       val s: Writer[String, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[Writer[String, ?], Int, Int](x => Writer(x.toString, x))
-      s.run must_===("12345", streamToTree(intStream.take(5)))
+      s.run must_===("12345" -> streamToTree(intStream.take(5)))
     }
 
     "traverseTree through the option effect yielding result" in {

@@ -17,7 +17,9 @@ object CodensityTest extends SpecLite {
     Equal.equalBy(_.improve)
 
   checkAll("List", monadPlus.laws[Codensity[List, ?]])
+  checkAll("List", monadTrans.laws[Codensity, List])
   checkAll("Option", monadPlus.laws[Codensity[Option, ?]])
+  checkAll("Option", monadTrans.laws[Codensity, Option])
 
   object instances {
     def functor[F[_]: MonadPlus] = Functor[Codensity[F, ?]]

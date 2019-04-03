@@ -73,9 +73,7 @@ object Foldable1Usage extends App {
 
   // Another notable instance of Foldable1 is OneAnd. OneAnd is a
   // generic container for values which are guaranteed to have at
-  // least one value present. In fact, scalaz defined this type alias:
-  //   type NonEmptyIList[A] = OneAnd[IList,A]
-  // which gives you a structure isomorphic to a NonEmptyList but
-  // using IList instead of List as the tail.
+  // least one value present. OneAnd[IList,A] gives you a structure
+  // isomorphic to a NonEmptyList.
   assert(OneAnd(1, IList(2,3)).foldMap1(identity) === 6)
 }

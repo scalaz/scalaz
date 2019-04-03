@@ -100,7 +100,7 @@ trait EnumerateeTFunctions {
     new EnumerateeT[E, E, F] {
       def apply[A] = {
         def step(s: StepT[E, F, A], last: Input[E]): IterateeT[E, F, A] =
-          s mapCont { k => 
+          s mapCont { k =>
             cont { in =>
               val inr = in.filter(e => last.forall(l => Order[E].order(e, l) != EQ))
               k(inr) >>== (step(_, in))
@@ -110,7 +110,7 @@ trait EnumerateeTFunctions {
         s => step(s, emptyInput).map(sdone(_, emptyInput))
       }
     }
-    
+
   /**
    * Zips with the count of elements that have been encountered.
    */
@@ -151,12 +151,12 @@ trait EnumerateeTFunctions {
           for {
             outerOpt   <- head[E1, F]
             sa         <- outerOpt match {
-                            case Some(e) => 
+                            case Some(e) =>
                               val pairingIteratee = EnumerateeT.map[E2, (E1, E2), F]((a: E2) => (e, a)).apply(step)
                               val nextStep = (pairingIteratee &= e2).run
                               iterateeT[(E1, E2), F, A](nextStep) >>== outerLoop
 
-                            case None    => 
+                            case None    =>
                               done[E1, F, StepT[(E1, E2), F, A]](step, eofInput)
                           }
           } yield sa
@@ -164,7 +164,7 @@ trait EnumerateeTFunctions {
         outerLoop
       }
     }
-    
+
 
   def doneOr[O, I, F[_] : Applicative, A](f: (Input[I] => IterateeT[I, F, A]) => IterateeT[O, F, StepT[I, F, A]]): StepT[I, F, A] => IterateeT[O, F, StepT[I, F, A]] = {
     (s: StepT[I, F, A]) => s.mapContOr(k => f(k), done(s, emptyInput))

@@ -56,6 +56,9 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   def toList(implicit F: Functor[F]): F[List[B]] =
     F.map(run)(_.toList)
 
+  def toIList(implicit F: Functor[F]): F[IList[B]] =
+    F.map(run)(_.toIList)
+
   def toStream(implicit F: Functor[F]): F[Stream[B]] =
     F.map(run)(_.toStream)
 
@@ -102,9 +105,9 @@ object LazyEitherT extends LazyEitherTInstances {
     LazyEitherT(a)
 
   def lazyEitherTU[FAB, AB, A0, B0](fab: FAB)(implicit
-    u1: Unapply[Functor, FAB]{type A = AB},
-    u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
-    l: Leibniz.===[AB, LazyEither[A0, B0]]
+                                              u1: Unapply[Functor, FAB]{type A = AB},
+                                              @deprecated("scala/bug#5075", "") u2: Unapply2[Bifunctor, AB]{type A = A0; type B = B0},
+                                              l: AB === LazyEither[A0, B0]
   ): LazyEitherT[u1.M, A0, B0] = LazyEitherT(l.subst[u1.M](u1(fab)))
 
   import LazyEither._
@@ -200,10 +203,18 @@ sealed abstract class LazyEitherTInstances1 {
       override def E = L
     }
 
-  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
-    new LazyEitherTBindRec[F, L] {
+  implicit def lazyEitherTAlt[F[_], L](implicit F0: Monad[F]): Alt[LazyEitherT[F, L, ?]] =
+    new Alt[LazyEitherT[F, L, ?]] with LazyEitherTMonad[F, L] {
       implicit def F = F0
-      implicit def B = B0
+
+      def alt[A](a: => LazyEitherT[F, L, A], b: => LazyEitherT[F, L, A]): LazyEitherT[F, L, A] =
+        LazyEitherT(
+          F.bind(a.run) { leA =>
+            F.map(b.run) {
+              Alt[LazyEither[L, ?]].alt(leA, _)
+            }
+          }
+        )
     }
 }
 
@@ -225,7 +236,7 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
     }
 
-  implicit def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
+  def lazyEitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[LazyEitherT[F, L, ?]] =
     new LazyEitherTMonad[F, L] {
       implicit def F = F0
     }
@@ -248,6 +259,12 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
 
       def naturalTrans = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L].to
     }
+
+  implicit def lazyEitherTBindRec[F[_], L](implicit F0: Monad[F], B0: BindRec[F]): BindRec[LazyEitherT[F, L, ?]] =
+    new LazyEitherTBindRec[F, L] {
+      implicit def F = F0
+      implicit def B = B0
+    }
 }
 
 // TODO more instances
@@ -260,7 +277,7 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTLeftProjectionBitraverse[F[_]](implicit F0: Traverse[F]): Bitraverse[LazyEitherT.LeftProjectionT[F, ?, ?]] =
     new IsomorphismBitraverse[LazyEitherT.LeftProjectionT[F, ?, ?], LazyEitherT[F, ?, ?]] {
       implicit def G = lazyEitherTBitraverse[F]
-  
+
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
     }
 
@@ -279,9 +296,9 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTHoist[A]: Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] =
     new Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] {
       override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-        new (LazyEitherT[M, A, ?] ~> LazyEitherT[N, A, ?]) {
-          def apply[B](mb: LazyEitherT[M, A, B]) = LazyEitherT(f(mb.run))
-        }
+        λ[LazyEitherT[M, A, ?] ~> LazyEitherT[N, A, ?]](
+          mb => LazyEitherT(f(mb.run))
+        )
       override def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]) =
         LazyEitherT(M.map(mb)(LazyEither.lazyRight[A].apply(_)))
       override def apply[M[_]: Monad] =
@@ -368,11 +385,11 @@ private trait LazyEitherTBitraverse[F[_]] extends Bitraverse[LazyEitherT[F, ?, ?
 private trait LazyEitherTBindRec[F[_], E] extends BindRec[LazyEitherT[F, E, ?]] with LazyEitherTMonad[F, E] {
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](f: A => LazyEitherT[F, E, A \/ B])(a: A): LazyEitherT[F, E, B] =
+  final def tailrecM[A, B](a: A)(f: A => LazyEitherT[F, E, A \/ B]): LazyEitherT[F, E, B] =
     LazyEitherT(
-      B.tailrecM[A, LazyEither[E, B]](a => F.map(f(a).run) {
-        _.fold(e => \/.right(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
-      })(a)
+      B.tailrecM[A, LazyEither[E, B]](a)(a => F.map(f(a).run) {
+        _.fold(e => \/-(LazyEither.lazyLeft(e)), _.map(b => LazyEither.lazyRight(b)))
+      })
     )
 }
 

@@ -4,7 +4,7 @@ package scalaz.example
 object UnapplyInference extends App {
   eitherTBifunctor()
 
-  def eitherTBifunctor() {
+  def eitherTBifunctor(): Unit = {
     import scalaz._, Scalaz._
 
     val either: (Int \/ Int) = \/.right(1)
@@ -13,19 +13,19 @@ object UnapplyInference extends App {
     println((eitherT :-> (_ - 1)).run) // Some(Right(0))
   }
 
-  def eitherTBitraverse() {
+  def eitherTBitraverse(): Unit = {
     import scalaz._
     import std.list._, std.option._
     import syntax.all._
 
     val either: (List[Int] \/ List[Int]) = \/.right(List(1))
-    val eitherT: EitherT[Option, List[Int], List[Int]] = EitherT(some(either))
+    val eitherT: EitherT[List[Int], Option, List[Int]] = EitherT(some(either))
 
-    val bisequence: List[EitherT[Option, Int, Int]] = eitherT.bisequence[List, Int, Int]
+    val bisequence: List[EitherT[Int, Option, Int]] = eitherT.bisequence[List, Int, Int]
   }
 
   // Without Unapply
-  def stateTraverse1 {
+  def stateTraverse1(): Unit = {
     import scalaz._, Scalaz._
     val ls = List(1, 2, 3)
     val traverseOpt: Option[List[Int]] = ls.traverse(a => some(a))
@@ -33,7 +33,7 @@ object UnapplyInference extends App {
   }
 
   // With Unapply (in the signature of traverseU)
-  def stateTraverse2 {
+  def stateTraverse2(): Unit = {
     import scalaz._, Scalaz._
 
     val ls = List(1, 2, 3)
@@ -43,7 +43,7 @@ object UnapplyInference extends App {
     val pair: State[Int, (Int, Int)] = State((x: Int) => (x + 1, x)).tuple(State((x: Int) => (x + 2, x)))
   }
 
-  def kleisliCompose() {
+  def kleisliCompose(): Unit = {
     import scalaz._
     import std.option._
     import syntax.compose._
@@ -53,13 +53,17 @@ object UnapplyInference extends App {
     k >>> k
   }
 
-  def kleisliU() {
+  def kleisliU(): Unit = {
     import scalaz._
+    import scalaz.syntax.either._
     val k: Kleisli[NumberFormatException \/ ?, String, Int] =
-      Kleisli.kleisliU{s: String => try \/-(s.toInt) catch{ case e: NumberFormatException => -\/(e) }}
+      Kleisli.kleisliU { s: String =>
+        try s.toInt.right[NumberFormatException]
+        catch { case e: NumberFormatException => e.left[Int] }
+      }
   }
 
-  def functorSyntaxChaining() {
+  def functorSyntaxChaining(): Unit = {
     import scalaz._
     import syntax.functor._
 

@@ -46,9 +46,13 @@ sealed abstract class Cofree[S[_], A] {
   /** Returns the components of this structure in a tuple. */
   final def toPair: (A, S[Cofree[S, A]]) = (head, tail)
 
-  /** Changes the branching functor by the given natural transformation. */
-  final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Cofree[T, A] =
+  /** Changes the branching functor with the given natural transformation, using the source branching functor's fmap. */
+  final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S]): Cofree[T, A] =
     Cofree.delay(head, f(S.map(tail)(_ mapBranching f)))
+
+  /** Changes the branching functor with the given natural transformation, using the target branching functor's fmap. */
+  final def mapBranchingT[T[_]](f: S ~> T)(implicit T: Functor[T]): Cofree[T, A] =
+    Cofree.delay(head, T.map(f(tail))(_ mapBranchingT f))
 
   /** Modifies the first branching with the given natural transformation. */
   final def mapFirstBranching(f: S ~> S): Cofree[S, A] =
@@ -63,11 +67,11 @@ sealed abstract class Cofree[S[_], A] {
     applyCofree(x => b, g)
 
   /** Applies a function `f` to a value in this comonad and a corresponding value in the dual monad, annihilating both. */
-  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit G: Functor[G], d: Zap[S, G]): C =
+  final def zapWith[G[_], B, C](bs: Free[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =
     Zap.comonadMonadZap.zapWith(this, bs)(f)
 
   /** Applies a function in a monad to the corresponding value in this comonad, annihilating both. */
-  final def zap[G[_], B](fs: Free[G, A => B])(implicit G: Functor[G], d: Zap[S, G]): B =
+  final def zap[G[_], B](fs: Free[G, A => B])(implicit d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
 }
 
@@ -222,7 +226,7 @@ private trait CofreeBind[F[_]] extends Bind[Cofree[F, ?]] with CofreeComonad[F]{
 
   def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] = {
     val c = f(fa.head)
-    Cofree.applyT(c.head, c.t.map(ct => G.plus(c.tail, F.map(fa.tail)(bind(_)(f))) ) )
+    Cofree.applyT(c.head, c.t.map(ct => G.plus(ct, F.map(fa.tail)(bind(_)(f))) ) )
   }
 }
 
@@ -275,7 +279,7 @@ private trait CofreeTraverse[F[_]] extends Traverse1[Cofree[F, ?]] with CofreeFo
     G.apply2(f(fa.head), F.traverse(fa.tail)(traverse(_)(f)))(Cofree(_, _))
 
   override def traverse1Impl[G[_], A, B](fa: Cofree[F,A])(f: A => G[B])(implicit G: Apply[G]): G[Cofree[F,B]] =
-    G.applyApplicative.traverse(fa.tail)(a => -\/(traverse1(a)(f)))
+    G.applyApplicative.traverse[Cofree[F, A], F, Cofree[F, B]](fa.tail)(a => -\/(traverse1(a)(f)))
       .fold(ftl => G.apply2(f(fa.head), ftl)(Cofree(_, _)),
          tl => G.map(f(fa.head))(Cofree.apply(_, tl)))
 }

@@ -11,8 +11,6 @@ object GenerateTupleW {
       file
     }
 
-    def double(s: String) = s + s
-
     val tuples: IndexedSeq[(String, String)] = for (arity: Int <- arities) yield {
       case class N(n: Int) {
         val alpha: String = ('A' + (n - 1)).toChar.toString
@@ -44,7 +42,7 @@ object GenerateTupleW {
       }
 
       val pimp = s"""|
-          |final class Tuple${arity}Ops[${tparams}](val value: (${tparams})) extends AnyVal {
+          |final class Tuple${arity}Ops[${tparams}](private val value: (${tparams})) extends AnyVal {
           |  def fold[Z](f: => (${tparams}) => Z): Z = {import value._; f(${params})}
           |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple${arity}[${ztparams}]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(${params})}
           |  def mapElements[${mapallTParams}](${mapallParams}): (${mapallTParams}) = (${mapallApply})

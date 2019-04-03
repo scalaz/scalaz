@@ -1,7 +1,7 @@
 package scalaz
 
 /** [[scala.Option]], but with a value by name. */
-sealed abstract class LazyOption[+A] extends Product with Serializable {
+sealed abstract class LazyOption[A] extends Product with Serializable {
 
   import LazyOption._
   import LazyEither._
@@ -10,16 +10,16 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def fold[X](some: (=> A) => X, none: => X): X =
     this match {
       case LazySome(z) => some(z())
-      case LazyNone    => none
+      case LazyNone()  => none
     }
 
   def ?[X](some: => X, none: => X): X =
     fold(_ => some, none)
 
-  def isDefined =
+  def isDefined: Boolean =
     fold(_ => true, false)
 
-  def isEmpty =
+  def isEmpty: Boolean =
     !isDefined
 
   def getOrElse[AA >: A](default: => AA): AA =
@@ -52,7 +52,7 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
   def toList: List[A] =
     fold(_ :: Nil, Nil)
 
-  def orElse[AA >: A](a: => LazyOption[AA]): LazyOption[AA] =
+  def orElse(a: => LazyOption[A]): LazyOption[A] =
     fold(_ => this, a)
 
 /* TODO
@@ -103,22 +103,23 @@ sealed abstract class LazyOption[+A] extends Product with Serializable {
 
 private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
-private case object LazyNone extends LazyOption[Nothing]
+private final case class LazyNone[A] private() extends LazyOption[A]
 
 sealed abstract class LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] = 
-    new Traverse[LazyOption] with MonadPlus[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
+  implicit val lazyOptionInstance: Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] =
+    new Traverse[LazyOption] with MonadPlus[LazyOption] with Alt[LazyOption] with BindRec[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Align[LazyOption] with Cobind[LazyOption] with Optional[LazyOption] with IsEmpty[LazyOption] {
       def cobind[A, B](fa: LazyOption[A])(f: LazyOption[A] => B): LazyOption[B] = map(cojoin(fa))(f)
       override def cojoin[A](a: LazyOption[A]) = a match {
-        case LazyNone => LazyNone
+        case LazyNone() => lazyNone
         case o @ LazySome(_) => LazySome(() => o)
       }
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyOption[A])(f: A => G[B]): G[LazyOption[B]] = fa traverse (a => f(a))
       override def foldRight[A, B](fa: LazyOption[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
       override def ap[A, B](fa: => LazyOption[A])(f: => LazyOption[A => B]): LazyOption[B] = fa ap f
       def plus[A](a: LazyOption[A], b: => LazyOption[A]): LazyOption[A] = a orElse b
+      def alt[A](a: => LazyOption[A], b: => LazyOption[A]): LazyOption[A] = plus(a, b)
       def bind[A, B](fa: LazyOption[A])(f: A => LazyOption[B]): LazyOption[B] = fa flatMap (a => f(a))
       def point[A](a: => A): LazyOption[A] = lazySome(a)
       def empty[A]: LazyOption[A] = lazyNone
@@ -141,12 +142,12 @@ sealed abstract class LazyOptionInstances {
       override def isDefined[A](fa: LazyOption[A]): Boolean = fa.isDefined
 
       @scala.annotation.tailrec
-      def tailrecM[A, B](f: A => LazyOption[A \/ B])(a: A): LazyOption[B] =
+      def tailrecM[A, B](a: A)(f: A => LazyOption[A \/ B]): LazyOption[B] =
         f(a) match {
-          case LazyNone => LazyNone
+          case LazyNone() => lazyNone
           case LazySome(t) => t() match {
             case \/-(b) => lazySome(b)
-            case -\/(a0) => tailrecM(f)(a0)
+            case -\/(a0) => tailrecM(a0)(f)
           }
         }
     }
@@ -158,13 +159,13 @@ sealed abstract class LazyOptionInstances {
 
   implicit def lazyOptionMonoid[A: Semigroup]: Monoid[LazyOption[A]] =
     new Monoid[LazyOption[A]] {
-      def zero = LazyNone
+      def zero = lazyNone
 
       def append(a: LazyOption[A], b: => LazyOption[A]) = (a, b) match {
         case (LazySome(a1), LazySome(b1))     => LazySome(() => Semigroup[A].append(a1(), b1()))
-        case (LazySome(_) , LazyNone)         => a
-        case (LazyNone    , b1 @ LazySome(_)) => b1
-        case (LazyNone    , LazyNone)         => LazyNone
+        case (LazySome(_) , LazyNone())       => a
+        case (LazyNone()  , b1 @ LazySome(_)) => b1
+        case (LazyNone()  , LazyNone())       => lazyNone
       }
     }
 
@@ -177,11 +178,13 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
 }
 
 object LazyOption extends LazyOptionInstances {
+  private val none = LazyNone[Any]
+
   def lazySome[A](a: => A): LazyOption[A] =
     LazySome(() => a)
 
   def lazyNone[A]: LazyOption[A] =
-    LazyNone
+    none.asInstanceOf[LazyOption[A]]
 
   def fromOption[A](oa: Option[A]): LazyOption[A] = oa match {
     case Some(x) => lazySome(x)

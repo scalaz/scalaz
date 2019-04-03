@@ -1,6 +1,15 @@
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true) {
+case class TypeClass(
+  name: String,
+  kind: Kind,
+  pack: Seq[String] = Seq("scalaz"),
+  extendsList: Seq[TypeClass] = Seq(),
+  createSyntax: Boolean = true,
+  iso: Boolean = true,
+  fromIso: Boolean = true
+) {
+
   require(pack.head == "scalaz")
   def syntaxPack = {
     Seq("scalaz", "syntax") ++ pack.drop(1)
@@ -17,6 +26,8 @@ object TypeClass {
 
   lazy val semigroup = TypeClass("Semigroup", *)
   lazy val monoid = TypeClass("Monoid", *, extendsList = Seq(semigroup))
+  lazy val band = TypeClass("Band", *, extendsList = Seq(semigroup))
+  lazy val semilattice = TypeClass("SemiLattice", *, extendsList = Seq(band))
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
@@ -24,21 +35,27 @@ object TypeClass {
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val distributive = TypeClass("Distributive", *->*, extendsList = Seq(functor))
+  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
+  lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
+  lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative))
+  lazy val applicativeError = TypeClass("ApplicativeError", |*->*|->*, extendsList = Seq(applicative))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val foldable = TypeClass("Foldable", *->*)
-  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
+  lazy val foldable = TypeClass("Foldable", *->*, fromIso = false)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable), fromIso = false)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
   lazy val divide = TypeClass("Divide", *->*, extendsList = Seq(contravariant))
-  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide))
+  lazy val divisible = TypeClass("Divisible", *->*, extendsList = Seq(divide, invariantApplicative))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
@@ -51,12 +68,11 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val associative = TypeClass("Associative", *^*->*)
+  lazy val associative = TypeClass("Associative", *^*->*, iso = false, fromIso = false)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
-  lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
+  lazy val bifoldable = TypeClass("Bifoldable", *^*->*, fromIso = false)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
-  lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
@@ -71,17 +87,24 @@ object TypeClass {
   lazy val liftControlIO = TypeClass("LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadControlIO = TypeClass("MonadControlIO", *->*, extendsList = Seq(liftControlIO, monad), pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
+  lazy val monadCatchIO = TypeClass("MonadCatchIO", *->*, pack = Seq("scalaz", "effect"), extendsList = Seq(monadIO), createSyntax = false)
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
-  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
+  lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad, applicativeError))
   lazy val monadTell = TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
   lazy val monadReader = TypeClass("MonadReader", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
 
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
 
+  lazy val isCovariant = TypeClass("IsCovariant", *->*, iso = false, fromIso = false)
+  lazy val isContravariant = TypeClass("IsContravariant", *->*, iso = false, fromIso = false)
+  //lazy val isBivariant = TypeClass("IsBivariant", *->*, extendsList = Seq(isCovariant, isContravariant), iso = false, fromIso = false)
+
   def core: List[TypeClass] = List(semigroup,
     monoid,
+    band,
+    semilattice,
     equal,
     show,
     order,
@@ -91,11 +114,17 @@ object TypeClass {
     optional,
     invariantFunctor,
     functor,
+    distributive,
     contravariant,
     divide,
     divisible,
     apply,
     applicative,
+    applicativeError,
+    invariantAlt,
+    invariantApplicative,
+    decidable,
+    alt,
     align,
     zip,
     unzip,
@@ -115,7 +144,6 @@ object TypeClass {
     bifunctor,
     bifoldable,
     bitraverse,
-    catchable,
     nondeterminism,
     compose,
     category,
@@ -130,10 +158,12 @@ object TypeClass {
     monadTell,
     monadReader,
     comonadStore,
-    bindRec
+    bindRec,
+    isCovariant,
+    isContravariant,
+    //isBivariant,
   )
-  lazy val concurrent = Seq[TypeClass]()
-  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
+  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource, monadCatchIO)
 }
 
 sealed abstract class Kind(val multipleParam: Boolean)
@@ -213,9 +243,18 @@ object GenTypeClass {
     val kind = tc.kind
     val extendsList = tc.extendsList.toList.map(_.name)
 
+
     import TypeClass._
     val classifiedTypeIdent = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
     else "F"
+
+    def extensionIdent(parent:TypeClass) = if (Set(arrow, associative, category, choice, split, compose, profunctor, strong, proChoice)(tc)) "=>:"
+    else parent.kind match {
+      case Kind.*      => "F"
+      case Kind.*->*   => "F"
+      case Kind.*^*->* => "F"
+      case Kind.|*->*|->* => "F, S"
+    }
 
     val typeShape: String = kind match {
       case Kind.*      => ""
@@ -227,15 +266,25 @@ object GenTypeClass {
 
     val classifiedTypeF = "F" +  typeShape
 
-    def extendsListText(suffix: String, parents: Seq[String] = extendsList, cti: String = classifiedTypeIdent) = parents match {
+    def extendsListText(suffix: String, parents: Seq[TypeClass] = tc.extendsList, cti: Map[Kind, String] = Map.empty[Kind, String]) = parents match {
       case Seq() => ""
-      case es    => es.map(n => n + suffix + "[" + cti + "]").mkString("extends ", " with ", "")
+      case es    => es.map(n => n.name + suffix + "[" + cti.getOrElse(n.kind, extensionIdent(n)) + "]").mkString("extends ", " with ", "")
     }
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
-        "extends To" + typeClassName + "Ops0" + (extendsList match {
+        "extends To" + typeClassName + "Ops0[TC]" + (extendsList match {
           case Seq() => ""
-          case es    => es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
+          case es    => es.map(n => "To" + n + "Ops[TC]").mkString(" with ", " with ", "")
+        })
+      case Kind.|*->*|->* =>
+        "extends To" + typeClassName + "Ops0[TC]" + (tc.extendsList match {
+          case Seq() => ""
+          case es    => es.map(n => n.kind match {
+            case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
+            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+          }
+
+          ).mkString(" with ", " with ", "")
         })
       case _    =>
         extendsList match {
@@ -261,6 +310,106 @@ object GenTypeClass {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
+    val iso = if (tc.iso) {
+      val extendsList = tc.extendsList match {
+        case Seq() =>
+          ""
+        case values =>
+          values.map(
+            t => s"Isomorphism${t.name}" + (t.kind match {
+              case Kind.|*->*|->* => "[F, G, S]"
+              case _ => "[F, G]"
+            })
+          ).mkString("with ", " with ", "")
+      }
+
+      kind match {
+        case Kind.* =>
+s"""
+trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+        case Kind.*->* =>
+s"""
+trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+
+        case Kind.*^*->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+  ////
+
+  ////
+}
+"""
+
+       case Kind.|*->*|->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
+  implicit def G: ${typeClassName}[G, S]
+  ////
+
+  ////
+}
+"""
+     }
+    } else {
+      ""
+    }
+
+    val fromIso: String = if (tc.fromIso) {
+      kind match {
+        case Kind.* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = M
+      override def iso: F <=> G = D
+    }"""
+
+        case Kind.*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~> G = D
+    }"""
+
+        case Kind.*^*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~~> G = D
+    }"""
+
+        case Kind.|*->*|->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: $typeClassName[G, E]): $typeClassName[F, E] =
+    new Isomorphism$typeClassName[F, G, E] {
+      override def G: $typeClassName[G, E] = A
+      override def iso: F <~> G = D
+    }"""
+      }
+    } else {
+      ""
+    }
+
+
     val mainSource = s"""${tc.packageString0}
 
 ////
@@ -278,11 +427,14 @@ $syntaxMember
 object $typeClassName {
   $applyMethod
 
+$fromIso
+
   ////
 
   ////
 }
-"""
+""" + iso
+
     val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {
@@ -305,9 +457,9 @@ trait To${typeClassName}Ops $extendsToSyntaxListText {
   ////
 }
 
-trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
+trait ${typeClassName}Syntax[F] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F](v)(${typeClassName}Syntax.this.F)
-  
+
   def F: ${typeClassName}[F]
   ////
 
@@ -316,11 +468,11 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
 """
     case Kind.*->* =>
       val ToVUnapply =
-s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[${typeClassName}, FA]) =
+s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
     new ${typeClassName}Ops[F0.M,F0.A](F0(v))(F0.TC)
 """
       val ToVMA =
-s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeClassName}[F]) =
+s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: TC[F]) =
     new ${typeClassName}Ops[F,A](v)
 """
 
@@ -333,18 +485,20 @@ final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit
   ////
 }
 
-sealed trait To${typeClassName}Ops0 {
+sealed trait To${typeClassName}OpsU[TC[F[_]] <: ${typeClassName}[F]] {
 $ToVUnapply
 }
 
-trait To${typeClassName}Ops $extendsToSyntaxListText {
+trait To${typeClassName}Ops0[TC[F[_]] <: ${typeClassName}[F]] extends To${typeClassName}OpsU[TC] {
 $ToVMA
   ////
 
   ////
 }
 
-trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
+trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] $extendsToSyntaxListText
+
+trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
@@ -356,19 +510,17 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
       case Kind.*^*->* =>
 
         val ToVUnapply =
-  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[${typeClassName}, FA]) =
-      new ${typeClassName}Ops[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  """
+  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
+    new ${typeClassName}Ops[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+"""
         val ToVKleisli =
-  s"""
-  implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[F[G, ?, ?]]) =
+  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
     new ${typeClassName}Ops[F[G, ?, ?], A, B](v)(F0)
 """
        val ToVFAB =
-  s"""
-  implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: ${typeClassName}[F]) =
+  s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
     new ${typeClassName}Ops[F,A, B](v)
-  """
+"""
 
 
     s"""$syntaxPackString
@@ -380,11 +532,12 @@ final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])
   ////
 }
 
-sealed trait To${typeClassName}Ops0 {
-  $ToVUnapply
+sealed trait To${typeClassName}OpsU[TC[F[_, _]] <: ${typeClassName}[F]] {
+$ToVUnapply
 }
 
-trait To${typeClassName}Ops ${extendsToSyntaxListText} {
+trait To${typeClassName}Ops0[TC[F[_, _]] <: ${typeClassName}[F]] extends To${typeClassName}OpsU[TC] {
+
   $ToVFAB
 
   $ToVKleisli
@@ -393,7 +546,9 @@ trait To${typeClassName}Ops ${extendsToSyntaxListText} {
   ////
 }
 
-trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
+trait To${typeClassName}Ops[TC[F[_, _]] <: ${typeClassName}[F]] ${extendsToSyntaxListText}
+
+trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = Map(Kind.*^*->* -> "F"))} {
   implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
 
   def F: ${typeClassName}[F]
@@ -405,7 +560,7 @@ trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = "F")} {
       case Kind.|*->*|->* =>
 
         val ToOps =
-  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: ${typeClassName}[F, S]) =
+  s"""implicit def To${typeClassName}Ops[F[_], S, A](v: F[A])(implicit F0: TC[F, S]) =
     new ${typeClassName}Ops[F, S, A](v)"""
 
 
@@ -418,7 +573,7 @@ final class ${typeClassName}Ops[F[_], S, A] private[syntax](self: F[A])(implicit
   ////
 }
 
-trait To${typeClassName}Ops ${extendsToSyntaxListText} {
+trait To${typeClassName}Ops0[TC[F[_], S] <: ${typeClassName}[F, S]] {
   $ToOps
 
   ////
@@ -426,7 +581,9 @@ trait To${typeClassName}Ops ${extendsToSyntaxListText} {
   ////
 }
 
-trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
+trait To${typeClassName}Ops[TC[F[_], S] <: ${typeClassName}[F, S]] ${extendsToSyntaxListText}
+
+trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, S, A] =
     new ${typeClassName}Ops[F, S, A](v)(${typeClassName}Syntax.this.F)
 

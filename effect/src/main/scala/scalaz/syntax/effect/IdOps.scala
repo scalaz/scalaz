@@ -4,7 +4,7 @@ package effect
 
 import scalaz.effect.IO
 
-final class IdOps[A](val self: A) extends AnyVal {
+final class IdOps[A](private val self: A) extends AnyVal {
 
   final def put(implicit S: Show[A]): IO[Unit] =
     IO.put(self)

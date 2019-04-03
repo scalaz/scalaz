@@ -1,190 +1,282 @@
 package scalaz
 
+import scala.annotation.tailrec
 import Id._
 
-sealed abstract class IndexedStateT[F[_], -S1, S2, A] { self =>
-  def getF[S <: S1]: Monad[F] => F[S => F[(S2, A)]]
+sealed abstract class IndexedStateT[S1, S2, F[_], A] { self =>
+  import IndexedStateT._
 
   /** Run and return the final value and state in the context of `F` */
-  def apply(initial: S1)(implicit F: Monad[F]): F[(S2, A)] =
-    F.join(F.map[S1 => F[(S2, A)], F[(S2, A)]](getF(F))(sf => sf(initial)))
+  @tailrec
+  final def apply(initial: S1)(implicit F: Bind[F]): F[(S2, A)] =
+    this match {
+      case Wrap(f) => f(initial)
+      case FlatMap(Wrap(f), g) => F.bind(f(initial)) { case (sx, x) => g(sx, x).run(sx) }
+      case FlatMap(FlatMap(f, g), h) => f.flatMapS((sx, x) => g(sx, x).flatMapS(h)).apply(initial)
+    }
 
   /** An alias for `apply` */
-  def run(initial: S1)(implicit F: Monad[F]): F[(S2, A)] = apply(initial)
+  def run(initial: S1)(implicit F: Bind[F]): F[(S2, A)] = apply(initial)
+
+  /** Run and return the final value and state in the context of `F` */
+  def runRec(initial: S1)(implicit F: BindRec[F]): F[(S2, A)] = {
+
+    abstract class Eval {
+      type S0
+      val s0: S0
+      val st: IndexedStateT[S0, S2, F, A]
+
+      @tailrec
+      final def step: F[Eval \/ (S2, A)] = st match {
+        case Wrap(f) => F.map(f(s0))(\/.right)
+        case FlatMap(Wrap(f), g) => F.map(f(s0)){ case (sx, x) => \/.left(Eval(g(sx, x), sx)) }
+        case FlatMap(FlatMap(f, g), h) => Eval(f.flatMapS((sx, x) => g(sx, x).flatMapS(h)), s0).step
+      }
+    }
+
+    object Eval {
+      def apply[S](f: IndexedStateT[S, S2, F, A], s: S): Eval = new Eval {
+        type S0 = S
+        val s0 = s
+        val st = f
+      }
+    }
+
+    F.tailrecM(Eval(this, initial))(_.step)
+  }
 
   /** Calls `run` using `Monoid[S].zero` as the initial state */
-  def runZero[S <: S1](implicit S: Monoid[S], F: Monad[F]): F[(S2, A)] =
-    run(S.zero)
+  def runZero(implicit S1: Monoid[S1], F: Bind[F]): F[(S2, A)] =
+    run(S1.zero)
+
+  /** Calls `run` using `Monoid[S].zero` as the initial state */
+  def runZeroRec(implicit S1: Monoid[S1], F: BindRec[F]): F[(S2, A)] =
+    runRec(S1.zero)
 
   /** Run, discard the final state, and return the final value in the context of `F` */
-  def eval(initial: S1)(implicit F: Monad[F]): F[A] =
-    F.bind[S1 => F[(S2, A)], A](getF(F))(sf => F.map(sf(initial))(_._2))
+  def eval(initial: S1)(implicit F: Bind[F]): F[A] =
+    F.map(run(initial))(_._2)
+
+  /** Run, discard the final state, and return the final value in the context of `F` */
+  def evalRec(initial: S1)(implicit F: BindRec[F]): F[A] =
+    F.map(runRec(initial))(_._2)
 
   /** Calls `eval` using `Monoid[S].zero` as the initial state */
-  def evalZero[S <: S1](implicit F: Monad[F], S: Monoid[S]): F[A] =
-    eval(S.zero)
+  def evalZero(implicit F: Bind[F], S1: Monoid[S1]): F[A] =
+    eval(S1.zero)
+
+  /** Calls `eval` using `Monoid[S].zero` as the initial state */
+  def evalZeroRec(implicit F: BindRec[F], S1: Monoid[S1]): F[A] =
+    evalRec(S1.zero)
 
   /** Run, discard the final value, and return the final state in the context of `F` */
-  def exec(initial: S1)(implicit F: Monad[F]): F[S2] =
+  def exec(initial: S1)(implicit F: Bind[F]): F[S2] =
     F.map(run(initial))(_._1)
 
+  /** Run, discard the final value, and return the final state in the context of `F` */
+  def execRec(initial: S1)(implicit F: BindRec[F]): F[S2] =
+    F.map(runRec(initial))(_._1)
+
   /** Calls `exec` using `Monoid[S].zero` as the initial state */
-  def execZero[S <: S1](implicit F: Monad[F], S: Monoid[S]): F[S2] =
-    exec(S.zero)
+  def execZero(implicit F: Bind[F], S1: Monoid[S1]): F[S2] =
+    exec(S1.zero)
 
-  def map[B](f: A => B)(implicit F: Functor[F]): IndexedStateT[F, S1, S2, B] =
-    mapsf((sf: (S1 => F[(S2, A)])) => (s: S1) => F.map(sf(s))(t => (t._1, f(t._2))))
+  /** Calls `exec` using `Monoid[S].zero` as the initial state */
+  def execZeroRec(implicit F: BindRec[F], S1: Monoid[S1]): F[S2] =
+    execRec(S1.zero)
 
-  def xmap[X1, X2](f: S2 => X1)(g: X2 => S1): IndexedStateT[F, X2, X1, A] = IndexedStateT.createState(
-    (F: Monad[F]) => (x: X2) => F.map(self(g(x))(F))(t => (f(t._1), t._2))
-  )
+  def map[B](f: A => B)(implicit F: Applicative[F]): IndexedStateT[S1, S2, F, B] =
+    flatMap(a => StateT[S2, F, B](s => F.point((s, f(a)))))
+
+  def xmap[X1, X2](f: S2 => X1)(g: X2 => S1)(implicit F: Applicative[F]): IndexedStateT[X2, X1, F, A] =
+    imap(f).contramap(g)
 
   /** Map both the return value and final state using the given function. */
-  def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[G, S1, S, B] = IndexedStateT.createState(
-    (m: Monad[G]) => (s: S1) => f(apply(s)(M))
-  )
+  def mapT[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[S1, S, G, B] =
+    IndexedStateT(s => f(apply(s)))
 
-  import BijectionT._
-  def bmap[X, S >: S2 <: S1](b: Bijection[S, X]): StateT[F, X, A] =
-    xmap(b to _)(b from _)
+  /** Alias for mapT */
+  def mapK[G[_], B, S](f: F[(S2, A)] => G[(S, B)])(implicit M: Monad[F]): IndexedStateT[S1, S, G, B] = mapT(f)
 
-  def contramap[X](g: X => S1): IndexedStateT[F, X, S2, A] =
-    mapsf(_ compose g)
+  import BijectionT._, Liskov._
+  def bmap[X, S](b: Bijection[S, X])(implicit F: Applicative[F], S1: S <~< S1, S2: S >~> S2): StateT[X, F, A] =
+    xmap(s => b.to(S2(s)))(s => S1(b.from(s)))
 
-  def imap[X](f: S2 => X)(implicit F: Functor[F]): IndexedStateT[F, S1, X, A] = bimap(f)(a => a)
+  def contramap[X](g: X => S1)(implicit F: Applicative[F]): IndexedStateT[X, S2, F, A] =
+    IndexedStateT((s: X) => F.point((g(s), ()))).flatMap(_ => this)
 
-  def bimap[X, B](f: S2 => X)(g: A => B)(implicit F: Functor[F]): IndexedStateT[F, S1, X, B] = mapsf(sf => (s: S1) => F.map(sf(s))(t => (f(t._1), g(t._2)) ))
+  def imap[X](f: S2 => X)(implicit F: Applicative[F]): IndexedStateT[S1, X, F, A] = bimap(f)(a => a)
 
-  def leftMap[X](f: S2 => X)(implicit F: Functor[F]): IndexedStateT[F, S1, X, A] =
+  def bimap[X, B](f: S2 => X)(g: A => B)(implicit F: Applicative[F]): IndexedStateT[S1, X, F, B] =
+    flatMap(a => IndexedStateT(s2 => F.point((f(s2), g(a)))))
+
+  def leftMap[X](f: S2 => X)(implicit F: Applicative[F]): IndexedStateT[S1, X, F, A] =
     imap(f)
 
-  def flatMap[S3, B](f: A => IndexedStateT[F, S2, S3, B])(implicit F: Monad[F]): IndexedStateT[F, S1, S3, B] =
-    mapsf(sf => (s: S1) => F.bind[(S2, A), (S3, B)](sf(s)){ t =>
-      val sfb: F[(S2 => F[(S3, B)])] = f(t._2).getF(F)
-      F.bind[S2 => F[(S3, B)], (S3, B)](sfb)(ff => ff(t._1))
-    })
+  def flatMap[S3, B](f: A => IndexedStateT[S2, S3, F, B]): IndexedStateT[S1, S3, F, B] =
+    flatMapS((s2, a) => f(a))
 
-  def lift[M[_]](implicit F: Monad[F], M: Applicative[M]): IndexedStateT[λ[α => M[F[α]]], S1, S2, A] =
-    IndexedStateT.createState[λ[α => M[F[α]]], S1, S2, A](
-      (m: Monad[λ[α => M[F[α]]]]) => (s: S1) => M.point(self(s))
-    )
+  def lift[M[_]](implicit F: Bind[F], M: Applicative[M]): IndexedStateT[S1, S2, λ[α => M[F[α]]], A] =
+    IndexedStateT[S1, S2, λ[α => M[F[α]]], A](s => M.point(self(s)))
 
   import Liskov._
-  def unlift[M[_], FF[_], S <: S1](implicit M: Comonad[M], F: Monad[λ[α => M[FF[α]]]], ev: this.type <~< IndexedStateT[λ[α => M[FF[α]]], S, S2, A]): IndexedStateT[FF, S, S2, A] = IndexedStateT.createState(
-    (m: Monad[FF]) => (s: S) => {
-      M.copoint(ev(self)(s))
-    }
-  )
+  def unlift[M[_], FF[_], S <: S1](implicit M: Comonad[M], F: Bind[λ[α => M[FF[α]]]], ev: this.type <~< IndexedStateT[S, S2, λ[α => M[FF[α]]], A]): IndexedStateT[S, S2, FF, A] =
+    IndexedStateT(s => M.copoint(ev(self)(s)))
 
-  def unliftId[M[_], S <: S1](implicit M: Comonad[M], F: Monad[M], ev: this.type <~< IndexedStateT[M, S, S2, A]): IndexedState[S, S2, A] = unlift[M, Id, S]
+  def unliftId[M[_], S <: S1](implicit M: Comonad[M], F: Bind[M], ev: this.type <~< IndexedStateT[S, S2, M, A]): IndexedState[S, S2, A] = unlift[M, Id, S]
 
-  def rwst[W, R](implicit F: Monad[F], W: Monoid[W]): IndexedReaderWriterStateT[F, R, W, S1, S2, A] =
+  def rwst[W, R](implicit F: Bind[F], W: Monoid[W]): IndexedReaderWriterStateT[R, W, S1, S2, F, A] =
     IndexedReaderWriterStateT(
-      (r, s) => F.bind[S1 => F[(S2, A)], (W, A, S2)] (getF(F))((sf: (S1 => F[(S2, A)])) => F.map(sf(s)) {
+      (r, s) => F.map(run(s)) {
         case (s, a) => (W.zero, a, s)
-      })
+      }
     )
 
-  def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(implicit F: Functor[F]): IndexedStateT[F, S0, S3, A] =
-    mapsf(sf => (s0:S0) => F.map(sf(l get s0))(t => (l.set(s0, t._1), t._2)))
+  def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(implicit F: Applicative[F]): IndexedStateT[S0, S3, F, A] =
+    IndexedStateT((s0: S0) => F.point((s0, ()))).flatMapS((s0, _) =>
+      this.contramap(l get (_: S0)).imap[S3](l.set(s0, _))
+    )
 
-  def liftF[S <: S1](implicit F: Functor[IndexedStateT[F, S, S2, ?]]) =
-    Free.liftF[IndexedStateT[F, S, S2, ?], A](self)
+  def liftF: Free[IndexedStateT[S1, S2, F, ?], A] =
+    Free.liftF[IndexedStateT[S1, S2, F, ?], A](self)
 
-  def mapsf[X1, X2, B](f: (S1 => F[(S2, A)]) => (X1 => F[(X2, B)])): IndexedStateT[F, X1, X2, B] =
-    IndexedStateT.createState((m: Monad[F]) => f((s:S1) => run(s)(m)))
+  private def flatMapS[S3, B](f: (S2, A) => IndexedStateT[S2, S3, F, B]): IndexedStateT[S1, S3, F, B] =
+    FlatMap(this, f)
 }
 
 object IndexedStateT extends StateTInstances with StateTFunctions {
-  def apply[F[_], S1, S2, A](f: S1 => F[(S2, A)])(implicit F: Monad[F]): IndexedStateT[F, S1, S2, A] =
-    new IndexedStateT[F, S1, S2, A] {
-      override def getF[S <: S1] = (m: Monad[F]) => F.point(f)
-    }
+  private final case class Wrap[F[_], S1, S2, A](run: S1 => F[(S2, A)]) extends IndexedStateT[S1, S2, F, A]
+  private final case class FlatMap[F[_], S1, S2, S3, A, B](a: IndexedStateT[S1, S2, F, A], f: (S2, A) => IndexedStateT[S2, S3, F, B]) extends IndexedStateT[S1, S3, F, B]
 
-  def createState[F[_], S1, S2, A](f: Monad[F] => S1 => F[(S2, A)]): IndexedStateT[F, S1, S2, A] =
-    new IndexedStateT[F, S1, S2, A] {
-      override def getF[S <: S1] = (m: Monad[F]) => m.point(f(m))
-    }
+  def apply[S1, S2, F[_], A](f: S1 => F[(S2, A)]): IndexedStateT[S1, S2, F, A] =
+    Wrap(f)
 }
 
 //
 // Prioritized Implicits for type class instances
 //
 
-sealed abstract class IndexedStateTInstances2 {
-  implicit def indexedStateTContravariant[S2, A0, F[_]]: Contravariant[IndexedStateT[F, ?, S2, A0]] =
-    new IndexedStateTContravariant[S2, A0, F] {}
+sealed abstract class IndexedStateTInstances3 {
+  implicit def indexedStateProfunctor[S2, F[_]](implicit F0: Applicative[F]): Profunctor[IndexedStateT[?, S2, F, ?]] =
+    new Profunctor[IndexedStateT[?, S2, F, ?]] {
+      def mapfst[S1, B, S3](fab: IndexedStateT[S1, S2, F, B])(f: S3 => S1): IndexedStateT[S3, S2, F, B] = fab.contramap(f)
+
+      def mapsnd[S1, B, D](fab: IndexedStateT[S1, S2, F, B])(f: B => D): IndexedStateT[S1, S2, F, D] = fab.map(f)
+    }
+}
+
+sealed abstract class IndexedStateTInstances2 extends IndexedStateTInstances3 {
+  implicit def indexedStateTContravariant[S2, A0, F[_]](implicit F0: Applicative[F]): Contravariant[IndexedStateT[?, S2, F, A0]] =
+    new IndexedStateTContravariant[S2, A0, F] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class IndexedStateTInstances1 extends IndexedStateTInstances2 {
-  implicit def indexedStateTFunctorLeft[S1, A0, F[_]](implicit F0: Functor[F]): Functor[IndexedStateT[F, S1, ?, A0]] =
+  implicit def indexedStateTFunctorLeft[S1, A0, F[_]](implicit F0: Applicative[F]): Functor[IndexedStateT[S1, ?, F, A0]] =
     new IndexedStateTFunctorLeft[S1, A0, F] {
-      implicit def F: Functor[F] = F0
+      implicit def F: Applicative[F] = F0
     }
 }
 
 sealed abstract class IndexedStateTInstances0 extends IndexedStateTInstances1 {
-  implicit def indexedStateTBifunctor[S1, F[_]](implicit F0: Functor[F]): Bifunctor[IndexedStateT[F, S1, ?, ?]] =
+  implicit def indexedStateTBifunctor[S1, F[_]](implicit F0: Applicative[F]): Bifunctor[IndexedStateT[S1, ?, F, ?]] =
     new IndexedStateTBifunctor[S1, F] {
-      implicit def F: Functor[F] = F0
+      implicit def F: Applicative[F] = F0
     }
 }
 
 sealed abstract class IndexedStateTInstances extends IndexedStateTInstances0 {
-  implicit def indexedStateTFunctorRight[S1, S2, F[_]](implicit F0: Functor[F]): Functor[IndexedStateT[F, S1, S2, ?]] =
+  implicit def indexedStateTFunctorRight[S1, S2, F[_]](implicit F0: Applicative[F]): Functor[IndexedStateT[S1, S2, F, ?]] =
     new IndexedStateTFunctorRight[S1, S2, F] {
-      implicit def F: Functor[F] = F0
+      implicit def F: Applicative[F] = F0
     }
 
-  implicit def indexedStateTPlus[F[_]: Monad: Plus, S1, S2]: Plus[IndexedStateT[F, S1, S2, ?]] =
+  implicit def indexedStateTPlus[F[_]: Bind: Plus, S1, S2]: Plus[IndexedStateT[S1, S2, F, ?]] =
     new IndexedStateTPlus[F, S1, S2] {
       def F = implicitly
       def G = implicitly
     }
 }
 
-sealed abstract class StateTInstances3 extends IndexedStateTInstances {
-  implicit def stateTBindRec[S, F[_]](implicit F0: Monad[F], F1: BindRec[F]): BindRec[StateT[F, S, ?]] =
+sealed abstract class StateTInstances4 extends IndexedStateTInstances {
+  implicit def stateTDivisible[S, F[_]](implicit F0: Divisible[F], F1: Bind[F]): Divisible[StateT[S, F, ?]] = new StateTDivisible[F, S] {
+    implicit def F: Divisible[F] = F0
+    implicit def G: Bind[F] = F1
+  }
+}
+
+sealed abstract class StateTInstances3 extends StateTInstances4 {
+  implicit def stateTBindRec[S, F[_]](implicit F0: Applicative[F]): BindRec[StateT[S, F, ?]] =
     new StateTBindRec[S, F] {
-      implicit def F: Monad[F] = F0
-      implicit def B: BindRec[F] = F1
+      implicit def F: Applicative[F] = F0
     }
+
+  implicit def stateTMonadError[S, F[_], E](implicit F0: MonadError[F, E]): MonadError[StateT[S, F, ?], E] =
+    new StateTMonadError[S, F, E] {
+      implicit def F: MonadError[F, E] = F0
+    }
+
+  implicit def stateTDecidable[S, F[_]](implicit F0: Decidable[F], F1: Bind[F]): Decidable[StateT[S, F, ?]] = new StateTDecidable[F, S] {
+    implicit def F: Decidable[F] = F0
+    implicit def G: Bind[F] = F1
+  }
 }
 
 sealed abstract class StateTInstances2 extends StateTInstances3 {
-  implicit def stateTMonadState[S, F[_]](implicit F0: Monad[F]): MonadState[StateT[F, S, ?], S] = 
+  implicit def stateTMonadState[S, F[_]](implicit F0: Applicative[F]): MonadState[StateT[S, F, ?], S] =
     new StateTMonadState[S, F] {
-      implicit def F: Monad[F] = F0
+      implicit def F: Applicative[F] = F0
     }
 }
 
 sealed abstract class StateTInstances1 extends StateTInstances2 {
-  implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[StateT[F, S, ?]] =
+  implicit def stateTMonadPlus[S, F[_]](implicit F0: MonadPlus[F]): MonadPlus[StateT[S, F, ?]] =
     new StateTMonadStateMonadPlus[S, F] {
       implicit def F: MonadPlus[F] = F0
     }
 }
 
 sealed abstract class StateTInstances0 extends StateTInstances1 {
-  implicit def StateMonadTrans[S]: Hoist[λ[(g[_], a) => StateT[g, S, a]]] =
+  implicit def StateMonadTrans[S]: Hoist[λ[(g[_], a) => StateT[S, g, a]]] =
     new StateTHoist[S] {}
+
+  implicit def stateComonad[S](implicit S: Monoid[S]): Comonad[State[S, ?]] =
+    new Comonad[State[S, ?]] {
+      override def copoint[A](fa: State[S, A]): A =
+        fa.eval(S.zero)
+
+      override def cojoin[A](fa: State[S, A]): State[S, State[S, A]] =
+        State[S, State[S, A]](s => (
+          fa.exec(s),
+          State((t: S) => fa.run(S.append(s, t)))))
+
+      override def map[A, B](fa: State[S, A])(f: A => B): State[S, B] =
+        fa map f
+
+      override def cobind[A, B](fa: State[S, A])(f: State[S, A] => B): State[S, B] =
+        cojoin(fa).map(f)
+    }
 }
 
 abstract class StateTInstances extends StateTInstances0 {
   implicit def stateMonad[S]: MonadState[State[S, ?], S] =
       StateT.stateTMonadState[S, Id](Id.id)
+
+  implicit def contravariantS1[S2, F[_], A]: IsContravariant[IndexedStateT[?, S2, F, A]] =
+    IsContravariant.force[IndexedStateT[?, S2, F, A]]
 }
 
 trait IndexedStateTFunctions {
-  def constantIndexedStateT[F[_], S1, S2, A](a: A)(s: => S2)(implicit F: Applicative[F]): IndexedStateT[F, S1, S2, A] =
-    IndexedStateT.createState((m: Monad[F]) => (_: S1) => F.point((s, a)))
+  def constantIndexedStateT[S1, S2, F[_], A](a: A)(s: => S2)(implicit F: Applicative[F]): IndexedStateT[S1, S2, F, A] =
+    IndexedStateT((_: S1) => F.point((s, a)))
 }
 
 trait StateTFunctions extends IndexedStateTFunctions {
-  def constantStateT[F[_], S, A](a: A)(s: => S)(implicit F: Monad[F]): StateT[F, S, A] =
+  def constantStateT[S, F[_], A](a: A)(s: => S)(implicit F: Applicative[F]): StateT[S, F, A] =
     StateT((_: S) => F.point((s, a)))
 
-  def stateT[F[_], S, A](a: A)(implicit F: Monad[F]): StateT[F, S, A] =
+  def stateT[S, F[_], A](a: A)(implicit F: Applicative[F]): StateT[S, F, A] =
     StateT(s => F.point((s, a)))
 }
 
@@ -192,101 +284,128 @@ trait StateTFunctions extends IndexedStateTFunctions {
 // Implementation traits for type class instances
 //
 
-private trait IndexedStateTContravariant[S2, A0, F[_]] extends Contravariant[IndexedStateT[F, ?, S2, A0]] {
-  override def contramap[A, B](fa: IndexedStateT[F, A, S2, A0])(f: B => A): IndexedStateT[F, B, S2, A0] = fa.contramap(f)
-}
+private trait StateTDivisible[F[_], S] extends Divisible[StateT[S, F, ?]] {
+  implicit def F: Divisible[F]
+  implicit def G: Bind[F]
 
-private trait IndexedStateTBifunctor[S1, F[_]] extends Bifunctor[IndexedStateT[F, S1, ?, ?]] {
-  implicit def F: Functor[F]
+  override def conquer[Z]: StateT[S, F, Z] = StateT(_ => F.conquer)
 
-  override def bimap[A, B, C, D](fab: IndexedStateT[F, S1, A, B])(f: A => C, g: B => D): IndexedStateT[F, S1, C, D] = fab.bimap(f)(g)
-}
-
-private trait IndexedStateTFunctorLeft[S1, A0, F[_]] extends Functor[IndexedStateT[F, S1, ?, A0]] {
-  implicit def F: Functor[F]
-
-  override def map[A, B](fa: IndexedStateT[F, S1, A, A0])(f: A => B): IndexedStateT[F, S1, B, A0] = fa.imap(f)
-}
-
-private trait IndexedStateTFunctorRight[S1, S2, F[_]] extends Functor[IndexedStateT[F, S1, S2, ?]] {
-  implicit def F: Functor[F]
-
-  override def map[A, B](fa: IndexedStateT[F, S1, S2, A])(f: A => B): IndexedStateT[F, S1, S2, B] = fa.map(f)
-}
-
-private trait StateTBind[S, F[_]] extends Bind[StateT[F, S, ?]] {
-  implicit def F: Monad[F]
-
-  override def map[A, B](fa: StateT[F, S, A])(f: A => B): StateT[F, S, B] = fa.map(f)
-
-  def bind[A, B](fa: StateT[F, S, A])(f: A => StateT[F, S, B]): StateT[F, S, B] = fa.flatMap(f)
-}
-
-private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[StateT[F, S, ?]] {
-  implicit def F: Monad[F]
-  implicit def B: BindRec[F]
-
-  def tailrecM[A, B](f: A => StateT[F, S, A \/ B])(a: A): StateT[F, S, B] = {
-    def go(t: (S, A)): F[(S, A) \/ (S, B)] = {
-      F.map(f(t._2)(t._1)) { case (s, m) =>
-        m match {
-          case -\/(a0) => -\/((s, a0))
-          case \/-(b) => \/-((s, b))
+  override def divide2[A1, A2, Z](a1: => StateT[S, F, A1], a2: => StateT[S, F, A2])(f: Z => (A1, A2)): StateT[S, F, Z] =
+    StateT(
+      s => F.divide2[(S, A1), (S, A2), (S, Z)](a1.run(s), a2.run(s)) ( (z: (S, Z)) =>
+        (z._1, f(z._2)) match {
+          case (w, (l, r)) => ((w, l), (w, r))
         }
-      }
-    }
+      )
+    )
+}
 
-    IndexedStateT(s => B.tailrecM(go)((s, a)))
+private trait StateTDecidable[F[_], S] extends Decidable[StateT[S, F, ?]] with StateTDivisible[F, S] {
+  implicit def F: Decidable[F]
+  implicit def G: Bind[F]
+
+  override def choose2[Z, A1, A2](a1: => StateT[S, F, A1], a2: => StateT[S, F, A2])(f: Z => A1 \/ A2): StateT[S, F, Z] =
+    StateT( s =>
+      F.choose2[(S, Z), (S, A1), (S, A2)](a1.run(s), a2.run(s))( (z: (S, Z)) =>
+        f(z._2).fold(l => -\/((z._1, l)), r => \/-((z._1, r)))
+      )
+    )
+}
+
+private trait IndexedStateTContravariant[S2, A0, F[_]] extends Contravariant[IndexedStateT[?, S2, F, A0]] {
+  implicit def F: Applicative[F]
+
+  override def contramap[A, B](fa: IndexedStateT[A, S2, F, A0])(f: B => A): IndexedStateT[B, S2, F, A0] = fa.contramap(f)
+}
+
+private trait IndexedStateTBifunctor[S1, F[_]] extends Bifunctor[IndexedStateT[S1, ?, F, ?]] {
+  implicit def F: Applicative[F]
+
+  override def bimap[A, B, C, D](fab: IndexedStateT[S1, A, F, B])(f: A => C, g: B => D): IndexedStateT[S1, C, F, D] = fab.bimap(f)(g)
+}
+
+private trait IndexedStateTFunctorLeft[S1, A0, F[_]] extends Functor[IndexedStateT[S1, ?, F, A0]] {
+  implicit def F: Applicative[F]
+
+  override def map[A, B](fa: IndexedStateT[S1, A, F, A0])(f: A => B): IndexedStateT[S1, B, F, A0] = fa.imap(f)
+}
+
+private trait IndexedStateTFunctorRight[S1, S2, F[_]] extends Functor[IndexedStateT[S1, S2, F, ?]] {
+  implicit def F: Applicative[F]
+
+  override def map[A, B](fa: IndexedStateT[S1, S2, F, A])(f: A => B): IndexedStateT[S1, S2, F, B] = fa.map(f)
+}
+
+private trait StateTBind[S, F[_]] extends Bind[StateT[S, F, ?]] {
+  implicit def F: Applicative[F]
+
+  override def map[A, B](fa: StateT[S, F, A])(f: A => B): StateT[S, F, B] = fa.map(f)
+
+  def bind[A, B](fa: StateT[S, F, A])(f: A => StateT[S, F, B]): StateT[S, F, B] = fa.flatMap(f)
+}
+
+private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[StateT[S, F, ?]] {
+  def tailrecM[A, B](a: A)(f: A => StateT[S, F, A \/ B]): StateT[S, F, B] = {
+    f(a).flatMap(_ match {
+      case -\/(a) => tailrecM(a)(f)
+      case \/-(b) => StateT(s => F.point((s, b)))
+    })
   }
 }
 
-private trait StateTMonadState[S, F[_]] extends MonadState[StateT[F, S, ?], S] with StateTBind[S, F] {
-  implicit def F: Monad[F]
+private trait StateTMonadState[S, F[_]] extends MonadState[StateT[S, F, ?], S] with StateTBind[S, F] {
+  implicit def F: Applicative[F]
 
-  def point[A](a: => A): StateT[F, S, A] = {
-    lazy val aa = a
-    StateT(s => F.point(s, aa))
+  def point[A](a: => A): StateT[S, F, A] = {
+    val aa = Need(a)
+    StateT(s => F.point((s, aa.value)))
   }
 
-  def init: StateT[F, S, S] = StateT(s => F.point((s, s)))
+  def get: StateT[S, F, S] = StateT(s => F.point((s, s)))
 
-  def get = init
+  def put(s: S): StateT[S, F, Unit] = StateT(_ => F.point((s, ())))
 
-  def put(s: S): StateT[F, S, Unit] = StateT(_ => F.point((s, ())))
+  override def modify(f: S => S): StateT[S, F, Unit] = StateT(s => F.point((f(s), ())))
 
-  override def modify(f: S => S): StateT[F, S, Unit] = StateT(s => F.point((f(s), ())))
-
-  override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
+  override def gets[A](f: S => A): StateT[S, F, A] = StateT(s => F.point((s, f(s))))
 }
 
-private trait StateTHoist[S] extends Hoist[λ[(g[_], a) => StateT[g, S, a]]] {
+private trait StateTMonadError[S, F[_], E] extends MonadError[StateT[S, F, ?], E] {
+  implicit def F: MonadError[F, E]
 
-  type StateTF[G[_], S] = {
-    type f[x] = StateT[G, S, x]
-  }
+  override def raiseError[A](e: E): StateT[S, F, A] =
+    StateT(_ => F.raiseError(e))
 
-  def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
+  override def handleError[A](fa: StateT[S, F, A])(f: (E) => StateT[S, F, A]): StateT[S, F, A] =
+    StateT(s => F.handleError(fa(s))(f(_)(s)))
+
+  override def bind[A, B](fa: StateT[S, F, A])(f: (A) => StateT[S, F, B]): StateT[S, F, B] =
+    fa flatMap f
+
+  override def point[A](a: => A): StateT[S, F, A] =
+    StateT(s => F.point((s, a)))
+}
+
+private trait StateTHoist[S] extends Hoist[StateT[S, ?[_], ?]] {
+
+  def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[S, G, A] =
     StateT(s => G.map(ga)(a => (s, a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
-    def apply[A](action: StateT[M, S, A]) = IndexedStateT.createState(
-      (n: Monad[N]) => (s: S) => f(action.run(s))
-    )
-  }
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateT[S, M, ?] ~> StateT[S, N, ?]](_ mapT f.apply)
 
-  implicit def apply[G[_] : Monad]: Monad[StateT[G, S, ?]] = StateT.stateTMonadState[S, G]
+  implicit def apply[G[_] : Monad]: Monad[StateT[S, G, ?]] = StateT.stateTMonadState[S, G]
 }
 
-private trait IndexedStateTPlus[F[_], S1, S2] extends Plus[IndexedStateT[F, S1, S2, ?]] {
-  implicit def F: Monad[F]
+private trait IndexedStateTPlus[F[_], S1, S2] extends Plus[IndexedStateT[S1, S2, F, ?]] {
+  implicit def F: Bind[F]
   implicit def G: Plus[F]
-  override final def plus[A](a: IndexedStateT[F, S1, S2, A], b: => IndexedStateT[F, S1, S2, A]) =
+  override final def plus[A](a: IndexedStateT[S1, S2, F, A], b: => IndexedStateT[S1, S2, F, A]) =
     IndexedStateT(s => G.plus(a.run(s), b.run(s)))
 }
 
-private trait StateTMonadStateMonadPlus[S, F[_]] extends StateTMonadState[S, F] with StateTHoist[S] with MonadPlus[StateT[F, S, ?]] with IndexedStateTPlus[F, S, S] {
+private trait StateTMonadStateMonadPlus[S, F[_]] extends StateTMonadState[S, F] with StateTHoist[S] with MonadPlus[StateT[S, F, ?]] with IndexedStateTPlus[F, S, S] {
   implicit def F: MonadPlus[F]
   override final def G = F
 
-  def empty[A]: StateT[F, S, A] = liftM[F, A](F.empty[A])
+  def empty[A]: StateT[S, F, A] = liftM[F, A](F.empty[A])
 }

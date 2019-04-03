@@ -13,27 +13,25 @@ trait EnumeratorT[E, F[_]] { self =>
   def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[B, F] =
     EnumerateeT.map[E, B, F](f) run self
 
-  def #::(e: => E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
+  def #::(e: E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
     new EnumeratorT[E, F] {
       def apply[A] = _.mapCont(_(elInput(e))) &= self
     }
   }
 
-  def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]) =
+  def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]): EnumeratorT[B, F] =
     EnumerateeT.flatMap(f) run self
 
-  def flatten[B, G[_]](implicit ev: E =:= G[B], MO: F |>=| G): EnumeratorT[B, F] = {
-    import MO._
-    flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(MO.promote(ev(e))))
-  }
+  def flatten[B](implicit ev: E === F[B], F: Monad[F]): EnumeratorT[B, F] =
+    flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(ev(e)))
 
   def bindM[B, G[_]](f: E => G[EnumeratorT[B, F]])(implicit F: Monad[F], G: Monad[G]): F[G[EnumeratorT[B, F]]] = {
     import scalaz.syntax.semigroup._
     val iter = fold[G[EnumeratorT[B, F]], F, G[EnumeratorT[B, F]]](G.point(EnumeratorT.empty[B, F])) {
-      case (acc, concat) => G.bind(acc) { en => 
-                              G.map(concat) { append => en |+| append } 
+      case (acc, concat) => G.bind(acc) { en =>
+                              G.map(concat) { append => en |+| append }
                             }
-    }   
+    }
 
     (iter &= self.map(f)).run
   }
@@ -63,7 +61,7 @@ trait EnumeratorT[E, F[_]] { self =>
         iterateeT(M.bind((IterateeT.fold[E, F, B](b)(f) &= self).value) { s => check(s).value })
       }
     }
-    
+
   def cross[E2](e2: EnumeratorT[E2, F])(implicit M: Monad[F]): EnumeratorT[(E, E2), F] =
     EnumerateeT.cross[E, E2, F](e2) run self
 }
@@ -86,7 +84,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
       implicit def M = M0
     }
 
-  implicit val enumeratorTMonadTrans: MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] = 
+  implicit val enumeratorTMonadTrans: MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] =
     new MonadTrans[λ[(β[_], α) => EnumeratorT[α, β]]] {
       def liftM[G[_]: Monad, E](ga: G[E]): EnumeratorT[E, G] =
         new EnumeratorT[E, G] {
@@ -105,7 +103,7 @@ trait EnumeratorTFunctions {
       def apply[A] = _.pointI
     }
 
-  /** 
+  /**
    * An EnumeratorT that is at EOF
    */
   def enumEofT[E, F[_] : Applicative]: EnumeratorT[E, F] =
@@ -142,14 +140,13 @@ trait EnumeratorTFunctions {
       }
     }
 
-  def enumIterator[E, F[_]](x: => Iterator[E])(implicit MO: MonadPartialOrder[F, IO]) : EnumeratorT[E, F] =
+  def enumIterator[E, F[_]](x: => Iterator[E])(implicit F: MonadIO[F]) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      import MO._
       def apply[A] = {
         def go(xs: Iterator[E])(s: StepT[E, F, A]): IterateeT[E, F, A] =
           if(xs.isEmpty) s.pointI
           else {
-            s mapCont { k => 
+            s mapCont { k =>
               val next = xs.next
               k(elInput(next)) >>== go(xs)
             }
@@ -158,9 +155,8 @@ trait EnumeratorTFunctions {
       }
     }
 
-  def enumIoSource[T, E, F[_]](get : () => IoExceptionOr[T], gotdata : IoExceptionOr[T] => Boolean, render : T => E)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[E], F] =
+  def enumIoSource[T, E, F[_]](get : () => IoExceptionOr[T], gotdata : IoExceptionOr[T] => Boolean, render : T => E)(implicit F: MonadIO[F]): EnumeratorT[IoExceptionOr[E], F] =
     new EnumeratorT[IoExceptionOr[E], F] {
-      import MO._
       def apply[A] = (s: StepT[IoExceptionOr[E], F, A]) =>
         s.mapCont(
           k => {
@@ -171,14 +167,14 @@ trait EnumeratorTFunctions {
         )
     }
 
-  def enumReader[F[_]](r: => java.io.Reader)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Char], F] = {
+  def enumReader[F[_]](r: => java.io.Reader)(implicit F: MonadIO[F]): EnumeratorT[IoExceptionOr[Char], F] = {
     lazy val src = r
     enumIoSource(get = () => IoExceptionOr(src.read),
                  gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
                  render = ((n: Int) => n.toChar))
   }
 
-  def enumInputStream[F[_]](is: => java.io.InputStream)(implicit MO: MonadPartialOrder[F, IO]): EnumeratorT[IoExceptionOr[Byte], F] = {
+  def enumInputStream[F[_]](is: => java.io.InputStream)(implicit F: MonadIO[F]): EnumeratorT[IoExceptionOr[Byte], F] = {
     lazy val src = is
     enumIoSource(get = () => IoExceptionOr(src.read),
                  gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
@@ -187,14 +183,14 @@ trait EnumeratorTFunctions {
 
   def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      private val limit = max.map(_ min (a.length)).getOrElse(a.length)
+      private[this] val limit = max.map(_ min (a.length)).getOrElse(a.length)
       def apply[A] = {
         def loop(pos : Int): StepT[E, F, A] => IterateeT[E, F, A] = {
-          s => 
+          s =>
             s.mapCont(
               k => if (limit > pos) k(elInput(a(pos))) >>== loop(pos + 1)
                    else             s.pointI
-            )   
+            )
         }
         loop(min)
       }

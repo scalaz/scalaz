@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-final class TheseOps[A](val self: A) extends AnyVal {
+final class TheseOps[A](private val self: A) extends AnyVal {
   final def wrapThis[B]: A \&/ B =
     \&/.This(self)
 
@@ -15,7 +15,7 @@ final class TheseOps[A](val self: A) extends AnyVal {
     \&/.That(self)
 }
 
-final class ThesePairOps[A, B](val self: (A, B)) extends AnyVal {
+final class ThesePairOps[A, B](private val self: (A, B)) extends AnyVal {
   final def both: A \&/ B =
     \&/.Both(self._1, self._2)
 }

@@ -16,26 +16,27 @@ final class ArrowOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit v
   ////
 }
 
-sealed trait ToArrowOps0 {
-    implicit def ToArrowOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
-      new ArrowOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  
+sealed trait ToArrowOpsU[TC[F[_, _]] <: Arrow[F]] {
+  implicit def ToArrowOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
+    new ArrowOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+
 }
 
-trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToStrongOps with ToCategoryOps {
-  
-  implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: Arrow[F]) =
-    new ArrowOps[F,A, B](v)
-  
+trait ToArrowOps0[TC[F[_, _]] <: Arrow[F]] extends ToArrowOpsU[TC] {
 
-  
-  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Arrow[F[G, ?, ?]]) =
+  implicit def ToArrowOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
+    new ArrowOps[F,A, B](v)
+
+
+  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
     new ArrowOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
 
   ////
 }
+
+trait ToArrowOps[TC[F[_, _]] <: Arrow[F]] extends ToArrowOps0[TC] with ToSplitOps[TC] with ToStrongOps[TC] with ToCategoryOps[TC]
 
 trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with StrongSyntax[F] with CategorySyntax[F] {
   implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] = new ArrowOps[F, A, B](v)(ArrowSyntax.this.F)

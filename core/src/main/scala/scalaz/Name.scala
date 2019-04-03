@@ -3,15 +3,21 @@ package scalaz
 import scala.annotation.tailrec
 
 /** Call by name */
-sealed abstract class Name[+A] {
+sealed abstract class Name[A] {
   def value: A
 }
 
 /** Call by need */
-sealed abstract class Need[+A] extends Name[A]
+final class Need[A] private(private[this] var eval: () => A) extends Name[A] {
+  lazy val value: A = {
+    val value0 = eval()
+    eval = null
+    value0
+  }
+}
 
 /** Call by value */
-final case class Value[+A](value: A) extends Need[A]
+final case class Value[A](value: A) extends Name[A]
 
 object Name {
   def apply[A](a: => A) = new Name[A] {
@@ -41,24 +47,21 @@ object Name {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Name[B])(implicit G: Functor[G]) =
         Name(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Name[A \/ B])(a: A): Name[B] =
+      def tailrecM[A, B](a: A)(f: A => Name[A \/ B]): Name[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Name(b)
         }
     }
   implicit def nameEqual[A: Equal]: Equal[Name[A]] = new Equal[Name[A]] {
     def equal(a1: Name[A], a2: Name[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Name] = IsCovariant.force
 }
 
 object Need {
-  def apply[A](a: => A): Need[A] = {
-    new Need[A] {
-      private[this] lazy val value0: A = a
-      def value = value0
-    }
-  }
+  def apply[A](a: => A): Need[A] = new Need(() => a)
+
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] =
@@ -83,15 +86,16 @@ object Need {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Need[B])(implicit G: Functor[G]) =
         Need(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Need[A \/ B])(a: A): Need[B] =
+      def tailrecM[A, B](a: A)(f: A => Need[A \/ B]): Need[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Need(b)
         }
     }
   implicit def needEqual[A: Equal]: Equal[Need[A]] = new Equal[Need[A]] {
     def equal(a1: Need[A], a2: Need[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Value] = IsCovariant.force
 }
 
 object Value {
@@ -114,13 +118,14 @@ object Value {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => Value[B])(implicit G: Functor[G]) =
         Value(G.map(fa)(a => f(a).value))
       @tailrec
-      def tailrecM[A, B](f: A => Value[A \/ B])(a: A): Value[B] =
+      def tailrecM[A, B](a: A)(f: A => Value[A \/ B]): Value[B] =
         f(a).value match {
-          case -\/(a0) => tailrecM(f)(a0)
+          case -\/(a0) => tailrecM(a0)(f)
           case \/-(b) => Value(b)
         }
     }
   implicit def valueEqual[A: Equal]: Equal[Value[A]] = new Equal[Value[A]] {
     def equal(a1: Value[A], a2: Value[A]): Boolean = Equal[A].equal(a1.value, a2.value)
   }
+  implicit def covariant: IsCovariant[Value] = IsCovariant.force
 }

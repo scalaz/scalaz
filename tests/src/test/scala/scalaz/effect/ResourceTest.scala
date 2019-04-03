@@ -2,7 +2,7 @@ package scalaz
 package effect
 
 import java.io._
-import std.effect.closeable._
+import std.effect.autoCloseable._
 
 object ResourceTest extends SpecLite {
 
@@ -29,7 +29,7 @@ object ResourceTest extends SpecLite {
         fail("should have thrown")
       } catch {
         case ioe: IOException => // ok
-      }    
+      }
     }
 
   }

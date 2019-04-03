@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scalaz.Liskov.<~<
+
 sealed trait FunctionInstances1 {
   implicit def function1Semigroup[A, R](implicit R0: Semigroup[R]): Semigroup[A => R] =
     new Function1Semigroup[A, R] {
@@ -42,7 +44,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
       def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: A => (=> T) => B): (=> T) => G[B] =
         t => Functor[G].map(fa)(a => f(a)(t))
 
-      def tailrecM[A, B](f: A => (=> T) => A \/ B)(a: A): (=> T) => B =
+      def tailrecM[A, B](a: A)(f: A => (=> T) => A \/ B): (=> T) => B =
         t => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -56,7 +58,7 @@ sealed trait FunctionInstances0 extends FunctionInstances1 {
 }
 
 trait FunctionInstances extends FunctionInstances0 {
-  implicit val function0Instance =
+  implicit val function0Instance: Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] =
     new Traverse[Function0] with Monad[Function0] with BindRec[Function0] with Comonad[Function0] with Distributive[Function0] {
       def point[A](a: => A) =
         () => a
@@ -85,7 +87,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def distributeImpl[G[_], A, B](fa: G[A])(f: A => () => B)(implicit G: Functor[G]): () => G[B] =
         () => G.map(fa)(a => f(a)())
 
-      def tailrecM[A, B](f: A => () => A \/ B)(a: A): () => B =
+      def tailrecM[A, B](a: A)(f: A => () => A \/ B): () => B =
         () => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -97,7 +99,7 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function0Equal[R: Equal] =
+  implicit def function0Equal[R: Equal]: Equal[() => R] =
     new Equal[() => R] {
       def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
     }
@@ -143,7 +145,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def distributeImpl[G[_]: Functor, A, B](fa: G[A])(f: A => T => B): T => G[B] =
         t => Functor[G].map(fa)(a => f(a)(t))
 
-      def tailrecM[A, B](f: A => T => A \/ B)(a: A): T => B =
+      def tailrecM[A, B](a: A)(f: A => T => A \/ B): T => B =
         t => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -158,6 +160,8 @@ trait FunctionInstances extends FunctionInstances0 {
   implicit def function1Contravariant[R]: Contravariant[? => R] =
     new Contravariant[? => R] {
       def contramap[A, B](r: A => R)(f: B => A) = r compose f
+      override def narrow[A, B](f: A => R)(implicit ev: B <~< A) =
+        Liskov.contra[-? => R, B, A](ev)(f)
     }
 
   implicit def function2Instance[T1, T2]: Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] =
@@ -168,7 +172,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2) => A)(f: (A) => (T1, T2) => B) =
         (t1, t2) => f(fa(t1, t2))(t1, t2)
 
-      def tailrecM[A, B](f: A => (T1, T2) => A \/ B)(a: A): (T1, T2) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2) => A \/ B): (T1, T2) => B =
         (t1, t2) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -188,7 +192,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3) => A)(f: (A) => (T1, T2, T3) => B) =
         (t1, t2, t3) => f(fa(t1, t2, t3))(t1, t2, t3)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3) => A \/ B)(a: A): (T1, T2, T3) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3) => A \/ B): (T1, T2, T3) => B =
         (t1, t2, t3) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -208,7 +212,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3, T4) => A)(f: (A) => (T1, T2, T3, T4) => B) =
         (t1, t2, t3, t4) => f(fa(t1, t2, t3, t4))(t1, t2, t3, t4)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3, T4) => A \/ B)(a: A): (T1, T2, T3, T4) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3, T4) => A \/ B): (T1, T2, T3, T4) => B =
         (t1, t2, t3, t4) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -228,7 +232,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3, T4, T5) => A)(f: (A) => (T1, T2, T3, T4, T5) => B) =
         (t1, t2, t3, t4, t5) => f(fa(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5) => A \/ B)(a: A): (T1, T2, T3, T4, T5) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3, T4, T5) => A \/ B): (T1, T2, T3, T4, T5) => B =
         (t1, t2, t3, t4, t5) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -248,7 +252,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6) => A)(f: (A) => (T1, T2, T3, T4, T5, T6) => B) =
         (t1, t2, t3, t4, t5, t6) => f(fa(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3, T4, T5, T6) => A \/ B): (T1, T2, T3, T4, T5, T6) => B =
         (t1, t2, t3, t4, t5, t6) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -268,7 +272,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6, T7) => A)(f: (A) => (T1, T2, T3, T4, T5, T6, T7) => B) =
         (t1, t2, t3, t4, t5, t6, t7) => f(fa(t1, t2, t3, t4, t5, t6, t7))(t1, t2, t3, t4, t5, t6, t7)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6, T7) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6, T7) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3, T4, T5, T6, T7) => A \/ B): (T1, T2, T3, T4, T5, T6, T7) => B =
         (t1, t2, t3, t4, t5, t6, t7) => {
           @scala.annotation.tailrec
           def go(a0: A): B =
@@ -288,7 +292,7 @@ trait FunctionInstances extends FunctionInstances0 {
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6, T7, T8) => A)(f: (A) => (T1, T2, T3, T4, T5, T6, T7, T8) => B) =
         (t1, t2, t3, t4, t5, t6, t7, t8) => f(fa(t1, t2, t3, t4, t5, t6, t7, t8))(t1, t2, t3, t4, t5, t6, t7, t8)
 
-      def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6, T7, T8) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6, T7, T8) => B =
+      def tailrecM[A, B](a: A)(f: A => (T1, T2, T3, T4, T5, T6, T7, T8) => A \/ B): (T1, T2, T3, T4, T5, T6, T7, T8) => B =
         (t1, t2, t3, t4, t5, t6, t7, t8) => {
           @scala.annotation.tailrec
           def go(a0: A): B =

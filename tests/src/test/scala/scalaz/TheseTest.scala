@@ -17,6 +17,7 @@ object TheseTest extends SpecLite {
   checkAll(order.laws[Int \&/ Int])
   checkAll(semigroup.laws[Int \&/ Int])
   checkAll(bitraverse.laws[\&/])
+  checkAll(band.laws[ISet[Int] \&/ ISet[Int]])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
@@ -48,6 +49,7 @@ object TheseTest extends SpecLite {
     def bindRec[L: Semigroup] = BindRec[L \&/ ?]
     def monad[L: Semigroup] = Monad[L \&/ ?]
     def semigroup[L: Semigroup, R: Semigroup] = Semigroup[L \&/ R]
+    def band[L: Band, R: Band] = Band[L \&/ R]
     def cobind[L] = Cobind[L \&/ ?]
     def foldable[L] = Foldable[L \&/ ?]
     def traverse[L] = Traverse[L \&/ ?]
@@ -58,5 +60,6 @@ object TheseTest extends SpecLite {
     // checking absence of ambiguity
     def functor[L: Semigroup] = Functor[L \&/ ?]
     def equal[A: Order, B: Order] = Equal[A \&/ B]
+    def semigroup[L: Band, R: Band] = Semigroup[L \&/ R]
   }
 }

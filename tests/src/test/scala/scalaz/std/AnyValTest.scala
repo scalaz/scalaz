@@ -2,11 +2,17 @@ package scalaz
 package std
 
 import std.AllInstances._
+import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
+import org.scalacheck.Arbitrary
 import Tags._
+import syntax.contravariant._
 
 object AnyValTest extends SpecLite {
+
+  private[this] implicit def tagArb[A, B](implicit A: Arbitrary[A]): Arbitrary[A @@ B] =
+    Functor[Arbitrary].map(A)(Tag.apply[A, B])
 
   checkAll("Unit", order.laws[Unit])
   checkAll("Boolean", order.laws[Boolean].withProp("benchmark", order.scalaOrdering[Boolean]))
@@ -24,15 +30,26 @@ object AnyValTest extends SpecLite {
 
   checkAll("Boolean @@ Conjunction", monoid.laws[Boolean @@ Conjunction])
 
+  checkAll("Band[Boolean @@ Conjunction]", band.laws[Boolean @@ Conjunction])
+  checkAll("Band[Boolean @@ Disjunction]", band.laws[Boolean @@ Disjunction])
+
   {
     implicit val B = std.anyVal.booleanInstance.conjunction
     checkAll("Boolean", monoid.laws[Boolean])
   }
 
+  {
+    implicit val B = std.anyVal.booleanInstance.disjunction
+    checkAll("Boolean", monoid.laws[Boolean])
+  }
+
+  checkAll("Int @@ Multiplication", monoid.laws[Int @@ Multiplication])
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
   checkAll("Byte @@ Multiplication", monoid.laws[Byte @@ Multiplication])
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
+
+  checkAll("Unit", semilattice.laws[Unit])
 
   checkAll("Unit", monoid.laws[Unit])
   checkAll("Int", monoid.laws[Int])
@@ -52,4 +69,45 @@ object AnyValTest extends SpecLite {
   checkAll("Long @@ Multiplication", enum.laws[Long @@ Multiplication])
   checkAll("Short @@ Multiplication", enum.laws[Short @@ Multiplication])
 
+  "Int multiplication should terminate when encountering 0" in {
+    val M = Monoid[Int @@ Multiplication]
+    implicit val S: Show[Int @@ Multiplication] = Show[Int].contramap(Tag.unwrap)
+
+    val f: Int => Maybe[(Int, Int @@ Multiplication)] = i => {
+      if(i >= 0) Maybe.just((i-1, Tag(i)))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== Tag(0)
+    M.unfoldrSum(5)(g) must_=== Tag(0)
+  }
+
+  "conjunction should terminate when encountering false" in {
+    val M = booleanInstance.conjunction
+
+    val f: Int => Maybe[(Int, Boolean)] = i => {
+      if(i > 0) Maybe.just((i-1, true))
+      else if(i == 0) Maybe.just((i-1, false))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== false
+    M.unfoldrSum(5)(g) must_=== false
+  }
+
+  "disjunction should terminate when encountering true" in {
+    val M = booleanInstance.disjunction
+
+    val f: Int => Maybe[(Int, Boolean)] = i => {
+      if(i > 0) Maybe.just((i-1, false))
+      else if(i == 0) Maybe.just((i-1, true))
+      else sys.error("BOOM!")
+    }
+    val g = (i: Int) => f(i) map (_.swap)
+
+    M.unfoldlSum(5)(f) must_=== true
+    M.unfoldrSum(5)(g) must_=== true
+  }
 }

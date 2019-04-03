@@ -42,14 +42,14 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     NullArgument {
       case None => -\/(apply(None))
       case Some(-\/(a)) => -\/(apply(Some(a)))
-      case Some(c @ \/-(_)) => c
+      case Some(c @ \/-(_)) => c.coerceLeft
     }
 
   def right[C]: (C \/ A) ?=> (C \/ B) =
     NullArgument {
       case None => \/-(apply(None))
       case Some(\/-(a)) => \/-(apply(Some(a)))
-      case Some(c @ -\/(_)) => c
+      case Some(c @ -\/(_)) => c.coerceRight
     }
 
   def compose[C](f: C ?=> A): C ?=> B =
@@ -157,7 +157,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         NullArgument.always(a)
       override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
         a flatMap f
-      override def tailrecM[A, B](f: A => NullArgument[X, A \/ B])(a: A) =
+      override def tailrecM[A, B](a: A)(f: A => NullArgument[X, A \/ B]) =
         NullArgument{ t =>
           @annotation.tailrec
           def go(a0: A): B =

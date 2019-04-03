@@ -9,6 +9,7 @@ object StreamTest extends SpecLite {
   checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
+  checkAll(alt.laws[Stream])
   checkAll(bindRec.laws[Stream])
   checkAll(traverse.laws[Stream])
   checkAll(cobind.laws[Stream])
@@ -77,12 +78,35 @@ object StreamTest extends SpecLite {
     Foldable[Stream].foldMap(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(false)
   }
 
-  "foldMap evaluates big stream" in {
-    Foldable[Stream].foldMap(Stream.from(1).take(1000000))(_ => 1)(intInstance) must_===(1000000)
+  "foldMap1Opt identity" ! forAll {
+    xs: Stream[Int] =>
+    Foldable[Stream].foldMap1Opt(xs)(Stream(_)).getOrElse(Stream.empty) must_===(xs)
+  }
+
+  "foldMap1Opt evaluates lazily" in {
+    Foldable[Stream].foldMap1Opt(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(Some(false))
   }
 
   "foldRight evaluates lazily" in {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===(true)
+  }
+
+  "foldMapLeft1Opt identity" ! forAll {
+    (xs: Stream[Int]) =>
+    Foldable[Stream].foldMapLeft1Opt(xs.reverse)(Stream(_))((xs, x) => x #:: xs) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt identity" ! forAll {
+    (xs: Stream[Int]) =>
+    Foldable[Stream].foldMapRight1Opt(xs)(Stream(_))(_ #:: _) must_===(
+      if (xs.isEmpty) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt evaluates lazily" in {
+    Foldable[Stream].foldMapRight1Opt(Stream.continually(true))(identity)(_ || _) must_===(Some(true))
   }
 
   "zipL" in {
@@ -107,6 +131,7 @@ object StreamTest extends SpecLite {
     def monoid[A] = Monoid[Stream[A]]
     def bindRec = BindRec[Stream]
     def monadPlus = MonadPlus[Stream]
+    def alt = Alt[Stream]
     def traverse = Traverse[Stream]
     def zip = Zip[Stream]
     def unzip = Unzip[Stream]

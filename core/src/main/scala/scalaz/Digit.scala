@@ -51,33 +51,33 @@ object Digit extends DigitInstances {
     override val toInt = 9
   }
 
-  val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+  private val digitsArray: Array[Digit] = Array(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
+
+  val digits: IList[Digit] = IList.fromSeq(digitsArray)
 
   implicit def DigitLong(d: Digit): Long = d.toLong
 
-  def digitFromChar(c: Char): Option[Digit] =
-    digits.find(_.toChar == c)
+  def digitFromChar(c: Char): Option[Digit] = digitFromInt(c.toInt - 48)
 
   def digitFromInt(i: Int): Option[Digit] =
-    digits.find(_.toInt == i)
+    if (0 <= i && i <= 9) Some(digitsArray(i)) else None
 
   def digitFromLong(i: Long): Option[Digit] =
-    digits.find(_.toLong == i)
+    if (0L <= i && i <= 9L) Some(digitsArray(i.toInt)) else None
 
-  def mod10Digit(i: Int): Digit =
-    i match {
-      case 0 => _0
-      case 1 => _1
-      case 2 => _2
-      case 3 => _3
-      case 4 => _4
-      case 5 => _5
-      case 6 => _6
-      case 7 => _7
-      case 8 => _8
-      case 9 => _9
-      case _ => mod10Digit(scala.math.abs(i) % 10)
-    }
+  def digitsFromInt(i: Int): NonEmptyList[Digit] = digitsFromNumberString(i.toString)
+
+  def digitsFromLong(l: Long): NonEmptyList[Digit] = digitsFromNumberString(l.toString)
+
+  def digitsFromBigInt(b: BigInt): NonEmptyList[Digit] = digitsFromNumberString(b.toString)
+
+  private def digitsFromNumberString(number: String): NonEmptyList[Digit] = {
+    val (head, tail) = number.stripPrefix("-").splitAt(1)
+    NonEmptyList.nel(
+      digitsArray(head.charAt(0).toInt - 48), tail.foldRight(IList.empty[Digit]) ((c, ds) => digitsArray(c.toInt - 48) ::  ds))
+  }
+
+  def mod10Digit(i: Int): Digit = digitsArray(scala.math.abs(i % 10))
 
   def longDigits[F[_]](digits: F[Digit])(implicit F: Foldable[F]): Long =
     F.foldLeft(digits, 0L)((n, a) => n * 10L + (a: Digit))
@@ -144,6 +144,7 @@ sealed abstract class DigitInstances {
 
     override def max = Some(Digit._9)
 
+    override def show(f: Digit): Cord = Cord(shows(f))
     override def shows(f: Digit) = f.toChar.toString
     def order(x: Digit, y: Digit): Ordering = Order[Int].order(x.toInt, y.toInt)
     override def equal(x: Digit, y: Digit): Boolean = x == y

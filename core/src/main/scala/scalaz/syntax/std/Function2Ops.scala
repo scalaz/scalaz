@@ -2,12 +2,12 @@ package scalaz
 package syntax
 package std
 
-final class Function2Ops[T1, T2, R](val self: (T1, T2) => R) extends AnyVal {
+final class Function2Ops[T1, T2, R](private val self: (T1, T2) => R) extends AnyVal {
   def flip: (T2, T1) => R = (v2: T2, v1: T1) => self(v1, v2)
 
   def on[X](f: (R, R) => X, t1: (T1, T1), t2: (T2, T2)): X = f(self(t1._1, t2._1), self(t1._2, t2._2))
 
-  def contramap[TT](f: TT => T1)(implicit ev: T1 =:= T2): (TT, TT) => R = (t1, t2) => self(f(t1), ev(f(t2)))
+  def contramap[TT](f: TT => T1)(implicit ev: T1 === T2): (TT, TT) => R = (t1, t2) => self(f(t1), ev(f(t2)))
 
   def lift[F[_]](implicit F: Applicative[F]): (F[T1], F[T2]) => F[R] = F.lift2(self)
 
@@ -15,5 +15,5 @@ final class Function2Ops[T1, T2, R](val self: (T1, T2) => R) extends AnyVal {
 }
 
 trait ToFunction2Ops {
-  implicit def ToFunction2Ops[T1, T2, R](f: (T1, T2) => R) = new Function2Ops(f)
+  implicit def ToFunction2Ops[T1, T2, R](f: (T1, T2) => R): Function2Ops[T1, T2, R] = new Function2Ops(f)
 }

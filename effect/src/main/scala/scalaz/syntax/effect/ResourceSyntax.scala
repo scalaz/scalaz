@@ -8,8 +8,8 @@ import scalaz.effect.Resource
 final class ResourceOps[F] private[syntax](val self: F)(implicit val F: Resource[F]) extends Ops[F] {
   ////
 
-  def close = F.close(self)
-  
+  def close: scalaz.effect.IO[Unit] = F.close(self)
+
   ////
 }
 
@@ -24,7 +24,7 @@ trait ToResourceOps  {
 
 trait ResourceSyntax[F]  {
   implicit def ToResourceOps(v: F): ResourceOps[F] = new ResourceOps[F](v)(ResourceSyntax.this.F)
-  
+
   def F: Resource[F]
   ////
 

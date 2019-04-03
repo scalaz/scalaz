@@ -15,7 +15,7 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   def id[A]: A =>: A
 
   /** `monoid`, but universally quantified. */
-  def empty: PlusEmpty[λ[α => α =>: α]] = 
+  def empty: PlusEmpty[λ[α => α =>: α]] =
     new PlusEmpty[λ[α => α =>: α]] with ComposePlus {
       def empty[A] = id
     }
@@ -50,6 +50,23 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
 object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Category[G]): Category[F] =
+    new IsomorphismCategory[F, G] {
+      override def G: Category[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
+  ////
+}
+
+trait IsomorphismCategory[F[_, _], G[_, _]] extends Category[F] with IsomorphismCompose[F, G]{
+  implicit def G: Category[G]
+  ////
+
+  override def id[A]: F[A, A] =
+    iso.from(G.id)
   ////
 }

@@ -4,16 +4,12 @@ package std
 import std.AllInstances._
 import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
-import scala.collection.immutable.{Map => SMap, MapLike}
+import scalaz.scalacheck.ScalazArbitrary._
+import scala.collection.immutable.{Map => SMap}
 import scala.math.{Ordering => SOrdering}
 import org.scalacheck.Prop.forAll
 
-abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], BKC[_]]
-  (dict: MapSubInstances with MapSubFunctions{
-     type XMap[A, B] = Map[A, B]
-     type BuildKeyConstraint[A] = BKC[A]
-   })(implicit BKCF: Contravariant[BKC], OI: BKC[Int], OS: BKC[String]) extends SpecLite {
-  import dict._
+object MapTest extends SpecLite {
 
   checkAll(traverse.laws[Map[Int, ?]])
   checkAll(FoldableTests.anyAndAllLazy[Map[Int, ?]])
@@ -22,31 +18,15 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
   checkAll(align.laws[Map[Int, ?]])
   checkAll(monoid.laws[Map[Int,String]])
   checkAll(order.laws[Map[Int,String]])
-  checkAll(equal.laws[Map[Int,String]])
+  checkAll(band.laws[Map[String, ISet[Int]]])
 
-  "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
-
-  implicit def mapArb[A: Arbitrary: BKC, B: Arbitrary]: Arbitrary[Map[A, B]] =
-    Arbitrary(arbitrary[SMap[A, B]] map (m => fromSeq(m.toSeq:_*)))
-
-  class NotNatural(val id: Int)
-  implicit def NotNaturalArbitrary: Arbitrary[NotNatural] =
-    Arbitrary(arbitrary[Int] map (new NotNatural(_)))
-
-  implicit def NotNaturalOrder: Order[NotNatural] =
-    Order.orderBy[NotNatural, Int](_.id)
-
-  implicit def NotNaturalBKC: BKC[NotNatural] = BKCF.contramap(OI)(_.id)
-
-  implicit def NotNaturalEqual: Equal[NotNatural] = new Equal[NotNatural] {
-    def equal(a1: NotNatural, a2: NotNatural): Boolean = a1.id == a2.id
-  }
+  checkAll("satisfy equals laws when not natural", equal.laws[Map[NotNatural, String]])
 
   "map ordering" ! forAll {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
     (kvs: List[(String,Int)], kvs2: List[(String,Int)]) => {
-      val (m1, m2) = (fromSeq(kvs:_*), fromSeq(kvs2:_*))
+      val (m1, m2) = (Map(kvs:_*), Map(kvs2:_*))
       ((m1.size == kvs.size) && (m2.size == kvs2.size)) ==> {
         val l: Boolean = O.lessThan(m1, m2)
         val r: Boolean = (if (m1.size < m2.size) true
@@ -84,20 +64,14 @@ abstract class XMapTest[Map[K, V] <: SMap[K, V] with MapLike[K, V, Map[K, V]], B
     val mWithNew = m0 + (k -> vNew)
 
     // not already in map
-    getOrAdd[Id.Id, Int, Long](mWithout, k)(vNew) must_=== (mWithNew, vNew)
+    getOrAdd[Id.Id, Int, Long](mWithout, k)(vNew) must_=== (mWithNew -> vNew)
 
     // already in map
-    getOrAdd[Id.Id, Int, Long](mWithOld, k)(vNew) must_=== (mWithOld, vOld)
+    getOrAdd[Id.Id, Int, Long](mWithOld, k)(vNew) must_=== (mWithOld -> vOld)
 
     // lazy
     var evaluated = false
-    getOrAdd[Id.Id, Int, Long](mWithOld, k)({evaluated = true; vNew}) must_=== (mWithOld, vOld)
+    getOrAdd[Id.Id, Int, Long](mWithOld, k)({evaluated = true; vNew}) must_=== (mWithOld -> vOld)
     evaluated must_=== false
   }
 }
-
-private object DIContravariant extends Contravariant[λ[α => DummyImplicit]] {
-  def contramap[A, B](fa: DummyImplicit)(f: B => A) = fa
-}
-
-object MapTest extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant, implicitly, implicitly)

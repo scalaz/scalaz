@@ -23,7 +23,7 @@ object EnumeratorTTest extends SpecLite {
   "Issue #553" in {
     import std.list._
     val xs = (1 to 10).map(List(_)).toList
-    val e = enumIterator(xs.iterator)
+    val e = enumIterator[List[Int], IO](xs.iterator)
     (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
     (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
   }
@@ -93,7 +93,7 @@ object EnumeratorTTest extends SpecLite {
     import scalaz.syntax.monoid._
     var v: Int = 0
     val enum = enumStream[Int, IO](Stream(1, 2))
-    val effect = EnumeratorT.perform[Int, IO, Unit](IO(v = 1))
+    val effect = EnumeratorT.perform[Int, IO, Unit](IO { v = 1 })
     val enum2 = enumStream[Int, IO](Stream(3, 4))
 
     val testIter = IterateeT.fold[Int, IO, Boolean](true) {

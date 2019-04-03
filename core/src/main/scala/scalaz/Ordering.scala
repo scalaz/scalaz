@@ -38,6 +38,7 @@ sealed abstract class OrderingInstances {
       case (GT, GT)      => EQ
     }
 
+    override def show(f: Ordering): Cord = Cord(shows(f))
     override def shows(f: Ordering) = f.name
 
     def append(f1: Ordering, f2: => Ordering): Ordering = f1 match {

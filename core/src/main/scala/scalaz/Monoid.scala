@@ -44,6 +44,12 @@ trait Monoid[F] extends Semigroup[F] { self =>
   final def onEmpty[A,B](a: F)(v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
     ifEmpty(a)(v)(mb.zero)
 
+  def unfoldlSum[S](seed: S)(f: S => Maybe[(S, F)]): F =
+    unfoldlSumOpt(seed)(f) getOrElse zero
+
+  def unfoldrSum[S](seed: S)(f: S => Maybe[(F, S)]): F =
+    unfoldrSumOpt(seed)(f) getOrElse zero
+
   /** Every `Monoid` gives rise to a [[scalaz.Category]], for which
     * the type parameters are phantoms.
     *
@@ -73,8 +79,8 @@ trait Monoid[F] extends Semigroup[F] { self =>
    *  - '''right identity''' : `forall a. append(a, zero) == a`
    */
   trait MonoidLaw extends SemigroupLaw {
-    def leftIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(zero, a))
-    def rightIdentity(a: F)(implicit F: Equal[F]) = F.equal(a, append(a, zero))
+    def leftIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(zero, a))
+    def rightIdentity(a: F)(implicit F: Equal[F]): Boolean = F.equal(a, append(a, zero))
   }
   def monoidLaw = new MonoidLaw {}
 
@@ -84,6 +90,14 @@ trait Monoid[F] extends Semigroup[F] { self =>
 
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
+
+  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: Monoid[G]): Monoid[F] =
+    new IsomorphismMonoid[F, G] {
+      override def G: Monoid[G] = M
+      override def iso: F <=> G = D
+    }
 
   ////
 
@@ -123,5 +137,13 @@ object Monoid {
       }
     }
 
+  ////
+}
+
+trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G]{
+  implicit def G: Monoid[G]
+  ////
+
+  def zero: F = iso.from(G.zero)
   ////
 }
