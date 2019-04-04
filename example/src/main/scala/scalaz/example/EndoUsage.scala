@@ -7,7 +7,7 @@ import scalaz.syntax.monoid._
 import scalaz.syntax.foldable._
 
 object EndoUsage extends App {
-  // The scala Endo class is a class which wraps functions from A ⇒ A
+  // The scala Endo class is a class which wraps functions from A => A
   // for some A. This class exists in order to supply some special
   // typeclass instances, since functions where the domain and the
   // codomain are the same type have some special properties.
@@ -17,8 +17,8 @@ object EndoUsage extends App {
   // this monoid returns a function which for a given input, returns
   // the resut of applying each function to this input and append the
   // two results to each other:
-  val f1: Int ⇒ Int = _ + 1
-  val f2: Int ⇒ Int = _ * 10
+  val f1: Int => Int = _ + 1
+  val f2: Int => Int = _ * 10
 
   assert(f1(1) == 2)
   assert(f2(1) == 10)
@@ -42,11 +42,11 @@ object EndoUsage extends App {
 
   case class Person(first: String, last: String, age: Int)
 
-  val lowercaseFirst: Endo[Person] = Endo(p ⇒ p.copy(first=p.first.toLowerCase))
-  val lowercaseLast: Endo[Person] = Endo(p ⇒ p.copy(last=p.last.toLowerCase))
-  val trimFirst: Endo[Person] = Endo(p ⇒ p.copy(first=p.first.trim))
-  val trimLast: Endo[Person] = Endo(p ⇒ p.copy(last=p.last.trim))
-  val birthday: Endo[Person] = Endo(p ⇒ p.copy(age = p.age+1))
+  val lowercaseFirst: Endo[Person] = Endo(p => p.copy(first=p.first.toLowerCase))
+  val lowercaseLast: Endo[Person] = Endo(p => p.copy(last=p.last.toLowerCase))
+  val trimFirst: Endo[Person] = Endo(p => p.copy(first=p.first.trim))
+  val trimLast: Endo[Person] = Endo(p => p.copy(last=p.last.trim))
+  val birthday: Endo[Person] = Endo(p => p.copy(age = p.age+1))
   val endos: IList[Endo[Person]] = IList(lowercaseFirst, lowercaseLast, trimFirst, trimLast, birthday)
 
   val stewBefore = Person(" Stew ", "O'Connor", 70)
