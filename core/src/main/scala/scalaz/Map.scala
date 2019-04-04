@@ -496,7 +496,7 @@ sealed abstract class ==>>[A, B] {
     * append to the existing value using the Semigroup
     */
   def updateAppend(k: A, v: B)(implicit o: Order[A], bsg: Semigroup[B]): A ==>> B =
-    alter(k, old ⇒ Some(old.map(bsg.append(_, v)).getOrElse(v)))
+    alter(k, old => Some(old.map(bsg.append(_, v)).getOrElse(v)))
 
   def minViewWithKey: Option[((A, B), A ==>> B)] =
     this match {

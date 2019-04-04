@@ -17,8 +17,8 @@ import std.either._
   * already familiar with. Whereas a Functor operates on a * → * and
   * has a single operation `map` which takes a function from A => B to
   * map a F[A] to a F[B], a Bifunctor operates on a *,* → * and has a
-  * single operation `bimap` which takes two functions: A ⇒ C and a
-  * B ⇒ D to map a F[A,B] to a F[C,D]:
+  * single operation `bimap` which takes two functions: A => C and a
+  * B => D to map a F[A,B] to a F[C,D]:
   *
   * def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
   *

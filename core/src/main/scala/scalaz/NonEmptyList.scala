@@ -159,8 +159,8 @@ object NonEmptyList extends NonEmptyListInstances {
     new NonEmptyList(h, t)
 
   def lift[A, B](f: NonEmptyList[A] => B): IList[A] => Option[B] = {
-    case INil() ⇒ None
-    case ICons(h, t) ⇒ Some(f(NonEmptyList.nel(h, t)))
+    case INil() => None
+    case ICons(h, t) => Some(f(NonEmptyList.nel(h, t)))
   }
 }
 
