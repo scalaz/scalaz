@@ -101,7 +101,7 @@ object TagUsage extends App {
   assert(minOption(sortList(List(3,2,1,5,3))) === Some(1))
 
   // we can also use pattern matching:
-  def minOption_v2[A]: List[A] @@ Sorted ⇒ Option[A] = {
-    case Sorted(list) ⇒ list.headOption
+  def minOption_v2[A]: List[A] @@ Sorted => Option[A] = {
+    case Sorted(list) => list.headOption
   }
 }

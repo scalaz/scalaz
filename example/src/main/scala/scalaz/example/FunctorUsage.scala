@@ -13,7 +13,7 @@ import syntax.functor._
 
 /**
   * A Functor is a ubiquitous typeclass involving type constructors of
-  * kind * → *, which is another way of saying types that have a
+  * kind * -> *, which is another way of saying types that have a
   * single type variable. Examples might be Option, List, Future.
   *
   * The Functor category involves a single operation, named `map`:
@@ -88,13 +88,13 @@ object FunctorUsage extends App {
   // to void a functor.
 
   // pretend this is our database
-  var database = Map("abc" → 1,
-                     "aaa" → 2,
-                     "qqq" → 3)
+  var database = Map("abc" -> 1,
+                     "aaa" -> 2,
+                     "qqq" -> 3)
 
   // Return a Task which removes items from our database and returns the number of items deleted
   def del(f: String => Boolean): Task[Int] = Task.delay {
-    val (count, db) = database.foldRight(0 → List.empty[(String,Int)]) {
+    val (count, db) = database.foldRight(0 -> List.empty[(String,Int)]) {
       case ((k,_),(d,r)) if f(k) => (d+1, r)
       case (i,(d,r)) => (d, i::r)
     }

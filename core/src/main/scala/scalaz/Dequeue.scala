@@ -175,10 +175,10 @@ sealed abstract class Dequeue[A] {
 }
 
 object Dequeue extends DequeueInstances {
-  def apply[A](as: A*): Dequeue[A] = as.foldLeft[Dequeue[A]](empty)((q, a) ⇒ q :+ a)
+  def apply[A](as: A*): Dequeue[A] = as.foldLeft[Dequeue[A]](empty)((q, a) => q :+ a)
 
   def fromFoldable[F[_],A](fa: F[A])(implicit F: Foldable[F]): Dequeue[A] =
-    F.foldLeft[A,Dequeue[A]](fa,empty)((q,a) ⇒ q :+ a)
+    F.foldLeft[A,Dequeue[A]](fa,empty)((q,a) => q :+ a)
 
   def empty[A]: Dequeue[A] = EmptyDequeue()
 

@@ -44,13 +44,13 @@ object Foldable1Usage extends App {
   // 1 /\
   //  2 /\
   //   3  4
-  assert(NonEmptyList(1,2,3,4).foldMapRight1[Tree[Int]](L.apply)((a,b) ⇒ N(L(a),b)) == N(L(1), N(L(2), N(L(3), L(4)))))
+  assert(NonEmptyList(1,2,3,4).foldMapRight1[Tree[Int]](L.apply)((a,b) => N(L(a),b)) == N(L(1), N(L(2), N(L(3), L(4)))))
 
   //    /\
   //   /\ 4
   //  /\ 3
   // 1  2
-  assert(NonEmptyList(1,2,3,4).foldMapLeft1[Tree[Int]](L.apply)((b,a) ⇒ N(b,L(a))) == N(N(N(L(1),L(2)),L(3)),L(4)))
+  assert(NonEmptyList(1,2,3,4).foldMapLeft1[Tree[Int]](L.apply)((b,a) => N(b,L(a))) == N(N(N(L(1),L(2)),L(3)),L(4)))
 
   // There are functions to find minimal and maximal elements similar
   // to Foldable, however, in contrast, the Foldable1 versions return
