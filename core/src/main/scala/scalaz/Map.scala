@@ -222,14 +222,14 @@ sealed abstract class ==>>[A, B] {
     def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
       t match {
         case Tip() =>
-          some((kx, x))
+          just((kx, x))
         case Bin(ky, y, l, r) =>
           if (o.lessThanOrEqual(k, ky)) goSome(kx, x, l) else goSome(ky, y, r)
       }
 
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         if (o.lessThanOrEqual(k, kx)) l.lookupLT(k) else goSome(kx, x, r)
     }
@@ -241,14 +241,14 @@ sealed abstract class ==>>[A, B] {
     def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
       t match {
         case Tip() =>
-          some((kx, x))
+          just((kx, x))
         case Bin(ky, y, l, r) =>
           if (o.greaterThanOrEqual(k, ky)) goSome(kx, x, r) else goSome(ky, y, l)
       }
 
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         if (o.greaterThanOrEqual(k, kx)) r.lookupGT(k) else goSome(kx, x, l)
     }
@@ -260,13 +260,13 @@ sealed abstract class ==>>[A, B] {
     def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
       t match {
         case Tip() =>
-          some((kx, x))
+          just((kx, x))
         case Bin(ky, y, l, r) =>
           o.order(k, ky) match {
             case LT =>
               goSome(kx, x, l)
             case EQ =>
-              some((ky, y))
+              just((ky, y))
             case GT =>
               goSome(ky, y, r)
           }
@@ -274,13 +274,13 @@ sealed abstract class ==>>[A, B] {
 
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
             l.lookupLE(k)
           case EQ =>
-            some((kx, x))
+            just((kx, x))
           case GT =>
             goSome(kx, x, r)
         }
@@ -293,13 +293,13 @@ sealed abstract class ==>>[A, B] {
     def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
       t match {
         case Tip() =>
-          some((kx, x))
+          just((kx, x))
         case Bin(ky, y, l, r) =>
           o.order(k, ky) match {
             case LT =>
               goSome(ky, y, l)
             case EQ =>
-              some((ky, y))
+              just((ky, y))
             case GT =>
               goSome(kx, x, r)
           }
@@ -307,13 +307,13 @@ sealed abstract class ==>>[A, B] {
 
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
             goSome(kx, x, l)
           case EQ =>
-            some((kx, x))
+            just((kx, x))
           case GT =>
             r.lookupGE(k)
         }
@@ -350,7 +350,7 @@ sealed abstract class ==>>[A, B] {
     foldlWithKey(IList.empty[(A, B)])((xs, k, x) => (k, x) :: xs)
 
   def member(k: A)(implicit n: Order[A]): Boolean =
-    lookup(k)(n).isDefined
+    lookup(k)(n).isJust
 
   def notMember(k: A)(implicit n: Order[A]): Boolean =
     !member(k)
@@ -411,7 +411,7 @@ sealed abstract class ==>>[A, B] {
     }
 
   def deleteAt(i: Int): A ==>> B =
-    updateAt(i, (A, B) => None)
+    updateAt(i, (A, B) => Maybe.empty)
 
   @tailrec
   final def findMin: Option[(A, B)] =
@@ -633,7 +633,7 @@ sealed abstract class ==>>[A, B] {
 
   /* Unions */
   def union(other: A ==>> B)(implicit k: Order[A]): A ==>> B = {
-    def hedgeUnion(blo: Option[A], bhi: Option[A], m1: A ==>> B, m2: A ==>> B): A ==>> B =
+    def hedgeUnion(blo: Maybe[A], bhi: Maybe[A], m1: A ==>> B, m2: A ==>> B): A ==>> B =
       (m1, m2) match {
         case (t1, Tip()) =>
           t1
@@ -665,7 +665,7 @@ sealed abstract class ==>>[A, B] {
     (this, other) match {
       case (Tip(), t2) => t2
       case (t1, Tip()) => t1
-      case (t1, t2)    => hedgeUnion(None, None, t1, t2)
+      case (t1, t2)    => hedgeUnion(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -673,7 +673,7 @@ sealed abstract class ==>>[A, B] {
     unionWithKey(other)((_, b, c) => f(b, c))
 
   def unionWithKey(other: A ==>> B)(f: (A, B, B) => B)(implicit o: Order[A]): A ==>> B =
-    mergeWithKey(this, other)((a, b, c) => some(f(a, b, c)))(x => x, x => x)
+    mergeWithKey(this, other)((a, b, c) => just(f(a, b, c)))(x => x, x => x)
 
   // Difference functions
   def \\[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B =
@@ -687,7 +687,7 @@ sealed abstract class ==>>[A, B] {
         case (Bin(kx, x, l, r), Tip()) =>
           link(kx, x, l filterGt blo, r filterLt bhi)
         case (t, Bin(kx, _, l, r)) =>
-          val bmi = some(kx)
+          val bmi = just(kx)
           val aa = hedgeDiff(blo, bmi, ==>>.trim(blo, bmi, t), l)
           val bb = hedgeDiff(bmi, bhi, ==>>.trim(bmi, bhi, t), r)
           aa merge bb
@@ -699,7 +699,7 @@ sealed abstract class ==>>[A, B] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiff(None, None, t1, t2)
+        hedgeDiff(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -718,7 +718,7 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), t2) =>
-          val bmi = some(kx)
+          val bmi = just(kx)
           val l2 = hedgeInt(blo, bmi, l, ==>>.trim(blo, bmi, t2))
           val r2 = hedgeInt(bmi, bhi, r, ==>>.trim(bmi, bhi, t2))
 
@@ -729,7 +729,7 @@ sealed abstract class ==>>[A, B] {
     (this, other) match {
       case (Tip(), _) => empty
       case (_, Tip()) => empty
-      case (t1, t2)   => hedgeInt(None, None, t1, t2)
+      case (t1, t2)   => hedgeInt(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -737,7 +737,7 @@ sealed abstract class ==>>[A, B] {
     intersectionWithKey(other)((_, x, y) => f(x, y))
 
   def intersectionWithKey[C, D](other: A ==>> C)(f: (A, B, C) => D)(implicit o: Order[A]): A ==>> D =
-    mergeWithKey(this, other)((a, b, c) => some(f(a, b, c)))(_ => empty, _ => empty)
+    mergeWithKey(this, other)((a, b, c) => just(f(a, b, c)))(_ => empty, _ => empty)
 
   // Submap
   def isSubmapOf(a: A ==>> B)(implicit o: Order[A], e: Equal[B]): Boolean =
@@ -803,12 +803,10 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         empty
       case Bin(kx, x, l, r) =>
-        f(kx, x) match {
-          case Some(y) =>
-            link(kx, y, l.mapOptionWithKey(f), r.mapOptionWithKey(f))
-          case None =>
-            l.mapOptionWithKey(f).merge(r.mapOptionWithKey(f))
-        }
+        f(kx, x).cata(y =>
+          link(kx, y, l.mapMaybeWithKey(f), r.mapMaybeWithKey(f)),
+          l.mapMaybeWithKey(f).merge(r.mapMaybeWithKey(f))
+        )
     }
 
   def mapEither[C, D](f: B => C \/ D)(implicit o: Order[A]): (A ==>> C, A ==>> D) =
@@ -982,7 +980,7 @@ sealed abstract class ==>>[A, B] {
           }
       }
 
-    cata(a)(filter(_, this), this)
+    a.cata(filter(_, this), this)
   }
 
   private def filterLt(a: Option[A])(implicit o: Order[A]): A ==>> B = {
@@ -998,7 +996,7 @@ sealed abstract class ==>>[A, B] {
           }
       }
 
-    cata(a)(filter(_, this), this)
+    a.cata(filter(_, this), this)
   }
 
   @deprecated("join is no longer a protected function", "7.3")
@@ -1083,6 +1081,7 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   import std.list._
   import std.tuple._
+  import std.list._
 
   implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
     Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
@@ -1158,7 +1157,7 @@ sealed abstract class MapInstances extends MapInstances0 {
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
 
       override def index[A](fa: S ==>> A, i: Int): Option[A] =
-        fa.elemAt(i).map(_._2)
+        fa.elemAt(i).map(_._2).toOption
 
       def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
         fa match {
@@ -1446,9 +1445,9 @@ object ==>> extends MapInstances {
 
   private[scalaz] def trim[A, B](lo: Option[A], hi: Option[A], t: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (lo, hi) match {
-      case (None, None) =>
+      case (Maybe.Empty(), Maybe.Empty()) =>
         t
-      case (Some(lk), None) =>
+      case (Just(lk), Maybe.Empty()) =>
         @tailrec
         def greater(lo: A, m: A ==>> B): A ==>> B =
           m match {
@@ -1458,7 +1457,7 @@ object ==>> extends MapInstances {
               m
           }
         greater(lk, t)
-      case (None, Some(hk)) =>
+      case (Maybe.Empty(), Just(hk)) =>
         @tailrec
         def lesser(hi: A, m: A ==>> B): A ==>> B =
           m match {
@@ -1468,7 +1467,7 @@ object ==>> extends MapInstances {
               m
           }
         lesser(hk, t)
-      case (Some(lk), Some(hk)) =>
+      case (Just(lk), Just(hk)) =>
         @tailrec
         def middle(lo: A, hi: A, m: A ==>> B): A ==>> B =
           m match {
@@ -1488,24 +1487,24 @@ object ==>> extends MapInstances {
         def greater(lo: A, m: A ==>> B): (Option[B], A ==>> B) =
           m match {
             case Tip() =>
-              (none, Tip())
+              (Maybe.empty, Tip())
             case Bin(kx, x, l, r) =>
               o.order(lo, kx) match {
                 case LT =>
                   (l.lookup(lo), m)
                 case EQ =>
-                  (some(x), r)
+                  (just(x), r)
                 case GT =>
                   greater(lo, r)
               }
           }
         greater(lk, t)
-      case Some(hk) =>
+      case Just(hk) =>
         @tailrec
         def middle(lo: A, hi: A, m: A ==>> B): (Option[B], A ==>> B) =
           m match {
             case Tip() =>
-              (none, Tip())
+              (Maybe.empty, Tip())
             case Bin(kx, x, l, r) =>
               o.order(lo, kx) match {
                 case LT if o.order(kx, hi) == LT =>
@@ -1513,7 +1512,7 @@ object ==>> extends MapInstances {
                 case LT =>
                   middle(lo, hi, l)
                 case EQ =>
-                  (some(x), lesser(hi, r))
+                  (just(x), lesser(hi, r))
                 case GT =>
                   middle(lo, hi, r)
               }
@@ -1569,12 +1568,12 @@ object ==>> extends MapInstances {
           val t2 = link(kx, x, l.filterGt(blo)(o), r.filterLt(bhi)(o))
           g2(t2)
         case (Bin(kx, x, l, r), t2) =>
-          val bmi = some(kx)
+          val bmi = just(kx)
           val l2 = hedgeMerge(blo, bmi, l, trim(blo, bmi, t2)(o))
           val (found, trim_t2) = trimLookupLo(kx, bhi, t2)(o)
           val r2 = hedgeMerge(bmi, bhi, r, trim_t2)
           found match {
-            case None =>
+            case Maybe.Empty() =>
               g1(singleton(kx, x)) match {
                 case Tip() =>
                   l2 merge r2
@@ -1583,11 +1582,11 @@ object ==>> extends MapInstances {
                 case _ =>
                   sys.error("mergeWithKey: Given function g1 does not fulfil required conditions (see documentation)")
               }
-            case Some(x2) =>
+            case Just(x2) =>
               f(kx, x, x2) match {
-                case None =>
+                case Maybe.Empty() =>
                   l2 merge r2
-                case Some(xx) =>
+                case Just(xx) =>
                   link(kx, xx, l2, r2)
               }
           }
@@ -1597,7 +1596,7 @@ object ==>> extends MapInstances {
     (a, b) match {
       case (Tip(), t2) => g2(t2)
       case (t1, Tip()) => g1(t1)
-      case (t1, t2)    => hedgeMerge(None, None, t1, t2)
+      case (t1, t2)    => hedgeMerge(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 }

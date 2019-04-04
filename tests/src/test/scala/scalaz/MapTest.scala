@@ -258,24 +258,24 @@ object MapTest extends SpecLite {
 
     "lookupIndex" ! forAll { (a: Byte ==>> Int, n: Byte) =>
       val x = a.keys.indexOf(n)
-      a.lookupIndex(n) must_=== x
-      a.lookupIndex(n).foreach{ b =>
-        a.elemAt(b).map(_._1) must_=== Some(n)
+      a.lookupIndex(n).toOption must_=== x
+      a.lookupIndex(n).toOption.foreach { b =>
+        a.elemAt(b).map(_._1) must_=== just(n)
       }
     }
 
     "lookupLT" ! forAll { (a: Int ==>> Int) =>
       if (a.size == 0) {
         val r = Random.nextInt()
-        a.lookupLT(r) must_=== None
+        a.lookupLT(r) must_=== Maybe.empty
       }
       else {
         (0 until a.keys.length).foreach { i =>
-          val (k, v) = a.elemAt(i).get
+          val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupLT(k) must_=== a.elemAt(i-1)
           if (k != Int.MaxValue) {
-            a.lookupLT(k+1) must_=== Some((k, v))
+            a.lookupLT(k+1) must_=== just((k, v))
           }
         }
       }
@@ -284,15 +284,15 @@ object MapTest extends SpecLite {
     "lookupGT" ! forAll { (a: Int ==>> Int) =>
       if (a.size == 0) {
         val r = Random.nextInt()
-        a.lookupGT(r) must_=== None
+        a.lookupGT(r) must_=== Maybe.empty
       }
       else {
         (0 until a.keys.length).foreach { i =>
-          val (k, v) = a.elemAt(i).get
+          val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupGT(k) must_=== a.elemAt(i+1)
           if (k != Int.MinValue) {
-            a.lookupGT(k-1) must_=== Some((k, v))
+            a.lookupGT(k-1) must_=== just((k, v))
           }
         }
       }
@@ -301,13 +301,13 @@ object MapTest extends SpecLite {
     "lookupLE" ! forAll { (a: Int ==>> Int) =>
       if (a.size == 0) {
         val r = Random.nextInt()
-        a.lookupLE(r) must_=== None
+        a.lookupLE(r) must_=== Maybe.empty
       }
       else {
         (0 until a.keys.length).foreach { i =>
-          val (k, v) = a.elemAt(i).get
+          val (k, v) = a.elemAt(i).toOption.get
 
-          a.lookupLE(k) must_=== Some((k, v))
+          a.lookupLE(k) must_=== just((k, v))
           if (k != Int.MinValue) {
             a.lookupLE(k-1) must_=== a.elemAt(i-1)
           }
@@ -318,13 +318,13 @@ object MapTest extends SpecLite {
     "lookupGE" ! forAll { (a: Int ==>> Int) =>
       if (a.size == 0) {
         val r = Random.nextInt()
-        a.lookupGE(r) must_=== None
+        a.lookupGE(r) must_=== Maybe.empty
       }
       else {
         (0 until a.keys.length).foreach { i =>
-          val (k, v) = a.elemAt(i).get
+          val (k, v) = a.elemAt(i).toOption.get
 
-          a.lookupGE(k) must_=== Some((k, v))
+          a.lookupGE(k) must_=== just((k, v))
           if (k != Int.MaxValue) {
             a.lookupGE(k+1) must_=== a.elemAt(i+1)
           }
@@ -805,7 +805,7 @@ object MapTest extends SpecLite {
 
   "==>> trim" should {
     "trim sound" ! forAll { a: Int ==>> Int =>
-      def checkValidity(a: Int ==>> Int, lo: Option[Int], hi: Option[Int], result: Int ==>> Int) = {
+      def checkValidity(a: Int ==>> Int, lo: Maybe[Int], hi: Maybe[Int], result: Int ==>> Int) = {
         val m = trim(lo, hi, a)
         structurallySound(m)
         m must_=== result
@@ -815,10 +815,10 @@ object MapTest extends SpecLite {
         case Tip() =>
           val lo = Random.nextInt()
           val hi = lo + 1
-          checkValidity(a, Some(lo), Some(hi), Tip())
-          checkValidity(a, Some(lo), None    , Tip())
-          checkValidity(a, None    , Some(hi), Tip())
-          checkValidity(a, None    , None    , Tip())
+          checkValidity(a, just(lo), just(hi), Tip())
+          checkValidity(a, just(lo), Maybe.empty    , Tip())
+          checkValidity(a, Maybe.empty    , just(hi), Tip())
+          checkValidity(a, Maybe.empty    , Maybe.empty    , Tip())
 
         case Bin(_, _, _, _) =>
           def rec(m: Int ==>> Int): Unit = {
@@ -826,26 +826,26 @@ object MapTest extends SpecLite {
               case Tip() =>
                 ()
               case Bin(k, x, l, r) =>
-                checkValidity(m, Some(k), None   , r)
-                checkValidity(m, None   , Some(k), l)
-                checkValidity(m, None   , None   , m)
+                checkValidity(m, just(k), Maybe.empty   , r)
+                checkValidity(m, Maybe.empty   , just(k), l)
+                checkValidity(m, Maybe.empty   , Maybe.empty   , m)
 
                 if (k == Int.MinValue) {
-                  checkValidity(m, Some(k), Some(k+1), Tip())
-                  checkValidity(m, None   , Some(k+1), m)
+                  checkValidity(m, just(k), just(k+1), Tip())
+                  checkValidity(m, Maybe.empty   , just(k+1), m)
 
                   rec(r)
                 }
                 else if (k == Int.MaxValue) {
-                  checkValidity(m, Some(k-1), Some(k), Tip())
-                  checkValidity(m, Some(k-1), None   , m)
+                  checkValidity(m, just(k-1), just(k), Tip())
+                  checkValidity(m, just(k-1), Maybe.empty   , m)
 
                   rec(l)
                 }
                 else {
-                  checkValidity(m, Some(k-1), Some(k+1), m)
-                  checkValidity(m, Some(k-1), None     , m)
-                  checkValidity(m, None     , Some(k+1), m)
+                  checkValidity(m, just(k-1), just(k+1), m)
+                  checkValidity(m, just(k-1), Maybe.empty     , m)
+                  checkValidity(m, Maybe.empty     , just(k+1), m)
 
                   rec(l)
                   rec(r)
@@ -857,12 +857,12 @@ object MapTest extends SpecLite {
     }
 
     "trimLookupLo sound" ! forAll { a: Int ==>> Int =>
-      def checkValidity(a: Int ==>> Int, lk: Int, hk: Option[Int]) = {
+      def checkValidity(a: Int ==>> Int, lk: Int, hk: Maybe[Int]) = {
         val (x, m) = trimLookupLo(lk, hk, a)
         structurallySound(m)
 
         val t1 = a.lookup(lk)
-        val t2 = trim(Some(lk), hk, a)
+        val t2 = trim(just(lk), hk, a)
         (x, m) must_=== (t1 -> t2)
       }
 
@@ -870,8 +870,8 @@ object MapTest extends SpecLite {
         case Tip() =>
           val lk = Random.nextInt()
           val hk = lk + 1
-          checkValidity(a, lk, Some(hk))
-          checkValidity(a, lk, None)
+          checkValidity(a, lk, just(hk))
+          checkValidity(a, lk, Maybe.empty)
 
         case Bin(_, _, _, _) =>
           def rec(m: Int ==>> Int): Unit = {
@@ -879,22 +879,22 @@ object MapTest extends SpecLite {
               case Tip() =>
                 ()
               case Bin(k, x, l, r) =>
-                checkValidity(m, k, None)
+                checkValidity(m, k, Maybe.empty)
 
                 if (k == Int.MinValue) {
-                  checkValidity(m, k, Some(k+1))
+                  checkValidity(m, k, just(k+1))
 
                   rec(r)
                 }
                 else if (k == Int.MaxValue) {
-                  checkValidity(m, k-1, Some(k))
-                  checkValidity(m, k-1, None)
+                  checkValidity(m, k-1, just(k))
+                  checkValidity(m, k-1, Maybe.empty)
 
                   rec(l)
                 }
                 else {
-                  checkValidity(m, k-1, Some(k+1))
-                  checkValidity(m, k-1, None)
+                  checkValidity(m, k-1, just(k+1))
+                  checkValidity(m, k-1, Maybe.empty)
 
                   rec(l)
                   rec(r)
