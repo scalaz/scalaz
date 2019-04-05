@@ -32,7 +32,7 @@ object IListUsage extends App {
   val sum = ns.foldLeft(0)(_ + _)
 
   // But they are all total
-  val tail = ns.tailOption
+  val tail = ns.tailMaybe
   val prod = ns.reduceLeftOption(_ * _)
 
   // Destructure with uncons
