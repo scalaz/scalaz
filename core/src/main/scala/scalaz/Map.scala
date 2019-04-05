@@ -4,10 +4,9 @@ package scalaz
  * @see [[https://hackage.haskell.org/package/containers-0.5.7.1/docs/mini_Data-Map-Strict.html]]
  * @see [[https://github.com/haskell/containers/blob/v0.5.7.1/Data/Map/Base.hs]]
  */
-import Ordering.{ EQ, LT, GT }
-
+import Ordering.{EQ, GT, LT}
 import std.anyVal._
-import std.option._
+import Maybe.{ Empty, Just, just }
 
 import annotation.tailrec
 
@@ -103,16 +102,16 @@ sealed abstract class ==>>[A, B] {
 
   /** like [[adjust]] but with the key available in the transformation - O(log n) */
   def adjustWithKey(k: A, f: (A, B) => B)(implicit o: Order[A]): A ==>> B =
-    updateWithKey(k, (a, b) => some(f(a, b)))
+    updateWithKey(k, (a, b) => just(f(a, b)))
 
   /** updates or removes a value - O(log n)
    *
    * if `f` returns `None`, then the key is removed from the map */
-  def update(k: A, f: B => Option[B])(implicit o: Order[A]): A ==>> B =
+  def update(k: A, f: B => Maybe[B])(implicit o: Order[A]): A ==>> B =
     updateWithKey(k, (_, x) => f(x))
 
   /** like [[update]] but with the key available in the update function - O(log n) */
-  def updateWithKey(k: A, f: (A, B) => Option[B])(implicit o: Order[A]): A ==>> B =
+  def updateWithKey(k: A, f: (A, B) => Maybe[B])(implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
         empty
@@ -124,9 +123,9 @@ sealed abstract class ==>>[A, B] {
             balanceL(kx, x, l, r.updateWithKey(k, f))
           case EQ =>
             f(kx, x) match {
-              case Some(v) =>
+              case Just(v) =>
                 Bin(kx, v, l, r)
-              case None =>
+              case Empty() =>
                 glue(l, r)
             }
         }
@@ -136,10 +135,10 @@ sealed abstract class ==>>[A, B] {
    *
    * Similar to [[updateWithKey]] but also returns the value. If the value was updated, returns the
    * new value. If the value was deleted, returns the old value. */
-  def updateLookupWithKey(k: A, f: (A, B) => Option[B])(implicit o: Order[A]): (Option[B], A ==>> B) =
+  def updateLookupWithKey(k: A, f: (A, B) => Maybe[B])(implicit o: Order[A]): (Maybe[B], A ==>> B) =
     this match {
       case Tip() =>
-        (none, empty)
+        (Maybe.empty, empty)
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
@@ -150,21 +149,21 @@ sealed abstract class ==>>[A, B] {
             (found, balanceL(kx, x, l, rr))
           case EQ =>
             f(kx, x) match {
-              case Some(xx) =>
-                (some(xx), Bin(kx, xx, l, r))
-              case None =>
-                (some(x), glue(l, r))
+              case Just(xx) =>
+                (just(xx), Bin(kx, xx, l, r))
+              case Empty() =>
+                (just(x), glue(l, r))
             }
         }
     }
 
-  def alter(k: A, f: Option[B] => Option[B])(implicit o: Order[A]): A ==>> B =
+  def alter(k: A, f: Maybe[B] => Maybe[B])(implicit o: Order[A]): A ==>> B =
     this match {
       case Tip() =>
-        f(None) match {
-          case None =>
+        f(Maybe.empty) match {
+          case Empty() =>
             empty
-          case Some(x) =>
+          case Just(x) =>
             singleton(k, x)
         }
 
@@ -175,20 +174,20 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             balance(kx, x, l, r.alter(k, f))
           case EQ =>
-            f(some(x)) match {
-              case None =>
+            f(just(x)) match {
+              case Empty() =>
                 glue(l, r)
-              case Some(xx) =>
+              case Just(xx) =>
                 Bin(kx, xx, l, r)
             }
         }
     }
 
   @tailrec
-  final def lookup(k: A)(implicit n: Order[A]): Option[B] =
+  final def lookup(k: A)(implicit n: Order[A]): Maybe[B] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         n.order(k, kx) match {
           case LT =>
@@ -196,15 +195,15 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.lookup(k)
           case EQ =>
-            some(x)
+            just(x)
         }
     }
 
   @tailrec
-  final def lookupAssoc(k: A)(implicit n: Order[A]): Option[(A, B)] =
+  final def lookupAssoc(k: A)(implicit n: Order[A]): Maybe[(A, B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l, r) =>
         n.order(k, kx) match {
           case LT =>
@@ -212,14 +211,14 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.lookupAssoc(k)
           case EQ =>
-            some((kx, x))
+            just((kx, x))
         }
     }
 
   @tailrec
-  final def lookupLT(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+  final def lookupLT(k: A)(implicit o: Order[A]): Maybe[(A, B)] = {
     @tailrec
-    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+    def goSome(kx: A, x: B, t: A ==>> B): Maybe[(A, B)] =
       t match {
         case Tip() =>
           just((kx, x))
@@ -236,9 +235,9 @@ sealed abstract class ==>>[A, B] {
   }
 
   @tailrec
-  final def lookupGT(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+  final def lookupGT(k: A)(implicit o: Order[A]): Maybe[(A, B)] = {
     @tailrec
-    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+    def goSome(kx: A, x: B, t: A ==>> B): Maybe[(A, B)] =
       t match {
         case Tip() =>
           just((kx, x))
@@ -255,9 +254,9 @@ sealed abstract class ==>>[A, B] {
   }
 
   @tailrec
-  final def lookupLE(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+  final def lookupLE(k: A)(implicit o: Order[A]): Maybe[(A, B)] = {
     @tailrec
-    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+    def goSome(kx: A, x: B, t: A ==>> B): Maybe[(A, B)] =
       t match {
         case Tip() =>
           just((kx, x))
@@ -288,9 +287,9 @@ sealed abstract class ==>>[A, B] {
   }
 
   @tailrec
-  final def lookupGE(k: A)(implicit o: Order[A]): Option[(A, B)] = {
+  final def lookupGE(k: A)(implicit o: Order[A]): Maybe[(A, B)] = {
     @tailrec
-    def goSome(kx: A, x: B, t: A ==>> B): Option[(A, B)] =
+    def goSome(kx: A, x: B, t: A ==>> B): Maybe[(A, B)] =
       t match {
         case Tip() =>
           just((kx, x))
@@ -355,12 +354,12 @@ sealed abstract class ==>>[A, B] {
   def notMember(k: A)(implicit n: Order[A]): Boolean =
     !member(k)
 
-  def lookupIndex(k: A)(implicit o: Order[A]): Option[Int] = {
+  def lookupIndex(k: A)(implicit o: Order[A]): Maybe[Int] = {
     @tailrec
-    def go(n: Int, m: A ==>> B): Option[Int] =
+    def go(n: Int, m: A ==>> B): Maybe[Int] =
       m match {
         case Tip() =>
-          none
+          Maybe.empty
         case Bin(kx, x, l, r) =>
           o.order(k, kx) match {
             case LT =>
@@ -368,7 +367,7 @@ sealed abstract class ==>>[A, B] {
             case GT =>
               go(n + l.size + 1, r)
             case EQ =>
-              some((n + l.size))
+              just((n + l.size))
           }
       }
 
@@ -376,10 +375,10 @@ sealed abstract class ==>>[A, B] {
   }
 
   @tailrec
-  final def elemAt(i: Int): Option[(A, B)] =
+  final def elemAt(i: Int): Maybe[(A, B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case Bin(kx, x, l ,r) =>
         implicitly[Order[Int]].order(i, l.size) match {
           case LT =>
@@ -387,12 +386,12 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.elemAt(i - l.size - 1)
           case EQ =>
-            some((kx, x))
+            just((kx, x))
         }
     }
 
   // TODO: This should be a total function
-  def updateAt(i: Int, f: (A, B) => Option[B]): A ==>> B =
+  def updateAt(i: Int, f: (A, B) => Maybe[B]): A ==>> B =
     this match {
       case Tip() =>
         sys.error("updateAt")
@@ -404,8 +403,8 @@ sealed abstract class ==>>[A, B] {
             balanceL(kx, x, l, r.updateAt(i - l.size - 1, f))
           case EQ =>
             f(kx, x) match {
-              case Some(y) => Bin(kx, y, l, r)
-              case None => glue(l, r)
+              case Just(y) => Bin(kx, y, l, r)
+              case Empty() => glue(l, r)
             }
         }
     }
@@ -414,25 +413,25 @@ sealed abstract class ==>>[A, B] {
     updateAt(i, (A, B) => Maybe.empty)
 
   @tailrec
-  final def findMin: Option[(A, B)] =
+  final def findMin: Maybe[(A, B)] =
     this match {
       case Bin(kx, x, Tip(), _) =>
-        some((kx, x))
+        just((kx, x))
       case Bin(_, _, l, _) =>
         l.findMin
       case Tip() =>
-        none
+        Maybe.empty
     }
 
   @tailrec
-  final def findMax: Option[(A, B)] =
+  final def findMax: Maybe[(A, B)] =
     this match {
       case Bin(kx, x, _, Tip()) =>
-        some((kx, x))
+        just((kx, x))
       case Bin(_, _, _, r) =>
         r.findMax
       case Tip() =>
-        none
+        Maybe.empty
     }
 
   def deleteMin: A ==>> B =
@@ -455,16 +454,16 @@ sealed abstract class ==>>[A, B] {
         empty
     }
 
-  def updateMin(f: B => Option[B]): A ==>> B =
+  def updateMin(f: B => Maybe[B]): A ==>> B =
     updateMinWithKey((_: A, b) => f(b))
 
-  def updateMinWithKey(f: (A, B) => Option[B]): A ==>> B =
+  def updateMinWithKey(f: (A, B) => Maybe[B]): A ==>> B =
     this match {
       case Bin(kx, x, Tip(), r) =>
         f(kx, x) match {
-          case None =>
+          case Empty() =>
             r
-          case Some(s) =>
+          case Just(s) =>
             Bin(kx, s, Tip(), r)
         }
       case Bin(kx, x, l, r) =>
@@ -473,16 +472,16 @@ sealed abstract class ==>>[A, B] {
         empty
     }
 
-  def updateMax(f: B => Option[B]): A ==>> B =
+  def updateMax(f: B => Maybe[B]): A ==>> B =
     updateMaxWithKey((_: A, b) => f(b))
 
-  def updateMaxWithKey(f: (A, B) => Option[B]): A ==>> B =
+  def updateMaxWithKey(f: (A, B) => Maybe[B]): A ==>> B =
     this match {
       case Bin(kx, x, l, Tip()) =>
         f(kx, x) match {
-          case None =>
+          case Empty() =>
             l
-          case Some(s) =>
+          case Just(s) =>
             Bin(kx, s, l, Tip())
         }
       case Bin(kx, x, l, r) =>
@@ -496,40 +495,40 @@ sealed abstract class ==>>[A, B] {
     * append to the existing value using the Semigroup
     */
   def updateAppend(k: A, v: B)(implicit o: Order[A], bsg: Semigroup[B]): A ==>> B =
-    alter(k, old ⇒ Some(old.map(bsg.append(_, v)).getOrElse(v)))
+    alter(k, old ⇒ just(old.map(bsg.append(_, v)).getOrElse(v)))
 
-  def minViewWithKey: Option[((A, B), A ==>> B)] =
+  def minViewWithKey: Maybe[((A, B), A ==>> B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case x @ Bin(_, _, _, _) =>
-        some(deleteFindMin(x))
+        just(deleteFindMin(x))
     }
 
-  def maxViewWithKey: Option[((A, B), A ==>> B)] =
+  def maxViewWithKey: Maybe[((A, B), A ==>> B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case x @ Bin(_, _, _, _) =>
-        some(deleteFindMax(x))
+        just(deleteFindMax(x))
     }
 
-  def minView: Option[(B, A ==>> B)] =
+  def minView: Maybe[(B, A ==>> B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case x @ Bin(_, _, _, _) =>
         val r = deleteFindMin(x)
-        some((r._1._2, r._2))
+        just((r._1._2, r._2))
     }
 
-  def maxView: Option[(B, A ==>> B)] =
+  def maxView: Maybe[(B, A ==>> B)] =
     this match {
       case Tip() =>
-        none
+        Maybe.empty
       case x @ Bin(_, _, _, _) =>
         val r = deleteFindMax(x)
-        some((r._1._2, r._2))
+        just((r._1._2, r._2))
     }
 
   private def deleteFindMax(t: Bin[A, B]): ((A, B), A ==>> B) =
@@ -642,7 +641,7 @@ sealed abstract class ==>>[A, B] {
         case (t1, Bin(kx, x, Tip(), Tip())) =>
           insertR(kx, x, t1)
         case (Bin(kx, x, l, r), t2) =>
-          val bmi = Some(kx)
+          val bmi = just(kx)
           val nm1 = hedgeUnion(blo, bmi, l, ==>>.trim(blo, bmi, t2))
           val nm2 = hedgeUnion(bmi, bhi, r, ==>>.trim(bmi, bhi, t2))
           link(kx, x, nm1, nm2)
@@ -680,7 +679,7 @@ sealed abstract class ==>>[A, B] {
     difference(other)
 
   def difference[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B = {
-    def hedgeDiff(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> B =
+    def hedgeDiff(blo: Maybe[A], bhi: Maybe[A], a: A ==>> B, b: A ==>> C): A ==>> B =
       (a, b) match {
         case (Tip(), _) =>
           empty
@@ -703,18 +702,16 @@ sealed abstract class ==>>[A, B] {
     }
   }
 
-  def differenceWith[C](other: A ==>> C)(f: (B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
+  def differenceWith[C](other: A ==>> C)(f: (B, C) => Maybe[B])(implicit o: Order[A]): A ==>> B =
     differenceWithKey(other)((_, b, c) => f(b, c))
 
-  def differenceWithKey[C](other: A ==>> C)(f: (A, B, C) => Option[B])(implicit o: Order[A]): A ==>> B =
+  def differenceWithKey[C](other: A ==>> C)(f: (A, B, C) => Maybe[B])(implicit o: Order[A]): A ==>> B =
     mergeWithKey(this, other)(f)(x => x, _ => empty)
 
   // Intersections
   def intersection[C](other: A ==>> C)(implicit o: Order[A]): A ==>> B = {
-    def hedgeInt(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> B =
+    def hedgeInt(blo: Maybe[A], bhi: Maybe[A], a: A ==>> B, b: A ==>> C): A ==>> B =
       (a, b) match {
-        case (_, Tip()) =>
-          empty
         case (_, Tip()) =>
           empty
         case (Tip(), _) =>
@@ -757,9 +754,9 @@ sealed abstract class ==>>[A, B] {
       case (Bin(kx, x, l, r), t) =>
         val (lt, found, gt) = t splitLookup kx
         found match {
-          case None =>
+          case Empty() =>
             false
-          case Some(y) =>
+          case Just(y) =>
             f(x, y) && l.submap(lt, f) && r.submap(gt, f)
         }
     }
@@ -797,10 +794,10 @@ sealed abstract class ==>>[A, B] {
           (l1 merge r1, link(kx, x, l2, r2))
     }
 
-  def mapOption[C](f: B => Option[C])(implicit o: Order[A]): A ==>> C =
-    mapOptionWithKey((_, x) => f(x))
+  def mapMaybe[C](f: B => Maybe[C])(implicit o: Order[A]): A ==>> C =
+    mapMaybeWithKey((_, x) => f(x))
 
-  def mapOptionWithKey[C](f: (A, B) => Option[C])(implicit o: Order[A]): A ==>> C =
+  def mapMaybeWithKey[C](f: (A, B) => Maybe[C])(implicit o: Order[A]): A ==>> C =
     this match {
       case Tip() =>
         empty
@@ -848,10 +845,10 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  def splitLookup(k: A)(implicit o: Order[A]): (A ==>> B, Option[B], A ==>> B) =
+  def splitLookup(k: A)(implicit o: Order[A]): (A ==>> B, Maybe[B], A ==>> B) =
     this match {
       case Tip() =>
-        (empty, none, empty)
+        (empty, Maybe.empty, empty)
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
@@ -861,14 +858,14 @@ sealed abstract class ==>>[A, B] {
             val (lt, z, gt) = r splitLookup k
             (link(kx, x, l, lt), z, gt)
           case EQ =>
-            (l, some(x), r)
+            (l, just(x), r)
         }
     }
 
-  def splitLookupWithKey(k: A)(implicit o: Order[A]): (A ==>> B, Option[(A, B)], A ==>> B) =
+  def splitLookupWithKey(k: A)(implicit o: Order[A]): (A ==>> B, Maybe[(A, B)], A ==>> B) =
     this match {
       case Tip() =>
-        (empty, none, empty)
+        (empty, Maybe.empty, empty)
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
@@ -878,7 +875,7 @@ sealed abstract class ==>>[A, B] {
             val (lt, z, gt) = r splitLookupWithKey k
             (link(kx, x, l, lt), z, gt)
           case EQ =>
-            (l, some((kx, x)), r)
+            (l, just((kx, x)), r)
         }
     }
 
@@ -937,10 +934,10 @@ sealed abstract class ==>>[A, B] {
 
   @deprecated("trimLookupLo is no longer a public function", "7.3")
   @tailrec
-  final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Option[(A, B)], A ==>> B) =
+  final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Maybe[(A, B)], A ==>> B) =
     this match {
       case Tip() =>
-        (none, empty)
+        (Maybe.empty, empty)
       case t @ Bin(kx, x, l, r) =>
         o.order(lo, kx) match {
           case LT =>
@@ -953,7 +950,7 @@ sealed abstract class ==>>[A, B] {
           case GT =>
             r.trimLookupLo(lo, cmphi)
           case EQ =>
-            (some((kx, x)), r.trim(a => o.order(lo, a), cmphi))
+            (just((kx, x)), r.trim(a => o.order(lo, a), cmphi))
         }
     }
 
@@ -969,7 +966,7 @@ sealed abstract class ==>>[A, B] {
     toAscList.hashCode
 
   // filters on keys
-  private def filterGt(a: Option[A])(implicit o: Order[A]): A ==>> B = {
+  private def filterGt(a: Maybe[A])(implicit o: Order[A]): A ==>> B = {
     def filter(filteringKey: A, m: A ==>> B): A ==>> B =
       m match {
         case Tip() =>
@@ -985,7 +982,7 @@ sealed abstract class ==>>[A, B] {
     a.cata(filter(_, this), this)
   }
 
-  private def filterLt(a: Option[A])(implicit o: Order[A]): A ==>> B = {
+  private def filterLt(a: Maybe[A])(implicit o: Order[A]): A ==>> B = {
     def filter(filteringKey: A, m: A ==>> B): A ==>> B =
       m match {
         case Tip() =>
@@ -1037,7 +1034,7 @@ sealed abstract class MapInstances0 extends MapInstances1 {
         fa map f
 
       def bind[A, B](fa: S ==>> A)(f: A => (S ==>> B)) =
-        fa.mapOptionWithKey((k, v) => f(v).lookup(k))
+        fa.mapMaybeWithKey((k, v) => f(v).lookup(k))
 
       import \&/._, ==>>.Tip
 
@@ -1247,9 +1244,6 @@ object ==>> extends MapInstances {
   final def fromIList[A: Order, B](l: IList[(A, B)]): A ==>> B =
     l.foldLeft(empty[A, B]) { (t, x) => t.insert(x._1, x._2) }
 
-  final def fromIList[A: Order, B](l: IList[(A, B)]): A ==>> B =
-    l.foldLeft(empty[A, B]) { (t, x) => t.insert(x._1, x._2) }
-
   final def fromListWith[A: Order, B](l: List[(A, B)])(f: (B, B) => B): A ==>> B =
     fromListWithKey(l)((_, x, y) => f(x, y))
 
@@ -1448,7 +1442,7 @@ object ==>> extends MapInstances {
         balanceL(ky, y, insertMin(kx, x, l), r)
     }
 
-  private[scalaz] def trim[A, B](lo: Option[A], hi: Option[A], t: A ==>> B)(implicit o: Order[A]): A ==>> B =
+  private[scalaz] def trim[A, B](lo: Maybe[A], hi: Maybe[A], t: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (lo, hi) match {
       case (Maybe.Empty(), Maybe.Empty()) =>
         t
@@ -1485,11 +1479,11 @@ object ==>> extends MapInstances {
         middle(lk, hk, t)
     }
 
-  private[scalaz] def trimLookupLo[A, B](lk: A, hkOption: Option[A], t: A ==>> B)(implicit o: Order[A]): (Option[B], A ==>> B) =
-    hkOption match {
-      case None =>
+  private[scalaz] def trimLookupLo[A, B](lk: A, hkMaybe: Maybe[A], t: A ==>> B)(implicit o: Order[A]): (Maybe[B], A ==>> B) =
+    hkMaybe match {
+      case Empty() =>
         @tailrec
-        def greater(lo: A, m: A ==>> B): (Option[B], A ==>> B) =
+        def greater(lo: A, m: A ==>> B): (Maybe[B], A ==>> B) =
           m match {
             case Tip() =>
               (Maybe.empty, Tip())
@@ -1506,7 +1500,7 @@ object ==>> extends MapInstances {
         greater(lk, t)
       case Just(hk) =>
         @tailrec
-        def middle(lo: A, hi: A, m: A ==>> B): (Option[B], A ==>> B) =
+        def middle(lo: A, hi: A, m: A ==>> B): (Maybe[B], A ==>> B) =
           m match {
             case Tip() =>
               (Maybe.empty, Tip())
@@ -1563,10 +1557,10 @@ object ==>> extends MapInstances {
   *  @param  g2  function applied to a nonempty subtree present only in the second map b
   */
   def mergeWithKey[A: Order, B, C, D](a: A ==>> B, b: A ==>> C)
-                                     (f: (A, B, C) => Option[D])
+                                     (f: (A, B, C) => Maybe[D])
                                      (g1: (A ==>> B) => (A ==>> D), g2: (A ==>> C) => (A ==>> D))
                                      (implicit o: Order[A]): A ==>> D = {
-    def hedgeMerge(blo: Option[A], bhi: Option[A], a: A ==>> B, b: A ==>> C): A ==>> D = {
+    def hedgeMerge(blo: Maybe[A], bhi: Maybe[A], a: A ==>> B, b: A ==>> C): A ==>> D = {
       (a, b) match {
         case (t1, Tip()) => g1(t1)
         case (Tip(), Bin(kx, x, l, r)) =>

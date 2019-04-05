@@ -1,6 +1,8 @@
 package scalaz
 
 import org.scalacheck.Prop.forAll
+import scalaz.Maybe.{Empty, Just, just}
+
 import scala.util.Random
 
 object MapTest extends SpecLite {
@@ -12,7 +14,6 @@ object MapTest extends SpecLite {
   import std.string._
   import std.option._
   import std.tuple._
-  import syntax.std.option._
 
   import ==>>._
 
@@ -66,8 +67,8 @@ object MapTest extends SpecLite {
     val F = Foldable[Int ==>> ?]
     F.index(a, i) must_=== a.toList.lift(i).map(_._2)
     F.index(a, -1) must_=== None
-    F.index(a, 0) must_=== a.findMin.map(_._2)
-    F.index(a, a.size - 1) must_=== a.findMax.map(_._2)
+    F.index(a, 0) must_=== a.findMin.map(_._2).toOption
+    F.index(a, a.size - 1) must_=== a.findMax.map(_._2).toOption
     F.index(a, a.size) must_=== None
   }
 
@@ -79,11 +80,11 @@ object MapTest extends SpecLite {
 
   "minViewWithKey" ! forAll { a: Int ==>> Int =>
     a.minViewWithKey match {
-      case None =>
+      case Empty() =>
         a.size must_=== 0
-      case Some(b) =>
+      case Just(b) =>
         structurallySound(b._2)
-        a.findMin must_=== Some(b._1)
+        a.findMin must_=== just(b._1)
         (b._2.size + 1) must_=== a.size
         (b._2 + b._1) must_=== a
     }
@@ -91,11 +92,11 @@ object MapTest extends SpecLite {
 
   "maxViewWithKey" ! forAll { a: Int ==>> Int =>
     a.maxViewWithKey match {
-      case None =>
+      case Empty() =>
         a.size must_=== 0
-      case Some(b) =>
+      case Just(b) =>
         structurallySound(b._2)
-        a.findMax must_=== Some(b._1)
+        a.findMax must_=== just(b._1)
         (b._2.size + 1) must_=== a.size
         (b._2 + b._1) must_=== a
     }
@@ -103,15 +104,15 @@ object MapTest extends SpecLite {
 
   "findMin" ! forAll { a: Int ==>> Int =>
     a.findMin must_=== {
-      if(a.isEmpty) None
-      else Some(a.toList.minBy(_._1))
+      if(a.isEmpty) Maybe.empty
+      else just(a.toList.minBy(_._1))
     }
   }
 
   "findMax" ! forAll { a: Int ==>> Int =>
     a.findMax must_=== {
-      if(a.isEmpty) None
-      else Some(a.toList.maxBy(_._1))
+      if(a.isEmpty) Maybe.empty
+      else just(a.toList.maxBy(_._1))
     }
   }
 
@@ -122,7 +123,7 @@ object MapTest extends SpecLite {
       b.isEmpty must_=== true
     }else{
       (b.size + 1) must_=== a.size
-      b must_=== a.delete(a.findMin.get._1)
+      b must_=== a.delete(a.findMin.toOption.get._1)
     }
   }
 
@@ -133,7 +134,7 @@ object MapTest extends SpecLite {
       b.isEmpty must_=== true
     }else{
       (b.size + 1) must_=== a.size
-      b must_=== a.delete(a.findMax.get._1)
+      b must_=== a.delete(a.findMax.toOption.get._1)
     }
   }
 
@@ -144,7 +145,7 @@ object MapTest extends SpecLite {
       structurallySound(b)
       (a.size - 1) must_=== b.size
       b.member(Foldable[IList].index(a.keys, n).get) must_=== false
-      (b + a.elemAt(n).get) must_=== a
+      (b + a.elemAt(n).toOption.get) must_=== a
     }
   }
 
@@ -188,16 +189,16 @@ object MapTest extends SpecLite {
   "elemAt" should {
     val d = fromList(List(5 -> "a", 3 -> "b"))
     "find successful result" in {
-      d.elemAt(0) must_== (3, "b").some
-      d.elemAt(1) must_== (5, "a").some
+      d.elemAt(0) must_== just((3, "b"))
+      d.elemAt(1) must_== just((5, "a"))
     }
 
     "not find a match" in {
-      d.elemAt(2) must_== None
+      d.elemAt(2) must_== Maybe.empty
     }
 
     "elemAt" ! forAll { (a: Byte ==>> Int, b: Byte) =>
-      a.elemAt(b) must_=== a.toList.lift(b)
+      a.elemAt(b) must_=== Maybe.fromOption(a.toList.lift(b))
     }
   }
 
@@ -215,41 +216,41 @@ object MapTest extends SpecLite {
     val d = fromList(List(5 -> "a", 3 -> "b"))
 
     "value lookup" in {
-      fromList(List(("John","Sales"), ("Bob","IT"))).lookup("John") must_===(Some("Sales"))
-      fromList(List(("John","Sales"), ("Bob","IT"))).lookup("Sarah") must_===(None)
+      fromList(List(("John","Sales"), ("Bob","IT"))).lookup("John") must_=== just("Sales")
+      fromList(List(("John","Sales"), ("Bob","IT"))).lookup("Sarah") must_=== Maybe.empty
     }
 
     "index lookup" in {
-      d.lookupIndex(2).isDefined must_== false
-      d.lookupIndex(3).get must_== 0
-      d.lookupIndex(5).get must_== 1
-      d.lookupIndex(6).isDefined must_== false
+      d.lookupIndex(2).isJust must_== false
+      d.lookupIndex(3) must_== just(0)
+      d.lookupIndex(5) must_== just(1)
+      d.lookupIndex(6).isJust must_== false
     }
 
     "value lookupLT" in {
-      fromList(List((3,"a"), (5,"b"))).lookupLT(3) must_=== None
-      fromList(List((3,"a"), (5,"b"))).lookupLT(4) must_=== Some((3, "a"))
+      fromList(List((3,"a"), (5,"b"))).lookupLT(3) must_=== Maybe.empty
+      fromList(List((3,"a"), (5,"b"))).lookupLT(4) must_=== just((3, "a"))
     }
 
     "value lookupGT" in {
-      fromList(List((3,"a"), (5,"b"))).lookupGT(5) must_=== None
-      fromList(List((3,"a"), (5,"b"))).lookupGT(3) must_=== Some((5, "b"))
+      fromList(List((3,"a"), (5,"b"))).lookupGT(5) must_=== Maybe.empty
+      fromList(List((3,"a"), (5,"b"))).lookupGT(3) must_=== just((5, "b"))
     }
 
     "value lookupLE" in {
-      fromList(List((3,"a"), (5,"b"))).lookupLE(2) must_=== None
-      fromList(List((3,"a"), (5,"b"))).lookupLE(3) must_=== Some((3, "a"))
-      fromList(List((3,"a"), (5,"b"))).lookupLE(4) must_=== Some((3, "a"))
+      fromList(List((3,"a"), (5,"b"))).lookupLE(2) must_=== Maybe.empty
+      fromList(List((3,"a"), (5,"b"))).lookupLE(3) must_=== just((3, "a"))
+      fromList(List((3,"a"), (5,"b"))).lookupLE(4) must_=== just((3, "a"))
     }
 
     "value lookupGE" in {
-      fromList(List((3,"a"), (5,"b"))).lookupGE(6) must_=== None
-      fromList(List((3,"a"), (5,"b"))).lookupGE(5) must_=== Some((5, "b"))
-      fromList(List((3,"a"), (5,"b"))).lookupGE(4) must_=== Some((5, "b"))
+      fromList(List((3,"a"), (5,"b"))).lookupGE(6) must_=== Maybe.empty
+      fromList(List((3,"a"), (5,"b"))).lookupGE(5) must_=== just((5, "b"))
+      fromList(List((3,"a"), (5,"b"))).lookupGE(4) must_=== just((5, "b"))
     }
 
     "lookup" ! forAll { (a: Byte ==>> Int, n: Byte) =>
-      a.lookup(n) must_=== a.toList.find(_._1 == n).map(_._2)
+      a.lookup(n).toOption must_=== a.toList.find(_._1 == n).map(_._2)
     }
 
     "lookupAssoc" ! forAll { (a: Byte ==>> Int, n: Byte) =>
@@ -364,12 +365,12 @@ object MapTest extends SpecLite {
       //-- > updateAt (\_ _  -> Nothing)  (-1) (fromList [(5,"a"), (3,"b")])    Error: index out of range
       val d = fromList(List(5 -> "a", 3 -> "b"))
 
-      d.updateAt(0, (_, _) => "x".some) must_===(fromList(List(3 -> "x", 5 -> "a")))
-      d.updateAt(1, (_, _) => "x".some) must_===(fromList(List(3 -> "b", 5 -> "x")))
+      d.updateAt(0, (_, _) => just("x")) must_=== fromList(List(3 -> "x", 5 -> "a"))
+      d.updateAt(1, (_, _) => just("x")) must_=== fromList(List(3 -> "b", 5 -> "x"))
       //d.updateAt(2, (_, _) => "x".some) must_===(empty[Int, String])
 
-      d.updateAt(0, (_, _) => None) must_===(singleton(5, "a"))
-      d.updateAt(1, (_, _) => None) must_===(singleton(3, "b"))
+      d.updateAt(0, (_, _) => Maybe.empty) must_=== singleton(5, "a")
+      d.updateAt(1, (_, _) => Maybe.empty) must_=== singleton(3, "b")
     }
   }
 
@@ -408,7 +409,7 @@ object MapTest extends SpecLite {
         m.size must_=== c.size
       else
         (m.size + 1) must_=== c.size
-      c.lookup(a) must_=== Some(b)
+      c.lookup(a) must_=== just(b)
     }
 
     "insertWith" in {
@@ -525,12 +526,12 @@ object MapTest extends SpecLite {
     }
 
     "differenceWith" in {
-      val f = (al: String, ar: String) => if (al == "b") Some(al + ":" + ar) else None
+      val f = (al: String, ar: String) => if (al == "b") just(al + ":" + ar) else Maybe.empty[String]
       fromList(List(5 -> "a", 3 -> "b")).differenceWith(fromList(List(5 -> "A", 3 -> "B", 7 -> "C")))(f) must_===(singleton(3, "b:B"))
     }
 
     "differenceWithKey" in {
-      val f = (k: Int, al: String, ar: String) => if (al == "b") Some(k.toString + ":" + al + "|" + ar) else None
+      val f = (k: Int, al: String, ar: String) => if (al == "b") just(k.toString + ":" + al + "|" + ar) else Maybe.empty[String]
       fromList(List(5 -> "a", 3 -> "b")).differenceWithKey(fromList(List(5 -> "A", 3 -> "B", 10 -> "C")))(f) must_===(singleton(3, "3:b|B"))
     }
   }
@@ -593,7 +594,7 @@ object MapTest extends SpecLite {
     }
 
     "update" in {
-      val f = (x: String) => if (x == "a") Some("new a") else None
+      val f = (x: String) => if (x == "a") just("new a") else Maybe.empty[String]
 
       fromList(List(5 -> "a", 3 -> "b")).update(5, f) must_===(fromList(List(3 -> "b", 5 -> "new a")))
       fromList(List(5 -> "a", 3 -> "b")).update(7, f) must_===(fromList(List(3 -> "b", 5 -> "a")))
@@ -601,7 +602,7 @@ object MapTest extends SpecLite {
     }
 
     "updateWithKey" in {
-      val f = (k: Int, x: String) => if (x == "a") Some(k.toString + ":new a") else None
+      val f = (k: Int, x: String) => if (x == "a") just(k.toString + ":new a") else Maybe.empty[String]
 
       fromList(List(5 -> "a", 3 -> "b")).updateWithKey(5, f) must_===(fromList(List(3 -> "b", 5 -> "5:new a")))
       fromList(List(5 -> "a", 3 -> "b")).updateWithKey(7, f) must_===(fromList(List(3 -> "b", 5 -> "a")))
@@ -610,19 +611,19 @@ object MapTest extends SpecLite {
 
     "updateLookupWithKey" in {
       import std.tuple._
-      val f = (k: Int, x: String) => if (x == "a") Some(k.toString + ":new a") else None
+      val f = (k: Int, x: String) => if (x == "a") just(k.toString + ":new a") else Maybe.empty[String]
 
-      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(5, f) must_===((Some("5:new a"), fromList(List(3 -> "b", 5 -> "5:new a"))))
-      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(7, f) must_===((None, fromList(List(3 -> "b", 5 -> "a"))))
-      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(3, f) must_===((Some("b"), singleton(5, "a")))
+      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(5, f) must_===((just("5:new a"), fromList(List(3 -> "b", 5 -> "5:new a"))))
+      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(7, f) must_===((Maybe.empty, fromList(List(3 -> "b", 5 -> "a"))))
+      fromList(List(5 -> "a", 3 -> "b")).updateLookupWithKey(3, f) must_===((just("b"), singleton(5, "a")))
     }
 
     "alter" in {
-      val f1 = (_: Option[String]) => none[String]
+      val f1 = (_: Maybe[String]) => Maybe.empty[String]
       fromList(List(5 -> "a", 3 -> "b")).alter(7, f1) must_===(fromList(List(3 -> "b", 5 -> "a")))
       fromList(List(5 -> "a", 3 -> "b")).alter(5, f1) must_===(singleton(3, "b"))
 
-      val f2 = (_: Option[String]) => "c".some
+      val f2 = (_: Maybe[String]) => just("c")
       fromList(List(5 -> "a", 3 -> "b")).alter(7, f2) must_===(fromList(List(3 -> "b", 5 -> "a", 7 -> "c")))
       fromList(List(5 -> "a", 3 -> "b")).alter(5, f2) must_===(fromList(List(3 -> "b", 5 -> "c")))
     }
@@ -647,7 +648,7 @@ object MapTest extends SpecLite {
       if(a isSubmapOf b){
         (a.keySet isSubsetOf b.keySet) must_=== true
         a.difference(b) must_=== ==>>.empty
-        a.toList.foreach{case (k, v) => b.lookup(k) must_=== Some(v)}
+        a.toList.foreach{case (k, v) => b.lookup(k) must_=== just(v)}
       }
     }
   }
@@ -736,13 +737,13 @@ object MapTest extends SpecLite {
     }
 
     "mapOption" in {
-      val f = (x: String) => if (x == "a") Some("new a") else None
-      fromList(List(5 -> "a", 3 -> "b")).mapOption(f) must_===(singleton(5, "new a"))
+      val f = (x: String) => if (x == "a") just("new a") else Maybe.empty[String]
+      fromList(List(5 -> "a", 3 -> "b")).mapMaybe(f) must_=== singleton(5, "new a")
     }
 
     "mapOptionWithKey" in {
-      val f = (k: Int, _: String) => if (k < 5) Some("key : " + k.toString) else None
-      fromList(List(5 -> "a", 3 -> "b")).mapOptionWithKey(f) must_===(singleton(3, "key : 3"))
+      val f = (k: Int, _: String) => if (k < 5) just("key : " + k.toString) else Maybe.empty[String]
+      fromList(List(5 -> "a", 3 -> "b")).mapMaybeWithKey(f) must_=== singleton(3, "key : 3")
     }
 
     "mapEither" in {
@@ -1000,7 +1001,7 @@ object MapTest extends SpecLite {
 
     x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB.member(k)).map(This(_))
     x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA.member(k)).map(That(_))
-    x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB.member(k)).mapWithKey((k, v) => Both(v, b.lookup(k).get))
+    x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB.member(k)).mapWithKey((k, v) => Both(v, b.lookup(k).toOption.get))
   }
 
   type IntMap[A] = Int ==>> A
