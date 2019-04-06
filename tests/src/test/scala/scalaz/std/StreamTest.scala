@@ -80,11 +80,11 @@ object StreamTest extends SpecLite {
 
   "foldMap1Opt identity" ! forAll {
     xs: Stream[Int] =>
-    Foldable[Stream].foldMap1Opt(xs)(Stream(_)).getOrElse(Stream.empty) must_===(xs)
+    Foldable[Stream].foldMap1Maybe(xs)(Stream(_)).getOrElse(Stream.empty) must_===(xs)
   }
 
   "foldMap1Opt evaluates lazily" in {
-    Foldable[Stream].foldMap1Opt(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(Some(false))
+    Foldable[Stream].foldMap1Maybe(Stream.continually(false))(identity)(booleanInstance.conjunction) must_===(Some(false))
   }
 
   "foldRight evaluates lazily" in {
@@ -93,20 +93,20 @@ object StreamTest extends SpecLite {
 
   "foldMapLeft1Opt identity" ! forAll {
     (xs: Stream[Int]) =>
-    Foldable[Stream].foldMapLeft1Opt(xs.reverse)(Stream(_))((xs, x) => x #:: xs) must_===(
+    Foldable[Stream].foldMapLeft1Maybe(xs.reverse)(Stream(_))((xs, x) => x #:: xs) must_===(
       if (xs.isEmpty) None else Some(xs)
     )
   }
 
   "foldMapRight1Opt identity" ! forAll {
     (xs: Stream[Int]) =>
-    Foldable[Stream].foldMapRight1Opt(xs)(Stream(_))(_ #:: _) must_===(
+    Foldable[Stream].foldMapRight1Maybe(xs)(Stream(_))(_ #:: _) must_===(
       if (xs.isEmpty) None else Some(xs)
     )
   }
 
   "foldMapRight1Opt evaluates lazily" in {
-    Foldable[Stream].foldMapRight1Opt(Stream.continually(true))(identity)(_ || _) must_===(Some(true))
+    Foldable[Stream].foldMapRight1Maybe(Stream.continually(true))(identity)(_ || _) must_===(Some(true))
   }
 
   "zipL" in {

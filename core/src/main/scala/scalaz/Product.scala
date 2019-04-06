@@ -99,11 +99,11 @@ private trait ProductFoldable1L[F[_], G[_]] extends Foldable1[λ[α => (F[α], G
   implicit def F: Foldable1[F]
 
   override def foldMapRight1[A, B](fa: (F[A], G[A]))(z: A => B)(f: (A, => B) => B): B =
-    cata(G.foldMapRight1Opt(fa._2)(z)(f))(F.foldRight(fa._1, _)(f), F.foldMapRight1(fa._1)(z)(f))
+    cata(G.foldMapRight1Maybe(fa._2)(z)(f))(F.foldRight(fa._1, _)(f), F.foldMapRight1(fa._1)(z)(f))
 
   override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
     val resume = F.foldMap1(fa._1)(f)
-    cata(G.foldMap1Opt(fa._2)(f))(S.append(resume, _), resume)
+    cata(G.foldMap1Maybe(fa._2)(f))(S.append(resume, _), resume)
   }
 
   override def foldMapLeft1[A, B](fa: (F[A], G[A]))(z: A => B)(f: (B, A) => B): B =
@@ -118,11 +118,11 @@ private trait ProductFoldable1R[F[_], G[_]] extends Foldable1[λ[α => (F[α], G
 
   override def foldMap1[A,B](fa: (F[A], G[A]))(f: A => B)(implicit S: Semigroup[B]): B = {
     def resume = G.foldMap1(fa._2)(f)
-    cata(F.foldMap1Opt(fa._1)(f))(S.append(_, resume), resume)
+    cata(F.foldMap1Maybe(fa._1)(f))(S.append(_, resume), resume)
   }
 
   override def foldMapLeft1[A, B](fa: (F[A], G[A]))(z: A => B)(f: (B, A) => B): B =
-    cata(F.foldMapLeft1Opt(fa._1)(z)(f))(G.foldLeft(fa._2, _)(f), G.foldMapLeft1(fa._2)(z)(f))
+    cata(F.foldMapLeft1Maybe(fa._1)(z)(f))(G.foldLeft(fa._2, _)(f), G.foldMapLeft1(fa._2)(z)(f))
 }
 
 private trait ProductFoldable1[F[_], G[_]] extends Foldable1[λ[α => (F[α], G[α])]] with ProductFoldable[F, G] {

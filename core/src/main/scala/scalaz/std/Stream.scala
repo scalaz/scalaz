@@ -46,7 +46,7 @@ trait StreamInstances {
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
-    override def foldMapLeft1Opt[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Option[B] = fa match {
+    override def foldMapLeft1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Option[B] = fa match {
       case Stream.Empty => None
       case hd #:: tl => Some(tl.foldLeft(z(hd))(f))
     }
@@ -57,10 +57,10 @@ trait StreamInstances {
         case None => Maybe.empty
       })
 
-    override def foldMap1Opt[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
-      foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))
+    override def foldMap1Maybe[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
+      foldMapRight1Maybe(fa)(f)((l, r) => B.append(f(l), r))
 
-    override def foldMapRight1Opt[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+    override def foldMapRight1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
       def rec(hd: A, tl: Stream[A]): B = tl match {
         case Stream.Empty => z(hd)
         case h #:: t => f(hd, rec(h, t))

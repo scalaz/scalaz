@@ -261,7 +261,7 @@ private trait CofreeFoldable[F[_]] extends Foldable1[Cofree[F, ?]]{
 
   override def foldMap1[A, B](fa: Cofree[F, A])(f: A => B)(implicit S: Semigroup[B]): B = {
     val h = f(fa.head)
-    F.foldMap1Opt(fa.tail)(foldMap1(_)(f)).map(S.append(h, _)).getOrElse(h)
+    F.foldMap1Maybe(fa.tail)(foldMap1(_)(f)).map(S.append(h, _)).getOrElse(h)
   }
 }
 

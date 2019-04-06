@@ -377,7 +377,7 @@ sealed abstract class ZipperInstances {
       fa.lefts.exists(f) || f(fa.focus) || fa.rights.exists(f)
     override def foldMap1[A, B](fa: Zipper[A])(f: A => B)(implicit F: Semigroup[B]) =
       fa.rights.foldLeft(
-        Foldable[Stream].foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
+        Foldable[Stream].foldMapRight1Maybe(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
           case Some(b) => F.append(b, f(fa.focus))
           case None => f(fa.focus)
         }
@@ -385,14 +385,14 @@ sealed abstract class ZipperInstances {
     override def foldMapRight1[A, B](fa: Zipper[A])(z: A => B)(f: (A, => B) => B) =
       Foldable[Stream].foldLeft(
         fa.lefts,
-        Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
+        Foldable[Stream].foldMapRight1Maybe(fa.rights)(z)(f) match {
           case Some(b) => f(fa.focus, b)
           case None => z(fa.focus)
         }
       )((b, a) => f(a, b))
     override def foldMapLeft1[A, B](fa: Zipper[A])(z: A => B)(f: (B, A) => B) =
       fa.rights.foldLeft(
-        Foldable[Stream].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
+        Foldable[Stream].foldMapRight1Maybe(fa.lefts)(z)((a, b) => f(b, a)) match {
           case Some(b) => f(b, fa.focus)
           case None => z(fa.focus)
         }

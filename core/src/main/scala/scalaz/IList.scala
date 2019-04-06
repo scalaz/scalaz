@@ -658,8 +658,8 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)((a, b) => f(a, b))
 
-      override def foldMapRight1Opt[A, B](fa: IList[A])(z: A => B)(f: (A, => B) => B) =
-        foldMapLeft1Opt(fa.reverse)(z)((b, a) => f(a, b))
+      override def foldMapRight1Maybe[A, B](fa: IList[A])(z: A => B)(f: (A, => B) => B) =
+        foldMapLeft1Maybe(fa.reverse)(z)((b, a) => f(a, b))
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
         M.unfoldrSum(fa)(as => as.headOption match {
@@ -667,13 +667,13 @@ sealed abstract class IListInstances extends IListInstance0 {
           case None => Maybe.empty
         })
 
-      override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
+      override def foldMap1Maybe[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
         fa match {
           case ICons(h, t) => Some(t.foldLeft(f(h))((b, a) => M.append(b, f(a))))
           case INil() => None
         }
 
-      override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(f: (B, A) => B) =
+      override def foldMapLeft1Maybe[A, B](fa: IList[A])(z: A => B)(f: (B, A) => B) =
         fa match {
           case ICons(h, t) => Some(t.foldLeft(z(h))(f))
           case INil() => None

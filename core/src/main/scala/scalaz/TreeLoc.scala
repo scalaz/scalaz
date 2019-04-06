@@ -325,17 +325,17 @@ sealed abstract class TreeLocInstances {
     }
 
     override def foldMapRight1[A, B](fa: TreeLoc[A])(z: A => B)(f: (A, => B) => B) =
-      ParentsT.foldMapRight1Opt(fa.parents)(z)(f) match {
+      ParentsT.foldMapRight1Maybe(fa.parents)(z)(f) match {
         case Some(p) =>
           fa.tree.foldRight(
             ForestT.foldRight(fa.lefts, ForestT.foldRight(fa.rights, p)(f))(f)
           )(f)
         case None =>
-          ForestT.foldMapRight1Opt(fa.rights)(z)(f) match {
+          ForestT.foldMapRight1Maybe(fa.rights)(z)(f) match {
             case Some(r) =>
               fa.tree.foldRight(ForestT.foldRight(fa.lefts, r)(f))(f)
             case None =>
-              ForestT.foldMapRight1Opt(fa.lefts)(z)(f) match {
+              ForestT.foldMapRight1Maybe(fa.lefts)(z)(f) match {
                 case Some(l) =>
                   fa.tree.foldRight(l)(f)
                 case None =>
@@ -387,7 +387,7 @@ sealed abstract class TreeLocInstances {
       }
 
       override def foldMapRight1[A, B](fa: Parent[A])(z: A => B)(f: (A, => B) => B): B =
-        ForestT.foldMapRight1Opt(fa._3)(z)(f) match {
+        ForestT.foldMapRight1Maybe(fa._3)(z)(f) match {
           case Some(r) =>
             ForestT.foldRight(fa._1, f(fa._2, r))(f)
           case None =>
