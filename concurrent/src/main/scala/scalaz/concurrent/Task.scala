@@ -66,7 +66,7 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * are reraised.
    */
   def handle[B>:A](f: PartialFunction[Throwable,B]): Task[B] =
-    handleWith(f andThen Task.now)
+    handleWith(f.andThen(x => Task.now(x)))
 
   /**
    * Calls `attempt` and handles some exceptions using the given partial
