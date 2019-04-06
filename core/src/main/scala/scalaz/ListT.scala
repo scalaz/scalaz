@@ -26,7 +26,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
 
   def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(_.headMaybe))
 
-  def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.map(_._2).getOrElse(ListT.empty))
+  def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.map(_._2).toOption.get)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(run)(_.filter(p)))
 
@@ -63,7 +63,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
     ListT(f(run))
 
   /**Don't use iteratively! */
-  def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailMaybe.getOrElse(IList.empty)))
+  def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailMaybe.toOption.get))
 
   def tailMaybe(implicit M: Functor[M]) : ListT[Lambda[a => M[Maybe[a]]], A] = new ListT[Lambda[a => M[Maybe[a]]], A](M.map(run)(_.tailMaybe))
 
