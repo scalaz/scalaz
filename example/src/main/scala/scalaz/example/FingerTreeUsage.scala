@@ -1,7 +1,7 @@
 package scalaz
 package example
 
-import collection.immutable.Stream
+import scala.collection.immutable.Stream
 
 
 object FingerTreeUsage extends App{

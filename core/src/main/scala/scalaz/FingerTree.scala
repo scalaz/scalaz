@@ -1,6 +1,6 @@
 package scalaz
 
-import collection.Iterator
+import scala.collection.Iterator
 import Maybe.Just
 import std.list.listMonoid
 import std.option._
