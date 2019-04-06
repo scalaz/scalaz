@@ -64,7 +64,7 @@ object Memo extends MemoInstances {
     */
   def doubleArrayMemo(n: Int, sentinel: Double = 0d): Memo[Int, Double] = new DoubleArrayMemo(n, sentinel)
 
-  import collection.mutable
+  import scala.collection.mutable
 
   private def mutableMapMemo[K, V](a: mutable.Map[K, V]): Memo[K, V] = memo[K, V](f => k => a.getOrElseUpdate(k, f(k)))
 
@@ -74,7 +74,7 @@ object Memo extends MemoInstances {
     */
   def mutableHashMapMemo[K, V]: Memo[K, V] = mutableMapMemo(new mutable.HashMap[K, V])
 
-  import collection.immutable
+  import scala.collection.immutable
 
   def immutableMapMemo[K, V](m: immutable.Map[K, V]): Memo[K, V] = {
     var a = m
