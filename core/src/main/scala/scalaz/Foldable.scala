@@ -1,7 +1,5 @@
 package scalaz
 
-import scalaz.Maybe.{Empty, Just, just}
-
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -334,10 +332,10 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, (List.empty[NonEmptyList[A]], Maybe.empty[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
-        case (_, Empty()) => List(NonEmptyList(a))
+        case (_, Maybe.Empty()) => List(NonEmptyList(a))
         case (Nil, _) => List(NonEmptyList(a))
-        case (x@(head :: tail), Just(q)) => if (pa == q) (a <:: head) :: tail else NonEmptyList(a) :: x
-      }, just(pa))
+        case (x@(head :: tail), Maybe.Just(q)) => if (pa == q) (a <:: head) :: tail else NonEmptyList(a) :: x
+      }, Maybe.just(pa))
     })._1
 
   /**
