@@ -335,7 +335,7 @@ trait Foldable[F[_]]  { self =>
       val pa = p(a)
       (b match {
         case (_, Empty()) => List(NonEmptyList(a))
-        case (x@Nil, _) => NonEmptyList(a) :: x
+        case (Nil, _) => List(NonEmptyList(a))
         case (x@(head :: tail), Just(q)) => if (pa == q) (a <:: head) :: tail else NonEmptyList(a) :: x
       }, just(pa))
     })._1
