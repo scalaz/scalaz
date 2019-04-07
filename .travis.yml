@@ -16,7 +16,6 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.13.0-RC1" ]]; then git clone https://github.com/non/kind-projector.git && cd kind-projector && git checkout eae68daafb5fcae1df246ca0d0db128973d89b8b && sbt 'set version := "0.9.9"' '++ 2.13.0-RC1!' publishLocal && cd .. ; fi
   - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
   - if [[ "${JAVA_HOME}" != $(jdk_switcher home openjdk11) && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
