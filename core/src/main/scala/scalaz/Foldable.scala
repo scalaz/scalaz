@@ -329,14 +329,14 @@ trait Foldable[F[_]]  { self =>
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
   def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, (List.empty[NonEmptyList[A]], Maybe.empty[Boolean]))((a, b) => {
+    foldRight(fa, Maybe.empty[(NonEmptyList[NonEmptyList[A]], Boolean)])((a, b) => {
       val pa = p(a)
-      (b match {
-        case (_, Maybe.Empty()) => List(NonEmptyList(a))
-        case (Nil, _) => List(NonEmptyList(a))
-        case (x@(head :: tail), Maybe.Just(q)) => if (pa == q) (a <:: head) :: tail else NonEmptyList(a) :: x
-      }, Maybe.just(pa))
-    })._1
+      Maybe.just(
+        (b match {
+          case Maybe.Just((x, q)) => if (pa == q) NonEmptyList.nel(a <:: x.head, x.tail) else NonEmptyList(a) <:: x
+          case Maybe.Empty() => NonEmptyList(NonEmptyList(a))
+        }, pa))
+    }).cata(_._1.list.toList, List.empty)
 
   /**
     * Splits the elements into groups that produce the same result by a function f.
@@ -365,12 +365,14 @@ trait Foldable[F[_]]  { self =>
    * Selects groups of elements that satisfy p and discards others.
    */
   def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, List.empty[NonEmptyList[A]])((a, li) => (li, p(a)) match {
-      case (x :: xs, pa) =>
-        if (pa) (a <:: x) :: xs else li
-      case (Nil, pa) =>
-        if (pa) NonEmptyList(a) :: li else li
-    })
+    foldRight(fa, (List.empty[NonEmptyList[A]], true))((a, lb) => (lb, p(a)) match {
+      case ((l, _), false) =>
+        (l, true)
+      case ((x :: xs, false), true) =>
+        ((a <:: x) :: xs, false)
+      case ((l, _), true) =>
+        (NonEmptyList(a) :: l, false)
+    })._1
 
   /** ``O(n log n)`` complexity */
   def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =

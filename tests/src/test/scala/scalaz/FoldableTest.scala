@@ -309,6 +309,14 @@ object FoldableTest extends SpecLite {
       L.selectSplit(l)(p).flatMap(_.toList) must_=== l.partition(p)._1
   }
 
+  "selectSplit: more than one list for multiple ranges" ! forAll {
+    (limit: Int) =>
+      val l = Math.abs(limit)
+      val splitRange = L.selectSplit(List.range(0, l))(_ % 2 != 0)
+      splitRange.size must_=== (l + 1)/2
+      splitRange.forall(_.size == 1) must_=== true
+  }
+
   /*
   "foldRight from foldMap" should {
 
