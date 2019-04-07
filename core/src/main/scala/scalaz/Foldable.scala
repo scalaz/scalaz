@@ -1,5 +1,7 @@
 package scalaz
 
+import scalaz.Maybe.{Empty, Just, just}
+
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -329,12 +331,13 @@ trait Foldable[F[_]]  { self =>
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
   def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, (List[NonEmptyList[A]](), None : Option[Boolean]))((a, b) => {
+    foldRight(fa, (List.empty[NonEmptyList[A]], Maybe.empty[Boolean]))((a, b) => {
       val pa = p(a)
       (b match {
-        case (_, None) => NonEmptyList(a) :: Nil
-        case (x, Some(q)) => if (pa == q) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
-      }, Some(pa))
+        case (_, Empty()) => List(NonEmptyList(a))
+        case (x@Nil, _) => NonEmptyList(a) :: x
+        case (x@(head :: tail), Just(q)) => if (pa == q) (a <:: head) :: tail else NonEmptyList(a) :: x
+      }, just(pa))
     })._1
 
   /**
@@ -364,16 +367,12 @@ trait Foldable[F[_]]  { self =>
    * Selects groups of elements that satisfy p and discards others.
    */
   def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, (List[NonEmptyList[A]](), false))((a, xb) => xb match {
-      case (x, b) => {
-        val pa = p(a)
-        (if (pa)
-          if (b)
-            (a <:: x.head) :: x.tail else
-            NonEmptyList(a) :: x
-        else x, pa)
-      }
-    })._1
+    foldRight(fa, List.empty[NonEmptyList[A]])((a, li) => (li, p(a)) match {
+      case (x :: xs, pa) =>
+        if (pa) (a <:: x) :: xs else li
+      case (Nil, pa) =>
+        if (pa) NonEmptyList(a) :: li else li
+    })
 
   /** ``O(n log n)`` complexity */
   def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =
