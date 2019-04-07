@@ -313,7 +313,7 @@ object FoldableTest extends SpecLite {
     (limit: Int) =>
       val l = Math.abs(limit)
       val splitRange = L.selectSplit(List.range(0, l))(_ % 2 != 0)
-      splitRange.size must_=== (l + 1)/2
+      splitRange.size must_=== l/2
       splitRange.forall(_.size == 1) must_=== true
   }
 
