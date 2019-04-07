@@ -310,9 +310,9 @@ object FoldableTest extends SpecLite {
   }
 
   "selectSplit range consistent with filter" ! forAll {
-    (limit: Byte) =>
-      val l = Math.abs(limit.toInt)
-      val range = List.range(0, l)
+    (i1: Byte, i2: Byte) =>
+      val (s, e) = (Math.min(i1.toInt, i2.toInt), Math.max(i1.toInt, i2.toInt))
+      val range = List.range(s, e)
       L.selectSplit(range)(_ % 2 != 0) must_=== range.filter(_ % 2 != 0).map(NonEmptyList(_))
   }
 
