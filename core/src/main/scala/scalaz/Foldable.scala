@@ -364,15 +364,14 @@ trait Foldable[F[_]]  { self =>
   /**
    * Selects groups of elements that satisfy p and discards others.
    */
-  def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
-    foldRight(fa, (List.empty[NonEmptyList[A]], true))((a, lb) => (lb, p(a)) match {
-      case ((l, _), false) =>
-        (l, true)
-      case ((x :: xs, false), true) =>
-        ((a <:: x) :: xs, false)
-      case ((l, _), true) =>
-        (NonEmptyList(a) :: l, false)
-    })._1
+  def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] = {
+    def squash(t: (List[NonEmptyList[A]], IList[A])): List[NonEmptyList[A]] = t._2.toNel.toList ::: t._1
+
+    squash(foldRight(fa, (List.empty[NonEmptyList[A]], IList.empty[A]))((a, l) =>
+      if (p(a)) (l._1, a :: l._2)
+      else (squash(l), IList.empty)
+    ))
+  }
 
   /** ``O(n log n)`` complexity */
   def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =
