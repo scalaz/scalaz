@@ -7,6 +7,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
 import org.scalacheck.Prop.forAll
+import Maybe.just
 
 object VectorTest extends SpecLite {
   implicit def vectorArb[A: Arbitrary] =
@@ -79,8 +80,8 @@ object VectorTest extends SpecLite {
       val wxs = findM[Int, W](xs)(x =>
         WriterT.writer(Vector(x) -> evenp(x)))
       (wxs.written, wxs.value) must_==={
-        if (i < 0) (xs, None)
-        else (xs take (i+1), Some(xs(i)))
+        if (i < 0) (xs, Maybe.empty)
+        else (xs take (i+1), just(xs(i)))
       }
   }
 

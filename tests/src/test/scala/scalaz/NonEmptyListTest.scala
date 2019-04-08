@@ -4,6 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
+import scalaz.Maybe.just
 
 object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
@@ -55,7 +56,7 @@ object NonEmptyListTest extends SpecLite {
   }
 
   "distinct" ! forAll { xs: NonEmptyList[Int] =>
-    Option(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
+    just(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }
 
   "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>

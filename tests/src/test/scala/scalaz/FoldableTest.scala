@@ -6,6 +6,7 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
+import scalaz.Maybe.{Empty, Just}
 //import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
@@ -223,8 +224,8 @@ object FoldableTest extends SpecLite {
     "foldMap1Opt" ! forAll {
       (xs: List[String]) =>
         xs.toNel match {
-          case None      => (xs foldMap1Opt strlen) must_== None
-          case Some(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
+          case Empty()      => (xs foldMap1Opt strlen) must_== None
+          case Just(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
         }
     }
 

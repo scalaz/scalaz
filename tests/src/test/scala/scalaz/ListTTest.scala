@@ -33,7 +33,7 @@ object ListTTest extends SpecLite {
 
   "find" ! forAll {
     (ass: ListTOpt[Int]) =>
-      ass.find(_ > 0 ) must_===(OptionT.optionT(ass.run.map(_.find( _ > 0))))
+      ass.find(_ > 0 ) must_=== MaybeT.maybeT(ass.run.map(_.find( _ > 0)))
   }
 
   "drop" ! forAll {

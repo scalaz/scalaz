@@ -1,14 +1,16 @@
 package scalaz
 
+import Maybe.just
+
 /**
  * ListT monad transformer.
  */
 
 final case class ListT[M[_], A](run: M[IList[A]]){
-  def uncons(implicit M: Applicative[M]): M[Option[(A, ListT[M, A])]] = {
+  def uncons(implicit M: Applicative[M]): M[Maybe[(A, ListT[M, A])]] = {
     M.map(run) {
-      case INil() => None
-      case ICons(listHead, listTail) => Some((listHead, new ListT(M.point(listTail))))
+      case INil() => Maybe.empty
+      case ICons(listHead, listTail) => just((listHead, new ListT(M.point(listTail))))
     }
   }
 
@@ -20,11 +22,11 @@ final case class ListT[M[_], A](run: M[IList[A]]){
 
   def headOption(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.headOption))
 
-  def find(predicate: A => Boolean)(implicit M: Functor[M]) : OptionT[M, A] = new OptionT(M.map(run)(_.find(predicate)))
+  def find(predicate: A => Boolean)(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(_.find(predicate)))
 
-  def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(l => Maybe.fromOption(l.headOption)))
+  def headMaybe(implicit M: Functor[M]) : MaybeT[M, A] = new MaybeT(M.map(run)(_.headMaybe))
 
-  def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.get._2)
+  def tailM(implicit M: Applicative[M]) : M[ListT[M, A]] = M.map(uncons)(_.map(_._2).toOption.get)
 
   def filter(p: A => Boolean)(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(run)(_.filter(p)))
 
@@ -61,9 +63,9 @@ final case class ListT[M[_], A](run: M[IList[A]]){
     ListT(f(run))
 
   /**Don't use iteratively! */
-  def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailOption.get))
+  def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailMaybe.toOption.get))
 
-  def tailOption(implicit M: Functor[M]) : ListT[Lambda[a => M[Option[a]]], A] = new ListT[Lambda[a => M[Option[a]]], A](M.map(run)(_.tailOption))
+  def tailMaybe(implicit M: Functor[M]) : ListT[Lambda[a => M[Maybe[a]]], A] = new ListT[Lambda[a => M[Maybe[a]]], A](M.map(run)(_.tailMaybe))
 
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Functor[M]) : M[B] = M.map(run)(_.foldLeft(z){(left, right) => f(left, right)})
 
