@@ -291,7 +291,7 @@ object FoldableTest extends SpecLite {
     (l: List[Int], p: Int => Boolean) =>
       import scalaz.syntax.std.list._
       val (trueL, falseL) = l.partition(p)
-      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel)
+      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel.toOption)
   }
 
   "selectSplit: removes all non-satisfying elements" ! forAll {
