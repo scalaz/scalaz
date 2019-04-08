@@ -3,6 +3,7 @@ package std
 
 import vector._
 import annotation.{switch, tailrec}
+import Maybe.just
 
 sealed trait VectorInstances0 {
   implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new VectorEqual[A] {
@@ -109,13 +110,13 @@ trait VectorFunctions {
   final def intersperse[A](as: Vector[A], a: A): Vector[A] =
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
-  final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] =
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
+  final def toNel[A](as: Vector[A]): Maybe[NonEmptyList[A]] =
+    if (as.isEmpty) Maybe.empty else just(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
 
-  final def toZipper[A](as: Vector[A]): Option[Zipper[A]] =
+  final def toZipper[A](as: Vector[A]): Maybe[Zipper[A]] =
     stream.toZipper(as.toStream)
 
-  final def zipperEnd[A](as: Vector[A]): Option[Zipper[A]] =
+  final def zipperEnd[A](as: Vector[A]): Maybe[Zipper[A]] =
     stream.zipperEnd(as.toStream)
 
   /**
@@ -146,10 +147,10 @@ trait VectorFunctions {
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
     */
-  final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Option[A]] =
-    lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
+  final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Maybe[A]] =
+    lazyFoldRight(as, Monad[M].point(Maybe.empty[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
-        if (b) Monad[M].point(Some(a): Option[A]) else g))
+        if (b) Monad[M].point(just[A](a)) else g))
 
   final def powerset[A](as: Vector[A]): Vector[Vector[A]] = {
     import vector.vectorInstance

@@ -64,7 +64,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   }
 
   /** @since 7.0.2 */
-  def init: IList[A] = tail.initOption.fold[IList[A]](IList.empty)(il => head :: il)
+  def init: IList[A] = tail.initMaybe.cata(il => head :: il, IList.empty[A])
 
   def inits: NonEmptyList[NonEmptyList[A]] =
     reverse.tails.map(_.reverse)
@@ -172,7 +172,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Alt[NonEmptyList] with BindRec[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] {
       override def findLeft[A](fa: NonEmptyList[A])(f: A => Boolean) =
-        if(f(fa.head)) Some(fa.head) else fa.tail.find(f)
+        if(f(fa.head)) Some(fa.head) else fa.tail.find(f).toOption
 
       override def foldMap[A, B](fa: NonEmptyList[A])(f: A => B)(implicit M: Monoid[B]) =
         Foldable[IList].foldMap(fa.list)(f)(M)

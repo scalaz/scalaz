@@ -10,11 +10,11 @@ final class ListOps[A](private val self: List[A]) extends AnyVal {
 
   final def tailOption: Option[List[A]] = l.tailOption(self)
 
-  final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
+  final def toNel: Maybe[NonEmptyList[A]] = l.toNel(self)
 
-  final def toZipper: Option[Zipper[A]] = l.toZipper(self)
+  final def toZipper: Maybe[Zipper[A]] = l.toZipper(self)
 
-  final def zipperEnd: Option[Zipper[A]] = l.zipperEnd(self)
+  final def zipperEnd: Maybe[Zipper[A]] = l.zipperEnd(self)
 
   final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = l.<^>(self)(f)
 
@@ -24,7 +24,7 @@ final class ListOps[A](private val self: List[A]) extends AnyVal {
 
   final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[List[A]] = l.filterM(self)(p)
 
-  final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = l.findM(self)(p)
+  final def findM[M[_] : Monad](p: A => M[Boolean]): M[Maybe[A]] = l.findM(self)(p)
 
   final def powerset: List[List[A]] = l.powerset(self)
 

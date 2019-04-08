@@ -7,8 +7,8 @@ import scalaz.std.{stream => s}
 
 final class StreamOps[A](private val self: Stream[A]) extends AnyVal {
   final def interleave(other: Stream[A]): Stream[A] = s.interleave(self, other)
-  final def toZipper: Option[Zipper[A]] = s.toZipper(self)
-  final def zipperEnd: Option[Zipper[A]] = s.zipperEnd(self)
+  final def toZipper: Maybe[Zipper[A]] = s.toZipper(self)
+  final def zipperEnd: Maybe[Zipper[A]] = s.zipperEnd(self)
   final def heads: Stream[Stream[A]] = s.heads(self)
   final def tails: Stream[Stream[A]] = s.tails(self)
   final def zapp[B, C](f: Stream[A => B => C]): Stream[B => C] = s.zapp(self)(f)

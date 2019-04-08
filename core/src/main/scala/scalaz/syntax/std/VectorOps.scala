@@ -8,11 +8,11 @@ import scalaz.std.{vector => v}
 final class VectorOps[A](private val self: Vector[A]) extends AnyVal {
   final def intersperse(a: A): Vector[A] = v.intersperse(self, a)
 
-  final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
+  final def toNel: Maybe[NonEmptyList[A]] = v.toNel(self)
 
-  final def toZipper: Option[Zipper[A]] = v.toZipper(self)
+  final def toZipper: Maybe[Zipper[A]] = v.toZipper(self)
 
-  final def zipperEnd: Option[Zipper[A]] = v.zipperEnd(self)
+  final def zipperEnd: Maybe[Zipper[A]] = v.zipperEnd(self)
 
   final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
 
@@ -22,7 +22,7 @@ final class VectorOps[A](private val self: Vector[A]) extends AnyVal {
 
   final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[Vector[A]] = v.filterM(self)(p)
 
-  final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = v.findM(self)(p)
+  final def findM[M[_] : Monad](p: A => M[Boolean]): M[Maybe[A]] = v.findM(self)(p)
 
   final def powerset: Vector[Vector[A]] = v.powerset(self)
 

@@ -1,6 +1,7 @@
 package scalaz
 
 import annotation.tailrec
+import Maybe.{Empty, Just, just}
 
 /**
  * Provides a pointed stream, which is a non-empty zipper-like stream structure that tracks an index (focus)
@@ -37,9 +38,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to next element to the right of focus.
    */
-  def next: Option[Zipper[A]] = rights match {
-    case Stream.Empty => None
-    case r #:: rs     => Some(zipper(Stream.cons(focus, lefts), r, rs))
+  def next: Maybe[Zipper[A]] = rights match {
+    case Stream.Empty => Maybe.empty
+    case r #:: rs     => just(zipper(Stream.cons(focus, lefts), r, rs))
   }
 
   /**
@@ -51,9 +52,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Possibly moves to the previous element to the left of focus.
    */
-  def previous: Option[Zipper[A]] = lefts match {
-    case Stream.Empty => None
-    case l #:: ls     => Some(zipper(ls, l, Stream.cons(focus, rights)))
+  def previous: Maybe[Zipper[A]] = lefts match {
+    case Stream.Empty => Maybe.empty
+    case l #:: ls     => just(zipper(ls, l, Stream.cons(focus, rights)))
   }
 
   /**
@@ -85,17 +86,17 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * An alias for `deleteRight`
    */
-  def delete: Option[Zipper[A]] = deleteRight
+  def delete: Maybe[Zipper[A]] = deleteRight
 
   /**
    * Deletes the element at focus and moves the focus to the left. If there is no element on the left,
    * focus is moved to the right.
    */
-  def deleteLeft: Option[Zipper[A]] = lefts match {
-    case l #:: ls     => Some(zipper(ls, l, rights))
+  def deleteLeft: Maybe[Zipper[A]] = lefts match {
+    case l #:: ls     => just(zipper(ls, l, rights))
     case Stream.Empty => rights match {
-      case r #:: rs     => Some(zipper(Stream.empty, r, rs))
-      case Stream.Empty => None
+      case r #:: rs     => just(zipper(Stream.empty, r, rs))
+      case Stream.Empty => Maybe.empty
     }
   }
 
@@ -110,11 +111,11 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
    * focus is moved to the left.
    */
-  def deleteRight: Option[Zipper[A]] = rights match {
-    case r #:: rs     => Some(zipper(lefts, r, rs))
+  def deleteRight: Maybe[Zipper[A]] = rights match {
+    case r #:: rs     => just(zipper(lefts, r, rs))
     case Stream.Empty => lefts match {
-      case l #:: ls     => Some(zipper(ls, l, Stream.empty))
-      case Stream.Empty => None
+      case l #:: ls     => just(zipper(ls, l, Stream.empty))
+      case Stream.Empty => Maybe.empty
     }
   }
 
@@ -155,20 +156,20 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   def withFocus: Zipper[(A, Boolean)] = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
 
   /**
-   * Moves focus n elements in the zipper, or None if there is no such element.
+   * Moves focus n elements in the zipper, or Maybe.empty if there is no such element.
    *
    * @param  n  number of elements to move (positive is forward, negative is backwards)
    */
-  def move(n: Int): Option[Zipper[A]] = {
+  def move(n: Int): Maybe[Zipper[A]] = {
     @tailrec
-    def move0(z: Option[Zipper[A]], n: Int): Option[Zipper[A]] =
-      if (n > 0 && rights.isEmpty || n < 0 && lefts.isEmpty) None
+    def move0(z: Maybe[Zipper[A]], n: Int): Maybe[Zipper[A]] =
+      if (n > 0 && rights.isEmpty || n < 0 && lefts.isEmpty) Maybe.empty
       else {
         if (n == 0) z
         else if (n > 0) move0(z flatMap ((_: Zipper[A]).next), n - 1)
         else move0(z flatMap ((_: Zipper[A]).previous), n + 1)
       }
-    move0(Some(this), n)
+    move0(just(this), n)
   }
 
   /**
@@ -195,13 +196,13 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
 
   /**
    * Moves focus to the nearest element matching the given predicate, preferring the left,
-   * or None if no element matches.
+   * or Maybe.empty if no element matches.
    */
-  def findZ(p: A => Boolean): Option[Zipper[A]] =
-    if (p(focus)) Some(this)
+  def findZ(p: A => Boolean): Maybe[Zipper[A]] =
+    if (p(focus)) just(this)
     else {
       val c = this.positions
-      std.stream.interleave(c.lefts, c.rights).find((x => p(x.focus)))
+      Maybe.fromOption(std.stream.interleave(c.lefts, c.rights).find(x => p(x.focus)))
     }
 
   /**
@@ -214,12 +215,12 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
    */
-  def findBy(f: Zipper[A] => Option[Zipper[A]])(p: A => Boolean): Option[Zipper[A]] = {
+  def findBy(f: Zipper[A] => Maybe[Zipper[A]])(p: A => Boolean): Maybe[Zipper[A]] = {
     @tailrec
-    def go(zopt: Option[Zipper[A]]): Option[Zipper[A]] = {
+    def go(zopt: Maybe[Zipper[A]]): Maybe[Zipper[A]] = {
       zopt match {
-        case Some(z) => if (p(z.focus)) Some(z) else go(f(z))
-        case None    => None
+        case Just(z) => if (p(z.focus)) just(z) else go(f(z))
+        case Empty()    => Maybe.empty
       }
     }
     go(f(this))
@@ -227,22 +228,22 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
 
   /**
    * Moves focus to the nearest element on the right that matches the given predicate,
-   * or None if there is no such element.
+   * or Maybe.empty if there is no such element.
    */
-  def findNext(p: A => Boolean): Option[Zipper[A]] = findBy((z: Zipper[A]) => z.next)(p)
+  def findNext(p: A => Boolean): Maybe[Zipper[A]] = findBy((z: Zipper[A]) => z.next)(p)
 
   /**
    * Moves focus to the previous element on the left that matches the given predicate,
-   * or None if there is no such element.
+   * or Maybe.empty if there is no such element.
    */
-  def findPrevious(p: A => Boolean): Option[Zipper[A]] = findBy((z: Zipper[A]) => z.previous)(p)
+  def findPrevious(p: A => Boolean): Maybe[Zipper[A]] = findBy((z: Zipper[A]) => z.previous)(p)
 
   /**
    * A zipper of all positions of the zipper, with focus on the current position.
    */
   def positions: Zipper[Zipper[A]] = {
-    val left = std.stream.unfold(this)(_.previous.map(x => (x, x)))
-    val right = std.stream.unfold(this)(_.next.map(x => (x, x)))
+    val left = std.stream.unfoldm(this)(_.previous.map(x => (x, x)))
+    val right = std.stream.unfoldm(this)(_.next.map(x => (x, x)))
 
     zipper(left, this, right)
   }
@@ -279,11 +280,11 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the left. If the focus was on the first element,
    * focus is moved to the last element.
    */
-  def deleteLeftC: Option[Zipper[A]] = lefts match {
-    case l #:: ls     => Some(zipper(ls, l, rights))
+  def deleteLeftC: Maybe[Zipper[A]] = lefts match {
+    case l #:: ls     => just(zipper(ls, l, rights))
     case Stream.Empty => rights match {
-      case _ #:: _      => val rrev = rights.reverse; Some(zipper(rrev.tail, rrev.head, Stream.empty))
-      case Stream.Empty => None
+      case _ #:: _      => val rrev = rights.reverse; just(zipper(rrev.tail, rrev.head, Stream.empty))
+      case Stream.Empty => Maybe.empty
     }
   }
 
@@ -298,18 +299,18 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
    * focus is moved to the first element.
    */
-  def deleteRightC: Option[Zipper[A]] = rights match {
-    case r #:: rs     => Some(zipper(lefts, r, rs))
+  def deleteRightC: Maybe[Zipper[A]] = rights match {
+    case r #:: rs     => just(zipper(lefts, r, rs))
     case Stream.Empty => lefts match {
-      case _ #:: _      => val lrev = lefts.reverse; Some(zipper(Stream.empty, lrev.head, lrev.tail))
-      case Stream.Empty => None
+      case _ #:: _      => val lrev = lefts.reverse; just(zipper(Stream.empty, lrev.head, lrev.tail))
+      case Stream.Empty => Maybe.empty
     }
   }
 
   /**
    * An alias for `deleteRightC`
    */
-  def deleteC: Option[Zipper[A]] = deleteRightC
+  def deleteC: Maybe[Zipper[A]] = deleteRightC
 
   /**
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
