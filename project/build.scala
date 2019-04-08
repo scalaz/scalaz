@@ -165,7 +165,7 @@ object build {
       case _ => Seq("-opt:l:method")
     }),
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((2, v)) if v <= 12 || scalaVersion.value == "2.13.0-M3" =>
+      case Some((2, v)) if v <= 12 =>
         Seq(
           "-Ypartial-unification",
           "-Yno-adapted-args"
