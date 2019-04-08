@@ -101,7 +101,6 @@ object build {
     "-deprecation",
     "-encoding", "UTF-8",
     "-feature",
-    "-Xfuture",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
@@ -167,6 +166,7 @@ object build {
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v <= 12 =>
         Seq(
+          "-Xfuture",
           "-Ypartial-unification",
           "-Yno-adapted-args"
         )
