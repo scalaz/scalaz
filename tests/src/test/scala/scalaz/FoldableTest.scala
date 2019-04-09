@@ -7,7 +7,6 @@ import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
 import scalaz.Maybe.{Empty, Just}
-//import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
   "maximum" ! forAll {
@@ -291,7 +290,7 @@ object FoldableTest extends SpecLite {
     (l: List[Int], p: Int => Boolean) =>
       import scalaz.syntax.std.list._
       val (trueL, falseL) = l.partition(p)
-      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel)
+      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel.toList)
   }
 
   "selectSplit: removes all non-satisfying elements" ! forAll {
