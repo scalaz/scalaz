@@ -23,7 +23,7 @@ trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with Alt[Option] with BindRec[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
       def point[A](a: => A) = Some(a)
-      override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
+      override def index[A](fa: Option[A], n: Int) = if (n == 0) Maybe.fromOption(fa) else Maybe.empty
       override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
       override def ap[A, B](fa: => Option[A])(f: => Option[A => B]) = f match {
         case Some(f) => fa match {

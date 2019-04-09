@@ -1113,7 +1113,7 @@ sealed abstract class IndSeqInstances {
       override def length[A](fa: IndSeq[A]) =
         fa.length
       override def index[A](fa: IndSeq[A], i: Int) =
-        if(0 <= i && i < fa.length) Some(fa(i)) else None
+        if(0 <= i && i < fa.length) Maybe.just(fa(i)) else Maybe.empty
       override def isEmpty[A](fa: IndSeq[A]) =
         fa.self.isEmpty
       override def empty[A](fa: IndSeq[A]) =

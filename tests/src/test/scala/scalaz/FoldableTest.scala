@@ -100,15 +100,15 @@ object FoldableTest extends SpecLite {
 
   "sumr1Opt" ! forAll {
     (xs: List[String]) => xs match {
-      case Nil => xs.sumr1Opt must_== None
-      case _ => xs.sumr1Opt must_== Some(xs.mkString)
+      case Nil => xs.sumr1Maybe must_== None
+      case _ => xs.sumr1Maybe must_== Some(xs.mkString)
     }
   }
 
   "suml1Opt" ! forAll {
     (xs: List[String]) => xs match {
-      case Nil => xs.suml1Opt must_== None
-      case _ => xs.suml1Opt must_== Some(xs.mkString)
+      case Nil => xs.suml1Maybe must_== None
+      case _ => xs.suml1Maybe must_== Some(xs.mkString)
     }
   }
 
@@ -192,45 +192,45 @@ object FoldableTest extends SpecLite {
     "foldLeft1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldLeft1Opt gt1) must_== None
-          case y :: ys => (xs foldLeft1Opt gt1) must_== Some(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldLeft1Maybe gt1) must_== None
+          case y :: ys => (xs foldLeft1Maybe gt1) must_== Some(ys.foldLeft(y)(gt1))
         }
     }
 
     "foldRight1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldRight1Opt gt2) must_== None
-          case _   => (xs foldRight1Opt gt2) must_== Some(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldRight1Maybe gt2) must_== None
+          case _   => (xs foldRight1Maybe gt2) must_== Some(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
     "foldl1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldl1Opt gt1.curried) must_== None
-          case y :: ys => (xs foldl1Opt gt1.curried) must_== Some(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldl1Maybe gt1.curried) must_== None
+          case y :: ys => (xs foldl1Maybe gt1.curried) must_== Some(ys.foldLeft(y)(gt1))
         }
     }
 
     "foldr1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldr1Opt gt2.curried) must_== None
-          case _   => (xs foldr1Opt gt2.curried) must_== Some(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldr1Maybe gt2.curried) must_== None
+          case _   => (xs foldr1Maybe gt2.curried) must_== Some(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
     "foldMap1Opt" ! forAll {
       (xs: List[String]) =>
         xs.toNel match {
-          case Empty()      => (xs foldMap1Opt strlen) must_== None
-          case Just(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
+          case Empty()      => (xs foldMap1Maybe strlen) must_== None
+          case Just(nel) => (xs foldMap1Maybe strlen) must_== Some(nel.foldMap1(strlen))
         }
     }
 
     "fold1Opt" ! forAll {
-      (xs: List[Int]) => xs.fold1Opt must_== xs.suml1Opt
+      (xs: List[Int]) => xs.fold1Maybe must_== xs.suml1Maybe
     }
 
     "foldMapM" ! forAll {

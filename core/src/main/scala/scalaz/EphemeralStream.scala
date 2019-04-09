@@ -194,15 +194,15 @@ sealed abstract class EphemeralStreamInstances {
       if (fa.isEmpty) Maybe.empty
       else just(foldLeft(fa.tail(), z(fa.head()))(f))
 
-    override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Maybe[B]) => C) = {
+    override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
       if(fa.isEmpty) emptyEphemeralStream
       else {
-        val (bo, bTail) = if(fb.isEmpty) (Maybe.empty, emptyEphemeralStream[B])
-                          else (just(fb.head()), fb.tail())
+        val (bo, bTail) = if(fb.isEmpty) (None, emptyEphemeralStream[B])
+                          else (Some(fb.head()), fb.tail())
         cons(f(fa.head(), bo), zipWithL(fa.tail(), bTail)(f))
       }
     }
-    override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Maybe[A], B) => C) =
+    override def zipWithR[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (Option[A], B) => C) =
       zipWithL(fb, fa)((b, a) => f(a, b))
 
     def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]) = {

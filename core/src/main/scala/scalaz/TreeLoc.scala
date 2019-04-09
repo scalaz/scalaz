@@ -1,6 +1,7 @@
 package scalaz
 
 import TreeLoc._
+
 import annotation.tailrec
 
 /**
@@ -185,6 +186,7 @@ sealed abstract class TreeLocInstances {
     import Stream.Empty
     import scalaz.std.stream._
 
+
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
     override def map[A, B](fa: TreeLoc[A])(f: A => B): TreeLoc[B] = fa map f
@@ -326,19 +328,19 @@ sealed abstract class TreeLocInstances {
 
     override def foldMapRight1[A, B](fa: TreeLoc[A])(z: A => B)(f: (A, => B) => B) =
       ParentsT.foldMapRight1Maybe(fa.parents)(z)(f) match {
-        case Some(p) =>
+        case Maybe.Just(p) =>
           fa.tree.foldRight(
             ForestT.foldRight(fa.lefts, ForestT.foldRight(fa.rights, p)(f))(f)
           )(f)
-        case None =>
+        case Maybe.Empty() =>
           ForestT.foldMapRight1Maybe(fa.rights)(z)(f) match {
-            case Some(r) =>
+            case Maybe.Just(r) =>
               fa.tree.foldRight(ForestT.foldRight(fa.lefts, r)(f))(f)
-            case None =>
+            case Maybe.Empty() =>
               ForestT.foldMapRight1Maybe(fa.lefts)(z)(f) match {
-                case Some(l) =>
+                case Maybe.Just(l) =>
                   fa.tree.foldRight(l)(f)
-                case None =>
+                case Maybe.Empty() =>
                   Foldable1[Tree].foldMapRight1(fa.tree)(z)(f)
               }
           }
@@ -388,9 +390,9 @@ sealed abstract class TreeLocInstances {
 
       override def foldMapRight1[A, B](fa: Parent[A])(z: A => B)(f: (A, => B) => B): B =
         ForestT.foldMapRight1Maybe(fa._3)(z)(f) match {
-          case Some(r) =>
+          case Maybe.Just(r) =>
             ForestT.foldRight(fa._1, f(fa._2, r))(f)
-          case None =>
+          case Maybe.Empty() =>
             ForestT.foldRight(fa._1, z(fa._2))(f)
         }
     }

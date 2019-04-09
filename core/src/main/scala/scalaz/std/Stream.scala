@@ -33,11 +33,11 @@ trait StreamInstances {
 
     override def index[A](fa: Stream[A], i: Int) = {
       var n = 0
-      var k: Option[A] = None
+      var k = Maybe.empty[A]
       val it = fa.iterator
       while (it.hasNext && k.isEmpty) {
         val z = it.next()
-        if (n == i) k = Some(z)
+        if (n == i) k = just(z)
         n = n + 1
       }
 
@@ -46,28 +46,28 @@ trait StreamInstances {
 
     override def foldLeft[A, B](fa: Stream[A], z: B)(f: (B, A) => B): B = fa.foldLeft(z)(f)
 
-    override def foldMapLeft1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Option[B] = fa match {
-      case Stream.Empty => None
-      case hd #:: tl => Some(tl.foldLeft(z(hd))(f))
+    override def foldMapLeft1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (B, A) => B): Maybe[B] = fa match {
+      case Stream.Empty => Maybe.empty[B]
+      case hd #:: tl => just(tl.foldLeft(z(hd))(f))
     }
 
     override def foldMap[A, B](fa: Stream[A])(f: A => B)(implicit M: Monoid[B]) =
       M.unfoldrSum(fa)(as => as.headOption match {
-        case Some(a) => Maybe.just((f(a), as.tail))
+        case Some(a) => just((f(a), as.tail))
         case None => Maybe.empty
       })
 
     override def foldMap1Maybe[A, B](fa: Stream[A])(f: A => B)(implicit B: Semigroup[B]) =
       foldMapRight1Maybe(fa)(f)((l, r) => B.append(f(l), r))
 
-    override def foldMapRight1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+    override def foldMapRight1Maybe[A, B](fa: Stream[A])(z: A => B)(f: (A, => B) => B): Maybe[B] = {
       def rec(hd: A, tl: Stream[A]): B = tl match {
         case Stream.Empty => z(hd)
         case h #:: t => f(hd, rec(h, t))
       }
       fa match {
-        case Stream.Empty => None
-        case hd #:: tl => Some(rec(hd, tl))
+        case Stream.Empty => Maybe.empty
+        case hd #:: tl => just(rec(hd, tl))
       }
     }
 
@@ -115,7 +115,7 @@ trait StreamInstances {
     def traverseImpl[F[_], A, B](fa: Stream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       val revOpt: Maybe[F[List[B]]] =
         F.unfoldrOpt[Stream[A], B, List[B]](fa)(_ match {
-          case a #:: as => Maybe.just((f(a), as))
+          case a #:: as => just((f(a), as))
           case Stream.Empty => Maybe.empty
         })(Reducer.ReverseListReducer[B])
 

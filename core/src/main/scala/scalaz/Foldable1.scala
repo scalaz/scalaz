@@ -8,6 +8,7 @@ package scalaz
 ////
 trait Foldable1[F[_]] extends Foldable[F] { self =>
   ////
+  import Maybe._
 
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product[G[_]](implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] =
@@ -25,7 +26,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** Map each element of the structure to a [[scalaz.Semigroup]], and combine the results. */
   def foldMap1[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B
-  override def foldMap1Maybe[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = Some(foldMap1(fa)(f))
+  override def foldMap1Maybe[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Maybe[B] = just(foldMap1(fa)(f))
 
   /**Right-associative fold of a structure. */
   def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B
@@ -43,10 +44,9 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /**Left-associative fold of a structure. */
   def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = {
-    import std.option._
-    foldLeft(fa, none[B]) {
-      case (None, r) => some(z(r))
-      case (Some(l), r) => some(f(l, r))
+    foldLeft(fa, Maybe.empty[B]) {
+      case (Empty(), r) => just(z(r))
+      case (Just(l), r) => just(f(l, r))
     }.getOrElse(sys.error("foldMapLeft1"))
   }
 
@@ -61,12 +61,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   /** Curried `foldRight1`. */
   final def foldr1[A](fa: F[A])(f: A => (=> A) => A): A = foldRight1(fa)((a, b) => f(a)(b))
-  override def foldMapRight1Maybe[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Option[B] = Some(foldMapRight1(fa)(z)(f))
-  override def foldr1Maybe[A](fa: F[A])(f: A => (=> A) => A): Option[A] = Some(foldr1(fa)(f))
+  override def foldMapRight1Maybe[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Maybe[B] = just(foldMapRight1(fa)(z)(f))
+  override def foldr1Maybe[A](fa: F[A])(f: A => (=> A) => A): Maybe[A] = just(foldr1(fa)(f))
   /** Curried `foldLeft1`. */
   final def foldl1[A](fa: F[A])(f: A => A => A): A = foldLeft1(fa)((b, a) => f(b)(a))
-  override def foldMapLeft1Maybe[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] = Some(foldMapLeft1(fa)(z)(f))
-  override def foldl1Maybe[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
+  override def foldMapLeft1Maybe[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Maybe[B] = just(foldMapLeft1(fa)(z)(f))
+  override def foldl1Maybe[A](fa: F[A])(f: A => A => A): Maybe[A] = just(foldl1(fa)(f))
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
 
@@ -96,12 +96,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def minimumBy1[A, B: Order](fa: F[A])(f: A => B): A =
     (minimumOf1(fa)(a => (a, f(a)))(Order.orderBy[(A, B), B](_._2)))._1
 
-  override def maximum[A: Order](fa: F[A]): Option[A] = Some(maximum1(fa))
-  override def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(maximumOf1(fa)(f))
-  override def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(maximumBy1(fa)(f))
-  override def minimum[A: Order](fa: F[A]): Option[A] = Some(minimum1(fa))
-  override def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] = Some(minimumOf1(fa)(f))
-  override def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] = Some(minimumBy1(fa)(f))
+  override def maximum[A: Order](fa: F[A]): Maybe[A] = just(maximum1(fa))
+  override def maximumOf[A, B: Order](fa: F[A])(f: A => B): Maybe[B] = just(maximumOf1(fa)(f))
+  override def maximumBy[A, B: Order](fa: F[A])(f: A => B): Maybe[A] = just(maximumBy1(fa)(f))
+  override def minimum[A: Order](fa: F[A]): Maybe[A] = just(minimum1(fa))
+  override def minimumOf[A, B: Order](fa: F[A])(f: A => B): Maybe[B] = just(minimumOf1(fa)(f))
+  override def minimumBy[A, B: Order](fa: F[A])(f: A => B): Maybe[A] = just(minimumBy1(fa)(f))
 
   /** ``O(n log n)`` complexity */
   def distinct1[A](fa: F[A])(implicit A: Order[A]): NonEmptyList[A] =

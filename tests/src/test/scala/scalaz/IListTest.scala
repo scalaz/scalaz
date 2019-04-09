@@ -58,15 +58,15 @@ object IListTest extends SpecLite {
   }
 
   "foldLeft1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldLeft1Opt(_ ::: _) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldLeft1Maybe(_ ::: _) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "foldRight1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldRight1Opt(_ ::: _) must_=== ns.toList.reduceRightOption(_ ::: _)
+    ns.foldRight1Maybe(_ ::: _) must_=== ns.toList.reduceRightOption(_ ::: _)
   }
 
   "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldMap1Maybe(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "foldMap" ! forAll { xs: IList[Int]  =>

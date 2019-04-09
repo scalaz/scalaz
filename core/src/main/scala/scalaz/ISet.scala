@@ -2,6 +2,7 @@ package scalaz
 
 import annotation.tailrec
 import Ordering._
+import scalaz.Maybe.{Empty, Just, just}
 import std.option._
 
 /**
@@ -212,7 +213,7 @@ sealed abstract class ISet[A] {
 
   // -- * Combine
   final def union(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
-    def hedgeUnion(blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A])(implicit o: Order[A]): ISet[A] =
+    def hedgeUnion(blo: Maybe[A], bhi: Maybe[A], t1: ISet[A], t2: ISet[A])(implicit o: Order[A]): ISet[A] =
       (t1, t2) match {
         case (t1, Tip()) =>
           t1
@@ -221,7 +222,7 @@ sealed abstract class ISet[A] {
         case (_, Bin(x, Tip(), Tip())) =>
           t1.insertR(x)
         case (Bin(x, l, r), _) =>
-          val bmi = some(x)
+          val bmi = just(x)
           join(x, hedgeUnion(blo, bmi, l, t2.trim(blo, bmi)), hedgeUnion(bmi, bhi, r, t2.trim(bmi, bhi)))
       }
 
@@ -231,7 +232,7 @@ sealed abstract class ISet[A] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeUnion(none, none, t1, t2)
+        hedgeUnion(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -251,14 +252,14 @@ sealed abstract class ISet[A] {
     }
 
   final def difference(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
-    def hedgeDiff(blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
+    def hedgeDiff(blo: Maybe[A], bhi: Maybe[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (Tip(), _) =>
           Tip()
         case (Bin(x, l, r), Tip()) =>
           join(x, l.filterGt(blo), r.filterLt(bhi))
         case (t, Bin(x, l, r)) =>
-          val bmi = some(x)
+          val bmi = just(x)
           hedgeDiff(blo, bmi, t.trim(blo, bmi), l) merge hedgeDiff(bmi, bhi, t.trim(bmi, bhi), r)
       }
 
@@ -268,7 +269,7 @@ sealed abstract class ISet[A] {
       case (t1, Tip()) =>
         t1
       case (t1, t2) =>
-        hedgeDiff(none, none, t1, t2)
+        hedgeDiff(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -277,14 +278,14 @@ sealed abstract class ISet[A] {
     difference(other)
 
   final def intersection(other: ISet[A])(implicit o: Order[A]): ISet[A] = {
-    def hedgeInt(blo: Option[A], bhi: Option[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
+    def hedgeInt(blo: Maybe[A], bhi: Maybe[A], t1: ISet[A], t2: ISet[A]): ISet[A] =
       (t1, t2) match {
         case (_, Tip()) =>
           t2
         case (Tip(), _) =>
           t1
         case (Bin(x, l, r), t2) =>
-          val bmi = some(x)
+          val bmi = just(x)
           val l2 = hedgeInt(blo, bmi, l, t2.trim(blo, bmi))
           val r2 = hedgeInt(bmi, bhi, r, t2.trim(bmi, bhi))
           if (t2.member(x)) join(x, l2, r2) else l2 merge r2
@@ -296,7 +297,7 @@ sealed abstract class ISet[A] {
       case (_, Tip()) =>
         other
       case (t1, t2) =>
-        hedgeInt(None, None, t1, t2)
+        hedgeInt(Maybe.empty, Maybe.empty, t1, t2)
     }
   }
 
@@ -370,15 +371,15 @@ sealed abstract class ISet[A] {
 
   // -- * Index
   /** Alias for Foldable[ISet].index */
-  final def elemAt(i: Int): Option[A] =
+  final def elemAt(i: Int): Maybe[A] =
     Foldable[ISet].index(this, i)
 
-  final def lookupIndex(x: A)(implicit o: Order[A]): Option[Int] = {
+  final def lookupIndex(x: A)(implicit o: Order[A]): Maybe[Int] = {
     @tailrec
-    def loop(s: ISet[A], i: Int): Option[Int] =
+    def loop(s: ISet[A], i: Int): Maybe[Int] =
       s match {
         case Tip() =>
-          none
+          Maybe.empty
         case Bin(y, l, r) =>
           val sizeL = l.size
           o.order(y, x) match {
@@ -387,7 +388,7 @@ sealed abstract class ISet[A] {
             case GT =>
               loop(l, i)
             case EQ =>
-              some(i + sizeL)
+              just(i + sizeL)
           }
       }
 
@@ -469,18 +470,18 @@ sealed abstract class ISet[A] {
 
   // -- * Min\/Max
   @tailrec
-  final def findMin: Option[A] =
+  final def findMin: Maybe[A] =
     this match {
-      case Tip() => none
-      case Bin(x, Tip(), _) => some(x)
+      case Tip() => Maybe.empty
+      case Bin(x, Tip(), _) => just(x)
       case Bin(_, l, _) => l.findMin
     }
 
   @tailrec
-  final def findMax: Option[A] =
+  final def findMax: Maybe[A] =
     this match {
-      case Tip() => none
-      case Bin(x, _, Tip()) => some(x)
+      case Tip() => Maybe.empty
+      case Bin(x, _, Tip()) => just(x)
       case Bin(_, _, r) => r.findMax
     }
 
@@ -603,25 +604,25 @@ sealed abstract class ISet[A] {
         else glue(l, r)
     }
 
-  final def trim(a: Option[A], b: Option[A])(implicit o: Order[A]): ISet[A] =
+  final def trim(a: Maybe[A], b: Maybe[A])(implicit o: Order[A]): ISet[A] =
     (a, b) match {
-      case (None, None) =>
+      case (Empty(), Empty()) =>
         this
-      case (Some(lx), None) =>
+      case (Just(lx), Empty()) =>
         def greater(lo: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, _, r) => if (o.lessThanOrEqual(x, lo)) greater(lo, r) else t
             case _ => t
           }
         greater(lx, this)
-      case (None, Some(hx)) =>
+      case (Empty(), Just(hx)) =>
         def lesser(hi: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, l, _) => if (o.greaterThanOrEqual(x, hi)) lesser(hi, l) else t
             case _ => t
           }
         lesser(hx, this)
-      case (Some(lx), Some(rx)) =>
+      case (Just(lx), Just(rx)) =>
         def middle(lo: A, hi: A, t: ISet[A]): ISet[A] =
           t match {
             case Bin(x, l, r) =>
@@ -633,8 +634,8 @@ sealed abstract class ISet[A] {
         middle(lx, rx, this)
     }
 
-  final def filterGt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    cata(a)(s => this match {
+  final def filterGt(a: Maybe[A])(implicit o: Order[A]): ISet[A] =
+    a.cata(s => this match {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(s, x) match {
@@ -644,8 +645,8 @@ sealed abstract class ISet[A] {
         }
     }, this)
 
-  final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    cata(a)(s => this match {
+  final def filterLt(a: Maybe[A])(implicit o: Order[A]): ISet[A] =
+    a.cata(s => this match {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(x, s) match {
@@ -669,6 +670,7 @@ sealed abstract class ISet[A] {
 
 sealed abstract class ISetInstances {
   import ISet._
+  import Maybe.{Just, Empty, just}
 
   implicit def setEqual[A: Equal]: Equal[ISet[A]] = new ISetEqual[A] {
     def A = implicitly
@@ -704,32 +706,32 @@ sealed abstract class ISetInstances {
       fa match {
         case Bin(x, l, r) =>
           findLeft(l)(f) match {
-            case a @ Some(_) =>
+            case a @ Just(_) =>
               a
-            case None =>
+            case Empty() =>
               if(f(x))
-                Some(x)
+                just(x)
               else
                 findLeft(r)(f)
           }
         case Tip() =>
-          None
+          Maybe.empty
       }
 
     override def findRight[A](fa: ISet[A])(f: A => Boolean) =
       fa match {
         case Bin(x, l, r) =>
           findRight(r)(f) match {
-            case a @ Some(_) =>
+            case a @ Just(_) =>
               a
-            case None =>
+            case Empty() =>
               if(f(x))
-                Some(x)
+                just(x)
               else
                 findRight(l)(f)
           }
         case Tip() =>
-          None
+          Maybe.empty
       }
 
     def foldMap[A, B](fa: ISet[A])(f: A => B)(implicit F: Monoid[B]): B =
@@ -746,9 +748,9 @@ sealed abstract class ISetInstances {
     override def foldLeft[A, B](fa: ISet[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(f)
 
-    override def index[A](fa: ISet[A], i: Int): Option[A] = {
+    override def index[A](fa: ISet[A], i: Int): Maybe[A] = {
       import std.anyVal._
-      @tailrec def loop(a: ISet[A], b: Int): Option[A] =
+      @tailrec def loop(a: ISet[A], b: Int): Maybe[A] =
         a match {
           case Bin(x, l, r) =>
             Order[Int].order(b, l.size) match {
@@ -757,14 +759,14 @@ sealed abstract class ISetInstances {
               case Ordering.GT =>
                 loop(r, b - l.size - 1)
               case Ordering.EQ =>
-                Some(x)
+                just(x)
             }
           case Tip() =>
-            None
+            Maybe.empty
         }
 
       if (i < 0 || fa.size <= i)
-        None
+        Maybe.empty
       else
         loop(fa, i)
     }
