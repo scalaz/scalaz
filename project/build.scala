@@ -299,8 +299,8 @@ object build {
         Nil
     }),
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.10",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    kindProjectorVersion := "0.10.0",
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
