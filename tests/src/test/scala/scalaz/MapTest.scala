@@ -12,6 +12,7 @@ object MapTest extends SpecLite {
   import std.string._
   import std.option._
   import std.tuple._
+  import Maybe.just
   import syntax.std.option._
 
   import ==>>._
@@ -48,8 +49,8 @@ object MapTest extends SpecLite {
 
   "findLeft/findRight" in {
     val a = ==>>.fromFoldable((1 to 5).map(n => n -> n).toList)
-    Foldable[Int ==>> ?].findLeft(a)(_ % 2 == 0) must_=== Some(2)
-    Foldable[Int ==>> ?].findRight(a)(_ % 2 == 0) must_=== Some(4)
+    Foldable[Int ==>> ?].findLeft(a)(_ % 2 == 0) must_=== just(2)
+    Foldable[Int ==>> ?].findRight(a)(_ % 2 == 0) must_=== just(4)
   }
 
   "findLeft" ! forAll{ (a: Int ==>> Int) =>
@@ -64,11 +65,11 @@ object MapTest extends SpecLite {
 
   "index" ! forAll { (a: Int ==>> Int, i: Byte) =>
     val F = Foldable[Int ==>> ?]
-    F.index(a, i) must_=== a.toList.lift(i).map(_._2)
-    F.index(a, -1) must_=== None
-    F.index(a, 0) must_=== a.findMin.map(_._2)
-    F.index(a, a.size - 1) must_=== a.findMax.map(_._2)
-    F.index(a, a.size) must_=== None
+    F.index(a, i) must_=== a.toList.lift(i).map(_._2).toMaybe
+    F.index(a, -1) must_=== Maybe.empty
+    F.index(a, 0) must_=== a.findMin.map(_._2).toMaybe
+    F.index(a, a.size - 1) must_=== a.findMax.map(_._2).toMaybe
+    F.index(a, a.size) must_=== Maybe.empty
   }
 
   "equals/hashCode" ! forAll { a: Int ==>> Int =>
@@ -143,7 +144,7 @@ object MapTest extends SpecLite {
       val b = a.deleteAt(n)
       structurallySound(b)
       (a.size - 1) must_=== b.size
-      b.member(Foldable[IList].index(a.keys, n).get) must_=== false
+      Foldable[IList].index(a.keys, n).map(b.member) must_=== just(false)
       (b + a.elemAt(n).get) must_=== a
     }
   }

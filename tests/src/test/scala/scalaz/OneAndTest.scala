@@ -6,6 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import OneAnd.oneAndNelIso
+import Maybe._
 import org.scalacheck.Prop.forAll
 
 object OneAndTest extends SpecLite {
@@ -34,8 +35,8 @@ object OneAndTest extends SpecLite {
 
   "findLeft/findRight" in {
     val a = OneAnd(1, List(2, 3, 4, 5))
-    Foldable[OneAnd[List, ?]].findLeft(a)(_ % 2 == 0) must_=== Some(2)
-    Foldable[OneAnd[List, ?]].findRight(a)(_ % 2 == 0) must_=== Some(4)
+    Foldable[OneAnd[List, ?]].findLeft(a)(_ % 2 == 0) must_=== just(2)
+    Foldable[OneAnd[List, ?]].findRight(a)(_ % 2 == 0) must_=== just(4)
   }
 
   "findLeft" ! forAll{ a: OneAnd[List, Int] =>

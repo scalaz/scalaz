@@ -33,7 +33,7 @@ object IListUsage extends App {
 
   // But they are all total
   val tail = ns.tailMaybe
-  val prod = ns.reduceLeftOption(_ * _)
+  val prod = ns.reduceLeftMaybe(_ * _)
 
   // Destructure with uncons
   val s1 = ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))

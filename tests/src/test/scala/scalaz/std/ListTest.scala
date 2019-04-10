@@ -4,6 +4,7 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import Id._
+import Maybe._
 import org.scalacheck.Prop.forAll
 
 object ListTest extends SpecLite {
@@ -141,7 +142,7 @@ object ListTest extends SpecLite {
   }
 
   "index" ! forAll { (xs: List[Int], n: Int) =>
-    (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
+    (xs index n) must_===(if (n >= 0 && xs.size > n) just(xs(n)) else Maybe.empty)
   }
 
   "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>

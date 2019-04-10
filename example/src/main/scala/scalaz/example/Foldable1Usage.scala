@@ -4,8 +4,8 @@ import scalaz.{Foldable1,IList,NonEmptyList,OneAnd}
 import scalaz.syntax.foldable1._
 import scalaz.syntax.equal._
 import scalaz.std.anyVal._
-import scalaz.std.option._
 import scalaz.std.string._
+import scalaz.Maybe.just
 
 object Foldable1Usage extends App {
   // Foldable1 is a typeclass which is like the Foldable typeclass
@@ -55,19 +55,19 @@ object Foldable1Usage extends App {
   // There are functions to find minimal and maximal elements similar
   // to Foldable, however, in contrast, the Foldable1 versions return
   // an A instead of an Option[A], since there is always at least one value.
-  assert(NonEmptyList(1,2,3,4).minimum === Some(1))
+  assert(NonEmptyList(1,2,3,4).minimum === just(1))
   assert(Foldable1[NonEmptyList].minimum1(NonEmptyList(1,2,3,4)) === 1)
   assert(NonEmptyList(1,2,3,4).minimum1 === 1)
 
-  assert(NonEmptyList(1,2,3,4).maximum === Some(4))
+  assert(NonEmptyList(1,2,3,4).maximum === just(4))
   assert(Foldable1[NonEmptyList].maximum1(NonEmptyList(1,2,3,4)) === 4)
   assert(NonEmptyList(1,2,3,4).maximum1 === 4)
 
-  assert(NonEmptyList("a", "aa", "aaa").minimumBy(_.length) === Some("a"))
+  assert(NonEmptyList("a", "aa", "aaa").minimumBy(_.length) === just("a"))
   assert(Foldable1[NonEmptyList].minimumBy1(NonEmptyList("a", "aa", "aaa"))(_.length) === "a")
   assert(NonEmptyList("a", "aa", "aaa").minimumBy1(_.length) === "a")
 
-  assert(NonEmptyList("a", "aa", "aaa").maximumBy(_.length) === Some("aaa"))
+  assert(NonEmptyList("a", "aa", "aaa").maximumBy(_.length) === just("aaa"))
   assert(Foldable1[NonEmptyList].maximumBy1(NonEmptyList("a", "aa", "aaa"))(_.length) === "aaa")
   assert(NonEmptyList("a", "aa", "aaa").maximumBy1(_.length) === "aaa")
 

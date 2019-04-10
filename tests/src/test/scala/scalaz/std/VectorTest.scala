@@ -104,7 +104,7 @@ object VectorTest extends SpecLite {
   }
 
   "index" ! forAll { (xs: Vector[Int], n: Int) =>
-    (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
+    (xs index n) must_===(if (n >= 0 && xs.size > n) just(xs(n)) else Maybe.empty)
   }
 
   "groupWhen is groupWhenM[Id]" ! forAll { xs: Vector[Int] =>

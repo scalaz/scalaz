@@ -292,11 +292,11 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   // no product, use Foldable#fold
 
-  def reduceLeftOption(f: (A, A) => A): Maybe[A] =
+  def reduceLeftMaybe(f: (A, A) => A): Maybe[A] =
     uncons(Maybe.empty, (h, t) => just(t.foldLeft(h)(f)))
 
-  def reduceRightOption(f: (A, A) => A): Maybe[A] =
-    reverse.reduceLeftOption((a, b) => f(b, a))
+  def reduceRightMaybe(f: (A, A) => A): Maybe[A] =
+    reverse.reduceLeftMaybe((a, b) => f(b, a))
 
   def reverse: IList[A] = {
     @tailrec def go(as: IList[A], acc: IList[A]): IList[A] = as match {
