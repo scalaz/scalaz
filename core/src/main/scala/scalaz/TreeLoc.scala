@@ -184,6 +184,7 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 sealed abstract class TreeLocInstances {
   implicit val treeLocInstance: Comonad[TreeLoc] with Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
     import Stream.Empty
+    import Maybe.Just
     import scalaz.std.stream._
 
 
@@ -328,17 +329,17 @@ sealed abstract class TreeLocInstances {
 
     override def foldMapRight1[A, B](fa: TreeLoc[A])(z: A => B)(f: (A, => B) => B) =
       ParentsT.foldMapRight1Maybe(fa.parents)(z)(f) match {
-        case Maybe.Just(p) =>
+        case Just(p) =>
           fa.tree.foldRight(
             ForestT.foldRight(fa.lefts, ForestT.foldRight(fa.rights, p)(f))(f)
           )(f)
         case Maybe.Empty() =>
           ForestT.foldMapRight1Maybe(fa.rights)(z)(f) match {
-            case Maybe.Just(r) =>
+            case Just(r) =>
               fa.tree.foldRight(ForestT.foldRight(fa.lefts, r)(f))(f)
             case Maybe.Empty() =>
               ForestT.foldMapRight1Maybe(fa.lefts)(z)(f) match {
-                case Maybe.Just(l) =>
+                case Just(l) =>
                   fa.tree.foldRight(l)(f)
                 case Maybe.Empty() =>
                   Foldable1[Tree].foldMapRight1(fa.tree)(z)(f)
