@@ -5,8 +5,6 @@ import org.scalacheck._
 import Prop.forAll
 import Scalaz._
 
-import scala.language.higherKinds
-
 /**
  * Scalacheck properties that should hold for instances of type classes defined in Scalaz Core.
  */
