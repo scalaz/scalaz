@@ -1,7 +1,5 @@
 package scalaz
 
-import scala.language.higherKinds
-
 /**
   * Covariant Day Convolution
   *
