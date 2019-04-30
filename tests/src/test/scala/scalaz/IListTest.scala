@@ -4,7 +4,9 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
-import syntax.bifunctor._, syntax.foldable._
+import scalaz.Maybe.just
+import syntax.bifunctor._
+import syntax.foldable._
 
 object IListTest extends SpecLite {
 
@@ -133,7 +135,7 @@ object IListTest extends SpecLite {
 
   "collectFirst" ! forAll { (ns: IList[Int]) =>
     val pf: PartialFunction[Int, Int] = { case n if n % 2 == 0 => n + 1 }
-    ns.collectFirst(pf) must_=== ns.toList.collectFirst(pf)
+    ns.collectFirst(pf).toOption must_=== ns.toList.collectFirst(pf)
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -185,7 +187,7 @@ object IListTest extends SpecLite {
   }
 
   "find" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
-    ns.find(f) must_=== ns.toList.find(f)
+    ns.find(f).toOption must_=== ns.toList.find(f)
   }
 
   // flatMap and folds are covered by laws
@@ -219,7 +221,7 @@ object IListTest extends SpecLite {
   }
 
   "initOption" ! forAll { ns: IList[Int] =>
-    ns.initOption.map(_.toList) must_=== (try Some(ns.toList.init) catch { case e: Exception => None })
+    ns.initMaybe.map(_.toList) must_=== (try just(ns.toList.init) catch { case e: Exception => Maybe.empty })
   }
 
   "inits" ! forAll { ns: IList[Int] =>
@@ -354,7 +356,7 @@ object IListTest extends SpecLite {
   }
 
   "tailOption" ! forAll { ns: IList[Int] =>
-    ns.tailOption.map(_.toList) must_=== (try Some(ns.toList.tail) catch { case e: Exception => None })
+    ns.tailMaybe.map(_.toList) must_=== (try just(ns.toList.tail) catch { case e: Exception => Maybe.empty })
   }
 
   "take" ! forAll { (ns: IList[Int], n: Byte) =>

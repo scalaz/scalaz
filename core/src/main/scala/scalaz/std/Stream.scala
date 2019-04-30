@@ -1,9 +1,11 @@
 package scalaz
 package std
 
+import Maybe.just
+
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] with Functor.OverrideWiden[Stream] {
 
     override def point[A](a: => A): Stream[A] =
       Stream(a)
@@ -182,18 +184,18 @@ trait StreamFunctions {
 
   import scala.Stream.{Empty, empty}
 
-  final def toZipper[A](as: Stream[A]): Option[Zipper[A]] =
+  final def toZipper[A](as: Stream[A]): Maybe[Zipper[A]] =
     as match {
-      case Empty   => None
-      case h #:: t => Some(Zipper.zipper(empty, h, t))
+      case Empty   => Maybe.empty
+      case h #:: t => just(Zipper.zipper(empty, h, t))
     }
 
-  final def zipperEnd[A](as: Stream[A]): Option[Zipper[A]] =
+  final def zipperEnd[A](as: Stream[A]): Maybe[Zipper[A]] =
     as match {
-      case Empty => None
+      case Empty => Maybe.empty
       case _     =>
         val x = as.reverse
-        Some(Zipper.zipper(x.tail, x.head, empty))
+        just(Zipper.zipper(x.tail, x.head, empty))
     }
 
   /** `[as take 1, as take 2, ..., as]` */

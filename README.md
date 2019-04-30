@@ -13,19 +13,19 @@ a large number of data structures.
 
 ## Getting Scalaz
 
-The current stable version is 7.2.26, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
+The current stable version is 7.2.27, which is cross-built against Scala 2.10.x, 2.11.x and 2.12.x.
 
 If you're using SBT, add the following line to your build file:
 
 ```scala
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.26"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.27"
 ```
 
-For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.2.26).
+For Maven and other build tools, you can visit [search.maven.org](https://search.maven.org/search?q=g:org.scalaz%20AND%20v:7.2.27).
 (This search will also list all available modules of scalaz.)
 
 To get sample configurations, click on the version of the module you are interested in.
-You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.26.jar`.
+You can also find direct download links at the bottom of that page. Choose the file ending in `7.2.27.jar`.
 
 ## Quick Start
 
@@ -93,7 +93,7 @@ employ the implicit scope.
 
 ### At a glance
 
-* `scalaz.{concurrent, effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
+* `scalaz.{effect, iteratee}` split to separate sub-projects; `scalaz.{http, geo}` dropped.
 * Refined and expanded the type class hierarchy.
 * Type class instances are no longer defined in the companion objects of the type class.
   Instances for standard library types are defined under `scalaz.std`, and instances for
@@ -116,7 +116,6 @@ Scalaz has been modularised.
 * **scalaz-core**: Type class hierarchy, data structures, type class instances for the Scala and Java standard libraries,
                  implicit conversions / syntax to access these.
 * **scalaz-effect**: Data structures to represent and compose IO effects in the type system.
-* **scalaz-concurrent**: Actor and Future implementation
 * **scalaz-iteratee**: Experimental new Iteratee implementation
 
 ### Type Class Hierarchy

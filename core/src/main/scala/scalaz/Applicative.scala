@@ -110,6 +110,11 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
       def point[A](a: => A) = Applicative.this.point(a)
     }
 
+  /** Semigroups can be added within an Applicative */
+  def plusA[A](x: => F[A], y: => F[A])(implicit sa: Semigroup[A]): F[A] =
+    apply2(x, y)((xa, ya) => sa.append(xa, ya))
+
+
   trait ApplicativeLaw extends ApplyLaw {
     /** `point(identity)` is a no-op. */
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =

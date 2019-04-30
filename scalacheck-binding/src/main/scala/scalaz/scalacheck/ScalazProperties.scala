@@ -211,6 +211,51 @@ object ScalazProperties {
       }
   }
 
+  object strong {
+    def firstIsSwappedSecond[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),(B,C)]]): Prop =
+      forAll(M.strongLaw.firstIsSwappedSecond[A, B, C] _)
+
+    def secondIsSwappedFirst[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),(C,B)]]): Prop =
+      forAll(M.strongLaw.secondIsSwappedFirst[A, B, C] _)
+
+    def mapfstEqualsFirstAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(A,C),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsFirstAndThenMapsnd[A, B, C] _)
+
+    def mapfstEqualsSecondAndThenMapsnd[M[_,_], A, B, C](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(C,A),B]]): Prop =
+      forAll(M.strongLaw.mapfstEqualsSecondAndThenMapsnd[A, B, C] _)
+
+    def dinaturalityFirst[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(A,C),(B,D)]]): Prop =
+      forAll(M.strongLaw.dinaturalityFirst[A, B, C, D] _)
+
+    def dinaturalitySecond[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], cd: Arbitrary[C => D], eq: Equal[M[(C,A), (D,B)]]): Prop =
+      forAll(M.strongLaw.dinaturalitySecond[A, B, C, D] _)
+
+    def firstFirstIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[((A,C),D),((B,C),D)]]): Prop =
+      forAll(M.strongLaw.firstFirstIsDimap[A, B, C, D] _)
+
+    def secondSecondIsDimap[M[_,_], A, B, C, D](implicit M: Strong[M], mba: Arbitrary[M[A, B]], eq: Equal[M[(D,(C,A)),(D,(C,B))]]): Prop =
+      forAll(M.strongLaw.secondSecondIsDimap[A, B, C, D] _)
+
+    def laws[M[_,_]](implicit
+         F: Strong[M],
+         af: Arbitrary[M[Int, Int]],
+         eq0: Equal[M[Int,Int]],
+         eq1: Equal[M[(Int,Int), (Int,Int)]],
+         eq2: Equal[M[(Int,Int), Int]],
+         eq3: Equal[M[((Int,Int),Int),((Int,Int),Int)]],
+         eq4: Equal[M[(Int,(Int,Int)),(Int,(Int,Int))]]): Properties =
+      newProperties("strong") { p =>
+        p.include(ScalazProperties.profunctor.laws[M])
+        p.property("firstIsSwappedSecond") = firstIsSwappedSecond[M, Int, Int, Int]
+        p.property("secondIsSwappedFirst") = secondIsSwappedFirst[M, Int, Int, Int]
+        p.property("mapfstEqualsFirstAndThenMapsnd") = mapfstEqualsFirstAndThenMapsnd[M, Int, Int, Int]
+        p.property("dinaturalityFirst") = dinaturalityFirst[M, Int, Int, Int, Int]
+        p.property("dinaturalitySecond") = dinaturalitySecond[M, Int, Int, Int, Int]
+        p.property("firstFirstIsDimap") = firstFirstIsDimap[M, Int, Int, Int, Int]
+        p.property("secondSecondIsDimap") = secondSecondIsDimap[M, Int, Int, Int, Int]
+      }
+  }
+
   object align {
     def collapse[F[_], A](implicit F: Align[F], E: Equal[F[A \&/ A]], A: Arbitrary[F[A]]): Prop =
       forAll(F.alignLaw.collapse[A] _)
@@ -354,6 +399,21 @@ object ScalazProperties {
         p.include(cobind.laws[F])
         p.property("cobind left identity") = cobindLeftIdentity[F, Int]
         p.property("cobind right identity") = cobindRightIdentity[F, Int, Int]
+      }
+  }
+
+  object density {
+    def densityIsLeftKan[F[_], A, B](implicit F: Density[F, A], F0: Equal[B], fa: Arbitrary[F[A]], fab: Arbitrary[F[A] => B]): Prop =
+      forAll(F.densityLaw.densityIsLeftKan[A,B] _)
+
+    def leftKanIsDensity[F[_], A, B](implicit F: Density[F, A], F0: Equal[F[A]], fa: Arbitrary[F[A]], fab: Arbitrary[F[A] => B]): Prop =
+      forAll(F.densityLaw.leftKanIsDensity[A,B] _)
+
+    def laws[F[_]](implicit a: Density[F, Int], am: Arbitrary[F[Int]],
+                   af: Arbitrary[F[Int] => Int], e: Equal[F[Int]]): Properties =
+      newProperties("density") { p =>
+        p.property("density is left kan") = densityIsLeftKan[F, Int, Int]
+        p.property("left kan is density") = leftKanIsDensity[F, Int, Int]
       }
   }
 

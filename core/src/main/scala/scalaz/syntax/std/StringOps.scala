@@ -17,7 +17,7 @@ final class StringOps(private val self: String) extends AnyVal {
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def charsNel : Option[NonEmptyList[Char]] = s.charsNel(self)
+  def charsNel : Maybe[NonEmptyList[Char]] = s.charsNel(self)
 
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.

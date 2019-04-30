@@ -11,6 +11,8 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 
   final def replicateM_(n: Int): F[Unit] =
     F.replicateM_(n, self)
+
+  final def +++(fa: => F[A])(implicit sa: Semigroup[A]): F[A] = F.plusA(self, fa)
   ////
 }
 

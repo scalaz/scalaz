@@ -180,7 +180,7 @@ trait Enum[F] extends Order[F] { self =>
           (_: F, _: F) => false
       }
       val k = succn(n, a)
-      if (cmp.value(k, z))
+      if (cmp.value(k, z) || cmp.value(a, k))
         return_(a :: INil())
       else
         suspend(fromStepToLT(n, k, z) map (a :: _))

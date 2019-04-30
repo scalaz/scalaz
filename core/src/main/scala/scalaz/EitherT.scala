@@ -278,6 +278,10 @@ object EitherT extends EitherTInstances {
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[A, F, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
+  /** Construct a disjunction value from a standard `scala.Option`. */
+  def fromOption[F[_], A, B](ifNone: => A)(fo: F[Option[B]])(implicit F: Functor[F]): EitherT[A, F, B] =
+    apply(F.map(fo)(o => \/.fromOption(ifNone)(o)))
+
   @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
   def fromTryCatchThrowable[F[_], A, B <: Throwable: NotNothing](a: => F[A])(implicit F: Applicative[F], ex: ClassTag[B]): EitherT[B, F, A] =
     try {
@@ -504,7 +508,7 @@ private[scalaz] trait EitherTMonadListen[F[_], W, A] extends MonadListen[EitherT
 
   def listen[B](ma: EitherT[A, F, B]): EitherT[A, F, (B, W)] = {
     val tmp = MT.bind[(A \/ B, W), A \/ (B, W)](MT.listen(ma.run)){
-      case (-\/(a), _) => MT.point(-\/(a))
+      case (a @ -\/(_), _) => MT.point(a.coerceRight)
       case (\/-(b), w) => MT.point(\/-((b, w)))
     }
 

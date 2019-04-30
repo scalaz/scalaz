@@ -8,7 +8,6 @@ import std.anyVal._
 import std.string._
 import std.tuple._
 import syntax.equal._
-import scalaz.concurrent.Task
 import syntax.functor._
 
 /**
@@ -81,46 +80,6 @@ object FunctorUsage extends App {
 
   // We can "void" a functor, which will change any F[A] into a F[Unit]
   assert(Functor[Option].void(Some(1)) === Some(()))
-
-  // You might wonder why such a thing would ever be useful, it will
-  // become useful when we have functors that control side-effects
-  // here's a bit of a contrived example to show where we might want
-  // to void a functor.
-
-  // pretend this is our database
-  var database = Map("abc" → 1,
-                     "aaa" → 2,
-                     "qqq" → 3)
-
-  // Return a Task which removes items from our database and returns the number of items deleted
-  def del(f: String => Boolean): Task[Int] = Task.delay {
-    val (count, db) = database.foldRight(0 → List.empty[(String,Int)]) {
-      case ((k,_),(d,r)) if f(k) => (d+1, r)
-      case (i,(d,r)) => (d, i::r)
-    }
-    database = db.toMap
-    count
-  }
-
-  // This is a task which will delete two of the three items in our database,
-  val delTask = del(_.startsWith("a"))
-
-  // it hasn't run yet
-  assert(database.size === 3)
-
-  // but perhaps we don't care about the number of items that were
-  // deleted, we really just want to execute the side-effects, and get
-  // a Task[Unit]
-  val voidTask: Task[Unit] = Functor[Task].void(delTask)
-
-  // There is syntax for void.
-  val voidTask2: Task[Unit] = delTask.void
-
-  // Running the task returns a Unit.
-  assert(voidTask.unsafePerformSync === (()))
-
-  // And now our database is smaller
-  assert(database.size === 1)
 
   //
   // Composition

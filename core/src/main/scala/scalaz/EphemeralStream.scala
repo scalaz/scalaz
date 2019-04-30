@@ -298,8 +298,8 @@ object EphemeralStream extends EphemeralStreamInstances {
     case h #:: t  => cons(h, fromStream(t))
   }
 
-  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new collection.AbstractIterable[A] {
-    def iterator = new collection.AbstractIterator[A] {
+  def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new scala.collection.AbstractIterable[A] {
+    def iterator = new scala.collection.AbstractIterator[A] {
       private[this] var cur = e
 
       def next() = {
@@ -340,7 +340,7 @@ object EphemeralStream extends EphemeralStreamInstances {
 
   def apply[A](as: A*): EphemeralStream[A] = {
     val as0 = as match{
-      case indexedSeq: collection.IndexedSeq[A] => indexedSeq
+      case indexedSeq: scala.collection.IndexedSeq[A] => indexedSeq
       case other => other.toIndexedSeq
     }
     val size = as.size

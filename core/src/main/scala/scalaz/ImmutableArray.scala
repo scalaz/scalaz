@@ -1,8 +1,8 @@
 package scalaz
 
 import reflect.ClassTag
-import collection.immutable.IndexedSeq
-import collection.mutable.{ArrayBuilder, Builder}
+import scala.collection.immutable.IndexedSeq
+import scala.collection.mutable.{ArrayBuilder, Builder}
 import syntax.Ops
 
 /**

@@ -46,6 +46,10 @@ object EitherTTest extends SpecLite {
     Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
   }
 
+  "fromOption" ! forAll { (o: Option[String], s: String) =>
+    List(o.isEmpty) must_=== EitherT.fromOption(s)(List(o)).isLeft
+  }
+
   "either, left, right" ! forAll { (a: String \/ Int) =>
     val e = EitherT.eitherT(Option(a))
 

@@ -121,7 +121,7 @@ object MixedBag extends App {
 
     val fileName = "abc.txt"
 
-    val oldExtensionAndNewName: Option[(String, String)] = for {
+    val oldExtensionAndNewName: Maybe[(String, String)] = for {
       zipper <- list.toZipper(fileName.toList)
 
       // previousC from the first position rotates the focus to the last element

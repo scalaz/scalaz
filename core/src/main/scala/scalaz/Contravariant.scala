@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Liskov.<~<
 /**
  * Contravariant functors.  For example, functions provide a
  * [[scalaz.Functor]] in their result type, but a
@@ -25,6 +26,9 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   def contramap[A, B](r: F[A])(f: B => A): F[B]
 
   // derived functions
+
+  def narrow[A, B](fa: F[A])(implicit ev: B <~< A): F[B] =
+    contramap(fa)(ev.apply)
 
   def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
     contramap(fa)(g)

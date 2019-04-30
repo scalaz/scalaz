@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import collection.immutable.Seq
+import scala.collection.immutable.Seq
 
 trait IterableInstances {
 
@@ -85,7 +85,7 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
 }
 
 private[std] trait IterableBindRec[F[X] <: Seq[X]] extends BindRec[F] {
-  protected[this] def createNewBuilder[A](): collection.mutable.Builder[A, F[A]]
+  protected[this] def createNewBuilder[A](): scala.collection.mutable.Builder[A, F[A]]
 
   override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
     val bs = createNewBuilder[B]()

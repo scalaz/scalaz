@@ -34,7 +34,7 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
   }
 
   def monadReaderLaw = new MonadReaderLaw {}
-  
+
   ////
 
 }

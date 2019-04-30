@@ -2,7 +2,8 @@ package scalaz
 package std
 
 import vector._
-import annotation.tailrec
+import annotation.{switch, tailrec}
+import Maybe.just
 
 sealed trait VectorInstances0 {
   implicit def vectorEqual[A](implicit A0: Equal[A]): Equal[Vector[A]] = new VectorEqual[A] {
@@ -11,7 +12,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with Alt[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] with Functor.OverrideWiden[Vector] {
 
     override def point[A](a: => A): Vector[A] =
       Vector(a)
@@ -44,9 +45,18 @@ trait VectorInstances extends VectorInstances0 {
     }
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-      v.foldLeft(F.point(empty[B])) { (fvb, a) =>
-        F.apply2(fvb, f(a))(_ :+ _)
+      // invariant: 0 <= s <= e <= v.size
+      def rec(s: Int, e: Int): F[Vector[B]] = (e - s: @switch) match {
+        case 0 => F.point(Vector())
+        case 1 => F.map(f(v(s)))(Vector(_))
+        // cases >1 but the inductive case are just optimizations; the
+        // returns diminish pretty rapidly, so only '2' is here
+        case 2 => F.apply2(f(v(s)), f(v(s + 1)))(Vector(_, _))
+        case n =>
+          val pivot = s + n / 2
+          F.apply2(rec(s, pivot), rec(pivot, e))(_ ++ _)
       }
+      rec(0, v.size)
     }
 
     override def foldRight[A, B](fa: Vector[A], z: => B)(f: (A, => B) => B) = {
@@ -100,13 +110,13 @@ trait VectorFunctions {
   final def intersperse[A](as: Vector[A], a: A): Vector[A] =
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
-  final def toNel[A](as: Vector[A]): Option[NonEmptyList[A]] =
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
+  final def toNel[A](as: Vector[A]): Maybe[NonEmptyList[A]] =
+    if (as.isEmpty) Maybe.empty else just(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
 
-  final def toZipper[A](as: Vector[A]): Option[Zipper[A]] =
+  final def toZipper[A](as: Vector[A]): Maybe[Zipper[A]] =
     stream.toZipper(as.toStream)
 
-  final def zipperEnd[A](as: Vector[A]): Option[Zipper[A]] =
+  final def zipperEnd[A](as: Vector[A]): Maybe[Zipper[A]] =
     stream.zipperEnd(as.toStream)
 
   /**
@@ -137,10 +147,10 @@ trait VectorFunctions {
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
     */
-  final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Option[A]] =
-    lazyFoldRight(as, Monad[M].point(None: Option[A]))((a, g) =>
+  final def findM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[Maybe[A]] =
+    lazyFoldRight(as, Monad[M].point(Maybe.empty[A]))((a, g) =>
       Monad[M].bind(p(a))(b =>
-        if (b) Monad[M].point(Some(a): Option[A]) else g))
+        if (b) Monad[M].point(just[A](a)) else g))
 
   final def powerset[A](as: Vector[A]): Vector[Vector[A]] = {
     import vector.vectorInstance

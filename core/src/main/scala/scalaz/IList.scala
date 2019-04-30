@@ -1,12 +1,12 @@
 package scalaz
 
 import scala.annotation.tailrec
-import scala.annotation.unchecked.uncheckedVariance
-import std.option.{ cata, none, some }
+import std.option.cata
 import std.stream.{ toZipper => sToZipper }
 import std.tuple.{ tuple2Bitraverse => BFT }
 import Liskov.{ <~<, refl }
 import IList.{empty, single}
+import scalaz.Maybe.just
 
 /**
  * Safe, invariant alternative to stdlib `List`. Most methods on `List` have a sensible equivalent
@@ -59,7 +59,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     go(this, empty).reverse
   }
 
-  def collectFirst[B](pf: PartialFunction[A,B]): Option[B] =
+  def collectFirst[B](pf: PartialFunction[A,B]): Maybe[B] =
     find(pf.isDefinedAt).map(pf)
 
   def concat(as: IList[A]): IList[A] =
@@ -129,11 +129,11 @@ sealed abstract class IList[A] extends Product with Serializable {
   def filterNot(f: A => Boolean): IList[A] =
     filter(a => !f(a))
 
-  def find(f: A => Boolean): Option[A] = {
-    @tailrec def find0[A](as: IList[A])(f: A => Boolean): Option[A] =
+  def find(f: A => Boolean): Maybe[A] = {
+    @tailrec def find0[A](as: IList[A])(f: A => Boolean): Maybe[A] =
       as match {
-        case INil() => none
-        case ICons(a, as) => if (f(a)) some(a) else find0[A](as)(f)
+        case INil() => Maybe.empty
+        case ICons(a, as) => if (f(a)) just(a) else find0[A](as)(f)
       }
     find0(this)(f)
   }
@@ -195,8 +195,8 @@ sealed abstract class IList[A] extends Product with Serializable {
     indexWhere0(0, this)
   }
 
-  def initOption: Option[IList[A]] =
-    reverse.tailOption.map(_.reverse)
+  def initMaybe: Maybe[IList[A]] =
+    reverse.tailMaybe.map(_.reverse)
 
   def inits: IList[IList[A]] =
     reverse.tails.map(_.reverse)
@@ -382,8 +382,8 @@ sealed abstract class IList[A] extends Product with Serializable {
     tails0(this, empty)
   }
 
-  def tailOption: Option[IList[A]] =
-    uncons(None, (_, t) => Some(t))
+  def tailMaybe: Maybe[IList[A]] =
+    uncons(Maybe.empty, (_, t) => just(t))
 
   def take(n: Int): IList[A] = {
     @tailrec def take0(n: Int, as: IList[A], accum: IList[A]): IList[A] =
@@ -422,8 +422,8 @@ sealed abstract class IList[A] extends Product with Serializable {
   def toList: List[A] =
     Foldable[IList].toList(this)
 
-  def toNel: Option[NonEmptyList[A]] =
-    uncons(None, (h, t) => Some(NonEmptyList.nel(h, t)))
+  def toNel: Maybe[NonEmptyList[A]] =
+    uncons(Maybe.empty, (h, t) => just(NonEmptyList.nel(h, t)))
 
   def toMap[K, V](implicit ev0: A <~< (K, V), ev1: Order[K]): K ==>> V =
     widen[(K,V)].foldLeft(==>>.empty[K,V])(_ + _)
@@ -437,7 +437,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   def toVector: Vector[A] =
     Foldable[IList].toVector(this)
 
-  def toZipper: Option[Zipper[A]] =
+  def toZipper: Maybe[Zipper[A]] =
     sToZipper(toStream)
 
   /**
@@ -450,7 +450,7 @@ sealed abstract class IList[A] extends Product with Serializable {
       case ICons(head, tail) =>
         f(head) match {
           case \/-(b) => go(tail, b :: acc)
-          case -\/(err) => -\/(err)
+          case e @ -\/(_) => e.coerceRight
         }
     }
     go(this, IList.empty).map(_.reverse)
@@ -493,7 +493,7 @@ sealed abstract class IList[A] extends Product with Serializable {
   // IList is invariant in behavior but covariant by nature, so we can safely widen to IList[B]
   // given evidence that A is a subtype of B.
   def widen[B](implicit ev: A <~< B): IList[B] =
-    ev.subst[λ[`-α` => IList[α @uncheckedVariance] <~< IList[B]]](refl)(this)
+    IList.covariant.widen(this)
 
   def zipWithIndex: IList[(A, Int)] =
     zip(IList.fromSeq(0 until length))
@@ -571,6 +571,7 @@ sealed abstract class IListInstance0 {
       val A = A0
     }
 
+  implicit final val covariant: IsCovariant[IList] = IsCovariant.force[IList]
 }
 
 sealed abstract class IListInstances extends IListInstance0 {
@@ -579,7 +580,7 @@ sealed abstract class IListInstances extends IListInstance0 {
 
     new Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
       override def findLeft[A](fa: IList[A])(f: A => Boolean) =
-        fa.find(f)
+        fa.find(f).toOption
 
       override def findRight[A](fa: IList[A])(f: A => Boolean) = {
         @tailrec def loop(a: IList[A], x: Option[A]): Option[A] =
@@ -625,7 +626,7 @@ sealed abstract class IListInstances extends IListInstance0 {
       def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]) = {
         val revOpt: Maybe[F[List[B]]] =
           F.unfoldrOpt[IList[A], B, List[B]](fa)(_ match {
-            case ICons(a, as) => Maybe.just((f(a), as))
+            case ICons(a, as) => just((f(a), as))
             case INil() => Maybe.empty
           })(Reducer.ReverseListReducer[B])
 
@@ -662,7 +663,7 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
         M.unfoldrSum(fa)(as => as.headOption match {
-          case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(IList.empty)))
+          case Some(a) => just((f(a), as.tailMaybe.getOrElse(IList.empty)))
           case None => Maybe.empty
         })
 

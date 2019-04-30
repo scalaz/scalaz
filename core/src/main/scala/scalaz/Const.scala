@@ -67,6 +67,13 @@ private trait ConstContravariant[C] extends Contravariant[Const[C, ?]] {
     Const(r.getConst)
 }
 
+private sealed trait ConstShow[A, B] extends Show[Const[A, B]] {
+  implicit def A: Show[A]
+
+  import syntax.show._
+  def show(f: Const[A, B]): Cord = cord"Const(${f.getConst})"
+}
+
 sealed abstract class ConstInstances1 {
   implicit def constTraverse[C]: Traverse[Const[C, ?]] =
     new ConstTraverse[C] {}
@@ -106,6 +113,11 @@ sealed abstract class ConstInstances extends ConstInstances0 {
   implicit def constInstance2[C: Monoid]: Applicative[Const[C, ?]] with Divisible[Const[C, ?]] =
     new ConstApplicativeDivisible[C] {
       val C: Monoid[C] = implicitly
+    }
+
+  implicit def constShow[A: Show, B]: Show[Const[A, B]] =
+    new ConstShow[A, B] {
+      val A: Show[A] = implicitly
     }
 }
 

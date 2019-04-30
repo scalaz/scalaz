@@ -32,6 +32,9 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
     subst(U(fa))
   def onContra[FA](fa: FA)(implicit U: Unapply.AuxA[Contravariant, FA, A]): U.M[B] =
     subst(U(fa))
+
+  /** `A === B` implies `A <~< B`. */
+  def liskov: Liskov[A, B] = Liskov.fromLeibniz(this)
 }
 
 sealed abstract class LeibnizInstances {
