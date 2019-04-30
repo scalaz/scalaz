@@ -189,6 +189,9 @@ trait Foldable[F[_]]  { self =>
   import Ordering.{GT, LT}
   import std.option.{some, none}
 
+  /** `fa` folded into an IList and then sorted by the implicitly available `Order` of `A` **/
+  def sorted[A: Order](fa: F[A]): IList[A] = toIList(fa).sorted
+
   /** The greatest element of `fa`, or None if `fa` is empty. */
   def maximum[A: Order](fa: F[A]): Option[A] =
     foldLeft(fa, none[A]) {
