@@ -193,11 +193,11 @@ object IListTest extends SpecLite {
   // flatMap and folds are covered by laws
 
   "groupBy" ! forAll { (ns: IList[Int], f: Int => Int) =>
-    ns.groupBy(f).map(_.toList).toList.toMap must_=== ns.toList.groupBy(f)
+    ns.groupBy(f).map(_.toList).toList.toList.toMap must_=== ns.toList.groupBy(f)
   }
 
   "groupBy1" ! forAll { (ns: IList[Int], f: Int => Int) =>
-    ns.groupBy1(f).map(oa => (oa.head :: oa.tail).toList.reverse).toList.toMap must_=== ns.toList.groupBy(f)
+    ns.groupBy1(f).map(oa => (oa.head :: oa.tail).toList.reverse).toList.toList.toMap must_=== ns.toList.groupBy(f)
   }
 
   "headOption" ! forAll { ns: IList[Int] =>
