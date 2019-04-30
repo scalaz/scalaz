@@ -6,55 +6,55 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
-import scalaz.Maybe.{Empty, Just}
+import scalaz.Maybe.{Empty, Just, just}
 //import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
   "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
-        (xs.maximum) must_==(None)
+        (xs.maximum) must_== Maybe.empty
       else
-        (xs.maximum) must_== Some((xs.max))
+        (xs.maximum) must_== just((xs.max))
   }
   "maximumOf" ! forAll {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs maximumOf f) must_==(None)
+        (xs maximumOf f) must_== Maybe.empty
       else
-        (xs maximumOf f) must_==(Some((xs.iterator map f).max))
+        (xs maximumOf f) must_== just((xs.iterator map f).max)
   }
   "maximumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs maximumBy f) must_== None
+        (xs maximumBy f) must_== Maybe.empty
       else
-        (xs maximumBy f) must_== Some((xs zip (xs map f)).maxBy(_._2)._1)
+        (xs maximumBy f) must_== just((xs zip (xs map f)).maxBy(_._2)._1)
   }
   "minimum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
-        (xs.minimum) must_== None
+        (xs.minimum) must_== Maybe.empty
       else
-        (xs.minimum) must_== Some(xs.min)
+        (xs.minimum) must_== just(xs.min)
   }
   "minimumOf" ! forAll {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs minimumOf f) must_== None
+        (xs minimumOf f) must_== Maybe.empty
       else
-        (xs minimumOf f) must_== Some((xs.iterator map f).min)
+        (xs minimumOf f) must_== just((xs.iterator map f).min)
   }
   "minimumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs minimumBy f) must_== None
+        (xs minimumBy f) must_== Maybe.empty
       else
-        (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
+        (xs minimumBy f) must_== just((xs zip (xs map f)).minBy(_._2)._1)
   }
   "extrema" ! forAll {
     (xs: List[Int]) =>
@@ -100,15 +100,15 @@ object FoldableTest extends SpecLite {
 
   "sumr1Opt" ! forAll {
     (xs: List[String]) => xs match {
-      case Nil => xs.sumr1Opt must_== None
-      case _ => xs.sumr1Opt must_== Some(xs.mkString)
+      case Nil => xs.sumr1Maybe must_== Maybe.empty
+      case _ => xs.sumr1Maybe must_== just(xs.mkString)
     }
   }
 
   "suml1Opt" ! forAll {
     (xs: List[String]) => xs match {
-      case Nil => xs.suml1Opt must_== None
-      case _ => xs.suml1Opt must_== Some(xs.mkString)
+      case Nil => xs.suml1Maybe must_== Maybe.empty
+      case _ => xs.suml1Maybe must_== just(xs.mkString)
     }
   }
 
@@ -192,80 +192,80 @@ object FoldableTest extends SpecLite {
     "foldLeft1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldLeft1Opt gt1) must_== None
-          case y :: ys => (xs foldLeft1Opt gt1) must_== Some(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldLeft1Maybe gt1) must_== Maybe.empty
+          case y :: ys => (xs foldLeft1Maybe gt1) must_== just(ys.foldLeft(y)(gt1))
         }
     }
 
     "foldRight1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldRight1Opt gt2) must_== None
-          case _   => (xs foldRight1Opt gt2) must_== Some(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldRight1Maybe gt2) must_== Maybe.empty
+          case _   => (xs foldRight1Maybe gt2) must_== just(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
     "foldl1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil     => (xs foldl1Opt gt1.curried) must_== None
-          case y :: ys => (xs foldl1Opt gt1.curried) must_== Some(ys.foldLeft(y)(gt1))
+          case Nil     => (xs foldl1Maybe gt1.curried) must_== Maybe.empty
+          case y :: ys => (xs foldl1Maybe gt1.curried) must_== just(ys.foldLeft(y)(gt1))
         }
     }
 
     "foldr1Opt" ! forAll {
       (xs: List[Int]) =>
         xs match {
-          case Nil => (xs foldr1Opt gt2.curried) must_== None
-          case _   => (xs foldr1Opt gt2.curried) must_== Some(xs.init.foldRight(xs.last)(gt1))
+          case Nil => (xs foldr1Maybe gt2.curried) must_== Maybe.empty
+          case _   => (xs foldr1Maybe gt2.curried) must_== just(xs.init.foldRight(xs.last)(gt1))
         }
     }
 
     "foldMap1Opt" ! forAll {
       (xs: List[String]) =>
         xs.toNel match {
-          case Empty()      => (xs foldMap1Opt strlen) must_== None
-          case Just(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
+          case Empty()      => (xs foldMap1Maybe strlen) must_== Maybe.empty
+          case Just(nel) => (xs foldMap1Maybe strlen) must_== just(nel.foldMap1(strlen))
         }
     }
 
     "fold1Opt" ! forAll {
-      (xs: List[Int]) => xs.fold1Opt must_== xs.suml1Opt
+      (xs: List[Int]) => xs.fold1Maybe must_== xs.suml1Maybe
     }
 
     "foldMapM" ! forAll {
-      (xs: List[String]) => xs.foldMapM(x => Some(x): Option[String]) must_== Some(xs.mkString)
+      (xs: List[String]) => xs.foldMapM(just) must_== just(xs.mkString)
     }
 
     type StateInt[A] = State[Int, A]
 
-    def found(z: Int): State[Int, Option[Int]] =
-      State(n => (n + 1, Some(z * 2)))
+    def found(z: Int): State[Int, Maybe[Int]] =
+      State(n => (n + 1, just(z * 2)))
 
-    def notfound: State[Int, Option[Int]] =
-      State(n => (n + 1, None))
+    def notfound: State[Int, Maybe[Int]] =
+      State(n => (n + 1, Maybe.empty))
 
     "findMapM: finding the first element performs transform and only runs only necessary effects" ! forAll {
-      (x: Int, xs: List[Int]) => (x :: xs).findMapM[StateInt, Int](found).run(0) must_== (1 -> Some(x * 2))
+      (x: Int, xs: List[Int]) => (x :: xs).findMapM[StateInt, Int](found).run(0) must_== (1 -> just(x * 2))
     }
 
     "findMapM: finding the last element performs transform and runs all effects (once only)" ! forAll {
       (x: Int, xs: List[Int]) => !xs.contains(x) ==> {
         (xs ++ List(x)).findMapM[StateInt, Int](z => if (z == x) found(z) else notfound).run(0) must_==
-          ((xs.length + 1) -> Some(x * 2))
+          ((xs.length + 1) -> just(x * 2))
       }
     }
 
     "findMapM: runs all effects but doesn't return a value for not found" ! forAll {
-      (xs: List[Int]) => xs.findMapM[StateInt, Int](_ => notfound).run(0) must_== (xs.length -> None)
+      (xs: List[Int]) => xs.findMapM[StateInt, Int](_ => notfound).run(0) must_== (xs.length -> Maybe.empty)
     }
 
     "findLeft" ! forAll {
-      (x: Int, xs: List[Int]) => (x :: xs).findLeft(_ == x) must_== Some(x)
+      (x: Int, xs: List[Int]) => (x :: xs).findLeft(_ == x) must_== just(x)
     }
 
     "findRight" ! forAll {
-      (x: Int, xs: List[Int]) => (xs ++ List(x)).findRight(_ == x) must_== Some(x)
+      (x: Int, xs: List[Int]) => (xs ++ List(x)).findRight(_ == x) must_== just(x)
     }
   }
 
@@ -284,37 +284,37 @@ object FoldableTest extends SpecLite {
 
   "splitWith on sorted list produces at most 2 elements" ! forAll {
     (l: List[Int], p: Int => Boolean) =>
-      L.splitWith(l.sortBy(p))(p).size mustBe_< 3
+      L.splitWith(l.sortBy(p))(p).length mustBe_< 3
   }
 
   "splitWith consistent with partition" ! forAll {
     (l: List[Int], p: Int => Boolean) =>
       import scalaz.syntax.std.list._
       val (trueL, falseL) = l.partition(p)
-      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel.toOption)
+      L.splitWith(l.sortBy(p))(p) must_=== IList(falseL, trueL).flatMap(l => IList.fromFoldable(l.toNel))
   }
 
   "selectSplit: removes all non-satisfying elements" ! forAll {
     (l: List[Int]) =>
-      L.selectSplit(l)(_ => false).size must_=== 0
+      L.selectSplit(l)(_ => false).length must_=== 0
   }
 
   "selectSplit: keeps all satisfying elements" ! forAll {
     (l: List[Int]) =>
       import scalaz.syntax.std.list._
-      L.selectSplit(l)(_ => true) must_=== l.toNel.toList
+      L.selectSplit(l)(_ => true) must_=== IList.fromFoldable(l.toNel)
   }
 
   "selectSplit: consistent with partition" ! forAll {
     (l: List[Int], p: Int => Boolean) =>
-      L.selectSplit(l)(p).flatMap(_.toList) must_=== l.partition(p)._1
+      L.selectSplit(l)(p).flatMap(_.toIList) must_=== l.partition(p)._1.toIList
   }
 
   "selectSplit range consistent with filter" ! forAll {
     (i1: Byte, i2: Byte) =>
       val (s, e) = (Math.min(i1.toInt, i2.toInt), Math.max(i1.toInt, i2.toInt))
       val range = List.range(s, e)
-      L.selectSplit(range)(_ % 2 != 0) must_=== range.filter(_ % 2 != 0).map(NonEmptyList(_))
+      L.selectSplit(range)(_ % 2 != 0) must_=== range.filter(_ % 2 != 0).map(NonEmptyList(_)).toIList
   }
 
   /*

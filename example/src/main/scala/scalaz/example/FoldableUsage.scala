@@ -42,8 +42,8 @@ object FoldableUsage extends App {
   assert(trues.foldr(false)(lazyOr))
   assert(Tag.unwrap(trues.foldMap((b: Boolean) => Tags.Disjunction(b))))
   assert(digits.map(_.toString).intercalate(",") === "0,1,2,3,4,5,6,7,8,9")
-  assert(digits.maximum === Some(9))
-  assert(digits.minimum === Some(0))
+  assert(digits.maximum === Maybe.just(9))
+  assert(digits.minimum === Maybe.just(0))
 
   // Foldables can be composed:
   val FoldListOfOptions = Foldable[List] compose Foldable[Option]

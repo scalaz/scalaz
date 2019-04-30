@@ -2,11 +2,11 @@ package scalaz
 
 import scala.annotation.tailrec
 import std.option.cata
-import std.stream.{ toZipper => sToZipper }
-import std.tuple.{ tuple2Bitraverse => BFT }
-import Liskov.{ <~<, refl }
+import std.stream.{toZipper => sToZipper}
+import std.tuple.{tuple2Bitraverse => BFT}
+import Liskov.{<~<, refl}
 import IList.{empty, single}
-import scalaz.Maybe.just
+import scalaz.Maybe.{Empty, Just, just}
 
 /**
  * Safe, invariant alternative to stdlib `List`. Most methods on `List` have a sensible equivalent
@@ -292,11 +292,11 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   // no product, use Foldable#fold
 
-  def reduceLeftOption(f: (A, A) => A): Option[A] =
-    uncons(None, (h, t) => Some(t.foldLeft(h)(f)))
+  def reduceLeftMaybe(f: (A, A) => A): Maybe[A] =
+    uncons(Maybe.empty, (h, t) => just(t.foldLeft(h)(f)))
 
-  def reduceRightOption(f: (A, A) => A): Option[A] =
-    reverse.reduceLeftOption((a, b) => f(b, a))
+  def reduceRightMaybe(f: (A, A) => A): Maybe[A] =
+    reverse.reduceLeftMaybe((a, b) => f(b, a))
 
   def reverse: IList[A] = {
     @tailrec def go(as: IList[A], acc: IList[A]): IList[A] = as match {
@@ -580,17 +580,17 @@ sealed abstract class IListInstances extends IListInstance0 {
 
     new Traverse[IList] with MonadPlus[IList] with Alt[IList] with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
       override def findLeft[A](fa: IList[A])(f: A => Boolean) =
-        fa.find(f).toOption
+        fa.find(f)
 
       override def findRight[A](fa: IList[A])(f: A => Boolean) = {
-        @tailrec def loop(a: IList[A], x: Option[A]): Option[A] =
+        @tailrec def loop(a: IList[A], x: Maybe[A]): Maybe[A] =
           a match {
             case ICons(h, t) =>
-              loop(t, if(f(h)) Some(h) else x)
+              loop(t, if(f(h)) just(h) else x)
             case INil() =>
               x
           }
-        loop(fa, None)
+        loop(fa, Maybe.empty[A])
       }
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] =
@@ -658,33 +658,30 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def foldRight[A, B](fa: IList[A], z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)((a, b) => f(a, b))
 
-      override def foldMapRight1Opt[A, B](fa: IList[A])(z: A => B)(f: (A, => B) => B) =
-        foldMapLeft1Opt(fa.reverse)(z)((b, a) => f(a, b))
+      override def foldMapRight1Maybe[A, B](fa: IList[A])(z: A => B)(f: (A, => B) => B) =
+        foldMapLeft1Maybe(fa.reverse)(z)((b, a) => f(a, b))
 
       override def foldMap[A, B](fa: IList[A])(f: A => B)(implicit M: Monoid[B]) =
-        M.unfoldrSum(fa)(as => as.headOption match {
-          case Some(a) => just((f(a), as.tailMaybe.getOrElse(IList.empty)))
-          case None => Maybe.empty
-        })
+        M.unfoldrSum(fa)(as => as.headMaybe.map(a => (f(a), as.tailMaybe.getOrElse(IList.empty))))
 
-      override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
+      override def foldMap1Maybe[A, B](fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
         fa match {
-          case ICons(h, t) => Some(t.foldLeft(f(h))((b, a) => M.append(b, f(a))))
-          case INil() => None
+          case ICons(h, t) => Just(t.foldLeft(f(h))((b, a) => M.append(b, f(a))))
+          case INil() => Maybe.empty
         }
 
-      override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(f: (B, A) => B) =
+      override def foldMapLeft1Maybe[A, B](fa: IList[A])(z: A => B)(f: (B, A) => B) =
         fa match {
-          case ICons(h, t) => Some(t.foldLeft(z(h))(f))
-          case INil() => None
+          case ICons(h, t) => Just(t.foldLeft(z(h))(f))
+          case INil() => Maybe.empty
         }
 
       override def index[A](fa: IList[A], i: Int) = {
-        @tailrec def go(as: IList[A], n: Int): Option[A] = as match {
-          case ICons(h, t) => if(n == i) Some(h) else go(t, n + 1)
-          case INil() => None
+        @tailrec def go(as: IList[A], n: Int): Maybe[A] = as match {
+          case ICons(h, t) => if(n == i) just(h) else go(t, n + 1)
+          case INil() => Maybe.empty
         }
-        if(i < 0) None
+        if(i < 0) Empty()
         else go(fa, 0)
       }
 

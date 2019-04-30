@@ -1,5 +1,6 @@
 package scalaz
 
+
 ////
 /**
  * A type parameter implying the ability to extract zero or more
@@ -8,13 +9,12 @@ package scalaz
 ////
 trait Foldable[F[_]]  { self =>
   ////
-
+  import Maybe._
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
-  /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
-  def foldMap1Opt[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Option[B] = {
-    import std.option._
-    foldMap(fa)(x => some(f(x)))
+  /** As `foldMap` but returning `Empty()` if the foldable is empty and `Just` otherwise */
+  def foldMap1Maybe[A,B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): Maybe[B] = {
+    foldMap(fa)(x => just(f(x)))
   }
 
   /**Right-associative fold of a structure. */
@@ -69,8 +69,8 @@ trait Foldable[F[_]]  { self =>
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
-  /** Like `fold` but returning `None` if the foldable is empty and `Some` otherwise */
-  def fold1Opt[A: Semigroup](fa: F[A]): Option[A] = foldMap1Opt(fa)(a => a)
+  /** Like `fold` but returning `Empty()` if the foldable is empty and `Just` otherwise */
+  def fold1Maybe[A: Semigroup](fa: F[A]): Maybe[A] = foldMap1Maybe(fa)(a => a)
 
   /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
@@ -100,21 +100,21 @@ trait Foldable[F[_]]  { self =>
 
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
-  def foldMapRight1Opt[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Option[B] =
-    foldRight(fa, None: Option[B])((a, optB) =>
-      optB map (f(a, _)) orElse Some(z(a)))
-  def foldRight1Opt[A](fa: F[A])(f: (A, => A) => A): Option[A] =
-    foldMapRight1Opt(fa)(identity)(f)
-  def foldr1Opt[A](fa: F[A])(f: A => (=> A) => A): Option[A] = foldRight(fa, None: Option[A])((a, optA) => optA map (aa => f(a)(aa)) orElse Some(a))
+  def foldMapRight1Maybe[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): Maybe[B] =
+    foldRight(fa, Maybe.empty[B])((a, optB) =>
+      optB map (f(a, _)) orElse just(z(a)))
+  def foldRight1Maybe[A](fa: F[A])(f: (A, => A) => A): Maybe[A] =
+    foldMapRight1Maybe(fa)(identity)(f)
+  def foldr1Maybe[A](fa: F[A])(f: A => (=> A) => A): Maybe[A] = foldRight(fa, Maybe.empty[A])((a, optA) => optA map (aa => f(a)(aa)) orElse just(a))
 
   /**Curried version of `foldLeft` */
   final def foldl[A, B](fa: F[A], z: B)(f: B => A => B): B = foldLeft(fa, z)((b, a) => f(b)(a))
-  def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] =
-    foldLeft(fa, None: Option[B])((optB, a) =>
-      optB map (f(_, a)) orElse Some(z(a)))
-  def foldLeft1Opt[A](fa: F[A])(f: (A, A) => A): Option[A] =
-    foldMapLeft1Opt(fa)(identity)(f)
-  def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa)(a)) orElse Some(a))
+  def foldMapLeft1Maybe[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Maybe[B] =
+    foldLeft(fa, Maybe.empty[B])((optB, a) =>
+      optB map (f(_, a)) orElse just(z(a)))
+  def foldLeft1Maybe[A](fa: F[A])(f: (A, A) => A): Maybe[A] =
+    foldMapLeft1Maybe(fa)(identity)(f)
+  def foldl1Maybe[A](fa: F[A])(f: A => A => A): Maybe[A] = foldLeft(fa, Maybe.empty[A])((optA, a) => optA map (aa => f(aa)(a)) orElse just(a))
 
   /**Curried version of `foldRightM` */
   final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] =
@@ -125,14 +125,14 @@ trait Foldable[F[_]]  { self =>
     foldLeftM(fa, z)((b, a) => f(b)(a))
 
   /** map elements in a Foldable with a monadic function and return the first element that is mapped successfully */
-  final def findMapM[M[_]: Monad, A, B](fa: F[A])(f: A => M[Option[B]]): M[Option[B]] =
+  final def findMapM[M[_]: Monad, A, B](fa: F[A])(f: A => M[Maybe[B]]): M[Maybe[B]] =
     toEphemeralStream(fa) findMapM f
 
-  def findLeft[A](fa: F[A])(f: A => Boolean): Option[A] =
-    foldLeft[A, Option[A]](fa, None)((b, a) => b.orElse(if(f(a)) Some(a) else None))
+  def findLeft[A](fa: F[A])(f: A => Boolean): Maybe[A] =
+    foldLeft[A, Maybe[A]](fa, Maybe.empty)((b, a) => b.orElse(if(f(a)) just(a) else Maybe.empty))
 
-  def findRight[A](fa: F[A])(f: A => Boolean): Option[A] =
-    foldRight[A, Option[A]](fa, None)((a, b) => b.orElse(if(f(a)) Some(a) else None))
+  def findRight[A](fa: F[A])(f: A => Boolean): Maybe[A] =
+    foldRight[A, Maybe[A]](fa, Maybe.empty)((a, b) => b.orElse(if(f(a)) just(a) else Maybe.empty))
 
   /** Alias for `length`. */
   final def count[A](fa: F[A]): Int = length(fa)
@@ -141,12 +141,12 @@ trait Foldable[F[_]]  { self =>
   def length[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
 
   /**
-   * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
+   * @return the element at index `i` in a `Just`, or `Empty()` if the given index falls outside of the range
    */
-  def index[A](fa: F[A], i: Int): Option[A] =
-    foldLeft[A, (Int, Option[A])](fa, (0, None)) {
+  def index[A](fa: F[A], i: Int): Maybe[A] =
+    foldLeft[A, (Int, Maybe[A])](fa, (0, Maybe.empty)) {
       case ((idx, elem), curr) =>
-        (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
+        (idx + 1, elem orElse { if (idx == i) just(curr) else Maybe.empty })
     }._2
 
   /**
@@ -187,57 +187,56 @@ trait Foldable[F[_]]  { self =>
     foldLeft(fa, 0)((b, a) => (if (f(a)) 1 else 0) + b)
 
   import Ordering.{GT, LT}
-  import std.option.{some, none}
 
-  /** The greatest element of `fa`, or None if `fa` is empty. */
-  def maximum[A: Order](fa: F[A]): Option[A] =
-    foldLeft(fa, none[A]) {
-      case (None, y) => some(y)
-      case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
+  /** The greatest element of `fa`, or Empty() if `fa` is empty. */
+  def maximum[A: Order](fa: F[A]): Maybe[A] =
+    foldLeft(fa, Maybe.empty[A]) {
+      case (Empty(), y) => just(y)
+      case (Just(x), y) => just(if (Order[A].order(x, y) == GT) x else y)
     }
 
-  /** The greatest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
-  def maximumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
-    foldLeft(fa, none[B]) {
-      case (None, a) => some(f(a))
-      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) b else bb)
+  /** The greatest value of `f(a)` for each element `a` of `fa`, or Empty() if `fa` is empty. */
+  def maximumOf[A, B: Order](fa: F[A])(f: A => B): Maybe[B] =
+    foldLeft(fa, Maybe.empty[B]) {
+      case (Empty(), a) => just(f(a))
+      case (Just(b), aa) => val bb = f(aa); just(if (Order[B].order(b, bb) == GT) b else bb)
     }
 
-  /** The element `a` of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
-  def maximumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
-    foldLeft(fa, none[(A, B)]) {
-      case (None, a) => some(a -> f(a))
-      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
+  /** The element `a` of `fa` which yields the greatest value of `f(a)`, or Empty() if `fa` is empty. */
+  def maximumBy[A, B: Order](fa: F[A])(f: A => B): Maybe[A] =
+    foldLeft(fa, Maybe.empty[(A, B)]) {
+      case (Empty(), a) => just(a -> f(a))
+      case (Just(x @ (a, b)), aa) => val bb = f(aa); just(if (Order[B].order(b, bb) == GT) x else aa -> bb)
     } map (_._1)
 
-  /** The smallest element of `fa`, or None if `fa` is empty. */
-  def minimum[A: Order](fa: F[A]): Option[A] =
-    foldLeft(fa, none[A]) {
-      case (None, y) => some(y)
-      case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
+  /** The smallest element of `fa`, or Empty() if `fa` is empty. */
+  def minimum[A: Order](fa: F[A]): Maybe[A] =
+    foldLeft(fa, Maybe.empty[A]) {
+      case (Empty(), y) => just(y)
+      case (Just(x), y) => just(if (Order[A].order(x, y) == LT) x else y)
     }
 
-  /** The smallest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
-  def minimumOf[A, B: Order](fa: F[A])(f: A => B): Option[B] =
-    foldLeft(fa, none[B]) {
-      case (None, a) => some(f(a))
-      case (Some(b), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) b else bb)
+  /** The smallest value of `f(a)` for each element `a` of `fa`, or Empty() if `fa` is empty. */
+  def minimumOf[A, B: Order](fa: F[A])(f: A => B): Maybe[B] =
+    foldLeft(fa, Maybe.empty[B]) {
+      case (Empty(), a) => just(f(a))
+      case (Just(b), aa) => val bb = f(aa); just(if (Order[B].order(b, bb) == LT) b else bb)
     }
 
-  /** The element `a` of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
-  def minimumBy[A, B: Order](fa: F[A])(f: A => B): Option[A] =
-    foldLeft(fa, none[(A, B)]) {
-      case (None, a) => some(a -> f(a))
-      case (Some(x @ (a, b)), aa) => val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
+  /** The element `a` of `fa` which yields the smallest value of `f(a)`, or Empty() if `fa` is empty. */
+  def minimumBy[A, B: Order](fa: F[A])(f: A => B): Maybe[A] =
+    foldLeft(fa, Maybe.empty[(A, B)]) {
+      case (Empty(), a) => just(a -> f(a))
+      case (Just(x @ (a, b)), aa) => val bb = f(aa); just(if (Order[B].order(b, bb) == LT) x else aa -> bb)
     } map (_._1)
 
-  /** The smallest and largest elements of `fa` or None if `fa` is empty */
-  def extrema[A: Order](fa: F[A]): Option[(A, A)] =
+  /** The smallest and largest elements of `fa` or Empty() if `fa` is empty */
+  def extrema[A: Order](fa: F[A]): Maybe[(A, A)] =
     extremaBy(fa)(identity)
 
-  /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or None if `fa` is empty */
-  def extremaOf[A, B: Order](fa: F[A])(f: A => B): Option[(B, B)] =
-    foldMapLeft1Opt(fa) { a =>
+  /** The smallest and largest values of `f(a)` for each element `a` of `fa` , or Empty() if `fa` is empty */
+  def extremaOf[A, B: Order](fa: F[A])(f: A => B): Maybe[(B, B)] =
+    foldMapLeft1Maybe(fa) { a =>
       val b = f(a)
       (b, b)
     } {
@@ -248,9 +247,9 @@ trait Foldable[F[_]]  { self =>
         else x
     }
 
-  /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or None if `fa` is empty */
-  def extremaBy[A, B: Order](fa: F[A])(f: A => B): Option[(A, A)] =
-    foldMapLeft1Opt(fa) { a =>
+  /** The elements (amin, amax) of `fa` which yield the smallest and largest values of `f(a)`, respectively, or Empty() if `fa` is empty */
+  def extremaBy[A, B: Order](fa: F[A])(f: A => B): Maybe[(A, A)] =
+    foldMapLeft1Maybe(fa) { a =>
         val b = f(a)
         (a, a, b, b)
     } {
@@ -277,14 +276,14 @@ trait Foldable[F[_]]  { self =>
   def sumr[A](fa: F[A])(implicit A: Monoid[A]): A =
     foldRight(fa, A.zero)(A.append)
 
-  def sumr1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
-    foldRight1Opt(fa)(A.append(_, _))
+  def sumr1Maybe[A](fa: F[A])(implicit A: Semigroup[A]): Maybe[A] =
+    foldRight1Maybe(fa)(A.append(_, _))
 
   def suml[A](fa: F[A])(implicit A: Monoid[A]): A =
     foldLeft(fa, A.zero)(A.append(_, _))
 
-  def suml1Opt[A](fa: F[A])(implicit A: Semigroup[A]): Option[A] =
-    foldLeft1Opt(fa)(A.append(_, _))
+  def suml1Maybe[A](fa: F[A])(implicit A: Semigroup[A]): Maybe[A] =
+    foldLeft1Maybe(fa)(A.append(_, _))
 
   /**
    * Map elements to `G[B]` and sum using a polymorphic monoid ([[PlusEmpty]]).
@@ -321,22 +320,22 @@ trait Foldable[F[_]]  { self =>
   def element[A: Equal](fa: F[A], a: A): Boolean = any(fa)(Equal[A].equal(a, _))
   /** Insert an `A` between every A, yielding the sum. */
   def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
-    (foldRight(fa, none[A]) {(l, oa) =>
-      some(A.append(l, oa map (A.append(a, _)) getOrElse A.zero))
+    (foldRight(fa, Maybe.empty[A]) {(l, oa) =>
+      just(A.append(l, oa map (A.append(a, _)) getOrElse A.zero))
     }).getOrElse(A.zero)
 
   /**
    * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
    */
-  def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
+  def splitWith[A](fa: F[A])(p: A => Boolean): IList[NonEmptyList[A]] =
     foldRight(fa, Maybe.empty[(NonEmptyList[NonEmptyList[A]], Boolean)])((a, b) => {
       val pa = p(a)
-      Maybe.just(
+      just(
         (b match {
-          case Maybe.Just((x, q)) => if (pa == q) NonEmptyList.nel(a <:: x.head, x.tail) else NonEmptyList(a) <:: x
-          case Maybe.Empty() => NonEmptyList(NonEmptyList(a))
+          case Just((x, q)) => if (pa == q) NonEmptyList.nel(a <:: x.head, x.tail) else NonEmptyList(a) <:: x
+          case Empty() => NonEmptyList(NonEmptyList(a))
         }, pa))
-    }).cata(_._1.list.toList, List.empty)
+    }).cata(_._1.list, IList.empty)
 
   /**
     * Splits the elements into groups that produce the same result by a function f.
@@ -364,12 +363,10 @@ trait Foldable[F[_]]  { self =>
   /**
    * Selects groups of elements that satisfy p and discards others.
    */
-  def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] = {
-    import scalaz.syntax.foldable._
+  def selectSplit[A](fa: F[A])(p: A => Boolean): IList[NonEmptyList[A]] = {
+    def squash(t: (IList[NonEmptyList[A]], IList[A])): IList[NonEmptyList[A]] = IList.fromFoldable(t._2.toNel) ::: t._1
 
-    def squash(t: (List[NonEmptyList[A]], IList[A])): List[NonEmptyList[A]] = t._2.toNel.toList ::: t._1
-
-    squash(foldRight(fa, (List.empty[NonEmptyList[A]], IList.empty[A]))((a, l) =>
+    squash(foldRight(fa, (IList.empty[NonEmptyList[A]], IList.empty[A]))((a, l) =>
       if (p(a)) (l._1, a :: l._2)
       else (squash(l), IList.empty)
     ))
@@ -436,10 +433,10 @@ object Foldable {
    *
    * Example:
    * {{{
-   * new Foldable[Option] with Foldable.FromFoldMap[Option] {
-   *   def foldMap[A, B](fa: Option[A])(f: A => B)(implicit F: Monoid[B]) = fa match {
-   *     case Some(a) => f(a)
-   *     case None    => F.zero
+   * new Foldable[Maybe] with Foldable.FromFoldMap[Maybe] {
+   *   def foldMap[A, B](fa: Maybe[A])(f: A => B)(implicit F: Monoid[B]) = fa match {
+   *     case Just(a) => f(a)
+   *     case Empty()    => F.zero
    *   }
    * }
    * }}}
@@ -454,10 +451,10 @@ object Foldable {
    *
    * Example:
    * {{{
-   * new Foldable[Option] with Foldable.FromFoldr[Option] {
-   *   def foldRight[A, B](fa: Option[A], z: B)(f: (A, => B) => B) = fa match {
-   *     case Some(a) => f(a, z)
-   *     case None => z
+   * new Foldable[Maybe] with Foldable.FromFoldr[Maybe] {
+   *   def foldRight[A, B](fa: Maybe[A], z: B)(f: (A, => B) => B) = fa match {
+   *     case Just(a) => f(a, z)
+   *     case Empty() => z
    *   }
    * }
    * }}}

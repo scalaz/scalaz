@@ -16,6 +16,7 @@ object ISetTest extends SpecLite {
   import std.string._
 
   import ISet._
+  import Maybe.just
 
   // Check some laws
   checkAll(equal.laws[ISet[Int]])
@@ -46,8 +47,8 @@ object ISetTest extends SpecLite {
 
   "findLeft/findRight" in {
     val a = ISet.fromList(List(1, 2, 3, 4, 5))
-    Foldable[ISet].findLeft(a)(_ % 2 == 0) must_=== Some(2)
-    Foldable[ISet].findRight(a)(_ % 2 == 0) must_=== Some(4)
+    Foldable[ISet].findLeft(a)(_ % 2 == 0) must_=== just(2)
+    Foldable[ISet].findRight(a)(_ % 2 == 0) must_=== just(4)
   }
 
   "findLeft" ! forAll{ a: ISet[Int] =>
@@ -62,11 +63,11 @@ object ISetTest extends SpecLite {
 
   "index" ! forAll { (a: ISet[Int], i: Byte) =>
     val F = Foldable[ISet]
-    F.index(a, i) must_=== a.toList.lift(i)
-    F.index(a, -1) must_=== None
+    F.index(a, i) must_=== a.toList.lift(i).toMaybe
+    F.index(a, -1) must_=== Maybe.empty
     F.index(a, 0) must_=== a.findMin
     F.index(a, a.size - 1) must_=== a.findMax
-    F.index(a, a.size) must_=== None
+    F.index(a, a.size) must_=== Maybe.empty
   }
 
   "toIList" ! forAll { a: ISet[Int] =>
@@ -127,14 +128,14 @@ object ISetTest extends SpecLite {
   "lookupIndex" ! forAll { a: ISet[Int] =>
     val l = a.toList
     (0 until a.size) foreach { i =>
-      a.lookupIndex(l(i)) must_=== Some(i)
+      a.lookupIndex(l(i)) must_=== just(i)
     }
     (0 until 5) foreach { _ =>
       val r = Random.nextInt()
       if(a.member(r))
-        a.lookupIndex(r) must_=== Some(l.indexOf(r))
+        a.lookupIndex(r) must_=== just(l.indexOf(r))
       else
-        a.lookupIndex(r) must_=== None
+        a.lookupIndex(r) must_=== Maybe.empty
     }
   }
 
@@ -157,7 +158,7 @@ object ISetTest extends SpecLite {
       case Some(b) =>
         (i > b) must_=== true
         val (c, d) = a.split(i)
-        c.findMax must_=== Option(b)
+        c.findMax must_=== just(b)
         Foldable[ISet].all(d)(_ > i) must_=== true
         a.filter(x => b < x && x < i) must_=== ISet.empty
       case None =>
@@ -169,7 +170,7 @@ object ISetTest extends SpecLite {
     a.lookupGT(i) match {
       case Some(b) =>
         (i < b) must_=== true
-        a.split(i)._2.findMin must_=== Option(b)
+        a.split(i)._2.findMin must_=== just(b)
       case None =>
         a.split(i)._2 must_=== ISet.empty
     }
@@ -262,11 +263,11 @@ object ISetTest extends SpecLite {
   }
 
   "findMin" ! forAll {(a: ISet[Int]) =>
-    a.findMin must_=== a.toList.sorted.headOption
+    a.findMin must_=== a.toIList.sorted.headMaybe
   }
 
   "findMax" ! forAll {(a: ISet[Int]) =>
-    a.findMax must_=== a.toList.sortWith(_ > _).headOption
+    a.findMax must_=== a.toIList.sorted.reverse.headMaybe
   }
 
   "deleteMin" ! forAll {(a: ISet[Int]) =>

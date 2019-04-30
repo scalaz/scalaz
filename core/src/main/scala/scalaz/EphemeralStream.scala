@@ -2,6 +2,7 @@ package scalaz
 
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicReference
+import Maybe._
 
 /** Like [[scala.collection.immutable.Stream]], but doesn't save
   * computed values.  As such, it can be used to represent similar
@@ -18,14 +19,14 @@ sealed abstract class EphemeralStream[A] {
 
   private[scalaz] def tail: () => EphemeralStream[A]
 
-  def headOption: Option[A] = {
-    if(isEmpty) None
-    else Some(head())
+  def headMaybe: Maybe[A] = {
+    if(isEmpty) Maybe.empty
+    else just(head())
   }
 
-  def tailOption: Option[EphemeralStream[A]] = {
-    if(isEmpty) None
-    else Some(tail())
+  def tailMaybe: Maybe[EphemeralStream[A]] = {
+    if(isEmpty) Maybe.empty
+    else just(tail())
   }
 
   def toList: List[A] =
@@ -77,20 +78,20 @@ sealed abstract class EphemeralStream[A] {
     if (isEmpty) EphemeralStream(emptyEphemeralStream)
     else cons(emptyEphemeralStream, tail().inits.map(cons(head(), _)))
 
-  def findM[M[_]: Monad](p: A => M[Boolean]): M[Option[A]] =
+  def findM[M[_]: Monad](p: A => M[Boolean]): M[Maybe[A]] =
     if(isEmpty)
-      Monad[M].point(None)
+      Monad[M].point(Maybe.empty)
     else {
       val hh = head()
-      Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
+      Monad[M].bind(p(hh))(if (_) Monad[M].point(just(hh)) else tail() findM p)
     }
 
-  def findMapM[M[_]: Monad, B](f: A => M[Option[B]]): M[Option[B]] = {
+  def findMapM[M[_]: Monad, B](f: A => M[Maybe[B]]): M[Maybe[B]] = {
     if(isEmpty)
-      Monad[M].point(None)
+      Monad[M].point(Maybe.empty)
     else{
       val hh = head()
-      Monad[M].bind(f(hh)) { case Some(b) => Monad[M].point(Some(b)); case None => tail() findMapM f }
+      Monad[M].bind(f(hh)) { case Just(b) => Monad[M].point(just(b)); case Empty() => tail() findMapM f }
     }
   }
 
@@ -172,26 +173,26 @@ sealed abstract class EphemeralStreamInstances {
     override def foldRight[A, B](fa: EphemeralStream[A], z: => B)(f: (A, => B) => B): B =
       if(fa.isEmpty) z else f(fa.head(), foldRight(fa.tail(), z)(f))
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
-      M.unfoldrSum(fa)(as => as.headOption match {
-        case Some(a) => Maybe.just((f(a), as.tailOption.getOrElse(EphemeralStream())))
-        case None => Maybe.empty
+      M.unfoldrSum(fa)(as => as.headMaybe match {
+        case Just(a) => Maybe.just((f(a), as.tailMaybe.getOrElse(EphemeralStream())))
+        case Empty() => Maybe.empty
       })
-    override def foldMap1Opt[A, B](fa: EphemeralStream[A])(f: A => B)(implicit B: Semigroup[B]) =
-      foldMapRight1Opt(fa)(f)((l, r) => B.append(f(l), r))
+    override def foldMap1Maybe[A, B](fa: EphemeralStream[A])(f: A => B)(implicit B: Semigroup[B]) =
+      foldMapRight1Maybe(fa)(f)((l, r) => B.append(f(l), r))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)((b, a) => f(b, a))
 
-    override def foldMapRight1Opt[A, B](fa: EphemeralStream[A])(z: A => B)(f: (A, => B) => B): Option[B] = {
+    override def foldMapRight1Maybe[A, B](fa: EphemeralStream[A])(z: A => B)(f: (A, => B) => B): Maybe[B] = {
       def rec(tortoise: EphemeralStream[A], hare: EphemeralStream[A]): B =
         if (hare.isEmpty) z(tortoise.head())
         else f(tortoise.head(), rec(hare, hare.tail()))
-      if (fa.isEmpty) None
-      else Some(rec(fa, fa.tail()))
+      if (fa.isEmpty) Maybe.empty
+      else just(rec(fa, fa.tail()))
     }
 
-    override def foldMapLeft1Opt[A, B](fa: EphemeralStream[A])(z: A => B)(f: (B, A) => B): Option[B] =
-      if (fa.isEmpty) None
-      else Some(foldLeft(fa.tail(), z(fa.head()))(f))
+    override def foldMapLeft1Maybe[A, B](fa: EphemeralStream[A])(z: A => B)(f: (B, A) => B): Maybe[B] =
+      if (fa.isEmpty) Maybe.empty
+      else just(foldLeft(fa.tail(), z(fa.head()))(f))
 
     override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
       if(fa.isEmpty) emptyEphemeralStream
@@ -216,9 +217,9 @@ sealed abstract class EphemeralStreamInstances {
       F.map(rev)((rev) => rev.foldLeft(EphemeralStream[B]())((r, c) => c ##:: r))
     }
 
-    override def index[A](fa: EphemeralStream[A], i: Int): Option[A] = {
+    override def index[A](fa: EphemeralStream[A], i: Int): Maybe[A] = {
       if(i < 0)
-        None
+        Maybe.empty
       else{
         var n = i
         var these = fa
@@ -226,7 +227,7 @@ sealed abstract class EphemeralStreamInstances {
           n -= 1
           these = these.tail()
         }
-        if (these.isEmpty) None else Some(these.head())
+        if (these.isEmpty) Maybe.empty else just(these.head())
       }
     }
     def tailrecM[A, B](a: A)(f: A => EphemeralStream[A \/ B]): EphemeralStream[B] = {

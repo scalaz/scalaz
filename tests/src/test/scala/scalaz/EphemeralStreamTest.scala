@@ -5,6 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import syntax.contravariant._
 import org.scalacheck.Prop.forAll
+import scalaz.Maybe.{fromOption, just}
 
 object EphemeralStreamTest extends SpecLite {
 
@@ -87,13 +88,13 @@ object EphemeralStreamTest extends SpecLite {
   }
 
   "index" ! forAll {(xs: EphemeralStream[Int], i: Int) =>
-    Foldable[EphemeralStream].index(xs, i) must_===(xs.toList.lift.apply(i))
+    Foldable[EphemeralStream].index(xs, i) must_=== fromOption(xs.toList.lift.apply(i))
   }
 
   "index infinite stream" in {
     val i = util.Random.nextInt(1000)
     val xs = Stream from 0
-    Foldable[EphemeralStream].index(EphemeralStream.fromStream(xs), i) must_===(xs.lift.apply(i))
+    Foldable[EphemeralStream].index(EphemeralStream.fromStream(xs), i) must_=== fromOption(xs.lift.apply(i))
   }
 
   "inits" ! forAll { xs: EphemeralStream[Int] =>
@@ -127,36 +128,36 @@ object EphemeralStreamTest extends SpecLite {
 
   "foldMap1Opt identity" ! forAll {
     xs: EphemeralStream[Int] =>
-    Foldable[EphemeralStream].foldMap1Opt(xs)(Vector(_)).getOrElse(Vector.empty) must_===(Foldable[EphemeralStream].toVector(xs))
+    Foldable[EphemeralStream].foldMap1Maybe(xs)(Vector(_)).getOrElse(Vector.empty) must_===(Foldable[EphemeralStream].toVector(xs))
   }
 
   "foldMap1Opt evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(false)(identity)
-    Foldable[EphemeralStream].foldMap1Opt(infiniteStream)(identity)(booleanInstance.conjunction) must_===(Some(false))
+    Foldable[EphemeralStream].foldMap1Maybe(infiniteStream)(identity)(booleanInstance.conjunction) must_=== just(false)
   }
 
   "foldRight evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(true)(identity)
-    Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must_===(true)
+    Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must_=== true
   }
 
   "foldMapLeft1Opt identity" ! forAll {
     (xs: EphemeralStream[Int]) =>
-    Foldable[EphemeralStream].foldMapLeft1Opt(xs.reverse)(EphemeralStream(_))((xs, x) => x ##:: xs) must_===(
-      if (xs.isEmpty) None else Some(xs)
+    Foldable[EphemeralStream].foldMapLeft1Maybe(xs.reverse)(EphemeralStream(_))((xs, x) => x ##:: xs) must_===(
+      if (xs.isEmpty) Maybe.empty else just(xs)
     )
   }
 
   "foldMapRight1Opt identity" ! forAll {
     (xs: EphemeralStream[Int]) =>
-    Foldable[EphemeralStream].foldMapRight1Opt(xs)(EphemeralStream(_))(_ ##:: _) must_===(
-      if (xs.isEmpty) None else Some(xs)
+    Foldable[EphemeralStream].foldMapRight1Maybe(xs)(EphemeralStream(_))(_ ##:: _) must_===(
+      if (xs.isEmpty) Maybe.empty else just(xs)
     )
   }
 
   "foldMapRight1Opt evaluates lazily" in {
     val infiniteStream = EphemeralStream.iterate(true)(identity)
-    Foldable[EphemeralStream].foldMapRight1Opt(infiniteStream)(identity)(_ || _) must_===(Some(true))
+    Foldable[EphemeralStream].foldMapRight1Maybe(infiniteStream)(identity)(_ || _) must_=== just(true)
   }
 
   "zipL" in {

@@ -1,6 +1,7 @@
 package scalaz
 
 import TreeLoc._
+
 import annotation.tailrec
 
 /**
@@ -183,7 +184,9 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 sealed abstract class TreeLocInstances {
   implicit val treeLocInstance: Comonad[TreeLoc] with Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
     import Stream.Empty
+    import Maybe.Just
     import scalaz.std.stream._
+
 
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
@@ -325,20 +328,20 @@ sealed abstract class TreeLocInstances {
     }
 
     override def foldMapRight1[A, B](fa: TreeLoc[A])(z: A => B)(f: (A, => B) => B) =
-      ParentsT.foldMapRight1Opt(fa.parents)(z)(f) match {
-        case Some(p) =>
+      ParentsT.foldMapRight1Maybe(fa.parents)(z)(f) match {
+        case Just(p) =>
           fa.tree.foldRight(
             ForestT.foldRight(fa.lefts, ForestT.foldRight(fa.rights, p)(f))(f)
           )(f)
-        case None =>
-          ForestT.foldMapRight1Opt(fa.rights)(z)(f) match {
-            case Some(r) =>
+        case Maybe.Empty() =>
+          ForestT.foldMapRight1Maybe(fa.rights)(z)(f) match {
+            case Just(r) =>
               fa.tree.foldRight(ForestT.foldRight(fa.lefts, r)(f))(f)
-            case None =>
-              ForestT.foldMapRight1Opt(fa.lefts)(z)(f) match {
-                case Some(l) =>
+            case Maybe.Empty() =>
+              ForestT.foldMapRight1Maybe(fa.lefts)(z)(f) match {
+                case Just(l) =>
                   fa.tree.foldRight(l)(f)
-                case None =>
+                case Maybe.Empty() =>
                   Foldable1[Tree].foldMapRight1(fa.tree)(z)(f)
               }
           }
@@ -387,10 +390,10 @@ sealed abstract class TreeLocInstances {
       }
 
       override def foldMapRight1[A, B](fa: Parent[A])(z: A => B)(f: (A, => B) => B): B =
-        ForestT.foldMapRight1Opt(fa._3)(z)(f) match {
-          case Some(r) =>
+        ForestT.foldMapRight1Maybe(fa._3)(z)(f) match {
+          case Maybe.Just(r) =>
             ForestT.foldRight(fa._1, f(fa._2, r))(f)
-          case None =>
+          case Maybe.Empty() =>
             ForestT.foldRight(fa._1, z(fa._2))(f)
         }
     }

@@ -1083,6 +1083,7 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   import std.list._
   import std.tuple._
+  import Maybe._
 
   implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
     Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
@@ -1108,36 +1109,36 @@ sealed abstract class MapInstances extends MapInstances0 {
 
   implicit def mapCovariant[S]: Traverse[S ==>> ?] =
     new Traverse[S ==>> ?] {
-      override def findLeft[A](fa: S ==>> A)(f: A => Boolean): Option[A] =
+      override def findLeft[A](fa: S ==>> A)(f: A => Boolean): Maybe[A] =
         fa match {
           case Bin(_, x, l, r) =>
             findLeft(l)(f) match {
-              case a @ Some(_) =>
+              case a @ Just(_) =>
                 a
-              case None =>
+              case Empty() =>
                 if (f(x))
-                  Some(x)
+                  just(x)
                 else
                   findLeft(r)(f)
             }
           case Tip() =>
-            None
+            Maybe.empty
         }
 
-      override def findRight[A](fa: S ==>> A)(f: A => Boolean): Option[A] =
+      override def findRight[A](fa: S ==>> A)(f: A => Boolean): Maybe[A] =
         fa match {
           case Bin(_, x, l, r) =>
             findRight(r)(f) match {
-              case a @ Some(_) =>
+              case a @ Just(_) =>
                 a
-              case None =>
+              case Empty() =>
                 if (f(x))
-                  Some(x)
+                  Just(x)
                 else
                   findRight(l)(f)
             }
           case Tip() =>
-            None
+            Maybe.empty
         }
 
       override def map[A, B](fa: S ==>> A)(f: A => B): S ==>> B =
@@ -1157,8 +1158,8 @@ sealed abstract class MapInstances extends MapInstances0 {
       override def foldLeft[A, B](fa: S ==>> A, z: B)(f: (B, A) => B): B =
         fa.foldlWithKey(z)((acc, _, b) => f(acc, b))
 
-      override def index[A](fa: S ==>> A, i: Int): Option[A] =
-        fa.elemAt(i).map(_._2)
+      override def index[A](fa: S ==>> A, i: Int): Maybe[A] =
+        fromOption(fa.elemAt(i).map(_._2))
 
       def traverseImpl[F[_], A, B](fa: S ==>> A)(f: A => F[B])(implicit G: Applicative[F]): F[S ==>> B] =
         fa match {

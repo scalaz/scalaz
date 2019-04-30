@@ -45,16 +45,16 @@ trait ListInstances extends ListInstances0 {
         else _a zip b
       }
 
-      override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
+      override def findLeft[A](fa: List[A])(f: A => Boolean) = Maybe.fromOption(fa.find(f))
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
-        @tailrec def loop(a: List[A], x: Option[A]): Option[A] =
+        @tailrec def loop(a: List[A], x: Maybe[A]): Maybe[A] =
           a match {
             case h :: t =>
-              loop(t, if(f(h)) Some(h) else x)
+              loop(t, if(f(h)) just(h) else x)
             case Nil =>
               x
           }
-        loop(fa, None)
+        loop(fa, Maybe.empty)
       }
 
       def alignWith[A, B, C](f: A \&/ B => C) = {

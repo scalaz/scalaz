@@ -58,15 +58,15 @@ object IListTest extends SpecLite {
   }
 
   "foldLeft1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldLeft1Opt(_ ::: _) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldLeft1Maybe(_ ::: _).toOption must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "foldRight1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldRight1Opt(_ ::: _) must_=== ns.toList.reduceRightOption(_ ::: _)
+    ns.foldRight1Maybe(_ ::: _).toOption must_=== ns.toList.reduceRightOption(_ ::: _)
   }
 
   "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
-    ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
+    ns.foldMap1Maybe(identity).toOption must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
   "foldMap" ! forAll { xs: IList[Int]  =>
@@ -205,7 +205,7 @@ object IListTest extends SpecLite {
   }
 
   "index" ! forAll { (ns: IList[Int], n: Int) =>
-    ns.index(n) must_=== ns.toList.lift(n)
+    ns.index(n).toOption must_=== ns.toList.lift(n)
   }
 
   "indexOf" ! forAll { (ns: IList[Int], n: Int) =>
@@ -288,11 +288,11 @@ object IListTest extends SpecLite {
   }
 
   "reduceLeftOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>
-    ns.reduceLeftOption(f) must_=== (try Some(ns.toList.reduceLeft(f)) catch { case e:Exception => None })
+    ns.reduceLeftMaybe(f) must_=== (try just(ns.toList.reduceLeft(f)) catch { case e:Exception => Maybe.empty })
   }
 
   "reduceRightOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>
-    ns.reduceRightOption(f) must_=== (try Some(ns.toList.reduceRight(f)) catch { case e:Exception => None })
+    ns.reduceRightMaybe(f) must_=== (try just(ns.toList.reduceRight(f)) catch { case e:Exception => Maybe.empty })
   }
 
   "reverse" ! forAll { ns: IList[Int] =>

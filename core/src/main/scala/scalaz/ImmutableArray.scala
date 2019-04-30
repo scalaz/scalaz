@@ -55,7 +55,7 @@ sealed abstract class ImmutableArrayInstances {
         else new ImmutableArray.ofRef((_a.iterator zip b.iterator).toArray)
       }
       override def index[A](fa: ImmutableArray[A], i: Int) =
-        if(0 <= i && i < fa.length) Some(fa(i)) else None
+        if(0 <= i && i < fa.length) Maybe.just(fa(i)) else Maybe.empty
       override def length[A](fa: ImmutableArray[A]) =
         fa.length
       override def empty[A](fa: ImmutableArray[A]) =
