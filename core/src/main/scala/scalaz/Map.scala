@@ -77,6 +77,14 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
+  def filterM[F[_]](f: B => F[Boolean])(implicit F: Applicative[F], O:Order[A]):F[A ==>> B] = this match {
+    case Tip() => F.pure(empty)
+    case Bin(kx, x, l ,r) => 
+      F.ap(F.tuple2(l.filterM(f),r.filterM(f)))(
+        F.map(f(x))(b => (tpl:(A ==>>B, A ==>> B)) => if (b) Bin(kx, x, tpl._1, tpl._2) else tpl._1.union(tpl._2))
+      )
+  }
+
   /** alias for [[delete]] */
   def -(k: A)(implicit o: Order[A]): A ==>> B =
     delete(k)

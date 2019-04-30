@@ -7,9 +7,14 @@ import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
 import scalaz.Maybe.{Empty, Just}
+import scalaz.scalacheck.ScalazArbitrary.ilistArbitrary
 //import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
+  "sorted List eq Foldable[List] sorted" ! forAll {
+    (xs: IList[Int]) => xs.sorted === Foldable[IList].sorted(xs)
+  }
+
   "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)
