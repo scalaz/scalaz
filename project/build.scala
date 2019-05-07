@@ -99,6 +99,7 @@ object build {
   private val stdOptions = Seq(
     // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
     "-deprecation",
+    "-Xlint:adapted-args",
     "-encoding", "UTF-8",
     "-feature",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
@@ -168,7 +169,6 @@ object build {
         Seq(
           "-Xfuture",
           "-Ypartial-unification",
-          "-Yno-adapted-args"
         )
     }.toList.flatten,
     scalacOptions ++= {

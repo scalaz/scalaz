@@ -94,7 +94,7 @@ lazy val example = Project(
   standardSettings,
   name := "scalaz-example",
   notPublish,
-  scalacOptions in (Compile, compile) -= "-Yno-adapted-args"
+  scalacOptions in (Compile, compile) -= "-Xlint:adapted-args"
 ).dependsOn(
   coreJVM, iterateeJVM
 )
@@ -158,7 +158,7 @@ lazy val site = Project(
   standardSettings,
   name := "scalaz-site",
   notPublish,
-  scalacOptions in (Compile, compile) -= "-Yno-adapted-args",
+  scalacOptions in (Compile, compile) -= "-Xlint:adapted-args",
 ).dependsOn(
   coreJVM
 ).enablePlugins(
