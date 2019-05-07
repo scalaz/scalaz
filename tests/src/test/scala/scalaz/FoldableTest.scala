@@ -6,6 +6,7 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
+import scalaz.Maybe.{Empty, Just}
 //import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
@@ -223,8 +224,8 @@ object FoldableTest extends SpecLite {
     "foldMap1Opt" ! forAll {
       (xs: List[String]) =>
         xs.toNel match {
-          case None      => (xs foldMap1Opt strlen) must_== None
-          case Some(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
+          case Empty()      => (xs foldMap1Opt strlen) must_== None
+          case Just(nel) => (xs foldMap1Opt strlen) must_== Some(nel.foldMap1(strlen))
         }
     }
 
@@ -279,6 +280,41 @@ object FoldableTest extends SpecLite {
     (l: List[Int], l2: List[Int]) =>
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
+  }
+
+  "splitWith on sorted list produces at most 2 elements" ! forAll {
+    (l: List[Int], p: Int => Boolean) =>
+      L.splitWith(l.sortBy(p))(p).size mustBe_< 3
+  }
+
+  "splitWith consistent with partition" ! forAll {
+    (l: List[Int], p: Int => Boolean) =>
+      import scalaz.syntax.std.list._
+      val (trueL, falseL) = l.partition(p)
+      L.splitWith(l.sortBy(p))(p) must_=== List(falseL, trueL).flatMap(_.toNel.toOption)
+  }
+
+  "selectSplit: removes all non-satisfying elements" ! forAll {
+    (l: List[Int]) =>
+      L.selectSplit(l)(_ => false).size must_=== 0
+  }
+
+  "selectSplit: keeps all satisfying elements" ! forAll {
+    (l: List[Int]) =>
+      import scalaz.syntax.std.list._
+      L.selectSplit(l)(_ => true) must_=== l.toNel.toList
+  }
+
+  "selectSplit: consistent with partition" ! forAll {
+    (l: List[Int], p: Int => Boolean) =>
+      L.selectSplit(l)(p).flatMap(_.toList) must_=== l.partition(p)._1
+  }
+
+  "selectSplit range consistent with filter" ! forAll {
+    (i1: Byte, i2: Byte) =>
+      val (s, e) = (Math.min(i1.toInt, i2.toInt), Math.max(i1.toInt, i2.toInt))
+      val range = List.range(s, e)
+      L.selectSplit(range)(_ % 2 != 0) must_=== range.filter(_ % 2 != 0).map(NonEmptyList(_))
   }
 
   /*

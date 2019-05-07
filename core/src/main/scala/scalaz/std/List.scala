@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scalaz.Maybe.just
+
 import scala.annotation.tailrec
 
 trait ListInstances0 {
@@ -70,7 +72,7 @@ trait ListInstances extends ListInstances0 {
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
         val revOpt: Maybe[F[List[B]]] =
           F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
-            case a :: as => Maybe.just((f(a), as))
+            case a :: as => just((f(a), as))
             case Nil => Maybe.empty
           })(Reducer.ReverseListReducer[B])
 
@@ -94,7 +96,7 @@ trait ListInstances extends ListInstances0 {
 
       override def foldMap[A, B](fa: List[A])(f: A => B)(implicit M: Monoid[B]) =
         M.unfoldrSum(fa)(as => as.headOption match {
-          case Some(a) => Maybe.just((f(a), as.tail))
+          case Some(a) => just((f(a), as.tail))
           case None => Maybe.empty
         })
 
@@ -144,15 +146,15 @@ trait ListFunctions {
   /** [[scala.Nil]] with a sometimes more convenient type */
   final def nil[A]: List[A] = Nil
 
-  final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
-    case Nil    => None
-    case h :: t => Some(NonEmptyList.nel(h, IList.fromList(t)))
+  final def toNel[A](as: List[A]): Maybe[NonEmptyList[A]] = as match {
+    case Nil    => Maybe.empty
+    case h :: t => just(NonEmptyList.nel(h, IList.fromList(t)))
   }
 
-  final def toZipper[A](as: List[A]): Option[Zipper[A]] =
+  final def toZipper[A](as: List[A]): Maybe[Zipper[A]] =
     stream.toZipper(as.toStream)
 
-  final def zipperEnd[A](as: List[A]): Option[Zipper[A]] =
+  final def zipperEnd[A](as: List[A]): Maybe[Zipper[A]] =
     stream.zipperEnd(as.toStream)
 
   /**
@@ -184,10 +186,10 @@ trait ListFunctions {
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
     */
-  final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
-    case Nil    => Monad[M].point(None: Option[A])
+  final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Maybe[A]] = as match {
+    case Nil    => Monad[M].point(Maybe.empty[A])
     case h :: t => Monad[M].bind(p(h))(b =>
-      if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
+      if (b) Monad[M].point(just[A](h)) else findM(t)(p))
   }
 
   final def powerset[A](as: List[A]): List[List[A]] = {

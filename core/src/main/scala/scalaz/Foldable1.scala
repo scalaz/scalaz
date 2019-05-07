@@ -70,6 +70,20 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 
   def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
 
+  def foldLeftM1[G[_], A, B](fa: F[A])(z: A => B)(f: (B, A) => G[B])(implicit G: Monad[G]): G[B] =
+    foldMapLeft1(fa)(a => G.point(z(a))) { (gb, a) => G.bind(gb)(f(_, a)) }
+
+  def foldRightM1[G[_], A, B](fa: F[A])(z: A => B)(f: (A, => B) => G[B])(implicit G: Monad[G]): G[B] =
+    foldMapRight1(fa)(a => G.point(z(a))) { (a, gb) => G.bind(gb)(f(a, _)) }
+
+  /**Curried version of `foldLeftM1` */
+  final def foldlM1[G[_]: Monad, A, B](fa: F[A])(z: A => B)(f: B => A => G[B]): G[B] =
+    foldLeftM1(fa)(z)((b, a) => f(b)(a))
+
+  /**Curried version of `foldRightM1` */
+  final def foldrM1[G[_]: Monad, A, B](fa: F[A])(z: A => B)(f: A => (=> B) => G[B]): G[B] =
+    foldRightM1(fa)(z)((a, b) => f(a)(b))
+
   import Ordering.{GT, LT}
 
   /** The greatest element of `fa`. */

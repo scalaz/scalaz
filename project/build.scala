@@ -101,7 +101,6 @@ object build {
     "-deprecation",
     "-encoding", "UTF-8",
     "-feature",
-    "-Xfuture",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
@@ -131,7 +130,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.8"
-  private def Scala213 = "2.13.0-M5"
+  private def Scala213 = "2.13.0-RC1"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -165,8 +164,9 @@ object build {
       case _ => Seq("-opt:l:method")
     }),
     scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((2, v)) if v <= 12 || scalaVersion.value == "2.13.0-M3" =>
+      case Some((2, v)) if v <= 12 =>
         Seq(
+          "-Xfuture",
           "-Ypartial-unification",
           "-Yno-adapted-args"
         )
@@ -301,8 +301,8 @@ object build {
     },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.9.9",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    kindProjectorVersion := "0.10.0",
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))

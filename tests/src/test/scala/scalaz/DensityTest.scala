@@ -6,8 +6,6 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 
-import scala.language.higherKinds
-
 class DensityTest extends SpecLite {
 
   implicit def densityArb[F[_], A](implicit A: Arbitrary[F[A]], W: Comonad[F]): Arbitrary[Density[F, A]] =

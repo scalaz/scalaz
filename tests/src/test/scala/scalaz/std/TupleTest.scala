@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-import collection.immutable.IndexedSeq
+import scala.collection.immutable.IndexedSeq
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
