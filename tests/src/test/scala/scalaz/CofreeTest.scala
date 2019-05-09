@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
-import std.AllInstances._
+import std.AllInstances.{ enumInstance => _, _}
 import org.scalacheck.{Arbitrary, Cogen}
 import org.scalacheck.Prop.forAll
 import Cofree._
@@ -12,34 +12,13 @@ import Cofree.CofreeZip
 import Isomorphism._
 import EphemeralStream._
 
-object CofreeTest extends SpecLite {
+object CofreeTest extends SpecLite with CofreeTestInstances {
 
   type CofreeLazyOption[A] = Cofree[LazyOption, A]
   type CofreeStream[A] = Cofree[EStream, A]
   type OneAndStream[A] = OneAnd[EStream, A]
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
-
-  implicit def cofreeEqual[F[_], A](implicit F: Eq1[F], A: Equal[A]): Equal[Cofree[F, A]] =
-    Equal.equal{ (a, b) =>
-      A.equal(a.head, b.head) && F.eq1(cofreeEqual[F, A]).equal(a.tail, b.tail)
-    }
-
-  implicit def cofreeZipEqual[F[_]: Eq1, A: Equal]: Equal[CofreeZip[F, A]] =
-    Tag.subst(cofreeEqual[F, A])
-
-  //needed to prevent SOE for testing with equality
-  implicit def cofreeOptEquals[A](implicit e: Equal[A]): Equal[CofreeOption[A]] = new Equal[CofreeOption[A]] {
-    override def equal(a: CofreeOption[A], b: CofreeOption[A]): Boolean = {
-      def tr(a: CofreeOption[A], b: CofreeOption[A]): Boolean =
-        (a.tail, b.tail) match {
-          case (Some(at), Some(bt)) if (e.equal(a.head, b.head)) => tr(at, bt)
-          case (None, None) if (e.equal(a.head, b.head)) => true
-          case _ => false
-        }
-      tr(a,b)
-    }
-  }
 
   val oneAndListCofreeOptionIso: OneAndList <~> CofreeOption =
     new IsoFunctorTemplate[OneAndList, CofreeOption] {
