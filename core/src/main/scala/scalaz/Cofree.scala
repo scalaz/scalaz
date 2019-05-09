@@ -116,7 +116,7 @@ object Cofree extends CofreeInstances {
 
 import Cofree.CofreeZip
 
-sealed abstract class CofreeInstances4 {
+sealed abstract class CofreeInstances4 extends CofreeInstancesVersionSpecific {
   /** low priority `Foldable1` instance */
   implicit def cofreeFoldable[F[_]: Foldable]: Foldable1[Cofree[F, ?]] =
     new CofreeFoldable[F]{
