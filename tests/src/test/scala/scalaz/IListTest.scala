@@ -117,10 +117,6 @@ object IListTest extends SpecLite {
     ns.foldRight(s)(f) == ns.toList.foldRight(s)(f)
   }
 
-  "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ns concat ms).toList must_=== ns.toList ++ ms.toList
-  }
-
   "collect" ! forAll { (ns: IList[Int]) =>
     val pf: PartialFunction[Int, Int] = { case n if n % 2 == 0 => n + 1 }
     ns.collect(pf).toList must_=== ns.toList.collect(pf)
@@ -132,7 +128,7 @@ object IListTest extends SpecLite {
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ns ++ ms).toList must_=== ns.toList ++ ms.toList
+    (ns concat ms).toList must_=== ns.toList ++ ms.toList
   }
 
   "containsSlice" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -274,6 +270,10 @@ object IListTest extends SpecLite {
 
   "prefixLength" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
     ns.prefixLength(f) must_=== ns.toList.prefixLength(f)
+  }
+
+  "prepend" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
+    (ms prepend ns).toList must_== ns.toList ++: ms.toList
   }
 
   "reduceLeftOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>
