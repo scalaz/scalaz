@@ -169,7 +169,6 @@ object build {
       "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
-      "-Xfuture",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -177,7 +176,14 @@ object build {
       case Some((2,v)) if v >= 12 => Seq("-opt:l:method")
       case _ => Nil
     }),
-
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v <= 12 =>
+          Seq("-Xfuture")
+        case _ =>
+          Nil
+      }
+    },
     scalacOptions in (Compile, doc) ++= {
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
       Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
