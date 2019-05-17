@@ -36,6 +36,11 @@ matrix:
     - scala: 2.12.8
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS"
+    - scala: 2.13.0-RC2
+      jdk: oraclejdk8
+      script:
+      - git clone https://github.com/typelevel/kind-projector.git && cd kind-projector && git checkout v0.10.0 && sbt "++${TRAVIS_SCALA_VERSION}!" publishLocal && cd ..
+      - sbt "++${TRAVIS_SCALA_VERSION}" "all effectJVM/compile concurrent/compile example/compile iterateeJVM/compile effectJS/compile iterateeJS/compile"
     - scala: 2.11.12
       jdk: oraclejdk8
       env: SCALA_NATIVE
