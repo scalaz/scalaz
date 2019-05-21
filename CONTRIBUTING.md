@@ -257,7 +257,7 @@ parameters.
     λ[α => (α, α)]  ===  ({type λ[α] = (α, α)})#λ
     λ[α[_] => F[α]  ===  ({type λ[α[_]] = F[α]})#λ
 
-For more information see https://github.com/non/kind-projector
+For more information see https://github.com/typelevel/kind-projector
 
 ### Parameters
 
