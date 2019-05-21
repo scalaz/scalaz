@@ -131,7 +131,7 @@ object build {
 
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.8"
-  private def Scala213 = "2.13.0-RC1"
+  private def Scala213 = "2.13.0-RC2"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -301,7 +301,7 @@ object build {
     },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.10.0",
+    kindProjectorVersion := "0.10.1",
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
