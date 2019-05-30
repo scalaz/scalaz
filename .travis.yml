@@ -17,7 +17,6 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.13.0-RC3" ]]; then git clone https://github.com/typelevel/kind-projector.git && cd kind-projector && git checkout v0.10.1 && sbt "++${TRAVIS_SCALA_VERSION}!" publishLocal && cd .. ; fi
   - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
   - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
