@@ -21,8 +21,9 @@ sealed abstract class IList[A] extends Product with Serializable {
   def ++(as: IList[A]): IList[A] =
     concat(as)
 
+  /** alias for `prepend` */
   def ++:(as: IList[A]): IList[A] =
-    as.concat(this)
+    prepend(as)
 
   def +:(a: A): IList[A] =
     ::(a)
@@ -289,6 +290,9 @@ sealed abstract class IList[A] extends Product with Serializable {
       }
     prefixLength0(0, this)
   }
+
+  def prepend(as: IList[A]): IList[A] =
+    as.concat(this)
 
   // no product, use Foldable#fold
 
