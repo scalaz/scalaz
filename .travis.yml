@@ -16,6 +16,7 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
+  - if [[ "${TRAVIS_SCALA_VERSION}" == "2.13.0-RC3" ]]; then git clone https://github.com/typelevel/kind-projector.git && cd kind-projector && git checkout v0.10.1 && sbt "++${TRAVIS_SCALA_VERSION}!" publishLocal && cd .. ; fi
   - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
   - if [[ "${JAVA_HOME}" != $(jdk_switcher home openjdk11) && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
@@ -50,10 +51,10 @@ matrix:
       env: TEST_PROJECT=""
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
-    - scala: 2.13.0-RC2
+    - scala: 2.13.0-RC3
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJVM_213"
-    - scala: 2.13.0-RC2
+    - scala: 2.13.0-RC3
       jdk: oraclejdk8
       env: TEST_PROJECT="rootJS_213"
 
