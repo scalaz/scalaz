@@ -166,7 +166,7 @@ def scalacheckBindingProject(
       },
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 12 =>
+          case Some((2, v)) if v <= 13 =>
             scalazMimaBasis.?.value.map { v =>
               organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
             }.toSet
@@ -181,7 +181,7 @@ def scalacheckBindingProject(
       },
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v <= 12 =>
+          case Some((2, v)) if v <= 13 =>
             scalazMimaBasis.?.value.map { v =>
               organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
             }.toSet
