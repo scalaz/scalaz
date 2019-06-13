@@ -320,15 +320,18 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
     }
 
   /** Convert to a disjunction. */
-  def disjunction: (E \/ A) =
+  def toDisjunction: (E \/ A) =
     this match {
       case Success(a) => \/-(a)
       case Failure(e) => -\/(e)
     }
 
+  @deprecated("Use `toDisjunction`", "7.3.0")
+  def disjunction: E \/ A = toDisjunction
+
   /** Run a disjunction function and back to validation again. Alias for `@\/` */
   def disjunctioned[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
-    k(disjunction).validation
+    k(toDisjunction).toValidation
 
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =

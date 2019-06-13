@@ -206,8 +206,11 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
     Z.cozip(run)
 
   /** Convert to a validation. */
-  def validation(implicit F: Functor[F]): F[Validation[A, B]] =
-    F.map(run)(_.validation)
+  def toValidation(implicit F: Functor[F]): F[Validation[A, B]] =
+    F.map(run)(_.toValidation)
+
+  @deprecated("Use `toValidation`", "7.3.0")
+  def validation(implicit F: Functor[F]): F[Validation[A, B]] = toValidation
 
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[AA, F, BB] =

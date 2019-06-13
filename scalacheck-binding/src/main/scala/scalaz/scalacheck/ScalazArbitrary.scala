@@ -437,7 +437,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     }
 
   implicit def ValidationArbitrary[A: Arbitrary, B: Arbitrary]: Arbitrary[Validation[A, B]] =
-    Functor[Arbitrary].map(arb[A \/ B])(_.validation)
+    Functor[Arbitrary].map(arb[A \/ B])(_.toValidation)
 
 //  implicit def ZipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] = arb[Stream[A]] ∘ ((s: Stream[A]) => s.ʐ)
 
