@@ -32,7 +32,7 @@ object ApplicativeTest extends SpecLite {
   def filterMMap[F[_]: Monad, A: Order, B](map: A ==>> B, f: B => F[Boolean]): F[A ==>> B] = map match {
     case Tip() => Monad[F].pure(==>>.empty)
     case Bin(kx, x, l ,r) => for {
-      b <- f(x) 
+      b <- f(x)
       newL <- filterMMap(l, f)
       newR <- filterMMap(r, f)
       self <- if (b) Monad[F].pure(Bin(kx, x, newL, newR)) else Monad[F].pure(newL.union(newR))
