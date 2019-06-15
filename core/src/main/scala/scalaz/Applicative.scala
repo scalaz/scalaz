@@ -70,6 +70,9 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
   def replicateM_[A](n: Int, fa: F[A]): F[Unit] =
     listInstance.sequence_(List.fill(n)(fa))(this)
 
+  /** Filter `map` according to an applicative predicate. **/
+  def filterM[A,B](map: A ==>> B)(f: B => F[Boolean])(implicit O:Order[A]):F[A ==>> B] = map.filterM(f)(this, O)
+
   /** Filter `l` according to an applicative predicate. */
   def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
     l match {
