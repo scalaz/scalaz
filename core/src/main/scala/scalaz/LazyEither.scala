@@ -28,7 +28,10 @@ sealed abstract class LazyEither[A, B] {
   def toEither: Either[A, B] =
     fold(Left(_), Right(_))
 
-  def disjunction: (A \/ B) =
+  @deprecated("Use `toDisjunction`", "7.3.0")
+  def disjunction: A \/ B = toDisjunction
+
+  def toDisjunction: (A \/ B) =
     fold(-\/(_), \/-(_))
 
   def getOrElse[BB >: B](default: => BB): BB =

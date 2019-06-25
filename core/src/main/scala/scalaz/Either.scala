@@ -315,22 +315,28 @@ sealed abstract class \/[A, B] extends Product with Serializable {
     }
 
   /** Convert to a Validation. */
-  def validation: Validation[A, B] =
+  def toValidation: Validation[A, B] =
     this match {
       case -\/(a) => Failure(a)
       case \/-(b) => Success(b)
     }
 
+  @deprecated("Use `toValidation`", "7.3.0")
+  def validation: Validation[A, B] = toValidation
+
   /** Convert to a ValidationNel. */
-  def validationNel[AA>:A] : ValidationNel[AA,B] =
+  def toValidationNel[AA>:A] : ValidationNel[AA,B] =
     this match {
       case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
     }
 
+  @deprecated("Use `toValidationNel`", "7.3.0")
+  def validationNel[AA>:A]: ValidationNel[AA, B] = toValidationNel
+
   /** Run a validation function and back to disjunction again. Alias for `@\?/` */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
-    k(validation).disjunction
+    k(toValidation).toDisjunction
 
   /** Run a validation function and back to disjunction again. Alias for `validationed` */
   def @\?/[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
