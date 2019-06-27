@@ -319,15 +319,15 @@ sealed abstract class EitherTInstances4 extends EitherTInstances5{
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[E, F, ?], E] =
-    new EitherTMonadError[F, E] {
+  implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[EitherT[L, F, ?]] =
+    new EitherTFunctor[F, L] {
       implicit def F = F0
     }
 }
 
 sealed abstract class EitherTInstances2 extends EitherTInstances3 {
-  implicit def eitherTFunctor[F[_], L](implicit F0: Functor[F]): Functor[EitherT[L, F, ?]] =
-    new EitherTFunctor[F, L] {
+  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[E, F, ?], E] =
+    new EitherTMonadError[F, E] {
       implicit def F = F0
     }
 }
