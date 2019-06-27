@@ -304,7 +304,6 @@ object build {
       case _ =>
         Nil
     }),
-    resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.10.3",
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
