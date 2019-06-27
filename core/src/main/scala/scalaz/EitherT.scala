@@ -304,7 +304,8 @@ sealed abstract class EitherTInstances4 {
 }
 
 sealed abstract class EitherTInstances3 extends EitherTInstances4 {
-  implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
+  // for binary compatibility
+  def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
     new EitherTMonadError[F, E] {
       implicit def F = F0
     }
@@ -323,6 +324,12 @@ sealed abstract class EitherTInstances1 extends EitherTInstances2 {
     new EitherTMonad[F, L] {
       implicit def F = F0
     }
+
+  override implicit def eitherTMonadError[F[_], E](implicit F0: Monad[F]): MonadError[EitherT[F, E, ?], E] =
+    new EitherTMonadError[F, E] {
+      implicit def F = F0
+    }
+
   implicit def eitherTPlus[F[_], L](implicit F0: Monad[F], L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
     new EitherTPlus[F, L] {
       implicit def F = F0
