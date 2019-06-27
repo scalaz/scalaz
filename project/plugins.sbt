@@ -14,7 +14,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.1")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.11")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.7.0")
 
