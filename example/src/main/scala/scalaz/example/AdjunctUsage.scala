@@ -33,12 +33,12 @@ object AdjunctUsage extends App {
   //-------------------------------------------
   // using reader and write adjunction as State
 
-  // Writer and Reader Functors form and adjunction that gives us a
-  // Monad the behaves like State, think of it as a function which
-  // Reads the state perfoms a computation and Writes the new state.
+  // Writer and Reader Functors form an adjunction that gives us a
+  // Monad that behaves like State. Think of it as a function which
+  // Reads the state, perfoms a computation and Writes the new state.
   type RWState[S,A] = Reader[S, Writer[S, A]]
 
-  // here is our checkForRepeats function rewriten for the new form
+  // here is our checkForRepeats function rewritten for the new form
   val checkForRepeatsAdj: Int => RWState[Option[Int], Boolean] = { next =>
     // read in the last value, write out the next value and the boolean result
     Reader(last => Writer(some(next), last === some(next)))
