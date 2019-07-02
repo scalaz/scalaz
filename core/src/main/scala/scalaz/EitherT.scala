@@ -338,6 +338,11 @@ sealed abstract class EitherTInstances1 extends EitherTInstances2 {
       implicit def F = F0
       implicit def G = L0
     }
+  
+  implicit def eitherTMonadReader[E, F[_], R](implicit F0: MonadReader[F, R]): MonadReader[EitherT[E, F, ?], R] = 
+    new EitherTMonadReader[E, F, R] {
+      implicit def F = F0
+    }
 }
 
 sealed abstract class EitherTInstances0 extends EitherTInstances1 {
@@ -537,4 +542,11 @@ private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[E, F
       case (a, residuals) =>
         a.map((_, residuals.map(new EitherT(_))))
     })
+}
+
+private trait EitherTMonadReader[E,F[_],R] extends MonadReader[EitherT[E,F,?], R] with EitherTMonad[F, E] {
+  implicit def F : MonadReader[F,R]
+  
+  def ask : EitherT[E,F,R] = EitherT.rightT(F.ask)
+  def local[A](f: R => R)(fa: EitherT[E,F,A]): EitherT[E,F,A] = fa.mapT(e => F.local(f)(e))
 }
