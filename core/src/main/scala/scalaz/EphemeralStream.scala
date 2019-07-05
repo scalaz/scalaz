@@ -248,9 +248,34 @@ sealed abstract class EphemeralStreamInstances {
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
 
+  // implicit def ephemeralStreamOrder[A : Order]: Order[EphemeralStream[A]] = 
+  //   Contravariant[Order].contramap(Stream.order[A])(_.toIList)
+  
+  // import EphemeralStream.EStream
+  implicit def ephemeralStreamOrder[A : Order : Equal] : Order[EphemeralStream[A]] =
+    new Order[EphemeralStream[A]] {
+      lazy val A = Order[A]
+      import Ordering._
+
+      @annotation.tailrec
+      override final def order(a: EphemeralStream[A], b: EphemeralStream[A]): Ordering =
+          (a.isEmpty, b.isEmpty) match {
+            case (true, true) => EQ
+            case (true, false) => LT
+            case (false, true) => GT
+            case _ => A.order(a.headOption.get, b.headOption.get) match {
+              case EQ => order(a.tailOption.get, b.tailOption.get)
+              case r => r
+            }
+          }
+    }
+
   implicit def ephemeralStreamSemigroup[A]: Semigroup[EphemeralStream[A]] = new Semigroup[EphemeralStream[A]] {
     def append(f1: EphemeralStream[A], f2: => EphemeralStream[A]) = f1 ++ f2
   }
+
+  implicit def ephemeralStreamMonoid[A]: Monoid[EphemeralStream[A]] =
+    ephemeralStreamInstance.monoid[A]
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Contravariant[Show].contramap(IList.show[A])(_.toIList)
