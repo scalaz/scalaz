@@ -92,6 +92,7 @@ object EitherTTest extends SpecLite {
     def bifunctor[F[_] : Functor] = Bifunctor[EitherT[?, F, ?]]
     def bifoldable[F[_] : Foldable] = Bifoldable[EitherT[?, F, ?]]
     def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[?, F, ?]]
+    def monadReader[E, R, F[_] : Monad](implicit F0: MonadReader[F, R]) = MonadReader[EitherT[E, F, ?], R]
 
     // checking absence of ambiguity
     def functor[A, F[_] : BindRec] = Functor[EitherT[A, F, ?]]
@@ -121,6 +122,8 @@ object EitherTTest extends SpecLite {
     def nondeterminismMonad[A, F[_] : Nondeterminism] = Monad[EitherT[A, F, ?]]
     def nondeterminismFunctor[A, F[_] : Nondeterminism: BindRec: Traverse] = Functor[EitherT[A, F, ?]]
     def nondeterminismMonad[A, F[_] : Nondeterminism: BindRec: Traverse] = Monad[EitherT[A, F, ?]]
+
+    def monadReader[E, R, F[_]](implicit F0: MonadReader[F, R]) = Monad[EitherT[E, F, ?]]
   }
 
   def compilationTests() = {

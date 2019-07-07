@@ -1,5 +1,6 @@
 .idea
 .idea_modules
+.metals
 target
 project/boot
 *.swp
@@ -14,3 +15,4 @@ tags
 .classpath
 .project
 .settings
+.bloop
