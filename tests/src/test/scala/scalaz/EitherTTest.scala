@@ -113,6 +113,7 @@ object EitherTTest extends SpecLite {
     def functor[A: Monoid, F[_] : Monad : Nondeterminism] = Functor[EitherT[A, F, ?]]
     def apply[A: Monoid, F[_] : Monad] = Apply[EitherT[A, F, ?]]
     def monad[A: Monoid, F[_] : Monad] = Monad[EitherT[A, F, ?]]
+    def monad[E, R, F[_]](implicit F0: MonadReader[F, R]) = Monad[EitherT[E, F, ?]]
     def plus[A: Monoid, F[_] : Monad] = Plus[EitherT[A, F, ?]]
     def foldable[A, F[_] : Traverse] = Foldable[EitherT[A, F, ?]]
     def bifunctor[F[_] : Traverse] = Bifunctor[EitherT[?, F, ?]]
@@ -122,8 +123,6 @@ object EitherTTest extends SpecLite {
     def nondeterminismMonad[A, F[_] : Nondeterminism] = Monad[EitherT[A, F, ?]]
     def nondeterminismFunctor[A, F[_] : Nondeterminism: BindRec: Traverse] = Functor[EitherT[A, F, ?]]
     def nondeterminismMonad[A, F[_] : Nondeterminism: BindRec: Traverse] = Monad[EitherT[A, F, ?]]
-
-    def monadReader[E, R, F[_]](implicit F0: MonadReader[F, R]) = Monad[EitherT[E, F, ?]]
   }
 
   def compilationTests() = {
