@@ -2,6 +2,7 @@ package scalaz
 
 import TreeLoc._
 import annotation.tailrec
+import EphemeralStream.{EStream, ##::, emptyEphemeralStream}
 
 /**
  * A rose-tree zipper. Represents a [[scalaz.Tree]] together with a position in that tree.
@@ -19,8 +20,8 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
   /** Select the parent of the current node. */
   def parent: Option[TreeLoc[A]] = parents match {
-    case (pls, v, prs) #:: ps => Some(loc(Node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
-    case Stream.Empty         => None
+    case (pls, v, prs) ##:: ps => Some(loc(Node(v, combChildren(lefts, tree, rights)), pls, prs, ps))
+    case s if s.isEmpty         => None
   }
 
   /** Select the root node of the tree. */
@@ -33,48 +34,50 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
   /** Select the left sibling of the current node. */
   def left: Option[TreeLoc[A]] = lefts match {
-    case t #:: ts     => Some(loc(t, ts, tree #:: rights, parents))
-    case Stream.Empty => None
+    case t ##:: ts     => Some(loc(t, ts, tree ##:: rights, parents))
+    case s if s.isEmpty => None
   }
 
   /** Select the right sibling of the current node. */
   def right: Option[TreeLoc[A]] = rights match {
-    case t #:: ts     => Some(loc(t, tree #:: lefts, ts, parents))
-    case Stream.Empty => None
+    case t ##:: ts     => Some(loc(t, tree ##:: lefts, ts, parents))
+    case s if s.isEmpty => None
   }
 
   /** Select the leftmost child of the current node. */
   def firstChild: Option[TreeLoc[A]] = tree.subForest match {
-    case t #:: ts     => Some(loc(t, Stream.Empty, ts, downParents))
-    case Stream.Empty => None
+    case t ##:: ts     => Some(loc(t, EphemeralStream.emptyEphemeralStream, ts, downParents))
+    case s if s.isEmpty => None
   }
 
   /** Select the rightmost child of the current node. */
   def lastChild: Option[TreeLoc[A]] = tree.subForest.reverse match {
-    case t #:: ts     => Some(loc(t, ts, Stream.Empty, downParents))
-    case Stream.Empty => None
+    case t ##:: ts     => Some(loc(t, ts, EphemeralStream.emptyEphemeralStream, downParents))
+    case s if s.isEmpty => None
   }
 
   /** Select the nth child of the current node. */
   def getChild(n: Int): Option[TreeLoc[A]] =
-    for {lr <- splitChildren(Stream.Empty, tree.subForest, n)
+    for {lr <- splitChildren(EphemeralStream.emptyEphemeralStream, tree.subForest, n)
          ls = lr._1
-    } yield loc(ls.head, ls.tail, lr._2, downParents)
+         h <- ls.headOption
+         t <- ls.tailOption
+    } yield loc(h, t, lr._2, downParents)
 
   /** Select the first immediate child of the current node that satisfies the given predicate. */
   def findChild(p: Tree[A] => Boolean): Option[TreeLoc[A]] = {
     @tailrec
     def split(acc: TreeForest[A], xs: TreeForest[A]): Option[(TreeForest[A], Tree[A], TreeForest[A])] =
       (acc, xs) match {
-        case (acc, Stream.cons(x, xs)) => if (p(x)) Some((acc, x, xs)) else split(Stream.cons(x, acc), xs)
+        case (acc, (x ##:: xs)) => if (p(x)) Some((acc, x, xs)) else split(EphemeralStream.cons(x, acc), xs)
         case _                         => None
       }
-    for (ltr <- split(Stream.Empty, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
+    for (ltr <- split(EphemeralStream.emptyEphemeralStream, tree.subForest)) yield loc(ltr._2, ltr._1, ltr._3, downParents)
   }
 
   /** Select the first descendant node of the current node that satisfies the given predicate. */
   def find(p: TreeLoc[A] => Boolean): Option[TreeLoc[A]] =
-    Cobind[TreeLoc].cojoin(this).tree.flatten.find(p)
+    Cobind[TreeLoc].cojoin(this).tree.flatten.filter(p).headOption
 
   /** Get the entire tree represented by this zipper. */
   def toTree: Tree[A] = root.tree
@@ -116,34 +119,34 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
   def setLabel(a: A): TreeLoc[A] = modifyTree((t: Tree[A]) => Node(a, t.subForest))
 
   /** Insert the given node to the left of the current node and give it focus. */
-  def insertLeft(t: Tree[A]): TreeLoc[A] = loc(t, lefts, Stream.cons(tree, rights), parents)
+  def insertLeft(t: Tree[A]): TreeLoc[A] = loc(t, lefts, EphemeralStream.cons(tree, rights), parents)
 
   /** Insert the given node to the right of the current node and give it focus. */
-  def insertRight(t: Tree[A]): TreeLoc[A] = loc(t, Stream.cons(tree, lefts), rights, parents)
+  def insertRight(t: Tree[A]): TreeLoc[A] = loc(t, EphemeralStream.cons(tree, lefts), rights, parents)
 
   /** Insert the given node as the first child of the current node and give it focus. */
-  def insertDownFirst(t: Tree[A]): TreeLoc[A] = loc(t, Stream.Empty, tree.subForest, downParents)
+  def insertDownFirst(t: Tree[A]): TreeLoc[A] = loc(t, EphemeralStream.emptyEphemeralStream, tree.subForest, downParents)
 
   /** Insert the given node as the last child of the current node and give it focus. */
-  def insertDownLast(t: Tree[A]): TreeLoc[A] = loc(t, tree.subForest.reverse, Stream.Empty, downParents)
+  def insertDownLast(t: Tree[A]): TreeLoc[A] = loc(t, tree.subForest.reverse, EphemeralStream.emptyEphemeralStream, downParents)
 
   /** Insert the given node as the nth child of the current node and give it focus. */
   def insertDownAt(n: Int, t: Tree[A]): Option[TreeLoc[A]] =
-    for (lr <- splitChildren(Stream.Empty, tree.subForest, n)) yield loc(t, lr._1, lr._2, downParents)
+    for (lr <- splitChildren(EphemeralStream.emptyEphemeralStream, tree.subForest, n)) yield loc(t, lr._1, lr._2, downParents)
 
   /** Delete the current node and all its children. */
   def delete: Option[TreeLoc[A]] = rights match {
-    case Stream.cons(t, ts) => Some(loc(t, lefts, ts, parents))
+    case t ##:: ts => Some(loc(t, lefts, ts, parents))
     case _                  => lefts match {
-      case Stream.cons(t, ts) => Some(loc(t, ts, rights, parents))
-      case _                  => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => Node(t.rootLabel, Stream.Empty))
+      case t ##:: ts => Some(loc(t, ts, rights, parents))
+      case _                  => for (loc1 <- parent) yield loc1.modifyTree((t: Tree[A]) => Node(t.rootLabel, emptyEphemeralStream))
     }
   }
 
   /**
    * The path from the focus to the root.
    */
-  def path: Stream[A] = getLabel #:: parents.map(_._2)
+  def path: EStream[A] = getLabel ##:: parents.map(_._2)
 
   /** Maps the given function over the elements. */
   def map[B](f: A => B): TreeLoc[B] = {
@@ -158,32 +161,32 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
     val lft = (_: TreeLoc[A]).left
     val rgt = (_: TreeLoc[A]).right
-    def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => Stream[TreeLoc[A]]) = {
-      val f = () => std.stream.unfold(tz.firstChild) {
+    def dwn[A](tz: TreeLoc[A]): (TreeLoc[A], () => EStream[TreeLoc[A]]) = {
+      val f = () => EphemeralStream.unfold(tz.firstChild) {
         (o: Option[TreeLoc[A]]) => for (c <- o) yield (c, c.right)
       }
       (tz, f)
     }
-    def uf[A](a: TreeLoc[A], f: TreeLoc[A] => Option[TreeLoc[A]]): Stream[Tree[TreeLoc[A]]] = {
-      std.stream.unfold(f(a)) {
+    def uf[A](a: TreeLoc[A], f: TreeLoc[A] => Option[TreeLoc[A]]): EStream[Tree[TreeLoc[A]]] = {
+      EphemeralStream.unfold(f(a)) {
         (o: Option[TreeLoc[A]]) => for (c <- o) yield (Tree.unfoldTree(c)(dwn[A](_: TreeLoc[A])), f(c))
       }
     }
 
-    val p = std.stream.unfold(parent) {
+    val p = EphemeralStream.unfold(parent) {
       (o: Option[TreeLoc[A]]) => for (z <- o) yield ((uf(z, lft), z, uf(z, rgt)), z.parent)
     }
     TreeLoc.loc(Tree.unfoldTree(this)(dwn[A](_: TreeLoc[A])), uf(this, lft), uf(this, rgt), p)
   }
 
-  private def downParents = (lefts, tree.rootLabel, rights) #:: parents
+  private def downParents = (lefts, tree.rootLabel, rights) ##:: parents
 
 }
 
 sealed abstract class TreeLocInstances {
   implicit val treeLocInstance: Comonad[TreeLoc] with Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
-    import Stream.Empty
-    import scalaz.std.stream._
+    // import Stream.Empty
+    // import scalaz.std.stream._
 
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
@@ -227,98 +230,101 @@ sealed abstract class TreeLocInstances {
             fa.lefts, Foldable1[Tree].foldMapLeft1(fa.tree)(z)(f))(f))(f))(f)
 
     override def traverse1Impl[G[_], A, B](fa: TreeLoc[A])(f: A => G[B])(implicit G: Apply[G]) = fa.lefts match {
-      case l #:: ls =>
+      case l ##:: ls =>
         val lefts1 = ForestT1.traverse1(OneAnd(l, ls))(f)
         fa.rights match {
-          case r #:: rs =>
+          case r ##:: rs =>
             val rights1 = ForestT1.traverse1(OneAnd(r, rs))(f)
             fa.parents match {
-              case p #:: ps =>
+              case p ##:: ps =>
                 G.apply4(fa.tree.traverse1(f), lefts1, rights1, ParentsT1.traverse1(OneAnd(p, ps))(f))(
                   (tree, lefts, rights, parents) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = lefts.head #:: lefts.tail,
-                      rights = rights.head #:: rights.tail,
-                      parents = parents.head #:: parents.tail
+                      lefts = lefts.head ##:: lefts.tail,
+                      rights = rights.head ##:: rights.tail,
+                      parents = parents.head ##:: parents.tail
                     )
                 )
-              case Empty =>
+              case s if s.isEmpty =>
                 G.apply3(fa.tree.traverse1(f), lefts1, rights1)(
                   (tree, lefts, rights) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = lefts.head #:: lefts.tail,
-                      rights = rights.head #:: rights.tail,
-                      parents = Empty
+                      lefts = lefts.head ##:: lefts.tail,
+                      rights = rights.head ##:: rights.tail,
+                      parents = emptyEphemeralStream
                     )
                 )
             }
-          case Empty =>
+          case s if s.isEmpty =>
             fa.parents match {
-              case p #:: ps =>
+              case p ##:: ps =>
                 G.apply3(fa.tree.traverse1(f), lefts1, ParentsT1.traverse1(OneAnd(p, ps))(f))(
                   (tree, lefts, parents) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = lefts.head #:: lefts.tail,
-                      rights = Empty,
-                      parents = parents.head #:: parents.tail
+                      lefts = lefts.head ##:: lefts.tail,
+                      rights = emptyEphemeralStream,
+                      parents = parents.head ##:: parents.tail
                     )
                 )
-              case Empty =>
+              case s if s.isEmpty =>
                 G.apply2(fa.tree.traverse1(f), lefts1)(
                   (tree, lefts) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = lefts.head #:: lefts.tail,
-                      rights = Empty,
-                      parents = Empty
+                      lefts = lefts.head ##:: lefts.tail,
+                      rights = emptyEphemeralStream,
+                      parents = emptyEphemeralStream
                     )
                 )
             }
         }
-      case Empty =>
+      case s if s.isEmpty =>
         fa.rights match {
-          case r #:: rs =>
+          case r ##:: rs =>
             val rights1 = ForestT1.traverse1(OneAnd(r, rs))(f)
             fa.parents match {
-              case p #:: ps =>
+              case p ##:: ps =>
                 G.apply3(fa.tree.traverse1(f), rights1, ParentsT1.traverse1(OneAnd(p, ps))(f))(
                   (tree, rights, parents) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = Empty,
-                      rights = rights.head #:: rights.tail,
-                      parents = parents.head #:: parents.tail
+                      lefts = emptyEphemeralStream,
+                      rights = rights.head ##:: rights.tail,
+                      parents = parents.head ##:: parents.tail
                     )
                 )
-              case Empty =>
+              case s if s.isEmpty =>
                 G.apply2(fa.tree.traverse1(f), rights1)(
                   (tree, rights) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = Empty,
-                      rights = rights.head #:: rights.tail,
-                      parents = Empty
+                      lefts = emptyEphemeralStream,
+                      rights = rights.head ##:: rights.tail,
+                      parents = emptyEphemeralStream
                     )
                 )
             }
-          case Empty =>
+          case s if s.isEmpty =>
             fa.parents match {
-              case p #:: ps =>
+              case p ##:: ps =>
                 G.apply2(fa.tree.traverse1(f), ParentsT1.traverse1(OneAnd(p, ps))(f))(
                   (tree, parents) =>
                     TreeLoc(
                       tree = tree,
-                      lefts = Empty,
-                      rights = Empty,
-                      parents = parents.head #:: parents.tail
+                      lefts = emptyEphemeralStream,
+                      rights = emptyEphemeralStream,
+                      parents = parents.head ##:: parents.tail
                     )
                 )
-              case Empty =>
+              case s if s.isEmpty =>
                 G.map(fa.tree.traverse1(f))(t =>
-                  TreeLoc(t, Empty, Empty, Empty)
+                  TreeLoc(t, 
+                  emptyEphemeralStream, 
+                  emptyEphemeralStream, 
+                  emptyEphemeralStream)
                 )
             }
         }
@@ -345,10 +351,10 @@ sealed abstract class TreeLocInstances {
       }
 
     private[this] val ForestT: Traverse[TreeForest] =
-      Traverse[Stream].compose[Tree]
+      Traverse[EStream].compose[Tree]
 
-    private[this] val ForestT1: Traverse1[Lambda[a => OneAnd[Stream, Tree[a]]]] =
-      Traverse1[Lambda[a => OneAnd[Stream, a]]].compose[Tree]
+    private[this] val ForestT1: Traverse1[Lambda[a => OneAnd[EStream, Tree[a]]]] =
+      Traverse1[Lambda[a => OneAnd[EStream, a]]].compose[Tree]
 
     private[this] implicit val ParentT: Traverse1[Parent] = new Traverse1[Parent] {
 
@@ -366,23 +372,23 @@ sealed abstract class TreeLocInstances {
 
       override def traverse1Impl[G[_], A, B](fa: Parent[A])(f: A => G[B])(implicit G: Apply[G]): G[Parent[B]] = {
         (fa._1, fa._3) match {
-          case (x #:: xs, y #:: ys) =>
+          case (x ##:: xs, y ##:: ys) =>
             G.apply3(ForestT1.traverse1(OneAnd(x, xs))(f), f(fa._2), ForestT1.traverse1(OneAnd(y, ys))(f)) {
               case (l, c, r) =>
-                (l.head #:: l.tail, c, r.head #:: r.tail)
+                (l.head ##:: l.tail, c, r.head ##:: r.tail)
             }
-          case (x #:: xs, _) =>
+          case (x ##:: xs, _) =>
             G.apply2(ForestT1.traverse1(OneAnd(x, xs))(f), f(fa._2)) {
               case (l, c) =>
-                (l.head #:: l.tail, c, Empty)
+                (l.head ##:: l.tail, c, EphemeralStream.emptyEphemeralStream)
             }
-          case (_, x #:: xs) =>
+          case (_, x ##:: xs) =>
             G.apply2(f(fa._2), ForestT1.traverse1(OneAnd(x, xs))(f)) {
               case (c, r) =>
-                (Empty, c, r.head #:: r.tail)
+                (emptyEphemeralStream, c, r.head ##:: r.tail)
             }
-          case (Empty, Empty) =>
-            G.map(f(fa._2))(c => (Empty, c, Empty))
+          case (x, y) if (x.isEmpty && y.isEmpty) =>
+            G.map(f(fa._2))(c => (emptyEphemeralStream, c, emptyEphemeralStream))
         }
       }
 
@@ -396,10 +402,10 @@ sealed abstract class TreeLocInstances {
     }
 
     private[this] val ParentsT: Traverse[Parents] =
-      Traverse[Stream].compose[Parent]
+      Traverse[EStream].compose[Parent]
 
-    private[this] val ParentsT1: Traverse1[Lambda[a => OneAnd[Stream, Parent[a]]]] =
-      Traverse1[Lambda[a => OneAnd[Stream, a]]].compose[Parent]
+    private[this] val ParentsT1: Traverse1[Lambda[a => OneAnd[EStream, Parent[a]]]] =
+      Traverse1[Lambda[a => OneAnd[EStream, a]]].compose[Parent]
   }
 
 
@@ -409,7 +415,7 @@ sealed abstract class TreeLocInstances {
   implicit def treeLocOrder[A](implicit A: Order[A]): Order[TreeLoc[A]] =
     new Order[TreeLoc[A]] with TreeLocEqual[A] {
       def E = A
-      import std.stream._, std.tuple._
+      import std.tuple._
 
       override def order(a: TreeLoc[A], b: TreeLoc[A]) =
         Divide[Order].dividing4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
@@ -418,37 +424,38 @@ sealed abstract class TreeLocInstances {
 
 object TreeLoc extends TreeLocInstances {
   type TreeForest[A] =
-  Stream[Tree[A]]
+  EStream[Tree[A]]
 
   type Parent[A] =
   (TreeForest[A], A, TreeForest[A])
 
   type Parents[A] =
-  Stream[Parent[A]]
+  EStream[Parent[A]]
 
   def loc[A](t: Tree[A], l: TreeForest[A], r: TreeForest[A], p: Parents[A]): TreeLoc[A] =
     TreeLoc(t, l, r, p)
 
   def fromForest[A](ts: TreeForest[A]): Option[TreeLoc[A]] = ts match {
-    case (Stream.cons(t, ts)) => Some(loc(t, Stream.Empty, ts, Stream.Empty))
+    case (t ##:: ts) => Some(loc(t, emptyEphemeralStream, ts, emptyEphemeralStream))
     case _ => None
   }
 
-  private def combChildren[A](ls: Stream[A], t: A, rs: Stream[A]) =
-    ls.foldLeft(t #:: rs)((a, b) => b #:: a)
+  private def combChildren[A](ls: EStream[A], t: A, rs: EStream[A]) =
+    ls.foldLeft(t ##:: rs)((a, b) => b ##:: a)
 
   @tailrec
-  private def splitChildren[A](acc: Stream[A], xs: Stream[A], n: Int): Option[(Stream[A], Stream[A])] =
+  private def splitChildren[A](acc: EStream[A], xs: EStream[A], n: Int): Option[(EStream[A], EStream[A])] =
     (acc, xs, n) match {
       case (acc, xs, 0)                 => Some((acc, xs))
-      case (acc, Stream.cons(x, xs), n) => splitChildren(Stream.cons(x, acc), xs, n - 1)
+      case (acc, (x ##:: xs), n) => splitChildren(EphemeralStream.cons(x, acc), xs, n - 1)
       case _                            => None
     }
 }
 
 private trait TreeLocEqual[A] extends Equal[TreeLoc[A]] {
   implicit def E: Equal[A]
-  import std.stream._, std.tuple._
+  // import std.stream._,
+  import std.tuple._
 
   override final def equal(a: TreeLoc[A], b: TreeLoc[A]) = {
     Equal[Tree[A]].equal(a.tree, b.tree) &&
