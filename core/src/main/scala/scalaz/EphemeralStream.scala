@@ -149,7 +149,8 @@ sealed abstract class EphemeralStream[A] {
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with scalaz.Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] = new MonadPlus[EphemeralStream] with Alt[EphemeralStream] with BindRec[EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[EphemeralStream] with Traverse[EphemeralStream] with Cobind[EphemeralStream] with IsEmpty[EphemeralStream] {
+  
     import EphemeralStream._
     override def isEmpty[A](fa: EphemeralStream[A]) = fa.isEmpty
     override def cojoin[A](a: EphemeralStream[A]): EphemeralStream[EphemeralStream[A]] = a match {
@@ -279,6 +280,26 @@ sealed abstract class EphemeralStreamInstances {
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Contravariant[Show].contramap(IList.show[A])(_.toIList)
+
+  import Tags.Zip
+  /**
+   * An alternative [[scalaz.Applicative]] instance for `EphemeralStream`, discriminated by the type tag [[scalaz.Tags.Zip]],
+   * that zips streams together.
+   *
+   * Example:
+   * {{{
+   * import scalaz.Tags.Zip
+   * streamZipApplicative.apply2(Zip(EphemeralStream(1, 2)), Zip(EphemeralStream(3, 4)))(_ * _) // EphemeralStream(3, 8)
+   * }}}
+   */
+  implicit val ephemeralStreamZipApplicative: Applicative[λ[α => EphemeralStream[α] @@ Zip]] =
+    new Applicative[λ[α => EphemeralStream[α] @@ Zip]] {
+      def point[A](a: => A) = Zip(EphemeralStream.fromStream(Stream.continually(a)))
+      def ap[A, B](fa: => (EphemeralStream[A] @@ Zip))(f: => (EphemeralStream[A => B] @@ Zip)) = {
+        Zip(if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty) EphemeralStream.emptyEphemeralStream[B]
+        else EphemeralStream.cons((Tag.unwrap(f).headOption.get)(Tag.unwrap(fa).headOption.get), Tag.unwrap(ap(Zip(Tag.unwrap(fa).tailOption.get))(Zip(Tag.unwrap(f).tailOption.get)))))
+      }
+    }
 }
 
 object EphemeralStream extends EphemeralStreamInstances {
