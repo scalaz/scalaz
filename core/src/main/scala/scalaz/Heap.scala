@@ -1,6 +1,7 @@
 package scalaz
 
 import std.tuple._
+import EphemeralStream.{EStream, emptyEphemeralStream, ##::}
 
 
 /**An efficient, asymptotically optimal, implementation of priority queues
@@ -67,10 +68,10 @@ sealed abstract class Heap[A] {
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
     fold(Empty[A], (s, leq, t) => t match {
-      case Node(_, Stream()) => Empty[A]
+      case Leaf(_) => Empty[A]
       case Node(_, f0)       => {
         val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
-        val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
+        val (zs, ts1, f1) : (Forest[A], Forest[A], Forest[A]) = splitForest(r, emptyEphemeralStream, emptyEphemeralStream, cf)
         val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
         val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
         Heap(s - 1, leq, Node(Ranked(0, x), f3))
@@ -83,18 +84,21 @@ sealed abstract class Heap[A] {
       Heap(s, leq, heapify(leq)(Node(Ranked(r, f(x)), xs)))
   }
 
-  def toUnsortedStream: Stream[A] = fold(Stream(), (_, _, t) => t.flatten.map(_.value))
+  def toUnsortedStream: EStream[A] = fold(emptyEphemeralStream, (_, _, t) => t.flatten.map(_.value))
 
   def toUnsortedList: List[A] = toUnsortedStream.toList
 
-  def toUnsortedIList: IList[A] = IList.fromSeq(toUnsortedStream)
+  def toUnsortedIList: IList[A] = IList.fromFoldable(toUnsortedStream)
 
-  def toStream: Stream[A] =
-    std.stream.unfold(this)(_.uncons)
+  def toEphemeralStream: EStream[A] =
+    EphemeralStream.unfold(this)(_.uncons)
+
+  def toStream: Stream[A] = 
+    Foldable[EphemeralStream].toStream(this.toEphemeralStream)
 
   def toList: List[A] = toStream.toList
 
-  def toIList: IList[A] = IList.fromSeq(toStream)
+  def toIList: IList[A] = toEphemeralStream.toIList
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B): Heap[B] = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
@@ -120,7 +124,7 @@ sealed abstract class Heap[A] {
   /**Partition the heap of the elements that are less than, equal to, and greater than a given value. O(n)*/
   def split(a: A): (Heap[A], Heap[A], Heap[A]) = {
     fold((Empty[A], Empty[A], Empty[A]), (s, leq, t) => {
-      def f(x: A) = if (leq(x, a)) if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
+      def f(x: A) : (Heap[A], Heap[A], Heap[A]) = if (leq(x, a)) if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
       else
         (singletonWith(leq, x), Empty[A], Empty[A])
       else
@@ -177,13 +181,11 @@ sealed abstract class Heap[A] {
    * O(n log n)*/
   def traverse[F[_] : Applicative, B: Order](f: A => F[B]): F[Heap[B]] = {
     val F = Applicative[F]
-    import std.stream._
-    F.map(F.traverse(toStream)(f))(fromCodata[Stream, B])
+    F.map(F.traverse(toEphemeralStream)(f))(fromCodata[EStream, B])
   }
 
   def foldRight[B](z: B)(f: (A, => B) => B): B = {
-    import std.stream._
-    Foldable[Stream].foldRight(toStream, z)(f)
+    Foldable[EStream].foldRight(toEphemeralStream, z)(f)
   }
 
   private def withList(f: List[A] => List[A]) = {
@@ -194,10 +196,10 @@ sealed abstract class Heap[A] {
   private[scalaz] def insertWith(f: (A, A) => Boolean, x: A) =
     fold(singletonWith(f, x), (s, _, t) => {
       val y = t.rootLabel.value
-      if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
+      if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), (t ##:: emptyEphemeralStream)))
       else
         Heap(s + 1, f, Node(Ranked(0, y),
-          skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
+          skewInsert(f, Node(Ranked(0, x), emptyEphemeralStream[Tree[Ranked[A]]]), t.subForest)))
     })
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {
@@ -214,9 +216,10 @@ sealed abstract class Heap[A] {
 }
 
 object Heap extends HeapInstances {
+
   final case class Ranked[A](rank: Int, value: A)
 
-  type Forest[A] = Stream[Tree[Ranked[A]]]
+  type Forest[A] = EStream[Tree[Ranked[A]]]
   type ForestZipper[A] = (Forest[A], Forest[A])
 
   /**The empty heap */
@@ -281,31 +284,31 @@ object Heap extends HeapInstances {
     import Tree._
 
     def rightZ[A]: ForestZipper[A] => ForestZipper[A] = {
-      case (path, x #:: xs) => (x #:: path, xs)
+      case (path, x ##:: xs) => (x ##:: path, xs)
     }
 
     def adjustZ[A](f: Tree[Ranked[A]] => Tree[Ranked[A]]):
     ForestZipper[A] => ForestZipper[A] = {
-      case (path, x #:: xs) => (path, f(x) #:: xs)
+      case (path, x ##:: xs) => (path, f(x) ##:: xs)
       case z                => z
     }
 
     def rezip[A]: ForestZipper[A] => Forest[A] = {
-      case (Stream(), xs)   => xs
-      case (x #:: path, xs) => rezip((path, x #:: xs))
+      case (s, xs) if s.isEmpty   => xs
+      case (x ##:: path, xs) => rezip((path, x ##:: xs))
     }
 
     def rootZ[A]: ForestZipper[A] => A = {
-      case (_, x #:: _) => x.rootLabel.value
+      case (_, x ##:: _) => x.rootLabel.value
       case _            => sys.error("Heap.rootZ: empty zipper")
     }
 
-    def zipper[A](xs: Forest[A]): ForestZipper[A] = (Stream(), xs)
+    def zipper[A](xs: Forest[A]): ForestZipper[A] = (emptyEphemeralStream, xs)
 
-    def emptyZ[A]: ForestZipper[A] = (Stream(), Stream())
+    def emptyZ[A]: ForestZipper[A] = (emptyEphemeralStream, emptyEphemeralStream)
 
     def minZ[A](f: (A, A) => Boolean): Forest[A] => ForestZipper[A] = {
-      case Stream() => emptyZ
+      case s if s.isEmpty => emptyZ
       case xs       => {
         val z = zipper(xs)
         minZp(f)(z, z)
@@ -314,22 +317,22 @@ object Heap extends HeapInstances {
 
     def minZp[A](leq: (A, A) => Boolean):
     (ForestZipper[A], ForestZipper[A]) => ForestZipper[A] = {
-      case (lo, (_, Stream())) => lo
+      case (lo, (_, ts)) if ts.isEmpty => lo
       case (lo, z)             => minZp(leq)(if (leq(rootZ(lo), rootZ(z))) lo else z, rightZ(z))
     }
 
     def heapify[A](leq: (A, A) => Boolean): Tree[Ranked[A]] => Tree[Ranked[A]] = {
-      case n@Node(_, Stream())      => n
+      case n@Node(_, ts) if ts.isEmpty      => n
       case n@Node(Ranked(r, a), as) => {
-        val (left, Node(Ranked(rp, ap), asp) #:: right) = minZ(leq)(as)
+        val (left, Node(Ranked(rp, ap), asp) ##:: right) = minZ(leq)(as)
         if (leq(a, ap)) n
         else
-          Node(Ranked(r, ap), rezip((left, heapify(leq)(Node(Ranked(rp, a), asp)) #:: right)))
+          Node(Ranked(r, ap), rezip((left, heapify(leq)(Node(Ranked(rp, a), asp)) ##:: right)))
       }
     }
 
     def singletonWith[A](f: (A, A) => Boolean, a: A) =
-      Heap(1, f, Node(Ranked(0, a), Stream()))
+      Heap(1, f, Node(Ranked(0, a), emptyEphemeralStream[Tree[Ranked[A]]]))
 
 
     def rank[A](t: Tree[Ranked[A]]) = t.rootLabel.rank
@@ -339,53 +342,53 @@ object Heap extends HeapInstances {
                     t1: Tree[Ranked[A]],
                     t2: Tree[Ranked[A]]): Tree[Ranked[A]] = (t0, t1, t2) match {
       case (Node(Ranked(r0, x0), cf0), Node(Ranked(r1, x1), cf1), Node(Ranked(r2, x2), cf2)) =>
-        if (f(x1, x0) && f(x1, x2)) Node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1)
+        if (f(x1, x0) && f(x1, x2)) Node(Ranked(r1 + 1, x1), t0 ##:: t2 ##:: cf1)
         else
-        if (f(x2, x0) && f(x2, x1)) Node(Ranked(r2 + 1, x2), t0 #:: t1 #:: cf2)
+        if (f(x2, x0) && f(x2, x1)) Node(Ranked(r2 + 1, x2), t0 ##:: t1 ##:: cf2)
         else
-          Node(Ranked(r1 + 1, x0), t1 #:: t2 #:: cf0)
+          Node(Ranked(r1 + 1, x0), t1 ##:: t2 ##:: cf0)
     }
 
     def link[A](f: (A, A) => Boolean):
     (Tree[Ranked[A]], Tree[Ranked[A]]) => Tree[Ranked[A]] = {
       case (t1@Node(Ranked(r1, x1), cf1), t2@Node(Ranked(r2, x2), cf2)) =>
-        if (f(x1, x2)) Node(Ranked(r1 + 1, x1), t2 #:: cf1)
+        if (f(x1, x2)) Node(Ranked(r1 + 1, x1), t2 ##:: cf1)
         else
-          Node(Ranked(r2 + 1, x2), t1 #:: cf2)
+          Node(Ranked(r2 + 1, x2), t1 ##:: cf2)
     }
 
     def skewInsert[A](f: (A, A) => Boolean, t: Tree[Ranked[A]], ts: Forest[A]): Forest[A] =
       ts match {
-        case t1 #:: t2 #:: rest =>
+        case t1 ##:: t2 ##:: rest =>
           if (rank(t1) == rank(t2))
-            skewLink(f, t, t1, t2) #:: rest
-          else (t #:: ts)
-        case _                  => t #:: ts
+            skewLink(f, t, t1, t2) ##:: rest
+          else (t ##:: ts)
+        case _                  => t ##:: ts
       }
 
     def getMin[A](f: (A, A) => Boolean, trees: Forest[A]): (Tree[Ranked[A]], Forest[A]) =
       trees match {
-        case Stream(t) => (t, Stream())
-        case t #:: ts  => {
+        case (t ##:: ts) if ts.isEmpty => (t, emptyEphemeralStream)
+        case t ##:: ts  => {
           val (tp, tsp) = getMin(f, ts)
-          if (f(t.rootLabel.value, tp.rootLabel.value)) (t, ts) else (tp, t #:: tsp)
+          if (f(t.rootLabel.value, tp.rootLabel.value)) (t, ts) else (tp, t ##:: tsp)
         }
       }
 
     def splitForest[A]:
     (Int, Forest[A], Forest[A], Forest[A]) => (Forest[A], Forest[A], Forest[A]) = {
       case (0, zs, ts, f)                  => (zs, ts, f)
-      case (1, zs, ts, Stream(t))          => (zs, t #:: ts, Stream())
-      case (1, zs, ts, t1 #:: t2 #:: f)    =>
-        if (rank(t2) == 0) (t1 #:: zs, t2 #:: ts, f)
+      case (1, zs, ts, (t ##:: tss)) if tss.isEmpty => (zs, t ##:: ts, emptyEphemeralStream)
+      case (1, zs, ts, t1 ##:: t2 ##:: f)    =>
+        if (rank(t2) == 0) (t1 ##:: zs, t2 ##:: ts, f)
         else
-          (zs, t1 #:: ts, t2 #:: f)
-      case (r, zs, ts, (t1 #:: t2 #:: cf)) =>
-        if (rank(t1) == rank(t2)) (zs, t1 #:: t2 #:: ts, cf)
+          (zs, t1 ##:: ts, t2 ##:: f)
+      case (r, zs, ts, (t1 ##:: t2 ##:: cf)) =>
+        if (rank(t1) == rank(t2)) (zs, t1 ##:: t2 ##:: ts, cf)
         else
-        if (rank(t1) == 0) splitForest(r - 1, t1 #:: zs, t2 #:: ts, cf)
+        if (rank(t1) == 0) splitForest(r - 1, t1 ##:: zs, t2 ##:: ts, cf)
         else
-          splitForest(r - 1, zs, t1 #:: ts, t2 #:: cf)
+          splitForest(r - 1, zs, t1 ##:: ts, t2 ##:: cf)
       case (_, _, _, _)                    => sys.error("Heap.splitForest: invalid arguments")
     }
 
@@ -393,26 +396,26 @@ object Heap extends HeapInstances {
       unionUniq(f)(uniqify(f)(ts), uniqify(f)(tsp))
 
     def ins[A](f: (A, A) => Boolean, t: Tree[Ranked[A]]): Forest[A] => Forest[A] = {
-      case Stream()    => Stream(t)
-      case (tp #:: ts) => if (rank(t) < rank(tp)) t #:: tp #:: ts
+      case s if s.isEmpty    => EphemeralStream(t)
+      case (tp ##:: ts) => if (rank(t) < rank(tp)) t ##:: tp ##:: ts
       else
         ins(f, link(f)(t, tp))(ts)
     }
 
     def uniqify[A](f: (A, A) => Boolean): Forest[A] => Forest[A] = {
-      case Stream()   => Stream()
-      case (t #:: ts) => ins(f, t)(ts)
+      case s if s.isEmpty   => emptyEphemeralStream
+      case (t ##:: ts) => ins(f, t)(ts)
     }
 
     def unionUniq[A](f: (A, A) => Boolean): (Forest[A], Forest[A]) => Forest[A] = {
-      case (Stream(), ts)                         => ts
-      case (ts, Stream())                         => ts
-      case (tts1@(t1 #:: ts1), tts2@(t2 #:: ts2)) =>
+      case (s, ts) if s.isEmpty                         => ts
+      case (ts, s) if s.isEmpty                         => ts
+      case (tts1@(t1 ##:: ts1), tts2@(t2 ##:: ts2)) =>
         import std.anyVal._
         Order[Int].order(rank(t1), rank(t2)) match {
-          case Ordering.LT => t1 #:: unionUniq(f)(ts1, tts2)
+          case Ordering.LT => t1 ##:: unionUniq(f)(ts1, tts2)
           case Ordering.EQ => ins(f, link(f)(t1, t2))(unionUniq(f)(ts1, ts2))
-          case Ordering.GT => t2 #:: unionUniq(f)(tts1, ts2)
+          case Ordering.GT => t2 ##:: unionUniq(f)(tts1, ts2)
         }
     }
   }
@@ -428,7 +431,6 @@ sealed abstract class HeapInstances {
     def zero = Heap.Empty.apply
   }
 
-  import std.stream._
-
-  implicit def heapEqual[A: Equal]: Equal[Heap[A]] = Equal.equalBy((_: Heap[A]).toStream)
+  // implicit def heapEqual[A: Equal]: Equal[Heap[A]] = Equal.equalBy((_: Heap[A]).toStream)
+  implicit def healEqual[A : Equal](implicit H : Foldable[Heap]): Equal[Heap[A]] = Equal[EStream[A]] contramap {H.toEphemeralStream(_: Heap[A])}
 }

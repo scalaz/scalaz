@@ -71,7 +71,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Cogen[List[A]].contramap(_.toList)
 
   implicit def cogenHeap[A: Cogen]: Cogen[Heap[A]] =
-    Cogen[Stream[A]].contramap(_.toUnsortedStream)
+    Cogen[EphemeralStream[A]].contramap(_.toUnsortedStream)
 
   implicit def cogenDequeue[A: Cogen]: Cogen[Dequeue[A]] =
     Cogen[List[A]].contramap(_.toList)
@@ -321,11 +321,11 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   import scalaz.Ordering._
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(oneOf(LT, EQ, GT))
 
-  private[this] def withSize[A](size: Int)(f: Int => Gen[A]): Gen[Stream[A]] = {
+  private[this] def withSize[A](size: Int)(f: Int => Gen[A]): Gen[EphemeralStream[A]] = {
     Applicative[Gen].sequence(
-      Stream.fill(size)(Gen.choose(1, size))
+      (IList.fill(size)(Gen.choose(1, size max 1))).toEphemeralStream
     ).flatMap { s =>
-      val ns = Traverse[Stream].traverseS(s) { n =>
+      val ns = Traverse[EphemeralStream].traverseS(s) { n =>
         for {
           sum <- State.get[Int]
           r <- if (sum >= size) {
@@ -336,7 +336,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
             State((s: Int) => (s + n) -> Option(n))
           }
         } yield r
-      }.eval(0).flatten
+      }.eval(0).flatMap(o => o.cata[EphemeralStream[Int]](EphemeralStream(_), EphemeralStream.emptyEphemeralStream))
 
       Applicative[Gen].sequence(ns.map(f))
     }
@@ -348,13 +348,13 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
         A.arbitrary.map(a => Tree.Leaf(a))
       case 2 =>
         arb[(A, A)].arbitrary.map{ case (a1, a2) =>
-          Tree.Node(a1, Stream(Tree.Leaf(a2)))
+          Tree.Node(a1, EphemeralStream(Tree.Leaf(a2)))
         }
       case 3 =>
         arb[(A, A, A)].arbitrary.flatMap{ case (a1, a2, a3) =>
           Gen.oneOf(
-            Tree.Node(a1, Stream(Tree.Leaf(a2), Tree.Leaf(a3))),
-            Tree.Node(a1, Stream(Tree.Node(a2, Stream(Tree.Leaf(a3)))))
+            Tree.Node(a1, EphemeralStream(Tree.Leaf(a2), Tree.Leaf(a3))),
+            Tree.Node(a1, EphemeralStream(Tree.Node(a2, EphemeralStream(Tree.Leaf(a3)))))
           )
         }
       case _ =>
@@ -401,7 +401,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
       withSize(n)(treeGenSized[A])
 
     val parent: Int => Gen[TreeLoc.Parent[A]] = { n =>
-      Gen.choose(0, n - 1).flatMap { x1 =>
+      Gen.choose(0, (n - 1) max 0).flatMap { x1 =>
         Apply[Gen].tuple3(
           forest(x1), A.arbitrary, forest(n - x1 - 1)
         )
@@ -411,7 +411,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     for{
       a <- Gen.choose(1, size max 1)
       b = size - a
-      aa <- Gen.choose(1, a)
+      aa <- Gen.choose(1, a max 1)
       ba <- Gen.choose(0, b max 0)
       t <- Apply[Gen].apply4(
         treeGenSized[A](aa),

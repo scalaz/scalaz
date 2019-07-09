@@ -103,7 +103,7 @@ case class StrictTree[A](
   }
 
   def toTree: Tree[A] = {
-    Tree.Node[A](rootLabel, subForest.toStream.map(_.toTree))
+    Tree.Node[A](rootLabel, subForest.foldRight(EphemeralStream.emptyEphemeralStream[Tree[A]])((t, b) => t.toTree ##:: b))
   }
 
   /** Binds the given function across all the subtrees of this tree. */

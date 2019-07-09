@@ -17,9 +17,27 @@ object EphemeralStreamTest extends SpecLite {
   checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
   checkAll(alt.laws[EphemeralStream])
+  checkAll(monoid.laws[EphemeralStream[Int]])
+  checkAll(order.laws[EphemeralStream[Int]])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
+
+  import EphemeralStream.EStream
+
+  "Order[EStream[Int]] is consistent with Order[List[Int]]" ! forAll {
+    (a: EStream[Int], b: EStream[Int]) =>
+      Order[EStream[Int]].order(a, b) must_=== Order[List[Int]].order(a.toList, b.toList)
+  }
+
+  "Order[EStream[Int]] is lazy" ! {
+    var evaluated = false
+    val a = 1 ##:: {evaluated = true; 2} ##:: EphemeralStream.emptyEphemeralStream[Int]
+    val b = 0 ##:: EphemeralStream.emptyEphemeralStream[Int]
+    Order[EStream[Int]].order(a, b) must_=== Ordering.GT
+    Order[EStream[Int]].order(b, a) must_=== Ordering.LT
+    evaluated must_=== false
+  }
 
   "reverse" ! forAll{ e: EphemeralStream[Int] =>
     e.reverse.toList must_===(e.toList.reverse)

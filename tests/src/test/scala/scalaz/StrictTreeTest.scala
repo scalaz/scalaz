@@ -46,7 +46,7 @@ object StrictTreeTest extends SpecLite {
   }
 
   "flatten is the same as the lazy Tree's flatten" ! forAll { (s: StrictTree[Byte]) =>
-    s.flatten must_=== s.toTree.flatten.toVector
+    s.flatten must_=== Foldable[EphemeralStream].toVector(s.toTree.flatten)
   }
 
   "StrictTree#toTree and Tree#toStrictTree are inverses" ! forAll { (s: StrictTree[Byte]) =>
