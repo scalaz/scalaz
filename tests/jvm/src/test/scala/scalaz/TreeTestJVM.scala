@@ -16,7 +16,7 @@ object TreeTestJVM extends SpecLite {
   }
 
   def genTree(size: Int): Tree[Int] =
-    (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, Stream(x)))
+    (1 to size).foldLeft(Leaf(0))((x, y) => Node(y, EphemeralStream(x)))
 
   val size = 100000
 
@@ -27,7 +27,7 @@ object TreeTestJVM extends SpecLite {
   }
 
   "deep Tree flatten should not cause a stack overflow" ! {
-    deepTree.flatten must_== (size to 0 by -1).toStream
+    Foldable[EphemeralStream].toStream(deepTree.flatten) must_== (size to 0 by -1).toStream
   }
 
   "deep Equal.equal should not cause a stack overflow" ! {

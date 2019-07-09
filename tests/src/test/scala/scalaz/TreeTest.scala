@@ -25,12 +25,12 @@ object TreeTest extends SpecLite {
   }
 
   "infinite Tree flatten" ! {
-    Node(0, Stream.from(1).map(Leaf(_))).flatten
+    Node(0, EphemeralStream.fromStream(Stream.from(1)).map(Leaf(_))).flatten
     true
   }
 
   "A tree must can be rendered as an ASCII string" ! {
-      Node(1, Stream(Node(2, Stream(Leaf(3))), Leaf(4))).drawTree must_== Seq(
+      Node(1, EphemeralStream(Node(2, EphemeralStream(Leaf(3))), Leaf(4))).drawTree must_== Seq(
       "1",
       "|",
       "+- 2",

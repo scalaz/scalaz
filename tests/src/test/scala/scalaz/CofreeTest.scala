@@ -10,12 +10,13 @@ import org.scalacheck.Prop.forAll
 import Cofree._
 import Cofree.CofreeZip
 import Isomorphism._
+import EphemeralStream._
 
 object CofreeTest extends SpecLite {
 
   type CofreeLazyOption[A] = Cofree[LazyOption, A]
-  type CofreeStream[A] = Cofree[Stream, A]
-  type OneAndStream[A] = OneAnd[Stream, A]
+  type CofreeStream[A] = Cofree[EStream, A]
+  type OneAndStream[A] = OneAnd[EStream, A]
   type OneAndList[A] = OneAnd[List, A]
   type CofreeOption[A] = Cofree[Option, A]
 
@@ -61,15 +62,15 @@ object CofreeTest extends SpecLite {
     new IsoFunctorTemplate[OneAndStream, CofreeLazyOption] {
       def to[A](fa: OneAndStream[A]) =
         Cofree.unfold(fa){
-          case OneAnd(a, h #:: t) => (a, LazyOption.lazySome(OneAnd(h, t)))
+          case OneAnd(a, h ##:: t) => (a, LazyOption.lazySome(OneAnd(h, t)))
           case OneAnd(a, _)       => (a, LazyOption.lazyNone)
         }
       def from[A](fa: CofreeLazyOption[A]) =
         OneAnd(
           fa.head,
           fa.tail.map(s =>
-            Foldable[CofreeLazyOption].foldRight(s, Stream.empty[A])(_ #:: _)
-          ).getOrElse(Stream.empty)
+            Foldable[CofreeLazyOption].foldRight(s, emptyEphemeralStream[A])(_ ##:: _)
+          ).getOrElse(emptyEphemeralStream)
         )
     }
 
@@ -136,7 +137,7 @@ object CofreeTest extends SpecLite {
   }
 
   {
-    type CofreeZipStream[A] = CofreeZip[Stream, A]
+    type CofreeZipStream[A] = CofreeZip[EStream, A]
 
     implicit def CofreeZipStreamArb[A: Arbitrary]: Arbitrary[CofreeZipStream[A]] =
       Tags.Zip.subst(CofreeStreamArb[A])
@@ -156,7 +157,7 @@ object CofreeTest extends SpecLite {
 
     import syntax.foldable._
     val f = (_: Int) + (_: Int)
-    val h #:: t = Tag.unwrap(Applicative[λ[α => Stream[α] @@ Tags.Zip]].apply2(Tags.Zip[Stream[Int]](a.toStream), Tags.Zip[Stream[Int]](b.toStream))(f))
+    val (h ##:: t) : EphemeralStream[Int] = Tag.unwrap(Applicative[λ[α => EphemeralStream[α] @@ Tags.Zip]].apply2(Tags.Zip[EStream[Int]](a.toEphemeralStream), Tags.Zip[EStream[Int]](b.toEphemeralStream))(f))
 
     val aa = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(a))
     val bb = Tags.Zip(oneAndStreamCofreeLazyOptionIso.to(b))
