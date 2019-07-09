@@ -185,8 +185,6 @@ final case class TreeLoc[A](tree: Tree[A], lefts: TreeForest[A],
 
 sealed abstract class TreeLocInstances {
   implicit val treeLocInstance: Comonad[TreeLoc] with Traverse1[TreeLoc] = new Comonad[TreeLoc] with Traverse1[TreeLoc] {
-    // import Stream.Empty
-    // import scalaz.std.stream._
 
     def copoint[A](p: TreeLoc[A]): A = p.tree.rootLabel
 
@@ -454,7 +452,6 @@ object TreeLoc extends TreeLocInstances {
 
 private trait TreeLocEqual[A] extends Equal[TreeLoc[A]] {
   implicit def E: Equal[A]
-  // import std.stream._,
   import std.tuple._
 
   override final def equal(a: TreeLoc[A], b: TreeLoc[A]) = {

@@ -12,7 +12,6 @@ object TreeLocTest extends SpecLite {
 
   {
     def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {
-      // import std.stream.streamEqual
       import EphemeralStream.{EStream, ephemeralStreamEqual}
 
       def streamEqualApprox = ephemeralStreamEqual[Tree[A]].contramap((_: EStream[Tree[A]]).take(1000))

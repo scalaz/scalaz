@@ -3,8 +3,6 @@ package scalaz
 import scalaz.Free.Trampoline
 import scalaz.Trampoline._
 import scalaz.EphemeralStream._
-// import std.stream.{streamInstance, streamMonoid}
-// import std.boolean.{fold}
 
 /**
  * A multi-way tree, also known as a rose tree. Also known as Cofree[Stream, A].
@@ -161,12 +159,6 @@ sealed abstract class Tree[A] {
                                 (_.traverse1(f))))
                            { case (h, t) => Node(h, t.head ##:: t.tail) }
                           )
-    // subForest match {
-    //   case Empty => G.map(f(rootLabel))(Leaf(_))
-    //   case x #:: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromFoldable(xs)).traverse1(_.traverse1(f))) {
-    //     case (h, t) => Node(h, t.list.toStream)
-    //   }
-    // }
   }
 
 }
@@ -185,11 +177,11 @@ sealed abstract class TreeInstances {
       case h ##:: t => t.foldLeft(z(h))((b, a) => f(a, b))
     }
     
-    def foldLeft[A, B](fa: Tree[A], z: B)(f: (B, => A) => B): B =
-      fa.flatten.foldLeft(z)(f)
+    override def foldLeft[A, B](fa: Tree[A], z: B)(f: (B, A) => B): B =
+      fa.flatten.foldLeft(z)((b, a) => f(b, a))
 
-    def foldMapLeft1[A, B](fa: Tree[A])(z: A => B)(f: (B, => A) => B): B = fa.flatten match {
-      case h ##:: t => t.foldLeft(z(h))(f)
+    override def foldMapLeft1[A, B](fa: Tree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
+      case h ##:: t => t.foldLeft(z(h))((b, a) => f(b, a))
     }
 
     override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
@@ -218,7 +210,6 @@ sealed abstract class TreeInstances {
   implicit def treeOrder[A](implicit A0: Order[A]): Order[Tree[A]] =
     new Order[Tree[A]] with TreeEqual[A] {
       def A = A0
-      // import std.stream._
       override def order(x: Tree[A], y: Tree[A]) =
         A.order(x.rootLabel, y.rootLabel) match {
           case Ordering.EQ =>

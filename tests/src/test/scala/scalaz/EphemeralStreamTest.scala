@@ -199,4 +199,14 @@ object EphemeralStreamTest extends SpecLite {
       EphemeralStream.fromStream(Stream.iterate(0)(_ + 1).zipWithIndex.take(n))
     )
   }
+
+  object instances {
+    def equal[A: Equal] = Equal[EphemeralStream[A]]
+    def order[A: Order] = Order[EphemeralStream[A]]
+    def semigroup[A] = Semigroup[EphemeralStream[A]]
+    def monoid[A] = Monoid[EphemeralStream[A]]
+
+    // checking absence of ambiguity
+    def equal[A: Order] = Equal[EphemeralStream[A]]
+  }
 }
