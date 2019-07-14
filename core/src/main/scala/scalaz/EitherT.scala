@@ -318,7 +318,17 @@ sealed abstract class EitherTInstances2 extends EitherTInstances3 {
     }
 }
 
-sealed abstract class EitherTInstances1 extends EitherTInstances2 {
+sealed abstract class EitherTInstances11 extends EitherTInstances2 {
+  implicit def eitherTApply[F[_], E](implicit F0: Apply[F]): Apply[EitherT[F, E, ?]] =
+    new EitherTApply[F, E] { def F = F0 }
+}
+
+sealed abstract class EitherTInstances10 extends EitherTInstances11 {
+  implicit def eitherTApplicative[F[_], E](implicit F0: Applicative[F]): Applicative[EitherT[F, E, ?]] =
+    new EitherTApplicative[F, E] { def F = F0 }
+}
+
+sealed abstract class EitherTInstances1 extends EitherTInstances10 {
   // for binary compatibility
   def eitherTMonad[F[_], L](implicit F0: Monad[F]): Monad[EitherT[F, L, ?]] =
     new EitherTMonad[F, L] {
@@ -382,6 +392,18 @@ private trait EitherTFunctor[F[_], E] extends Functor[EitherT[F, E, ?]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: EitherT[F, E, A])(f: A => B): EitherT[F, E, B] = fa map f
+}
+
+private trait EitherTApply[F[_], E] extends Apply[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
+  implicit def F: Apply[F]
+
+  final def ap[A, B](fa: => EitherT[F, E, A])(f: => EitherT[F, E, A => B]): EitherT[F, E, B] = fa app f
+}
+
+private trait EitherTApplicative[F[_], E] extends Applicative[EitherT[F, E, ?]] with EitherTApply[F, E] {
+  implicit def F: Applicative[F]
+
+  final def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/.right(a)))
 }
 
 private trait EitherTBind[F[_], E] extends Bind[EitherT[F, E, ?]] with EitherTFunctor[F, E] {

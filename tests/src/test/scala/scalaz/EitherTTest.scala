@@ -9,12 +9,15 @@ import org.scalacheck.Prop.forAll
 
 object EitherTTest extends SpecLite {
 
+  type ValidationInt[A] = Validation[Int, A]
   type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
+  type EitherTValidationInt[A] = EitherT[ValidationInt, Int, A]
   type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
 
   checkAll(equal.laws[EitherTListInt[Int]])
+  checkAll(applicative.laws[EitherTValidationInt])
   checkAll(bindRec.laws[EitherTListInt])
   checkAll(monadPlus.laws[EitherTListInt])
   checkAll(monadError.laws[EitherTListInt, Int])
@@ -87,6 +90,8 @@ object EitherTTest extends SpecLite {
 
   object instances {
     def functor[F[_] : Functor, A] = Functor[EitherT[F, A, ?]]
+    def apply[F[_] : Apply, A] = Apply[EitherT[F, A, ?]]
+    def applicative[F[_] : Applicative, A] = Applicative[EitherT[F, A, ?]]
     def bindRec[F[_] : Monad: BindRec, A] = BindRec[EitherT[F, A, ?]]
     def monad[F[_] : Monad, A] = Monad[EitherT[F, A, ?]]
     def plus[F[_] : Monad, A: Semigroup] = Plus[EitherT[F, A, ?]]
