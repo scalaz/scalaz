@@ -14,3 +14,5 @@ tags
 .classpath
 .project
 .settings
+.bloop
+.metals
