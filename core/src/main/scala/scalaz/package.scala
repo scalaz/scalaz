@@ -363,6 +363,12 @@ package object scalaz {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, R, R, Id, A](f)
   }
 
+  /** @template */
+  type Select[R, A] = SelectT[R, Id, A]
+  object Select {
+    def apply[R, A](f: (A => R) => A): Select[R, A] = SelectT[R, Id, A](f)
+  }
+
   /** [[scalaz.Inject]][F, G] */
   type :<:[F[_], G[_]] = Inject[F, G]
 
