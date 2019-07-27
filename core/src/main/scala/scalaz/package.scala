@@ -96,7 +96,13 @@ package object scalaz {
 
   implicit val idInstance: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = Id.id
 
-  private[scalaz] type Tagged[A, T] = {type Tag = T; type Self = A}
+  private[scalaz] final class TagModule {
+    type Tagged = Any { type Tag }
+    trait Scope[A, T] extends Any
+    type @@[T, Tag] <: Tagged with Scope[T, Tag]
+  }
+
+  private[scalaz] val TagModule: TagModule = new TagModule
 
   /**
    * Tag a type `T` with `Tag`.
@@ -107,7 +113,7 @@ package object scalaz {
    *
    * Credit to Miles Sabin for the idea.
    */
-  type @@[T, Tag] = Tagged[T, Tag]
+  type @@[T, Tag] = TagModule.@@[T, Tag]
 
   /** A [[scalaz.NaturalTransformation]][F, G]. */
   type ~>[-F[_], +G[_]] = NaturalTransformation[F, G]
