@@ -23,7 +23,7 @@ object Tag {
     * parameter is safe.
     *
     * We do not have a
-    * <a href="https://ghc.haskell.org/trac/ghc/wiki/Roles">type role</a>
+    * <a href="https://gitlab.haskell.org/ghc/ghc/wikis/roles">type role</a>
     * system in Scala with which to declare the exact situations under
     * which `subst` is safe.  If we did, we would declare that `subst`
     * is safe if and only if the parameter has "representational" or
