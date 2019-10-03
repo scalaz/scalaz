@@ -10,7 +10,7 @@ language: scala
 scala:
   - 2.12.10
   - 2.11.12
-  - 2.13.0
+  - 2.13.1
 jdk:
   - openjdk8 # scalaz 7.3 does not support Java 7
 
