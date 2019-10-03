@@ -301,8 +301,8 @@ object build {
     },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.10.3",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    kindProjectorVersion := "0.11.0",
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
