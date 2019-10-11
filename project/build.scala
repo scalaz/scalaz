@@ -11,7 +11,7 @@ import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 
-import com.typesafe.sbt.pgp.PgpKeys._
+import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
 
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.sbt.osgi.SbtOsgi._
@@ -119,8 +119,8 @@ object build {
   }
 
   private def Scala211 = "2.11.12"
-  private def Scala212 = "2.12.8"
-  private def Scala213 = "2.13.0"
+  private def Scala212 = "2.12.10"
+  private def Scala213 = "2.13.1"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -304,8 +304,8 @@ object build {
       case _ =>
         Nil
     }),
-    kindProjectorVersion := "0.10.3",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    kindProjectorVersion := "0.11.0",
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
