@@ -30,6 +30,8 @@ import sbtcrossproject.CrossPlugin.autoImport._
 
 import sbtdynver.DynVerPlugin.autoImport._
 
+import xerial.sbt.Sonatype.autoImport._
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -229,7 +231,10 @@ object build {
     },
 
     credentialsSetting,
-    publishSetting,
+    publishTo := sonatypePublishToBundle.value,
+    sonatypeBundleDirectory := {
+      (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
+    },
     publishArtifact in Test := false,
 
     // adapted from sbt-release defaults
@@ -247,6 +252,7 @@ object build {
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining(s"; ++ ${Scala213}! ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
+      releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
@@ -376,14 +382,6 @@ object build {
     .nativeSettings(
       nativeSettings
     )
-
-  lazy val publishSetting = publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (version.value.trim.endsWith("SNAPSHOT"))
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
 
   lazy val credentialsSetting = credentials ++= {
     val name = "Sonatype Nexus Repository Manager"
