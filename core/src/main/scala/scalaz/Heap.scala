@@ -37,7 +37,7 @@ sealed abstract class Heap[A] {
   final def +(a: A)(implicit o: Order[A]): Heap[A] = this insert a
 
   def insertAll(as: TraversableOnce[A])(implicit o: Order[A]): Heap[A] =
-    (this /: as)((h,a) => h insert a)
+    as.foldLeft(this)((h,a) => h insert a)
 
   def insertAllF[F[_]](as: F[A])(implicit F: Foldable[F], o: Order[A]): Heap[A] =
     F.foldLeft(as, this)((h,a) => h insert a)
