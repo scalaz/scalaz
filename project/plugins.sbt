@@ -1,6 +1,7 @@
 scalacOptions += "-deprecation"
 
 val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("0.6.28")
+val scalaNativeVersion = sys.env.get("SCALA_NATIVE_VERSION").filter(_.trim.nonEmpty).getOrElse("0.3.9")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.1.0")
 
@@ -8,7 +9,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.1")
 
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.1")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.9")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % scalaNativeVersion)
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
 
