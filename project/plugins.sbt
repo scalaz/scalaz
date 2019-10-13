@@ -1,6 +1,7 @@
 scalacOptions += "-deprecation"
 
 val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("0.6.29")
+val scalaNativeVersion = sys.env.get("SCALA_NATIVE_VERSION").filter(_.trim.nonEmpty).getOrElse("0.3.9")
 
 addSbtPlugin("com.47deg" % "sbt-microsites" % "0.9.7")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
@@ -13,7 +14,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-osgi" % "0.9.5")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.1")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.1")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJsVersion)
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.9")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % scalaNativeVersion)
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
