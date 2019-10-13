@@ -43,7 +43,21 @@ matrix:
     env: TEST_PROJECT="rootJVM"
   - scala: 2.11.12
     jdk: openjdk8
-    env: SCALA_NATIVE
+    env:
+    - SCALA_NATIVE
+    - SCALA_NATIVE_VERSION="0.3.9"
+    sudo: required
+    before_install:
+    - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -
+    script:
+    - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
+    - if [[ "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
+      then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver coreNative/publish effectNative/publish iterateeNative/publish ; fi
+  - scala: 2.11.12
+    jdk: openjdk8
+    env:
+    - SCALA_NATIVE
+    - SCALA_NATIVE_VERSION="0.4.0-M2"
     sudo: required
     before_install:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -
