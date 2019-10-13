@@ -426,4 +426,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     ))
   }
 
+  implicit def parallelArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[A @@ Parallel] = 
+    Parallel.subst(A)
 }

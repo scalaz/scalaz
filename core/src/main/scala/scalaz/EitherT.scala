@@ -376,6 +376,9 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
 
   implicit def eitherTShow[F[_], A, B](implicit F0: Show[F[A \/ B]]): Show[EitherT[F, A, B]] =
     Contravariant[Show].contramap(F0)(_.run)
+
+  implicit def eitherTParallelApplicative[F[_], E](implicit F0: Applicative.Par[F]): Applicative.Par[EitherT[F, E, ?]] =
+    new EitherTParallelApplicative[F, E] { def F = F0 }
 }
 
 private trait EitherTFunctor[F[_], E] extends Functor[EitherT[F, E, ?]] {
@@ -509,4 +512,18 @@ private trait EitherTMonadError[F[_], E] extends MonadError[EitherT[F, E, ?], E]
       case -\/(e) => f(e).run
       case r => F.point(r)
     })
+}
+
+private trait EitherTParallelApplicative[F[_], E] extends Applicative.Par[EitherT[F, E, ?]] {
+  import Tags.Parallel
+  implicit def F: Applicative.Par[F]
+
+  def point[A](a: => A): EitherT[F, E, A] @@ Parallel =
+    Parallel(EitherT(Parallel.unwrap(F.point(\/.right[E, A](a)))))
+  
+  def ap[A, B](fa: => EitherT[F, E, A] @@ Parallel)(f: => EitherT[F, E, A => B] @@ Parallel): EitherT[F, E, B] @@ Parallel = {
+    val pfa = Parallel.subst1[EitherT[?[_], E, A], F](Parallel.unwrap(fa))
+    val pf = Parallel.subst1[EitherT[?[_], E, A => B], F](Parallel.unwrap(f))
+    Parallel(Parallel.unsubst1[F, EitherT[?[_], E, B]](pfa app pf))
+  }
 }

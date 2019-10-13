@@ -6,13 +6,22 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
+import Tags.Parallel
 
 object EitherTTest extends SpecLite {
 
+  type ValidationInt[A] = Validation[Int, A]
   type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
+  type EitherTValidationInt[A] = EitherT[ValidationInt, Int, A] @@ Parallel
   type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
+
+  implicit val validationIntParalellelApplicative: Applicative.Par[ValidationInt] =
+    Parallel.subst1[Applicative, ValidationInt](Applicative[ValidationInt])
+
+  implicit def equalParallel[A: Equal]: Equal[A @@ Tags.Parallel] =
+    Tags.Parallel.subst(Equal[A])
 
   checkAll(equal.laws[EitherTListInt[Int]])
   checkAll(bindRec.laws[EitherTListInt])
@@ -20,6 +29,7 @@ object EitherTTest extends SpecLite {
   checkAll(monadError.laws[EitherTListInt, Int])
   checkAll(traverse.laws[EitherTListInt])
   checkAll(bitraverse.laws[EitherTList])
+  checkAll(applicative.laws[EitherTValidationInt])
 
   "rightU" should {
     val a: String \/ Int = \/-(1)
@@ -96,6 +106,7 @@ object EitherTTest extends SpecLite {
     def bifunctor[F[_] : Functor] = Bifunctor[EitherT[F, ?, ?]]
     def bifoldable[F[_] : Foldable] = Bifoldable[EitherT[F, ?, ?]]
     def bitraverse[F[_] : Traverse] = Bitraverse[EitherT[F, ?, ?]]
+    def parallel[F[_] : Applicative.Par, E] = implicitly[Applicative.Par[EitherT[F, E, ?]]]
 
     // checking absence of ambiguity
     def functor[A, F[_] : BindRec] = Functor[EitherT[F, A, ?]]
