@@ -1,6 +1,6 @@
 # Use Docker-based container (instead of OpenVZ)
 sudo: false
-dist: trusty
+dist: xenial
 cache:
   directories:
     - $HOME/.ivy2/cache
@@ -8,20 +8,20 @@ cache:
 
 language: scala
 scala:
+  - 2.12.10
   - 2.11.12
   - 2.10.7
 jdk:
-  - openjdk7
+  - openjdk8
 
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - if [[ "${TRAVIS_JDK_VERSION}" == "openjdk7" ]]; then echo "-XX:MaxPermSize=512m" >> .jvmopts ; fi
   - if [[ "${JAVA_HOME}" != $(jdk_switcher home openjdk11) && "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then export PUBLISH_SONATYPE=true; fi
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+  - sbt "++${TRAVIS_SCALA_VERSION}!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test $(if [[ "${PUBLISH_SONATYPE}" != "true" ]]; then echo "publishLocal"; fi)
-  - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver "project $TEST_PROJECT" publish ; fi
+  - sbt "++${TRAVIS_SCALA_VERSION}!" "project $TEST_PROJECT" test $(if [[ "${PUBLISH_SONATYPE}" != "true" ]]; then echo "publishLocal"; fi)
+  - if [[ "${PUBLISH_SONATYPE}" == "true" ]]; then sbt "++${TRAVIS_SCALA_VERSION}!" setVersionUseDynver "project $TEST_PROJECT" publish ; fi
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
@@ -30,14 +30,8 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.12.10
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.10
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJS"
     - scala: 2.11.12
-      jdk: oraclejdk8
+      jdk: openjdk8
       env: 
       - SCALA_NATIVE
       - SCALA_NATIVE_VERSION="0.3.9"
@@ -48,7 +42,7 @@ matrix:
       - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run
       - if [[ "${TRAVIS_BRANCH}" == "series/7.2.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]]; then ./sbt "++${TRAVIS_SCALA_VERSION}" setVersionUseDynver rootNative/publish ; fi
     - scala: 2.11.12
-      jdk: oraclejdk8
+      jdk: openjdk8
       env: 
       - SCALA_NATIVE
       - SCALA_NATIVE_VERSION="0.4.0-M2"
@@ -64,10 +58,10 @@ matrix:
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
     - scala: 2.13.1
-      jdk: oraclejdk8
+      jdk: openjdk8
       env: TEST_PROJECT="rootJVM_213"
     - scala: 2.13.1
-      jdk: oraclejdk8
+      jdk: openjdk8
       env: TEST_PROJECT="rootJS_213"
 
 env:
