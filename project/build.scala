@@ -319,7 +319,6 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*")
     ),
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
