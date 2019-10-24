@@ -308,7 +308,6 @@ object build {
       LICENSE_txt
     },
     // kind-projector plugin
-    resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.11.0",
     libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
