@@ -2,7 +2,7 @@ package scalaz.std
 
 trait AllInstances
   extends AnyValInstances with FunctionInstances with ListInstances with MapInstances with SortedMapInstances
-  with OptionInstances with SetInstances with StringInstances with StreamInstances
+  with OptionInstances with SetInstances with StringInstances with StreamInstances with LazyListInstances
   with TupleInstances with VectorInstances with FutureInstances
   with EitherInstances with PartialFunctionInstances with TypeConstraintInstances
   with scalaz.std.math.BigDecimalInstances with scalaz.std.math.BigInts
