@@ -178,7 +178,7 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion_1_13 := "1.13.5",
-    scalaCheckVersion_1_14 := "1.14.2",
+    scalaCheckVersion_1_14 := "1.14.3",
     scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
