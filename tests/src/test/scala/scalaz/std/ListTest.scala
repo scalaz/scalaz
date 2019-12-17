@@ -195,6 +195,6 @@ object ListTest extends SpecLite {
     def cobind = Cobind[List]
 
     // checking absence of ambiguity
-    def equal[A: Order] = Equal[Option[A]]
+    def equal[A: Order] = Equal[List[A]]
   }
 }
