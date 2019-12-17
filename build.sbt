@@ -3,6 +3,7 @@ import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import sbtcrossproject.Platform
 
 val minSuccessfulTests = settingKey[Int]("")
 
@@ -26,7 +27,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest
+  coreNative, effectNative, iterateeNative, nativeTest, scalacheckBindingNative_1_14
 )
 
 lazy val scalaz = Project(
@@ -135,11 +136,13 @@ def scalacheckBindingProject(
   id: String,
   base: String,
   scalacheckVersion: SettingKey[String],
-  versionSuffix: String) = {
+  versionSuffix: String,
+  platforms: Seq[Platform]
+) = {
 
   def fullVersion(base: String) = base + "-scalacheck-" + versionSuffix
 
-  sbtcrossproject.CrossProject(id, file(base))(JVMPlatform, JSPlatform)
+  sbtcrossproject.CrossProject(id, file(base))(platforms: _*)
     .crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
@@ -196,7 +199,8 @@ lazy val scalacheckBinding_1_13 = scalacheckBindingProject(
   id = "scalacheck-binding_1_13",
   base = "scalacheck-binding_1_13",
   scalacheckVersion = scalaCheckVersion_1_13,
-  versionSuffix = "1.13"
+  versionSuffix = "1.13",
+  platforms = Seq(JVMPlatform, JSPlatform)
 )
 
 lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
@@ -206,12 +210,18 @@ lazy val scalacheckBinding_1_14 = scalacheckBindingProject(
   id = "scalacheck-binding_1_14",
   base = "scalacheck-binding_1_14",
   scalacheckVersion = scalaCheckVersion_1_14,
-  versionSuffix = "1.14"
+  versionSuffix = "1.14",
+  platforms = Seq(JVMPlatform, JSPlatform, NativePlatform)
 )
 
 lazy val scalacheckBindingJVM_1_14 = scalacheckBinding_1_14.jvm
 lazy val scalacheckBindingJS_1_14  = scalacheckBinding_1_14.js
-
+lazy val scalacheckBindingNative_1_14 = scalacheckBinding_1_14.native.settings(
+  nativeSettings,
+  (unmanagedSourceDirectories in Compile) += {
+    (baseDirectory in LocalRootProject).value / "scalacheck-binding/native/src/main/scala"
+  }
+)
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)

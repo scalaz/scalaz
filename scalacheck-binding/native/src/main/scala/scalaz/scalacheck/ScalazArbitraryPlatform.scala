@@ -1,0 +1,3 @@
+package scalaz.scalacheck
+
+abstract class ScalazArbitraryPlatform extends ScalazArbitrary1
