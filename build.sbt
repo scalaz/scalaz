@@ -23,7 +23,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest
+  coreNative, effectNative, iterateeNative, nativeTest, scalacheckBindingNative
 )
 
 lazy val scalaz = Project(
@@ -99,7 +99,7 @@ lazy val example = Project(
   coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
@@ -110,9 +110,11 @@ lazy val scalacheckBinding =
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
+    .nativeSettings(nativeSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingNative = scalacheckBinding.native
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
