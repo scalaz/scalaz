@@ -43,7 +43,7 @@ object FunctorUsage extends App {
   // lift
   //
 
-  // We can use the Funtor to "lift" a function to operate on the Functor type:
+  // We can use the Functor to "lift" a function to operate on the Functor type:
   val lenOption: Option[String] => Option[Int] = Functor[Option].lift(len)
   assert(lenOption(Some("abcd")) === Some(4))
 
