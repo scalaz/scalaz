@@ -15,7 +15,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 
   /**
    * Execute an action repeatedly as long as the given `Boolean` expression
-   * returns `true`. The condition is evalated before the loop body.
+   * returns `true`. The condition is evaluated before the loop body.
    * Collects the results into an arbitrary `MonadPlus` value, such as a `List`.
    */
   def whileM[G[_], A](p: F[Boolean], body: => F[A])(implicit G: MonadPlus[G]): F[G[A]] = {

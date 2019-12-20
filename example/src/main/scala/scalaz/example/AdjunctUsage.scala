@@ -35,7 +35,7 @@ object AdjunctUsage extends App {
 
   // Writer and Reader Functors form and adjunction that gives us a
   // Monad the behaves like State, think of it as a function which
-  // Reads the state perfoms a computation and Writes the new state.
+  // Reads the state performs a computation and Writes the new state.
   type RWState[S,A] = Reader[S, Writer[S, A]]
 
   // here is our checkForRepeats function rewriten for the new form

@@ -15,7 +15,7 @@ object EndoUsage extends App {
   // there already exists a Monoid instance for any Function1 where
   // there exists a monoid for the codomain, the append function of
   // this monoid returns a function which for a given input, returns
-  // the resut of applying each function to this input and append the
+  // the result of applying each function to this input and append the
   // two results to each other:
   val f1: Int => Int = _ + 1
   val f2: Int => Int = _ * 10
