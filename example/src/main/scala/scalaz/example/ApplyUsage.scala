@@ -11,7 +11,7 @@ object ApplyUsage extends App {
   import scalaz.syntax.equal._
   import scalaz.syntax.std.option._
 
-  // Apply extends the (hopefully familar) Functor Typeclass by adding
+  // Apply extends the (hopefully familiar) Functor Typeclass by adding
   // a method named "ap" which is similar to "map" from Functor in
   // that it applies a function to values in a context, however with
   // ap, the function is also in the same context. Here are some
