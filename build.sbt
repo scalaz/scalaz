@@ -19,11 +19,11 @@ val minSuccessfulTests = settingKey[Int]("")
 
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_13, scalacheckBindingJS_1_14, testsJS
+  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_14, testsJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_13, scalacheckBindingJVM_1_14, testsJVM, concurrent, example
+  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM_1_14, testsJVM, concurrent, example
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
@@ -49,7 +49,7 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a)) -- inProjects(scalacheckBindingJVM_1_13)
+    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
@@ -79,22 +79,6 @@ lazy val rootJVM = Project(
   standardSettings,
   notPublish
 ).aggregate(jvmProjects: _*)
-
-lazy val rootJS_213 = Project(
-  "rootJS_213",
-  file("rootJS_213")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(jsProjects.filter((scalacheckBindingJS_1_13: ProjectReference) != _): _*)
-
-lazy val rootJVM_213 = Project(
-  "rootJVM_213",
-  file("rootJVM_213")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(jvmProjects.filter((scalacheckBindingJVM_1_13: ProjectReference) != _): _*)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
@@ -194,17 +178,6 @@ def scalacheckBindingProject(
       }
     )
 }
-
-lazy val scalacheckBinding_1_13 = scalacheckBindingProject(
-  id = "scalacheck-binding_1_13",
-  base = "scalacheck-binding_1_13",
-  scalacheckVersion = scalaCheckVersion_1_13,
-  versionSuffix = "1.13",
-  platforms = Seq(JVMPlatform, JSPlatform)
-)
-
-lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
-lazy val scalacheckBindingJS_1_13  = scalacheckBinding_1_13.js
 
 lazy val scalacheckBinding_1_14 = scalacheckBindingProject(
   id = "scalacheck-binding_1_14",

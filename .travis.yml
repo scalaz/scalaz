@@ -8,9 +8,9 @@ cache:
 
 language: scala
 scala:
+  - 2.13.1
   - 2.12.10
   - 2.11.12
-  - 2.10.7
 jdk:
   - openjdk8
 
@@ -57,12 +57,6 @@ matrix:
       env: TEST_PROJECT=""
       script:
       - ./sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJS/test
-    - scala: 2.13.1
-      jdk: openjdk8
-      env: TEST_PROJECT="rootJVM_213"
-    - scala: 2.13.1
-      jdk: openjdk8
-      env: TEST_PROJECT="rootJS_213"
 
 env:
   matrix:

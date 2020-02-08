@@ -168,7 +168,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq("2.10.7", Scala211, Scala212),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -264,7 +264,6 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining(s"; ++ ${Scala213}! ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
