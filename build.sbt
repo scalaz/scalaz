@@ -170,7 +170,7 @@ def scalacheckBindingProject(
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, v)) if v <= 13 =>
             scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
+              organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % fullVersion(v)
             }.toSet
           case _ =>
             Set.empty
