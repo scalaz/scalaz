@@ -3,7 +3,7 @@ scalacOptions += "-deprecation"
 val scalaJsVersion = sys.env.get("SCALA_JS_VERSION").filter(_.trim.nonEmpty).getOrElse("1.0.1")
 val scalaNativeVersion = sys.env.get("SCALA_NATIVE_VERSION").filter(_.trim.nonEmpty).getOrElse("0.3.9")
 
-addSbtPlugin("com.47deg" % "sbt-microsites" % "1.1.3")
+addSbtPlugin("com.47deg" % "sbt-microsites" % "1.1.5")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
