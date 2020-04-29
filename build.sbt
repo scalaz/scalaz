@@ -11,7 +11,7 @@ val minSuccessfulTests = settingKey[Int]("")
  *   onLoad in Global := { s => "project rootJVM" :: s }
  *
  * and regular commands such as "compile" / "test" will skip over all the
- * scalajs / scala-native stuff.
+ * scalajs stuff.
  */
 
 lazy val jsProjects = Seq[ProjectReference](
@@ -20,10 +20,6 @@ lazy val jsProjects = Seq[ProjectReference](
 
 lazy val jvmProjects = Seq[ProjectReference](
   coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, example
-)
-
-lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest, scalacheckBindingNative
 )
 
 lazy val scalaz = Project(
@@ -44,20 +40,12 @@ lazy val scalaz = Project(
     new RuleTransformer(rule).transform(node)(0)
   },
   unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+    (jsProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
   Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
-
-lazy val rootNative = Project(
-  rootNativeId,
-  file("rootNative")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(nativeProjects: _*)
 
 lazy val rootJS = Project(
   "rootJS",
@@ -77,15 +65,12 @@ lazy val rootJVM = Project(
 
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
-lazy val coreNative = core.native
 
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
-lazy val effectNative = effect.native
 
 lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
-lazy val iterateeNative = iteratee.native
 
 lazy val example = Project(
   id = "example",
@@ -99,7 +84,7 @@ lazy val example = Project(
   coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
@@ -110,11 +95,9 @@ lazy val scalacheckBinding =
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
-    .nativeSettings(nativeSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
-lazy val scalacheckBindingNative = scalacheckBinding.native
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
@@ -147,16 +130,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
 
-// can't use "sbt test"
-// https://github.com/rickynils/scalacheck/issues/396
-lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
-  .settings(
-    standardSettings,
-    nativeSettings,
-    notPublish
-  )
-  .dependsOn(iterateeNative)
-
 lazy val site = Project(
   id = "site",
   base = file("site")
@@ -175,7 +148,7 @@ lazy val site = Project(
   micrositeFooterText := Some("""
                                 |<p>&copy; 2018 <a href="https://github.com/scalaz/scalaz">Scalaz Maintainers</a></p>
                                 |""".stripMargin),
-  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.12/${(version in Compile).value}",
+  micrositeDocumentationUrl := s"https://javadoc.io/doc/org.scalaz/scalaz-core_2.13/${(version in Compile).value}",
   micrositeDocumentationLabelDescription := "Scaladoc",
   micrositeName := "Scalaz",
   micrositeDescription := "Scalaz",

@@ -17,8 +17,6 @@ import com.typesafe.sbt.osgi.SbtOsgi
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
-import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 import sbtcrossproject.CrossPlugin.autoImport._
 
@@ -28,9 +26,6 @@ import xerial.sbt.Sonatype.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
-
-  val rootNativeId = "rootNative"
-  val nativeTestId = "nativeTest"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -86,7 +81,6 @@ object build {
       val dir = projectType match {
         case JVMPlatform => "jvm"
         case JSPlatform => "js"
-        case NativePlatform => "native"
       }
       crossBase / dir
     }
@@ -104,23 +98,14 @@ object build {
     "-Xlint:adapted-args",
     "-encoding", "UTF-8",
     "-feature",
+    "-opt:l:method,inline",
+    "-opt-inline-from:scalaz.**",
     "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
 
-  private val Scala211_jvm_and_js_options = Seq(
-    "-Ybackend:GenBCode",
-    "-Ydelambdafy:method",
-    "-target:jvm-1.8"
-  )
-
   val unusedWarnOptions = Def.setting {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 11)) =>
-        Seq("-Ywarn-unused-import")
-      case _ =>
-        Seq("-Ywarn-unused:imports")
-    }
+    Seq("-Ywarn-unused:imports")
   }
 
   val lintOptions = Seq(
@@ -131,11 +116,7 @@ object build {
     // "-Yrangepos" https://github.com/scala/bug/issues/10706
   )
 
-  private def Scala211 = "2.11.12"
-  private def Scala212 = "2.12.11"
   private def Scala213 = "2.13.2"
-
-  private val SetScala211 = releaseStepCommand("++" + Scala211)
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -163,8 +144,8 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    scalaVersion := Scala213,
+    crossScalaVersions := Seq(Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -174,31 +155,7 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.3",
-    scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,11)) => Scala211_jvm_and_js_options
-      case _ => Seq("-opt:l:method")
-    }),
-    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((2, v)) if v <= 12 =>
-        Seq(
-          "-Xfuture",
-          "-Ypartial-unification",
-        )
-    }.toList.flatten,
-    scalacOptions ++= {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, v)) if v >= 12 =>
-          Seq(
-            "-opt:l:method,inline",
-            "-opt-inline-from:scalaz.**"
-          )
-
-        case Some((2, 11)) =>
-          Seq("-Xsource:2.12")
-        case _ =>
-          Nil
-      }
-    },
+    scalacOptions ++= stdOptions,
     scalacOptions ++= lintOptions,
     scalacOptions ++= unusedWarnOptions.value,
     Seq(Compile, Test).flatMap(c =>
@@ -257,15 +214,11 @@ object build {
       checkSnapshotDependencies,
       inquireVersions,
       runTest,
-      SetScala211,
-      releaseStepCommand(s"${nativeTestId}/run"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := false"),
       publishSignedArtifacts,
-      SetScala211,
-      releaseStepCommand(s"${rootNativeId}/publishSigned"),
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
@@ -348,13 +301,7 @@ object build {
     }
   }
 
-  val nativeSettings = Seq(
-    scalacOptions --= Scala211_jvm_and_js_options,
-    scalaVersion := Scala211,
-    crossScalaVersions := Scala211 :: Nil
-  )
-
-  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
@@ -373,16 +320,10 @@ object build {
     )
     .jvmSettings(
       jvm_js_settings,
-      libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
-      }.toList,
       typeClasses := TypeClass.core
     )
-    .nativeSettings(
-      nativeSettings
-    )
 
-  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  lazy val effect = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
@@ -392,20 +333,14 @@ object build {
     .jvmSettings(
       typeClasses := TypeClass.effect
     )
-    .nativeSettings(
-      nativeSettings
-    )
 
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+  lazy val iteratee = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
-    .nativeSettings(
-      nativeSettings
-    )
 
   lazy val credentialsSetting = credentials ++= {
     val name = "Sonatype Nexus Repository Manager"

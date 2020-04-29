@@ -1,5 +1,7 @@
 package scalaz
 
+import Cofree.CofreeZip
+
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
 sealed abstract class Cofree[S[_], A] {
 
@@ -114,9 +116,40 @@ object Cofree extends CofreeInstances {
     Cofree.delay(W copoint z, f(W.extend(z)(mapUnfold(_:W[A])(f))))
 }
 
-import Cofree.CofreeZip
+sealed abstract class CofreeInstances6 {
 
-sealed abstract class CofreeInstances4 extends CofreeInstancesVersionSpecific {
+  implicit def cofreeEqual[F[_], A](implicit A0: Equal[A], F0: => Equal[F[Cofree[F, A]]]): Equal[Cofree[F, A]] =
+    new CofreeEqual[F, A] {
+      override def A = A0
+      override lazy val F = F0
+    }
+
+  implicit def cofreeZipEqual[F[_], A](implicit A: Equal[A], F: => Equal[F[CofreeZip[F, A]]]): Equal[CofreeZip[F, A]] =
+    Tags.Zip.subst(
+      cofreeEqual[F, A](A, F.contramap(Tags.Zip.subst))
+    )
+
+}
+
+sealed abstract class CofreeInstances5 extends CofreeInstances6 {
+
+  implicit def cofreeOrder[F[_], A](implicit A0: Order[A], F0: => Order[F[Cofree[F, A]]]): Order[Cofree[F, A]] =
+    new Order[Cofree[F, A]] with CofreeEqual[F, A] {
+      override lazy val F = F0
+      override def A = A0
+      override def order(x: Cofree[F, A], y: Cofree[F, A]) = {
+        Monoid[Ordering].append(A.order(x.head, y.head), F0.order(x.tail, y.tail))
+      }
+    }
+
+  implicit def cofreeZipOrder[F[_], A](implicit A: Order[A], F: => Order[F[CofreeZip[F, A]]]): Order[CofreeZip[F, A]] =
+    Tags.Zip.subst(
+      cofreeOrder[F, A](A, F.contramap(Tags.Zip.subst))
+    )
+
+}
+
+sealed abstract class CofreeInstances4 extends CofreeInstances5 {
   /** low priority `Foldable1` instance */
   implicit def cofreeFoldable[F[_]: Foldable]: Foldable1[Cofree[F, ?]] =
     new CofreeFoldable[F]{
@@ -289,5 +322,13 @@ private trait CofreeTraverse1[F[_]] extends Traverse1[Cofree[F, ?]] with CofreeT
 
   override def traverse1Impl[G[_], A, B](fa: Cofree[F,A])(f: A => G[B])(implicit G: Apply[G]): G[Cofree[F,B]] =
     G.apply2(f(fa.head), F.traverse1(fa.tail)(traverse1(_)(f)))(Cofree(_, _))
+}
+
+private trait CofreeEqual[F[_], A] extends Equal[Cofree[F, A]] {
+  protected[this] def A: Equal[A]
+  protected[this] def F: Equal[F[Cofree[F, A]]]
+  override final def equal(x: Cofree[F, A], y: Cofree[F, A]) = {
+    A.equal(x.head, y.head) && F.equal(x.tail, y.tail)
+  }
 }
 

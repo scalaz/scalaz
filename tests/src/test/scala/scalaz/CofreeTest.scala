@@ -12,7 +12,7 @@ import Cofree.CofreeZip
 import Isomorphism._
 import EphemeralStream._
 
-object CofreeTest extends SpecLite with CofreeTestInstances {
+object CofreeTest extends SpecLite {
 
   type CofreeLazyOption[A] = Cofree[LazyOption, A]
   type CofreeStream[A] = Cofree[EStream, A]

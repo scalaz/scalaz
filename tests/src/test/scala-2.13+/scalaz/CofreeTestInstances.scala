@@ -1,3 +1,0 @@
-package scalaz
-
-trait CofreeTestInstances
