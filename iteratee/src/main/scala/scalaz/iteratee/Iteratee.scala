@@ -1,10 +1,23 @@
 package scalaz
 package iteratee
 
-import Iteratee._
 import Id._
 
+object Iteratee
+  extends IterateeFunctions
+  with IterateeTFunctions
+  with EnumeratorTFunctions
+  with EnumeratorPFunctions
+  with EnumerateeTFunctions
+  with StepTFunctions
+  with InputFunctions {
+
+  def apply[E, A](s: Step[E, A]): Iteratee[E, A] = iteratee(s)
+}
+
 trait IterateeFunctions {
+  import Iteratee._
+
   def iteratee[E, A](s: Step[E, A]): Iteratee[E, A] =
     iterateeT[E, Id, A](s)
 
