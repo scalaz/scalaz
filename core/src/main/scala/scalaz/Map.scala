@@ -925,9 +925,8 @@ sealed abstract class ==>>[A, B] {
       }
     }
 
-  @deprecated("trim is no longer a public function", "7.3")
   @tailrec
-  final def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
+  private final def trim(lo: A => Ordering, hi: A => Ordering): A ==>> B =
     this match {
       case Tip() =>
         empty
@@ -941,9 +940,8 @@ sealed abstract class ==>>[A, B] {
         }
     }
 
-  @deprecated("trimLookupLo is no longer a public function", "7.3")
   @tailrec
-  final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Maybe[(A, B)], A ==>> B) =
+  private final def trimLookupLo(lo: A, cmphi: A => Ordering)(implicit o: Order[A]): (Maybe[(A, B)], A ==>> B) =
     this match {
       case Tip() =>
         (Maybe.empty, empty)
@@ -1007,8 +1005,7 @@ sealed abstract class ==>>[A, B] {
     a.cata(filter(_, this), this)
   }
 
-  @deprecated("join is no longer a protected function", "7.3")
-  protected def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
+  private def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
     (this, other) match {
       case (Tip(), r) =>
         insertMin(kx, x, r)

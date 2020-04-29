@@ -12,9 +12,6 @@ sealed abstract class Liskov[-A, +B] {
   def substCo[F[+_]](p: F[A]): F[B]
   def substCt[F[-_]](p: F[B]): F[A]
 
-  @deprecated("use substCt instead", since = "7.3.0")
-  final def subst[F[-_]](p: F[B]): F[A] = substCt(p)
-
   final def *[+[+_, +_], C, D](that: Liskov[C, D]): Liskov[A + C, B + D] = Liskov.lift2(this, that)
 
   final def andThen[C](that: Liskov[B, C]): Liskov[A, C] = Liskov.trans(that, this)

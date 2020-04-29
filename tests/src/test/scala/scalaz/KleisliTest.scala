@@ -163,38 +163,4 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  "Catchable[Kleisli]" should {
-
-    import effect.IO
-
-    type F[A] = Kleisli[IO, Int, A]
-    val C = Catchable[F]
-    val err = new Error("oh noes")
-    val bad = C.fail[Int](err)
-
-    "throw exceptions captured via fail()" in {
-      try {
-        bad.run(1).unsafePerformIO
-        fail("should have thrown")
-      } catch {
-        case t: Throwable => t must_== err
-      }
-    }
-
-    "catch exceptions captured via fail()" in {
-      C.attempt(bad).run(1).unsafePerformIO must_== -\/(err)
-    }
-
-    "catch ambient exceptions (1/2)" in {
-      C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_== -\/(err)
-    }
-
-    "catch ambient exceptions (2/2)" in {
-      C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_== -\/(err)
-    }
-
-    "properly handle success" in {
-      C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
-    }
-  }
 }

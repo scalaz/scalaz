@@ -7,14 +7,14 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{ Try, Success => TSuccess }
 
 trait FutureInstances1 {
-  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with Catchable[Future] =
+  implicit def futureInstance(implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] =
     new FutureInstance
 
   implicit def futureSemigroup[A](implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
     Semigroup.liftSemigroup[Future, A]
 }
 
-private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] with Catchable[Future] {
+private class FutureInstance(implicit ec: ExecutionContext) extends Nondeterminism[Future] with Cobind[Future] with MonadError[Future, Throwable] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f

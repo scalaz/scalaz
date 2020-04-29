@@ -306,14 +306,6 @@ trait Foldable[F[_]]  { self =>
   final def asum[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
     psum(fa)
 
-  @deprecated("use psum", "7.3.0")
-  def msuml[G[_], A](fa: F[G[A]])(implicit G: PlusEmpty[G]): G[A] =
-    psum(fa)
-
-  @deprecated("use psum", "7.3.0")
-  def msumlU[GA](fa: F[GA])(implicit G: Unapply[PlusEmpty, GA]): G.M[G.A] =
-    msuml[G.M, G.A](G.leibniz.subst[F](fa))(G.TC)
-
   def longDigits[A](fa: F[A])(implicit d: A <:< Digit): Long = foldLeft(fa, 0L)((n, a) => n * 10L + (a: Digit))
   /** Deforested alias for `toStream(fa).isEmpty`. */
   def empty[A](fa: F[A]): Boolean = all(fa)(_ => false)

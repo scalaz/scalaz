@@ -559,24 +559,12 @@ trait BooleanFunctions {
   final def emptyOrPoint[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
-  /**
-   * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
-   * for `M`.
-   */
-  @deprecated("use emptyOrPoint instead", since = "7.3.0")
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
-    if (!cond) M.point(a) else M0.empty
-
   /** [[pointOrEmpty]] curried into a natural transformation. */
   final def pointOrEmptyNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
     λ[Id ~> M](pointOrEmpty(cond)(_)(M, M0))
 
   /** [[emptyOrPoint]] curried into a natural transformation. */
   final def emptyOrPointNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
-    λ[Id ~> M](emptyOrPoint(cond)(_)(M, M0))
-
-  @deprecated("use emptyOrPointNT instead", since = "7.3.0")
-  final def emptyOrPureNT[M[_]](cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): Id ~> M =
     λ[Id ~> M](emptyOrPoint(cond)(_)(M, M0))
 
 }

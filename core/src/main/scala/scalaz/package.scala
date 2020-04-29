@@ -52,7 +52,6 @@
  *  - [[scalaz.Bifunctor]]
  *  - [[scalaz.Bifoldable]]
  *  - [[scalaz.Bitraverse]] extends [[scalaz.Bifunctor]] with [[scalaz.Bifoldable]]
- *  - [[scalaz.Catchable]]
  *  - [[scalaz.Nondeterminism]] extends [[scalaz.Monad]]
  *  - [[scalaz.Compose]]
  *  - [[scalaz.Profunctor]]

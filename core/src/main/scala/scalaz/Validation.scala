@@ -42,8 +42,6 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
   }
 
   /** If this validation is success, return the given X value, otherwise, return the X value given to the return value. */
-  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
-              since = "7.3.0")
   def :?>>[X](success: => X): SwitchingValidation[X] =
     new SwitchingValidation[X](success)
 
@@ -326,9 +324,6 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
       case Failure(e) => -\/(e)
     }
 
-  @deprecated("Use `toDisjunction`", "7.3.0")
-  def disjunction: E \/ A = toDisjunction
-
   /** Run a disjunction function and back to validation again. Alias for `@\/` */
   def disjunctioned[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     k(toDisjunction).toValidation
@@ -411,20 +406,6 @@ object Validation extends ValidationInstances {
 
   def liftNel[E, A](a: A)(f : A => Boolean, fail: E) : ValidationNel[E, A] =
     lift(a)(f, fail).toValidationNel
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): Validation[E, T] = try {
-    Success(a)
-  } catch {
-    case e if ex.runtimeClass.isInstance(e) => Failure(e.asInstanceOf[E])
-  }
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchNonFatal[T](a: => T): Validation[Throwable, T] = try {
-    Success(a)
-  } catch {
-    case NonFatal(t) => Failure(t)
-  }
 
   /** Construct a `Validation` from an `Either`. */
   def fromEither[E, A](e: Either[E, A]): Validation[E, A] =

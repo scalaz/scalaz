@@ -149,13 +149,6 @@ sealed abstract class IOInstances0 extends IOInstances1 {
 
 sealed abstract class IOInstances extends IOInstances0 {
   implicit val ioMonadCatchIO: MonadCatchIO[IO] = new IOMonadCatchIO with IOLiftIO with IOMonad
-
-  implicit val ioCatchable: Catchable[IO] =
-    new Catchable[IO] {
-      def attempt[A](f: IO[A]): IO[Throwable \/ A] = f.catchLeft
-      def fail[A](err: Throwable): IO[A] = IO(throw err)
-    }
-
 }
 
 private trait IOMonad extends Monad[IO] with BindRec[IO] {

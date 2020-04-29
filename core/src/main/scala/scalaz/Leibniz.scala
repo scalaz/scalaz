@@ -38,7 +38,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
 }
 
 sealed abstract class LeibnizInstances {
-  import Leibniz.{=== => _, _}
+  import Leibniz._
 
   implicit val leibniz: Category[===] = new Category[===] {
     def id[A]: (A === A) = refl[A]
@@ -70,10 +70,6 @@ sealed abstract class LeibnizInstances {
 }
 
 object Leibniz extends LeibnizInstances {
-
-  /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
-  @deprecated("Use scalaz's package's type alias instead", "7.3.x")
-  type ===[A,B] = scalaz.===[A, B]
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
   implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A] {

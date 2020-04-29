@@ -22,8 +22,6 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
-  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
-              since = "7.3.0")
   def :?>>[X](right: => X): Switching_\/[X] =
     new Switching_\/(right)
 
@@ -209,9 +207,6 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
   def toValidation(implicit F: Functor[F]): F[Validation[A, B]] =
     F.map(run)(_.toValidation)
 
-  @deprecated("Use `toValidation`", "7.3.0")
-  def validation(implicit F: Functor[F]): F[Validation[A, B]] = toValidation
-
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[AA, F, BB] =
     EitherT(F.map(run)(_ validationed k))
@@ -284,22 +279,6 @@ object EitherT extends EitherTInstances {
   /** Construct a disjunction value from a standard `scala.Option`. */
   def fromOption[F[_], A, B](ifNone: => A)(fo: F[Option[B]])(implicit F: Functor[F]): EitherT[A, F, B] =
     apply(F.map(fo)(o => \/.fromOption(ifNone)(o)))
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchThrowable[F[_], A, B <: Throwable: NotNothing](a: => F[A])(implicit F: Applicative[F], ex: ClassTag[B]): EitherT[B, F, A] =
-    try {
-      rightT(a)
-    } catch {
-      case e if ex.runtimeClass.isInstance(e) => leftT(F.point(e.asInstanceOf[B]))
-    }
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchNonFatal[F[_], A](a: => F[A])(implicit F: Applicative[F]): EitherT[Throwable, F, A] =
-    try {
-      rightT(a)
-    } catch {
-      case NonFatal(t) => leftT(F.point(t))
-    }
 
 }
 

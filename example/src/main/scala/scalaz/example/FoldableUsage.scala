@@ -17,7 +17,7 @@ object FoldableUsage extends App {
   // we cannot use foldRight from the standard library with an
   // infinite stream, as it attempts to reverse the stream, causing a
   // Stack Overflow
-  val so = \/.fromTryCatchThrowable[Boolean,Throwable](trues.foldRight(false)(_ || _))
+  val so = try { \/-(trues.foldRight(false)(_ || _)) } catch { case e: Throwable => -\/(e) }
   assert(so.fold(_.toString, _.toString) === "java.lang.StackOverflowError")
 
   // however, the Foldable typeclass has an implementation named foldr

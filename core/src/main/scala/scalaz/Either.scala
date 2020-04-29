@@ -31,8 +31,6 @@ sealed abstract class \/[A, B] extends Product with Serializable {
   }
 
   /** If this disjunction is right, return the given X value, otherwise, return the X value given to the return value. */
-  @deprecated("Due to SI-1980, <<?: will always evaluate its left argument; use foldConst instead",
-              since = "7.3.0")
   def :?>>[X](right: => X): SwitchingDisjunction[X] =
     new SwitchingDisjunction[X](right)
 
@@ -321,18 +319,12 @@ sealed abstract class \/[A, B] extends Product with Serializable {
       case \/-(b) => Success(b)
     }
 
-  @deprecated("Use `toValidation`", "7.3.0")
-  def validation: Validation[A, B] = toValidation
-
   /** Convert to a ValidationNel. */
   def toValidationNel[AA>:A] : ValidationNel[AA,B] =
     this match {
       case -\/(a) => Failure(NonEmptyList(a))
       case \/-(b) => Success(b)
     }
-
-  @deprecated("Use `toValidationNel`", "7.3.0")
-  def validationNel[AA>:A]: ValidationNel[AA, B] = toValidationNel
 
   /** Run a validation function and back to disjunction again. Alias for `@\?/` */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB]): AA \/ BB =
@@ -406,16 +398,6 @@ object \/ extends DisjunctionInstances {
   /** Construct a disjunction value from a standard `scala.Option`. */
   def fromOption[A, B](ifNone: => A)(o: Option[B]): A \/ B =
     o.fold(left[A, B](ifNone))(right)
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchThrowable[T, E <: Throwable: NotNothing](a: => T)(implicit ex: ClassTag[E]): E \/ T = try {
-    \/-(a)
-  } catch {
-    case e if ex.runtimeClass.isInstance(e) => -\/(e.asInstanceOf[E])
-  }
-
-  @deprecated("Throwable is not referentially transparent, use \\/.attempt", "7.3.0")
-  def fromTryCatchNonFatal[T](a: => T): Throwable \/ T = attempt(a)(identity)
 
   /**
    * Wrap a call to a deterministic partial function, making a total function.

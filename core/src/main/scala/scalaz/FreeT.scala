@@ -80,12 +80,6 @@ sealed abstract class FreeT[S[_], M[_], A] {
         Suspend(mn(m))
     }
 
-  @deprecated("Alias for `hoist`", "7.3")
-  def hoistN[N[_]](mn: M ~> N): FreeT[S, N, A] = hoist(mn)
-
-  @deprecated("Alias for `hoist`", "7.3")
-  def hoistM[N[_]](mn: M ~> N): FreeT[S, N, A] = hoist(mn)
-
   /** Change the base functor `S` for a `FreeT` action. */
   def interpret[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] =
     step match {
@@ -94,12 +88,6 @@ sealed abstract class FreeT[S[_], M[_], A] {
       case Suspend(m) =>
         Suspend(M.map(m)(_.map(s => st(s))))
     }
-
-  @deprecated("Alias for `interpret`", "7.3")
-  def interpretS[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] = interpret(st)
-
-  @deprecated("Alias for `interpret`", "7.3")
-  def interpretT[T[_]](st: S ~> T)(implicit M: Functor[M]): FreeT[T, M, A] = interpret(st)
 
   /**
     * Runs to completion, mapping the suspension with the given transformation

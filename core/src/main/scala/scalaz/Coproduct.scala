@@ -65,9 +65,6 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
   def toValidation: Validation[F[A], G[A]] =
     run.toValidation
 
-  @deprecated("Use `toValidation`", "7.3.0")
-  def validation: Validation[F[A], G[A]] = toValidation
-
 }
 
 object Coproduct extends CoproductInstances {
