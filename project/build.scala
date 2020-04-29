@@ -16,6 +16,9 @@ import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
+import com.typesafe.tools.mima.plugin.MimaPlugin
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
+
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
@@ -49,6 +52,13 @@ object build {
     enableCrossBuild = true
   )
 
+  lazy val setMimaVersion: ReleaseStep = { st: State =>
+    val extracted = Project.extract(st)
+    val (releaseV, _) = st.get(ReleaseKeys.versions).getOrElse(sys.error("impossible"))
+    IO.write(extracted get releaseVersionFile, s"""\nbuild.scalazMimaBasis in ThisBuild := "${releaseV}"\n""", append = true)
+    reapply(Seq(scalazMimaBasis in ThisBuild := releaseV), st)
+  }
+
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
@@ -66,6 +76,11 @@ object build {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
+    },
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
+      }.toSet
     }
   )
 
@@ -74,7 +89,8 @@ object build {
     publish := {},
     publishLocal := {},
     publishSigned := {},
-    publishLocalSigned := {}
+    publishLocalSigned := {},
+    mimaPreviousArtifacts := Set.empty,
   )
 
   // avoid move files
@@ -269,6 +285,7 @@ object build {
       releaseStepCommandAndRemaining("set ThisBuild / useSuperShell := true"),
       releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
+      setMimaVersion,
       commitNextVersion,
       pushChanges
     ),
@@ -327,6 +344,13 @@ object build {
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
+  ) ++ Def.settings(
+    ThisBuild / mimaReportSignatureProblems := true,
+    mimaPreviousArtifacts := {
+      scalazMimaBasis.?.value.map {
+        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+      }.toSet
+    }
   )
 
   private[this] val jvm_js_settings = Seq(
@@ -366,7 +390,7 @@ object build {
       buildInfoObject := "ScalazBuildInfo",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+    .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
     .jsSettings(
       jvm_js_settings,
       scalajsProjectSettings,
@@ -388,6 +412,7 @@ object build {
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
+    .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings : _*)
     .jvmSettings(
       typeClasses := TypeClass.effect
@@ -402,6 +427,7 @@ object build {
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
+    .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings : _*)
     .nativeSettings(
       nativeSettings
@@ -428,6 +454,8 @@ object build {
   }
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+
+  lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
   lazy val genTypeClasses = taskKey[Seq[(FileStatus, File)]]("")
 

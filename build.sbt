@@ -1,5 +1,6 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
+import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val minSuccessfulTests = settingKey[Int]("")
@@ -31,6 +32,7 @@ lazy val scalaz = Project(
   base = file(".")
 ).settings(
   standardSettings,
+  mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
   packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
@@ -101,6 +103,7 @@ lazy val example = Project(
 lazy val scalacheckBinding =
   crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
+    .enablePlugins(MimaPlugin)
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
@@ -120,7 +123,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
-    notPublish,
     testOptions in Test += {
       val scalacheckOptions = Seq(
         "-maxSize", "5",
@@ -143,6 +145,9 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
+  .settings(
+    notPublish
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js

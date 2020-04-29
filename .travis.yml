@@ -18,7 +18,7 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
-  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
+  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile mimaReportBinaryIssues $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
   # restart sbt for avoid OutOfMemoryError
   - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
   - if [[ "${JAVA_HOME}" == $(jdk_switcher home openjdk8) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "series/7.3.x" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
