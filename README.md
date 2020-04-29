@@ -6,7 +6,7 @@ It provides purely functional data structures to complement those from the Scala
 It defines a set of foundational type classes (e.g. `Functor`, `Monad`) and corresponding instances for
 a large number of data structures.
 
-[![Build Status](https://travis-ci.com/scalaz/scalaz.svg?branch=series%2F7.3.x)](https://travis-ci.com/scalaz/scalaz)
+[![Build Status](https://travis-ci.com/scalaz/scalaz.svg?branch=master)](https://travis-ci.com/scalaz/scalaz)
 [![IRC](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](irc://irc.freenode.net/scalaz)
 [![Gitter](http://badges.gitter.im/scalaz/scalaz.png)](https://gitter.im/scalaz/scalaz)
 [![Discord](https://img.shields.io/discord/455164441852641282.svg?label=Discord)](https://discord.gg/cVHGnke)
@@ -75,7 +75,7 @@ res2: Option[Int] = Some(1)
 
 Let the types speak for themselves via the [Scalaz Scaladocs](https://scalaz.github.io/scalaz/#scaladoc)!
 
-The [examples module](https://github.com/scalaz/scalaz/tree/series/7.3.x/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
+The [examples module](https://github.com/scalaz/scalaz/tree/master/example/src/main/scala/scalaz/example) contains some snippets of Scalaz usage.
 
 The [wiki](https://github.com/scalaz/scalaz/wiki) contains release and migration information.
 
@@ -308,7 +308,7 @@ type Id[A] = A
 
 ## Contributing
 
-[Documentation for contributors](https://github.com/scalaz/scalaz/blob/series/7.3.x/CONTRIBUTING.md)
+[Documentation for contributors](https://github.com/scalaz/scalaz/blob/master/CONTRIBUTING.md)
 
 ## Credits
 
