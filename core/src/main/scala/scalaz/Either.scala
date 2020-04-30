@@ -399,6 +399,34 @@ object \/ extends DisjunctionInstances {
   def right[A, B]: B => A \/ B =
     \/-(_)
 
+  /** Construct a left disjunction value but specify only the `right` type param
+   *
+   * @example {{{
+   *   val x = \/.l[String](42)
+   *   x: Int \/ String
+   * }}}
+   */
+  def l[B]: L[B] =
+    new L[B]
+
+  private[scalaz] final class L[B] private[scalaz] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[A](left: A): A \/ B = -\/(left)
+  }
+
+  /** Construct a right disjunction value but specify only the `left` type param
+   *
+   * @example {{{
+   *   val x = \/.r[String](42)
+   *   x: String \/ Int
+   * }}}
+   */
+  def r[B]: R[B] =
+    new R[B]
+
+  private[scalaz] final class R[A] private[scalaz] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[B](right: B): A \/ B = \/-(right)
+  }
+
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[A, B](e: Either[A, B]): A \/ B =
     e fold (left, right)

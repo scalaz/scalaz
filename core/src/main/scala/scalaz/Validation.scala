@@ -402,6 +402,34 @@ object Validation extends ValidationInstances {
   def failure[E, A]: E => Validation[E, A] =
     Failure(_)
 
+  /** Construct a failure validation value but specify only the `success` type param
+   *
+   * @example {{{
+   *   val x = Validation.f[String](42)
+   *   x: Validation[Int, String]
+   * }}}
+   */
+  def f[B]: F[B] =
+    new F[B]
+
+  private[scalaz] final class F[B] private[scalaz] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[A](failure: A): Validation[A, B] = Failure(failure)
+  }
+
+  /** Construct a success validation value but specify only the `failure` type param
+   *
+   * @example {{{
+   *   val x = Validation.s[String](42)
+   *   x: Validation[String, Int]
+   * }}}
+   */
+  def s[B]: S[B] =
+    new S[B]
+
+  private[scalaz] final class S[A] private[scalaz] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[B](success: B): Validation[A, B] = Success(success)
+  }
+
   /** Wrap a value in a `NonEmptyList` and construct a failure validation out of it. */
   def failureNel[E, A](e: E): ValidationNel[E, A] =
     Failure(NonEmptyList(e))
