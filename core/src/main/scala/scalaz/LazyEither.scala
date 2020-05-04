@@ -109,23 +109,19 @@ object LazyEither extends LazyEitherInstances {
    */
   def condLazyEither[A, B](cond: Boolean)(ifTrue: => A, ifFalse: => B): LazyEither[A, B] = if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
 
-  sealed abstract class LazyLeftConstruct[B] {
-    def apply[A](a: => A): LazyEither[A, B]
+  final class LazyLeftConstruct[B] private[LazyEither] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[A](a: => A): LazyEither[A, B] = LazyLeft(() => a)
   }
 
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
-    def apply[A](a: => A) = LazyLeft(() => a)
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B]
+
+  final class LazyRightConstruct[A] private[LazyEither] (private val dummy: Boolean = true) extends AnyVal {
+    def apply[B](b: => B): LazyEither[A, B] = LazyRight(() => b)
   }
 
-  sealed abstract class LazyRightConstruct[A] {
-    def apply[B](b: => B): LazyEither[A, B]
-  }
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A]
 
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
-    def apply[B](b: => B) = LazyRight(() => b)
-  }
-
-  final case class LeftProjection[A, B](e: LazyEither[A, B]) {
+  final case class LeftProjection[A, B](e: LazyEither[A, B]) extends AnyVal {
     import LazyOption._
 
     def getOrElse[AA >: A](default: => AA): AA =
