@@ -299,11 +299,11 @@ object StreamT extends StreamTInstances {
 
   final case class Yield[A, S](a: A, s: () => S) extends Step[A, S]
   object Yield {
-    def apply[A, S](a: A, s: => S): Step[A, S] = new Yield(a, s _)
+    def apply[A, S](a: A, s: => S): Step[A, S] = new Yield(a, () => s)
   }
   final case class Skip[A, S](s: () => S) extends Step[A, S]
   object Skip {
-    def apply[A, S](s: => S): Step[A, S] = new Skip(s _)
+    def apply[A, S](s: => S): Step[A, S] = new Skip(() => s)
   }
   sealed abstract case class Done[A, S]() extends Step[A, S]
   object Done {
