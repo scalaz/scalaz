@@ -136,8 +136,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenMaybeT[F[_], A](implicit F: Cogen[F[Maybe[A]]]): Cogen[MaybeT[F, A]] =
     F.contramap(_.run)
 
-  implicit def cogenStreamT[F[_]: Monad, A](implicit F: Cogen[F[Stream[A]]]): Cogen[StreamT[F, A]] =
-    F.contramap(_.toStream)
+  implicit def cogenStreamT[F[_]: Monad, A](implicit F: Cogen[F[LazyList[A]]]): Cogen[StreamT[F, A]] =
+    F.contramap(_.toLazyList)
 
   implicit def cogenOptionT[F[_], A](implicit F: Cogen[F[Option[A]]]): Cogen[OptionT[F, A]] =
     F.contramap(_.run)
@@ -590,7 +590,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def listTArb[F[_]: Applicative, A](implicit FA: Arbitrary[F[IList[A]]]): Arbitrary[ListT[F, A]] = Functor[Arbitrary].map(FA)(ListT.fromIList(_))
 
-  implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[Stream[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
+  implicit def streamTArb[F[_], A](implicit FA: Arbitrary[F[LazyList[A]]], F: Applicative[F]): Arbitrary[StreamT[F, A]] = Functor[Arbitrary].map(FA)(StreamT.fromLazyList(_))
 
   implicit def CaseInsensitiveArbitrary[A](implicit A0: Arbitrary[A], A1: FoldCase[A]): Arbitrary[CaseInsensitive[A]] =
     Functor[Arbitrary].map(A0)(CaseInsensitive(_))

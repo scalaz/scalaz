@@ -122,29 +122,29 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
   /**
    * **Warning:** Requires evaluation of the whole stream. Depending on
    * the monad `M`, the evaluation will happen either immediately, or
-   * will be deferred until the resulting `Stream` is extracted from the
+   * will be deferred until the resulting `LazyList` is extracted from the
    * returned `M`.
    */
-  def toStream(implicit M: Monad[M]): M[Stream[A]] = M.map(rev)(_.reverse)
+  def toLazyList(implicit M: Monad[M]): M[LazyList[A]] = M.map(rev)(_.reverse)
 
   /**
    * **Warning:** Requires evaluation of the whole stream. Depending on
    * the monad `M`, the evaluation will happen either immediately, or
-   * will be deferred until the resulting `Stream` is extracted from the
+   * will be deferred until the resulting `LazyList` is extracted from the
    * returned `M`.
    */
-  def toStreamRec(implicit M: BindRec[M]): M[Stream[A]] = M.map(revRec)(_.reverse)
+  def toLazyListRec(implicit M: BindRec[M]): M[LazyList[A]] = M.map(revRec)(_.reverse)
 
   /**
-   * Converts this `StreamT` to a lazy `Stream`, i.e. without forcing
+   * Converts this `StreamT` to a lazy `LazyList`, i.e. without forcing
    * evaluation of all elements. Note, however, that at least one element
    * of this stream will be evaluated, and depending on the structure of
    * this stream, up to two elements might be evaluated.
    */
-  def asStream(implicit ev: M[Step[A, StreamT[M, A]]] === Id[Step[A, StreamT[Id, A]]]): Stream[A] = {
-    def go(s: StreamT[Id, A]): Stream[A] = s.unconsRec match {
-      case None          => Stream.empty[A]
-      case Some((a, s1)) => Stream.cons(a, go(s1))
+  def asLazyList(implicit ev: M[Step[A, StreamT[M, A]]] === Id[Step[A, StreamT[Id, A]]]): LazyList[A] = {
+    def go(s: StreamT[Id, A]): LazyList[A] = s.unconsRec match {
+      case None          => LazyList.empty[A]
+      case Some((a, s1)) => LazyList.cons(a, go(s1))
     }
 
     go(StreamT(ev(step)))
@@ -200,18 +200,18 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   private def stepBind[B](f: Step[A, StreamT[M, A]] => M[Step[B, StreamT[M, B]]])(implicit M: Monad[M]): StreamT[M, B] = StreamT(M.bind(step)(f))
 
-  private def rev(implicit M: Monad[M]): M[Stream[A]] = {
-    def loop(xs: StreamT[M, A], ys: Stream[A]): M[Stream[A]] =
+  private def rev(implicit M: Monad[M]): M[LazyList[A]] = {
+    def loop(xs: StreamT[M, A], ys: LazyList[A]): M[LazyList[A]] =
       M.bind(xs.step) {
         case Yield(a, s) => loop(s(), a #:: ys)
         case Skip(s)     => loop(s(), ys)
         case Done()      => M.point(ys)
       }
-    loop(this, Stream.Empty)
+    loop(this, LazyList.empty)
   }
 
-  private def revRec(implicit M: BindRec[M]): M[Stream[A]] =
-    M.tailrecM((() => this, Stream.empty[A])) { case (xs, ys) =>
+  private def revRec(implicit M: BindRec[M]): M[LazyList[A]] =
+    M.tailrecM((() => this, LazyList.empty[A])) { case (xs, ys) =>
       M.map(xs().step) {
         case Yield(a, s) => -\/((s, a #:: ys))
         case Skip(s)     => -\/((s, ys))
@@ -246,8 +246,8 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
     new StreamTMonadPlus[F] {
       implicit def F: Applicative[F] = F0
     }
-  implicit def StreamTEqual[F[_], A](implicit E: Equal[F[Stream[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toStream)
-  implicit def StreamTShow[F[_], A](implicit E: Show[F[Stream[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toStream)
+  implicit def StreamTEqual[F[_], A](implicit E: Equal[F[LazyList[A]]], F: Monad[F]): Equal[StreamT[F, A]] = E.contramap((_: StreamT[F, A]).toLazyList)
+  implicit def StreamTShow[F[_], A](implicit E: Show[F[LazyList[A]]], F: Monad[F]): Show[StreamT[F, A]] = Contravariant[Show].contramap(E)((_: StreamT[F, A]).toLazyList)
   implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
   implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, ?]] =
     new Foldable[StreamT[F, ?]] with Foldable.FromFoldMap[StreamT[F, ?]] {
@@ -260,8 +260,8 @@ object StreamT extends StreamTInstances {
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] = new StreamT[M, A](M point Done())
 
-  def fromStream[M[_], A](mas: M[Stream[A]])(implicit M: Applicative[M]): StreamT[M, A] = {
-    def loop(as: Stream[A]): Step[A, StreamT[M, A]] = as match {
+  def fromLazyList[M[_], A](mas: M[LazyList[A]])(implicit M: Applicative[M]): StreamT[M, A] = {
+    def loop(as: LazyList[A]): Step[A, StreamT[M, A]] = as match {
       case head #:: tail => Yield(head, apply(M.point(loop(tail))))
       case _ => Done()
     }

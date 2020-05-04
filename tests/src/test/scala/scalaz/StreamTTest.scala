@@ -8,18 +8,18 @@ import org.scalacheck.Prop.forAll
 object StreamTTest extends SpecLite {
   type StreamTOpt[A] = StreamT[Option, A]
 
-  "fromStream / toStream" ! forAll {
-    (ass: Stream[Stream[Int]]) =>
-      StreamT.fromStream(ass).toStream must_===(ass)
+  "fromLazyList / toLazyList" ! forAll {
+    (ass: LazyList[LazyList[Int]]) =>
+      StreamT.fromLazyList(ass).toLazyList must_===(ass)
   }
 
-  "fromStream / asStream" ! forAll {
+  "fromLazyList / asLazyList" ! forAll {
     import Id._
-    (as: Stream[Int]) =>
-      StreamT.fromStream[Id, Int](as).asStream must_===(as)
+    (as: LazyList[Int]) =>
+      StreamT.fromLazyList[Id, Int](as).asLazyList must_===(as)
   }
 
-  "asStream" should {
+  "asLazyList" should {
     "be lazy" in {
       var highestTouched = 0
 
@@ -28,55 +28,55 @@ object StreamTTest extends SpecLite {
         if(i < 100) Some((i, i+1)) else None
       })
 
-      val s2 = s1.asStream
+      val s2 = s1.asLazyList
 
       // test that at most 2 elements were evaluated in the conversion
       // (the fact that 2 are actually evaluated is a consequence of
-      // how Stream.cons and StreamT.unfold are implemented)
+      // how LazyList.cons and StreamT.unfold are implemented)
       highestTouched mustBe_< 3
     }
   }
 
   "filter all" ! forAll {
-    (ass: StreamT[Stream, Int]) =>
+    (ass: StreamT[LazyList, Int]) =>
       ass.filter(_ => true) must_===(ass)
   }
 
   "isEmpty" ! forAll {
-    (s: Stream[Int]) =>
-      StreamT.fromStream(List(s)).isEmpty.forall(_ == s.isEmpty)
+    (s: LazyList[Int]) =>
+      StreamT.fromLazyList(List(s)).isEmpty.forall(_ == s.isEmpty)
   }
 
   "filter none" ! forAll {
-    (ass: StreamT[Stream, Int]) =>
+    (ass: StreamT[LazyList, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
       isEmpty.forall(_ == true)
   }
 
   "drop" ! forAll {
-    (ass: Option[Stream[Int]], x: Int) =>
-      StreamT.fromStream(ass).drop(x).toStream must_===(ass.map(_.drop(x)))
+    (ass: Option[LazyList[Int]], x: Int) =>
+      StreamT.fromLazyList(ass).drop(x).toLazyList must_===(ass.map(_.drop(x)))
   }
 
   "take" ! forAll {
-    (ass: Option[Stream[Int]], x: Int) =>
-      StreamT.fromStream(ass).take(x).toStream must_===(ass.map(_.take(x)))
+    (ass: Option[LazyList[Int]], x: Int) =>
+      StreamT.fromLazyList(ass).take(x).toLazyList must_===(ass.map(_.take(x)))
   }
 
   "mapM" ! forAll {
-    (s: Stream[Int], l: List[Int]) =>
+    (s: LazyList[Int], l: List[Int]) =>
       val s0 = s map (_ + 1)
-      StreamT.fromStream(List(s, s0)).mapM(i => l.map(_ + i)).toStream must_==(
-        Traverse[Stream].traverse(s)(i => l.map(_ + i)) :::
-        Traverse[Stream].traverse(s0)(i => l.map(_ + i))
+      StreamT.fromLazyList(List(s, s0)).mapM(i => l.map(_ + i)).toLazyList must_==(
+        Traverse[LazyList].traverse(s)(i => l.map(_ + i)) :::
+        Traverse[LazyList].traverse(s0)(i => l.map(_ + i))
       )
   }
 
   "foldMap" ! forAll {
-    (s: Stream[Int]) =>
+    (s: LazyList[Int]) =>
       import scalaz.Scalaz._
-      StreamT.fromStream(s.some).foldMap(_.toString) must_==(s.foldMap(_.toString))
+      StreamT.fromLazyList(s.some).foldMap(_.toString) must_==(s.foldMap(_.toString))
   }
 
   "foldRightM" should {
@@ -180,12 +180,12 @@ object StreamTTest extends SpecLite {
       s.lengthRec must_=== 1
     }
 
-    "not stack-overflow on toStreamRec" in {
-      s.toStreamRec.toList must_=== List("foo")
+    "not stack-overflow on toLazyListRec" in {
+      s.toLazyListRec.toList must_=== List("foo")
     }
 
-    "not stack-overflow on asStream" in {
-      s.asStream.toList must_=== List("foo")
+    "not stack-overflow on asLazyList" in {
+      s.asLazyList.toList must_=== List("foo")
     }
   }
 
