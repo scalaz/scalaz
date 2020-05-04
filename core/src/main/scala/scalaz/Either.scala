@@ -1,7 +1,6 @@
 package scalaz
 
 import scala.util.control.NonFatal
-import scala.reflect.ClassTag
 import Liskov.<~<
 
 /** Represents a disjunction: a result that is either an `A` or a `B`.

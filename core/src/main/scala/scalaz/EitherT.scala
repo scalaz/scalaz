@@ -1,7 +1,5 @@
 package scalaz
 
-import scala.util.control.NonFatal
-import scala.reflect.ClassTag
 import Liskov.<~<
 
 /**

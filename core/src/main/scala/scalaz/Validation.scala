@@ -1,8 +1,5 @@
 package scalaz
 
-import scala.util.control.NonFatal
-import scala.reflect.ClassTag
-
 /**
  * Represents either:
  *  - `Success(a)`, or

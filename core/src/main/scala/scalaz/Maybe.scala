@@ -2,7 +2,6 @@ package scalaz
 
 import scala.annotation.tailrec
 import scala.util.control.NonFatal
-import scala.reflect.ClassTag
 import Ordering._
 import Isomorphism.{<~>, IsoFunctorTemplate}
 
