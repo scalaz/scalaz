@@ -14,19 +14,19 @@ final class StrongOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit 
 }
 
 sealed trait ToStrongOps0 {
-  implicit def ToStrongOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Strong, FA]) =
-    new StrongOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  implicit def ToStrongOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Strong, FA]): StrongOps[F0.M, F0.A, F0.B] =
+    new StrongOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 
 }
 
 trait ToStrongOps extends ToStrongOps0 with ToProfunctorOps {
 
-  implicit def ToStrongOps[F[_, _],A, B](v: F[A, B])(implicit F0: Strong[F]) =
-    new StrongOps[F,A, B](v)
+  implicit def ToStrongOps[F[_, _],A, B](v: F[A, B])(implicit F0: Strong[F]): StrongOps[F, A, B] =
+    new StrongOps[F, A, B](v)
 
 
-  implicit def ToStrongVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: Strong[F[G, ?, ?]]) =
-    new StrongOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToStrongVFromKleisliLike[G[_], F[G[_], _, _], A, B](v: F[G, A, B])(implicit F0: Strong[F[G, *, *]]): StrongOps[F[G, *, *], A, B] =
+    new StrongOps[F[G, *, *], A, B](v)(F0)
 
   ////
 
@@ -34,7 +34,8 @@ trait ToStrongOps extends ToStrongOps0 with ToProfunctorOps {
 }
 
 trait StrongSyntax[F[_, _]] extends ProfunctorSyntax[F] {
-  implicit def ToStrongOps[A, B](v: F[A, B]): StrongOps[F, A, B] = new StrongOps[F, A, B](v)(StrongSyntax.this.F)
+  implicit def ToStrongOps[A, B](v: F[A, B]): StrongOps[F, A, B] =
+    new StrongOps[F, A, B](v)(StrongSyntax.this.F)
 
   def F: Strong[F]
   ////

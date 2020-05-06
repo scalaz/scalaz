@@ -28,14 +28,14 @@ final class Traverse1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToTraverse1Ops0 {
-  implicit def ToTraverse1OpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse1, FA]) =
-    new Traverse1Ops[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToTraverse1OpsUnapply[FA](v: FA)(implicit F0: Unapply[Traverse1, FA]): Traverse1Ops[F0.M, F0.A] =
+    new Traverse1Ops[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToTraverse1Ops extends ToTraverse1Ops0 with ToTraverseOps with ToFoldable1Ops {
-  implicit def ToTraverse1Ops[F[_],A](v: F[A])(implicit F0: Traverse1[F]) =
-    new Traverse1Ops[F,A](v)
+  implicit def ToTraverse1Ops[F[_], A](v: F[A])(implicit F0: Traverse1[F]): Traverse1Ops[F, A] =
+    new Traverse1Ops[F, A](v)
 
   ////
 

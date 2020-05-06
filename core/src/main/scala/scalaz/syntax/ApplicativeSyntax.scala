@@ -15,14 +15,14 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 }
 
 sealed trait ToApplicativeOps0 {
-  implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
-    new ApplicativeOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]): ApplicativeOps[F0.M, F0.A] =
+    new ApplicativeOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
-  implicit def ToApplicativeOps[F[_],A](v: F[A])(implicit F0: Applicative[F]) =
-    new ApplicativeOps[F,A](v)
+  implicit def ToApplicativeOps[F[_], A](v: F[A])(implicit F0: Applicative[F]): ApplicativeOps[F, A] =
+    new ApplicativeOps[F, A](v)
 
   ////
   implicit def ApplicativeIdV[A](v: => A): ApplicativeIdV[A] = new ApplicativeIdV[A] {

@@ -20,7 +20,7 @@ final class MonadErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit val F
 }
 
 trait ToMonadErrorOps extends ToMonadOps {
-  implicit def ToMonadErrorOps[F[_], S, A](v: F[A])(implicit F0: MonadError[F, S]) =
+  implicit def ToMonadErrorOps[F[_], S, A](v: F[A])(implicit F0: MonadError[F, S]): MonadErrorOps[F, S, A] =
     new MonadErrorOps[F, S, A](v)
 
   ////

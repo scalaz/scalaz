@@ -14,7 +14,7 @@ final class MonadTellOps[F[_], S, A] private[syntax](self: F[A])(implicit val F:
 }
 
 trait ToMonadTellOps extends ToMonadOps {
-  implicit def ToMonadTellOps[F[_], S, A](v: F[A])(implicit F0: MonadTell[F, S]) =
+  implicit def ToMonadTellOps[F[_], S, A](v: F[A])(implicit F0: MonadTell[F, S]): MonadTellOps[F, S, A] =
     new MonadTellOps[F, S, A](v)
 
   ////

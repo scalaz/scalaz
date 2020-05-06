@@ -19,14 +19,14 @@ final class AlignOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Ali
 }
 
 sealed trait ToAlignOps0 {
-  implicit def ToAlignOpsUnapply[FA](v: FA)(implicit F0: Unapply[Align, FA]) =
-    new AlignOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToAlignOpsUnapply[FA](v: FA)(implicit F0: Unapply[Align, FA]): AlignOps[F0.M, F0.A] =
+    new AlignOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToAlignOps extends ToAlignOps0 with ToFunctorOps {
-  implicit def ToAlignOps[F[_],A](v: F[A])(implicit F0: Align[F]) =
-    new AlignOps[F,A](v)
+  implicit def ToAlignOps[F[_], A](v: F[A])(implicit F0: Align[F]): AlignOps[F, A] =
+    new AlignOps[F, A](v)
 
   ////
 

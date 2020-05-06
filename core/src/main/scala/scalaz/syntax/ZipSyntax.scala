@@ -13,14 +13,14 @@ final class ZipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Zip[F
 }
 
 sealed trait ToZipOps0 {
-  implicit def ToZipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]) =
-    new ZipOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToZipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Zip, FA]): ZipOps[F0.M, F0.A] =
+    new ZipOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToZipOps extends ToZipOps0 {
-  implicit def ToZipOps[F[_],A](v: F[A])(implicit F0: Zip[F]) =
-    new ZipOps[F,A](v)
+  implicit def ToZipOps[F[_], A](v: F[A])(implicit F0: Zip[F]): ZipOps[F, A] =
+    new ZipOps[F, A](v)
 
   ////
 

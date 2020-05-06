@@ -10,14 +10,14 @@ final class ContravariantOps[F[_],A] private[syntax](val self: F[A])(implicit va
 }
 
 sealed trait ToContravariantOps0 {
-  implicit def ToContravariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[Contravariant, FA]) =
-    new ContravariantOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToContravariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[Contravariant, FA]): ContravariantOps[F0.M, F0.A] =
+    new ContravariantOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToContravariantOps extends ToContravariantOps0 with ToInvariantFunctorOps {
-  implicit def ToContravariantOps[F[_],A](v: F[A])(implicit F0: Contravariant[F]) =
-    new ContravariantOps[F,A](v)
+  implicit def ToContravariantOps[F[_], A](v: F[A])(implicit F0: Contravariant[F]): ContravariantOps[F, A] =
+    new ContravariantOps[F, A](v)
 
   ////
 

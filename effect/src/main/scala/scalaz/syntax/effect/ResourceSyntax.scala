@@ -14,7 +14,7 @@ final class ResourceOps[F] private[syntax](val self: F)(implicit val F: Resource
 }
 
 trait ToResourceOps  {
-  implicit def ToResourceOps[F](v: F)(implicit F0: Resource[F]) =
+  implicit def ToResourceOps[F](v: F)(implicit F0: Resource[F]): ResourceOps[F] =
     new ResourceOps[F](v)
 
   ////

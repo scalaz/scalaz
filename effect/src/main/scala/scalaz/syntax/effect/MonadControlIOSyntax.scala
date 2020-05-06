@@ -12,14 +12,14 @@ final class MonadControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit v
 }
 
 sealed trait ToMonadControlIOOps0 {
-  implicit def ToMonadControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]) =
-    new MonadControlIOOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToMonadControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]): MonadControlIOOps[F0.M, F0.A] =
+    new MonadControlIOOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToMonadControlIOOps extends ToMonadControlIOOps0 with ToLiftControlIOOps with ToMonadOps {
-  implicit def ToMonadControlIOOps[F[_],A](v: F[A])(implicit F0: MonadControlIO[F]) =
-    new MonadControlIOOps[F,A](v)
+  implicit def ToMonadControlIOOps[F[_], A](v: F[A])(implicit F0: MonadControlIO[F]): MonadControlIOOps[F, A] =
+    new MonadControlIOOps[F, A](v)
 
   ////
 

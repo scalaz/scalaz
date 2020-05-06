@@ -9,7 +9,7 @@ final class SemiLatticeOps[F] private[syntax](val self: F)(implicit val F: SemiL
 }
 
 trait ToSemiLatticeOps extends ToBandOps {
-  implicit def ToSemiLatticeOps[F](v: F)(implicit F0: SemiLattice[F]) =
+  implicit def ToSemiLatticeOps[F](v: F)(implicit F0: SemiLattice[F]): SemiLatticeOps[F] =
     new SemiLatticeOps[F](v)
 
   ////
