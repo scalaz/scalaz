@@ -31,14 +31,14 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToMonadPlusOpsU[TC[F[_]] <: MonadPlus[F]] {
-  implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new MonadPlusOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToMonadPlusOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): MonadPlusOps[F0.M, F0.A] =
+    new MonadPlusOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToMonadPlusOps0[TC[F[_]] <: MonadPlus[F]] extends ToMonadPlusOpsU[TC] {
-  implicit def ToMonadPlusOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new MonadPlusOps[F,A](v)
+  implicit def ToMonadPlusOps[F[_],A](v: F[A])(implicit F0: TC[F]): MonadPlusOps[F, A] =
+    new MonadPlusOps[F, A](v)
 
   ////
 

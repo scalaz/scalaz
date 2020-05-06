@@ -12,14 +12,14 @@ final class IsContravariantOps[F[_],A] private[syntax](val self: F[A])(implicit 
 }
 
 sealed trait ToIsContravariantOpsU[TC[F[_]] <: IsContravariant[F]] {
-  implicit def ToIsContravariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new IsContravariantOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToIsContravariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): IsContravariantOps[F0.M, F0.A] =
+    new IsContravariantOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToIsContravariantOps0[TC[F[_]] <: IsContravariant[F]] extends ToIsContravariantOpsU[TC] {
-  implicit def ToIsContravariantOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new IsContravariantOps[F,A](v)
+  implicit def ToIsContravariantOps[F[_],A](v: F[A])(implicit F0: TC[F]): IsContravariantOps[F, A] =
+    new IsContravariantOps[F, A](v)
 
   ////
 

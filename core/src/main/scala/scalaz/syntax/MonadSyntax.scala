@@ -23,14 +23,14 @@ final class MonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Mon
 }
 
 sealed trait ToMonadOpsU[TC[F[_]] <: Monad[F]] {
-  implicit def ToMonadOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new MonadOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToMonadOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): MonadOps[F0.M, F0.A] =
+    new MonadOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToMonadOps0[TC[F[_]] <: Monad[F]] extends ToMonadOpsU[TC] {
-  implicit def ToMonadOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new MonadOps[F,A](v)
+  implicit def ToMonadOps[F[_],A](v: F[A])(implicit F0: TC[F]): MonadOps[F, A] =
+    new MonadOps[F, A](v)
 
   ////
 

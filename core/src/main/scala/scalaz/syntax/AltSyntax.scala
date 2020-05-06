@@ -12,14 +12,14 @@ final class AltOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Alt[F
 }
 
 sealed trait ToAltOpsU[TC[F[_]] <: Alt[F]] {
-  implicit def ToAltOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new AltOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToAltOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): AltOps[F0.M, F0.A] =
+    new AltOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToAltOps0[TC[F[_]] <: Alt[F]] extends ToAltOpsU[TC] {
-  implicit def ToAltOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new AltOps[F,A](v)
+  implicit def ToAltOps[F[_],A](v: F[A])(implicit F0: TC[F]): AltOps[F, A] =
+    new AltOps[F, A](v)
 
   ////
 

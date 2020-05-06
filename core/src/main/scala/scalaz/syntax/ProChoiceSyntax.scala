@@ -14,18 +14,18 @@ final class ProChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
 }
 
 sealed trait ToProChoiceOpsU[TC[F[_, _]] <: ProChoice[F]] {
-  implicit def ToProChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
-    new ProChoiceOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  implicit def ToProChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ProChoiceOps[F0.M, F0.A, F0.B] =
+    new ProChoiceOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 
 }
 
 trait ToProChoiceOps0[TC[F[_, _]] <: ProChoice[F]] extends ToProChoiceOpsU[TC] {
 
-  implicit def ToProChoiceOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
-    new ProChoiceOps[F,A, B](v)
+  implicit def ToProChoiceOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): ProChoiceOps[F, A, B] =
+    new ProChoiceOps[F, A, B](v)
 
 
-  implicit def ToProChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
+  implicit def ToProChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ProChoiceOps[F[G, ?, ?], A, B] =
     new ProChoiceOps[F[G, ?, ?], A, B](v)(F0)
 
   ////

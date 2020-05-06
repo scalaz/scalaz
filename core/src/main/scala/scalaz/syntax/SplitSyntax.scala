@@ -10,18 +10,18 @@ final class SplitOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit v
 }
 
 sealed trait ToSplitOpsU[TC[F[_, _]] <: Split[F]] {
-  implicit def ToSplitOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
-    new SplitOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  implicit def ToSplitOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): SplitOps[F0.M, F0.A, F0.B] =
+    new SplitOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 
 }
 
 trait ToSplitOps0[TC[F[_, _]] <: Split[F]] extends ToSplitOpsU[TC] {
 
-  implicit def ToSplitOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
-    new SplitOps[F,A, B](v)
+  implicit def ToSplitOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): SplitOps[F, A, B] =
+    new SplitOps[F, A, B](v)
 
 
-  implicit def ToSplitVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
+  implicit def ToSplitVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): SplitOps[F[G, ?, ?], A, B] =
     new SplitOps[F[G, ?, ?], A, B](v)(F0)
 
   ////

@@ -12,14 +12,14 @@ final class IsCovariantOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 }
 
 sealed trait ToIsCovariantOpsU[TC[F[_]] <: IsCovariant[F]] {
-  implicit def ToIsCovariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new IsCovariantOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToIsCovariantOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): IsCovariantOps[F0.M, F0.A] =
+    new IsCovariantOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToIsCovariantOps0[TC[F[_]] <: IsCovariant[F]] extends ToIsCovariantOpsU[TC] {
-  implicit def ToIsCovariantOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new IsCovariantOps[F,A](v)
+  implicit def ToIsCovariantOps[F[_],A](v: F[A])(implicit F0: TC[F]): IsCovariantOps[F, A] =
+    new IsCovariantOps[F, A](v)
 
   ////
 

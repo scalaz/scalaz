@@ -9,14 +9,14 @@ final class DecidableOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToDecidableOpsU[TC[F[_]] <: Decidable[F]] {
-  implicit def ToDecidableOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new DecidableOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToDecidableOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): DecidableOps[F0.M, F0.A] =
+    new DecidableOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToDecidableOps0[TC[F[_]] <: Decidable[F]] extends ToDecidableOpsU[TC] {
-  implicit def ToDecidableOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new DecidableOps[F,A](v)
+  implicit def ToDecidableOps[F[_],A](v: F[A])(implicit F0: TC[F]): DecidableOps[F, A] =
+    new DecidableOps[F, A](v)
 
   ////
 

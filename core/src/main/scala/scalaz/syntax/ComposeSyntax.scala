@@ -19,18 +19,18 @@ final class ComposeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit
 }
 
 sealed trait ToComposeOpsU[TC[F[_, _]] <: Compose[F]] {
-  implicit def ToComposeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
-    new ComposeOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  implicit def ToComposeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): ComposeOps[F0.M, F0.A, F0.B] =
+    new ComposeOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 
 }
 
 trait ToComposeOps0[TC[F[_, _]] <: Compose[F]] extends ToComposeOpsU[TC] {
 
-  implicit def ToComposeOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
-    new ComposeOps[F,A, B](v)
+  implicit def ToComposeOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): ComposeOps[F, A, B] =
+    new ComposeOps[F, A, B](v)
 
 
-  implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
+  implicit def ToComposeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ComposeOps[F[G, ?, ?], A, B] =
     new ComposeOps[F[G, ?, ?], A, B](v)(F0)
 
   ////

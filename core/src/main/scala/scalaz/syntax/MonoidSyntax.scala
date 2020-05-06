@@ -17,7 +17,7 @@ final class MonoidOps[F] private[syntax](val self: F)(implicit val F: Monoid[F])
 }
 
 trait ToMonoidOps extends ToSemigroupOps {
-  implicit def ToMonoidOps[F](v: F)(implicit F0: Monoid[F]) =
+  implicit def ToMonoidOps[F](v: F)(implicit F0: Monoid[F]): MonoidOps[F] =
     new MonoidOps[F](v)
 
   ////

@@ -20,18 +20,18 @@ final class BitraverseOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 }
 
 sealed trait ToBitraverseOpsU[TC[F[_, _]] <: Bitraverse[F]] {
-  implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]) =
-    new BitraverseOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
+  implicit def ToBitraverseOpsUnapply[FA](v: FA)(implicit F0: Unapply2[TC, FA]): BitraverseOps[F0.M, F0.A, F0.B] =
+    new BitraverseOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 
 }
 
 trait ToBitraverseOps0[TC[F[_, _]] <: Bitraverse[F]] extends ToBitraverseOpsU[TC] {
 
-  implicit def ToBitraverseOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]) =
-    new BitraverseOps[F,A, B](v)
+  implicit def ToBitraverseOps[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): BitraverseOps[F, A, B] =
+    new BitraverseOps[F, A, B](v)
 
 
-  implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]) =
+  implicit def ToBitraverseVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): BitraverseOps[F[G, ?, ?], A, B] =
     new BitraverseOps[F[G, ?, ?], A, B](v)(F0)
 
   ////

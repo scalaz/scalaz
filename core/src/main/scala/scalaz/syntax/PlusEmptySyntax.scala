@@ -9,14 +9,14 @@ final class PlusEmptyOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToPlusEmptyOpsU[TC[F[_]] <: PlusEmpty[F]] {
-  implicit def ToPlusEmptyOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new PlusEmptyOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToPlusEmptyOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): PlusEmptyOps[F0.M, F0.A] =
+    new PlusEmptyOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToPlusEmptyOps0[TC[F[_]] <: PlusEmpty[F]] extends ToPlusEmptyOpsU[TC] {
-  implicit def ToPlusEmptyOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new PlusEmptyOps[F,A](v)
+  implicit def ToPlusEmptyOps[F[_],A](v: F[A])(implicit F0: TC[F]): PlusEmptyOps[F, A] =
+    new PlusEmptyOps[F, A](v)
 
   ////
 

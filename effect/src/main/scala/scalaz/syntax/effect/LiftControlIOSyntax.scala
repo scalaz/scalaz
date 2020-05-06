@@ -12,14 +12,14 @@ final class LiftControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit va
 }
 
 sealed trait ToLiftControlIOOpsU[TC[F[_]] <: LiftControlIO[F]] {
-  implicit def ToLiftControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new LiftControlIOOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToLiftControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): LiftControlIOOps[F0.M, F0.A] =
+    new LiftControlIOOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToLiftControlIOOps0[TC[F[_]] <: LiftControlIO[F]] extends ToLiftControlIOOpsU[TC] {
-  implicit def ToLiftControlIOOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new LiftControlIOOps[F,A](v)
+  implicit def ToLiftControlIOOps[F[_],A](v: F[A])(implicit F0: TC[F]): LiftControlIOOps[F, A] =
+    new LiftControlIOOps[F, A](v)
 
   ////
 
