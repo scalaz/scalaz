@@ -277,7 +277,8 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
   def divideLaw = new DivideLaw {}
 
   ////
-  val divideSyntax = new scalaz.syntax.DivideSyntax[F] { def F = Divide.this }
+  val divideSyntax: scalaz.syntax.DivideSyntax[F] =
+    new scalaz.syntax.DivideSyntax[F] { def F = Divide.this }
 }
 
 object Divide {

@@ -282,11 +282,12 @@ object GenTypeClass {
     val syntaxPackString = tc.syntaxPack.map("package " + _).mkString("\n") + (if (tc.pack == Seq("scalaz")) "" else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember = if(tc.createSyntax) {
-      if (kind.multipleParam) {
-        s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
+      val tpe = if (kind.multipleParam) {
+        s"$syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S]"
       } else {
-        s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
+        s"$syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent]"
       }
+      s"  val ${Util.initLower(typeClassName)}Syntax: $tpe =\n    new $tpe { def F = $typeClassName.this }"
     } else ""
 
     val applyMethod = if(kind.multipleParam) {

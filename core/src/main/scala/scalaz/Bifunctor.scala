@@ -63,7 +63,8 @@ trait Bifunctor[F[_, _]] extends BifunctorParent[F] { self =>
     embed[Id.Id,H]
 
   ////
-  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
+  val bifunctorSyntax: scalaz.syntax.BifunctorSyntax[F] =
+    new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
 object Bifunctor {

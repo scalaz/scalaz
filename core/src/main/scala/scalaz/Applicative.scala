@@ -112,7 +112,8 @@ trait Applicative[F[_]] extends Apply[F] with ApplicativeParent[F] { self =>
   def applicativeLaw = new ApplicativeLaw {}
 
   ////
-  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
+  val applicativeSyntax: scalaz.syntax.ApplicativeSyntax[F] =
+    new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
 
 object Applicative {

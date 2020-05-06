@@ -33,7 +33,8 @@ trait Equal[F]  { self =>
   }
   def equalLaw = new EqualLaw {}
   ////
-  val equalSyntax = new scalaz.syntax.EqualSyntax[F] { def F = Equal.this }
+  val equalSyntax: scalaz.syntax.EqualSyntax[F] =
+    new scalaz.syntax.EqualSyntax[F] { def F = Equal.this }
 }
 
 object Equal {

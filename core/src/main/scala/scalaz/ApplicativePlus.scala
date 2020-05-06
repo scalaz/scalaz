@@ -36,7 +36,8 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
   def many[A](a: F[A]): F[List[A]] = new Mutual(a).y.run
 
   ////
-  val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
+  val applicativePlusSyntax: scalaz.syntax.ApplicativePlusSyntax[F] =
+    new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
 }
 
 object ApplicativePlus {

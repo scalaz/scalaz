@@ -123,7 +123,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     embed[Id.Id,H]
 
   ////
-  val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }
+  val bitraverseSyntax: scalaz.syntax.BitraverseSyntax[F] =
+    new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }
 }
 
 object Bitraverse {

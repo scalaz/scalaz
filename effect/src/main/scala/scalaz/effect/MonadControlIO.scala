@@ -12,7 +12,8 @@ trait MonadControlIO[F[_]] extends LiftControlIO[F] with Monad[F] { self =>
   // derived functions
 
   ////
-  val monadControlIOSyntax = new scalaz.syntax.effect.MonadControlIOSyntax[F] { def F = MonadControlIO.this }
+  val monadControlIOSyntax: scalaz.syntax.effect.MonadControlIOSyntax[F] =
+    new scalaz.syntax.effect.MonadControlIOSyntax[F] { def F = MonadControlIO.this }
 }
 
 object MonadControlIO {

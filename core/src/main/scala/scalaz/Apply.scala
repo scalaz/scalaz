@@ -144,7 +144,8 @@ trait Apply[F[_]] extends Functor[F] with ApplyParent[F] { self =>
   def applyLaw = new ApplyLaw {}
 
   ////
-  val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
+  val applySyntax: scalaz.syntax.ApplySyntax[F] =
+    new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }
 
 object Apply {

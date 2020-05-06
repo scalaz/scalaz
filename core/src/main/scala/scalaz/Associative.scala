@@ -27,7 +27,8 @@ trait Associative[=>:[_, _]]  { self =>
 
   def associativeLaw = new AssociativeLaw {}
   ////
-  val associativeSyntax = new scalaz.syntax.AssociativeSyntax[=>:] { def F = Associative.this }
+  val associativeSyntax: scalaz.syntax.AssociativeSyntax[=>:] =
+    new scalaz.syntax.AssociativeSyntax[=>:] { def F = Associative.this }
 }
 
 object Associative {

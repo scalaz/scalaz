@@ -197,7 +197,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] with TraverseParent[F] 
   def traverseLaw = new TraverseLaw {}
 
   ////
-  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
+  val traverseSyntax: scalaz.syntax.TraverseSyntax[F] =
+    new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
 }
 
 object Traverse {

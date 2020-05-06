@@ -94,7 +94,8 @@ trait Bifoldable[F[_, _]]  { self =>
 
   def bifoldableLaw = new BifoldableLaw {}
   ////
-  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
+  val bifoldableSyntax: scalaz.syntax.BifoldableSyntax[F] =
+    new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
 
 object Bifoldable {
