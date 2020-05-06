@@ -35,8 +35,8 @@ import Tags.LastVal
  * @tparam V The type of the annotations of the nodes (the '''measure''')
  * @tparam A The type of the elements stored at the leaves
  *
- * @see [[http://www.soi.city.ac.uk/~ross/papers/FingerTree.pdf Finger trees: a simple general-purpose data structure]]
- * @see [[http://apfelmus.nfshost.com/articles/monoid-fingertree.html]]
+ * @see [[https://www.staff.city.ac.uk/~ross/papers/FingerTree.pdf Finger trees: a simple general-purpose data structure]]
+ * @see [[https://apfelmus.nfshost.com/articles/monoid-fingertree.html]]
  */
 sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   import measurer.semigroup
