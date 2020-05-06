@@ -9,14 +9,14 @@ final class DistributiveOps[F[_],A] private[syntax](val self: F[A])(implicit val
 }
 
 sealed trait ToDistributiveOpsU[TC[F[_]] <: Distributive[F]] {
-  implicit def ToDistributiveOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new DistributiveOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToDistributiveOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): DistributiveOps[F0.M, F0.A] =
+    new DistributiveOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToDistributiveOps0[TC[F[_]] <: Distributive[F]] extends ToDistributiveOpsU[TC] {
-  implicit def ToDistributiveOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new DistributiveOps[F,A](v)
+  implicit def ToDistributiveOps[F[_],A](v: F[A])(implicit F0: TC[F]): DistributiveOps[F, A] =
+    new DistributiveOps[F, A](v)
 
   ////
 

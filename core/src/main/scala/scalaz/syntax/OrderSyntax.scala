@@ -20,7 +20,7 @@ final class OrderOps[F] private[syntax](val self: F)(implicit val F: Order[F]) e
 }
 
 trait ToOrderOps extends ToEqualOps {
-  implicit def ToOrderOps[F](v: F)(implicit F0: Order[F]) =
+  implicit def ToOrderOps[F](v: F)(implicit F0: Order[F]): OrderOps[F] =
     new OrderOps[F](v)
 
   ////

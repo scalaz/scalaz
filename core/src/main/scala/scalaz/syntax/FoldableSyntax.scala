@@ -86,14 +86,14 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
 }
 
 sealed trait ToFoldableOpsU[TC[F[_]] <: Foldable[F]] {
-  implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new FoldableOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): FoldableOps[F0.M, F0.A] =
+    new FoldableOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToFoldableOps0[TC[F[_]] <: Foldable[F]] extends ToFoldableOpsU[TC] {
-  implicit def ToFoldableOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new FoldableOps[F,A](v)
+  implicit def ToFoldableOps[F[_],A](v: F[A])(implicit F0: TC[F]): FoldableOps[F, A] =
+    new FoldableOps[F, A](v)
 
   ////
 

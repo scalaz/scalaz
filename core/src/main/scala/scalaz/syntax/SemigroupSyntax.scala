@@ -11,7 +11,7 @@ final class SemigroupOps[F] private[syntax](val self: F)(implicit val F: Semigro
 }
 
 trait ToSemigroupOps  {
-  implicit def ToSemigroupOps[F](v: F)(implicit F0: Semigroup[F]) =
+  implicit def ToSemigroupOps[F](v: F)(implicit F0: Semigroup[F]): SemigroupOps[F] =
     new SemigroupOps[F](v)
 
   ////

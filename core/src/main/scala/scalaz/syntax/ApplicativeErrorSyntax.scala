@@ -16,7 +16,7 @@ final class ApplicativeErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit
 }
 
 trait ToApplicativeErrorOps0[TC[F[_], S] <: ApplicativeError[F, S]] {
-  implicit def ToApplicativeErrorOps[F[_], S, A](v: F[A])(implicit F0: TC[F, S]) =
+  implicit def ToApplicativeErrorOps[F[_], S, A](v: F[A])(implicit F0: TC[F, S]): ApplicativeErrorOps[F, S, A] =
     new ApplicativeErrorOps[F, S, A](v)
 
   ////

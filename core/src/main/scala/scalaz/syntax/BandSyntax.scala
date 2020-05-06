@@ -9,7 +9,7 @@ final class BandOps[F] private[syntax](val self: F)(implicit val F: Band[F]) ext
 }
 
 trait ToBandOps extends ToSemigroupOps {
-  implicit def ToBandOps[F](v: F)(implicit F0: Band[F]) =
+  implicit def ToBandOps[F](v: F)(implicit F0: Band[F]): BandOps[F] =
     new BandOps[F](v)
 
   ////

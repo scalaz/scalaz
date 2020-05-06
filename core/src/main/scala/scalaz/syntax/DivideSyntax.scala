@@ -9,14 +9,14 @@ final class DivideOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Di
 }
 
 sealed trait ToDivideOpsU[TC[F[_]] <: Divide[F]] {
-  implicit def ToDivideOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]) =
-    new DivideOps[F0.M,F0.A](F0(v))(F0.TC)
+  implicit def ToDivideOpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): DivideOps[F0.M, F0.A] =
+    new DivideOps[F0.M, F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToDivideOps0[TC[F[_]] <: Divide[F]] extends ToDivideOpsU[TC] {
-  implicit def ToDivideOps[F[_],A](v: F[A])(implicit F0: TC[F]) =
-    new DivideOps[F,A](v)
+  implicit def ToDivideOps[F[_],A](v: F[A])(implicit F0: TC[F]): DivideOps[F, A] =
+    new DivideOps[F, A](v)
 
   ////
 

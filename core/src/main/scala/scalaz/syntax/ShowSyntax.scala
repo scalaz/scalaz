@@ -12,7 +12,7 @@ final class ShowOps[F] private[syntax](val self: F)(implicit val F: Show[F]) ext
 }
 
 trait ToShowOps  {
-  implicit def ToShowOps[F](v: F)(implicit F0: Show[F]) =
+  implicit def ToShowOps[F](v: F)(implicit F0: Show[F]): ShowOps[F] =
     new ShowOps[F](v)
 
   ////

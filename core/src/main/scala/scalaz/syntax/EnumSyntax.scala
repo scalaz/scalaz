@@ -44,7 +44,7 @@ final class EnumOps[F] private[syntax](val self: F)(implicit val F: Enum[F]) ext
 }
 
 trait ToEnumOps extends ToOrderOps {
-  implicit def ToEnumOps[F](v: F)(implicit F0: Enum[F]) =
+  implicit def ToEnumOps[F](v: F)(implicit F0: Enum[F]): EnumOps[F] =
     new EnumOps[F](v)
 
   ////
