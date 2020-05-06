@@ -39,7 +39,8 @@ trait IsContravariant[F[_]]  { self =>
     liftLiskovCt(ev).apply(fa)
 
   ////
-  val isContravariantSyntax = new scalaz.syntax.IsContravariantSyntax[F] { def F = IsContravariant.this }
+  val isContravariantSyntax: scalaz.syntax.IsContravariantSyntax[F] =
+    new scalaz.syntax.IsContravariantSyntax[F] { def F = IsContravariant.this }
 }
 
 object IsContravariant {

@@ -64,7 +64,8 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
     <<<[A, B, C](arr(f), fab)
 
   ////
-  val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
+  val arrowSyntax: scalaz.syntax.ArrowSyntax[=>:] =
+    new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
 
 object Arrow {

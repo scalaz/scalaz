@@ -19,7 +19,8 @@ trait Resource[F]  { self =>
   }
 
   ////
-  val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
+  val resourceSyntax: scalaz.syntax.effect.ResourceSyntax[F] =
+    new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
 }
 
 object Resource {

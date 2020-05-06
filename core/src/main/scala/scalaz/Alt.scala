@@ -77,7 +77,8 @@ trait Alt[F[_]] extends Applicative[F] with InvariantAlt[F] { self =>
   def altLaw = new AltLaw {}
 
   ////
-  val altSyntax = new scalaz.syntax.AltSyntax[F] { def F = Alt.this }
+  val altSyntax: scalaz.syntax.AltSyntax[F] =
+    new scalaz.syntax.AltSyntax[F] { def F = Alt.this }
 }
 
 object Alt {

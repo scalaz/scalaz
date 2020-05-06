@@ -46,7 +46,8 @@ trait BindRec[F[_]] extends Bind[F] { self =>
   def bindRecLaw = new BindRecLaw {}
 
   ////
-  val bindRecSyntax = new scalaz.syntax.BindRecSyntax[F] { def F = BindRec.this }
+  val bindRecSyntax: scalaz.syntax.BindRecSyntax[F] =
+    new scalaz.syntax.BindRecSyntax[F] { def F = BindRec.this }
 }
 
 object BindRec {

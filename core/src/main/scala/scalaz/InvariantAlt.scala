@@ -54,7 +54,8 @@ trait InvariantAlt[F[_]] extends InvariantApplicative[F] { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = xcoproduct4(a1, a2, a3, a4)(f, g)
 
   ////
-  val invariantAltSyntax = new scalaz.syntax.InvariantAltSyntax[F] { def F = InvariantAlt.this }
+  val invariantAltSyntax: scalaz.syntax.InvariantAltSyntax[F] =
+    new scalaz.syntax.InvariantAltSyntax[F] { def F = InvariantAlt.this }
 }
 
 object InvariantAlt {

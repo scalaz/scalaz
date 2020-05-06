@@ -73,7 +73,8 @@ trait InvariantApplicative[F[_]] extends InvariantFunctor[F] { self =>
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = xproduct4(a1, a2, a3, a4)(f, g)
 
   ////
-  val invariantApplicativeSyntax = new scalaz.syntax.InvariantApplicativeSyntax[F] { def F = InvariantApplicative.this }
+  val invariantApplicativeSyntax: scalaz.syntax.InvariantApplicativeSyntax[F] =
+    new scalaz.syntax.InvariantApplicativeSyntax[F] { def F = InvariantApplicative.this }
 }
 
 object InvariantApplicative {

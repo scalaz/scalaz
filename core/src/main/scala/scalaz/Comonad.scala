@@ -25,7 +25,8 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
   def comonadLaw = new ComonadLaws {}
 
   ////
-  val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] { def F = Comonad.this }
+  val comonadSyntax: scalaz.syntax.ComonadSyntax[F] =
+    new scalaz.syntax.ComonadSyntax[F] { def F = Comonad.this }
 }
 
 object Comonad {

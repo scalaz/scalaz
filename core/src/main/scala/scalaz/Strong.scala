@@ -92,7 +92,8 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
   def strongLaw: StrongLaws = new StrongLaws {}
 
   ////
-  val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
+  val strongSyntax: scalaz.syntax.StrongSyntax[=>:] =
+    new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
 }
 
 object Strong {

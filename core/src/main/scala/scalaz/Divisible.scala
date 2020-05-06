@@ -41,7 +41,8 @@ trait Divisible[F[_]] extends Divide[F] with InvariantApplicative[F] { self =>
   def divisibleLaw = new DivisibleLaw {}
 
   ////
-  val divisibleSyntax = new scalaz.syntax.DivisibleSyntax[F] { def F = Divisible.this }
+  val divisibleSyntax: scalaz.syntax.DivisibleSyntax[F] =
+    new scalaz.syntax.DivisibleSyntax[F] { def F = Divisible.this }
 }
 
 object Divisible {

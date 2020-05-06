@@ -41,7 +41,8 @@ trait Distributive[F[_]] extends Functor[F] { self =>
     distributeImpl(fa)(x => x)
 
   ////
-  val distributiveSyntax = new scalaz.syntax.DistributiveSyntax[F] { def F = Distributive.this }
+  val distributiveSyntax: scalaz.syntax.DistributiveSyntax[F] =
+    new scalaz.syntax.DistributiveSyntax[F] { def F = Distributive.this }
 }
 
 object Distributive {
