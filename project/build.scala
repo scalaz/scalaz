@@ -217,6 +217,12 @@ object build {
       }
     },
     scalacOptions ++= lintOptions,
+    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
+      case Some((0 | 3, _)) =>
+        Seq(
+          "-Ykind-projector"
+        )
+    }.toList.flatten,
     scalacOptions ++= unusedWarnOptions.value,
     Seq(Compile, Test).flatMap(c =>
       scalacOptions in (c, console) --= unusedWarnOptions.value
@@ -339,7 +345,12 @@ object build {
     },
     // kind-projector plugin
     kindProjectorVersion := "0.11.0",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+    libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
+      case Some((2, _)) =>
+        Seq(
+          compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+        )
+    }.toList.flatten
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
