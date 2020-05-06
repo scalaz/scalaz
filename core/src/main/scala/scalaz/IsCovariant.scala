@@ -39,7 +39,8 @@ trait IsCovariant[F[_]]  { self =>
     liftLiskovCo(ev).apply(fa)
 
   ////
-  val isCovariantSyntax = new scalaz.syntax.IsCovariantSyntax[F] { def F = IsCovariant.this }
+  val isCovariantSyntax: scalaz.syntax.IsCovariantSyntax[F] =
+    new scalaz.syntax.IsCovariantSyntax[F] { def F = IsCovariant.this }
 }
 
 object IsCovariant {

@@ -17,7 +17,8 @@ trait ApplicativeError[F[_], S] extends Applicative[F] { self =>
 
   def applicativeErrorLaws = new ApplicativeErrorLaws {}
   ////
-  val applicativeErrorSyntax = new scalaz.syntax.ApplicativeErrorSyntax[F, S] { def F = ApplicativeError.this }
+  val applicativeErrorSyntax: scalaz.syntax.ApplicativeErrorSyntax[F, S] =
+    new scalaz.syntax.ApplicativeErrorSyntax[F, S] { def F = ApplicativeError.this }
 }
 
 object ApplicativeError {

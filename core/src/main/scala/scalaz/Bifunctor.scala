@@ -67,7 +67,8 @@ trait Bifunctor[F[_, _]]  { self =>
     bimap(fab)(identity[C], identity[D])
 
   ////
-  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
+  val bifunctorSyntax: scalaz.syntax.BifunctorSyntax[F] =
+    new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
 object Bifunctor {

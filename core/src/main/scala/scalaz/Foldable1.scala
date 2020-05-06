@@ -198,7 +198,8 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def foldable1Law = new Foldable1Law {}
 
   ////
-  val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
+  val foldable1Syntax: scalaz.syntax.Foldable1Syntax[F] =
+    new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
 
 object Foldable1 {

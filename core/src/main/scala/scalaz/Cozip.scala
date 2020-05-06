@@ -26,7 +26,8 @@ trait Cozip[F[_]]  { self =>
     cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map cozip))))
 
   ////
-  val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
+  val cozipSyntax: scalaz.syntax.CozipSyntax[F] =
+    new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
 }
 
 object Cozip {

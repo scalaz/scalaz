@@ -108,7 +108,8 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   }
   def functorLaw = new FunctorLaw {}
   ////
-  val functorSyntax = new scalaz.syntax.FunctorSyntax[F] { def F = Functor.this }
+  val functorSyntax: scalaz.syntax.FunctorSyntax[F] =
+    new scalaz.syntax.FunctorSyntax[F] { def F = Functor.this }
 }
 
 object Functor {

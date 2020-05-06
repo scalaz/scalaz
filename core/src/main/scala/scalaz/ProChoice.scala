@@ -12,7 +12,8 @@ trait ProChoice[=>:[_, _]] extends Profunctor[=>:] { self =>
   def right[A, B, C](fa: A =>: B): (C \/ A) =>: (C \/ B)
 
   ////
-  val proChoiceSyntax = new scalaz.syntax.ProChoiceSyntax[=>:] { def F = ProChoice.this }
+  val proChoiceSyntax: scalaz.syntax.ProChoiceSyntax[=>:] =
+    new scalaz.syntax.ProChoiceSyntax[=>:] { def F = ProChoice.this }
 }
 
 object ProChoice {

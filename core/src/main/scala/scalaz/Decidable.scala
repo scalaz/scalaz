@@ -73,7 +73,8 @@ trait Decidable[F[_]] extends Divisible[F] with InvariantAlt[F] { self =>
   def decidableLaw = new DecidableLaw {}
 
   ////
-  val decidableSyntax = new scalaz.syntax.DecidableSyntax[F] { def F = Decidable.this }
+  val decidableSyntax: scalaz.syntax.DecidableSyntax[F] =
+    new scalaz.syntax.DecidableSyntax[F] { def F = Decidable.this }
 }
 
 object Decidable {

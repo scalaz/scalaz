@@ -43,7 +43,8 @@ trait InvariantFunctor[F[_]]  { self =>
 
   def invariantFunctorLaw = new InvariantFunctorLaw {}
   ////
-  val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }
+  val invariantFunctorSyntax: scalaz.syntax.InvariantFunctorSyntax[F] =
+    new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }
 }
 
 object InvariantFunctor {

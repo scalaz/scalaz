@@ -74,7 +74,8 @@ trait Bind[F[_]] extends Apply[F] { self =>
   def bindLaw = new BindLaw {}
 
   ////
-  val bindSyntax = new scalaz.syntax.BindSyntax[F] { def F = Bind.this }
+  val bindSyntax: scalaz.syntax.BindSyntax[F] =
+    new scalaz.syntax.BindSyntax[F] { def F = Bind.this }
 }
 
 object Bind {

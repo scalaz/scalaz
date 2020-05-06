@@ -60,7 +60,8 @@ trait Unzip[F[_]]  { self =>
   }
 
   ////
-  val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
+  val unzipSyntax: scalaz.syntax.UnzipSyntax[F] =
+    new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
 }
 
 object Unzip {

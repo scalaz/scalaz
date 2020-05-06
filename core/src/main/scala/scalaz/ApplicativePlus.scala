@@ -23,7 +23,8 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     }
 
   ////
-  val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
+  val applicativePlusSyntax: scalaz.syntax.ApplicativePlusSyntax[F] =
+    new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
 }
 
 object ApplicativePlus {
