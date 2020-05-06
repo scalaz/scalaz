@@ -2,7 +2,7 @@ package scalaz
 
 ////
 /**
- * Applicative Functor, described in [[http://www.soi.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects]]
+ * Applicative Functor, described in [[https://www.staff.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects]]
  *
  * Whereas a [[scalaz.Functor]] allows application of a pure function to a value in a context, an Applicative
  * also allows application of a function in a context to a value in a context (`ap`).
