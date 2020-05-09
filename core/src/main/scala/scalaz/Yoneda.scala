@@ -30,19 +30,19 @@ abstract class Yoneda[F[_], A] { yo =>
     }
 
   /** `Yoneda` is a comonad in an endofunctor category */
-  def extend[G[_]:Functor](f: Yoneda[F,?] ~> G): Yoneda[G,A] =
+  def extend[G[_]:Functor](f: Yoneda[F,*] ~> G): Yoneda[G,A] =
     Yoneda(f(this))
 
   /** `Yoneda` is a monad in an endofunctor category */
-  def flatMap[G[_]](f: F ~> Yoneda[G,?]): Yoneda[G,A] =
+  def flatMap[G[_]](f: F ~> Yoneda[G,*]): Yoneda[G,A] =
     f(run)
 }
 
 object Yoneda {
 
   /** `Yoneda[F,_]` is a functor for any `F` */
-  implicit def yonedaFunctor[F[_]]: Functor[Yoneda[F, ?]] =
-    new Functor[Yoneda[F, ?]] {
+  implicit def yonedaFunctor[F[_]]: Functor[Yoneda[F, *]] =
+    new Functor[Yoneda[F, *]] {
       def map[A,B](ya: Yoneda[F,A])(f: A => B) = ya map f
     }
 

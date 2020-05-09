@@ -112,7 +112,7 @@ object AdjunctUsage extends App {
   // state monad by itself.
   val bothAtOnce = {
     // yay for type scala's inference :(
-    implicit val adjMonad = adjOptionInt.compose[Writer[Int,?],Reader[Int,?]](adjInt).monad
+    implicit val adjMonad = adjOptionInt.compose[Writer[Int,*],Reader[Int,*]](adjInt).monad
     nonRepeating.traverseU(checkForRepeatsAdjAndSum).run(None).run(0).run
   }
 

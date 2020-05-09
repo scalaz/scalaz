@@ -34,9 +34,9 @@ object MonadTell {
 
   /** Extensible Effect */
   def liftF[F[_], S](
-    implicit I: Ast[S, ?] :<: F
-  ): MonadTell[Free[F, ?], S] with BindRec[Free[F, ?]] =
-    new MonadTell[Free[F, ?], S] with BindRec[Free[F, ?]] {
+    implicit I: Ast[S, *] :<: F
+  ): MonadTell[Free[F, *], S] with BindRec[Free[F, *]] =
+    new MonadTell[Free[F, *], S] with BindRec[Free[F, *]] {
       val delegate = Free.freeMonad[F]
       def point[A](a: =>A): Free[F, A] = delegate.point(a)
       def bind[A, B](fa: Free[F, A])(f: A => Free[F, B]) = delegate.bind(fa)(f)

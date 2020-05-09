@@ -15,8 +15,8 @@ trait Enumeratee2T[J, K, I, F[_]] {
 trait Enumeratee2TFunctions {
   import scalaz.syntax.order._
 
-  @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, IterateeT[K, F, ?], A] =
-    IterateeT.IterateeTMonadTrans[J].liftM[IterateeT[K, F, ?], A](iter)
+  @inline private def lift[J, K, F[_]: Monad, A](iter: IterateeT[K, F, A]): IterateeT[J, IterateeT[K, F, *], A] =
+    IterateeT.IterateeTMonadTrans[J].liftM[IterateeT[K, F, *], A](iter)
 
   def cogroupI[J, K, F[_]](implicit M: Monad[F], order: (J, K) => Ordering): Enumeratee2T[J, K, Either3[J, (J, K), K], F] =
     new Enumeratee2T[J, K, Either3[J, (J, K), K], F] {

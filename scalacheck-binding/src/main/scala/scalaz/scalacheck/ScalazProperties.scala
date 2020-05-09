@@ -353,8 +353,8 @@ object ScalazProperties {
         p.property("consistent right bifold") = rightFMConsistent[F, Int, Int]
         implicit val left = F.leftFoldable[Int]
         implicit val right = F.rightFoldable[Int]
-        p.include(foldable.laws[F[?, Int]])
-        p.include(foldable.laws[F[Int, ?]])
+        p.include(foldable.laws[F[*, Int]])
+        p.include(foldable.laws[F[Int, *]])
       }
   }
 
@@ -364,8 +364,8 @@ object ScalazProperties {
         p.include(bifoldable.laws[F])
         implicit val left = F.leftTraverse[Int]
         implicit val right = F.rightTraverse[Int]
-        p.include(traverse.laws[F[?, Int]])
-        p.include(traverse.laws[F[Int, ?]])
+        p.include(traverse.laws[F[*, Int]])
+        p.include(traverse.laws[F[Int, *]])
       }
   }
 
@@ -603,8 +603,8 @@ object ScalazProperties {
     def laws[F[_, _]](implicit F: Bifunctor[F], E: Equal[F[Int, Int]], af: Arbitrary[F[Int, Int]],
                       axy: Arbitrary[(Int => Int)]): Properties =
       newProperties("bifunctor") { p =>
-        p.include(functor.laws[F[?, Int]](F.leftFunctor[Int], implicitly, implicitly, implicitly))
-        p.include(functor.laws[F[Int, ?]](F.rightFunctor[Int], implicitly, implicitly, implicitly))
+        p.include(functor.laws[F[*, Int]](F.leftFunctor[Int], implicitly, implicitly, implicitly))
+        p.include(functor.laws[F[Int, *]](F.rightFunctor[Int], implicitly, implicitly, implicitly))
       }
   }
 

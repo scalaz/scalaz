@@ -12,11 +12,11 @@ import org.scalacheck.Prop.forAll
 
 object SortedMapTest extends SpecLite {
 
-  checkAll(traverse.laws[SortedMap[Int, ?]])
-  checkAll(FoldableTests.anyAndAllLazy[SortedMap[Int, ?]])
-  checkAll(isEmpty.laws[SortedMap[Int, ?]])
-  checkAll(bind.laws[SortedMap[Int, ?]])
-  checkAll(align.laws[SortedMap[Int, ?]])
+  checkAll(traverse.laws[SortedMap[Int, *]])
+  checkAll(FoldableTests.anyAndAllLazy[SortedMap[Int, *]])
+  checkAll(isEmpty.laws[SortedMap[Int, *]])
+  checkAll(bind.laws[SortedMap[Int, *]])
+  checkAll(align.laws[SortedMap[Int, *]])
   checkAll(monoid.laws[SortedMap[Int,String]])
   checkAll(order.laws[SortedMap[Int,String]])
   checkAll(band.laws[SortedMap[String, ISet[Int]]])
@@ -45,13 +45,13 @@ object SortedMapTest extends SpecLite {
 
   "align" ! forAll { (a: SortedMap[Int, String], b: SortedMap[Int, Long]) =>
     import std.set._, \&/._
-    val F = Align[SortedMap[Int, ?]]
+    val F = Align[SortedMap[Int, *]]
     val x = F.align(a, b)
     val keysA = a.keySet
     val keysB = b.keySet
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
-    ==>>.fromList(x.toList) must_=== Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
+    ==>>.fromList(x.toList) must_=== Align[Int ==>> *].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
     x.keySet must_== (keysA ++ keysB)
 
     x.filter(_._2.isThis).keySet must_== (keysA diff keysB)

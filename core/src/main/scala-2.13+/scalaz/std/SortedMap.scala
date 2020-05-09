@@ -41,7 +41,7 @@ trait SortedMapInstances0 {
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
   }
 
-  private[std] trait SortedMapFoldable[K] extends Foldable.FromFoldr[SortedMap[K, ?]] {
+  private[std] trait SortedMapFoldable[K] extends Foldable.FromFoldr[SortedMap[K, *]] {
     override def foldLeft[A, B](fa: SortedMap[K, A], z: B)(f: (B, A) => B) =
       fa.valuesIterator.foldLeft(z)(f)
 
@@ -61,7 +61,7 @@ trait SortedMapInstances0 {
       def OV = Equal[V]
     }
 
-  implicit def sortedMapFoldable[K]: Foldable[SortedMap[K, ?]] =
+  implicit def sortedMapFoldable[K]: Foldable[SortedMap[K, *]] =
     new SortedMapFoldable[K]{}
 
   implicit def sortedMapBand[K, V](implicit S: Band[V], K: scala.Ordering[K]): Band[SortedMap[K, V]] =
@@ -77,8 +77,8 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def sortedMapInstance[K: scala.Ordering]: Traverse[SortedMap[K, ?]] with IsEmpty[SortedMap[K, ?]] with Bind[SortedMap[K, ?]] with Align[SortedMap[K, ?]] =
-    new Traverse[SortedMap[K, ?]] with IsEmpty[SortedMap[K, ?]] with Bind[SortedMap[K, ?]] with SortedMapFoldable[K] with Align[SortedMap[K, ?]] {
+  implicit def sortedMapInstance[K: scala.Ordering]: Traverse[SortedMap[K, *]] with IsEmpty[SortedMap[K, *]] with Bind[SortedMap[K, *]] with Align[SortedMap[K, *]] =
+    new Traverse[SortedMap[K, *]] with IsEmpty[SortedMap[K, *]] with Bind[SortedMap[K, *]] with SortedMapFoldable[K] with Align[SortedMap[K, *]] {
       def empty[V] = SortedMap.empty[K, V]
       def plus[V](a: SortedMap[K, V], b: => SortedMap[K, V]) = a ++ b
       def isEmpty[V](fa: SortedMap[K, V]) = fa.isEmpty

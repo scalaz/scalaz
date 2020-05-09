@@ -397,7 +397,7 @@ sealed abstract class ZipperInstances {
         }
       )(f)
     override def traverse1Impl[G[_], A, B](fa: Zipper[A])(f: A => G[B])(implicit G: Apply[G]) = {
-      val F = Traverse1[OneAnd[Stream, ?]]
+      val F = Traverse1[OneAnd[Stream, *]]
       fa.lefts.reverse match {
         case h1 #:: t1 =>
           val x = G.map(F.traverse1(OneAnd(h1, t1))(f)) { s => (s.head #:: s.tail).reverse }

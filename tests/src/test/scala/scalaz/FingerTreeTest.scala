@@ -20,8 +20,8 @@ object FingerTreeTest extends SpecLite {
   checkAll(monoid.laws[SequenceTree[String]])
   checkAll(equal.laws[SequenceTree[String]])
   checkAll("FingerTree", foldable.laws[SequenceTree])
-  checkAll("Finger", foldable.laws[Finger[Int, ?]])
-  checkAll("Node", foldable.laws[Node[Int, ?]])
+  checkAll("Finger", foldable.laws[Finger[Int, *]])
+  checkAll("Node", foldable.laws[Node[Int, *]])
 
   checkAll("IndSeq", equal.laws[IndSeq[Int]])
   checkAll("IndSeq", monadPlus.strongLaws[IndSeq])
@@ -81,7 +81,7 @@ object FingerTreeTest extends SpecLite {
   "Fingertree" should {
 
     "apply effects in order" in {
-      val s: Writer[String, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[Writer[String, ?], Int, Int](x => Writer(x.toString, x))
+      val s: Writer[String, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[Writer[String, *], Int, Int](x => Writer(x.toString, x))
       s.run must_===("12345" -> streamToTree(intStream.take(5)))
     }
 

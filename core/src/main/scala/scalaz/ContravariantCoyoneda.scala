@@ -55,8 +55,8 @@ sealed abstract class ContravariantCoyonedaInstances {
   /** `ContravariantCoyoneda[F,_]` is a contravariant functor for any
     * `F`.
     */
-  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyoneda[F, ?]] =
-    new Contravariant[ContravariantCoyoneda[F, ?]] {
+  implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[ContravariantCoyoneda[F, *]] =
+    new Contravariant[ContravariantCoyoneda[F, *]] {
       def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
         fa contramap f
     }
@@ -94,8 +94,8 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   import Isomorphism._
 
-  def iso[F[_]: Contravariant]: ContravariantCoyoneda[F, ?] <~> F =
-    new IsoFunctorTemplate[ContravariantCoyoneda[F, ?], F] {
+  def iso[F[_]: Contravariant]: ContravariantCoyoneda[F, *] <~> F =
+    new IsoFunctorTemplate[ContravariantCoyoneda[F, *], F] {
       def from[A](fa: F[A]) = lift(fa)
       def to[A](fa: ContravariantCoyoneda[F, A]) = fa.run
     }

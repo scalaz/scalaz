@@ -53,11 +53,11 @@ trait Bifoldable[F[_, _]]  { self =>
     bifoldLeft(fa, z)(Function.uncurried(f))(Function.uncurried(g))
 
   /** Extract the Foldable on the first parameter. */
-  def leftFoldable[X]: Foldable[F[?, X]] =
+  def leftFoldable[X]: Foldable[F[*, X]] =
     new LeftFoldable[F, X] {val F = self}
 
   /** Extract the Foldable on the second parameter. */
-  def rightFoldable[X]: Foldable[F[X, ?]] =
+  def rightFoldable[X]: Foldable[F[X, *]] =
     new RightFoldable[F, X] {val F = self}
 
   /** Unify the foldable over both params. */

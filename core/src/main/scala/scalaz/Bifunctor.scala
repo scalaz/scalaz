@@ -26,14 +26,14 @@ trait Bifunctor[F[_, _]] extends BifunctorParent[F] { self =>
     }
 
   /** Extract the Functor on the first param. */
-  def leftFunctor[X]: Functor[F[?, X]] =
+  def leftFunctor[X]: Functor[F[*, X]] =
     new LeftFunctor[F, X] {val F = self}
 
   def leftMap[A, B, C](fab: F[A, B])(f: A => C): F[C, B] =
     bimap(fab)(f, z => z)
 
   /** Extract the Functor on the second param. */
-  def rightFunctor[X]: Functor[F[X, ?]] =
+  def rightFunctor[X]: Functor[F[X, *]] =
     new RightFunctor[F, X] {val F = self}
 
   /** Unify the functor over both params. */

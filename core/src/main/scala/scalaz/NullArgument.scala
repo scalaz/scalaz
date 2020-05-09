@@ -147,8 +147,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         r map f
     }
 
-  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =
-    new Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] {
+  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, *]] with BindRec[NullArgument[X, *]] =
+    new Monad[NullArgument[X, *]] with BindRec[NullArgument[X, *]] {
       override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
         a ap f
       override def map[A, B](a: NullArgument[X, A])(f: A => B) =
@@ -169,8 +169,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         }
     }
 
-  implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[?, X]] =
-    new Contravariant[NullArgument[?, X]] {
+  implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[*, X]] =
+    new Contravariant[NullArgument[*, X]] {
       override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
         a contramap f
     }
