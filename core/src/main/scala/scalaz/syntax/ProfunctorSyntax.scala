@@ -35,8 +35,8 @@ trait ToProfunctorOps0[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOpsU[TC
     new ProfunctorOps[F, A, B](v)
 
 
-  implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ProfunctorOps[F[G, ?, ?], A, B] =
-    new ProfunctorOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToProfunctorVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ProfunctorOps[F[G, *, *], A, B] =
+    new ProfunctorOps[F[G, *, *], A, B](v)(F0)
 
   ////
 

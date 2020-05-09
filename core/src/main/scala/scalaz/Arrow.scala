@@ -15,8 +15,8 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   /** Lift an ordinary function. */
   def arr[A, B](f: A => B): A =>: B
 
-  override def covariantInstance[C]: Applicative[C =>: ?] =
-    new Applicative[C =>: ?] with SndCovariant[C] {
+  override def covariantInstance[C]: Applicative[C =>: *] =
+    new Applicative[C =>: *] with SndCovariant[C] {
       def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
     }

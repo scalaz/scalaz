@@ -124,11 +124,11 @@ object CofreeTest extends SpecLite with CofreeTestInstances {
     checkAll("CofreeZipStream", ScalazProperties.apply.laws[CofreeZipStream])
   }
 
-  "no stack overflow Applicative[CofreeZip[IList, ?]]#point" in {
+  "no stack overflow Applicative[CofreeZip[IList, *]]#point" in {
     val a = 1
-    val b = Applicative[CofreeZip[IList, ?]].point(a)
+    val b = Applicative[CofreeZip[IList, *]].point(a)
     val size = 10
-    Foldable[Cofree[IList, ?]].toStream(Tag.unwrap(b)).take(size) must_=== Stream.fill(size)(a)
+    Foldable[Cofree[IList, *]].toStream(Tag.unwrap(b)).take(size) must_=== Stream.fill(size)(a)
   }
 
   "Applicative[λ[α => CofreeZip[LazyOption, α]]] is Applicative[λ[α => Stream[α] @@ Zip]]" ! forAll{
@@ -152,31 +152,31 @@ object CofreeTest extends SpecLite with CofreeTestInstances {
   }
 
   object instances{
-    def comonad[F[_]: Functor] = Comonad[Cofree[F, ?]]
-    def bind[F[_]: Plus: Functor] = Bind[Cofree[F, ?]]
-    def monad[F[_]: PlusEmpty: Functor] = Monad[Cofree[F, ?]]
-    def foldable1[F[_]: Foldable] = Foldable1[Cofree[F, ?]]
-    def traverse1[F[_]: Traverse] = Traverse1[Cofree[F, ?]]
+    def comonad[F[_]: Functor] = Comonad[Cofree[F, *]]
+    def bind[F[_]: Plus: Functor] = Bind[Cofree[F, *]]
+    def monad[F[_]: PlusEmpty: Functor] = Monad[Cofree[F, *]]
+    def foldable1[F[_]: Foldable] = Foldable1[Cofree[F, *]]
+    def traverse1[F[_]: Traverse] = Traverse1[Cofree[F, *]]
 
     // checking absence of ambiguity
-    def bind[F[_]: PlusEmpty: Functor] = Bind[Cofree[F, ?]]
-    def bind[F[_]: PlusEmpty: Traverse] = Bind[Cofree[F, ?]]
-    def functor[F[_]: Traverse] = Functor[Cofree[F, ?]]
-    def functor[F[_]: Traverse1] = Functor[Cofree[F, ?]]
-    def functor[F[_]: Plus: Functor] = Functor[Cofree[F, ?]]
-    def functor[F[_]: PlusEmpty: Traverse] = Functor[Cofree[F, ?]]
-    def functor[F[_]: PlusEmpty: Traverse1] = Functor[Cofree[F, ?]]
-    def foldable1[F[_]: Traverse1] = Foldable1[Cofree[F, ?]]
-    def traverse1[F[_]: Traverse1] = Traverse1[Cofree[F, ?]]
+    def bind[F[_]: PlusEmpty: Functor] = Bind[Cofree[F, *]]
+    def bind[F[_]: PlusEmpty: Traverse] = Bind[Cofree[F, *]]
+    def functor[F[_]: Traverse] = Functor[Cofree[F, *]]
+    def functor[F[_]: Traverse1] = Functor[Cofree[F, *]]
+    def functor[F[_]: Plus: Functor] = Functor[Cofree[F, *]]
+    def functor[F[_]: PlusEmpty: Traverse] = Functor[Cofree[F, *]]
+    def functor[F[_]: PlusEmpty: Traverse1] = Functor[Cofree[F, *]]
+    def foldable1[F[_]: Traverse1] = Foldable1[Cofree[F, *]]
+    def traverse1[F[_]: Traverse1] = Traverse1[Cofree[F, *]]
 
     object zip{
-      def functor[F[_]: Functor] = Functor[CofreeZip[F, ?]]
-      def apply[F[_]: Apply] = Apply[CofreeZip[F, ?]]
-      def applicative[F[_]: Applicative] = Applicative[CofreeZip[F, ?]]
+      def functor[F[_]: Functor] = Functor[CofreeZip[F, *]]
+      def apply[F[_]: Apply] = Apply[CofreeZip[F, *]]
+      def applicative[F[_]: Applicative] = Applicative[CofreeZip[F, *]]
 
       // checking absence of ambiguity
-      def functor[F[_]: Applicative] = Functor[CofreeZip[F, ?]]
-      def apply[F[_]: Applicative] = Apply[CofreeZip[F, ?]]
+      def functor[F[_]: Applicative] = Functor[CofreeZip[F, *]]
+      def apply[F[_]: Applicative] = Apply[CofreeZip[F, *]]
     }
 
   }

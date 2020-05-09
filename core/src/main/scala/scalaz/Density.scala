@@ -79,7 +79,7 @@ object Density extends DensityInstances {
 
 sealed abstract class DensityInstances extends DensityInstances0 {
 
-  implicit def comonadInstance[F[_]]: Comonad[Density[F, ?]] = new DensityComonad[F] {}
+  implicit def comonadInstance[F[_]]: Comonad[Density[F, *]] = new DensityComonad[F] {}
 }
 
 sealed abstract class DensityInstances0 {
@@ -92,7 +92,7 @@ sealed abstract class DensityInstances0 {
 }
 
 /** Density is a free Comonad */
-private trait DensityComonad[F[_]] extends Comonad[Density[F, ?]] {
+private trait DensityComonad[F[_]] extends Comonad[Density[F, *]] {
 
   def map[A, B](fa: Density[F, A])(f: A => B): Density[F, B] = fa.map(f)
 

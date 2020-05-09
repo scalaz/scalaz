@@ -33,7 +33,7 @@ object TrampolineUsage extends App {
     val sorted = runQuickSort[Function0, Int](xs)
     println(sorted)
 
-    val step = λ[λ[α => (Int, Function0[α])] ~> (Int, ?)] { case (i, f) => (i + 1, f()) }
+    val step = λ[λ[α => (Int, Function0[α])] ~> (Int, *)] { case (i, f) => (i + 1, f()) }
     val (steps, sorted1) = quickSort[Function0, Int](xs).foldRun(0)(step)
     println("sort using heap took %d steps".format(steps))
   }

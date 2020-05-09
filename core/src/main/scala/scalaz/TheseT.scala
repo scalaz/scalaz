@@ -72,7 +72,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   = TheseT(F.map(run)(_.bimap(f, g)))
 
   def traverse[G[_], D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, A, D]]
-  = G.map(F.traverse(run)(o => Traverse[A \&/ ?].traverse(o)(g)))(TheseT(_))
+  = G.map(F.traverse(run)(o => Traverse[A \&/ *].traverse(o)(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]
@@ -91,33 +91,33 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 }
 
 sealed abstract class TheseTInstances1 {
-  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, ?]] =
+  implicit def theseTFunctor[F[_]: Functor, L]: Functor[TheseT[F, L, *]] =
     new TheseTFunctor[F, L] {
       override def F = implicitly
     }
 }
 
 sealed abstract class TheseTInstances0 extends TheseTInstances1 {
-  implicit def TheseTInstance1[F[_]: Traverse, L]: Traverse[TheseT[F, L, ?]]
-  = new Traverse[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
+  implicit def TheseTInstance1[F[_]: Traverse, L]: Traverse[TheseT[F, L, *]]
+  = new Traverse[TheseT[F, L, *]] with TheseTFunctor[F, L] {
     override def F = implicitly
     override def traverseImpl[G[_], A, B](fa: TheseT[F, L, A])(f: (A) => G[B])(implicit A: Applicative[G]) =
       fa.traverse(f)
   }
 
-  implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[?[_], A, ?]] = new Hoist[TheseT[?[_], A, ?]] {
+  implicit def TheseTHoist[A: Semigroup]: Hoist[TheseT[*[_], A, *]] = new Hoist[TheseT[*[_], A, *]] {
     override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-      λ[TheseT[M, A, ?] ~> TheseT[N, A, ?]](_ mapT f.apply)
+      λ[TheseT[M, A, *] ~> TheseT[N, A, *]](_ mapT f.apply)
 
     override def liftM[G[_]: Monad, B](a: G[B]): TheseT[G, A, B] = TheseT(Monad[G].map(a)(x => \&/.That(x)))
 
-    override implicit def apply[G[_]: Monad]: Monad[TheseT[G, A, ?]] = TheseT.theseTMonad[G, A]
+    override implicit def apply[G[_]: Monad]: Monad[TheseT[G, A, *]] = TheseT.theseTMonad[G, A]
   }
 }
 
 sealed abstract class TheseTInstances extends TheseTInstances0 {
-  implicit def theseTMonad[F[_]: Monad, L: Semigroup]: Monad[TheseT[F, L, ?]]
-  = new Monad[TheseT[F, L, ?]] with TheseTFunctor[F, L] {
+  implicit def theseTMonad[F[_]: Monad, L: Semigroup]: Monad[TheseT[F, L, *]]
+  = new Monad[TheseT[F, L, *]] with TheseTFunctor[F, L] {
     override def F = implicitly
 
     override def bind[A, B](fa: TheseT[F, L, A])(f: (A) => TheseT[F, L, B]) = fa.flatMap(f)
@@ -125,8 +125,8 @@ sealed abstract class TheseTInstances extends TheseTInstances0 {
     override def point[A](a: => A) = TheseT(Monad[F].point(\&/.That(a)))
   }
 
-  implicit def theseTBitraverse[F[_]: Traverse]: Bitraverse[TheseT[F, ?, ?]]
-  = new Bitraverse[TheseT[F, ?, ?]] {
+  implicit def theseTBitraverse[F[_]: Traverse]: Bitraverse[TheseT[F, *, *]]
+  = new Bitraverse[TheseT[F, *, *]] {
 
     override def bitraverseImpl[G[_], A, B, C, D](fab: TheseT[F, A, B])(f: (A) => G[C], g: (B) => G[D])(implicit A: Applicative[G])
     = fab.bitraverse(f, g)
@@ -148,7 +148,7 @@ object TheseT extends TheseTInstances {
 
 }
 
-private trait TheseTFunctor[F[_], L] extends Functor[TheseT[F, L, ?]] {
+private trait TheseTFunctor[F[_], L] extends Functor[TheseT[F, L, *]] {
   protected implicit def F: Functor[F]
 
   override final def map[A, B](fa: TheseT[F, L, A])(f: A => B) =

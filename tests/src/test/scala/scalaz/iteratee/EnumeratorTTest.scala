@@ -109,8 +109,8 @@ object EnumeratorTTest extends SpecLite {
   //checkAll(monad.laws[Enum])
 
   object instances {
-    //def functor[F[_] : Functor] = Functor[EnumeratorT[?, F]]
-    def monad[F[_] : Monad]     = Monad[EnumeratorT[?, F]]
+    //def functor[F[_] : Functor] = Functor[EnumeratorT[*, F]]
+    def monad[F[_] : Monad]     = Monad[EnumeratorT[*, F]]
     def semigroup[E, F[_]: Bind] = Semigroup[EnumeratorT[E, F]]
     def monoid[E, F[_]: Monad] = Monoid[EnumeratorT[E, F]]
   }

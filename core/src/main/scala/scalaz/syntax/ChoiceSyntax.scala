@@ -21,8 +21,8 @@ trait ToChoiceOps0[TC[F[_, _]] <: Choice[F]] extends ToChoiceOpsU[TC] {
     new ChoiceOps[F, A, B](v)
 
 
-  implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ChoiceOps[F[G, ?, ?], A, B] =
-    new ChoiceOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToChoiceVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ChoiceOps[F[G, *, *], A, B] =
+    new ChoiceOps[F[G, *, *], A, B](v)(F0)
 
   ////
 

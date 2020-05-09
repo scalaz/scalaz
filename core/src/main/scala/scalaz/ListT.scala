@@ -83,7 +83,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
 //
 
 sealed abstract class ListTInstances2 {
-  implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[ListT[F, ?]] =
+  implicit def listTFunctor[F[_]](implicit F0: Functor[F]): Functor[ListT[F, *]] =
     new ListTFunctor[F]{
       implicit def F: Functor[F] = F0
     }
@@ -102,8 +102,8 @@ sealed abstract class ListTInstances1 extends ListTInstances2 {
 }
 
 sealed abstract class ListTInstances extends ListTInstances1 {
-  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, ?]] with Alt[ListT[F, ?]] =
-    new ListTMonadPlus[F] with Alt[ListT[F, ?]] {
+  implicit def listTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[ListT[F, *]] with Alt[ListT[F, *]] =
+    new ListTMonadPlus[F] with Alt[ListT[F, *]] {
       implicit def F: Monad[F] = F0
 
     def alt[A](a: => ListT[F, A], b: => ListT[F, A]): ListT[F, A] =
@@ -119,15 +119,15 @@ sealed abstract class ListTInstances extends ListTInstances1 {
   implicit val listTHoist: Hoist[ListT] =
     new ListTHoist {}
 
-  implicit def listTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[ListT[F, ?]] =
+  implicit def listTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[ListT[F, *]] =
     new ListTDecidable[F] {
       implicit def F: Divisible[F] = F0
     }
 }
 
 object ListT extends ListTInstances {
-  def listT[M[_]]: (λ[α => M[IList[α]]] ~> ListT[M, ?]) =
-    λ[λ[α => M[IList[α]]] ~> ListT[M, ?]](
+  def listT[M[_]]: (λ[α => M[IList[α]]] ~> ListT[M, *]) =
+    λ[λ[α => M[IList[α]]] ~> ListT[M, *]](
       new ListT(_)
     )
 
@@ -145,7 +145,7 @@ object ListT extends ListTInstances {
 // Implementation traits for type class instances
 //
 
-private trait ListTDecidable[F[_]] extends Decidable[ListT[F, ?]] {
+private trait ListTDecidable[F[_]] extends Decidable[ListT[F, *]] {
   implicit def F: Divisible[F]
   override def conquer[A]: ListT[F, A] = ListT(F.conquer)
 
@@ -163,7 +163,7 @@ private trait ListTDecidable[F[_]] extends Decidable[ListT[F, ?]] {
     )
 }
 
-private trait ListTFunctor[F[_]] extends Functor[ListT[F, ?]] {
+private trait ListTFunctor[F[_]] extends Functor[ListT[F, *]] {
  implicit def F: Functor[F]
  override def map[A, B](fa: ListT[F, A])(f: A => B): ListT[F, B] = fa map f
 }
@@ -179,7 +179,7 @@ private trait ListTMonoid[F[_], A] extends Monoid[ListT[F, A]] with ListTSemigro
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
-private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] with ListTFunctor[F] {
+private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, *]] with ListTFunctor[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] = fa flatMap f
@@ -194,12 +194,12 @@ private trait ListTMonadPlus[F[_]] extends MonadPlus[ListT[F, ?]] with ListTFunc
 private trait ListTHoist extends Hoist[ListT] {
   import ListT._
 
-  implicit def apply[G[_] : Monad]: Monad[ListT[G, ?]] =
+  implicit def apply[G[_] : Monad]: Monad[ListT[G, *]] =
     listTMonadPlus[G]
 
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromIList(G.map(a)(entry => entry :: INil()))
 
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
-    λ[ListT[M, ?] ~> ListT[N, ?]](_ mapT f.apply)
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, *] ~> ListT[N, *] =
+    λ[ListT[M, *] ~> ListT[N, *]](_ mapT f.apply)
 }

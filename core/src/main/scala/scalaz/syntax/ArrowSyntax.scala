@@ -28,8 +28,8 @@ trait ToArrowOps0[TC[F[_, _]] <: Arrow[F]] extends ToArrowOpsU[TC] {
     new ArrowOps[F, A, B](v)
 
 
-  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ArrowOps[F[G, ?, ?], A, B] =
-    new ArrowOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToArrowVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ArrowOps[F[G, *, *], A, B] =
+    new ArrowOps[F[G, *, *], A, B](v)(F0)
 
   ////
 

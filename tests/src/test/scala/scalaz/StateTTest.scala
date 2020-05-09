@@ -22,34 +22,34 @@ object StateTTest extends SpecLite {
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
   checkAll(profunctor.laws[IStateTList])
-  checkAll(monadTrans.laws[StateT[Int, ?[_], ?], List])
-  checkAll(monadError.laws[StateT[Int, Either[Int, ?], ?], Int])
+  checkAll(monadTrans.laws[StateT[Int, *[_], *], List])
+  checkAll(monadError.laws[StateT[Int, Either[Int, *], *], Int])
 
   checkAll {
     // Not sure why this is needed explicitly
     val am: Arbitrary[State[Int, Int]]        = implicitly
     val af: Arbitrary[State[Int, Int] => Int] = implicitly
     val eq: Equal[State[Int, Int]]            = implicitly
-    comonad.laws[State[Int, ?]](implicitly, am, af, eq)
+    comonad.laws[State[Int, *]](implicitly, am, af, eq)
   }
 
   object instances {
-    def functor[S, F[_] : Applicative] = Functor[StateT[S, F, ?]]
-    def plus[S1, S2, F[_]: Monad: Plus] = Plus[IndexedStateT[S1, S2, F, ?]]
-    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[S, F, ?]]
-    def monadState[S, F[_] : Monad] = MonadState[StateT[S, F, ?], S]
-    def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[S, F, ?]]
-    def decidable[S, F[_] : Decidable: Bind] = Decidable[StateT[S, F, ?]]
-    def divisible[S, F[_] : Divisible: Bind] = Divisible[StateT[S, F, ?]]
+    def functor[S, F[_] : Applicative] = Functor[StateT[S, F, *]]
+    def plus[S1, S2, F[_]: Monad: Plus] = Plus[IndexedStateT[S1, S2, F, *]]
+    def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[S, F, *]]
+    def monadState[S, F[_] : Monad] = MonadState[StateT[S, F, *], S]
+    def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[S, F, *]]
+    def decidable[S, F[_] : Decidable: Bind] = Decidable[StateT[S, F, *]]
+    def divisible[S, F[_] : Divisible: Bind] = Divisible[StateT[S, F, *]]
 
     // F = Id
-    def functor[S] = Functor[State[S, ?]]
-    def monadState[S] = MonadState[State[S, ?], S]
+    def functor[S] = Functor[State[S, *]]
+    def monadState[S] = MonadState[State[S, *], S]
 
     // checking absence of ambiguity
-    def functor[S, F[_] : Monad] = Functor[StateT[S, F, ?]]
-    def plus[S, F[_]: MonadPlus] = Plus[StateT[S, F, ?]]
-    def divisible[S, F[_] : Decidable: Bind] = Divisible[StateT[S, F, ?]]
+    def functor[S, F[_] : Monad] = Functor[StateT[S, F, *]]
+    def plus[S, F[_]: MonadPlus] = Plus[StateT[S, F, *]]
+    def divisible[S, F[_] : Decidable: Bind] = Divisible[StateT[S, F, *]]
   }
 
   "monadState.point" in {

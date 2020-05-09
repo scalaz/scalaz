@@ -18,8 +18,8 @@ class DensityTest extends SpecLite {
 
   type PairInt[A] = (Int, A)
 
-  checkAll("Density[NonEmptyList, ?] comonad laws", comonad.laws[Density[NonEmptyList, ?]])
-  checkAll("Density[PairInt, ?] comonad laws", comonad.laws[Density[PairInt, ?]])
+  checkAll("Density[NonEmptyList, *] comonad laws", comonad.laws[Density[NonEmptyList, *]])
+  checkAll("Density[PairInt, *] comonad laws", comonad.laws[Density[PairInt, *]])
 
   implicit val pairIntDesity = new Density[PairInt, Int] {
     type X = Unit
@@ -27,11 +27,11 @@ class DensityTest extends SpecLite {
     def f: PairInt[Unit] => Int = a => a._1
   }
 
-  checkAll("Density[PairInt, ?] density laws", density.laws[PairInt])
+  checkAll("Density[PairInt, *] density laws", density.laws[PairInt])
 
   object instances {
-    def forFree[F[_]] = Comonad[Density[F, ?]]
-    def comonad[F[_]: Comonad] = Comonad[Density[F, ?]]
-    def combind[F[_]: Cobind] = Comonad[Density[F, ?]]
+    def forFree[F[_]] = Comonad[Density[F, *]]
+    def comonad[F[_]: Comonad] = Comonad[Density[F, *]]
+    def combind[F[_]: Cobind] = Comonad[Density[F, *]]
   }
 }

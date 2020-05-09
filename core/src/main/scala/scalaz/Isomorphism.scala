@@ -67,7 +67,7 @@ sealed abstract class Isomorphisms {
     def unlift1[A](implicit
       FG: Arr[F, G] <~< (F ~~> G),
       GF: Arr[G, F] <~< (G ~~> F)
-    ): F[A, ?] <~> G[A, ?] = {
+    ): F[A, *] <~> G[A, *] = {
       type FA[α] = F[A, α]
       type GA[α] = G[A, α]
       new IsoFunctorTemplate[FA, GA]{
@@ -79,7 +79,7 @@ sealed abstract class Isomorphisms {
     def unlift2[A](implicit
       FG: Arr[F, G] <~< (F ~~> G),
       GF: Arr[G, F] <~< (G ~~> F)
-    ): F[?, A] <~> G[?, A] = {
+    ): F[*, A] <~> G[*, A] = {
       type FA[α] = F[α, A]
       type GA[α] = G[α, A]
       new IsoFunctorTemplate[FA, GA]{

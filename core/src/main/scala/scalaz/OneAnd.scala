@@ -21,7 +21,7 @@ import scalaz.Ordering.orderingInstance
   * operations on `OneAnd` should be preserved across the natural
   * transformation to [[scalaz.NonEmptyList]] where one exists.  That
   * is it should "be like" a nonempty structure.  For example,
-  * `ap`-ing two `OneAnd[Vector, ?]`s or `NonEmptyList`s of lengths
+  * `ap`-ing two `OneAnd[Vector, *]`s or `NonEmptyList`s of lengths
   * *a* and *b* yields a sequence of same type of length *a*×*b*, but
   * two `λ[α => (α, Vector[α])]`s of length *c* and *d* `ap` to one of
   * length 1+(*c*–1)×(*d*–1).  For another example, `point` of the
@@ -46,14 +46,14 @@ final class OneAnd[F[_], A] private (
   }
 }
 
-private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, ?]] {
+private sealed trait OneAndFunctor[F[_]] extends Functor[OneAnd[F, *]] {
   def F: Functor[F]
 
   override def map[A, B](fa: OneAnd[F, A])(f: A => B): OneAnd[F, B] =
     OneAnd(f(fa.head), F.map(fa.tail)(f))
 }
 
-private sealed trait OneAndApply[F[_]] extends Apply[OneAnd[F, ?]] with OneAndFunctor[F] {
+private sealed trait OneAndApply[F[_]] extends Apply[OneAnd[F, *]] with OneAndFunctor[F] {
   def F: Applicative[F]
   def G: Plus[F]
 
@@ -65,7 +65,7 @@ private sealed trait OneAndApply[F[_]] extends Apply[OneAnd[F, ?]] with OneAndFu
   }
 }
 
-private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, ?]] with OneAndFunctor[F] {
+private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, *]] with OneAndFunctor[F] {
   def F: Align[F]
 
   override def alignWith[A, B, C](f: A \&/ B => C) = {
@@ -74,14 +74,14 @@ private sealed trait OneAndAlign[F[_]] extends Align[OneAnd[F, ?]] with OneAndFu
   }
 }
 
-private sealed trait OneAndApplicative[F[_]] extends Applicative[OneAnd[F, ?]] with OneAndApply[F] {
+private sealed trait OneAndApplicative[F[_]] extends Applicative[OneAnd[F, *]] with OneAndApply[F] {
   def F: Applicative[F]
   def G: PlusEmpty[F]
 
   def point[A](a: => A): OneAnd[F, A] = OneAnd(a, G.empty)
 }
 
-private sealed trait OneAndAlt[F[_]] extends Alt[OneAnd[F, ?]] with OneAndApplicative[F] {
+private sealed trait OneAndAlt[F[_]] extends Alt[OneAnd[F, *]] with OneAndApplicative[F] {
   def F: Alt[F]
   def G: PlusEmpty[F]
 
@@ -89,7 +89,7 @@ private sealed trait OneAndAlt[F[_]] extends Alt[OneAnd[F, ?]] with OneAndApplic
     OneAnd(a.head, F.alt(F.alt(a.tail, F.point(b.head)), b.tail))
 }
 
-private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, ?]] with OneAndApply[F] {
+private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, *]] with OneAndApply[F] {
   def F: Monad[F]
   def G: Plus[F]
 
@@ -105,7 +105,7 @@ private sealed trait OneAndBind[F[_]] extends Bind[OneAnd[F, ?]] with OneAndAppl
   )
 }
 
-private sealed trait OneAndPlus[F[_]] extends Plus[OneAnd[F, ?]] {
+private sealed trait OneAndPlus[F[_]] extends Plus[OneAnd[F, *]] {
   def F: Applicative[F]
   def G: Plus[F]
 
@@ -113,12 +113,12 @@ private sealed trait OneAndPlus[F[_]] extends Plus[OneAnd[F, ?]] {
     OneAnd(a.head, G.plus(G.plus(a.tail, F.point(b.head)), b.tail))
 }
 
-private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, ?]] with OneAndBind[F] with OneAndApplicative[F] {
+private sealed trait OneAndMonad[F[_]] extends Monad[OneAnd[F, *]] with OneAndBind[F] with OneAndApplicative[F] {
   def F: MonadPlus[F]
   def G = F
 }
 
-private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, ?]] {
+private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, *]] {
   def F: Foldable[F]
 
   override def findLeft[A](fa: OneAnd[F, A])(f: A => Boolean) =
@@ -194,7 +194,7 @@ private sealed trait OneAndFoldable1[F[_]] extends OneAndFoldable[F] {
     f(fa.head, F.foldMapRight1(fa.tail)(z)(f))
 }
 
-private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, ?]] with OneAndFunctor[F] with OneAndFoldable[F] {
+private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, *]] with OneAndFunctor[F] with OneAndFoldable[F] {
   def F: Traverse[F]
 
   def traverse1Impl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Apply[G]) =
@@ -221,27 +221,27 @@ private sealed trait OneAndTraverse1[F[_]] extends OneAndTraverse[F] with OneAnd
 }
 
 sealed abstract class OneAndInstances5 {
-  implicit def oneAndFunctor[F[_]: Functor]: Functor[OneAnd[F, ?]] =
+  implicit def oneAndFunctor[F[_]: Functor]: Functor[OneAnd[F, *]] =
     new OneAndFunctor[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class OneAndInstances4 extends OneAndInstances5 {
-  implicit def oneAndApply[F[_]: Applicative: Plus]: Apply[OneAnd[F, ?]] =
+  implicit def oneAndApply[F[_]: Applicative: Plus]: Apply[OneAnd[F, *]] =
     new OneAndApply[F] {
       def F = implicitly
       def G = implicitly
     }
 
-  implicit def oneAndAlign[F[_]: Align]: Align[OneAnd[F, ?]] =
+  implicit def oneAndAlign[F[_]: Align]: Align[OneAnd[F, *]] =
     new OneAndAlign[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class OneAndInstances3 extends OneAndInstances4 {
-  implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[OneAnd[F, ?]] =
+  implicit def oneAndApplicative[F[_]: ApplicativePlus]: Applicative[OneAnd[F, *]] =
     new OneAndApplicative[F] {
       def F = implicitly
       def G = implicitly
@@ -249,13 +249,13 @@ sealed abstract class OneAndInstances3 extends OneAndInstances4 {
 }
 
 sealed abstract class OneAndInstances2 extends OneAndInstances3 {
-  implicit def oneAndBind[F[_]: Monad: Plus]: Bind[OneAnd[F, ?]] =
+  implicit def oneAndBind[F[_]: Monad: Plus]: Bind[OneAnd[F, *]] =
     new OneAndBind[F] {
       def F = implicitly
       def G = implicitly
     }
 
-  implicit def oneAndAlt[F[_]: Alt: PlusEmpty]: Alt[OneAnd[F, ?]] =
+  implicit def oneAndAlt[F[_]: Alt: PlusEmpty]: Alt[OneAnd[F, *]] =
     new OneAndAlt[F] {
       def F = implicitly
       def G = implicitly
@@ -263,12 +263,12 @@ sealed abstract class OneAndInstances2 extends OneAndInstances3 {
 }
 
 sealed abstract class OneAndInstances1 extends OneAndInstances2 {
-  implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, ?]] =
+  implicit def oneAndMonad[F[_]: MonadPlus]: Monad[OneAnd[F, *]] =
     new OneAndMonad[F] {
       def F = implicitly
     }
 
-  implicit def oneAndFoldable[F[_]: Foldable]: Foldable1[OneAnd[F, ?]] =
+  implicit def oneAndFoldable[F[_]: Foldable]: Foldable1[OneAnd[F, *]] =
     new OneAndFoldable[F] {
       def F = implicitly
     }
@@ -288,7 +288,7 @@ sealed abstract class OneAndInstances0 extends OneAndInstances1 {
   /** If you have `Foldable1[F]`, `foldMap1` and `foldRight1` are
     * nonstrict and significantly more efficient.
     */
-  implicit def oneAndFoldable1[F[_]: Foldable1]: Foldable1[OneAnd[F, ?]] =
+  implicit def oneAndFoldable1[F[_]: Foldable1]: Foldable1[OneAnd[F, *]] =
     new OneAndFoldable1[F] {
       def F = implicitly
     }
@@ -299,20 +299,20 @@ sealed abstract class OneAndInstances0 extends OneAndInstances1 {
       def OFA = FA
     }
 
-  implicit def oneAndTraverse[F[_]: Traverse]: Traverse1[OneAnd[F, ?]] =
+  implicit def oneAndTraverse[F[_]: Traverse]: Traverse1[OneAnd[F, *]] =
     new OneAndTraverse[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class OneAndInstances extends OneAndInstances0 {
-  implicit def oneAndPlus[F[_]: Applicative: Plus]: Plus[OneAnd[F, ?]] =
+  implicit def oneAndPlus[F[_]: Applicative: Plus]: Plus[OneAnd[F, *]] =
     new OneAndPlus[F] {
       def F = implicitly
       def G = implicitly
     }
 
-  implicit def oneAndTraverse1[F[_]: Traverse1]: Traverse1[OneAnd[F, ?]] =
+  implicit def oneAndTraverse1[F[_]: Traverse1]: Traverse1[OneAnd[F, *]] =
     new OneAndTraverse1[F] {
       def F = implicitly
     }
@@ -334,8 +334,8 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
   implicit def oneAndSemigroup[F[_]: Applicative: Plus, A]: Semigroup[OneAnd[F, A]] =
     oneAndPlus[F].semigroup
 
-  implicit def oneAndZip[F[_]: Zip]: Zip[OneAnd[F, ?]] =
-    new Zip[OneAnd[F, ?]] {
+  implicit def oneAndZip[F[_]: Zip]: Zip[OneAnd[F, *]] =
+    new Zip[OneAnd[F, *]] {
       def zip[A, B](a: => OneAnd[F, A], b: => OneAnd[F, B]) = {
         val a0 = a
         val b0 = b
@@ -343,8 +343,8 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
       }
     }
 
-  implicit def oneAndUnzip[F[_]: Unzip]: Unzip[OneAnd[F, ?]] =
-    new Unzip[OneAnd[F, ?]] {
+  implicit def oneAndUnzip[F[_]: Unzip]: Unzip[OneAnd[F, *]] =
+    new Unzip[OneAnd[F, *]] {
       def unzip[A, B](a: OneAnd[F, (A, B)]) = {
         val (fa, fb) = Unzip[F].unzip(a.tail)
         val (aa, ab) = a.head
@@ -367,8 +367,8 @@ object OneAnd extends OneAndInstances {
     def apply[F[_], A](hd: A, tl: F[A]): OneAnd[F, A] = new OneAnd(Value(hd), Value(tl))
   }
 
-  val oneAndNelIso: NonEmptyList <~> OneAnd[IList, ?] =
-    new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, ?]] {
+  val oneAndNelIso: NonEmptyList <~> OneAnd[IList, *] =
+    new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, *]] {
       def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
       def from[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
     }

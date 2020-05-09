@@ -251,12 +251,12 @@ object IO extends IOInstances {
    * all registered finalizers will be performed if they're not duplicated to a parent region.
    */
   def onExit[S, P[_] : MonadIO](finalizer: IO[Unit]):
-  RegionT[S, P, FinalizerHandle[RegionT[S, P, ?]]] =
+  RegionT[S, P, FinalizerHandle[RegionT[S, P, *]]] =
     regionT(kleisli(hsIORef => (for {
       refCntIORef <- newIORef(1)
       h = refCountedFinalizer(finalizer, refCntIORef)
       _ <- hsIORef.mod(h :: _)
-    } yield finalizerHandle[RegionT[S, P, ?]](h)).liftIO[P]))
+    } yield finalizerHandle[RegionT[S, P, *]](h)).liftIO[P]))
 
   /**
    * Execute a region inside its parent region P. All resources which have been opened in the given
@@ -266,7 +266,7 @@ object IO extends IOInstances {
    * on exit if they haven't been duplicated themselves.
    * The Forall quantifier prevents resources from being returned by this function.
    */
-  def runRegionT[P[_] : MonadControlIO, A](r: Forall[RegionT[?, P, A]]): P[A] = {
+  def runRegionT[P[_] : MonadControlIO, A](r: Forall[RegionT[*, P, A]]): P[A] = {
     def after(hsIORef: IORef[IList[RefCountedFinalizer]]) = for {
       hs <- hsIORef.read
       _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {

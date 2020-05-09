@@ -34,19 +34,19 @@ object OneAndTest extends SpecLite {
 
   "findLeft/findRight" in {
     val a = OneAnd(1, List(2, 3, 4, 5))
-    Foldable[OneAnd[List, ?]].findLeft(a)(_ % 2 == 0) must_=== Some(2)
-    Foldable[OneAnd[List, ?]].findRight(a)(_ % 2 == 0) must_=== Some(4)
+    Foldable[OneAnd[List, *]].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[OneAnd[List, *]].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
   "findLeft" ! forAll{ a: OneAnd[List, Int] =>
     val f = (_: Int) % 3 == 0
-    val F = Foldable[OneAnd[List, ?]]
+    val F = Foldable[OneAnd[List, *]]
     F.findLeft(a)(f) must_=== Foldable[IList].findLeft(F.toIList(a))(f)
   }
 
   "findRight" ! forAll { a: OneAnd[List, Int] =>
     val f = (_: Int) % 3 == 0
-    val F = Foldable[OneAnd[List, ?]]
+    val F = Foldable[OneAnd[List, *]]
     F.findRight(a)(f) must_=== Foldable[IList].findRight(F.toIList(a))(f)
   }
 
@@ -103,36 +103,36 @@ object OneAndTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_]: Functor] = Functor[OneAnd[F, ?]]
-    def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, ?]]
-    def align[F[_]: Align] = Align[OneAnd[F, ?]]
-    def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, ?]]
-    def alt[F[_]: Alt: PlusEmpty] = Alt[OneAnd[F, ?]]
-    def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, ?]]
-    def monad[F[_]: MonadPlus] = Monad[OneAnd[F, ?]]
-    def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, ?]]
-    def foldable[F[_]: Foldable] = Foldable1[OneAnd[F, ?]]
-    def foldable1[F[_]: Foldable1] = Foldable1[OneAnd[F, ?]]
-    def traverse[F[_]: Traverse] = Traverse1[OneAnd[F, ?]]
-    def traverse1[F[_]: Traverse1] = Traverse1[OneAnd[F, ?]]
+    def functor[F[_]: Functor] = Functor[OneAnd[F, *]]
+    def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, *]]
+    def align[F[_]: Align] = Align[OneAnd[F, *]]
+    def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, *]]
+    def alt[F[_]: Alt: PlusEmpty] = Alt[OneAnd[F, *]]
+    def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, *]]
+    def monad[F[_]: MonadPlus] = Monad[OneAnd[F, *]]
+    def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, *]]
+    def foldable[F[_]: Foldable] = Foldable1[OneAnd[F, *]]
+    def foldable1[F[_]: Foldable1] = Foldable1[OneAnd[F, *]]
+    def traverse[F[_]: Traverse] = Traverse1[OneAnd[F, *]]
+    def traverse1[F[_]: Traverse1] = Traverse1[OneAnd[F, *]]
     def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
 
     // checking absence of ambiguity
-    def functor[F[_]: Traverse] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: Traverse1] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: Apply] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: Applicative] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: Bind] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: BindRec] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: Monad] = Functor[OneAnd[F, ?]]
-    def functor[F[_]: MonadPlus] = Functor[OneAnd[F, ?]]
-    def apply[F[_]: ApplicativePlus] = Apply[OneAnd[F, ?]]
-    def apply[F[_]: Applicative: PlusEmpty] = Apply[OneAnd[F, ?]]
-    def apply[F[_]: Monad: PlusEmpty] = Apply[OneAnd[F, ?]]
-    def apply[F[_]: MonadPlus] = Apply[OneAnd[F, ?]]
-    def bind[F[_]: MonadPlus] = Bind[OneAnd[F, ?]]
-    def plus[F[_]: ApplicativePlus] = Plus[OneAnd[F, ?]]
-    def plus[F[_]: Monad: Plus] = Plus[OneAnd[F, ?]]
-    def plus[F[_]: MonadPlus] = Plus[OneAnd[F, ?]]
+    def functor[F[_]: Traverse] = Functor[OneAnd[F, *]]
+    def functor[F[_]: Traverse1] = Functor[OneAnd[F, *]]
+    def functor[F[_]: Apply] = Functor[OneAnd[F, *]]
+    def functor[F[_]: Applicative] = Functor[OneAnd[F, *]]
+    def functor[F[_]: Bind] = Functor[OneAnd[F, *]]
+    def functor[F[_]: BindRec] = Functor[OneAnd[F, *]]
+    def functor[F[_]: Monad] = Functor[OneAnd[F, *]]
+    def functor[F[_]: MonadPlus] = Functor[OneAnd[F, *]]
+    def apply[F[_]: ApplicativePlus] = Apply[OneAnd[F, *]]
+    def apply[F[_]: Applicative: PlusEmpty] = Apply[OneAnd[F, *]]
+    def apply[F[_]: Monad: PlusEmpty] = Apply[OneAnd[F, *]]
+    def apply[F[_]: MonadPlus] = Apply[OneAnd[F, *]]
+    def bind[F[_]: MonadPlus] = Bind[OneAnd[F, *]]
+    def plus[F[_]: ApplicativePlus] = Plus[OneAnd[F, *]]
+    def plus[F[_]: Monad: Plus] = Plus[OneAnd[F, *]]
+    def plus[F[_]: MonadPlus] = Plus[OneAnd[F, *]]
   }
 }

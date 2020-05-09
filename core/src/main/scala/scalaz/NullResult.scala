@@ -208,8 +208,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         }
     }
 
-  implicit def nullResultMonadPlusAlt[X]: MonadPlus[NullResult[X, ?]] with Alt[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
-    new MonadPlus[NullResult[X, ?]] with Alt[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
+  implicit def nullResultMonadPlusAlt[X]: MonadPlus[NullResult[X, *]] with Alt[NullResult[X, *]] with BindRec[NullResult[X, *]] =
+    new MonadPlus[NullResult[X, *]] with Alt[NullResult[X, *]] with BindRec[NullResult[X, *]] {
       import std.option._
       override def tailrecM[A, B](a: A)(f: A => NullResult[X, A \/ B]) =
         NullResult(r => BindRec[Option].tailrecM(a)(f(_)(r)))
@@ -229,8 +229,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
         plus(a, b)
     }
 
-  implicit def nullResultContravariant[X]: Contravariant[NullResult[?, X]] =
-    new Contravariant[NullResult[?, X]] {
+  implicit def nullResultContravariant[X]: Contravariant[NullResult[*, X]] =
+    new Contravariant[NullResult[*, X]] {
       override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
         a contramap f
     }

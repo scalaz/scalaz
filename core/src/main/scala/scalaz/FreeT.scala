@@ -45,8 +45,8 @@ object FreeT extends FreeTInstances {
 
   import Isomorphism._
 
-  def isoFree[S[_]]: FreeT[S, Id.Id, ?] <~> Free[S, ?] =
-    new IsoFunctorTemplate[FreeT[S, Id.Id, ?], Free[S, ?]] {
+  def isoFree[S[_]]: FreeT[S, Id.Id, *] <~> Free[S, *] =
+    new IsoFunctorTemplate[FreeT[S, Id.Id, *], Free[S, *]] {
       override def to[A](fa: FreeT[S, Id.Id, A]) = fa match {
         case Suspend(\/-(a)) =>
           Free.liftF(a)
@@ -188,8 +188,8 @@ sealed abstract class FreeT[S[_], M[_], A] {
 }
 
 sealed abstract class FreeTInstances6 {
-  implicit def freeTMonadTell[S[_], M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, ?], E] =
-    new MonadTell[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+  implicit def freeTMonadTell[S[_], M[_], E](implicit M1: MonadTell[M, E]): MonadTell[FreeT[S, M, *], E] =
+    new MonadTell[FreeT[S, M, *], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def writer[A](w: E, v: A) =
         FreeT.liftM(M1.writer(w, v))
@@ -197,8 +197,8 @@ sealed abstract class FreeTInstances6 {
 }
 
 sealed abstract class FreeTInstances5 extends FreeTInstances6 {
-  implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, ?], E] =
-    new MonadReader[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+  implicit def freeTMonadReader[S[_], M[_], E](implicit M1: MonadReader[M, E]): MonadReader[FreeT[S, M, *], E] =
+    new MonadReader[FreeT[S, M, *], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def ask =
         FreeT.liftM(M1.ask)
@@ -208,8 +208,8 @@ sealed abstract class FreeTInstances5 extends FreeTInstances6 {
 }
 
 sealed abstract class FreeTInstances4 extends FreeTInstances5 {
-  implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, ?], E] =
-    new MonadState[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+  implicit def freeTMonadState[S[_], M[_], E](implicit M1: MonadState[M, E]): MonadState[FreeT[S, M, *], E] =
+    new MonadState[FreeT[S, M, *], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def get =
         FreeT.liftM(M1.get)
@@ -219,8 +219,8 @@ sealed abstract class FreeTInstances4 extends FreeTInstances5 {
 }
 
 sealed abstract class FreeTInstances3 extends FreeTInstances4 {
-  implicit def freeTMonadError[S[_], M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, ?], E] =
-    new MonadError[FreeT[S, M, ?], E] with FreeTMonad[S, M] {
+  implicit def freeTMonadError[S[_], M[_]: BindRec, E](implicit E: MonadError[M, E]): MonadError[FreeT[S, M, *], E] =
+    new MonadError[FreeT[S, M, *], E] with FreeTMonad[S, M] {
       override def M = implicitly
       override def handleError[A](fa: FreeT[S, M, A])(f: E => FreeT[S, M, A]) =
         FreeT.liftM[S, M, FreeT[S, M, A]](E.handleError(fa.toM)(f.andThen(_.toM)))(M).flatMap(identity)
@@ -230,22 +230,22 @@ sealed abstract class FreeTInstances3 extends FreeTInstances4 {
 }
 
 sealed abstract class FreeTInstances2 extends FreeTInstances3 {
-  implicit def freeTBind[S[_], M[_]](implicit M0: Applicative[M]): Bind[FreeT[S, M, ?]] =
+  implicit def freeTBind[S[_], M[_]](implicit M0: Applicative[M]): Bind[FreeT[S, M, *]] =
     new FreeTBind[S, M] {
       implicit def M: Applicative[M] = M0
     }
 
-  implicit def freeTHoist[S[_]]: Hoist[FreeT[S, ?[_], ?]] =
-    new Hoist[FreeT[S, ?[_], ?]] {
+  implicit def freeTHoist[S[_]]: Hoist[FreeT[S, *[_], *]] =
+    new Hoist[FreeT[S, *[_], *]] {
       def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-        λ[FreeT[S, M, ?] ~> FreeT[S, N, ?]](_ hoist f)
+        λ[FreeT[S, M, *] ~> FreeT[S, N, *]](_ hoist f)
       def liftM[G[_]: Monad, A](a: G[A]) =
         FreeT.liftM(a)
       def apply[G[_]: Monad] =
-        Monad[FreeT[S, G, ?]]
+        Monad[FreeT[S, G, *]]
     }
 
-  implicit def freeTFoldable[S[_]: Foldable, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, ?]] =
+  implicit def freeTFoldable[S[_]: Foldable, M[_]: Foldable: Applicative: BindRec]: Foldable[FreeT[S, M, *]] =
     new FreeTFoldable[S, M] {
       override def F = implicitly
       override def M = implicitly
@@ -255,7 +255,7 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
 }
 
 sealed abstract class FreeTInstances1 extends FreeTInstances2 {
-  implicit def freeTTraverse[S[_]: Traverse, M[_]: Traverse: Applicative: BindRec]: Traverse[FreeT[S, M, ?]] =
+  implicit def freeTTraverse[S[_]: Traverse, M[_]: Traverse: Applicative: BindRec]: Traverse[FreeT[S, M, *]] =
     new FreeTTraverse[S, M] {
       override def F = implicitly
       override def M = implicitly
@@ -265,12 +265,12 @@ sealed abstract class FreeTInstances1 extends FreeTInstances2 {
 }
 
 sealed abstract class FreeTInstances0 extends FreeTInstances1 {
-  implicit def freeTMonad[S[_], M[_]](implicit M0: Applicative[M]): Monad[FreeT[S, M, ?]] with BindRec[FreeT[S, M, ?]] =
+  implicit def freeTMonad[S[_], M[_]](implicit M0: Applicative[M]): Monad[FreeT[S, M, *]] with BindRec[FreeT[S, M, *]] =
     new FreeTMonad[S, M] {
       def M = M0
     }
 
-  implicit def freeTPlus[S[_], M[_]: Applicative: BindRec: Plus]: Plus[FreeT[S, M, ?]] =
+  implicit def freeTPlus[S[_], M[_]: Applicative: BindRec: Plus]: Plus[FreeT[S, M, *]] =
     new FreeTPlus[S, M] {
       override def M = implicitly
       override def M1 = implicitly
@@ -279,8 +279,8 @@ sealed abstract class FreeTInstances0 extends FreeTInstances1 {
 }
 
 sealed abstract class FreeTInstances extends FreeTInstances0 {
-  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, ?]] with Alt[FreeT[S, M, ?]] =
-    new MonadPlus[FreeT[S, M, ?]] with Alt[FreeT[S, M, ?]] with FreeTPlus[S, M] with FreeTMonad[S, M] {
+  implicit def freeTMonadPlus[S[_], M[_]: ApplicativePlus: BindRec]: MonadPlus[FreeT[S, M, *]] with Alt[FreeT[S, M, *]] =
+    new MonadPlus[FreeT[S, M, *]] with Alt[FreeT[S, M, *]] with FreeTPlus[S, M] with FreeTMonad[S, M] {
       override def M = implicitly
       override def M1 = implicitly
       override def M2 = implicitly
@@ -292,14 +292,14 @@ sealed abstract class FreeTInstances extends FreeTInstances0 {
     }
 }
 
-private trait FreeTBind[S[_], M[_]] extends Bind[FreeT[S, M, ?]] {
+private trait FreeTBind[S[_], M[_]] extends Bind[FreeT[S, M, *]] {
   implicit def M: Applicative[M]
 
   override final def map[A, B](fa: FreeT[S, M, A])(f: A => B): FreeT[S, M, B] = fa.map(f)
   def bind[A, B](fa: FreeT[S, M, A])(f: A => FreeT[S, M, B]): FreeT[S, M, B] = fa.flatMap(f)
 }
 
-private trait FreeTMonad[S[_], M[_]] extends Monad[FreeT[S, M, ?]] with BindRec[FreeT[S, M, ?]] with FreeTBind[S, M] {
+private trait FreeTMonad[S[_], M[_]] extends Monad[FreeT[S, M, *]] with BindRec[FreeT[S, M, *]] with FreeTBind[S, M] {
   implicit def M: Applicative[M]
 
   override final def point[A](a: => A) =
@@ -308,7 +308,7 @@ private trait FreeTMonad[S[_], M[_]] extends Monad[FreeT[S, M, ?]] with BindRec[
     FreeT.tailrecM(a)(f)
 }
 
-private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, ?]] {
+private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, *]] {
   implicit def M: Applicative[M]
   implicit def M1: BindRec[M]
   def M2: Plus[M]
@@ -316,7 +316,7 @@ private trait FreeTPlus[S[_], M[_]] extends Plus[FreeT[S, M, ?]] {
     FreeT.liftM(M2.plus(a.toM, b.toM))(M).flatMap(identity)
 }
 
-private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, ?]] with Foldable.FromFoldMap[FreeT[S, M, ?]] {
+private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, *]] with Foldable.FromFoldMap[FreeT[S, M, *]] {
   implicit def M: Applicative[M]
   implicit def M1: BindRec[M]
   def F: Foldable[S]
@@ -331,7 +331,7 @@ private trait FreeTFoldable[S[_], M[_]] extends Foldable[FreeT[S, M, ?]] with Fo
     }
 }
 
-private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, ?]] with FreeTFoldable[S, M] with FreeTBind[S, M] {
+private trait FreeTTraverse[S[_], M[_]] extends Traverse[FreeT[S, M, *]] with FreeTFoldable[S, M] with FreeTBind[S, M] {
   override implicit def F: Traverse[S]
   override def M2: Traverse[M]
   override implicit def M: Applicative[M]

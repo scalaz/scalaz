@@ -27,47 +27,47 @@ final case class SelectT[R, M[_], A](run: (A => M[R]) => M[A]) { self =>
 }
 
 sealed abstract class SelectTInstances7 {
-  implicit def selectTFunctor[R, M[_]: Functor]: Functor[SelectT[R, M, ?]] =
+  implicit def selectTFunctor[R, M[_]: Functor]: Functor[SelectT[R, M, *]] =
     new SelectTFunctor[R, M] {
       override def F = implicitly
     }
 }
 
 sealed abstract class SelectTInstances6 extends SelectTInstances7 {
-  implicit def selectTBind[R, M[_]: Bind]: Bind[SelectT[R, M, ?]] =
+  implicit def selectTBind[R, M[_]: Bind]: Bind[SelectT[R, M, *]] =
     new SelectTBind[R, M] {
       override def F = implicitly
     }
 }
 
 sealed abstract class SelectTInstances5 extends SelectTInstances6 {
-  implicit def selectTPlus[R, M[_]: Plus]: Plus[SelectT[R, M, ?]] =
+  implicit def selectTPlus[R, M[_]: Plus]: Plus[SelectT[R, M, *]] =
     new SelectTPlus[R, M] {
       override def F = implicitly
     }
 }
 
 sealed abstract class SelectTInstances4 extends SelectTInstances5 {
-  implicit def selectTPlusEmpty[R, M[_]: PlusEmpty]: PlusEmpty[SelectT[R, M, ?]] =
+  implicit def selectTPlusEmpty[R, M[_]: PlusEmpty]: PlusEmpty[SelectT[R, M, *]] =
     new SelectTPlusEmpty[R, M] {
       override def F = implicitly
     }
 }
 
 sealed abstract class SelectTInstances3 extends SelectTInstances4 {
-  implicit def selectTMonad[R, M[_]: Monad]: Monad[SelectT[R, M, ?]] =
+  implicit def selectTMonad[R, M[_]: Monad]: Monad[SelectT[R, M, *]] =
     new SelectTMonad[R, M] {
       override def F = implicitly
     }
 }
 
 sealed abstract class SelectTInstances2 extends SelectTInstances3 {
-  implicit def selectMonad[R]: Monad[Select[R, ?]] =
+  implicit def selectMonad[R]: Monad[Select[R, *]] =
     SelectT.selectTMonad[R, Id](Id.id)
 }
 
 sealed abstract class SelectTInstances1 extends SelectTInstances2 {
-  implicit def selectTMonadPlus[R, M[_]: MonadPlus]: MonadPlus[SelectT[R, M, ?]] =
+  implicit def selectTMonadPlus[R, M[_]: MonadPlus]: MonadPlus[SelectT[R, M, *]] =
     new SelectTMonadPlus[R, M] {
       override def F = implicitly
     }
@@ -88,41 +88,41 @@ object SelectT extends SelectTInstances {
 
 }
 
-private trait SelectTFunctor[R, M[_]] extends Functor[SelectT[R, M, ?]] {
+private trait SelectTFunctor[R, M[_]] extends Functor[SelectT[R, M, *]] {
   protected implicit def F: Functor[M]
 
   override final def map[A, B](fa: SelectT[R, M, A])(f: A => B) =
     fa map f
 }
 
-private trait SelectTBind[R, M[_]] extends Bind[SelectT[R, M, ?]] with SelectTFunctor[R, M] {
+private trait SelectTBind[R, M[_]] extends Bind[SelectT[R, M, *]] with SelectTFunctor[R, M] {
   protected implicit def F: Bind[M]
 
   override def bind[A, B](fa: SelectT[R, M, A])(f: A => SelectT[R, M, B]) =
     fa flatMap f
 }
 
-private trait SelectTMonad[R, M[_]] extends Monad[SelectT[R, M, ?]] with SelectTBind[R, M] {
+private trait SelectTMonad[R, M[_]] extends Monad[SelectT[R, M, *]] with SelectTBind[R, M] {
   protected def F: Monad[M]
 
   override def point[A](a: => A): SelectT[R, M, A] =
     SelectT(_ => F.point(a))
 }
 
-private trait SelectTPlus[R, M[_]] extends Plus[SelectT[R, M, ?]] {
+private trait SelectTPlus[R, M[_]] extends Plus[SelectT[R, M, *]] {
   protected def F: Plus[M]
 
   override def plus[A](a: SelectT[R, M, A], b: => SelectT[R, M, A]) =
     SelectT(k => F.plus(a.run(k), b.run(k)))
 }
 
-private trait SelectTPlusEmpty[R, M[_]] extends PlusEmpty[SelectT[R, M, ?]] with SelectTPlus[R, M] {
+private trait SelectTPlusEmpty[R, M[_]] extends PlusEmpty[SelectT[R, M, *]] with SelectTPlus[R, M] {
   protected def F: PlusEmpty[M]
 
   override def empty[A] =
     SelectT(_ => F.empty[A])
 }
 
-private trait SelectTMonadPlus[R, M[_]] extends MonadPlus[SelectT[R, M, ?]] with SelectTPlusEmpty[R, M] with SelectTMonad[R, M] {
+private trait SelectTMonadPlus[R, M[_]] extends MonadPlus[SelectT[R, M, *]] with SelectTPlusEmpty[R, M] with SelectTMonad[R, M] {
   protected def F: MonadPlus[M]
 }

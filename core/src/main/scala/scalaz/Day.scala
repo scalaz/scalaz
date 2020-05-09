@@ -75,14 +75,14 @@ object Day extends DayInstances {
   /** Collapse to type constructor if both of them are the same */
   def dap[F[_], A](d: Day[F, F, A])(implicit AF: Applicative[F]): F[A] = AF.apply2(d.fx, d.gy)(d.xya)
 
-  def assoc[F[_], G[_], H[_], A, B](d: Day[F, Day[G, H, ?], A]): Day[Day[F, G, ?], H, A] = {
+  def assoc[F[_], G[_], H[_], A, B](d: Day[F, Day[G, H, *], A]): Day[Day[F, G, *], H, A] = {
     val fx = Day[F, G, (d.X, d.gy.X), d.X, d.gy.X](d.fx, d.gy.fx, (x, y) => (x, y))
-    Day[Day[F, G, ?], H, A, (d.X, d.gy.X), d.gy.Y](fx, d.gy.gy, (a, e) => d.xya(a._1, d.gy.xya(a._2, e)))
+    Day[Day[F, G, *], H, A, (d.X, d.gy.X), d.gy.Y](fx, d.gy.gy, (a, e) => d.xya(a._1, d.gy.xya(a._2, e)))
   }
 
-  def disassoc[F[_], G[_], H[_], A](d: Day[Day[F, G, ?], H, A]): Day[F, Day[G, H, ?], A] = {
+  def disassoc[F[_], G[_], H[_], A](d: Day[Day[F, G, *], H, A]): Day[F, Day[G, H, *], A] = {
     val gyy:  Day[G, H, (d.fx.Y, d.Y)] = Day[G, H, (d.fx.Y, d.Y), d.fx.Y, d.Y](d.fx.gy, d.gy, (x,y) => (x,y))
-    Day[F, Day[G, H, ?], A, d.fx.X, (d.fx.Y, d.Y)](d.fx.fx, gyy, (x: d.fx.X, y: (d.fx.Y, d.Y)) => d.xya(d.fx.xya(x, y._1), y._2))
+    Day[F, Day[G, H, *], A, d.fx.X, (d.fx.Y, d.Y)](d.fx.fx, gyy, (x: d.fx.X, y: (d.fx.Y, d.Y)) => d.xya(d.fx.xya(x, y._1), y._2))
   }
 }
 
@@ -94,10 +94,10 @@ sealed abstract class DayInstances extends DayInstances1 {
         G.map(a.gy)(a.xya(F.copoint(a.fx), _))
 
       override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-        Lambda[Day[F, M, ?] ~> Day[F, N, ?]](_ trans2 f)
+        Lambda[Day[F, M, *] ~> Day[F, N, *]](_ trans2 f)
     }
 
-  implicit def comonadDay[F[_], G[_]](implicit CF0: Comonad[F], CG0: Comonad[G]): Comonad[Day[F, G, ?]] = new DayComonad[F, G] {
+  implicit def comonadDay[F[_], G[_]](implicit CF0: Comonad[F], CG0: Comonad[G]): Comonad[Day[F, G, *]] = new DayComonad[F, G] {
     def CF: Comonad[F] = CF0
     def CG: Comonad[G] = CG0
   }
@@ -105,12 +105,12 @@ sealed abstract class DayInstances extends DayInstances1 {
 
 sealed abstract class DayInstances1 extends DayInstances2 {
 
-  implicit def cobindDay[F[_], G[_]]: Cobind[Day[F, G, ?]] = new DayCobind[F, G] {}
+  implicit def cobindDay[F[_], G[_]]: Cobind[Day[F, G, *]] = new DayCobind[F, G] {}
 }
 
 sealed abstract class DayInstances2 extends DayInstances3 {
 
-  implicit def applicativeDay[F[_], G[_]](implicit AF0: Applicative[F], AG0: Applicative[G]): Applicative[Day[F, G, ?]] = new DayApplicative[F, G] {
+  implicit def applicativeDay[F[_], G[_]](implicit AF0: Applicative[F], AG0: Applicative[G]): Applicative[Day[F, G, *]] = new DayApplicative[F, G] {
     def AF: Applicative[F] = AF0
     def AG: Applicative[G] = AG0
   }
@@ -118,7 +118,7 @@ sealed abstract class DayInstances2 extends DayInstances3 {
 
 sealed abstract class DayInstances3 extends DayInstances4 {
 
-  implicit def applyDay[F[_], G[_]](implicit AF0: Apply[F], AG0: Apply[G]): Apply[Day[F, G, ?]] = new DayApply[F, G] {
+  implicit def applyDay[F[_], G[_]](implicit AF0: Apply[F], AG0: Apply[G]): Apply[Day[F, G, *]] = new DayApply[F, G] {
     def AF: Apply[F] = AF0
     def AG: Apply[G] = AG0
   }
@@ -126,25 +126,25 @@ sealed abstract class DayInstances3 extends DayInstances4 {
 
 sealed abstract class DayInstances4 {
 
-  implicit def functorDay[F[_], G[_]]: Functor[Day[F, G, ?]] = new DayFunctor[F, G] {}
+  implicit def functorDay[F[_], G[_]]: Functor[Day[F, G, *]] = new DayFunctor[F, G] {}
 }
 
-private trait DayFunctor[F[_], G[_]] extends Functor[Day[F, G, ?]] {
+private trait DayFunctor[F[_], G[_]] extends Functor[Day[F, G, *]] {
   override def map[C, D](d: Day[F, G, C])(f: C => D): Day[F, G, D] = d.map(f)
 }
 
-private trait DayCobind[F[_], G[_]] extends Cobind[Day[F, G, ?]] with DayFunctor[F, G] {
+private trait DayCobind[F[_], G[_]] extends Cobind[Day[F, G, *]] with DayFunctor[F, G] {
   override def cobind[A, B](fa: Day[F, G, A])(f: Day[F, G, A] => B): Day[F, G, B] = fa.cobind(f)
 }
 
-private trait DayComonad[F[_], G[_]] extends Comonad[Day[F, G, ?]] with DayCobind[F, G] {
+private trait DayComonad[F[_], G[_]] extends Comonad[Day[F, G, *]] with DayCobind[F, G] {
   def CF: Comonad[F]
   def CG: Comonad[G]
 
   def copoint[C](w: Day[F, G, C]): C = w.xya(CF.copoint(w.fx), CG.copoint(w.gy))
 }
 
-private trait DayApply[F[_], G[_]] extends Apply[Day[F, G, ?]] with DayFunctor[F, G] {
+private trait DayApply[F[_], G[_]] extends Apply[Day[F, G, *]] with DayFunctor[F, G] {
   def AF: Apply[F]
   def AG: Apply[G]
 
@@ -159,7 +159,7 @@ private trait DayApply[F[_], G[_]] extends Apply[Day[F, G, ?]] with DayFunctor[F
   }
 }
 
-private trait DayApplicative[F[_], G[_]] extends Applicative[Day[F, G, ?]] with DayApply[F, G] {
+private trait DayApplicative[F[_], G[_]] extends Applicative[Day[F, G, *]] with DayApply[F, G] {
   def AF: Applicative[F]
   def AG: Applicative[G]
 

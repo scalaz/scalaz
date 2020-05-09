@@ -113,7 +113,7 @@ object ListTest extends SpecLite {
   }
 
   "takeWhileM example" in {
-    def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[State[Int, ?]](a => State {
+    def takeWhileN[A](as: List[A], n: Int)(f: A => Boolean): List[A] = as.takeWhileM[State[Int, *]](a => State {
       i =>
         val j = i + (if (f(a)) 0 else 1)
         val done = j >= n

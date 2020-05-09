@@ -46,7 +46,7 @@ object Tag {
 
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
-      extends (Id.Id ~> (? @@ T)) {
+      extends (Id.Id ~> (* @@ T)) {
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
 
@@ -66,7 +66,7 @@ object Tag {
       * the enclosing context.
       */
     def onF[A, B](fa: A => B): A => (B @@ T) =
-      subst[A => ?, B](fa)
+      subst[A => *, B](fa)
 
     /** One variant of `subst` with different inference. */
     def onCov[FA](fa: FA)(implicit U: Unapply[Functor, FA]): U.M[U.A @@ T] =

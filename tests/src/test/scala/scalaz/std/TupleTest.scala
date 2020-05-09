@@ -48,25 +48,25 @@ object TupleTest extends SpecLite {
   checkAll("Tuple7", semilattice.laws[(ISet[A], ISet[B], ISet[C], ISet[D], ISet[E], ISet[F], ISet[G])])
   checkAll("Tuple8", semilattice.laws[(ISet[A], ISet[B], ISet[C], ISet[D], ISet[E], ISet[F], ISet[G], ISet[H])])
 
-  checkAll("Tuple2", bindRec.laws[(B, ?)])
-  checkAll("Tuple3", bindRec.laws[(B, C, ?)])
-  checkAll("Tuple4", bindRec.laws[(B, C, D, ?)])
-  checkAll("Tuple5", bindRec.laws[(B, C, D, E, ?)])
-  checkAll("Tuple6", bindRec.laws[(B, C, D, E, F, ?)])
-  checkAll("Tuple7", bindRec.laws[(B, C, D, E, F, G, ?)])
-  checkAll("Tuple8", bindRec.laws[(B, C, D, E, F, G, H, ?)])
+  checkAll("Tuple2", bindRec.laws[(B, *)])
+  checkAll("Tuple3", bindRec.laws[(B, C, *)])
+  checkAll("Tuple4", bindRec.laws[(B, C, D, *)])
+  checkAll("Tuple5", bindRec.laws[(B, C, D, E, *)])
+  checkAll("Tuple6", bindRec.laws[(B, C, D, E, F, *)])
+  checkAll("Tuple7", bindRec.laws[(B, C, D, E, F, G, *)])
+  checkAll("Tuple8", bindRec.laws[(B, C, D, E, F, G, H, *)])
 
   checkAll("Tuple1", monad.laws[Tuple1])
-  checkAll("Tuple2", monad.laws[(B, ?)])
-  checkAll("Tuple3", monad.laws[(B, C, ?)])
-  checkAll("Tuple4", monad.laws[(B, C, D, ?)])
-  checkAll("Tuple5", monad.laws[(B, C, D, E, ?)])
-  checkAll("Tuple6", monad.laws[(B, C, D, E, F, ?)])
-  checkAll("Tuple7", monad.laws[(B, C, D, E, F, G, ?)])
-  checkAll("Tuple8", monad.laws[(B, C, D, E, F, G, H, ?)])
+  checkAll("Tuple2", monad.laws[(B, *)])
+  checkAll("Tuple3", monad.laws[(B, C, *)])
+  checkAll("Tuple4", monad.laws[(B, C, D, *)])
+  checkAll("Tuple5", monad.laws[(B, C, D, E, *)])
+  checkAll("Tuple6", monad.laws[(B, C, D, E, F, *)])
+  checkAll("Tuple7", monad.laws[(B, C, D, E, F, G, *)])
+  checkAll("Tuple8", monad.laws[(B, C, D, E, F, G, H, *)])
 
   checkAll("Tuple1", comonad.laws[Tuple1])
-  checkAll("Tuple2", comonad.laws[(Int, ?)])
+  checkAll("Tuple2", comonad.laws[(Int, *)])
 
   checkAll("Tuple2", associative.laws[Tuple2])
 
@@ -113,17 +113,17 @@ object TupleTest extends SpecLite {
 
       def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
-      def functor = Functor[(B, ?)]
-      def bindRec[A: Semigroup] = BindRec[(A, ?)]
-      def monad[A: Monoid] = Monad[(A, ?)]
-      def cozip = Cozip[(A, ?)]
+      def functor = Functor[(B, *)]
+      def bindRec[A: Semigroup] = BindRec[(A, *)]
+      def monad[A: Monoid] = Monad[(A, *)]
+      def cozip = Cozip[(A, *)]
 
       // checking absence of ambiguity
       def equal[A: Order, B: Order] = Equal[(A, B)]
       def semigroup[A: Monoid: Band, B: Monoid: Band] = Semigroup[(A, B)]
       def semigroup[A: Monoid: SemiLattice, B: Monoid: SemiLattice] = Semigroup[(A, B)]
       def band[A: SemiLattice, B: SemiLattice] = Band[(A, B)]
-      def functor[A: Monoid] = Functor[(A, ?)]
+      def functor[A: Monoid] = Functor[(A, *)]
     }
     object tuple3 {
       def show[A: Show, B: Show, C: Show] = Show[(A, B, C)]

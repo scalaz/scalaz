@@ -27,7 +27,7 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
   def flip: Leibniz[L, H, B, A] =
     Leibniz.symm(this)
 
-  def onF[X](fa: X => A): X => B = subst[X => ?](fa)
+  def onF[X](fa: X => A): X => B = subst[X => *](fa)
   def onCov[FA](fa: FA)(implicit U: Unapply.AuxA[Functor, FA, A]): U.M[B] =
     subst(U(fa))
   def onContra[FA](fa: FA)(implicit U: Unapply.AuxA[Contravariant, FA, A]): U.M[B] =
@@ -84,7 +84,7 @@ object Leibniz extends LeibnizInstances {
    * We rely on subtyping to enable this to work for any Leibniz arrow
    */
   implicit def witness[A, B](f: scalaz.===[A, B]): A => B =
-    f.subst[A => ?](identity)
+    f.subst[A => *](identity)
 
   implicit def subst[A, B](a: A)(implicit f: scalaz.===[A, B]): B = f.subst[Id](a)
 

@@ -53,8 +53,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   // reduce - given monoid
   def traversal[G[_]:Applicative]: Traversal[G] =
     new Traversal[G]
-  def traversalS[S]: Traversal[State[S, ?]] =
-    new Traversal[State[S, ?]]()(StateT.stateMonad) {
+  def traversalS[S]: Traversal[State[S, *]] =
+    new Traversal[State[S, *]]()(StateT.stateMonad) {
       override def run[A, B](fa: F[A])(f: A => State[S, B]) = traverseS(fa)(f)
     }
 

@@ -21,38 +21,38 @@ final case class IdT[F[_], A](run: F[A]) {
 }
 
 sealed abstract class IdTInstances6 {
-  implicit def idTDivisible[F[_]](implicit F0: Divisible[F]): Divisible[IdT[F, ?]] =
+  implicit def idTDivisible[F[_]](implicit F0: Divisible[F]): Divisible[IdT[F, *]] =
     Divisible.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances5 extends IdTInstances6 {
-  implicit def idTDecidable[F[_]](implicit F0: Decidable[F]): Decidable[IdT[F, ?]] =
+  implicit def idTDecidable[F[_]](implicit F0: Decidable[F]): Decidable[IdT[F, *]] =
     Decidable.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances4 extends IdTInstances5 {
-  implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, ?]] =
+  implicit def idTFunctor[F[_]](implicit F0: Functor[F]): Functor[IdT[F, *]] =
     Functor.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances3 extends IdTInstances4 {
-  implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[IdT[F, ?]] =
+  implicit def idTApply[F[_]](implicit F0: Apply[F]): Apply[IdT[F, *]] =
     Apply.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances2 extends IdTInstances3 {
-  implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[IdT[F, ?]] =
+  implicit def idTApplicative[F[_]](implicit F0: Applicative[F]): Applicative[IdT[F, *]] =
     Applicative.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances1 extends IdTInstances2 {
-  implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[IdT[F, ?]] =
+  implicit def idTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[IdT[F, *]] =
     Foldable.fromIso(IdT.iso[F].to)
 
   implicit def idTEqual[F[_], A](implicit F: Equal[F[A]]): Equal[IdT[F, A]] =
     F.contramap(_.run)
 
-  implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[IdT[F, ?]] =
+  implicit def idTMonad[F[_]](implicit F0: Monad[F]): Monad[IdT[F, *]] =
     Monad.fromIso(IdT.iso[F])
 }
 
@@ -60,20 +60,20 @@ sealed abstract class IdTInstances0 extends IdTInstances1 {
   implicit def idTOrder[F[_], A](implicit F: Order[F[A]]): Order[IdT[F, A]] =
     F.contramap(_.run)
 
-  implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, ?]] =
+  implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[IdT[F, *]] =
     Traverse.fromIso(IdT.iso[F])
 }
 
 sealed abstract class IdTInstances extends IdTInstances0 {
   implicit val idTHoist: Hoist[IdT] = IdTHoist
 
-  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, ?]] =
+  implicit def idTBindRec[F[_]](implicit F0: BindRec[F]): BindRec[IdT[F, *]] =
     BindRec.fromIso(IdT.iso[F])
 
   implicit val idTCohoist: Cohoist[IdT] =
     new Cohoist[IdT] {
       override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-        Lambda[IdT[M, ?] ~> IdT[N, ?]](x => IdT(f(x.run)))
+        Lambda[IdT[M, *] ~> IdT[N, *]](x => IdT(f(x.run)))
 
       override def lower[G[_]: Cobind, A](a: IdT[G, A]) =
         a.run
@@ -82,7 +82,7 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 
 object IdT extends IdTInstances {
   import Isomorphism._
-  def iso[F[_]]: IdT[F, ?] <~> F = new IsoFunctorTemplate[IdT[F, ?], F] {
+  def iso[F[_]]: IdT[F, *] <~> F = new IsoFunctorTemplate[IdT[F, *], F] {
     def from[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
     def to[A](fa: IdT[F, A]): F[A] = fa.run
   }
@@ -93,9 +93,9 @@ private object IdTHoist extends Hoist[IdT] {
     new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    λ[IdT[M, ?] ~> IdT[N, ?]](fa => new IdT(f(fa.run)))
+    λ[IdT[M, *] ~> IdT[N, *]](fa => new IdT(f(fa.run)))
 
-  implicit def apply[G[_] : Monad]: Monad[IdT[G, ?]] =
+  implicit def apply[G[_] : Monad]: Monad[IdT[G, *]] =
     IdT.idTMonad[G]
 }
 

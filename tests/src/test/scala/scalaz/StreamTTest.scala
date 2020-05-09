@@ -192,17 +192,17 @@ object StreamTTest extends SpecLite {
   object instances {
     def semigroup[F[_]: Functor, A] = Semigroup[StreamT[F, A]]
     def monoid[F[_]: Applicative, A] = Monoid[StreamT[F, A]]
-    def functor[F[_]: Functor] = Functor[StreamT[F, ?]]
-    def bind[F[_]: Functor] = Bind[StreamT[F, ?]]
-    def plus[F[_]: Functor] = Plus[StreamT[F, ?]]
-    def monad[F[_]: Applicative] = Monad[StreamT[F, ?]]
-    def monadPlus[F[_]: Applicative] = MonadPlus[StreamT[F, ?]]
-    def foldable[F[_]: Foldable] = Foldable[StreamT[F, ?]]
+    def functor[F[_]: Functor] = Functor[StreamT[F, *]]
+    def bind[F[_]: Functor] = Bind[StreamT[F, *]]
+    def plus[F[_]: Functor] = Plus[StreamT[F, *]]
+    def monad[F[_]: Applicative] = Monad[StreamT[F, *]]
+    def monadPlus[F[_]: Applicative] = MonadPlus[StreamT[F, *]]
+    def foldable[F[_]: Foldable] = Foldable[StreamT[F, *]]
 
     // checking absence of ambiguity
     def semigroup[F[_]: Applicative, A] = Semigroup[StreamT[F, A]]
-    def functor[F[_]: Applicative] = Functor[StreamT[F, ?]]
-    def bind[F[_]: Applicative] = Bind[StreamT[F, ?]]
-    def plus[F[_]: Applicative] = Plus[StreamT[F, ?]]
+    def functor[F[_]: Applicative] = Functor[StreamT[F, *]]
+    def bind[F[_]: Applicative] = Bind[StreamT[F, *]]
+    def plus[F[_]: Applicative] = Plus[StreamT[F, *]]
   }
 }
