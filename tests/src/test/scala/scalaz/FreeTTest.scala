@@ -135,28 +135,28 @@ object FreeTTest extends SpecLite {
 
   private def compilationTest = {
     val a: String \/ Int = \/-(42)
-    val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
+    val b: FreeT[Maybe, String \/ *, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
   }
 
   object instances {
-    def bind[S[_]: Functor, F[_]: Applicative] = Bind[FreeT[S, F, ?]]
-    def foldable[S[_]: Foldable: Functor, F[_]: Foldable: Applicative: BindRec] = Foldable[FreeT[S, F, ?]]
-    def traverse[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Traverse[FreeT[S, F, ?]]
-    def monad[S[_]: Functor, F[_]: Applicative] = Monad[FreeT[S, F, ?]]
-    def monadError[S[_]: Functor, F[_]: BindRec, E](implicit F: MonadError[F, E]) = MonadError[FreeT[S, F, ?], E]
-    def monadState[S[_]: Functor, F[_], E](implicit F: MonadState[F, E]) = MonadState[FreeT[S, F, ?], E]
-    def monadReader[S[_]: Functor, F[_], E](implicit F: MonadReader[F, E]) = MonadReader[FreeT[S, F, ?], E]
-    def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, ?], E]
-    def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, ?]]
-    def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, ?]]
-    def alt[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Alt[FreeT[S, F, ?]]
-    def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, ?[_], ?]]
+    def bind[S[_]: Functor, F[_]: Applicative] = Bind[FreeT[S, F, *]]
+    def foldable[S[_]: Foldable: Functor, F[_]: Foldable: Applicative: BindRec] = Foldable[FreeT[S, F, *]]
+    def traverse[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Traverse[FreeT[S, F, *]]
+    def monad[S[_]: Functor, F[_]: Applicative] = Monad[FreeT[S, F, *]]
+    def monadError[S[_]: Functor, F[_]: BindRec, E](implicit F: MonadError[F, E]) = MonadError[FreeT[S, F, *], E]
+    def monadState[S[_]: Functor, F[_], E](implicit F: MonadState[F, E]) = MonadState[FreeT[S, F, *], E]
+    def monadReader[S[_]: Functor, F[_], E](implicit F: MonadReader[F, E]) = MonadReader[FreeT[S, F, *], E]
+    def monadTell[S[_]: Functor, F[_], E](implicit F: MonadTell[F, E]) = MonadTell[FreeT[S, F, *], E]
+    def plus[S[_]: Functor, F[_]: Applicative: BindRec: Plus] = Plus[FreeT[S, F, *]]
+    def monadPlus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = MonadPlus[FreeT[S, F, *]]
+    def alt[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Alt[FreeT[S, F, *]]
+    def monadTrans[S[_]: Functor] = MonadTrans[FreeT[S, *[_], *]]
 
     // checking absence of ambiguity
-    def functor[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Functor[FreeT[S, F, ?]]
-    def foldable[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Foldable[FreeT[S, F, ?]]
-    def monad[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Monad[FreeT[S, F, ?]]
-    def plus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Plus[FreeT[S, F, ?]]
+    def functor[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Functor[FreeT[S, F, *]]
+    def foldable[S[_]: Traverse, F[_]: Traverse: Applicative: BindRec] = Foldable[FreeT[S, F, *]]
+    def monad[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Monad[FreeT[S, F, *]]
+    def plus[S[_]: Functor, F[_]: ApplicativePlus: BindRec] = Plus[FreeT[S, F, *]]
 
     object issue_1308 {
       type G[A] = State[Byte, A]

@@ -22,20 +22,20 @@ object UnwriterTTest extends SpecLite {
   private[this] implicit def unwriterCogen[W: Cogen, A: Cogen]: Cogen[Unwriter[W, A]] =
     Cogen[(W, A)].contramap(_.run)
 
-  checkAll(comonad.laws[Unwriter[Int, ?]])
+  checkAll(comonad.laws[Unwriter[Int, *]])
 
   object instances {
     def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) = Equal[UnwriterT[F, W, A]]
-    def functor[F[_]: Functor, W] = Functor[UnwriterT[F, W, ?]]
-    def apply[F[_]: Apply, W] = Apply[UnwriterT[F, W, ?]]
-    def bind[F[_]: Bind, W] = Bind[UnwriterT[F, W, ?]]
-    def bifunctor[F[_]: Functor] = Bifunctor[UnwriterT[F, ?, ?]]
-    def bitraverse[F[_]: Traverse] = Bitraverse[UnwriterT[F, ?, ?]]
-    def foldable[F[_]: Foldable, W] = Foldable[UnwriterT[F, W, ?]]
-    def traverse[F[_]: Traverse, W] = Traverse[UnwriterT[F, W, ?]]
+    def functor[F[_]: Functor, W] = Functor[UnwriterT[F, W, *]]
+    def apply[F[_]: Apply, W] = Apply[UnwriterT[F, W, *]]
+    def bind[F[_]: Bind, W] = Bind[UnwriterT[F, W, *]]
+    def bifunctor[F[_]: Functor] = Bifunctor[UnwriterT[F, *, *]]
+    def bitraverse[F[_]: Traverse] = Bitraverse[UnwriterT[F, *, *]]
+    def foldable[F[_]: Foldable, W] = Foldable[UnwriterT[F, W, *]]
+    def traverse[F[_]: Traverse, W] = Traverse[UnwriterT[F, W, *]]
 
     object Unwriter {
-      def comonad[W] = Comonad[Unwriter[W, ?]]
+      def comonad[W] = Comonad[Unwriter[W, *]]
     }
   }
 }

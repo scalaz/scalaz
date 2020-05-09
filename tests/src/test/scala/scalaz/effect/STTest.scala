@@ -5,7 +5,7 @@ import std.AllInstances._
 import ST._
 
 object STTest extends SpecLite {
-  type ForallST[A] = Forall[ST[?, A]]
+  type ForallST[A] = Forall[ST[*, A]]
 
   "STArray#fill" in {
     val xs = STArray(3, "a")

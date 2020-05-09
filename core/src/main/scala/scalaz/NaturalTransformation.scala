@@ -29,15 +29,15 @@ trait NaturalTransformation[F[_], G[_]] {
     * The current NaturalTransformation will be used to transform the Left (`F`) value of
     * the [[scalaz.Coproduct]] while the other one will be used to transform the Right (`H`) value.
     */
-  def or[H[_]](hg: H ~> G): Coproduct[F, H, ?] ~> G =
-    λ[Coproduct[F, H, ?] ~> G](_.fold(self, hg))
+  def or[H[_]](hg: H ~> G): Coproduct[F, H, *] ~> G =
+    λ[Coproduct[F, H, *] ~> G](_.fold(self, hg))
 
   import LiskovF._
 
   def widen[GG[_]](implicit ev: GG >~~> G): F ~> GG =
-    ev.substCo[F ~> ?[_]](this)
+    ev.substCo[F ~> *[_]](this)
   def narrow[FF[_]](implicit ev: FF <~~< F): FF ~> G =
-    ev.substCt[?[_] ~> G](this)
+    ev.substCt[*[_] ~> G](this)
 }
 
 trait NaturalTransformations {
@@ -60,8 +60,8 @@ object NaturalTransformation extends NaturalTransformations {
    * Construct a natural transformation over a coproduct from its parts.
    * Useful for combining Free interpreters.
    */
-  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, ?] ~> G =
-    λ[Coproduct[F, H, ?] ~> G](_.fold(fg, hg))
+  def or[F[_], G[_], H[_]](fg: F ~> G, hg: H ~> G): Coproduct[F, H, *] ~> G =
+    λ[Coproduct[F, H, *] ~> G](_.fold(fg, hg))
 
   /**
    * Like Hoist, for Functors, when we already know how to transform `F ~> G`.

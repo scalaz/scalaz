@@ -180,7 +180,7 @@ trait VectorFunctions {
       Monad[M].point(empty)
     else {
       val stateP = (i: A) => StateT[A, M, Boolean](s => Monad[M].map(p(s, i))(i ->))
-      Monad[M].bind(spanM[A, StateT[A, M, ?]](as.tail)(stateP).eval(as.head)) {
+      Monad[M].bind(spanM[A, StateT[A, M, *]](as.tail)(stateP).eval(as.head)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))((g: Vector[Vector[A]]) => (as.head +: x) +: g)
       }

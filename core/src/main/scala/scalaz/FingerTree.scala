@@ -412,24 +412,24 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   def isEmpty: Boolean = fold(true, (v, x) => false, (v, pr, m, sf) => false)
 
-  def viewl: ViewL[FingerTree[V, ?], A] =
+  def viewl: ViewL[FingerTree[V, *], A] =
     fold(
-      EmptyL[FingerTree[V, ?], A],
-      (v, x) => OnL[FingerTree[V, ?], A](x, empty[V, A]),
+      EmptyL[FingerTree[V, *], A],
+      (v, x) => OnL[FingerTree[V, *], A](x, empty[V, A]),
       (v, pr, m, sf) =>
         pr match {
-          case One(v, x) => OnL[FingerTree[V, ?], A](x, rotL(m, sf))
-          case _ => OnL[FingerTree[V, ?], A](pr.lhead, deep(pr.ltail, m, sf))
+          case One(v, x) => OnL[FingerTree[V, *], A](x, rotL(m, sf))
+          case _ => OnL[FingerTree[V, *], A](pr.lhead, deep(pr.ltail, m, sf))
         })
 
-  def viewr: ViewR[FingerTree[V, ?], A] =
+  def viewr: ViewR[FingerTree[V, *], A] =
     fold(
-      EmptyR[FingerTree[V, ?], A],
-      (v, x) => OnR[FingerTree[V, ?], A](empty[V, A], x),
+      EmptyR[FingerTree[V, *], A],
+      (v, x) => OnR[FingerTree[V, *], A](empty[V, A], x),
       (v, pr, m, sf) =>
         sf match {
-          case One(v, x) => OnR[FingerTree[V, ?], A](rotR(pr, m), x)
-          case _ => OnR[FingerTree[V, ?], A](deep(pr, m, sf.rtail), sf.rhead)
+          case One(v, x) => OnR[FingerTree[V, *], A](rotR(pr, m), x)
+          case _ => OnR[FingerTree[V, *], A](deep(pr, m, sf.rtail), sf.rhead)
         })
 
   /**
@@ -538,7 +538,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   def toIList: IList[A] = to[IList]
 
   /** Convert the leaves of the tree to an `M` */
-  def reduceTo[M: Reducer[A, ?]: Monoid]: M = map[A, M](x => x).measure.getOrElse(Monoid[M].zero)
+  def reduceTo[M: Reducer[A, *]: Monoid]: M = map[A, M](x => x).measure.getOrElse(Monoid[M].zero)
 
   /** Convert the leaves of the tree to an `F[A]` */
   def to[F[_]](implicit R: Reducer[A, F[A]], M: Monoid[F[A]]): F[A] = reduceTo[F[A]]
@@ -554,20 +554,20 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 sealed abstract class FingerTreeInstances {
   import FingerTree._
 
-  implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[ViewL[S, ?]] =
-    new Functor[ViewL[S, ?]] {
+  implicit def viewLFunctor[S[_]](implicit s: Functor[S]): Functor[ViewL[S, *]] =
+    new Functor[ViewL[S, *]] {
       def map[A, B](t: ViewL[S, A])(f: A => B): ViewL[S, B] =
         t.fold(EmptyL[S, B], (x, xs) => OnL(f(x), s.map(xs)(f))) //TODO define syntax for &: and :&
     }
 
-  implicit def viewRFunctor[S[_]](implicit s: Functor[S]): Functor[ViewR[S, ?]] =
-    new Functor[ViewR[S, ?]] {
+  implicit def viewRFunctor[S[_]](implicit s: Functor[S]): Functor[ViewR[S, *]] =
+    new Functor[ViewR[S, *]] {
       def map[A, B](t: ViewR[S, A])(f: A => B): ViewR[S, B] =
         t.fold(EmptyR[S, B], (xs, x) => OnR(s.map(xs)(f), f(x)))
     }
 
-  implicit def fingerFoldable[V]: Foldable[Finger[V, ?]] =
-    new Foldable[Finger[V, ?]] with Foldable.FromFoldMap[Finger[V, ?]] {
+  implicit def fingerFoldable[V]: Foldable[Finger[V, *]] =
+    new Foldable[Finger[V, *]] with Foldable.FromFoldMap[Finger[V, *]] {
       override def foldMap[A, M: Monoid](v: Finger[V, A])(f: A => M) = v.foldMap(f)
     }
 
@@ -579,15 +579,15 @@ sealed abstract class FingerTreeInstances {
             (v, _, _) => v,
             (v, _, _, _) => v))
 
-  implicit def nodeFoldable[V]: Foldable[Node[V, ?]] =
-    new Foldable[Node[V, ?]] {
+  implicit def nodeFoldable[V]: Foldable[Node[V, *]] =
+    new Foldable[Node[V, *]] {
       def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
       def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
          foldMap(v)((a: A) => Endo.endoByName[B](f(a, _))) apply z
     }
 
-  implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, ?]] =
-    new Foldable[FingerTree[V, ?]] {
+  implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, *]] =
+    new Foldable[FingerTree[V, *]] {
       override def foldLeft[A, B](t: FingerTree[V, A], b: B)(f: (B, A) => B) = t.foldLeft(b)(f)
 
       def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t foldMap(f)
@@ -595,7 +595,7 @@ sealed abstract class FingerTreeInstances {
       override def foldRight[A, B](t: FingerTree[V, A], z: => B)(f: (A, => B) => B) = t.foldRight(z)(f)
     }
 
-  implicit def fingerTreeMonoid[V: Reducer[A, ?], A]: Monoid[FingerTree[V, A]] =
+  implicit def fingerTreeMonoid[V: Reducer[A, *], A]: Monoid[FingerTree[V, A]] =
     new Monoid[FingerTree[V, A]] {
       def append(f1: FingerTree[V, A], f2: => FingerTree[V, A]) = f1 <++> f2
       def zero = empty
@@ -609,7 +609,7 @@ sealed abstract class FingerTreeInstances {
       override def show(t: FingerTree[V,A]) = t.fold(
         empty = cord"[]",
         single = (v, x) => cord"$v [$x]",
-        deep = (v, pf, m, sf) => cord"$v [${AS.show(pf.toList)}, ?, ${AS.show(sf.toList)}]"
+        deep = (v, pf, m, sf) => cord"$v [${AS.show(pf.toList)}, *, ${AS.show(sf.toList)}]"
       )
     }
 
@@ -623,14 +623,14 @@ sealed abstract class FingerTreeInstances {
 
 object FingerTree extends FingerTreeInstances {
 
-  def Node2[V: Reducer[A, ?], A](v: V, a1: => A, a2: => A): Node[V, A] =
+  def Node2[V: Reducer[A, *], A](v: V, a1: => A, a2: => A): Node[V, A] =
     new Node[V, A] {
       def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
         two(v, a1, a2)
       val measure = v
     }
 
-  def Node3[V: Reducer[A, ?], A](v: V, a1: => A, a2: => A, a3: => A): Node[V, A] =
+  def Node3[V: Reducer[A, *], A](v: V, a1: => A, a2: => A, a3: => A): Node[V, A] =
     new Node[V, A] {
       def fold[B](two: (V, => A, => A) => B, three: (V, => A, => A, => A) => B) =
         three(v, a1, a2, a3)
@@ -685,7 +685,7 @@ object FingerTree extends FingerTreeInstances {
 
   def single[V, A](a: A)(implicit ms: Reducer[A, V]): FingerTree[V, A] = single(ms.unit(a), a)
 
-  def single[V: Reducer[A, ?], A](v: V, a: => A): FingerTree[V, A] =
+  def single[V: Reducer[A, *], A](v: V, a: => A): FingerTree[V, A] =
     new FingerTree[V, A] {
       def fold[B](b: => B, s: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B = s(v, a)
     }
@@ -696,20 +696,20 @@ object FingerTree extends FingerTreeInstances {
     deep(measure.snoc(mappendVal(measure.unit(pr), m), sf), pr, m, sf)
   }
 
-  def deep[V: Reducer[A, ?], A](v: V, pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A]): FingerTree[V, A] =
+  def deep[V: Reducer[A, *], A](v: V, pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A]): FingerTree[V, A] =
     new FingerTree[V, A] {
       private[this] val mz = Need(m)
       def fold[B](b: => B, f: (V, A) => B, d: (V, Finger[V, A], => FingerTree[V, Node[V, A]], Finger[V, A]) => B): B =
         d(v, pr, mz.value, sf)
     }
 
-  def deepL[V: Reducer[A, ?], A](mpr: Option[Finger[V, A]], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A]): FingerTree[V, A] =
+  def deepL[V: Reducer[A, *], A](mpr: Option[Finger[V, A]], m: => FingerTree[V, Node[V, A]], sf: Finger[V, A]): FingerTree[V, A] =
     mpr match {
       case None => rotL(m, sf)
       case Some(pr) => deep(pr, m, sf)
     }
 
-  def deepR[V: Reducer[A, ?], A](pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], msf: Option[Finger[V, A]]): FingerTree[V, A] =
+  def deepR[V: Reducer[A, *], A](pr: Finger[V, A], m: => FingerTree[V, Node[V, A]], msf: Option[Finger[V, A]]): FingerTree[V, A] =
     msf match {
       case None => rotR(pr, m)
       case Some(sf) => deep(pr, m, sf)
@@ -780,7 +780,7 @@ object FingerTree extends FingerTreeInstances {
 
     def toTree: FingerTree[V, A]
 
-    def map[B, V2: Reducer[B, ?]](f: A => B): Finger[V2, B]
+    def map[B, V2: Reducer[B, *]](f: A => B): Finger[V2, B]
 
     /** Apply the given side effect to each element. */
     def foreach(f: A => Unit): Unit
@@ -819,7 +819,7 @@ object FingerTree extends FingerTreeInstances {
 
     def toTree = single(a1)
 
-    def map[B, V2: Reducer[B, ?]](f: A => B) = one(f(a1))
+    def map[B, V2: Reducer[B, *]](f: A => B) = one(f(a1))
 
     def foreach(f: A => Unit): Unit = {
       f(a1)
@@ -860,7 +860,7 @@ object FingerTree extends FingerTreeInstances {
       deep(v, one(a1), empty[V, Node[V, A]], one(a2))
     }
 
-    def map[B, V2: Reducer[B, ?]](f: A => B) = two(f(a1), f(a2))
+    def map[B, V2: Reducer[B, *]](f: A => B) = two(f(a1), f(a2))
 
     def foreach(f: A => Unit): Unit = {
       f(a1)
@@ -907,7 +907,7 @@ object FingerTree extends FingerTreeInstances {
       deep(v, two(a1, a2), empty[V, Node[V, A]], one(a3))
     }
 
-    def map[B, V2: Reducer[B, ?]](f: A => B) = three(f(a1), f(a2), f(a3))
+    def map[B, V2: Reducer[B, *]](f: A => B) = three(f(a1), f(a2), f(a3))
 
     def foreach(f: A => Unit): Unit = {
       f(a1)
@@ -960,7 +960,7 @@ object FingerTree extends FingerTreeInstances {
       deep(v, two(a1, a2), empty[V, Node[V, A]], two(a3, a4))
     }
 
-    def map[B, V2: Reducer[B, ?]](f: A => B) = four(f(a1), f(a2), f(a3), f(a4))
+    def map[B, V2: Reducer[B, *]](f: A => B) = four(f(a1), f(a2), f(a3), f(a4))
 
     def foreach(f: A => Unit): Unit = {
       f(a1)
@@ -1008,7 +1008,7 @@ object FingerTree extends FingerTreeInstances {
 
     val measure: V
 
-    def map[B, V2: Reducer[B, ?]](f: A => B): Node[V2, B] = fold(
+    def map[B, V2: Reducer[B, *]](f: A => B): Node[V2, B] = fold(
       (v, a1, a2) => node2(f(a1), f(a2)),
       (v, a1, a2, a3) => node3(f(a1), f(a2), f(a3)))
 
@@ -1102,9 +1102,9 @@ sealed abstract class IndSeqInstances {
     Equal.equalBy(_.self)
 
   implicit val indSeqInstance: MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] =
-    new MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, ?]]{
+    new MonadPlus[IndSeq] with Alt[IndSeq] with Traverse[IndSeq] with IsEmpty[IndSeq] with IsomorphismFoldable[IndSeq, FingerTree[Int, *]]{
       def G = implicitly
-      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, ?]](_.self)
+      override val naturalTrans = λ[IndSeq ~> FingerTree[Int, *]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
         implicit val r = UnitReducer((_: B) => 1)

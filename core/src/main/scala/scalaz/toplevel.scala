@@ -22,15 +22,15 @@ object Unwriter {
 
 object StateT extends StateTInstances with StateTFunctions {
   def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = IndexedStateT[S, S, F, A](f)
-  def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[StateT[S, ?[_], ?]].liftM(fa)
+  def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[StateT[S, *[_], *]].liftM(fa)
 
-  def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, ?] ~> StateT[S, G, ?] =
-    λ[StateT[S, F, ?] ~> StateT[S, G, ?]](st => StateT((s: S) => nat(st.run(s))))
+  def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, *] ~> StateT[S, G, *] =
+    λ[StateT[S, F, *] ~> StateT[S, G, *]](st => StateT((s: S) => nat(st.run(s))))
 
-  def get[F[_]: Monad, S]: StateT[S, F, S] = MonadState[StateT[S, F, ?], S].get
-  def gets[F[_]: Monad, S, A](f: S => A): StateT[S, F, A] = MonadState[StateT[S, F, ?], S].gets(f)
-  def put[F[_]: Monad, S](s: S): StateT[S, F, Unit] = MonadState[StateT[S, F, ?], S].put(s)
-  def modify[F[_]: Monad, S](f: S => S): StateT[S, F, Unit] = MonadState[StateT[S, F, ?], S].modify(f)
+  def get[F[_]: Monad, S]: StateT[S, F, S] = MonadState[StateT[S, F, *], S].get
+  def gets[F[_]: Monad, S, A](f: S => A): StateT[S, F, A] = MonadState[StateT[S, F, *], S].gets(f)
+  def put[F[_]: Monad, S](s: S): StateT[S, F, Unit] = MonadState[StateT[S, F, *], S].put(s)
+  def modify[F[_]: Monad, S](f: S => S): StateT[S, F, Unit] = MonadState[StateT[S, F, *], S].modify(f)
 }
 
 object IndexedState extends StateFunctions {
@@ -51,7 +51,7 @@ object State extends StateFunctions {
     )
 
   def hoist[F[_], G[_], S](nat: F ~> G): λ[α => State[S, F[α]]] ~> λ[α => State[S, G[α]]] =
-    NaturalTransformation.liftMap[F, G, State[S, ?]](nat)
+    NaturalTransformation.liftMap[F, G, State[S, *]](nat)
 }
 
 object StoreT extends StoreTInstances with StoreTFunctions {

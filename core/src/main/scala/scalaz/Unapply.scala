@@ -32,7 +32,7 @@ import Leibniz.refl
  *   import State.{State, stateMonad}
  *   val ls = List(1, 2, 3)
  *   val traverseOpt: Option[List[Int]] = ls.traverse(a => Some(a))
- *   val traverseState: State[Int, List[Int]] = ls.traverse[State[Int, ?], Int](a => State((x: Int) => (x + 1, a)))
+ *   val traverseState: State[Int, List[Int]] = ls.traverse[State[Int, *], Int](a => State((x: Int) => (x + 1, a)))
  * }
  *
  * // New usage
@@ -96,7 +96,7 @@ sealed abstract class Unapply_3 extends Unapply_4 {
 
 sealed abstract class Unapply_2 extends Unapply_3 {
   /**Unpack a value of type `M0[F[_], A0, B0]` into types `[a]M0[F, a, B0]` and `A0`, given an instance of `TC` */
-  implicit def unapplyMFAB1[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[M0[F, ?, B0]]): Unapply[TC, M0[F, A0, B0]] {
+  implicit def unapplyMFAB1[TC[_[_]], F[_], M0[F[_], _, _], A0, B0](implicit TC0: TC[M0[F, *, B0]]): Unapply[TC, M0[F, A0, B0]] {
     type M[X] = M0[F, X, B0]
     type A = A0
   } =
@@ -110,7 +110,7 @@ sealed abstract class Unapply_2 extends Unapply_3 {
 
 sealed abstract class Unapply_0 extends Unapply_2 {
   /**Unpack a value of type `M0[A0, B0]` into types `[a]M0[a, B0]` and `A0`, given an instance of `TC` */
-  implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[M0[?, B0]]): Unapply[TC, M0[A0, B0]] {
+  implicit def unapplyMAB1[TC[_[_]], M0[_, _], A0, B0](implicit TC0: TC[M0[*, B0]]): Unapply[TC, M0[A0, B0]] {
     type M[X] = M0[X, B0]
     type A = A0
   } =
@@ -192,7 +192,7 @@ object Unapply2 {
     }
 
   /**Unpack a value of type `M0[A0, F0, B0]` into types `M0`, `A`, `F0`, and 'B', given an instance of `TC` */
-  implicit def unapplyMAFB[TC[_[_, _]], M0[_, _[_], _], A0, F0[_], B0](implicit TC0: TC[M0[?, F0, ?]]): Unapply2[TC, M0[A0, F0, B0]] {
+  implicit def unapplyMAFB[TC[_[_, _]], M0[_, _[_], _], A0, F0[_], B0](implicit TC0: TC[M0[*, F0, *]]): Unapply2[TC, M0[A0, F0, B0]] {
     type M[X, Y] = M0[X, F0, Y]
     type A = A0
     type B = B0
@@ -224,13 +224,13 @@ object Unapply21 {
     type B = U.B
   } = U
 
-  implicit def unapply210MFABC[TC[_[_, _], _], F[_,_], M0[_[_], _, _], A0, B0, C](implicit TC0: TC[λ[(α, β) => M0[F[α, ?], C, β]], A0]): Unapply21[TC, M0[F[A0, ?], C, B0]]{
-    type M[X, Y] = M0[F[X, ?], C, Y]
+  implicit def unapply210MFABC[TC[_[_, _], _], F[_,_], M0[_[_], _, _], A0, B0, C](implicit TC0: TC[λ[(α, β) => M0[F[α, *], C, β]], A0]): Unapply21[TC, M0[F[A0, *], C, B0]]{
+    type M[X, Y] = M0[F[X, *], C, Y]
     type A = A0
     type B = B0
   } =
-    new Unapply21[TC, M0[F[A0, ?], C, B0]]{
-      type M[X, Y] = M0[F[X, ?], C, Y]
+    new Unapply21[TC, M0[F[A0, *], C, B0]]{
+      type M[X, Y] = M0[F[X, *], C, Y]
       type A = A0
       type B = B0
 

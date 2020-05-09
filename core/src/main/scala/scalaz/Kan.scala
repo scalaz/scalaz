@@ -15,8 +15,8 @@ trait Ran[G[_], H[_], A] { ran =>
 object Ran {
   import Id._
 
-  implicit def ranFunctor[G[_], H[_]]: Functor[Ran[G, H, ?]] =
-    new Functor[Ran[G, H, ?]] {
+  implicit def ranFunctor[G[_], H[_]]: Functor[Ran[G, H, *]] =
+    new Functor[Ran[G, H, *]] {
       def map[A,B](r: Ran[G, H, A])(f: A => B) = r map f
     }
 
@@ -35,7 +35,7 @@ object Ran {
   /**
    * `toRan` and `fromRan` witness an adjunction from `Compose[G,_,_]` to `Ran[G,_,_]`.
    */
-  def fromRan[G[_], H[_], K[_], B](k: K[G[B]])(s: K ~> Ran[G, H, ?]): H[B] =
+  def fromRan[G[_], H[_], K[_], B](k: K[G[B]])(s: K ~> Ran[G, H, *]): H[B] =
     s(k)(x => x)
 
   def adjointToRan[F[_], G[_], A](f: F[A])(implicit A: Adjunction[F, G]): Ran[G, Id, A] =
@@ -92,8 +92,8 @@ trait Lan[G[_], H[_], A] { lan =>
 object Lan extends LanInstances {
   import Id._
 
-  implicit def lanApplicative[G[_]:Functor, H[_]:Applicative]: Applicative[Lan[G, H, ?]] =
-    new Applicative[Lan[G, H, ?]] with LanApply[G, H] {
+  implicit def lanApplicative[G[_]:Functor, H[_]:Applicative]: Applicative[Lan[G, H, *]] =
+    new Applicative[Lan[G, H, *]] with LanApply[G, H] {
       def G = implicitly
       def H = implicitly
       def point[A](a: => A) = new Lan[G,H,A] {
@@ -106,7 +106,7 @@ object Lan extends LanInstances {
   /**
    * `fromLan` and `toLan` witness an adjunction from `Lan[G,_,_]` to `Compose[G,_,_]`:
    */
-  def fromLan[F[_], G[_], H[_], B](h: H[B])(s: Lan[G, H, ?] ~> F): F[G[B]] =
+  def fromLan[F[_], G[_], H[_], B](h: H[B])(s: Lan[G, H, *] ~> F): F[G[B]] =
     s(glan(h))
 
   /** The natural transformation that defines a left Kan extension */
@@ -136,23 +136,23 @@ object Lan extends LanInstances {
 }
 
 sealed abstract class LanInstances0 {
-  implicit def lanFunctor[F[_], G[_]]: Functor[Lan[F, G, ?]] =
+  implicit def lanFunctor[F[_], G[_]]: Functor[Lan[F, G, *]] =
     new LanFunctor[F, G] { }
 }
 
 sealed abstract class LanInstances extends LanInstances0 {
-  implicit def lanApply[F[_]: Functor, G[_]: Apply]: Apply[Lan[F, G, ?]] =
+  implicit def lanApply[F[_]: Functor, G[_]: Apply]: Apply[Lan[F, G, *]] =
     new LanApply[F, G] {
       def G = implicitly
       def H = implicitly
     }
 }
 
-private trait LanFunctor[G[_], H[_]] extends Functor[Lan[G, H, ?]] {
+private trait LanFunctor[G[_], H[_]] extends Functor[Lan[G, H, *]] {
   override final def map[A, B](lan: Lan[G, H, A])(g: A => B) = lan map g
 }
 
-private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, ?]] with LanFunctor[G, H] {
+private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, *]] with LanFunctor[G, H] {
   def G: Functor[G]
   def H: Apply[H]
 

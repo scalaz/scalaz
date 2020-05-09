@@ -515,8 +515,8 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
     new ${typeClassName}Ops[F0.M, F0.A, F0.B](F0(v))(F0.TC)
 """
         val ToVKleisli =
-  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): ${typeClassName}Ops[F[G, ?, ?], A, B] =
-    new ${typeClassName}Ops[F[G, ?, ?], A, B](v)(F0)
+  s"""implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): ${typeClassName}Ops[F[G, *, *], A, B] =
+    new ${typeClassName}Ops[F[G, *, *], A, B](v)(F0)
 """
        val ToVFAB =
   s"""implicit def To${typeClassName}Ops[F[_, _],A, B](v: F[A, B])(implicit F0: TC[F]): ${typeClassName}Ops[F, A, B] =

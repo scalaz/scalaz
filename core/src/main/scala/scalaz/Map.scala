@@ -1034,8 +1034,8 @@ sealed abstract class MapInstances1 extends MapInstances2 {
 
 sealed abstract class MapInstances0 extends MapInstances1 {
 
-  implicit def scalazMapInstance[S: Order]: Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] =
-    new Bind[S ==>> ?] with Align[S ==>> ?] with Zip[S ==>> ?] {
+  implicit def scalazMapInstance[S: Order]: Bind[S ==>> *] with Align[S ==>> *] with Zip[S ==>> *] =
+    new Bind[S ==>> *] with Align[S ==>> *] with Zip[S ==>> *] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
         fa map f
 
@@ -1073,7 +1073,7 @@ sealed abstract class MapInstances0 extends MapInstances1 {
         else a0.intersectionWith(b)(Tuple2.apply)
       }
 
-      override def zipWith[A, B, C](a: => (S ==>> A), b: => (S ==>> B))(f: (A, B) => C)(implicit F: Functor[S ==>> ?]) = {
+      override def zipWith[A, B, C](a: => (S ==>> A), b: => (S ==>> B))(f: (A, B) => C)(implicit F: Functor[S ==>> *]) = {
         val a0 = a
         if(a0.isEmpty) ==>>.empty
         else a0.intersectionWith(b)(f)
@@ -1109,8 +1109,8 @@ sealed abstract class MapInstances extends MapInstances0 {
     Tag.subst(Semigroup.instance((l, r) =>
       (l intersectionWith r)(B.append(_, _))))
 
-  implicit def mapCovariant[S]: Traverse[S ==>> ?] =
-    new Traverse[S ==>> ?] {
+  implicit def mapCovariant[S]: Traverse[S ==>> *] =
+    new Traverse[S ==>> *] {
       override def findLeft[A](fa: S ==>> A)(f: A => Boolean): Option[A] =
         fa match {
           case Bin(_, x, l, r) =>

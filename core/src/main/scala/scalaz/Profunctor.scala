@@ -17,7 +17,7 @@ trait Profunctor[=>:[_, _]]  { self =>
   def dimap[A, B, C, D](fab: (A =>: B))(f: C => A)(g: B => D): (C =>: D) =
     mapsnd(mapfst(fab)(f))(g)
 
-  protected[this] trait SndCovariant[C] extends Functor[C =>: ?] {
+  protected[this] trait SndCovariant[C] extends Functor[C =>: *] {
     override def map[A, B](fa: C =>: A)(f: A => B) = mapsnd(fa)(f)
   }
 
@@ -27,11 +27,11 @@ trait Profunctor[=>:[_, _]]  { self =>
         mapsnd(mapfst(ma)(g))(f)
     }
 
-  def covariantInstance[C]: Functor[C =>: ?] =
+  def covariantInstance[C]: Functor[C =>: *] =
     new SndCovariant[C]{}
 
-  def contravariantInstance[C]: Contravariant[? =>: C] =
-    new Contravariant[? =>: C] {
+  def contravariantInstance[C]: Contravariant[* =>: C] =
+    new Contravariant[* =>: C] {
       def contramap[A, B](fa: A =>: C)(f: B => A): (B =>: C) =
         mapfst(fa)(f)
     }
@@ -71,30 +71,30 @@ object Profunctor {
   type DownStar[F[_], D, C] = (F[D] => C) @@ DownStarF
   val DownStar = Tag.of[DownStarF]
 
-  implicit def upStarProfunctor[F[_]: Functor]: Profunctor[UpStar[F, ?, ?]] =
-    new Profunctor[UpStar[F, ?, ?]] {
+  implicit def upStarProfunctor[F[_]: Functor]: Profunctor[UpStar[F, *, *]] =
+    new Profunctor[UpStar[F, *, *]] {
       def mapfst[A, B, C](h: UpStar[F, A, B])(f: C => A): UpStar[F, C, B] =
         UpStar(Tag unwrap h compose f)
       def mapsnd[A, B, C](h: UpStar[F, A, B])(f: B => C): UpStar[F, A, C] =
         UpStar(a => Functor[F].map(Tag.unwrap(h)(a))(f))
     }
 
-  implicit def downStarProfunctor[F[_]: Functor]: Profunctor[DownStar[F, ?, ?]] =
-    new Profunctor[DownStar[F, ?, ?]] {
+  implicit def downStarProfunctor[F[_]: Functor]: Profunctor[DownStar[F, *, *]] =
+    new Profunctor[DownStar[F, *, *]] {
       def mapfst[A, B, C](h: DownStar[F, A, B])(f: C => A): DownStar[F, C, B] =
         DownStar(fa => Tag.unwrap(h)(Functor[F].map(fa)(f)))
       def mapsnd[A, B, C](h: DownStar[F, A, B])(f: B => C): DownStar[F, A, C] =
         DownStar(f compose Tag.unwrap(h))
     }
 
-  implicit def upStarFunctor[F[_]: Functor, D]: Functor[UpStar[F, D, ?]] =
-    new Functor[UpStar[F, D, ?]] {
+  implicit def upStarFunctor[F[_]: Functor, D]: Functor[UpStar[F, D, *]] =
+    new Functor[UpStar[F, D, *]] {
       def map[A, B](m: UpStar[F, D, A])(f: A => B) =
         upStarProfunctor[F].mapsnd(m)(f)
     }
 
-  implicit def downStarFunctor[F[_], D]: Functor[DownStar[F, D, ?]] =
-    new Functor[DownStar[F, D, ?]] {
+  implicit def downStarFunctor[F[_], D]: Functor[DownStar[F, D, *]] =
+    new Functor[DownStar[F, D, *]] {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
         DownStar(k compose Tag.unwrap(f))
     }

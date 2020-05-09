@@ -114,14 +114,14 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 //
 
 sealed abstract class OptionTInstances3 {
-  implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[OptionT[F, ?]] =
+  implicit def optionTFunctor[F[_]](implicit F0: Functor[F]): Functor[OptionT[F, *]] =
     new OptionTFunctor[F] {
       implicit def F: Functor[F] = F0
     }
 }
 
 sealed abstract class OptionTInstances2 extends OptionTInstances3 {
-  implicit def optionTBindRec[F[_]](implicit F0: Monad[F], B0: BindRec[F]): BindRec[OptionT[F, ?]] =
+  implicit def optionTBindRec[F[_]](implicit F0: Monad[F], B0: BindRec[F]): BindRec[OptionT[F, *]] =
     new OptionTBindRec[F] {
       implicit def F = F0
       implicit def B = B0
@@ -129,18 +129,18 @@ sealed abstract class OptionTInstances2 extends OptionTInstances3 {
 }
 
 sealed abstract class OptionTInstances1 extends OptionTInstances2 {
-  implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[OptionT[F, ?]] =
+  implicit def optionTFoldable[F[_]](implicit F0: Foldable[F]): Foldable[OptionT[F, *]] =
     new OptionTFoldable[F] {
       implicit def F: Foldable[F] = F0
     }
 
-  implicit def optionTMonadError[F[_], E](implicit F0: MonadError[F, E]): MonadError[OptionT[F, ?], E] =
+  implicit def optionTMonadError[F[_], E](implicit F0: MonadError[F, E]): MonadError[OptionT[F, *], E] =
     new OptionTMonadError[F, E] {
       def F = F0
     }
 
-  implicit def optionTAlt[F[_]](implicit F0: Monad[F]): Alt[OptionT[F, ?]] =
-    new Alt[OptionT[F, ?]] with OptionTApply[F] with OptionTPoint[F] {
+  implicit def optionTAlt[F[_]](implicit F0: Monad[F]): Alt[OptionT[F, *]] =
+    new Alt[OptionT[F, *]] with OptionTApply[F] with OptionTPoint[F] {
       def F = F0
 
       def alt[A](a: => OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
@@ -148,7 +148,7 @@ sealed abstract class OptionTInstances1 extends OptionTInstances2 {
 }
 
 sealed abstract class OptionTInstances0 extends OptionTInstances1 {
-  implicit def optionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[OptionT[F, ?]] =
+  implicit def optionTMonadPlus[F[_]](implicit F0: Monad[F]): MonadPlus[OptionT[F, *]] =
     new OptionTMonadPlus[F] {
       implicit def F: Monad[F] = F0
     }
@@ -157,7 +157,7 @@ sealed abstract class OptionTInstances0 extends OptionTInstances1 {
 sealed abstract class OptionTInstances extends OptionTInstances0 {
   implicit val optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
 
-  implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[OptionT[F, ?]] =
+  implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[OptionT[F, *]] =
     new OptionTTraverse[F] {
       implicit def F: Traverse[F] = F0
     }
@@ -168,15 +168,15 @@ sealed abstract class OptionTInstances extends OptionTInstances0 {
   implicit def optionTShow[F[_], A](implicit F0: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     Contravariant[Show].contramap(F0)(_.run)
 
-  implicit def optionTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[OptionT[F, ?]] =
+  implicit def optionTDecidable[F[_]](implicit F0: Divisible[F]): Decidable[OptionT[F, *]] =
     new OptionTDecidable[F] {
       implicit def F: Divisible[F] = F0
     }
 }
 
 object OptionT extends OptionTInstances {
-  def optionT[M[_]]: λ[α => M[Option[α]]] ~> OptionT[M, ?] =
-    λ[λ[α => M[Option[α]]] ~> OptionT[M, ?]](
+  def optionT[M[_]]: λ[α => M[Option[α]]] ~> OptionT[M, *] =
+    λ[λ[α => M[Option[α]]] ~> OptionT[M, *]](
       new OptionT(_)
     )
 
@@ -186,12 +186,12 @@ object OptionT extends OptionTInstances {
   def none[M[_], A](implicit M: Applicative[M]): OptionT[M, A] =
     OptionT.optionT[M].apply[A](M.point(None))
 
-  def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): MonadTell[OptionT[F, ?], W] =
+  def monadTell[F[_], W, A](implicit MT0: MonadTell[F, W]): MonadTell[OptionT[F, *], W] =
     new OptionTMonadTell[F, W] {
       def MT = MT0
     }
 
-  def monadListen[F[_], W, A](implicit ML0: MonadListen[F, W]): MonadListen[OptionT[F, ?], W] =
+  def monadListen[F[_], W, A](implicit ML0: MonadListen[F, W]): MonadListen[OptionT[F, *], W] =
     new OptionTMonadListen[F, W] {
       def MT = ML0
     }
@@ -201,7 +201,7 @@ object OptionT extends OptionTInstances {
 // Implementation traits for type class instances
 //
 
-private trait OptionTDecidable[F[_]] extends Decidable[OptionT[F, ?]] {
+private trait OptionTDecidable[F[_]] extends Decidable[OptionT[F, *]] {
   implicit def F: Divisible[F]
 
   override final def conquer[A]: OptionT[F, A] = OptionT(F.conquer)
@@ -218,13 +218,13 @@ private trait OptionTDecidable[F[_]] extends Decidable[OptionT[F, ?]] {
     )
 }
 
-private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
+private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, *]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] = fa map f
 }
 
-private trait OptionTApply[F[_]] extends Apply[OptionT[F, ?]] with OptionTFunctor[F]{
+private trait OptionTApply[F[_]] extends Apply[OptionT[F, *]] with OptionTFunctor[F]{
   implicit def F: Monad[F]
 
   override final def ap[A, B](fa: => OptionT[F, A])(f: => OptionT[F, A => B]): OptionT[F, B] = fa ap f
@@ -236,13 +236,13 @@ private trait OptionTPoint[F[_]] {
   def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
-private trait OptionTBind[F[_]] extends Bind[OptionT[F, ?]] with OptionTFunctor[F]{
+private trait OptionTBind[F[_]] extends Bind[OptionT[F, *]] with OptionTFunctor[F]{
   implicit def F: Monad[F]
 
   final def bind[A, B](fa: OptionT[F, A])(f: A => OptionT[F, B]): OptionT[F, B] = fa flatMap f
 }
 
-private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBind[F] {
+private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, *]] with OptionTBind[F] {
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
@@ -254,11 +254,11 @@ private trait OptionTBindRec[F[_]] extends BindRec[OptionT[F, ?]] with OptionTBi
     )
 }
 
-private trait OptionTMonad[F[_]] extends Monad[OptionT[F, ?]] with OptionTBind[F] with OptionTPoint[F] {
+private trait OptionTMonad[F[_]] extends Monad[OptionT[F, *]] with OptionTBind[F] with OptionTPoint[F] {
   implicit def F: Monad[F]
 }
 
-private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, ?], E] with OptionTMonad[F] {
+private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, *], E] with OptionTMonad[F] {
   override def F: MonadError[F, E]
 
   override def raiseError[A](e: E) =
@@ -268,13 +268,13 @@ private trait OptionTMonadError[F[_], E] extends MonadError[OptionT[F, ?], E] wi
     OptionT[F, A](F.handleError(fa.run)(f(_).run))
 }
 
-private trait OptionTFoldable[F[_]] extends Foldable.FromFoldr[OptionT[F, ?]] {
+private trait OptionTFoldable[F[_]] extends Foldable.FromFoldr[OptionT[F, *]] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: OptionT[F, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-private trait OptionTTraverse[F[_]] extends Traverse[OptionT[F, ?]] with OptionTFoldable[F] with OptionTFunctor[F]{
+private trait OptionTTraverse[F[_]] extends Traverse[OptionT[F, *]] with OptionTFoldable[F] with OptionTFunctor[F]{
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: A => G[B]): G[OptionT[F, B]] = fa traverse f
@@ -285,19 +285,19 @@ private trait OptionTHoist extends Hoist[OptionT] {
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    λ[OptionT[M, ?] ~> OptionT[N, ?]](_ mapT f.apply)
+    λ[OptionT[M, *] ~> OptionT[N, *]](_ mapT f.apply)
 
-  implicit def apply[G[_] : Monad]: Monad[OptionT[G, ?]] = OptionT.optionTMonadPlus[G]
+  implicit def apply[G[_] : Monad]: Monad[OptionT[G, *]] = OptionT.optionTMonadPlus[G]
 }
 
-private trait OptionTMonadPlus[F[_]] extends MonadPlus[OptionT[F, ?]] with OptionTMonad[F] {
+private trait OptionTMonadPlus[F[_]] extends MonadPlus[OptionT[F, *]] with OptionTMonad[F] {
   implicit def F: Monad[F]
 
   def empty[A]: OptionT[F, A] = OptionT(F point none[A])
   def plus[A](a: OptionT[F, A], b: => OptionT[F, A]): OptionT[F, A] = a orElse b
 }
 
-private trait OptionTMonadTell[F[_], W] extends MonadTell[OptionT[F, ?], W] with OptionTMonad[F] with OptionTHoist {
+private trait OptionTMonadTell[F[_], W] extends MonadTell[OptionT[F, *], W] with OptionTMonad[F] with OptionTHoist {
   def MT: MonadTell[F, W]
 
   implicit def F = MT
@@ -306,7 +306,7 @@ private trait OptionTMonadTell[F[_], W] extends MonadTell[OptionT[F, ?], W] with
     liftM[F, A](MT.writer(w, v))
 }
 
-private trait OptionTMonadListen[F[_], W] extends MonadListen[OptionT[F, ?], W] with OptionTMonadTell[F, W] {
+private trait OptionTMonadListen[F[_], W] extends MonadListen[OptionT[F, *], W] with OptionTMonadTell[F, W] {
   def MT: MonadListen[F, W]
 
   def listen[A](ma: OptionT[F, A]): OptionT[F, (A, W)] = {

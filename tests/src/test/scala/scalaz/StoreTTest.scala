@@ -19,7 +19,7 @@ object StoreTTest extends SpecLite {
         }
     }
 
-  checkAll(comonad.laws[StoreT[Tuple1, Int, ?]])
+  checkAll(comonad.laws[StoreT[Tuple1, Int, *]])
 
   checkAll {
     // Not sure why this is needed explicitly
@@ -27,19 +27,19 @@ object StoreTTest extends SpecLite {
     val af: Arbitrary[Int => Store[Int, Int]] = implicitly
     val ag: Arbitrary[Store[Int, Int => Int]] = implicitly
     val eq: Equal[Store[Int, Int]]            = implicitly
-    monad.laws[Store[Int, ?]](implicitly, am, af, ag, eq)
+    monad.laws[Store[Int, *]](implicitly, am, af, ag, eq)
   }
 
   object instances {
     type A = Int
-    def functor[F[_] : Functor] = Functor[StoreT[F, A, ?]]
-    def cobind[F[_] : Cobind] = Cobind[StoreT[F, A, ?]]
-    def comonad[F[_] : Comonad] = Comonad[StoreT[F, A, ?]]
+    def functor[F[_] : Functor] = Functor[StoreT[F, A, *]]
+    def cobind[F[_] : Cobind] = Cobind[StoreT[F, A, *]]
+    def comonad[F[_] : Comonad] = Comonad[StoreT[F, A, *]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Cobind] = Functor[StoreT[F, A, ?]]
-    def functor[F[_] : Comonad] = Functor[StoreT[F, A, ?]]
-    def cobind[F[_] : Comonad] = Cobind[StoreT[F, A, ?]]
+    def functor[F[_] : Cobind] = Functor[StoreT[F, A, *]]
+    def functor[F[_] : Comonad] = Functor[StoreT[F, A, *]]
+    def cobind[F[_] : Comonad] = Cobind[StoreT[F, A, *]]
   }
 
 }

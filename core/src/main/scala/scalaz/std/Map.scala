@@ -38,7 +38,7 @@ trait MapInstances0 {
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
   }
 
-  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[Map[K, ?]] {
+  private[std] trait MapFoldable[K] extends Foldable.FromFoldr[Map[K, *]] {
     override def foldLeft[A, B](fa: Map[K, A], z: B)(f: (B, A) => B) =
       fa.valuesIterator.foldLeft(z)(f)
 
@@ -58,7 +58,7 @@ trait MapInstances0 {
       def OV = Equal[V]
     }
 
-  implicit def mapFoldable[K]: Foldable[Map[K, ?]] =
+  implicit def mapFoldable[K]: Foldable[Map[K, *]] =
     new MapFoldable[K]{}
 
   implicit def mapBand[K, V](implicit S: Band[V]): Band[Map[K, V]] =
@@ -73,8 +73,8 @@ trait MapInstances extends MapInstances0 with MapFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K]: Traverse[Map[K, ?]] with IsEmpty[Map[K, ?]] with Bind[Map[K, ?]] with Align[Map[K, ?]] =
-    new Traverse[Map[K, ?]] with IsEmpty[Map[K, ?]] with Bind[Map[K, ?]] with MapFoldable[K] with Align[Map[K, ?]] {
+  implicit def mapInstance[K]: Traverse[Map[K, *]] with IsEmpty[Map[K, *]] with Bind[Map[K, *]] with Align[Map[K, *]] =
+    new Traverse[Map[K, *]] with IsEmpty[Map[K, *]] with Bind[Map[K, *]] with MapFoldable[K] with Align[Map[K, *]] {
       def empty[V] = Map.empty[K, V]
       def plus[V](a: Map[K, V], b: => Map[K, V]) = a ++ b
       def isEmpty[V](fa: Map[K, V]) = fa.isEmpty

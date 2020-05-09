@@ -33,24 +33,24 @@ object RegionT extends RegionTInstances {
 }
 
 sealed abstract class RegionTInstances1 {
-  implicit def RegionTLiftIO[S, M[_]](implicit M: LiftIO[M]): LiftIO[RegionT[S, M, ?]] = new RegionTLiftIO[S, M] {
+  implicit def RegionTLiftIO[S, M[_]](implicit M: LiftIO[M]): LiftIO[RegionT[S, M, *]] = new RegionTLiftIO[S, M] {
     implicit def L = M
   }
 
-  implicit def RegionTMonad[S, M[_]](implicit M0: Monad[M]): Monad[RegionT[S, M, ?]] = new RegionTMonad[S, M] {
+  implicit def RegionTMonad[S, M[_]](implicit M0: Monad[M]): Monad[RegionT[S, M, *]] = new RegionTMonad[S, M] {
     implicit def M = M0
   }
 
   implicit def RegionTHoist[S] = new Hoist[λ[(α[_], β) => RegionT[S, α, β]]] {
     def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-      λ[RegionT[S, M, ?] ~> RegionT[S, N, ?]](fa =>
+      λ[RegionT[S, M, *] ~> RegionT[S, N, *]](fa =>
         RegionT(Kleisli(r => f.apply(fa.runT(r))))
       )
 
       override def liftM[M[_]: Monad, B](a: M[B]): RegionT[S, M, B] =
         RegionT(Kleisli(r => a))
 
-      override implicit def apply[M[_]: Monad]: Monad[RegionT[S, M, ?]] =
+      override implicit def apply[M[_]: Monad]: Monad[RegionT[S, M, *]] =
         RegionTMonad[S, M]
   }
 
@@ -59,7 +59,7 @@ sealed abstract class RegionTInstances1 {
 sealed abstract class RegionTInstances extends RegionTInstances1 {
 }
 
-trait RegionTMonad[S, M[_]] extends Monad[RegionT[S, M, ?]] {
+trait RegionTMonad[S, M[_]] extends Monad[RegionT[S, M, *]] {
   implicit def M: Monad[M]
 
   def point[A](a: => A): RegionT[S, M, A] = RegionT(kleisli(s => M.point(a)))
@@ -67,7 +67,7 @@ trait RegionTMonad[S, M[_]] extends Monad[RegionT[S, M, ?]] {
     RegionT(kleisli(s => M.bind(fa.value.run(s))((a: A) => f(a).value.run(s))))
 }
 
-trait RegionTLiftIO[S, M[_]] extends LiftIO[RegionT[S, M, ?]] {
+trait RegionTLiftIO[S, M[_]] extends LiftIO[RegionT[S, M, *]] {
   implicit def L: LiftIO[M]
 
   def liftIO[A](ioa: IO[A]) = RegionT.regionT(kleisli(_ => L.liftIO(ioa)))

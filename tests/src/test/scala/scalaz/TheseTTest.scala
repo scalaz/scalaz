@@ -15,13 +15,13 @@ object TheseTTest extends SpecLite {
   checkAll(monad.laws[TheseTListInt])
   checkAll(traverse.laws[TheseTListInt])
   checkAll(bitraverse.laws[TheseTList])
-  checkAll(monadTrans.laws[TheseT[?[_], Int, ?], List])
+  checkAll(monadTrans.laws[TheseT[*[_], Int, *], List])
 
   object instances {
-    def functor[F[_]: Functor, L] = Functor[TheseT[F, L, ?]]
+    def functor[F[_]: Functor, L] = Functor[TheseT[F, L, *]]
 
     // checking absence of ambiguity
-    def functor[F[_]: Traverse, L] = Functor[TheseT[F, L, ?]]
-    def functor[F[_]: Monad, L: Semigroup] = Functor[TheseT[F, L, ?]]
+    def functor[F[_]: Traverse, L] = Functor[TheseT[F, L, *]]
+    def functor[F[_]: Monad, L: Semigroup] = Functor[TheseT[F, L, *]]
   }
 }

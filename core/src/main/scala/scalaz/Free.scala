@@ -36,8 +36,8 @@ object Free extends FreeInstances {
     liftF(MA(value))
 
   /** Monadic join for the higher-order monad `Free` */
-  def joinF[S[_], A](value: Free[Free[S, ?], A]): Free[S, A] =
-    value.flatMapSuspension(NaturalTransformation.refl[Free[S, ?]])
+  def joinF[S[_], A](value: Free[Free[S, *], A]): Free[S, A] =
+    value.flatMapSuspension(NaturalTransformation.refl[Free[S, *]])
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
@@ -45,10 +45,10 @@ object Free extends FreeInstances {
 
   /** A source that produces the given value. */
   def produce[A](a: A): Source[A, Unit] =
-    liftF[(A, ?), Unit]((a, ()))
+    liftF[(A, *), Unit]((a, ()))
 
   /** A sink that waits for a single value and returns it. */
-  def await[A]: Sink[A, A] = liftF[(=> A) => ?, A](a => a)
+  def await[A]: Sink[A, A] = liftF[(=> A) => *, A](a => a)
 
   /** Absorb a step in `S` into the free monad for `S` */
   def apply[S[_], A](s: S[Free[S, A]]): Free[S, A] =
@@ -77,14 +77,14 @@ object Free extends FreeInstances {
     *
     * @template
     */
-  type Source[A, B] = Free[(A, ?), B]
+  type Source[A, B] = Free[(A, *), B]
 
   /** A computation that accepts values of type `A`, eventually resulting in a value of type `B`.
     * Note the similarity to an [[scalaz.iteratee.Iteratee]].
     *
     * @template
     */
-  type Sink[A, B] = Free[(=> A) => ?, B]
+  type Sink[A, B] = Free[(=> A) => *, B]
 
   /** Suspends a value within a functor in a single step. Monadic unit for a higher-order monad. */
   def liftF[S[_], A](value: S[A]): Free[S, A] =
@@ -131,7 +131,7 @@ sealed abstract class Free[S[_], A] {
 
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T): Free[T, A] =
-    flatMapSuspension(λ[S ~> Free[T,?]](s => Suspend(f(s))))
+    flatMapSuspension(λ[S ~> Free[T,*]](s => Suspend(f(s))))
 
   /** Modifies the first suspension with the given natural transformation. */
   final def mapFirstSuspension(f: S ~> S): Free[S, A] =
@@ -148,8 +148,8 @@ sealed abstract class Free[S[_], A] {
    * Substitutes a free monad over the given functor into the suspension functor of this program.
    * `Free` is a monad in an endofunctor category and this is its monadic bind.
    */
-  final def flatMapSuspension[T[_]](f: S ~> Free[T, ?]): Free[T, A] =
-    foldMap[Free[T,?]](f)(freeMonad[T])
+  final def flatMapSuspension[T[_]](f: S ~> Free[T, *]): Free[T, A] =
+    foldMap[Free[T,*]](f)(freeMonad[T])
 
   /** Applies a function `f` to a value in this monad and a corresponding value in the dual comonad, annihilating both. */
   final def zapWith[G[_], B, C](bs: Cofree[G, B])(f: (A, B) => C)(implicit d: Zap[S, G]): C =
@@ -266,7 +266,7 @@ sealed abstract class Free[S[_], A] {
     }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
-  @tailrec final def foldRun[B](b: B)(f: λ[α => (B, S[α])] ~> (B, ?)): (B, A) =
+  @tailrec final def foldRun[B](b: B)(f: λ[α => (B, S[α])] ~> (B, *)): (B, A) =
     step match {
       case Return(a) => (b, a)
       case Suspend(sa) => f((b, sa))
@@ -325,8 +325,8 @@ sealed abstract class Free[S[_], A] {
     @tailrec def go(src: Source[E, A], snk: Sink[Option[E], B]): (A, B) =
       (src.resume, snk.resume) match {
         case (-\/((e, c)), -\/(f)) => go(c, f(Some(e)))
-        case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[Option[E], ?]].pure(y))
-        case (\/-(x), -\/(f))      => go(Monad[Source[E, ?]].pure(x), f(None))
+        case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[Option[E], *]].pure(y))
+        case (\/-(x), -\/(f))      => go(Monad[Source[E, *]].pure(x), f(None))
         case (\/-(x), \/-(y))      => (x, y)
       }
     go(ev(this), sink)
@@ -346,7 +346,7 @@ sealed abstract class Free[S[_], A] {
   def drain[E, B](source: Source[E, B])(implicit ev: Free[S, A] === Sink[E, A]): (A, B) = {
     @tailrec def go(src: Source[E, B], snk: Sink[E, A]): (A, B) = (src.resume, snk.resume) match {
       case (-\/((e, c)), -\/(f)) => go(c, f(e))
-      case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[E, ?]].pure(y))
+      case (-\/((e, c)), \/-(y)) => go(c, Monad[Sink[E, *]].pure(y))
       case (\/-(x), -\/(f))      => sys.error("Not enough values in source.")
       case (\/-(x), \/-(y))      => (y, x)
     }
@@ -354,10 +354,10 @@ sealed abstract class Free[S[_], A] {
   }
 
   /** Duplication in `Free` as a comonad in the endofunctor category. */
-  def duplicateF: Free[Free[S, ?], A] = extendF[Free[S,?]](NaturalTransformation.refl[Free[S,?]])
+  def duplicateF: Free[Free[S, *], A] = extendF[Free[S,*]](NaturalTransformation.refl[Free[S,*]])
 
   /** Extension in `Free` as a comonad in the endofunctor category. */
-  def extendF[T[_]](f: Free[S, ?] ~> T): Free[T, A] = mapSuspension(λ[S ~> T](x => f(liftF(x))))
+  def extendF[T[_]](f: Free[S, *] ~> T): Free[T, A] = mapSuspension(λ[S ~> T](x => f(liftF(x))))
 
   /** Extraction from `Free` as a comonad in the endofunctor category. */
   def extractF(implicit S: Monad[S]): S[A] = foldMap(NaturalTransformation.refl[S])
@@ -396,39 +396,39 @@ sealed abstract class FreeInstances4 {
 }
 
 sealed abstract class FreeInstances3 extends FreeInstances4 {
-  implicit def freeFoldable[F[_]: Foldable]: Foldable[Free[F, ?]] =
+  implicit def freeFoldable[F[_]: Foldable]: Foldable[Free[F, *]] =
     new FreeFoldable[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class FreeInstances2 extends FreeInstances3 {
-  implicit def freeFoldable1[F[_]: Foldable1]: Foldable1[Free[F, ?]] =
+  implicit def freeFoldable1[F[_]: Foldable1]: Foldable1[Free[F, *]] =
     new FreeFoldable1[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class FreeInstances1 extends FreeInstances2 {
-  implicit def freeTraverse[F[_]: Traverse]: Traverse[Free[F, ?]] =
+  implicit def freeTraverse[F[_]: Traverse]: Traverse[Free[F, *]] =
     new FreeTraverse[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class FreeInstances0 extends FreeInstances1 {
-  implicit def freeTraverse1[F[_]: Traverse1]: Traverse1[Free[F, ?]] =
+  implicit def freeTraverse1[F[_]: Traverse1]: Traverse1[Free[F, *]] =
     new FreeTraverse1[F] {
       def F = implicitly
     }
 
   implicit def freeSemigroup[S[_], A: Semigroup]: Semigroup[Free[S, A]] =
-    Semigroup.liftSemigroup[Free[S, ?], A]
+    Semigroup.liftSemigroup[Free[S, *], A]
 }
 
 sealed abstract class FreeInstances extends FreeInstances0 {
-  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
-    new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
+  implicit def freeMonad[S[_]]: Monad[Free[S, *]] with BindRec[Free[S, *]] =
+    new Monad[Free[S, *]] with BindRec[Free[S, *]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
       def point[A](a: => A) = Free.point(a)
@@ -437,8 +437,8 @@ sealed abstract class FreeInstances extends FreeInstances0 {
         f(a).flatMap(_.fold(tailrecM(_)(f), point(_)))
     }
 
-  implicit def freeZip[S[_]](implicit Z: Zip[S]): Zip[Free[S, ?]] =
-    new Zip[Free[S, ?]] {
+  implicit def freeZip[S[_]](implicit Z: Zip[S]): Zip[Free[S, *]] =
+    new Zip[Free[S, *]] {
       override def zip[A, B](aa: => Free[S, A], bb: => Free[S, B]) =
         (aa.resumeC, bb.resumeC) match {
           case (-\/(a), -\/(b)) => liftF(Z.zip(a.fi, b.fi)).flatMap(ab => zip(a.k(ab._1), b.k(ab._2)))
@@ -449,15 +449,15 @@ sealed abstract class FreeInstances extends FreeInstances0 {
     }
 
   implicit def freeMonoid[S[_], A: Monoid]: Monoid[Free[S, A]] =
-    Monoid.liftMonoid[Free[S, ?], A]
+    Monoid.liftMonoid[Free[S, *], A]
 }
 
-private sealed trait FreeBind[F[_]] extends Bind[Free[F, ?]] {
+private sealed trait FreeBind[F[_]] extends Bind[Free[F, *]] {
   override def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
   def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
 }
 
-private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {
+private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
   def F: Foldable[F]
 
   override final def foldMap[A, B: Monoid](fa: Free[F, A])(f: A => B): B =
@@ -482,7 +482,7 @@ private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, ?]] {
     )
 }
 
-private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, ?]] {
+private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
   def F: Foldable1[F]
 
   override final def foldMap1[A, B: Semigroup](fa: Free[F, A])(f: A => B): B =
@@ -507,7 +507,7 @@ private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, ?]] {
     )
 }
 
-private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFoldable[F]{
+private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, *]] with FreeFoldable[F]{
   implicit def F: Traverse[F]
 
   override final def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
@@ -519,7 +519,7 @@ private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, ?]] with FreeFo
     }
 }
 
-private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[Free[F, ?]] with FreeTraverse[F] with FreeFoldable1[F]{
+private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[Free[F, *]] with FreeTraverse[F] with FreeFoldable1[F]{
   implicit def F: Traverse1[F]
 
   override final def traverse1Impl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Apply[G]): G[Free[F, B]] =

@@ -71,8 +71,8 @@ object ApplicativeTest extends SpecLite {
 
     //Const is an applicative that is not a monad
     def const[A](a: A) = Const[A, String](a) // won't compile w/o known B
-    Applicative[Const[Int, ?]].plusA(const(1), const(2)) must_== const(3)
-    Applicative[Const[String, ?]].plusA(const("1"), const("2")) must_== const("12")
+    Applicative[Const[Int, *]].plusA(const(1), const(2)) must_== const(3)
+    Applicative[Const[String, *]].plusA(const("1"), const("2")) must_== const("12")
 
     // check +++ syntax
 

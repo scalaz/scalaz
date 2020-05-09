@@ -18,8 +18,8 @@ object FreeMonadsUsage {
     final case class Write(s: String) extends Ast[Unit]
 
     // and an implementation of the trait for any Free algebra
-    def liftF[F[_]](implicit I: Ast :<: F): Console[Free[F, ?]] =
-      new Console[Free[F, ?]] {
+    def liftF[F[_]](implicit I: Ast :<: F): Console[Free[F, *]] =
+      new Console[Free[F, *]] {
         def read: Free[F, String] = Free.liftF(I.inj(Read()))
         def write(s: String): Free[F, Unit] = Free.liftF(I.inj(Write(s)))
       }

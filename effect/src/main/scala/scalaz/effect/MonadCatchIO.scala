@@ -26,8 +26,8 @@ object MonadCatchIO {
     }
 
   ////
-  implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup]: MonadCatchIO[TheseT[M, E, ?]] =
-    new MonadCatchIO[TheseT[M, E, ?]] {
+  implicit def theseTMonadCatchIO[M[_]: MonadCatchIO, E: Semigroup]: MonadCatchIO[TheseT[M, E, *]] =
+    new MonadCatchIO[TheseT[M, E, *]] {
       val TheseTMonadIO = MonadIO.theseTMonadIO[M, E]
       val M = MonadCatchIO[M]
       override def except[A](ma: TheseT[M, E, A])(handler: Throwable => TheseT[M, E, A]) =
@@ -101,8 +101,8 @@ object MonadCatchIO {
   def using[M[_], A, B](ma: M[A])(f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]): M[B] =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
-  implicit def KleisliMonadCatchIO[F[_], R](implicit F: MonadCatchIO[F]): MonadCatchIO[Kleisli[F, R, ?]] =
-    new MonadCatchIO[Kleisli[F, R, ?]] with MonadIO.FromLiftIO[Kleisli[F, R, ?]] {
+  implicit def KleisliMonadCatchIO[F[_], R](implicit F: MonadCatchIO[F]): MonadCatchIO[Kleisli[F, R, *]] =
+    new MonadCatchIO[Kleisli[F, R, *]] with MonadIO.FromLiftIO[Kleisli[F, R, *]] {
       def FM = MonadIO.kleisliMonadIO[F, R]
       def FLO = MonadIO.kleisliMonadIO[F, R]
       def except[A](k: Kleisli[F, R, A])(h: Throwable => Kleisli[F, R, A]) =

@@ -20,8 +20,8 @@ trait ToCategoryOps0[TC[F[_, _]] <: Category[F]] extends ToCategoryOpsU[TC] {
     new CategoryOps[F, A, B](v)
 
 
-  implicit def ToCategoryVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): CategoryOps[F[G, ?, ?], A, B] =
-    new CategoryOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToCategoryVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): CategoryOps[F[G, *, *], A, B] =
+    new CategoryOps[F[G, *, *], A, B](v)(F0)
 
   ////
   ////

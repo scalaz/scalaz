@@ -28,7 +28,7 @@ object MonadErrorTest extends SpecLite {
     )
     // with `-Ypartial-unification` we could write
     //
-    // val iso: Decoder <~> Kleisli[Int \/ ?, String, ?] = Kleisli.iso(
+    // val iso: Decoder <~> Kleisli[Int \/ *, String, *] = Kleisli.iso(
     //   λ[λ[a => (String => Int \/ a)] ~> Decoder](instance(_)),
     //   λ[Decoder ~> λ[a => (String => Int \/ a)]](_.decode)
     // )

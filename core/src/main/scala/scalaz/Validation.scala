@@ -18,7 +18,7 @@ package scalaz
  *
  * def parseInt(s: String): Validation[String, Int] =
  *   try { Success(s.toInt) } catch { case ex: NumberFormatException => Failure(ex.getMessage) }
- * val V = Applicative[ValidationNel[String, ?]]
+ * val V = Applicative[ValidationNel[String, *]]
  *
  * val x: ValidationNel[String, Int] =
  *   V.apply2(parseInt("1.x").toValidationNel, parseInt("1..0").toValidationNel)(_ * _)
@@ -513,8 +513,8 @@ sealed abstract class ValidationInstances1 extends ValidationInstances2 {
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {
-  implicit def ValidationInstances1[L]: Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Optional[Validation[L, ?]] =
-    new Traverse[Validation[L, ?]] with Cozip[Validation[L, ?]] with Optional[Validation[L, ?]] {
+  implicit def ValidationInstances1[L]: Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Optional[Validation[L, *]] =
+    new Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Optional[Validation[L, *]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
@@ -538,7 +538,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
         fa.fold(l => -\/(Failure(l)), \/.right)
     }
 
-  implicit def ValidationPlus[E: Semigroup]: Plus[Validation[E, ?]] = new Plus[Validation[E, ?]] {
+  implicit def ValidationPlus[E: Semigroup]: Plus[Validation[E, *]] = new Plus[Validation[E, *]] {
     override def plus[A](a1: Validation[E, A], a2: => Validation[E, A]) =
       a1 findSuccess a2
   }
@@ -555,8 +555,8 @@ sealed abstract class ValidationInstances3 {
         fab.bitraverse(f, g)
     }
 
-  implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, ?], L] with Alt[Validation[L, ?]] =
-    new ApplicativeError[Validation[L, ?], L] with Alt[Validation[L, ?]] {
+  implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, *], L] with Alt[Validation[L, *]] =
+    new ApplicativeError[Validation[L, *], L] with Alt[Validation[L, *]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
         fa map f
 

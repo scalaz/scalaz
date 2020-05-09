@@ -82,11 +82,11 @@ trait EnumeratorPFunctions {
     (e1: EnumeratorP[J, F], e2: EnumeratorP[K, F]) => new EnumeratorP[I, F] {
       def apply[G[_]: Monad](trans: F ~> G): EnumeratorT[I, G] =
         new EnumeratorT[I, G] {
-          val transIterateeT = new (F ~> IterateeT[K, G, ?]) {
+          val transIterateeT = new (F ~> IterateeT[K, G, *]) {
             def apply[A](f: F[A]): IterateeT[K, G, A] =
               MonadTrans[λ[(β[_], α) => IterateeT[K, β, α]]].liftM(trans(f))
           }
-          lazy val enum1 = e1[IterateeT[K, G, ?]](transIterateeT)
+          lazy val enum1 = e1[IterateeT[K, G, *]](transIterateeT)
           lazy val enum2 = e2[G](trans)
 
           def apply[A] =

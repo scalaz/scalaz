@@ -227,7 +227,7 @@ trait ListFunctions {
     case Nil    => Monad[M].point(Nil)
     case h :: t =>
       val stateP = (i: A) => StateT[A, M, Boolean](s => Monad[M].map(p(s, i))(i ->))
-      Monad[M].bind(spanM[A, StateT[A, M, ?]](t)(stateP).eval(h)) {
+      Monad[M].bind(spanM[A, StateT[A, M, *]](t)(stateP).eval(h)) {
         case (x, y) =>
           Monad[M].map(groupWhenM(y)(p))(g => NonEmptyList.nel(h, IList.fromList(x)) :: g)
       }

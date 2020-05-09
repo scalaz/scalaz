@@ -19,7 +19,7 @@ object MaybeTTest extends SpecLite {
   checkAll(traverse.laws[MaybeTList])
   checkAll(monadError.laws[MaybeTEither, Int])
   checkAll(monadTrans.laws[MaybeT, List])
-  checkAll(decidable.laws[MaybeT[ConstInt, ?]])
+  checkAll(decidable.laws[MaybeT[ConstInt, *]])
 
   "show" ! forAll { a: MaybeTList[Int] =>
     Show[MaybeTList[Int]].show(a) must_=== Show[List[Maybe[Int]]].show(a.run)
@@ -34,20 +34,20 @@ object MaybeTTest extends SpecLite {
   }
 
   object instances {
-    def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]
-    def monad[F[_] : Monad] = MonadPlus[MaybeT[F, ?]]
-    def bindRec[F[_] : Monad : BindRec] = BindRec[MaybeT[F, ?]]
-    def monadError[F[_], E](implicit F: MonadError[F, E]) = MonadError[MaybeT[F, ?], E]
-    def foldable[F[_] : Foldable] = Foldable[MaybeT[F, ?]]
-    def traverse[F[_] : Traverse] = Traverse[MaybeT[F, ?]]
-    def decidable[F[_] : Divisible] = Decidable[MaybeT[F, ?]]
+    def functor[F[_] : Functor] = Functor[MaybeT[F, *]]
+    def monad[F[_] : Monad] = MonadPlus[MaybeT[F, *]]
+    def bindRec[F[_] : Monad : BindRec] = BindRec[MaybeT[F, *]]
+    def monadError[F[_], E](implicit F: MonadError[F, E]) = MonadError[MaybeT[F, *], E]
+    def foldable[F[_] : Foldable] = Foldable[MaybeT[F, *]]
+    def traverse[F[_] : Traverse] = Traverse[MaybeT[F, *]]
+    def decidable[F[_] : Divisible] = Decidable[MaybeT[F, *]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Monad] = Functor[MaybeT[F, ?]]
-    def functor[F[_] : Monad : Traverse] = Functor[MaybeT[F, ?]]
-    def functor[F[_], E](implicit F1: MonadError[F, E], F2: Traverse[F]) = Functor[MaybeT[F, ?]]
-    def apply[F[_] : Monad] = Apply[MaybeT[F, ?]]
-    def foldable[F[_] : Traverse] = Foldable[MaybeT[F, ?]]
-    def monadEither[E] = Monad[MaybeT[E \/ ?, ?]]
+    def functor[F[_] : Monad] = Functor[MaybeT[F, *]]
+    def functor[F[_] : Monad : Traverse] = Functor[MaybeT[F, *]]
+    def functor[F[_], E](implicit F1: MonadError[F, E], F2: Traverse[F]) = Functor[MaybeT[F, *]]
+    def apply[F[_] : Monad] = Apply[MaybeT[F, *]]
+    def foldable[F[_] : Traverse] = Foldable[MaybeT[F, *]]
+    def monadEither[E] = Monad[MaybeT[E \/ *, *]]
   }
 }

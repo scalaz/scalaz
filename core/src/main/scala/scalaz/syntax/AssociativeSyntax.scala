@@ -27,8 +27,8 @@ trait ToAssociativeOps0[TC[F[_, _]] <: Associative[F]] extends ToAssociativeOpsU
     new AssociativeOps[F, A, B](v)
 
 
-  implicit def ToAssociativeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, ?, ?]]): AssociativeOps[F[G, ?, ?], A, B] =
-    new AssociativeOps[F[G, ?, ?], A, B](v)(F0)
+  implicit def ToAssociativeVFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: TC[F[G, *, *]]): AssociativeOps[F[G, *, *], A, B] =
+    new AssociativeOps[F[G, *, *], A, B](v)(F0)
 
   ////
 

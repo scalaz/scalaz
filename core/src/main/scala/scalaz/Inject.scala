@@ -21,14 +21,14 @@ sealed abstract class InjectInstances {
       def prj[A](ga: F[A]) = some(ga)
     }
 
-  implicit def leftInjectInstance[F[_], G[_]]: Inject[F, Coproduct[F, G, ?]]  =
-    new Inject[F, Coproduct[F, G, ?]] {
+  implicit def leftInjectInstance[F[_], G[_]]: Inject[F, Coproduct[F, G, *]]  =
+    new Inject[F, Coproduct[F, G, *]] {
       def inj[A](fa: F[A]) = Coproduct.leftc(fa)
       def prj[A](ga: Coproduct[F, G, A]) = ga.run.fold(some, _ => none)
     }
 
-  implicit def rightInjectInstance[F[_], G[_], H[_]](implicit I: Inject[F, G]): Inject[F, Coproduct[H, G, ?]] =
-      new Inject[F, Coproduct[H, G, ?]] {
+  implicit def rightInjectInstance[F[_], G[_], H[_]](implicit I: Inject[F, G]): Inject[F, Coproduct[H, G, *]] =
+      new Inject[F, Coproduct[H, G, *]] {
         def inj[A](fa: F[A]) = Coproduct.rightc(I.inj(fa))
         def prj[A](ga: Coproduct[H, G, A]) = ga.run.fold(_ => none, I.prj)
       }

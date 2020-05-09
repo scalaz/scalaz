@@ -9,15 +9,15 @@ object BitraverseTest extends SpecLite {
   implicit val LE = Bitraverse[\/].leftTraverse[Int]
   implicit val RE = Bitraverse[\/].rightTraverse[Int]
 
-  checkAll("Left-biased Bitraverse for Either",  traverse.laws[? \/ Int])
-  checkAll("Right-biased Bitraverse for Either", traverse.laws[Int \/ ?])
+  checkAll("Left-biased Bitraverse for Either",  traverse.laws[* \/ Int])
+  checkAll("Right-biased Bitraverse for Either", traverse.laws[Int \/ *])
 
 
   implicit val LT = Bitraverse[Tuple2].leftTraverse[Int]
   implicit val RT = Bitraverse[Tuple2].rightTraverse[Int]
 
-  checkAll("Left-biased Bitraverse for (,)",  traverse.laws[(?, Int)])
-  checkAll("Right-biased Bitraverse for (,)", traverse.laws[(Int, ?)])
+  checkAll("Left-biased Bitraverse for (,)",  traverse.laws[(*, Int)])
+  checkAll("Right-biased Bitraverse for (,)", traverse.laws[(Int, *)])
 
   "bitraverseU" in {
     import syntax.bitraverse._

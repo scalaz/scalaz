@@ -79,7 +79,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
       implicit def F = F0
     }
 
-  implicit def enumeratorTMonad[F[_]](implicit M0: Monad[F]): Monad[EnumeratorT[?, F]] =
+  implicit def enumeratorTMonad[F[_]](implicit M0: Monad[F]): Monad[EnumeratorT[*, F]] =
     new EnumeratorTMonad[F] {
       implicit def M = M0
     }
@@ -91,7 +91,7 @@ trait EnumeratorTInstances extends EnumeratorTInstances0 {
           def apply[A] = (s: StepT[E, G, A]) => iterateeT(Monad[G].bind(ga) { e => s.mapCont(k => k(elInput(e))).value })
         }
 
-      implicit def apply[G[_]: Monad]: Monad[EnumeratorT[?, G]] = enumeratorTMonad[G]
+      implicit def apply[G[_]: Monad]: Monad[EnumeratorT[*, G]] = enumeratorTMonad[G]
     }
 }
 
@@ -250,12 +250,12 @@ private trait EnumeratorTMonoid[E, F[_]] extends Monoid[EnumeratorT[E, F]] with 
   }
 }
 
-private trait EnumeratorTFunctor[F[_]] extends Functor[EnumeratorT[?, F]] {
+private trait EnumeratorTFunctor[F[_]] extends Functor[EnumeratorT[*, F]] {
   implicit def M: Monad[F]
   abstract override def map[A, B](fa: EnumeratorT[A, F])(f: A => B): EnumeratorT[B, F] = fa.map(f)
 }
 
-private trait EnumeratorTMonad[F[_]] extends Monad[EnumeratorT[?, F]] with EnumeratorTFunctor[F] {
+private trait EnumeratorTMonad[F[_]] extends Monad[EnumeratorT[*, F]] with EnumeratorTFunctor[F] {
   def bind[A, B](fa: EnumeratorT[A, F])(f: A => EnumeratorT[B, F]) = fa.flatMap(f)
   def point[E](e: => E) = EnumeratorT.enumOne[E, F](e)
 }

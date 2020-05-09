@@ -28,17 +28,17 @@ object IndexedContsTTest extends SpecLite {
   checkAll(alt.laws[ContTMaybeBoolean])
 
   object instances {
-    def functorRight[W[_]: Functor, R, M[_], O] = Functor[IndexedContsT[W, R, O, M, ?]]
-    def functorLeft[W[_], O, M[_]: Functor, A] = Functor[IndexedContsT[W, ?, O, M, A]]
-    def contravariant[W[_]: Functor, R, M[_]: Functor, A] = Contravariant[IndexedContsT[W, R, ?, M, A]]
-    def bifunctor[W[_]: Functor, O, M[_]: Functor] = Bifunctor[IndexedContsT[W, ?, O, M, ?]]
-    def bind[W[_]: Cobind, R, M[_]] = Bind[ContsT[W, R, M, ?]]
-    def monad[W[_]: Comonad, R, M[_]] = Monad[ContsT[W, R, M, ?]]
-    def alt[W[_]: Comonad, R, M[_]: PlusEmpty] = Alt[ContsT[W, R, M, ?]]
+    def functorRight[W[_]: Functor, R, M[_], O] = Functor[IndexedContsT[W, R, O, M, *]]
+    def functorLeft[W[_], O, M[_]: Functor, A] = Functor[IndexedContsT[W, *, O, M, A]]
+    def contravariant[W[_]: Functor, R, M[_]: Functor, A] = Contravariant[IndexedContsT[W, R, *, M, A]]
+    def bifunctor[W[_]: Functor, O, M[_]: Functor] = Bifunctor[IndexedContsT[W, *, O, M, *]]
+    def bind[W[_]: Cobind, R, M[_]] = Bind[ContsT[W, R, M, *]]
+    def monad[W[_]: Comonad, R, M[_]] = Monad[ContsT[W, R, M, *]]
+    def alt[W[_]: Comonad, R, M[_]: PlusEmpty] = Alt[ContsT[W, R, M, *]]
 
     // checking absence of ambiguity
-    def functor[W[_]: Comonad, R, M[_]] = Functor[ContsT[W, R, M, ?]]
-    def functor[W[_]: Cobind, R, M[_]] = Functor[ContsT[W, R, M, ?]]
-    def bind[W[_]: Comonad, R, M[_]] = Bind[ContsT[W, R, M, ?]]
+    def functor[W[_]: Comonad, R, M[_]] = Functor[ContsT[W, R, M, *]]
+    def functor[W[_]: Cobind, R, M[_]] = Functor[ContsT[W, R, M, *]]
+    def bind[W[_]: Comonad, R, M[_]] = Bind[ContsT[W, R, M, *]]
   }
 }
