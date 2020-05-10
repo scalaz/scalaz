@@ -1005,17 +1005,6 @@ sealed abstract class ==>>[A, B] {
     a.cata(filter(_, this), this)
   }
 
-  private def join(kx: A, x: B, other: A ==>> B)(implicit o: Order[A]): A ==>> B =
-    (this, other) match {
-      case (Tip(), r) =>
-        insertMin(kx, x, r)
-      case (l, Tip()) =>
-        insertMax(kx, x, l)
-      case (l @ Bin(ky, y, ly, ry), r @ Bin(kz, z, lz, rz)) =>
-        if (delta * l.size < r.size) balanceL(kz, z, link(kx, x, l, lz), rz)
-        else if (delta * r.size < l.size) balanceR(ky, y, ly, link(kx, x, ry, r))
-        else Bin(kx, x, l, r)
-    }
 }
 
 sealed abstract class MapInstances2 {
