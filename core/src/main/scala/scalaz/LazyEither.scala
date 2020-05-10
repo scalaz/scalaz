@@ -192,8 +192,8 @@ sealed abstract class LazyEitherInstances {
           }
         )
 
-     def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
-       fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
+      def pextract[B, A](fa: LazyEither[E,A]): LazyEither[E,B] \/ A =
+        fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
 
       def raiseError[A](e: E): LazyEither[E, A] =
         LazyEither.lazyLeft(e)
