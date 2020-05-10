@@ -18,7 +18,7 @@ trait ToUnzipOps extends ToUnzipOps0 {
     new UnzipOps[F, A](v)
 
   ////
-  implicit def ToUnzipPairOps[F[_],A,B](v: F[(A, B)])(implicit F0: Unzip[F]) =
+  implicit def ToUnzipPairOps[F[_],A,B](v: F[(A, B)])(implicit F0: Unzip[F]): UnzipPairOps[F, A, B] =
     new UnzipPairOps[F,A,B](v)(F0)
 
   final class UnzipPairOps[F[_],A, B] private[syntax](self: F[(A, B)])(implicit F: Unzip[F]) {

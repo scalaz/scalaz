@@ -242,7 +242,7 @@ object CorecursiveList extends CorecursiveListInstances {
 
   implicit def orderInstance[A: Order]: Order[CorecursiveList[A]] =
     new Order[CorecursiveList[A]] with CorecursiveListEqual[A] {
-      val A = Order[A]
+      override val A: Order[A] = Order[A]
       def order(l: CorecursiveList[A], r: CorecursiveList[A]) = {
         @tailrec def rec(ls: l.S, rs: r.S): Ordering =
           (l.step(ls), r.step(rs)) match {

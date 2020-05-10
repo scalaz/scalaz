@@ -11,11 +11,11 @@ final class MonadListenOps[F[_], W, A] private[syntax](self: F[A])(implicit ML: 
 }
 
 trait ToMonadListenOps extends ToMonadTellOps {
-  implicit def ToMonadListenOps[F[_], A, W](v: F[A])(implicit F0: MonadListen[F, W]) =
+  implicit def ToMonadListenOps[F[_], A, W](v: F[A])(implicit F0: MonadListen[F, W]): MonadListenOps[F, W, A] =
     new MonadListenOps[F, W, A](v)(F0)
 }
 
 trait MonadListenSyntax[F[_], W] extends MonadTellSyntax[F, W] {
-  implicit def ToMonadListenOps[A](v: F[A])(implicit F0: MonadListen[F, W]) =
+  implicit def ToMonadListenOps[A](v: F[A])(implicit F0: MonadListen[F, W]): MonadListenOps[F, W, A] =
     new MonadListenOps[F, W, A](v)(F0)
 }
