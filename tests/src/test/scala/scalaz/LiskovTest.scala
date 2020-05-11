@@ -2,9 +2,9 @@ package scalaz
 
 object LiskovTest extends SpecLite {
 
-  trait Co1[+ _]
+  trait Co1[+A]
 
-  trait Contra1[- _]
+  trait Contra1[-A]
 
   trait Co1_2[+A, B]
 
