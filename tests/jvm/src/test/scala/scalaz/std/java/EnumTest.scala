@@ -4,8 +4,8 @@ package std.java
 
 object EnumTest extends SpecLite {
 
-  import syntax.enum._
-  import std.java.enum._
+  import syntax.`enum`._
+  import std.java.`enum`._
   import java.util.concurrent.TimeUnit
 
   //get all ordered 2-element subsets of TimeUnit

@@ -5,7 +5,7 @@ package std.java
 object EnumTest extends SpecLite {
 
   import syntax.equal._
-  import std.java.enum._
+  import std.java.`enum`._
   import java.util.concurrent.TimeUnit
 
   "equal" in {

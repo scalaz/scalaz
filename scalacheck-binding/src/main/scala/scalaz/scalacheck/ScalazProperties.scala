@@ -54,7 +54,7 @@ object ScalazProperties {
       }
   }
 
-  object enum {
+  object `enum` {
     def succpred[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = forAll(A.enumLaw.succpred _)
 
     def predsucc[A](implicit A: Enum[A], arb: Arbitrary[A]): Prop = forAll(A.enumLaw.predsucc _)
