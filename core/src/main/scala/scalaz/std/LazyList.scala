@@ -154,7 +154,7 @@ trait LazyListInstances {
     new LazyListEqual[A] { def A = A0 }
   implicit def lazylistOrder[A](implicit A0: Order[A]): Order[LazyList[A]] =
     new Order[LazyList[A]] with LazyListEqual[A] {
-      def A = A0
+      override def A: Order[A] = A0
       import Ordering._
       @annotation.tailrec
       override final def order(a: LazyList[A], b: LazyList[A]): Ordering =

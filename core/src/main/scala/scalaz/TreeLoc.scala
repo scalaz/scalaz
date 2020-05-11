@@ -412,7 +412,7 @@ sealed abstract class TreeLocInstances {
 
   implicit def treeLocOrder[A](implicit A: Order[A]): Order[TreeLoc[A]] =
     new Order[TreeLoc[A]] with TreeLocEqual[A] {
-      def E = A
+      override def E: Order[A] = A
       import std.tuple._
 
       override def order(a: TreeLoc[A], b: TreeLoc[A]) =
