@@ -7,9 +7,9 @@ import Ordering._
 trait EnumerateeT[O, I, F[_]] { self =>
   def apply[A]: StepT[I, F, A] => IterateeT[O, F, StepT[I, F, A]]
 
-  def run(enum: EnumeratorT[O, F])(implicit M: Monad[F]): EnumeratorT[I, F] = {
+  def run(enumerator: EnumeratorT[O, F])(implicit M: Monad[F]): EnumeratorT[I, F] = {
     new EnumeratorT[I, F] {
-      def apply[A] = (s: StepT[I, F, A]) => iterateeT((self[A](s) &= enum).run)
+      def apply[A] = (s: StepT[I, F, A]) => iterateeT((self[A](s) &= enumerator).run)
     }
   }
 }
