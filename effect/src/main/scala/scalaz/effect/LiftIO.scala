@@ -50,11 +50,10 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = EitherT(LiftIO[F].liftIO(ioa.map(\/.right)))
     }
 
-  implicit def theseTLiftIO[F[_]: LiftIO, E]: LiftIO[TheseT[F, E, *]]
-  = new LiftIO[TheseT[F, E, *]] {
-    override def liftIO[A](ioa: IO[A]) = TheseT(LiftIO[F].liftIO(ioa.map(a => \&/.That(a))))
-  }
-
+  implicit def theseTLiftIO[F[_]: LiftIO, E]: LiftIO[TheseT[F, E, *]] =
+    new LiftIO[TheseT[F, E, *]] {
+      override def liftIO[A](ioa: IO[A]) = TheseT(LiftIO[F].liftIO(ioa.map(a => \&/.That(a))))
+    }
 
   implicit def streamTLiftIO[F[_]: LiftIO: Applicative]: LiftIO[StreamT[F, *]] =
     new LiftIO[StreamT[F, *]] {
