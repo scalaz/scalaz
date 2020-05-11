@@ -26,13 +26,13 @@ sealed abstract class MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
 }
 
 sealed trait ToMonadCatchIOOps0 {
-  implicit def ToMonadCatchIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadCatchIO, FA]) =
+  implicit def ToMonadCatchIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadCatchIO, FA]): MonadCatchIOOps[F0.M, F0.A] =
     new MonadCatchIOOps[F0.M,F0.A] { def self = F0(v); implicit def F: MonadCatchIO[F0.M] = F0.TC }
 
 }
 
 trait ToMonadCatchIOOps extends ToMonadCatchIOOps0 {
-  implicit def ToMonadCatchIOOps[F[_],A](v: F[A])(implicit F0: MonadCatchIO[F]) =
+  implicit def ToMonadCatchIOOps[F[_],A](v: F[A])(implicit F0: MonadCatchIO[F]): MonadCatchIOOps[F, A] =
     new MonadCatchIOOps[F,A] { def self = v; implicit def F: MonadCatchIO[F] = F0 }
 
   ////

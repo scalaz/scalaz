@@ -70,7 +70,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Prepends an element to the left of the tree. O(1). */
   def +:(a: A): FingerTree[V, A] = {
-    implicit val nm = nodeMeasure[A, V]
+    implicit val nm: Reducer[FingerTree.Node[V, A], V] = nodeMeasure[A, V]
     fold(
       single(measurer.unit(a), a),
       (v, b) => deep(measurer.cons(a, v), one(a), empty[V, Node[V, A]], one(b)),
@@ -84,7 +84,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Appends an element to the right of the tree. O(1). */
   def :+(a: => A): FingerTree[V, A] = {
-    implicit val nm = nodeMeasure[A, V]
+    implicit val nm: Reducer[FingerTree.Node[V, A], V] = nodeMeasure[A, V]
     val az = Need(a)
     fold(
       single(measurer.unit(az.value), az.value),
@@ -463,7 +463,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
   /** Maps the given function across the tree, annotating nodes in the resulting tree according to the provided `Reducer`. */
   def map[B, V2](f: A => B)(implicit r: Reducer[B, V2]): FingerTree[V2, B] = {
     import r.semigroup
-    implicit val nm = nodeMeasure[B, V2]
+    implicit val nm: Reducer[FingerTree.Node[V2, B], V2] = nodeMeasure[B, V2]
     fold(
       empty[V2, B],
       (v, x) => single(f(x)),
@@ -1107,7 +1107,7 @@ sealed abstract class IndSeqInstances {
       override val naturalTrans = λ[IndSeq ~> FingerTree[Int, *]](_.self)
       def traverseImpl[G[_], A, B](fa: IndSeq[A])(f: A => G[B])(implicit G: Applicative[G]) = {
         import std.anyVal._
-        implicit val r = UnitReducer((_: B) => 1)
+        implicit val r: Reducer[B, Int] = UnitReducer((_: B) => 1)
         G.map(fa.self.traverseTree(f))(new IndSeq(_))
       }
       override def length[A](fa: IndSeq[A]) =

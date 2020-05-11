@@ -1,5 +1,7 @@
 package scalaz
 
+import scalaz.Isomorphism.<=>
+
 /** Endomorphisms.  They have special properties among functions, so
   * are captured in this newtype.
   *
@@ -51,12 +53,12 @@ object Endo extends EndoInstances {
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 
-  def IsoEndo[A] = new IsoSet[Endo[A], A => A] {
+  def IsoEndo[A]: Endo[A] <=> (A => A) = new IsoSet[Endo[A], A => A] {
     def to: (Endo[A]) => A => A = _.run
     def from: (A => A) => Endo[A] = endo
   }
 
-  val IsoFunctorEndo = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
+  val IsoFunctorEndo: IsoFunctorTemplate[Endo, λ[α => α => α]] = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
     def to[A](fa: Endo[A]): A => A = fa.run
     def from[A](ga: A => A): Endo[A] = endo(ga)
   }
