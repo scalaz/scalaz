@@ -4,7 +4,6 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
   def apply(a: A): Option[B] = _apply(a)
 
   import NullResult._
-  import NullArgument._
 
   def dimap[C, D](f: C => A, g: B => D): NullResult[C, D] =
     NullResult(c => apply(f(c)) map g)
@@ -78,7 +77,7 @@ final class NullResult[A, B] private(_apply: A => Option[B]) {
       b2 <- x
     } yield S.append(b1, b2)
 
-  def =>>[C](f: B ?=> C): A =>? C =
+  def =>>[C](f: NullArgument[B, C]): A =>? C =
     NullResult(apply(_) map (b => f(Some(b))))
 
   def isDefinedAt(a: A): Boolean =
