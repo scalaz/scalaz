@@ -47,11 +47,11 @@ sealed abstract class RegionTInstances1 {
         RegionT(Kleisli(r => f.apply(fa.runT(r))))
       )
 
-      override def liftM[M[_]: Monad, B](a: M[B]): RegionT[S, M, B] =
-        RegionT(Kleisli(r => a))
+    override def liftM[M[_]: Monad, B](a: M[B]): RegionT[S, M, B] =
+      RegionT(Kleisli(r => a))
 
-      override implicit def apply[M[_]: Monad]: Monad[RegionT[S, M, *]] =
-        RegionTMonad[S, M]
+    override implicit def apply[M[_]: Monad]: Monad[RegionT[S, M, *]] =
+      RegionTMonad[S, M]
   }
 
 }
