@@ -19,4 +19,4 @@ trait EnumInstances {
   }
 }
 
-object enum extends EnumInstances
+object `enum` extends EnumInstances

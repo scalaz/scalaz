@@ -425,7 +425,7 @@ object IListTest extends SpecLite {
   }
 
   "psumMap should be lazy" in {
-    import scalaz.syntax.enum._
+    import scalaz.syntax.`enum`._
     import scalaz.syntax.show._
     import Maybe.just
 

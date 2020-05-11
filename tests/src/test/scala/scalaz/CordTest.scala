@@ -4,7 +4,7 @@ import org.scalacheck.{ Arbitrary, Gen }
 import org.scalacheck.Prop.forAll
 
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.syntax.enum._
+import scalaz.syntax.`enum`._
 import scalaz.syntax.monoid._
 import scalaz.std.anyVal._
 import scalaz.std.string._

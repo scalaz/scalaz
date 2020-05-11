@@ -2,7 +2,7 @@ package scalaz
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
-import syntax.enum._
+import syntax.`enum`._
 
 /**
  * Implementation of a Discrete Interval Encoding Tree [[http://web.engr.oregonstate.edu/~erwig/diet/]] that

@@ -101,15 +101,15 @@ object TimeTestJVM extends SpecLite {
   checkAll("Period", monoid.laws[Period])
   checkAll("Period", equal.laws[Period])
 
-  checkAll("YearMonth", ScalazProperties.enum.laws[YearMonth])
+  checkAll("YearMonth", ScalazProperties.`enum`.laws[YearMonth])
   checkAll("MonthDay", order.laws[MonthDay])
-  checkAll("Month", ScalazProperties.enum.laws[Month])
+  checkAll("Month", ScalazProperties.`enum`.laws[Month])
   checkAll("LocalTime", order.laws[LocalTime])
 
-  checkAll("LocalDate", ScalazProperties.enum.laws[LocalDate])
-  checkAll("Year", ScalazProperties.enum.laws[Year])
+  checkAll("LocalDate", ScalazProperties.`enum`.laws[LocalDate])
+  checkAll("Year", ScalazProperties.`enum`.laws[Year])
 
-  checkAll("DayOfWeek", ScalazProperties.enum.laws[DayOfWeek])
+  checkAll("DayOfWeek", ScalazProperties.`enum`.laws[DayOfWeek])
   checkAll("LocalDateTime", order.laws[LocalDateTime])
   checkAll("OffsetDateTime", order.laws[OffsetDateTime])
   checkAll("OffsetTime", order.laws[OffsetTime])
