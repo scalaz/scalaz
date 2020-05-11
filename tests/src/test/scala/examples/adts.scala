@@ -14,7 +14,7 @@ package adt {
   sealed trait Foo
   final case class Bar(s: String)          extends Foo
   final case class Faz(b: Boolean, i: Int) extends Foo
-  final case object Baz extends Foo {
+  case object Baz extends Foo {
     implicit val equal: Equal[Baz.type] =
       Decidable[Equal].xderiving0(Baz)
     implicit val default: Default[Baz.type] =
