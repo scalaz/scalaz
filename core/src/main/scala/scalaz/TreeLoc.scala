@@ -416,7 +416,9 @@ sealed abstract class TreeLocInstances {
       import std.tuple._
 
       override def order(a: TreeLoc[A], b: TreeLoc[A]) =
-        Divide[Order].dividing4(Function.unlift(TreeLoc.unapply[A])).order(a, b)
+        Divide[Order].dividing4(
+          (x: TreeLoc[A]) => (x.tree, x.lefts, x.rights, x.parents)
+        ).order(a, b)
     }
 }
 
