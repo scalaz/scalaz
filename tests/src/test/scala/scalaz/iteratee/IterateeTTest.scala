@@ -18,8 +18,8 @@ object IterateeTTest extends SpecLite {
 
   "fold in constant stack space" in {
     val iter = fold[Int, Id, Int](0){ case (a,v) => a + v }.up[Trampoline]
-    val enum = enumStream[Int, Trampoline](Stream.fill(10000)(1))
-    (iter &= enum).run.run must_===(10000)
+    val e = enumStream[Int, Trampoline](Stream.fill(10000)(1))
+    (iter &= e).run.run must_===(10000)
   }
 
   object instances {
