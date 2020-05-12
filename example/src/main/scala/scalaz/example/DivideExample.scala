@@ -10,7 +10,7 @@ object DivideExample {
 
   object User {
     implicit val instance: Order[User] =
-      Divide[Order].dividing2(Function.unlift(unapply))
+      Divide[Order].dividing2((x: User) => (x.id, x.name))
   }
 
 }

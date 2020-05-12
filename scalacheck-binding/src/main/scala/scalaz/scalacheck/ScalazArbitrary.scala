@@ -164,7 +164,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Cogen[List[A]].contramap(_.toList)
 
   implicit def cogenTreeLoc[A: Cogen]: Cogen[TreeLoc[A]] =
-    Divide[Cogen].dividing4(Function.unlift(TreeLoc.unapply))
+    Divide[Cogen].dividing4((x: TreeLoc[A]) =>
+      (x.tree, x.lefts, x.rights, x.parents)
+    )
 
   implicit def cogenStrictTree[A: Cogen]: Cogen[StrictTree[A]] =
     Cogen[List[A]].contramap(_.toList)
