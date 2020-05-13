@@ -37,11 +37,11 @@ sealed abstract class Diev[A] {
 
   def foldLeft[B](z: B)(f: (B, A) => B): B
 
-  def toSet(): Set[A]
+  def toSet: Set[A]
 
-  def toList(): List[A]
+  def toList: List[A]
 
-  def toIList(): IList[A]
+  def toIList: IList[A]
 }
 
 object DievInterval {
@@ -206,11 +206,11 @@ trait DievImplementation {
       }
     }
 
-    def toSet(): Set[A] = foldLeft[Set[A]](Set[A]())(_ + _)
+    def toSet: Set[A] = foldLeft[Set[A]](Set[A]())(_ + _)
 
-    def toList(): List[A] = foldLeft[ListBuffer[A]](new ListBuffer())(_ += _).toList
+    def toList: List[A] = foldLeft[ListBuffer[A]](new ListBuffer())(_ += _).toList
 
-    def toIList(): IList[A] = foldRight[IList[A]](INil())(_ :: _)
+    def toIList: IList[A] = foldRight[IList[A]](INil())(_ :: _)
 
     override def toString(): String = intervals.foldLeft(new StringBuilder().append("("))(_.append(_)).append(")").toString
   }
