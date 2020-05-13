@@ -85,7 +85,7 @@ object FreeUsage extends App {
   println(prog.exec(0L))   // pure! always returns (60,28,green)
   println(prog.exec(0L))   // exactly the same of course
   println(prog.exec(123L)) // (82,52,blue)
-  println(prog.liftIO.unsafePerformIO) // DANGER: impure, who knows what will happen?
+  println(prog.liftIO.unsafePerformIO()) // DANGER: impure, who knows what will happen?
 
   // Of course all the normal combinators work
   println(nextBoolean.replicateM(10).exec(0L))
