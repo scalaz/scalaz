@@ -11,7 +11,7 @@ object ResourceTest extends SpecLite {
     "close the resource properly (1)" in {
       val r = new StringReader("abcdef")
       r.read
-      Resource[StringReader].close(r).unsafePerformIO
+      Resource[StringReader].close(r).unsafePerformIO()
       try {
         r.read
         fail("should have thrown")
@@ -23,7 +23,7 @@ object ResourceTest extends SpecLite {
     "close the resource properly (2)" in {
       val r = new StringReader("abcdef")
       r.read
-      IO(r).using(_ => IO.ioUnit).unsafePerformIO
+      IO(r).using(_ => IO.ioUnit).unsafePerformIO()
       try {
         r.read
         fail("should have thrown")
