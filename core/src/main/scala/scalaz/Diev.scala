@@ -5,7 +5,7 @@ import scala.collection.mutable.ListBuffer
 import syntax.`enum`._
 
 /**
- * Implementation of a Discrete Interval Encoding Tree [[http://web.engr.oregonstate.edu/~erwig/diet/]] that
+ * Implementation of a Discrete Interval Encoding Tree [[https://web.engr.oregonstate.edu/~erwig/diet/]] that
  * is actually implemented using a Vector and is balanced at all times as a result.
  */
 sealed abstract class Diev[A] {
