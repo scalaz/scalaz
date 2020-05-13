@@ -3,8 +3,6 @@ package scalaz
 final class NullArgument[A, B] private(_apply: Option[A] => B) {
   def apply(a: Option[A]): B = _apply(a)
 
-  import NullArgument._
-
   def dimap[C, D](f: C => A, g: B => D): NullArgument[C, D] =
     NullArgument(c => g(_apply(c.map(f))))
 
