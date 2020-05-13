@@ -24,8 +24,8 @@ object EnumeratorTTest extends SpecLite {
     import std.list._
     val xs = (1 to 10).map(List(_)).toList
     val e = enumIterator[List[Int], IO](xs.iterator)
-    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
-    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO must_===(xs.flatten)
+    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO() must_===(xs.flatten)
+    (Iteratee.sum[List[Int], IO] &= e).run.unsafePerformIO() must_===(xs.flatten)
   }
 
   "eof" in {
@@ -101,7 +101,7 @@ object EnumeratorTTest extends SpecLite {
       case (true, i) => if (i <= 2) v == 0 else v == 1
     }
 
-    (testIter &= (enum1 |+| effect |+| enum2)).run.unsafePerformIO must_===(true)
+    (testIter &= (enum1 |+| effect |+| enum2)).run.unsafePerformIO() must_===(true)
   }
 
   //checkAll(functor.laws[Enum])
