@@ -46,7 +46,7 @@ trait Bifoldable[F[_, _]]  { self =>
 
   /**Curried version of `bifoldRight` */
   final def bifoldR[A, B, C](fa: F[A, B], z: => C)(f: A => (=> C) => C)(g: B => (=> C) => C): C =
-    bifoldRight(fa, z)(Function.uncurried(f))(Function.uncurried(g))
+    bifoldRight(fa, z)((a, c) => f(a)(c))((b, c) => g(b)(c))
 
   /**Curried version of `bifoldLeft` */
   final def bifoldL[A, B, C](fa: F[A, B], z: C)(f: C => A => C)(g: C => B => C): C =
