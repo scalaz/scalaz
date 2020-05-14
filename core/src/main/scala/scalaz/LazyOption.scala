@@ -178,7 +178,7 @@ implicit def LazyOptionOrder[A: Order]: Order[LazyOption[A]] =
 }
 
 object LazyOption extends LazyOptionInstances {
-  private val none = LazyNone[Any]
+  private val none = LazyNone[Any]()
 
   def lazySome[A](a: => A): LazyOption[A] =
     LazySome(() => a)
