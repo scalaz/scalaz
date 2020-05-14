@@ -79,7 +79,7 @@ object LazyListTest extends SpecLite {
   }
 
   "foldMap1Opt identity" ! forAll {
-    xs: LazyList[Int] =>
+    (xs: LazyList[Int]) =>
     Foldable[LazyList].foldMap1Opt(xs)(LazyList(_)).getOrElse(LazyList.empty) must_===(xs)
   }
 

@@ -46,13 +46,13 @@ object MapTest extends SpecLite {
     F.index(a, a.size) must_=== None
   }
 
-  "equals/hashCode" ! forAll { a: Int ==>> Int =>
+  "equals/hashCode" ! forAll { (a: Int ==>> Int) =>
     val b = ==>>.fromList(Random.shuffle(a.toList))
     a must_== b
     a.## must_=== b.##
   }
 
-  "minViewWithKey" ! forAll { a: Int ==>> Int =>
+  "minViewWithKey" ! forAll { (a: Int ==>> Int) =>
     a.minViewWithKey match {
       case None =>
         a.size must_=== 0
@@ -64,7 +64,7 @@ object MapTest extends SpecLite {
     }
   }
 
-  "maxViewWithKey" ! forAll { a: Int ==>> Int =>
+  "maxViewWithKey" ! forAll { (a: Int ==>> Int) =>
     a.maxViewWithKey match {
       case None =>
         a.size must_=== 0
@@ -76,21 +76,21 @@ object MapTest extends SpecLite {
     }
   }
 
-  "findMin" ! forAll { a: Int ==>> Int =>
+  "findMin" ! forAll { (a: Int ==>> Int) =>
     a.findMin must_=== {
       if(a.isEmpty) None
       else Some(a.toList.minBy(_._1))
     }
   }
 
-  "findMax" ! forAll { a: Int ==>> Int =>
+  "findMax" ! forAll { (a: Int ==>> Int) =>
     a.findMax must_=== {
       if(a.isEmpty) None
       else Some(a.toList.maxBy(_._1))
     }
   }
 
-  "deleteMin" ! forAll { a: Int ==>> Int =>
+  "deleteMin" ! forAll { (a: Int ==>> Int) =>
     val b = a.deleteMin
     structurallySound(b)
     if(a.isEmpty){
@@ -101,7 +101,7 @@ object MapTest extends SpecLite {
     }
   }
 
-  "deleteMax" ! forAll { a: Int ==>> Int =>
+  "deleteMax" ! forAll { (a: Int ==>> Int) =>
     val b = a.deleteMax
     structurallySound(b)
     if(a.isEmpty){
@@ -588,7 +588,7 @@ object MapTest extends SpecLite {
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeys(_ => 3) must_===(singleton(3, "c"))
     }
 
-    "mapKeys sound" ! forAll { a: Int ==>> Int =>
+    "mapKeys sound" ! forAll { (a: Int ==>> Int) =>
       val b = a.mapKeys(identity)
       b must_=== a
       structurallySound(b)

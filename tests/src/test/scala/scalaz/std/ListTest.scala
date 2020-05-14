@@ -139,7 +139,7 @@ object ListTest extends SpecLite {
     (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 
-  "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>
+  "groupWhen is groupWhenM[Id]" ! forAll { (xs: List[Int]) =>
     val f: (Int, Int) => Boolean = _ > _
     xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
   }

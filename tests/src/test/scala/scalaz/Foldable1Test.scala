@@ -67,7 +67,7 @@ object Foldable1Test extends SpecLite {
   }
 
   "toNel" ! forAll {
-    intAnd: OneAnd[IList, Int] =>
+    (intAnd: OneAnd[IList, Int]) =>
     intAnd.toNel must_=== NonEmptyList.nel(intAnd.head, intAnd.tail)
   }
 }

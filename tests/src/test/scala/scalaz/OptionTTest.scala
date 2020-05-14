@@ -18,11 +18,11 @@ object OptionTTest extends SpecLite {
   checkAll(traverse.laws[OptionTList])
   checkAll(monadError.laws[OptionTEither, Int])
 
-  "show" ! forAll { a: OptionTList[Int] =>
+  "show" ! forAll { (a: OptionTList[Int]) =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
   }
 
-  "optionT" ! forAll { ass: List[Option[Int]] =>
+  "optionT" ! forAll { (ass: List[Option[Int]]) =>
       OptionT.optionT(ass).run == ass
   }
 

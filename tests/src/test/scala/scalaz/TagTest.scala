@@ -8,14 +8,14 @@ import org.scalacheck.Prop.forAll
 
 object TagTest extends SpecLite {
   "of.subst" should {
-    "substitute" ! forAll {xs: List[Int] =>
+    "substitute" ! forAll { (xs: List[Int]) =>
       (Tag unwrap Foldable[List].fold(Tag.of[Mult].subst(xs))
          must_===(xs.foldLeft(1)(_ * _)))
     }
   }
 
   "of.onF" should {
-    "substitute" ! forAll {xs: List[List[Unit]] =>
+    "substitute" ! forAll { (xs: List[List[Unit]]) =>
       (Tag unwrap (Foldable[List].foldMap(xs)(Tag.of[Mult].onF(_.length)))
          must_===(xs.foldLeft(1)((n, l) => n * l.length)))
     }

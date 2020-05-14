@@ -24,7 +24,7 @@ object MonoidTest extends SpecLite {
   "endo kleisli multiply" in {
     import syntax.monoid._
 
-    val k = Kleisli { i: Int => if (i % 2 == 0) Some(i * 2) else None }
+    val k = Kleisli { (i: Int) => if (i % 2 == 0) Some(i * 2) else None }
 
     val kTimes3 = k.endo.multiply(3)
     kTimes3.run(2) must_=== (Some(16))

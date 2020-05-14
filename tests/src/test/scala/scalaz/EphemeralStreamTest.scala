@@ -25,7 +25,7 @@ object EphemeralStreamTest extends SpecLite {
     e.reverse.reverse must_===(e)
   }
 
-  "foldLeft" ! forAll{ xs: List[List[Int]] =>
+  "foldLeft" ! forAll{ (xs: List[List[Int]]) =>
     Foldable[EphemeralStream].foldLeft(EphemeralStream(xs: _*), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
 
@@ -54,7 +54,7 @@ object EphemeralStreamTest extends SpecLite {
     es.foldLeft(Need(0))(x => y => Need(y)).value must_=== 10
   }
 
-  "unzip zip" ! forAll { xs: EphemeralStream[(Int, Int)] =>
+  "unzip zip" ! forAll { (xs: EphemeralStream[(Int, Int)]) =>
     val (firsts, seconds) = xs.unzip
     (firsts zip seconds) must_===(xs)
   }
@@ -95,12 +95,12 @@ object EphemeralStreamTest extends SpecLite {
     Foldable[EphemeralStream].index(EphemeralStream.fromStream(xs), i) must_===(xs.lift.apply(i))
   }
 
-  "inits" ! forAll { xs: EphemeralStream[Int] =>
+  "inits" ! forAll { (xs: EphemeralStream[Int]) =>
     import syntax.std.list._
     xs.inits.map(_.toList).toList must_===(xs.toList.initz)
   }
 
-  "tails" ! forAll { xs: EphemeralStream[Int] =>
+  "tails" ! forAll { (xs: EphemeralStream[Int]) =>
     import syntax.std.list._
     xs.tails.map(_.toList).toList must_===(xs.toList.tailz)
   }
@@ -125,7 +125,7 @@ object EphemeralStreamTest extends SpecLite {
   }
 
   "foldMap1Opt identity" ! forAll {
-    xs: EphemeralStream[Int] =>
+    (xs: EphemeralStream[Int]) =>
     Foldable[EphemeralStream].foldMap1Opt(xs)(Vector(_)).getOrElse(Vector.empty) must_===(Foldable[EphemeralStream].toVector(xs))
   }
 

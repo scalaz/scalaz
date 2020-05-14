@@ -78,7 +78,7 @@ object StreamTest extends SpecLite {
   }
 
   "foldMap1Opt identity" ! forAll {
-    xs: Stream[Int] =>
+    (xs: Stream[Int]) =>
     Foldable[Stream].foldMap1Opt(xs)(Stream(_)).getOrElse(Stream.empty) must_===(xs)
   }
 

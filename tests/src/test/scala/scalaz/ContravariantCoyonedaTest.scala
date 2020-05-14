@@ -30,14 +30,14 @@ object ContravariantCoyonedaGens {
 
   def aToString[A] = CtCoOrder((_:A).toString)
 
-  val evensFirst = CtCoOrder{x:Int =>
+  val evensFirst = CtCoOrder{ (x: Int) =>
     if (x % 2 == 0) (0, x)
     else (1, x)
   }
 
-  val negated = CtCoOrder{x:Int => -x}
+  val negated = CtCoOrder{ (x: Int) => -x }
 
-  val probablePrime = CtCoOrder{x:Int =>
+  val probablePrime = CtCoOrder{ (x: Int) =>
     ((x - 1 : BigInt) isProbablePrime 5, x)
   }
 

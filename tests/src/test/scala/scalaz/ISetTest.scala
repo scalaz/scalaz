@@ -40,7 +40,7 @@ object ISetTest extends SpecLite {
       Functor[Arbitrary].map(implicitly[Arbitrary[Int]])(Foo(_))
   }
 
-  "show" ! forAll { a: ISet[Foo] =>
+  "show" ! forAll { (a: ISet[Foo]) =>
     Show[ISet[Foo]].shows(a) must_=== a.toAscList.map(_.a).mkString("ISet(", ",", ")")
   }
 
@@ -50,12 +50,12 @@ object ISetTest extends SpecLite {
     Foldable[ISet].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
-  "findLeft" ! forAll{ a: ISet[Int] =>
+  "findLeft" ! forAll{ (a: ISet[Int]) =>
     val f = (_: Int) % 3 == 0
     Foldable[ISet].findLeft(a)(f) must_=== Foldable[List].findLeft(a.toList)(f)
   }
 
-  "findRight" ! forAll { a: ISet[Int] =>
+  "findRight" ! forAll { (a: ISet[Int]) =>
     val f = (_: Int) % 3 == 0
     Foldable[ISet].findRight(a)(f) must_=== Foldable[List].findRight(a.toList)(f)
   }
@@ -69,12 +69,12 @@ object ISetTest extends SpecLite {
     F.index(a, a.size) must_=== None
   }
 
-  "toIList" ! forAll { a: ISet[Int] =>
+  "toIList" ! forAll { (a: ISet[Int]) =>
     val b = Foldable[ISet].toIList(a)
     b.sorted must_=== b
   }
 
-  "equals/hashCode" ! forAll { a: ISet[Int] =>
+  "equals/hashCode" ! forAll { (a: ISet[Int]) =>
     val b = ISet.fromList(Random.shuffle(a.toList))
     a must_== b
     a.## must_=== b.##
@@ -109,7 +109,7 @@ object ISetTest extends SpecLite {
     }
   }
 
-  "splitRoot" ! forAll { a: ISet[Int] =>
+  "splitRoot" ! forAll { (a: ISet[Int]) =>
     a match {
       case Tip() =>
         a.splitRoot must_=== List.empty[ISet[Int]]
@@ -124,7 +124,7 @@ object ISetTest extends SpecLite {
     }
   }
 
-  "lookupIndex" ! forAll { a: ISet[Int] =>
+  "lookupIndex" ! forAll { (a: ISet[Int]) =>
     val l = a.toList
     (0 until a.size) foreach { i =>
       a.lookupIndex(l(i)) must_=== Some(i)
@@ -138,7 +138,7 @@ object ISetTest extends SpecLite {
     }
   }
 
-  "deleteAt" ! forAll { a: ISet[Int] =>
+  "deleteAt" ! forAll { (a: ISet[Int]) =>
     val l = a.toList
     (0 until a.size) foreach { i =>
       val e = l(i)

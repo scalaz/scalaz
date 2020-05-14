@@ -17,7 +17,7 @@ object TreeTest extends SpecLite {
 
   checkAll(FoldableTests.anyAndAllLazy[Tree])
 
-  "indexed" ! forAll { xs: Tree[Byte] =>
+  "indexed" ! forAll { (xs: Tree[Byte]) =>
     val F = Traverse[Tree]
     val a = F.indexed(xs)
     Equal[Tree[Byte]].equal(a.map(_._2), xs) must_=== true

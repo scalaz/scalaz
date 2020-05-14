@@ -108,7 +108,7 @@ object FreeTTest extends SpecLite {
     }
   }
 
-  "isoFree" ! forAll { a: FreeOption[Int] =>
+  "isoFree" ! forAll { (a: FreeOption[Int]) =>
     val iso = FreeT.isoFree[Option]
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
   }
