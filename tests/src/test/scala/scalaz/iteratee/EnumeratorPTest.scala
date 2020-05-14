@@ -9,7 +9,6 @@ import Id._
 import NaturalTransformation.id
 
 object EnumeratorPTest extends SpecLite {
-  implicit val intO = Order[Int].order _
   "cogroupE" should {
     "work the same as directly using the nested iteratee " in {
       val enum1 = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))
