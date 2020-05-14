@@ -13,7 +13,7 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
     indexedStoreT((F.map(set)(_ compose g), f(pos)))
 
   def bmap[X, Z >: I <: A](b: Bijection[Z, X])(implicit F: Functor[F]): StoreT[F, X, B] =
-    xmap(b to)(b from)
+    xmap(b to _)(b from _)
 
   def imap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     indexedStoreT((set, f(pos)))
@@ -22,7 +22,7 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
     indexedStoreT((F.map(set)(_ compose g), pos))
 
   def bimap[X, Y](f: I => X)(g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
-    indexedStoreT((F.map(set)(g compose), f(pos)))
+    indexedStoreT((F.map(set)(g compose _), f(pos)))
 
   def leftMap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     imap(f)

@@ -32,13 +32,13 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     plensFamily(x => apply(g(x)) map (_ map (f)))
 
   def xmapbA[X, A >: A2 <: A1](b: Bijection[A, X]): PLensFamily[X, X, B1, B2] =
-    xmapA(b to)(b from)
+    xmapA(b to _)(b from _)
 
   def xmapB[X1, X2](f: B1 => X1)(g: X2 => B2): PLensFamily[A1, A2, X1, X2] =
     plensFamily(a => apply(a) map (_.xmap(f)(g)))
 
   def xmapbB[X, B >: B1 <: B2](b: Bijection[B, X]): PLensFamily[A1, A2, X, X] =
-    xmapB(b to)(b from)
+    xmapB(b to _)(b from _)
 
   def get(a: A1): Option[B1] =
     run(a) map (_.pos)
