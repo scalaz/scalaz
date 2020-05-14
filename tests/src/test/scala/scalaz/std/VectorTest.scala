@@ -10,9 +10,6 @@ import org.scalacheck.Prop.forAll
 import Maybe.just
 
 object VectorTest extends SpecLite {
-  implicit def vectorArb[A: Arbitrary] =
-    Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toVector))
-
   import std.vector._
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])
