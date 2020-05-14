@@ -98,7 +98,7 @@ object AdjunctUsage extends App {
   }
 
   // but this can be done more generically for any two of these Reader/Writer adjunctions
-  def run2RWState[A,S1,S2,B,C,R](rws1: A => RWState[S1,B], rws2: A => RWState[S2,C], f: (B,C) => R) = { a: A =>
+  def run2RWState[A,S1,S2,B,C,R](rws1: A => RWState[S1,B], rws2: A => RWState[S2,C], f: (B,C) => R) = { (a: A) =>
     rws1(a).map(b => rws2(a).map(_.map(c => Writer(b.run._1,f(b.run._2,c)))))
   }
 

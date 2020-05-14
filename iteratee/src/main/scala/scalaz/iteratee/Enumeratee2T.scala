@@ -75,7 +75,7 @@ trait Enumeratee2TFunctions {
     new Enumeratee2T[J, K, (J, K), F] {
       def apply[A] = {
         def cstep(step: StepT[(J, K), F, A]): StepT[Either3[J, (J, K), K], F, StepT[(J, K), F, A]] = step.fold(
-          cont = contf => scont { in: Input[Either3[J, (J, K), K]] =>
+          cont = contf => scont { (in: Input[Either3[J, (J, K), K]]) =>
             val nextInput = in.flatMap(_.middleOr(emptyInput[(J, K)]) { elInput(_) })
 
             contf(nextInput) >>== (s => cstep(s).pointI)
@@ -124,7 +124,7 @@ trait Enumeratee2TFunctions {
     new Enumeratee2T[J, K, J, F] {
       def apply[A] = {
         def cstep(step: StepT[J, F, A]): StepT[Either3[J, (J, K), K], F, StepT[J, F, A]]  = step.fold(
-          cont = contf => scont { in: Input[Either3[J, (J, K), K]] =>
+          cont = contf => scont { (in: Input[Either3[J, (J, K), K]]) =>
             val nextInput = in map {
               case Left3(j) => j
               case Middle3((j, k)) => m.append(j, f(k))
