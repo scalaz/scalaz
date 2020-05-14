@@ -16,8 +16,9 @@ import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
+import com.typesafe.tools.mima.core.{ProblemFilters, IncompatibleSignatureProblem}
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems}
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
@@ -346,6 +347,15 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := true,
+    mimaBinaryIssueFilters ++= {
+      if (scalaBinaryVersion.value == "2.11") {
+        Seq(
+          ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
+        )
+      } else {
+        Nil
+      }
+    },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
