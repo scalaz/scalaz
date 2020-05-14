@@ -57,7 +57,7 @@ object UnapplyInference extends App {
     import scalaz._
     import scalaz.syntax.either._
     val k: Kleisli[NumberFormatException \/ *, String, Int] =
-      Kleisli.kleisliU { s: String =>
+      Kleisli.kleisliU { (s: String) =>
         try s.toInt.right[NumberFormatException]
         catch { case e: NumberFormatException => e.left[Int] }
       }
