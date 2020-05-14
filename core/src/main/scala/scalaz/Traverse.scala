@@ -79,7 +79,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseSTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => State[S, G[B]]): State[S, G[F[B]]] = {
     import Free._
-    implicit val A = StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
+    implicit val A: Applicative[({type l[a] = StateT[S, Trampoline, G[a]]})#l] =
+      StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](s => {
       val st = traverse[λ[α => StateT[S, Trampoline, G[α]]], A, B](fa)(f(_: A).lift[Trampoline])
       st.run(s).run
@@ -89,7 +90,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseKTrampoline[S, G[_] : Applicative, A, B](fa: F[A])(f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
     import Free._
-    implicit val A = Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
+    implicit val A: Applicative[({type l[a] = Kleisli[Trampoline, S, G[a]]})#l] =
+      Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](s => {
       val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
       kl.run

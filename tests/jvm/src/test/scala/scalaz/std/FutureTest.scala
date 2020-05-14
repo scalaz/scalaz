@@ -28,7 +28,7 @@ class FutureTest extends SpecLite {
  {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap { future: Future[A] =>
+  implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A] contramap { (future: Future[A]) =>
     val futureWithError = future.map(_.right[Throwable]).recover { case e => e.left[A] }
     Await.result(futureWithError, duration)
   }

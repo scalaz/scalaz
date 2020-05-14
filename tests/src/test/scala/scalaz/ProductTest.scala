@@ -8,13 +8,14 @@ object ProductTest extends SpecLite {
   type OptionList[α] = (Option[α], List[α])
   type OneAndOption[α] = OneAnd[Option, α]
   type OneAndOptionPair[α] = (OneAndOption[α], OneAndOption[α])
+  type EitherTuple2[a, b] = (Either[a, b], (a, b))
 
-  implicit val optionListMonadPlus = MonadPlus[Option].product[List]
-  implicit val optionListZip = Zip[Option].product[List]
-  implicit val oneAndOptionPairTraverse1 = Traverse1[OneAndOption].product[OneAndOption]
+  implicit val optionListMonadPlus: MonadPlus[OptionList] = MonadPlus[Option].product[List]
+  implicit val optionListZip: Zip[OptionList] = Zip[Option].product[List]
+  implicit val oneAndOptionPairTraverse1: Traverse1[OneAndOptionPair] = Traverse1[OneAndOption].product[OneAndOption]
 
   {
-    implicit val optionListBindRec = BindRec[Option].product[List]
+    implicit val optionListBindRec: BindRec[OptionList] = BindRec[Option].product[List]
     checkAll(bindRec.laws[OptionList])
   }
 
@@ -22,6 +23,6 @@ object ProductTest extends SpecLite {
   checkAll(zip.laws[OptionList])
   checkAll(traverse1.laws[OneAndOptionPair])
 
-  implicit val eitherTuple2 = Bitraverse[Either].product[Tuple2]
-  checkAll(bitraverse.laws[λ[(α, β) => (Either[α, β], (α, β))]])
+  implicit val eitherTuple2: Bitraverse[EitherTuple2] = Bitraverse[Either].product[Tuple2]
+  checkAll(bitraverse.laws[EitherTuple2])
 }

@@ -122,13 +122,13 @@ trait MapInstances extends MapInstances0 with MapFunctions {
 
   implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] =
     new Order[Map[K, V]] with MapEqual[K, V] {
-      def OK = Order[K]
-      def OV = Equal[V]
+      override def OK: Order[K] = Order[K]
+      override def OV: Equal[V] = Equal[V]
       def order(x: Map[K, V], y: Map[K, V]): Ordering = {
         import vector._
         import anyVal._
         import tuple._
-        implicit val ok = Order[K].toScalaOrdering
+        implicit val ok: scala.Ordering[K] = Order[K].toScalaOrdering
         Semigroup[Ordering]
          .append(Order[Int].order(x.size, y.size),
                  Order[Vector[(K, V)]]

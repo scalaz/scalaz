@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 
 object ApplyTest extends SpecLite {
   checkAll("List applyApplicative", {
-             implicit val F = Apply[List].applyApplicative
+             implicit val F: Applicative[λ[α => List[α] \/ α]] = Apply[List].applyApplicative
              applicative.laws[λ[α => List[α] \/ α]]
            })
 

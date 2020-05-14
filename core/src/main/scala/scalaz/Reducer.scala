@@ -35,13 +35,12 @@ trait Reducer[C, M] {
 
   /** Distribute `C`s to `M` and `N`. */
   def compose[N](r: Reducer[C, N]): Reducer[C, (M, N)] = {
-    implicit val m = Reducer.this.semigroup
-    implicit val n = r.semigroup
     new Reducer[C, (M, N)] {
-
+      private[this] implicit val m: Semigroup[M] = Reducer.this.semigroup
+      private[this] implicit val n: Semigroup[N] = r.semigroup
       import std.tuple._
 
-      val semigroup = Semigroup[(M, N)]
+      override val semigroup: Semigroup[(M, N)] = Semigroup[(M, N)]
 
       override def unit(x: C) = (Reducer.this.unit(x), r.unit(x))
 

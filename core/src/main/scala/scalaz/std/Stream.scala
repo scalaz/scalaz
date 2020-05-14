@@ -152,7 +152,7 @@ trait StreamInstances {
     new StreamEqual[A] { def A = A0 }
   implicit def streamOrder[A](implicit A0: Order[A]): Order[Stream[A]] =
     new Order[Stream[A]] with StreamEqual[A] {
-      def A = A0
+      override def A: Order[A] = A0
       import Ordering._
       @annotation.tailrec
       override final def order(a: Stream[A], b: Stream[A]): Ordering =

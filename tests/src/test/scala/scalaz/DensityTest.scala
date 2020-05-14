@@ -21,7 +21,7 @@ class DensityTest extends SpecLite {
   checkAll("Density[NonEmptyList, *] comonad laws", comonad.laws[Density[NonEmptyList, *]])
   checkAll("Density[PairInt, *] comonad laws", comonad.laws[Density[PairInt, *]])
 
-  implicit val pairIntDensity = new Density[PairInt, Int] {
+  implicit val pairIntDensity: Density[PairInt, Int] = new Density[PairInt, Int] {
     type X = Unit
     val fb: PairInt[Unit] = (0, ())
     def f: PairInt[Unit] => Int = a => a._1
