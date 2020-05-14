@@ -142,6 +142,15 @@ object IStream {
       // wtf is traversal all about?
       override def traverse[G[_]: Applicative, A, B](fa: IStream[A])(f: A => G[B]): G[IStream[B]] = traverseImpl(fa)(f)
 
+      override def length[A](fa: IStream[A]): Int = {
+        @tailrec def loop(t: IStream[A], acc: Int): Int = t match {
+          case Cons(_, tail) =>
+            loop(tail.value, acc + 1)
+          case _: Nil[_] =>
+            acc
+        }
+        loop(fa, 0)
+      }
     }
 
   implicit def equal[A: Equal]: Equal[IStream[A]] = {
