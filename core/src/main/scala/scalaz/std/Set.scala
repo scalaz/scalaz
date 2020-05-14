@@ -40,8 +40,8 @@ trait SetInstances {
     def order(a1: Set[A], a2: Set[A]) = {
       import anyVal._
       import scala.math.Ordering.Implicits._
-      implicit val o = Order[A].toScalaOrdering
-      implicit val so = Order.fromScalaOrdering(implicitly[scala.math.Ordering[Seq[A]]])
+      implicit val o: scala.Ordering[A] = Order[A].toScalaOrdering
+      implicit val so: Order[Seq[A]] = Order.fromScalaOrdering(implicitly[scala.math.Ordering[Seq[A]]])
       Order[Int].order(a1.size, a2.size) match {
         case EQ => Order.orderBy((s: Set[A]) => s.toSeq.sorted).order(a1, a2)
         case x => x
@@ -51,7 +51,7 @@ trait SetInstances {
     override def equal(a1: Set[A], a2: Set[A]) = {
       if (equalIsNatural) a1 == a2
       else {
-        implicit val x = Order[A].toScalaOrdering
+        implicit val x: scala.Ordering[A] = Order[A].toScalaOrdering
         import scala.collection.immutable.TreeSet
         val s1 = TreeSet[A](a1.toSeq: _*)
         val s2 = TreeSet[A](a2.toSeq: _*)

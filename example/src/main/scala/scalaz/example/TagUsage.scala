@@ -97,7 +97,7 @@ object TagUsage extends App {
   // now we can define a function which takes lists which are tagged as being sorted
   def minOption[A](a: List[A] @@ Sorted): Option[A] = Sorted.unwrap(a).headOption
 
-  implicit val ord = implicitly[Order[Option[Int]]].toScalaOrdering
+  implicit val ord: scala.Ordering[Option[Int]] = Order[Option[Int]].toScalaOrdering
   assert(minOption(sortList(List(3,2,1,5,3))) === Some(1))
 
   // we can also use pattern matching:

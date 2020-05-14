@@ -9,7 +9,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 case class FreeList[A](f: Free[List, A])
 
 sealed abstract class FreeListInstances {
-  implicit def freeListTraverse = new Traverse[FreeList] {
+  implicit def freeListTraverse: Traverse[FreeList] = new Traverse[FreeList] {
     def traverseImpl[G[_], A, B](fa: FreeList[A])(f: A => G[B])(implicit G: Applicative[G]) =
       G.map(Traverse[Free[List, ?]].traverseImpl(fa.f)(f))(FreeList.apply)
   }
@@ -23,7 +23,7 @@ object FreeList extends FreeListInstances {
       FreeList(Z.zip(a.f, b.f))
   }
 
-  implicit def freeListMonad = new Monad[FreeList] with BindRec[FreeList] {
+  implicit def freeListMonad: Monad[FreeList] with BindRec[FreeList] = new Monad[FreeList] with BindRec[FreeList] {
     def point[A](a: => A): FreeList[A] =
       FreeList(Monad[Free[List, ?]].point(a))
 

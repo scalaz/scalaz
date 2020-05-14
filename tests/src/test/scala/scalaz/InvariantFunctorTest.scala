@@ -27,6 +27,6 @@ object InvariantFunctorTest extends SpecLite {
   }
 
   case class Num(x: Int)
-  implicit val showNum = Show.showA[Num]
-  implicit val eqNum = Equal.equalA[Num]
+  implicit val showNum: Show[Num] = Show.showA[Num]
+  implicit val eqNum: Equal[Num] = Equal.equalA[Num]
 }
