@@ -40,4 +40,26 @@ object IStreamTest extends SpecLite {
     // got here without exception... that's good!
   }
 
+  "length" in {
+    var counter = 0
+
+    def a(): Unit = {
+      counter += 1
+      42
+    }
+
+    val x = IStream.ByName.cons(
+      a(),
+      IStream.ByName.cons(
+        a(),
+        IStream.ByName.cons(
+          a(),
+          IStream.ByName(a())
+        )
+      )
+    )
+    Foldable[IStream].length(x) must_=== 4
+    counter must_=== 0
+  }
+
 }
