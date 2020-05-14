@@ -57,28 +57,28 @@ object IListTest extends SpecLite {
     rnge.foldRight(IList[Int]())(_++_) must_=== F.foldRight(rnge.toList, IList[Int]())(_++_)
   }
 
-  "foldLeft1Opt" ! forAll { ns: IList[List[Int]] =>
+  "foldLeft1Opt" ! forAll { (ns: IList[List[Int]]) =>
     ns.foldLeft1Opt(_ ::: _) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
-  "foldRight1Opt" ! forAll { ns: IList[List[Int]] =>
+  "foldRight1Opt" ! forAll { (ns: IList[List[Int]]) =>
     ns.foldRight1Opt(_ ::: _) must_=== ns.toList.reduceRightOption(_ ::: _)
   }
 
-  "foldMap1Opt" ! forAll { ns: IList[List[Int]] =>
+  "foldMap1Opt" ! forAll { (ns: IList[List[Int]]) =>
     ns.foldMap1Opt(identity) must_=== ns.toList.reduceLeftOption(_ ::: _)
   }
 
-  "foldMap" ! forAll { xs: IList[Int]  =>
+  "foldMap" ! forAll { (xs: IList[Int])  =>
     xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)
   }
 
-  "mapAccumLeft" ! forAll { xs: IList[Int] =>
+  "mapAccumLeft" ! forAll { (xs: IList[Int]) =>
     val f = (_: Int) + 1
     xs.mapAccumLeft(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs -> xs.map(f))
   }
 
-  "mapAccumRight" ! forAll { xs: IList[Int] =>
+  "mapAccumRight" ! forAll { (xs: IList[Int]) =>
     val f = (_: Int) + 1
     xs.mapAccumRight(IList[Int]())((c, a) => (c :+ a, f(a))) must_=== (xs.reverse -> xs.map(f))
   }
@@ -146,7 +146,7 @@ object IListTest extends SpecLite {
     ns.count(p) must_=== ns.toList.count(p)
   }
 
-  "distinct" ! forAll { xs: IList[Int] =>
+  "distinct" ! forAll { (xs: IList[Int]) =>
     xs.distinct.toList must_=== xs.toList.distinct
   }
 
@@ -196,7 +196,7 @@ object IListTest extends SpecLite {
     ns.groupBy1(f).map(oa => (oa.head :: oa.tail).toList.reverse).toList.toMap must_=== ns.toList.groupBy(f)
   }
 
-  "headOption" ! forAll { ns: IList[Int] =>
+  "headOption" ! forAll { (ns: IList[Int]) =>
     ns.headOption must_=== ns.toList.headOption
   }
 
@@ -216,11 +216,11 @@ object IListTest extends SpecLite {
     ns.indexWhere(f).getOrElse(-1) must_=== ns.toList.indexWhere(f)
   }
 
-  "initOption" ! forAll { ns: IList[Int] =>
+  "initOption" ! forAll { (ns: IList[Int]) =>
     ns.initMaybe.map(_.toList) must_=== (try just(ns.toList.init) catch { case e: Exception => Maybe.empty })
   }
 
-  "inits" ! forAll { ns: IList[Int] =>
+  "inits" ! forAll { (ns: IList[Int]) =>
     ns.inits.map(_.toList).toList must_=== ns.toList.inits.toList
   }
 
@@ -257,17 +257,17 @@ object IListTest extends SpecLite {
     ns.lastIndexWhere(f).getOrElse(-1) must_=== ns.toList.lastIndexWhere(f)
   }
 
-  "lastOption" ! forAll { ns: IList[Int] =>
+  "lastOption" ! forAll { (ns: IList[Int]) =>
     ns.lastOption must_=== ns.toList.lastOption
   }
 
-  "length" ! forAll { ns: IList[Int] =>
+  "length" ! forAll { (ns: IList[Int]) =>
     ns.length must_=== ns.toList.length
   }
 
   // map is tested by functor laws
 
-  "nonEmpty" ! forAll { ns: IList[Int] =>
+  "nonEmpty" ! forAll { (ns: IList[Int]) =>
     ns.nonEmpty must_=== ns.toList.nonEmpty
   }
 
@@ -295,7 +295,7 @@ object IListTest extends SpecLite {
     ns.reduceRightOption(f) must_=== (try Some(ns.toList.reduceRight(f)) catch { case e:Exception => None })
   }
 
-  "reverse" ! forAll { ns: IList[Int] =>
+  "reverse" ! forAll { (ns: IList[Int]) =>
     ns.reverse.toList must_=== ns.toList.reverse
   }
 
@@ -351,11 +351,11 @@ object IListTest extends SpecLite {
     ns.startsWith(ms) must_=== ns.toList.startsWith(ms.toList)
   }
 
-  "tails" ! forAll { ns: IList[Int] =>
+  "tails" ! forAll { (ns: IList[Int]) =>
     ns.tails.map(_.toList).toList must_=== ns.toList.tails.toList
   }
 
-  "tailOption" ! forAll { ns: IList[Int] =>
+  "tailOption" ! forAll { (ns: IList[Int]) =>
     ns.tailMaybe.map(_.toList) must_=== (try just(ns.toList.tail) catch { case e: Exception => Maybe.empty })
   }
 
@@ -375,31 +375,31 @@ object IListTest extends SpecLite {
     ns.takeWhile(f).toList must_=== ns.toList.takeWhile(f)
   }
 
-  "toEphemeralStream" ! forAll { ns: List[Int] =>
+  "toEphemeralStream" ! forAll { (ns: List[Int]) =>
     IList.fromSeq(ns).toEphemeralStream.toList must_=== EphemeralStream(ns: _*).toList
   }
 
-  "toList" ! forAll { ns: List[Int] =>
+  "toList" ! forAll { (ns: List[Int]) =>
     IList.fromSeq(ns).toList must_=== ns
   }
 
-  "toMap" ! forAll { ps: List[(String, Int)] =>
+  "toMap" ! forAll { (ps: List[(String, Int)]) =>
     IList.fromSeq(ps).toMap must_=== ==>>(ps: _*)
   }
 
-  "toNel" ! forAll { ns: List[Int] =>
+  "toNel" ! forAll { (ns: List[Int]) =>
     IList.fromSeq(ns).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
-  "toStream" ! forAll { ns: List[Int] =>
+  "toStream" ! forAll { (ns: List[Int]) =>
     IList.fromSeq(ns).toStream must_=== ns.toStream
   }
 
-  "toVector" ! forAll { ns: Vector[Int] =>
+  "toVector" ! forAll { (ns: Vector[Int]) =>
     IList.fromSeq(ns).toVector must_=== ns
   }
 
-  "toZipper" ! forAll { ns: List[Int] =>
+  "toZipper" ! forAll { (ns: List[Int]) =>
     IList.fromSeq(ns).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
   }
 
@@ -420,7 +420,7 @@ object IListTest extends SpecLite {
   // widen is tested by toMap and unzip
   // zip is tested by zip laws
 
-  "zipWithIndex" ! forAll { ns: IList[Int] =>
+  "zipWithIndex" ! forAll { (ns: IList[Int]) =>
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 

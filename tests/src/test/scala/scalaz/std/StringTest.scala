@@ -31,7 +31,7 @@ object StringTest extends SpecLite {
     parseLong("-12345678901234567890") must_===(Validation.failure(s"-12345678901234567890 is outside of range for Long (${Long.MinValue} - ${Long.MaxValue})"))
   }
 
-  "parseLong" ! forAll { l: Long =>
+  "parseLong" ! forAll { (l: Long) =>
     string.parseLong(l.toString) must_=== Validation.success(l)
   }
 
@@ -42,7 +42,7 @@ object StringTest extends SpecLite {
     parseInt("-123456789012") must_===(Validation.failure(s"-123456789012 is outside of range for Int (${Int.MinValue} - ${Int.MaxValue})"))
   }
 
-  "parseInt" ! forAll { i: Int =>
+  "parseInt" ! forAll { (i: Int) =>
     string.parseInt(i.toString) must_=== Validation.success(i)
   }
 
@@ -53,7 +53,7 @@ object StringTest extends SpecLite {
     parseByte("-1234") must_===(Validation.failure(s"-1234 is outside of range for Byte (${Byte.MinValue} - ${Byte.MaxValue})"))
   }
 
-  "parseByte" ! forAll { b: Byte =>
+  "parseByte" ! forAll { (b: Byte) =>
     string.parseByte(b.toString) must_=== Validation.success(b)
   }
 
@@ -64,7 +64,7 @@ object StringTest extends SpecLite {
     parseShort("-1234567") must_===(Validation.failure(s"-1234567 is outside of range for Short (${Short.MinValue} - ${Short.MaxValue})"))
   }
 
-  "parseShort" ! forAll { s: Short =>
+  "parseShort" ! forAll { (s: Short) =>
     string.parseShort(s.toString) must_=== Validation.success(s)
   }
 
@@ -75,7 +75,7 @@ object StringTest extends SpecLite {
     parseDouble("124567812345678234567812345678234567823456723456782345678234567823456782456789245678923456789245678923456789245678924567892345678923456928379487239847293874982374982739487239482398479238749823749827394872398472938479238749823794827394872398472938749823749827394872398472938479283749823749823749823794823794872394789") must_===(Validation.failure(s"124567812345678234567812345678234567823456723456782345678234567823456782456789245678923456789245678923456789245678924567892345678923456928379487239847293874982374982739487239482398479238749823749827394872398472938479238749823794827394872398472938749823749827394872398472938479283749823749823749823794823794872394789 is outside of range for Double"))
   }
 
-  "parseDouble" ! forAll { d: Double =>
+  "parseDouble" ! forAll { (d: Double) =>
     string.parseDouble(d.toString) must_=== Validation.success(d)
   }
 
@@ -86,7 +86,7 @@ object StringTest extends SpecLite {
     parseFloat("124567812345678234567812345678234567823456723456782345678234567823456782456789245678923456789245678923456789245678924567892345678923456928379487239847293874982374982739487239482398479238749823749827394872398472938479238749823794827394872398472938749823749827394872398472938479283749823749823749823794823794872394789") must_===(Validation.failure(s"124567812345678234567812345678234567823456723456782345678234567823456782456789245678923456789245678923456789245678924567892345678923456928379487239847293874982374982739487239482398479238749823749827394872398472938479238749823794827394872398472938749823749827394872398472938479283749823749823749823794823794872394789 is outside of range for Float"))
   }
 
-  "parseFloat" ! forAll { f: Float =>
+  "parseFloat" ! forAll { (f: Float) =>
     string.parseFloat(f.toString) must_=== Validation.success(f)
   }
 
@@ -96,7 +96,7 @@ object StringTest extends SpecLite {
     parseBigInt("abc") must_===(Validation.failure("abc does not represent a valid BigInteger"))
   }
 
-  "parseBigInt" ! forAll { b: BigInteger =>
+  "parseBigInt" ! forAll { (b: BigInteger) =>
     string.parseBigInt(b.toString) must_=== Validation.success(b)
   }
 
@@ -106,7 +106,7 @@ object StringTest extends SpecLite {
     parseBigDecimal("abc") must_===(Validation.failure("abc does not represent a valid BigDecimal"))
   }
 
-  "parseBigDecimal" ! forAll { b: BigDecimal =>
+  "parseBigDecimal" ! forAll { (b: BigDecimal) =>
     string.parseBigDecimal(b.toString) must_=== Validation.success(b)
   }
 }

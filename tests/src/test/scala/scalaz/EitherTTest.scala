@@ -29,7 +29,7 @@ object EitherTTest extends SpecLite {
     b must_== EitherT.rightT[Boolean, ({type l[a] = String \/ a})#l, Int](a)
   }
 
-  "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
+  "consistent Bifoldable" ! forAll { (a: EitherTList[Int, Int]) =>
     val F = new Bitraverse[EitherTList]{
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
         EitherT.eitherTBitraverse[List].bitraverseImpl(fab)(f, g)
@@ -38,7 +38,7 @@ object EitherTTest extends SpecLite {
     Bifoldable[EitherTList].bifoldMap(a)(_ :: Nil)(_ :: Nil) must_=== F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
   }
 
-  "show" ! forAll { a: EitherTList[Int, Int] =>
+  "show" ! forAll { (a: EitherTList[Int, Int]) =>
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
   }
 

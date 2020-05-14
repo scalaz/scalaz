@@ -136,7 +136,7 @@ object ListTest extends SpecLite {
       must_===(F.foldRight(rnge, List[Int]())(_++_)))
   }
 
-  "foldMap" ! forAll { xs: List[Int] =>
+  "foldMap" ! forAll { (xs: List[Int]) =>
     xs.foldMap(identity) must_=== xs.foldRight(0)(_+_)
   }
 
@@ -144,7 +144,7 @@ object ListTest extends SpecLite {
     (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 
-  "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>
+  "groupWhen is groupWhenM[Id]" ! forAll { (xs: List[Int]) =>
     val f: (Int, Int) => Boolean = _ > _
     xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
   }

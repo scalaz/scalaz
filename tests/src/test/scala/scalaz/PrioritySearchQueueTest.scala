@@ -29,19 +29,19 @@ object PrioritySearchQueueTest extends SpecLite {
   private def queueFrom[F[_]: Foldable](entries: F[Entry]): PrioritySearchQueue[Entry, Int, Int] =
     entries.foldLeft(emptyQueue)((acc, e) => acc.insert(e)._1)
 
-  "contains everything that was inserted" ! forAll { entries: List[Entry] =>
+  "contains everything that was inserted" ! forAll { (entries: List[Entry]) =>
     val queue = queueFrom(entries)
     for (e <- entries) {
       assert(queue.containsKey(e.key))
     }
   }
 
-  "contains exactly the inserted elements" ! forAll { entries: IList[Entry] =>
+  "contains exactly the inserted elements" ! forAll { (entries: IList[Entry]) =>
     val queue = queueFrom(entries)
     queue.toUnsortedList.toSet must_=== entries.distinct.toList.toSet
   }
 
-  "does not contain a key after it has been removed" ! forAll { entries: IList[Entry] =>
+  "does not contain a key after it has been removed" ! forAll { (entries: IList[Entry]) =>
     val distinctEntries = entries.distinct.toList
     var queue = queueFrom(distinctEntries)
     for (e <- distinctEntries) {
@@ -53,7 +53,7 @@ object PrioritySearchQueueTest extends SpecLite {
     assert(queue.isEmpty)
   }
 
-  "unchanged after removing an absent element" ! forAll { entries: List[Entry] =>
+  "unchanged after removing an absent element" ! forAll { (entries: List[Entry]) =>
     val queue = queueFrom(entries)
     for (e <- entries) {
       val (q, _) = queue.removeByKey(e.key)
@@ -61,7 +61,7 @@ object PrioritySearchQueueTest extends SpecLite {
     }
   }
 
-  "deleteMin removes minimum" ! forAll { keys: List[Int] =>
+  "deleteMin removes minimum" ! forAll { (keys: List[Int]) =>
     // entries with the same priority and different keys
     val entries = keys.distinct.map(Entry(1, _))
 
@@ -77,7 +77,7 @@ object PrioritySearchQueueTest extends SpecLite {
     go(queueFrom(entries))
   }
 
-  "iterated deleteMin produces a sequence sorted by priority" ! forAll { entries: IList[Entry] =>
+  "iterated deleteMin produces a sequence sorted by priority" ! forAll { (entries: IList[Entry]) =>
     import scala.collection.mutable.Buffer
 
     @tailrec
@@ -92,7 +92,7 @@ object PrioritySearchQueueTest extends SpecLite {
     sorted must_=== distinctEntries.toList.sortBy(e => (e.priority, e.key))
   }
 
-  "deleteLt" ! forAll { entries: IList[Entry] =>
+  "deleteLt" ! forAll { (entries: IList[Entry]) =>
     val distinctEntries = entries.distinct
     val queue = queueFrom(distinctEntries)
     val pivot = distinctEntries.headMaybe.map(_.priority).getOrElse(0)
@@ -101,7 +101,7 @@ object PrioritySearchQueueTest extends SpecLite {
     retained.size must_=== distinctEntries.count(_.priority >= pivot)
   }
 
-  "deleteLte" ! forAll { entries: IList[Entry] =>
+  "deleteLte" ! forAll { (entries: IList[Entry]) =>
     val distinctEntries = entries.distinct
     val queue = queueFrom(distinctEntries)
     val pivot = distinctEntries.headMaybe.map(_.priority).getOrElse(0)
@@ -110,7 +110,7 @@ object PrioritySearchQueueTest extends SpecLite {
     retained.size must_=== distinctEntries.count(_.priority > pivot)
   }
 
-  "splitBeforePrio" ! forAll { entries: IList[Entry] =>
+  "splitBeforePrio" ! forAll { (entries: IList[Entry]) =>
     val distinctEntries = entries.distinct
     val queue = queueFrom(distinctEntries)
     val pivot = distinctEntries.headMaybe.map(_.priority).getOrElse(0)
@@ -120,7 +120,7 @@ object PrioritySearchQueueTest extends SpecLite {
     right.size must_=== distinctEntries.length - left.size
   }
 
-  "splitAfterPrio" ! forAll { entries: IList[Entry] =>
+  "splitAfterPrio" ! forAll { (entries: IList[Entry]) =>
     val distinctEntries = entries.distinct
     val queue = queueFrom(distinctEntries)
     val pivot = distinctEntries.headMaybe.map(_.priority).getOrElse(0)

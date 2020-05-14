@@ -39,7 +39,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse { xs.length mustBe_<(2) }
   }
 
-  "nextC moves focus or loops" ! forAll { z: Zipper[Int] =>
+  "nextC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
     val zn = z.nextC
     zn.toStream must_===(z.toStream)
 
@@ -81,7 +81,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse { xs.length mustBe_<(2) }
   }
 
-  "previousC moves focus or loops" ! forAll { z: Zipper[Int] =>
+  "previousC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
     val zp = z.previousC
     zp.toStream must_===(z.toStream)
 
@@ -161,7 +161,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse {xs.length mustBe_<(2) }
   }
 
-  "deleteRightC moves the focus to the right or if not possible to the first element" ! forAll { z: Zipper[Int] =>
+  "deleteRightC moves the focus to the right or if not possible to the first element" ! forAll { (z: Zipper[Int]) =>
     (
       for {
         zd <- z.deleteRightC
@@ -185,7 +185,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse ( xs.length mustBe_<(2) )
   }
 
-  "deleteRight moves the focus to the right or if not possible left" ! forAll { z: Zipper[Int] =>
+  "deleteRight moves the focus to the right or if not possible left" ! forAll { (z: Zipper[Int]) =>
     (
       for {
         zd <- z.deleteRight
@@ -213,7 +213,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse (xs.length mustBe_<(2))
   }
 
-  "deleteLeft moves the focus to the left or if not possible right" ! forAll { z: Zipper[Int] =>
+  "deleteLeft moves the focus to the left or if not possible right" ! forAll { (z: Zipper[Int]) =>
     (
       for {
         zd <- z.deleteLeft
@@ -231,7 +231,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse (xs.length mustBe_<(2))
   }
 
-  "deleteLeftC moves the focus to the left or if not possible to the last element" ! forAll { z: Zipper[Int] =>
+  "deleteLeftC moves the focus to the left or if not possible to the last element" ! forAll { (z: Zipper[Int]) =>
     (
       for {
         zd <- z.deleteLeftC
@@ -350,20 +350,20 @@ object ZipperTest extends SpecLite {
     else l.isEmpty must_==(false)
   }
 
-  "withFocus should pair only the focus with true, false otherwise" ! forAll { z: Zipper[Int] =>
+  "withFocus should pair only the focus with true, false otherwise" ! forAll { (z: Zipper[Int]) =>
     val zf = z.withFocus
     zf.lefts.find(_._2).isEmpty must_==(true)
     zf.focus._2 must_==(true)
     zf.rights.find(_._2).isEmpty must_==(true)
   }
 
-  "start should set the zipper at the start" ! forAll { z: Zipper[Int] =>
+  "start should set the zipper at the start" ! forAll { (z: Zipper[Int]) =>
     val zs = z.start
     zs.toStream must_===(z.toStream)
     zs.index must_===(0)
   }
 
-  "end should set the zipper at the end" ! forAll { z: Zipper[Int] =>
+  "end should set the zipper at the end" ! forAll { (z: Zipper[Int]) =>
     val ze = z.end
     ze.toStream must_===(z.toStream)
     ze.index must_===(ze.length - 1)
@@ -408,7 +408,7 @@ object ZipperTest extends SpecLite {
     r must_=== just(elem)
   }
 
-  "findBy if given a function that returns None should not return anything" ! forAll { z: Zipper[Int] =>
+  "findBy if given a function that returns None should not return anything" ! forAll { (z: Zipper[Int]) =>
     z.findBy(z => Maybe.empty)(x => x == z.focus).isEmpty
   }
 
@@ -422,7 +422,7 @@ object ZipperTest extends SpecLite {
     z.findBy(z => just(z.nextC))(x => x == e).isDefined
    }
 
-  "findBy should not blow the stack" !  prop { z: Zipper[Int] =>
+  "findBy should not blow the stack" !  prop { (z: Zipper[Int]) =>
     var limit = 10 * 1000
     z.findBy(z => if (limit > 0) { limit -= 1; just(z.nextC) } else Maybe.empty)(x => false)
     true
@@ -477,11 +477,11 @@ object ZipperTest extends SpecLite {
     (z.move(-ys.length) == just(zo) || (z.length == 0)) must_== true
   }
 
-  "positions should return a zippers with focus on this" ! forAll { z: Zipper[Int] =>
+  "positions should return a zippers with focus on this" ! forAll { (z: Zipper[Int]) =>
     z.positions.focus must_===(z)
   }
 
-  "positions should return a zippers with all possible positions of a zipper" ! forAll { z: Zipper[Int] =>
+  "positions should return a zippers with all possible positions of a zipper" ! forAll { (z: Zipper[Int]) =>
     val indeces = z.positions.map { _.index }.toStream
     indeces.min must_===(0)
     indeces.max must_===(z.length -1)

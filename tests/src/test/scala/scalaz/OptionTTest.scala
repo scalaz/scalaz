@@ -22,15 +22,15 @@ object OptionTTest extends SpecLite {
   checkAll(monadError.laws[OptionTEither, Int])
   checkAll(decidable.laws[OptionT[ConstInt, *]])
 
-  "show" ! forAll { a: OptionTList[Int] =>
+  "show" ! forAll { (a: OptionTList[Int]) =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
   }
 
-  "optionT" ! forAll { ass: List[Option[Int]] =>
+  "optionT" ! forAll { (ass: List[Option[Int]]) =>
       OptionT.optionT(ass).run == ass
   }
 
-  "listT" ! forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toIList)}
+  "listT" ! forAll { (a: OptionTList[Int]) => a.toListT.run must_=== a.run.map(_.toIList)}
 
   "flatMapF consistent with flatMap" ! forAll { (fa: OptionTList[Int], f: Int => List[Option[Int]]) =>
     fa.flatMap(f andThen OptionT.apply) must_=== fa.flatMapF(f)

@@ -21,7 +21,7 @@ object MaybeTTest extends SpecLite {
   checkAll(monadTrans.laws[MaybeT, List])
   checkAll(decidable.laws[MaybeT[ConstInt, *]])
 
-  "show" ! forAll { a: MaybeTList[Int] =>
+  "show" ! forAll { (a: MaybeTList[Int]) =>
     Show[MaybeTList[Int]].show(a) must_=== Show[List[Maybe[Int]]].show(a.run)
   }
 

@@ -11,7 +11,7 @@ import scalaz.std.string._
 
 object CordTest extends SpecLite {
 
-  ".toString should be .shows" ! forAll { c: Cord =>
+  ".toString should be .shows" ! forAll { (c: Cord) =>
     // potentially flushes out a bunch of problems, but the cords aren't that
     // big so don't expect it to catch any stack overflow bugs.
     c.shows.must_===(c.toString)

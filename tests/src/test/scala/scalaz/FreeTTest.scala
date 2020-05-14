@@ -89,7 +89,7 @@ object FreeTTest extends SpecLite {
       Equal[FreeTListOption[Unit]].equal(expected, result)
     }
 
-    "hoist" ! forAll { a: FreeTListOption[Int] =>
+    "hoist" ! forAll { (a: FreeTListOption[Int]) =>
       val b = a.hoist(NaturalTransformation.refl)
       Equal[FreeTListOption[Int]].equal(a, b)
     }
@@ -102,7 +102,7 @@ object FreeTTest extends SpecLite {
       val b = a.hoist(NaturalTransformation.refl) // used to overflow
     }
 
-    "interpret" ! forAll { a: FreeTListOption[Int] =>
+    "interpret" ! forAll { (a: FreeTListOption[Int]) =>
       val b = a.interpret(NaturalTransformation.refl)
       Equal[FreeTListOption[Int]].equal(a, b)
     }
@@ -115,7 +115,7 @@ object FreeTTest extends SpecLite {
       val b = a.interpret(NaturalTransformation.refl) // used to overflow
     }
 
-    "foldMap should be consistent with runM" ! forAll { a: FreeTListOption[Int] =>
+    "foldMap should be consistent with runM" ! forAll { (a: FreeTListOption[Int]) =>
       val x = a.runM(_.headOption)
       val y = a.foldMap(headOption)
       Equal[Option[Int]].equal(x, y)
@@ -128,7 +128,7 @@ object FreeTTest extends SpecLite {
     a != b
   }
 
-  "isoFree" ! forAll { a: FreeOption[Int] =>
+  "isoFree" ! forAll { (a: FreeOption[Int]) =>
     val iso = FreeT.isoFree[Option]
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
   }

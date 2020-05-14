@@ -41,10 +41,10 @@ object CorecursiveListTest extends SpecLite {
     SF: Show[F[Int]], SG: Show[G[Int]],
     F: Equal[F[Int]], G: Equal[G[Int]]) = {
     val p = new Properties("iso roundtrip")
-    p.property("f to g") = forAll{a: F[Int] =>
+    p.property("f to g") = forAll{ (a: F[Int]) =>
       iso.from(iso.to(a)) must_===(a)
     }
-    p.property("g to f") = forAll{a: G[Int] =>
+    p.property("g to f") = forAll{ (a: G[Int]) =>
       iso.to(iso.from(a)) must_===(a)
     }
     p
@@ -54,11 +54,11 @@ object CorecursiveListTest extends SpecLite {
 
   checkAll("eph stream to corec iso", isoTest(CL.ephemeralStreamIso))
 
-  "fromList" ! forAll {xs: List[Int] =>
+  "fromList" ! forAll { (xs: List[Int]) =>
     CL.fromList(xs) must_===(CL.fromStream(xs.toStream))
   }
 
-  "fromVector" ! forAll {xs: Vector[Int] =>
+  "fromVector" ! forAll { (xs: Vector[Int]) =>
     CL.fromVector(xs) must_===(CL.fromStream(xs.toStream))
   }
 
@@ -99,11 +99,11 @@ object CorecursiveListTest extends SpecLite {
     sab.step(sab.init).map(_._2) must_===(just((a, b)))
   }
 
-  "filter identity" ! forAll {a: CL[Int] =>
+  "filter identity" ! forAll { (a: CL[Int]) =>
     MonadPlus[CL].filter(a)(_ => true) must_===(a)
   }
 
-  "filter empty" ! forAll {a: CL[Int] =>
+  "filter empty" ! forAll { (a: CL[Int]) =>
     MonadPlus[CL].filter(a)(_ => false) must_===(PlusEmpty[CL].empty)
   }
 

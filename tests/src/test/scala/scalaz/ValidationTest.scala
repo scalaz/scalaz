@@ -115,7 +115,7 @@ object ValidationTest extends SpecLite {
     fail1 <+> fail2 must_=== Validation.failure[String, Int]("34")
   }
 
-  "toMaybe" ! forAll { x: Validation[String, Int] =>
+  "toMaybe" ! forAll { (x: Validation[String, Int]) =>
     val m = x.toMaybe
     if (x.isSuccess) m.isJust else m.isEmpty
   }
