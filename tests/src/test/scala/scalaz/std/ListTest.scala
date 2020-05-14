@@ -51,7 +51,7 @@ object ListTest extends SpecLite {
 
   "groupByWhenM[Id] ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhenM[Id](p).forall { group: NonEmptyList[Int] =>
+      a.groupWhenM[Id](p).forall { group =>
         list.adjacentPairs(group.list.toList).forall(p.tupled)
       }
   }
@@ -90,7 +90,7 @@ object ListTest extends SpecLite {
 
   "groupByWhen ∀(i,j) | 0<i<resut.len & 0<j<result(i).len: p(result(i)(j), p(result(i)(j+1)) yields true" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
-      a.groupWhen(p).forall { group: NonEmptyList[Int] =>
+      a.groupWhen(p).forall { group =>
         list.adjacentPairs(group.list.toList).forall(p.tupled)
       }
   }
