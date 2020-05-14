@@ -144,8 +144,31 @@ object IStream {
 
     }
 
-  // it would be more in keeping with the data structure's objectives to
-  // Align.align and compare elements, to avoid a full traversal...
-  implicit def equal[A: Equal]: Equal[IStream[A]] = Equal[IList[A]].contramap(instances.toIList(_))
+  implicit def equal[A: Equal]: Equal[IStream[A]] = {
+    val nameEq = Equal[Name[A]]
+    @tailrec
+    def loop(x1: IStream[A], x2: IStream[A]): Boolean = {
+      (x1 eq x2) || {
+        x1 match {
+          case Cons(h1, t1) =>
+            x2 match {
+              case Cons(h2, t2) if nameEq.equal(h1, h2) =>
+                loop(t1.value, t2.value)
+              case _ =>
+                false
+            }
+          case _ =>
+            x2 match {
+              case Cons(_, _) =>
+                false
+              case _ =>
+                true
+            }
+        }
+      }
+    }
+
+    loop _
+  }
 
 }
