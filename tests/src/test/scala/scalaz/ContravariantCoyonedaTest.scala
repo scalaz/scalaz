@@ -24,7 +24,7 @@ object ContravariantCoyonedaGens {
       : Schwartzian[F, A, co.type] = new Schwartzian[F, A, co.type](co)
 
   def cmappedOrderLaws[A: Arbitrary](co: CtCoOrder[A]) = {
-    implicit val ran = co.run
+    implicit val ran: Order[A] = co.run
     scalaz.scalacheck.ScalazProperties.order.laws[A]
   }
 
@@ -49,7 +49,7 @@ object ContravariantCoyonedaGens {
 object ContravariantCoyonedaTest extends SpecLite {
   import ContravariantCoyonedaGens._
 
-  implicit val arbIntOrders = Arbitrary(intOrders)
+  implicit val arbIntOrders: Arbitrary[CtCoOrder[Int]] = Arbitrary(intOrders)
 
   checkAll(cmappedOrderLaws(aToString[Int]))
   checkAll(cmappedOrderLaws(evensFirst))

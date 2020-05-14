@@ -7,7 +7,7 @@ import std.AllInstances._
 object ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Int, Int, Int, Option, A]
 
-  implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {
+  implicit val RWSOptIntEqual: Equal[RWSOptInt[Int]] = new Equal[RWSOptInt[Int]] {
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
   }
 

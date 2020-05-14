@@ -75,6 +75,6 @@ trait IsomorphismOptional[F[_], G[_]] extends Optional[F] {
   def iso: F <~> G
 
   override def pextract[B, A](fa: F[A]): F[B] \/ A =
-    G.pextract(iso.to(fa)).leftMap(iso.from.apply)
+    G.pextract[B, A](iso.to(fa)).leftMap(iso.from.apply)
   ////
 }

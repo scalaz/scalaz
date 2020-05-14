@@ -125,13 +125,13 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
 
   implicit def sortedMapOrder[K: Order, V: Order]: Order[SortedMap[K, V]] =
     new Order[SortedMap[K, V]] with SortedMapEqual[K, V] {
-      def OK = Order[K]
-      def OV = Equal[V]
+      override def OK: Order[K] = Order[K]
+      override def OV: Equal[V] = Equal[V]
       def order(x: SortedMap[K, V], y: SortedMap[K, V]): Ordering = {
         import vector._
         import anyVal._
         import tuple._
-        implicit val ok = Order[K].toScalaOrdering
+        implicit val ok: scala.Ordering[K] = Order[K].toScalaOrdering
         Semigroup[Ordering]
          .append(Order[Int].order(x.size, y.size),
                  Order[Vector[(K, V)]]

@@ -224,7 +224,7 @@ sealed abstract class StrictTreeInstances {
 
   implicit def treeOrder[A](implicit A0: Order[A]): Order[StrictTree[A]] =
     new Order[StrictTree[A]] with StrictTreeEqual[A] {
-      def A = A0
+      override def A: Order[A] = A0
       import std.vector._
       override def order(x: StrictTree[A], y: StrictTree[A]) =
         A.order(x.rootLabel, y.rootLabel) match {
