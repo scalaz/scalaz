@@ -21,7 +21,7 @@ object TraverseTest extends SpecLite {
       s.run must_===(("123", List(1, 2, 3)))
     }
 
-    "indexed" ! forAll { xs: List[Byte] =>
+    "indexed" ! forAll { (xs: List[Byte]) =>
       Traverse[List].indexed(xs) must_=== xs.zipWithIndex.map{case (a, b) => (b, a)}
     }
 

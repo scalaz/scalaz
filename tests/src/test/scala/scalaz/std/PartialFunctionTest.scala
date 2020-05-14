@@ -25,7 +25,7 @@ object PartialFunctionTest extends SpecLite {
        must_===((0 - num, 0 - num2)))
   }
 
-  "Arrow[PartialFunction]#compose#isDefinedAt" ! forAll{ a: Int =>
+  "Arrow[PartialFunction]#compose#isDefinedAt" ! forAll{ (a: Int) =>
     var callF: Int = 0
     var callG: Int = 0
     val f: PartialFunction[Int, Int] = {
@@ -44,7 +44,7 @@ object PartialFunctionTest extends SpecLite {
     }
   }
 
-  "Arrow[PartialFunction]#compose#applyOrElse" ! forAll{ a: Int =>
+  "Arrow[PartialFunction]#compose#applyOrElse" ! forAll{ (a: Int) =>
     var callF: Int = 0
     var callG: Int = 0
     val f: PartialFunction[Int, Int] = {

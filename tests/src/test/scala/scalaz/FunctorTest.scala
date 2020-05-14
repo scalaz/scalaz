@@ -24,7 +24,7 @@ object FunctorTest extends SpecLite {
     some(1).fpair must_===(some((1, 1)))
   }
 
-  "widen" ! forAll { ola: Option[List[Int]] =>
+  "widen" ! forAll { (ola: Option[List[Int]]) =>
     import std.iterable._
     val oia: Option[Iterable[Int]] = ola
     ola.widen[Iterable[Int]] must_===(oia)

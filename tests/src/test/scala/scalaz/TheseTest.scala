@@ -32,7 +32,7 @@ object TheseTest extends SpecLite {
   }
 
   "onlyThisOrThat" should {
-    "be invertible" ! forAll { ab: Int \/ String =>
+    "be invertible" ! forAll { (ab: Int \/ String) =>
       ab.toThese.onlyThisOrThat must_=== Some(ab)
     }
     "handle both" ! forAll { (a: Int, b: String) =>

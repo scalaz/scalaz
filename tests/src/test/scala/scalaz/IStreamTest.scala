@@ -16,12 +16,12 @@ object IStreamTest extends SpecLite {
   implicit def iStreamShow[A: Show]: Show[IStream[A]] =
     Show[List[A]].contramap(_.toList)
 
-  "reverse" ! forAll{ e: IStream[Int] =>
+  "reverse" ! forAll{ (e: IStream[Int]) =>
     e.reverse.toList must_===(e.toList.reverse)
     e.reverse.reverse must_===(e)
   }
 
-  "Foldable.foldLeft" ! forAll{ xs: List[List[Int]] =>
+  "Foldable.foldLeft" ! forAll{ (xs: List[List[Int]]) =>
     Foldable[IStream].foldLeft(IStream.fromFoldable(xs), List[Int]())(_ ::: _) must_===(xs.foldLeft(List[Int]())(_ ::: _))
   }
 

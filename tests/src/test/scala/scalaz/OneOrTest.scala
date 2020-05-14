@@ -22,13 +22,13 @@ object OneOrTest extends SpecLite {
 //    }
 //  }
 
-  "findLeft" ! forAll{ a: OneOr[List, Int] =>
+  "findLeft" ! forAll{ (a: OneOr[List, Int]) =>
     val f = (_: Int) % 2 == 0
     val F = Foldable[OneOr.OneOrList]
     F.findLeft(a)(f) must_=== Foldable[List].findLeft(F.toList(a))(f)
   }
 
-  "findRight" ! forAll { a: OneOr[List, Int] =>
+  "findRight" ! forAll { (a: OneOr[List, Int]) =>
     val f = (_: Int) % 2 == 0
     val F = Foldable[OneOr.OneOrList]
     F.findRight(a)(f) must_=== Foldable[List].findRight(F.toList(a))(f)

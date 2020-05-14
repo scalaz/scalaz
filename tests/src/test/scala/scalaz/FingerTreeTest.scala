@@ -103,7 +103,7 @@ object FingerTreeTest extends SpecLite {
 
   }
 
-  "OrdSeq is ordered" ! forAll { xs: List[Int] => OrdSeq(xs:_*).toList == xs.sorted }
+  "OrdSeq is ordered" ! forAll { (xs: List[Int]) => OrdSeq(xs:_*).toList == xs.sorted }
 
   "IndSeq" should {
     import org.scalacheck._
@@ -116,9 +116,9 @@ object FingerTreeTest extends SpecLite {
       m <- Gen.choose(0, arr.length-1)
     } yield TestInstance(arr,m))
 
-    "have a length" ! forAll { xs: Array[Int] => IndSeq(xs: _*).length == xs.length }
+    "have a length" ! forAll { (xs: Array[Int]) => IndSeq(xs: _*).length == xs.length }
 
-    "allow random access" ! forAll { ti: TestInstance =>
+    "allow random access" ! forAll { (ti: TestInstance) =>
       IndSeq(ti.arr: _*)(ti.index) == ti.arr(ti.index)
     }
   }

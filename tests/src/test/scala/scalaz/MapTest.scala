@@ -72,13 +72,13 @@ object MapTest extends SpecLite {
     F.index(a, a.size) must_=== None
   }
 
-  "equals/hashCode" ! forAll { a: Int ==>> Int =>
+  "equals/hashCode" ! forAll { (a: Int ==>> Int) =>
     val b = ==>>.fromList(Random.shuffle(a.toList))
     a must_== b
     a.## must_=== b.##
   }
 
-  "minViewWithKey" ! forAll { a: Int ==>> Int =>
+  "minViewWithKey" ! forAll { (a: Int ==>> Int) =>
     a.minViewWithKey match {
       case Empty() =>
         a.size must_=== 0
@@ -90,7 +90,7 @@ object MapTest extends SpecLite {
     }
   }
 
-  "maxViewWithKey" ! forAll { a: Int ==>> Int =>
+  "maxViewWithKey" ! forAll { (a: Int ==>> Int) =>
     a.maxViewWithKey match {
       case Empty() =>
         a.size must_=== 0
@@ -102,21 +102,21 @@ object MapTest extends SpecLite {
     }
   }
 
-  "findMin" ! forAll { a: Int ==>> Int =>
+  "findMin" ! forAll { (a: Int ==>> Int) =>
     a.findMin must_=== {
       if(a.isEmpty) Maybe.empty
       else just(a.toList.minBy(_._1))
     }
   }
 
-  "findMax" ! forAll { a: Int ==>> Int =>
+  "findMax" ! forAll { (a: Int ==>> Int) =>
     a.findMax must_=== {
       if(a.isEmpty) Maybe.empty
       else just(a.toList.maxBy(_._1))
     }
   }
 
-  "deleteMin" ! forAll { a: Int ==>> Int =>
+  "deleteMin" ! forAll { (a: Int ==>> Int) =>
     val b = a.deleteMin
     structurallySound(b)
     if(a.isEmpty){
@@ -127,7 +127,7 @@ object MapTest extends SpecLite {
     }
   }
 
-  "deleteMax" ! forAll { a: Int ==>> Int =>
+  "deleteMax" ! forAll { (a: Int ==>> Int) =>
     val b = a.deleteMax
     structurallySound(b)
     if(a.isEmpty){
@@ -335,7 +335,7 @@ object MapTest extends SpecLite {
   }
 
   "split" should {
-    "splitRoot" ! forAll { a: Int ==>> Int =>
+    "splitRoot" ! forAll { (a: Int ==>> Int) =>
       a match {
         case Tip() =>
           a.splitRoot must_=== IList.empty[Int ==>> Int]
@@ -721,7 +721,7 @@ object MapTest extends SpecLite {
       fromList(List(1 -> "b", 2 -> "a", 3 -> "d", 4 -> "c")).mapKeys(_ => 3) must_===(singleton(3, "c"))
     }
 
-    "mapKeys sound" ! forAll { a: Int ==>> Int =>
+    "mapKeys sound" ! forAll { (a: Int ==>> Int) =>
       val b = a.mapKeys(identity)
       b must_=== a
       structurallySound(b)
@@ -796,7 +796,7 @@ object MapTest extends SpecLite {
       fromList(List(5 -> "a", 3 -> "b")).foldrWithKey("Map: ")(f) must_== "Map: (5:a)(3:b)"
     }
 
-    "foldMapWithKey" ! forAll { a: Byte ==>> Byte =>
+    "foldMapWithKey" ! forAll { (a: Byte ==>> Byte) =>
       val f = (i: Byte, j: Byte) => i.toInt + j.toInt
       val res = a.toList.foldLeft(0: Int)((acc, kv) => acc + kv._1.toInt + kv._2.toInt)
 
@@ -805,7 +805,7 @@ object MapTest extends SpecLite {
   }
 
   "==>> trim" should {
-    "trim sound" ! forAll { a: Int ==>> Int =>
+    "trim sound" ! forAll { (a: Int ==>> Int) =>
       def checkValidity(a: Int ==>> Int, lo: Maybe[Int], hi: Maybe[Int], result: Int ==>> Int) = {
         val m = trim(lo, hi, a)
         structurallySound(m)
@@ -857,7 +857,7 @@ object MapTest extends SpecLite {
       }
     }
 
-    "trimLookupLo sound" ! forAll { a: Int ==>> Int =>
+    "trimLookupLo sound" ! forAll { (a: Int ==>> Int) =>
       def checkValidity(a: Int ==>> Int, lk: Int, hk: Maybe[Int]) = {
         val (x, m) = trimLookupLo(lk, hk, a)
         structurallySound(m)
@@ -948,8 +948,8 @@ object MapTest extends SpecLite {
 
   "==>> fromSet" should {
     "fromSet" in {
-      fromSet(ISet.fromList(List[Int](3, 5))){ i: Int => List.fill(i)('a').mkString } must_=== fromList(List(5 -> "aaaaa", 3 -> "aaa"))
-      fromSet(ISet.fromList(List[Int]())){ i: Int => i } must_=== empty
+      fromSet(ISet.fromList(List[Int](3, 5))){ (i: Int) => List.fill(i)('a').mkString } must_=== fromList(List(5 -> "aaaaa", 3 -> "aaa"))
+      fromSet(ISet.fromList(List[Int]())){ (i: Int) => i } must_=== empty
     }
 
     "fromSet" ! forAll { (a: ISet[Int]) =>
@@ -957,7 +957,7 @@ object MapTest extends SpecLite {
       fromSet(a)(i => i) must_=== fromList(li)
     }
 
-    "consistent keySet" ! forAll { a: Byte ==>> Byte =>
+    "consistent keySet" ! forAll { (a: Byte ==>> Byte) =>
       fromSet(a.keySet)(_ => ()) must_=== a.map(_ => ())
     }
   }

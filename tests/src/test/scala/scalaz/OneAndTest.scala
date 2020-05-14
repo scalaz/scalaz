@@ -38,13 +38,13 @@ object OneAndTest extends SpecLite {
     Foldable[OneAnd[List, *]].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
-  "findLeft" ! forAll{ a: OneAnd[List, Int] =>
+  "findLeft" ! forAll{ (a: OneAnd[List, Int]) =>
     val f = (_: Int) % 3 == 0
     val F = Foldable[OneAnd[List, *]]
     F.findLeft(a)(f) must_=== Foldable[IList].findLeft(F.toIList(a))(f)
   }
 
-  "findRight" ! forAll { a: OneAnd[List, Int] =>
+  "findRight" ! forAll { (a: OneAnd[List, Int]) =>
     val f = (_: Int) % 3 == 0
     val F = Foldable[OneAnd[List, *]]
     F.findRight(a)(f) must_=== Foldable[IList].findRight(F.toIList(a))(f)

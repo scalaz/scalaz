@@ -20,14 +20,14 @@ object NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", align.laws[NonEmptyList])
   checkAll("NonEmptyList", comonad.laws[NonEmptyList])
 
-  "scanLeft1" ! forAll { fa: NonEmptyList[List[Int]] =>
+  "scanLeft1" ! forAll { (fa: NonEmptyList[List[Int]]) =>
     def f[A]: (List[A], List[A]) => List[A] = _ ::: _
     val a = Foldable1[NonEmptyList].scanLeft1(fa)(f)
     a.list must_=== fa.tail.scanLeft(fa.head)(f)
     a.size must_=== fa.size
   }
 
-  "scanRight1" ! forAll { fa: NonEmptyList[List[Int]] =>
+  "scanRight1" ! forAll { (fa: NonEmptyList[List[Int]]) =>
     def f[A]: (List[A], List[A]) => List[A] = _ ::: _
     val a = Foldable1[NonEmptyList].scanRight1(fa)(f)
     a.list must_=== fa.init.scanRight(fa.last)(f)
@@ -45,21 +45,21 @@ object NonEmptyListTest extends SpecLite {
     Foldable[NonEmptyList].foldMap(a)(identity) must_=== 15
   }
 
-  "findLeft" ! forAll{ a: NonEmptyList[Int] =>
+  "findLeft" ! forAll{ (a: NonEmptyList[Int]) =>
     val f = (_: Int) % 3 == 0
     Foldable[NonEmptyList].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.list)(f)
   }
 
-  "findRight" ! forAll { a: NonEmptyList[Int] =>
+  "findRight" ! forAll { (a: NonEmptyList[Int]) =>
     val f = (_: Int) % 3 == 0
     Foldable[NonEmptyList].findRight(a)(f) must_=== Foldable[IList].findRight(a.list)(f)
   }
 
-  "distinct" ! forAll { xs: NonEmptyList[Int] =>
+  "distinct" ! forAll { (xs: NonEmptyList[Int]) =>
     just(xs.distinct) must_=== std.list.toNel(Foldable[NonEmptyList].toList(xs).distinct)
   }
 
-  "NonEmptyList size is correct" ! forAll { xs:NonEmptyList[Int] =>
+  "NonEmptyList size is correct" ! forAll { (xs: NonEmptyList[Int]) =>
     xs.size must_===(1 + xs.tail.count(b => true))
   }
 
@@ -72,27 +72,27 @@ object NonEmptyListTest extends SpecLite {
     val F = Foldable1[NonEmptyList]
     rnge.list.toList.reduceRight(_++_) must_===(F.foldr1(rnge)(a => b => a ++ b))
   }
-  "foldRight1 is reduceRight" ! forAll { xs: NonEmptyList[IList[Int]] =>
+  "foldRight1 is reduceRight" ! forAll { (xs: NonEmptyList[IList[Int]]) =>
     val F = Foldable1[NonEmptyList]
     xs.list.toList.reduceRight(_ ++ _) must_== F.foldRight1(xs)(_ ++ _)
   }
-  "NonEmptyList.last is correct" ! forAll { xs:NonEmptyList[Int] =>
+  "NonEmptyList.last is correct" ! forAll { (xs: NonEmptyList[Int]) =>
     xs.reverse.head must_===(xs.last)
   }
-  "NonEmptyList.init size is correct" ! forAll { xs:NonEmptyList[Int] =>
+  "NonEmptyList.init size is correct" ! forAll { (xs: NonEmptyList[Int]) =>
     xs.init.count(a => true) must_===(xs.tail.count(a => true))
   }
-  "correctness of tails" ! forAll { xs: NonEmptyList[Int] =>
+  "correctness of tails" ! forAll { (xs: NonEmptyList[Int]) =>
     import NonEmptyList._
     xs.tails must_=== nel(xs, xs.tail match {
       case INil() => INil()
       case ICons(h, t) => nel(h, t).tails.list
     })
   }
-  "toNel is self" ! forAll { xs: NonEmptyList[Int] =>
+  "toNel is self" ! forAll { (xs: NonEmptyList[Int]) =>
     Foldable1[NonEmptyList].toNel(xs) must_=== xs
   }
-  "zipWithIndex" ! forAll { xs: NonEmptyList[Int] =>
+  "zipWithIndex" ! forAll { (xs: NonEmptyList[Int]) =>
     xs.zipWithIndex.list must_== xs.list.zipWithIndex
   }
 
