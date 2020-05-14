@@ -18,22 +18,16 @@ object MonadErrorTest extends SpecLite {
 
     implicit val string: Decoder[String] = instance(_.right)
 
-    // type ascriptions are needed for type inference
-    type I = String
-    type O[a] = Int \/ a
-    type MT[a] = Kleisli[O, I, a]
-    val iso: Decoder <~> MT = Kleisli.iso[Decoder, I, O](
-      instance = λ[λ[a => (I => O[a])] ~> Decoder](instance(_)),
-      decode   = λ[Decoder ~> λ[a => (I => O[a])]](_.decode)
+    val iso: Decoder <~> Kleisli[Int \/ *, String, *] = Kleisli.iso(
+      new (λ[a => (String => Int \/ a)] ~> Decoder){
+        override def apply[A](a: String => (Int \/ A)) =
+          instance(a)
+      },
+      new (Decoder ~> λ[a => (String => Int \/ a)]) {
+        override def apply[A](a: Decoder[A]) =
+          a decode _
+      }
     )
-    // with `-Ypartial-unification` we could write
-    //
-    // val iso: Decoder <~> Kleisli[Int \/ *, String, *] = Kleisli.iso(
-    //   λ[λ[a => (String => Int \/ a)] ~> Decoder](instance(_)),
-    //   λ[Decoder ~> λ[a => (String => Int \/ a)]](_.decode)
-    // )
-    //
-    // or introduce `type Decode[a] = String => Int \/ a` to keep it terse.
 
     implicit val monad: MonadError[Decoder, Int] = MonadError.fromIso(iso)
   }
