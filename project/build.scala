@@ -20,7 +20,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import com.typesafe.tools.mima.core.ProblemFilters
 import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters}
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
@@ -328,9 +328,17 @@ object build {
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  ) ++ mimaDefaultSettings ++ Seq[Sett](
-    mimaBinaryIssueFilters ++= Seq(
-    ),
+  ) ++ mimaDefaultSettings ++ Def.settings(
+    ThisBuild / mimaReportSignatureProblems := true,
+    mimaBinaryIssueFilters ++= {
+      if (scalaBinaryVersion.value == "2.11") {
+        Seq(
+          ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
+        )
+      } else {
+        Nil
+      }
+    },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
