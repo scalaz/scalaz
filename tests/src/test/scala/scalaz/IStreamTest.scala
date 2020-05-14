@@ -12,6 +12,7 @@ object IStreamTest extends SpecLite {
   checkAll(monadPlus.strongLaws[IStream])
   checkAll(isEmpty.laws[IStream])
   checkAll(traverse.laws[IStream])
+  checkAll(equal.laws[IStream[Int]])
 
   implicit def iStreamShow[A: Show]: Show[IStream[A]] =
     Show[List[A]].contramap(_.toList)
