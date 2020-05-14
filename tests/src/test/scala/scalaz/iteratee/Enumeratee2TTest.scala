@@ -9,8 +9,6 @@ import Id._
 import NaturalTransformation.id
 
 object Enumeratee2TTest extends SpecLite {
-  implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
-  implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]
   val intO = Order[Int].order _
 
