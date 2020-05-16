@@ -83,7 +83,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[A, F, C]] =
-    G.map(F.traverse(run)(o => Traverse[A \/ *].traverse(o)(f)))(EitherT(_))
+    G.map(F.traverse(run)(o => Traverse[\/[A, *]].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,

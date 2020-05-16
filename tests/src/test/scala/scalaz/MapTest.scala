@@ -49,22 +49,22 @@ object MapTest extends SpecLite {
 
   "findLeft/findRight" in {
     val a = ==>>.fromFoldable((1 to 5).map(n => n -> n).toList)
-    Foldable[Int ==>> *].findLeft(a)(_ % 2 == 0) must_=== Some(2)
-    Foldable[Int ==>> *].findRight(a)(_ % 2 == 0) must_=== Some(4)
+    Foldable[==>>[Int, *]].findLeft(a)(_ % 2 == 0) must_=== Some(2)
+    Foldable[==>>[Int, *]].findRight(a)(_ % 2 == 0) must_=== Some(4)
   }
 
   "findLeft" ! forAll{ (a: Int ==>> Int) =>
     val f = (_: Int) % 3 == 0
-    Foldable[Int ==>> *].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.values)(f)
+    Foldable[==>>[Int, *]].findLeft(a)(f) must_=== Foldable[IList].findLeft(a.values)(f)
   }
 
   "findRight" ! forAll{ (a: Int ==>> Int) =>
     val f = (_: Int) % 3 == 0
-    Foldable[Int ==>> *].findRight(a)(f) must_=== Foldable[IList].findRight(a.values)(f)
+    Foldable[==>>[Int, *]].findRight(a)(f) must_=== Foldable[IList].findRight(a.values)(f)
   }
 
   "index" ! forAll { (a: Int ==>> Int, i: Byte) =>
-    val F = Foldable[Int ==>> *]
+    val F = Foldable[==>>[Int, *]]
     F.index(a, i) must_=== a.toList.lift(i).map(_._2)
     F.index(a, -1) must_=== None
     F.index(a, 0) must_=== a.findMin.map(_._2).toOption
@@ -987,7 +987,7 @@ object MapTest extends SpecLite {
 
   "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
     import \&/._
-    val F = Align[Int ==>> *]
+    val F = Align[==>>[Int, *]]
     val x = F.align(a, b)
     val keysA = a.keySet
     val keysB = b.keySet
@@ -1013,14 +1013,14 @@ object MapTest extends SpecLite {
   checkAll(FoldableTests.anyAndAllLazy[IntMap])
 
   object instances {
-    def bind[A: Order] = Bind[A ==>> *]
-    def traverse[A] = Traverse[A ==>> *]
+    def bind[A: Order] = Bind[==>>[A, *]]
+    def traverse[A] = Traverse[==>>[A, *]]
     def band[A: Order, B: Band] = Band[A ==>> B]
     def semiLattice[A: Order, B: SemiLattice] = SemiLattice[A ==>> B]
     def monoid[A: Order, B: Semigroup] = Monoid[A ==>> B]
 
     // checking absence of ambiguity
-    def functor[A: Order] = Functor[A ==>> *]
+    def functor[A: Order] = Functor[==>>[A, *]]
     def semigroup[A: Order, B: SemiLattice] = Semigroup[A ==>> B]
   }
 }

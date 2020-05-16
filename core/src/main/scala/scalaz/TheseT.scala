@@ -72,7 +72,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   = TheseT(F.map(run)(_.bimap(f, g)))
 
   def traverse[G[_], D](g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, A, D]]
-  = G.map(F.traverse(run)(o => Traverse[A \&/ *].traverse(o)(g)))(TheseT(_))
+  = G.map(F.traverse(run)(o => Traverse[\&/[A, *]].traverse(o)(g)))(TheseT(_))
 
 
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[TheseT[F, C, D]]

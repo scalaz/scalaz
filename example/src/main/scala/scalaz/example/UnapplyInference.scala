@@ -56,7 +56,7 @@ object UnapplyInference extends App {
   def kleisliU(): Unit = {
     import scalaz._
     import scalaz.syntax.either._
-    val k: Kleisli[NumberFormatException \/ *, String, Int] =
+    val k: Kleisli[\/[NumberFormatException, *], String, Int] =
       Kleisli.kleisliU { (s: String) =>
         try s.toInt.right[NumberFormatException]
         catch { case e: NumberFormatException => e.left[Int] }
@@ -69,7 +69,7 @@ object UnapplyInference extends App {
 
     val e: String \/ Int = \/-(1)
 
-    ToFunctorOps[String \/ *, Int](e.map(1 +)).map(1 +)
+    ToFunctorOps[\/[String, *], Int](e.map(1 +)).map(1 +)
     ToFunctorOpsUnapply(e.map(1 +)).map(1 +)
 
     e.map(1 +).map(1 +)

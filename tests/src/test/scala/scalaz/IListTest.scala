@@ -312,7 +312,7 @@ object IListTest extends SpecLite {
 
     def f(i: Int): String \/ Int = if (i % 2 == 0) -\/(i.toString) else \/-(i)
 
-    is.traverseDisjunction(f).must_===(is.traverse[String \/ *, Int](f))
+    is.traverseDisjunction(f).must_===(is.traverse[\/[String, *], Int](f))
   }
 
   "scanLeft" ! forAll { (ss: IList[String], f: (Int, String) => Int) =>
