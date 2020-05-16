@@ -22,7 +22,7 @@ object Unwriter {
 
 object StateT extends StateTInstances with StateTFunctions {
   def apply[S, F[_], A](f: S => F[(S, A)]): StateT[S, F, A] = IndexedStateT[S, S, F, A](f)
-  def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[StateT[S, *[_], *]].liftM(fa)
+  def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[({type l[a[_], b] = StateT[S, a, b]})#l].liftM(fa)
 
   def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, *] ~> StateT[S, G, *] =
     new ~>[StateT[S, F, *], StateT[S, G, *]] {

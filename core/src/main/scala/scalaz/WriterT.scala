@@ -284,7 +284,7 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
       implicit def W = W0
     }
 
-  implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[λ[(α[_], β) => WriterT[W, α, β]]] =
+  implicit def writerTHoist[W](implicit W0: Monoid[W]): Hoist[({type l[α[_], β] = WriterT[W, α, β]})#l] =
     new WriterTHoist[W] {
       implicit def W = W0
     }
@@ -457,7 +457,7 @@ private trait WriterComonad[W] extends Comonad[Writer[W, *]] with WriterTFunctor
     Writer(fa.written, f(fa))
 }
 
-private trait WriterTHoist[W] extends Hoist[λ[(α[_], β) => WriterT[W, α, β]]] {
+private trait WriterTHoist[W] extends Hoist[({type l[α[_], β] = WriterT[W, α, β]})#l] {
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): WriterT[W, M, B] =
     WriterT(M.map(mb)((W.zero, _)))
 

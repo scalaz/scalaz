@@ -293,8 +293,8 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTHoist[A]: Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] =
-    new Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] {
+  implicit def lazyEitherTHoist[A]: Hoist[({type l[a[_], b] = LazyEitherT[a, A, b]})#l] =
+    new Hoist[({type l[a[_], b] = LazyEitherT[a, A, b]})#l] {
       override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
         new (LazyEitherT[M, A, *] ~> LazyEitherT[N, A, *]) {
           def apply[B](mb: LazyEitherT[M, A, B]) = LazyEitherT(f(mb.run))

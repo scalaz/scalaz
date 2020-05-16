@@ -22,7 +22,7 @@ object StateTTest extends SpecLite {
   checkAll(bindRec.laws[StateTListInt])
   checkAll(monad.laws[StateTListInt])
   checkAll(profunctor.laws[IStateTList])
-  checkAll(monadTrans.laws[StateT[Int, *[_], *], List])
+  checkAll(monadTrans.laws[({type l[a[_], b] = StateT[Int, a, b]})#l, List])
   checkAll(monadError.laws[StateT[Int, Either[Int, *], *], Int])
 
   checkAll {

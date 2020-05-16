@@ -4,7 +4,7 @@ sealed abstract class LiskovF[-A[_], +B[_]] {
   def substCo[F[+_[_]]](p: F[A]): F[B]
   def substCt[F[-_[_]]](p: F[B]): F[A]
 
-  def apply[X](a: A[X]): B[X] = substCo[λ[F[_] => F[X]]](a)
+  def apply[X](a: A[X]): B[X] = substCo[({type l[F[_]] = F[X]})#l](a)
 }
 
 object LiskovF {

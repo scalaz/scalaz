@@ -88,8 +88,8 @@ object Day extends DayInstances {
 
 sealed abstract class DayInstances extends DayInstances1 {
 
-  implicit def cohoistDay[F[_]](implicit F: Comonad[F]): Cohoist[Lambda[(X[_], Y) => Day[F, X, Y]]] =
-    new Cohoist[Lambda[(X[_], Y) => Day[F, X, Y]]] {
+  implicit def cohoistDay[F[_]](implicit F: Comonad[F]): Cohoist[({type l[X[_], Y] = Day[F, X, Y]})#l] =
+    new Cohoist[({type l[X[_], Y] = Day[F, X, Y]})#l] {
       override def lower[G[_], A](a: Day[F, G, A])(implicit G: Cobind[G]): G[A] =
         G.map(a.gy)(a.xya(F.copoint(a.fx), _))
 

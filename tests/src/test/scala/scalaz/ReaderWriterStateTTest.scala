@@ -22,7 +22,7 @@ object ReaderWriterStateTTest extends SpecLite {
 
   checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
-  checkAll(monadTrans.laws[ReaderWriterStateT[Int, Int, Int, *[_], *], Option])
+  checkAll(monadTrans.laws[({type l[a[_], b] = ReaderWriterStateT[Int, Int, Int, a, b]})#l, Option])
   checkAll(monadError.laws[RWST[Int, Int, Int, Either[Int, *], *], Int])
 
   "ReaderWriterStateT can be trampolined without stack overflow" in {
@@ -42,7 +42,7 @@ object ReaderWriterStateTTest extends SpecLite {
     def bind[R, W: Semigroup, S, F[_]: Bind] = Bind[RWST[R, W, S, F, *]]
     def monadReader[R, W: Monoid, S, F[_]: Monad] = MonadReader[RWST[R, W, S, F, *], R]
     def monadState[R, W: Monoid, S, F[_]: Monad] = MonadState[RWST[R, W, S, F, *], S]
-    def monadTrans[R, W: Monoid, S] = MonadTrans[λ[(f[_], α) => RWST[R, W, S, f, α]]]
+    def monadTrans[R, W: Monoid, S] = MonadTrans[({type l[f[_], α] = RWST[R, W, S, f, α]})#l]
     // checking absence of ambiguity
     def functor[R, W: Monoid, S, F[_]: Monad] = Functor[RWST[R, W, S, F, *]]
     def functor[R, W: Semigroup, S, F[_]: Bind] = Functor[RWST[R, W, S, F, *]]

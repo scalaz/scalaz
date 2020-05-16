@@ -15,7 +15,7 @@ object TheseTTest extends SpecLite {
   checkAll(monad.laws[TheseTListInt])
   checkAll(traverse.laws[TheseTListInt])
   checkAll(bitraverse.laws[TheseTList])
-  checkAll(monadTrans.laws[TheseT[*[_], Int, *], List])
+  checkAll(monadTrans.laws[({type l[a[_], b] = TheseT[a, Int, b]})#l, List])
 
   object instances {
     def functor[F[_]: Functor, L] = Functor[TheseT[F, L, *]]

@@ -368,7 +368,7 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
       implicit def F = F0
     }
 
-  implicit def eitherTHoist[A]: Hoist[λ[(α[_], β) => EitherT[A, α, β]]] =
+  implicit def eitherTHoist[A]: Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] =
     new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[A, F, B]] =
@@ -464,9 +464,11 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[*, F, *]] with 
     fab.bitraverse(f, g)
 }
 
-private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[A, α, β]]] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    λ[EitherT[A, M, *] ~> EitherT[A, N, *]](_ mapT f.apply)
+private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new ~>[EitherT[A, M, *], EitherT[A, N, *]] {
+    def apply[B](mb: EitherT[A, M, B]): EitherT[A, N, B] =
+      mb.mapT(f.apply)
+  }
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[A, M, B] = EitherT(M.map(mb)(\/.right))
 
