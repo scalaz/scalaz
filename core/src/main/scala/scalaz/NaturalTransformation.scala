@@ -87,15 +87,3 @@ trait DiNaturalTransformation[F[_,_], G[_,_]] {
 trait Konst[A] {
   type Apply[B] = A
 }
-//
-//trait Biff[P[_,_], F[_], G[_]] {
-//  type Apply[A, B] = P[F[A], G[B]]
-//}
-//
-//trait On[P[_,_], F[_]] {
-//  type Apply[A, B] = P[F[A], F[B]]
-//}
-//
-//trait Distributes[F[_], G[_]] {
-//  def apply[A](f: F[G[A]]): G[F[A]]
-//}
