@@ -15,7 +15,7 @@ trait MonadError[F[_], S] extends Monad[F] with ApplicativeError[F, S] { self =>
     def errorsRaised[A](a: A, e: S)(implicit FEA: Equal[F[A]]): Boolean =
       FEA.equal(bind(point(a))(_ => raiseError(e)), raiseError(e))
     def errorsStopComputation[A](e: S, a: A)(implicit FEA: Equal[F[A]]): Boolean =
-      FEA.equal(bind(raiseError(e))(point), raiseError(e))
+      FEA.equal(bind(raiseError[A](e))(point(_)), raiseError[A](e))
   }
   def monadErrorLaw = new MonadErrorLaw {}
 
