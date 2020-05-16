@@ -362,7 +362,7 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
 
       def alt[A](a1: => EitherT[L, F, A], a2: => EitherT[L, F, A]): EitherT[L, F, A] =
         EitherT(
-          F.bind(a1.run)(_ match {
+          F.bind(a1.run){
             case -\/(l) =>
               F.map(a2.run)(
                 _.leftMap(G.append(l, _))
@@ -370,7 +370,7 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
 
             case r: \/-[L, A] =>
               F.point(r)
-          })
+          }
         )
     }
 

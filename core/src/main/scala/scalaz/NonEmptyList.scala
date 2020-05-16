@@ -179,10 +179,10 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       override def traverse1[F[_], A, B](fa: NonEmptyList[A])(f: A => F[B])(implicit F: Apply[F]) = {
         val revOpt: Maybe[F[NonEmptyList[B]]] =
-          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list)(_ match {
+          F.unfoldrOpt[IList[A], B, NonEmptyList[B]](fa.list){
             case ICons(a, as) => Maybe.just((f(a), as))
             case INil() => Maybe.empty
-          })(Reducer.ReverseNonEmptyListReducer[B])
+          }(Reducer.ReverseNonEmptyListReducer[B])
 
         val rev: F[NonEmptyList[B]] = revOpt getOrElse sys.error("Head cannot be empty")
         F.map(rev)(_.reverse)
