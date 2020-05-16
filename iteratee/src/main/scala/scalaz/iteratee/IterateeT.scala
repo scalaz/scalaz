@@ -111,9 +111,9 @@ sealed abstract class IterateeT[E, F[_], A] {
   }
 
   def up[G[_]](implicit G: Applicative[G], F: Comonad[F]): IterateeT[E, G, A] = {
-    mapI(λ[F ~> G](a =>
-      G.point(F.copoint(a))
-    ))
+    mapI(new (F ~> G) {
+      def apply[A](a: F[A]) = G.point(F.copoint(a))
+    })
   }
 
   def joinI[I, B](implicit outer: IterateeT[E, F, A] === IterateeT[E, F, StepT[I, F, B]], M: Monad[F]): IterateeT[E, F, B] = {
@@ -361,7 +361,9 @@ private trait IterateeTHoist[E] extends Hoist[λ[(β[_], α) => IterateeT[E, β,
     type λ[α] = IterateeT[E, F, α]
   }
 
-  override def hoist[F[_]: Monad, G[_]](f: F ~> G) = λ[IterateeTF[F]#λ ~> IterateeTF[G]#λ](_ mapI f)
+  override def hoist[F[_]: Monad, G[_]](f: F ~> G) = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
+    def apply[A](fa: IterateeT[E, F, A]): IterateeT[E, G, A] = fa mapI f
+  }
 
   def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[E, G, A] =
     iterateeT(Monad[G].map(ga)(sdone[E, G, A](_, emptyInput)))

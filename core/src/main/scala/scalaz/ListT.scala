@@ -127,9 +127,9 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 
 object ListT extends ListTInstances {
   def listT[M[_]]: (λ[α => M[IList[α]]] ~> ListT[M, *]) =
-    λ[λ[α => M[IList[α]]] ~> ListT[M, *]](
-      new ListT(_)
-    )
+    new (λ[α => M[IList[α]]] ~> ListT[M, *]) {
+      def apply[A](a: M[IList[A]]) = new ListT[M, A](a)
+    }
 
   def empty[M[_], A](implicit M: Applicative[M]): ListT[M, A] =
     new ListT[M, A](M.point(INil()))
@@ -201,5 +201,8 @@ private trait ListTHoist extends Hoist[ListT] {
     fromIList(G.map(a)(entry => entry :: INil()))
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, *] ~> ListT[N, *] =
-    λ[ListT[M, *] ~> ListT[N, *]](_ mapT f.apply)
+    new (ListT[M, *] ~> ListT[N, *]) {
+      def apply[A](a: ListT[M, A]): ListT[N, A] =
+        a.mapT(f.apply)
+    }
 }

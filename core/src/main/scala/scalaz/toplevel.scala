@@ -25,7 +25,10 @@ object StateT extends StateTInstances with StateTFunctions {
   def liftM[F[_]: Monad, S, A](fa: F[A]): StateT[S, F, A] = MonadTrans[StateT[S, *[_], *]].liftM(fa)
 
   def hoist[F[_]: Monad, G[_]: Monad, S, A](nat: F ~> G): StateT[S, F, *] ~> StateT[S, G, *] =
-    λ[StateT[S, F, *] ~> StateT[S, G, *]](st => StateT((s: S) => nat(st.run(s))))
+    new ~>[StateT[S, F, *], StateT[S, G, *]] {
+      def apply[X](st: StateT[S, F, X]) =
+        StateT((s: S) => nat(st.run(s)))
+    }
 
   def get[F[_]: Monad, S]: StateT[S, F, S] = MonadState[StateT[S, F, *], S].get
   def gets[F[_]: Monad, S, A](f: S => A): StateT[S, F, A] = MonadState[StateT[S, F, *], S].gets(f)

@@ -105,7 +105,9 @@ object Coyoneda extends CoyonedaInstances {
 
   /** Turns a natural transformation F ~> G into CF ~> CG */
   def liftT[F[_], G[_]](fg: F ~> G): Coyoneda[F, *] ~> Coyoneda[G, *] =
-    λ[Coyoneda[F, *] ~> Coyoneda[G, *]](_.trans(fg))
+    new (Coyoneda[F, *] ~> Coyoneda[G, *]) {
+      def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
+    }
 
 }
 
