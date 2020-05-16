@@ -145,7 +145,7 @@ sealed abstract class IndexedStateT[S1, S2, F[_], A] { self =>
 }
 
 object IndexedStateT extends StateTInstances with StateTFunctions {
-  private final case class Wrap[F[_], S1, S2, A](run: S1 => F[(S2, A)]) extends IndexedStateT[S1, S2, F, A]
+  private final case class Wrap[F[_], S1, S2, A](value: S1 => F[(S2, A)]) extends IndexedStateT[S1, S2, F, A]
   private final case class FlatMap[F[_], S1, S2, S3, A, B](a: IndexedStateT[S1, S2, F, A], f: (S2, A) => IndexedStateT[S2, S3, F, B]) extends IndexedStateT[S1, S3, F, B]
 
   def apply[S1, S2, F[_], A](f: S1 => F[(S2, A)]): IndexedStateT[S1, S2, F, A] =
