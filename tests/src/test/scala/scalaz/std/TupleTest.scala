@@ -73,7 +73,7 @@ object TupleTest extends SpecLite {
   "syntax" should {
     import std.tuple.tupleSyntax._
     "mapElements" in {
-       (1, 2).mapElements(_1 = 2 *) must_===((2, 2))
+       (1, 2).mapElements(_1 = 2 * _) must_===((2, 2))
     }
     "toIndexedSeq" in {
       val as: IndexedSeq[Int] = (1, 2).toIndexedSeq
