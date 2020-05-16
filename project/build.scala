@@ -93,14 +93,13 @@ object build {
   }
 
   private val stdOptions = Seq(
-    // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
     "-deprecation",
     "-Xlint:adapted-args",
     "-encoding", "UTF-8",
     "-feature",
     "-opt:l:method,inline",
     "-opt-inline-from:scalaz.**",
-    "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
+    "-language:implicitConversions", "-language:higherKinds", "-language:existentials",
     "-unchecked"
   )
 
