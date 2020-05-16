@@ -66,23 +66,23 @@ object Liskov extends LiskovInstances {
 
   /** Subtyping is transitive */
   def trans[A, B, C](f: B <~< C, g: A <~< B): A <~< C =
-    g.substCt[λ[`-α` => α <~< C]](f)
+    g.substCt[({type l[-α] = α <~< C})#l](f)
 
   /** We can lift subtyping into any covariant type constructor */
   def co[T[+_], A, A2](a: A <~< A2): (T[A] <~< T[A2]) =
-    a.substCt[λ[`-α` => T[α] <~< T[A2]]](refl)
+    a.substCt[({type l[-α] = T[α] <~< T[A2]})#l](refl)
 
   def co2[T[+_, _], Z, A, B](a: A <~< Z): T[A, B] <~< T[Z, B] =
-    a.substCt[λ[`-α` => T[α, B] <~< T[Z, B]]](refl)
+    a.substCt[({type l[-α] = T[α, B] <~< T[Z, B]})#l](refl)
 
   def co2_2[T[_, +_], Z, A, B](a: B <~< Z): T[A, B] <~< T[A, Z] =
-    a.substCt[λ[`-α` => T[A, α] <~< T[A, Z]]](refl)
+    a.substCt[({type l[-α] = T[A, α] <~< T[A, Z]})#l](refl)
 
   def co3[T[+_, _, _], Z, A, B, C](a: A <~< Z): T[A, B, C] <~< T[Z, B, C] =
-    a.substCt[λ[`-α` => T[α, B, C] <~< T[Z, B, C]]](refl)
+    a.substCt[({type l[-α] = T[α, B, C] <~< T[Z, B, C]})#l](refl)
 
   def co4[T[+_, _, _, _], Z, A, B, C, D](a: A <~< Z): T[A, B, C, D] <~< T[Z, B, C, D] =
-    a.substCt[λ[`-α` => T[α, B, C, D] <~< T[Z, B, C, D]]](refl)
+    a.substCt[({type l[-α] = T[α, B, C, D] <~< T[Z, B, C, D]})#l](refl)
 
   /** lift2(a,b) = co1_2(a) compose co2_2(b) */
   def lift2[T[+_, +_], A, A2, B, B2](
@@ -122,36 +122,36 @@ object Liskov extends LiskovInstances {
 
   /** We can lift subtyping into any contravariant type constructor */
   def contra[T[-_], A, A2](a: A <~< A2): (T[A2] <~< T[A]) =
-    a.substCt[λ[`-α` => T[A2] <~< T[α]]](refl)
+    a.substCt[({type l[-α] = T[A2] <~< T[α]})#l](refl)
 
   // binary
   def contra1_2[T[-_, _], Z, A, B](a: A <~< Z): (T[Z, B] <~< T[A, B]) =
-    a.substCt[λ[`-α` => T[Z, B] <~< T[α, B]]](refl)
+    a.substCt[({type l[-α] = T[Z, B] <~< T[α, B]})#l](refl)
 
   def contra2_2[T[_, -_], Z, A, B](a: B <~< Z): (T[A, Z] <~< T[A, B]) =
-    a.substCt[λ[`-α` => T[A, Z] <~< T[A, α]]](refl)
+    a.substCt[({type l[-α] = T[A, Z] <~< T[A, α]})#l](refl)
 
   // ternary
   def contra1_3[T[-_, _, _], Z, A, B, C](a: A <~< Z): (T[Z, B, C] <~< T[A, B, C]) =
-    a.substCt[λ[`-α` => T[Z, B, C] <~< T[α, B, C]]](refl)
+    a.substCt[({type l[-α] = T[Z, B, C] <~< T[α, B, C]})#l](refl)
 
   def contra2_3[T[_, -_, _], Z, A, B, C](a: B <~< Z): (T[A, Z, C] <~< T[A, B, C]) =
-    a.substCt[λ[`-α` => T[A, Z, C] <~< T[A, α, C]]](refl)
+    a.substCt[({type l[-α] = T[A, Z, C] <~< T[A, α, C]})#l](refl)
 
   def contra3_3[T[_, _, -_], Z, A, B, C](a: C <~< Z): (T[A, B, Z] <~< T[A, B, C]) =
-    a.substCt[λ[`-α` => T[A, B, Z] <~< T[A, B, α]]](refl)
+    a.substCt[({type l[-α] = T[A, B, Z] <~< T[A, B, α]})#l](refl)
 
   def contra1_4[T[-_, _, _, _], Z, A, B, C, D](a: A <~< Z): (T[Z, B, C, D] <~< T[A, B, C, D]) =
-    a.substCt[λ[`-α` => T[Z, B, C, D] <~< T[α, B, C, D]]](refl)
+    a.substCt[({type l[-α] = T[Z, B, C, D] <~< T[α, B, C, D]})#l](refl)
 
   def contra2_4[T[_, -_, _, _], Z, A, B, C, D](a: B <~< Z): (T[A, Z, C, D] <~< T[A, B, C, D]) =
-    a.substCt[λ[`-α` => T[A, Z, C, D] <~< T[A, α, C, D]]](refl)
+    a.substCt[({type l[-α] = T[A, Z, C, D] <~< T[A, α, C, D]})#l](refl)
 
   def contra3_4[T[_, _, -_, _], Z, A, B, C, D](a: C <~< Z): (T[A, B, Z, D] <~< T[A, B, C, D]) =
-    a.substCt[λ[`-α` => T[A, B, Z, D] <~< T[A, B, α, D]]](refl)
+    a.substCt[({type l[-α] = T[A, B, Z, D] <~< T[A, B, α, D]})#l](refl)
 
   def contra4_4[T[_, _, _, -_], Z, A, B, C, D](a: D <~< Z): (T[A, B, C, Z] <~< T[A, B, C, D]) =
-    a.substCt[λ[`-α` => T[A, B, C, Z] <~< T[A, B, C, α]]](refl)
+    a.substCt[({type l[-α] = T[A, B, C, Z] <~< T[A, B, C, α]})#l](refl)
 
   /** Lift subtyping into a unary function-like type
    *  {{{

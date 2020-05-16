@@ -161,7 +161,7 @@ trait FunctionInstances extends FunctionInstances0 {
     new Contravariant[* => R] {
       def contramap[A, B](r: A => R)(f: B => A) = r compose f
       override def narrow[A, B](f: A => R)(implicit ev: B <~< A) =
-        Liskov.contra[-* => R, B, A](ev)(f)
+        Liskov.contra[({type l[-a] = Function1[a, R]})#l, B, A](ev)(f)
     }
 
   implicit def function2Instance[T1, T2]: Monad[(T1, T2) => *] with BindRec[(T1, T2) => *] =

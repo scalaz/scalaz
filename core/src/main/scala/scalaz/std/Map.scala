@@ -80,7 +80,7 @@ trait MapInstances extends MapInstances0 with MapFunctions {
       def isEmpty[V](fa: Map[K, V]) = fa.isEmpty
       def bind[A, B](fa: Map[K,A])(f: A => Map[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
       override def map[A, B](fa: Map[K, A])(f: A => B) = fa.transform{case (_, v) => f(v)}
-      override def widen[A, B](fa: Map[K, A])(implicit ev: A <~< B) = Liskov.co[Map[K, +?], A, B](ev)(fa)
+      override def widen[A, B](fa: Map[K, A])(implicit ev: A <~< B) = Liskov.co[({type l[+a] = Map[K, a]})#l, A, B](ev)(fa)
       def traverseImpl[G[_],A,B](m: Map[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[Map[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => Map(xs:_*))
       import \&/._
