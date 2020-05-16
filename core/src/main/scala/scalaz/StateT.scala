@@ -346,10 +346,10 @@ private trait StateTBind[S, F[_]] extends Bind[StateT[S, F, *]] {
 
 private trait StateTBindRec[S, F[_]] extends StateTBind[S, F] with BindRec[StateT[S, F, *]] {
   def tailrecM[A, B](a: A)(f: A => StateT[S, F, A \/ B]): StateT[S, F, B] = {
-    f(a).flatMap(_ match {
+    f(a).flatMap{
       case -\/(a) => tailrecM(a)(f)
       case \/-(b) => StateT(s => F.point((s, b)))
-    })
+    }
   }
 }
 

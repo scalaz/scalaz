@@ -71,10 +71,10 @@ trait ListInstances extends ListInstances0 {
       }
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
         val revOpt: Maybe[F[List[B]]] =
-          F.unfoldrOpt[List[A], B, List[B]](l)(_ match {
+          F.unfoldrOpt[List[A], B, List[B]](l){
             case a :: as => just((f(a), as))
             case Nil => Maybe.empty
-          })(Reducer.ReverseListReducer[B])
+          }(Reducer.ReverseListReducer[B])
 
         val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

@@ -207,10 +207,10 @@ sealed abstract class EphemeralStreamInstances {
 
     def traverseImpl[F[_], A, B](fa: EphemeralStream[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       val revOpt: Maybe[F[List[B]]] =
-        F.unfoldrOpt[EphemeralStream[A], B, List[B]](fa)(_ match {
+        F.unfoldrOpt[EphemeralStream[A], B, List[B]](fa){
           case a ##:: as => Maybe.just((f(a), as))
           case emptyEphemeralStream => Maybe.empty
-        })(Reducer.ReverseListReducer[B])
+        }(Reducer.ReverseListReducer[B])
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

@@ -628,10 +628,10 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]) = {
         val revOpt: Maybe[F[List[B]]] =
-          F.unfoldrOpt[IList[A], B, List[B]](fa)(_ match {
+          F.unfoldrOpt[IList[A], B, List[B]](fa){
             case ICons(a, as) => just((f(a), as))
             case INil() => Maybe.empty
-          })(Reducer.ReverseListReducer[B])
+          }(Reducer.ReverseListReducer[B])
 
         val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 

@@ -116,10 +116,10 @@ trait LazyListInstances {
 
     def traverseImpl[F[_], A, B](fa: LazyList[A])(f: A => F[B])(implicit F: Applicative[F]) = {
       val revOpt: Maybe[F[List[B]]] =
-        F.unfoldrOpt[LazyList[A], B, List[B]](fa)(_ match {
+        F.unfoldrOpt[LazyList[A], B, List[B]](fa){
           case a #:: as => Maybe.just((f(a), as))
           case _ => Maybe.empty
-        })(Reducer.ReverseListReducer[B])
+        }(Reducer.ReverseListReducer[B])
 
       val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
 
