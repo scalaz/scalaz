@@ -152,7 +152,7 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, *]] {
     F.foldLeft(fa.tail, f(z, fa.head))(f)
 
   override def traverseS_[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
-    State{s: S => F.traverseS_(fa.tail)(f)(f(fa.head)(s)._1)}
+    State{(s: S) => F.traverseS_(fa.tail)(f)(f(fa.head)(s)._1)}
 
   override def length[A](fa: OneAnd[F, A]) = 1 + F.length(fa.tail)
 
@@ -206,7 +206,7 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, *]] with O
     G.apply2(f(fa.head), F.traverseImpl(fa.tail)(f)(G))(OneAnd.apply)
 
   override def traverseS[S,A,B](fa: OneAnd[F, A])(f: A => State[S,B]) =
-    State{s: S =>
+    State{(s: S) =>
       val (s2, b) = f(fa.head)(s)
       val (s3, bs) = F.traverseS(fa.tail)(f)(s2)
       (s3, OneAnd(b, bs))
