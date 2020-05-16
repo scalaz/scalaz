@@ -44,7 +44,7 @@ object GenerateTupleW {
       val pimp = s"""|
           |final class Tuple${arity}Ops[${tparams}](private val value: (${tparams})) extends AnyVal {
           |  def fold[Z](f: => (${tparams}) => Z): Z = {import value._; f(${params})}
-          |  def toIndexedSeq[Z](implicit ev: value.type <:< Tuple${arity}[${ztparams}]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(${params})}
+          |  def toIndexedSeq[Z](implicit ev: Tuple${arity}[${tparams}] <:< Tuple${arity}[${ztparams}]): IndexedSeq[Z] = {val zs = ev(value); import zs._; IndexedSeq(${params})}
           |  def mapElements[${mapallTParams}](${mapallParams}): (${mapallTParams}) = (${mapallApply})
           |}""".stripMargin
 
