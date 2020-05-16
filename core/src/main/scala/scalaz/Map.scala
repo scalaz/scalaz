@@ -221,7 +221,7 @@ sealed abstract class ==>>[A, B] {
     foldrWithKey(List.empty[A])((x, _, xs) => x :: xs)
 
   def keySet: ISet[A] = this match {
-    case Tip()        => ISet.Tip[A]
+    case Tip()        => ISet.Tip[A]()
     case Bin(k,v,l,r) => ISet.Bin(k,l.keySet,r.keySet)
   }
 
