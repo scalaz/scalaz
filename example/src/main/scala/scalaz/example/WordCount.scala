@@ -10,7 +10,7 @@ import scalaz.{Monoid, StateT}
  */
 object WordCount {
   def main(args: Array[String]) = {
-    wordCount
+    wordCount()
   }
 
   def wordCount(): Unit = {
