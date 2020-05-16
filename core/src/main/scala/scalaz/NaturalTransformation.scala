@@ -94,22 +94,3 @@ trait BiConstrainedNaturalTransformation[F[_,_], G[_,_], C[_], E[_]] {
 trait DiNaturalTransformation[F[_,_], G[_,_]] {
   def apply[A](f: F[A,A]): G[A,A]
 }
-
-// TODO needed, or just use type lambdas?
-//type Thunk[A] = () => A
-//
-trait Konst[A] {
-  type Apply[B] = A
-}
-//
-//trait Biff[P[_,_], F[_], G[_]] {
-//  type Apply[A, B] = P[F[A], G[B]]
-//}
-//
-//trait On[P[_,_], F[_]] {
-//  type Apply[A, B] = P[F[A], F[B]]
-//}
-//
-//trait Distributes[F[_], G[_]] {
-//  def apply[A](f: F[G[A]]): G[F[A]]
-//}
