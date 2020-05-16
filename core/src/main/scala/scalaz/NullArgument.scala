@@ -36,7 +36,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     }
 
   def +++[C, D](x: C ?=> D): (A \/ C) ?=> (B \/ D) =
-    left compose x.right
+    left[D] compose x.right[A]
 
   def left[C]: (A \/ C) ?=> (B \/ C) =
     NullArgument {
