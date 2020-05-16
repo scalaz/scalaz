@@ -65,7 +65,7 @@ final case class ListT[M[_], A](run: M[IList[A]]){
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailMaybe.toOption.get))
 
-  def tailMaybe(implicit M: Functor[M]) : ListT[Lambda[a => M[Maybe[a]]], A] = new ListT[Lambda[a => M[Maybe[a]]], A](M.map(run)(_.tailMaybe))
+  def tailMaybe(implicit M: Functor[M]) : ListT[λ[a => M[Maybe[a]]], A] = new ListT[λ[a => M[Maybe[a]]], A](M.map(run)(_.tailMaybe))
 
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Functor[M]) : M[B] = M.map(run)(_.foldLeft(z){(left, right) => f(left, right)})
 

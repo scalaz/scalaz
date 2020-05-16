@@ -114,8 +114,8 @@ object TracedT extends TracedTInstances {
 
   import scalaz.Isomorphism._
 
-  def iso[W[_]]: TracedT[W, *, *] <~~> Lambda[(a, b) => W[a => b]] =
-    new IsoBifunctorTemplate[TracedT[W, *, *], Lambda[(a, b) => W[a => b]]] {
+  def iso[W[_]]: TracedT[W, *, *] <~~> λ[(a, b) => W[a => b]] =
+    new IsoBifunctorTemplate[TracedT[W, *, *], λ[(a, b) => W[a => b]]] {
       override def to[A, B](fa: TracedT[W, A, B]) = fa.run
       override def from[A, B](ga: W[A => B]) = TracedT(ga)
     }
