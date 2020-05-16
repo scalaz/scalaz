@@ -12,7 +12,7 @@ object FunctorTest extends SpecLite {
   }
 
   "map" in {
-    (some(1) ∘ (1+)) must_===(some(2))
+    (some(1) ∘ (1 + _)) must_===(some(2))
   }
 
   "strength" in {
