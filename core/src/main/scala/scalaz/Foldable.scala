@@ -82,7 +82,7 @@ trait Foldable[F[_]]  { self =>
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
-    State{s: S =>
+    State{ s =>
       (foldLeft(fa, s)((s, a) => f(a)(s)._1), ())
     }
 
