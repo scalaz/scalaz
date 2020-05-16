@@ -78,8 +78,8 @@ object Coproduct extends CoproductInstances {
 
   def coproductIso[F[_], G[_]]: Coproduct[F, G, *] <~> λ[A => F[A] \/ G[A]] =
     new IsoFunctorTemplate[Coproduct[F, G, *], λ[A => F[A] \/ G[A]]] {
-      def from[A](ga: F[A] \/ G[A]) = Coproduct(ga)
-      def to[A](fa: Coproduct[F, G, A]) = fa.run
+      def from_[A](ga: F[A] \/ G[A]) = Coproduct(ga)
+      def to_[A](fa: Coproduct[F, G, A]) = fa.run
     }
 
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =

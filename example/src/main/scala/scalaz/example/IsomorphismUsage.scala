@@ -17,8 +17,8 @@ object IsomorphismUsage extends App {
 
 
   def isoFunctor = new IsoFunctorTemplate[Seq, List] {
-    def to[A](sa: Seq[A]): List[A] = sa.toList
-    def from[A](la: List[A]): Seq[A] = la.toSeq
+    def to_[A](sa: Seq[A]): List[A] = sa.toList
+    def from_[A](la: List[A]): Seq[A] = la.toSeq
   }
 
   implicit def isoMonoid[A]: IsomorphismMonoid[Seq[A], List[A]] = new IsomorphismMonoid[Seq[A], List[A]] {

@@ -85,8 +85,8 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 object IdT extends IdTInstances {
   import Isomorphism._
   def iso[F[_]]: IdT[F, *] <~> F = new IsoFunctorTemplate[IdT[F, *], F] {
-    def from[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
-    def to[A](fa: IdT[F, A]): F[A] = fa.run
+    def from_[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
+    def to_[A](fa: IdT[F, A]): F[A] = fa.run
   }
 }
 

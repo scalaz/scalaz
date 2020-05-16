@@ -96,7 +96,7 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   def iso[F[_]: Contravariant]: ContravariantCoyoneda[F, *] <~> F =
     new IsoFunctorTemplate[ContravariantCoyoneda[F, *], F] {
-      def from[A](fa: F[A]) = lift(fa)
-      def to[A](fa: ContravariantCoyoneda[F, A]) = fa.run
+      def from_[A](fa: F[A]) = lift(fa)
+      def to_[A](fa: ContravariantCoyoneda[F, A]) = fa.run
     }
 }

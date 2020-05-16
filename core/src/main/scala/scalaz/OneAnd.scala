@@ -369,7 +369,7 @@ object OneAnd extends OneAndInstances {
 
   val oneAndNelIso: NonEmptyList <~> OneAnd[IList, *] =
     new IsoFunctorTemplate[NonEmptyList, OneAnd[IList, *]] {
-      def to[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
-      def from[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
+      def to_[A](fa: NonEmptyList[A]) = OneAnd(fa.head, fa.tail)
+      def from_[A](ga: OneAnd[IList, A]) = NonEmptyList.nel(ga.head, ga.tail)
     }
 }

@@ -561,8 +561,8 @@ object IList extends IListInstances {
 
   val listIListIso: List <~> IList =
     new IsoFunctorTemplate[List, IList] {
-      def to[A](fa: List[A]) = fromList(fa)
-      def from[A](fa: IList[A]) = fa.toList
+      def to_[A](fa: List[A]) = fromList(fa)
+      def from_[A](fa: IList[A]) = fa.toList
     }
 
 }

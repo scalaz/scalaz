@@ -295,8 +295,8 @@ object Kleisli extends KleisliInstances {
     decode:  D ~> λ[a => (I => O[a])]
   ): D <~> Kleisli[O, I, *] =
     new IsoFunctorTemplate[D, Kleisli[O, I, *]] {
-      def from[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
-      def to[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
+      def from_[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
+      def to_[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
     }
 }
 

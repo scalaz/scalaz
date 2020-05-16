@@ -59,8 +59,8 @@ object Endo extends EndoInstances {
   }
 
   val IsoFunctorEndo: Endo <~> λ[α => α => α] = new IsoFunctorTemplate[Endo, λ[α => α => α]] {
-    def to[A](fa: Endo[A]): A => A = fa.run
-    def from[A](ga: A => A): Endo[A] = endo(ga)
+    def to_[A](fa: Endo[A]): A => A = fa.run
+    def from_[A](ga: A => A): Endo[A] = endo(ga)
   }
 }
 

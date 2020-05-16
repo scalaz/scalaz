@@ -43,24 +43,24 @@ object CorecursiveList extends CorecursiveListInstances {
 
   val ephemeralStreamIso: EphemeralStream <~> CorecursiveList =
     new IsoFunctorTemplate[EphemeralStream, CorecursiveList] {
-      def to[A](fa: EphemeralStream[A]) =
+      def to_[A](fa: EphemeralStream[A]) =
         CorecursiveList(fa)(fa =>
           if (fa.isEmpty) Empty() else just((fa.tail(), fa.head())))
 
-      def from[A](ga: CorecursiveList[A]) =
+      def from_[A](ga: CorecursiveList[A]) =
         EphemeralStream.unfold(ga.init)(s =>
           ga.step(s).map{case (s, a) => (a, s)}.toOption)
     }
 
   val streamIso: Stream <~> CorecursiveList =
     new IsoFunctorTemplate[Stream, CorecursiveList] {
-      def to[A](fa: Stream[A]) =
+      def to_[A](fa: Stream[A]) =
         CorecursiveList(fa){
           case Stream.Empty => Empty()
           case x #:: xs => just((xs, x))
         }
 
-      def from[A](ga: CorecursiveList[A]) = {
+      def from_[A](ga: CorecursiveList[A]) = {
         def rec(s: ga.S): Stream[A] =
           ga.step(s) cata ({case (s, a) => a #:: rec(s)}, Stream())
         rec(ga.init)

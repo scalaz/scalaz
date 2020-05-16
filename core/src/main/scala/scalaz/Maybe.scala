@@ -168,8 +168,8 @@ object Maybe extends MaybeInstances {
 
   val optionMaybeIso: Option <~> Maybe =
     new IsoFunctorTemplate[Option, Maybe] {
-      def to[A](fa: Option[A]) = std.option.toMaybe(fa)
-      def from[A](ga: Maybe[A]) = ga.toOption
+      def to_[A](fa: Option[A]) = std.option.toMaybe(fa)
+      def from_[A](ga: Maybe[A]) = ga.toOption
     }
 
   /** Wrap a value in Just, or return Empty if the value is null */

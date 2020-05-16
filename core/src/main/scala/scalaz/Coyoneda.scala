@@ -90,8 +90,8 @@ object Coyoneda extends CoyonedaInstances {
 
   def iso[F[_]: Functor]: Coyoneda[F, *] <~> F =
     new IsoFunctorTemplate[Coyoneda[F, *], F] {
-      def from[A](fa: F[A]) = lift(fa)
-      def to[A](fa: Coyoneda[F, A]) = fa.run
+      def from_[A](fa: F[A]) = lift(fa)
+      def to_[A](fa: Coyoneda[F, A]) = fa.run
     }
 
   /** Turns a natural transformation F ~> G into CF ~> G */

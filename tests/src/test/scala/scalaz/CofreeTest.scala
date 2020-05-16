@@ -22,13 +22,13 @@ object CofreeTest extends SpecLite {
 
   val oneAndListCofreeOptionIso: OneAndList <~> CofreeOption =
     new IsoFunctorTemplate[OneAndList, CofreeOption] {
-      def to[A](fa: OneAndList[A]) =
+      def to_[A](fa: OneAndList[A]) =
         Cofree.unfold(fa) {
           case OneAnd(a, h :: t) =>
             (a, Some(OneAnd(h, t)))
           case OneAnd(a, _) => (a, None)
         }
-      def from[A](ga: CofreeOption[A]) =
+      def from_[A](ga: CofreeOption[A]) =
         OneAnd(
           ga.head,
           ga.tail.map(s =>
@@ -39,12 +39,12 @@ object CofreeTest extends SpecLite {
 
   val oneAndStreamCofreeLazyOptionIso: OneAndStream <~> CofreeLazyOption =
     new IsoFunctorTemplate[OneAndStream, CofreeLazyOption] {
-      def to[A](fa: OneAndStream[A]) =
+      def to_[A](fa: OneAndStream[A]) =
         Cofree.unfold(fa){
           case OneAnd(a, h ##:: t) => (a, LazyOption.lazySome(OneAnd(h, t)))
           case OneAnd(a, _)       => (a, LazyOption.lazyNone)
         }
-      def from[A](fa: CofreeLazyOption[A]) =
+      def from_[A](fa: CofreeLazyOption[A]) =
         OneAnd(
           fa.head,
           fa.tail.map(s =>
@@ -55,9 +55,9 @@ object CofreeTest extends SpecLite {
 
   val treeCofreeStreamIso: Tree <~> CofreeStream =
     new IsoFunctorTemplate[Tree, CofreeStream] {
-      def to[A](tree: Tree[A]): CofreeStream[A] =
+      def to_[A](tree: Tree[A]): CofreeStream[A] =
         Cofree(tree.rootLabel, tree.subForest.map(to(_)))
-      def from[A](c: CofreeStream[A]): Tree[A] =
+      def from_[A](c: CofreeStream[A]): Tree[A] =
         Tree.Node(c.head, c.tail.map(from(_)))
     }
 
