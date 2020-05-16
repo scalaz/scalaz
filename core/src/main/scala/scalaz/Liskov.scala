@@ -30,7 +30,7 @@ sealed abstract class LiskovInstances {
 
     def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
   }
-  
+
   /** Lift Scala's subtyping relationship */
   implicit def isa[A, B >: A]: A <~< B = new (A <~< B) {
     def substCo[F[+ _]](p: F[A]) = p
