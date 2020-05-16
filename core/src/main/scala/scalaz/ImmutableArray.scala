@@ -149,8 +149,8 @@ object ImmutableArray extends ImmutableArrayInstances {
     def slice(from: Int, until: Int) = fromArray(arr.slice(from, until))
 
     // TODO can do O(1) for primitives
-    override def ++[B >: A: ClassTag](other: ImmutableArray[B]) = {
-      val newArr = new Array(length + other.length)
+    override def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B] = {
+      val newArr = new Array[B](length + other.length)
       this.copyToArray(newArr, 0, length)
       other.copyToArray(newArr, length, other.length)
       fromArray(newArr)
