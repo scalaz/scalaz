@@ -7,24 +7,25 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 trait StringInstances {
-  implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[λ[α => String]] {
-    type SA[α] = String
-    def append(f1: String, f2: => String) = f1 + f2
-    def zero: String = ""
-    private[this] val cordDoubleQuote = Cord("\"")
-    override def show(f: String): Cord = cordDoubleQuote :: Cord(f) :: cordDoubleQuote
-    override def shows(f: String): String = s""""${f}""""
-    def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
-    override def equal(x: String, y: String) = x == y
-    override def equalIsNatural: Boolean = true
-    def empty[A] = zero
-    def plus[A](f1: SA[A], f2: => SA[A]) = f1 + f2
-    def isEmpty[A](s: SA[A]) = s == ""
-  }
+  implicit val stringInstance: Monoid[String] with Show[String] with Order[String] with IsEmpty[λ[α => String]] =
+    new Monoid[String] with Show[String] with Order[String] with IsEmpty[λ[α => String]] {
+      type SA[α] = String
+      def append(f1: String, f2: => String) = f1 + f2
+      def zero: String = ""
+      private[this] val cordDoubleQuote = Cord("\"")
+      override def show(f: String): Cord = cordDoubleQuote :: Cord(f) :: cordDoubleQuote
+      override def shows(f: String): String = s""""${f}""""
+      def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))
+      override def equal(x: String, y: String) = x == y
+      override def equalIsNatural: Boolean = true
+      def empty[A] = zero
+      def plus[A](f1: SA[A], f2: => SA[A]) = f1 + f2
+      def isEmpty[A](s: SA[A]) = s == ""
+    }
 }
 
 trait StringFunctions {
-  private[this] implicit val instance = new StringInstances {}.stringInstance
+  import string.stringInstance
 
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
@@ -66,13 +67,13 @@ trait StringFunctions {
     asNumber(_.toDouble, Double.MinValue, Double.MaxValue, s)
       .filter(_ != Double.NegativeInfinity)
       .filter(_ != Double.PositiveInfinity)
-      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Double" else e)
+      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Double" else e)
 
   def parseFloat(s: String): Validation[String, Float] =
     asNumber(_.toFloat, Float.MinValue, Float.MaxValue, s)
       .filter(_ != Float.NegativeInfinity)
       .filter(_ != Float.PositiveInfinity)
-      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Float" else e)
+      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Float" else e)
 
   def parseBigInt(s: String): Validation[String, BigInteger] =
     try {
