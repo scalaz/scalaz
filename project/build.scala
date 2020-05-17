@@ -88,32 +88,19 @@ object build {
     def shared(projectBase: File, conf: String) =
       projectBase.getParentFile / "src" / conf / "scala"
 
+    def scala2(projectBase: File, conf: String) =
+      projectBase.getParentFile / "src" / conf / "scala-2"
+
+    def scala3(projectBase: File, conf: String) =
+      projectBase.getParentFile / "src" / conf / "scala-3"
+
     override def sharedSrcDir(projectBase: File, conf: String) =
       Some(shared(projectBase, conf))
   }
 
-  private val stdOptions = Seq(
-    "-deprecation",
-    "-Xlint:adapted-args",
-    "-encoding", "UTF-8",
-    "-feature",
-    "-opt:l:method,inline",
-    "-opt-inline-from:scalaz.**",
-    "-language:implicitConversions", "-language:higherKinds", "-language:existentials",
-    "-unchecked"
-  )
-
   val unusedWarnOptions = Def.setting {
     Seq("-Ywarn-unused:imports")
   }
-
-  val lintOptions = Seq(
-    "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard",
-    // "-Yrangepos" https://github.com/scala/bug/issues/10706
-  )
 
   private def Scala213 = "2.13.2"
 
@@ -142,15 +129,48 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.3",
-    scalacOptions ++= stdOptions,
-    scalacOptions ++= lintOptions,
-    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((0 | 3, _)) =>
-        Seq(
-          "-Ykind-projector"
-        )
-    }.toList.flatten,
-    scalacOptions ++= unusedWarnOptions.value,
+    Seq(Compile, Test).map { scope =>
+      unmanagedSourceDirectories in scope ++= {
+        val dir = Defaults.nameForSrc(scope.name)
+        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, _)) =>
+            Seq(ScalazCrossType.scala2(baseDirectory.value, dir))
+          case Some((0 | 3, _)) =>
+            Seq(ScalazCrossType.scala3(baseDirectory.value, dir))
+          case _ =>
+            Nil
+        }
+      }
+    },
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-encoding", "UTF-8",
+      "-feature",
+      "-unchecked"
+    ),
+    scalacOptions ++= {
+      val common = "implicitConversions,higherKinds,existentials"
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((0 | 3, _)) =>
+          Seq(
+            "-Ykind-projector",
+            s"-language:Scala2Compat,$common",
+            "-rewrite",
+          )
+        case _ =>
+          Seq(
+            "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
+            "-Ywarn-dead-code",
+            "-Ywarn-numeric-widen",
+            "-Ywarn-value-discard",
+            "-Xlint:adapted-args",
+            "-opt:l:method,inline",
+            "-opt-inline-from:scalaz.**",
+            s"-language:$common",
+          ) ++ unusedWarnOptions.value
+      }
+    },
     Seq(Compile, Test).flatMap(c =>
       scalacOptions in (c, console) --= unusedWarnOptions.value
     ),
@@ -168,7 +188,15 @@ object build {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
         val dir = ScalazCrossType.shared(baseDirectory.value, "main")
-        typeclassSource(tc).sources.map(_.createOrUpdate(dir, s.log))
+        val scala2dir = ScalazCrossType.scala2(baseDirectory.value, "main")
+        val scala3dir = ScalazCrossType.scala3(baseDirectory.value, "main")
+        val t = typeclassSource(tc)
+
+        List(
+          t.sources.map(_.createOrUpdate(dir, s.log)),
+          t.scala2sources.map(_.createOrUpdate(scala2dir, s.log)),
+          t.scala3sources.map(_.createOrUpdate(scala3dir, s.log)),
+        ).flatten
       }
     },
     checkGenTypeClasses := {

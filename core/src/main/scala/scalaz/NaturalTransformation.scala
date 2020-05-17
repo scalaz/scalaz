@@ -37,9 +37,14 @@ trait NaturalTransformation[F[_], G[_]] {
   import LiskovF._
 
   def widen[GG[_]](implicit ev: GG >~~> G): F ~> GG =
-    ev.substCo[F ~> *[_]](this)
+    new NaturalTransformation[F, GG] {
+      def apply[A](a: F[A]) = ev(self(a))
+    }
+
   def narrow[FF[_]](implicit ev: FF <~~< F): FF ~> G =
-    ev.substCt[*[_] ~> G](this)
+    new NaturalTransformation[FF, G] {
+      def apply[A](a: FF[A]) = self(ev(a))
+    }
 }
 
 trait NaturalTransformations {

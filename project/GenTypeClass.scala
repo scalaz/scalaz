@@ -19,6 +19,10 @@ case class TypeClass(
   def packageString = pack.mkString(".")
   def fqn = (pack :+ name).mkString(".")
   def doc = "[[" + fqn + "]]" + (if (extendsList.nonEmpty) " extends " + extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
+
+  def separateByScalaVersion: Boolean = {
+    (kind == Kind.|*->*|->*) && extendsList.exists(_.kind != Kind.|*->*|->*) && createSyntax
+  }
 }
 
 object TypeClass {
@@ -188,6 +192,16 @@ object FileStatus{
 }
 
 object GenTypeClass {
+  private sealed trait ScalaV {
+    def isScala2: Boolean
+  }
+  private case object Scala2 extends ScalaV {
+    def isScala2 = true
+  }
+  private case object Scala3 extends ScalaV {
+    def isScala2 = false
+  }
+
   case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
@@ -232,7 +246,12 @@ object GenTypeClass {
     }
   }
 
-  case class TypeClassSource(mainFile: SourceFile, syntaxFile: Option[SourceFile]) {
+  case class TypeClassSource(
+    mainFile: SourceFile,
+    syntaxFile: Option[SourceFile],
+    scala2sources: List[SourceFile],
+    scala3sources: List[SourceFile]
+  ) {
     def sources: List[SourceFile] = mainFile :: syntaxFile.toList
   }
 
@@ -268,22 +287,32 @@ object GenTypeClass {
       case Seq() => ""
       case es    => es.map(n => n.name + suffix + "[" + cti.getOrElse(n.kind, extensionIdent(n)) + "]").mkString("extends ", " with ", "")
     }
-    def extendsToSyntaxListText = kind match {
+    def extendsToSyntaxListText(scalaV: ScalaV = Scala2) = kind match {
       case Kind.*->* | Kind.*^*->* =>
         "extends To" + typeClassName + "Ops0[TC]" + (extendsList match {
           case Seq() => ""
           case es    => es.map(n => "To" + n + "Ops[TC]").mkString(" with ", " with ", "")
         })
       case Kind.|*->*|->* =>
-        "extends To" + typeClassName + "Ops0[TC]" + (tc.extendsList match {
-          case Seq() => ""
-          case es    => es.map(n => n.kind match {
-            case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
-            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+        "extends To" + typeClassName + "Ops0[TC]" + (
+          tc.extendsList.flatMap(
+            n => n.kind match {
+              case Kind.|*->*|->* =>
+                Some("To" + n.name + "Ops[TC]")
+              case _ =>
+                if (scalaV.isScala2) {
+                  Some("To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]")
+                } else {
+                  None
+                }
+            }
+          ) match {
+            case Seq() =>
+              ""
+            case es =>
+              es.mkString(" with ", " with ", "")
           }
-
-          ).mkString(" with ", " with ", "")
-        })
+        )
       case _    =>
         extendsList match {
           case Seq() => ""
@@ -436,6 +465,10 @@ $fromIso
 
     val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
+    def ToTypeClassOpsSource(scalaV: ScalaV) = s"""
+trait To${typeClassName}Ops[TC[F[_], S] <: ${typeClassName}[F, S]] ${extendsToSyntaxListText(scalaV)}
+"""
+
     val syntaxSource = kind match {
       case Kind.* =>
         s"""$syntaxPackString
@@ -447,7 +480,7 @@ final class ${typeClassName}Ops[F] private[syntax](val self: F)(implicit val F: 
   ////
 }
 
-trait To${typeClassName}Ops $extendsToSyntaxListText {
+trait To${typeClassName}Ops ${extendsToSyntaxListText()} {
   implicit def To${typeClassName}Ops[F](v: F)(implicit F0: ${typeClassName}[F]): ${typeClassName}Ops[F] =
     new ${typeClassName}Ops[F](v)
 
@@ -495,7 +528,7 @@ $ToVMA
   ////
 }
 
-trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] $extendsToSyntaxListText
+trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] ${extendsToSyntaxListText()}
 
 trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
@@ -545,7 +578,7 @@ trait To${typeClassName}Ops0[TC[F[_, _]] <: ${typeClassName}[F]] extends To${typ
   ////
 }
 
-trait To${typeClassName}Ops[TC[F[_, _]] <: ${typeClassName}[F]] ${extendsToSyntaxListText}
+trait To${typeClassName}Ops[TC[F[_, _]] <: ${typeClassName}[F]] ${extendsToSyntaxListText()}
 
 trait ${typeClassName}Syntax[F[_, _]] ${extendsListText("Syntax", cti = Map(Kind.*^*->* -> "F"))} {
   implicit def To${typeClassName}Ops[A, B](v: F[A, B]): ${typeClassName}Ops[F, A, B] = new ${typeClassName}Ops[F, A, B](v)(${typeClassName}Syntax.this.F)
@@ -579,9 +612,7 @@ trait To${typeClassName}Ops0[TC[F[_], S] <: ${typeClassName}[F, S]] {
 
   ////
 }
-
-trait To${typeClassName}Ops[TC[F[_], S] <: ${typeClassName}[F, S]] ${extendsToSyntaxListText}
-
+${if (tc.separateByScalaVersion) "" else ToTypeClassOpsSource(Scala2)}
 trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, S, A] =
     new ${typeClassName}Ops[F, S, A](v)(${typeClassName}Syntax.this.F)
@@ -597,6 +628,22 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax")} {
       Some(SourceFile(tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource))
     } else None
 
-    TypeClassSource(mainSourceFile, syntaxSourceFile)
+    if (tc.separateByScalaVersion) {
+      val name = "To" + typeClassName + "Ops.scala"
+      val pack = Seq("scalaz", "syntax").map("package " + _).mkString("", "\n", "\n")
+      TypeClassSource(
+        mainSourceFile,
+        syntaxSourceFile,
+        SourceFile(tc.syntaxPack, name, pack + ToTypeClassOpsSource(scalaV = Scala2)) :: Nil,
+        SourceFile(tc.syntaxPack, name, pack + ToTypeClassOpsSource(scalaV = Scala3)) :: Nil,
+      )
+    } else {
+      TypeClassSource(
+        mainSourceFile,
+        syntaxSourceFile,
+        Nil,
+        Nil
+      )
+    }
   }
 }

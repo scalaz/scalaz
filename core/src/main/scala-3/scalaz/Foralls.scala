@@ -1,0 +1,3 @@
+package scalaz
+
+trait Foralls
