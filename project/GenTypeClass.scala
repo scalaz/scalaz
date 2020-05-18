@@ -188,8 +188,6 @@ object FileStatus{
 }
 
 object GenTypeClass {
-  val useDependentMethodTypes = true
-
   case class SourceFile(packages: Seq[String], fileName: String, source: String) {
     def file(scalaSource: File): File = packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
