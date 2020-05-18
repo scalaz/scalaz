@@ -165,7 +165,6 @@ object FileStatus{
 }
 
 object GenTypeClass {
-  val useDependentMethodTypes = true
 
   case class SourceFile(packages: Seq[String], fileName: String, source: String, baseDir: File => File = identity) {
     def file(scalaSource: File): File =
