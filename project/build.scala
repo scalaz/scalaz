@@ -121,18 +121,6 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
-    Seq(Compile, Test).map { scope =>
-      unmanagedSourceDirectories in scope += {
-        val dir = Defaults.nameForSrc(scope.name)
-        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v >= 13 =>
-            base / "scala-2.13+"
-          case _ =>
-            base / "scala-2.13-"
-        }
-      }
-    },
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
