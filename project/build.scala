@@ -24,7 +24,7 @@ import sbtdynver.DynVerPlugin.autoImport._
 
 import xerial.sbt.Sonatype.autoImport._
 
-import dotty.tools.sbtplugin.DottyPlugin.autoImport.isDotty
+import dotty.tools.sbtplugin.DottyPlugin.autoImport.{isDotty, dottyLatestNightlyBuild}
 
 object build {
   type Sett = Def.Setting[_]
@@ -120,6 +120,7 @@ object build {
       }
       (f, path)
     },
+    addCommandAlias("SetDottyNightlyVersion", s"""++ ${dottyLatestNightlyBuild.get}!"""),
     scalaVersion := Scala213,
     crossScalaVersions := Seq(Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
