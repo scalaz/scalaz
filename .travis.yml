@@ -43,4 +43,4 @@ matrix:
   - scala: 0.24.0-RC1
     jdk: openjdk8
     script:
-    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile
+    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile rootJVM/publishLocal

@@ -24,6 +24,8 @@ import sbtdynver.DynVerPlugin.autoImport._
 
 import xerial.sbt.Sonatype.autoImport._
 
+import dotty.tools.sbtplugin.DottyPlugin.autoImport.isDotty
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -177,9 +179,23 @@ object build {
 
     scala213_pre_cross_setting,
 
-    scalacOptions in (Compile, doc) ++= {
+    scalacOptions in (Compile, doc) := {
+      val tag = tagOrHash.value
       val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
-      Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value + "€{FILE_PATH}.scala")
+      val options = (scalacOptions in (Compile, doc)).value
+      if (isDotty.value) {
+        Nil
+      } else {
+        options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
+      }
+    },
+    sources in (Compile, doc) := {
+      val src = (sources in (Compile, doc)).value
+      if (isDotty.value) {
+        Nil
+      } else {
+        src
+      }
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
