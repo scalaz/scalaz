@@ -43,10 +43,10 @@ matrix:
   - scala: 0.24.0-RC1
     jdk: openjdk8
     script:
-    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/compile rootJVM/publishLocal
+    - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses rootJVM/test rootJVM/publishLocal
   - name: dotty-nightly
     jdk: openjdk8
     script:
-    - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/compile rootJVM/publishLocal
+    - sbt -J-Xmx3784m checkGenTypeClasses SetDottyNightlyVersion rootJVM/test rootJVM/publishLocal
   allow_failures:
   - name: dotty-nightly

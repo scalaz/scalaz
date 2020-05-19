@@ -116,7 +116,39 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
     libraryDependencies += ("org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test").withDottyCompat(scalaVersion.value)
   )
   .jvmSettings(
-    minSuccessfulTests := 33
+    minSuccessfulTests := 33,
+    (Test / sources) := {
+      // TODO enable
+      val exclude = Set(
+        "BitraverseTest.scala",
+        "BooleanSyntaxTest.scala",
+        "EitherTTest.scala",
+        "FingerTreeTest.scala",
+        "FoldableTest.scala",
+        "FreeTTest.scala",
+        "ImmutableArrayTest.scala",
+        "LazyEitherTTest.scala",
+        "LeibnizTest.scala",
+        "MapTest.scala",
+        "MonadErrorTest.scala",
+        "MonadPlusTest.scala",
+        "MonadTransTest.scala",
+        "TagTest.scala",
+        "TracedTTest.scala",
+        "TraverseTest.scala",
+        "UnapplyTest.scala",
+        "WriterTTest.scala",
+        "ZipperTest.scala"
+      )
+      val list = (Test / sources).value
+      if (isDotty.value) {
+        list.filterNot { src =>
+          exclude.contains(src.getName)
+        }
+      } else {
+        list
+      }
+    },
   )
   .jsSettings(
     sources in Test ~= { values =>
