@@ -24,7 +24,7 @@ object SortedMapTest extends SpecLite {
   checkAll("satisfy equals laws when not natural", equal.laws[SortedMap[NotNatural, String]])
 
   implicit def sortedMapArb[A: Arbitrary: Order, B: Arbitrary]: Arbitrary[SortedMap[A, B]] = {
-    implicit val o = Order[A].toScalaOrdering
+    implicit val o: scala.Ordering[A] = Order[A].toScalaOrdering
     Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq:_*)))
   }
 
