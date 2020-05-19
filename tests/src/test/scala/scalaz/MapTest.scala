@@ -179,7 +179,6 @@ object MapTest extends SpecLite {
   "==>> conversions" should {
     "toAscList" in {
       import std.tuple._
-      implicit val listTupleShow = Show[List[(Int, String)]]
 
       fromList(List(5 -> "a", 3 -> "b")).toAscList must_===(fromList(List(3 -> "b", 5 -> "a")).toAscList)
       fromList(List(5 -> "a", 7 -> "c", 3 -> "b")) must_===(fromList(List(3 -> "b", 5 -> "a", 7 -> "c")))
