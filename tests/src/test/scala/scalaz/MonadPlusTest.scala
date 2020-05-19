@@ -9,10 +9,6 @@ object MonadPlusTest extends SpecLite {
     MonadPlus[List].unite(List(some(1), none[Int], some(2))) must_===(List(1, 2))
   }
 
-  "uniteU" in {
-    MonadPlus[List].uniteU(List[String \/ Int](\/.right(1), \/.left("a"), \/.right(2))) must_===(List(1, 2))
-  }
-
   "lefts" in {
     import \&/._
     import syntax.monadPlus._
