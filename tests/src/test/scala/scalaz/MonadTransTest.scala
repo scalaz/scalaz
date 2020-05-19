@@ -12,8 +12,7 @@ object MonadTransTest extends SpecLite {
 
   "liftMU" in {
     val mt = IndexedStateT.StateMonadTrans[Int]
-    // Inference of M fails when using liftM with a higher kinded type
-    mt.liftM[String \/ *, Int](10.right[String]).run(1) must_===((1, 10).right[String])
+    mt.liftM(10.right[String]).run(1) must_===((1, 10).right[String])
     mt.liftMU(10.right[String]).run(1) must_===((1, 10).right[String])
   }
 }
