@@ -41,9 +41,7 @@ abstract class SpecLite extends Properties("") {
       property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
   }
 
-  def check(x: => Boolean): Prop = {
-    x must_==(true)
-  }
+  def check(x: => Boolean): Prop = Prop.secure(x)
 
   def fail(msg: String): Nothing = throw new AssertionError(msg)
   class AnyOps[A](actual: => A) {
