@@ -46,12 +46,6 @@ object WriterTTest extends SpecLite {
       fa.mapF(f andThen (s => Applicative[Option].point(s))) must_=== fa.map(f)
   }
 
-  private def writerTUcompilationTest: Unit = {
-    import syntax.either._
-    val a: String \/ (Int, Boolean) = (1, true).right[String]
-    WriterT.writerTU(a)
-  }
-
   object instances {
     def monoid[W, F[_], A](implicit F: Monoid[F[(W,A)]]) = Monoid[WriterT[W, F, A]]
     def plus[W, F[_]: Plus] = Plus[WriterT[W, F, *]]

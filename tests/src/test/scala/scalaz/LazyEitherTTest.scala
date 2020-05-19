@@ -35,11 +35,6 @@ object LazyEitherTTest extends SpecLite {
     result.getOrElse(0) must_=== times
   }
 
-  private def lazyEitherTUcompilationTest: Unit = {
-    val a: String \/ LazyEither[Int, Boolean] = null
-    LazyEitherT.lazyEitherTU(a)
-  }
-
   object instances {
     def functor[F[_] : Functor, A] = Functor[LazyEitherT[F, A, *]]
     def plus[F[_] : Monad, A: Semigroup] = Plus[LazyEitherT[F, A, *]]

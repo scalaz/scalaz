@@ -23,12 +23,6 @@ object EitherTTest extends SpecLite {
   checkAll(monadTrans.laws[({type l[a[_], b] = EitherT[Int, a, b]})#l, List])
   checkAll(alt.laws[EitherTListInt])
 
-  "rightU" should {
-    val a: String \/ Int = \/-(1)
-    val b: EitherT[Boolean, ({type l[a] = String \/ a})#l, Int] = EitherT.rightU[Boolean](a)
-    b must_== EitherT.rightT[Boolean, ({type l[a] = String \/ a})#l, Int](a)
-  }
-
   "consistent Bifoldable" ! forAll { (a: EitherTList[Int, Int]) =>
     val F = new Bitraverse[EitherTList]{
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
@@ -55,12 +49,12 @@ object EitherTTest extends SpecLite {
 
     e must_=== {
       a match {
-        case -\/(v) => EitherT.left(v)
-        case \/-(v) => EitherT.right(v)
+        case -\/(v) => EitherT.left[String, Option, Int](v)
+        case \/-(v) => EitherT.right[String, Option, Int](v)
       }
     }
 
-    e must_=== EitherT.either(a)
+    e must_=== EitherT.either[String, Option, Int](a)
   }
 
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
@@ -153,14 +147,6 @@ object EitherTTest extends SpecLite {
       for {
         (a,b) <- brokenMethod
       } yield "yay"
-    }
-
-    //compilation test for eitherTU
-    {
-      val se: State[Vector[String], Int \/ Float] = null
-      EitherT.eitherTU(se)
-      val ee: String \/ (Int \/ Float) = null
-      EitherT.eitherTU(ee)
     }
   }
 }
