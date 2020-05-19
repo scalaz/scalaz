@@ -19,22 +19,6 @@ object BitraverseTest extends SpecLite {
   checkAll("Left-biased Bitraverse for (,)",  traverse.laws[(*, Int)])
   checkAll("Right-biased Bitraverse for (,)", traverse.laws[(Int, *)])
 
-  "bitraverseU" in {
-    import syntax.bitraverse._
-    val a: Validation[Int \/ String, Int \/ Boolean] = Success(\/-(true))
-    val b = a.bitraverseU(identity, identity)
-    val _ = b: (Int \/ Validation[String, Boolean])
-    b must_=== \/-(Success(true))
-  }
-
-  "bisequenceU" in {
-    import syntax.bitraverse._
-    val a: Validation[Int \/ String, Int \/ Boolean] = Success(\/-(true))
-    val b = a.bisequenceU
-    val _ = b: (Int \/ Validation[String, Boolean])
-    b must_=== \/-(Success(true))
-  }
-
   "left/right bias" in {
     import scalaz.syntax.either._
 

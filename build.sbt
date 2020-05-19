@@ -120,20 +120,14 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
     (Test / sources) := {
       // TODO enable
       val exclude = Set(
-        "BitraverseTest.scala",
-        "BooleanSyntaxTest.scala",
         "EitherTTest.scala",
-        "FingerTreeTest.scala",
-        "FoldableTest.scala",
         "FreeTTest.scala",
         "LazyEitherTTest.scala",
         "LeibnizTest.scala",
-        "MapTest.scala",
         "MonadErrorTest.scala",
         "TraverseTest.scala",
         "UnapplyTest.scala",
         "WriterTTest.scala",
-        "ZipperTest.scala"
       )
       val list = (Test / sources).value
       if (isDotty.value) {

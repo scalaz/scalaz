@@ -62,16 +62,6 @@ object BooleanSyntaxTest extends SpecLite {
       b.unlessM(None).isDefined == b
     }
 
-    "boolean.whenMU" ! forAll { (b: Boolean) =>
-      import syntax.validation._
-      b.whenMU("false".failure).isSuccess != b
-    }
-
-    "boolean.unlessMU" ! forAll { (b: Boolean) =>
-      import syntax.validation._
-      b.unlessMU("false".failure).isSuccess == b
-    }
-
     "boolean.guard" ! forAll { (b: Boolean, s: String) =>
       b.guard[Option](s) == b.option(s)
     }

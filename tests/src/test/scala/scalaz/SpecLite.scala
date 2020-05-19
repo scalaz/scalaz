@@ -4,7 +4,7 @@ import reflect.ClassTag
 
 import org.scalacheck._
 
-abstract class SpecLite extends Properties("") {
+abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
   override val name = this.getClass.getName.stripSuffix("$")
 
   def checkAll(name: String, props: Properties): Unit = {
@@ -100,7 +100,10 @@ abstract class SpecLite extends Properties("") {
   implicit def propToProp(p: => Prop): Prop = p
   implicit def check1[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = Prop.forAll((t: T) => toProp(result(t)))
   implicit def unitToProp(u: => Unit): Prop = booleanToProp({u; true})
-  implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
   implicit def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
 
+}
+
+sealed trait SpecLiteFunctions1 { self: SpecLite =>
+  implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
 }
