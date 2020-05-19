@@ -42,9 +42,7 @@ abstract class SpecLite extends Properties("") {
     }
   }
 
-  def check(x: => Boolean): Prop = {
-    x must_==(true)
-  }
+  def check(x: => Boolean): Prop = Prop.secure(x)
 
   def fail(msg: String): Nothing = throw new AssertionError(msg)
   class AnyOps[A](actual: => A) {
