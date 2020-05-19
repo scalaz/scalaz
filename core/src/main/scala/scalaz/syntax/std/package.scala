@@ -5,6 +5,7 @@ package std
 object boolean extends ToBooleanOps
 object list extends ToListOps
 object stream extends ToStreamOps
+object lazylist extends ToLazyListOps
 object vector extends ToVectorOps
 object function1 extends ToFunction1Ops
 object function2 extends ToFunction2Ops

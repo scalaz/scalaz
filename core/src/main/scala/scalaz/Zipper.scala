@@ -10,7 +10,7 @@ import Maybe.{Empty, Just, just}
  * <p/>
  * Based on the pointedlist library by Jeff Wheeler.
  */
-final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
+final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
   import Zipper._
 
   def map[B](f: A => B): Zipper[B] =
@@ -21,6 +21,13 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * not evaluated.
    */
   def toStream: Stream[A] =
+    (lefts.reverse ++ focus #:: rights).toStream
+
+  /**
+   * Get the LazyList representation of this Zipper. This fully traverses `lefts`. `rights` is
+   * not evaluated.
+   */
+  def toLazyList: LazyList[A] =
     lefts.reverse ++ focus #:: rights
 
   /**
@@ -39,8 +46,8 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Possibly moves to next element to the right of focus.
    */
   def next: Maybe[Zipper[A]] = rights match {
-    case Stream.Empty => Maybe.empty
-    case r #:: rs     => just(zipper(Stream.cons(focus, lefts), r, rs))
+    case LazyList() => Maybe.empty
+    case r #:: rs     => just(zipper(LazyList.cons(focus, lefts), r, rs))
   }
 
   /**
@@ -53,8 +60,8 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Possibly moves to the previous element to the left of focus.
    */
   def previous: Maybe[Zipper[A]] = lefts match {
-    case Stream.Empty => Maybe.empty
-    case l #:: ls     => just(zipper(ls, l, Stream.cons(focus, rights)))
+    case LazyList() => Maybe.empty
+    case l #:: ls     => just(zipper(ls, l, LazyList.cons(focus, rights)))
   }
 
   /**
@@ -94,9 +101,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def deleteLeft: Maybe[Zipper[A]] = lefts match {
     case l #:: ls     => just(zipper(ls, l, rights))
-    case Stream.Empty => rights match {
-      case r #:: rs     => just(zipper(Stream.empty, r, rs))
-      case Stream.Empty => Maybe.empty
+    case LazyList() => rights match {
+      case r #:: rs     => just(zipper(LazyList.empty, r, rs))
+      case LazyList() => Maybe.empty
     }
   }
 
@@ -113,9 +120,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def deleteRight: Maybe[Zipper[A]] = rights match {
     case r #:: rs     => just(zipper(lefts, r, rs))
-    case Stream.Empty => lefts match {
-      case l #:: ls     => just(zipper(ls, l, Stream.empty))
-      case Stream.Empty => Maybe.empty
+    case LazyList() => lefts match {
+      case l #:: ls     => just(zipper(ls, l, LazyList.empty))
+      case LazyList() => Maybe.empty
     }
   }
 
@@ -129,13 +136,13 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Deletes all elements except the focused element.
    */
-  def deleteOthers: Zipper[A] = zipper(Stream.Empty, focus, Stream.Empty)
+  def deleteOthers: Zipper[A] = zipper(LazyList(), focus, LazyList())
 
   def foldLeft[B](b: B)(f: (B, A) => B): B =
-    Stream.cons(focus, rights).foldLeft(lefts.foldRight(b)((a, b) => f(b, a)))(f)
+    LazyList.cons(focus, rights).foldLeft(lefts.foldRight(b)((a, b) => f(b, a)))(f)
 
   def foldRight[B](b: => B)(f: (A, => B) => B): B =
-    lefts.foldLeft(Stream.cons(focus, rights).foldRight(b)((a, b) => f(a, b)))((a, b) => f(b, a))
+    lefts.foldLeft(LazyList.cons(focus, rights).foldRight(b)((a, b) => f(a, b)))((a, b) => f(b, a))
 
   def length: Int =
     this.foldLeft(0)((b, _) => b + 1)
@@ -153,7 +160,7 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   /**
    * Pairs each element with a boolean indicating whether that element has focus.
    */
-  def withFocus: Zipper[(A, Boolean)] = zipper(lefts.zip(Stream.continually(false)), (focus, true), rights.zip(Stream.continually(false)))
+  def withFocus: Zipper[(A, Boolean)] = zipper(lefts.zip(LazyList.continually(false)), (focus, true), rights.zip(LazyList.continually(false)))
 
   /**
    * Moves focus n elements in the zipper, or Maybe.empty if there is no such element.
@@ -177,7 +184,7 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def start: Zipper[A] = {
     val rights = this.lefts.reverse ++ focus #:: this.rights
-    this.copy(Stream.Empty, rights.head, rights.tail)
+    this.copy(LazyList(), rights.head, rights.tail)
   }
 
   /**
@@ -185,7 +192,7 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def end: Zipper[A] = {
     val lefts = this.rights.reverse ++ focus #:: this.lefts
-    this.copy(lefts.tail, lefts.head, Stream.empty)
+    this.copy(lefts.tail, lefts.head, LazyList.empty)
   }
 
   /**
@@ -202,7 +209,7 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     if (p(focus)) just(this)
     else {
       val c = this.positions
-      Maybe.fromOption(std.stream.interleave(c.lefts, c.rights).find(x => p(x.focus)))
+      Maybe.fromOption(std.lazylist.interleave(c.lefts, c.rights).find(x => p(x.focus)))
     }
 
   /**
@@ -242,8 +249,8 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * A zipper of all positions of the zipper, with focus on the current position.
    */
   def positions: Zipper[Zipper[A]] = {
-    val left = std.stream.unfoldm(this)(_.previous.map(x => (x, x)))
-    val right = std.stream.unfoldm(this)(_.next.map(x => (x, x)))
+    val left = std.lazylist.unfoldm(this)(_.previous.map(x => (x, x)))
+    val right = std.lazylist.unfoldm(this)(_.next.map(x => (x, x)))
 
     zipper(left, this, right)
   }
@@ -257,22 +264,22 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    * Moves focus to the next element. If the last element is currently focused, loop to the first element.
    */
   def nextC: Zipper[A] = (lefts, rights) match {
-    case (Stream.Empty, Stream.Empty) => this
-    case (_, Stream.Empty)            =>
+    case (LazyList(), LazyList()) => this
+    case (_, LazyList())            =>
       val xs = lefts.reverse
-      zipper(rights, xs.head, xs.tail ++ Stream(focus))
+      zipper(rights, xs.head, xs.tail ++ LazyList(focus))
     case (_, r #:: rs)                =>
-      zipper(Stream.cons(focus, lefts), r, rs)
+      zipper(LazyList.cons(focus, lefts), r, rs)
   }
 
   /**
    * Moves focus to the previous element. If the first element is currently focused, loop to the last element.
    */
   def previousC: Zipper[A] = (lefts, rights) match {
-    case (Stream.Empty, Stream.Empty) => this
-    case (Stream.Empty, _)            =>
+    case (LazyList(), LazyList()) => this
+    case (LazyList(), _)            =>
       val xs = rights.reverse
-      zipper(xs.tail ++ Stream(focus), xs.head, lefts)
+      zipper(xs.tail ++ LazyList(focus), xs.head, lefts)
     case (_, _)                       => tryPrevious
   }
 
@@ -282,9 +289,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def deleteLeftC: Maybe[Zipper[A]] = lefts match {
     case l #:: ls     => just(zipper(ls, l, rights))
-    case Stream.Empty => rights match {
-      case _ #:: _      => val rrev = rights.reverse; just(zipper(rrev.tail, rrev.head, Stream.empty))
-      case Stream.Empty => Maybe.empty
+    case LazyList() => rights match {
+      case _ #:: _      => val rrev = rights.reverse; just(zipper(rrev.tail, rrev.head, LazyList.empty))
+      case LazyList() => Maybe.empty
     }
   }
 
@@ -301,9 +308,9 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
    */
   def deleteRightC: Maybe[Zipper[A]] = rights match {
     case r #:: rs     => just(zipper(lefts, r, rs))
-    case Stream.Empty => lefts match {
-      case _ #:: _      => val lrev = lefts.reverse; just(zipper(Stream.empty, lrev.head, lrev.tail))
-      case Stream.Empty => Maybe.empty
+    case LazyList() => lefts match {
+      case _ #:: _      => val lrev = lefts.reverse; just(zipper(LazyList.empty, lrev.head, lrev.tail))
+      case LazyList() => Maybe.empty
     }
   }
 
@@ -320,10 +327,10 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     deleteRightC getOrElse z
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
-    val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried
+    val z = (Zipper.zipper(_: LazyList[B], _: B, _: LazyList[B])).curried
     val G = Applicative[G]
-    import std.stream.streamInstance
-    G.apF(G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(s => z(s.reverse)))(f(focus)))(Traverse[Stream].traverse[G, A, B](rights)(f))
+    import std.lazylist.lazylistInstance
+    G.apF(G.apF(G.map(Traverse[LazyList].traverse[G, A, B](lefts.reverse)(f))(s => z(s.reverse)))(f(focus)))(Traverse[LazyList].traverse[G, A, B](rights)(f))
   }
 
   def ap[B](f: => Zipper[A => B]): Zipper[B] = {
@@ -342,7 +349,7 @@ final case class Zipper[A](lefts: Stream[A], focus: A, rights: Stream[A]) {
 }
 
 object Zipper extends ZipperInstances {
-  def zipper[A](ls: Stream[A], a: A, rs: Stream[A]): Zipper[A] =
+  def zipper[A](ls: LazyList[A], a: A, rs: LazyList[A]): Zipper[A] =
     Zipper(ls, a, rs)
 }
 
@@ -350,7 +357,7 @@ sealed abstract class ZipperInstances {
   import Zipper._
 
   implicit val zipperInstance: Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] = new Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
-    import std.stream._
+    import std.lazylist._
     override def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
     def cobind[A, B](fa: Zipper[A])(f: Zipper[A] => B): Zipper[B] =
@@ -366,7 +373,7 @@ sealed abstract class ZipperInstances {
     override def foldMap[A, B](fa: Zipper[A])(f: A => B)(implicit F: Monoid[B]) =
       fa.foldLeft(F.zero)((b, a) => F.append(b, f(a)))
     def point[A](a: => A): Zipper[A] =
-      zipper(Stream.continually(a), a, Stream.continually(a))
+      zipper(LazyList.continually(a), a, LazyList.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
       fa ap f
     override def map[A, B](fa: Zipper[A])(f: A => B): Zipper[B] =
@@ -377,28 +384,28 @@ sealed abstract class ZipperInstances {
       fa.lefts.exists(f) || f(fa.focus) || fa.rights.exists(f)
     override def foldMap1[A, B](fa: Zipper[A])(f: A => B)(implicit F: Semigroup[B]) =
       fa.rights.foldLeft(
-        Foldable[Stream].foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
+        Foldable[LazyList].foldMapRight1Opt(fa.lefts)(f)((a, b) => F.append(b, f(a))) match {
           case Some(b) => F.append(b, f(fa.focus))
           case None => f(fa.focus)
         }
       )((b, a) => F.append(b, f(a)))
     override def foldMapRight1[A, B](fa: Zipper[A])(z: A => B)(f: (A, => B) => B) =
-      Foldable[Stream].foldLeft(
+      Foldable[LazyList].foldLeft(
         fa.lefts,
-        Foldable[Stream].foldMapRight1Opt(fa.rights)(z)(f) match {
+        Foldable[LazyList].foldMapRight1Opt(fa.rights)(z)(f) match {
           case Some(b) => f(fa.focus, b)
           case None => z(fa.focus)
         }
       )((b, a) => f(a, b))
     override def foldMapLeft1[A, B](fa: Zipper[A])(z: A => B)(f: (B, A) => B) =
       fa.rights.foldLeft(
-        Foldable[Stream].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
+        Foldable[LazyList].foldMapRight1Opt(fa.lefts)(z)((a, b) => f(b, a)) match {
           case Some(b) => f(b, fa.focus)
           case None => z(fa.focus)
         }
       )(f)
     override def traverse1Impl[G[_], A, B](fa: Zipper[A])(f: A => G[B])(implicit G: Apply[G]) = {
-      val F = Traverse1[OneAnd[Stream, *]]
+      val F = Traverse1[OneAnd[LazyList, *]]
       fa.lefts.reverse match {
         case h1 #:: t1 =>
           val x = G.map(F.traverse1(OneAnd(h1, t1))(f)) { s => (s.head #:: s.tail).reverse }
@@ -407,20 +414,20 @@ sealed abstract class ZipperInstances {
               G.apply3(x, f(fa.focus), F.traverse1(OneAnd(h2, t2))(f)) { (l, z, r) =>
                 Zipper(l, z, r.head #:: r.tail)
               }
-            case Stream.Empty =>
+            case LazyList() =>
               G.apply2(x, f(fa.focus)) { (l, z) =>
-                Zipper(l, z, Stream.Empty)
+                Zipper(l, z, LazyList())
               }
           }
-        case Stream.Empty =>
+        case LazyList() =>
           fa.rights match {
             case h2 #:: t2 =>
               G.apply2(f(fa.focus), F.traverse1(OneAnd(h2, t2))(f)) { (z, r) =>
-                Zipper(Stream.Empty, z, r.head #:: r.tail)
+                Zipper(LazyList(), z, r.head #:: r.tail)
               }
-            case Stream.Empty =>
+            case LazyList() =>
               G.map(f(fa.focus)) { z =>
-                Zipper(Stream.Empty, z, Stream.Empty)
+                Zipper(LazyList(), z, LazyList())
               }
           }
       }
@@ -428,16 +435,17 @@ sealed abstract class ZipperInstances {
   }
 
   implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
-    import std.stream.streamEqual
+    import std.lazylist.lazylistEqual
+    private[this] val A = Equal[LazyList[A]]
     def equal(a1: Zipper[A], a2: Zipper[A]) =
-      streamEqual[A].equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && streamEqual[A].equal(a1.rights, a2.rights)
+      A.equal(a1.lefts, a2.lefts) && Equal[A].equal(a1.focus, a2.focus) && A.equal(a1.rights, a2.rights)
   }
 
   implicit def zipperShow[A: Show]: Show[Zipper[A]] = Show.show { f =>
-    import std.stream._
+    import std.lazylist._
     import syntax.show._
-    val left = Show[Stream[A]].show(f.lefts)
-    val right = Show[Stream[A]].show(f.rights)
+    val left = Show[LazyList[A]].show(f.lefts)
+    val right = Show[LazyList[A]].show(f.rights)
     cord"Zipper($left,${f.focus},$right)"
   }
 

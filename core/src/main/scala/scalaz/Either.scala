@@ -181,11 +181,11 @@ sealed abstract class \/[A, B] extends Product with Serializable {
     }
 
 
-  /** Return an empty stream or stream with one element on the right of this disjunction. */
-  def toStream: Stream[B] =
+  /** Return an empty LazyList or stream with one element on the right of this disjunction. */
+  def toLazyList: LazyList[B] =
     this match {
-      case -\/(_) => Stream()
-      case \/-(b) => Stream(b)
+      case -\/(_) => LazyList.empty[B]
+      case \/-(b) => LazyList(b)
     }
 
   /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */

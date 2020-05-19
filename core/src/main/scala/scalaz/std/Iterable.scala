@@ -73,7 +73,7 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
   override final def toList[A](fa: I[A]) = fa.toList
   override final def toVector[A](fa: I[A]) = fa.toVector
   override final def toSet[A](fa: I[A]) = fa.toSet
-  override final def toStream[A](fa: I[A]) = fa.toStream
+  override final def toLazyList[A](fa: I[A]) = fa.to(LazyList)
 
   override final def empty[A](fa: I[A]) = fa.isEmpty
 

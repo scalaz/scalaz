@@ -285,7 +285,7 @@ sealed abstract class EphemeralStreamInstances {
    */
   implicit val ephemeralStreamZipApplicative: Applicative[λ[α => EphemeralStream[α] @@ Zip]] =
     new Applicative[λ[α => EphemeralStream[α] @@ Zip]] {
-      def point[A](a: => A) = Zip(EphemeralStream.fromStream(Stream.continually(a)))
+      def point[A](a: => A) = Zip(EphemeralStream.fromLazyList(LazyList.continually(a)))
       def ap[A, B](fa: => (EphemeralStream[A] @@ Zip))(f: => (EphemeralStream[A => B] @@ Zip)) = {
         Zip(if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty) EphemeralStream.emptyEphemeralStream[B]
         else EphemeralStream.cons((Tag.unwrap(f).headOption.get)(Tag.unwrap(fa).headOption.get), Tag.unwrap(ap(Zip(Tag.unwrap(fa).tailOption.get))(Zip(Tag.unwrap(f).tailOption.get)))))
@@ -333,6 +333,11 @@ object EphemeralStream extends EphemeralStreamInstances {
   def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
     case Stream() => emptyEphemeralStream
     case h #:: t  => cons(h, fromStream(t))
+  }
+
+  def fromLazyList[A](s: LazyList[A]): EphemeralStream[A] = s match {
+    case LazyList() => emptyEphemeralStream
+    case h #:: t  => cons(h, fromLazyList(t))
   }
 
   def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new scala.collection.AbstractIterable[A] {

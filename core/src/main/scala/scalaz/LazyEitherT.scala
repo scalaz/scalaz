@@ -59,8 +59,8 @@ final case class LazyEitherT[F[_], A, B](run: F[LazyEither[A, B]]) {
   def toIList(implicit F: Functor[F]): F[IList[B]] =
     F.map(run)(_.toIList)
 
-  def toStream(implicit F: Functor[F]): F[Stream[B]] =
-    F.map(run)(_.toStream)
+  def toLazyList(implicit F: Functor[F]): F[LazyList[B]] =
+    F.map(run)(_.toLazyList)
 
   def map[C](f: (=> B) => C)(implicit F: Functor[F]): LazyEitherT[F, A, C] =
     lazyEitherT(F.map(run)(_ map f))
@@ -162,8 +162,8 @@ object LazyEitherT extends LazyEitherTInstances {
     def toList(implicit F: Functor[F]): F[List[A]] =
       F.map(lazyEitherT.run)(_.left.toList)
 
-    def toStream(implicit F: Functor[F]): F[Stream[A]] =
-      F.map(lazyEitherT.run)(_.left.toStream)
+    def toLazyList(implicit F: Functor[F]): F[LazyList[A]] =
+      F.map(lazyEitherT.run)(_.left.toLazyList)
 
     def map[C](f: (=> A) => C)(implicit F: Functor[F]): LazyEitherT[F, C, B] =
       LazyEitherT(F.map(lazyEitherT.run)(_.left map f))

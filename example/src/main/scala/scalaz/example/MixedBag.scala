@@ -134,7 +134,7 @@ object MixedBag extends App {
       oldExtension = zipperAtDot.rights.mkString
 
       // Change the extension.
-      changedExtZipper = zipperAtDot.copy(rights = "log".toStream)
+      changedExtZipper = zipperAtDot.copy(rights = "log".to(LazyList))
 
       // Convert the Zipper back to a string
       newFileName = changedExtZipper.toStream.mkString

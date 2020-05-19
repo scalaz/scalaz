@@ -39,6 +39,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def toVector: Vector[A] = F.toVector(self)
   final def toSet: Set[A] = F.toSet(self)
   final def toStream: Stream[A] = F.toStream(self)
+  final def toLazyList: LazyList[A] = F.toLazyList(self)
   final def toIList: IList[A] = F.toIList(self)
   final def toEphemeralStream: EphemeralStream[A] = F.toEphemeralStream(self)
   final def all(p: A => Boolean): Boolean = F.all(self)(p)

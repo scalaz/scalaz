@@ -93,21 +93,21 @@ sealed abstract class Heap[A] {
   def toEphemeralStream: EStream[A] =
     EphemeralStream.unfold(this)(_.uncons)
 
-  def toStream: Stream[A] = 
-    Foldable[EphemeralStream].toStream(this.toEphemeralStream)
+  def toLazyList: LazyList[A] =
+    Foldable[EphemeralStream].toLazyList(this.toEphemeralStream)
 
-  def toList: List[A] = toStream.toList
+  def toList: List[A] = toLazyList.toList
 
   def toIList: IList[A] = toEphemeralStream.toIList
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
   def map[B: Order](f: A => B): Heap[B] = fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
 
-  def forall(f: A => Boolean): Boolean = toStream.forall(f)
+  def forall(f: A => Boolean): Boolean = toLazyList.forall(f)
 
-  def exists(f: A => Boolean): Boolean = toStream.exists(f)
+  def exists(f: A => Boolean): Boolean = toLazyList.exists(f)
 
-  def foreach(f: A => Unit): Unit = toStream.foreach(f)
+  def foreach(f: A => Unit): Unit = toLazyList.foreach(f)
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =

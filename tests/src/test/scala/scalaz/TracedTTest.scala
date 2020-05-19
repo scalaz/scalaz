@@ -14,7 +14,7 @@ object TracedTTest extends SpecLite {
     Equal.equal{ case (TracedT(xs), TracedT(ys)) =>
       (xs.size == ys.size) && Foldable[NonEmptyList].all(xs.zip(ys)){
         case (x, y) =>
-          Stream.continually(A.arbitrary.sample).flatten.take(3).forall(
+          LazyList.continually(A.arbitrary.sample).flatten.take(3).forall(
             a => B.equal(x(a), y(a))
           )
       }

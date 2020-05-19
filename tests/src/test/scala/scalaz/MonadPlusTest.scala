@@ -19,7 +19,7 @@ object MonadPlusTest extends SpecLite {
 
     Vector[Int \&/ String](This(1), Both(3, "a"), That("b")).lefts must_===(Vector(1, 3))
 
-    Stream[Validation[String, Int]](Success(1), Failure("a"), Success(2)).lefts must_===(Stream("a"))
+    LazyList[Validation[String, Int]](Success(1), Failure("a"), Success(2)).lefts must_===(LazyList("a"))
   }
 
   "rights" in {
@@ -32,7 +32,7 @@ object MonadPlusTest extends SpecLite {
 
     Vector[Int \&/ String](This(1), Both(3, "a"), That("b")).rights must_===(Vector("a", "b"))
 
-    Stream[Validation[String, Int]](Success(1), Failure("a"), Success(2)).rights must_===(Stream(1, 2))
+    LazyList[Validation[String, Int]](Success(1), Failure("a"), Success(2)).rights must_===(LazyList(1, 2))
   }
 
   "separate" in {
@@ -45,7 +45,7 @@ object MonadPlusTest extends SpecLite {
 
     Vector[Int \&/ String](This(1), Both(3, "a"), That("b")).separate must_===(Vector(1, 3) -> Vector("a", "b"))
 
-    Stream[Validation[String, Int]](Success(1), Failure("a"), Success(2)).separate must_===(Stream("a") -> Stream(1, 2))
+    LazyList[Validation[String, Int]](Success(1), Failure("a"), Success(2)).separate must_===(LazyList("a") -> LazyList(1, 2))
   }
 
   "filter" in {

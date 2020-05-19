@@ -61,8 +61,8 @@ sealed abstract class LazyEither[A, B] {
   def toIList[BB >: B]: IList[BB] =
     fold(_ => INil(), ICons(_, INil()))
 
-  def toStream: Stream[B] =
-    fold(_ => Stream(), Stream(_))
+  def toLazyList: LazyList[B] =
+    fold(_ => LazyList(), LazyList(_))
 
   def map[C](f: (=> B) => C): LazyEither[A, C] =
     fold(lazyLeft(_), b => lazyRight(f(b)))
@@ -145,8 +145,8 @@ object LazyEither extends LazyEitherInstances {
     def toList: List[A] =
       e.fold(_ :: Nil, _ => Nil)
 
-    def toStream: Stream[A] =
-      e.fold(Stream(_), _ => Stream())
+    def toLazyList: LazyList[A] =
+      e.fold(LazyList(_), _ => LazyList())
 
     def map[C](f: (=> A) => C): LazyEither[C, B] =
       e.fold(a => lazyLeft(f(a)), lazyRight(_))

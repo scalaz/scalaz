@@ -3,7 +3,7 @@ package scalaz
 import scalacheck.ScalazArbitrary._
 import scalacheck.ScalazProperties._
 import std.anyVal._
-import std.stream._
+import std.lazylist._
 import std.string._
 import std.tuple._
 import std.option._
@@ -28,76 +28,76 @@ object FingerTreeTest extends SpecLite {
   checkAll("IndSeq", isEmpty.laws[IndSeq])
   checkAll("IndSeq", alt.laws[IndSeq])
 
-  val intStream = Stream.from(1)
+  val intLazyList = LazyList.from(1)
 
-  def streamToTree[A](stream: Stream[A]): SequenceTree[A] = stream.foldLeft(FingerTree.empty[Int, A]) {
+  def lazyListToTree[A](list: LazyList[A]): SequenceTree[A] = list.foldLeft(FingerTree.empty[Int, A]) {
     case (t, x) => (t :+ x)
   }
 
   "append one element works correctly" ! forAll {(tree: SequenceTree[Int], x: Int) =>
-    (tree :+ x).toStream must_===(tree.toStream :+ x)
+    (tree :+ x).toLazyList must_===(tree.toLazyList :+ x)
   }
 
   "prepending one element works correctly" ! forAll {(tree: SequenceTree[Int], x: Int) =>
-    (x +: tree).toStream must_===(x +: tree.toStream)
+    (x +: tree).toLazyList must_===(x +: tree.toLazyList)
   }
 
-  "converting a stream to a finger-tree and back produces an equal stream" ! forAll {(stream: Stream[Int]) =>
-    streamToTree(stream).toStream must_===(stream)
+  "converting a stream to a finger-tree and back produces an equal stream" ! forAll {(stream: LazyList[Int]) =>
+    lazyListToTree(stream).toLazyList must_===(stream)
   }
 
   "appending two trees works correctly" ! forAll {(tree1: SequenceTree[Int], tree2: SequenceTree[Int]) =>
-    (tree1 <++> tree2).toStream must_===(tree1.toStream ++ tree2.toStream)
+    (tree1 <++> tree2).toLazyList must_===(tree1.toLazyList ++ tree2.toLazyList)
   }
 
   "splitting a tree works the same as splitting a stream" ! forAll {(tree: SequenceTree[Int], index: Int) =>
-    val asStream = tree.toStream
+    val asLazyList = tree.toLazyList
     val splitTree = tree.split(_ > index)
-    (splitTree._1.toStream, splitTree._2.toStream) must_===(asStream.splitAt(index))
+    (splitTree._1.toLazyList, splitTree._2.toLazyList) must_===(asLazyList.splitAt(index))
   }
 
   "replacing last element works correctly" ! forAll{(tree: SequenceTree[Int], x: Int) =>
-    !tree.isEmpty ==> ((tree :-| x).toStream must_===(tree.toStream.init :+ x))
+    !tree.isEmpty ==> ((tree :-| x).toLazyList must_===(tree.toLazyList.init :+ x))
   }
 
   "replacing first element works correctly" ! forAll {(tree: SequenceTree[Int], x: Int) =>
-    !tree.isEmpty ==> ((x |-: tree).toStream must_=== (x +: tree.toStream.tail))
+    !tree.isEmpty ==> ((x |-: tree).toLazyList must_=== (x +: tree.toLazyList.tail))
   }
 
   "head and tail work correctly"  ! forAll {(tree: SequenceTree[Int]) =>
-    !tree.isEmpty ==> ((tree.head === tree.toStream.head) && (tree.tail.toStream === tree.toStream.tail))
+    !tree.isEmpty ==> ((tree.head === tree.toLazyList.head) && (tree.tail.toLazyList === tree.toLazyList.tail))
   }
 
   "last and init work correctly" ! forAll {(tree: SequenceTree[Int]) =>
-    !tree.isEmpty ==> ((tree.last === tree.toStream.last) && (tree.init.toStream === tree.toStream.init))
+    !tree.isEmpty ==> ((tree.last === tree.toLazyList.last) && (tree.init.toLazyList === tree.toLazyList.init))
   }
 
   "foldLeft snoc is identity" ! forAll {
-    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])(_ :+ _).toStream must_==(tree.toStream)
+    (tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])(_ :+ _).toLazyList must_==(tree.toLazyList)
   }
 
-  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])((x, y) => y +: x).toStream must_==(tree.toStream.reverse)}
+  "foldLeft cons is reverse" ! forAll {(tree: SequenceTree[Int]) => tree.foldLeft(FingerTree.empty[Int, Int])((x, y) => y +: x).toLazyList must_==(tree.toLazyList.reverse)}
 
   "Fingertree" should {
 
     "apply effects in order" in {
-      val s: Writer[String, FingerTree[Int, Int]] = streamToTree(intStream.take(5)).traverseTree[Writer[String, *], Int, Int](x => Writer(x.toString, x))
-      s.run must_===("12345" -> streamToTree(intStream.take(5)))
+      val s: Writer[String, FingerTree[Int, Int]] = lazyListToTree(intLazyList.take(5)).traverseTree[Writer[String, *], Int, Int](x => Writer(x.toString, x))
+      s.run must_===("12345" -> lazyListToTree(intLazyList.take(5)))
     }
 
     "traverseTree through the option effect yielding result" in {
-      val tree = streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i => Some(i * 2))
-      tree.map(_.toStream) getOrElse(Stream.empty) must_===(streamToTree(intStream.take(20).map(_ * 2)).toStream)
+      val tree = lazyListToTree(intLazyList.take(20)).traverseTree[Option, Int, Int](i => Some(i * 2))
+      tree.map(_.toLazyList) getOrElse(LazyList.empty) must_===(lazyListToTree(intLazyList.take(20).map(_ * 2)).toLazyList)
     }
 
     "traverseTree through the option effect yielding none" in {
-      val tree = streamToTree(intStream.take(20)).traverseTree[Option, Int, Int](i => if (i < 10) Some(i * 2) else None)
+      val tree = lazyListToTree(intLazyList.take(20)).traverseTree[Option, Int, Int](i => if (i < 10) Some(i * 2) else None)
       tree must_===(None)
     }
 
     "not blow the stack" in {
-      val tree: Option[FingerTree[Int, Int]] = streamToTree(intStream.take(32 * 1024)).traverseTree[Option, Int, Int](x => Some(x))
-      tree.map(_.toStream.take(100)) getOrElse Stream.empty must_===(intStream.take(100))
+      val tree: Option[FingerTree[Int, Int]] = lazyListToTree(intLazyList.take(32 * 1024)).traverseTree[Option, Int, Int](x => Some(x))
+      tree.map(_.toLazyList.take(100)) getOrElse LazyList.empty must_===(intLazyList.take(100))
     }
 
   }
@@ -123,12 +123,12 @@ object FingerTreeTest extends SpecLite {
   }
 
   "viewl works correctly" ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
-    tree.viewl.fold[Boolean](true, (x, t) => (x === asStream.head) && (t.toStream === asStream.tail))
+    val asLazyList = tree.toLazyList
+    tree.viewl.fold[Boolean](true, (x, t) => (x === asLazyList.head) && (t.toLazyList === asLazyList.tail))
   }
 
   "viewr works correctly" ! forAll {(tree: SequenceTree[Int]) =>
-    val asStream = tree.toStream
-    tree.viewr.fold[Boolean](true, (i, x) => (i.toStream ≟ asStream.init) && (x ≟ asStream.last))
+    val asLazyList = tree.toLazyList
+    tree.viewr.fold[Boolean](true, (i, x) => (i.toLazyList ≟ asLazyList.init) && (x ≟ asLazyList.last))
   }
 }

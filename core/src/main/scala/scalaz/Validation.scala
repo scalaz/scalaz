@@ -178,11 +178,11 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
       case Success(a) => IList(a)
     }
 
-  /** Return an empty stream or stream with one element on the success of this validation. */
-  def toStream: Stream[A] =
+  /** Return an empty LazyList or LazyList with one element on the success of this validation. */
+  def toLazyList: LazyList[A] =
     this match {
-      case Failure(_) => Stream()
-      case Success(a) => Stream(a)
+      case Failure(_) => LazyList()
+      case Success(a) => LazyList(a)
     }
 
   /** Return an empty option or option with one element on the success of this validation. Useful to sweep errors under the carpet. */

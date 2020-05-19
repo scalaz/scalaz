@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import Isomorphism.<~>
 import Maybe.just
 import std.anyVal._
-import std.stream._
+import std.lazylist._
 import std.tuple._
 import syntax.contravariant._
 
@@ -33,7 +33,7 @@ object CorecursiveListTest extends SpecLite {
   import EphemeralStreamTest.ephemeralStreamShow
 
   implicit def corecursiveListShow[A: Show]: Show[CL[A]] =
-    Show[Stream[A]] contramap (CL.streamIso.from(_))
+    Show[LazyList[A]] contramap (CL.lazyListIso.from(_))
 
   def isoTest[F[_], G[_]](iso: F <~> G)(
     implicit AF: Arbitrary[F[Int]], AG: Arbitrary[G[Int]],
@@ -50,16 +50,16 @@ object CorecursiveListTest extends SpecLite {
     p
   }
 
-  checkAll("stream to corec iso", isoTest(CL.streamIso))
+  checkAll("stream to corec iso", isoTest(CL.lazyListIso))
 
   checkAll("eph stream to corec iso", isoTest(CL.ephemeralStreamIso))
 
   "fromList" ! forAll { (xs: List[Int]) =>
-    CL.fromList(xs) must_===(CL.fromStream(xs.toStream))
+    CL.fromList(xs) must_===(CL.fromLazyList(xs.to(LazyList)))
   }
 
   "fromVector" ! forAll { (xs: Vector[Int]) =>
-    CL.fromVector(xs) must_===(CL.fromStream(xs.toStream))
+    CL.fromVector(xs) must_===(CL.fromLazyList(xs.to(LazyList)))
   }
 
   def justDie[A](msg: String = "too strict!"): CL[A] =
@@ -108,7 +108,7 @@ object CorecursiveListTest extends SpecLite {
   }
 
   "cons naturality" ! forAll {(x: Int, xs: CL[Int]) =>
-    CL.streamIso.from(CL.cons(x, xs)) must_===(x #:: CL.streamIso.from(xs))
+    CL.lazyListIso.from(CL.cons(x, xs)) must_===(x #:: CL.lazyListIso.from(xs))
   }
 
   object instances {

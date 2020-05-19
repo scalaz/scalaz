@@ -334,11 +334,11 @@ sealed abstract class Free[S[_], A] {
     go(ev(this), sink)
   }
 
-  /** Feed the given stream to this `Source`. */
-  def feed[E](ss: Stream[E])(implicit ev: Free[S, A] === Sink[E, A]): A = {
-    @tailrec def go(snk: Sink[E, A], rest: Stream[E]): A = (rest, snk.resume) match {
+  /** Feed the given LazyList to this `Source`. */
+  def feed[E](ss: LazyList[E])(implicit ev: Free[S, A] === Sink[E, A]): A = {
+    @tailrec def go(snk: Sink[E, A], rest: LazyList[E]): A = (rest, snk.resume) match {
       case (x #:: xs, -\/(f)) => go(f(x), xs)
-      case (Stream(), -\/(f)) => go(f(sys.error("No more values.")), Stream())
+      case (LazyList(), -\/(f)) => go(f(sys.error("No more values.")), LazyList.empty)
       case (_, \/-(r))        => r
     }
     go(ev(this), ss)

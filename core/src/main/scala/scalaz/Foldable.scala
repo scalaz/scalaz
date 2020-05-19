@@ -166,6 +166,8 @@ trait Foldable[F[_]]  { self =>
   }
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
 
+  def toLazyList[A](fa: F[A]): LazyList[A] = foldRight[A, LazyList[A]](fa, LazyList.empty)(LazyList.cons(_, _))
+
   def toIList[A](fa: F[A]): IList[A] =
     foldLeft(fa, IList.empty[A])((t, h) => h :: t).reverse
 

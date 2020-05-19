@@ -128,9 +128,9 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
   /** Return a `this` on the left-side or a `that` on the right-side of this disjunction  */
   def toThese(implicit F: Functor[F]): TheseT[F, A, B] = TheseT(F.map(run)(_.toThese))
 
-  /** Return an empty stream or stream with one element on the right of this disjunction. */
-  def toStream(implicit F: Functor[F]): F[Stream[B]] =
-    F.map(run)((_: (A \/ B)).fold(_ => Stream(), Stream(_)))
+  /** Return an empty LazyList or LazyList with one element on the right of this disjunction. */
+  def toLazyList(implicit F: Functor[F]): F[LazyList[B]] =
+    F.map(run)((_: (A \/ B)).fold(_ => LazyList(), LazyList(_)))
 
   /** Return an empty option or option with one element on the right of this disjunction. Useful to sweep errors under the carpet. */
   def toOption(implicit F: Functor[F]): OptionT[F, B] =

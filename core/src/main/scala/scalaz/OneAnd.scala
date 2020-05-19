@@ -171,8 +171,8 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, *]] {
   override def toSet[A](fa: OneAnd[F, A]) =
     F.toSet(fa.tail) + fa.head
 
-  override def toStream[A](fa: OneAnd[F, A]) =
-    fa.head #:: F.toStream(fa.tail)
+  override def toLazyList[A](fa: OneAnd[F, A]) =
+    fa.head #:: F.toLazyList(fa.tail)
 
   override def toEphemeralStream[A](fa: OneAnd[F, A]) =
     EphemeralStream.cons(fa.head, F.toEphemeralStream(fa.tail))

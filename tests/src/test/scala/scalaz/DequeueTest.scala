@@ -14,7 +14,7 @@ object DequeueTest extends SpecLite {
   checkAll(alt.laws[Dequeue])
 
   "fromList works" ! forAll{ (l: List[Int]) =>
-    Dequeue.fromFoldable(l).toStream must_===(l.toStream)
+    Dequeue.fromFoldable(l).toLazyList must_===(l.to(LazyList))
   }
 
   "reverse twice is id" ! forAll{ (dq: Dequeue[Int]) =>
@@ -25,8 +25,8 @@ object DequeueTest extends SpecLite {
     Dequeue.fromFoldable(l).size must_===(l.size)
   }
 
-  "reverse stream works" ! forAll{ (l: List[Int]) =>
-    Dequeue.fromFoldable(l).toBackStream must_===(l.reverse.toStream)
+  "reverse LazyList works" ! forAll{ (l: List[Int]) =>
+    Dequeue.fromFoldable(l).toBackLazyList must_===(l.reverse.to(LazyList))
   }
 
   "toIList consistent with Ilist.fromFoldable" ! forAll{ (l: List[Int]) =>
@@ -43,10 +43,10 @@ object DequeueTest extends SpecLite {
   }
 
   "snoc works" ! forAll{ (l: List[Int]) =>
-    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q snoc a)).toStream must_=== l.toStream
+    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q snoc a)).toLazyList must_=== l.to(LazyList)
   }
 
   "cons works" ! forAll{ (l: List[Int]) =>
-    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a,q) => q cons a)).toStream must_=== l.toStream
+    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a,q) => q cons a)).toLazyList must_=== l.to(LazyList)
   }
 }

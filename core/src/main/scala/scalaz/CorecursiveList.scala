@@ -52,17 +52,17 @@ object CorecursiveList extends CorecursiveListInstances {
           ga.step(s).map{case (s, a) => (a, s)}.toOption)
     }
 
-  val streamIso: Stream <~> CorecursiveList =
-    new IsoFunctorTemplate[Stream, CorecursiveList] {
-      def to_[A](fa: Stream[A]) =
+  val lazyListIso: LazyList <~> CorecursiveList =
+    new IsoFunctorTemplate[LazyList, CorecursiveList] {
+      def to_[A](fa: LazyList[A]) =
         CorecursiveList(fa){
-          case Stream.Empty => Empty()
+          case LazyList() => Empty()
           case x #:: xs => just((xs, x))
         }
 
       def from_[A](ga: CorecursiveList[A]) = {
-        def rec(s: ga.S): Stream[A] =
-          ga.step(s) cata ({case (s, a) => a #:: rec(s)}, Stream())
+        def rec(s: ga.S): LazyList[A] =
+          ga.step(s) cata ({case (s, a) => a #:: rec(s)}, LazyList())
         rec(ga.init)
       }
     }
@@ -97,8 +97,8 @@ object CorecursiveList extends CorecursiveListInstances {
         }
     }
 
-  def fromStream[A](s: Stream[A]): CorecursiveList[A] =
-    streamIso.to(s)
+  def fromLazyList[A](s: LazyList[A]): CorecursiveList[A] =
+    lazyListIso.to(s)
 
   /** A frightfully inefficient way to add elements to the beginning of
     * a corecursive list.  It is correct, and reasonable enough for

@@ -78,13 +78,13 @@ object TraverseTest extends SpecLite {
 
   "stream" should {
     "apply effects in order" in {
-      val s: Writer[String, Stream[Int]] = Stream(1, 2, 3).traverseU(x => Writer(x.toString, x))
-      s.run must_===(("123", Stream(1, 2, 3)))
+      val s: Writer[String, LazyList[Int]] = LazyList(1, 2, 3).traverseU(x => Writer(x.toString, x))
+      s.run must_===(("123", LazyList(1, 2, 3)))
     }
 
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[Stream[Int]] = Stream.from(0) traverse { x =>
+      val s: Maybe[LazyList[Int]] = LazyList.from(0) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
@@ -96,7 +96,7 @@ object TraverseTest extends SpecLite {
   "ephemeralstream" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromStream(Stream.from(0)) traverse { x =>
+      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromLazyList(LazyList.from(0)) traverse { x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")

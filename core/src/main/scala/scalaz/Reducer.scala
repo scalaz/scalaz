@@ -165,6 +165,12 @@ sealed abstract class ReducerInstances {
     reducer(NonEmptyList.nel(_, INil()), (c, cs) => NonEmptyList.nel(cs.head, cs.tail :+ c), (cs, c) => c <:: cs)
   }
 
+  /** Collect `C`s into a LazyList, in order. */
+  implicit def LazyListReducer[C]: Reducer[C, LazyList[C]] = {
+    import std.lazylist._
+    unitLazyConsReducer(LazyList.cons(_, LazyList.empty), LazyList.cons(_, _))
+  }
+
   /** Collect `C`s into a stream, in order. */
   implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
     import std.stream._

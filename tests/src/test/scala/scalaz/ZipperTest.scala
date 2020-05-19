@@ -12,11 +12,11 @@ import scalaz.Maybe.just
 
 object ZipperTest extends SpecLite {
 
-  "Zipper From Stream" ! forAll { (xs: Stream[Int]) =>
-    (xs.toZipper map (_.toStream)).getOrElse(Stream()) === xs
+  "Zipper From LazyList" ! forAll { (xs: LazyList[Int]) =>
+    (xs.toZipper map (_.toLazyList)).getOrElse(LazyList()) === xs
   }
 
-  "Mapping on a zipper should be the same as mapping on the elements of the stream" ! forAll { (xs: Stream[Int], a: Int) =>
+  "Mapping on a zipper should be the same as mapping on the elements of the stream" ! forAll { (xs: LazyList[Int], a: Int) =>
     val fun: Int => Int = _ + a
 
     (
@@ -24,12 +24,12 @@ object ZipperTest extends SpecLite {
     ) getOrElse { xs.length must_===(0) }
   }
 
-  "Zipper Move Then To Stream" in check {
+  "Zipper Move Then To LazyList" in check {
     val n = NonEmptyList(1, 2, 3, 4)
-    n.toZipper.move(2).map(_.toStream).exists(_ ==(n.stream))
+    n.toZipper.move(2).map(_.toLazyList).exists(_ ==(n.stream))
   }
 
-  "Next Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "Next Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.next)
         yield {
@@ -41,13 +41,13 @@ object ZipperTest extends SpecLite {
 
   "nextC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
     val zn = z.nextC
-    zn.toStream must_===(z.toStream)
+    zn.toLazyList must_===(z.toLazyList)
 
     if (z.atEnd) zn.atStart must_==(true)
     else zn.index must_===(z.index + 1)
   }
 
-  "Next changes focus, lefts and rights " ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "Next changes focus, lefts and rights " ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     if (r.length > 0) {
       val nextZipper = zipper(l, f, r).next.toOption.get
       nextZipper.focus must_===(r(0))
@@ -58,13 +58,13 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "Zipper next returns Some when rights is nonempty, none otherwise." ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "Zipper next returns Some when rights is nonempty, none otherwise." ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     if (r.length > 0) zipper(l, f, r).next.isJust must_==(true)
     else zipper(l, f, r).next.isJust must_==(false)
   }
 
   "Zipper nextOr returns a new zipper when used on empty rights or Some of next" ! forAll {
-    (l: Stream[Int], f: Int, r: Stream[Int], alt: Zipper[Int]) =>
+    (l: LazyList[Int], f: Int, r: LazyList[Int], alt: Zipper[Int]) =>
 
     val z = zipper(l, f, r)
     if (r.length > 0) {
@@ -74,7 +74,7 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "Previous Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "Previous Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.previous)
         yield zn.lefts.length must_===(z.lefts.length - 1) and (zn.rights.length must_===(z.rights.length + 1))
@@ -83,13 +83,13 @@ object ZipperTest extends SpecLite {
 
   "previousC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
     val zp = z.previousC
-    zp.toStream must_===(z.toStream)
+    zp.toLazyList must_===(z.toLazyList)
 
     if (z.atStart) zp.atEnd must_==(true)
     else zp.index must_===(z.index - 1)
   }
 
-  "Previous changes the focus, lefts and rights " ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "Previous changes the focus, lefts and rights " ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     if (l.length > 0) {
       val prevZipper = zipper(l, f, r).previous.toOption.get
       prevZipper.focus must_===(l(0))
@@ -101,7 +101,7 @@ object ZipperTest extends SpecLite {
   }
 
   "Zipper previousOr returns a new zipper when used on empty rights or Some of next" ! forAll {
-    (l: Stream[Int], f: Int, r: Stream[Int], alt: Zipper[Int]) =>
+    (l: LazyList[Int], f: Int, r: LazyList[Int], alt: Zipper[Int]) =>
 
     val z = zipper(l, f, r)
     if (l.length > 0) {
@@ -111,7 +111,7 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "Zipper tryPrevious returns Some of next or throws" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "Zipper tryPrevious returns Some of next or throws" ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     val z = zipper(l, f, r)
     if (l.length > 0) {
       z.previous must_=== just(z.tryPrevious)
@@ -147,14 +147,14 @@ object ZipperTest extends SpecLite {
   insertionTest("insert changes focus and appends to lefts",      (z, e) => z.insert(e),      leftAndFocusChanged)
   insertionTest("insertLeft changes focus and appends to lefts",  (z, e) => z.insertLeft(e),  rightAndFocusChanged)
 
-  "DeleteRight Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "DeleteRight Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRight)
         yield zn.rights.length must_===(z.rights.length - 1)
     ) getOrElse {xs.length mustBe_<(2) }
   }
 
-  "DeleteRightC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "DeleteRightC Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRightC)
         yield zn.rights.length must_===(z.rights.length - 1)
@@ -178,7 +178,7 @@ object ZipperTest extends SpecLite {
     else z.deleteRightC must_=== just(zd)
   }
 
-  "DeleteRight Affects Lengths and Moves Left if at end" ! forAll { (xs: Stream[Int]) =>
+  "DeleteRight Affects Lengths and Moves Left if at end" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteRight)
         yield zn.lefts.length must_===(z.lefts.length - 1)
@@ -206,7 +206,7 @@ object ZipperTest extends SpecLite {
       (zd.rights.isEmpty must_==(true)) and (zd.lefts must_===(z.lefts.tail))
   }
 
-  "DeleteLeft Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "DeleteLeft Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteLeft)
         yield zn.lefts.length must_===(z.lefts.length - 1)
@@ -224,7 +224,7 @@ object ZipperTest extends SpecLite {
     ) getOrElse((z.lefts.isEmpty must_==(true)) and (z.rights.isEmpty must_==(true)))
   }
 
-  "DeleteLeftC Affects Lengths" ! forAll { (xs: Stream[Int]) =>
+  "DeleteLeftC Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteLeftC)
         yield zn.lefts.length must_===(z.lefts.length - 1)
@@ -260,7 +260,7 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "DeleteLeft Affects Lengths and Moves Right if at start" ! forAll { (xs: Stream[Int]) =>
+  "DeleteLeft Affects Lengths and Moves Right if at start" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteLeft)
         yield zn.rights.length must_===(z.rights.length - 1)
@@ -281,21 +281,21 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "DeleteRightC Affects Lengths and Cycles to Start if at end" ! forAll { (xs: Stream[Int]) =>
+  "DeleteRightC Affects Lengths and Cycles to Start if at end" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.deleteRightC)
         yield zn.rights.length must_===(z.lefts.length - 1)
     ) getOrElse (xs.length mustBe_<(2))
   }
 
-  "DeleteLeftC Affects Lengths and Cycles to end if at start" ! forAll { (xs: Stream[Int]) =>
+  "DeleteLeftC Affects Lengths and Cycles to end if at start" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteLeftC)
         yield zn.lefts.length must_===(z.rights.length - 1)
     ) getOrElse (xs.length mustBe_<(2))
   }
 
-  "Move" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Short) =>
+  "Move" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Short) =>
 
     zipper(xs, f, ys).move(n) map { (z: Zipper[Int]) =>
       z.lefts.length must_===(xs.length + n)
@@ -317,7 +317,7 @@ object ZipperTest extends SpecLite {
     val n = size - 1
 
     val f = for {
-      z <- Stream.from(1).take(size).toZipper
+      z <- LazyList.from(1).take(size).toZipper
       zm <- z.move(n)
     } yield zm.focus
 
@@ -325,7 +325,7 @@ object ZipperTest extends SpecLite {
   }
 
   "moveOr should return some of move or an alternative" ! forAll {
-    (l: Stream[Int], f: Int, r: Stream[Int], n: Short, alt: Zipper[Int]) =>
+    (l: LazyList[Int], f: Int, r: LazyList[Int], n: Short, alt: Zipper[Int]) =>
 
     val z = zipper(l, f, r).moveOr(n, alt)
     if (l.length < (-n) || r.length < n) z must_===(alt)
@@ -341,11 +341,11 @@ object ZipperTest extends SpecLite {
     }
   }
 
-  "Length should return the size of the zipper" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "Length should return the size of the zipper" ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     zipper(l, f, r).length must_===(l.length + 1 + r.length)
   }
 
-  "The zipper should be atStart when the lefts stream is empty" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "The zipper should be atStart when the lefts stream is empty" ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     if (zipper(l, f, r).atStart) l.isEmpty must_==(true)
     else l.isEmpty must_==(false)
   }
@@ -359,30 +359,30 @@ object ZipperTest extends SpecLite {
 
   "start should set the zipper at the start" ! forAll { (z: Zipper[Int]) =>
     val zs = z.start
-    zs.toStream must_===(z.toStream)
+    zs.toLazyList must_===(z.toLazyList)
     zs.index must_===(0)
   }
 
   "end should set the zipper at the end" ! forAll { (z: Zipper[Int]) =>
     val ze = z.end
-    ze.toStream must_===(z.toStream)
+    ze.toLazyList must_===(z.toLazyList)
     ze.index must_===(ze.length - 1)
   }
 
-  "The zipper should be atEnd when the right stream is empty" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "The zipper should be atEnd when the right stream is empty" ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     if (zipper(l, f, r).atEnd) r.isEmpty
     else !r.isEmpty
   }
 
-  "Find" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
+  "Find" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
     zipper(xs, f, ys).findZ(p) map { z => p(z.focus) } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
   }
 
-  "findZ shouldn't change elements" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, n: Int, m: Int) =>
+  "findZ shouldn't change elements" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
     zipper(xs, f, ys).findZ(p).map {
-      z => z.toStream == zipper(xs, f, ys).toStream
+      z => z.toLazyList == zipper(xs, f, ys).toLazyList
     } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
   }
 
@@ -401,7 +401,7 @@ object ZipperTest extends SpecLite {
     val size = 32 * 1024
     val elem = size - 1
     val r = for {
-      z <- Stream.from(1).take(size).toZipper
+      z <- LazyList.from(1).take(size).toZipper
       zf <- z.findZ(_ == elem)
     } yield zf.focus
 
@@ -414,7 +414,7 @@ object ZipperTest extends SpecLite {
 
   val intZipperWithExistingElement: Gen[(Zipper[Int], Int)] = for {
     z <- arbitrary[Zipper[Int]]
-    stream = z.toStream
+    stream = z.toLazyList
     i <- Gen.choose(0, stream.length -1)
   } yield (z, stream(i))
 
@@ -431,8 +431,8 @@ object ZipperTest extends SpecLite {
   def minSizeIntZipper(size: Int): Gen[Zipper[Int]] = for {
       leftSize <- Gen.choose(0, size - 2)
       rightSize = size - 1 - leftSize
-      lefts  <- Gen.containerOfN[Stream,Int](leftSize,  implicitly[Arbitrary[Int]].arbitrary)
-      rights <- Gen.containerOfN[Stream,Int](rightSize, implicitly[Arbitrary[Int]].arbitrary)
+      lefts  <- Gen.containerOfN[LazyList,Int](leftSize,  implicitly[Arbitrary[Int]].arbitrary)
+      rights <- Gen.containerOfN[LazyList,Int](rightSize, implicitly[Arbitrary[Int]].arbitrary)
       focus <- arbitrary[Int]
   } yield zipper(lefts, focus, rights)
 
@@ -448,16 +448,16 @@ object ZipperTest extends SpecLite {
     true
    }
 
-  "Update Modifies Zipper Correctly" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, u: Int) =>
+  "Update Modifies Zipper Correctly" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, u: Int) =>
     zipper(xs, f, ys).update(u) must_===(zipper(xs, u, ys))
   }
 
-  "Modify Modifies Zipper Correctly" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int, u: Int) =>
+  "Modify Modifies Zipper Correctly" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, u: Int) =>
     val modF: Int => Int = _ + u
     zipper(xs, f, ys).modify(modF) must_===(zipper(xs, f + u, ys))
   }
 
-  "Start" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
+  "Start" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int) =>
     val zo = zipper(xs, f, ys)
     val z = zo.start
 
@@ -467,7 +467,7 @@ object ZipperTest extends SpecLite {
     ((z.move(xs.length) == just(zo)) || z.length == 0) must_== true
   }
 
-  "End" ! forAll { (xs: Stream[Int], ys: Stream[Int], f: Int) =>
+  "End" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int) =>
     val zo = zipper(xs, f, ys)
     val z = zo.end
 
@@ -482,14 +482,14 @@ object ZipperTest extends SpecLite {
   }
 
   "positions should return a zippers with all possible positions of a zipper" ! forAll { (z: Zipper[Int]) =>
-    val indeces = z.positions.map { _.index }.toStream
+    val indeces = z.positions.map { _.index }.toLazyList
     indeces.min must_===(0)
     indeces.max must_===(z.length -1)
     indeces.sorted must_===(indeces)
-    z.positions.map { _.toStream }.toStream.distinct.length must_===(1)
+    z.positions.map { _.toLazyList }.toLazyList.distinct.length must_===(1)
   }
 
-  "index returns the position of the focus" ! forAll { (l: Stream[Int], f: Int, r: Stream[Int]) =>
+  "index returns the position of the focus" ! forAll { (l: LazyList[Int], f: Int, r: LazyList[Int]) =>
     zipper(l, f, r).index must_===(l.length)
   }
 
@@ -500,12 +500,12 @@ object ZipperTest extends SpecLite {
 
   {
     implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] = new Equal[Zipper[A]] {
-      import std.stream.streamEqual
-      def streamEqualApprox = streamEqual[A].contramap((_: Stream[A]).take(1000))
+      import std.lazylist._
+      def equalApprox = Equal[LazyList[A]].contramap((_: LazyList[A]).take(1000))
       def equal(a1: Zipper[A], a2: Zipper[A]) =
-        streamEqualApprox.equal(a1.lefts, a2.lefts) &&
+        equalApprox.equal(a1.lefts, a2.lefts) &&
           Equal[A].equal(a1.focus, a2.focus) &&
-          streamEqualApprox.equal(a1.rights, a2.rights)
+          equalApprox.equal(a1.rights, a2.rights)
     }
 
     checkAll("Zipper", applicative.laws[Zipper])

@@ -1,18 +1,15 @@
 package scalaz
 package example
 
-import scala.collection.immutable.Stream
-
-
 object FingerTreeUsage extends App{
   import FingerTree._
   import std.anyVal._
 
-  def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] = stream.foldLeft(empty[Int, A]) {
+  def lazyListToTree[A](list: LazyList[A]): FingerTree[Int, A] = list.foldLeft(empty[Int, A]) {
     case (t, x) => (t :+ x)
   }
 
-  val intStream = Stream.from(1)
+  val intLazyList = LazyList.from(1)
 
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
 
@@ -27,22 +24,22 @@ object FingerTreeUsage extends App{
   assert((emptyTree :+ 2 :+ 3 :+ 4).toList == List(2, 3, 4))
 
   //folding
-  assert(streamToTree(intStream.take(20)).foldRight(0)(_ + _) == (1 to 20).sum)
+  assert(lazyListToTree(intLazyList.take(20)).foldRight(0)(_ + _) == (1 to 20).sum)
 
   //replace the first element of the tree
-  assert((5 |-: streamToTree(intStream.take(3))).toList == List(5, 2, 3))
+  assert((5 |-: lazyListToTree(intLazyList.take(3))).toList == List(5, 2, 3))
 
   //replace the last element of the tree
-  assert((streamToTree(intStream.take(3)) :-| 5).toList == List(1, 2, 5))
+  assert((lazyListToTree(intLazyList.take(3)) :-| 5).toList == List(1, 2, 5))
 
   //appending two trees
-  assert((streamToTree(intStream.take(5)) <++> streamToTree(Stream.from(6).take(5))).toStream == intStream.take(10))
+  assert((lazyListToTree(intLazyList.take(5)) <++> lazyListToTree(LazyList.from(6).take(5))).toLazyList == intLazyList.take(10))
 
   import std.option._
 
   //traversing the tree
-  val traversedTree = streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i => Some(i * 2))
-  assert(traversedTree.map(_.toStream).getOrElse(Stream.empty) == intStream.map(_ * 2).take(10))
+  val traversedTree = lazyListToTree(intLazyList.take(10)).traverseTree[Option, Int, Int](i => Some(i * 2))
+  assert(traversedTree.map(_.toLazyList).getOrElse(LazyList.empty) == intLazyList.map(_ * 2).take(10))
 
-  println(streamToTree(intStream.take(10)).traverseTree[Option, Int, Int](i => Some(i + 1)))
+  println(lazyListToTree(intLazyList.take(10)).traverseTree[Option, Int, Int](i => Some(i + 1)))
 }

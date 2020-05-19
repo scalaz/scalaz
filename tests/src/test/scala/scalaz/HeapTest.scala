@@ -16,12 +16,12 @@ object HeapTest extends SpecLite {
     (a: Heap[Int]) => a.toList must_===(a.toList.sorted)
   }
 
-  "toList / toStream" ! forAll {
-    (a: Heap[Int]) => a.toStream must_===(a.toList.toStream)
+  "toList / toLazyList" ! forAll {
+    (a: Heap[Int]) => a.toLazyList must_===(a.toList.to(LazyList))
   }
 
   "filter" ! forAll {
-    (a: Heap[Int]) => a.filter(pred).toStream must_===(a.toStream.filter(pred))
+    (a: Heap[Int]) => a.filter(pred).toLazyList must_===(a.toLazyList.filter(pred))
   }
 
   "partition" ! forAll {

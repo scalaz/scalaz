@@ -25,7 +25,7 @@ object TreeTest extends SpecLite {
   }
 
   "infinite Tree flatten" ! {
-    Node(0, EphemeralStream.fromStream(Stream.from(1)).map(Leaf(_))).flatten
+    Node(0, EphemeralStream.fromLazyList(LazyList.from(1)).map(Leaf(_))).flatten
     true
   }
 

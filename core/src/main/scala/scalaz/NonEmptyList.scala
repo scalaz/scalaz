@@ -53,13 +53,13 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   def stream: Stream[A] = head #:: tail.toStream
 
-  def toZipper: Zipper[A] = zipper(Stream.Empty, head, tail.toStream)
+  def toZipper: Zipper[A] = zipper(LazyList.empty, head, tail.toLazyList)
 
   def zipperEnd: Zipper[A] = {
-    import Stream._
+    import LazyList._
     tail.reverse match {
-      case INil()     => zipper(empty, head, empty)
-      case ICons(t, ts) => zipper(ts.toStream :+ head, t, empty)
+      case INil() => zipper(empty, head, empty)
+      case ICons(t, ts) => zipper(ts.toLazyList :+ head, t, empty)
     }
   }
 

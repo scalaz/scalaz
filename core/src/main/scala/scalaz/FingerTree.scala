@@ -4,7 +4,7 @@ import scala.collection.Iterator
 import Maybe.Just
 import std.list.listMonoid
 import std.option._
-import std.stream.streamMonoid
+import std.lazylist.lazylistMonoid
 import syntax.Ops
 import syntax.semigroup._
 import FingerTree._
@@ -528,8 +528,8 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     (_, x) => Iterator.single(x),
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
 
-  /** Convert the leaves of the tree to a `scala.Stream` */
-  def toStream: Stream[A] = to[Stream]
+  /** Convert the leaves of the tree to a `scala.LazyList` */
+  def toLazyList: LazyList[A] = to[LazyList]
 
   /** Convert the leaves of the tree to a `scala.List` */
   def toList: List[A] = to[List]
@@ -615,9 +615,9 @@ sealed abstract class FingerTreeInstances {
 
   implicit def fingerTreeEqual[V, A : Equal]: Equal[FingerTree[V, A]] =
     new Equal[FingerTree[V, A]] {
-      import std.stream._
+      import std.lazylist._
       def equal(x: FingerTree[V, A], y: FingerTree[V, A]) =
-        Equal[Stream[A]].equal(x.toStream, y.toStream)
+        Equal[LazyList[A]].equal(x.toLazyList, y.toLazyList)
     }
 }
 

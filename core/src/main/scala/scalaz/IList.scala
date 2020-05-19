@@ -435,6 +435,9 @@ sealed abstract class IList[A] extends Product with Serializable {
   def toStream: Stream[A] =
     uncons(Stream.empty, (h, t) => h #:: t.toStream)
 
+  def toLazyList: LazyList[A] =
+    uncons(LazyList.empty, (h, t) => h #:: t.toLazyList)
+
   override def toString: String =
     IList.show(Show.showA).shows(this) // lame, but helpful for debugging
 
@@ -654,6 +657,8 @@ sealed abstract class IListInstances extends IListInstance0 {
       override def toIList[A](fa: IList[A]) = fa
 
       override def toStream[A](fa: IList[A]) = fa.toStream
+
+      override def toLazyList[A](fa: IList[A]) = fa.toLazyList
 
       override def foldLeft[A, B](fa: IList[A], z: B)(f: (B, A) => B) =
         fa.foldLeft(z)(f)

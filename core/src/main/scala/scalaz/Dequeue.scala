@@ -84,14 +84,14 @@ sealed abstract class Dequeue[A] {
   def :+(a: A): Dequeue[A] = snoc(a)
 
   /**
-    * convert this queue to a stream of elements from front to back
+    * convert this queue to a LazyList of elements from front to back
     */
-  def toStream: Stream[A] = std.stream.unfoldm(this)(_.uncons)
+  def toLazyList: LazyList[A] = std.lazylist.unfoldm(this)(_.uncons)
 
   /**
-    * convert this queue to a stream of elements from back to front
+    * convert this queue to a LazyList of elements from back to front
     */
-  def toBackStream: Stream[A] = std.stream.unfoldm(this)(_.unsnoc)
+  def toBackLazyList: LazyList[A] = std.lazylist.unfoldm(this)(_.unsnoc)
 
   /**
     * convert this queue to a list of elements from front to back
@@ -259,9 +259,9 @@ sealed abstract class DequeueInstances {
 
 private[scalaz] trait DequeueEqual[A] extends Equal[Dequeue[A]] {
   implicit def A: Equal[A]
-  import std.stream._
+  import std.lazylist._
 
   final override def equal(a: Dequeue[A], b: Dequeue[A]): Boolean =
-    Equal[Stream[A]].equal(a.toStream, b.toStream)
+    Equal[LazyList[A]].equal(a.toLazyList, b.toLazyList)
 }
 

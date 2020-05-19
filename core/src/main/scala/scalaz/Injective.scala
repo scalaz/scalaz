@@ -43,5 +43,5 @@ object Injectivity {
   implicit def Tuple4Injective: Injective4[Tuple4] = Injective4()
   implicit def Tuple5Injective: Injective5[Tuple5] = Injective5()
   implicit def ValidationInjective: Injective2[Validation] = Injective2()
-  implicit def StreamInjective: Injective[Stream] = Injective()
+  implicit def LazyListInjective: Injective[LazyList] = Injective()
 }

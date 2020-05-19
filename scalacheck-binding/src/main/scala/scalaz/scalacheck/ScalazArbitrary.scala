@@ -92,7 +92,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     A.contramap(_.getConst)
 
   implicit def cogenZipper[A](implicit A: Cogen[A]): Cogen[Zipper[A]] =
-    Cogen[(Stream[A], A, Stream[A])].contramap(z => (z.lefts, z.focus, z.rights))
+    Cogen[(LazyList[A], A, LazyList[A])].contramap(z => (z.lefts, z.focus, z.rights))
 
   implicit def cogenTracedT[W[_], A, B](implicit W: Cogen[W[A => B]]): Cogen[TracedT[W, A, B]] =
     W.contramap(_.run)
@@ -243,13 +243,13 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Functor[Arbitrary].map(F)(Endomorphic[F, A](_))
 
   implicit def EphemeralStreamArbitrary[A : Arbitrary]: Arbitrary[EphemeralStream[A]] =
-    Functor[Arbitrary].map(arb[Stream[A]])(EphemeralStream.fromStream[A](_))
+    Functor[Arbitrary].map(arb[LazyList[A]])(EphemeralStream.fromLazyList[A](_))
 
   implicit def IStreamArbitrary[A : Arbitrary]: Arbitrary[IStream[A]] =
-    Functor[Arbitrary].map(arb[Stream[A]])(IStream.fromStream[A](_))
+    Functor[Arbitrary].map(arb[LazyList[A]])(IStream.fromLazyList[A](_))
 
   implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
-    Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
+    Functor[Arbitrary].map(arb[LazyList[A]])(CorecursiveList.fromLazyList)
 
   implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassTag]: Arbitrary[ImmutableArray[A]] =
     Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
@@ -500,7 +500,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   import Zipper._
   implicit def ZipperArbitrary[A: Arbitrary]: Arbitrary[Zipper[A]] =
-    Apply[Arbitrary].apply3[Stream[A], A, Stream[A], Zipper[A]](arb[Stream[A]], arb[A], arb[Stream[A]])(zipper[A](_, _, _))
+    Apply[Arbitrary].apply3[LazyList[A], A, LazyList[A], Zipper[A]](arb[LazyList[A]], arb[A], arb[LazyList[A]])(zipper[A](_, _, _))
 
   implicit def KleisliArbitrary[M[_], A, B](implicit a: Arbitrary[A => M[B]]): Arbitrary[Kleisli[M, A, B]] =
     Functor[Arbitrary].map(a)(Kleisli[M, A, B](_))

@@ -186,7 +186,7 @@ trait LazyListFunctions {
 
   final def toZipper[A](as: LazyList[A]): Maybe[Zipper[A]] =
     as match {
-      case h #:: t => just(Zipper.zipper(Stream.empty, h, t.toStream))
+      case h #:: t => just(Zipper.zipper(LazyList.empty, h, t))
       case _ => Maybe.empty
     }
 
@@ -195,7 +195,7 @@ trait LazyListFunctions {
       Maybe.empty
     } else {
       val x = as.reverse
-      just(Zipper.zipper(x.tail.toStream, x.head, Stream.empty))
+      just(Zipper.zipper(x.tail, x.head, LazyList.empty))
     }
 
   /** `[as take 1, as take 2, ..., as]` */

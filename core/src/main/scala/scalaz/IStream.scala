@@ -80,9 +80,9 @@ object IStream {
     def cons[A](head: A, tail: IStream[A]): IStream[A] = head !: tail
   }
 
-  def fromStream[A](sa: Stream[A]): IStream[A] = sa match {
-    case Stream() => empty[A]
-    case h #:: t  => Lazy.cons(h, fromStream(t))
+  def fromLazyList[A](sa: LazyList[A]): IStream[A] = sa match {
+    case LazyList() => empty[A]
+    case h #:: t => Lazy.cons(h, fromLazyList(t))
   }
 
   def fromMaybe[A](ma: Maybe[A]): IStream[A] = ma match {
