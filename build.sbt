@@ -95,7 +95,7 @@ lazy val concurrent = Project(
   OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
 ).dependsOn(
   coreJVM, effectJVM
-)
+).enablePlugins(MimaPlugin)
 
 lazy val effectJVM = effect.jvm
 lazy val effectJS  = effect.js
@@ -216,6 +216,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .jsSettings(
     minSuccessfulTests := 10
   )
+  .enablePlugins(MimaPlugin)
   .dependsOn(core, effect, iteratee, scalacheckBinding_1_14)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)

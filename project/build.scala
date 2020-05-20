@@ -19,7 +19,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.core.ProblemFilters
 import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
+import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
@@ -328,7 +328,7 @@ object build {
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
   } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  ) ++ mimaDefaultSettings ++ Def.settings(
+  ) ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := true,
     mimaBinaryIssueFilters ++= {
       if (scalaBinaryVersion.value == "2.11") {
@@ -367,7 +367,7 @@ object build {
       buildInfoPackage := buildInfoPackageName,
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
+    .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
     .jsSettings(scalajsProjectSettings)
     .jvmSettings(
       typeClasses := TypeClass.core
@@ -384,6 +384,7 @@ object build {
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
+    .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings)
     .jvmSettings(
       typeClasses := TypeClass.effect
@@ -398,6 +399,7 @@ object build {
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
+    .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings)
     .nativeSettings(
       nativeSettings
