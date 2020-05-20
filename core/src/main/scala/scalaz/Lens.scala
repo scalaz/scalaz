@@ -468,7 +468,7 @@ abstract class LensInstances extends LensInstances0 {
     def +=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
       lens %= (_ + elem1 + elem2 ++ elems)
 
-    def ++=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
+    def ++=(xs: IterableOnce[K]): IndexedState[S1, S2, Set[K]] =
       lens %= (_ ++ xs.toIterable)
 
     def -=(elem: K): IndexedState[S1, S2, Set[K]] =
@@ -477,7 +477,7 @@ abstract class LensInstances extends LensInstances0 {
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
       lens %= (_ - elem1 - elem2 diff elems.toSet)
 
-    def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
+    def --=(xs: IterableOnce[K]): IndexedState[S1, S2, Set[K]] =
       lens %= (_ diff xs.toSet)
   }
 
@@ -507,7 +507,7 @@ abstract class LensInstances extends LensInstances0 {
     def +=(elem: (K, V)): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ + elem)
 
-    def ++=(xs: TraversableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
+    def ++=(xs: IterableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ ++ xs.toIterable)
 
     def update(key: K, value: V): IndexedState[S1, S2, Unit] =
@@ -519,7 +519,7 @@ abstract class LensInstances extends LensInstances0 {
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ - elem1 - elem2 -- elems)
 
-    def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Map[K, V]] =
+    def --=(xs: IterableOnce[K]): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ -- xs)
   }
 
