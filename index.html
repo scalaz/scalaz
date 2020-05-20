@@ -70,7 +70,6 @@
 <h2><a href="#scaladoc">Scaladoc</a></h2>
 <div>
   <ul id="scaladoc">
-    <li><a target='_blank' href='https://oss.sonatype.org/service/local/repositories/snapshots/archive/org/scalaz/scalaz_2.12/7.3.0-SNAPSHOT/scalaz_2.12-7.3.0-SNAPSHOT-javadoc.jar/!/scalaz/index.html'>7.3.0-SNAPSHOT</a></li>
   </ul>
   <details>
     <summary>more older versions scaladoc</summary>
@@ -120,10 +119,17 @@
 
   var tags = [
     {
+      "2.13" : versions(0, 1, "7.3."),
+      "2.12" : [],
+      "2.11" : []
+    },
+    {
+      "2.13" : [],
       "2.12" : versions(6, 31, "7.3.0-M"),
       "2.11" : versions(1, 5, "7.3.0-M"),
     },
     {
+      "2.13" : [],
       "2.12" : versions(7, 30, "7.2."),
       "2.11" : [].concat(
         versions(0, 6, "7.2."),
@@ -137,6 +143,10 @@
     }
   ];
   var scalaVersions = [
+    {
+      version : "2.13",
+      suffix : "scalaz/index.html"
+    },
     {
       version : "2.12",
       suffix : "scalaz/index.html"
