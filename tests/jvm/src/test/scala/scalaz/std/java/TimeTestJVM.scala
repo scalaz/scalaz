@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.java.time._
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object TimeTestJVM extends SpecLite {
 
