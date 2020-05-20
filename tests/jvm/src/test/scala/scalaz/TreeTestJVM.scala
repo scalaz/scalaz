@@ -12,7 +12,7 @@ object TreeTestJVM extends SpecLite {
 
   "ScalazArbitrary.treeGenSized" ! forAll(Gen.choose(1, 200)){ size =>
     val gen = treeGenSized[Unit](size)
-    Stream.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
+    LazyList.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
   }
 
   def genTree(size: Int): Tree[Int] =
@@ -27,7 +27,7 @@ object TreeTestJVM extends SpecLite {
   }
 
   "deep Tree flatten should not cause a stack overflow" ! {
-    Foldable[EphemeralStream].toStream(deepTree.flatten) must_== (size to 0 by -1).toStream
+    Foldable[EphemeralStream].toLazyList(deepTree.flatten) must_== (size to 0 by -1).to(LazyList)
   }
 
   "deep Equal.equal should not cause a stack overflow" ! {

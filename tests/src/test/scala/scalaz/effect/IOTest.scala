@@ -2,7 +2,7 @@ package scalaz
 package effect
 
 import syntax.foldable._
-import std.stream._
+import std.lazylist._
 
 object IOTest extends SpecLite {
   "IO" should {
@@ -10,7 +10,7 @@ object IOTest extends SpecLite {
     // fix in bb4ebd650
     "not stack overflow" in {
       var counter: Long = 0L
-      val action: IO[Unit] = Stream.from(1).take(40000).traverse_(i => IO { counter += i })
+      val action: IO[Unit] = LazyList.from(1).take(40000).traverse_(i => IO { counter += i })
       action.unsafePerformIO()
       counter must_== 800020000L
     }

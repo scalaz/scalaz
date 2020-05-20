@@ -13,7 +13,7 @@ object IndexedContsTTest extends SpecLite {
     A: Arbitrary[A => F[B]],
     B: Equal[F[B]]
   ): Equal[ContT[B, F, A]] = {
-    val functions = Stream.continually(
+    val functions = LazyList.continually(
       A.arbitrary.sample
     ).flatten.take(5).toList
 

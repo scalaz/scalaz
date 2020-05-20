@@ -446,10 +446,10 @@ object ScalazProperties {
         p.include(foldable.laws[F])
         p.property("identity traverse") = identityTraverse[F, Int, Int]
 
-        import std.list._, std.option._, std.stream._
+        import std.list._, std.option._, std.lazylist._
 
         p.property("purity.option") = purity[F, Option, Int]
-        p.property("purity.stream") = purity[F, Stream, Int]
+        p.property("purity.LazyList") = purity[F, LazyList, Int]
 
         p.property("sequential fusion") = resizeProp(sequentialFusion[F, Option, List, Int, Int, Int], 3)
         // TODO naturality, parallelFusion

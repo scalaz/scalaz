@@ -66,11 +66,11 @@ object LaunchburyInterpreter extends App {
                     )
 
   case class ReduceState( heap: IMap[String, Expr]
-                        , freshVars: Stream[String]
+                        , freshVars: LazyList[String]
                         )
 
   private val initialState = ReduceState( IMap()
-                                        , Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
+                                        , LazyList.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
                                         )
   // Substitute new variable names in
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")

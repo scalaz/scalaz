@@ -53,7 +53,6 @@ object IListUsage extends App {
   // Turn into something more familiar
   val lst = ns.toList
   val vec = ns.toVector
-  val str = ns.toStream
 
   // Or less familiar
   val estr = ns.toEphemeralStream

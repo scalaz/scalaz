@@ -113,22 +113,20 @@ object FoldableTest extends SpecLite {
   "psum should be stack-safe and short-circuiting" in {
     import Maybe.{empty, just}
     val N = 10000
-    Stream.from(1).map(i =>
+    LazyList.from(1).map(i =>
       if(i < N)
         empty[String]
-      else if(i < N+2)
-        // put two "Stop" elements before "BOOM!",
-        // because Stream always evaluates the first element
+      else if(i < N+1)
         just("Stop")
       else
         sys.error("BOOM!")
     ).psum must_=== just("Stop")
   }
 
-  "psumMap should be stack-safe and short-circuiting with Stream" in {
+  "psumMap should be stack-safe and short-circuiting with LazyList" in {
     import Maybe.{empty, just}
     val N = 10000
-    Stream.from(1).psumMap(i =>
+    LazyList.from(1).psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")
       else sys.error("BOOM!")
@@ -138,7 +136,7 @@ object FoldableTest extends SpecLite {
   "psumMap should be stack-safe and short-circuiting with EphemeralStream" in {
     import Maybe.{empty, just}
     val N = 10000
-    val xs = EphemeralStream.fromStream(Stream.from(1))
+    val xs = EphemeralStream.fromLazyList(LazyList.from(1))
     xs.psumMap(i =>
       if(i < N) empty[String]
       else if(i == N) just("Stop")

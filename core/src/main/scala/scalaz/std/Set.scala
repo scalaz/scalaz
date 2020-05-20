@@ -49,7 +49,7 @@ trait SetInstances {
         import scala.collection.immutable.TreeSet
         val s1 = TreeSet[A](a1.toSeq: _*)
         val s2 = TreeSet[A](a2.toSeq: _*)
-        s1.toStream.corresponds(s2.toStream)(Order[A].equal)
+        s1.iterator.corresponds(s2.iterator)(Order[A].equal)
       }
     }
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural

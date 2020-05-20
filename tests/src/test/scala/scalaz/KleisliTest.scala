@@ -16,7 +16,7 @@ object KleisliTest extends SpecLite {
 
   implicit def KleisliEqual[M[_], A, B](implicit A: Arbitrary[A], M: Equal[M[B]]): Equal[Kleisli[M, A, B]] =
     Equal.equal{ (x, y) =>
-      val values = Stream.continually(A.arbitrary.sample).flatten.take(5)
+      val values = LazyList.continually(A.arbitrary.sample).flatten.take(5)
       values.forall { z =>
         M.equal(x(z), y(z))
       }

@@ -15,7 +15,7 @@ object ReducerTest extends SpecLite {
   checkAll(reducer.laws[Int, List[Int]])
   checkAll(reducer.laws[Int, IList[Int]])
   checkAll(reducer.laws[Int, NonEmptyList[Int]])
-  checkAll(reducer.laws[Int, Stream[Int]])
+  checkAll(reducer.laws[Int, LazyList[Int]])
   checkAll(reducer.laws[Int, Vector[Int]])
   checkAll(reducer.laws[Boolean, Boolean])
   checkAll(reducer.laws[Boolean, Boolean @@ Conjunction])

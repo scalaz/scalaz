@@ -25,7 +25,7 @@ object FunctionTest extends SpecLite {
 
   implicit def EqualFunction1[A, B: Equal](implicit A: Arbitrary[A], B: Equal[B]): Equal[A => B] =
     Equal.equal { (x, y) =>
-      val values = Stream.continually(A.arbitrary.sample).flatten.take(3)
+      val values = LazyList.continually(A.arbitrary.sample).flatten.take(3)
       values.forall { z =>
         B.equal(x(z), y(z))
       }
@@ -82,7 +82,7 @@ object FunctionTest extends SpecLite {
 
   "fix" ! forAll{(n: Int) =>
     fix[Int](_ => n) must_===(n)
-    (fix[Stream[Int]](ns => n #:: (2*n) #:: ns).take(4).toList
+    (fix[LazyList[Int]](ns => n #:: (2*n) #:: ns).take(4).toList
       must_===(List(n, 2*n, n, 2*n)))
   }
 

@@ -239,7 +239,7 @@ object IListTest extends SpecLite {
       a.index(index) == Some(y)
     } must_=== true
 
-    xs.interleave(ys).toStream must_=== std.stream.interleave(xs.toStream, ys.toStream)
+    xs.interleave(ys).toLazyList must_=== std.lazylist.interleave(xs.toLazyList, ys.toLazyList)
   }
 
   // intersperse is tested above
@@ -391,8 +391,8 @@ object IListTest extends SpecLite {
     IList.fromSeq(ns).toNel must_=== Scalaz.ToListOpsFromList(ns).toNel
   }
 
-  "toStream" ! forAll { (ns: List[Int]) =>
-    IList.fromSeq(ns).toStream must_=== ns.toStream
+  "toLazyList" ! forAll { (ns: List[Int]) =>
+    IList.fromSeq(ns).toLazyList must_=== ns.to(LazyList)
   }
 
   "toVector" ! forAll { (ns: Vector[Int]) =>
@@ -400,7 +400,7 @@ object IListTest extends SpecLite {
   }
 
   "toZipper" ! forAll { (ns: List[Int]) =>
-    IList.fromSeq(ns).toZipper must_=== scalaz.std.stream.toZipper(ns.toStream)
+    IList.fromSeq(ns).toZipper must_=== scalaz.std.lazylist.toZipper(ns.toLazyList)
   }
 
   // uncons is tested everywhere
