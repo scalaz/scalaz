@@ -19,7 +19,7 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
     }
   }
 
-  implicit class PropertyOps(props: Properties) {
+  implicit protected[this] class PropertyOps(props: Properties) {
     def withProp(propName: String, prop: Prop): Properties = {
       val p = new Properties(props.name)
       for {(name, x) <- props.properties} p.property(name) = x
@@ -30,7 +30,7 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
 
   private var context: String = ""
 
-  implicit class StringOps(s: String) {
+  implicit protected[this] class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
@@ -94,16 +94,16 @@ abstract class SpecLite extends Properties("") with SpecLiteFunctions1 {
       }
     }
   }
-  implicit def enrichAny[A](actual: => A): AnyOps[A] = new AnyOps(actual)
+  implicit protected[this] def enrichAny[A](actual: => A): AnyOps[A] = new AnyOps(actual)
 
   def prop[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = check1(result)
-  implicit def propToProp(p: => Prop): Prop = p
-  implicit def check1[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = Prop.forAll((t: T) => toProp(result(t)))
-  implicit def unitToProp(u: => Unit): Prop = booleanToProp({u; true})
-  implicit def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
+  implicit protected[this] def propToProp(p: => Prop): Prop = p
+  implicit protected[this] def check1[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = Prop.forAll((t: T) => toProp(result(t)))
+  implicit protected[this] def unitToProp(u: => Unit): Prop = booleanToProp({u; true})
+  implicit protected[this] def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
 
 }
 
 sealed trait SpecLiteFunctions1 { self: SpecLite =>
-  implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
+  implicit protected[this] def unitToProp2(u: Unit): Prop = booleanToProp(true)
 }
