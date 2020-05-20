@@ -1,6 +1,5 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
-import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val minSuccessfulTests = settingKey[Int]("")
 
