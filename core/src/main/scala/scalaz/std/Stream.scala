@@ -2,8 +2,10 @@ package scalaz
 package std
 
 import Maybe.just
+import scala.annotation.nowarn
 
 
+@nowarn("since=2.13.0")
 trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Alt[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] with Functor.OverrideWiden[Stream] {
 
@@ -177,6 +179,7 @@ trait StreamInstances {
 
 }
 
+@nowarn("since=2.13.0")
 trait StreamFunctions {
   final def interleave[A](s1: Stream[A], s2: Stream[A]): Stream[A] =
     if (s1.isEmpty) s2
@@ -272,6 +275,7 @@ object stream extends StreamInstances with StreamFunctions {
   object streamSyntax extends scalaz.syntax.std.ToStreamOps
 }
 
+@nowarn("since=2.13.0")
 private trait StreamEqual[A] extends Equal[Stream[A]] {
   def A: Equal[A]
   override final def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A.equal)

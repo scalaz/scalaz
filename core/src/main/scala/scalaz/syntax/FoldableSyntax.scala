@@ -5,6 +5,7 @@ package syntax
 final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
   ////
   import Liskov.<~<
+  import scala.annotation.nowarn
 
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
   final def foldMap1Opt[B: Semigroup](f: A => B = (a: A) => a): Option[B] = F.foldMap1Opt(self)(f)
@@ -38,6 +39,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def toList: List[A] = F.toList(self)
   final def toVector: Vector[A] = F.toVector(self)
   final def toSet: Set[A] = F.toSet(self)
+  @nowarn("since=2.13.0")
   final def toStream: Stream[A] = F.toStream(self)
   final def toLazyList: LazyList[A] = F.toLazyList(self)
   final def toIList: IList[A] = F.toIList(self)

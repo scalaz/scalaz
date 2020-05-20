@@ -3,8 +3,10 @@ package syntax
 package std
 
 import scalaz.std.{stream => s}
+import scala.annotation.nowarn
 
 
+@nowarn("since=2.13.0")
 final class StreamOps[A](private val self: Stream[A]) extends AnyVal {
   final def interleave(other: Stream[A]): Stream[A] = s.interleave(self, other)
   final def toZipper: Maybe[Zipper[A]] = s.toZipper(self)
@@ -17,6 +19,7 @@ final class StreamOps[A](private val self: Stream[A]) extends AnyVal {
   final def intersperse(a: A): Stream[A] = s.intersperse(self, a)
 }
 
+@nowarn("since=2.13.0")
 trait ToStreamOps {
   implicit def ToStreamOpsFromStream[A](a: Stream[A]): StreamOps[A] = new StreamOps(a)
 }

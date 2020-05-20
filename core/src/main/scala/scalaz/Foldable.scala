@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scala.annotation.nowarn
 /**
  * A type parameter implying the ability to extract zero or more
  * values of that type.
@@ -164,6 +165,7 @@ trait Foldable[F[_]]  { self =>
   def toSet[A](fa: F[A]): Set[A] = {
     foldLeft(fa, Set.newBuilder[A])(_ += _).result
   }
+  @nowarn("since=2.13.0")
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
 
   def toLazyList[A](fa: F[A]): LazyList[A] = foldRight[A, LazyList[A]](fa, LazyList.empty)(LazyList.cons(_, _))
