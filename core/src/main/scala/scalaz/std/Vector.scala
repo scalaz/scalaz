@@ -114,10 +114,10 @@ trait VectorFunctions {
     if (as.isEmpty) Maybe.empty else just(NonEmptyList.nel(as.head, IList.fromFoldable(as.tail)))
 
   final def toZipper[A](as: Vector[A]): Maybe[Zipper[A]] =
-    stream.toZipper(as.toStream)
+    lazylist.toZipper(as.to(LazyList))
 
   final def zipperEnd[A](as: Vector[A]): Maybe[Zipper[A]] =
-    stream.zipperEnd(as.toStream)
+    lazylist.zipperEnd(as.to(LazyList))
 
   /**
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.

@@ -223,7 +223,7 @@ trait LazyListFunctions {
     as.map(a => {
       def unfoldTree(x: A): Tree[B] =
         f(x) match {
-          case (b, bs) => Tree.Node(b, EphemeralStream.fromStream(unfoldForest(bs())(f).toStream))
+          case (b, bs) => Tree.Node(b, EphemeralStream.fromLazyList(unfoldForest(bs())(f)))
         }
 
       unfoldTree(a)
@@ -238,7 +238,7 @@ trait LazyListFunctions {
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, LazyList[A])) =>
         Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: LazyList[Tree[B]]) =>
-          Tree.Node(abs._1, EphemeralStream.fromStream(ts.toStream))))
+          Tree.Node(abs._1, EphemeralStream.fromLazyList(ts))))
 
     mapM(as, unfoldTreeM)
   }
