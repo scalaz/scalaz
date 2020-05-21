@@ -120,7 +120,9 @@ object build {
       }
       (f, path)
     },
-    addCommandAlias("SetDottyNightlyVersion", s"""++ ${dottyLatestNightlyBuild.get}!"""),
+    commands += Command.command("SetDottyNightlyVersion") {
+      s"""++ ${dottyLatestNightlyBuild.get}!""" :: _
+    },
     scalaVersion := Scala213,
     crossScalaVersions := Seq(Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
