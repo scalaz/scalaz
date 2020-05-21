@@ -300,7 +300,7 @@ object IListTest extends SpecLite {
   }
 
   "reverseMap" ! forAll { (ns: IList[Int], f: Int => Int) =>
-    ns.reverseMap(f).toList must_=== ns.toList.reverseMap(f)
+    ns.reverseMap(f).toList must_=== ns.toList.reverseIterator.map(f).toList
   }
 
   "reverse_:::" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
